@@ -47,15 +47,28 @@ foam.CLASS({
         var s = schema[key];
         var p = {};
 
+        var isArray = Array.isArray(s);
+        if ( isArray ) s.type = Array.prototype.constructor;
+
         switch ( s.type ) {
           case String:  p.class = 'String';  break;
           case Boolean: p.class = 'Boolean'; break;
           case Date:    p.class = 'Date';    break;
           case Number:  p.class = 'Double';  break;
+          case Array:
+            s = s[0];
+            p.class = 'Array';
+            switch ( s ) {
+              case String:  p.of = 'String';  break;
+              case Boolean: p.of = 'Boolean'; break;
+              case Date:    p.of = 'Date';    break;
+              case Number:  p.of = 'Double';  break;
+            }
+            break;
         }
 
         if ( s.ref ) {
-          p.class = 'Reference';
+          if ( ! isArray ) p.class = 'Reference';
           p.of = this.package ? this.package + '.' + s.ref : s.ref;
         }
         p.name = key;
