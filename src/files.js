@@ -168,6 +168,7 @@ FOAM_FILES([
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
   { name: "foam/u2/view/BlobView", flags: ['web'] },
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
+  { name: "foam/u2/view/ImageView", flags: ['web'] },
   { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
   { name: "foam/u2/tag/Card", flags: ['web'] },
