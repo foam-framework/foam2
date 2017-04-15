@@ -49,24 +49,28 @@ foam.CLASS({
   implements: ['foam.blob.Blob'],
   methods: [
     function pipe(writeFn) {
-      var offset = offset || 0;
-      var buf = new Buffer(8192 * 4);
       var self = this;
-      var limit = limit || self.size;
+
+      var offset = 0;
+      var buf = new Buffer(8192 * 4);
+      var limit = self.size;
 
       function a() {
-        if ( offset >= limit) return;
+        if ( offset > limit ) {
+          throw 'Offest beyond limit?';
+        }
+
+        if ( offset == limit ) return;
 
         return self.read(buf, offset).then(function(buf2) {
           offset += buf2.length;
-          return writeFn(buf2);
+          return writeFn(new Buffer(buf2));
         }).then(a);
       };
 
       return a();
     },
     function slice(offset, length) {
-      console.log("Slicing", offset, length);
       return foam.blob.SubBlob.create({
         parent: this,
         offset: offset,
