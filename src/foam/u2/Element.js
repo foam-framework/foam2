@@ -30,6 +30,8 @@ foam.ENUM({
   package: 'foam.u2',
   name: 'ControllerMode',
 
+  documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
+
   values: [
     { name: 'CREATE', label: 'Create' },
     { name: 'VIEW',   label: 'View'   },
@@ -42,10 +44,12 @@ foam.ENUM({
   package: 'foam.u2',
   name: 'Visibility',
 
+  documentation: 'View visibility mode combines with current ControllerModel to determine DisplayMode.',
+
   values: [
     { name: 'RW',       label: 'Read-Write' },
-    { name: 'FINAL',    label: 'Final'      },
-    { name: 'DISABLED', label: 'Disabled'   },
+    { name: 'FINAL',    label: 'Final',     documentation: 'FINAL views are editable only in CREATE ControllerMode.' },
+    { name: 'DISABLED', label: 'Disabled',  documentation: 'DISABLED views are visible but not editable.' },
     { name: 'RO',       label: 'Read-Only'  },
     { name: 'HIDDEN',   label: 'Hidden'     }
   ]
@@ -55,6 +59,8 @@ foam.ENUM({
 foam.ENUM({
   package: 'foam.u2',
   name: 'DisplayMode',
+
+  documentation: 'View display mode; how or if a view is displayed.',
 
   values: [
     { name: 'RW',       label: 'Read-Write' },
@@ -96,6 +102,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'CSS',
+
+  documentation: 'Axiom to install CSS.',
 
   properties: [
     {
@@ -148,9 +156,9 @@ foam.CLASS({
         if ( (65 <= c && c <= 90) || (97 <= c && c <= 122) ||
             (48 <= c && c <= 57) || c === 45 || c === 95 ) {
           return base + '-' + next;
-        } else {
-          return base + next;
         }
+
+        return base + next;
       });
     }
   ]
@@ -161,9 +169,9 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'DefaultValidator',
 
-  axioms: [ foam.pattern.Singleton.create() ],
-
   documentation: 'Default Element validator.',
+
+  axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
     function validateNodeName(name) {
@@ -210,13 +218,15 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ElementState',
 
+  documentation: 'Current lifecycle state of an Element.',
+
   methods: [
     function output(out) {},
     function load() {},
     function unload() {},
     function onRemove() {},
     // function detach() {},
-    function onSetCls() {},
+    function onSetClass() {},
     function onFocus() {},
     function onAddListener() {},
     function onRemoveListener() {},
@@ -246,9 +256,10 @@ foam.CLASS({
   name: 'UnloadedElementState',
   extends: 'foam.u2.ElementState',
 
+  documentation: 'State of an unloaded Element.',
+
   methods: [
     function output(out) {
-      this.initE();
       this.state = this.OUTPUT;
       this.output_(out);
       return out;
@@ -266,8 +277,27 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'InitialElementState',
+  extends: 'foam.u2.UnloadedElementState',
+
+  documentation: 'Initial state of a newly created Element.',
+
+  methods: [
+    function output(out) {
+      this.initE();
+      return this.SUPER(out);
+    },
+    function toString() { return 'INITIAL'; }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'OutputElementState',
   extends: 'foam.u2.ElementState',
+
+  documentation: 'State of Element after it has been output to DOM, but not yet loaded.',
 
   methods: [
     function output(out) {
@@ -304,7 +334,7 @@ foam.CLASS({
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
     },
-    function onSetCls(cls, enabled) { this.error(); },
+    function onSetClass(cls, enabled) { this.error(); },
     function onFocus(cls, enabled) { this.error(); },
     function onAddListener(topic, listener) { this.error(); },
     function onRemoveListener(topic, listener) { this.error(); },
@@ -325,6 +355,8 @@ foam.CLASS({
   name: 'LoadedElementState',
   extends: 'foam.u2.ElementState',
 
+  documentation: 'State of an Element after it has been output to the DOM and loaded.',
+
   methods: [
     function output(out) {
       this.warn('Duplicate output.');
@@ -341,7 +373,7 @@ foam.CLASS({
       this.visitChildren('unload');
     },
     function onRemove() { this.unload(); },
-    function onSetCls(cls, enabled) {
+    function onSetClass(cls, enabled) {
       var e = this.el();
       if ( e ) {
         e.classList[enabled ? 'add' : 'remove'](cls);
@@ -477,7 +509,7 @@ foam.CLASS({
 
     // State of an Element after it has been output (to a String) but before it is loaded.
     // This should be only a brief transitory state, as the Element should be loaded
-    // almost immediately after being output.  It is an error to try and mutate the Element
+    // almost immediately after being output. It is an error to try and mutate the Element
     // while in the OUTPUT state.
     OUTPUT: foam.u2.OutputElementState.create(),
 
@@ -485,10 +517,12 @@ foam.CLASS({
     // A Loaded Element should be visible in the DOM.
     LOADED: foam.u2.LoadedElementState.create(),
 
-    // State of an Element before it has been added to the DOM, or after it has
-    // been removed from the DOM.
-    // An unloaded Element can be (re-)added to the DOM.
+    // State of an Element after it has been removed from the DOM.
+    // An unloaded Element can be readded to the DOM.
     UNLOADED: foam.u2.UnloadedElementState.create(),
+
+    // Initial state of an Element before it has been added to the DOM.
+    INITIAL: foam.u2.InitialElementState.create(),
 
     // ???: Add DESTROYED State?
 
@@ -570,14 +604,11 @@ foam.CLASS({
       topics: [],
       delegates: foam.u2.ElementState.getOwnAxiomsByClass(foam.core.Method).
           map(function(m) { return m.name; }),
-      factory: function() { return this.UNLOADED; },
+      factory: function() { return this.INITIAL; },
       postSet: function(oldState, state) {
         if ( state === this.LOADED ) {
           this.pub('onload');
-        } else if ( state === this.UNLOADED && oldState ) {
-          // When state is first set from the factory oldState will be undefined
-          // but we don't want to publish that we're unloaded since we haven't
-          // actually been loaded yet.
+        } else if ( state === this.UNLOADED ) {
           this.pub('onunload');
         }
       }
@@ -600,9 +631,9 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( o === n ) return;
         if ( n ) {
-          this.removeCls('foam-u2-Element-hidden');
+          this.removeClass('foam-u2-Element-hidden');
         } else {
-          this.cssClass('foam-u2-Element-hidden');
+          this.addClass('foam-u2-Element-hidden');
         }
       }
     },
@@ -838,12 +869,17 @@ foam.CLASS({
     },
 
     function myCls(opt_extra) {
-      var f = this.cls_.myCls_;
+      console.warn('Deprecated use of Element.myCls(). Use myClass() instead.');
+      return this.myClass(opt_extra);
+    },
+
+    function myClass(opt_extra) {
+      var f = this.cls_.myClass_;
 
       if ( ! f ) {
         var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
 
-        f = this.cls_.myCls_ = foam.Function.memoize1(function(e) {
+        f = this.cls_.myClass_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
         });
       }
@@ -1130,22 +1166,24 @@ foam.CLASS({
       return this.entity('nbsp');
     },
 
-    // Was renamed from cls() in FOAM1, current name seems
-    // out of place.  Maybe renamed addClass().
-    function cssClass(cls) { /* Slot | String */
+    function cssClass(cls) {
+      return this.addClass(cls);
+    },
+
+    function addClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
         var lastValue = null;
         var l = function() {
           var v = cls.get();
-          self.cssClass_(lastValue, v);
+          self.addClass_(lastValue, v);
           lastValue = v;
         };
         cls.sub(l);
         l();
       } else if ( typeof cls === 'string' ) {
-        this.cssClass_(null, cls);
+        this.addClass_(null, cls);
       } else {
         this.error('cssClass type error. Must be Slot or String.');
       }
@@ -1154,6 +1192,11 @@ foam.CLASS({
     },
 
     function enableCls(cls, enabled, opt_negate) {
+      console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
+      return this.enableClass(cls, enabled, opt_negate);
+    },
+
+    function enableClass(cls, enabled, opt_negate) {
       /* Enable/disable a CSS class based on a boolean-ish dynamic value. */
       function negate(a, b) { return b ? ! a : a; }
 
@@ -1161,7 +1204,7 @@ foam.CLASS({
       if ( foam.core.Slot.isInstance(enabled) ) {
         var self = this;
         var value = enabled;
-        var l = function() { self.enableCls(cls, value.get(), opt_negate); };
+        var l = function() { self.enableClass(cls, value.get(), opt_negate); };
         value.sub(l);
         l();
       } else {
@@ -1169,17 +1212,22 @@ foam.CLASS({
         var parts = cls.split(' ');
         for ( var i = 0 ; i < parts.length ; i++ ) {
           this.classes[parts[i]] = enabled;
-          this.onSetCls(parts[i], enabled);
+          this.onSetClass(parts[i], enabled);
         }
       }
       return this;
     },
 
     function removeCls(cls) {
+      console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
+      return this.removeClass(cls);
+    },
+
+    function removeClass(cls) {
       /* Remove specified CSS class. */
       if ( cls ) {
         delete this.classes[cls];
-        this.onSetCls(cls, false);
+        this.onSetClass(cls, false);
       }
       return this;
     },
@@ -1187,6 +1235,11 @@ foam.CLASS({
     function on(topic, listener) {
       /* Shorter fluent version of addEventListener. Prefered method. */
       this.addEventListener(topic, listener);
+      return this;
+    },
+
+    function attr(key, value) {
+      this.setAttribute(key, value);
       return this;
     },
 
@@ -1536,13 +1589,13 @@ foam.CLASS({
       return this;
     },
 
-    function cssClass_(oldClass, newClass) {
+    function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeCls(oldClass);
+      this.removeClass(oldClass);
       if ( newClass ) {
         this.classes[newClass] = true;
-        this.onSetCls(newClass, true);
+        this.onSetClass(newClass, true);
       }
     },
 
@@ -1728,6 +1781,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'U2Context',
 
+  documentation: 'Context which includes U2 functionality.',
+
   exports: [
     'E',
     'registerElement',
@@ -1737,6 +1792,7 @@ foam.CLASS({
   properties: [
     {
       name: 'elementMap',
+      documentation: 'Map of registered Elements.',
       factory: function() { return {}; }
     }
   ],
@@ -1755,12 +1811,13 @@ foam.CLASS({
     },
 
     function registerElement(elClass, opt_elName) {
+      /* Register a View class against an abstract node name. */
       var key = opt_elName || elClass.name;
       this.elementMap[key.toUpperCase()] = elClass;
     },
 
     function elementForName(nodeName) {
-      if ( this.elementMap[nodeName] ) console.log('NODENAME: ', nodeName, this.elementMap[nodeName]);
+      /* Find an Element Class for the specified node name. */
       return this.elementMap[nodeName];
     }
   ]
@@ -1799,7 +1856,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Property',
-
 
   requires: [
     'foam.u2.TextField'
@@ -1936,6 +1992,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ControllerViewTrait',
 
+  documentation: 'Trait for adding a ControllerMode controllerMode Property.',
+
   exports: [ 'controllerMode' ],
 
   properties: [
@@ -1952,6 +2010,8 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'View',
   extends: 'foam.u2.Element',
+
+  documentation: 'A View is an Element used to display data.',
 
   exports: [ 'data' ],
 
@@ -2034,6 +2094,8 @@ foam.CLASS({
   name: 'Controller',
   extends: 'foam.u2.Element',
 
+  documentation: 'A Controller is an Element which exports itself as "data".',
+
   exports: [ 'as data' ]
 });
 
@@ -2066,14 +2128,11 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TableColumns',
 
+  documentation: 'Axiom for storing Table Columns information in Class. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
   properties: [
     [ 'name', 'tableColumns' ],
-    {
-      name: 'columns',
-      factory: function() {
-        debugger;
-      }
-    }
+    'columns'
   ]
 });
 

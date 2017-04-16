@@ -185,7 +185,7 @@ foam.boot.end();
   foam.json.Storage does not encode storageTransient fields.
  */
 foam.CLASS({
-  refines: 'Property',
+  refines: 'foam.core.Property',
 
   properties: [
     {
@@ -232,6 +232,7 @@ foam.CLASS({
       foam.USED[m.id] = c;
       return c;
     });
+
     foam.__context__.registerFactory(m, f);
     foam.package.registerClassFactory(m, f);
   };

@@ -239,7 +239,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'Socket',
 
   imports: [
@@ -388,11 +388,11 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.net',
+  package: 'foam.net.node',
   name: 'SocketService',
 
   requires: [
-    'foam.net.Socket',
+    'foam.net.node.Socket',
     'foam.box.RegisterSelfMessage'
   ],
 
@@ -589,7 +589,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'WebSocketService',
-  extends: 'foam.net.WebSocketService',
+  extends: 'foam.net.web.WebSocketService',
 
   requires: [
     'foam.net.node.WebSocket',
@@ -645,7 +645,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPRequest',
-  extends: 'foam.net.HTTPRequest',
+  extends: 'foam.net.web.HTTPRequest',
 
   requires: [
     'foam.net.node.HTTPResponse'
@@ -656,25 +656,57 @@ foam.CLASS({
       class: 'Boolean',
       name: 'followRedirect',
       value: true
+    },
+    {
+      name: 'urlLib',
+      factory: function() { return require('url'); }
     }
   ],
 
   methods: [
     function fromUrl(url) {
-      var data = require('url').parse(url);
-      this.protocol = data.protocol.slice(0, -1);
-      this.hostname = data.hostname;
+      var data = this.urlLib.parse(url);
+      if ( data.protocol ) this.protocol = data.protocol.slice(0, -1);
+      if ( data.hostname ) this.hostname = data.hostname;
       if ( data.port ) this.port = data.port;
-      this.path = data.path;
+      if ( data.path ) this.path = data.path;
+
+      return this;
+    },
+
+    function copyUrlFrom(other) {
+      if ( other.url ) {
+        this.fromUrl(other.url);
+        return this;
+      }
+
+      this.protocol = other.protocol;
+      this.hostname = other.hostname;
+      if ( other.port ) this.port = other.port;
+      other.path = other.path;
+
+      return this;
     },
 
     function send() {
       if ( this.url ) {
         this.fromUrl(this.url);
       }
+      this.addContentHeaders();
 
       if ( this.protocol !== 'http' && this.protocol !== 'https' )
         throw new Error("Unsupported protocol '" + this.protocol + "'");
+
+      // 'Content-Length' or 'Transfer-Encoding' required for some requests
+      // to be properly handled by Node JS servers.
+      // See https://github.com/nodejs/node/issues/3009 for details.
+      var buf;
+      if ( this.payload ) {
+        buf = new Buffer(this.payload, 'utf8');
+        if ( ! this.headers['Content-Length'] ) {
+          this.headers['Content-Length'] = buf.length;
+        }
+      }
 
       var options = {
         hostname: this.hostname,
@@ -685,12 +717,17 @@ foam.CLASS({
       if ( this.port ) options.port = this.port;
 
       return new Promise(function(resolve, reject) {
-        var req = require(this.protocol).request(options, function(res) {
+        var req = require(this.protocol).request(options, function(nodeResp) {
           var resp = this.HTTPResponse.create({
-            resp: res,
+            resp: nodeResp,
             responseType: this.responseType
           });
 
+          // Ensure that payload factory wires up listeners immediately.
+          resp.payload;
+
+          // TODO(markdittmer): Write integration tests for redirects, including
+          // same-origin/path-only redirects.
           if ( this.followRedirect &&
                ( resp.status === 301 ||
                  resp.status === 302 ||
@@ -698,13 +735,15 @@ foam.CLASS({
                  resp.status === 307 ||
                  resp.status === 308 ) ) {
             resolve(this.cls_.create({
-              url: resp.headers.location,
               method: this.method,
               payload: this.payload,
               responseType: this.responseType,
               headers: this.headers,
               followRedirect: true
-            }).send());
+              // Redirect URL may not contain all parts if it points to same domain.
+              // Copy original URL and overwrite non-null parts from "location"
+              // header.
+            }).copyUrlFrom(this).fromUrl(resp.headers.location).send());
           } else {
             resolve(resp);
           }
@@ -715,7 +754,7 @@ foam.CLASS({
           reject(e);
         });
 
-        if ( this.payload ) req.write(this.payload);
+        if ( this.payload ) req.write(buf);
         req.end();
       }.bind(this));
     }
@@ -726,7 +765,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.net.node',
   name: 'HTTPResponse',
-  extends: 'foam.net.HTTPResponse',
+  extends: 'foam.net.web.HTTPResponse',
 
   properties: [
     {
@@ -734,19 +773,34 @@ foam.CLASS({
       factory: function() {
         if ( this.streaming ) return null;
 
-        // TODO: Handle response type.
+        var self = this;
         return new Promise(function(resolve, reject) {
           var buffer = ""
-          this.resp.on('data', function(d) {
+          self.resp.on('data', function(d) {
             buffer += d.toString();
           });
-          this.resp.on('end', function() {
-            resolve(buffer);
+          self.resp.on('end', function() {
+            switch (self.responseType) {
+            case "text":
+              resolve(buffer);
+              return;
+            case "json":
+              try {
+                resolve(JSON.parse(buffer));
+              } catch ( error ) {
+                reject(error);
+              }
+              return;
+            }
+
+            // TODO: responseType should be an enum and/or have validation.
+            reject(new Error(
+                'Unsupported response type: ' + self.responseType));
           });
-          this.resp.on('error', function(e) {
+          self.resp.on('error', function(e) {
             reject(e);
           });
-        }.bind(this));
+        });
       }
     },
     {

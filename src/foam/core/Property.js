@@ -143,7 +143,8 @@ foam.CLASS({
          have them installed on the clone. */ cloneMap
       ) {
         /** Override to provide special deep cloning behavior. */
-        cloneMap[this.name] = ( value && value.clone ) ? value.clone() : value;
+        cloneMap[this.name] = ( value && value.clone ) ? value.clone() :
+          foam.util.clone(value);
       }
     ],
 
@@ -243,7 +244,7 @@ foam.CLASS({
       copying undefined values from parent Property, if it exists.
     */
     function installInClass(c, superProp, existingProp) {
-      var prop      = this;
+      var prop = this;
 
       if ( superProp && foam.core.Property.isInstance(superProp) ) {
         prop = superProp.createChildProperty_(prop);
@@ -547,7 +548,9 @@ foam.CLASS({
           s && subs.push(s);
           args[i] = this[argNames[i]];
         }
-        return e.apply(this, args);
+        var ret = e.apply(this, args);
+        if ( ret === undefined ) this.warn('Expression returned undefined');
+        return ret;
       };
     },
 

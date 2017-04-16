@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-/**
-  The base class for most DAOs, defining basic DAO behavior.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAO',
   implements: [ 'foam.dao.DAO' ],
+
+  documentation: 'Abstract base class for implementing DAOs.',
 
   requires: [
     'foam.dao.ExternalException',
@@ -142,9 +141,9 @@ foam.CLASS({
       var sub;
 
       fc.propertyChange.sub(function(s, _, pname) {
-        if ( pname == "stopped") {
+        if ( pname == 'stopped' ) {
           if ( sub ) sub.detach();
-        } else if ( pname === "errorEvt" ) {
+        } else if ( pname === 'errorEvt' ) {
           if ( sub ) sub.detach();
           mySink.error(fc.errorEvt);
         }

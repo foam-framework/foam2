@@ -46,7 +46,7 @@ foam.CLASS({
           if ( args.view.cls_.getAxiomByName('label') ) {
             args.view.label = args.label || args.prop.label;
           }
-          return this.E().cssClass(this.myCls('filter-container'))
+          return this.E().addClass(this.myClass('filter-container'))
               .add(args.view);
         }
       }

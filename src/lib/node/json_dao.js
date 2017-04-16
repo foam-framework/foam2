@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'JSONFileDAO',
   extends: 'foam.dao.ArrayDAO',
 
+  imports: [ 'warn' ],
+
   properties: [
     {
       class: 'String',
@@ -33,6 +35,10 @@ foam.CLASS({
       factory: function() {
         return require('fs');
       }
+    },
+    {
+      class: 'Array',
+      name: 'futures_'
     }
   ],
 
@@ -43,24 +49,57 @@ foam.CLASS({
         data = this.fs_.readFileSync(this.path).toString();
       } catch(e) { }
 
-      if (data && data.length) {
+      if ( data && data.length )
         this.array = foam.json.parse(foam.json.parseString(data));
-      }
 
-      this.on.put.sub(this.updated);
-      this.on.remove.sub(this.updated);
+      this.on.put.sub(this.onUpdate);
+      this.on.remove.sub(this.onUpdate);
+    },
 
-      // TODO: base on an indexed DAO
+    function put(o) {
+      return this.SUPER(o).then(this.getPromise_.bind(this, o));
+    },
+
+    function remove(o) {
+      var self     = this;
+      var startLen = self.array.length;
+
+      return self.SUPER(o).then(function() {
+        // Resolve after async update iff something was removed.
+        return self.array.length < startLen ?
+          self.getPromise_(o) :
+          o ;
+      });
+    },
+
+    function getPromise_(o) {
+      var future;
+      var promise = new Promise(function(resolve) {
+        future = resolve.bind(this, o);
+      });
+      this.futures_.push(future);
+      return promise;
     }
   ],
 
   listeners: [
     {
-      name: 'updated',
+      name: 'onUpdate',
       isMerged: 100,
       code: function() {
-        this.fs_.writeFileSync(this.path, foam.json.stringify(this.array));
+        this.fs_.writeFile(
+            this.path,
+            foam.json.stringify(this.array),
+            this.onUpdateComplete);
       }
+    },
+
+    function onUpdateComplete() {
+      var futures = this.futures_;
+      for ( var i = 0 ; i < futures.length ; i++ ) {
+        futures[i]();
+      }
+      this.futures_ = [];
     }
   ]
 });

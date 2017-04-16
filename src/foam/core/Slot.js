@@ -15,22 +15,23 @@
  * limitations under the License.
  */
 
-/**
-  Slots are observable values which can change over time.
-
-  Slots are simple single-value Model-View-Controller Models, but since
-  another meaning of 'Model' is already heavily used in FOAM, Slot is
-  used to avoid overloading the term.
-
-  <ul>Types of Slots include:
-    <li>PropertySlot
-    <li>ConstantSlot
-    <li>ExpressionSlot
-</ul>
-*/
 foam.CLASS({
   package: 'foam.core',
   name: 'Slot', // ???: Rename AbstractSlot or make an Interface
+
+  documentation: `
+    Slots are observable values which can change over time.
+
+    Slots are simple single-value Model-View-Controller Models, but since
+    another meaning of 'Model' is already heavily used in FOAM, Slot is
+    used to avoid overloading the term.
+
+    <ul>Types of Slots include:
+      <li>PropertySlot
+      <li>ConstantSlot
+      <li>ExpressionSlot
+    </ul>
+  `,
 
   methods: [
     /**
@@ -197,15 +198,16 @@ foam.CLASS({
 });
 
 
-/**
-  PropertySlot represents object properties as Slots.
-  Created with calling obj.prop$ or obj.slot('prop').
-  For internal use only.
- */
 foam.CLASS({
   package: 'foam.core.internal',
   name: 'PropertySlot',
   extends: 'foam.core.Slot',
+
+  documentation: `
+    Represents object properties as Slots.
+    Created with calling obj.prop$ or obj.slot('prop').
+    For internal use only.
+  `,
 
   methods: [
     function initArgs() { },
@@ -339,12 +341,13 @@ foam.CLASS({
 });
 
 
-/** An immutable constant valued Slot. */
 foam.CLASS({
   package: 'foam.core',
   name: 'ConstantSlot',
 
   implements: [ 'foam.core.Slot' ],
+
+  documentation: 'An immutable constant valued Slot.',
 
   properties: [
     {
@@ -369,38 +372,41 @@ foam.CLASS({
 
 
 /**
-  Tracks dependencies for a dynamic function and invalidates if they change.
-
-<pre>
-  foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
-  var p = Person.create({fname: 'John', lname: 'Smith'});
-  var e = foam.core.ExpressionSlot.create({
-    args: [ p.fname$, p.lname$ ],
-    code: function(f, l) { return f + ' ' + l; }
-  });
-  log(e.get());
-  e.sub(log);
-  p.fname = 'Steve';
-  p.lname = 'Jones';
-  log(e.get());
-
-  Output:
-   > John Smith
-   > [object Object] propertyChange value [object Object]
-   > [object Object] propertyChange value [object Object]
-   > Steve Jones
-
-  var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
-  var e = foam.core.ExpressionSlot.create({
-    obj: p,
-    code: function(f, l) { return f + ' ' + l; }
-  });
-</pre>
 */
 foam.CLASS({
   package: 'foam.core',
   name: 'ExpressionSlot',
   implements: [ 'foam.core.Slot' ],
+
+  documentation: `
+    Tracks dependencies for a dynamic function and invalidates if they change.
+
+    <pre>
+      foam.CLASS({name: 'Person', properties: ['fname', 'lname']});
+      var p = Person.create({fname: 'John', lname: 'Smith'});
+      var e = foam.core.ExpressionSlot.create({
+        args: [ p.fname$, p.lname$ ],
+        code: function(f, l) { return f + ' ' + l; }
+      });
+      log(e.get());
+      e.sub(log);
+      p.fname = 'Steve';
+      p.lname = 'Jones';
+      log(e.get());
+
+      Output:
+       > John Smith
+       > [object Object] propertyChange value [object Object]
+       > [object Object] propertyChange value [object Object]
+       > Steve Jones
+
+      var p = foam.CLASS({name: 'Person', properties: [ 'f', 'l' ]}).create({f:'John', l: 'Doe'});
+      var e = foam.core.ExpressionSlot.create({
+        obj: p,
+        code: function(f, l) { return f + ' ' + l; }
+      });
+    </pre>
+  `,
 
   properties: [
     'obj',

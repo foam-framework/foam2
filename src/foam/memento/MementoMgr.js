@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.memento',
   name: 'MementoMgr',
 
+  documentation: 'Provide memento undo/redo support.',
+
   properties: [
     {
       name: 'memento'

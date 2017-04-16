@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.audio',
   name: 'Beep',
 
+  documentation: 'Make a configurable beep sound.',
+
   imports: [
     'setTimeout',
     'window'

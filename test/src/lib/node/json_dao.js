@@ -16,19 +16,23 @@
  */
 
 describe('JSONFileDAO', function() {
+  var path = require('path');
+  var fs = require('fs');
+  var JSONFileDAO = foam.dao.node.JSONFileDAO;
+  var tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'foam2_tests', ''));
+  var tmpFile = path.join(tmpDir, 'test.json');
   genericDAOTestBattery(function(model) {
-    try { require('fs').unlinkSync('test.json'); } catch(e) {}
-    return Promise.resolve(foam.dao.node.JSONFileDAO.create({ path: 'test.json', of: model }));
+    try { fs.unlinkSync(tmpFile); } catch(e) {}
+    return Promise.resolve(JSONFileDAO.create({ path: tmpFile, of: model }));
   });
 
   afterAll(function() {
-    try { require('fs').unlinkSync('test.json'); } catch(e) {}
+    try { fs.unlinkSync(tmpFile); fs.rmdirSync(tmpDir); } catch(e) {}
   });
 
-  xit('should actually persist to a JSON file', function(done) {
-    var fs = require('fs');
+  it('should actually persist to a JSON file', function(done) {
     // Make sure the file is empty before we start.
-    try { fs.unlinkSync('test.json'); } catch(e) { }
+    try { fs.unlinkSync(tmpFile); } catch(e) { }
 
     foam.CLASS({
       package: 'test.dao.node.json_file',
@@ -36,24 +40,22 @@ describe('JSONFileDAO', function() {
       properties: ['id', 'name'],
     });
 
-    var dao = foam.dao.node.JSONFileDAO.create({
-      path: 'test.json',
+    var TestModel = test.dao.node.json_file.TestModel;
+    var dao = JSONFileDAO.create({
+      path: tmpFile,
       of: 'test.dao.node.json_file.TestModel',
     });
 
     Promise.all([
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 1, name: 'foo' }, foam.__context__)),
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 2, name: 'bar' }, foam.__context__)),
-      dao.put(test.dao.node.json_file.TestModel.create({ id: 3, name: 'baz' }, foam.__context__))
+      dao.put(TestModel.create({ id: 1, name: 'foo' })),
+      dao.put(TestModel.create({ id: 2, name: 'bar' })),
+      dao.put(TestModel.create({ id: 3, name: 'baz' }))
     ]).then(function() {
-      // Wait 150ms to ensure the file has really been written.
-      return new Promise(function(res) { setTimeout(res, 150); });
-    }).then(function() {
       dao = null;
-      expect(fs.statSync('test.json').isFile()).toBe(true);
+      expect(fs.statSync(tmpFile).isFile()).toBe(true);
 
-      var dao2 = foam.dao.node.JSONFileDAO.create({
-        path: 'test.json',
+      var dao2 = JSONFileDAO.create({
+        path: tmpFile,
         of: 'test.dao.node.json_file.TestModel',
       });
 

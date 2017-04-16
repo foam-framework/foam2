@@ -127,12 +127,8 @@ foam.CLASS({
           '[key, value] choice. Required when a DAO is provided.'
     },
     {
-      name: 'dao',
-      postSet: function(old, nu) {
-        old && old.on.unsub(this.onDAOUpdate);
-        nu && nu.on.sub(this.onDAOUpdate);
-        this.onDAOUpdate();
-      }
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
     },
     {
       name: 'text',
@@ -179,6 +175,8 @@ foam.CLASS({
         choices$: this.choices$,
         placeholder$: this.placeholder$
       }).end();
+
+      this.dao$proxy.on.sub(this.onDAOUpdate);
     },
 
     function findIndexOfChoice(choice) {
