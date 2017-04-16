@@ -642,7 +642,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff second arg found in first array argument.',
+  documentation: 'Predicate returns true if second arg found in first array argument.',
 
   methods: [
     {
@@ -662,7 +662,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff second arg found in first array argument, ignoring case.',
+  documentation: 'Predicate returns true if second arg found in first array argument, ignoring case.',
 
   methods: [
     function f(o) {
@@ -686,7 +686,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff arg1 starts with arg2 or if arg1 is an array, if an element starts with arg2.',
+  documentation: 'Predicate returns true if arg1 starts with arg2 or if arg1 is an array, if an element starts with arg2.',
 
   methods: [
     {
@@ -714,7 +714,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: ['foam.core.Serializable'],
 
-  documentation: 'Predicate returns true iff arg1 starts with arg2 or if arg1 is an array, if an element starts with arg2, ignoring case.',
+  documentation: 'Predicate returns true if arg1 starts with arg2 or if arg1 is an array, if an element starts with arg2, ignoring case.',
 
   methods: [
     {
@@ -742,7 +742,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2.',
+  documentation: 'Predicate returns true if arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2.',
 
   properties: [
     {
@@ -799,7 +799,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2, case insensitive.',
+  documentation: 'Predicate returns true if arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2, case insensitive.',
 
   properties: [
     {
@@ -905,7 +905,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Binary Predicate returns true iff arg1 EQUALS arg2.',
+  documentation: 'Binary Predicate returns true if arg1 EQUALS arg2.',
 
   methods: [
     {
@@ -929,7 +929,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Binary Predicate returns true iff arg1 does NOT EQUAL arg2.',
+  documentation: 'Binary Predicate returns true if arg1 does NOT EQUAL arg2.',
 
   methods: [
     {
@@ -949,7 +949,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Binary Predicate returns true iff arg1 is LESS THAN arg2.',
+  documentation: 'Binary Predicate returns true if arg1 is LESS THAN arg2.',
 
   methods: [
     {
@@ -969,7 +969,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Binary Predicate returns true iff arg1 is LESS THAN or EQUAL to arg2.',
+  documentation: 'Binary Predicate returns true if arg1 is LESS THAN or EQUAL to arg2.',
 
   methods: [
     {
@@ -989,7 +989,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN arg2.',
+  documentation: 'Binary Predicate returns true if arg1 is GREATER THAN arg2.',
 
   methods: [
     {
@@ -1009,7 +1009,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Binary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Binary Predicate returns true iff arg1 is GREATER THAN or EQUAL to arg2.',
+  documentation: 'Binary Predicate returns true if arg1 is GREATER THAN or EQUAL to arg2.',
 
 
   methods: [
@@ -1029,7 +1029,7 @@ foam.CLASS({
   extends: 'foam.mlang.predicate.Unary',
   implements: [ 'foam.core.Serializable' ],
 
-  documentation: 'Unary Predicate that returns true iff the given property has a value other than null, undefined, \'\', or [].',
+  documentation: 'Unary Predicate that returns true if the given property has a value other than null, undefined, \'\', or [].',
 
   methods: [
     function f(obj) {
