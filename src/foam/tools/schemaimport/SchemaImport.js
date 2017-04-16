@@ -47,7 +47,7 @@ foam.CLASS({
         var s = schema[key];
         var p = {};
 
-        var isArray = Array.isArray(s);
+        var isArray = foam.Array.isInstance(s);
         if ( isArray ) s.type = Array.prototype.constructor;
 
         switch ( s.type ) {
@@ -58,12 +58,7 @@ foam.CLASS({
           case Array:
             s = s[0];
             p.class = 'Array';
-            switch ( s ) {
-              case String:  p.of = 'String';  break;
-              case Boolean: p.of = 'Boolean'; break;
-              case Date:    p.of = 'Date';    break;
-              case Number:  p.of = 'Double';  break;
-            }
+            p.of    = s.name;
             break;
         }
 
