@@ -1714,7 +1714,7 @@ foam.CLASS({
     function HAS(a) { return this._unary_("Has", a); },
     function NOT(a) { return this._unary_("Not", a); },
     function KEYWORD(a) { return this._unary_("Keyword", a); },
-    function STARTS_WITH(a, b) { return this._binary_("StartsWith", a); },
+    function STARTS_WITH(a, b) { return this._binary_("StartsWith", a, b); },
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
