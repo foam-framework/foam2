@@ -189,22 +189,38 @@ foam.LIB({
     /** Start second phase of bootstrap process. */
     function phase2() {
       // Upgrade to final CLASS() definition.
-      /* Creates a Foam class from a plain-old-object definition.
+      /* Creates a Foam class from a plain-old-object definition:
+          (1) Determine the class of model for the new class's model;
+          (2) Construct and validate the new class's model;
+          (3) Construct and validate the new class.
           @method CLASS
           @memberof module:foam */
-      foam.CLASS = function(m) {
+      foam.CLASS = function(m, skipRegistration) {
         var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
         var model = cls.create(m);
         model.validate();
-        var cls = model.buildClass();
+        // cls was: class-for-model-construction;
+        // cls is: class-constructed-from-model.
+        cls = model.buildClass();
         cls.validate();
 
+        if ( skipRegistration ) return cls;
+
         if ( ! m.refines ) {
+          // Register class in global context.
           foam.register(cls);
 
           // Register the class in the global package path.
           foam.package.registerClass(cls);
+        } else if ( m.name ) {
+          // Register refinement id in global context.
+          foam.register(cls, ( m.package || 'foam.core' ) + '.' + m.name);
         }
+        // TODO(markdittmer): Identify and name anonymous refinements with:
+        // else {
+        //   console.warn('Refinement without unique id', cls);
+        //   debugger;
+        // }
 
         return cls;
       };
@@ -212,8 +228,12 @@ foam.LIB({
       // Upgrade existing classes to real classes.
       for ( var key in foam.core ) {
         var m = foam.lookup(key).model_;
+
+        // classModel.buildClass() expects 'refines' if we are upgrading an
+        // existing class.
         m.refines = m.id;
-        foam.CLASS(m);
+
+        foam.CLASS(m, true);
       }
     },
 

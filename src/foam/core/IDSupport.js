@@ -22,6 +22,7 @@ foam.CLASS({
 
   documentation: function() {/*
   An Identity Axiom which installs a psedo-property to use as an id.
+
   Use when you want a multi-part primary-key.
   <pre>
   Ex.
@@ -85,6 +86,7 @@ foam.CLASS({
         return prop;
       });
 
+      // Extends Property, so actually gets installed in SUPER call
       this.SUPER(c);
     }
   ]

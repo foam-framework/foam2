@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-
 foam.CLASS({
   package: 'foam.dao',
   name: 'ArrayDAO',
   extends: 'foam.dao.AbstractDAO',
+
+  documentation: 'DAO implementation backed by an array.',
 
   requires: [
     'foam.dao.ArraySink',
@@ -68,6 +69,7 @@ foam.CLASS({
       var fc = this.FlowControl.create();
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( fc.stopped ) break;
+
         if ( fc.errorEvt ) {
           sink.error(fc.errorEvt);
           return Promise.reject(fc.errorEvt);

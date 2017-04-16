@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-/* Indexed Memory-based DAO. */
 foam.CLASS({
   package: 'foam.dao',
   name: 'MDAO',
   label: 'Indexed DAO',
   extends: 'foam.dao.AbstractDAO',
+
+  documentation: 'Indexed in-Memory DAO.',
 
   requires: [
     'foam.dao.ArraySink',
@@ -116,7 +117,7 @@ foam.CLASS({
       // Upgrade single Index to an AltIndex if required.
       if ( ! this.AltIndex.isInstance(this.index.index) ) {
         this.index = this.AltIndex.create({
-          delegates: [ this.index.index ], // create factory
+          delegates: [ this.index.index ] // create factory
         }).createNode({
           delegates: [ this.index ] // create an instance
         });

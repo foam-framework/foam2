@@ -20,6 +20,14 @@ foam.CLASS({
   name: 'TextField',
   extends: 'foam.u2.tag.Input',
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^:read-only { border-width: 0; }
+      */}
+    })
+  ],
+
   properties: [
     {
       class: 'Int',
@@ -47,13 +55,5 @@ foam.CLASS({
         this.visibility = prop.visibility;
       }
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^:read-only { border-width: 0; }
-      */}
-    })
   ]
 });

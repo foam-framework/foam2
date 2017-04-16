@@ -619,7 +619,7 @@ describe('MLang', function() {
     // probably don't want to change it anywhere except mlangs.
     it('toString()s nicely', function() {
       expect(IN(test.mlang.Person.NAME, ['Jimi Hendrix', 'Mark Knopfler']).toString()).toBe(
-          'IN(name, Jimi Hendrix,Mark Knopfler)');
+          'IN(name, ["Jimi Hendrix", "Mark Knopfler"])');
     });
   });
 
@@ -710,4 +710,62 @@ describe('MLang', function() {
       });
     });
   });
+
+  describe('STARTS_WITH()', function() {
+    var STARTS_WITH;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      STARTS_WITH = expr.STARTS_WITH.bind(expr);
+    });
+
+    it('correctly implements STARTS_WITH', function() {
+      expect(STARTS_WITH('Murray', 'M').f()).toBe(true);
+      expect(STARTS_WITH('slash', 's').f()).toBe(true);
+      expect(STARTS_WITH('jimmy', 'j').f()).toBe(true);
+      expect(STARTS_WITH('jimmy', 'J').f()).toBe(false);
+    });
+
+    it('works on DAO', function(done) {
+      dao.where(STARTS_WITH(test.mlang.Person.NAME, 'J')).select()
+      .then(function(sink) {
+        expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        done();
+      });
+    });
+
+    it('toString()s nicely', function() {
+      expect(STARTS_WITH(test.mlang.Person.NAME, 'C').toString())
+          .toBe('STARTS_WITH(name, "C")');
+    });
+  });
+
+  describe('STARTS_WITH_IC()', function() {
+    var STARTS_WITH_IC;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      STARTS_WITH_IC = expr.STARTS_WITH_IC.bind(expr);
+    });
+
+    it('correctly implements STARTS_WITH_IC', function() {
+      expect(STARTS_WITH_IC('Murray', 'm').f()).toBe(true);
+      expect(STARTS_WITH_IC('Murray', 'M').f()).toBe(true);
+      expect(STARTS_WITH_IC('jimmy', 'J').f()).toBe(true);
+      expect(STARTS_WITH_IC('jimmy', 'j').f()).toBe(true);
+      expect(STARTS_WITH_IC('jimmy', 'a').f()).toBe(false);
+    });
+
+    it('works on DAO', function(done) {
+      dao.where(STARTS_WITH_IC(test.mlang.Person.NAME, 'j')).select()
+      .then(function(sink) {
+        expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        done();
+      });
+    });
+
+    it('toString()s nicely', function() {
+      expect(STARTS_WITH_IC(test.mlang.Person.NAME, 'C').toString())
+          .toBe('STARTS_WITH_IC(name, "C")');
+    });
+  });
+
 });

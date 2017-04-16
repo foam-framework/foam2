@@ -15,16 +15,14 @@
  * limitations under the License.
  */
 
-/**
-  A DAO which does nothing on 'select all' but otherwise acts as a ProxyDAO.
-  A 'select all' contains no query, limit, or skip.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'NoSelectAllDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  requires: ['foam.dao.ArraySink'],
+  requires: [ 'foam.dao.ArraySink' ],
+
+  documentation: 'DAO Decorator which prevents \'select all\', ie. a select() with no query, limit, or skip.',
 
   methods: [
     function select(sink, skip, limit, order, predicate) {

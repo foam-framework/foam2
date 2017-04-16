@@ -47,7 +47,7 @@ foam.CLASS({
       shortName: 'c',
       aliases: [ 'colour', 'medal' ],
       tableCellView: function(medal, e) {
-        return e.E('span').cssClass(medal.color.label).add(medal.color.label);
+        return e.E('span').addClass(medal.color.label).add(medal.color.label);
       },
       searchView: {
         class: 'foam.u2.search.GroupBySearchView',

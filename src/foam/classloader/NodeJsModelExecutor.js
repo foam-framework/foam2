@@ -49,12 +49,12 @@ foam.CLASS({
         var modelDao = this.NodeModelFileDAO.create({
           classpath: classpaths[0],
         });
-        for (var i = 1, classpath; classpath = classpaths[i]; i++) {
+        for ( var i = 1, classpath ; classpath = classpaths[i] ; i++ ) {
           modelDao = this.OrDAO.create({
             delegate: modelDao,
             primary: this.NodeModelFileDAO.create({
               classpath: classpath,
-            }),
+            })
           });
         }
         return modelDao;

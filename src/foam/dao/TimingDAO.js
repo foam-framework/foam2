@@ -1,4 +1,4 @@
-  /**
+/**
  * @license
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-/**
-  Times access to the delegate DAO. Useful for debugging and profiling.
-*/
 foam.CLASS({
   package: 'foam.dao',
   name: 'TimingDAO',
-
   extends: 'foam.dao.ProxyDAO',
+
+  documentation: 'Times access to the delegate DAO; useful for debugging and profiling.',
 
   properties: [
     'name',

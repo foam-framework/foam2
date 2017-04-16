@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.net.HTTPRequest'
+    'foam.net.web.HTTPRequest'
   ],
 
   properties: [
@@ -49,25 +49,23 @@ foam.CLASS({
       return req.send().then(function(payload) {
         return payload.resp.text();
       }).then(function(js) {
-        var model;
-        var foamCLASS = foam.CLASS;
-
-        foam.CLASS = function(m) {
-          var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
-          model = cls.create(m, self);
-          foam.CLASS = foamCLASS;
-        }
+        var cls = null;
 
         try {
           eval(js);
+
+          cls = foam.lookup(id, true);
+
+          if ( ! cls ) {
+            console.warn(
+                'Class', id, 'created via arequire, but never built or registered');
+          }
         } catch(e) {
           console.warn('Unable to load at ' + url + '. Error: ' + e.stack);
           return Promise.resolve(null);
-        } finally {
-          foam.CLASS = foamCLASS;
         }
 
-        return Promise.resolve(model);
+        return Promise.resolve(cls.model_);
       });
     }
   ]

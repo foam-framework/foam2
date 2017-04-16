@@ -26,13 +26,13 @@ foam.CLASS({
       var promises = [];
       if ( this.extends ) promises.push(X.arequire(this.extends, opt_deps));
 
-      for (var i = 0, a; a = this.axioms_[i]; i++) {
+      for ( var i = 0, a; a = this.axioms_[i]; i++ ) {
         if ( a.arequire ) promises.push(a.arequire(opt_deps));
       }
 
       return Promise.all(promises);
-    },
-  ],
+    }
+  ]
 });
 
 
@@ -53,6 +53,8 @@ foam.CLASS({
   package: 'foam.classloader',
   name: 'ClassLoader',
 
+  documentation: 'Asynchronous class loader service. Loads classes dynamically.',
+
   exports: [
     'arequire'
   ],
@@ -72,8 +74,8 @@ foam.CLASS({
       code: function(X, modelId, opt_deps) {
         // Contains models that depend on the modelId and have already been
         // arequired. Used to avoid circular dependencies from waiting on
-        // eachother.
-        deps = opt_deps || {};
+        // each other.
+        var deps = opt_deps || {};
 
         if ( X.isRegistered(modelId) ) return Promise.resolve();
         if ( deps[modelId] ) return Promise.resolve();
@@ -82,8 +84,12 @@ foam.CLASS({
 
         var modelDao = X[foam.String.daoize(foam.core.Model.name)];
         this.pending[modelId] = modelDao.find(modelId).then(function(m) {
-          m.validate();
-          return m.arequire(deps).then(function() { return m; });
+          // Model validation may make use of deps. Require them first, then
+          // validate the model.
+          return m.arequire(deps).then(function() {
+            m.validate();
+            return m;
+          });
         }).then(function(m) {
           if ( X.isRegistered(modelId) ) return m;
 
@@ -103,6 +109,7 @@ foam.CLASS({
             return c;
           });
 
+          // Register model in global context and global namespace.
           foam.__context__.registerFactory(m, f);
           foam.package.registerClassFactory(m, f);
           return m;
@@ -119,6 +126,8 @@ foam.CLASS({
   ]
 });
 
+// Export ClassLoader.arequire by overwriting global context with
+// ClassLoader's sub-context.
 foam.__context__ = foam.classloader.ClassLoader.create(
   {},
   foam.__context__

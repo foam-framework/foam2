@@ -20,12 +20,15 @@ foam.CLASS({
   name: 'DetailPropertyView',
   extends: 'foam.u2.Element',
 
+  documentation: 'View for one row/property of a DetailView.',
+
   properties: [
     'prop',
     [ 'nodeName', 'tr' ]
   ],
 
   templates: [
+    // TODO: this isn't used
     function CSS() {/*
       .foam-u2-PropertyView-label {
         color: #444;
@@ -52,11 +55,11 @@ foam.CLASS({
 
       // TODO: hide this element if the prop changes it's mode to HIDDEN.
       this.
-        cssClass('foam-u2-PropertyView-').
-        start('td').cssClass('foam-u2-PropertyView-label').add(prop.label).end().
-        start('td').cssClass('foam-u2-PropertyView-view').add(
+        addClass('foam-u2-PropertyView-').
+        start('td').addClass('foam-u2-PropertyView-label').add(prop.label).end().
+        start('td').addClass('foam-u2-PropertyView-view').add(
           prop,
-          prop.units && this.E('span').cssClass('foam-u2-PropertyView-units').add(' ', prop.units)).
+          prop.units && this.E('span').addClass('foam-u2-PropertyView-units').add(' ', prop.units)).
         end();
     }
   ]

@@ -338,10 +338,6 @@ describe('SkipSink', function() {
 
 
 
-if ( typeof localStorage === "undefined" || localStorage === null ) {
-  var LocalStorage = require('node-localstorage').LocalStorage;
-  localStorage = new LocalStorage('./tmp');
-}
 describe('LocalStorageDAO', function() {
   var a;
   var a2;
@@ -1373,7 +1369,7 @@ describe('EasyDAO-permutations', function() {
 // debug.js:264 Boolean              autoIndex      false
 // debug.js:264 Boolean              syncWithServer false
 // debug.js:264 Boolean              syncPolling    true
-// debug.js:264 String               serverUri      http://localhost:8000/api
+// debug.js:264 String               serverUri      http://0.0.0.0:8000/api
 // debug.js:264 Boolean              isServer       false
 // debug.js:264 Property             syncProperty   undefined
 // debug.js:264 Class2               of             PropertyClass
@@ -1435,7 +1431,7 @@ describe('EasyDAO-permutations', function() {
       of: test.CompA,
       daoType: 'MDAO',
       syncWithServer: true,
-      serverUri: 'localhost:8888',
+      serverUri: '0.0.0.0:8888',
       syncPolling: true,
       syncProperty: test.CompA.A
     }, env);

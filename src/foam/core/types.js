@@ -57,6 +57,16 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  documentation: 'Upgrade Mode.documentation to a proper String property.',
+
+  properties: [
+    { class: 'String', name: 'documentation' }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -405,7 +415,7 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    ['factory', function() { return {} }],
+    [ 'factory', function() { return {} } ],
     'of'
   ]
 });
@@ -424,9 +434,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) {
-        return of + 'DAO';
-      }
+      expression: function(of) { return of + 'DAO'; }
     },
     {
       name: 'adapt',
@@ -438,6 +446,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',

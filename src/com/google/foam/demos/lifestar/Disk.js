@@ -85,7 +85,7 @@ foam.CLASS({
         var l = on ? 70 : 30;
         p.color = this.hsl(i*365/this.n, s, l);
       }.bind(this));
-      this.addChildren(p);
+      this.add(p);
     }
   ],
   listeners: [

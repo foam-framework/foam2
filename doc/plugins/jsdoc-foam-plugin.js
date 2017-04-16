@@ -40,8 +40,9 @@
 */
 
 var fs = require('fs');
+var logger = require('jsdoc/util/logger');
 var exports;
-require("../../src/foam.js");
+require('../../src/foam.js');
 
 var modelComments = {};
 
@@ -164,11 +165,11 @@ var getComment = function getComment(node, filename) {
 
   // only allow one type of commenting
   if ( commentsFound > 1 ) {
-    console.warn('!!! Only one type of comment allowed. Found:');
-    console.warn('  documentation property:', propComment);
-    console.warn('  function body comment:', bodyComment);
-    console.warn('  object literal (inside braces):', objComment);
-    console.warn('  leading comment:', leadingComment);
+    logger.warn('!!! Only one type of comment allowed. Found:');
+    logger.warn('  documentation property:', propComment);
+    logger.warn('  function body comment:', bodyComment);
+    logger.warn('  object literal (inside braces):', objComment);
+    logger.warn('  leading comment:', leadingComment);
   }
   return propComment || bodyComment || objComment || leadingComment;
 };
@@ -190,14 +191,18 @@ var getDefinitionType = function getDefinitionType(node) {
   given the node of the CLASS call */
 var getCLASSPackage = function getCLASSPackage(node) {
 
-  var pkg = getNodePropertyNamed(node, 'package').replace(/\./g, '/');
-  if ( ! pkg ) {
+  var pkg = getNodePropertyNamed(node, 'package');
+  if ( typeof pkg == 'string' ) {
+    pkg = pkg.replace(/\./g, '/');
     if ( getDefinitionType(node) === 'LIB' ) {
       pkg = getNodePropertyNamed(node, 'name').replace(/\./g, '/');
       pkg = pkg.substring(0, pkg.lastIndexOf('/'));
     } else {
       pkg = 'foam/core';
     }
+  }
+  else {
+    pkg = 'foam/core';
   }
 
   return pkg;
@@ -227,6 +232,7 @@ var getCLASSName = function getCLASSName(node) {
   if ( j > 0 ) {
     name = name.substring(j + 1);
   }
+
   return ( pkg ? 'module:' + pkg + '.' : '' ) + name;
 };
 
@@ -323,7 +329,7 @@ var processArgs = function processArgs(e, node) {
       }
     }
   } catch ( err ) {
-    console.log('!!! Args not processed for ', err);
+    logger.error('!!! Args not processed for ', err);
   }
 };
 
@@ -409,6 +415,15 @@ exports.astNodeVisitor = {
     if ( getDefinitionType(node) ) {
       var defType = getDefinitionType(node);
       var className = getNodePropertyNamed(node, 'name');
+
+      if ( typeof className === 'object' ) {
+        logger.info('skipping dynamic generated foam.CLASS: ', {
+          file: currentSourceName,
+          node: e
+        });
+        return;
+      }
+
       var classPackage = getCLASSPackage(node);
       var classExt = getCLASSPath(node, 'extends');
 
@@ -440,11 +455,11 @@ exports.astNodeVisitor = {
         if ( newComment &&
              modelComments[classPackage + '.' + className] &&
              modelComments[classPackage + '.' + className].mainCommentFound ) {
-          console.warn('!!! Found multiple comment types defined for',
+          logger.warn('!!! Found multiple comment types defined for',
             classPackage + '.' + className);
-          console.warn('  old:', modelComments[classPackage +
+          logger.warn('  old:', modelComments[classPackage +
             '.' + className]._queue);
-          console.warn('  new:', newComment);
+          logger.warn('  new:', newComment);
           return;
         }
       }
@@ -512,8 +527,8 @@ exports.astNodeVisitor = {
         }
       };
 
-      //console.log('++++++++++++++++++', parser._resultBuffer);
-      //console.log('********',e.comment, className, classPackage);
+      // console.log('++++++++++++++++++', parser._resultBuffer);
+      // console.log('********',e.comment, className, classPackage);
 
     } // function in an array (methods, todo: listeners, etc)
     else if ( node.type === 'FunctionExpression' &&
