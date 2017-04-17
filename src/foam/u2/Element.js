@@ -512,6 +512,7 @@ foam.CLASS({
           if ( self.batch !== batch ) return;
 
           var objs = a.a;
+          self.cleanup();
           for ( var i = 0 ; i < objs.length ; i++ ) {
             self.addRow(objs[i]);
           }
