@@ -28,13 +28,14 @@ foam.CLASS({
     'junctionProperty',
     'joinDAOKey',
     'targetProperty',
+    'dest',
     {
       name: 'predicate',
       documentation: `ManyToMany filtered querys are always "backward" to
         match inverse-namd property and source object's id.`,
       getter: function() {
         return this.EQ(
-          this.of[foam.String.constantize(this.relationship.inverseName)],
+          this.dest[foam.String.constantize(this.relationship.inverseName)],
           this.obj.id);
       }
     }
