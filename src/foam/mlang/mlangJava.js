@@ -46,7 +46,7 @@ foam.CLASS({
   ]
 });
 
-
+debugger;
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
@@ -107,6 +107,33 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
 
   methods: [
+    {
+      // TODO: This is a duplicate of the method in Predicate,
+      // but it's necessary because when we refine Predicate, it doesn't
+      // update classes that copied their axioms in from Predicate as a trait.
+      // If we were more careful about the ordering of classes this wouldn't be
+      // necessary.
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: 'return false;',
+      javaReturns: 'boolean'
+    },
+    {
+      // TODO: Same TODO as .f method above
+      name: 'toIndex',
+      javaSupport: false
+    },
+    {
+      // TODO: Same TODO as .f
+      name: 'toDisjunctiveNormalForm',
+      javaSupport: false,
+      javaReturns: 'foam.mlang.predicate.Predicate'
+    },
     {
       name: 'partialEval',
       javaCode: 'return this;',
@@ -384,14 +411,6 @@ foam.CLASS({
     {
       name: 'toString',
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
-    },
-    {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
-        'if ( arg1 != null ) {' +
-          'return arg1.toIndex(tail);'+
-        '}'+
-        'return null;'
     },
     {
       name: 'orderTail',
