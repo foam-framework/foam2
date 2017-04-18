@@ -59,7 +59,7 @@ to run the unit tests.
 
 Documentation is created by JSDoc with a plugin to account for FOAM's package
 structure and declarative nature. JSDoc modules correspond with FOAM packages.
-See [./doc/Documentation.md](./doc/Documentation.md) for information on comment
+See [/doc/guides/Documentation.md](/doc/guides/Documentation.md) for information on comment
 formatting.
 
 # Contributing
