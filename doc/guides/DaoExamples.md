@@ -118,9 +118,7 @@ var expr = foam.mlang.Expressions.create();
 ```js
 // returns all the guitars
 guitarDAO
-.select() 
-// when a "sink" function isn't provided, FOAM defaults it to an ArraySink
-// which puts the results in a "a" prop 
+.select()
 .then(function(db) {
   console.log('count: ', db.a.length);
   console.log('count: ', db.a[0].price);
