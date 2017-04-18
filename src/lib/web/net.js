@@ -336,11 +336,13 @@ foam.CLASS({
       };
 
       if ( this.payload ) {
-        if ( this.BlobBlob.isInstance(this.payload) ) options.body = this.payload.blob;
-        if ( this.Blob.isInstance(this.payload) ) {
+        if ( this.BlobBlob.isInstance(this.payload) ) {
+          options.body = this.payload.blob;
+        } else if ( this.Blob.isInstance(this.payload) ) {
           foam.assert(false, 'TODO: Implemented sending of foam.blob.Blob over HTTPRequest.');
+        } else {
+          options.body = this.payload;
         }
-        options.body = this.payload;
       }
 
       var request = new Request(
