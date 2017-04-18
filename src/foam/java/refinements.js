@@ -1,4 +1,14 @@
 foam.CLASS({
+  refines: 'foam.core.Argument',
+  properties: [
+    {
+      class: 'String',
+      name: 'javaType'
+    }
+  ]
+});
+
+foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
     {
@@ -203,27 +213,28 @@ foam.CLASS({
 
   methods: [
     function createChildMethod_(child) {
-      var m = child.clone();
-      m.returns = child.hasOwnProperty('returns') ?
-        child.returns :
-        this.returns;
+      var result = child.clone();
+      var props = child.cls_.getAxiomsByClass(foam.core.Property);
+      for ( var i = 0 ; i < props.length ; i++ ) {
+        var prop = props[i];
 
-      m.args = child.hasOwnProperty('args') ?
-        child.args :
-        ( this.args || [] );
+        if ( ! child.hasOwnProperty(prop.name) ) {
+          prop.set(result, prop.get(this));
+        }
 
-      m.javaReturns = child.hasOwnProperty('javaReturns') ?
-        child.javaReturns : this.javaReturns;
-      m.sourceCls_ = child.sourceCls_;
+      }
 
-      child.throws = this.throws;
-      child.code = child.code || this.code;
-      return m;
+      // Special merging behaviour for args.
+      var argCount = Math.max(this.args.length, child.args.length)
+      for ( var i = 0 ; i < argCount ; i++ ) {
+        result.args[i] = this.args[i].clone().copyFrom(child.args[i]);
+      }
+
+      return result;
     },
 
     function buildJavaClass(cls) {
       if ( ! this.javaSupport ) return;
-
       if ( ! this.javaCode && ! this.abstract ) return;
 
       cls.method({
@@ -260,15 +271,18 @@ foam.CLASS({
   properties: [
     {
       name: 'javaCode',
-      expression: function(name, property, returns) {
+      getter: function() {
+        // TODO: This could be an expression if the copyFrom in createChildMethod
+        // didn't finalize its value
+        if ( this.name == 'find' ) console.log(this.name, "returns", this.javaReturns)
         var code = '';
 
-        if ( this.returns ) {
+        if ( this.javaReturns && this.javaReturns !== 'void' ) {
           code += 'return ';
         }
 
-        code += 'get' + foam.String.capitalize(property) + '()';
-        code += '.' + name + '(';
+        code += 'get' + foam.String.capitalize(this.property) + '()';
+        code += '.' + this.name + '(';
 
         for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
           code += this.args[i].name;
