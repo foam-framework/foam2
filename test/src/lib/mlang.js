@@ -36,6 +36,14 @@ describe('MLang', function() {
           name: 'birthday',
         },
         {
+          class: 'Long',
+          name: 'age'
+        },
+        {
+          class: 'String',
+          name: 'guitar'
+        },
+        {
           class: 'Boolean',
           name: 'deceased',
           value: false,
@@ -56,45 +64,59 @@ describe('MLang', function() {
       name: 'Jimi Hendrix',
       deceased: true,
       birthday: '1942-11-27',
+      guitar: 'Fender',
+      age: 27
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 2,
       name: 'Carlos Santana',
       birthday: '1947-07-20',
+      guitar: 'PRS',
+      age: 69
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 3,
       name: 'Ritchie Blackmore',
       birthday: '1945-04-14',
       someArray: [1, 2, 4, 6],
+      guitar: 'Fender',
+      age: 72
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 4,
       name: 'Mark Knopfler',
       birthday: '1949-08-12',
       someArray: [1, 6, 3],
+      guitar: 'Gibson',
+      age: 67
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 5,
       name: 'Eric Clapton',
       birthday: '1945-03-30',
       someArray: [1, 4],
+      guitar: 'Fender',
+      age: 72
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 6,
       name: 'Jimmy Page',
+      guitar: 'Gibson',
       birthday: '1944-01-09',
+      age: 73
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 7,
       name: 'David Bowie',
       birthday: '1947-01-08',
       deceased: true,
+      age: 69
     }, foam.__context__));
     dao.put(test.mlang.Person.create({
       id: 8,
       name: 'Tom Scholz',
-      birthday: '1947-03-10'
+      birthday: '1947-03-10',
+      age: 70
     }, foam.__context__));
   });
 
@@ -765,6 +787,114 @@ describe('MLang', function() {
     it('toString()s nicely', function() {
       expect(STARTS_WITH_IC(test.mlang.Person.NAME, 'C').toString())
           .toBe('STARTS_WITH_IC(name, "C")');
+    });
+  });
+
+  describe('MAX()', function() {
+    var MAX;
+    var EQ;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      MAX = expr.MAX.bind(expr);
+      EQ = expr.EQ.bind(expr);
+    });
+
+    it('correctly implements MAX', function(done) {
+      dao.select(MAX(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(73);
+        done();
+      });
+    });
+
+    it('MAX with where', function(done) {
+      dao
+      .where(EQ(test.mlang.Person.DECEASED, true))
+      .select(MAX(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(69);
+        done();
+      });
+    });
+
+    it('toString()s nicely', function() {
+      expect(MAX(test.mlang.Person.AGE).toString())
+          .toBe('MAX(age)');
+    });
+
+  });
+
+  describe('COUNT()', function() {
+    var COUNT;
+    var EQ;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      COUNT = expr.COUNT.bind(expr);
+      EQ = expr.EQ.bind(expr);
+    });
+
+    it('simple COUNT', function(done) {
+      dao.select(COUNT(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(8);
+        done();
+      });
+    });
+
+
+    it('COUNT with where', function(done) {
+      dao
+      .where(EQ(test.mlang.Person.GUITAR, 'Fender'))
+      .select(COUNT(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(3);
+        done();
+      });
+    });
+
+    it('toString()s nicely', function() {
+      expect(COUNT().toString())
+          .toBe('COUNT()');
+    });
+  });
+
+  describe('SUM()', function() {
+    var SUM;
+    var EQ;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      SUM = expr.SUM.bind(expr);
+      EQ = expr.EQ.bind(expr);
+    });
+
+    it('simple SUM', function(done) {
+      dao
+      .select(SUM(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(519);
+        done();
+      });
+    });
+
+    it('SUM with where', function(done) {
+      dao
+      .where(EQ(test.mlang.Person.GUITAR, 'Gibson'))
+      .select(SUM(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(140);
+        done();
+      });
+    });
+
+    xit('toString()s nicely', function() {
+      expect(SUM().toString())
+          .toBe('SUM()');
     });
   });
 
