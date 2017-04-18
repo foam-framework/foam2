@@ -112,16 +112,16 @@ foam.CLASS({
     function initE() {
       this.nodeName = 'div';
       this.
-          cssClass(this.myCls()).
-          start('span').cssClass('prefix', 'label').add('Filter prefix: ').end().
+          addClass(this.myClass()).
+          start('span').addClass('prefix', 'label').add('Filter prefix: ').end().
           start(this.PREFIX, {onKey: true, type: 'search'}).end().
-          start('div').cssClass('content').
-            start('span').cssClass('summaryPane').
+          start('div').addClass('content').
+            start('span').addClass('summaryPane').
               start(this.FILTERED_DAO, {hardSelection$: this.selection$}).end().
             end().
-            start('span').cssClass('detailPane').
+            start('span').addClass('detailPane').
               add(this.PERSON).
-              start('div').cssClass('buttons').
+              start('div').addClass('buttons').
                 add(this.CREATE_ITEM, this.UPDATE_ITEM, this.DELETE_ITEM).
               end().
             end().

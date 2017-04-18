@@ -523,3 +523,15 @@ foam.CLASS({
 
 var e  = foam.u2.Element.create().add("hello world content").add('foobar');
 EOne.create({title: "hello world title"}).add(e).write();
+
+foam.CLASS({
+  name: 'PredicateTest',
+  properties: [ 'id', 'pred' ]
+});
+
+var dao = foam.dao.EasyDAO.create({of: PredicateTest, daoType: 'IDB', cache: true});
+var M = foam.mlang.Expressions.create();
+var p2 = PredicateTest.create({id: 2, pred: M.EQ(PredicateTest.ID, 2)});
+var p3 = PredicateTest.create({id: 3, pred: M.EQ(PredicateTest.ID, 3)});
+dao.put(p2);
+dao.put(p3);

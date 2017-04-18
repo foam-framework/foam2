@@ -15,36 +15,23 @@
  * limitations under the License.
  */
 
-foam.CLASS({
-  package: 'foam.u2.mcw',
-  name: 'TextField',
-  extends: 'foam.u2.TextField',
+var env = require('process').env;
 
-  properties: [
-    {
-      name: 'peer_',
-      factory: function() { return new mdc.textfield.MDCTextfield(this.el()); }
-    },
-    {
-      class: 'Boolean',
-      name: 'raised',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'primary',
-      value: false
-    }
-  ],
+describe('BatchMutationDatastoreDAO', function() {
+  var clearCDS = com.google.cloud.datastore.clear;
+  function daoFactory(cls) {
+    return clearCDS().then(function() {
+      return foam.lookup('com.google.cloud.datastore.BatchMutationDatastoreDAO')
+          .create({
+            of: cls,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID
+          });
+    });
+  }
 
-  methods: [
-    function load() {
-      this.SUPER();
-      this.peer_.foundation_.init();
-    },
-
-    function initCls() {
-      this.addClass('mdc-textfield');
-    }
-  ]
+  // From helpers/generic_dao.js.
+  global.genericDAOTestBattery(daoFactory);
 });

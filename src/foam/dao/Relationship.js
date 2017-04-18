@@ -213,7 +213,10 @@ foam.CLASS({
             package: source.package,
             name: name,
             ids: [ 'sourceId', 'targetId' ],
-            properties: [ 'sourceId', 'targetId' ]
+            properties: [
+              { name: 'sourceId', shortName: 's' },
+              { name: 'targetId', shortName: 't' }
+            ]
           });
 
           jModel = foam.lookup(id);
@@ -290,10 +293,11 @@ foam.CLASS({
       */
     },
 
-    function targetQueryFromSource(obj, forward) {
-      var targetClass = this.lookup(forward ? this.targetModel : this.sourceModel);
-      var name        = forward ? this.inverseName : this.forwardName;
+    function targetQueryFromSource(obj) {
+      var targetClass = this.lookup(this.targetModel);
+      var name        = this.inverseName;
       var targetProp  = targetClass[foam.String.constantize(name)];
+
       return this.EQ(targetProp, obj.id);
     }
   ]
