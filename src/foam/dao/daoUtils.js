@@ -31,6 +31,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return foam.dao.NullDAO.create() },
     },
     {
