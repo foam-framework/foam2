@@ -117,9 +117,10 @@ var expr = foam.mlang.Expressions.create();
 
 ```js
 // returns all the guitars
-
 guitarDAO
-.select() // when a "sink" function isn't provided, FOAM defaults it to an ArraySink, which puts the results in a "a" prop 
+.select() 
+// when a "sink" function isn't provided, FOAM defaults it to an ArraySink
+// which puts the results in a "a" prop 
 .then(function(db) {
   console.log('count: ', db.a.length);
   console.log('count: ', db.a[0].price);
@@ -244,6 +245,14 @@ guitarDAO
 ```
 
 ```js
+// sums all guitars prices
+guitarDAO.select(expr.SUM(Guitar.PRICE))
+.then(function(g) {
+  console.log(g.value);
+});
+```
+
+```js
 // returns the most expensive guitar
 guitarDAO.select(expr.MAX(Guitar.PRICE))
 .then(function(g) {
@@ -252,14 +261,13 @@ guitarDAO.select(expr.MAX(Guitar.PRICE))
 ```
 
 ```js
-// sums all guitars prices
-guitarDAO.select(expr.SUM(Guitar.PRICE))
+// returns the cheapest guitar
+guitarDAO.select(expr.MIN(Guitar.PRICE))
 .then(function(g) {
   console.log(g.value);
+});
 ```
 
-
 ```js
-// TODO: PIE, UI
-// TODO: MIN, MUL
+// TODO: PIE, UI, Relationships
 ```
