@@ -33,8 +33,8 @@ foam.CLASS({
         end();
 
       if ( this.lvl < this.maxLvl ) {
-        this.add(this.PyBranch.create({lvl: this.lvl+1}).cssClass('l'));
-        this.add(this.PyBranch.create({lvl: this.lvl+1}).cssClass('r'));
+        this.add(this.PyBranch.create({lvl: this.lvl+1}).addClass('l'));
+        this.add(this.PyBranch.create({lvl: this.lvl+1}).addClass('r'));
       }
     },
     {

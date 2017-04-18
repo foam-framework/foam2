@@ -226,7 +226,7 @@ foam.CLASS({
     function unload() {},
     function onRemove() {},
     // function detach() {},
-    function onSetCls() {},
+    function onSetClass() {},
     function onFocus() {},
     function onAddListener() {},
     function onRemoveListener() {},
@@ -334,7 +334,7 @@ foam.CLASS({
     function error() {
       throw new Error('Mutations not allowed in OUTPUT state.');
     },
-    function onSetCls(cls, enabled) { this.error(); },
+    function onSetClass(cls, enabled) { this.error(); },
     function onFocus(cls, enabled) { this.error(); },
     function onAddListener(topic, listener) { this.error(); },
     function onRemoveListener(topic, listener) { this.error(); },
@@ -373,7 +373,7 @@ foam.CLASS({
       this.visitChildren('unload');
     },
     function onRemove() { this.unload(); },
-    function onSetCls(cls, enabled) {
+    function onSetClass(cls, enabled) {
       var e = this.el();
       if ( e ) {
         e.classList[enabled ? 'add' : 'remove'](cls);
@@ -631,9 +631,9 @@ foam.CLASS({
       postSet: function(o, n) {
         if ( o === n ) return;
         if ( n ) {
-          this.removeCls('foam-u2-Element-hidden');
+          this.removeClass('foam-u2-Element-hidden');
         } else {
-          this.cssClass('foam-u2-Element-hidden');
+          this.addClass('foam-u2-Element-hidden');
         }
       }
     },
@@ -869,12 +869,17 @@ foam.CLASS({
     },
 
     function myCls(opt_extra) {
-      var f = this.cls_.myCls_;
+      console.warn('Deprecated use of Element.myCls(). Use myClass() instead.');
+      return this.myClass(opt_extra);
+    },
+
+    function myClass(opt_extra) {
+      var f = this.cls_.myClass_;
 
       if ( ! f ) {
         var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
 
-        f = this.cls_.myCls_ = foam.Function.memoize1(function(e) {
+        f = this.cls_.myClass_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
         });
       }
@@ -1161,22 +1166,24 @@ foam.CLASS({
       return this.entity('nbsp');
     },
 
-    // Was renamed from cls() in FOAM1, current name seems
-    // out of place.  Maybe renamed addClass().
-    function cssClass(cls) { /* Slot | String */
+    function cssClass(cls) {
+      return this.addClass(cls);
+    },
+
+    function addClass(cls) { /* Slot | String */
       /* Add a CSS cls to this Element. */
       var self = this;
       if ( foam.core.Slot.isInstance(cls) ) {
         var lastValue = null;
         var l = function() {
           var v = cls.get();
-          self.cssClass_(lastValue, v);
+          self.addClass_(lastValue, v);
           lastValue = v;
         };
         cls.sub(l);
         l();
       } else if ( typeof cls === 'string' ) {
-        this.cssClass_(null, cls);
+        this.addClass_(null, cls);
       } else {
         this.error('cssClass type error. Must be Slot or String.');
       }
@@ -1185,6 +1192,11 @@ foam.CLASS({
     },
 
     function enableCls(cls, enabled, opt_negate) {
+      console.warn('Deprecated use of Element.enableCls(). Use enableClass() instead.');
+      return this.enableClass(cls, enabled, opt_negate);
+    },
+
+    function enableClass(cls, enabled, opt_negate) {
       /* Enable/disable a CSS class based on a boolean-ish dynamic value. */
       function negate(a, b) { return b ? ! a : a; }
 
@@ -1192,7 +1204,7 @@ foam.CLASS({
       if ( foam.core.Slot.isInstance(enabled) ) {
         var self = this;
         var value = enabled;
-        var l = function() { self.enableCls(cls, value.get(), opt_negate); };
+        var l = function() { self.enableClass(cls, value.get(), opt_negate); };
         value.sub(l);
         l();
       } else {
@@ -1200,17 +1212,22 @@ foam.CLASS({
         var parts = cls.split(' ');
         for ( var i = 0 ; i < parts.length ; i++ ) {
           this.classes[parts[i]] = enabled;
-          this.onSetCls(parts[i], enabled);
+          this.onSetClass(parts[i], enabled);
         }
       }
       return this;
     },
 
     function removeCls(cls) {
+      console.warn('Deprecated use of Element.removeCls(). Use removeClass() instead.');
+      return this.removeClass(cls);
+    },
+
+    function removeClass(cls) {
       /* Remove specified CSS class. */
       if ( cls ) {
         delete this.classes[cls];
-        this.onSetCls(cls, false);
+        this.onSetClass(cls, false);
       }
       return this;
     },
@@ -1218,6 +1235,11 @@ foam.CLASS({
     function on(topic, listener) {
       /* Shorter fluent version of addEventListener. Prefered method. */
       this.addEventListener(topic, listener);
+      return this;
+    },
+
+    function attr(key, value) {
+      this.setAttribute(key, value);
       return this;
     },
 
@@ -1567,13 +1589,13 @@ foam.CLASS({
       return this;
     },
 
-    function cssClass_(oldClass, newClass) {
+    function addClass_(oldClass, newClass) {
       /* Replace oldClass with newClass. Called by cls(). */
       if ( oldClass === newClass ) return;
-      this.removeCls(oldClass);
+      this.removeClass(oldClass);
       if ( newClass ) {
         this.classes[newClass] = true;
-        this.onSetCls(newClass, true);
+        this.onSetClass(newClass, true);
       }
     },
 

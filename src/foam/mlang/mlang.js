@@ -1187,6 +1187,15 @@ foam.CLASS({
       class: 'StringArray',
       name: 'groupKeys',
       factory: function() { return []; }
+    },
+    {
+      class: 'Boolean',
+      name: 'processArrayValuesIndividually',
+      documentation: 'If true, each value of an array will be entered into a separate group.',
+      factory: function() {
+        // TODO: it would be good if it could also detect RelationshipJunction.sourceId/targetId
+        return ! foam.core.MultiPartID.isInstance(this.arg1);
+      }
     }
   ],
 
@@ -1208,9 +1217,9 @@ foam.CLASS({
 
     function put(obj) {
       var key = this.arg1.f(obj);
-      if ( Array.isArray(key) ) {
+      if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
-          for ( var i = 0; i < key.length; i++ ) {
+          for ( var i = 0 ; i < key.length ; i++ ) {
             this.putInGroup_(key[i], obj);
           }
         } else {
@@ -1620,6 +1629,14 @@ foam.CLASS({
   methods: [
     function f(o) {
       return this.arg2.f(this.arg1.f(o));
+    },
+
+    function comparePropertyValues(o1, o2) {
+      /**
+         Compare property values using arg2's property value comparator.
+         Used by GroupBy
+      **/
+      return this.arg2.comparePropertyValues(o1, o2);
     }
   ]
 });
@@ -1641,6 +1658,7 @@ foam.CLASS({
     'foam.mlang.predicate.Contains',
     'foam.mlang.predicate.ContainsIC',
     'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.False',
     'foam.mlang.predicate.Func',
     'foam.mlang.predicate.Gt',
     'foam.mlang.predicate.Gte',
@@ -1654,6 +1672,7 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
+    'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
@@ -1662,6 +1681,11 @@ foam.CLASS({
     'foam.mlang.sink.Max',
     'foam.mlang.sink.Sum'
   ],
+
+  constants: {
+    FALSE: foam.mlang.predicate.False.create(),
+    TRUE: foam.mlang.predicate.True.create()
+  },
 
   methods: [
     function _nary_(name, args) {
@@ -1690,7 +1714,7 @@ foam.CLASS({
     function HAS(a) { return this._unary_("Has", a); },
     function NOT(a) { return this._unary_("Not", a); },
     function KEYWORD(a) { return this._unary_("Keyword", a); },
-    function STARTS_WITH(a, b) { return this._binary_("StartsWith", a); },
+    function STARTS_WITH(a, b) { return this._binary_("StartsWith", a, b); },
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },

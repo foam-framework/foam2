@@ -148,11 +148,11 @@ e5.style({color: 'blue'});
 E('br').write();
 
 
-E('div').add('add class before').cssClass('important').write();
+E('div').add('add class before').addClass('important').write();
 
 var e7 = E('div').add('add class after');
 e7.write();
-e7.cssClass('important');
+e7.addClass('important');
 
 
 
@@ -328,7 +328,7 @@ foam.CLASS({
       var o2 = this.cls_.create({field1: 'O2.f1', field2: 'O2.f2'});
 
       this.
-        cssClass(this.slot(function(flip) {
+        addClass(this.slot(function(flip) {
             return flip ? 'important' : '';
           })).
           tag('br').

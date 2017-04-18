@@ -48,9 +48,9 @@ foam.CLASS({
     },
 
     function initCls() {
-      this.cssClass('mdc-button');
-      if ( this.raised  ) this.cssClass('mdc-button--raised');
-      if ( this.primary ) this.cssClass('mdc-button--primary');
+      this.addClass('mdc-button');
+      if ( this.raised  ) this.addClass('mdc-button--raised');
+      if ( this.primary ) this.addClass('mdc-button--primary');
     }
   ]
 });

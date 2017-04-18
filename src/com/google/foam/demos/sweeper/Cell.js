@@ -74,7 +74,7 @@ foam.CLASS({
     {
       name: 'stateClass',
       expression: function(covered, marked) {
-        return this.myCls(marked ? 'marked' : covered ? 'covered' : '');
+        return this.myClass(marked ? 'marked' : covered ? 'covered' : '');
       }
     }
   ],
@@ -83,11 +83,11 @@ foam.CLASS({
     function initE() {
       this.
         setNodeName('span').
-        cssClass(this.myCls()).
-        cssClass(this.stateClass$).
+        addClass(this.myClass()).
+        addClass(this.stateClass$).
         on('click',       this.sweep).
         on('contextmenu', this.mark).
-        start('span').cssClass(this.myCls('flag')).entity('#x2691').end();
+        start('span').addClass(this.myClass('flag')).entity('#x2691').end();
 
       if ( this.mined ) {
         this.start('font').entity('#x2699').end();

@@ -83,23 +83,18 @@ describe('RestDAO', function() {
             return dao.find(id).then(function(o) {
               return createResponse({ status: 200, payload: jsonify(o) });
             });
-          } else if ( this.method === 'GET' &&
+          } else if ( this.method === 'POST' &&
                       this.url.indexOf(this.baseURL) === 0 &&
                       this.url.substring(this.baseURL.length)
-                          .match(/^:select([?].*)$/) ) {
+                          .match(/^:select([?].*)?$/) ) {
             // select()
-            var data = url.parse(this.url, true).query;
+            var data;
             try {
-              for ( var key in data ) {
-                // Note: This would use data.hasOwnProperty(key), except that
-                // Node JS ParsedQueryString objects do not descend from
-                // Object.prototype.
-                data[key] = foam.json.parseString(decodeURIComponent(
-                  data[key]));
-              }
+              data = foam.json.parseString(this.payload);
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
+
             var sink = data.sink || this.ArraySink.create();
             skip = data.skip;
             limit = data.limit;

@@ -141,9 +141,9 @@ foam.CLASS({
       var sub;
 
       fc.propertyChange.sub(function(s, _, pname) {
-        if ( pname == "stopped") {
+        if ( pname == 'stopped' ) {
           if ( sub ) sub.detach();
-        } else if ( pname === "errorEvt" ) {
+        } else if ( pname === 'errorEvt' ) {
           if ( sub ) sub.detach();
           mySink.error(fc.errorEvt);
         }

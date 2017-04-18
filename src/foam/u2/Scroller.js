@@ -95,9 +95,9 @@ foam.CLASS({
         height$: this.scrollHeight_$
       });
 
-      this.cssClass(this.myCls())
+      this.addClass(this.myClass())
           .start()
-              .cssClass(this.myCls('container'))
+              .addClass(this.myClass('container'))
               .call(function() { self.table = this; })
               .start(this.tableView, {
                 of: this.of,
