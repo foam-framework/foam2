@@ -622,6 +622,7 @@ describe('MLang', function() {
       expect(IN(7, [1, 2, 7]).f()).toBe(true);
       expect(IN(8, [1, 2, 7]).f()).toBe(false);
     });
+
     it('works with a .f()\'d left-hand side and a constant array', function(done) {
       dao.where(IN(test.mlang.Person.NAME, ['Jimi Hendrix', 'Mark Knopfler'])).select()
       .then(function(sink) {
@@ -629,6 +630,7 @@ describe('MLang', function() {
         done();
       });
     });
+
     it('works with a constant left-hand side and a .f()\'d array', function(done) {
       dao.where(IN(6, test.mlang.Person.SOME_ARRAY)).select()
       .then(function(sink) {
@@ -790,6 +792,31 @@ describe('MLang', function() {
     });
   });
 
+  describe('MUL()', function() {
+    var MUL;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      MUL = expr.MUL.bind(expr);
+    });
+
+    it('correctly implements MUL', function() {
+      expect(MUL(1, 5).f()).toBe(5);
+      expect(MUL(2, 5).f()).toBe(10);
+      expect(MUL(3, 5).f()).toBe(15);
+    });
+
+    // todo: mul should return false when one of the arguments is not a number 
+    xit('correctly handle', function() {
+      expect(MUL('a', 'x').f()).toBe(false);
+    });
+
+    it('toString()s nicely', function() {
+      expect(MUL(4, 12).toString())
+          .toBe('MUL(4, 12)');
+    });
+  });
+
+
   describe('MAX()', function() {
     var MAX;
     var EQ;
@@ -823,7 +850,6 @@ describe('MLang', function() {
       expect(MAX(test.mlang.Person.AGE).toString())
           .toBe('MAX(age)');
     });
-
   });
 
   describe('COUNT()', function() {
