@@ -816,7 +816,6 @@ describe('MLang', function() {
     });
   });
 
-
   describe('MAX()', function() {
     var MAX;
     var EQ;
@@ -849,6 +848,41 @@ describe('MLang', function() {
     it('toString()s nicely', function() {
       expect(MAX(test.mlang.Person.AGE).toString())
           .toBe('MAX(age)');
+    });
+  });
+
+  describe('MIN()', function() {
+    var MIN;
+    var EQ;
+    beforeEach(function() {
+      var expr = foam.mlang.ExpressionsSingleton.create();
+      MIN = expr.MIN.bind(expr);
+      EQ = expr.EQ.bind(expr);
+    });
+
+    it('correctly implements MIN', function(done) {
+      dao.select(MIN(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(27); // hendrix
+        done();
+      });
+    });
+
+    it('MIN with where', function(done) {
+      dao
+      .where(EQ(test.mlang.Person.DECEASED, true))
+      .select(MIN(test.mlang.Person.AGE))
+      .then(function(sink) {
+        expect(sink.hasOwnProperty('value')).toBe(true);
+        expect(sink.value).toBe(27); // hendrix
+        done();
+      });
+    });
+
+    it('toString()s nicely', function() {
+      expect(MIN(test.mlang.Person.AGE).toString())
+          .toBe('MIN(age)');
     });
   });
 
