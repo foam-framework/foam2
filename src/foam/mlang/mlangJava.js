@@ -409,47 +409,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  refines: 'foam.mlang.order.ThenBy',
-
-  methods: [
-    {
-      name: 'compare',
-      javaCode: 'int c = getArg1().compare(o1, o2); ' +
-        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
-        'return c;'
-    },
-    {
-      name: 'toString',
-      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
-        '"," + getArg1().toString() + ")";'
-    },
-    {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
-        'foam.mlang.order.Comparator arg2 = getArg2();' +
-        'if ( arg1 != null && arg2 != null ) {' +
-          'return arg1.toIndex(arg2.toIndex(tail));' +
-        '}' +
-        'return null;'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return getArg2();'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1().orderPrimaryProperty();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'return getArg1().orderDirection();'
-    }
-  ]
-});
-
-
 foam.CLASS({
   refines: 'foam.mlang.order.CustomComparator',
 
