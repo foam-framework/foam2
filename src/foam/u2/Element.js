@@ -471,6 +471,56 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'RenderSink',
+  properties: [
+    {
+      class: 'Function',
+      name: 'addRow'
+    },
+    {
+      class: 'Function',
+      name: 'cleanup'
+    },
+    'dao',
+    {
+      class: 'Int',
+      name: 'batch'
+    }
+  ],
+  methods: [
+    function put(s, obj) {
+      this.reset();
+    },
+    function remove(s, obj) {
+      this.reset();
+    },
+    function reset() {
+      this.paint();
+    }
+  ],
+  listeners: [
+    {
+      name: 'paint',
+      isMerged: 100,
+      code: function() {
+        var batch = ++this.batch;
+        var self = this;
+        this.dao.select().then(function(a) {
+          // Check if this is a stale render
+          if ( self.batch !== batch ) return;
+
+          var objs = a.a;
+          self.cleanup();
+          for ( var i = 0 ; i < objs.length ; i++ ) {
+            self.addRow(objs[i]);
+          }
+        });
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.u2',
@@ -1267,9 +1317,12 @@ foam.CLASS({
       return this;
     },
 
-    function tag(spec, args) {
+    function tag(spec, args, slot) {
       /* Create a new Element and add it as a child. Return this. */
-      return this.add(this.createChild_(spec, args));
+      var c = this.createChild_(spec, args);
+      this.add(c);
+      if ( slot ) slot.set(c);
+      return this;
     },
 
     function br() {
@@ -1419,55 +1472,44 @@ foam.CLASS({
     },
 
     function select(dao, f, update) {
-      // TODO: cleanup on detach
       var es   = {};
       var self = this;
-      var reset = function() {
-        for ( var key in es ) {
-          removeRow(null, null, null, {id: key});
-        }
-        dao.select({
-          put: function(o) { addRow(null, null, null, o); },
-          eof: function() {}
-        });
-      };
-      var addRow = function(_, __, ___, o) {
-        if ( update ) {
-          o = o.clone();
-        }
 
-        // todo: add o listener and add in sub-context??
-        self.startContext({data: o});
-        var e = f.call(self, o);
-        if ( update ) {
-          // ???: Why is it necessary to delay this until after load?
-          e.onload.sub(function() {
+      var listener = foam.u2.RenderSink.create({
+        dao: dao,
+        addRow: function(o) {
+          if ( update ) o = o.clone();
+
+          self.startContext({data: o});
+
+          var e = f.call(self, o);
+
+          if ( update ) {
             o.propertyChange.sub(function(_,__,prop,slot) {
               dao.put(o.clone());
             });
-          });
-        }
-        self.endContext();
+          }
 
-        if ( es[o.id] ) {
-          self.replaceChild(es[o.id], e);
-        } else {
-          self.add(e);
-        }
-        es[o.id] = e;
-      };
-      var removeRow = function(_, __, ___, o) {
-        var e = es[o.id];
-        if ( e ) {
-          e.remove();
-          delete es[o.id];
-        }
-      }
+          self.endContext();
 
-      reset();
-      dao.on.put.sub(addRow);
-      dao.on.remove.sub(removeRow);
-      dao.on.reset.sub(reset);
+          if ( es[o.id] ) {
+            self.replaceChild(es[o.id], e);
+          } else {
+            self.add(e);
+          }
+          es[o.id] = e;
+        },
+        cleanup: function() {
+          for ( var key in es ) {
+            es[key].remove();
+          }
+
+          es = {};
+        }
+      })
+
+      this.onDetach(dao.listen(listener));
+      listener.paint();
 
       return this;
     },
@@ -1640,7 +1682,7 @@ foam.CLASS({
 
         // Convert e or e[0] into a SPAN if needed,
         // So that it can be located later.
-        if ( ! e ) {
+        if ( e === undefined || e === null || e === '' ) {
           e = self.E('SPAN');
         } else if ( Array.isArray(e) ) {
           if ( e.length ) {
@@ -1906,6 +1948,12 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+  properties: [
+    [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Date',

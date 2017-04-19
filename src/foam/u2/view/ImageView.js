@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,16 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'FlowControl',
-
-  documentation: 'FlowControl object used to stop or error while performing a DAO.select().',
-
+  package: 'foam.u2.view',
+  name: 'ImageView',
+  extends: 'foam.u2.Element',
   properties: [
-    {
-      class: 'Boolean',
-      name: 'stopped'
-    },
-    {
-      class: 'Object',
-      name: 'errorEvt'
-    }
+    'data',
+    ['nodeName', 'img']
   ],
-
   methods: [
-    {
-      name: 'stop',
-      code: function() { this.stopped = true; }
-    },
-    {
-      name: 'error',
-      code: function error(e) { this.errorEvt = e; }
+    function initE() {
+      this.attrs({ src: this.data$ });
     }
   ]
 });

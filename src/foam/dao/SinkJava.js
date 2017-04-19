@@ -24,12 +24,12 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
         },
         {
-          name: 'fc',
-          javaType: 'foam.dao.FlowControl'
+          name: 'obj',
+          javaType: 'foam.core.FObject'
         }
       ]
     },
@@ -38,12 +38,12 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
         },
         {
-          name: 'fc',
-          javaType: 'foam.dao.FlowControl'
+          name: 'obj',
+          javaType: 'foam.core.FObject'
         }
       ]
     },
@@ -52,12 +52,14 @@ foam.INTERFACE({
       javaReturns: 'void'
     },
     {
-      name: 'error',
-      javaReturns: 'void'
-    },
-    {
       name: 'reset',
-      javaReturns: 'void'
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ]
     }
   ]
 });
@@ -78,10 +80,6 @@ foam.CLASS({
       javaCode: 'return;'
     },
     {
-      name: 'error',
-      javaCode: 'return;'
-    },
-    {
       name: 'reset',
       javaCode: 'return;'
     }
@@ -95,11 +93,11 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(obj, fc);'
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(sub, obj);'
     },
     {
       name: 'remove',
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(obj, fc);'
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(sub, obj);'
     }
   ]
 });
@@ -112,19 +110,19 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  fc.stop();\n'
+              + '  sub.detach();\n'
               + '} else {\n'
               + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(obj, fc);\n'
+              + '  getDelegate().put(sub, obj);\n'
               + '}\n'
     },
     {
       name: 'remove',
       javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  fc.stop();\n'
+              + '  sub.detach();\n'
               + '} else {'
               + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(obj, fc);\n'
+              + '  getDelegate().put(sub, obj);\n'
               + '}\n'
     }
   ]
@@ -140,7 +138,7 @@ foam.CLASS({
               + '  setCount(getCount() + 1);\n'
               + '  return;'
               + '}\n'
-              + 'getDelegate().put(obj, fc);'
+              + 'getDelegate().put(sub, obj);'
     },
     {
       name: 'remove',
@@ -148,7 +146,7 @@ foam.CLASS({
               + '  setCount(getCount() + 1);\n'
               + '  return;'
               + '}\n'
-              + 'getDelegate().remove(obj, fc);'
+              + 'getDelegate().remove(sub, obj);'
     }
   ]
 });
@@ -167,12 +165,12 @@ foam.CLASS({
       name: 'eof',
       javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
                 + 'java.util.Collections.sort(getArray());\n'
-                + 'foam.dao.FlowControl fc = (foam.dao.FlowControl)getX().create(foam.dao.FlowControl.class);\n'
+                + 'foam.dao.Subscription sub = getX().create(foam.dao.Subscription.class);\n'
                 + 'for ( Object o : getArray() ) {\n'
-                + '  if ( fc.getStopped() || fc.getErrorEvt() != null ) {\n'
+                + '  if ( sub.getDetached() ) {\n'
                 + '    break;\n'
                 + '  }\n'
-                + '  getDelegate().put((foam.core.FObject)o, fc);\n'
+                + '  getDelegate().put(sub, (foam.core.FObject)o);\n'
                 + '}'
     }
   ]

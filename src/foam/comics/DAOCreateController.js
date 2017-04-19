@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +44,11 @@ foam.CLASS({
     {
       name: 'data',
       label: '',
-      view: { class: 'foam.u2.DetailView' },
+      view: function(args, X) {
+        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.of }, X).copyFrom(args);
+        e.data$ = X.data$.dot(this.name);
+        return e;
+      },
       factory: function() {
         return this.of.create(null, this);
       }
@@ -56,8 +61,10 @@ foam.CLASS({
       code: function() {
         var stack = this.stack;
 
-        this.dao.put(this.data).then(function() {
+        this.dao.put(this.data.clone()).then(function() {
           if ( stack ) stack.back();
+        }, function(e) {
+          console.error(e);
         });
       }
     },

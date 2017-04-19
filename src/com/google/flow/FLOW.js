@@ -291,7 +291,7 @@ foam.CLASS({
             var log = this.log;
             var first = true;
             self.flows.select({
-              put: function(o) {
+              put: function(_, o) {
                 if ( first ) {
                   first = false;
                   log('\n');

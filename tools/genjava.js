@@ -65,7 +65,6 @@ var classes = [
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
-  'foam.dao.FlowControl',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count'
 ];
