@@ -306,15 +306,6 @@ foam.CLASS({
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
-    },
-
-    function xxpipe(sink, skip, limit, order, predicate) {
-      return this.delegate.pipe(
-        sink,
-        skip, limit, order,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
     }
   ]
 });
@@ -340,10 +331,7 @@ foam.CLASS({
     },
     function listen(sink, skip, limit, order, predicate) {
       return this.delegate.listen(sink, skip, limit, order ? order : this.comparator, predicate);
-    },
-    function xxpipe(sink, skip, limit, order, predicate) {
-      return this.delegate.pipe(sink, skip, limit, order ? order : this.comparator, predicate);
-    },
+    }
   ]
 });
 
@@ -368,10 +356,7 @@ foam.CLASS({
     },
     function listen(sink, skip, limit, order, predicate) {
       return this.delegate.listen(sink, this.skip_, limit, order, predicate);
-    },
-    function xxpipe(sink, skip, limit, order, predicate) {
-      return this.delegate.pipe(sink, this.skip_, limit, order, predicate);
-    },
+    }
   ]
 });
 
@@ -404,13 +389,6 @@ foam.CLASS({
 
     function listen(sink, skip, limit, order, predicate) {
       return this.delegate.listen(
-        sink, skip,
-        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
-        order, predicate);
-    },
-
-    function xxpipe(sink, skip, limit, order, predicate) {
-      return this.delegate.pipe(
         sink, skip,
         limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
         order, predicate);
