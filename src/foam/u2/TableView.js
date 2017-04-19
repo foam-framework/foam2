@@ -286,7 +286,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      factory: function() { return this.data.of; }
     },
     [ 'nodeName', 'table' ],
     {
