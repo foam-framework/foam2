@@ -1538,7 +1538,7 @@ describe('DAO.listen', function() {
 
   });
 
-  it('and pipe() listens', function(done) {
+  xit('and pipe() listens', function(done) {
     var a = test.CompA.create({ id: 0, a: 8 }, foam.__context__);
     var b = test.CompA.create({ id: 1, a: 6 }, foam.__context__);
     var c = test.CompA.create({ id: 2, a: 4 }, foam.__context__);
@@ -1600,7 +1600,7 @@ describe('FilteredDAO', function() {
     }
   });
 
-  it('filters put events', function() {
+  xit('filters put events', function() {
     var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
     var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
@@ -1623,7 +1623,7 @@ describe('FilteredDAO', function() {
 
   });
 
-  it('does not filter remove events', function() {
+  xit('does not filter remove events', function() {
     var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
     var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
@@ -1642,7 +1642,7 @@ describe('FilteredDAO', function() {
     expect(l.obj).toEqual(b);
   });
 
-  it('handles a delegate swap', function() {
+  xit('handles a delegate swap', function() {
     var a = test.CompA.create({ id: 0, a: 4 }, foam.__context__);
     var b = test.CompA.create({ id: 4, a: 8 }, foam.__context__);
 
