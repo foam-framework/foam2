@@ -15,24 +15,6 @@
  * limitations under the License.
  */
 
-describe('FlowControl', function() {
-
-  it('stops', function() {
-    var fc = foam.dao.FlowControl.create();
-
-    fc.stop();
-    expect(fc.stopped).toEqual(true);
-  });
-
-  it('errors', function() {
-    var fc = foam.dao.FlowControl.create();
-
-    fc.error("error");
-    expect(fc.errorEvt).toEqual("error");
-  });
-
-});
-
 describe('AbstractSink', function() {
   it('covers empty methods', function() {
     var sink = foam.dao.AbstractSink.create();
@@ -40,7 +22,6 @@ describe('AbstractSink', function() {
     sink.put();
     sink.remove();
     sink.eof();
-    sink.error();
     sink.reset();
   });
 });
