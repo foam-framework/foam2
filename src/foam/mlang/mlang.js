@@ -1592,6 +1592,33 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Min',
+  extends: 'foam.dao.AbstractSink',
+
+  implements: [
+    'foam.mlang.predicate.Unary',
+    'foam.core.Serializable'
+  ],
+
+  documentation: 'A Sink which remembers the minimum value put().',
+
+  properties: [
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+
+  methods: [
+    function put(obj) {
+      if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj) ) > 0) {
+        this.value = this.arg1.f(obj);
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -1679,6 +1706,7 @@ foam.CLASS({
     'foam.mlang.sink.Unique',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
+    'foam.mlang.sink.Min',
     'foam.mlang.sink.Sum'
   ],
 
@@ -1726,6 +1754,7 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    function MIN(arg1) { return this.Min.create({ arg1: arg1 }); },
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
