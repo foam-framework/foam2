@@ -1640,7 +1640,7 @@ foam.CLASS({
 
         // Convert e or e[0] into a SPAN if needed,
         // So that it can be located later.
-        if ( ! e ) {
+        if ( e === undefined || e === null || e === '' ) {
           e = self.E('SPAN');
         } else if ( Array.isArray(e) ) {
           if ( e.length ) {
