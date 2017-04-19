@@ -67,6 +67,8 @@ foam.CLASS({
     function plan() { this.cost = 1; return this; },
 
     function select(sink, skip, limit, order, predicate, cache) {
+      if ( sink && sink.cls_ && sink.cls_.id == 'foam.dao.index.TreeIndexNode' ) debugger;
+
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;

@@ -241,7 +241,7 @@ foam.CLASS({
           var insertAfter = head;
           // TODO: refactor with insertAfter as a property of a new class?
           insertPlanSink = foam.dao.QuickSink.create({
-            putFn: function(o) {
+            putFn: function(_, o) {
               function insert() {
                 var nu = Object.create(NodeProto);
                 nu.next = insertAfter.next;
