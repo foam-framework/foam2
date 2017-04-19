@@ -233,7 +233,7 @@ foam.CLASS({
           targetDAOKey: this.junctionDAOKey,
           relationshipDAOFactory: function(source) {
             return foam.dao.ManyToManyRelationshipDAO.create({
-              dest: jModel,
+              junctionCls: jModel,
               obj: source,
               of: target.id,
               relationship: this,
@@ -264,7 +264,7 @@ foam.CLASS({
           targetDAOKey: this.junctionDAOKey,
           relationshipDAOFactory: function(s) {
             return foam.dao.ManyToManyRelationshipDAO.create({
-              dest: jModel,
+              junctionCls: jModel,
               obj: s,
               of: source.id,
               relationship: this,
