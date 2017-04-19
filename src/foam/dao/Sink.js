@@ -357,7 +357,7 @@ foam.CLASS({
         });
 
         for ( var i = 0 ; i < this.array.length ; i++ ) {
-          this.delegate.put(this.array[i]);
+          this.delegate.put(null, this.array[i]);
         }
       }
     },

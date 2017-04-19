@@ -1613,7 +1613,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put(s, obj) {
       if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj) ) > 0) {
         this.value = this.arg1.f(obj);
       }
