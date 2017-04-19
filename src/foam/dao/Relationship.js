@@ -167,6 +167,7 @@ foam.CLASS({
             foam.core.Property.create({
               name: forwardName,
               transient: true,
+              hidden: true,
               setter: function() {},
               getter: function() {
                 return this.instance_[forwardName] || ( this.instance_[forwardName] = relationship.relationshipDAOFactory(this) );
