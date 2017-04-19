@@ -241,7 +241,7 @@ describe('Query parser', function() {
     var dao2 = foam.dao.ArrayDAO.create({
       of: Item
     }, foam.__context__);
-    dao.select(dao2);
+    dao.select(foam.dao.DAOSink.create({ dao: dao2 }));
 
     var todayItem = Item.create({
       id: 6,

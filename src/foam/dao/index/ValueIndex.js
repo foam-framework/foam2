@@ -52,7 +52,7 @@ foam.CLASS({
       /** Note that this will put(undefined) if you remove() the item but
         leave this ValueIndex intact. Usages of ValueIndex should clean up
         the ValueIndex itself when the value is removed. */
-      sink.put(this.value);
+      sink.put(null, this.value);
     },
 
     function toString() {
@@ -67,10 +67,12 @@ foam.CLASS({
     function plan() { this.cost = 1; return this; },
 
     function select(sink, skip, limit, order, predicate, cache) {
+      if ( sink && sink.cls_ && sink.cls_.id == 'foam.dao.index.TreeIndexNode' ) debugger;
+
       if ( predicate && ! predicate.f(this.value) ) return;
       if ( skip && skip[0]-- > 0 ) return;
       if ( limit && limit[0]-- <= 0 ) return;
-      sink.put(this.value);
+      sink.put(null, this.value);
     },
   ]
 });

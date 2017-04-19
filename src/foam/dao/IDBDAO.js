@@ -291,7 +291,10 @@ foam.CLASS({
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var fc = this.FlowControl.create();
+      var sub = foam.core.FObject.create();
+      var detached = false;
+      sub.onDetach(function() { detached = true; });
+
       var self = this;
 
       return new Promise(function(resolve, reject) {
@@ -306,24 +309,22 @@ foam.CLASS({
 
           request.onsuccess = function(e) {
             var cursor = e.target.result;
-            if ( fc.errorEvt ) {
-              sink.error && sink.error(fc.errorEvt);
-              reject(fc.errorEvt);
+            if ( e.target.error ) {
+              reject(e.target.error);
               return;
             }
 
-            if ( ! cursor || fc.stopped ) {
+            if ( ! cursor || detached ) {
               sink.eof && sink.eof();
               resolve(resultSink);
               return;
             }
 
             var value = self.deserialize(cursor.value);
-            sink.put(value, fc);
+            sink.put(sub, value);
             cursor.continue();
           };
           request.onerror = function(e) {
-            sink.error && sink.error(e);
             reject(self.IDBInternalException.create({ id: 'select', error: e }));
           };
         });

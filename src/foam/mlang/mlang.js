@@ -34,7 +34,8 @@ foam.CLASS({
 
   methods: [
     function put() { this.value++; },
-
+    function remove() { this.value--; },
+    function reset() { this.value = 0; },
     function toString() { return 'COUNT()'; }
   ]
 });
@@ -1138,7 +1139,7 @@ foam.CLASS({
   methods: [
     function f(o) { return this.arg1.f(o); },
 
-    function put(o) { this.delegate.put( this.f(o) ); }
+    function put(sub, o) { this.delegate.put(sub, this.f(o)); }
   ]
 });
 
@@ -1205,30 +1206,30 @@ foam.CLASS({
       return this.groupKeys;
     },
 
-    function putInGroup_(key, obj) {
+    function putInGroup_(sub, key, obj) {
       var group = this.groups.hasOwnProperty(key) && this.groups[key];
       if ( ! group ) {
         group = this.arg2.clone();
         this.groups[key] = group;
         this.groupKeys.push(key);
       }
-      group.put(obj);
+      group.put(sub, obj);
     },
 
-    function put(obj) {
+    function put(sub, obj) {
       var key = this.arg1.f(obj);
       if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
-          for ( var i = 0 ; i < key.length ; i++ ) {
-            this.putInGroup_(key[i], obj);
+          for ( var i = 0; i < key.length; i++ ) {
+            this.putInGroup_(sub, key[i], obj);
           }
         } else {
           // Perhaps this should be a key value of null, not '', since '' might
           // actually be a valid key.
-          this.putInGroup_('', obj);
+          this.putInGroup_(sub, '', obj);
         }
       } else {
-        this.putInGroup_(key, obj);
+        this.putInGroup_(sub, key, obj);
       }
     },
 
@@ -1582,7 +1583,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put(sub, obj) {
       if ( ! this.hasOwnProperty('value') ) {
         this.value = this.arg1.f(obj);
       } else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
@@ -1592,6 +1593,33 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Min',
+  extends: 'foam.dao.AbstractSink',
+
+  implements: [
+    'foam.mlang.predicate.Unary',
+    'foam.core.Serializable'
+  ],
+
+  documentation: 'A Sink which remembers the minimum value put().',
+
+  properties: [
+    {
+      name: 'value',
+      value: 0
+    }
+  ],
+
+  methods: [
+    function put(s, obj) {
+      if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj) ) > 0) {
+        this.value = this.arg1.f(obj);
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.mlang.sink',
@@ -1613,7 +1641,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) { this.value += this.arg1.f(obj); }
+    function put(sub, obj) { this.value += this.arg1.f(obj); }
   ]
 });
 
@@ -1676,10 +1704,11 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
-    'foam.mlang.sink.Unique',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
-    'foam.mlang.sink.Sum'
+    'foam.mlang.sink.Min',
+    'foam.mlang.sink.Sum',
+    'foam.mlang.sink.Unique'
   ],
 
   constants: {
@@ -1726,10 +1755,11 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    function MIN(arg1) { return this.Min.create({ arg1: arg1 }); },
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
+    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); }
   ]
 });
 

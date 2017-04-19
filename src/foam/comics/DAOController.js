@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +34,16 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      view: 'foam.u2.view.RecipricalSearch'
+      view: function(args, X) {
+        return {
+          class: 'foam.u2.view.RecipricalSearch',
+          of: X.data.of
+        };
+      }
     },
     {
       name: 'filteredDAO',
-      view: 'foam.u2.view.TableView',
+      view: 'foam.u2.view.ScrollTableView',
       expression: function(data, predicate) {
         return predicate ? data.where(predicate) : data;
       }
@@ -54,8 +60,9 @@ foam.CLASS({
       name: 'create',
       code: function() {
         this.stack.push({
-          class: 'foam.comics.DAOCreateController',
-          of: this.of
+          class: 'foam.comics.DAOCreateControllerView',
+          of: this.of,
+          data: this.data
         });
       }
     }

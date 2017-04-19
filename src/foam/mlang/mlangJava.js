@@ -46,7 +46,7 @@ foam.CLASS({
   ]
 });
 
-
+debugger;
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
@@ -107,6 +107,33 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
 
   methods: [
+    {
+      // TODO: This is a duplicate of the method in Predicate,
+      // but it's necessary because when we refine Predicate, it doesn't
+      // update classes that copied their axioms in from Predicate as a trait.
+      // If we were more careful about the ordering of classes this wouldn't be
+      // necessary.
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: 'return false;',
+      javaReturns: 'boolean'
+    },
+    {
+      // TODO: Same TODO as .f method above
+      name: 'toIndex',
+      javaSupport: false
+    },
+    {
+      // TODO: Same TODO as .f
+      name: 'toDisjunctiveNormalForm',
+      javaSupport: false,
+      javaReturns: 'foam.mlang.predicate.Predicate'
+    },
     {
       name: 'partialEval',
       javaCode: 'return this;',
@@ -386,14 +413,6 @@ foam.CLASS({
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     },
     {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
-        'if ( arg1 != null ) {' +
-          'return arg1.toIndex(tail);'+
-        '}'+
-        'return null;'
-    },
-    {
       name: 'orderTail',
       javaCode: 'return null;'
     },
@@ -408,47 +427,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  refines: 'foam.mlang.order.ThenBy',
-
-  methods: [
-    {
-      name: 'compare',
-      javaCode: 'int c = getArg1().compare(o1, o2); ' +
-        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
-        'return c;'
-    },
-    {
-      name: 'toString',
-      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
-        '"," + getArg1().toString() + ")";'
-    },
-    {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
-        'foam.mlang.order.Comparator arg2 = getArg2();' +
-        'if ( arg1 != null && arg2 != null ) {' +
-          'return arg1.toIndex(arg2.toIndex(tail));' +
-        '}' +
-        'return null;'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return getArg2();'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1().orderPrimaryProperty();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'return getArg1().orderDirection();'
-    }
-  ]
-});
-
 
 foam.CLASS({
   refines: 'foam.mlang.order.CustomComparator',

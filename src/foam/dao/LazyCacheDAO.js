@@ -225,7 +225,7 @@ foam.CLASS({
         self.selects_[key] = entry = {
           time: Date.now(),
           promise:
-            self.delegate.select(self.cache, skip, limit, order, predicate)
+            self.delegate.select(self.DAOSink.create({ dao: self.cache }), skip, limit, order, predicate)
               .then(function(cache) {
                 self.pub('on', 'reset');
                 return cache;

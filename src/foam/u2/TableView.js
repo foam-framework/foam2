@@ -184,7 +184,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(obj) {
+    function put(_, obj) {
       this.body.addObj(obj);
     }
   ]
@@ -286,7 +286,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      factory: function() { return this.data.of; }
     },
     [ 'nodeName', 'table' ],
     {

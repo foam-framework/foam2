@@ -700,8 +700,11 @@ foam.CLASS({
       // 'Content-Length' or 'Transfer-Encoding' required for some requests
       // to be properly handled by Node JS servers.
       // See https://github.com/nodejs/node/issues/3009 for details.
+
       var buf;
-      if ( this.payload ) {
+      if ( this.payload && this.Blob.isInstance(this.payload) ) {
+        this.headers['Content-Length'] = this.payload.size;
+      } else if ( this.payload ) {
         buf = new Buffer(this.payload, 'utf8');
         if ( ! this.headers['Content-Length'] ) {
           this.headers['Content-Length'] = buf.length;
@@ -722,9 +725,6 @@ foam.CLASS({
             resp: nodeResp,
             responseType: this.responseType
           });
-
-          // Ensure that payload factory wires up listeners immediately.
-          resp.payload;
 
           // TODO(markdittmer): Write integration tests for redirects, including
           // same-origin/path-only redirects.
@@ -747,14 +747,27 @@ foam.CLASS({
           } else {
             resolve(resp);
           }
-
         }.bind(this));
 
         req.on('error', function(e) {
           reject(e);
         });
 
-        if ( this.payload ) req.write(buf);
+        if ( this.payload && this.Blob.isInstance(this.payload) ) {
+          this.payload.pipe(function(buf) {
+            if ( req.write(buf) ) {
+              return new Promise(function(resolve) { req.once('drain', resolve); });
+            }
+          }).then(function() {
+            req.end();
+          });
+          return;
+        } else if ( this.payload ) {
+          req.write(buf);
+          req.end();
+          return;
+        }
+
         req.end();
       }.bind(this));
     }
