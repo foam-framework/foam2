@@ -24,10 +24,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'data',
-      hidden: true
-    },
-    {
       class: 'Class',
       name: 'of',
       hidden: true
@@ -51,18 +47,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'status'
-    }
-  ],
-
-  methods: [
-    function init() {
-      var self = this;
-      this.dao.find(this.data).then(function(obj) {
-        self.obj = obj.clone();
-      }, function(e) {
-        // TODO: Handle this better.
-        self.status = 'Failed to load record. ' + e.message;
-      });
     }
   ],
 
