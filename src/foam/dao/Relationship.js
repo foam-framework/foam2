@@ -167,6 +167,7 @@ foam.CLASS({
             foam.dao.DAOProperty.create({
               name: forwardName,
               transient: true,
+              hidden: true,
               setter: function() {},
               getter: function() {
                 return this.instance_[forwardName] || ( this.instance_[forwardName] = relationship.relationshipDAOFactory(this) );
@@ -255,7 +256,7 @@ foam.CLASS({
         foam.RELATIONSHIP({
           sourceModel: this.targetModel,
           targetModel: id,
-          sourceProperty: this.targetProperty,
+          targetProperty: this.targetProperty,
           forwardName: this.inverseName,
           inverseName: 'targetId',
           sourceDAOKey: this.targetDAOKey,
