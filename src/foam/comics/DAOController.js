@@ -20,11 +20,30 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
 
+  requires: [
+    'foam.u2.stack.Stack',
+  ],
+
   imports: [
-    'stack'
+    'stack? as importedStack'
+  ],
+
+  exports: [
+    'stack',
   ],
 
   properties: [
+    {
+      name: 'stack',
+      /*
+      expression: function(importedStack) {
+        return importedStack || this.Stack.create();
+      },
+      */
+      factory: function() {
+        return this.importedStack || this.Stack.create();
+      },
+    },
     {
       name: 'data',
       hidden: true,
