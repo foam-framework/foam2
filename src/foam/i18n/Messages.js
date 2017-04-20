@@ -33,15 +33,14 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'messageMap',
-      help: 'Map of language codes to the message in that language.'
+      help: 'Map of language codes to the message in that language.',
+      factory: function() { return {}; }
     },
     {
       class: 'String',
       name: 'message',
-      getter: function() {
-        return this.message_ || this.messageMap[foam.locale];
-      },
-      setter: function(m) { this.message_ = m; },
+      getter: function() { return this.message_ || this.messageMap[foam.locale]; },
+      setter: function(m) { this.message_ = this.messageMap[foam.locale] = m; }
     },
     {
       class: 'Simple',
@@ -80,4 +79,3 @@ foam.CLASS({
     }
   ]
 });
-ß
