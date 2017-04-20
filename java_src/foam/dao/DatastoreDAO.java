@@ -130,7 +130,7 @@ public class DatastoreDAO extends AbstractDAO {
 
     Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
 
-    FlowControl fc = (FlowControl)getX().create(FlowControl.class);
+    Subscription sub = getX().create(foam.dao.Subscription.class);
 
     // TODO: Richer query handling
 
@@ -139,16 +139,11 @@ public class DatastoreDAO extends AbstractDAO {
     for ( Entity e : query.asIterable() ) {
       FObject obj = deserialize(e);
 
-      if ( fc.getStopped() || fc.getErrorEvt() != null ) {
+      if ( sub.getDetached() ) {
         break;
       }
 
-      decorated.put(obj, fc);
-    }
-
-    if ( fc.getErrorEvt() != null ) {
-      decorated.error();
-      return sink;
+      decorated.put(sub, obj);
     }
 
     decorated.eof();

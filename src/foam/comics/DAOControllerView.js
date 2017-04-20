@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +19,52 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOControllerView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Element',
+
+  imports: [
+    'stack'
+  ],
+
+  exports: [
+    'editRecord'
+  ],
 
   requires: [
     'foam.comics.DAOController'
   ],
 
+  properties: [
+    'data',
+    'of',
+    {
+      name: 'controller',
+      factory: function() {
+        return this.DAOController.create({
+          of$: this.of$,
+          data$: this.data$
+        });
+      }
+    }
+  ],
+
   methods: [
+    function editRecord(obj) {
+      this.stack.push({
+        class: 'foam.comics.DAOUpdateControllerView',
+        of: this.of,
+        data: obj.id
+      });
+    },
     function initE() {
-      this.add(
-        this.DAOController.PREDICATE,
-        this.DAOController.FILTERED_DAO
-      );
+      this.startContext({ data: this.controller }).
+        start('table').
+          start('tr').
+            start('td').add(this.DAOController.PREDICATE).end().
+            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
+          end().
+          start('tr').start('td').end().start('td').add(this.DAOController.CREATE).end().
+        end().
+        endContext();
     }
   ]
 });

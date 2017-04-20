@@ -123,13 +123,11 @@ foam.CLASS({
       name: 'oneWay'
     },
     {
-      class: 'FObjectProperty',
-      of: 'Property',
+      class: 'Map',
       name: 'sourceProperty'
     },
     {
-      class: 'FObjectProperty',
-      of: 'Property',
+      class: 'Map',
       name: 'targetProperty'
     },
     {
@@ -169,6 +167,7 @@ foam.CLASS({
             foam.core.Property.create({
               name: forwardName,
               transient: true,
+              hidden: true,
               setter: function() {},
               getter: function() {
                 return this.instance_[forwardName] || ( this.instance_[forwardName] = relationship.relationshipDAOFactory(this) );
@@ -294,9 +293,14 @@ foam.CLASS({
     },
 
     function targetQueryFromSource(obj) {
-      var targetClass = this.lookup(this.sourceModel);
-      var name        = this.forwardName;
+      var targetClass = this.lookup(this.targetModel);
+      var name        = this.inverseName;
       var targetProp  = targetClass[foam.String.constantize(name)];
+
+      if ( obj.id === undefined ) {
+        this.warn('Attempted to read relationship from object with no id.');
+        return this.FALSE;
+      }
 
       return this.EQ(targetProp, obj.id);
     }

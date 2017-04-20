@@ -167,7 +167,7 @@ describe('ValueIndex', function() {
   it('selects when skip and limit allow', function() {
     idx.put(data[0]);
 
-    var sink = { put: function(o) { this.putted = o; } };
+    var sink = { put: function(_, o) { this.putted = o; } };
 
     idx.select(sink);
     expect(sink.putted).toBe(data[0]);
@@ -215,7 +215,7 @@ describe('ValueIndex', function() {
   it('selects when predicate allows', function() {
     idx.put(data[0]);
 
-    var sink = { put: function(o) { this.putted = o; } };
+    var sink = { put: function(_, o) { this.putted = o; } };
 
     var predicate = { f: function() { return false; } };
     idx.select(sink, undefined, undefined, undefined, predicate);
@@ -263,7 +263,7 @@ describe('ValueIndex (as Plan)', function() {
   it('plans for no value', function() {
     plan = idx.plan();
 
-    var sink = { put: function(o) { this.putted = o; } };
+    var sink = { put: function(_, o) { this.putted = o; } };
 
     expect(plan.cost).toEqual(1);
     plan.execute([/*promise*/], sink);
@@ -276,7 +276,7 @@ describe('ValueIndex (as Plan)', function() {
     idx.put(data[0]);
     plan = idx.plan();
 
-    var sink = { put: function(o) { this.putted = o; } };
+    var sink = { put: function(_, o) { this.putted = o; } };
 
     expect(plan.cost).toEqual(1);
     plan.execute([/*promise*/], sink);
@@ -1075,7 +1075,7 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 10; i++ ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       })
@@ -1094,7 +1094,7 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 10; i++ ) {
-            sink.put(data.setA[9 - i]);
+            sink.put(null, data.setA[9 - i]);
           }
         }
       })
@@ -1115,21 +1115,21 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
@@ -1150,21 +1150,21 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
@@ -1186,21 +1186,21 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) { // put cloned dupes of first 5
-            sink.put(data.setA[i].clone());
+            sink.put(null, data.setA[i].clone());
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
@@ -1222,14 +1222,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(data.setB[i]);
+            sink.put(null, data.setB[i]);
           }
         }
       }),
@@ -1266,14 +1266,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(data.setB[i]);
+            sink.put(null, data.setB[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
@@ -1309,14 +1309,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(data.setB[i]);
+            sink.put(null, data.setB[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
@@ -1349,7 +1349,7 @@ describe('MergePlan', function() {
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           promise[0] = Promise.resolve().then(function() {
             for ( var i = 9; i >= 0; i-- ) {
-              sink.put(data.setB[i]);
+              sink.put(null, data.setB[i]);
             }
           });
         }
@@ -1360,7 +1360,7 @@ describe('MergePlan', function() {
             innerResolve = res; // intermediate promise we control
           }).then(function() {
             for ( var i = 9; i >= 0; i-- ) { // do final work
-              sink.put(data.setA[i]);
+              sink.put(null, data.setA[i]);
             }
           });
         }
@@ -1394,14 +1394,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 8; i++ ) {
-            sink.put(data.setA[i]);
+            sink.put(null, data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 8; i++ ) {
-            sink.put(data.setA[i].clone());
+            sink.put(null, data.setA[i].clone());
           }
         }
       }),
@@ -1428,26 +1428,26 @@ describe('MergePlan', function() {
     plan.subPlans = [
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
-          sink.put(data.setA[1]);
-          sink.put(data.setA[0]);
-          sink.put(data.setA[3]);
-          sink.put(data.setA[2]);
-          sink.put(data.setA[6]);
-          sink.put(data.setA[7]);
-          sink.put(data.setA[4]);
-          sink.put(data.setA[5]);
+          sink.put(null, data.setA[1]);
+          sink.put(null, data.setA[0]);
+          sink.put(null, data.setA[3]);
+          sink.put(null, data.setA[2]);
+          sink.put(null, data.setA[6]);
+          sink.put(null, data.setA[7]);
+          sink.put(null, data.setA[4]);
+          sink.put(null, data.setA[5]);
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
-          sink.put(data.setA[0]);
-          sink.put(data.setA[3]);
-          sink.put(data.setA[1]);
-          sink.put(data.setA[2]);
-          sink.put(data.setA[6]);
-          sink.put(data.setA[5]);
-          sink.put(data.setA[7]);
-          sink.put(data.setA[4]);
+          sink.put(null, data.setA[0]);
+          sink.put(null, data.setA[3]);
+          sink.put(null, data.setA[1]);
+          sink.put(null, data.setA[2]);
+          sink.put(null, data.setA[6]);
+          sink.put(null, data.setA[5]);
+          sink.put(null, data.setA[7]);
+          sink.put(null, data.setA[4]);
         }
       }),
     ];
@@ -1469,6 +1469,3 @@ describe('MergePlan', function() {
 
 
 });
-
-
-
