@@ -33,7 +33,7 @@ foam.CLASS({
     {
       name: 'messageMap',
       help: 'Map of language codes to the message in that language.',
-      class: 'Object',
+      class: 'Object'
     },
     {
       name: 'message',
@@ -77,4 +77,3 @@ foam.CLASS({
     }
   ]
 });
-
