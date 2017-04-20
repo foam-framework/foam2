@@ -20,33 +20,38 @@ foam.CLASS({
   name: 'InlineDAOControllerView',
   extends: 'foam.u2.Element',
 
+  imports: [
+    'stack'
+  ],
+
   exports: [
     'editRecord'
   ],
 
   requires: [
-    'foam.comics.DAOController',
+    'foam.comics.DAOController'
   ],
 
   properties: [
     'data',
+    'of',
     {
       name: 'controller',
-      expression: function(data) {
-        return this.DAOController.create({
-          data: data,
-        }, data.__context__);
+      factory: function() {
+        var controller = this.DAOController.create();
+        this.onDetach(controller.of$.follow(this.of$));
+        this.onDetach(controller.data$.follow(this.data$));
+        return controller;
       }
     }
   ],
 
   methods: [
     function editRecord(obj) {
-      if (!this.controller) return;
-      this.controller.stack.push({
+      this.stack.push({
         class: 'foam.comics.DAOUpdateControllerView',
-        dao: this.data,
-        data: obj
+        of: this.of,
+        data: obj.id
       });
     },
     function initE() {
