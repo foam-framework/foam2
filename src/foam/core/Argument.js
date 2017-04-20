@@ -295,3 +295,14 @@ foam.CLASS({
     })()
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Method',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Argument',
+      name: 'args'
+    }
+  ]
+});

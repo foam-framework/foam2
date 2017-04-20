@@ -32,7 +32,7 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function CSS() {/*
         ^ select {
-          width: 100%;
+          min-width: 220px;
         }
       */}
     })
@@ -45,7 +45,7 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'viewSpec',
-      value: { class: 'foam.u2.view.ChoiceView' }
+      value: { class: 'foam.u2.view.ChoiceView', size: 10 }
     },
     {
       name: 'dao',

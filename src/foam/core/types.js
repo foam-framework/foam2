@@ -243,15 +243,17 @@ foam.CLASS({
     [
       'isDefaultValue',
       function(v) { return ! v || ! v.length; }
-    ],
+    ]
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
   name: 'List',
   extends: 'foam.core.Object'
 });
+
 
 foam.CLASS({
   package: 'foam.core',

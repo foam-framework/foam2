@@ -74,6 +74,10 @@ foam.CLASS({
     'hoverSelection'
   ],
 
+  imports: [
+    'editRecord?'
+  ],
+
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -97,20 +101,20 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      factory: function() {
+        return this.data && this.data.of;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data',
-      postSet: function(_, data) {
-        if ( ! this.of ) this.of = data.of;
-      }
+      name: 'data'
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'orderedDAO',
       expression: function(data, order) {
-        return data.orderBy(order);
+        return data ? data.orderBy(order) : foam.dao.NullDAO.create();
       }
     },
     {
@@ -183,9 +187,12 @@ foam.CLASS({
                 E('tr').
                 start('tr').
                 on('mouseover', function() { view.hoverSelection = obj; }).
-                on('click', function() { view.selection = obj; }).
+                on('click', function() {
+                  view.selection = obj;
+                  if ( view.editRecord ) view.editRecord(obj);
+                }).
                 addClass(this.slot(function(selection) {
-                  if ( obj === selection ) return view.myClass('selected');
+                  if ( obj === selection ) return view.myCls('selected');
                   return '';
                 }, view.selection$)).
                 addClass(view.myClass('row')).

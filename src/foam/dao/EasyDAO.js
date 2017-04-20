@@ -33,12 +33,15 @@ foam.CLASS({
   requires: [
     'foam.dao.MDAO',
     'foam.dao.JournalDAO',
+    'foam.dao.JournaledDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.CachingDAO',
     'foam.dao.SyncDAO',
     'foam.dao.ContextualizingDAO',
+    'foam.dao.DecoratedDAO',
+    'foam.dao.CompoundDAODecorator',
     'foam.dao.DeDupDAO',
     'foam.dao.ClientDAO',
     'foam.dao.PromisedDAO',
@@ -61,7 +64,8 @@ foam.CLASS({
       ARRAY: 'foam.dao.ArrayDAO',
       MDAO:  'foam.dao.MDAO',
       IDB:   'foam.dao.IDBDAO',
-      LOCAL: 'foam.dao.LocalStorageDAO'
+      LOCAL: 'foam.dao.LocalStorageDAO',
+      CLIENT: 'foam.dao.ClientDAO'
     }
   },
 
@@ -110,8 +114,7 @@ foam.CLASS({
     },
     {
       /** Keep a history of all state changes to the DAO. */
-      name: 'journal',
-      value: false
+      name: 'journal'
     },
     {
       /** Enable logging on the DAO. */
@@ -181,19 +184,6 @@ foam.CLASS({
       value: true
     },
     {
-      /** The URI of the server to use. If sockets is true, this will use
-        a web socket, otherwise HTTP to contact the server-side DAO. On your
-        server, use an EasyDAO with isServer:true to provide the other end
-        of the connection. */
-      class: 'String',
-      name: 'serverUri',
-      factory: function() {
-        return this.document && this.document.location ?
-            this.document.location.origin + '/api' :
-            '';
-      }
-    },
-    {
       /** Set to true if you are running this on a server, and clients will
         synchronize with this DAO. */
       class: 'Boolean',
@@ -206,9 +196,13 @@ foam.CLASS({
       name: 'syncProperty'
     },
     {
-      /** If true, uses sockets instead of HTTP for server communication. */
-      name: 'sockets',
-      value: false
+      /** Destination address for server. */
+      name: 'serverBox'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.dao.DAODecorator',
+      name: 'decorators'
     },
     'testData'
   ],
@@ -233,6 +227,11 @@ foam.CLASS({
         daoType;
 
       var params = { of: this.of };
+
+      if ( daoType == 'foam.dao.ClientDAO' ) {
+        foam.assert(this.serverBox, 'EasyDAO client type requires a server box');
+        params.delegate = this.serverBox;
+      }
 
       if ( ! daoModel ) {
         this.warn(
@@ -271,6 +270,13 @@ foam.CLASS({
         }
       }
 
+      if ( this.journal ) {
+        dao = this.JournaledDAO.create({
+          delegate: dao,
+          journal: this.journal
+        });
+      }
+
       if ( this.seqNo && this.guid ) throw "EasyDAO 'seqNo' and 'guid' features are mutually exclusive.";
 
       if ( this.seqNo ) {
@@ -299,21 +305,12 @@ foam.CLASS({
       }
 
       if ( this.syncWithServer ) {
-        var boxContext = this.Context.create();
-        var boxSender = ( this.sockets ) ?
-          this.SocketBox.create({
-            address: this.serverUri
-          }, boxContext) :
-          this.HTTPBox.create({
-             url: this.serverUri,
-             method: 'POST'
-          }, boxContext); // TODO: retry?
-          //TODO: EasyClientDAO
+        foam.assert(this.serverBox, 'syncWithServer requires serverBox');
 
         dao = this.SyncDAO.create({
           remoteDAO: this.ClientDAO.create({
               name: this.name,
-              delegate: boxSender
+              delegate: this.serverBox
           }, boxContext),
           syncProperty: this.syncProperty,
           delegate: dao,
@@ -339,16 +336,14 @@ foam.CLASS({
         dao = this.ContextualizingDAO.create({delegate: dao});
       }
 
-      if ( this.journal ) {
-        dao = this.JournalDAO.create({
-          delegate: dao,
-          journal: foam.dao.EasyDAO.create({
-            of:      foam.dao.JournalEntry,
-            daoType: this.daoType,
-            seqNo:   true,
-            name:    this.name + '_Journal'
-          })
+      if ( this.decorators.length ) {
+        var decorated = this.DecoratedDAO.create({
+          decorator: this.CompoundDAODecorator.create({
+            decorators: this.decorators
+          }),
+          delegate: dao
         });
+        dao = decorated;
       }
 
       if ( this.timing  ) {
@@ -360,6 +355,8 @@ foam.CLASS({
       }
 
       var self = this;
+
+      if ( decorated ) decorated.dao = dao;
 
       if ( this.testData ) {
         var delegate = dao;

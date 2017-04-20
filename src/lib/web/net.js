@@ -238,7 +238,9 @@ foam.CLASS({
   name: 'HTTPRequest',
 
   requires: [
-    'foam.net.web.HTTPResponse'
+    'foam.net.web.HTTPResponse',
+    'foam.blob.Blob',
+    'foam.blob.BlobBlob'
   ],
 
   topics: [
@@ -334,7 +336,13 @@ foam.CLASS({
       };
 
       if ( this.payload ) {
-        options.body = this.payload;
+        if ( this.BlobBlob.isInstance(this.payload) ) {
+          options.body = this.payload.blob;
+        } else if ( this.Blob.isInstance(this.payload) ) {
+          foam.assert(false, 'TODO: Implemented sending of foam.blob.Blob over HTTPRequest.');
+        } else {
+          options.body = this.payload;
+        }
       }
 
       var request = new Request(
@@ -345,10 +353,13 @@ foam.CLASS({
           options);
 
       return fetch(request).then(function(resp) {
-        return this.HTTPResponse.create({
+        var resp = this.HTTPResponse.create({
           resp: resp,
           responseType: this.responseType
         });
+
+        if ( resp.success ) return resp;
+        throw resp;
       }.bind(this));
     },
     function addContentHeaders() {
@@ -592,9 +603,12 @@ foam.CLASS({
           if ( this.readyState === this.LOADING ||
                this.readyState === this.DONE ) {
             this.removeEventListener('readystatechange', foo);
-            resolve(self.HTTPResponse.create({
+            var resp = self.HTTPResponse.create({
               xhr: this
-            }));
+            });
+
+            if ( resp.success ) resolve(resp);
+            else reject(resp);
           }
         });
         xhr.send(self.payload);

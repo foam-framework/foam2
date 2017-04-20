@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,17 @@
  */
 
 foam.CLASS({
-  refines: 'foam.dao.FlowControl',
+  package: 'foam.java',
+  name: 'Argument',
+
+  properties: [
+    'type',
+    'name'
+  ],
+
   methods: [
-    {
-      name: 'stop',
-      javaCode: 'setStopped(true);'
+    function outputJava(o) {
+      o.out(this.type, ' ', this.name);
     }
   ]
 });

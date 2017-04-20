@@ -47,11 +47,11 @@ foam.CLASS({
     ],
     [ 'adaptArrayElement', function(o, obj) {
       // FUTURE: replace 'foam.' with '(this.__subContext__ || foam).' ?
-      var cls = foam.lookup(this.of);
-      foam.assert(cls, 'Unknown array "of": ', this.of);
+      var ctx = obj.__subContext__ || foam;
+      var of = o.class || this.of;
+      var cls = ctx.lookup(of);
       return cls.isInstance(o) ? o : cls.create(o, obj);
-      }
-    ],
+    }],
     {
       name: 'fromJSON',
       value: function(value, ctx, prop) {
