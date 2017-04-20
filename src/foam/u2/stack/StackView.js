@@ -19,9 +19,11 @@ foam.CLASS({
   package: 'foam.u2.stack',
   name: 'StackView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.stack.Stack'
   ],
+
   methods: [
     function initE() {
       this.setNodeName('div').
