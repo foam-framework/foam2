@@ -164,7 +164,7 @@ foam.CLASS({
       if ( cardinality === '1:*' ) {
         if ( ! sourceProps.length ) {
           sourceProps = [
-            foam.core.Property.create({
+            foam.dao.DAOProperty.create({
               name: forwardName,
               transient: true,
               hidden: true,
@@ -224,6 +224,7 @@ foam.CLASS({
         // forward
         foam.RELATIONSHIP({
           sourceModel: this.sourceModel,
+          sourceProperty: this.sourceProperty,
           targetModel: id,
           forwardName: this.forwardName,
           inverseName: 'sourceId',
@@ -231,7 +232,9 @@ foam.CLASS({
           targetDAOKey: this.junctionDAOKey,
           relationshipDAOFactory: function(source) {
             return foam.dao.ManyToManyRelationshipDAO.create({
+              junctionCls: jModel,
               obj: source,
+              of: target.id,
               relationship: this,
               joinDAOKey: relationship.targetDAOKey,
               junctionProperty: jModel.TARGET_ID,
@@ -253,18 +256,21 @@ foam.CLASS({
         foam.RELATIONSHIP({
           sourceModel: this.targetModel,
           targetModel: id,
+          targetProperty: this.targetProperty,
           forwardName: this.inverseName,
           inverseName: 'targetId',
           sourceDAOKey: this.targetDAOKey,
           targetDAOKey: this.junctionDAOKey,
-          relationshipDAOFactory: function(source) {
+          relationshipDAOFactory: function(s) {
             return foam.dao.ManyToManyRelationshipDAO.create({
-              obj: source,
+              junctionCls: jModel,
+              obj: s,
+              of: source.id,
               relationship: this,
               joinDAOKey: relationship.sourceDAOKey,
               junctionProperty: jModel.SOURCE_ID,
               targetProperty: target.ID
-            }, source);
+            }, s);
           },
           adaptTarget: function(s, t) {
             if ( source.isInstance(t) ) {
