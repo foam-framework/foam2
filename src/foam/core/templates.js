@@ -180,7 +180,7 @@ foam.CLASS({
           ( result[0] ? t : result[1] ) +
           this.FOOTER;
 
-      var newArgs = ['opt_outputter'].concat(args);
+      var newArgs = ['opt_outputter'].concat(args.map(function(a) { return a.name }));
       var f = eval(
         '(function() { ' +
           'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
