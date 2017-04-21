@@ -32,8 +32,8 @@ foam.CLASS({
     {
       name: 'dao',
       hidden: true,
-      factory: function() {
-        return this.__context__[foam.String.daoize(this.of.name)];
+      expression: function(of) {
+        return of && this.__context__[foam.String.daoize(of.name)] || foam.dao.NullDAO.create();
       }
     },
     {

@@ -42,6 +42,13 @@ foam.CLASS({
   ],
 
   methods: [
+    function put(obj) {
+      var self = this;
+      return self.__context__[foam.String.daoize(self.of.name)].put(obj)
+          .then(function(obj) {
+            return self.delegate.put(self.relationship.adaptTarget(self.obj, obj))
+          })
+    },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
       var joinDAO = this.__context__[this.joinDAOKey];

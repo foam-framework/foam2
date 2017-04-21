@@ -30,7 +30,7 @@ foam.CLASS({
       factory: function() {
         return this.DAOUpdateController.create({
           of$: this.of$,
-          data$: this.data$
+          obj$: this.data$
         })
       }
     }

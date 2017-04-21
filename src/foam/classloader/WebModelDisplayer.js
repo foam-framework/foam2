@@ -27,6 +27,8 @@ foam.CLASS({
   `,
 
   requires: [
+    'foam.u2.stack.Stack',
+    'foam.u2.stack.StackView',
     'foam.classloader.OrDAO',
     'foam.classloader.WebModelFileDAO'
   ],
@@ -37,6 +39,7 @@ foam.CLASS({
   ],
 
   exports: [
+    'stack',
     foam.String.daoize(foam.core.Model.name)
   ],
 
@@ -46,6 +49,10 @@ foam.CLASS({
     },
     {
       name: 'view',
+    },
+    {
+      name: 'stack',
+      factory: function() { return this.Stack.create() },
     },
     {
       name: 'locale',
@@ -116,8 +123,9 @@ foam.CLASS({
         var model = X.lookup(self.model).create(null, self);
         var view = self.view ?
             X.lookup(self.view).create({data: model}, self) :
-            model.toE(null, self);
-        view.write();
+            model.toE(null, model);
+        self.stack.push(view);
+        self.StackView.create({data: self.stack}, model).write();
       })
     }
   ]
