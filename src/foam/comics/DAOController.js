@@ -54,7 +54,6 @@ foam.CLASS({
     {
       name: 'create',
       code: function() {
-        debugger;
         this.stack.push({
           class: 'foam.comics.DAOCreateControllerView',
           dao: this.data
