@@ -28,16 +28,14 @@ foam.CLASS({
     {
       name: 'data',
       hidden: true,
-      expression: function(of) {
-        return of && this.__context__[foam.String.daoize(of.name)] || foam.dao.NullDAO.create();
-      }
+      required: true
     },
     {
       name: 'predicate',
       view: function(args, X) {
         return {
           class: 'foam.u2.view.RecipricalSearch',
-          of: X.data.of
+          of: X.data.data.of
         };
       }
     },
@@ -45,16 +43,10 @@ foam.CLASS({
       name: 'filteredDAO',
       view: 'foam.u2.view.ScrollTableView',
       expression: function(data, predicate) {
-        return predicate ? data.where(predicate) : data;
+        return ! data ? foam.dao.NullDAO.create() :
+          predicate ? data.where(predicate) :
+          data;
       }
-    },
-    {
-      class: 'Class',
-      name: 'of',
-      expression: function(data) {
-        return data.of;
-      },
-      hidden: true
     }
   ],
 
@@ -62,10 +54,10 @@ foam.CLASS({
     {
       name: 'create',
       code: function() {
+        debugger;
         this.stack.push({
           class: 'foam.comics.DAOCreateControllerView',
-          of: this.of,
-          data: this.data
+          dao: this.data
         });
       }
     }
