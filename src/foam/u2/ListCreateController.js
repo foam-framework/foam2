@@ -30,19 +30,28 @@ foam.CLASS({
       extends: 'foam.u2.Element',
 
       imports: [ 'controller', 'dao' ],
+      exports: [ 'as data' ],
+
+      properties: [
+          {
+            name: 'obj',
+            factory: function() { return this.dao.of.create(); }
+          }
+      ],
 
       methods: [
         function initE() {
-          this.tag(this.controller.detailView, {of: this.dao.of}).add(this.SAVE, this.CANCEL);
+          this.tag(this.controller.detailView, {data: this.obj}).add(this.SAVE, this.CANCEL);
         }
       ],
 
       actions: [
         function save(X) {
-          X.controller.data.back();
+          this.dao.put(this.obj);
+          this.controller.back();
         },
         function cancel(X) {
-          X.controller.data.back();
+          this.controller.back();
         }
       ]
     }
@@ -71,6 +80,10 @@ foam.CLASS({
   methods: [
     function initE() {
       this.data.push(this.ListController.create());
+    },
+
+    function back() {
+      this.data.back();
     }
   ],
 
