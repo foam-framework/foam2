@@ -101,10 +101,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of',
-      factory: function() {
-        return this.data && this.data.of;
-      }
+      name: 'of'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -122,7 +119,8 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of) {
+      expression: function(columns, data, of) {
+        var of = this.of || ( data && data.of);
         if ( ! of ) return [];
 
         return columns.map(function(p) {
@@ -134,10 +132,11 @@ foam.CLASS({
     },
     {
       name: 'columns',
-      expression: function(of) {
+      expression: function(data, of) {
+        var of = this.of || ( data && data.of);
         if ( ! of ) return [];
 
-        var tableColumns = this.of.getAxiomByName('tableColumns');
+        var tableColumns = of.getAxiomByName('tableColumns');
 
         if ( tableColumns ) return tableColumns.columns;
 
