@@ -119,7 +119,7 @@ foam.CLASS({
     function maybeCall(ctx, data) {
       if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
-        data.pub('action', this.name, this);
+        data && data.pub('action', this.name, this);
         return true;
       }
 
