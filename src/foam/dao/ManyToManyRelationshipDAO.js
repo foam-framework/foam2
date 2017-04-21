@@ -30,6 +30,12 @@ foam.CLASS({
     'targetProperty',
     'junctionCls',
     {
+      name: 'joinDAO',
+      getter: function() {
+        return this.__context__[this.joinDAOKey];
+      }
+    },
+    {
       name: 'predicate',
       documentation: `ManyToMany filtered querys are always "backward" to
         match inverse-namd property and source object's id.`,
@@ -49,12 +55,14 @@ foam.CLASS({
             return self.delegate.put(self.relationship.adaptTarget(self.obj, obj))
           })
     },
+    function find(id) {
+      return this.joinDAO.find(id);
+    },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
-      var joinDAO = this.__context__[this.joinDAOKey];
 
       return self.SUPER(self.MAP(self.junctionProperty)).then(function(map) {
-        return joinDAO.select(sink, skip, limit, order, self.AND(
+        return self.joinDAO.select(sink, skip, limit, order, self.AND(
           predicate || self.TRUE,
           self.IN(self.targetProperty, map.delegate.a)));
       });
