@@ -1,5 +1,5 @@
 /**
- * @license
+n * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,15 +38,10 @@ foam.CLASS({
       }
     },
     {
-      class: 'Class',
-      name: 'of',
-      hidden: true
-    },
-    {
       name: 'obj',
       label: '',
       view: function(args, X) {
-        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.of }, X).copyFrom(args);
+        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.dao.of }, X).copyFrom(args);
         e.data$ = X.data$.dot(this.name);
         return e;
       }
@@ -54,9 +49,7 @@ foam.CLASS({
     {
       name: 'dao',
       hidden: true,
-      expression: function(of) {
-        return of && this.__context__[foam.String.daoize(of.name)] || foam.dao.NullDAO.create();
-      }
+      required: true
     },
     {
       class: 'String',

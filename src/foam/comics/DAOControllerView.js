@@ -36,16 +36,9 @@ foam.CLASS({
   properties: [
     'data',
     {
-      name: 'of',
-      expression: function(data) {
-        return data.of;
-      }
-    },
-    {
       name: 'controller',
       factory: function() {
         var controller = this.DAOController.create();
-        this.onDetach(controller.of$.follow(this.of$));
         this.onDetach(controller.data$.follow(this.data$));
         return controller;
       }
@@ -56,12 +49,9 @@ foam.CLASS({
     function editRecord(obj) {
       this.stack.push({
         class: 'foam.comics.DAOUpdateControllerView',
-        of: this.of,
+        dao: this.data,
         data: obj.id
       });
-    },
-    function fromProperty(prop) {
-      if ( prop.of ) this.of = prop.of;
     },
     function initE() {
       this.startContext({ data: this.controller }).
