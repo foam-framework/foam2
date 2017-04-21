@@ -35,14 +35,19 @@ foam.CLASS({
 
   properties: [
     'data',
-    'of',
+    {
+      name: 'of',
+      expression: function(data) {
+        return data.of;
+      }
+    },
     {
       name: 'controller',
       factory: function() {
-        return this.DAOController.create({
-          of$: this.of$,
-          data$: this.data$
-        });
+        var controller = this.DAOController.create();
+        this.onDetach(controller.of$.follow(this.of$));
+        this.onDetach(controller.data$.follow(this.data$));
+        return controller;
       }
     }
   ],
@@ -54,6 +59,9 @@ foam.CLASS({
         of: this.of,
         data: obj.id
       });
+    },
+    function fromProperty(prop) {
+      if ( prop.of ) this.of = prop.of;
     },
     function initE() {
       this.startContext({ data: this.controller }).
