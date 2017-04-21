@@ -24,6 +24,20 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'data',
+      postSet: function(old, nu) {
+        var self = this;
+        this.dao.find(nu).then(function(obj) {
+          if ( ! obj ) {
+            console.error("Failed to find object", nu);
+          }
+          self.obj = obj.clone();
+        }, function(e) {
+          console.error("Failed to find object", nu, e);
+        });
+      }
+    },
+    {
       class: 'Class',
       name: 'of',
       hidden: true
