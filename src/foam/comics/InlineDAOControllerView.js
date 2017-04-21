@@ -34,7 +34,12 @@ foam.CLASS({
 
   properties: [
     'data',
-    'of',
+    {
+      name: 'of',
+      expression: function(data) {
+        return data.of;
+      },
+    },
     {
       name: 'controller',
       factory: function() {
@@ -51,7 +56,7 @@ foam.CLASS({
       this.stack.push({
         class: 'foam.comics.DAOUpdateControllerView',
         of: this.of,
-        data: obj.id
+        data: obj.clone()
       });
     },
     function initE() {
