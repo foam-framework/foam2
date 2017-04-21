@@ -43,6 +43,7 @@ foam.CLASS({
     },
 
     function select(sink) {
+      sink = sink || foam.dao.ArraySink.create();
       sink.eof();
       return Promise.resolve(sink);
     },
