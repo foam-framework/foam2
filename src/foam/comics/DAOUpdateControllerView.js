@@ -28,10 +28,10 @@ foam.CLASS({
     {
       name: 'controller',
       factory: function() {
-        return this.DAOUpdateController.create({
-          of$: this.of$,
-          obj$: this.data$
-        })
+        var controller = this.DAOUpdateController.create();
+        this.onDetach(controller.of$.follow(this.of$));
+        this.onDetach(controller.data$.follow(this.data$));
+        return controller;
       }
     }
   ],

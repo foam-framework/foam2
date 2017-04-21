@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.u2.stack',
   name: 'Stack',
+
   properties: [
     {
       name: 'stack_',
@@ -48,6 +49,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function slotAt(i) {
       return this.StackSlot.create({
@@ -55,9 +57,11 @@ foam.CLASS({
         stack: this
       });
     },
+
     function at(i) {
       return i < 0 ? this.stack_[this.pos + i + 1] : this.stack_[i];
     },
+
     function push(v) {
       var pos = this.pos + 1;
 
@@ -67,26 +71,26 @@ foam.CLASS({
       this.pos = pos;
     }
   ],
+
   actions: [
     {
       name: 'back',
       isEnabled: function(pos) { return pos > 0; },
-      code: function() {
-        this.pos--;
-      }
+      code: function() { this.pos--; }
     },
     {
       name: 'forward',
       isEnabled: function(pos, depth) { return pos < depth - 1; },
-      code: function() {
-        this.pos++;
-      }
+      code: function() { this.pos++; }
     }
   ],
+
   classes: [
     {
       name: 'StackSlot',
+
       implements: [ 'foam.core.Slot' ],
+
       properties: [
         {
           name: 'stack'
@@ -96,27 +100,32 @@ foam.CLASS({
           name: 'pos'
         }
       ],
+
       methods: [
         function init() {
           this.onDetach(this.stack.pos$.sub(this.onStackChange));
         },
+
         function get() {
           return this.stack.at(this.pos);
         },
+
         function set() {
           // unimplemnted.
         },
+
         function sub(l) {
           return this.SUPER('update', l);
         },
+
         function toString() {
           return 'StackSlot(' + this.pos + ')';
         }
       ],
+
       listeners: [
         function onStackChange(s) {
-          if ( this.pos < 0 ||
-              this.pos === this.stack.pos ) {
+          if ( this.pos < 0 || this.pos === this.stack.pos ) {
             this.pub('update');
           }
         }
