@@ -35,7 +35,12 @@ foam.CLASS({
 
   properties: [
     'data',
-    'of',
+    {
+      name: 'of',
+      expression: function(data) {
+        return data.of;
+      }
+    },
     {
       name: 'controller',
       factory: function() {
@@ -54,6 +59,9 @@ foam.CLASS({
         of: this.of,
         data: obj.id
       });
+    },
+    function fromProperty(prop) {
+      if ( prop.of ) this.of = prop.of;
     },
     function initE() {
       this.startContext({ data: this.controller }).
