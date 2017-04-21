@@ -29,13 +29,13 @@ foam.CLASS({
       name: 'CreateController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'controller', 'dao' ],
+      imports: [ 'controller', 'dao', 'factory' ],
       exports: [ 'as data' ],
 
       properties: [
           {
             name: 'obj',
-            factory: function() { return this.dao.of.create(); }
+            factory: function() { return this.factory(); }
           }
       ],
 
@@ -62,7 +62,7 @@ foam.CLASS({
     'foam.u2.DetailView'
   ],
 
-  exports: [ 'as controller', 'dao' ],
+  exports: [ 'as controller', 'dao', 'factory' ],
 
   properties: [
     'dao',
@@ -73,6 +73,10 @@ foam.CLASS({
     {
       name: 'detailView',
       value: { class: 'foam.u2.DetailView' }
+    },
+    {
+      name: 'factory',
+      value: function() { return this.dao.of.create(); }
     },
     [ 'showActions', false ]
   ],
