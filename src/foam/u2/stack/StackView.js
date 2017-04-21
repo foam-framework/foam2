@@ -24,13 +24,30 @@ foam.CLASS({
     'foam.u2.stack.Stack'
   ],
 
+  exports: [ 'data as stack' ],
+
+  properties: [
+    {
+      name: 'data',
+      factory: function() { return this.Stack.create(); }
+    },
+    {
+      class: 'Boolean',
+      name: 'showActions',
+      value: true
+    }
+  ],
+
   methods: [
-    function initE() {
-      this.setNodeName('div').
-        add(this.Stack.BACK, this.Stack.FORWARD).
-        add(this.slot(function(s) {
-          return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
-        }, this.data$.dot('top')));
+    function init() {
+      this.setNodeName('div');
+
+      if ( this.showActions )
+        this.add(this.Stack.BACK, this.Stack.FORWARD);
+
+      this.add(this.slot(function(s) {
+        return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
+      }, this.data$.dot('top')));
     }
   ]
 });
