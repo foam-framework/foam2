@@ -41,16 +41,16 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.tag(this.controller.detailView, {data: this.obj}).add(this.SAVE, this.CANCEL);
+          this.tag(this.controller.detailView, {data: this.obj}).add(this.CANCEL, this.SAVE);
         }
       ],
 
       actions: [
-        function save(X) {
-          this.dao.put(this.obj);
+        function cancel(X) {
           this.controller.back();
         },
-        function cancel(X) {
+        function save(X) {
+          this.dao.put(this.obj);
           this.controller.back();
         }
       ]
