@@ -67,16 +67,8 @@ foam.CLASS({
   extends: 'foam.dao.DAOProperty',
   properties: [
     {
-      name: 'relationship',
-    },
-    {
       name: 'view',
-      expression: function(relationship) {
-        return {
-          class: 'foam.comics.RelationshipDAOControllerView',
-          relationship: relationship,
-        };
-      },
+      value: { class: 'foam.comics.RelationshipDAOControllerView' },
     },
   ],
 })
