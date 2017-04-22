@@ -497,6 +497,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobServiceDecorator',
+  implements: ['foam.dao.DAODecorator'],
   imports: [
     'blobService'
   ],
@@ -513,7 +514,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(obj, existing) {
+    function write(X, dao, obj, existing) {
       var i = 0;
       var props = this.props;
       var self = this;
@@ -531,7 +532,10 @@ foam.CLASS({
         });
       });
     },
-    function find(obj) {
+    function read(X, dao, obj) {
+      return Promise.resolve(obj);
+    },
+    function remove(X, dao, obj) {
       return Promise.resolve(obj);
     }
   ]

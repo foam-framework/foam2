@@ -78,22 +78,60 @@ foam.INTERFACE({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.dao',
-  name: 'CascadingRemoveDecorator',
-  implements: [ 'foam.dao.DAODecorator' ],
-
-  mehtods: [
-    function read(X, dao, obj) {
-    },
+  name: 'AbstractDAODecorator',
+  implements: ['foam.dao.DAODecorator'],
+  methods: [
     function write(X, dao, obj, existing) {
+      return Promise.resolve(obj);
+    },
+    function read(X, dao, obj) {
+      return Promise.resolve(obj);
     },
     function remove(X, dao, obj) {
+      return Promise.resolve(obj);
     }
   ]
 });
 
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'CompoundDAODecorator',
+  implements: ['foam.dao.DAODecorator'],
+  properties: [
+    {
+      class: 'Array',
+      name: 'decorators'
+    }
+  ],
+  methods: [
+    function write(X, dao, obj, existing) {
+      var i = 0;
+      var d = this.decorators;
+
+      return Promise.resolve(obj).then(function a(obj) {
+        return d[i] ? d[i++].write(X, dao, obj, existing).then(a) : obj;
+      });
+    },
+    function read(X, dao, obj) {
+      var i = 0;
+      var d = this.decorators;
+
+      return Promise.resolve(obj).then(function a(obj) {
+        return d[i] ? d[i++].read(X, dao, obj).then(a) : obj;
+      });
+    },
+    function remove(X, dao, obj) {
+      var i = 0;
+      var d = this.decorators;
+
+      return Promise.resolve(obj).then(function a(obj) {
+        return d[i] ? d[i++].remove(X, dao, obj).then(a) : obj;
+      });
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.dao',
@@ -105,6 +143,9 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.dao.DAODecorator',
       name: 'decorator'
+    },
+    {
+      name: 'dao'
     }
   ],
 
@@ -112,25 +153,32 @@ foam.CLASS({
     {
       name: 'put',
       code: function(obj) {
+        // TODO: obj.id can generate garbase, would be
+        // slightly faster if DAO.find() could take an object
+        // as well.
         var self = this;
-        return this.delegate.find(obj.id).then(function(existing) {
-          return self.decorator.write(obj, existing);
-        }).then(function(newObj) {
-          return self.delegate.put(newObj);
+        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find(obj.id) ).then(function(existing) {
+          return self.decorator.write(self.__context__, self.dao, obj, existing);
+        }).then(function(obj) {
+          return self.delegate.put(obj);
         });
       }
     },
     {
       name: 'remove',
       code: function(obj) {
+        var self = this;
+        return this.decorator.remove(self.__context__, self.dao, self.obj).then(function(obj) {
+          self.delegate.remove(obj);
+        });
       }
     },
     {
       name: 'find',
       code: function(id) {
         var self = this;
-        return this.SUPER(id).then(function(o) {
-          return o && self.decorator.read(o);
+        return this.delegate.find(id).then(function(obj) {
+          return self.decorator.read(self.__context__, self.dao, obj);
         });
       }
     }
