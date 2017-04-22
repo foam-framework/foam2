@@ -68,6 +68,8 @@ foam.CLASS({
         }
 
         return Promise.resolve(model);
+      }).catch(function(e) {
+        return Promise.resolve(null);
       });
     }
   ]
