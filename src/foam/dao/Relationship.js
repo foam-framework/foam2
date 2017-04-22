@@ -164,7 +164,7 @@ foam.CLASS({
       if ( cardinality === '1:*' ) {
         if ( ! sourceProps.length ) {
           sourceProps = [
-            foam.dao.DAOProperty.create({
+            foam.dao.RelationshipDAOProperty.create({
               name: forwardName,
               transient: true,
               setter: function() {},
