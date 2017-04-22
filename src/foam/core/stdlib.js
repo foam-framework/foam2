@@ -732,6 +732,44 @@ foam.LIB({
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
+    },
+    /**
+     * Multi-method that supports automatically prefixing "localMap" keys with
+     * "packageName". This allows callers to use:
+     * <pre>
+     *   foam.localMMethod('some.long.package.name', {
+     *     Foo: ...,
+     *     Bar: ...,
+     *     Baz: ...,
+     *     ...
+     *   });
+     * </pre>
+     * rather than
+     * <pre>
+     *   foam.mmethod('some.long.package.name', {
+     *     'some.long.package.name.Foo': ...,
+     *     'some.long.package.name.Bar': ...,
+     *     'some.long.package.name.Baz': ...,
+     *     ...
+     *   });
+     * </pre>
+
+     * "opt_defaultMethod" and "opt_globalMap" allow for a default method and
+     * fully-qualified map.
+     */
+    function localMMethod(packageName, localMap,
+        opt_defaultMethod, opt_globalMap) {
+      var map = opt_globalMap || {};
+      for ( var key in localMap ) {
+        if ( localMap.hasOwnProperty(key) ) {
+          var mapKey = packageName + '.' + key;
+          foam.assert( ! map.hasOwnProperty(mapKey),
+              'localMMethod: Duplicate local/global entries for "' + mapKey +
+              '"');
+          map[packageName + '.' + key] = localMap[key];
+        }
+      }
+      return foam.mmethod(map, opt_defaultMethod);
     }
   ]
 });
