@@ -10,11 +10,13 @@ foam.CLASS({
       name: 'ListController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'controller', 'dao' ],
+      imports: [ 'controller', 'dao', 'createLabel' ],
 
       methods: [
         function initE() {
-          this.tag(this.controller.summaryView, {data: this.dao}).add(this.CREATE);
+          this
+            .tag(this.controller.summaryView, {data: this.dao})
+            .tag(this.CREATE, this.createLabel && {label: this.createLabel});
         }
       ],
 
@@ -49,6 +51,7 @@ foam.CLASS({
         function cancel(X) {
           this.controller.back();
         },
+
         function save(X) {
           this.dao.put(this.obj);
           this.controller.back();
@@ -62,7 +65,7 @@ foam.CLASS({
     'foam.u2.DetailView'
   ],
 
-  exports: [ 'as controller', 'dao', 'factory' ],
+  exports: [ 'as controller', 'dao', 'factory', 'createLabel' ],
 
   properties: [
     'dao',
@@ -77,6 +80,10 @@ foam.CLASS({
     {
       name: 'factory',
       value: function() { return this.dao.of.create(); }
+    },
+    {
+      class: 'String',
+      name: 'createLabel'
     },
     [ 'showActions', false ]
   ],
