@@ -197,41 +197,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'FObjectProperty',
-  extends: 'Property',
-
-  properties: [
-    {
-      name: 'of',
-      value: 'FObject'
-    },
-    {
-      name: 'fromJSON',
-      value: function(json, ctx, prop) {
-        return foam.json.parse(json, prop.of, ctx);
-      }
-    },
-    {
-      name: 'adapt',
-      value: function(_, v, prop) {
-        // All FObjects may be null.
-        if (v === null) return v;
-
-        var of = foam.lookup(prop.of);
-
-        return of.isInstance(v) ?
-            v :
-            ( v.class ?
-                foam.lookup(v.class) :
-                of ).create(v, this.__subContext__);
-      }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'Array',
   extends: 'Property',
 
@@ -419,6 +384,40 @@ foam.CLASS({
   properties: [
     [ 'factory', function() { return {} } ],
     'of'
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectProperty',
+  extends: 'Property',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of'
+    },
+    {
+      name: 'fromJSON',
+      value: function(json, ctx, prop) {
+        return foam.json.parse(json, prop.of, ctx);
+      }
+    },
+    {
+      name: 'adapt',
+      value: function(_, v, prop) {
+        // All FObjects may be null.
+        if (v === null) return v;
+
+        var of = foam.lookup(prop.of);
+
+        return of.isInstance(v) ?
+            v :
+            ( v.class ?
+                foam.lookup(v.class) :
+                of ).create(v, this.__subContext__);
+      }
+    }
   ]
 });
 
