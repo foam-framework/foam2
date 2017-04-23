@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
+    'foam.dao.FnSink',
     'foam.u2.view.ChoiceView'
   ],
 
@@ -48,11 +49,9 @@ foam.CLASS({
       value: { class: 'foam.u2.view.ChoiceView', size: 10 }
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'dao',
       required: true,
-      postSet: function() {
-        this.updateDAO();
-      }
     },
     {
       name: 'property',
@@ -101,7 +100,13 @@ foam.CLASS({
       });
       this.view.end();
 
-      this.dao.on.sub(this.updateDAO);
+      this.onDetach(
+        this.dao$proxy.listen(
+          this.FnSink.create({fn: this.updateDAO})
+        )
+      );
+      this.updateDAO();
+
       this.view.data$.sub(this.updatePredicate);
     },
     function updatePredicate_(choice) {
