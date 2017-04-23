@@ -75,7 +75,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'editRecord?'
+    'editRecord?',
+    'selection? as importSelection'
   ],
 
   axioms: [
@@ -188,10 +189,11 @@ foam.CLASS({
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 on('click', function() {
                   view.selection = obj;
+                  if ( view.importSelection$ ) view.importSelection = obj;
                   if ( view.editRecord ) view.editRecord(obj);
                 }).
                 addClass(this.slot(function(selection) {
-                  if ( obj === selection ) return view.myCls('selected');
+                  if ( obj === selection ) return view.myClass('selected');
                   return '';
                 }, view.selection$)).
                 addClass(view.myClass('row')).
