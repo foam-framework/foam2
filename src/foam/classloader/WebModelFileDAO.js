@@ -59,7 +59,7 @@ foam.CLASS({
         };
 
         try {
-          eval(js);
+          eval('//# sourceURL=' + url + '\n' + js);
         } catch(e) {
           console.warn('Unable to load at ' + url + '. Error: ' + e.stack);
           return Promise.resolve(null);
