@@ -57,7 +57,9 @@ foam.CLASS({
       this.startContext({ data: this.controller }).
         start('table').
           start('tr').
-            start('td').add(this.DAOController.PREDICATE).end().
+            start('td').
+              start(this.DAOController.PREDICATE, {dao$: this.data$}).end().
+            end().
             start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
           end().
           start('tr').start('td').end().start('td').add(this.DAOController.CREATE).end().
