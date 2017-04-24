@@ -35,7 +35,7 @@ foam.CLASS({
       view: function(args, X) {
         return {
           class: 'foam.u2.view.RecipricalSearch',
-          of: X.data.data.of
+          of$: X.data$.dot('data').dot('of')
         };
       }
     },

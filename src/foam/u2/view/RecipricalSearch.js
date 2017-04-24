@@ -36,8 +36,8 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
-      factory: function() {
-        return this.__context__[foam.String.daoize(this.of.name)];
+      expression: function(of) {
+        return of ? this.__context__[foam.String.daoize(of.name)] : foam.dao.NullDAO.create();
       }
     },
     {
@@ -74,7 +74,7 @@ foam.CLASS({
             // could find the search manager via the context and add itself to that.
             var axiom = self.of.getAxiomByName(f);
             var spec  = axiom.searchView;
-            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao }, this, this.__subSubContext__);
+            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao$proxy }, this, this.__subSubContext__);
 
             searchManager.add(view);
             this.add(axiom.label, view);
