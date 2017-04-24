@@ -409,7 +409,7 @@ foam.CLASS({
         // All FObjects may be null.
         if (v === null) return v;
 
-        var of = typeof prop.of === 'string' ? foam.lookup(prop.of) : prop.of;
+        var of = prop.of;
 
         return of.isInstance(v) ?
             v :
