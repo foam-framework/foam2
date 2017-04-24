@@ -19,7 +19,7 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOControllerView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
 
   imports: [
     'stack'
@@ -60,7 +60,9 @@ foam.CLASS({
             start('td').add(this.DAOController.PREDICATE).end().
             start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
           end().
-          start('tr').start('td').end().start('td').add(this.DAOController.CREATE).end().
+        start('tr').
+          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+          start('td').end().start('td').add(this.DAOController.CREATE).end().
         end().
         endContext();
     }
