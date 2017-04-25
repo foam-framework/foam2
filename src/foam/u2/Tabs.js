@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: don't instantiate tabs until viewed
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'Tab',
@@ -42,11 +44,11 @@ foam.CLASS({
         }
         ^tabRow { height: 37px; }
         ^tab {
-          float: left;
-          border: 1px solid black;
-          border-bottom: none;
-          padding: 5px;
           background: lightgray;
+          border-bottom: none;
+          border: 1px solid black;
+          float: left;
+          padding: 5px;
         }
         ^tab.selected {
           background: white;
@@ -54,14 +56,14 @@ foam.CLASS({
           z-index: 1;
         }
         ^content {
-box-shadow: 3px 3px 6px 0 gray; 
-          margin: 4px;
-          padding: 0;
           background: white;
           border: 1px solid black;
+          box-shadow: 3px 3px 6px 0 gray;
+          left: -4px;
+          margin: 4px;
+          padding: 0;
           position: relative;
           top: -13px;
-          left: -4px;
         }
       */}
     })
