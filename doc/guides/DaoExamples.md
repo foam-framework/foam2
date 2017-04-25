@@ -267,7 +267,3 @@ guitarDAO.select(expr.MIN(Guitar.PRICE))
   console.log(g.value);
 });
 ```
-
-```js
-// TODO: PIE, UI, Relationships
-```
