@@ -113,8 +113,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
-  implements: ['foam.dao.DAO'],
-
+  extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       class: 'Promised',
