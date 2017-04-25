@@ -122,11 +122,11 @@ foam.CLASS({
       Promise.all(promises).then(function() {
         var model = X.lookup(self.model).create(null, self);
         window.__foam_obj__ = model;
-        var view = self.view ?
-            X.lookup(self.view).create({data: model}, self) :
-            model.toE(null, model);
-        self.stack.push(view);
-        self.StackView.create({data: self.stack}, model).write();
+
+        var viewSpec = self.view ? { class: self.view, data: model } : model.toE.bind(model);
+
+        self.stack.push(viewSpec);
+        self.StackView.create({data: self.stack}).write();
       })
     }
   ]
