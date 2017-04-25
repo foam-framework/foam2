@@ -25,16 +25,12 @@ foam.CLASS({
   ],
 
   properties: [
-    'data',
-    'of',
+    'dao',
     {
       name: 'controller',
       factory: function() {
-        var c = this.DAOCreateController.create({
-          of$: this.of$
-        });
-        if ( this.data ) c.dao$ = this.data$;
-
+        var c = this.DAOCreateController.create();
+        this.onDetach(c.dao$.follow(this.dao$));
         return c;
       }
     }

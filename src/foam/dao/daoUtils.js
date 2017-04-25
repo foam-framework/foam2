@@ -113,8 +113,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
-  implements: ['foam.dao.DAO'],
-
+  extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       class: 'Promised',
@@ -186,84 +185,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message'
-    }
-  ]
-});
-
-foam.INTERFACE({
-  package: 'foam.dao',
-  name: 'DAODecorator',
-  methods: [
-    {
-      name: 'put',
-      args: ['obj', 'existing']
-    },
-    {
-      name: 'find',
-      args: ['obj']
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'CompoundDAODecorator',
-  properties: [
-    {
-      class: 'Array',
-      name: 'decorators'
-    }
-  ],
-  methods: [
-    function put(obj, existing) {
-      var i = 0;
-      var d = this.decorators;
-
-      return Promise.resolve(obj).then(function a(obj) {
-        return d[i] ? d[i++].put(obj, existing).then(a) : obj;
-      });
-    },
-    function find(obj) {
-      var i = 0;
-      var d = this.decorators;
-
-      return Promise.resolve(obj).then(function a(obj) {
-        return d[i] ? d[i++].find(obj).then(a) : obj;
-      });
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'DecoratedDAO',
-  extends: 'foam.dao.ProxyDAO',
-  properties: [
-    {
-      name: 'decorator'
-    },
-    {
-      name: 'dao'
-    }
-  ],
-  methods: [
-    // TODO: What do we do for select?
-    function put(obj) {
-      // TODO: obj.id can generate garbase, would be
-      // slightly faster if DAO.find() could take an object
-      // as well.
-      var self = this;
-      return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find(obj.id) ).then(function(existing) {
-        return self.decorator.put(obj, existing);
-      }).then(function(obj) {
-        return self.delegate.put(obj);
-      });
-    },
-    function find(id) {
-      var self = this;
-      return this.delegate.find(id).then(function(obj) {
-        return self.decorator.find(obj);
-      });
     }
   ]
 });

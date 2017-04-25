@@ -75,7 +75,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'editRecord?'
+    'editRecord?',
+    'selection? as importSelection'
   ],
 
   axioms: [
@@ -101,10 +102,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of',
-      factory: function() {
-        return this.data && this.data.of;
-      }
+      name: 'of'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -122,7 +120,8 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, of) {
+      expression: function(columns, data, of) {
+        var of = this.of || ( data && data.of);
         if ( ! of ) return [];
 
         return columns.map(function(p) {
@@ -134,10 +133,11 @@ foam.CLASS({
     },
     {
       name: 'columns',
-      expression: function(of) {
+      expression: function(data, of) {
+        var of = this.of || ( data && data.of);
         if ( ! of ) return [];
 
-        var tableColumns = this.of.getAxiomByName('tableColumns');
+        var tableColumns = of.getAxiomByName('tableColumns');
 
         if ( tableColumns ) return tableColumns.columns;
 
@@ -189,10 +189,11 @@ foam.CLASS({
                 on('mouseover', function() { view.hoverSelection = obj; }).
                 on('click', function() {
                   view.selection = obj;
+                  if ( view.importSelection$ ) view.importSelection = obj;
                   if ( view.editRecord ) view.editRecord(obj);
                 }).
                 addClass(this.slot(function(selection) {
-                  if ( obj === selection ) return view.myCls('selected');
+                  if ( obj === selection ) return view.myClass('selected');
                   return '';
                 }, view.selection$)).
                 addClass(view.myClass('row')).
