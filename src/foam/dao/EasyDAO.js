@@ -114,6 +114,8 @@ foam.CLASS({
     },
     {
       /** Keep a history of all state changes to the DAO. */
+      class: 'FObjectProperty',
+      of: 'foam.dao.Journal',
       name: 'journal'
     },
     {

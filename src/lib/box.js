@@ -624,7 +624,8 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      name: 'box'
+      of: 'foam.box.Box',
+      name: 'box',
     }
   ],
   methods: [

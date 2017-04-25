@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +17,30 @@
  */
 
 foam.CLASS({
-  package: 'foam.u2.stack',
-  name: 'StackView',
-  extends: 'foam.u2.View',
-
-  requires: [
-    'foam.u2.stack.Stack'
-  ],
-
-  exports: [ 'data as stack' ],
-
+  package: 'foam.comics',
+  name: 'RelationshipDAOAddController',
+  extends: 'foam.comics.DAOController',
   properties: [
     {
-      name: 'data',
-      factory: function() { return this.Stack.create(); }
+      name: 'relationshipDAO',
     },
     {
-      class: 'Boolean',
-      name: 'showActions',
-      value: true
-    }
+      name: 'data',
+    },
+    {
+      name: 'selection',
+    },
   ],
-
-  methods: [
-    function initE() {
-      this.setNodeName('div');
-
-      if ( this.showActions )
-        this.add(this.Stack.BACK, this.Stack.FORWARD);
-
-      this.add(this.slot(function(s) {
-        return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
-      }, this.data$.dot('top')));
-    }
-  ]
+  actions: [
+    {
+      name: 'add',
+      isEnabled: function(selection) { return !!selection },
+      code: function() {
+        var self = this;
+        this.relationshipDAO.put(this.selection.clone()).then(function() {
+          self.stack.back();
+        });
+      }
+    },
+  ],
 });

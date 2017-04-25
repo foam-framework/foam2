@@ -303,9 +303,14 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.core.Argument',
       name: 'args',
-      adaptArrayElement: function(o, prop) {
-        return foam.String.isInstance(o) ?
-          foam.core.Argument.create({name: o}) : o;
+      adaptArrayElement: function(e, obj) {
+        var ctx = obj.__subContext__ || foam;
+        var of = e.class || this.of;
+        var cls = ctx.lookup(of);
+
+        return cls.isInstance(e) ? e :
+          foam.String.isInstance(e) ? cls.create({ name: e }) :
+          cls.create(e, obj);
       }
     }
   ]

@@ -24,14 +24,14 @@ foam.CLASS({
   ],
   properties: [
     'data',
-    'of',
+    'dao',
     {
       name: 'controller',
       factory: function() {
-        return this.DAOUpdateController.create({
-          of$: this.of$,
-          data$: this.data$
-        })
+        var controller = this.DAOUpdateController.create();
+        this.onDetach(controller.dao$.follow(this.dao$));
+        this.onDetach(controller.data$.follow(this.data$));
+        return controller;
       }
     }
   ],
