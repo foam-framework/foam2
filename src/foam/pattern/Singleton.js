@@ -31,7 +31,12 @@ foam.CLASS({
     function installInClass(cls) {
       /** @param {any} cls */
       var oldCreate = cls.create;
-      cls.create = function() {
+      var newCreate = cls.create = function() {
+        // This happens when a newer Axiom replaces create().
+        // If this happens, don't apply Singleton behaviour.
+        if ( cls.create !== newCreate )
+          return oldCreate.apply(this, arguments);
+
         return this.private_.instance_ ||
             ( this.private_.instance_ = oldCreate.apply(this, arguments) );
       };
