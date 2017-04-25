@@ -26,9 +26,6 @@ foam.CLASS({
     },
     {
       name: 'data',
-      expression: function(relationshipDAO) {
-        return this.__context__[foam.String.daoize(relationshipDAO.of.name)];
-      },
     },
     {
       name: 'selection',
