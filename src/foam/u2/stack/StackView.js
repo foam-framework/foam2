@@ -39,7 +39,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
+    function initE() {
       this.setNodeName('div');
 
       if ( this.showActions )
