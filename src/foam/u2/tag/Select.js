@@ -20,6 +20,21 @@ foam.CLASS({
   name: 'Select',
   extends: 'foam.u2.View',
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function() {/*
+        ^:disabled {
+          appearance: none;
+          -moz-appearance:none;
+          -webkit-appearance:none;
+          border: none;
+          background: rgba(0,0,0,0);
+          color: initial;
+        }
+      */}
+    })
+  ],
+
   properties: [
     [ 'nodeName', 'select' ],
     {
@@ -44,8 +59,10 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.attrSlot().linkFrom(this.data$);
-      this.attrs({ size: this.size$ });
+      this
+        .addClass(this.myClass())
+        .attrs({size: this.size$})
+        .attrSlot().linkFrom(this.data$);
 
       this.setChildren(this.slot(function(choices, placeholder) {
         var cs = [];
@@ -67,6 +84,13 @@ foam.CLASS({
 
         return cs;
       }));
+    },
+
+    function updateMode_(mode) {
+      this.setAttribute(
+        'disabled',
+        mode === foam.u2.DisplayMode.DISABLED || mode === foam.u2.DisplayMode.RO);
     }
+
   ]
 });
