@@ -84,7 +84,7 @@ foam.CLASS({
       if ( c ) this.rowClick.pub(c.data);
     },
 
-    function daoPut(obj) {
+    function daoPut(sub, obj) {
       if ( this.rows_[obj.id] ) {
         this.rows_[obj.id].data = obj;
         return;

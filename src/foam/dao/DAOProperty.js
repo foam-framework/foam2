@@ -25,7 +25,10 @@ foam.CLASS({
   requires: [ 'foam.dao.ProxyDAO' ],
 
   properties: [
-    [ 'view', 'foam.u2.DAOList' ]
+    {
+      name: 'view',
+      value: {class: 'foam.comics.InlineDAOControllerView'},
+    }
   ],
 
   methods: [

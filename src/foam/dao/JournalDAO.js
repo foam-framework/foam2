@@ -15,6 +15,15 @@
  * limitations under the License.
  */
 
+foam.INTERFACE({
+  package: 'foam.dao',
+  name: 'Journal',
+  extends: 'foam.dao.Sink',
+  methods: [
+    function replay(dao) {}
+  ]
+});
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'JournalEntry',
@@ -42,7 +51,7 @@ if ( foam.isServer ) {
   foam.CLASS({
     package: 'foam.dao',
     name: 'NodeFileJournal',
-    implements: ['foam.dao.Sink'],
+    implements: ['foam.dao.Journal'],
     properties: [
       {
         name: 'fd',

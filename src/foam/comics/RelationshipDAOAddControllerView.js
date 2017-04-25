@@ -1,6 +1,5 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,54 +17,29 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOControllerView',
-  extends: 'foam.u2.View',
-
-  imports: [
-    'stack'
-  ],
-
-  exports: [
-    'editRecord'
-  ],
-
+  name: 'RelationshipDAOAddControllerView',
+  extends: 'foam.comics.DAOControllerView',
   requires: [
-    'foam.comics.DAOController'
+    'foam.comics.RelationshipDAOAddController',
   ],
-
   properties: [
-    'data',
     {
       name: 'controller',
       factory: function() {
-        var controller = this.DAOController.create();
-        this.onDetach(controller.data$.follow(this.data$));
+        var controller = this.RelationshipDAOAddController.create();
+        this.onDetach(controller.relationshipDAO$.follow(this.data$));
         return controller;
       }
     }
   ],
-
   methods: [
     function editRecord(obj) {
-      this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
-        dao: this.data,
-        data: obj.id
-      });
+      this.controller.selection = obj;
     },
     function initE() {
       this.startContext({ data: this.controller }).
-        start('table').
-          start('tr').
-            start('td').
-              start(this.DAOController.PREDICATE, {dao$: this.data$}).end().
-            end().
-            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
-          end().
-        start('tr').
-          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-          start('td').end().start('td').add(this.DAOController.CREATE).end().
-        end().
+        add(this.RelationshipDAOAddController.FILTERED_DAO,
+            this.RelationshipDAOAddController.ADD).
         endContext();
     }
   ]

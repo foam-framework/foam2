@@ -32,25 +32,18 @@ foam.CLASS({
     {
       name: 'dao',
       hidden: true,
-      factory: function() {
-        return this.__context__[foam.String.daoize(this.of.name)];
-      }
-    },
-    {
-      class: 'Class',
-      name: 'of',
-      hidden: true
+      required: true
     },
     {
       name: 'data',
       label: '',
       view: function(args, X) {
-        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.of }, X).copyFrom(args);
+        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.dao.of }, X).copyFrom(args);
         e.data$ = X.data$.dot(this.name);
         return e;
       },
       factory: function() {
-        return this.of.create(null, this);
+        return this.dao.of.create(null, this);
       }
     }
   ],

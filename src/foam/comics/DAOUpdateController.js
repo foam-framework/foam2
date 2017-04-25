@@ -25,18 +25,23 @@ foam.CLASS({
   properties: [
     {
       name: 'data',
-      hidden: true
-    },
-    {
-      class: 'Class',
-      name: 'of',
-      hidden: true
+      postSet: function(old, nu) {
+        var self = this;
+        this.dao.find(nu).then(function(obj) {
+          if ( ! obj ) {
+            console.error("Failed to find object", nu);
+          }
+          self.obj = obj.clone();
+        }, function(e) {
+          console.error("Failed to find object", nu, e);
+        });
+      }
     },
     {
       name: 'obj',
       label: '',
       view: function(args, X) {
-        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.of }, X).copyFrom(args);
+        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.dao.of }, X).copyFrom(args);
         e.data$ = X.data$.dot(this.name);
         return e;
       }
@@ -44,25 +49,11 @@ foam.CLASS({
     {
       name: 'dao',
       hidden: true,
-      factory: function() {
-        return this.__context__[foam.String.daoize(this.of.name)];
-      }
+      required: true
     },
     {
       class: 'String',
       name: 'status'
-    }
-  ],
-
-  methods: [
-    function init() {
-      var self = this;
-      this.dao.find(this.data).then(function(obj) {
-        self.obj = obj.clone();
-      }, function(e) {
-        // TODO: Handle this better.
-        self.status = 'Failed to load record. ' + e.message;
-      });
     }
   ],
 
