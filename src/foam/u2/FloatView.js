@@ -22,6 +22,12 @@ foam.CLASS({
 
   documentation: 'View for editing Float Properties.',
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
+    })
+  ],
+
   properties: [
     [ 'type', 'number' ],
     { class: 'Float', name: 'data' },
@@ -29,6 +35,11 @@ foam.CLASS({
   ],
 
   methods: [
+    function initE() {
+      this.SUPER();
+      this.addClass(this.myClass());
+    },
+
     function link() {
       this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
           this.data$,
