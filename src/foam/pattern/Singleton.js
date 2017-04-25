@@ -33,7 +33,7 @@ foam.CLASS({
       var oldCreate = cls.create;
       cls.create = function() {
         return this.private_.instance_ ||
-            (this.private_.instance_ = oldCreate.apply(this, arguments));
+            ( this.private_.instance_ = oldCreate.apply(this, arguments) );
       };
     },
 
