@@ -29,12 +29,12 @@ foam.CLASS({
 
   methods: [
     function put(obj) {
-      return Promise.reject(this.ExternalException.create({
-        message: 'NullDAO: Cannot handle put()'
-      }));
+      this.pub('on', 'pub', obj);
+      return Promise.resolve(obj);
     },
 
     function remove(obj) {
+      this.pub('on', 'remove', obj);
       return Promise.resolve();
     },
 
@@ -43,6 +43,7 @@ foam.CLASS({
     },
 
     function select(sink) {
+      sink = sink || foam.dao.ArraySink.create();
       sink.eof();
       return Promise.resolve(sink);
     },

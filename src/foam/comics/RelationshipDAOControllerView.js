@@ -18,54 +18,27 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOControllerView',
-  extends: 'foam.u2.View',
-
-  imports: [
-    'stack'
-  ],
-
-  exports: [
-    'editRecord'
-  ],
-
+  name: 'RelationshipDAOControllerView',
+  extends: 'foam.comics.DAOControllerView',
   requires: [
-    'foam.comics.DAOController'
+    'foam.comics.RelationshipDAOController'
   ],
-
   properties: [
-    'data',
     {
       name: 'controller',
       factory: function() {
-        var controller = this.DAOController.create();
+        var controller = this.RelationshipDAOController.create();
         this.onDetach(controller.data$.follow(this.data$));
         return controller;
       }
     }
   ],
-
   methods: [
-    function editRecord(obj) {
-      this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
-        dao: this.data,
-        data: obj.id
-      });
-    },
     function initE() {
       this.startContext({ data: this.controller }).
-        start('table').
-          start('tr').
-            start('td').
-              start(this.DAOController.PREDICATE, {dao$: this.data$}).end().
-            end().
-            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
-          end().
-        start('tr').
-          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-          start('td').end().start('td').add(this.DAOController.CREATE).end().
-        end().
+        add(this.RelationshipDAOController.FILTERED_DAO,
+            this.RelationshipDAOController.ADD,
+            this.RelationshipDAOController.CREATE).
         endContext();
     }
   ]

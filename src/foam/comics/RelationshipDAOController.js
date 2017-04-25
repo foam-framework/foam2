@@ -1,5 +1,6 @@
 /**
  * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,32 +18,20 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOCreateControllerView',
-  extends: 'foam.u2.Element',
-
+  name: 'RelationshipDAOController',
+  extends: 'foam.comics.DAOController',
   requires: [
-    'foam.comics.DAOCreateController'
+    'foam.comics.RelationshipDAOAddControllerView'
   ],
-
-  properties: [
-    'dao',
+  actions: [
     {
-      name: 'controller',
-      factory: function() {
-        var c = this.DAOCreateController.create();
-        this.onDetach(c.dao$.follow(this.dao$));
-        return c;
+      name: 'add',
+      code: function() {
+        this.stack.push({
+          class: 'foam.comics.RelationshipDAOAddControllerView',
+          data: this.data
+        });
       }
-    }
-  ],
-
-  methods: [
-    function initE() {
-      this.startContext({ data: this.controller }).
-        add(this.DAOCreateController.DATA,
-            this.DAOCreateController.SAVE,
-            this.DAOCreateController.CANCEL).
-        endContext();
     }
   ]
 });
