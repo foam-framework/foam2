@@ -43,7 +43,7 @@ foam.CLASS({
         return e;
       },
       factory: function() {
-        return this.dao.of.create(null, this);
+        return this.dao.of.create(null, this.dao);
       }
     }
   ],
@@ -54,7 +54,7 @@ foam.CLASS({
       code: function() {
         var stack = this.stack;
 
-        this.dao.put(this.data.clone()).then(function() {
+        this.dao.put(this.data.clone(this.dao)).then(function() {
           if ( stack ) stack.back();
         }, function(e) {
           console.error(e);
