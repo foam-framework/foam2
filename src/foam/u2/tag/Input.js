@@ -49,13 +49,14 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
-        ^:read-only { border-width: 0; }
+        ^:read-only { border: none; background: rgba(0,0,0,0); }
       */}
     })
   ],
 
   methods: [
     function initE() {
+      this.SUPER();
       if ( this.type ) this.attrs({ type: this.type });
       this.initCls();
       this.link();
