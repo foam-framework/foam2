@@ -61,10 +61,10 @@ foam.CLASS({
   constants: {
     // Aliases for daoType
     ALIASES: {
-      ARRAY: 'foam.dao.ArrayDAO',
-      MDAO:  'foam.dao.MDAO',
-      IDB:   'foam.dao.IDBDAO',
-      LOCAL: 'foam.dao.LocalStorageDAO',
+      ARRAY:  'foam.dao.ArrayDAO',
+      MDAO:   'foam.dao.MDAO',
+      IDB:    'foam.dao.IDBDAO',
+      LOCAL:  'foam.dao.LocalStorageDAO',
       CLIENT: 'foam.dao.ClientDAO'
     }
   },
