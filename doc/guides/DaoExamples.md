@@ -171,7 +171,8 @@ guitarDAO.where(expr.IN(Guitar.BRAND, ['gibson', 'fender']))
 
 ```js
 // give me all fenders with a price below 2500
-guitarDAO.where(expr.LT(Guitar.PRICE, 2500))
+guitarDAO
+.where(expr.AND(expr.LT(Guitar.PRICE, 2500), expr.EQ(Guitar.BRAND, 'fender')))
 .select()
 .then(function(guitars) {
   console.log(guitars.a.length);
@@ -215,15 +216,6 @@ guitarDAO.where(expr.EQ(Guitar.BRAND, 'fender'))
 .then(function() {
   var a = sink.a;
   a.forEach(function(g) { console.log(g.price) }) // 2700, 2400, 2000
-});
-```
-
-```js
-// give me only two guitars
-guitarDAO.limit(2)
-.select()
-.then(function(g) {
-  console.log(g.a.length);
 });
 ```
 
