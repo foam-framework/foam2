@@ -208,15 +208,15 @@ guitarDAO.where(expr.CONTAINS_IC(Guitar.NAME, 'SH'))
 
 ```js
 // give me all fenders and order by price
-var sink = foam.dao.ArraySink.create();
+
+// this is a custom sink function
+// this function will be applied on each guitar instance.
+var sinkFn = function (guitar) { console.log(guitar.price) }
 
 guitarDAO.where(expr.EQ(Guitar.BRAND, 'fender'))
 .orderBy(expr.DESC(Guitar.PRICE))
-.select(sink)
-.then(function() {
-  var a = sink.a;
-  a.forEach(function(g) { console.log(g.price) }) // 2700, 2400, 2000
-});
+.select({ put: sinkFn })
+.then();
 ```
 
 ```js
