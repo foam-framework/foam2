@@ -25,17 +25,6 @@ foam.CLASS({
   properties: [
     {
       name: 'data',
-      postSet: function(old, nu) {
-        var self = this;
-        this.dao.find(nu).then(function(obj) {
-          if ( ! obj ) {
-            console.error("Failed to find object", nu);
-          }
-          self.obj = obj.clone();
-        }, function(e) {
-          console.error("Failed to find object", nu, e);
-        });
-      }
     },
     {
       name: 'obj',
@@ -49,12 +38,39 @@ foam.CLASS({
     {
       name: 'dao',
       hidden: true,
-      required: true
+      required: true,
     },
     {
       class: 'String',
       name: 'status'
     }
+  ],
+
+  listeners: [
+    {
+      name: 'updateObj',
+      isFramed: true,
+      code: function() {
+        if (!this.dao || !this.data) return;
+        var self = this;
+        this.dao.find(this.data).then(function(obj) {
+          if ( ! obj ) {
+            console.error("Failed to find object", self.data);
+          }
+          self.obj = obj.clone();
+        }, function(e) {
+          console.error("Failed to find object", self.data, e);
+        });
+      },
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.onDetach(this.dao$.sub(this.updateObj));
+      this.onDetach(this.data$.sub(this.updateObj));
+      this.updateObj();
+    },
   ],
 
   actions: [

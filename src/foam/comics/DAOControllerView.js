@@ -21,10 +21,6 @@ foam.CLASS({
   name: 'DAOControllerView',
   extends: 'foam.u2.View',
 
-  imports: [
-    'stack'
-  ],
-
   exports: [
     'editRecord'
   ],
@@ -34,31 +30,23 @@ foam.CLASS({
   ],
 
   properties: [
-    'data',
     {
-      name: 'controller',
-      factory: function() {
-        var controller = this.DAOController.create();
-        this.onDetach(controller.data$.follow(this.data$));
-        return controller;
-      }
-    }
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOController',
+      name: 'data',
+    },
   ],
 
   methods: [
     function editRecord(obj) {
-      this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
-        dao: this.data,
-        data: obj.id
-      });
+      this.data.edit(obj);
     },
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.startContext({ data: this.data$ }). // TODO data could change.
         start('table').
           start('tr').
             start('td').
-              start(this.DAOController.PREDICATE, {dao$: this.data$}).end().
+              start(this.DAOController.PREDICATE, {dao$: this.data$.dot('data')}).end().
             end().
             start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
           end().

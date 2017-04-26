@@ -24,10 +24,15 @@ foam.CLASS({
   ],
   properties: [
     {
+      name: 'relationshipDAO',
+    },
+    {
       name: 'controller',
-      factory: function() {
-        var controller = this.RelationshipDAOAddController.create();
-        this.onDetach(controller.relationshipDAO$.follow(this.data$));
+      expression: function(data, relationshipDAO) {
+        var controller = this.RelationshipDAOAddController.create({
+          relationshipDAO: relationshipDAO,
+          data: data,
+        }, data.__context__);
         return controller;
       }
     }
@@ -37,7 +42,7 @@ foam.CLASS({
       this.controller.selection = obj;
     },
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.startContext({ data: this.controller }). // TODO controller can change.
         add(this.RelationshipDAOAddController.FILTERED_DAO,
             this.RelationshipDAOAddController.ADD).
         endContext();

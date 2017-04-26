@@ -19,26 +19,15 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateControllerView',
   extends: 'foam.u2.Element',
-
   requires: [
-    'foam.comics.DAOCreateController'
+    'foam.comics.DAOCreateController',
   ],
-
   properties: [
-    'dao',
-    {
-      name: 'controller',
-      factory: function() {
-        var c = this.DAOCreateController.create();
-        this.onDetach(c.dao$.follow(this.dao$));
-        return c;
-      }
-    }
+    'data',
   ],
-
   methods: [
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.startContext({ data: this.data }).
         add(this.DAOCreateController.DATA,
             this.DAOCreateController.SAVE,
             this.DAOCreateController.CANCEL).

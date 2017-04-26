@@ -20,6 +20,11 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
 
+  requires: [
+    'foam.comics.DAOCreateController',
+    'foam.comics.DAOUpdateController',
+  ],
+
   imports: [
     'stack'
   ],
@@ -50,13 +55,27 @@ foam.CLASS({
     }
   ],
 
+  methods: [
+    function edit(obj) {
+      this.stack.push({
+        class: 'foam.comics.DAOUpdateControllerView',
+        data: this.DAOUpdateController.create({
+          data: obj.id,
+          dao: this.data,
+        }),
+      });
+    },
+  ],
+
   actions: [
     {
       name: 'create',
       code: function() {
         this.stack.push({
           class: 'foam.comics.DAOCreateControllerView',
-          dao: this.data
+          data: this.DAOCreateController.create({
+            dao: this.data,
+          }),
         });
       }
     }

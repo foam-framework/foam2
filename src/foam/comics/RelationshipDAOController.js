@@ -29,7 +29,8 @@ foam.CLASS({
       code: function() {
         this.stack.push({
           class: 'foam.comics.RelationshipDAOAddControllerView',
-          data: this.data
+          data: this.__context__[foam.String.daoize(this.data.of.name)],
+          relationshipDAO: this.data
         });
       }
     }

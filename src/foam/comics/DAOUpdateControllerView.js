@@ -24,20 +24,10 @@ foam.CLASS({
   ],
   properties: [
     'data',
-    'dao',
-    {
-      name: 'controller',
-      factory: function() {
-        var controller = this.DAOUpdateController.create();
-        this.onDetach(controller.dao$.follow(this.dao$));
-        this.onDetach(controller.data$.follow(this.data$));
-        return controller;
-      }
-    }
   ],
   methods: [
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.startContext({ data: this.data }). // TODO controller could change.
         tag(this.DAOUpdateController.STATUS, { visibility: foam.u2.Visibility.RO }).
         add(this.DAOUpdateController.OBJ,
             this.DAOUpdateController.SAVE, this.DAOUpdateController.DELETE).
