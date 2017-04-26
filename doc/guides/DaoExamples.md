@@ -111,7 +111,10 @@ guitarDAO.bulkLoad(guitarArray);
 ```
 
 ```js
-// mLang
+// we declare mLang here, the foam "modelled language"
+// in simple terms, mlang is foam's own "SQL syntax"
+// it's used to filter and manipulate DAO operations.
+// https://github.com/foam-framework/foam2/blob/master/src/foam/mlang/mlang.js
 var expr = foam.mlang.Expressions.create();
 ```
 
