@@ -35,7 +35,7 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.data.push(this.ListController.create());
+      this.data.push(this.ListController);
     },
 
     function back() {
@@ -73,7 +73,10 @@ foam.CLASS({
 
           var self = this;
           this.selection$.sub(function() {
-            self.controller.data.push(self.controller.ViewController.create({obj: self.selection}));
+            if ( self.selection ) {
+              self.controller.data.push(self.controller.ViewController.create({obj: self.selection}));
+              self.selection = undefined;
+            }
           });
         }
       ],
