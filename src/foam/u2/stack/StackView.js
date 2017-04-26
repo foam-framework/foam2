@@ -39,7 +39,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function initE() {
+    // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
+    function init() {
       this.setNodeName('div');
 
       if ( this.showActions )

@@ -56,15 +56,15 @@ foam.CLASS({
     'foam.dao.TimingDAO'
   ],
 
-  imports: [ 'document' ],
+  imports: [ 'document', 'log' ],
 
   constants: {
     // Aliases for daoType
     ALIASES: {
-      ARRAY: 'foam.dao.ArrayDAO',
-      MDAO:  'foam.dao.MDAO',
-      IDB:   'foam.dao.IDBDAO',
-      LOCAL: 'foam.dao.LocalStorageDAO',
+      ARRAY:  'foam.dao.ArrayDAO',
+      MDAO:   'foam.dao.MDAO',
+      IDB:    'foam.dao.IDBDAO',
+      LOCAL:  'foam.dao.LocalStorageDAO',
       CLIENT: 'foam.dao.ClientDAO'
     }
   },
@@ -366,17 +366,17 @@ foam.CLASS({
         dao = this.PromisedDAO.create({
           promise: new Promise(function(resolve, reject) {
             delegate.select(self.COUNT()).then(function(c) {
-              console.log("Loading test data");
               // Only load testData if DAO is empty
               if ( c.value ) {
                 resolve(delegate);
                 return;
               }
 
+              self.log("Loading test data");
               Promise.all(foam.json.parse(self.testData, self.of).map(
                 function(o) { return delegate.put(o); }
               )).then(function() {
-                console.log("Loaded", self.testData.length, "records.");
+                self.log("Loaded", self.testData.length, "records.");
                 resolve(delegate);
               }, reject);
             });
