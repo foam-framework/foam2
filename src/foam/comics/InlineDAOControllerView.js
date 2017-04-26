@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.comics.DAOControllerView',
   methods: [
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.startContext({ data: this.data }). // TODO controller could change.
         add(this.DAOController.FILTERED_DAO,
             this.DAOController.CREATE).
         endContext();

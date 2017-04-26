@@ -26,10 +26,10 @@ foam.CLASS({
   properties: [
     {
       name: 'controller',
-      factory: function() {
-        var controller = this.RelationshipDAOController.create();
-        this.onDetach(controller.data$.follow(this.data$));
-        return controller;
+      expression: function(data) {
+        return this.RelationshipDAOController.create({
+          data: data,
+        }, data.__context__);
       }
     }
   ],
