@@ -162,6 +162,10 @@ foam.CLASS({
       class: 'foam.parse.ParserProperty',
       final: true
     }
+  ],
+
+  methods: [
+    function toString() { return this.p.toString(); }
   ]
 });
 
@@ -792,6 +796,10 @@ foam.CLASS({
         }
       }
       return ps.setValue(this.value !== undefined ? this.value : str);
+    },
+
+    function toString() {
+      return '"' + this.s + '"';
     }
   ]
 });
@@ -843,6 +851,10 @@ foam.CLASS({
         }
       }
       return ps.setValue(this.value !== undefined ? this.value : this.s);
+    },
+
+    function toString() {
+      return 'ignoreCase("' + this.lower + '")';
     }
   ]
 });
@@ -887,6 +899,15 @@ foam.CLASS({
         if ( ret ) return ret;
       }
       return undefined;
+    },
+
+    function toString() {
+      var args = this.args;
+      var strs = new Array(args.length);
+      for ( var i = 0; i < args.length; i++ ) {
+        strs[i] = args[i].toString();
+      }
+      return 'alt(' + strs.join(', ') + ')';
     }
   ]
 });
@@ -955,6 +976,15 @@ foam.CLASS({
         ret.push(ps.value);
       }
       return ps.setValue(ret);
+    },
+
+    function toString() {
+      var args = this.args;
+      var strs = new Array(args.length);
+      for ( var i = 0; i < args.length; i++ ) {
+        strs[i] = args[i].toString();
+      }
+      return 'seq(' + strs.join(', ') + ')';
     }
   ]
 });
@@ -968,6 +998,10 @@ foam.CLASS({
     function parse(ps, obj) {
       ps = this.p.parse(ps, obj);
       return ps ? ps.setValue(ps.value.join('')) : undefined;
+    },
+
+    function toString() {
+      return 'str(' + this.SUPER() + ')';
     }
   ]
 });
@@ -1037,6 +1071,15 @@ foam.CLASS({
         if ( i === n ) ret = ps.value;
       }
       return ps.setValue(ret);
+    },
+
+    function toString() {
+      var args = this.args;
+      var strs = new Array(args.length);
+      for ( var i = 0; i < args.length; i++ ) {
+        strs[i] = args[i].toString();
+      }
+      return 'seq1(' + this.n + ', ' + strs.join(', ') + ')';
     }
   ]
 });
@@ -1054,8 +1097,12 @@ foam.CLASS({
 
     function parse(ps, obj) {
       return this.p.parse(ps, obj) || ps.setValue(null);
+    },
+
+    function toString() {
+      return 'opt(' + this.SUPER() + ')';
     }
-  ]
+  ],
 });
 
 
@@ -1075,7 +1122,9 @@ foam.CLASS({
 
     function parse(ps) {
       return ps.head ? ps.tail : undefined;
-    }
+    },
+
+    function toString() { return 'anyChar()'; }
   ]
 });
 
@@ -1103,6 +1152,15 @@ foam.CLASS({
     function parse(ps) {
       return ps.head && this.string.indexOf(ps.head) === -1 ?
         ps.tail : undefined;
+    },
+
+    function toString() {
+      var str = this.string;
+      var chars = new Array(str.length);
+      for ( var i = 0; i < str.length; i++ ) {
+        chars[i] = str.charAt(i);
+      }
+      return 'notChars("' + chars.join('", "') + '")';
     }
   ]
 });
@@ -1138,6 +1196,10 @@ foam.CLASS({
       return ( this.from <= ps.head && ps.head <= this.to ) ?
           ps.tail.setValue(ps.head) :
           undefined;
+    },
+
+    function toString() {
+      return 'range("' + this.from + '", "' + this.to + '")';
     }
   ]
 });
@@ -1243,6 +1305,14 @@ foam.CLASS({
 
       if ( this.minimum > 0 && ret.length < this.minimum ) return undefined;
       return last.setValue(ret);
+    },
+
+    function toString() {
+      var str = 'repeat(' + this.SUPER();
+      if ( this.delimiter ) str += ', ' + this.delimiter;
+      if ( this.minimum ) str += ', ' + this.minimum;
+      str += ')';
+      return str;
     }
   ]
 });
@@ -1255,6 +1325,15 @@ foam.CLASS({
 
   properties: [
     ['minimum', 1]
+  ],
+
+  methods: [
+    function toString() {
+      var str = 'plus(' + this.p.toString();
+      if ( this.delimiter ) str += ', ' + this.delimiter;
+      str += ')';
+      return str;
+    }
   ]
 });
 
@@ -1274,6 +1353,14 @@ foam.CLASS({
       var p = this.p;
       while ( res = p.parse(ps, obj) ) ps = res;
       return ps.setValue('');
+    },
+
+    function toString() {
+      var str = 'repeat0(' + this.p.toString();
+      if ( this.delimiter ) str += ', ' + this.delimiter;
+      if ( this.minimum ) str += ', ' + this.minimum;
+      str += ')';
+      return str;
     }
   ]
 });
@@ -1319,6 +1406,13 @@ foam.CLASS({
       return this.p.parse(ps, obj) ?
         undefined :
         (this.else ? this.else.parse(ps, obj) : ps);
+    },
+
+    function toString() {
+      var str = 'not(' + this.SUPER();
+      if ( this.else ) str += ', ' + this.else.toString();
+      str += ')';
+      return str;
     }
   ]
 });
@@ -1433,7 +1527,9 @@ foam.CLASS({
         return undefined;
       }
       return p.parse(ps, grammar);
-    }
+    },
+
+    function toString() { return 'sym("' + this.name + '")'; }
   ]
 });
 
