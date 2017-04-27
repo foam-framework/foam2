@@ -29,18 +29,17 @@ foam.CLASS({
 
   axioms: [
     foam.u2.CSS.create({code: `
-      .foam-u2-PropertyView {
-        padding: 4px;
-      }
       .foam-u2-PropertyView-label {
         color: #444;
         display: block;
         float: left;
         font-size: 13px;
-        padding-left: 6px;
-        padding-right: 8px;
+        padding: 2px 8px 2px 6px;
         text-align: right;
         vertical-align: top;
+      }
+      .foam-u2-PropertyView-view {
+        padding: 2px 8px 2px 6px;
       }
       .foam-u2-PropertyView-units  {
         color: #444;
