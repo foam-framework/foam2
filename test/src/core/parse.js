@@ -26,6 +26,8 @@ describe('basic parsers', function() {
   var sym = parsers.sym;
   var seq1 = parsers.seq1;
   var repeat = parsers.repeat;
+  var plus = parsers.plus;
+  var str = parsers.str;
   var range = parsers.range;
   var notChars = parsers.notChars;
   var not = parsers.not;
@@ -397,6 +399,21 @@ describe('basic parsers', function() {
       expect(ps).toBeDefined();
       expect(ps.value).toBe('');
       expect(ps.head).toBe('!');
+    });
+  });
+
+  describe('toString()', function() {
+    it('should completely describe parser', function() {
+      var parser = seq('seq', repeat0(
+          alt('alt', sym('symbolName'),
+              seq1(1, 'seq1', repeat(plus(str(range('0', '9')))),
+                   notChars('abc'), not(optional(literal('literal'))),
+                   literalIC('ignore case'), anyChar()))));
+
+      expect(parser.toString()).toBe(
+          'seq("seq", repeat0(alt("alt", sym("symbolName"), seq1(1, "seq1", ' +
+              'repeat(plus(str(range("0", "9")))), notChars("a", "b", "c"), ' +
+              'not(opt("literal")), ignoreCase("ignore case"), anyChar()))))');
     });
   });
 });
