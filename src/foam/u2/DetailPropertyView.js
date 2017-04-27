@@ -27,16 +27,18 @@ foam.CLASS({
     [ 'nodeName', 'tr' ]
   ],
 
-  templates: [
-    // TODO: this isn't used
-    function CSS() {/*
+  axioms: [
+    foam.u2.CSS.create({code: `
+      .foam-u2-PropertyView {
+        padding: 4px;
+      }
       .foam-u2-PropertyView-label {
         color: #444;
         display: block;
         float: left;
         font-size: 13px;
         padding-left: 6px;
-        padding-top: 6px;
+        padding-right: 8px;
         text-align: right;
         vertical-align: top;
       }
@@ -46,7 +48,7 @@ foam.CLASS({
         padding: 4px;
         text-align: right;
       }
-    */}
+    `})
   ],
 
   methods: [
@@ -55,7 +57,7 @@ foam.CLASS({
 
       // TODO: hide this element if the prop changes it's mode to HIDDEN.
       this.
-        addClass('foam-u2-PropertyView-').
+        addClass('foam-u2-PropertyView').
         start('td').addClass('foam-u2-PropertyView-label').add(prop.label).end().
         start('td').addClass('foam-u2-PropertyView-view').add(
           prop,
