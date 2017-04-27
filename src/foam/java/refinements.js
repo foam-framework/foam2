@@ -437,7 +437,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
-        var of = this.of === 'FObject' ? 'foam.core.FObject' : this.of;
+        var of = this.of.id;
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
       return info;
@@ -493,7 +493,7 @@ foam.CLASS({
     {
       name: 'javaType',
       expression: function(of) {
-        return of ? of : 'foam.core.FObject';
+        return of ? of.id : 'foam.core.FObject';
       }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
