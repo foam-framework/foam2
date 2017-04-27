@@ -24,7 +24,7 @@ foam.CLASS({
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
-      ^ {
+      ^ button {
         -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
         box-shadow: inset 0 1px 0 0 #ffffff;
         background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
@@ -63,6 +63,16 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'showLabel',
+      value: true
+    },
+    {
+      class: 'URL',
+      name: 'icon',
+      factory: function(action) { return this.action.icon; }
+    },
     'data',
     'action',
     [ 'nodeName', 'button' ],
@@ -77,8 +87,14 @@ foam.CLASS({
       this.initCls();
 
       this.
-        on('click', this.click).
-        add(this.label$);
+        on('click', this.click);
+
+      if ( this.icon ) {
+        // this.nodeName = 'a';
+        this.start('img').attr('src', this.icon).end();
+      }
+      if ( this.showLabel )
+        this.add(this.label$);
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
