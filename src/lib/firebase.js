@@ -253,7 +253,7 @@ foam.CLASS({
 
           sink.put(sub, obj);
         }
-        sink.eof();
+        sink.eof && sink.eof();
 
         return resultSink;
       }.bind(this), function(resp) {

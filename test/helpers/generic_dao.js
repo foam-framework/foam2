@@ -302,6 +302,23 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
+      it('should treat eof() as optional', function(done) {
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          // Exercise non-trivial select() in case eof() logic masked when DAO
+          // is empty.
+          var p = mkPerson1();
+          var p2;
+          dao.put(p).then(function() {
+            // Use ad hoc sink with no eof().
+            dao.select({ put: function(_, o) { p2 = o; } }).then(function() {
+              if ((!p) || (!p2)) debugger;
+              expect(p.id).toBe(p2.id);
+              done();
+            });
+          });
+        });
+      });
+
       it('should call sink.put for each item', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p1 = mkPerson1();

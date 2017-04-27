@@ -79,7 +79,7 @@ foam.CLASS({
           sink.put(sub, self.array[i]);
         }
 
-        sink.eof();
+        sink.eof && sink.eof();
 
         resolve(resultSink);
       });

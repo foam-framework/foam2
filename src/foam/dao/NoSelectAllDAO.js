@@ -37,7 +37,7 @@ foam.CLASS({
           ( foam.Number.isInstance(skip) && Number.isFinite(skip) && skip != 0 ) ) {
         return this.delegate.select(sink, skip, limit, order, predicate);
       } else {
-        sink && sink.eof();
+        sink && sink.eof && sink.eof();
         return Promise.resolve(sink || this.ArraySink.create());
       }
     }

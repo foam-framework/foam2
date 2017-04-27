@@ -709,7 +709,7 @@ foam.CLASS({
             sink.put(sub, items[i]);
           }
 
-          sink.eof();
+          sink.eof && sink.eof();
 
           return sink;
         });

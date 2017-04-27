@@ -43,7 +43,7 @@ foam.CLASS({
     },
 
     function select(sink) {
-      sink.eof();
+      sink && sink.eof && sink.eof();
       return Promise.resolve(sink);
     },
 
