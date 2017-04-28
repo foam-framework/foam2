@@ -84,6 +84,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'junctionDAOKey',
+    },
+    {
       name: 'sourceDAOKey',
       expression: function(sourceModel) {
         return foam.String.daoize(foam.lookup(sourceModel).name);
@@ -138,6 +141,37 @@ foam.CLASS({
           relationship: this
         }, source);
       }
+    },
+    {
+      name: 'targetDAOFactory',
+      value: function(source) {
+        return source.__context__[this.targetDAOKey];
+      }
+    },
+    {
+      name: 'junctionDAOFactory',
+      value: function(source) {},
+    },
+    {
+      name: 'relationshipDAOInstances_',
+      factory: function() { return {} },
+    },
+    {
+      name: 'relationshipPropertyValueFactory',
+      value: function(source) {
+        var self = this;
+        return foam.dao.RelationshipPropertyValue.create({
+          daoGetter: function() {
+            if (!self.relationshipDAOInstances_[source.id]) {
+              self.relationshipDAOInstances_[source.id] =
+                  self.relationshipDAOFactory(source);
+            }
+            return self.relationshipDAOInstances_[source.id];
+          },
+          targetDAO: this.targetDAOFactory(source),
+          junctionDAO: this.junctionDAOFactory(source),
+        });
+      }
     }
     /* FUTURE:
     {
@@ -164,13 +198,13 @@ foam.CLASS({
       if ( cardinality === '1:*' ) {
         if ( ! sourceProps.length ) {
           sourceProps = [
-            foam.dao.RelationshipDAOProperty.create({
+            foam.dao.RelationshipProperty.create({
               name: forwardName,
+              cloneProperty: function(value, map) {},
               transient: true,
-              setter: function() {},
-              getter: function() {
-                return this.instance_[forwardName] || ( this.instance_[forwardName] = relationship.relationshipDAOFactory(this) );
-              }
+              expression: function(id) {
+                return relationship.relationshipPropertyValueFactory(this);
+              },
             }).copyFrom(this.sourceProperty)
           ];
         }
@@ -240,6 +274,12 @@ foam.CLASS({
               targetProperty: target.ID
             }, source);
           },
+          targetDAOFactory: function(source) {
+            return source.__context__[relationship.targetDAOKey];
+          },
+          junctionDAOFactory: function(source) {
+            return source.__context__[relationship.junctionDAOKey];
+          },
           adaptTarget: function(s, t) {
             if ( target.isInstance(t) ) {
               t = jModel.create({targetId: t.id});
@@ -268,8 +308,14 @@ foam.CLASS({
               relationship: this,
               joinDAOKey: relationship.sourceDAOKey,
               junctionProperty: jModel.SOURCE_ID,
-              targetProperty: target.ID
+              targetProperty: source.ID
             }, s);
+          },
+          targetDAOFactory: function(source) {
+            return source.__context__[relationship.sourceDAOKey];
+          },
+          junctionDAOFactory: function(source) {
+            return source.__context__[relationship.junctionDAOKey];
           },
           adaptTarget: function(s, t) {
             if ( source.isInstance(t) ) {
@@ -325,4 +371,43 @@ foam.LIB({
       return r;
     }
   ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'RelationshipPropertyValue',
+  properties: [
+    {
+      name: 'daoGetter',
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      getter: function() { return this.daoGetter() },
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'junctionDAO',
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'targetDAO',
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'RelationshipProperty',
+  extends: 'foam.core.FObjectProperty',
+  properties: [
+    {
+      name: 'of',
+      value: 'foam.dao.RelationshipPropertyValue',
+    },
+    {
+      name: 'view',
+      value: { class: 'foam.comics.RelationshipView' },
+    },
+  ],
 });

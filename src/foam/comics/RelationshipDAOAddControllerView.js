@@ -22,27 +22,12 @@ foam.CLASS({
   requires: [
     'foam.comics.RelationshipDAOAddController',
   ],
-  properties: [
-    {
-      name: 'relationshipDAO',
-    },
-    {
-      name: 'controller',
-      expression: function(data, relationshipDAO) {
-        var controller = this.RelationshipDAOAddController.create({
-          relationshipDAO: relationshipDAO,
-          data: data,
-        }, data.__context__);
-        return controller;
-      }
-    }
-  ],
   methods: [
     function editRecord(obj) {
-      this.controller.selection = obj;
+      this.data.selection = obj;
     },
     function initE() {
-      this.startContext({ data: this.controller }). // TODO controller can change.
+      this.startContext({ data: this.data$ }).
         add(this.RelationshipDAOAddController.FILTERED_DAO,
             this.RelationshipDAOAddController.ADD).
         endContext();
