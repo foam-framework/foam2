@@ -21,7 +21,11 @@ foam.CLASS({
   name: 'RelationshipDAOController',
   extends: 'foam.comics.DAOController',
   requires: [
-    'foam.comics.RelationshipDAOAddControllerView'
+    'foam.comics.RelationshipDAOAddController',
+    'foam.comics.RelationshipDAOAddControllerView',
+  ],
+  properties: [
+    'relationshipPropertyValue',
   ],
   actions: [
     {
@@ -29,8 +33,10 @@ foam.CLASS({
       code: function() {
         this.stack.push({
           class: 'foam.comics.RelationshipDAOAddControllerView',
-          data: this.__context__[foam.String.daoize(this.data.of.name)],
-          relationshipDAO: this.data
+          data: this.RelationshipDAOAddController.create({
+            data: this.relationshipPropertyValue.targetDAO,
+            relationshipDAO: this.relationshipPropertyValue.dao,
+          }),
         });
       }
     }

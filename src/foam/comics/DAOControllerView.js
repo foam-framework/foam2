@@ -42,7 +42,8 @@ foam.CLASS({
       this.data.edit(obj);
     },
     function initE() {
-      this.startContext({ data: this.data$ }). // TODO data could change.
+      // TODO Changes have been made and this hasn't been tested.
+      this.startContext({ data: this.data$ }).
         start('table').
           start('tr').
             start('td').
