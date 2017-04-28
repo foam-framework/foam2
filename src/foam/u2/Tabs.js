@@ -46,7 +46,11 @@ foam.CLASS({
         ^tab {
           background: lightgray;
           border-bottom: none;
-          border: 1px solid black;
+          border-top: 1px solid black;
+          border-left: 1px solid black;
+          border-right: 1px solid black;
+          border-top-right-radius: 4px;
+          border-top-left-radius: 4px;
           float: left;
           padding: 5px;
         }

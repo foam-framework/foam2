@@ -34,7 +34,7 @@ foam.CLASS({
       var newCreate = cls.create = function() {
         // This happens when a newer Axiom replaces create().
         // If this happens, don't apply Singleton behaviour.
-        if ( cls.create !== newCreate )
+        if ( this.create !== newCreate )
           return oldCreate.apply(this, arguments);
 
         return this.private_.instance_ ||

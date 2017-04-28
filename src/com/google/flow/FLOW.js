@@ -74,7 +74,6 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'FObjectProperty',
       name: 'value',
       cloneProperty: function(o, m) {
         m[this.name ] = o.cls_.create({
