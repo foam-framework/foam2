@@ -18,17 +18,36 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'RelationshipDAOControllerView',
-  extends: 'foam.comics.DAOControllerView',
+  name: 'RelationshipView',
+  extends: 'foam.u2.View',
+
   requires: [
-    'foam.comics.RelationshipDAOController'
+    'foam.comics.RelationshipDAOController',
+    'foam.comics.RelationshipDAOControllerView',
+    'foam.dao.RelationshipPropertyValue',
+    'foam.comics.DAOView',
   ],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.dao.RelationshipPropertyValue',
+      name: 'data',
+    },
+    {
+      name: 'daoController',
+      factory: function() {
+        return this.RelationshipDAOController.create({
+          relationshipPropertyValue$: this.data$,
+          data$: this.data$.dot('dao'),
+        });
+      },
+    },
+  ],
+
   methods: [
     function initE() {
-      this.startContext({ data: this.data$ }).
-        add(this.RelationshipDAOController.FILTERED_DAO,
-            this.RelationshipDAOController.ADD).
-        endContext();
+      this.start(this.RelationshipDAOControllerView, { data: this.daoController }).end();
     }
   ]
 });
