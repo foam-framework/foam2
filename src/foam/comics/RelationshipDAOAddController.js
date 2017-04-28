@@ -25,9 +25,6 @@ foam.CLASS({
       name: 'relationshipDAO',
     },
     {
-      name: 'data',
-    },
-    {
       name: 'selection',
     },
   ],
