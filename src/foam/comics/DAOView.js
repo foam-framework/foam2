@@ -30,7 +30,7 @@ foam.CLASS({
     {
       name: 'controller',
       expression: function(data) {
-        return this.DAOController.create({data: data}, data.__subContext__);
+        return this.DAOController.create({data: data}, data);
       },
     },
   ],
