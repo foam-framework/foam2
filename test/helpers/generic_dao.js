@@ -116,7 +116,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      xit('should pub on.put with the object', function(done) {
+      it('should pub on.put with the object', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();
           var listenerCalled = false;
@@ -179,7 +179,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      xit('should only remove that which matches the predicate', function(done) {
+      it('should only remove that which matches the predicate', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var exprs = foam.mlang.Expressions.create();
           var p = mkPerson1();
@@ -240,7 +240,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      xit('should pub on.remove with the object', function(done) {
+      it('should pub on.remove with the object', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();
           var listenerCalled = false;
@@ -262,7 +262,7 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
-      xit('should not pub on.remove if nothing was removed', function(done) {
+      it('should not pub on.remove if nothing was removed', function(done) {
         var dao = daoFactory(test.dao.generic.Person).then(function(dao) {
           dao.on.remove.sub(function() {
             fail('No object should have been removed.');
