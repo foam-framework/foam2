@@ -27,7 +27,7 @@ foam.CLASS({
   axioms: [
     {
       installInClass: function(cls) {
-        cls.createView = function(spec, args, that, ctx) {
+        cls.createView = function(spec, args, self, ctx) {
           if ( foam.u2.Element.isInstance(spec) )
             return spec;
 
@@ -38,7 +38,7 @@ foam.CLASS({
             return spec.toE(args, ctx);
 
           if ( foam.Function.isInstance(spec) )
-            return foam.u2.ViewSpec.createView(spec.call(that, args, ctx), args, that, ctx);
+            return foam.u2.ViewSpec.createView(spec.call(self, args, ctx), args, self, ctx);
 
           if ( foam.Object.isInstance(spec) ) {
             var ret = spec.create ?
