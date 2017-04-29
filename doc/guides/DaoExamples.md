@@ -265,7 +265,7 @@ guitarDAO.select(expr.MIN(Guitar.PRICE))
 
 ### DAO Decorators
 
-Dao decorators adds more functionality into existing daos, examples below:
+DAO decorators add more functionality to existing daos, examples below:
 
 #### TimingDAO
 
