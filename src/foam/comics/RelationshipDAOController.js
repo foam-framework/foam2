@@ -26,10 +26,14 @@ foam.CLASS({
   ],
   properties: [
     'relationshipPropertyValue',
+    'relationshipPropertyValueSourceId',
   ],
   actions: [
     {
       name: 'add',
+      isEnabled: function(relationshipPropertyValueSourceId) {
+        return !!relationshipPropertyValueSourceId;
+      },
       code: function() {
         this.stack.push({
           class: 'foam.comics.RelationshipDAOAddControllerView',
@@ -40,5 +44,13 @@ foam.CLASS({
         });
       }
     }
-  ]
+  ],
+  methods: [
+    function init() {
+      this.SUPER();
+      this.onDetach(
+        this.relationshipPropertyValueSourceId$.follow(
+          this.relationshipPropertyValue$.dot('sourceId')));
+    },
+  ],
 });

@@ -161,6 +161,7 @@ foam.CLASS({
       value: function(source) {
         var self = this;
         return foam.dao.RelationshipPropertyValue.create({
+          sourceId: source.id,
           daoGetter: function() {
             if (!self.relationshipDAOInstances_[source.id]) {
               self.relationshipDAOInstances_[source.id] =
@@ -378,6 +379,10 @@ foam.CLASS({
   name: 'RelationshipPropertyValue',
   properties: [
     {
+      name: 'sourceId',
+    },
+    {
+      class: 'Function',
       name: 'daoGetter',
     },
     {
