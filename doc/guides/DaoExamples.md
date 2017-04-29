@@ -262,3 +262,22 @@ guitarDAO.select(expr.MIN(Guitar.PRICE))
   console.log(g.value);
 });
 ```
+
+### DAO Decorators
+
+Dao decorators adds more functionality into existing daos, examples below:
+
+#### TimingDAO
+
+```js
+
+// TimingDAO extends the ProxyDAO which require us to setup a delegated class.
+// it adds timing functionality to specific DAO operations.
+// ie: time spent in a "select()" operation.
+
+var timing = foam.dao.TimingDAO.create({ name: 'guitar-timer', delegate: guitarDAO });
+
+// time spent in a default ArraySink select()
+timing.where().select().then();
+// Timing:  timer-guitar-select   0.445  ms
+```
