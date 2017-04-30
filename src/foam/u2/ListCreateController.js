@@ -68,8 +68,8 @@ foam.CLASS({
       methods: [
         function initE() {
           this
-            .tag(this.controller.summaryView, {data: this.dao, selection$: this.selection$})
-            .tag(this.CREATE, this.createLabel && {label: this.createLabel});
+            .start(this.CREATE, this.createLabel && {label: this.createLabel}).style({float: 'right'}).end()
+            .tag(this.controller.summaryView, {data: this.dao, selection$: this.selection$});
 
           var self = this;
           this.selection$.sub(function() {
