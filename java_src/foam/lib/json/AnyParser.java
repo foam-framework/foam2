@@ -7,6 +7,7 @@ public class AnyParser extends ProxyParser {
     super(new Alt(
                   new NullParser(),
                   new StringParser(),
+                  new ShortParser(),
                   new LongParser(),
                   new IntParser(),
                   new FloatParser(),
