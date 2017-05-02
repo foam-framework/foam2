@@ -55,14 +55,14 @@ foam.CLASS({
     function maybeClone(locked) {
       return locked ? this.clone() : this;
     },
-    
+
     function clone() {
       var c = this.cls_.create();
-      c.key = this.key;
+      c.key   = this.key;
       c.value = this.value;
-      c.size = this.size;
+      c.size  = this.size;
       c.level = this.level;
-      c.left = this.left;
+      c.left  = this.left;
       c.right = this.right;
       return c;
     },
@@ -260,7 +260,7 @@ foam.CLASS({
       return s;
     },
 
-  
+
     function select(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
@@ -277,7 +277,7 @@ foam.CLASS({
       this.right.select(sink, skip, limit, order, predicate, cache);
     },
 
-   
+
     function selectReverse(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
