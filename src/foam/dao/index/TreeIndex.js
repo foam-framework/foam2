@@ -136,7 +136,7 @@ foam.CLASS({
               predicate = predicate.clone();
               predicate.args[i] = self.True.create();
               predicate = predicate.partialEval();
-              if (  self.True.isInstance(predicate) ) predicate = undefined;
+              if ( self.True.isInstance(predicate) ) predicate = undefined;
               return { arg2: q.arg2, predicate: predicate };
             }
           }
@@ -175,9 +175,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-
-      // TODO: replace with bound methods when available
-      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.index.dedup, this);
+      this.dedup = this.dedup.bind(this, this.prop.name);
       //this.compare = foam.Function.bind(this.compare, this);
     },
 
@@ -293,10 +291,9 @@ foam.CLASS({
       if ( tail.trim().length > 0 ) ret += tail;
       return ret;
     }
-
   ]
-
 });
+
 
 /** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
@@ -312,7 +309,7 @@ foam.CLASS({
     {
       class: 'Simple',
       name: 'root',
-    },
+    }
   ],
 
   methods: [
@@ -343,7 +340,6 @@ foam.CLASS({
         }
       }
     },
-
 
     function put(newValue) {
       this.root = this.root.putKeyValue(
@@ -378,7 +374,6 @@ foam.CLASS({
     },
 
     function size() { return this.root.size; },
-
 
     function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
@@ -574,8 +569,7 @@ foam.CLASS({
 
     function toString() {
       return 'TreeIndex(' + (this.index || this).prop.name + ', ' + (this.index || this).tail + ')';
-    },
-
+    }
   ]
 });
 
@@ -586,6 +580,8 @@ foam.CLASS({
   name: 'CITreeIndex',
   extends: 'foam.dao.index.TreeIndex',
 });
+
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'CITreeIndexNode',
@@ -619,7 +615,7 @@ foam.CLASS({
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
       }
-    },
+    }
   ]
 });
 
@@ -630,6 +626,8 @@ foam.CLASS({
   name: 'SetIndex',
   extends: 'foam.dao.index.TreeIndex',
 });
+
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'SetIndexNode',
@@ -678,7 +676,6 @@ foam.CLASS({
       } else {
         this.root = this.root.removeKeyValue('', value, this.index.compare, this.index.nullNode);
       }
-    },
-
+    }
   ]
 });
