@@ -99,7 +99,7 @@ foam.CLASS({
       this.daoPut(null, obj);
     },
 
-    function daoRemove(obj) {
+    function daoRemove(_, obj) {
       if ( this.rows_[obj.id] ) {
         this.removeChild(this.rows_[obj.id]);
         delete this.rows_[obj.id];
