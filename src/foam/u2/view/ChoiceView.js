@@ -221,11 +221,8 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        this.dao.select(foam.mlang.sink.Map.create({
-          arg1: this.objToChoice,
-          delegate: foam.dao.ArraySink.create()
-        })).then(function(map) {
-          this.choices = map.delegate.a;
+        this.dao.select().then(function(s) {
+          this.choices = s.a.map(self.objToChoice);
           if ( ! this.data && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
