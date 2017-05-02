@@ -163,9 +163,7 @@ foam.CLASS({
     },
     {
       name: 'treeNode',
-      factory: function() {
-        return this.TreeNode;
-      }
+      factory: function() { return this.TreeNode; }
     },
     {
       name: 'tail',
@@ -176,7 +174,6 @@ foam.CLASS({
   methods: [
     function init() {
       this.dedup = this.dedup.bind(this, this.prop.name);
-      //this.compare = foam.Function.bind(this.compare, this);
     },
 
     /** Set the value's property to be the same as the key in the index.
