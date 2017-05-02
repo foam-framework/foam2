@@ -387,6 +387,28 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Short',
+
+  properties: [
+    ['javaType', 'short'],
+    ['javaInfoType', 'foam.core.AbstractShortPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.ShortParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).shortValue() :'
+            + '(short)o;';
+      return info;
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Long',
 
   properties: [
