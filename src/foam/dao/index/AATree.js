@@ -36,14 +36,8 @@ foam.CLASS({
     { class: 'Simple', name: 'value' },
     { class: 'Simple', name: 'size'  },
     { class: 'Simple', name: 'level' },
-    {
-      class: 'Simple',
-      name: 'left',
-    },
-    {
-      class: 'Simple',
-      name: 'right',
-    },
+    { class: 'Simple', name: 'left'  },
+    { class: 'Simple', name: 'right' }
   ],
 
   methods: [
@@ -370,8 +364,7 @@ foam.CLASS({
       copy.size = s.size - s.right.size;
       copy.right = nullNode;
       return copy;
-    },
-
+    }
   ]
 });
 
