@@ -387,6 +387,28 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Byte',
+
+  properties: [
+    ['javaType', 'byte'],
+    ['javaInfoType', 'foam.core.AbstractBytePropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.ByteParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).byteValue() :'
+            + '(byte)o;';
+      return info;
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Short',
 
   properties: [
