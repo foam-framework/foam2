@@ -430,9 +430,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.left = undefined;
+      this.left  = undefined;
       this.right = undefined;
-      this.size = 0;
+      this.size  = 0;
       this.level = 0;
     },
 
@@ -449,11 +449,11 @@ foam.CLASS({
       var subIndex = this.tail.createNode();
       subIndex.put(value);
       var n = this.treeNode.create();
-      n.left = this;
+      n.left  = this;
       n.right = this;
-      n.key = key;
+      n.key   = key;
       n.value = subIndex;
-      n.size = 1;
+      n.size  = 1;
       n.level = 1;
       return n;
     },
@@ -477,7 +477,7 @@ foam.CLASS({
       var m    = start + Math.floor((end-start+1) / 2);
       tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
 
-      tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
+      tree.left  = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
       tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);
       tree.size += tree.left.size + tree.right.size;
 
