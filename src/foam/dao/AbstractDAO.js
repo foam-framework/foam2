@@ -278,6 +278,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
+      topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ]
     }
   ],

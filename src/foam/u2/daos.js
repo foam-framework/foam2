@@ -96,7 +96,7 @@ foam.CLASS({
     },
 
     function onDAOPut(_, __, ___, obj) {
-      this.daoPut(obj);
+      this.daoPut(null, obj);
     },
 
     function daoRemove(obj) {
@@ -107,7 +107,7 @@ foam.CLASS({
     },
 
     function onDAORemove(_, __, ___, obj) {
-      this.daoRemove(obj);
+      this.daoRemove(null, obj);
     },
 
     function onDAOReset() {
@@ -120,19 +120,19 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.dao.RelationshipDAO',
-  
+
   requires: [
     'foam.u2.CitationView',
     'foam.u2.DAOList'
   ],
-  
+
   methods: [
     function toE(args, ctx) {
       args = args || {};
       args.data = this;
       args.rowView = this.CitationView;
       return this.DAOList.create(args, ctx);
-    }    
+    }
   ]
-  
+
 })
