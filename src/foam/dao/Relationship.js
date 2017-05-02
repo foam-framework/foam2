@@ -153,21 +153,13 @@ foam.CLASS({
       value: function(source) {},
     },
     {
-      name: 'relationshipDAOInstances_',
-      factory: function() { return {} },
-    },
-    {
       name: 'relationshipPropertyValueFactory',
       value: function(source) {
         var self = this;
         return foam.dao.RelationshipPropertyValue.create({
           sourceId: source.id,
-          daoGetter: function() {
-            if (!self.relationshipDAOInstances_[source.id]) {
-              self.relationshipDAOInstances_[source.id] =
-                  self.relationshipDAOFactory(source);
-            }
-            return self.relationshipDAOInstances_[source.id];
+          daoFactory: function() {
+            return self.relationshipDAOFactory(source);
           },
           targetDAO: this.targetDAOFactory(source),
           junctionDAO: this.junctionDAOFactory(source),
@@ -383,12 +375,12 @@ foam.CLASS({
     },
     {
       class: 'Function',
-      name: 'daoGetter',
+      name: 'daoFactory',
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
-      getter: function() { return this.daoGetter() },
+      getter: function() { return this.daoFactory() },
     },
     {
       class: 'foam.dao.DAOProperty',
