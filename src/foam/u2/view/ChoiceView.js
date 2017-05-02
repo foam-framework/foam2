@@ -222,7 +222,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         this.dao.select().then(function(s) {
-          this.choices = s.a.map(self.objToChoice);
+          this.choices = s.a.map(this.objToChoice);
           if ( ! this.data && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
