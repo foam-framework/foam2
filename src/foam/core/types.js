@@ -117,6 +117,16 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Short',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Short.',
+  label: 'Round short numbers'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name:  'Long',
   extends: 'Int',
 
