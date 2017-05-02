@@ -117,6 +117,16 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Byte',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Byte.',
+  label: 'Round byte numbers'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Short',
   extends: 'Int',
 
