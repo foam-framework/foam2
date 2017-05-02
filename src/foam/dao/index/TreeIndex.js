@@ -121,7 +121,7 @@ foam.CLASS({
         //  been cloned.
         if ( model.isInstance(predicate) &&
             ( predicate.arg1 === prop || foam.util.equals(predicate.arg1, prop) )
-        ){
+        ) {
           var arg2 = predicate.arg2;
           predicate = undefined;
           return { arg2: arg2, predicate: predicate };
