@@ -38,6 +38,7 @@ foam.CLASS({
 
   methods: [
     function fromProperty(prop) {
+      this.SUPER(prop);
       if ( ! this.hasOwnProperty('objToChoice') ) {
         var of = prop.of;
 
