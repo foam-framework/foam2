@@ -16,7 +16,7 @@
  */
 
 foam.ENUM({
-  package: 'foam.log',
+  package: 'foam.nanos.log',
   name: 'LogLevel',
 
   properties: [

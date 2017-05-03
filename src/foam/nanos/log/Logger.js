@@ -16,12 +16,12 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.log',
+  package: 'foam.nanos.log',
   name: 'Logger',
 
   methods: [
     { name: 'debug', documentation: 'Log at "debug" log level.' },
-    { name: 'log',   documentation: 'Log at "log" log level.'   },
+    { name: 'log',   documentation: 'Synonym for "info".'       },
     { name: 'info',  documentation: 'Log at "info" log level.'  },
     { name: 'warn',  documentation: 'Log at "warn" log level.'  },
     { name: 'error', documentation: 'Log at "error" log level.' }

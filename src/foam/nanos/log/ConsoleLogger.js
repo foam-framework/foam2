@@ -16,14 +16,14 @@
  */
 
 foam.CLASS({
-  package: 'foam.log',
-  name: 'SimpleLogger',
-  implements: [ 'foam.log.Logger' ],
+  package: 'foam.nanos.log',
+  name: 'ConsoleLogger',
+  implements: [ 'foam.nanos.log.Logger' ],
 
   documentation: `Decorate contextual logging methods with log level (short
       name) and date string`,
 
-  requires: [ 'foam.log.LogLevel' ],
+  requires: [ 'foam.nanos.log.LogLevel' ],
   imports: [
     'debug as debug_',
     'log as log_',
@@ -47,6 +47,7 @@ foam.CLASS({
     },
     {
       class: 'Function',
+      documentation: 'Synonym for "info".',
       name: 'log',
       factory() { return this.put.bind(this, this.LogLevel.INFO); }
     },
