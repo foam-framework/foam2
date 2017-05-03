@@ -26,13 +26,14 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.mlang.predicate.True'
   ],
+  imports: [ 'lookup' ],
 
   properties: [
     {
       class: 'Class',
       name: 'of',
       factory: function() {
-        if (this.array.length === 0) return foam.lookup('foam.core.FObject');
+        if (this.array.length === 0) return this.lookup('foam.core.FObject');
         return this.array[0].cls_;
       },
     },
