@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-describe('SimpleLogger', function() {
+describe('ConsoleLogger', function() {
   var captureLogger;
   var testCtx;
   var LogLevel;
@@ -23,9 +23,9 @@ describe('SimpleLogger', function() {
 
   beforeEach(function() {
     foam.CLASS({
-      package: 'foam.log.test',
+      package: 'foam.nanos.log.test',
       name: 'CaptureLogger',
-      implements: [ 'foam.log.Logger' ],
+      implements: [ 'foam.nanos.log.Logger' ],
 
       exports: [
         'debug',
@@ -56,19 +56,19 @@ describe('SimpleLogger', function() {
       }])
     });
     foam.CLASS({
-      package: 'foam.log.test',
-      name: 'SimpleLogger',
-      extends: 'foam.log.SimpleLogger',
+      package: 'foam.nanos.log.test',
+      name: 'ConsoleLogger',
+      extends: 'foam.nanos.log.ConsoleLogger',
 
       properties: [
         ['getDateString', function() { return 'DATE'; }]
       ]
     });
-    LogLevel = foam.lookup('foam.log.LogLevel');
-    testCtx = foam.lookup('foam.log.test.SimpleLogger').create(
+    LogLevel = foam.lookup('foam.nanos.log.LogLevel');
+    testCtx = foam.lookup('foam.nanos.log.test.ConsoleLogger').create(
       null,
       captureLogger =
-          foam.lookup('foam.log.test.CaptureLogger').create()
+          foam.lookup('foam.nanos.log.test.CaptureLogger').create()
     ).__subContext__;
   });
 
