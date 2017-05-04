@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.comics.DAOControllerView',
   methods: [
     function initE() {
+      this.
         add(this.cls.FILTERED_DAO,
             this.cls.CREATE,
             this.cls.getAxiomsByClass(foam.core.Action));

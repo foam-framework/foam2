@@ -1384,7 +1384,10 @@ foam.CLASS({
         if ( c === undefined || c === null ) {
           // nop
         } else if ( Array.isArray(c) ) {
-          this.add_.apply(this, c, parentNode);
+          for ( var j = 0 ; j < c.length ; j++ ) {
+            var v = c[j];
+            es.push(v.toE ? v.toE(null, Y) : v);
+          }
         } else if ( c.toE ) {
           var e = c.toE(null, Y);
           if ( foam.core.Slot.isInstance(e) ) {
