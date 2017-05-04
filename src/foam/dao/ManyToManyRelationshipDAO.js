@@ -48,13 +48,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
-      var self = this;
-      return self.joinDAO.put(obj)
-          .then(function(obj) {
-            return self.delegate.put(self.relationship.adaptTarget(self.obj, obj))
-          })
-    },
     function find(id) {
       return this.joinDAO.find(id);
     },

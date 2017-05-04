@@ -23,7 +23,9 @@ foam.CLASS({
   documentation: 'An Axiom for defining Relationships between models.',
 
   requires: [
-    'foam.dao.RelationshipDAO'
+    'foam.dao.RelationshipDAO',
+    'foam.dao.ManyToManyRelationshipDAO',
+    'foam.dao.ReadOnlyDAO',
   ],
 
   properties: [
@@ -136,10 +138,12 @@ foam.CLASS({
     {
       name: 'relationshipDAOFactory',
       value: function(source) {
-        return this.RelationshipDAO.create({
-          obj: source,
-          relationship: this
-        }, source);
+        return this.ReadOnlyDAO.create({
+          delegate: this.RelationshipDAO.create({
+            obj: source,
+            relationship: this
+          }, source)
+        });
       }
     },
     {
@@ -257,15 +261,17 @@ foam.CLASS({
           sourceDAOKey: this.sourceDAOKey,
           targetDAOKey: this.junctionDAOKey,
           relationshipDAOFactory: function(source) {
-            return foam.dao.ManyToManyRelationshipDAO.create({
-              junctionCls: jModel,
-              obj: source,
-              of: target.id,
-              relationship: this,
-              joinDAOKey: relationship.targetDAOKey,
-              junctionProperty: jModel.TARGET_ID,
-              targetProperty: target.ID
-            }, source);
+            return this.ReadOnlyDAO.create({
+              delegate: this.ManyToManyRelationshipDAO.create({
+                junctionCls: jModel,
+                obj: source,
+                of: target.id,
+                relationship: this,
+                joinDAOKey: relationship.targetDAOKey,
+                junctionProperty: jModel.TARGET_ID,
+                targetProperty: target.ID
+              }, source)
+            });
           },
           targetDAOFactory: function(source) {
             return source.__context__[relationship.targetDAOKey];
@@ -389,6 +395,14 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'targetDAO',
+    },
+  ],
+  methods: [
+    function add(obj) {
+      return Promise.reject('TODO: Implement relationship add');
+    },
+    function remove(obj) {
+      return Promise.reject('TODO: Implement relationship remove');
     },
   ],
 });
