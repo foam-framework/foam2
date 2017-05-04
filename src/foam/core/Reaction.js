@@ -30,11 +30,17 @@ foam.CLASS({
       if ( topic.length ) {
         var l = listener;
         var prevSub;
+        var args = topic.concat(l);
+
         listener = function() {
           prevSub && prevSub.detach();
           var target = slot.get();
-          obj.onDetach(prevSub = target.sub.apply(target, topic));
+          if ( target ) {
+            obj.onDetach(prevSub = target.sub.apply(target, args));
+          }
         };
+
+        listener();
       }
 
       obj.onDetach(slot.sub(listener));
