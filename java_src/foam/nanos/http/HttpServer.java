@@ -1,24 +1,19 @@
 package foam.nanos.http;
 
 import java.io.IOException;
+import java.io.RuntimeException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.charset.Charset;
 
 import com.sun.net.httpserver.*;
 
 import foam.core.*;
 
-public class HttpServer implements Server {
+public class HttpServer extends ContextAwareSupport implements NanoService {
   private HttpServer server;
-  private String[] nanosList;
 
-  static void start(Integer port, String[] nanos) {
+  static void start(Integer port) {
     server = HttpServer.create(new InetSocketAddress(port), 0);
     nanosList = nanos;
 
@@ -30,22 +25,34 @@ public class HttpServer implements Server {
   static class nanoHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-      URI requestURI = t.getRequestURI();
+      URI requestURI = exchange.getRequestURI();
       String path = requestURI.getPath();
+      String query = requestURI.getQuery();
 
-      // Path htmlFilePath = Paths.get("test.html");
-      // byte[] htmlFile = Files.readAllBytes(htmlFilePath);
-      // String response = new String (htmlFile, Charset.forName("UTF-8"));
+      // AuthService auth = this.X.get(AuthService);
 
-      Headers h = exchange.getResponseHeaders();
-      h.set("Content-Type", "text/html");
+      String[] urlParams = path.split('/');
 
-      exchange.sendResponseHeaders(200, response.length());
+      /*
+       * Get the item right after the first slash
+       * E.g.: /foo/bar => ['', 'foo', 'bar']
+      */
+      String serviceKey = urlParams[1];
 
-      OutputStream os = exchange.getResponseBody();
+      DAO services = (DAO) this.X.get('serviceFactoryDAO');
+      NSSpec serviceFactory = services.find(serviceKey);
 
-      os.write(response.getBytes());
-      os.close();
+      NanoService service = this.X.get(serviceKey);
+
+      if ( service instanceof HttpHandler ) {
+        // if ( auth.checkPermission(...) ) {}
+
+        ((HttpHandler) service).handle(exchange);
+      } else {
+        String errorMsg = "Service " + serviceKey + " does not have a HttpHandler";
+
+        throw new RuntimeException(errorMsg);
+      }
     }
   }
 }
