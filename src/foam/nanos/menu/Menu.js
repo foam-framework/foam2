@@ -26,5 +26,9 @@ foam.RELATIONSHIP({
   inverseName: 'parent',
   sourceProperty: {
     hidden: true
+  },
+  targetProperty: {
+    class: 'String',
+    value: ''
   }
 });
