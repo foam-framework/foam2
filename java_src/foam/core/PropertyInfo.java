@@ -3,6 +3,7 @@ package foam.core;
 import foam.lib.parse.Parser;
 import java.util.Comparator;
 
+// ???: Why is this interface mutable?
 public interface PropertyInfo
   extends foam.mlang.Expr, Comparator
 {
