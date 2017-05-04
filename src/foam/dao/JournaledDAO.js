@@ -24,29 +24,6 @@ foam.INTERFACE({
   ]
 });
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'JournalEntry',
-
-  documentation: 'Used by JournalDAO to store the state of an object at a specific time.',
-
-  properties: [
-    'id',
-    {
-      /** The object state to store */
-      class: 'FObjectProperty',
-      name: 'record'
-    },
-    {
-      /** Set true if this record was a removal of the object, not an
-        update or add. */
-      class: 'Boolean',
-      name: 'isRemove',
-      value: false
-    }
-  ]
-});
-
 if ( foam.isServer ) {
   foam.CLASS({
     package: 'foam.dao',
@@ -124,49 +101,6 @@ foam.CLASS({
           return dao;
         });
       }
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'JournalDAO',
-  extends: 'foam.dao.ProxyDAO',
-
-  documentation: 'Saves each addition, update, or removal of objects to the delegate DAO. Previous state for the object is stored, so the journal can replay the object put() and remove() events to recreate the delegate DAO.',
-
-  requires: [
-    'foam.dao.JournalEntry'
-  ],
-
-  properties: [
-    {
-      /** The DAO to store the journal entries.
-        Note that this must have a TimestampDAO or SequenceNumberDAO to
-        apply a unique id to each entry. */
-      name: 'journal'
-    }
-  ],
-
-  methods: [
-    function put(obj) {
-      return this.delegate.put(obj).then(function(obj) {
-        this.journal.put(this.JournalEntry.create({
-          record: obj
-        }));
-        return obj;
-      }.bind(this));
-    },
-
-    function remove(obj) {
-      return this.delegate.remove(obj).then(function(r) {
-        this.journal.put(this.JournalEntry.create({
-          record: obj,
-          isRemove: true
-        }));
-        return r;
-      }.bind(this));
     }
   ]
 });
