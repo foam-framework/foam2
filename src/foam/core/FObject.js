@@ -69,9 +69,9 @@ foam.LIB({
       // initArgs() is the standard argument extraction method.
       obj.initArgs(args, opt_parent);
 
-      var axioms = this.getAxioms();
+      var axioms = this.getInitAgents();
       for ( var i = 0 ; i < axioms.length ; i++ ) {
-        axioms[i].initObj_ && axioms[i].initObj_(obj);
+        axioms[i].initObj_(obj);
       }
 
       // init() is called when object is created.
@@ -282,6 +282,17 @@ foam.LIB({
         this.private_.axiomCache[''] = as;
       }
       return as;
+    },
+
+    function getInitAgents() {
+      if ( ! this.private_.initAgentsCache ) {
+        this.private_.initAgentsCache = [];
+        for ( var key in this.axiomMap_ ) {
+          var axiom = this.axiomMap_[key];
+          if (axiom.initObj_) this.private_.initAgentsCache.push(axiom);
+        }
+      }
+      return this.private_.initAgentsCache;
     },
 
     // NOP, is replaced if debug.js is loaded
