@@ -6,7 +6,13 @@ import foam.mlang.*;
 import foam.mlang.predicate.*;
 import foam.mlang.order.*;
 
-public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
+public abstract class AbstractDAO
+  extends ContextAwareSupport
+  implements DAO
+{
+  private ClassInfo    of_         = null;
+  private PropertyInfo primaryKey_ = null;
+
   public DAO where(Predicate predicate) {
     return ((FilteredDAO)getX().create(FilteredDAO.class)).setPredicate(predicate).setDelegate(this);
   }
@@ -47,10 +53,6 @@ public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
     return sink;
   }
 
-
-  private ClassInfo of_ = null;
-  private PropertyInfo primaryKey_ = null;
-
   public ClassInfo getOf() {
     return of_;
   }
@@ -69,7 +71,7 @@ public abstract class AbstractDAO extends ContextAwareSupport implements DAO {
     return getPrimaryKey().get(obj);
   }
 
-    public void listen() {
-        // TODO
-    }
+  public void listen() {
+    // TODO
+  }
 }

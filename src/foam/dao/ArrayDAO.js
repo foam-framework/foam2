@@ -29,6 +29,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Class',
+      name: 'of',
+      factory: function() {
+        if (this.array.length === 0) return this.lookup('foam.core.FObject');
+        return this.array[0].cls_;
+      },
+    },
+    {
       name: 'array',
       factory: function() { return []; }
     }
@@ -106,7 +114,8 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function find(id) {
+    function find(key) {
+      var id = this.of.isInstance(key) ? key.id : key;
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
           return Promise.resolve(this.array[i]);
