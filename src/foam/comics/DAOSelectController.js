@@ -1,6 +1,5 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,41 +17,31 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOController',
+  name: 'DAOSelectController',
+  imports: [
+    'stack'
+  ],
   properties: [
     {
-      name: 'data',
-      hidden: true
+      name: 'data'
     },
     {
-      name: 'predicate',
-      view: { class: 'foam.u2.view.RecipricalSearch' }
+      name: 'dao',
     },
     {
-      name: 'filteredDAO',
-      view: { class: 'foam.u2.view.ScrollTableView' },
-      expression: function(data, predicate) {
-        return ! data ? foam.dao.NullDAO.create() :
-          predicate ? data.where(predicate) :
-          data;
-      }
-    },
-    {
-      name: 'selection',
-      hidden: true
+      class: 'Boolean',
+      name: 'allowCreation',
+      value: true
     }
   ],
-
   actions: [
     {
       name: 'create',
-      code: function() { }
-    },
-    {
-      name: 'edit',
-      isEnabled: function(selection) { return !! selection; },
       code: function() {
-        this.pub('edit', this.selection.id);
+        this.stack.push({
+          class: 'foam.comics.DAOCreateControllerView',
+          dao: this.dao
+        });
       }
     }
   ]

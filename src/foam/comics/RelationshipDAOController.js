@@ -28,6 +28,14 @@ foam.CLASS({
     'relationshipPropertyValue',
     'relationshipPropertyValueSourceId',
   ],
+  methods: [
+    function init() {
+      this.SUPER();
+      this.onDetach(
+        this.relationshipPropertyValueSourceId$.follow(
+          this.relationshipPropertyValue$.dot('sourceId')));
+    },
+  ],
   actions: [
     {
       name: 'add',
@@ -44,13 +52,5 @@ foam.CLASS({
         });
       }
     }
-  ],
-  methods: [
-    function init() {
-      this.SUPER();
-      this.onDetach(
-        this.relationshipPropertyValueSourceId$.follow(
-          this.relationshipPropertyValue$.dot('sourceId')));
-    },
   ],
 });

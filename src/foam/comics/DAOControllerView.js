@@ -21,12 +21,18 @@ foam.CLASS({
   name: 'DAOControllerView',
   extends: 'foam.u2.View',
 
-  exports: [
-    'editRecord'
-  ],
-
   requires: [
     'foam.comics.DAOController'
+  ],
+
+  imports: [
+    'stack',
+    'data? as importedData'
+  ],
+
+  exports: [
+    'data.selection as selection',
+    'data.data as dao'
   ],
 
   properties: [
@@ -34,28 +40,53 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.DAOController',
       name: 'data',
+      expression: function(importedData) { return importedData; },
+      listeners: [
+        {
+          topic: ['action', 'create'],
+          listener: 'onCreate'
+        },
+        {
+          topic: ['edit'],
+          listener: 'onEdit'
+        }
+      ]
     },
+    {
+      name: 'cls',
+      expression: function(data) { return data.cls_; }
+    }
   ],
 
   methods: [
-    function editRecord(obj) {
-      this.data.edit(obj);
-    },
     function initE() {
-      // TODO Changes have been made and this hasn't been tested.
-      this.startContext({ data: this.data$ }).
+      this.
         start('table').
-          start('tr').
-            start('td').
-              start(this.DAOController.PREDICATE, {dao$: this.data$.dot('data')}).end().
-            end().
-            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
-          end().
+        start('tr').
+          start('td').add(this.cls.PREDICATE).end().
+          start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
+            add(this.cls.FILTERED_DAO).end().
+        end().
         start('tr').
           show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-          start('td').end().start('td').add(this.DAOController.CREATE).end().
-        end().
-        endContext();
+        start('td').end().start('td').
+        add(this.cls.getAxiomsByClass(foam.core.Action)).
+        end();
     }
-  ]
+  ],
+
+  listeners: [
+    function onCreate() {
+      this.stack.push({
+        class: 'foam.comics.DAOCreateControllerView'
+      }, this);
+    },
+
+    function onEdit(s, edit, id) {
+      this.stack.push({
+        class: 'foam.comics.DAOUpdateControllerView',
+        key: id
+      }, this);
+    }
+  ],
 });

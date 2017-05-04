@@ -18,42 +18,25 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOController',
+  name: 'RelationshipController',
+  extends: 'foam.comics.DAOController',
   properties: [
     {
-      name: 'data',
-      hidden: true
-    },
-    {
-      name: 'predicate',
-      view: { class: 'foam.u2.view.RecipricalSearch' }
-    },
-    {
-      name: 'filteredDAO',
-      view: { class: 'foam.u2.view.ScrollTableView' },
-      expression: function(data, predicate) {
-        return ! data ? foam.dao.NullDAO.create() :
-          predicate ? data.where(predicate) :
-          data;
-      }
-    },
-    {
-      name: 'selection',
-      hidden: true
+      name: 'relationship'
     }
   ],
 
   actions: [
     {
-      name: 'create',
+      name: 'add',
       code: function() { }
     },
     {
-      name: 'edit',
-      isEnabled: function(selection) { return !! selection; },
-      code: function() {
-        this.pub('edit', this.selection.id);
-      }
+      name: 'create',
+      isAvailable: function() { return false; }
+    },
+    {
+      name: 'edit'
     }
   ]
 });

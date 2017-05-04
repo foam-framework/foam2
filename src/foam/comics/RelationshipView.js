@@ -20,34 +20,42 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'RelationshipView',
   extends: 'foam.u2.View',
-
   requires: [
-    'foam.comics.RelationshipDAOController',
-    'foam.comics.RelationshipDAOControllerView',
     'foam.dao.RelationshipPropertyValue',
-    'foam.comics.DAOView',
+    'foam.dao.RelationshipController'
   ],
-
+  exports: [
+    'controller as data'
+  ],
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.RelationshipPropertyValue',
       name: 'data',
+      adapt: function(_, r) {
+        if ( this.RelationshipPropertyValue.isInstance(r) ) {
+          return this.RelationshipController.create({
+            relationship: r
+          });
+        }
+        return r;
+      }
     },
     {
-      name: 'daoController',
-      factory: function() {
-        return this.RelationshipDAOController.create({
-          relationshipPropertyValue$: this.data$,
-          data$: this.data$.dot('dao'),
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOController',
+      name: 'controller',
+      expression: function(data) {
+        return this.RelationshipController.create({
+          data: data.dao,
+          targetDAO: data.targetDAO,
+          junctionDAO: data.junctionDAO
         });
-      },
-    },
+      }
+    }
   ],
 
   methods: [
     function initE() {
-      this.start(this.RelationshipDAOControllerView, { data: this.daoController }).end();
+      this.tag(this.RelationshipControllerView)
     }
   ]
 });
