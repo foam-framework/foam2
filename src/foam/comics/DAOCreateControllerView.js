@@ -36,16 +36,14 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.DAOCreateController',
       name: 'data',
-      listeners: [
-        {
-          topic: ['finished'],
-          listener: 'onFinished'
-        }
-      ],
       factory: function() {
         return this.DAOCreateController.create();
       }
     }
+  ],
+
+  reactions: [
+    [ 'data', 'finished', 'onFinished' ]
   ],
 
   methods: [

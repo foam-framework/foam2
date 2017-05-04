@@ -9,24 +9,16 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.comics.RelationshipDAOController',
-      name: 'data',
-      listeners: [
-      listeners: [
-        {
-          topic: ['action', 'create'],
-          listener: 'onCreate'
-        },
-        {
-          topic: ['action', 'add']
-          listener: 'onAdd'
-        },
-        {
-          topic: ['action', 'edit'],
-          listener: 'onEdit'
-        }
-      ]
+      name: 'data'
     }
   ],
+
+  reactions: [
+    [ 'data', 'action,create', 'onCreate' ],
+    [ 'data', 'action,add', 'onAdd' ],
+    [ 'data', 'action,edit', 'onEdit' ]
+  ],
+
   listeners: [
     function onAdd() {
       this.stack.push({

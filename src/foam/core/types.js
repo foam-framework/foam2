@@ -389,21 +389,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core.internal',
-  name: 'FObjectPropertySubscription',
-  properties: [
-    {
-      class: 'StringArray',
-      name: 'topic'
-    },
-    {
-      class: 'String',
-      name: 'listener'
-    }
-  ]
-});
-
-foam.CLASS({
   package: 'foam.core',
   name: 'FObjectProperty',
   extends: 'Property',
@@ -420,11 +405,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.internal.FObjectPropertySubscription',
-      name: 'listeners'
-    },
-    {
       name: 'adapt',
       value: function(_, v, prop) {
         // All FObjects may be null.
@@ -437,22 +417,6 @@ foam.CLASS({
             ( v.class ?
                 foam.lookup(v.class) :
                 of ).create(v, this.__subContext__);
-      }
-    }
-  ],
-  methods: [
-    function initObj_(obj) {
-      for ( var listener, i = 0 ; listener = this.listeners[i] ; i++ ) {
-        var inner;
-
-        function onChange(s, pc, n, slot) {
-          if ( inner ) inner.detach();
-          var value = slot.get();
-          inner = value && value.sub.apply(value, listener.topic.concat(obj[listener.listener]));
-        }
-
-        var sub = obj.sub('propertyChange', this.name, onChange);
-        onChange(null, null, null, this.toSlot(obj));
       }
     }
   ]

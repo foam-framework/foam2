@@ -964,6 +964,10 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
+    },
+
+    function dot(name) {
+      return this[name + '$'];
     }
   ]
 });
