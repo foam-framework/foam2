@@ -5,22 +5,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class ClassInfoImpl implements ClassInfo {
-  private List axioms;
-  private String id;
+public class ClassInfoImpl
+  implements ClassInfo
+{
+  private List      axioms;
+  private String    id;
+  private HashMap   axiomsByName_ = new HashMap();
+  private ClassInfo parent_       = null;
+  private List      allAxioms_    = null;
+  private HashMap   axiomMap_     = new HashMap();
+
 
   public ClassInfoImpl() {
     axioms = new ArrayList();
+  }
+
+  public String getId() {
+    return id;
   }
 
   public ClassInfo setId(String id) {
     this.id = id;
     return this;
   }
-
-  private HashMap axiomsByName_ = new HashMap();
-
-  private ClassInfo parent_ = null;
 
   public ClassInfo getParent() {
     if ( parent_ == null ) {
@@ -49,30 +56,25 @@ public class ClassInfoImpl implements ClassInfo {
     return this;
   }
 
-  private List allAxioms_ = null;
-
   public List getAxioms() {
     if ( allAxioms_ == null ) {
       allAxioms_ = new ArrayList();
       allAxioms_.addAll(axioms);
       allAxioms_.addAll(getParent().getAxioms());
     }
+
     return allAxioms_;
   }
 
   public Object getAxiomByName(String name) {
     Object ret = axiomsByName_.get(name);
+
     if ( ret == null ) {
       ret = getParent().getAxiomByName(name);
     }
+
     return ret;
   }
-
-  public String getId() {
-    return id;
-  }
-
-  private HashMap axiomMap_ = new HashMap();
 
   public List getAxiomsByClass(Class cls) {
     if ( axiomMap_.containsKey(cls) ) {
@@ -80,17 +82,14 @@ public class ClassInfoImpl implements ClassInfo {
     }
 
     ArrayList ret = new ArrayList();
-    Iterator i = axioms.iterator();
-    while ( i.hasNext() ) {
+    for ( Iterator i = axioms.iterator() ; i.hasNext() ; ) {
       Object axiom = i.next();
-      if ( cls.isInstance(axiom) ) {
-        ret.add(axiom);
-      }
+      if ( cls.isInstance(axiom) ) ret.add(axiom);
     }
 
     ret.addAll(getParent().getAxiomsByClass(cls));
-
     axiomMap_.put(cls, ret);
+
     return ret;
   }
 }
