@@ -3,7 +3,9 @@ package foam.core;
 import foam.lib.parse.Parser;
 import java.util.Comparator;
 
-public interface PropertyInfo extends foam.mlang.Expr, Comparator {
+public interface PropertyInfo
+  extends foam.mlang.Expr, Comparator
+{
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
 
