@@ -69,11 +69,11 @@ foam.CLASS({
           .then(this.onRemoveResponse);
     },
 
-    function find(objOrId) {
+    function find(key) {
       /**
        * GET baseURL/<network-foam-jsonified FOAM object id>
        */
-      var id = this.of.isInstance(objOrId) ? objOrId.id : objOrId;
+      var id = this.of.isInstance(key) ? key.id : key;
       return this.createRequest_({
         method: 'GET',
         url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(id))

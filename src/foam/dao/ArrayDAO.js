@@ -26,7 +26,6 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.mlang.predicate.True'
   ],
-  imports: [ 'lookup' ],
 
   properties: [
     {
@@ -115,8 +114,8 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function find(objOrId) {
-      var id = this.of.isInstance(objOrId) ? objOrId.id : objOrId;
+    function find(key) {
+      var id = this.of.isInstance(key) ? key.id : key;
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
           return Promise.resolve(this.array[i]);
