@@ -37,7 +37,11 @@ foam.CLASS({
     },
     function wrap(s) {
       return this.slot(function(s) {
-        return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
+        var view = s[0];
+        var parent = s[1];
+
+        var X = parent ? this.__subSubContext__.createSubContext(parent) : this.__subSubContext__;
+        return foam.u2.ViewSpec.createView(view, null, this, X);
       }, s);
     }
   ]

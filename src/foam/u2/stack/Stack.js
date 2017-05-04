@@ -62,12 +62,12 @@ foam.CLASS({
       return i < 0 ? this.stack_[this.pos + i + 1] : this.stack_[i];
     },
 
-    function push(v) {
+    function push(v, parent) {
       var pos = this.pos + 1;
 
       this.depth = pos + 1;
       this.stack_.length = this.depth;
-      this.stack_[pos] = v;
+      this.stack_[pos] = [v, parent];
       this.pos = pos;
     }
   ],
