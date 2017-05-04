@@ -18,20 +18,49 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateControllerView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
   requires: [
     'foam.comics.DAOCreateController',
   ],
-  properties: [
-    'data',
+
+  imports: [
+    'stack'
   ],
+
+  exports: [
+    'data'
+  ],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOCreateController',
+      name: 'data',
+      listeners: [
+        {
+          topic: ['finished'],
+          listener: 'onFinished'
+        }
+      ],
+      factory: function() {
+        return this.DAOCreateController.create();
+      }
+    }
+  ],
+
   methods: [
     function initE() {
-      this.startContext({ data: this.data }).
+      this.
         add(this.DAOCreateController.DATA,
             this.DAOCreateController.SAVE,
             this.DAOCreateController.CANCEL).
         endContext();
+    }
+  ],
+
+  listeners: [
+    function onFinished() {
+      this.stack.back();
     }
   ]
 });

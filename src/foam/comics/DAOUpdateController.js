@@ -18,84 +18,55 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOUpdateController',
-  imports: [
-    'stack'
+
+  topics: [
+    'finished'
   ],
 
   properties: [
     {
-      name: 'data',
+      name: 'dao'
+    },
+    {
+      name: 'data'
     },
     {
       name: 'obj',
-      label: '',
-      view: function(args, X) {
-        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.dao.of }, X).copyFrom(args);
-        e.data$ = X.data$.dot(this.name);
-        return e;
-      }
-    },
-    {
-      name: 'dao',
-      hidden: true,
-      required: true,
-    },
-    {
-      class: 'String',
-      name: 'status'
-    }
-  ],
-
-  listeners: [
-    {
-      name: 'updateObj',
-      isFramed: true,
-      code: function() {
-        if (!this.dao || !this.data) return;
+      view: { class: 'foam.u2.DetailView' },
+      factory: function() {
         var self = this;
         this.dao.find(this.data).then(function(obj) {
-          if ( ! obj ) {
-            console.error("Failed to find object", self.data);
-          }
           self.obj = obj.clone();
-        }, function(e) {
-          console.error("Failed to find object", self.data, e);
         });
-      },
-    },
-  ],
-
-  methods: [
-    function init() {
-      this.onDetach(this.dao$.sub(this.updateObj));
-      this.onDetach(this.data$.sub(this.updateObj));
-      this.updateObj();
-    },
+        return null;
+      }
+    }
   ],
 
   actions: [
     {
       name: 'save',
-      isEnabled: function(obj) { return obj != null; },
+      isEnabled: function(obj) { return !! obj; },
       code: function() {
         var self = this;
-        this.status = 'Saving...';
-        var self = this;
         this.dao.put(this.obj.clone()).then(function() {
-          self.status = 'Saved';
-          self.stack.back();
+          self.finished.pub();
         }, function(e) {
-          self.status = "Error saving record: " + e.toString();
+          // TODO: Display error in view.
+          console.error(e);
         });
       }
     },
     {
       name: 'delete',
-      isEnabled: function(obj) { return obj != null; },
+      isEnabled: function(obj) { return !! obj; },
       code: function() {
         var self = this;
         this.dao.remove(this.obj).then(function() {
-          self.stack.back();
+          self.finished.pub();
+        }, function(e) {
+          // TODO: Display error in view.
+          console.error(e);
         });
       }
     }

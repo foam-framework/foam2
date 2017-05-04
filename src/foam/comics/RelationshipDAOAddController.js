@@ -22,7 +22,7 @@ foam.CLASS({
   extends: 'foam.comics.DAOController',
   properties: [
     {
-      name: 'relationshipDAO',
+      name: 'relationship',
     },
     {
       name: 'selection',
@@ -34,8 +34,8 @@ foam.CLASS({
       isEnabled: function(selection) { return !!selection },
       code: function() {
         var self = this;
-        this.relationshipDAO.put(this.selection.clone()).then(function() {
-          self.stack.back();
+        this.relationship.add(this.selection).then(function() {
+          self.pub('finished');
         });
       }
     },

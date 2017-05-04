@@ -1,6 +1,5 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,41 +17,51 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'DAOController',
+  name: 'DAOSelectControllerView',
+  extends: 'foam.u2.Element',
+  imports: [
+    'stack',
+  ],
   properties: [
     {
       name: 'data',
-      hidden: true
-    },
-    {
-      name: 'predicate',
-      view: { class: 'foam.u2.view.RecipricalSearch' }
-    },
-    {
-      name: 'filteredDAO',
-      view: { class: 'foam.u2.view.ScrollTableView' },
-      expression: function(data, predicate) {
-        return ! data ? foam.dao.NullDAO.create() :
-          predicate ? data.where(predicate) :
-          data;
+      postSet: function(old, nu) {
+        if ( nu ) this.stack.back();
       }
     },
     {
-      name: 'selection',
-      hidden: true
+      name: 'dao',
+      view: { class: 'foam.u2.view.TableView' }
+    },
+    {
+      class: 'Boolean',
+      name: 'allowCreation',
+      value: true
     }
   ],
-
+  methods: [
+    function initE() {
+       this.startContext({
+        data: this,
+        selection: this.data$
+      }).add(this.DAO).
+        start('span').show(this.allowCreation$).add(this.CREATE).end().
+        endContext();
+    },
+    function fromProperty(prop) {
+      if ( prop.of && ! this.dao ) {
+        this.dao = this.__context__[foam.String.daoize(prop.of.name)];
+      }
+    }
+  ],
   actions: [
     {
       name: 'create',
-      code: function() { }
-    },
-    {
-      name: 'edit',
-      isEnabled: function(selection) { return !! selection; },
       code: function() {
-        this.pub('edit', this.selection.id);
+        this.stack.push({
+          class: 'foam.comics.DAOCreateControllerView',
+          dao: this.dao
+        });
       }
     }
   ]
