@@ -41,21 +41,16 @@ foam.CLASS({
       of: 'foam.comics.DAOController',
       name: 'data',
       expression: function(importedData) { return importedData; },
-      listeners: [
-        {
-          topic: ['action', 'create'],
-          listener: 'onCreate'
-        },
-        {
-          topic: ['edit'],
-          listener: 'onEdit'
-        }
-      ]
     },
     {
       name: 'cls',
       expression: function(data) { return data.cls_; }
     }
+  ],
+
+  reactions: [
+    [ 'data', 'action,create', 'onCreate' ],
+    [ 'data', 'edit', 'onEdit' ]
   ],
 
   methods: [

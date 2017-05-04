@@ -67,6 +67,7 @@ FOAM_FILES([
   { name: "foam/core/templates" },
   { name: "foam/i18n/Messages" },
   { name: "foam/core/Action" },
+  { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
   { name: "foam/java/Argument", flags: ['java'] },
   { name: "foam/java/Class", flags: ['java'] },
