@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'ManyToManyRelationshipDAO',
-  extends: 'foam.dao.RelationshipDAO',
+  extends: 'foam.dao.ProxyDAO',
 
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -26,36 +26,30 @@ foam.CLASS({
 
   properties: [
     'junctionProperty',
-    'joinDAOKey',
+    'junctionDAOKey',
     'targetProperty',
     'junctionCls',
+    'obj',
     {
-      name: 'joinDAO',
+      name: 'junctionDAO',
       getter: function() {
-        return this.__context__[this.joinDAOKey];
+        return this.__context__[this.junctionDAOKey];
       }
     },
-    {
-      name: 'predicate',
-      documentation: `ManyToMany filtered querys are always "backward" to
-        match inverse-namd property and source object's id.`,
-      getter: function() {
-        return this.EQ(
-          this.junctionCls[foam.String.constantize(this.relationship.inverseName)],
-          this.obj.id);
-      }
-    }
   ],
 
   methods: [
     function find(id) {
-      return this.joinDAO.find(id);
+      var self = this;
+      return self.junctionDAO.select(self.MAP(self.junctionProperty)).then(function(map) {
+        self.delegate.where(self.IN(self.targetProperty, map.delegate.a)).find(id);
+      });
     },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
 
-      return self.SUPER(self.MAP(self.junctionProperty)).then(function(map) {
-        return self.joinDAO.select(sink, skip, limit, order, self.AND(
+      return self.junctionDAO.select(self.MAP(self.junctionProperty)).then(function(map) {
+        return self.delegate.select(sink, skip, limit, order, self.AND(
           predicate || self.TRUE,
           self.IN(self.targetProperty, map.delegate.a)));
       });
