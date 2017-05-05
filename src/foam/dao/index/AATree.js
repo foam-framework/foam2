@@ -36,14 +36,8 @@ foam.CLASS({
     { class: 'Simple', name: 'value' },
     { class: 'Simple', name: 'size'  },
     { class: 'Simple', name: 'level' },
-    {
-      class: 'Simple',
-      name: 'left',
-    },
-    {
-      class: 'Simple',
-      name: 'right',
-    },
+    { class: 'Simple', name: 'left'  },
+    { class: 'Simple', name: 'right' }
   ],
 
   methods: [
@@ -55,14 +49,14 @@ foam.CLASS({
     function maybeClone(locked) {
       return locked ? this.clone() : this;
     },
-    
+
     function clone() {
       var c = this.cls_.create();
-      c.key = this.key;
+      c.key   = this.key;
       c.value = this.value;
-      c.size = this.size;
+      c.size  = this.size;
       c.level = this.level;
-      c.left = this.left;
+      c.left  = this.left;
       c.right = this.right;
       return c;
     },
@@ -260,7 +254,7 @@ foam.CLASS({
       return s;
     },
 
-  
+
     function select(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
@@ -277,7 +271,7 @@ foam.CLASS({
       this.right.select(sink, skip, limit, order, predicate, cache);
     },
 
-   
+
     function selectReverse(sink, skip, limit, order, predicate, cache) {
       if ( limit && limit[0] <= 0 ) return;
 
@@ -370,8 +364,7 @@ foam.CLASS({
       copy.size = s.size - s.right.size;
       copy.right = nullNode;
       return copy;
-    },
-
+    }
   ]
 });
 
@@ -430,9 +423,9 @@ foam.CLASS({
 
   methods: [
     function init() {
-      this.left = undefined;
+      this.left  = undefined;
       this.right = undefined;
-      this.size = 0;
+      this.size  = 0;
       this.level = 0;
     },
 
@@ -449,11 +442,11 @@ foam.CLASS({
       var subIndex = this.tail.createNode();
       subIndex.put(value);
       var n = this.treeNode.create();
-      n.left = this;
+      n.left  = this;
       n.right = this;
-      n.key = key;
+      n.key   = key;
       n.value = subIndex;
-      n.size = 1;
+      n.size  = 1;
       n.level = 1;
       return n;
     },
@@ -477,7 +470,7 @@ foam.CLASS({
       var m    = start + Math.floor((end-start+1) / 2);
       tree = tree.putKeyValue(keyExtractor(a[m]), a[m]);
 
-      tree.left = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
+      tree.left  = tree.left.bulkLoad_(a, start, m-1, keyExtractor);
       tree.right = tree.right.bulkLoad_(a, m+1, end, keyExtractor);
       tree.size += tree.left.size + tree.right.size;
 

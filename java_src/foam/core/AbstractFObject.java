@@ -3,7 +3,10 @@ package foam.core;
 import java.util.List;
 import java.util.Iterator;
 
-public abstract class AbstractFObject extends ContextAwareSupport implements FObject {
+public abstract class AbstractFObject
+  extends ContextAwareSupport
+  implements FObject
+{
   public int compareTo(Object o) {
     if ( o == this ) return 0;
     if ( o == null ) return 1;
