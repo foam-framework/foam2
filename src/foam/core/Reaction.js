@@ -3,6 +3,12 @@ foam.CLASS({
   name: 'Reaction',
   properties: [
     {
+      name: 'name',
+      expression: function(target, topic, listener) {
+        return 'reaction_' + target +  '$$' + topic + '$$' + listener;
+      }
+    },
+    {
       class: 'String',
       name: 'target'
     },
@@ -49,7 +55,7 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.FObject',
+  refines: 'foam.core.Model',
   properties: [
     {
       class: 'AxiomArray',
