@@ -774,6 +774,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'scrollHeight',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -794,6 +797,20 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function observeScrollHeight() {
+      var self = this;
+      this.onload.sub(function(s) {
+        s.detach();
+        var observer = new MutationObserver(function(mutations) {
+          self.scrollHeight = self.el().scrollHeight;
+        });
+        var config = { attributes: true, childList: true, characterData: true };
+        observer.observe(self.el(), config);
+        self.onDetach(function() { observer.disconnect() });
+      });
+      return this;
     },
 
     function evtToCharCode(evt) {
