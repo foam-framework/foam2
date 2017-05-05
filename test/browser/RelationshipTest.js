@@ -74,14 +74,14 @@ foam.CLASS({
       children.select({put: function(o) { console.log(o.stringify()); }});
 
       console.log('Odin\'s Children:');
-      odin.children.select({put: function(o) { console.log(o.stringify()); }});
+      odin.children.dao.select({put: function(o) { console.log(o.stringify()); }});
 
       console.log('Zeus\'s Children:');
-      zeus.children.select({put: function(o) { console.log(o.stringify()); }});
+      zeus.children.dao.select({put: function(o) { console.log(o.stringify()); }});
 
-      zeus.children.put(this.Child1.create({name: 'Apollo'}));
+      zeus.children.dao.put(this.Child1.create({name: 'Apollo'}));
       console.log('Zeus\'s Children (after adding Apollo):');
-      zeus.children.select({put: function(o) { console.log(o.stringify()); }});
+      zeus.children.dao.select({put: function(o) { console.log(o.stringify()); }});
     }
   ]
 });
@@ -98,13 +98,13 @@ foam.CLASS({
       var joe = this.Parent1.create({name: 'Joe'});
       // Real world has no parent/child DAOs, so the relationships won't work yet
       mythos.parents.put(joe);
-      mythos.children.put(this.Child1.create({name: 'Larry', parent: 'Joe'}));
-      mythos.children.put(this.Child1.create({name: 'Edna', parent: 'Joe'}));
+      mythos.children.dao.put(this.Child1.create({name: 'Larry', parent: 'Joe'}));
+      mythos.children.dao.put(this.Child1.create({name: 'Edna', parent: 'Joe'}));
 
       // clone joe to the mythological context to access the right DAOs
       var mythoJoe = this.Parent1.create(joe, mythos);
       console.log("Joe's children:");
-      mythoJoe.children.select({put: function(o) { console.log(o.stringify()); }});
+      mythoJoe.children.dao.select({put: function(o) { console.log(o.stringify()); }});
     }
   ]
 });
@@ -197,24 +197,24 @@ foam.CLASS({
       this.bDAO.put(i2 = this.B.create({name: 'I2'}));
       this.bDAO.put(i3 = this.B.create({name: 'I3'}));
 
-      b1.bs.put(i1);
-      b1.bs.put(i2);
+      b1.bs.add(i1);
+      b1.bs.add(i2);
 
-      b2.bs.put(i2);
+      b2.bs.add(i2);
 
-      b3.bs.put(i1);
-      b3.bs.put(i2);
+      b3.bs.add(i1);
+      b3.bs.add(i2);
 
       // Or, go the other way:
-      i3.as.put(b3);
+      i3.as.add(b3);
 
       this.ABJunctionDAO.select({
         put: function(o) { console.log('***: ', o.sourceId, o.targetId); },
         eof: function() {}
       });
 
-      b3.bs.select({put: function(i) { console.log(i.id); }});
-      i3.as.select({put: function(i) { console.log(i.id); }});
+      b3.bs.dao.select(foam.dao.QuickSink.create({ putFn: function(_, i) { console.log(i.id); }}));
+      i3.as.dao.select(foam.dao.QuickSink.create({ putFn: function(_, i) { console.log(i.id); }}));
 
       var b1is, b3i2;
 

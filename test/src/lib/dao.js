@@ -1052,10 +1052,7 @@ describe('Relationship', function() {
     forwardName: 'children',
     inverseName: 'parent',
     sourceModel: 'test.RelA',
-    //sourceProperties: [ 'bRef' ],
     targetModel: 'test.RelB',
-    //targetProperties: [ 'aRef' ],
-
   });
 
   it('has relationship DAOs', function() {
@@ -1063,11 +1060,7 @@ describe('Relationship', function() {
     var relObjA = test.RelA.create(undefined, env);
 
     var relDAO = relObjA.children;
-
-
-
   })
-
 });
 
 
