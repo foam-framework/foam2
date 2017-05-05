@@ -367,7 +367,7 @@ global.genericDAOTestBattery = function(daoFactory) {
           expect(filtered.select).toBeDefined();
         });
 
-        it('should honour where()', function(done) {
+        it('should honour where() on select()', function(done) {
           dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).select().then(function(a) {
             expect(a).toBeDefined();
             expect(a.a).toBeDefined();
@@ -375,6 +375,43 @@ global.genericDAOTestBattery = function(daoFactory) {
           }).catch(function(e) {
             fail(e);
           }).then(done);
+        });
+
+        it('should honour where() on find()', function(done) {
+          var deceased = dao.where(
+              exprs.EQ(test.dao.generic.Person.DECEASED, true));
+          var p1;
+          var p2;
+
+          // Person 1 (id=1) is not deceased; Person 2 (id=2) is deceased.
+          Promise.all([
+            Promise.all([
+              dao.find(1).then(function(p) { p1 = p; }),
+              dao.find(2).then(function(p) { p2 = p; }),
+            ]).then(function() {
+              // Find by object.
+              return Promise.all([
+                deceased.find(p1).then(function(p) {
+                  expect(p).toBeNull();
+                }),
+                (function() {
+                  debugger;
+                  return deceased.find(p2).then(function(p) {
+                    expect(p).not.toBeNull();
+                  });
+                })()
+              ]);
+            }),
+            // Find by id:
+            Promise.all([
+              deceased.find(1).then(function(p) {
+                expect(p).toBeNull();
+              }),
+              deceased.find(2).then(function(p) {
+                expect(p).not.toBeNull();
+              })
+            ])
+          ]).then(done, done.fail);
         });
 
         it('should honour limit()', function(done) {
