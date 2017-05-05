@@ -5,7 +5,9 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
 import foam.dao.Sink;
 
-public class FilteredDAO extends ProxyDAO {
+public class FilteredDAO
+  extends ProxyDAO
+{
   private Predicate predicate_;
 
   public FilteredDAO setPredicate(Predicate predicate) {
@@ -16,7 +18,7 @@ public class FilteredDAO extends ProxyDAO {
   private Predicate getPredicate(Predicate arg) {
     if ( arg != null ) return predicate_;
 
-    return ((And)getX().create(And.class))
+    return ((And) getX().create(And.class))
       .setArgs(new Predicate[] {
           predicate_,
           arg
