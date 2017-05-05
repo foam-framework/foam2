@@ -149,6 +149,18 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
+      it('should support find(object)', function(done) {
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.put(p).then(function() {
+            return dao.find(p);
+          }).then(function(p2) {
+            expect(p.id).toBe(p2.id);
+            done();
+          });
+        });
+      });
+
       it('should resolve with null if not found', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();
