@@ -5,7 +5,7 @@ import foam.core.*;
 public class Boot {
 
   protected DAO serviceDAO_;
-  protected X   root_ = EmptyContext.instance();
+  protected X   root_ = new ProxyX();
 
   public Boot() {
     serviceDAO_ = new ArrayDAO();
@@ -20,7 +20,7 @@ public class Boot {
         NanoService ns = sp.createService();
         ns.setContext(root_);
         ns.start();
-        root_ = root_.put(sp.name, ns);
+        root_.put(sp.name, ns);
       }
     });
   }
