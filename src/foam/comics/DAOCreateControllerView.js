@@ -24,7 +24,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack'
+    'stack',
+    'dao'
   ],
 
   exports: [
@@ -36,16 +37,14 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.DAOCreateController',
       name: 'data',
-      listeners: [
-        {
-          topic: ['finished'],
-          listener: 'onFinished'
-        }
-      ],
       factory: function() {
-        return this.DAOCreateController.create();
+        return this.DAOCreateController.create({ dao: this.dao });
       }
     }
+  ],
+
+  reactions: [
+    [ 'data', 'finished', 'onFinished' ]
   ],
 
   methods: [

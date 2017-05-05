@@ -22,9 +22,11 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        add(this.cls.FILTERED_DAO,
-            this.cls.CREATE,
-            this.cls.getAxiomsByClass(foam.core.Action));
+        add(this.cls.FILTERED_DAO).
+        start('span').
+          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+          add(this.cls.getAxiomsByClass(foam.core.Action)).
+        end();
     }
   ]
 });

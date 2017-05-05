@@ -20,15 +20,14 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateController',
 
-  imports: [
-    'dao'
-  ],
-
   topics: [
     'finished'
   ],
 
   properties: [
+    {
+      name: 'dao'
+    },
     {
       name: 'data',
       view: { class: 'foam.u2.DetailView' },

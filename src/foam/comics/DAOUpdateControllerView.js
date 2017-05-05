@@ -40,12 +40,6 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.comics.DAOUpdateController',
       name: 'data',
-      listeners: [
-        {
-          topic: ['finished'],
-          listener: 'onFinished'
-        }
-      ],
       factory: function() {
         return this.DAOUpdateController.create({
           data: this.key,
@@ -53,6 +47,10 @@ foam.CLASS({
         });
       }
     }
+  ],
+
+  reactions: [
+    [ 'data', 'finished', 'onFinished' ]
   ],
 
   methods: [

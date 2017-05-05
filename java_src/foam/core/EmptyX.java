@@ -19,7 +19,9 @@ package foam.core;
 
 // TODO: make this a functional tree rather than a linked list. (for performance)
 
-abstract class AbstractX implements X {
+abstract class AbstractX
+  implements X
+{
   public Object get(String name) {
     return get(this, name);
   }
@@ -33,7 +35,7 @@ abstract class AbstractX implements X {
   }
 
   public Object getInstanceOf(Object value, Class type) {
-    return ((FacetManager)get("facetManager")).getInstanceOf(value, type, this);
+    return ((FacetManager) get("facetManager")).getInstanceOf(value, type, this);
   }
 
   public <T> T create(Class<T> type) {
@@ -42,7 +44,10 @@ abstract class AbstractX implements X {
 }
 
 
-class XI extends AbstractX {
+/** Default implementation of X interface. Stores one key-value binding. **/
+class XI
+  extends AbstractX
+{
   final X      parent_;
   final String name_;
   final Object value_;
@@ -53,18 +58,18 @@ class XI extends AbstractX {
     value_  = value;
   }
 
-  X parent() {
-    return parent_;
-  }
+  X parent() { return parent_; }
 
   public Object get(X x, String name) {
     return name.equals(name_) ? value_ : parent().get(name);
   }
-
 }
 
 
-class FactoryXI extends AbstractX {
+/** Implementation of X interface when binding a key-factory pair. **/
+class FactoryXI
+  extends AbstractX
+{
   final X        parent_;
   final String   name_;
   final XFactory factory_;
@@ -87,20 +92,15 @@ class FactoryXI extends AbstractX {
 }
 
 
-public class EmptyX extends AbstractX {
-  private static X x_ = new EmptyX().put("facetManager", new SimpleFacetManager());;
+/** Empty Context. Used to create new contexts. **/
+public class EmptyX
+  extends AbstractX
+{
+  private static X x_ = new EmptyX().put("facetManager", new SimpleFacetManager());
 
-  private EmptyX()
-  {
-  }
+  private EmptyX() {}
 
-  public static X instance()
-  {
-    return x_;
-  }
+  public static X instance() { return x_; }
 
-  public Object get(X x, String name)
-  {
-    return null;
-  }
+  public Object get(X x, String name) { return null; }
 }

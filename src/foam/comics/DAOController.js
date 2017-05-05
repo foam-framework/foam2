@@ -19,6 +19,11 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
+
+  topics: [
+    'finished'
+  ],
+
   properties: [
     {
       name: 'data',
@@ -32,27 +37,65 @@ foam.CLASS({
       name: 'filteredDAO',
       view: { class: 'foam.u2.view.ScrollTableView' },
       expression: function(data, predicate) {
-        return ! data ? foam.dao.NullDAO.create() :
-          predicate ? data.where(predicate) :
-          data;
+        return predicate ? data.where(predicate) : data;
       }
+    },
+    {
+      name: 'relationship'
     },
     {
       name: 'selection',
       hidden: true
+    },
+    {
+      name: 'mode',
+      value: 'browse'
     }
   ],
+
+  constants: {
+    MODE_SELECT: 'select',
+    MODE_BROWSE: 'browse'
+  },
 
   actions: [
     {
       name: 'create',
-      code: function() { }
+      code: function() {
+      }
     },
     {
       name: 'edit',
       isEnabled: function(selection) { return !! selection; },
       code: function() {
         this.pub('edit', this.selection.id);
+      }
+    },
+    {
+      name: 'findRelatedObject',
+      label: 'Add',
+      isAvailable: function(relationship, mode) {
+        return !! ( relationship && relationship.junctionDAO ) && mode != this.MODE_SELECT;
+      },
+      code: function() {
+      }
+    },
+    {
+      name: 'addSelection',
+      label: 'Add',
+      isAvailable: function(mode) { return mode == this.MODE_SELECT },
+      code: function() {
+        var self = this;
+        this.relationship.add(this.selection).then(function() {
+          self.finished.pub();
+        });
+      }
+    },
+    {
+      name: 'select',
+      isAvailable: function() { },
+      code: function() {
+        this.pub('select', this.selection.id);
       }
     }
   ]

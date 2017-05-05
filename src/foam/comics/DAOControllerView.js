@@ -41,21 +41,18 @@ foam.CLASS({
       of: 'foam.comics.DAOController',
       name: 'data',
       expression: function(importedData) { return importedData; },
-      listeners: [
-        {
-          topic: ['action', 'create'],
-          listener: 'onCreate'
-        },
-        {
-          topic: ['edit'],
-          listener: 'onEdit'
-        }
-      ]
     },
     {
       name: 'cls',
       expression: function(data) { return data.cls_; }
     }
+  ],
+
+  reactions: [
+    [ 'data', 'action,create', 'onCreate' ],
+    [ 'data', 'edit', 'onEdit' ],
+    [ 'data', 'action,findRelatedObject', 'onFindRelated' ],
+    [ 'data', 'finished', 'onFinished']
   ],
 
   methods: [
@@ -87,6 +84,23 @@ foam.CLASS({
         class: 'foam.comics.DAOUpdateControllerView',
         key: id
       }, this);
+    },
+
+    function onFindRelated() {
+      var data = this.DAOController.create({
+        data: this.data.relationship.targetDAO,
+        mode: this.DAOController.MODE_SELECT,
+        relationship: this.data.relationship
+      });
+
+      this.stack.push({
+        class: 'foam.comics.DAOControllerView',
+        data: data
+      }, this);
+    },
+
+    function onFinished() {
+      this.stack.back();
     }
   ],
 });

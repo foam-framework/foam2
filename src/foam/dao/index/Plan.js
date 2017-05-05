@@ -42,7 +42,7 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
-    { name: 'cost', value: Number.MAX_VALUE }
+    { name: 'cost', value: 0 }
   ],
 
   methods: [
