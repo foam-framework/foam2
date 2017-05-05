@@ -15,6 +15,16 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'handler'
     }
+  ],
+
+  actions: [
+    {
+      name: 'launch',
+      code: function() {
+        // TODO:
+        console.log('MENU: ', this.id);
+      }
+    }
   ]
 });
 
