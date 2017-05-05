@@ -524,9 +524,11 @@ foam.CLASS({
 
         if ( ! prop ) return obj;
 
-        var f = prop.f(obj);
+        var blob = prop.f(obj);
 
-        return self.blobService.put(prop.f(obj)).then(function(b) {
+        if ( ! blob ) return obj;
+
+        return self.blobService.put(blob).then(function(b) {
           prop.set(obj, b);
           return a();
         });
@@ -545,6 +547,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'TestBlobService',
+  requires: [
+    'foam.blob.IdentifiedBlob'
+  ],
   properties: [
     {
       class: 'Map',
@@ -560,7 +565,7 @@ foam.CLASS({
     function put(file) {
       var id = this.nextId++;
       this.blobs[id] = file;
-      return Promise.resolve(id);//this.NumberedFile.create({ id: id }));
+      return Promise.resolve(self.IdentifiedBlob.create({ id }));
     },
     function find(id) {
       return Promise.resolve(this.blobs[id] || null);
