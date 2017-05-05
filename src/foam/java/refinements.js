@@ -523,10 +523,24 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
+
   properties: [
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.StringParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'getWidth',
+        visibility: 'public',
+        type: 'int',
+        body: 'return ' + this.width + ';'
+      });
+      return info;
+    }
   ]
 });
 
