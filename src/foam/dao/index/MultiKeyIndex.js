@@ -27,7 +27,6 @@ foam.CLASS({
       return ret;
     }
   ]
-
 });
 
 foam.CLASS({
@@ -42,11 +41,11 @@ foam.CLASS({
       // any key part is not found, returning undefined.
       // TODO(jacksonic): validate key array
       var subIndex = this.delegate.get(key[0]);
-      for (var i = 1; (i < key.length && subIndex); ++i) {
+      for ( var i = 1; ( i < key.length && subIndex ); ++i ) {
         subIndex = subIndex.get(key[i]);
       }
       return subIndex;
-    },
+    }
   ]
 });
 
@@ -60,7 +59,7 @@ foam.CLASS({
       // build index, innermost to outermost
       var index = tail;
       var ps = this.props;
-      for (var i = ps.length - 1; i >= 0; --i) {
+      for ( var i = ps.length - 1; i >= 0; --i ) {
         index = ps[i].toIndex(index);
       }
       return this.MultiKeyIndex.create({ delegate: index });

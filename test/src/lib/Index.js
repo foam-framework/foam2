@@ -947,16 +947,23 @@ describe('AutoIndex', function() {
       )
     );
 
+    // Note: changes to the order of predicates produced by this function may
+    // require the test to be revised.
     pred = pred.toDisjunctiveNormalForm();
 
+    // Expect that the index will:
+    // 0. start with an ID index covering property INT
+    // 1. add an index for FLOAT(ID:INT)
+    // 2. add an index for DATE(String(ID:INT))
+    // The standalone string predicate is satisifed by the 
+    //   DATE+STRING index, leaving three indexes at the root level
     for ( var i = 0; i < pred.args.length; i++ ) {
       var subpred = pred.args[i];
       var plan = idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-      console.log("plan for ", subpred.toString(), plan.cost);
-
       plan.execute([], sink, undefined, undefined, undefined, subpred);
     }
+
     expect(idxInstance.delegate.delegates.length).toEqual(3);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
     expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
@@ -985,11 +992,11 @@ describe('AutoIndex', function() {
       m.LT(test.Indexable.DATE, 8)
     ];
 
+    // In this test every subpredicate should produce a new index
     for ( var i = 0; i < preds.length; i++ ) {
       var subpred = preds[i];
       var plan = idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-      console.log("plan for ", subpred.toString(), plan.cost);
       plan.execute([], sink, undefined, undefined, undefined, subpred);
 
       expect(idxInstance.delegate.delegates.length).toEqual(i+1);
