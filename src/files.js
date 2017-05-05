@@ -76,7 +76,7 @@ FOAM_FILES([
   { name: "foam/java/Interface", flags: ['java'] },
   { name: "foam/java/InterfaceMethod", flags: ['java'] },
   { name: "foam/java/Method", flags: ['java'] },
-  { name: "foam/java/Enum"/*, flags: ['java'] */},
+  { name: "foam/java/Enum", flags: ['java'] },
   { name: "foam/java/MultiPartGetter", flags: ['java'] },
   { name: "foam/java/MultiPartSetter", flags: ['java'] },
   { name: "foam/java/Outputter", flags: ['java'] },
