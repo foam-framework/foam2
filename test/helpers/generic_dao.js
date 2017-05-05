@@ -394,12 +394,9 @@ global.genericDAOTestBattery = function(daoFactory) {
                 deceased.find(p1).then(function(p) {
                   expect(p).toBeNull();
                 }),
-                (function() {
-                  debugger;
-                  return deceased.find(p2).then(function(p) {
-                    expect(p).not.toBeNull();
-                  });
-                })()
+                deceased.find(p2).then(function(p) {
+                  expect(p).not.toBeNull();
+                })
               ]);
             }),
             // Find by id:
