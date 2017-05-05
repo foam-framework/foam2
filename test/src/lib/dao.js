@@ -1007,63 +1007,6 @@ describe('String.daoize', function() {
 
 });
 
-describe('Relationship', function() {
-
-  foam.CLASS({
-    package: 'test',
-    name: 'RelA',
-    properties: [
-      'bRef'
-    ]
-  });
-  foam.CLASS({
-    package: 'test',
-    name: 'RelB',
-    properties: [
-      'aRef'
-    ]
-  });
-
-  foam.CLASS({
-    package: 'test',
-    name: 'relEnv',
-    exports: [
-      'test_RelADAO',
-      'test_RelBDAO'
-    ],
-    properties: [
-      {
-        name: 'test.RelADAO',
-        factory: function() {
-          return foam.dao.ArrayDAO.create();
-        }
-      },
-      {
-        name: 'test.RelBDAO',
-        factory: function() {
-          return foam.dao.ArrayDAO.create();
-        }
-      }
-
-    ]
-  });
-
-  foam.RELATIONSHIP({
-    forwardName: 'children',
-    inverseName: 'parent',
-    sourceModel: 'test.RelA',
-    targetModel: 'test.RelB',
-  });
-
-  it('has relationship DAOs', function() {
-    var env = test.relEnv.create(undefined, foam.__context__);
-    var relObjA = test.RelA.create(undefined, env);
-
-    var relDAO = relObjA.children;
-  })
-});
-
-
 describe('MultiPartID MDAO support', function() {
   var mDAO;
 
