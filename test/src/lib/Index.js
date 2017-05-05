@@ -865,12 +865,15 @@ describe('AutoIndex', function() {
   var fakeRoot;
 
   beforeEach(function() {
+    // The base autoindex definition. ID is the INT property
     idx = foam.dao.index.AutoIndex.create({
       idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
     });
 
+    // The instance to self-build by calling .plan(...) in each test
     idxInstance = idx.createNode();
 
+    // the ID index will start populated, and populate each newly added index
     idxInstance.bulkLoad(createData2(1000));
 
     fakeRoot = {
