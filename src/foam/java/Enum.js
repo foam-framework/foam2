@@ -3,13 +3,6 @@
 foam.CLASS({
   refines: 'foam.core.EnumModel',
 
-  methods: [
-    function outputJava(o) {
-      console.log('--------------')
-      console.log('HERE')
-    }
-  ],
-
   templates: [
     {
       name: 'javaSource',
