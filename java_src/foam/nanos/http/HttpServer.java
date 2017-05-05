@@ -13,7 +13,9 @@ import foam.core.*;
 public class HttpServer extends ContextAwareSupport implements NanoService {
   private HttpServer server;
 
-  static void start(Integer port) {
+  protected int port_ = 80;
+
+  static void start() {
     server = HttpServer.create(new InetSocketAddress(port), 0);
     nanosList = nanos;
 
