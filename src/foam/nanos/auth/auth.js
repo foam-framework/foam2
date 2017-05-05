@@ -106,7 +106,16 @@ foam.CLASS({
 });
 
 
-foam.RELATIONSHIP( *:* from Group to Permission )
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'net.nanopay.auth.Group',
+  targetModel: 'net.nanopay.b2b.Permission',
+  forwardName: 'permissions',
+  inverseName: 'groups',
+  sourceProperty: {
+    hidden: true
+  }
+});
 
 
 foam.CLASS({
@@ -250,7 +259,17 @@ foam.CLASS({
   ]
 });
 
-foam.RELATIONSHIP( 1:* from Users to Groups )
+
+foam.RELATIONSHIP({
+  cardinality: '*:*',
+  sourceModel: 'net.nanopay.auth.User',
+  targetModel: 'net.nanopay.b2b.Group',
+  forwardName: 'groups',
+  inverseName: 'users',
+  sourceProperty: {
+    hidden: true
+  }
+});
 
 
 // ???: Split into AuthSPI / AuthService ?
