@@ -19,6 +19,11 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
+
+  topics: [
+    'finished'
+  ],
+
   properties: [
     {
       name: 'data',
@@ -32,9 +37,7 @@ foam.CLASS({
       name: 'filteredDAO',
       view: { class: 'foam.u2.view.ScrollTableView' },
       expression: function(data, predicate) {
-        return ! data ? foam.dao.NullDAO.create() :
-          predicate ? data.where(predicate) :
-          data;
+        return predicate ? data.where(predicate) : data;
       }
     },
     {
@@ -71,7 +74,9 @@ foam.CLASS({
     {
       name: 'findRelatedObject',
       label: 'Add',
-      isAvailable: function() { },
+      isAvailable: function(relationship, mode) {
+        return !! ( relationship && relationship.junctionDAO ) && mode != this.MODE_SELECT;
+      },
       code: function() {
       }
     },

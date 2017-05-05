@@ -51,7 +51,6 @@ foam.CLASS({
   reactions: [
     [ 'data', 'action,create', 'onCreate' ],
     [ 'data', 'edit', 'onEdit' ],
-    [ 'data', 'select', 'onSelect' ],
     [ 'data', 'action,findRelatedObject', 'onFindRelated' ],
     [ 'data', 'finished', 'onFinished']
   ],
@@ -98,11 +97,6 @@ foam.CLASS({
         class: 'foam.comics.DAOControllerView',
         data: data
       }, this);
-    },
-
-    function onSelect(id) {
-      this.data.relationship.add(id);
-      this.stack.back();
     },
 
     function onFinished() {
