@@ -41,8 +41,9 @@ foam.CLASS({
         match inverse-namd property and source object's id.`,
       getter: function() {
         return this.EQ(
-          this.junctionCls[foam.String.constantize(this.relationship.inverseName)],
-          this.obj.id);
+            this.junctionCls[
+              foam.String.constantize(this.relationship.inverseName)],
+            this.obj.id);
       }
     }
   ],
@@ -52,20 +53,42 @@ foam.CLASS({
       var self = this;
       return self.__context__[foam.String.daoize(self.of.name)].put(obj)
           .then(function(obj) {
-            return self.delegate.put(self.relationship.adaptTarget(self.obj, obj))
-          })
+            return self.delegate.put(
+                self.relationship.adaptTarget(self.obj, obj));
+          });
     },
-    function find(id) {
-      return this.joinDAO.find(id);
+    function find(key) {
+      var id = this.of.isInstance(key) ? key.id : key;
+      var dao = this.joinDAO;
+
+      // Find junction record associated with this source-id and
+      // target-id = "id". Doing this rather than calling select() directly
+      // avoids need to accumulate all "junctionProperty" values associated
+      // with this source-id and pass them to a joinDAO query.
+      return this.selectFromJunction(
+          this.COUNT(), undefined, 1, undefined,
+          this.EQ(this.junctionProperty, id))
+              .then(function(count) {
+                // Return joinDAO's .find() value
+                return count.value > 0 ? dao.find(id) : null;
+              });
     },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
 
-      return self.SUPER(self.MAP(self.junctionProperty)).then(function(map) {
-        return self.joinDAO.select(sink, skip, limit, order, self.AND(
-          predicate || self.TRUE,
-          self.IN(self.targetProperty, map.delegate.a)));
-      });
+      return self.selectFromJunction(self.MAP(self.junctionProperty))
+          .then(function(map) {
+            return self.joinDAO.select(sink, skip, limit, order, self.AND(
+                predicate || self.TRUE,
+                self.IN(self.targetProperty, map.delegate.a)));
+          });
+    },
+    function selectFromJunction(sink, skip, limit, order, predicate) {
+      return this.delegate.select(
+        sink, skip, limit, order,
+        predicate ?
+          this.And.create({ args: [this.predicate, predicate] }) :
+          this.predicate);
     }
   ]
 });
