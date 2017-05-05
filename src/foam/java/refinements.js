@@ -537,7 +537,9 @@ foam.CLASS({
         name: 'getWidth',
         visibility: 'public',
         type: 'int',
-        body: 'return ' + this.width + ';'
+        body: ( this.width > 0 ) ?
+          'return ' + this.width + ';' :
+          'return 30;'
       });
       return info;
     }
