@@ -473,6 +473,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
 
@@ -482,6 +483,7 @@ foam.CLASS({
       if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
         var of = this.of.id;
+
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
       return info;
@@ -489,6 +491,36 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  refines: 'foam.core.EnumModel',
+
+  properties: [
+    {
+      name: 'javaType',
+      //expression: function(off) {
+      //  return off ? off.id : 'foam.core.EnumModel';
+      //}
+    },
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+
+            console.log('refinement------------------------------')
+      var info = cls;//this.SUPER(cls);
+      if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
+        var m = info.getMethod('jsonParser');
+        var of = this.of.id;
+        m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
+      }
+
+      return info;
+    }
+  ]
+});
 
 
 foam.CLASS({

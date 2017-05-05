@@ -231,6 +231,14 @@ foam.CLASS({
         return v;
       }
     }
+  ],
+
+  methods: [
+    function installInClass(cls) {
+      var e = cls.create(this.definition);
+      cls.installConstant(this.name, e);
+      cls.VALUES.push(e);
+    }
   ]
 });
 
