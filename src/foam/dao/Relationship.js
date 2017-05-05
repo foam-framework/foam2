@@ -138,12 +138,10 @@ foam.CLASS({
     {
       name: 'relationshipDAOFactory',
       value: function(source) {
-        return this.ReadOnlyDAO.create({
-          delegate: this.RelationshipDAO.create({
-            obj: source,
-            relationship: this
-          }, source)
-        });
+        return  this.RelationshipDAO.create({
+          obj: source,
+          relationship: this
+        }, source);
       }
     },
     {
