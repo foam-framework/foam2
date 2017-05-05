@@ -45,7 +45,7 @@ foam.CLASS({
   documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
-    { class: 'Int', name: 'width' },
+    { class: 'Int', name: 'width', value: 30 },
     [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.String.multiline(a) :
                typeof a === 'number'   ? String(a)                :
@@ -112,6 +112,26 @@ foam.CLASS({
 
   documentation: 'Describes properties of type DateTime.',
   label: 'Date and time'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Byte',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Byte.',
+  label: 'Round byte numbers'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Short',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Short.',
+  label: 'Round short numbers'
 });
 
 
@@ -389,21 +409,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  package: 'foam.core.internal',
-  name: 'FObjectPropertySubscription',
-  properties: [
-    {
-      class: 'StringArray',
-      name: 'topic'
-    },
-    {
-      class: 'String',
-      name: 'listener'
-    }
-  ]
-});
-
-foam.CLASS({
   package: 'foam.core',
   name: 'FObjectProperty',
   extends: 'Property',
@@ -420,11 +425,6 @@ foam.CLASS({
       }
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.internal.FObjectPropertySubscription',
-      name: 'listeners'
-    },
-    {
       name: 'adapt',
       value: function(_, v, prop) {
         // All FObjects may be null.
@@ -437,22 +437,6 @@ foam.CLASS({
             ( v.class ?
                 foam.lookup(v.class) :
                 of ).create(v, this.__subContext__);
-      }
-    }
-  ],
-  methods: [
-    function initObj_(obj) {
-      for ( var listener, i = 0 ; listener = this.listeners[i] ; i++ ) {
-        var inner;
-
-        function onChange(s, pc, n, slot) {
-          if ( inner ) inner.detach();
-          var value = slot.get();
-          inner = value && value.sub.apply(value, listener.topic.concat(obj[listener.listener]));
-        }
-
-        var sub = obj.sub('propertyChange', this.name, onChange);
-        onChange(null, null, null, this.toSlot(obj));
       }
     }
   ]

@@ -2,7 +2,10 @@ package foam.dao;
 
 import java.util.*;
 
-public class ListSink extends AbstractSink implements foam.lib.json.OutputJSON {
+public class ListSink
+  extends    AbstractSink
+  implements foam.lib.json.OutputJSON
+{
   private ArrayList data_ = new ArrayList();
 
   public List getData() {

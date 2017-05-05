@@ -221,7 +221,7 @@ foam.CLASS({
 
       var e = this.start('tr');
       if ( this.selectionQuery$ ) {
-        e.start('td').end();
+        e.tag('td');
       }
 
       for ( var i = 0 ; i < this.columns_.length ; i++ ) {

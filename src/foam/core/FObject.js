@@ -71,7 +71,7 @@ foam.LIB({
 
       var axioms = this.getInitAgents();
       for ( var i = 0 ; i < axioms.length ; i++ ) {
-        axioms[i].initObj_(obj);
+        axioms[i].initObject(obj);
       }
 
       // init() is called when object is created.
@@ -289,7 +289,7 @@ foam.LIB({
         this.private_.initAgentsCache = [];
         for ( var key in this.axiomMap_ ) {
           var axiom = this.axiomMap_[key];
-          if (axiom.initObj_) this.private_.initAgentsCache.push(axiom);
+          if (axiom.initObject) this.private_.initAgentsCache.push(axiom);
         }
       }
       return this.private_.initAgentsCache;
@@ -975,6 +975,10 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
+    },
+
+    function dot(name) {
+      return this[name + '$'];
     }
   ]
 });

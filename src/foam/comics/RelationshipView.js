@@ -1,6 +1,5 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,43 +18,16 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'RelationshipView',
-  extends: 'foam.u2.View',
-  requires: [
-    'foam.dao.RelationshipPropertyValue',
-    'foam.dao.RelationshipController'
-  ],
-  exports: [
-    'controller as data'
-  ],
+  extends: 'foam.comics.InlineBrowserView',
   properties: [
     {
-      name: 'data',
-      adapt: function(_, r) {
-        if ( this.RelationshipPropertyValue.isInstance(r) ) {
-          return this.RelationshipController.create({
-            relationship: r
-          });
-        }
-        return r;
-      }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.comics.DAOController',
       name: 'controller',
       expression: function(data) {
-        return this.RelationshipController.create({
+        return this.DAOController.create({
           data: data.dao,
-          targetDAO: data.targetDAO,
-          junctionDAO: data.junctionDAO
+          relationship: data
         });
       }
-    }
-  ],
-
-  methods: [
-    function initE() {
-      this.tag(this.RelationshipControllerView)
     }
   ]
 });
