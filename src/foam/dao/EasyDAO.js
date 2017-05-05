@@ -32,7 +32,6 @@ foam.CLASS({
 
   requires: [
     'foam.dao.MDAO',
-    'foam.dao.JournalDAO',
     'foam.dao.JournaledDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',

@@ -8,11 +8,14 @@ import foam.mlang.predicate.Predicate;
 
 // TODO: Deep serialization
 
-public class DatastoreDAO extends AbstractDAO {
-  private ClassInfo of_ = null;
-  private PropertyInfo primaryKey_ = null;
-
+/** DAO Strategy for storing in AppEngine Datastore. **/
+public class DatastoreDAO
+  extends AbstractDAO
+{
+  private ClassInfo        of_ = null;
+  private PropertyInfo     primaryKey_ = null;
   private DatastoreService datastore_ = DatastoreServiceFactory.getDatastoreService();
+
   private DatastoreService getData() { return datastore_; }
 
   public ClassInfo getOf() {

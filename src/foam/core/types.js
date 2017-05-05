@@ -45,7 +45,7 @@ foam.CLASS({
   documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
-    { class: 'Int', name: 'width' },
+    { class: 'Int', name: 'width', value: 30 },
     [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.String.multiline(a) :
                typeof a === 'number'   ? String(a)                :
@@ -112,6 +112,26 @@ foam.CLASS({
 
   documentation: 'Describes properties of type DateTime.',
   label: 'Date and time'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Byte',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Byte.',
+  label: 'Round byte numbers'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Short',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Short.',
+  label: 'Round short numbers'
 });
 
 

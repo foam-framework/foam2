@@ -1918,7 +1918,8 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.u2.Visibility',
-      name: 'visibility'
+      name: 'visibility',
+      value: foam.u2.Visibility.RW      
     }
   ],
 
@@ -2161,8 +2162,7 @@ foam.CLASS({
       var view = foam.u2.ViewSpec.createView(
         { class: 'foam.u2.ActionView', action: this }, args, this, X);
 
-      if ( X.data$ &&
-           ! ( args && ( args.data || args.data$ ) ) ) {
+      if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         view.data$ = X.data$;
       }
 

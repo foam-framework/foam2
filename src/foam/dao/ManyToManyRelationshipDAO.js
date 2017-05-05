@@ -35,7 +35,7 @@ foam.CLASS({
       getter: function() {
         return this.__context__[this.junctionDAOKey];
       }
-    },
+    }
   ],
 
   methods: [

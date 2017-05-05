@@ -207,7 +207,6 @@ foam.CLASS({
 
         var junctionDAOKey = this.junctionDAOKey;
 
-
         if ( ! sourceProps.length ) {
           sourceProps = [
             foam.dao.RelationshipProperty.create({
@@ -260,7 +259,6 @@ foam.CLASS({
           ];
         }
       }
-
 
       foam.assert(
         sourceProps.length === targetProps.length,
