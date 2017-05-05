@@ -191,6 +191,9 @@ foam.LIB({
       });
 
       var axioms = this.getOwnAxioms();
+
+      console.log(axioms.length)
+
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
@@ -492,36 +495,75 @@ foam.CLASS({
 });
 
 
+
 foam.CLASS({
-  refines: 'foam.core.EnumModel',
+  refines: 'foam.core.Enum',
 
   properties: [
-    {
-      name: 'javaType',
-      //expression: function(off) {
-      //  return off ? off.id : 'foam.core.EnumModel';
-      //}
-    },
+    ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    //    ['javaJSONParser', 'foam.lib.json.EnumParser']
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
-
-            console.log('refinement------------------------------')
-      var info = cls;//this.SUPER(cls);
-      if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
-        var m = info.getMethod('jsonParser');
-        var of = this.of.id;
-        m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
-      }
-
+      console.log('logType')
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).byteValue() :'
+            + '(byte)o;';
       return info;
     }
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+
+  properties: [
+    ['javaType', 'java.lang.Enum'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    //    ['javaJSONParser', 'foam.lib.json.EnumParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      console.log('logType')
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).byteValue() :'
+            + '(byte)o;';
+      return info;
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.EnumModel',
+
+  properties: [
+    ['javaType', 'java.lang.Enum'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    //    ['javaJSONParser', 'foam.lib.json.EnumParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      console.log('logType')
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ( o instanceof Number ) ?'
+            + '((Number)o).byteValue() :'
+            + '(byte)o;';
+      return info;
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
