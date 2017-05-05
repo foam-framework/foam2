@@ -24,7 +24,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'stack'
+    'stack',
+    'dao'
   ],
 
   exports: [
@@ -37,7 +38,7 @@ foam.CLASS({
       of: 'foam.comics.DAOCreateController',
       name: 'data',
       factory: function() {
-        return this.DAOCreateController.create();
+        return this.DAOCreateController.create({ dao: this.dao });
       }
     }
   ],
