@@ -6,6 +6,10 @@ public class ProxyX
   implements X
 {
 
+  public ProxyX() {
+    this(EmptyContext.instance());
+  }
+
   public ProxyX(X x) {
     setX(x);
   }
