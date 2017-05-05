@@ -2,7 +2,9 @@ package foam.core;
 
 import foam.lib.parse.Parser;
 
-public abstract class AbstractPropertyInfo implements PropertyInfo {
+public abstract class AbstractPropertyInfo
+  implements PropertyInfo
+{
   protected ClassInfo parent;
 
   @Override

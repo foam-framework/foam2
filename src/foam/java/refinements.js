@@ -473,6 +473,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
 
@@ -488,7 +489,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 
 foam.CLASS({

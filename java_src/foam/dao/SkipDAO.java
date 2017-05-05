@@ -5,7 +5,9 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
 import foam.dao.Sink;
 
-public class SkipDAO extends ProxyDAO {
+public class SkipDAO
+  extends ProxyDAO
+{
   private int skip_;
 
   public SkipDAO setSkip(int skip) {

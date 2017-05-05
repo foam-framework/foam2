@@ -6,7 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-public class MapDAO extends AbstractDAO {
+public class MapDAO
+  extends AbstractDAO
+{
   private Map<Object, FObject> data_ = null;
 
   private synchronized void data_factory() {
@@ -46,14 +48,11 @@ public class MapDAO extends AbstractDAO {
       sink = new ListSink();
     }
 
-    Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
-
-    Subscription sub = getX().create(Subscription.class);
+    Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
+    Subscription sub       = getX().create(Subscription.class);
 
     for ( FObject obj : getData().values() ) {
-      if ( sub.getDetached() ) {
-        break;
-      }
+      if ( sub.getDetached() ) break;
 
       decorated.put(sub, obj);
     }
