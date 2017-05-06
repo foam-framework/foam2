@@ -32,7 +32,7 @@ foam.CLASS({
     },
     {
       name: 'obj',
-      view: { class: 'foam.u2.DetailView' },
+      view: { class: 'foam.u2.DetailView', showActions: true },
       factory: function() {
         var self = this;
         this.dao.find(this.data).then(function(obj) {
