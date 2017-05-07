@@ -1277,7 +1277,7 @@ foam.CLASS({
       group.put(obj);
     },
 
-    function put(obj) {
+    function put(sub, obj) {
       var value = this.expr.f(obj);
       if ( Array.isArray(value) ) {
         throw 'Unique doesn\'t Array values.';
