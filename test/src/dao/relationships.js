@@ -218,11 +218,11 @@ describe('relationships', function() {
     it('should expose all items in .targetDAO', function(done) {
       Promise.all([
         adam.albums.targetDAO.select().then(function(sink) {
-          expect(sortedEquals(sink.a, [ adam, eve ])).toBe(true);
-        }),
-        inTheBeginning.artists.targetDAO.select().then(function(sink) {
           expect(sortedEquals(sink.a, [ inTheBeginning, eden, temptation ]))
             .toBe(true);
+        }),
+        inTheBeginning.artists.targetDAO.select().then(function(sink) {
+          expect(sortedEquals(sink.a, [ adam, eve ])).toBe(true);
         })
       ]).then(done, done.fail);
     });
