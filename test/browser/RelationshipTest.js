@@ -68,20 +68,20 @@ foam.CLASS({
       children.put(this.Child1.create({name: 'Athena', parent: 'Zeus'}));
 
       console.log('Parents:');
-      parents.select({put: function(o) { console.log(o.stringify()); }});
+      parents.select({put: function(_, o) { console.log(o.stringify()); }});
 
       console.log('Children:');
-      children.select({put: function(o) { console.log(o.stringify()); }});
+      children.select({put: function(_, o) { console.log(o.stringify()); }});
 
       console.log('Odin\'s Children:');
-      odin.children.dao.select({put: function(o) { console.log(o.stringify()); }});
+      odin.children.dao.select({put: function(_, o) { console.log(o.stringify()); }});
 
       console.log('Zeus\'s Children:');
-      zeus.children.dao.select({put: function(o) { console.log(o.stringify()); }});
+      zeus.children.dao.select({put: function(_, o) { console.log(o.stringify()); }});
 
       zeus.children.dao.put(this.Child1.create({name: 'Apollo'}));
       console.log('Zeus\'s Children (after adding Apollo):');
-      zeus.children.dao.select({put: function(o) { console.log(o.stringify()); }});
+      zeus.children.dao.select({put: function(_, o) { console.log(o.stringify()); }});
     }
   ]
 });
@@ -98,13 +98,13 @@ foam.CLASS({
       var joe = this.Parent1.create({name: 'Joe'});
       // Real world has no parent/child DAOs, so the relationships won't work yet
       mythos.parents.put(joe);
-      mythos.children.dao.put(this.Child1.create({name: 'Larry', parent: 'Joe'}));
-      mythos.children.dao.put(this.Child1.create({name: 'Edna', parent: 'Joe'}));
+      mythos.children.put(this.Child1.create({name: 'Larry', parent: 'Joe'}));
+      mythos.children.put(this.Child1.create({name: 'Edna', parent: 'Joe'}));
 
       // clone joe to the mythological context to access the right DAOs
       var mythoJoe = this.Parent1.create(joe, mythos);
       console.log("Joe's children:");
-      mythoJoe.children.dao.select({put: function(o) { console.log(o.stringify()); }});
+      mythoJoe.children.dao.select({put: function(_, o) { console.log(o.stringify()); }});
     }
   ]
 });
@@ -209,7 +209,7 @@ foam.CLASS({
       i3.as.add(b3);
 
       this.ABJunctionDAO.select({
-        put: function(o) { console.log('***: ', o.sourceId, o.targetId); },
+        put: function(_, o) { console.log('***: ', o.sourceId, o.targetId); },
         eof: function() {}
       });
 
