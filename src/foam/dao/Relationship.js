@@ -202,7 +202,7 @@ foam.CLASS({
             ]
           });
 
-          junction = foam.lookup(id);
+          junction = foam.lookup(this.junctionModel);
         }
 
         var junctionDAOKey = this.junctionDAOKey;
