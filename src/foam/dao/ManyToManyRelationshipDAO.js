@@ -27,9 +27,11 @@ foam.CLASS({
   properties: [
     'junctionProperty',
     'junctionDAOKey',
-    'targetProperty',
     'junctionCls',
-    'obj',
+    'targetProperty',
+    'sourceKey',
+    'sourceProperty',
+    'junctionKeyFactory',
     {
       name: 'junctionDAO',
       getter: function() {
@@ -39,20 +41,24 @@ foam.CLASS({
   ],
 
   methods: [
-    function find(id) {
+    function find(key) {
+      var id = foam.core.FObject.isInstance(key) ? key.id : key;
       var self = this;
-      return self.junctionDAO.select(self.MAP(self.junctionProperty)).then(function(map) {
-        self.delegate.where(self.IN(self.targetProperty, map.delegate.a)).find(id);
+
+      return self.junctionDAO.find(self.junctionKeyFactory(id)).then(function(a) {
+        return a && self.delegate.find(id);
       });
     },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
 
-      return self.junctionDAO.select(self.MAP(self.junctionProperty)).then(function(map) {
-        return self.delegate.select(sink, skip, limit, order, self.AND(
-          predicate || self.TRUE,
-          self.IN(self.targetProperty, map.delegate.a)));
-      });
+      return self.junctionDAO.
+        where(self.EQ(self.sourceProperty, self.sourceKey)).
+        select(self.MAP(self.junctionProperty)).then(function(map) {
+          return self.delegate.select(sink, skip, limit, order, self.AND(
+            predicate || self.TRUE,
+            self.IN(self.targetProperty, map.delegate.a)));
+        });
     }
   ]
 });

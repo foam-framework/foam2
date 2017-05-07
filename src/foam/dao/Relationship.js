@@ -221,8 +221,11 @@ foam.CLASS({
                       delegate: this.__context__[targetDAOKey],
                       junctionProperty: junction.TARGET_ID,
                       junctionDAOKey: junctionDAOKey,
-                      targetProperty: target.ID,
-                      junctionCls: junction
+                      junctionKeyFactory: function(a) { return [id, a]; },
+                      junctionCls: junction,
+                      sourceKey: id,
+                      sourceProperty: junction.SOURCE_ID,
+                      targetProperty: target.ID
                     }, this)
                   }, this),
                   targetDAO: this.__context__[targetDAOKey],
@@ -247,8 +250,11 @@ foam.CLASS({
                       delegate: this.__context__[sourceDAOKey],
                       junctionProperty: junction.SOURCE_ID,
                       junctionDAOKey: junctionDAOKey,
-                      targetProperty: source.ID,
-                      junctionCls: junction
+                      junctionKeyFactory: function(a) { return [a, id]; },
+                      junctionCls: junction,
+                      sourceKey: id,
+                      sourceProperty: junction.TARGET_ID,
+                      targetProperty: source.ID
                     }, this)
                   }, this),
                   targetDAO: this.__context__[sourceDAOKey],
