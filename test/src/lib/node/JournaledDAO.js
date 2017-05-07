@@ -48,7 +48,7 @@ describe('JournaledDAO', function() {
       inboundDAO.put(
         test.Car.create({
           id: i,
-          color: "color " + i
+          color: 'color ' + i
         })
       );
     }
@@ -95,7 +95,7 @@ describe('JournaledDAO', function() {
       .then(function(cars) {
         cars.a.forEach(function(car, i) {
           expect(car.id).toBe(i);
-          expect(car.color).toBe("color " + i);
+          expect(car.color).toBe('color ' + i);
         })
         done();
       });
