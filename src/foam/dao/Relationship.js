@@ -221,7 +221,9 @@ foam.CLASS({
                       delegate: this.__context__[targetDAOKey],
                       junctionProperty: junction.TARGET_ID,
                       junctionDAOKey: junctionDAOKey,
+                      sourceProperty: junction.SOURCE_ID,
                       targetProperty: target.ID,
+                      junctionKeyFactory: function(a) { return [id, a]; },
                       junctionCls: junction
                     }, this)
                   }, this),
@@ -246,8 +248,10 @@ foam.CLASS({
                     delegate: foam.dao.ManyToManyRelationshipDAO.create({
                       delegate: this.__context__[sourceDAOKey],
                       junctionProperty: junction.SOURCE_ID,
+                      sourceProperty: junction.TARGET_ID,
                       junctionDAOKey: junctionDAOKey,
                       targetProperty: source.ID,
+                      junctionKeyFactory: function(a) { return [a, id]; },
                       junctionCls: junction
                     }, this)
                   }, this),
