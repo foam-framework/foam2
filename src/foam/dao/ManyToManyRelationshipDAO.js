@@ -29,8 +29,8 @@ foam.CLASS({
     'junctionDAOKey',
     'junctionCls',
     'targetProperty',
+    'sourceKey',
     'sourceProperty',
-    'obj',
     'junctionKeyFactory',
     {
       name: 'junctionDAO',
@@ -52,11 +52,13 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate) {
       var self = this;
 
-      return self.junctionDAO.select(self.MAP(self.junctionProperty)).then(function(map) {
-        return self.delegate.select(sink, skip, limit, order, self.AND(
-          predicate || self.TRUE,
-          self.IN(self.targetProperty, map.delegate.a)));
-      });
+      return self.junctionDAO.
+        where(self.EQ(self.sourceProperty, self.sourceKey)).
+        select(self.MAP(self.junctionProperty)).then(function(map) {
+          return self.delegate.select(sink, skip, limit, order, self.AND(
+            predicate || self.TRUE,
+            self.IN(self.targetProperty, map.delegate.a)));
+        });
     }
   ]
 });
