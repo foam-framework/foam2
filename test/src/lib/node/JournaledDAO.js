@@ -20,9 +20,12 @@ describe('JournaledDAO', function() {
 
   var fs = require('fs');
   var filename = 'journal_file.txt';
-  var jDAO;
+  var eof = function(){};
+  var inboundDAO;
+  var cars;
 
   beforeEach(function(done) {
+
     foam.CLASS({
       package: 'test',
       name: 'Car',
@@ -33,21 +36,22 @@ describe('JournaledDAO', function() {
     });
 
     cars = foam.dao.ArrayDAO.create();
+
+    inboundDAO = foam.dao.JournaledDAO.create({
+      delegate: cars,
+      journal: foam.dao.NodeFileJournal.create({
+        fd: fs.openSync(filename, 'w+') // write permisson
+      })
+    });
+
     for ( var i = 0; i < 50; ++i ) {
-      cars.put(
+      inboundDAO.put(
         test.Car.create({
           id: i,
           color: "color " + i
         })
       );
     }
-
-    jDAO = foam.dao.JournaledDAO.create({
-      delegate: cars,
-      journal: foam.dao.NodeFileJournal.create({
-        fd: fs.openSync(filename, 'w+') // write permisson
-      })
-    });
 
     done();
   });
@@ -58,7 +62,8 @@ describe('JournaledDAO', function() {
 
   it('should persist to file', function(done) {
 
-    cars.select({ put: function(sub, car) { jDAO.put(car)}, eof: function () {} })
+    inboundDAO
+    .select()
     .then(function() {
       fs.readFile(filename, 'utf8', function (err, data) {
        if (err) {
@@ -69,6 +74,33 @@ describe('JournaledDAO', function() {
        done();
      });
     });
+  });
+
+  it('should read from journaled file and populate arrayDao properly', function(done) {
+
+    foam.dao.JournaledDAO.create({
+      delegate: cars,
+      journal: foam.dao.NodeFileJournal.create({
+        fd: fs.openSync(filename, 'r+')
+      })
+    })
+    .select({
+      put: function(sub, data) {
+        cars.put(data);
+      },
+      eof: eof
+    })
+    .then(function() {
+      cars.select()
+      .then(function(cars) {
+        cars.a.forEach(function(car, i) {
+          expect(car.id).toBe(i);
+          expect(car.color).toBe("color " + i);
+        })
+        done();
+      });
+    });
+
   });
 
 });
