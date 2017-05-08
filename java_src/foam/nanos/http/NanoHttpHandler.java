@@ -5,12 +5,14 @@ import java.net.URI;
 
 import com.sun.net.httpserver.*;
 
+import foam.core.*;
+
 public class NanoHttpHandler implements HttpHandler {
 
-  protected X;
+  protected X x_;
 
   public NanoHttpHandler(X x) {
-    this.X = x;
+    x_ = x;
   }
 
   @Override
@@ -32,7 +34,7 @@ public class NanoHttpHandler implements HttpHandler {
     // DAO services = (DAO) this.X.get('serviceFactoryDAO');
     // NSSpec serviceFactory = services.find(serviceKey);
 
-    NanoService service = this.X.get(serviceKey);
+    NanoService service = x_.get(serviceKey);
 
     if ( service instanceof HttpHandler ) {
       // if ( auth.checkPermission(...) ) {}
