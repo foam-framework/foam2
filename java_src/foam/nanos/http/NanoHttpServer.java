@@ -13,7 +13,11 @@ public class NanoHttpServer extends ContextAwareSupport implements NanoService {
   protected int port_ = 80;
 
   public void start() {
-    server_ = HttpServer.create(new InetSocketAddress(port_), 0);
+    try {
+      server_ = HttpServer.create(new InetSocketAddress(port_), 0);
+    } catch(IOException e) {
+       e.printStackTrace();
+    }
 
     server_.createContext("/", new NanoHttpHandler(getX()));
 

@@ -10,6 +10,7 @@ public class MapDAO
   extends AbstractDAO
 {
   private Map<Object, FObject> data_ = null;
+  private ClassInfo            of_ = null;
 
   private synchronized void data_factory() {
     if ( data_ == null ) {
@@ -26,6 +27,16 @@ public class MapDAO
 
   public void setData(Map<Object, FObject> data) {
     data_ = data;
+  }
+
+  public ClassInfo getOf() {
+    return of_;
+  }
+
+  public MapDAO setOf(ClassInfo of) {
+    of_ = of;
+    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
+    return this;
   }
 
   public FObject put(FObject obj) {

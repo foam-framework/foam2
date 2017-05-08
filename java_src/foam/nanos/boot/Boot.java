@@ -2,6 +2,7 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
+import foam.nanos.*;
 
 public class Boot {
 
@@ -9,9 +10,9 @@ public class Boot {
   protected X   root_ = new ProxyX();
 
   public Boot() {
-    serviceDAO_ = new ArrayDAO();
+    serviceDAO_ = new MapDAO();
     loadTestData();
-    serviceDAO_.setOf(foam.nanos.boot.NSpec);
+    ((MapDAO)serviceDAO_).setOf(NSpec.getOwnClassInfo());
 
     serviceDAO.select(new AbstractSink() {
       public void put(Detachable sub, FObject obj) {
