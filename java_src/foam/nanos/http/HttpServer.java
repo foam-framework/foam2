@@ -41,8 +41,8 @@ public class HttpServer extends ContextAwareSupport implements NanoService {
       */
       String serviceKey = urlParams[1];
 
-      DAO services = (DAO) this.X.get('serviceFactoryDAO');
-      NSSpec serviceFactory = services.find(serviceKey);
+      // DAO services = (DAO) this.X.get('serviceFactoryDAO');
+      // NSSpec serviceFactory = services.find(serviceKey);
 
       NanoService service = this.X.get(serviceKey);
 
