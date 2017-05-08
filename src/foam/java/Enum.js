@@ -1,4 +1,4 @@
-// Test with: foam.u2.ControllerMode.model_.javaSource();
+// Defines template for the EnumModel
 
 foam.CLASS({
   refines: 'foam.core.EnumModel',
@@ -34,22 +34,22 @@ public enum <%= this.name %> {
 %>
 
   private final int index_;
-  private final int value_;
+  private final int ordinal_;
   private final String label_;
-  <%= this.name %>(int index, int value, String label) {
+  <%= this.name %>(int index, int ordinal, String label) {
     index_ = index;
+    ordinal_ = ordinal;
     label_ = label;
-    value_ = value;
   }
 
-  public int getValue() { return value_; }
+  public int getOrdinal() { return ordinal_; }
   public int getIndex() { return index_; }
   public String getLabel() { return label_; }
 
   public static <%= this.name %> forOrdinal(int ordinal) {
     switch (ordinal) {
 <% for (var i = 0, value; value = this.values[i]; i++) { %>
-      case <%= i %>: return <%= this.name %>.<%= value.name %>;
+      case <%= value.definition.ordinal %>: return <%= this.name %>.<%= value.name %>;
 <% } %>
     }
     return null;
@@ -64,12 +64,13 @@ public enum <%= this.name %> {
     return null;
   }
 
-  public static <%= this.name %> forValue(int value) {
-    for (<%= this.name %> e : <%= this.name %>.values()) {
-      if (value == e.getValue()) {
-        return e;
-      }
+  public static <%= this.name %> forLabel(String label) {
+    switch (label) {
+<% for (var i = 0, value; value = this.values[i]; i++) { %>
+      case <%= labelForValue(value) %>: return <%= this.name %>.<%= value.name %>;
+<% } %>
     }
+
     return null;
   }
 
