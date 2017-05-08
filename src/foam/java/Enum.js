@@ -12,11 +12,7 @@ foam.CLASS({
 package <%= this.package %>;
 <%
 var labelForValue = function(value) {
-  if (this.androidResource) {
-    return this.androidResource + "." + this.name + "_" + value.definition.name;
-  } else {
-    return '"' + value.definition.label + '"';
-  }
+  return '"' + value.definition.label + '"';
 }
 
 %>
