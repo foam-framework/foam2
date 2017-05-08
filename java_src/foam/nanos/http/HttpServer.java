@@ -1,7 +1,6 @@
 package foam.nanos.http;
 
 import java.io.IOException;
-import java.io.RuntimeException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -11,13 +10,11 @@ import com.sun.net.httpserver.*;
 import foam.core.*;
 
 public class HttpServer extends ContextAwareSupport implements NanoService {
-  private HttpServer server;
-
+  protected HttpServer server;
   protected int port_ = 80;
 
-  static void start() {
-    server = HttpServer.create(new InetSocketAddress(port), 0);
-    nanosList = nanos;
+  public void start() {
+    server = HttpServer.create(new InetSocketAddress(port_), 0);
 
     server.createContext('/', new nanoHttpHandler());
 
