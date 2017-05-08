@@ -192,8 +192,6 @@ foam.LIB({
 
       var axioms = this.getOwnAxioms();
 
-      console.log(axioms.length)
-
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
@@ -494,8 +492,6 @@ foam.CLASS({
   ]
 });
 
-
-
 foam.CLASS({
   refines: 'foam.core.Enum',
 
@@ -503,19 +499,6 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
-    //    ['javaJSONParser', 'foam.lib.json.EnumParser']
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      console.log('logType')
-      var info = this.SUPER(cls);
-      var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).byteValue() :'
-            + '(byte)o;';
-      return info;
-    }
   ]
 });
 
@@ -526,19 +509,6 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
-    //    ['javaJSONParser', 'foam.lib.json.EnumParser']
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      console.log('logType')
-      var info = this.SUPER(cls);
-      var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).byteValue() :'
-            + '(byte)o;';
-      return info;
-    }
   ]
 });
 
@@ -549,19 +519,6 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
-    //    ['javaJSONParser', 'foam.lib.json.EnumParser']
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      console.log('logType')
-      var info = this.SUPER(cls);
-      var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).byteValue() :'
-            + '(byte)o;';
-      return info;
-    }
   ]
 });
 
@@ -574,7 +531,6 @@ foam.CLASS({
     ['javaJSONParser', 'foam.lib.json.DateParser']
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.core.Map',
