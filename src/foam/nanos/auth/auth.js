@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.pattern', // ???: better package?
+  package: 'foam.nanos.auth',
   name: 'EnabledAware',
 
   properties: [
@@ -13,7 +13,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.pattern', // ???: better package?
+  package: 'foam.nanos.auth',
   name: 'LastModifiedAware',
 
   properties: [
@@ -27,7 +27,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.pattern', // ???: better package?
+  package: 'foam.nanos.auth',
   name: 'LastModifiedByAware',
 
   properties: [
