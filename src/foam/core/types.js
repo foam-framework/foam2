@@ -240,12 +240,6 @@ foam.CLASS({
   extends: 'foam.core.Object'
 });
 
-foam.CLASS({
-  package: 'foam.core',
-  name: 'EnumModel',
-  extends: 'foam.core.FObject'
-});
-
 
 foam.CLASS({
   package: 'foam.core',
