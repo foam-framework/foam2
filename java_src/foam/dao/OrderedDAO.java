@@ -5,7 +5,9 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
 import foam.dao.Sink;
 
-public class OrderedDAO extends ProxyDAO {
+public class OrderedDAO
+  extends ProxyDAO
+{
   private foam.mlang.order.Comparator order_;
 
   public OrderedDAO setOrder(foam.mlang.order.Comparator order) {

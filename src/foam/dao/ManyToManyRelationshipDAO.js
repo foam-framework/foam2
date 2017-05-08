@@ -38,7 +38,7 @@ foam.CLASS({
     {
       name: 'predicate',
       documentation: `ManyToMany filtered querys are always "backward" to
-        match inverse-namd property and source object's id.`,
+        match inverse-name property and source object's id.`,
       getter: function() {
         return this.EQ(
           this.junctionCls[foam.String.constantize(this.relationship.inverseName)],
