@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors, All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,18 @@ foam.CLASS({
   ],
 
   methods: [
+    function fromArgs(argv) {
+      for ( var i = 0 ; i < argv.length ; i++ ) {
+        if ( argv[i].startsWith('--classpath=') ) {
+          this.classpaths = argv[i].substring(12).split(':').map(function(p) {
+            return require('path').isAbsolute(p) ? p : require('path').join(process.cwd(), p);
+          });
+          continue;
+        }
+        this.modelId = argv[i];
+      }
+      return this;
+    },
     function execute() {
       var self = this;
       var modelArgs = this.modelArgs;
