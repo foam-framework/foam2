@@ -175,6 +175,7 @@ foam.CLASS({
   properties: [
     {
       name: 'registry',
+      hidden: true,
       factory: function() { return {}; }
     }
   ],
@@ -1217,6 +1218,7 @@ foam.CLASS({
   properties: [
     {
       name: 'messagePortService',
+      hidden: true,
       factory: function() {
         var model = foam.lookup('foam.messageport.MessagePortService', true);
         if ( model ) {
@@ -1228,6 +1230,7 @@ foam.CLASS({
     },
     {
       name: 'socketService',
+      hidden: true,
       factory: function() {
         var model = foam.lookup('foam.net.node.SocketService', true);
         if ( model ) {
@@ -1239,6 +1242,7 @@ foam.CLASS({
     },
     {
       name: 'webSocketService',
+      hidden: true,
       factory: function() {
         var model = foam.lookup('foam.net.node.WebSocketService', true) ||
             foam.lookup('foam.net.web.WebSocketService', true);
@@ -1252,22 +1256,26 @@ foam.CLASS({
     },
     {
       name: 'registry',
+      hidden: true,
       factory: function() {
         return this.BoxRegistryBox.create();
       }
     },
     {
       name: 'root',
+      hidden: true,
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
       }
     },
     {
       class: 'String',
-      name: 'myname'
+      name: 'myname',
+      hidden: true,
     },
     {
       name: 'me',
+      hidden: true,
       factory: function() {
         var me = this.NamedBox.create({
           name: this.myname || ( '/com/foamdev/anonymous/' + foam.uuid.randomGUID() )
