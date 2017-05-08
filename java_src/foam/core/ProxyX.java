@@ -7,7 +7,7 @@ public class ProxyX
 {
 
   public ProxyX() {
-    this(EmptyContext.instance());
+    this(EmptyX.instance());
   }
 
   public ProxyX(X x) {
