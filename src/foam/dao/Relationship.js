@@ -228,17 +228,16 @@ foam.CLASS({
           forwardName: this.forwardName,
           inverseName: 'sourceId',
           sourceDAOKey: this.sourceDAOKey,
-          targetDAOKey: this.junctionDAOKey,
-          relationshipDAOFactory: function(source) {
+          relationshipDAOFactory: function(s) {
             return foam.dao.ManyToManyRelationshipDAO.create({
               junctionCls: jModel,
-              obj: source,
+              obj: s,
               of: target.id,
               relationship: this,
               joinDAOKey: relationship.targetDAOKey,
               junctionProperty: jModel.TARGET_ID,
               targetProperty: target.ID
-            }, source);
+            }, s);
           },
           adaptTarget: function(s, t) {
             if ( target.isInstance(t) ) {
@@ -259,7 +258,6 @@ foam.CLASS({
           forwardName: this.inverseName,
           inverseName: 'targetId',
           sourceDAOKey: this.targetDAOKey,
-          targetDAOKey: this.junctionDAOKey,
           relationshipDAOFactory: function(s) {
             return foam.dao.ManyToManyRelationshipDAO.create({
               junctionCls: jModel,

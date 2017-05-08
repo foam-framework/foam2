@@ -45,7 +45,7 @@ foam.CLASS({
   documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
-    { class: 'Int', name: 'width' },
+    { class: 'Int', name: 'width', value: 30 },
     [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.String.multiline(a) :
                typeof a === 'number'   ? String(a)                :

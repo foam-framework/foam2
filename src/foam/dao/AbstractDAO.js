@@ -284,6 +284,12 @@ foam.CLASS({
   ],
 
   methods: [
+    function find(key) {
+      var predicate = this.predicate;
+      return this.delegate.find(key).then(function(o) {
+        return predicate.f(o) ? o : null;
+      });
+    },
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(
         sink, skip, limit, order,
