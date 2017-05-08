@@ -26,39 +26,27 @@ public enum <%= this.name %> {
     var value = this.values[i];
     if ( value.javaSource ) { value.javaSource(out); }
     else {
-%>  <%= value.name %>(<%= i %>, <%= value.definition.ordinal %>, <%= labelForValue(value) %>) <%
+%>  <%= value.name %>(<%= value.definition.ordinal %>, <%= labelForValue(value) %>) <%
     }
     if ( i == this.values.length - 1 ) {%>;<%}
     else {%>,<%}
   }
 %>
 
-  private final int index_;
   private final int ordinal_;
   private final String label_;
-  <%= this.name %>(int index, int ordinal, String label) {
-    index_ = index;
+  <%= this.name %>(int ordinal, String label) {
     ordinal_ = ordinal;
     label_ = label;
   }
 
   public int getOrdinal() { return ordinal_; }
-  public int getIndex() { return index_; }
   public String getLabel() { return label_; }
 
   public static <%= this.name %> forOrdinal(int ordinal) {
     switch (ordinal) {
 <% for (var i = 0, value; value = this.values[i]; i++) { %>
       case <%= value.definition.ordinal %>: return <%= this.name %>.<%= value.name %>;
-<% } %>
-    }
-    return null;
-  }
-
-  public static <%= this.name %> forIndex(int index) {
-    switch (index) {
-<% for (var i = 0, value; value = this.values[i]; i++) { %>
-      case <%= i %>: return <%= this.name %>.<%= value.name %>;
 <% } %>
     }
     return null;
