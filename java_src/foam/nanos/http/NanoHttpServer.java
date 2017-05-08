@@ -9,14 +9,14 @@ import com.sun.net.httpserver.*;
 
 import foam.core.*;
 
-public class HttpServer extends ContextAwareSupport implements NanoService {
+public class NanoHttpServer extends ContextAwareSupport implements NanoService {
   protected HttpServer server;
   protected int port_ = 80;
 
   public void start() {
     server = HttpServer.create(new InetSocketAddress(port_), 0);
 
-    server.createContext('/', new nanoHttpHandler());
+    server.createContext("/", new nanoHttpHandler());
 
     server.start();
   }
@@ -30,7 +30,7 @@ public class HttpServer extends ContextAwareSupport implements NanoService {
 
       // AuthService auth = this.X.get(AuthService);
 
-      String[] urlParams = path.split('/');
+      String[] urlParams = path.split("/");
 
       /*
        * Get the item right after the first slash
