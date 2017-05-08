@@ -1,6 +1,7 @@
 package foam.nanos.boot;
 
 import foam.core.*;
+import foam.dao.*;
 
 public class Boot {
 
@@ -27,7 +28,7 @@ public class Boot {
 
   protected void loadTestData() {
     NSpec s = new NSpec();
-    s.setName('http');
+    s.setName("http");
     s.setServiceClass("foam.nano.http.HttpServer");
     serviceDAO_.put(s);
   }
