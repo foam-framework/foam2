@@ -95,7 +95,7 @@ foam.CLASS({
     {
       name: 'size',
       assertValue: function(value) {
-        foam.assert(this.offset + value < this.parent.size, 'Cannot create sub blob beyond end of parent.');
+        foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
       }
     }
   ],
