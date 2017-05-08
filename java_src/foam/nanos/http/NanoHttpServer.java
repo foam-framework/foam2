@@ -1,5 +1,6 @@
 package foam.nanos.http;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.*;
