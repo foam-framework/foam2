@@ -515,7 +515,7 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.buildJavaClass =  function(cls) {
-          cls = cls || foam.java.EnumModel.create();
+          cls = cls || foam.java.Enum.create();
 
           cls.name = this.name;
           cls.package = this.package;
