@@ -19,8 +19,8 @@ foam.CLASS({
   methods: [
     {
       name: 'createService',
-      returnType: 'NanoService',
-      javaSource: `return Class.forName(serviceClass).newInstance();`
+      javaReturns: 'NanoService',
+      javaCode: `return Class.forName(serviceClass).newInstance();`
     }
   ]
 })
