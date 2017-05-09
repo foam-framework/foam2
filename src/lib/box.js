@@ -93,6 +93,10 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'HelloMessage'
+});
 
 foam.CLASS({
   package: 'foam.box',
@@ -265,6 +269,7 @@ foam.CLASS({
   requires: [
     'foam.box.SubBoxMessage',
     'foam.box.Message',
+    'foam.box.HelloMessage',
     'foam.box.SkeletonBox'
   ],
 
@@ -296,6 +301,7 @@ foam.CLASS({
                 }));
             }
           }
+        } else if ( this.HelloMessage.isInstance(msg.object) ) {
         } else {
           this.registrySkeleton.send(msg);
         }
@@ -1472,6 +1478,67 @@ foam.CLASS({
 
 	return this.RawMessagePortBox.create({ port: channel.port1 });
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardedMessage',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      name: 'destination'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'payload'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.ForwardedMessage'
+  ],
+  properties: [
+    {
+      name: 'destination'
+    }
+  ],
+  methods: [
+    function send(m) {
+      m.object = this.ForwardedMessage.create({
+        destination: this.destination,
+        payload: m.object
+      });
+      this.SUPER(m);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardingBox',
+  implements: [ 'foam.box.Box' ],
+  requires: [
+    'foam.box.ForwardedMessage'
+  ],
+  methods: [
+    function send(m) {
+      if ( ! this.ForwardedMessage.isInstance(m.object) ) throw foam.box.InvalidMessageException.create();
+
+      var wrapper = m.object;
+      m.object = wrapper.payload;
+
+      wrapper.destination.describe();
+
+
+      wrapper.destination.send(m);
     }
   ]
 });
