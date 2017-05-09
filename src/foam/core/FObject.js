@@ -978,6 +978,8 @@ foam.CLASS({
     },
 
     function dot(name) {
+      // Behaves just like Slot.dot().  Makes it easy for creating sub-slots
+      // without worrying if you're holding an FObject or a slot.
       return this[name + '$'];
     }
   ]
