@@ -16,13 +16,13 @@ public class Boot {
 
     serviceDAO.select(new AbstractSink() {
       public void put(Detachable sub, FObject obj) {
-        NSpec sp = (FObject) obj;
-        System.out.println("NSpec: " + sp.name);
+        NSpec sp = (NSpec) obj;
+        System.out.println("NSpec: " + sp.getName());
 
         NanoService ns = sp.createService();
         ns.setContext(root_);
         ns.start();
-        root_.put(sp.name, ns);
+        root_.put(sp.getName(), ns);
       }
     });
   }

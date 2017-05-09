@@ -1,4 +1,4 @@
-package foam.nanos.http;
+package foam.nanos;
 
 public interface NanoService {
   public void start();

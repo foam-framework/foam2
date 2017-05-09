@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import com.sun.net.httpserver.*;
 
 import foam.core.*;
+import foam.nanos.*;
 
 public class NanoHttpServer extends ContextAwareSupport implements NanoService {
 
