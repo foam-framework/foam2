@@ -725,3 +725,123 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  package: 'foam.net.web',
+  name: 'RTCPeerConnection',
+
+  topics: [
+    'data',
+  ],
+
+  requires: [
+  ],
+
+  properties: [
+    // TODO: Put some effort in closing channels/connections.
+    {
+      name: 'connection',
+      factory: function() {
+        var self = this;
+        var connection = new RTCPeerConnection();
+        connection.ondatachannel = this.onDataChannel;
+
+        var iceCandidates = [];
+        connection.onicecandidate = function(event) {
+          if ( event.candidate ) iceCandidates.push(event.candidate);
+          else self.iceCandidates = iceCandidates;
+        };
+
+        return connection;
+      },
+    },
+    {
+      name: 'channel',
+      postSet: function(o, n) {
+        if (o) {
+          o.onmessage = undefined;
+          o.onopen = undefined;
+          o.onclose = undefined;
+        }
+        if (n) {
+          n.onmessage = this.onChannelMessage;
+          n.onopen = this.onChannelOpen;
+          n.onclose = this.onChannelClose;
+        }
+      },
+    },
+    {
+      name: 'localDescription',
+      postSet: function(_, n) { this.connection.setLocalDescription(n) },
+    },
+    {
+      name: 'remoteDescription',
+      postSet: function(_, n) { this.connection.setRemoteDescription(n) },
+    },
+    {
+      name: 'iceCandidates',
+      value: [],
+    },
+    {
+      name: 'channelName',
+      value: 'sendDataChannel',
+    },
+  ],
+
+  listeners: [
+    function onDataChannel(event) {
+      this.channel = event.channel;
+    },
+    function onChannelOpen(event) {
+    },
+    function onChannelClose(event) {
+    },
+    function onChannelMessage(event) {
+      this.data.pub(event.data);
+    },
+    function onSendChannelStateChange(event) {
+    },
+  ],
+
+  actions: [
+    {
+      name: 'createChannel',
+      isEnabled: function(connection) { return !!connection },
+      code: function() {
+        this.channel = this.connection.createDataChannel(this.channelName);
+      },
+    },
+    {
+      name: 'createOffer',
+      isEnabled: function(connection) { return !!connection },
+      code: function() {
+        var self = this;
+        self.connection.createOffer().then(function(desc) {
+          self.localDescription = desc
+        });
+      },
+    },
+    {
+      name: 'createAnswer',
+      isEnabled: function(connection, remoteDescription) {
+        return !!connection && !!remoteDescription;
+      },
+      code: function() {
+        var self = this;
+        self.connection.createAnswer().then(function(desc) {
+          self.localDescription = desc
+        });
+      },
+    },
+  ],
+
+  methods: [
+    function addIceCandidate(c) {
+      this.connection.addIceCandidate(c)
+    },
+    function send(msg) {
+      this.channel.send(msg);
+    },
+  ]
+});
