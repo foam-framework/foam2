@@ -54,8 +54,7 @@ foam.CLASS({
   ],
 
   constants: {
-    MODE_SELECT: 'select',
-    MODE_BROWSE: 'browse'
+    MODE_SELECT: 'select'
   },
 
   actions: [
