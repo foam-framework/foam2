@@ -59,15 +59,16 @@ foam.CLASS({
     function initE() {
       this.
         start('table').
-        start('tr').
-          start('td').add(this.cls.PREDICATE).end().
-          start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
-            add(this.cls.FILTERED_DAO).end().
-        end().
-        start('tr').
-          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-        start('td').end().start('td').
-        add(this.cls.getAxiomsByClass(foam.core.Action)).
+          start('tr').
+            start('td').add(this.cls.PREDICATE).end().
+            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
+              add(this.cls.FILTERED_DAO).
+            end().
+          end().
+          start('tr').
+            show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+            start('td').add(this.cls.getAxiomsByClass(foam.core.Action)).end().
+          end().
         end();
     }
   ],
