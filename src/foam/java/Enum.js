@@ -19,12 +19,7 @@ foam.CLASS({
   package: 'foam.java',
   name: 'Enum',
   extends: 'foam.java.Class',
-
-  properties: [
-    ['javaType', 'java.lang.Enum'],
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser'],
-  ],
+  
   methods: [
     function outputJava(o) {
       function labelForValue(value) {
