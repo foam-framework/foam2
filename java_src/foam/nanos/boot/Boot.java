@@ -14,7 +14,7 @@ public class Boot {
     loadTestData();
     ((MapDAO)serviceDAO_).setOf(NSpec.getOwnClassInfo());
 
-    serviceDAO.select(new AbstractSink() {
+    ((MapDAO)serviceDAO_).select(new AbstractSink() {
       public void put(Detachable sub, FObject obj) {
         NSpec sp = (NSpec) obj;
         System.out.println("NSpec: " + sp.getName());
@@ -37,7 +37,7 @@ public class Boot {
   public void main (String[] args) throws Exception {
     new Boot();
 
-    Thread.currentThread.setDaemon(true);
+    Thread.currentThread().setDaemon(true);
   }
 
 }
