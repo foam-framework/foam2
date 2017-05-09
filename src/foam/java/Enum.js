@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.java',
   name: 'Enum',
   extends: 'foam.java.Class',
-  
+
   methods: [
     function outputJava(o) {
       function labelForValue(value) {
@@ -150,12 +150,6 @@ foam.CLASS({
       o.decreaseIndent();
       o.indent();
       o.out('}');
-    },
-
-    function toJavaSource() {
-      var output = foam.java.Outputter.create();
-      output.out(this);
-      return output.buf_;
     }
   ]
 });
