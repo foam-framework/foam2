@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.java',
-  name: 'EnumModel',
+  name: 'Enum',
   extends: 'foam.java.Class',
 
   properties: [
