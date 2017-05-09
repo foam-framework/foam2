@@ -163,18 +163,14 @@ foam.CLASS({
       if ( cardinality === '1:*' ) {
         if ( ! sourceProps.length ) {
           sourceProps = [
-            foam.dao.RelationshipProperty.create({
+            foam.dao.DAOProperty.create({
               name: forwardName,
               cloneProperty: function(value, map) {},
               transient: true,
               expression: function(id) {
-                return foam.dao.RelationshipPropertyValue.create({
-                  sourceId: id,
-                  dao: foam.dao.RelationshipDAO.create({
-                    obj: this,
-                    relationship: relationship
-                  }, this),
-                  targetDAO: this.__context__[targetDAOKey]
+                return foam.dao.RelationshipDAO.create({
+                  obj: this,
+                  relationship: relationship
                 }, this);
               },
             }).copyFrom(this.sourceProperty)
