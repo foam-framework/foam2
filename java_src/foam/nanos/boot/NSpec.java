@@ -137,7 +137,7 @@ public class NSpec extends foam.core.AbstractFObject {
     serviceClassIsSet_ = true;
     return this;
   }
-  public foam.nanos.NanoService createService() {
-    return Class.forName(getServiceClass()).newInstance();
+  public foam.nanos.NanoService createService() throws java.lang.ClassNotFoundException, java.lang.InstantiationException, java.lang.IllegalAccessException {
+    return (foam.nanos.NanoService) Class.forName(getServiceClass()).newInstance();
   }
 }
