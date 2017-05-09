@@ -574,7 +574,7 @@ foam.CLASS({
     function put(file) {
       var id = this.nextId++;
       this.blobs[id] = file;
-      return Promise.resolve(self.IdentifiedBlob.create({ id }));
+      return Promise.resolve(this.IdentifiedBlob.create({ id }));
     },
     function find(id) {
       return Promise.resolve(this.blobs[id] || null);
