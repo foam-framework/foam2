@@ -138,6 +138,6 @@ public class NSpec extends foam.core.AbstractFObject {
     return this;
   }
   public foam.nanos.NanoService createService() {
-    return Class.forName(serviceClass).newInstance();
+    return Class.forName(getServiceClass()).newInstance();
   }
 }
