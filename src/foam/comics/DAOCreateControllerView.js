@@ -52,8 +52,7 @@ foam.CLASS({
       this.
         add(this.DAOCreateController.DATA,
             this.DAOCreateController.SAVE,
-            this.DAOCreateController.CANCEL).
-        endContext();
+            this.DAOCreateController.CANCEL);
     }
   ],
 
