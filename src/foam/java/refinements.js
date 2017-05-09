@@ -504,12 +504,6 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.AbstractEnum',
-
-  properties: [
-    ['javaType', 'java.lang.Enum'],
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
-  ],
   
   axioms: [
     {
@@ -532,16 +526,6 @@ foam.CLASS({
         };
       }
     }
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.EnumModel',
-
-  properties: [
-    ['javaType', 'java.lang.Enum'],
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ]
 });
 
