@@ -20,10 +20,7 @@ foam.CLASS({
   name: 'RestDAOHandler',
   extends: 'foam.net.node.Handler',
 
-  imports: [
-    'info',
-    'warn'
-  ],
+  imports: [ 'info' ],
 
   properties: [
     {
@@ -75,7 +72,7 @@ foam.CLASS({
         // No suffix on put() requests.
         if ( target !== '' ) {
           self.send404(req, res);
-          self.warn('Attempt to put() with path suffix');
+          self.reportWarnMsg(req, 'Attempt to put() with path suffix');
           return true;
         }
 
@@ -126,7 +123,8 @@ foam.CLASS({
           }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unrecognized DAO GET URL fragment: '  + sep + target);
+          self.reportWarnMsg(
+            req, 'Unrecognized DAO GET URL fragment: '  + sep + target);
         }
       } else if ( req.method === 'POST' ) {
         if ( sep === ':' && target === 'select' ) {
@@ -174,11 +172,11 @@ foam.CLASS({
           }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unknown POST request: ' + target);
+          self.reportWarnMsg(req, 'Unknown POST request: ' + target);
         }
       } else {
         self.send404(req, res);
-        self.warn('Method not supported: '  + req.method);
+        self.reportWarnMsg(req, 'Method not supported: '  + req.method);
       }
 
       return true;
