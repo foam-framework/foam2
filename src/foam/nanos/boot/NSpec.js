@@ -20,7 +20,7 @@ foam.CLASS({
     {
       name: 'createService',
       javaReturns: 'foam.nanos.NanoService',
-      javaCode: `return Class.forName(serviceClass).newInstance();`
+      javaCode: `return Class.forName(getServiceClass()).newInstance();`
     }
   ]
 })

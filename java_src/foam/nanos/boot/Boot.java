@@ -14,13 +14,13 @@ public class Boot {
     loadTestData();
     ((MapDAO)serviceDAO_).setOf(NSpec.getOwnClassInfo());
 
-    ((MapDAO)serviceDAO_).select(new AbstractSink() {
+    ((AbstractDAO)serviceDAO_).select(new AbstractSink() {
       public void put(Detachable sub, FObject obj) {
         NSpec sp = (NSpec) obj;
         System.out.println("NSpec: " + sp.getName());
 
         NanoService ns = sp.createService();
-        ns.setContext(root_);
+        ns.setX(root_);
         ns.start();
         root_.put(sp.getName(), ns);
       }
