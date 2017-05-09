@@ -191,4 +191,14 @@ foam.async.repeat(FBE.length, function runExemplar(index) {
     writeOutput();
     return result;
   }
-})();
+})().then(function() {
+  // reverting logging strategy performed during async calls
+  console = {
+    __proto__: oldConsole,
+    log: oldConsole.log,
+    warn: oldConsole.warn,
+    error: oldConsole.error,
+    debug: oldConsole.debug,
+    assert: oldConsole.assert
+  }
+});
