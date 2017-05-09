@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-FOAM.class({
+foam.CLASS({
   package: 'foam.nanos.test',
   name: 'Script',
 
