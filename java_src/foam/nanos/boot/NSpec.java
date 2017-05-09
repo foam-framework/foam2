@@ -137,7 +137,7 @@ public class NSpec extends foam.core.AbstractFObject {
     serviceClassIsSet_ = true;
     return this;
   }
-  public NanoService createService() {
+  public foam.nanos.NanoService createService() {
     return Class.forName(serviceClass).newInstance();
   }
 }
