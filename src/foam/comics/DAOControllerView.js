@@ -49,9 +49,9 @@ foam.CLASS({
   ],
 
   reactions: [
-    [ 'data', 'action,create', 'onCreate' ],
+    [ 'data', 'action.create', 'onCreate' ],
     [ 'data', 'edit', 'onEdit' ],
-    [ 'data', 'action,findRelatedObject', 'onFindRelated' ],
+    [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
     [ 'data', 'finished', 'onFinished']
   ],
 
