@@ -41,8 +41,9 @@ foam.CLASS({
         match inverse-name property and source object's id.`,
       getter: function() {
         return this.EQ(
-          this.junctionCls[foam.String.constantize(this.relationship.inverseName)],
-          this.obj.id);
+            this.junctionCls[
+              foam.String.constantize(this.relationship.inverseName)],
+            this.obj.id);
       }
     }
   ],
@@ -52,20 +53,26 @@ foam.CLASS({
       var self = this;
       return self.__context__[foam.String.daoize(self.of.name)].put(obj)
           .then(function(obj) {
-            return self.delegate.put(self.relationship.adaptTarget(self.obj, obj))
-          })
+            return self.delegate.put(
+                self.relationship.adaptTarget(self.obj, obj));
+          });
     },
-    function find(id) {
-      return this.joinDAO.find(id);
+    function find(key) {
+      var id = this.of.isInstance(key) ? key.id : key;
+      var dao = this.joinDAO;
+      return this.delegate.find([this.obj.id, id]).then(function(obj) {
+        return obj !== null ? dao.find(id) : null;
+      });
     },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
 
-      return self.SUPER(self.MAP(self.junctionProperty)).then(function(map) {
-        return self.joinDAO.select(sink, skip, limit, order, self.AND(
-          predicate || self.TRUE,
-          self.IN(self.targetProperty, map.delegate.a)));
-      });
+      return self.SUPER(self.MAP(self.junctionProperty))
+          .then(function(map) {
+            return self.joinDAO.select(sink, skip, limit, order, self.AND(
+                predicate || self.TRUE,
+                self.IN(self.targetProperty, map.delegate.a)));
+          });
     }
   ]
 });
