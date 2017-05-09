@@ -242,8 +242,9 @@ var examples = [
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     platforms: { web: true },
     code: function async() {
-      var tsink = foam.dao.ArrayDAO.create();
-      foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
+      var tdao = foam.dao.ArrayDAO.create();
+      var tsink = foam.dao.DAOSink.create({ dao: tdao });
+      foam.u2.TableView.create({ of: app.Transaction, data: tdao }).write();
 
       // Start querying at the top, and produce a larger set of results
       //   to sub-query at each step
@@ -268,8 +269,9 @@ var examples = [
     dependencies: [ 'Load MLangs', 'Create Transactions' ],
     platforms: { web: true },
     code: function async() {
-      var tsink = foam.dao.ArrayDAO.create();
-      foam.u2.TableView.create({ of: app.Transaction, data: tsink }).write();
+      var tdao = foam.dao.ArrayDAO.create();
+      var tsink = foam.dao.DAOSink.create({ dao: tdao });
+      foam.u2.TableView.create({ of: app.Transaction, data: tdao }).write();
 
       // to store intermediate reuslts for matching customer IDs
       var customerIds = foam.dao.ArraySink.create();
