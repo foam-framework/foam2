@@ -499,6 +499,29 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+    axioms: [
+    {
+      installInClass: function(cls) {
+        console.log('sf')
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.EnumModel.create();
+
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
+          cls.values = this.VALUES;
+
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
+      }
+    }
   ]
 });
 
@@ -509,6 +532,29 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+    axioms: [
+    {
+      installInClass: function(cls) {
+        console.log('sdfa')
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.EnumModel.create();
+
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
+          cls.values = this.VALUES;
+
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
+      }
+    }
   ]
 });
 
@@ -519,6 +565,29 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+    axioms: [
+    {
+      installInClass: function(cls) {
+        cls.buildJavaClass =  function(cls) {
+          console.log('sfa')
+          cls = cls || foam.java.EnumModel.create();
+
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
+          cls.values = this.VALUES;
+
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
+      }
+    }
   ]
 });
 
