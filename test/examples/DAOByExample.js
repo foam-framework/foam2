@@ -161,7 +161,7 @@ var examples = [
       // Generate accounts for each customer. Select into an in-line
       // sink to process results as they come in.
       return app.customerDAO.select(foam.dao.QuickSink.create({
-        putFn: function(customer) {
+        putFn: function(_, customer) {
           // create accounts, add to accountDAO, save the promises for later
           // so we know all the puts have completed.
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
@@ -251,7 +251,7 @@ var examples = [
         .then(function(customer) {
           var transactionSelectPromises = [];
           return customer.accounts.select(foam.dao.QuickSink.create({
-            putFn: function(account) {
+            putFn: function(_, account) {
               // no route to return promise here, since Sink.put doesn't return a promise...
               transactionSelectPromises.push(account.transactions.select(tsink));
             }
