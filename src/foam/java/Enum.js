@@ -20,136 +20,118 @@ foam.CLASS({
   name: 'Enum',
   extends: 'foam.java.Class',
 
-  methods: [
-    function outputJava(o) {
-      function labelForValue(value) {
-        return '"' + value.label + '"';
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'isEnum',
+      value: true
+    },    
+    {
+      name: 'labelsOutput',
+      expression: function() {
+        var out = 'return new String[] { ';
+
+        for (var i = 0, value; value = this.values[i]; i++) {
+          out += this.labelForValue(value);
+          if (i < this.values.length - 1) out += ', ';
+        }
+
+        out += ' };';
+
+        return out;
       }
+    },    
+    {
+      name: 'forOrdinal',
+      expression: function() {
+        var out = 'switch (ordinal) {\n';
 
-      o.out('// DO NOT MODIFY BY HAND.\n');
-      o.out('// GENERATED CODE\n\n');
-      o.out('package ', this.package, ';\n\n');
+        for (var i = 0, value; value = this.values[i]; i++) {
+          out += '  case ' + value.ordinal + ': return ' + this.name + '.' + value.name + ';\n';
+        }
 
-      this.imports && this.imports.forEach(function(i) {
-        o.out(i, ';\n');
-      });
+        out += '}\nreturn null;';
 
-      o.out('\n');
-      o.out(this.visibility, ' ', this.static ? 'static ' : '');
-      o.out('enum ', this.name,' {\n');
+        return out;
+      }
+    },    
+    {
+      name: 'forLabel',
+      expression: function() {
+        var out = 'switch (label) {\n';
 
-      o.increaseIndent();
+        for (var i = 0, value; value = this.values[i]; i++) {
+          out += '  case ' + '"' + value.label + '"' + ': return ' + this.name + '.' + value.name + ';\n';
+        }
+
+        out += '}\nreturn null;';
+
+        return out;
+      }
+    },
+    {
+      name: 'methods',
+      factory: function() {
+        return [
+          {
+            name: this.name,
+            args: [ 
+                    { 
+                      name: 'ordinal', 
+                      type: 'int' 
+                    },
+                    { 
+                      name: 'label', 
+                      type: 'String' 
+                    },
+                  ],
+            body: 'ordinal_ = ordinal;\nlabel_ = label;'
+          },
+          {
+            name: 'forOrdinal',
+            type: this.name,
+            visibility: 'public',
+            static: true,
+            args: [ { name: 'ordinal', type: 'int' } ],
+            body: this.forOrdinal
+          },
+          {
+            name: 'forLabel',
+            type: this.name,
+            visibility: 'public',
+            static: true,
+            args: [ { name: 'label', type: 'String' } ],
+            body: this.forLabel
+          },
+          {
+            name: 'labels',
+            type: 'String[]',
+            visibility: 'public',
+            static: true,
+            body: this.labelsOutput
+          }
+        ]
+      }
+    }
+  ],
+
+  methods: [
+    function labelForValue(value) {
+        return '"' + value.label + '"';
+    },
+    function writeDeclarations(o) {
       o.indent();
 
       // Outputs declared enums
       for ( var i = 0 ; i < this.values.length ; i++ ) {
         var value = this.values[i];
-        o.out(value.name, '(', value.ordinal, ',', labelForValue(value),')');
+        o.out(value.name, '(', value.ordinal, ',', this.labelForValue(value),')');
         
-        if ( i == this.values.length - 1 ) { o.out(';')}
+        if ( i == this.values.length - 1 ) { o.out(';\n\n')}
         else {o.out(', ')}
       }
 
-      o.out('\n\n');
-      o.indent();
-      o.out('private final int ordinal_;\n');
-      o.indent();
-      o.out('private final String label_;\n');
-      o.out('\n');
-
-      // Constructor
-      o.indent();
-      o.out(this.name, '(int ordinal, String label) {\n');
-      o.increaseIndent();
-      o.indent();
-      o.out('ordinal_ = ordinal;\n');
-      o.indent();
-      o.out('label_ = label;\n');
-      o.decreaseIndent();
-      o.indent();
-      o.out('}');
-
-      o.out('\n\n');
-
-      // Getters
-      o.indent();
-      o.out('public int getOrdinal() { return ordinal_; }\n');
-      o.indent();
-      o.out('public String getLabel() { return label_; }');
-
-      o.out('\n\n');
-
-      // forOrdinal Function
-      o.indent();
-      o.out('public static ', this.name, ' forOrdinal(int ordinal) {\n');
-      o.increaseIndent();
-
-      o.indent();
-      o.out('switch (ordinal) {\n')
-      o.increaseIndent();
-      for (var i = 0, value; value = this.values[i]; i++) {
-        o.indent();
-        o.out('case ', value.ordinal, ': ')
-        o.out('return ', this.name, '.', value.name, ';\n');
-      }
-
-      forValueFunctionFooter();
-
-
-      // forLabel Function
-      o.indent();
-      o.out('public static ', this.name, ' forLabel(String label) {\n');
-      o.increaseIndent();
-
-      o.indent();
-      o.out('switch (label) {\n')
-      o.increaseIndent();
-      for (var i = 0, value; value = this.values[i]; i++) {
-        o.indent();
-        o.out('case ', '"' + value.label + '"', ': ')
-        o.out('return ', this.name, '.', value.name, ';\n');
-      }
-
-      forValueFunctionFooter();
-
-
-      function forValueFunctionFooter() {
-        o.decreaseIndent();
-        o.indent();
-        o.out('}\n\n');
-        o.indent();
-        o.out('return null;\n')
-        o.decreaseIndent();
-        o.indent();
-        o.out('}\n\n');
-      }
-      
-      
-      o.indent();
-      o.out('public static String[] labels() {\n');
-      o.increaseIndent();
-      o.indent();
-      o.out('return new String[] {\n');
-      o.increaseIndent();
-
-      for (var i = 0, value; value = this.values[i]; i++) {
-        o.indent();
-        o.out(labelForValue(value));
-        if (i < this.values.length - 1) o.out(',');
-        o.out('\n');
-      }
-
-      o.decreaseIndent();
-      o.indent();
-      o.out('};\n');
-      o.decreaseIndent();
-      o.indent();
-      o.out('}\n');
-
-      this.extras.forEach(function(c) { o.out(c, '\n'); });
-      o.decreaseIndent();
-      o.indent();
-      o.out('}');
+      this.out = o;
     }
   ]
 });
