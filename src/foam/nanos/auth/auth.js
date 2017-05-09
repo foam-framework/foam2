@@ -9,9 +9,11 @@ foam.CLASS({
   name: 'EnabledAware',
 
   properties: [
-    class: 'Boolean'
-    name: 'enabled',
-    value: true
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
+    }
   ]
 });
 
@@ -23,9 +25,11 @@ foam.CLASS({
   name: 'LastModifiedAware',
 
   properties: [
-    class: 'DateTime'
-    name: 'lastModified',
-    factory: function() { new Date(); }
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      factory: function() { new Date(); }
+    }
   ]
 });
 
@@ -37,8 +41,10 @@ foam.CLASS({
   name: 'LastModifiedByAware',
 
   properties: [
-    class: 'DateTime'
-    name: 'lastModifiedBy'
+    {
+      class: 'DateTime',
+      name: 'lastModifiedBy'
+    }
   ]
 });
 
@@ -68,7 +74,15 @@ foam.CLASS({
   documentation: '',
 
   properties: [
-    'id'
+    {
+      class: 'String',
+      name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'description',
+      documenation: 'Description of the Group.'
+    }
   ]
 });
 
@@ -195,7 +209,7 @@ foam.CLASS({
       label: 'Service Provider',
       name: 'spid',
       documentation: "User's service provider."
-    }
+    },
     {
       class: 'DateTime',
       name: 'lastLogin'
@@ -203,6 +217,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName'
+    },
+    {
+      class: 'String',
+      name: 'middleName'
     },
     {
       class: 'String',
