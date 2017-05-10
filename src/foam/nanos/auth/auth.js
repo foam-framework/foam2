@@ -92,7 +92,7 @@ foam.CLASS({
   name: 'Group',
 
   implements: [
-    'EnabledAware'
+    'foam.nanos.auth.EnabledAware'
   ],
 
   documentation: 'A Group of Users.',
@@ -128,8 +128,8 @@ foam.CLASS({
 
 foam.RELATIONSHIP({
   cardinality: '*:*',
-  sourceModel: 'net.nanopay.auth.Group',
-  targetModel: 'net.nanopay.b2b.Permission',
+  sourceModel: 'foam.nanos.auth.Group',
+  targetModel: 'foam.nanos.auth.Permission',
   forwardName: 'permissions',
   inverseName: 'groups',
   sourceProperty: {
@@ -190,9 +190,9 @@ foam.CLASS({
   name: 'User',
 
   implements: [
-    'EnabledAware',
-    'LastModifiedAware',
-    'LastModifiedByAware'
+    'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   documentation: '',
@@ -205,7 +205,8 @@ foam.CLASS({
       width: 100
     },
     {
-      class: 'SPID',
+      class: 'String',
+      // class: 'SPID',
       label: 'Service Provider',
       name: 'spid',
       documentation: "User's service provider."
@@ -235,19 +236,24 @@ foam.CLASS({
       name: 'department'
     },
     {
-      class: 'Email',
+      class: 'String',
+      // class: 'Email',
       name: 'email'
     },
     {
-      class: 'Phone',
+      class: 'String',
+      // class: 'Phone',
       name: 'phone'
     },
     {
-      class: 'Phone',
+      class: 'String',
+      // class: 'Phone',
       name: 'mobile'
     },
     {
-      class: 'Reference',
+      class: 'String',
+      name: 'language',
+//      class: 'Reference',
       of: 'Language',
       value: 'en'
     },
@@ -286,8 +292,8 @@ foam.CLASS({
 
 foam.RELATIONSHIP({
   cardinality: '*:*',
-  sourceModel: 'net.nanopay.auth.User',
-  targetModel: 'net.nanopay.b2b.Group',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.auth.Group',
   forwardName: 'groups',
   inverseName: 'users',
   sourceProperty: {
@@ -297,6 +303,7 @@ foam.RELATIONSHIP({
 
 
 // ???: Split into AuthSPI / AuthService ?
+/*
 foam.INTERFACE({
 
   interface AuthService {
@@ -321,7 +328,7 @@ foam.INTERFACE({
     throws IllegalStateException;
 
 }
-
+*/
 
 // TODO: create UserAndGroupAuthService
 // TODO: create CachingAuthService
