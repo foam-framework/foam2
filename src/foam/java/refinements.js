@@ -1,18 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -191,6 +180,7 @@ foam.LIB({
       });
 
       var axioms = this.getOwnAxioms();
+
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
@@ -483,6 +473,7 @@ foam.CLASS({
       if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
         var of = this.of.id;
+
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
       return info;
@@ -490,6 +481,42 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Enum',
+
+  properties: [
+    ['javaType', 'java.lang.Enum'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+  
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.Enum.create();
+
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
+          cls.values = this.VALUES;
+
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
@@ -500,7 +527,6 @@ foam.CLASS({
     ['javaJSONParser', 'foam.lib.json.DateParser']
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.core.Map',
