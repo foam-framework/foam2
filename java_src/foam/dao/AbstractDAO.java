@@ -74,4 +74,8 @@ public abstract class AbstractDAO
   public void listen() {
     // TODO
   }
+
+  public Sink select(Sink sink) {
+    return this.select(sink, 0, Integer.MAX_VALUE, null, null);
+  }
 }
