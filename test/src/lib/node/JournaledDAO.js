@@ -60,38 +60,19 @@ describe('JournaledDAO', function() {
     fs.unlink(filename, done);
   });
 
-  it('should persist to file', function(done) {
+  it('should populate a new arrayDao properly', function(done) {
 
-    inboundDAO
-    .select()
-    .then(function() {
-      fs.readFile(filename, 'utf8', function (err, data) {
-       if (err) {
-         return done(err);
-       }
-       var lines = data.split('\n').filter(Boolean);
-       expect(lines.length).toBe(50);
-       done();
-     });
-    });
-  });
-
-  it('should read from journaled file and populate arrayDao properly', function(done) {
+    var arrayDao = foam.dao.ArrayDAO.create({});
 
     foam.dao.JournaledDAO.create({
-      delegate: cars,
+      delegate: arrayDao,
       journal: foam.dao.NodeFileJournal.create({
         fd: fs.openSync(filename, 'r+')
       })
     })
-    .select({
-      put: function(sub, data) {
-        cars.put(data);
-      },
-      eof: eof
-    })
+    .select()
     .then(function() {
-      cars.select()
+      arrayDao.select()
       .then(function(cars) {
         cars.a.forEach(function(car, i) {
           expect(car.id).toBe(i);
@@ -100,7 +81,6 @@ describe('JournaledDAO', function() {
         done();
       });
     });
-
   });
 
 });
