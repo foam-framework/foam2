@@ -4,10 +4,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-FOAM.class({
+foam.CLASS({
   package: 'foam.nanos.test',
   name: 'Test',
-  extends: 'foam.nanos.script.Script'
+  extends: 'foam.nanos.script.Script',
 
   implements: [ 'foam.pattern.EnabledAware' ],
 
