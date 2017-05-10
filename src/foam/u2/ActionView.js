@@ -58,6 +58,10 @@ foam.CLASS({
         vertical-align: middle;
       }
 
+      ^material-icons {
+        cursor: pointer;
+      }
+
       ^:disabled { color: #bbb; -webkit-filter: grayscale(0.8); }
     */}})
   ],
@@ -72,6 +76,21 @@ foam.CLASS({
       class: 'URL',
       name: 'icon',
       factory: function(action) { return this.action.icon; }
+    },
+    {
+      class: 'String',
+      name: 'iconFontFamily',
+      factory: function(action) { return this.action.iconFontFamily; }
+    },
+    {
+      class: 'String',
+      name: 'iconFontClass',
+      factory: function(action) { return this.action.iconFontClass; }
+    },
+    {
+      class: 'String',
+      name: 'iconFontName',
+      factory: function(action) { return this.action.iconFontName; }
     },
     'data',
     'action',
@@ -92,9 +111,17 @@ foam.CLASS({
       if ( this.icon ) {
         // this.nodeName = 'a';
         this.start('img').attr('src', this.icon).end();
-      }
-      if ( this.showLabel )
+      } else if (this.iconFontName) {
+        this.nodeName = 'i';
+        this.cssClass(this.action.name);
+        this.cssClass(this.myClass(this.iconFontClass));
+        this.cssClass(this.iconFontClass); // required by font package
+        this.style({'font-family': this.iconFontFamily});
+        this.add(this.iconFontName);
+        this.setAttribute('title', this.action.name); // hover text
+      } else if ( this.showLabel ) {
         this.add(this.label$);
+      }
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
