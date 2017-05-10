@@ -1,0 +1,33 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+package foam.nanos.http;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
+import com.sun.net.httpserver.*;
+
+import foam.core.*;
+import foam.nanos.*;
+
+public class NanoHttpServer extends ContextAwareSupport implements NanoService {
+
+  protected HttpServer server_;
+  protected int port_ = 80;
+
+  public void start() {
+    try {
+      server_ = HttpServer.create(new InetSocketAddress(port_), 0);
+    } catch(IOException e) {
+       e.printStackTrace();
+    }
+
+    server_.createContext("/", new NanoHttpHandler(getX()));
+
+    server_.start();
+  }
+}
