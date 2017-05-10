@@ -93,12 +93,22 @@ var proxies = [
   'com.google.foam.demos.appengine.TestService'
 ];
 
-if ( process.argv.length != 3 ) {
-  console.log("USAGE: genjava.js output-path");
+
+if ( process.argv.length != 4 ) {
+  console.log("USAGE: genjava.js input-path output-path");
   process.exit(1);
 }
 
-var outdir = process.argv[2];
+var indir = process.argv[2];
+indir = require('path').resolve(require('path').normalize(indir));
+
+var externalFile = require(indir);
+var classes = externalFile.classes;
+var abstractClasses = externalFile.abstractClasses;
+var skeletons = externalFile.skeletons;
+var proxies = externalFile.proxies;
+
+var outdir = process.argv[3];
 outdir = require('path').resolve(require('path').normalize(outdir));
 
 function ensurePath(p) {
