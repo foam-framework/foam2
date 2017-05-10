@@ -21,8 +21,6 @@
  require('../src/foam.js');
 
  if ( process.argv.length != 4 ) {
-   console.log("hello here");
-   console.log(process.argv.length);
    console.log("USAGE: genjava.js input-path output-path");
    process.exit(1);
  }
