@@ -28,7 +28,10 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
-  requires: [ 'foam.dao.ArraySink' ],
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.dao.DAOSink'
+  ],
 
   properties: [
     {
@@ -227,7 +230,7 @@ foam.CLASS({
           promise:
             self.delegate.select(self.DAOSink.create({ dao: self.cache }), skip, limit, order, predicate)
               .then(function(cache) {
-                self.pub('on', 'reset');
+                //self.pub('on', 'reset'); //FIXME: triggering repeated/cyclic onDAOUpdate in caller.
                 return cache;
               })
         }
@@ -242,7 +245,7 @@ foam.CLASS({
       // wait on the pending cache update.
       return self.cache.select(this.COUNT(), skip, limit, order, predicate)
         .then(function(c) {
-          if ( c.count > 0 ) {
+          if ( c.value > 0 ) {
             return readFromCache();
           } else {
             return entry.promise.then(readFromCache);
