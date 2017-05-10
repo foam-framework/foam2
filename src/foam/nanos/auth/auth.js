@@ -251,10 +251,9 @@ foam.CLASS({
       name: 'mobile'
     },
     {
-      class: 'String',
+      class: 'Reference',
       name: 'language',
-//      class: 'Reference',
-      of: 'Language',
+      of: 'foam.nanos.auth.Language',
       value: 'en'
     },
     {
