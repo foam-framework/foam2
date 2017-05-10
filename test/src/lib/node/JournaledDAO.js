@@ -21,8 +21,6 @@ describe('JournaledDAO', function() {
   var fs = require('fs');
   var filename = 'journal_file.txt';
   var eof = function(){};
-  var inboundDAO;
-  var cars;
 
   beforeEach(function(done) {
 
@@ -34,6 +32,9 @@ describe('JournaledDAO', function() {
         { name: 'color' }
       ]
     });
+
+    var inboundDAO;
+    var cars;
 
     cars = foam.dao.ArrayDAO.create();
 
