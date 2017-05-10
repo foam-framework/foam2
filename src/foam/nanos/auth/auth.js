@@ -1,11 +1,19 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
-  package: 'foam.pattern', // ???: better package?
+  package: 'foam.nanos.auth',
   name: 'EnabledAware',
 
   properties: [
-    class: 'Boolean'
-    name: 'enabled',
-    value: true
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
+    }
   ]
 });
 
@@ -13,13 +21,15 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.pattern', // ???: better package?
+  package: 'foam.nanos.auth',
   name: 'LastModifiedAware',
 
   properties: [
-    class: 'DateTime'
-    name: 'lastModified',
-    factory: function() { new Date(); }
+    {
+      class: 'DateTime',
+      name: 'lastModified',
+      factory: function() { new Date(); }
+    }
   ]
 });
 
@@ -27,12 +37,14 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.pattern', // ???: better package?
+  package: 'foam.nanos.auth',
   name: 'LastModifiedByAware',
 
   properties: [
-    class: 'DateTime'
-    name: 'lastModifiedBy'
+    {
+      class: 'DateTime',
+      name: 'lastModifiedBy'
+    }
   ]
 });
 
@@ -62,7 +74,15 @@ foam.CLASS({
   documentation: '',
 
   properties: [
-    'id'
+    {
+      class: 'String',
+      name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'description',
+      documenation: 'Description of the Group.'
+    }
   ]
 });
 
@@ -72,7 +92,7 @@ foam.CLASS({
   name: 'Group',
 
   implements: [
-    'EnabledAware'
+    'foam.nanos.auth.EnabledAware'
   ],
 
   documentation: 'A Group of Users.',
@@ -108,8 +128,8 @@ foam.CLASS({
 
 foam.RELATIONSHIP({
   cardinality: '*:*',
-  sourceModel: 'net.nanopay.auth.Group',
-  targetModel: 'net.nanopay.b2b.Permission',
+  sourceModel: 'foam.nanos.auth.Group',
+  targetModel: 'foam.nanos.auth.Permission',
   forwardName: 'permissions',
   inverseName: 'groups',
   sourceProperty: {
@@ -170,9 +190,9 @@ foam.CLASS({
   name: 'User',
 
   implements: [
-    'EnabledAware',
-    'LastModifiedAware',
-    'LastModifiedByAware'
+    'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.LastModifiedAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   documentation: '',
@@ -185,11 +205,12 @@ foam.CLASS({
       width: 100
     },
     {
-      class: 'SPID',
+      class: 'String',
+      // class: 'SPID',
       label: 'Service Provider',
       name: 'spid',
       documentation: "User's service provider."
-    }
+    },
     {
       class: 'DateTime',
       name: 'lastLogin'
@@ -197,6 +218,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName'
+    },
+    {
+      class: 'String',
+      name: 'middleName'
     },
     {
       class: 'String',
@@ -211,20 +236,24 @@ foam.CLASS({
       name: 'department'
     },
     {
-      class: 'Email',
+      class: 'String',
+      // class: 'Email',
       name: 'email'
     },
     {
-      class: 'Phone',
+      class: 'String',
+      // class: 'Phone',
       name: 'phone'
     },
     {
-      class: 'Phone',
+      class: 'String',
+      // class: 'Phone',
       name: 'mobile'
     },
     {
       class: 'Reference',
-      of: 'Language',
+      name: 'language',
+      of: 'foam.nanos.auth.Language',
       value: 'en'
     },
     {
@@ -262,8 +291,8 @@ foam.CLASS({
 
 foam.RELATIONSHIP({
   cardinality: '*:*',
-  sourceModel: 'net.nanopay.auth.User',
-  targetModel: 'net.nanopay.b2b.Group',
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.auth.Group',
   forwardName: 'groups',
   inverseName: 'users',
   sourceProperty: {
@@ -273,6 +302,7 @@ foam.RELATIONSHIP({
 
 
 // ???: Split into AuthSPI / AuthService ?
+/*
 foam.INTERFACE({
 
   interface AuthService {
@@ -297,7 +327,7 @@ foam.INTERFACE({
     throws IllegalStateException;
 
 }
-
+*/
 
 // TODO: create UserAndGroupAuthService
 // TODO: create CachingAuthService
