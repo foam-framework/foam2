@@ -38,7 +38,7 @@ foam.CLASS({
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.static ? 'static ' : '',
-        this.type, ' ',
+        this.type ? this.type + ' ' : '',
         this.name, '(');
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
         o.out(this.args[i]);

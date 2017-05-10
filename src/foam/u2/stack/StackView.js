@@ -51,6 +51,10 @@ foam.CLASS({
 
         var view = s[0];
         var parent = s[1];
+
+
+        // Do a bit of a dance with the context, to ensure that exports from "parent"
+        // are available to "view"
         var X = parent ? this.__subSubContext__.createSubContext(parent) : this.__subSubContext__;
 
         return foam.u2.ViewSpec.createView(view, null, this, X);

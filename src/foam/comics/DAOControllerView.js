@@ -90,7 +90,7 @@ foam.CLASS({
     function onFindRelated() {
       var data = this.DAOController.create({
         data: this.data.relationship.targetDAO,
-        mode: this.DAOController.MODE_SELECT,
+        isSelecting: true,
         relationship: this.data.relationship
       });
 
