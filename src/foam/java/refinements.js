@@ -180,6 +180,7 @@ foam.LIB({
       });
 
       var axioms = this.getOwnAxioms();
+
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
@@ -472,6 +473,7 @@ foam.CLASS({
       if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
         var of = this.of.id;
+
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
       return info;
@@ -479,6 +481,42 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Enum',
+
+  properties: [
+    ['javaType', 'java.lang.Enum'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+  
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.Enum.create();
+
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
+          cls.values = this.VALUES;
+
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
@@ -489,7 +527,6 @@ foam.CLASS({
     ['javaJSONParser', 'foam.lib.json.DateParser']
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.core.Map',
