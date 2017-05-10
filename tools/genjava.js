@@ -66,7 +66,8 @@ var classes = [
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
   'foam.mlang.order.Comparator',
-  'foam.mlang.sink.Count'
+  'foam.mlang.sink.Count',
+  'foam.nanos.boot.NSpec'
 ];
 
 var abstractClasses = [
