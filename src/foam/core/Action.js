@@ -54,6 +54,20 @@ foam.CLASS({
       name: 'icon'
     },
     {
+      class: 'String',
+      name: 'iconFontFamily',
+      value: 'Material Icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontClass',
+      value: 'material-icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontName'
+    },
+    {
       class: 'Array',
       name: 'keyboardShortcuts'
     },
