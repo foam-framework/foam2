@@ -44,7 +44,6 @@ foam.CLASS({
     function find(key) {
       var id = foam.core.FObject.isInstance(key) ? key.id : key;
       var self = this;
-
       return self.junctionDAO.find(self.junctionKeyFactory(id)).then(function(a) {
         return a && self.delegate.find(id);
       });

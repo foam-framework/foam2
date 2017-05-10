@@ -315,7 +315,7 @@ foam.CLASS({
       if ( r < 0 ) {
         var l = s.left.gte(key, compare, nullNode);
         copy = s.clone();
-        copy.size = s.size - s.left.size + l.size,
+        copy.size = s.size - s.left.size + l.size;
         copy.left = l;
         return copy;
       }
@@ -323,7 +323,7 @@ foam.CLASS({
       if ( r > 0 ) return s.right.gte(key, compare, nullNode);
 
       copy = s.clone();
-      copy.size = s.size - s.left.size,
+      copy.size = s.size - s.left.size;
       copy.left = nullNode;
       return copy;
     },
@@ -358,7 +358,7 @@ foam.CLASS({
         return copy;
       }
 
-      if ( r < 0 ) return s.right.lte(key, compare, nullNode);
+      if ( r < 0 ) return s.left.lte(key, compare, nullNode);
 
       copy = s.clone();
       copy.size = s.size - s.right.size;

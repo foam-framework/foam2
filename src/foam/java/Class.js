@@ -65,6 +65,11 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'isEnum',
+      value: false
+    },
+    {
       name: 'extras',
       factory: function() { return []; }
     }
@@ -116,7 +121,9 @@ foam.CLASS({
 
       if ( ! this.anonymous ) {
         o.out(this.visibility, ' ', this.static ? 'static ' : '');
-        o.out(this.abstract ? 'abstract ' : '', 'class ', this.name);
+
+        o.out(this.abstract ? 'abstract ' : '');
+        o.out(this.isEnum ? 'enum ' : 'class ', this.name);
 
         if ( this.extends ) {
           o.out(' extends ', this.extends);
@@ -134,6 +141,8 @@ foam.CLASS({
       o.out(' {\n');
 
       o.increaseIndent();
+
+      if (this.isEnum) this.writeDeclarations(o);
 
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
