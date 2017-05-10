@@ -278,7 +278,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      final: true
+      final: true,
+      factory: function() {
+        return this.name;
+      }
     }
   ],
 
