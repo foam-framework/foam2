@@ -48,20 +48,17 @@ foam.CLASS({
       hidden: true
     },
     {
-      name: 'mode',
-      value: 'browse'
+      class: 'Boolean',
+      name: 'isSelecting',
+      documentation: "True if we are in a state where we're selecting an item from the DAO.  This enables the 'Add' button.",
+      value: false
     }
   ],
-
-  constants: {
-    MODE_SELECT: 'select'
-  },
 
   actions: [
     {
       name: 'create',
-      code: function() {
-      }
+      code: function() { }
     },
     {
       name: 'edit',
@@ -73,16 +70,15 @@ foam.CLASS({
     {
       name: 'findRelatedObject',
       label: 'Add',
-      isAvailable: function(relationship, mode) {
-        return !! ( relationship && relationship.junctionDAO ) && mode != this.MODE_SELECT;
+      isAvailable: function(relationship, isSelecting) {
+        return !! ( relationship && relationship.junctionDAO ) && ! isSelecting;
       },
-      code: function() {
-      }
+      code: function() { }
     },
     {
       name: 'addSelection',
       label: 'Add',
-      isAvailable: function(mode) { return mode == this.MODE_SELECT },
+      isAvailable: function(isSelecting) { return isSelecting; },
       code: function() {
         var self = this;
         this.relationship.add(this.selection).then(function() {
