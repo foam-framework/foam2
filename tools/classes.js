@@ -45,7 +45,13 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count',
-  'foam.nanos.boot.NSpec'
+  'foam.nanos.boot.NSpec',
+  'foam.nanos.auth.EnabledAware',
+  'foam.nanos.auth.Group',
+  'foam.nanos.auth.LastModifiedAware',
+  'foam.nanos.auth.LastModifiedByAware',
+  'foam.nanos.auth.Permission',
+  'foam.nanos.auth.User'
 ];
 
 var abstractClasses = [
