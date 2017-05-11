@@ -14,7 +14,7 @@ public class TestRunner
     DAO tests = (DAO) getX().get('TestDAO');
 
     tests.select(new AbstractSink() {
-      public void put(FObject o, Detachable sub) {
+      public void put(Detachable sub, FObject o) {
         Test test = (Test) o;
 
         // phase 2
