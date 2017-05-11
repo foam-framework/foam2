@@ -187,7 +187,7 @@ foam.CLASS({
 
       if ( localSink.put ) {
         for ( var i = 0; i < array.length; i++ ) {
-          localSink.put(null, array[i]);
+          localSink.put(array[i]);
         }
       }
       if ( localSink.eof ) localSink.eof();
