@@ -24,12 +24,12 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        },
-        {
           name: 'obj',
           javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
         }
       ]
     },
