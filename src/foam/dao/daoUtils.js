@@ -98,11 +98,20 @@ foam.CLASS({
   name: 'ArraySink',
   extends: 'foam.dao.AbstractSink',
 
+  imports: ['warn?'],
+
   properties: [
     {
       class: 'Array',
       name: 'array'
-    }
+    },
+    {
+      name: 'a',
+      getter: function() {
+        this.warn && this.warn('Use of deprecated ArraySink.a');
+        return this.array;
+      }
+    },
   ],
 
   methods: [
