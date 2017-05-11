@@ -95,18 +95,18 @@ foam.CLASS({
       this.add(child);
     },
 
-    function onDAOPut(_, __, ___, obj) {
+    function onDAOPut(_, __, obj) {
       this.daoPut(null, obj);
     },
 
-    function daoRemove(_, obj) {
+    function daoRemove(obj) {
       if ( this.rows_[obj.id] ) {
         this.removeChild(this.rows_[obj.id]);
         delete this.rows_[obj.id];
       }
     },
 
-    function onDAORemove(_, __, ___, obj) {
+    function onDAORemove(_, __, obj) {
       this.daoRemove(null, obj);
     },
 

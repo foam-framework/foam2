@@ -490,10 +490,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       this.reset();
     },
-    function remove(s, obj) {
+    function remove(obj, s) {
       this.reset();
     },
     function reset() {
@@ -1918,7 +1918,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW      
+      value: foam.u2.Visibility.RW
     }
   ],
 
