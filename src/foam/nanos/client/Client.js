@@ -63,8 +63,12 @@ foam.CLASS({
                 { parent: 'auth', id: 'users',       label: 'Users' },
                 { parent: 'auth', id: 'groups',      label: 'Groups' },
                 { parent: 'auth', id: 'permissions', label: 'Permissions' },
-                { parent: 'auth', id: 'lang',        label: 'Languages' },
-            //  { parent: 'admin', id: 'countries', label: 'Countries' },
+                { parent: 'auth', id: 'lang',        label: 'Languages', handler: {
+                    class: 'foam.nanos.menu.ViewMenu',
+                    view: { class: 'foam.u2.ListCreateController', dao: this.languageDAO } } },
+                { parent: 'admin', id: 'countries', label: 'Countries', handler: {
+                    class: 'foam.nanos.menu.ViewMenu',
+                    view: { class: 'foam.u2.ListCreateController', dao: this.countryDAO } } },
               { parent: 'admin', id: 'menus',     label: 'Menus' },
             { id: 'debug',    label: 'Debug' },
               { parent: 'debug', id: 'api',     label: 'API Reference' },
@@ -94,7 +98,8 @@ foam.CLASS({
         return this.createDAO({
           of: this.Language,
           testData: [
-            { code: 'en', label: 'English' }
+            { code: 'en', name: 'English' },
+            { code: 'fr', name: 'French' }
           ]
         });
       }
@@ -157,7 +162,7 @@ foam.CLASS({
 
   methods: [
     function createDAO(config) {
-      config.daoType = 'IDB';
+      config.daoType = 'MDAO'; // 'IDB';
       config.cache   = true;
 
       return this.EasyDAO.create(config);
