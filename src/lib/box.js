@@ -636,12 +636,12 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(_, obj) {
+    function put(obj) {
       this.box.send(this.DAOEvent.create({
         name: 'put', obj: obj
       }));
     },
-    function remove(_, obj) {
+    function remove(obj) {
       this.box.send(this.DAOEvent.create({
         name: 'remove', obj: obj
       }));
@@ -714,7 +714,7 @@ foam.CLASS({
           for ( var i = 0 ; i < items.length ; i++ ) {
             if ( detached ) break;
 
-            sink.put(sub, items[i]);
+            sink.put(items[i], sub);
           }
 
           sink.eof();

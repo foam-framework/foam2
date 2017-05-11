@@ -539,7 +539,7 @@ foam.CLASS({
             limit = Math.min(a.length, limit);
 
             for ( var i = skip; i < limit; i++ )
-              sink.put(null, a[i]);
+              sink.put(a[i]);
           } else {
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place
