@@ -490,10 +490,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       this.reset();
     },
-    function remove(s, obj) {
+    function remove(obj, s) {
       this.reset();
     },
     function reset() {

@@ -1139,7 +1139,7 @@ foam.CLASS({
   methods: [
     function f(o) { return this.arg1.f(o); },
 
-    function put(sub, o) { this.delegate.put(sub, this.f(o)); }
+    function put(o, sub) { this.delegate.put(this.f(o), sub); }
   ]
 });
 
@@ -1213,10 +1213,10 @@ foam.CLASS({
         this.groups[key] = group;
         this.groupKeys.push(key);
       }
-      group.put(sub, obj);
+      group.put(obj, sub);
     },
 
-    function put(sub, obj) {
+    function put(obj, sub) {
       var key = this.arg1.f(obj);
       if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
@@ -1583,7 +1583,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(sub, obj) {
+    function put(obj, sub) {
       if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
         this.value = this.arg1.f(obj);
       }
@@ -1611,7 +1611,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj) ) > 0) {
         this.value = this.arg1.f(obj);
       }
@@ -1639,7 +1639,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(sub, obj) { this.value += this.arg1.f(obj); }
+    function put(obj, sub) { this.value += this.arg1.f(obj); }
   ]
 });
 
