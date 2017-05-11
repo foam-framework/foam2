@@ -1103,6 +1103,14 @@ describe('NoSelectAllDAO', function() {
     });
   });
 
+  it('Forwards select() with a predicate and an order', function(done) {
+    dao.where(m.GT(test.CompA.A, 20)).orderBy(m.DESC(test.CompA.A)).select(sink).then(function(snk) {
+      expect(snk.array.length).toEqual(2);
+      expect(snk.array[0].a).toEqual(99);
+      done();
+    });
+  });
+
   it('Forwards select() with a limit', function(done) {
     dao.limit(2).select(sink).then(function(snk) {
       expect(snk.dao.array.length).toEqual(2);

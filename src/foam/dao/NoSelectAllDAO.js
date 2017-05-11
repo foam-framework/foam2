@@ -31,8 +31,8 @@ foam.CLASS({
   methods: [
     function select(sink, skip, limit, order, predicate) {
         if ( predicate &&
-             ( ! this.True.isInstance(predicate) &&
-               ! this.False.isInstance(predicate) ) ||
+             ( ( this.True && ( ! this.True.isInstance(predicate) ) ) &&
+               ( this.False && ( ! this.False.isInstance(predicate) ) ) ) ||
           ( foam.Number.isInstance(limit) && Number.isFinite(limit) && limit != 0 ) ||
           ( foam.Number.isInstance(skip) && Number.isFinite(skip) && skip != 0 ) ) {
         return this.delegate.select(sink, skip, limit, order, predicate);
