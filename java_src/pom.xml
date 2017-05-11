@@ -93,6 +93,9 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <excludes>
+                        <exclude>**/com/chrome/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
