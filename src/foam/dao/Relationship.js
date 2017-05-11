@@ -188,9 +188,12 @@ foam.CLASS({
         }
       } else { /* cardinality === '*.*' */
         if ( ! junction ) {
+          var name = this.junctionModel.substring(
+            this.junctionModel.lastIndexOf('.') + 1);
+          var id = this.package + '.' + name;
           foam.CLASS({
             package: this.package,
-            name: this.junctionModel.substring(this.junctionModel.lastIndexOf('.') + 1),
+            name: name,
             ids: [ 'sourceId', 'targetId' ],
             properties: [
               { name: 'sourceId', shortName: 's' },
