@@ -49,7 +49,7 @@ foam.CLASS({
           this.y *= s;
           var t = this.transform;
           t.scale(s, s);
-          x.transform(t.a, t.d, t.b, t.e, t.c, t.f);
+          x.transform(t.array, t.d, t.b, t.e, t.c, t.f);
           this.x = oldX;
           this.y = oldY;
         },

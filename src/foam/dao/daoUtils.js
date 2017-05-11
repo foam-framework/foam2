@@ -101,13 +101,13 @@ foam.CLASS({
   properties: [
     {
       class: 'Array',
-      name: 'a'
+      name: 'array'
     }
   ],
 
   methods: [
     function put(o, sub) {
-      this.a.push(o);
+      this.array.push(o);
     }
   ]
 });
