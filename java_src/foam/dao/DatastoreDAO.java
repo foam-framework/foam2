@@ -146,7 +146,7 @@ public class DatastoreDAO
         break;
       }
 
-      decorated.put(obj, sub);
+      decorated.put(sub, obj);
     }
 
     decorated.eof();
