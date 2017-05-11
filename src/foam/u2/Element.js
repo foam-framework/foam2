@@ -511,7 +511,7 @@ foam.CLASS({
           // Check if this is a stale render
           if ( self.batch !== batch ) return;
 
-          var objs = a.a;
+          var objs = a.array;
           self.cleanup();
           for ( var i = 0 ; i < objs.length ; i++ ) {
             self.addRow(objs[i]);

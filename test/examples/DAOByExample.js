@@ -214,7 +214,7 @@ var examples = [
       // Select 'chq' accounts first
       return app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
         .select().then(function(defaultArraySink) {
-          var accounts = defaultArraySink.a;
+          var accounts = defaultArraySink.array;
           for ( var i = 0; i < accounts.length; i++ ) {
             generateAccountChq(accounts[i]);
           }
@@ -224,7 +224,7 @@ var examples = [
         date = new Date(0);
         app.accountDAO.where(M.EQ(app.Account.TYPE, 'sav'))
           .select().then(function(defaultArraySink) {
-            var accounts = defaultArraySink.a;
+            var accounts = defaultArraySink.array;
             for ( var i = 0; i < accounts.length; i++ ) {
               generateAccountSav(accounts[i]);
             }
@@ -286,11 +286,11 @@ var examples = [
         .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
         .then(function() {
           return app.accountDAO // query matches for the array of customer IDs
-            .where(M.IN(app.Account.OWNER, customerIds.a))
+            .where(M.IN(app.Account.OWNER, customerIds.array))
             .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
             .then(function() {
                 return app.transactionDAO // query matches for list of accounts
-                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
+                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.array))
                   .select(tsink) // could dedup, but no duplicates in this case
             });
         });
