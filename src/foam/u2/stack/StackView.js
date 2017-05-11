@@ -47,6 +47,8 @@ foam.CLASS({
         this.add(this.Stack.BACK, this.Stack.FORWARD);
 
       this.add(this.slot(function(s) {
+        if ( ! s ) return this.E('span');
+
         var view = s[0];
         var parent = s[1];
 

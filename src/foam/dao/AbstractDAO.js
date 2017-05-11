@@ -152,10 +152,10 @@ foam.CLASS({
       sub.onDetach(this.on.sub(function(s, on, e, obj) {
         switch(e) {
           case 'put':
-            mySink.put(sub, obj);
+            mySink.put(obj, sub);
             break;
           case 'remove':
-            mySink.remove(sub, obj);
+            mySink.remove(obj, sub);
             break;
           case 'reset':
             mySink.reset(sub);

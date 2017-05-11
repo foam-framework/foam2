@@ -237,6 +237,7 @@ FOAM_FILES([
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
   { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
+  { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
   { name: "foam/parsers/html" },
   { name: "foam/parsers/HTMLLexer" }
 ]);

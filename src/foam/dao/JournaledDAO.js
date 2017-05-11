@@ -47,12 +47,12 @@ if ( foam.isServer ) {
       }
     ],
     methods: [
-      function put(_, obj) {
+      function put(obj) {
         this.write_(
           new Buffer("put(foam.json.parse(" +
                      foam.json.Storage.stringify(obj) + "));\n"));
       },
-      function remove(_, obj) {
+      function remove(obj) {
         this.write_(
           new Buffer("remove(foam.json.parse(" +
                      foam.json.Storage.stringify(obj) + "));\n"));

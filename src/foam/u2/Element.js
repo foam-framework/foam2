@@ -490,10 +490,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       this.reset();
     },
-    function remove(s, obj) {
+    function remove(obj, s) {
       this.reset();
     },
     function reset() {
@@ -774,6 +774,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'scrollHeight',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -794,6 +797,22 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function observeScrollHeight() {
+      // TODO: This should be handled by an onsub event when someone subscribes to
+      // scroll height changes.
+      var self = this;
+      this.onload.sub(function(s) {
+        s.detach();
+        var observer = new MutationObserver(function(mutations) {
+          self.scrollHeight = self.el().scrollHeight;
+        });
+        var config = { attributes: true, childList: true, characterData: true };
+        observer.observe(self.el(), config);
+        self.onDetach(function() { observer.disconnect() });
+      });
+      return this;
     },
 
     function evtToCharCode(evt) {
@@ -1919,7 +1938,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW      
+      value: foam.u2.Visibility.RW
     }
   ],
 

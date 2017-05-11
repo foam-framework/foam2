@@ -95,7 +95,7 @@ foam.CLASS({
     {
       name: 'size',
       assertValue: function(value) {
-        foam.assert(this.offset + value < this.parent.size, 'Cannot create sub blob beyond end of parent.');
+        foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
       }
     }
   ],
@@ -299,12 +299,14 @@ foam.CLASS({
   methods: [
     function setup() {
       if ( this.isSet ) return;
-      var root = require('fs').statSync(this.root);
 
-      if ( ! root.isDirectory() ) {
-        throw new Error('Blob storage root is not a directory.');
+      var parsed = require('path').parse(this.root);
+
+      if ( ! require('fs').statSync(parsed.dir).isDirectory() ) {
+        throw new Error(parsed.dir + ' is not a directory.');
       }
 
+      this.ensureDir(this.root);
       this.ensureDir(this.tmp);
       this.ensureDir(this.sha256);
 
@@ -312,11 +314,16 @@ foam.CLASS({
     },
 
     function ensureDir(path) {
-      // TODO: Create all necessary parent directories.
-      var stat = require('fs').statSync(path);
-      if ( stat && stat.isDirectory() ) return;
+      var stat;
 
-      require('fs').mkdirSync(path);
+      try {
+        stat = require('fs').statSync(path);
+        if ( stat && stat.isDirectory() ) return;
+      } catch(e) {
+        if ( e.code === 'ENOENT' ) return require('fs').mkdirSync(path);
+
+        throw e;
+      }
     },
 
     function allocateTmp() {
@@ -341,6 +348,7 @@ foam.CLASS({
     },
 
     function put(obj) {
+      this.setup();
       // This process could probably be sped up a bit by
       // requesting chunks of the incoming blob in advance,
       // currently we wait until they're put into the write-stream's
@@ -408,6 +416,7 @@ foam.CLASS({
     },
 
     function find(id) {
+      this.setup();
       if ( id.indexOf(require('path').sep) != -1 ) {
         return Promise.reject(new Error("Invalid file name"));
       }
