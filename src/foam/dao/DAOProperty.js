@@ -27,7 +27,7 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: {class: 'foam.comics.InlineDAOControllerView'},
+      value: {class: 'foam.comics.InlineBrowserView'},
     }
   ],
 

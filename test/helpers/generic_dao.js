@@ -323,7 +323,7 @@ global.genericDAOTestBattery = function(daoFactory) {
           var eofCalled = false;
           var seen = {};
           var sink = {
-            put: function(_, o) {
+            put: function(o) {
               expect(o).toBeDefined();
               expect(seen[o.id]).toBeUndefined();
               seen[o.id] = true;

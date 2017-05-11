@@ -92,7 +92,7 @@ foam.CLASS({
         .orderBy(this.DESC(self.LRUCacheItem.TIMESTAMP))
         .skip(self.maxSize)
         .select({
-          put: function(_, obj) {
+          put: function(obj) {
             self.dao.remove(obj);
           }
         });
