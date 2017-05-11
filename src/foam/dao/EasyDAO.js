@@ -33,7 +33,7 @@ foam.CLASS({
   requires: [
     'foam.dao.MDAO',
     'foam.dao.JournaledDAO',
-    'foam.dao.GUIDDAO',
+    'foam.dao.GUIDDAODecorator',
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
     'foam.dao.CachingDAO',
@@ -286,12 +286,6 @@ foam.CLASS({
         dao = this.SequenceNumberDAO.create(args);
       }
 
-      if ( this.guid ) {
-        var args = {__proto__: params, delegate: dao, of: this.of};
-        if ( this.seqProperty ) args.property = this.seqProperty;
-        dao = this.GUIDDAO.create(args);
-      }
-
       var cls = this.of;
 
       if ( this.syncWithServer && this.isServer ) throw "isServer and syncWithServer are mutually exclusive.";
@@ -337,10 +331,17 @@ foam.CLASS({
         dao = this.ContextualizingDAO.create({delegate: dao});
       }
 
-      if ( this.decorators.length ) {
+      var decorators = this.decorators.slice();
+      if ( this.guid ) {
+        var args = {__proto__: params, delegate: dao, of: this.of};
+        if ( this.seqProperty ) args.property = this.seqProperty;
+        decorators.unshift(this.GUIDDAODecorator.create(args));
+      }
+
+      if ( decorators.length ) {
         var decorated = this.DecoratedDAO.create({
           decorator: this.CompoundDAODecorator.create({
-            decorators: this.decorators
+            decorators: decorators
           }),
           delegate: dao
         });
