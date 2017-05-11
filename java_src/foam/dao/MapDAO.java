@@ -66,7 +66,7 @@ public class MapDAO
     for ( FObject obj : getData().values() ) {
       if ( sub.getDetached() ) break;
 
-      decorated.put(obj, sub);
+      decorated.put(sub, obj);
     }
 
     decorated.eof();
