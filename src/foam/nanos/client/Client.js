@@ -12,6 +12,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.EasyDAO',
+    'foam.nanos.boot.NSpec',
     'foam.nanos.menu.Menu',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
@@ -23,6 +24,7 @@ foam.CLASS({
 
   exports: [
     'menuDAO',
+    'nSpecDAO',
     'userDAO',
     'groupDAO',
     'languageDAO',
@@ -32,6 +34,19 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      name: 'nSpecDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.User,
+          seqNo: true,
+          testData: [
+            { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' }
+          ]
+        });
+      }
+    },
+
     {
       name: 'menuDAO',
       factory: function() {
@@ -43,6 +58,7 @@ foam.CLASS({
             // { id: 'expenses', label: 'Expenses' },
             // { id: 'settings', label: 'Settings' },
             { id: 'admin',    label: 'Admin' },
+              { parent: 'admin', id: 'nspec', label: 'Nano Services' },
               { parent: 'admin', id: 'auth', label: 'Authentication' },
                 { parent: 'auth', id: 'users',       label: 'Users' },
                 { parent: 'auth', id: 'groups',      label: 'Groups' },
