@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'ReferenceView',
   extends: 'foam.u2.view.ChoiceView',
 
+  imports: [
+    'data as parentObj',
+  ],
+
   properties: [
     {
       name: 'objToChoice',
@@ -34,6 +38,7 @@ foam.CLASS({
 
   methods: [
     function fromProperty(prop) {
+      this.SUPER(prop);
       if ( ! this.hasOwnProperty('objToChoice') ) {
         var of = prop.of;
 
@@ -58,7 +63,7 @@ foam.CLASS({
         }
       }
 
-      var dao = this.__context__[prop.targetDAOKey];
+      var dao = this.parentObj.__context__[prop.targetDAOKey];
       this.dao = dao;
     }
   ]

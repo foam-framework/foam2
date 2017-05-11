@@ -175,6 +175,7 @@ foam.CLASS({
         alwaysFloatLabel: this.alwaysFloatLabel,
         choices$: this.choices$,
         placeholder$: this.placeholder$,
+        mode$: this.mode$,
         size: this.size
       }).end();
 
@@ -212,6 +213,7 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
+      this.SUPER(p);
       this.defaultValue = p.value;
     }
   ],
