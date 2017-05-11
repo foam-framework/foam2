@@ -1,5 +1,5 @@
 PM:
-Records inforamtion and is sent to PMLogger
+Records information and is sent to PMLogger
 class PM {
     PM(this.class, name) -> marks down time
     getName() -> returns name
@@ -13,10 +13,10 @@ class PM {
 
 
 PMInfo:
-A collection of data that is accessed through the PMDao
+A collection of data that is accessed through the PMDAO
 records ->
     the class, and name associated with the PM
-    number of occurences
+    count (number of occurrences)
     maximum time
     minimum time
     average time
@@ -25,11 +25,14 @@ records ->
 
 Interface PMLogger:
 class PMLogger {
-    Log(PM) -> attmepts to find a PMInfo in the PMDao, if it finds it, it will update it, if it can't it will create a new one.
+    log(PM) -> attempts to find a PMInfo in the PMDAO, if it finds it, it will update it, if it can't it will create a new one.
 }
 
-Log(PM) will need to be implemented, for example a DAOPMLogger will take the PM, and use the PMDao to update a PMInfo
+log(PM) will need to be implemented, for example a DAOPMLogger will take the PM, and use the PMInfoDAO to update a PMInfo
 
 
-PMDao:
+PMInfoDAO:
 Provides an interface to the PMInfo database for reading and writing
+
+PMDAO
+Decorate DAO interface to add PM LoggingDAO
