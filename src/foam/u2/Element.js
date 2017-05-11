@@ -800,6 +800,8 @@ foam.CLASS({
     },
 
     function observeScrollHeight() {
+      // TODO: This should be handled by an onsub event when someone subscribes to
+      // scroll height changes.
       var self = this;
       this.onload.sub(function(s) {
         s.detach();
@@ -1936,7 +1938,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW      
+      value: foam.u2.Visibility.RW
     }
   ],
 
