@@ -93,11 +93,11 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(sub, obj);'
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().put(obj, sub);'
     },
     {
       name: 'remove',
-      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(sub, obj);'
+      javaCode: 'if ( getPredicate().f(obj) ) getDelegate().remove(obj, sub);'
     }
   ]
 });
@@ -113,7 +113,7 @@ foam.CLASS({
               + '  sub.detach();\n'
               + '} else {\n'
               + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(sub, obj);\n'
+              + '  getDelegate().put(obj, sub);\n'
               + '}\n'
     },
     {
@@ -122,7 +122,7 @@ foam.CLASS({
               + '  sub.detach();\n'
               + '} else {'
               + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(sub, obj);\n'
+              + '  getDelegate().put(obj, sub);\n'
               + '}\n'
     }
   ]
@@ -138,7 +138,7 @@ foam.CLASS({
               + '  setCount(getCount() + 1);\n'
               + '  return;'
               + '}\n'
-              + 'getDelegate().put(sub, obj);'
+              + 'getDelegate().put(obj, sub);'
     },
     {
       name: 'remove',
@@ -170,7 +170,7 @@ foam.CLASS({
                 + '  if ( sub.getDetached() ) {\n'
                 + '    break;\n'
                 + '  }\n'
-                + '  getDelegate().put(sub, (foam.core.FObject)o);\n'
+                + '  getDelegate().put((foam.core.FObject)o, sub);\n'
                 + '}'
     }
   ]
