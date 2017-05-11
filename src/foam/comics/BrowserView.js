@@ -17,30 +17,29 @@
 
 foam.CLASS({
   package: 'foam.comics',
-  name: 'RelationshipDAOAddControllerView',
-  extends: 'foam.comics.DAOControllerView',
+  name: 'BrowserView',
+  extends: 'foam.u2.View',
   requires: [
-    'foam.comics.RelationshipDAOAddController',
+    'foam.comics.DAOController',
+    'foam.comics.DAOControllerView'
+  ],
+  exports: [
+    'controller as data'
   ],
   properties: [
     {
+      name: 'data',
+    },
+    {
       name: 'controller',
-      factory: function() {
-        var controller = this.RelationshipDAOAddController.create();
-        this.onDetach(controller.relationshipDAO$.follow(this.data$));
-        return controller;
+      expression: function(data) {
+        return this.DAOController.create({ data: data });
       }
     }
   ],
   methods: [
-    function editRecord(obj) {
-      this.controller.selection = obj;
-    },
     function initE() {
-      this.startContext({ data: this.controller }).
-        add(this.RelationshipDAOAddController.FILTERED_DAO,
-            this.RelationshipDAOAddController.ADD).
-        endContext();
+      this.tag(this.DAOControllerView);
     }
   ]
 });

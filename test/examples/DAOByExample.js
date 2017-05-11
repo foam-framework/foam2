@@ -164,8 +164,8 @@ var examples = [
         putFn: function(_, customer) {
           // create accounts, add to accountDAO, save the promises for later
           // so we know all the puts have completed.
-          accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
-          accountPuts.push(customer.accounts.put(app.Account.create({ type: 'sav' })));
+          accountPuts.push(customer.accounts.dao.put(app.Account.create({ type: 'chq' })));
+          accountPuts.push(customer.accounts.dao.put(app.Account.create({ type: 'sav' })));
         }
       })).then(function() {
         return Promise.all(accountPuts);
@@ -188,7 +188,7 @@ var examples = [
       function generateAccountChq(account) {
         for ( var j = 0; j < 10; j++ ) {
           date.setDate(date.getDate() + 1);
-          transactionPuts.push(account.transactions.put(app.Transaction.create({
+          transactionPuts.push(account.transactions.dao.put(app.Transaction.create({
             date: new Date(date),
             label: 'x'+amount+'x',
             amount: ((amount += 0.25) % 20) - 5 + (amount % 2) * 5
@@ -198,7 +198,7 @@ var examples = [
       function generateAccountSav(account) {
         for ( var j = 0; j < 5; j++ ) {
           date.setDate(date.getDate() + 2.5);
-          transactionPuts.push(account.transactions.put(app.Transaction.create({
+          transactionPuts.push(account.transactions.dao.put(app.Transaction.create({
             date: new Date(date),
             label: 's'+amount+'s',
             amount: ((amount += 1.5) % 50) + (amount % 4) * 5
