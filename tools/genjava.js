@@ -64,7 +64,7 @@ function generateClass(cls) {
     cls = foam.lookup(cls);
 
   var outfile = outdir + require('path').sep +
-  cls.id.replace(/\./g, require('path').sep) + '.java';
+    cls.id.replace(/\./g, require('path').sep) + '.java';
 
   ensurePath(outfile);
 
@@ -75,7 +75,7 @@ function generateAbstractClass(cls) {
   cls = foam.lookup(cls);
 
   var outfile = outdir + require('path').sep +
-  cls.id.replace(/\./g, require('path').sep) + '.java';
+    cls.id.replace(/\./g, require('path').sep) + '.java';
 
   ensurePath(outfile);
 
@@ -120,9 +120,9 @@ function generateProxy(intf) {
         name: 'delegate'
       }
     ]
- });
+  });
 
- generateClass(proxy.buildClass());
+  generateClass(proxy.buildClass());
 }
 
 classes.forEach(loadClass);
