@@ -34,7 +34,7 @@
       function init() {
         var ic1 = this.InnerClass1.create({a:1, b:2});
         var ic2 = this.InnerClass2.create({x:5, y:10});
-        log(ic1.a, ic1.b, ic2.x, ic2.y);
+        log(ic1.array, ic1.b, ic2.x, ic2.y);
       }
     ]
   });
