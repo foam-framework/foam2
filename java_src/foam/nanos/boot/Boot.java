@@ -21,7 +21,7 @@ public class Boot {
     ((MapDAO) serviceDAO_).setOf(NSpec.getOwnClassInfo());
 
     ((AbstractDAO) serviceDAO_).select(new AbstractSink() {
-      public void put(FObject obj, Detachable sub) {
+      public void put(Detachable sub, FObject obj) {
         NSpec sp = (NSpec) obj;
         System.out.println("NSpec: " + sp.getName());
 
