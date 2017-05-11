@@ -190,7 +190,7 @@ foam.CLASS({
                 on('click', function() {
                   view.selection = obj;
                   if ( view.importSelection$ ) view.importSelection = obj;
-                  if ( view.editRecord ) view.editRecord(obj);
+                  if ( view.editRecord$ ) view.editRecord(obj);
                 }).
                 addClass(this.slot(function(selection) {
                   if ( obj === selection ) return view.myClass('selected');

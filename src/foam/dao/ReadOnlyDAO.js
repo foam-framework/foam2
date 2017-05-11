@@ -1,7 +1,6 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +16,19 @@
  */
 
 foam.CLASS({
-  package: 'foam.comics',
-  name: 'RelationshipDAOController',
-  extends: 'foam.comics.DAOController',
-  requires: [
-    'foam.comics.RelationshipDAOAddControllerView'
-  ],
-  actions: [
-    {
-      name: 'add',
-      code: function() {
-        this.stack.push({
-          class: 'foam.comics.RelationshipDAOAddControllerView',
-          data: this.data
-        });
-      }
-    }
+  package: 'foam.dao',
+  name: 'ReadOnlyDAO',
+  extends: 'foam.dao.ProxyDAO',
+  documentation: 'DAO decorator that throws errors on put and remove.',
+  methods: [
+    function put() {
+      return Promise.reject('Cannot put into ReadOnlyDAO');
+    },
+    function remove() {
+      return Promise.reject('Cannot remove from ReadOnlyDAO');
+    },
+    function removeAll() {
+      return Promise.reject('Cannot removeAll from ReadOnlyDAO');
+    },
   ]
 });

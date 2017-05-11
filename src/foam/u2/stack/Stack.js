@@ -62,12 +62,17 @@ foam.CLASS({
       return i < 0 ? this.stack_[this.pos + i + 1] : this.stack_[i];
     },
 
-    function push(v) {
+    function push(v, parent) {
+      // "parent" is the parent object for this view spec.  A view of this stack
+      // should ensure that the context that "v" is rendered in extends from
+      // both the u2.Element is it being rendered under, and from the "parent"
+      // parameter.  This way views on the stack can export values to views
+      // that get rendered after them.
       var pos = this.pos + 1;
 
       this.depth = pos + 1;
       this.stack_.length = this.depth;
-      this.stack_[pos] = v;
+      this.stack_[pos] = [v, parent];
       this.pos = pos;
     }
   ],
