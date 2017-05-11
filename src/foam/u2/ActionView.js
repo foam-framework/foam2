@@ -20,7 +20,14 @@ foam.CLASS({
   name: 'ActionView',
   extends: 'foam.u2.Element',
 
-  documentation: 'A button View for triggering Actions.',
+  documentation: function() {/*
+    A button View for triggering Actions.
+
+    Icon Fonts
+    If using icon-fonts a css stylesheet link to the fonts is required in index.html.
+    The default of foam.core.Action.js is 'Material Icons' supported by the following
+    link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+  */},
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
@@ -58,7 +65,7 @@ foam.CLASS({
         vertical-align: middle;
       }
 
-      ^material-icons {
+      ^.material-icons {
         cursor: pointer;
       }
 
@@ -114,11 +121,10 @@ foam.CLASS({
       } else if (this.iconFontName) {
         this.nodeName = 'i';
         this.cssClass(this.action.name);
-        this.cssClass(this.myClass(this.iconFontClass));
         this.cssClass(this.iconFontClass); // required by font package
         this.style({'font-family': this.iconFontFamily});
         this.add(this.iconFontName);
-        this.setAttribute('title', this.action.name); // hover text
+        this.setAttribute('title', this.action.speechLabel); // hover text
       } else if ( this.showLabel ) {
         this.add(this.label$);
       }
