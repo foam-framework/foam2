@@ -109,8 +109,8 @@ foam.CLASS({
       if ( this.anonymous ) {
         o.out('new ', this.extends, '()');
       } else if ( ! this.innerClass ) {
-        o.out('// DO NOT MODIFY BY HAND.\n');
-        o.out('// GENERATED CODE (adamvy@google.com)\n');
+        o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
+        
         o.out('package ', this.package, ';\n\n');
 
         this.imports && this.imports.forEach(function(i) {
