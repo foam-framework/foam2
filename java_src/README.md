@@ -1,1 +1,1 @@
-Compile with: ./gen.sh; mvn compile
+Compile with: ./gen.sh; mvn compile; mvn package
