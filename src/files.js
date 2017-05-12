@@ -92,6 +92,7 @@ FOAM_FILES([
   { name: "foam/nanos/log/LogLevel" },
   { name: "foam/nanos/log/Logger" },
   { name: "foam/nanos/log/ConsoleLogger" },
+  { name: "foam/nanos/auth/EnabledAwareDAO" },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Element" },

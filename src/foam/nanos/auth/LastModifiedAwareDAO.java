@@ -11,7 +11,7 @@ import foam.core.*;
 import foam.nanos.auth.LastModifiedAware;
 import java.time.LocalDateTime;
 
-public abstract class LastModifiedAwareDAO
+public class LastModifiedAwareDAO
   extends ProxyDAO
   implements DAO, LastModifiedAware
 {
