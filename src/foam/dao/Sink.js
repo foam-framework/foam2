@@ -257,7 +257,7 @@ foam.CLASS({
       name: 'put',
       code: function put(obj, sub) {
         if ( this.count++ >= this.limit ) {
-          sub.detach();
+          sub && sub.detach();
         } else {
           this.delegate.put(obj, sub);
         }
@@ -267,7 +267,7 @@ foam.CLASS({
       name: 'remove',
       code: function remove(obj, sub) {
         if ( this.count++ >= this.limit ) {
-          sub.detach();
+          sub && sub.detach();
         } else {
           this.delegate.remove(obj, sub);
         }
