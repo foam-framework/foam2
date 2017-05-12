@@ -21,6 +21,7 @@
   var isWorker = typeof importScripts !== 'undefined';
 
   var flags    = this.FOAM_FLAGS || {};
+  flags.js     = true;
   flags.web    = ! isServer,
   flags.node   = isServer;
   flags.loader = ! isServer;
