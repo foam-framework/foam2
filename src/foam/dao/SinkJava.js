@@ -24,12 +24,12 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
-          name: 'sub',
-          javaType: 'foam.core.Detachable'
-        },
-        {
           name: 'obj',
           javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
         }
       ]
     },
@@ -38,13 +38,13 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
           name: 'sub',
           javaType: 'foam.core.Detachable'
         },
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
       ]
     },
     {
@@ -146,7 +146,7 @@ foam.CLASS({
               + '  setCount(getCount() + 1);\n'
               + '  return;'
               + '}\n'
-              + 'getDelegate().remove(sub, obj);'
+              + 'getDelegate().remove(obj, sub);'
     }
   ]
 });
