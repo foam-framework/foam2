@@ -241,7 +241,7 @@ foam.CLASS({
           var insertAfter = head;
           // TODO: refactor with insertAfter as a property of a new class?
           insertPlanSink = foam.dao.QuickSink.create({
-            putFn: function(_, o) {
+            putFn: function(o) {
               function insert() {
                 var nu = Object.create(NodeProto);
                 nu.next = insertAfter.next;
@@ -311,7 +311,7 @@ foam.CLASS({
         //  overflow of skip+limit
         var node = head.next;
         while ( node && ! detached ) {
-          resultSink.put(sub, node.data);
+          resultSink.put(node.data, sub);
           node = node.next;
         }
       }

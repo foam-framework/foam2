@@ -69,6 +69,11 @@ foam.LIB({
       // initArgs() is the standard argument extraction method.
       obj.initArgs(args, opt_parent);
 
+      var axioms = this.getInitAgents();
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
+        axioms[i].initObject(obj);
+      }
+
       // init() is called when object is created.
       // This is where class-specific initialization code should
       // be put (not in initArgs).
@@ -277,6 +282,17 @@ foam.LIB({
         this.private_.axiomCache[''] = as;
       }
       return as;
+    },
+
+    function getInitAgents() {
+      if ( ! this.private_.initAgentsCache ) {
+        this.private_.initAgentsCache = [];
+        for ( var key in this.axiomMap_ ) {
+          var axiom = this.axiomMap_[key];
+          if (axiom.initObject) this.private_.initAgentsCache.push(axiom);
+        }
+      }
+      return this.private_.initAgentsCache;
     },
 
     // NOP, is replaced if debug.js is loaded
@@ -959,6 +975,12 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
+    },
+
+    function dot(name) {
+      // Behaves just like Slot.dot().  Makes it easy for creating sub-slots
+      // without worrying if you're holding an FObject or a slot.
+      return this[name + '$'];
     }
   ]
 });

@@ -1,95 +1,30 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 // enable FOAM java support.
 global.FOAM_FLAGS = { 'java': true, 'debug': true };
 
 require('../src/foam.js');
+require('../src/foam/nanos/nanos.js');
 
-var classes = [
-  'foam.core.Serializable',
-  'foam.mlang.predicate.Predicate',
-  'foam.mlang.predicate.True',
-  'foam.mlang.predicate.False',
-  'foam.mlang.predicate.And',
-  'foam.mlang.predicate.Gt',
-  'foam.mlang.predicate.Or',
-  'foam.mlang.predicate.AbstractPredicate',
-  'foam.mlang.predicate.Nary',
-  'foam.mlang.predicate.Unary',
-  'foam.mlang.predicate.Binary',
-  'foam.mlang.predicate.Contains',
-  'foam.mlang.predicate.StartsWithIC',
-  'foam.mlang.predicate.Gt',
-  'foam.mlang.predicate.Gte',
-  'foam.mlang.predicate.Lt',
-  'foam.mlang.predicate.Lte',
-  'foam.mlang.Expr',
-  'foam.mlang.AbstractExpr',
-  'foam.mlang.predicate.Eq',
-  'foam.mlang.Constant',
-  'foam.box.Box',
-  'foam.box.ProxyBox',
-  'foam.box.SubBox',
-  'foam.box.Message',
-  'foam.box.SubBoxMessage',
-  'foam.box.SubscribeMessage',
-  'com.google.foam.demos.appengine.TestModel',
-  'foam.box.HTTPReplyBox',
-  'com.google.foam.demos.appengine.TestService',
-  'com.google.foam.demos.heroes.Hero',
-  'com.google.auth.TokenVerifier',
-  'foam.box.RPCMessage',
-  'foam.box.RPCReturnMessage',
-  'foam.box.BoxRegistry',
-  'foam.box.BoxRegistryBox',
-  'foam.box.CheckAuthenticationBox',
-  'foam.dao.DAO',
-  'foam.dao.Sink',
-  'foam.dao.AbstractSink',
-  'foam.dao.PredicatedSink',
-  'foam.dao.OrderedSink',
-  'foam.dao.LimitedSink',
-  'foam.dao.SkipSink',
-  'foam.mlang.order.Comparator',
-  'foam.mlang.sink.Count'
-];
-
-var abstractClasses = [
-//  'foam.json.Outputer'
-];
-
-var skeletons = [
-  'com.google.foam.demos.appengine.TestService',
-  'foam.dao.DAO'
-];
-
-var proxies = [
-  'foam.dao.DAO',
-  'foam.dao.Sink',
-  'com.google.foam.demos.appengine.TestService'
-];
-
-if ( process.argv.length != 3 ) {
-  console.log("USAGE: genjava.js output-path");
+if ( process.argv.length != 4 ) {
+  console.log("USAGE: genjava.js input-path output-path");
   process.exit(1);
 }
 
-var outdir = process.argv[2];
+var indir = process.argv[2];
+indir = require('path').resolve(require('path').normalize(indir));
+
+var externalFile = require(indir);
+var classes = externalFile.classes;
+var abstractClasses = externalFile.abstractClasses;
+var skeletons = externalFile.skeletons;
+var proxies = externalFile.proxies;
+
+var outdir = process.argv[3];
 outdir = require('path').resolve(require('path').normalize(outdir));
 
 function ensurePath(p) {

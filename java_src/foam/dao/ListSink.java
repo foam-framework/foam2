@@ -12,7 +12,7 @@ public class ListSink
     return data_;
   }
 
-  public void put(foam.core.Detachable sub, foam.core.FObject obj) {
+  public void put(foam.core.FObject obj, foam.core.Detachable sub) {
     getData().add(obj);
   }
 
