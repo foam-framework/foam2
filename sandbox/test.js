@@ -29,10 +29,10 @@ dao.select().then(function(array) {
   console.error("Error event", e);
 });
 
-dao.on.put.sub(function(s, _, __, obj) {
+dao.on.put.sub(function(s, _, obj) {
   console.log("On put", obj.id, obj.phone);
 });
-dao.on.remove.sub(function(s, _, __, obj) {
+dao.on.remove.sub(function(s, _, obj) {
   console.log("On remove", obj.id, obj.phone);
 });
 dao.on.reset.sub(function() {

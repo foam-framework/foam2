@@ -20,30 +20,19 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateController',
 
-  imports: [
-    'stack'
-  ],
-
-  exports: [
-    'data'
+  topics: [
+    'finished'
   ],
 
   properties: [
     {
-      name: 'dao',
-      hidden: true,
-      required: true
+      name: 'dao'
     },
     {
       name: 'data',
-      label: '',
-      view: function(args, X) {
-        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.dao.of }, X).copyFrom(args);
-        e.data$ = X.data$.dot(this.name);
-        return e;
-      },
+      view: { class: 'foam.u2.DetailView' },
       factory: function() {
-        return this.dao.of.create(null, this.dao);
+        return this.dao.of.create();
       }
     }
   ],
@@ -52,11 +41,11 @@ foam.CLASS({
     {
       name: 'save',
       code: function() {
-        var stack = this.stack;
-
-        this.dao.put(this.data.clone(this.dao)).then(function() {
-          if ( stack ) stack.back();
+        var self = this;
+        this.dao.put(this.data.clone()).then(function() {
+          self.finished.pub();
         }, function(e) {
+          // TODO: Display error in view.
           console.error(e);
         });
       }
@@ -64,7 +53,7 @@ foam.CLASS({
     {
       name: 'cancel',
       code: function() {
-        this.stack && this.stack.back();
+        this.finished.pub();
       }
     }
   ]

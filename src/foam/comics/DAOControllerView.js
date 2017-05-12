@@ -21,52 +21,87 @@ foam.CLASS({
   name: 'DAOControllerView',
   extends: 'foam.u2.View',
 
-  imports: [
-    'stack'
-  ],
-
-  exports: [
-    'editRecord'
-  ],
-
   requires: [
     'foam.comics.DAOController'
   ],
 
+  imports: [
+    'stack',
+    'data? as importedData'
+  ],
+
+  exports: [
+    'data.selection as selection',
+    'data.data as dao'
+  ],
+
   properties: [
-    'data',
     {
-      name: 'controller',
-      factory: function() {
-        var controller = this.DAOController.create();
-        this.onDetach(controller.data$.follow(this.data$));
-        return controller;
-      }
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOController',
+      name: 'data',
+      expression: function(importedData) { return importedData; },
+    },
+    {
+      name: 'cls',
+      expression: function(data) { return data.cls_; }
     }
   ],
 
+  reactions: [
+    [ 'data', 'action.create', 'onCreate' ],
+    [ 'data', 'edit', 'onEdit' ],
+    [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
+    [ 'data', 'finished', 'onFinished']
+  ],
+
   methods: [
-    function editRecord(obj) {
-      this.stack.push({
-        class: 'foam.comics.DAOUpdateControllerView',
-        dao: this.data,
-        data: obj.id
-      });
-    },
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.
         start('table').
           start('tr').
-            start('td').
-              start(this.DAOController.PREDICATE, {dao$: this.data$}).end().
+            start('td').add(this.cls.PREDICATE).end().
+            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
+              add(this.cls.FILTERED_DAO).
             end().
-            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).add(this.DAOController.FILTERED_DAO).end().
           end().
-        start('tr').
-          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-          start('td').end().start('td').add(this.DAOController.CREATE).end().
-        end().
-        endContext();
+          start('tr').
+            show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+            start('td').add(this.cls.getAxiomsByClass(foam.core.Action)).end().
+          end().
+        end();
     }
-  ]
+  ],
+
+  listeners: [
+    function onCreate() {
+      this.stack.push({
+        class: 'foam.comics.DAOCreateControllerView'
+      }, this);
+    },
+
+    function onEdit(s, edit, id) {
+      this.stack.push({
+        class: 'foam.comics.DAOUpdateControllerView',
+        key: id
+      }, this);
+    },
+
+    function onFindRelated() {
+      var data = this.DAOController.create({
+        data: this.data.relationship.targetDAO,
+        isSelecting: true,
+        relationship: this.data.relationship
+      });
+
+      this.stack.push({
+        class: 'foam.comics.DAOControllerView',
+        data: data
+      }, this);
+    },
+
+    function onFinished() {
+      this.stack.back();
+    }
+  ],
 });
