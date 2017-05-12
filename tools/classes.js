@@ -47,6 +47,7 @@ var classes = [
   'foam.mlang.sink.Count',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
+  'foam.nanos.auth.EnabledAwareDAO',
   'foam.nanos.auth.Group',
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
