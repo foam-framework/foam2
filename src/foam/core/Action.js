@@ -51,6 +51,12 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      documentation: 'displayed on :hover',
+      class: 'String',
+      name: 'toolTip',
+      expression: function(label) { return label; }
+    },
+    {
       name: 'icon'
     },
     {
