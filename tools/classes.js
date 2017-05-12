@@ -43,6 +43,7 @@ var classes = [
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
+  'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count',
   'foam.nanos.boot.NSpec',
