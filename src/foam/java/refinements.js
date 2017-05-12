@@ -771,3 +771,21 @@ foam.CLASS({
     }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'foam.java.JavaImport',
+      name: 'javaImports',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          foam.java.JavaImport.create({import: o}) :
+          foam.java.JavaImport.create(o) ;
+      }
+    }
+  ]
+});
