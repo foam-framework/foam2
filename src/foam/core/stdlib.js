@@ -498,11 +498,11 @@ foam.LIB({
   name: 'foam.Array',
   methods: [
     function isInstance(o) { return Array.isArray(o); },
-    function clone(o) {
+    function clone(o, opt_X) {
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(o.length);
       for ( var i = 0 ; i < o.length ; i++ ) {
-        ret[i] = foam.util.clone(o[i]);
+        ret[i] = foam.util.clone(o[i], opt_X);
       }
       return ret;
     },
@@ -623,7 +623,7 @@ foam.LIB({
     // Can't be an FObject yet because we haven't built the class system yet
     /* istanbul ignore next */
     function isInstance(o) { return false; },
-    function clone(o)      { return o ? o.clone() : this; },
+    function clone(o, opt_X)      { return o ? o.clone(opt_X) : this; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
@@ -744,7 +744,7 @@ foam.LIB({
     name: 'foam.util',
 
     methods: [
-      function clone(o)      { return typeOf(o).clone(o); },
+      function clone(o, opt_X)      { return typeOf(o).clone(o, opt_X); },
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) { return typeOf(a).compare(a, b); },
       function hashCode(o)   { return typeOf(o).hashCode(o); },

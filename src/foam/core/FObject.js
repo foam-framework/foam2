@@ -883,7 +883,7 @@ foam.CLASS({
         if ( this.instance_[key] === undefined ) continue; // Skip previously cleared keys.
 
         var value = this[key];
-        this.cls_.getAxiomByName(key).cloneProperty(value, m);
+        this.cls_.getAxiomByName(key).cloneProperty(value, m, opt_X);
       }
       return this.cls_.create(m, opt_X || this.__context__);
     },

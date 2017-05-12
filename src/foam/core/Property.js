@@ -140,11 +140,12 @@ foam.CLASS({
     [ 'cloneProperty', function(
       /* any // The value to clone */         value,
       /* object // Add values to this map to
-         have them installed on the clone. */ cloneMap
+         have them installed on the clone. */ cloneMap,
+      /* context // Optional context */       opt_X
       ) {
         /** Override to provide special deep cloning behavior. */
-        cloneMap[this.name] = ( value && value.clone ) ? value.clone() :
-          foam.util.clone(value);
+        cloneMap[this.name] = ( value && value.clone ) ? value.clone(opt_X) :
+          foam.util.clone(value, opt_X);
       }
     ],
 
