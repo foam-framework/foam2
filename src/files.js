@@ -22,7 +22,6 @@
  */
 
 FOAM_FILES([
-  { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
@@ -85,13 +84,11 @@ FOAM_FILES([
   { name: "foam/java/PropertyInfo", flags: ['java'] },
   { name: "foam/java/PropertyRefinement", flags: ['java'] },
   { name: "foam/java/Skeleton", flags: ['java'] },
+  { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
   { name: "foam/util/Timer" },
   { name: "foam/memento/MementoMgr" },
   { name: "lib/input", flags: ['web'] },
-  { name: "foam/nanos/log/LogLevel" },
-  { name: "foam/nanos/log/Logger" },
-  { name: "foam/nanos/log/ConsoleLogger" },
   { name: "foam/nanos/auth/EnabledAwareDAO" },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
