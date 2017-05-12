@@ -42,6 +42,7 @@ foam.CLASS({
     },
     'sourceCls',
     'propType',
+    'propRequired',
     'jsonParser',
     {
       name: 'methods',
@@ -99,6 +100,12 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.transient + ';'
+          },
+          {
+            name: 'getRequired',
+            visibility: 'public',
+            type: 'boolean',
+            body: 'return ' + Boolean(this.propRequired) + ';'
           }
         ]
       }
