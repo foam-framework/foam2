@@ -20,44 +20,77 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOController',
 
-  imports: [
-    'stack'
+  topics: [
+    'finished'
   ],
 
   properties: [
     {
       name: 'data',
-      hidden: true,
-      required: true
+      hidden: true
     },
     {
       name: 'predicate',
-      view: function(args, X) {
-        return {
-          class: 'foam.u2.view.RecipricalSearch',
-          of$: X.data$.dot('data').dot('of')
-        };
-      }
+      view: { class: 'foam.u2.view.RecipricalSearch' }
     },
     {
       name: 'filteredDAO',
-      view: 'foam.u2.view.ScrollTableView',
+      view: { class: 'foam.u2.view.ScrollTableView' },
       expression: function(data, predicate) {
-        return ! data ? foam.dao.NullDAO.create() :
-          predicate ? data.where(predicate) :
-          data;
+        return predicate ? data.where(predicate) : data;
       }
+    },
+    {
+      name: 'relationship'
+    },
+    {
+      name: 'selection',
+      hidden: true
+    },
+    {
+      class: 'Boolean',
+      name: 'isSelecting',
+      documentation: "True if we are in a state where we're selecting an item from the DAO.  This enables the 'Add' button.",
+      value: false
     }
   ],
 
   actions: [
     {
       name: 'create',
+      code: function() { }
+    },
+    {
+      name: 'edit',
+      isEnabled: function(selection) { return !! selection; },
       code: function() {
-        this.stack.push({
-          class: 'foam.comics.DAOCreateControllerView',
-          dao: this.data
+        this.pub('edit', this.selection.id);
+      }
+    },
+    {
+      name: 'findRelatedObject',
+      label: 'Add',
+      isAvailable: function(relationship, isSelecting) {
+        return !! ( relationship && relationship.junctionDAO ) && ! isSelecting;
+      },
+      code: function() { }
+    },
+    {
+      name: 'addSelection',
+      label: 'Add',
+      isAvailable: function(isSelecting) { return isSelecting; },
+      code: function() {
+        var self = this;
+        this.relationship.add(this.selection).then(function() {
+          self.finished.pub();
         });
+      }
+    },
+    {
+      name: 'select',
+      isAvailable: function() { },
+      code: function() {
+        this.pub('select', this.selection.id);
       }
     }
   ]

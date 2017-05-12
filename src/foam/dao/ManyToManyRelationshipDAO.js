@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'ManyToManyRelationshipDAO',
-  extends: 'foam.dao.RelationshipDAO',
+  extends: 'foam.dao.ProxyDAO',
 
   implements: [ 'foam.mlang.Expressions' ],
 
@@ -26,53 +26,38 @@ foam.CLASS({
 
   properties: [
     'junctionProperty',
-    'joinDAOKey',
-    'targetProperty',
+    'junctionDAOKey',
     'junctionCls',
+    'targetProperty',
+    'sourceKey',
+    'sourceProperty',
+    'junctionKeyFactory',
     {
-      name: 'joinDAO',
+      name: 'junctionDAO',
       getter: function() {
-        return this.__context__[this.joinDAOKey];
-      }
-    },
-    {
-      name: 'predicate',
-      documentation: `ManyToMany filtered querys are always "backward" to
-        match inverse-name property and source object's id.`,
-      getter: function() {
-        return this.EQ(
-            this.junctionCls[
-              foam.String.constantize(this.relationship.inverseName)],
-            this.obj.id);
+        return this.__context__[this.junctionDAOKey];
       }
     }
   ],
 
   methods: [
-    function put(obj) {
-      var self = this;
-      return self.__context__[foam.String.daoize(self.of.name)].put(obj)
-          .then(function(obj) {
-            return self.delegate.put(
-                self.relationship.adaptTarget(self.obj, obj));
-          });
-    },
     function find(key) {
-      var id = this.of.isInstance(key) ? key.id : key;
-      var dao = this.joinDAO;
-      return this.delegate.find([this.obj.id, id]).then(function(obj) {
-        return obj !== null ? dao.find(id) : null;
+      var id = foam.core.FObject.isInstance(key) ? key.id : key;
+      var self = this;
+      return self.junctionDAO.find(self.junctionKeyFactory(id)).then(function(a) {
+        return a && self.delegate.find(id);
       });
     },
     function select(sink, skip, limit, order, predicate) {
       var self = this;
 
-      return self.SUPER(self.MAP(self.junctionProperty))
-          .then(function(map) {
-            return self.joinDAO.select(sink, skip, limit, order, self.AND(
-                predicate || self.TRUE,
-                self.IN(self.targetProperty, map.delegate.a)));
-          });
+      return self.junctionDAO.
+        where(self.EQ(self.sourceProperty, self.sourceKey)).
+        select(self.MAP(self.junctionProperty)).then(function(map) {
+          return self.delegate.select(sink, skip, limit, order, self.AND(
+            predicate || self.TRUE,
+            self.IN(self.targetProperty, map.delegate.a)));
+        });
     }
   ]
 });

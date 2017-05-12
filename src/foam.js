@@ -76,7 +76,7 @@
       map(function(f) { return f.name; }).
       forEach(load);
 
-    delete this.FOAM_FILES;
+  //  delete this.FOAM_FILES;
   };
 
   load('files');
