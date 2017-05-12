@@ -53,7 +53,10 @@ foam.CLASS({
       name: 'classes',
       factory: function() { return []; }
     },
-    'imports',
+    {
+      name: 'imports',
+      factory: function() { return []; }
+    },
     {
       class: 'Boolean',
       name: 'anonymous',
