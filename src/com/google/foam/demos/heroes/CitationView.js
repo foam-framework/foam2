@@ -87,8 +87,9 @@ foam.CLASS({
       name: 'removeHero',
       label: 'X',
       speechLabel: 'delete',
+      toolTip: 'delete',
       iconFontName: 'delete_forever',
-      code: function() { this.heroDAO.remove(this.data);}
+      code: function() { this.heroDAO.remove(this.data); }
     }
   ],
 
