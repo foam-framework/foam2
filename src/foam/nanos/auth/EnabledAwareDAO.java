@@ -9,7 +9,7 @@ import foam.dao.*;
 import foam.core.*;
 import foam.nanos.auth.EnabledAware;
 
-public abstract class EnabledAwareDAO
+public class EnabledAwareDAO
   extends FilteredDAO
   implements DAO, EnabledAware
 {
