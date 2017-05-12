@@ -16,6 +16,8 @@ foam.CLASS({
     'foam.nanos.menu.Menu',
     'foam.nanos.auth.User',
     'foam.nanos.auth.Group',
+    'foam.nanos.auth.Country',
+    'foam.nanos.auth.Region',
     'foam.nanos.auth.Language',
     'foam.nanos.auth.Permission',
     'foam.nanos.script.Script',
@@ -23,6 +25,8 @@ foam.CLASS({
   ],
 
   exports: [
+    'countryDAO',
+    'regionDAO',
     'menuDAO',
     'nSpecDAO',
     'userDAO',
@@ -42,6 +46,42 @@ foam.CLASS({
           seqNo: true,
           testData: [
             { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' }
+          ]
+        });
+      }
+    },
+
+    {
+      name: 'countryDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.Country,
+          testData: [
+            { code: 'BR', name: 'Brazil' },
+            { code: 'CA', name: 'Canada' },
+            { code: 'CN', name: 'China' },
+            { code: 'IN', name: 'India' },
+            { code: 'JM', name: 'Jamacia' },
+            { code: 'LB', name: 'Lebanon' },
+            { code: 'MX', name: 'Mexico' },
+            { code: 'RS', name: 'Serbia' },
+            { code: 'TT', name: 'Trinidad and Tobago' },
+            { code: 'UK', name: 'United Kingdom' },
+            { code: 'US', name: 'USA' },
+            { code: 'ZA', name: 'South Africa' }
+          ]
+        });
+      }
+    },
+
+    {
+      name: 'regionDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.Region,
+          testData: [
+            { countryId: 'CA', code: 'ON', name: 'Ontario' },
+            { countryId: 'CA', code: 'PQ', name: 'Quebec' }
           ]
         });
       }
