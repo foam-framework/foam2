@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'JavaImport',
 
   documentation: 'Specify imports to be added to generated Java class.',
+
   properties: [
     {
       class: 'String',
