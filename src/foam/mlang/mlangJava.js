@@ -356,7 +356,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'Object value = getArg1().f(obj); '+
+      javaCode: 'Object value = getArg1().f(obj);'+
         'return ! (value == null || '+
           '(value instanceof String && ((String)value).length() == 0) || '+
           '(value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));'
