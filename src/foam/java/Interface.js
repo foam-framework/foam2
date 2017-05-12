@@ -65,6 +65,8 @@ foam.CLASS({
     },
 
     function outputJava(o) {
+      o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
+
       if ( this.package ) { o.out('package ', this.package, ';\n\n'); }
 
       o.out(this.visibility, this.visibility ? ' ' : '',
