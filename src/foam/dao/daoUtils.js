@@ -81,10 +81,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       this.delegate.put(this, obj);
     },
-    function remove(s, obj) {
+    function remove(obj, s) {
       this.delegate.remove(this, obj);
     },
     function reset(s) {
@@ -106,7 +106,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(sub, o) {
+    function put(o, sub) {
       this.a.push(o);
     }
   ]

@@ -53,22 +53,9 @@ foam.CLASS({
     function put(obj) {
       return this.SUPER(this.relationship.adaptTarget(this.obj, obj));
     },
-
     function clone() {
       // Prevent cloneing
       return this;
     }
   ]
 });
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'RelationshipDAOProperty',
-  extends: 'foam.dao.DAOProperty',
-  properties: [
-    {
-      name: 'view',
-      value: { class: 'foam.comics.RelationshipDAOControllerView' },
-    },
-  ],
-})

@@ -4,6 +4,25 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+ foam.CLASS({
+   package: 'foam.nanos.menu',
+   name: 'ViewMenu',
+
+   properties: [
+     {
+       class: 'foam.u2.ViewSpec',
+       name: 'view'
+     }
+   ],
+
+   methods: [
+     function execute(X) {
+       X.stack.push(this.view);
+     }
+   ]
+ });
+
+
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
@@ -26,9 +45,9 @@ foam.CLASS({
   actions: [
     {
       name: 'launch',
-      code: function() {
-        // TODO:
+      code: function(X) {
         console.log('MENU: ', this.id);
+        this.handler && this.handler.execute(X);
       }
     }
   ]
