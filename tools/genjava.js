@@ -8,6 +8,7 @@
 global.FOAM_FLAGS = { 'java': true, 'debug': true };
 
 require('../src/foam.js');
+require('../src/foam/nanos/nanos.js');
 
 if ( process.argv.length != 4 ) {
   console.log("USAGE: genjava.js input-path output-path");
