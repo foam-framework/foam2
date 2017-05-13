@@ -104,8 +104,7 @@ foam.CLASS({
                 { parent: 'auth', id: 'groups',      label: 'Groups' },
                 { parent: 'auth', id: 'permissions', label: 'Permissions' },
                 { parent: 'auth', id: 'lang',        label: 'Languages', handler: {
-                    class: 'foam.nanos.menu.ViewMenu',
-                    view: { class: 'foam.u2.ListCreateController', dao: this.languageDAO } } },
+                    class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
                 { parent: 'admin', id: 'countries', label: 'Countries', handler: {
                     class: 'foam.nanos.menu.ViewMenu',
                     view: { class: 'foam.u2.ListCreateController', dao: this.countryDAO } } },
