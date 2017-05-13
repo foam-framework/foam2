@@ -4,23 +4,23 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
-   package: 'foam.nanos.menu',
-   name: 'ViewMenu',
+foam.CLASS({
+  package: 'foam.nanos.menu',
+  name: 'ViewMenu',
 
-   properties: [
-     {
-       class: 'foam.u2.ViewSpec',
-       name: 'view'
-     }
-   ],
+  properties: [
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'view'
+    }
+  ],
 
-   methods: [
-     function execute(X) {
-       X.stack.push(this.view);
-     }
-   ]
- });
+  methods: [
+    function execute(X) {
+      X.stack.push(this.view);
+    }
+  ]
+});
 
 
 foam.CLASS({
