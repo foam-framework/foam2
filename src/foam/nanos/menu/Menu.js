@@ -25,6 +25,25 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.nanos.menu',
+  name: 'DAOMenu',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'daoKey'
+    }
+  ],
+
+  methods: [
+    function execute(X) {
+      X.stack.push({class: 'foam.u2.ListCreateController', dao: X[this.daoKey]});
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.nanos.menu',
   name: 'Menu',
 
   properties: [
