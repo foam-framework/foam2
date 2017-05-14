@@ -12,6 +12,9 @@
    inverseName: 'groups',
    sourceProperty: {
      hidden: true
+   },
+   targetProperty: {
+     hidden: true
    }
  });
 
@@ -22,6 +25,9 @@
    forwardName: 'groups',
    inverseName: 'users',
    sourceProperty: {
+     hidden: true
+   },
+   targetProperty: {
      hidden: true
    }
  });
