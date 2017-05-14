@@ -16,9 +16,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(X) {
-      X.stack.push(this.view);
-    }
+    function createView(X) { return this.view; }
   ]
 });
 
@@ -35,8 +33,42 @@ foam.CLASS({
   ],
 
   methods: [
-    function execute(X) {
-      X.stack.push({class: 'foam.u2.ListCreateController', dao: X[this.daoKey]});
+    function createView(X) {
+      return { class: 'foam.u2.ListCreateController', dao: X[this.daoKey] };
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.nanos.menu',
+  name: 'TabsMenu',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'daoKey'
+    }
+  ],
+
+  methods: [
+    function createView(X, menu) {
+      var tabs = foam.u2.Tabs.create();
+
+      X.stack.push(tabs);
+
+      menu.children.select({
+        put: function(menu) {
+          console.log(menu.label);
+          if ( menu.handler )
+          tabs.start({class: 'foam.u2.Tab', label: menu.label})
+            .tag((menu.handler && menu.handler.createView(X, menu)) || 'Coming Soon!')
+          .end();
+        },
+        eof: function() {}
+      });
+
+      return tabs;
     }
   ]
 });
@@ -66,7 +98,7 @@ foam.CLASS({
       name: 'launch',
       code: function(X) {
         console.log('MENU: ', this.id);
-        this.handler && this.handler.execute(X);
+        this.handler && X.stack.push(this.handler.createView(X, this));
       }
     }
   ]
