@@ -49,7 +49,7 @@ public class Boot {
     serviceDAO_.put(s);
   }
 
-  public void main (String[] args) throws Exception {
+  public static void main (String[] args) throws Exception {
     new Boot();
 
     Thread.currentThread().setDaemon(true);
