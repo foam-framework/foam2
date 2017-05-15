@@ -67,10 +67,13 @@ foam.CLASS({
 
       menu.children.select({
         put: function(menu) {
-          if ( ! menu.handler ) return;
-          tabs.start({class: 'foam.u2.Tab', label: menu.label})
-            .tag((menu.handler && menu.handler.createView(X, menu)))
-          .end();
+          tabs.start({class: 'foam.u2.Tab', label: menu.label}).call(function() {
+            if ( menu.handler ) {
+              this.tag((menu.handler && menu.handler.createView(X, menu)));
+            } else {
+              this.add('Coming Soon!');
+            }
+          }).end();
         },
         eof: function() {}
       });
