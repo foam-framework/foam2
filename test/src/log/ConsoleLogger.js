@@ -21,11 +21,6 @@ describe('ConsoleLogger', function() {
   var LogLevel;
   var logLevels = [ 'debug', 'info', 'warn', 'error' ];
 
-  beforeAll(function() {
-    var path = require('path');
-    require(path.join(__dirname, '../../../src/foam/nanos/nanos.js'));
-  });
-
   beforeEach(function() {
     foam.CLASS({
       package: 'foam.nanos.log.test',
