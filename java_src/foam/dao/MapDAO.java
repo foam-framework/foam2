@@ -15,7 +15,7 @@ public class MapDAO
 
   private synchronized void data_factory() {
     if ( data_ == null ) {
-      data_ = (Map<Object, FObject>)getX().create(ConcurrentHashMap.class);
+      data_ = (Map<Object, FObject>) new ConcurrentHashMap();
     }
   }
 

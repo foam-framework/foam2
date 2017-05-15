@@ -12,25 +12,29 @@ foam.CLASS({
 
   requires: [
     'foam.dao.EasyDAO',
-    'foam.nanos.boot.NSpec',
-    'foam.nanos.menu.Menu',
-    'foam.nanos.auth.User',
+    'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.Language',
     'foam.nanos.auth.Permission',
+    'foam.nanos.auth.Region',
+    'foam.nanos.auth.User',
+    'foam.nanos.boot.NSpec',
+    'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test'
   ],
 
   exports: [
-    'menuDAO',
-    'nSpecDAO',
-    'userDAO',
+    'countryDAO',
     'groupDAO',
     'languageDAO',
+    'menuDAO',
+    'nSpecDAO',
     'permissionDAO',
+    'regionDAO',
     'scriptDAO',
-    'testDAO'
+    'testDAO',
+    'userDAO'
   ],
 
   properties: [
@@ -48,32 +52,65 @@ foam.CLASS({
     },
 
     {
+      name: 'countryDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.Country,
+          testData: [
+            { code: 'BR', name: 'Brazil' },
+            { code: 'CA', name: 'Canada' },
+            { code: 'CN', name: 'China' },
+            { code: 'IN', name: 'India' },
+            { code: 'JM', name: 'Jamacia' },
+            { code: 'LB', name: 'Lebanon' },
+            { code: 'MX', name: 'Mexico' },
+            { code: 'RS', name: 'Serbia' },
+            { code: 'TT', name: 'Trinidad and Tobago' },
+            { code: 'UK', name: 'United Kingdom' },
+            { code: 'US', name: 'USA' },
+            { code: 'ZA', name: 'South Africa' }
+          ]
+        });
+      }
+    },
+
+    {
+      name: 'regionDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.Region,
+          testData: [
+            { countryId: 'CA', code: 'ON', name: 'Ontario' },
+            { countryId: 'CA', code: 'PQ', name: 'Quebec' }
+          ]
+        });
+      }
+    },
+
+    {
       name: 'menuDAO',
       factory: function() {
         return this.createDAO({
           of: this.Menu,
           testData: [
-            // { id: 'dash',     label: 'Dashboard' },
-            // { id: 'sales',    label: 'Sales' },
-            // { id: 'expenses', label: 'Expenses' },
-            // { id: 'settings', label: 'Settings' },
-            { id: 'admin',    label: 'Admin' },
-              { parent: 'admin', id: 'nspec', label: 'Nano Services' },
-              { parent: 'admin', id: 'auth', label: 'Authentication' },
-                { parent: 'auth', id: 'users',       label: 'Users' },
-                { parent: 'auth', id: 'groups',      label: 'Groups' },
-                { parent: 'auth', id: 'permissions', label: 'Permissions' },
-                { parent: 'auth', id: 'lang',        label: 'Languages', handler: {
-                    class: 'foam.nanos.menu.ViewMenu',
-                    view: { class: 'foam.u2.ListCreateController', dao: this.languageDAO } } },
-                { parent: 'admin', id: 'countries', label: 'Countries', handler: {
-                    class: 'foam.nanos.menu.ViewMenu',
-                    view: { class: 'foam.u2.ListCreateController', dao: this.countryDAO } } },
-              { parent: 'admin', id: 'menus',     label: 'Menus' },
-            { id: 'debug',    label: 'Debug' },
-              { parent: 'debug', id: 'api',     label: 'API Reference' },
-              { parent: 'debug', id: 'context', label: 'Context Walker' },
-              { parent: 'debug', id: 'data',    label: 'View Data' }
+            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ }  },
+              { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+              { parent: 'admin', id: 'auth',         label: 'Authentication', handler: { class: 'foam.nanos.menu.TabsMenu' } },
+                { parent: 'auth', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
+                { parent: 'auth', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
+                { parent: 'auth', id: 'permissions', label: 'Permissions',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'permissionDAO' }  },
+                { parent: 'auth', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
+                { parent: 'auth', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
+                { parent: 'auth', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
+              { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO' }  },
+              { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' }  },
+              { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },
+              { parent: 'admin', id: 'pm',           label: 'Performance' },
+              { parent: 'admin', id: 'log',          label: 'View Logs' },
+            { id: 'debug',                           label: 'Debug' },
+              { parent: 'debug', id: 'api',          label: 'API Reference' },
+              { parent: 'debug', id: 'context',      label: 'Context Walker' },
+              { parent: 'debug', id: 'data',         label: 'View Data' }
           ]
         });
       }

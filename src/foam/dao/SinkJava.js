@@ -38,13 +38,13 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
           name: 'sub',
           javaType: 'foam.core.Detachable'
         },
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
       ]
     },
     {
@@ -110,7 +110,7 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  sub.detach();\n'
+              + '  if ( sub != null ) sub.detach();\n'
               + '} else {\n'
               + '  setCount(getCount() + 1);\n'
               + '  getDelegate().put(obj, sub);\n'
@@ -119,7 +119,7 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  sub.detach();\n'
+              + '  if ( sub != null ) sub.detach();\n'
               + '} else {'
               + '  setCount(getCount() + 1);\n'
               + '  getDelegate().put(obj, sub);\n'
@@ -146,7 +146,7 @@ foam.CLASS({
               + '  setCount(getCount() + 1);\n'
               + '  return;'
               + '}\n'
-              + 'getDelegate().remove(sub, obj);'
+              + 'getDelegate().remove(obj, sub);'
     }
   ]
 });

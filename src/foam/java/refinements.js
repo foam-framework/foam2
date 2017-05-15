@@ -54,6 +54,7 @@ foam.CLASS({
         sourceCls: cls,
         propName: this.name,
         propType: this.javaType,
+        propRequired: this.required,
         jsonParser: this.javaJSONParser,
         extends: this.javaInfoType,
         transient: this.transient
@@ -768,6 +769,24 @@ foam.CLASS({
         props: props,
         clsName: cls.name
       });
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'foam.java.JavaImport',
+      name: 'javaImports',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          foam.java.JavaImport.create({import: o}) :
+          foam.java.JavaImport.create(o) ;
+      }
     }
   ]
 });
