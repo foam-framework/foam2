@@ -5,10 +5,10 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.test',
+  package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: [ 'foam.pattern.EnabledAware' ],
+  implements: [ 'foam.nanos.auth.EnabledAware' ],
 
   ids: [ 'name' ],
 
@@ -24,18 +24,18 @@ foam.CLASS({
     {
       class: 'String',
       name: 'notes',
-      displayHeight: 20
+      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 80 }
     },
     {
       class: 'String',
       name: 'code',
-      displayHeight: 20
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
     },
     {
       class: 'String',
       name: 'output',
       visibility: foam.u2.Visibility.RO,
-      displayHeight: 20
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
     }
   ]
 });
