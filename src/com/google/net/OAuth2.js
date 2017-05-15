@@ -88,14 +88,14 @@ foam.CLASS({
       var SUPER = this.SUPER.bind(this);
 
       return self.auth2.then(function(auth2) {
-        auth2 = auth2.array;
+        auth2 = auth2.a;
 
         if ( ! auth2.isSignedIn.get() ) {
           // kick off GAPI_SIGNIN_PROMISE if non-existent
-          if ( ! self.GAPI_SIGNIN_PROMISE.array ) {
-            self.GAPI_SIGNIN_PROMISE.array = auth2.signIn();
+          if ( ! self.GAPI_SIGNIN_PROMISE.a ) {
+            self.GAPI_SIGNIN_PROMISE.a = auth2.signIn();
           }
-          return self.GAPI_SIGNIN_PROMISE.array.then(self.onSignIn.bind(self)).then(SUPER).then(self.completeSend);
+          return self.GAPI_SIGNIN_PROMISE.a.then(self.onSignIn.bind(self)).then(SUPER).then(self.completeSend);
 
         } else {
           // grab token from gapi if we don't have a local copy yet
