@@ -5,10 +5,10 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.test',
+  package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: [ 'foam.pattern.EnabledAware' ],
+  implements: [ 'foam.nanos.auth.EnabledAware' ],
 
   ids: [ 'name' ],
 
