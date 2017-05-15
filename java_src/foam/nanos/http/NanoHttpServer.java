@@ -17,7 +17,7 @@ import foam.nanos.*;
 public class NanoHttpServer extends ContextAwareSupport implements NanoService {
 
   protected HttpServer server_;
-  protected int port_ = 80;
+  protected int port_ = 8080;
 
   public void start() {
     try {

@@ -11,7 +11,7 @@ public abstract class AbstractDAO
   implements DAO
 {
   private ClassInfo    of_         = null;
-  private PropertyInfo primaryKey_ = null;
+  protected PropertyInfo primaryKey_ = null;
 
   public DAO where(Predicate predicate) {
     return ((FilteredDAO)getX().create(FilteredDAO.class)).setPredicate(predicate).setDelegate(this);

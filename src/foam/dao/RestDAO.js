@@ -181,7 +181,7 @@ foam.CLASS({
       // If not proxying a local unserializable sink, just return the remote.
       if ( wasSerializable ) return remoteSink;
 
-      var array = remoteSink.a;
+      var array = remoteSink.array;
       if ( ! array )
         throw new Error('Expected ArraySink from REST endpoint when proxying local sink');
 
