@@ -13,6 +13,11 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'name',
+      getter: function() { return 'javaimport_' + this.import; }
+    },
+    {
+      class: 'String',
       name: 'import'
     }
   ],
