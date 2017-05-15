@@ -11,6 +11,7 @@ public interface PropertyInfo
   public ClassInfo getClassInfo();
 
   public boolean getTransient();
+  public boolean getRequired();
   public String getName();
   public Object get(Object obj);
   public void set(Object obj, Object value);
