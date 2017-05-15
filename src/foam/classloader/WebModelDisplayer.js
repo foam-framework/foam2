@@ -55,6 +55,10 @@ foam.CLASS({
       factory: function() { return this.Stack.create() },
     },
     {
+      name: 'showStackViewActions',
+      value: true,
+    },
+    {
       name: 'locale',
       postSet: function(_, n) { foam.locale = n; }
     },
@@ -126,7 +130,10 @@ foam.CLASS({
         var viewSpec = self.view ? { class: self.view, data: model } : model.toE.bind(model);
 
         self.stack.push(viewSpec);
-        self.StackView.create({data: self.stack}).write();
+        self.StackView.create({
+          showActions: self.showStackViewActions,
+          data: self.stack,
+        }).write();
       })
     }
   ]
