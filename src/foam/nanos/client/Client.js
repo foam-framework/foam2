@@ -97,9 +97,9 @@ foam.CLASS({
             // { id: 'sales',    label: 'Sales' },
             // { id: 'expenses', label: 'Expenses' },
             // { id: 'settings', label: 'Settings' },
-            { id: 'admin',    label: 'Admin' },
-              { parent: 'admin', id: 'nspec', label: 'Nano Services',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
-              { parent: 'admin', id: 'auth', label: 'Authentication',      handler: { class: 'foam.nanos.menu.TabsMenu' } },
+            { id: 'admin',                           label: 'Admin', handler: { class: 'foam.nanos.menu.SubMenu' }  },
+              { parent: 'admin', id: 'nspec',        label: 'Nano Services',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+              { parent: 'admin', id: 'auth',         label: 'Authentication',      handler: { class: 'foam.nanos.menu.TabsMenu' } },
                 { parent: 'auth', id: 'users',       label: 'Users',       handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
                 { parent: 'auth', id: 'groups',      label: 'Groups',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
                 { parent: 'auth', id: 'permissions', label: 'Permissions', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'permissionDAO' }  },
@@ -107,10 +107,10 @@ foam.CLASS({
                 { parent: 'auth', id: 'regions',     label: 'Regions',     handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
                 { parent: 'auth', id: 'lang',        label: 'Languages',   handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
               { parent: 'admin', id: 'menus',        label: 'Menus', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO' }  },
-            { id: 'debug',    label: 'Debug' },
-              { parent: 'debug', id: 'api',     label: 'API Reference' },
-              { parent: 'debug', id: 'context', label: 'Context Walker' },
-              { parent: 'debug', id: 'data',    label: 'View Data' }
+            { id: 'debug',                           label: 'Debug' },
+              { parent: 'debug', id: 'api',          label: 'API Reference' },
+              { parent: 'debug', id: 'context',      label: 'Context Walker' },
+              { parent: 'debug', id: 'data',         label: 'View Data' }
           ]
         });
       }
