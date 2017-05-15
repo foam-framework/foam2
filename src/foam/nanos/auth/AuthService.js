@@ -7,6 +7,7 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
+	// javaImports: ['foam.core.X', 'javax.security.auth.login.LoginException'],
   methods: [
 		{
   		name: 'generateChallenge',

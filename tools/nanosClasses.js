@@ -1,7 +1,11 @@
 var classes = [
 	'foam.nanos.boot.NSpec',
 	'foam.nanos.auth.AuthService',
-	'foam.nanos.auth.User'
+	'foam.nanos.auth.User',
+	'foam.dao.RelationshipPropertyValue',
+	'foam.nanos.auth.EnabledAware',
+  'foam.nanos.auth.LastModifiedAware',
+  'foam.nanos.auth.LastModifiedByAware'
 ];
 
 var abstractClasses = [
