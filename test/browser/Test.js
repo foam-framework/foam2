@@ -166,27 +166,27 @@ var e = foam.mlang.Expressions.create();
 
 dao.where(e.EQ(Test2.LNAME, null)).select().then(function (a) {
   console.log('EQ(null)');
-  a.a.forEach(function (t) { console.log(t.fname); });
+  a.array.forEach(function (t) { console.log(t.fname); });
 });
 
 dao.where(e.NOT(e.HAS(Test2.LNAME))).select().then(function (a) {
   console.log('NOT(HAS())');
-  a.a.forEach(function (t) { console.log(t.fname); });
+  a.array.forEach(function (t) { console.log(t.fname); });
 });
 
 dao.orderBy(Test2.LNAME).select().then(function (a) {
   console.log('by LNAME');
-  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+  a.array.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
 
 dao.orderBy(Test2.FNAME).select().then(function (a) {
   console.log('by FNAME');
-  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+  a.array.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
 
 dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
   console.log('by LNAME, FNAME');
-  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+  a.array.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
 
 // dao.removeAll();

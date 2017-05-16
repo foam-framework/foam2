@@ -238,7 +238,7 @@ foam.CLASS({
                 .where(self.EQ(ABJunction.SOURCE_ID, s2.id))
                 .select(self.MAP(ABJunction.TARGET_ID))
           ]).then(function(ids) {
-            var i1s = ids[0].delegate.a, i2s = ids[1].delegate.a;
+            var i1s = ids[0].delegate.array, i2s = ids[1].delegate.array;
             resolve(intersect(i1s, i2s));
           });
         });
@@ -261,11 +261,11 @@ foam.CLASS({
       });
 
       this.ABJunctionDAO.select(this.UNIQUE(ABJunction.SOURCE_ID)).then(function (u) {
-        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+        console.log(u.delegate.array.join(','), ' unique values: ', u.values);
       });
 
       this.ABJunctionDAO.select(this.UNIQUE(ABJunction.TARGET_ID)).then(function (u) {
-        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+        console.log(u.delegate.array.join(','), ' unique values: ', u.values);
       });
     }
   ]

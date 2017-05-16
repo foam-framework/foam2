@@ -11,11 +11,10 @@ public class MapDAO
 {
   private Map<Object, FObject> data_ = null;
   private ClassInfo            of_ = null;
-  private PropertyInfo         primaryKey_ = null;
 
   private synchronized void data_factory() {
     if ( data_ == null ) {
-      data_ = (Map<Object, FObject>)getX().create(ConcurrentHashMap.class);
+      data_ = (Map<Object, FObject>) new ConcurrentHashMap();
     }
   }
 
