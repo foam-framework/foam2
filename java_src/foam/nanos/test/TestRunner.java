@@ -27,15 +27,16 @@ public class TestRunner extends ContextAwareSupport implements NanoService {
        }
        
         // increment lastRun, success, failures
-        tests.put(test); 
+       // tests.put(test); 
       }
     });
   }
 
  public static void main(String[] args){
-    DAO tests = new MapDAO();
+    MapDAO tests = new MapDAO();
+    tests.setOf(Test.getOwnClassInfo());
     Test test1 = new Test();
-    test1.setName("Test 1");
+    test1.setId("Test 1");
     test1.setCode("System.out.println(\"I'm working\");");
 
     tests.put(test1);
