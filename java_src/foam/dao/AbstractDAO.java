@@ -14,19 +14,19 @@ public abstract class AbstractDAO
   protected PropertyInfo primaryKey_ = null;
 
   public DAO where(Predicate predicate) {
-    return ((FilteredDAO)getX().create(FilteredDAO.class)).setPredicate(predicate).setDelegate(this);
+    return new FilteredDAO().setPredicate(predicate).setDelegate(this);
   }
 
   public DAO orderBy(Comparator comparator) {
-    return ((OrderedDAO)getX().create(OrderedDAO.class)).setOrder(comparator).setDelegate(this);
+    return new OrderedDAO().setOrder(comparator).setDelegate(this);
   }
 
   public DAO skip(int count) {
-    return ((SkipDAO)getX().create(SkipDAO.class)).setSkip(count).setDelegate(this);
+    return new SkipDAO().setSkip(count).setDelegate(this);
   }
 
   public DAO limit(int count) {
-    return ((LimitedDAO)getX().create(LimitedDAO.class)).setLimit(count).setDelegate(this);
+    return new LimitedDAO().setLimit(count).setDelegate(this);
   }
 
   public void pipe(foam.dao.Sink sink) {
@@ -35,19 +35,19 @@ public abstract class AbstractDAO
 
   protected Sink decorateSink_(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
     if ( limit != null ) {
-      sink = ((LimitedSink)getX().create(LimitedSink.class)).setLimit(limit.intValue()).setDelegate(sink);
+      sink = new LimitedSink().setLimit(limit.intValue()).setDelegate(sink);
     }
 
     if ( skip != null ) {
-      sink = ((SkipSink)getX().create(SkipSink.class)).setSkip(skip.intValue()).setDelegate(sink);
+      sink = new SkipSink().setSkip(skip.intValue()).setDelegate(sink);
     }
 
     if ( order != null ) {
-      sink = ((OrderedSink)getX().create(OrderedSink.class)).setComparator(order).setDelegate(sink);
+      sink = new OrderedSink().setComparator(order).setDelegate(sink);
     }
 
     if ( predicate != null ) {
-      sink = ((PredicatedSink)getX().create(PredicatedSink.class)).setPredicate(predicate).setDelegate(sink);
+      sink = new PredicatedSink().setPredicate(predicate).setDelegate(sink);
     }
 
     return sink;
