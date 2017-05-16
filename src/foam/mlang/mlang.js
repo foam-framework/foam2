@@ -54,18 +54,27 @@ foam.CLASS({
   ]
 });
 
-
 foam.INTERFACE({
   package: 'foam.mlang',
-  name: 'Expr',
+  name: 'F',
 
-  documentation: 'Expression interface: f(obj) -> val.',
+  documentation: 'Function for Expression interface: f(obj) -> val.',
 
   methods: [
     {
       name: 'f',
       args: [ 'obj' ]
-    },
+    }
+  ]
+});
+
+foam.INTERFACE({
+  package: 'foam.mlang',
+  name: 'Expr',
+  extends: ['foam.mlang.F'],
+  documentation: 'Expression interface: extends Function and executes partialEval.',
+
+  methods: [
     {
       name: 'partialEval'
     }

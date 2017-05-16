@@ -16,7 +16,7 @@
  */
 
 foam.INTERFACE({
-  refines: 'foam.mlang.Expr',
+  refines: 'foam.mlang.F',
 
   methods: [
     {
@@ -28,7 +28,14 @@ foam.INTERFACE({
         }
       ],
       javaReturns: 'Object'
-    },
+    }
+  ]
+});
+
+foam.INTERFACE({
+  refines: 'foam.mlang.Expr',
+
+  methods: [
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
@@ -46,7 +53,6 @@ foam.CLASS({
   ]
 });
 
-debugger;
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
