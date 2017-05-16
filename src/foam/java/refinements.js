@@ -347,9 +347,10 @@ foam.CLASS({
         cls.buildJavaClass =  function(cls) {
           cls = cls || foam.java.Interface.create();
 
-          cls.name = this.name;
-          cls.package = this.package;
-          cls.extends = this.extends;
+          cls.name = this.model_.name;
+          cls.package = this.model_.package;
+          cls.extends = this.model_.extends ===  'foam.core.AbstractInterface' ?
+                        this.extends : this.model_.extends;
 
           var axioms = this.getAxioms();
 
@@ -627,7 +628,7 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-  
+
   if ( values1.length > values2.length ) return 1;
   if ( values1.length < values2.length ) return -1;
 
