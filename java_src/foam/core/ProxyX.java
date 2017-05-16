@@ -35,10 +35,10 @@ public class ProxyX
   }
 
   public Object getInstanceOf(Object value, Class type) {
-    return getX().getInstanceOf(value, type);
+    return ((FacetManager) getX().get("facetManager")).getInstanceOf(value, type, this);
   }
 
   public <T> T create(Class<T> type) {
-    return getX().create(type);
+    return ((FacetManager) getX().get("facetManager")).create(type, this);
   }
 }
