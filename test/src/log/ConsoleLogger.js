@@ -72,6 +72,12 @@ describe('ConsoleLogger', function() {
     ).__subContext__;
   });
 
+  it('should construct in default context', function() {
+    expect(function() {
+      foam.lookup('foam.nanos.log.ConsoleLogger').create();
+    }).not.toThrow();
+  });
+
   it('should output strings', function() {
     logLevels.forEach(function(logLevel) {
       testCtx[logLevel]('frobinator');
