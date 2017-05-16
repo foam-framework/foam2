@@ -627,15 +627,16 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-        if ( values1.length > values2.length ) return 1;
-        if ( values1.length < values2.length ) return -1;
+  
+  if ( values1.length > values2.length ) return 1;
+  if ( values1.length < values2.length ) return -1;
 
-        int result;
-        for ( int i = 0 ; i < values1.length ; i++ ) {
-          result = ((Comparable)values1[i]).compareTo(values2[i]);
-          if ( result != 0 ) return result;
-        }
-        return 0;*/}
+  int result;
+  for ( int i = 0 ; i < values1.length ; i++ ) {
+    result = ((Comparable)values1[i]).compareTo(values2[i]);
+    if ( result != 0 ) return result;
+  }
+  return 0;*/}
     }
   ]
 });
@@ -678,18 +679,18 @@ foam.CLASS({
     {
       name: 'compareTemplate',
       template: function() {/*
-<%= this.javaType %> values1 = get_(o1);
-<%= this.javaType %> values2 = get_(o2);
-if ( values1.length > values2.length ) return 1;
-if ( values1.length < values2.length ) return -1;
+  <%= this.javaType %> values1 = get_(o1);
+  <%= this.javaType %> values2 = get_(o2);
+  if ( values1.length > values2.length ) return 1;
+  if ( values1.length < values2.length ) return -1;
 
-int result;
-for ( int i = 0 ; i < values1.length ; i++ ) {
-result = ((Comparable)values1[i]).compareTo(values2[i]);
-if ( result != 0 ) return result;
-}
-return 0;
-*/}
+  int result;
+  for ( int i = 0 ; i < values1.length ; i++ ) {
+  result = ((Comparable)values1[i]).compareTo(values2[i]);
+  if ( result != 0 ) return result;
+  }
+  return 0;
+  */}
       }
   ]
 });
@@ -721,15 +722,16 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-        if ( values1.size() > values2.size() ) return 1;
-        if ( values1.size() < values2.size() ) return -1;
 
-        int result;
-        for ( int i = 0 ; i < values1.size() ; i++ ) {
-          result = ((Comparable)values1.get(i)).compareTo(values2.get(i));
-          if ( result != 0 ) return result;
-        }
-        return 0;*/}
+  if ( values1.size() > values2.size() ) return 1;
+  if ( values1.size() < values2.size() ) return -1;
+
+  int result;
+  for ( int i = 0 ; i < values1.size() ; i++ ) {
+    result = ((Comparable)values1.get(i)).compareTo(values2.get(i));
+    if ( result != 0 ) return result;
+  }
+  return 0;*/}
     }
   ]
 });
