@@ -54,6 +54,7 @@ foam.CLASS({
         sourceCls: cls,
         propName: this.name,
         propType: this.javaType,
+        propRequired: this.required,
         jsonParser: this.javaJSONParser,
         extends: this.javaInfoType,
         transient: this.transient

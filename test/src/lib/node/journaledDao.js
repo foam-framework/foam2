@@ -76,7 +76,7 @@ xdescribe('JournaledDAO', function() {
     .then(function() {
       arrayDao.select()
       .then(function(cars) {
-        cars.a.forEach(function(car, i) {
+        cars.array.forEach(function(car, i) {
           expect(car.id).toBe(i);
           expect(car.color).toBe('color ' + i);
         })

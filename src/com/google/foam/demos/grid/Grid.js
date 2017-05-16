@@ -198,7 +198,7 @@ foam.CLASS({
           window.alert(foam.json.Outputer.create({
             pretty: false,
             outputClassNames: false
-          }).stringify(s.a));
+          }).stringify(s.array));
         });
       }
     },

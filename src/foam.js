@@ -21,11 +21,11 @@
   var isWorker = typeof importScripts !== 'undefined';
 
   var flags    = this.FOAM_FLAGS || {};
-  flags.js     = true;
   flags.web    = ! isServer,
   flags.node   = isServer;
   flags.loader = ! isServer;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
+  if ( ! flags.hasOwnProperty('js')    ) flags.js    = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
