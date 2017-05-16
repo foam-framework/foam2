@@ -36,7 +36,7 @@ foam.INTERFACE({
 		},
 		{
 			name: 'login',
-			javaReturns: 'void',
+			javaReturns: 'Boolean',
 			args: [
 				{
 					name: 'username',
