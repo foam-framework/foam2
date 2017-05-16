@@ -696,6 +696,46 @@ return 0;
 
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'ArrayList',
+  extends: 'foam.core.Array',
+
+  properties: [
+    ['javaType', 'ArrayList'],
+    ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.ArrayParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = this.compareTemplate();
+      return info;
+    }
+  ],
+
+  templates: [
+    {
+      name: 'compareTemplate',
+      template: function() {/*
+  <%= this.javaType %> values1 = get_(o1);
+  <%= this.javaType %> values2 = get_(o2);
+        if ( values1.size() > values2.size() ) return 1;
+        if ( values1.size() < values2.size() ) return -1;
+
+        int result;
+        for ( int i = 0 ; i < values1.size() ; i++ ) {
+          result = ((Comparable)values1.get(i)).compareTo(values2.get(i));
+          if ( result != 0 ) return result;
+        }
+        return 0;*/}
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Boolean',
   properties: [
     ['javaType', 'boolean'],
