@@ -66,7 +66,7 @@ foam.CLASS({
 
       return self.delegate.select(skip, limit, order, predicate).then(function(sink) {
         return Promise.all(
-            sink.a.map(function(obj) {
+            sink.array.map(function(obj) {
               if (self.pending_.has(obj.id)) {
                 return self.delegate.removeAll();
               } else {

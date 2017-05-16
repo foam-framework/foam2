@@ -31,9 +31,9 @@ var dao = foam.dao.ClientDAO.create({
 }, env);
 
 dao.select().then(function(m) {
-  console.log("Read", m.a.length, 'mails');
-  for ( var i = 0 ; i < m.a.length ; i++ ) {
-    var mail = m.a[i];
+  console.log("Read", m.array.length, 'mails');
+  for ( var i = 0 ; i < m.array.length ; i++ ) {
+    var mail = m.array[i];
     console.log('');
     console.log('');
     console.log('MSGID:', mail.id);

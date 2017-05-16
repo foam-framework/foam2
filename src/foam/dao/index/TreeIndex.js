@@ -320,7 +320,7 @@ foam.CLASS({
      * Faster than loading individually, and produces a balanced tree.
      **/
     function bulkLoad(a) {
-      a = a.a || a;
+      a = a.array || a;
       this.root = this.index.nullNode;
 
       // Only safe if children aren't themselves trees
@@ -530,7 +530,7 @@ foam.CLASS({
             index.selectCount++;
             subTree.select(arrSink, null, null, null, predicate, {});
             index.selectCount--;
-            var a = arrSink.a;
+            var a = arrSink.array;
             a.sort(order.compare.bind(order));
 
             skip = skip || 0;
@@ -607,7 +607,7 @@ foam.CLASS({
      * Do not optimize bulkload
      **/
     function bulkLoad(a) {
-      a = a.a || a;
+      a = a.array || a;
       this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
@@ -640,7 +640,7 @@ foam.CLASS({
      * Do not optimize bulkload to SetIndex
      **/
     function bulkLoad(a) {
-      a = a.a || a;
+      a = a.array || a;
       this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
