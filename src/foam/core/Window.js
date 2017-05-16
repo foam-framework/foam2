@@ -51,6 +51,7 @@ foam.CLASS({
     'clearInterval',
     'clearTimeout',
     'console',
+    'debug',
     'delayed',
     'document',
     'error',
@@ -86,6 +87,10 @@ foam.CLASS({
 
     function getElementsByClassName(cls) {
       return this.document.getElementsByClassName(cls);
+    },
+
+    function debug() {
+      this.console.debug.apply(this.console, arguments);
     },
 
     function error() {
