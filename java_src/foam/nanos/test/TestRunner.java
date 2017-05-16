@@ -32,7 +32,7 @@ public class TestRunner extends ContextAwareSupport implements NanoService {
     });
   }
 
- public void main(){
+ public static void main(String[] args){
     DAO tests = new MapDAO();
     Test test1 = new Test();
     test1.setName("Test 1");
@@ -41,7 +41,7 @@ public class TestRunner extends ContextAwareSupport implements NanoService {
     tests.put(test1);
     X x = EmptyX.instance().put("TestDAO", tests);
     TestRunner runner = new TestRunner();
-    setX(x);
+    runner.setX(x);
     runner.start();
   }
 
