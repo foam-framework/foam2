@@ -75,9 +75,9 @@ foam.CLASS({
 
       var date = new Date();
 
-      this.secondHand.a = Math.PI/2 - Math.PI*2 * date.getSeconds() / 60 ;
-      this.minuteHand.a = Math.PI/2 - Math.PI*2 * date.getMinutes() / 60 ;
-      this.hourHand.a   = Math.PI/2 - Math.PI*2 * (date.getHours() % 12) / 12 + this.minuteHand.a / 12;
+      this.secondHand.angle = Math.PI/2 - Math.PI*2 * date.getSeconds() / 60 ;
+      this.minuteHand.angle = Math.PI/2 - Math.PI*2 * date.getMinutes() / 60 ;
+      this.hourHand.angle   = Math.PI/2 - Math.PI*2 * (date.getHours() % 12) / 12 + this.minuteHand.angle / 12;
 
       if ( ! this.drawTicks ) return;
 
@@ -113,7 +113,7 @@ foam.CLASS({
       extends: 'foam.graphics.CView',
 
       properties: [
-        'a',
+        'angle',
         [ 'width', 5 ],
         'radius'
       ],
@@ -122,7 +122,7 @@ foam.CLASS({
         function paint(canvas) {
           canvas.beginPath();
           canvas.moveTo(0,0);
-          canvas.lineTo(this.radius*Math.cos(this.a),-this.radius*Math.sin(this.a));
+          canvas.lineTo(this.radius*Math.cos(this.angle),-this.radius*Math.sin(this.angle));
           canvas.closePath();
 
           canvas.lineWidth   = this.width;

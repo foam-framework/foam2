@@ -59,12 +59,12 @@ foam.LIB({
         var endTime = performance.now();
         console.log("\"" + testName + "\": { name: \"" + testName + "\", time:", 
             endTime - startTime, 
-            (( arg && arg.a ) ? ", length: " + arg.a.length : ""), 
+            (( arg && arg.array ) ? ", length: " + arg.array.length : ""), 
             "},");
         return test.TestRun.create({ 
           name: testName,
           time: endTime - startTime,
-          length: ( arg && arg.a ) ? arg.a.length : undefined
+          length: ( arg && arg.array ) ? arg.array.length : undefined
         });
       };
       return foam.async.sequence([ fn1, fn, fn2 ]);
@@ -82,7 +82,7 @@ foam.LIB({
         if ( DEBUG ) console.log("Starting:", name);
       }
       var fn2 = function(arg) {
-        if ( DEBUG ) console.log(name, 'result size: ', arg.a.length);
+        if ( DEBUG ) console.log(name, 'result size: ', arg.array.length);
       };
       return foam.async.sequence([ fn1, foam.async.atime(name, fn), fn2 ]);
     }

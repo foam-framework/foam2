@@ -21,7 +21,7 @@ var dao = com.firebase.FirebaseDAO.create({
 // })
 
 dao.select().then(function(array) {
-  array = array.a;
+  array = array.array;
   for ( var i = 0 ; i < array.length ; i++ ) {
     console.log("Object", array[i].toJSON());
   }
@@ -330,7 +330,7 @@ server.connect(worker).then(function(workerBox) {
 
   dao.select().then(function(a) {
     console.log("They are");
-    a = a.a;
+    a = a.array;
     for ( var i = 0 ; i < a.length ; i++ ) {
       var p = a[i];
       console.log(p.name, ' - ', p.phone);
@@ -344,7 +344,7 @@ server.connect(worker).then(function(workerBox) {
     .select()
     .then(function(a) {
       console.log("People named adam");
-      a = a.a;
+      a = a.array;
       for ( var i = 0 ; i < a.length ; i++ ) {
         console.log(a[i].name, a[i].phone);
       }
