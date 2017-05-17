@@ -54,6 +54,7 @@ foam.CLASS({
     function initE() {
       var view = this;
       this.
+        addClass(this.myClass()).
         select(this.data$proxy, function(obj) {
           return ( this.rowView ?
                        foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__) :
