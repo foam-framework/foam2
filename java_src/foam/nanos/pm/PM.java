@@ -1,7 +1,5 @@
 package foam.nanos.pm;
 
-import foam.core.X;
-
 /**
 * Created by nick on 15/05/17.
 */
@@ -18,7 +16,7 @@ public class PM {
     startTime_ = System.nanoTime();
   }
 
-  public void end(PerformanceLogger x) {
+  public void end(PMLogger x) {
     if(x != null) {
       endTime_ = System.nanoTime();
       x.log(this);
