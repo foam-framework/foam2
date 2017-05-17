@@ -9,13 +9,10 @@ foam.CLASS({
   name: 'Script',
 
   implements: [ 'foam.nanos.auth.EnabledAware' ],
-
-  ids: [ 'name' ],
-
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'id'
     },
     {
       class: 'DateTime',

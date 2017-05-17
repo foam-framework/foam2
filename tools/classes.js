@@ -54,6 +54,8 @@ var classes = [
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
   'foam.nanos.pm.PMInfo'
+  'foam.nanos.script.Script',
+  'foam.nanos.test.Test'
 ];
 
 var abstractClasses = [
