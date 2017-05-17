@@ -111,7 +111,7 @@ foam.CLASS({
         o.out('package ', this.package, ';\n\n');
 
         this.imports && this.imports.forEach(function(i) {
-          o.out(i, ';\n');
+          o.out('import ' + i, ';\n');
         });
 
         o.out('\n');
