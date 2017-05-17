@@ -38,6 +38,7 @@ foam.CLASS({
       name: 'data'
     },
     {
+      class: 'foam.u2.ViewSpec',
       name: 'rowView'
     },
     {
@@ -54,8 +55,9 @@ foam.CLASS({
       var view = this;
       this.
         select(this.data$proxy, function(obj) {
-          return this.E().
-            start(this.rowView || this.rowFactory$f({data: obj}), {data: obj}).
+          return ( this.rowView ?
+                       foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__) :
+                       this.rowFactory$f({ data: obj }) ).
               on('mouseover', function() { view.hoverSelection = obj; }).
               on('click', function() {
                 view.selection = obj;
