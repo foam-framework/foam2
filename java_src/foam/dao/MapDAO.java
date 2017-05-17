@@ -18,7 +18,7 @@ public class MapDAO
     }
   }
 
-  private Map<Object, FObject> getData() {
+  protected Map<Object, FObject> getData() {
     if ( data_ == null ) {
       data_factory();
     }
