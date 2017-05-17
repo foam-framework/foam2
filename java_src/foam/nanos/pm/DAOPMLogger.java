@@ -7,7 +7,7 @@ import foam.nanos.NanoService;
 /**
  * Created by nick on 17/05/17.
  */
-public class DAOPMLogger extends ContextAwareSupport implements PerformanceLogger, NanoService {
+public class DAOPMLogger extends ContextAwareSupport implements PMLogger, NanoService {
 
   @Override
   public void log(PM pm) {
