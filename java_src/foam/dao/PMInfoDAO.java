@@ -10,10 +10,6 @@ import java.util.Map;
  */
 public class PMInfoDAO extends MapDAO {
 
-  public Map<Object, FObject> getMap() {
-    return getData();
-  }
-
   @Override
   public FObject put(FObject obj) {
     if(obj instanceof PMInfo) {
