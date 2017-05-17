@@ -57,10 +57,10 @@ describe('LocalStorageDAO', function() {
     var result = foam.dao.ArraySink.create();
     dao2.select(result);
 
-    expect(result.a[0]).toEqual(a);
-    expect(result.a[1]).toEqual(a2);
-    expect(result.a[2]).toEqual(b);
-    expect(result.a[2].stringify()).toEqual(b.stringify());
+    expect(result.array[0]).toEqual(a);
+    expect(result.array[1]).toEqual(a2);
+    expect(result.array[2]).toEqual(b);
+    expect(result.array[2].stringify()).toEqual(b.stringify());
   });
 
   // Run the generic suite of DAO tests against it.
@@ -218,16 +218,16 @@ describe('SequenceNumberDAO', function() {
     var a = test.CompA.create({ a: 4 }, foam.__context__); // id not set
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].id).toEqual(1);
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].id).toEqual(1);
         a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
-            expect(sink.a.length).toEqual(2);
-            expect(sink.a[0].id).toEqual(1);
-            expect(sink.a[0].a).toEqual(4);
-            expect(sink.a[1].id).toEqual(2);
-            expect(sink.a[1].a).toEqual(6);
+            expect(sink.array.length).toEqual(2);
+            expect(sink.array[0].id).toEqual(1);
+            expect(sink.array[0].a).toEqual(4);
+            expect(sink.array[1].id).toEqual(2);
+            expect(sink.array[1].a).toEqual(6);
             done();
           });
         });
@@ -239,16 +239,16 @@ describe('SequenceNumberDAO', function() {
     var a = test.CompA.create({ id: 3, a: 4 }, foam.__context__);
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].id).toEqual(3);
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].id).toEqual(3);
         a = test.CompA.create({ id: 2, a: 6 }, foam.__context__);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
-            expect(sink.a.length).toEqual(2);
-            expect(sink.a[0].id).toEqual(2);
-            expect(sink.a[0].a).toEqual(6);
-            expect(sink.a[1].id).toEqual(3);
-            expect(sink.a[1].a).toEqual(4);
+            expect(sink.array.length).toEqual(2);
+            expect(sink.array[0].id).toEqual(2);
+            expect(sink.array[0].a).toEqual(6);
+            expect(sink.array[1].id).toEqual(3);
+            expect(sink.array[1].a).toEqual(4);
             done();
           });
         });
@@ -260,16 +260,16 @@ describe('SequenceNumberDAO', function() {
     var a = test.CompA.create({ id: 1, a: 4 }, foam.__context__);
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].id).toEqual(1);
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].id).toEqual(1);
         a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
-            expect(sink.a.length).toEqual(2);
-            expect(sink.a[0].id).toEqual(1);
-            expect(sink.a[0].a).toEqual(4);
-            expect(sink.a[1].id).toEqual(2);
-            expect(sink.a[1].a).toEqual(6);
+            expect(sink.array.length).toEqual(2);
+            expect(sink.array[0].id).toEqual(1);
+            expect(sink.array[0].a).toEqual(4);
+            expect(sink.array[1].id).toEqual(2);
+            expect(sink.array[1].a).toEqual(6);
             done();
           });
         });
@@ -285,15 +285,15 @@ describe('SequenceNumberDAO', function() {
     var a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
     sDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(3);
-        expect(sink.a[0].id).toEqual(45);
-        expect(sink.a[1].id).toEqual(568);
-        expect(sink.a[2].id).toEqual(569);
+        expect(sink.array.length).toEqual(3);
+        expect(sink.array[0].id).toEqual(45);
+        expect(sink.array[1].id).toEqual(568);
+        expect(sink.array[2].id).toEqual(569);
         a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
-            expect(sink.a.length).toEqual(4);
-            expect(sink.a[3].id).toEqual(570);
+            expect(sink.array.length).toEqual(4);
+            expect(sink.array[3].id).toEqual(570);
             done();
           });
         });
@@ -330,15 +330,15 @@ describe('GUIDDAO', function() {
     var a = test.CompA.create({ a: 4 }, foam.__context__); // id not set
     gDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].id.length).toBeGreaterThan(8);
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].id.length).toBeGreaterThan(8);
         // id set, not a GUID character for predictable sorting in this test
         a = test.CompA.create({ id: '!!!', a: 6 }, foam.__context__);
         return gDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
-            expect(sink.a.length).toEqual(2);
-            expect(sink.a[0].id.length).toBeLessThan(8);
-            expect(sink.a[1].id.length).toBeGreaterThan(8);
+            expect(sink.array.length).toEqual(2);
+            expect(sink.array[0].id.length).toBeLessThan(8);
+            expect(sink.array[1].id.length).toBeGreaterThan(8);
             done();
           });
         });
@@ -568,8 +568,8 @@ describe('ContextualizingDAO', function() {
 
     cDAO.put(a).then(function() {
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].exp).toBeUndefined();
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].exp).toBeUndefined();
 
         return cDAO.find(1).then(function (obj) {
           expect(obj.exp).toEqual(66); // now has context with env export
@@ -643,8 +643,8 @@ describe('SyncDAO', function() {
 
     doSyncThen(function() {
       syncDAO.select().then(function(sink) {
-        expect(sink.a.length).toEqual(5);
-        expect(sink.a[2].version).toEqual(3);
+        expect(sink.array.length).toEqual(5);
+        expect(sink.array[2].version).toEqual(3);
       }).then(done);
     });
   });
@@ -655,8 +655,8 @@ describe('SyncDAO', function() {
 
     doSyncThen(function() {
       syncDAO.select().then(function(sink) {
-        expect(sink.a.length).toEqual(5);
-        expect(sink.a[2].version).toEqual(3);
+        expect(sink.array.length).toEqual(5);
+        expect(sink.array[2].version).toEqual(3);
       }).then(done);
     });
   });
@@ -692,11 +692,11 @@ describe('SyncDAO', function() {
 
     doSyncThen(function() {
       syncDAO.select().then(function(sink) {
-        expect(sink.a.length).toEqual(5);
+        expect(sink.array.length).toEqual(5);
 
         remoteDAO.offline = true;
-        syncDAO.remove(sink.a[1]);
-        syncDAO.remove(sink.a[0]); // version is stale, will not remove
+        syncDAO.remove(sink.array[1]);
+        syncDAO.remove(sink.array[0]); // version is stale, will not remove
         remoteDAO.offline = false;
 
         doSyncThen(function() {
@@ -716,12 +716,12 @@ describe('SyncDAO', function() {
 
 //     doSyncThen(function() {
 //       syncDAO.select().then(function(sink) {
-//         expect(sink.a.length).toEqual(5);
+//         expect(sink.array.length).toEqual(5);
 //           console.log("cache1", cacheDAO.array);
 
-//         remoteDAO.remove(sink.a[1]);
+//         remoteDAO.remove(sink.array[1]);
 //         remoteDAO.offline = true;
-//         syncDAO.remove(sink.a[0]);
+//         syncDAO.remove(sink.array[0]);
 //         remoteDAO.offline = false;
 //         doSyncThen(function() {
 //           expect(remoteDAO.array.length).toEqual(3);
@@ -854,18 +854,18 @@ describe('TimestampDAO', function() {
     sDAO.put(a).then(function() {
       jasmine.clock().tick(2000);
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].id).toBeGreaterThan(0);
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].id).toBeGreaterThan(0);
         a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
         jasmine.clock().tick(2000);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             jasmine.clock().tick(2000);
-            expect(sink.a.length).toEqual(2);
-            expect(sink.a[0].id).toBeGreaterThan(0);
-            expect(sink.a[0].a).toEqual(4);
-            expect(sink.a[1].id).toBeGreaterThan(sink.a[0].id);
-            expect(sink.a[1].a).toEqual(6);
+            expect(sink.array.length).toEqual(2);
+            expect(sink.array[0].id).toBeGreaterThan(0);
+            expect(sink.array[0].a).toEqual(4);
+            expect(sink.array[1].id).toBeGreaterThan(sink.array[0].id);
+            expect(sink.array[1].a).toEqual(6);
             done();
           });
         });
@@ -880,18 +880,18 @@ describe('TimestampDAO', function() {
     sDAO.put(a).then(function() {
       jasmine.clock().tick(2000);
       return mDAO.select().then(function (sink) {
-        expect(sink.a.length).toEqual(1);
-        expect(sink.a[0].id).toEqual(3);
+        expect(sink.array.length).toEqual(1);
+        expect(sink.array[0].id).toEqual(3);
         a = test.CompA.create({ id: 2, a: 6 }, foam.__context__);
         jasmine.clock().tick(2000);
         return sDAO.put(a).then(function() {
           return mDAO.select().then(function (sink) {
             jasmine.clock().tick(2000);
-            expect(sink.a.length).toEqual(2);
-            expect(sink.a[0].id).toEqual(2);
-            expect(sink.a[0].a).toEqual(6);
-            expect(sink.a[1].id).toEqual(3);
-            expect(sink.a[1].a).toEqual(4);
+            expect(sink.array.length).toEqual(2);
+            expect(sink.array[0].id).toEqual(2);
+            expect(sink.array[0].a).toEqual(6);
+            expect(sink.array[1].id).toEqual(3);
+            expect(sink.array[1].a).toEqual(4);
             done();
           });
         });
@@ -1006,70 +1006,6 @@ describe('String.daoize', function() {
   });
 
 });
-
-describe('Relationship', function() {
-
-  foam.CLASS({
-    package: 'test',
-    name: 'RelA',
-    properties: [
-      'bRef'
-    ]
-  });
-  foam.CLASS({
-    package: 'test',
-    name: 'RelB',
-    properties: [
-      'aRef'
-    ]
-  });
-
-  foam.CLASS({
-    package: 'test',
-    name: 'relEnv',
-    exports: [
-      'test_RelADAO',
-      'test_RelBDAO'
-    ],
-    properties: [
-      {
-        name: 'test.RelADAO',
-        factory: function() {
-          return foam.dao.ArrayDAO.create();
-        }
-      },
-      {
-        name: 'test.RelBDAO',
-        factory: function() {
-          return foam.dao.ArrayDAO.create();
-        }
-      }
-
-    ]
-  });
-
-  foam.RELATIONSHIP({
-    forwardName: 'children',
-    inverseName: 'parent',
-    sourceModel: 'test.RelA',
-    //sourceProperties: [ 'bRef' ],
-    targetModel: 'test.RelB',
-    //targetProperties: [ 'aRef' ],
-
-  });
-
-  it('has relationship DAOs', function() {
-    var env = test.relEnv.create(undefined, foam.__context__);
-    var relObjA = test.RelA.create(undefined, env);
-
-    var relDAO = relObjA.children;
-
-
-
-  })
-
-});
-
 
 describe('MultiPartID MDAO support', function() {
   var mDAO;

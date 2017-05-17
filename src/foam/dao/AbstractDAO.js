@@ -152,10 +152,10 @@ foam.CLASS({
       sub.onDetach(this.on.sub(function(s, on, e, obj) {
         switch(e) {
           case 'put':
-            mySink.put(sub, obj);
+            mySink.put(obj, sub);
             break;
           case 'remove':
-            mySink.remove(sub, obj);
+            mySink.remove(obj, sub);
             break;
           case 'reset':
             mySink.reset(sub);
@@ -254,6 +254,7 @@ foam.CLASS({
   extends: 'Exception'
 })
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
@@ -290,6 +291,7 @@ foam.CLASS({
         return predicate.f(o) ? o : null;
       });
     },
+
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(
         sink, skip, limit, order,

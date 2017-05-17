@@ -68,20 +68,20 @@ foam.CLASS({
       children.put(this.Child1.create({name: 'Athena', parent: 'Zeus'}));
 
       console.log('Parents:');
-      parents.select({put: function(o) { console.log(o.stringify()); }});
+      parents.select({put: function(_, o) { console.log(o.stringify()); }});
 
       console.log('Children:');
-      children.select({put: function(o) { console.log(o.stringify()); }});
+      children.select({put: function(_, o) { console.log(o.stringify()); }});
 
       console.log('Odin\'s Children:');
-      odin.children.select({put: function(o) { console.log(o.stringify()); }});
+      odin.children.select({put: function(_, o) { console.log(o.stringify()); }});
 
       console.log('Zeus\'s Children:');
-      zeus.children.select({put: function(o) { console.log(o.stringify()); }});
+      zeus.children.select({put: function(_, o) { console.log(o.stringify()); }});
 
       zeus.children.put(this.Child1.create({name: 'Apollo'}));
       console.log('Zeus\'s Children (after adding Apollo):');
-      zeus.children.select({put: function(o) { console.log(o.stringify()); }});
+      zeus.children.select({put: function(_, o) { console.log(o.stringify()); }});
     }
   ]
 });
@@ -104,7 +104,7 @@ foam.CLASS({
       // clone joe to the mythological context to access the right DAOs
       var mythoJoe = this.Parent1.create(joe, mythos);
       console.log("Joe's children:");
-      mythoJoe.children.select({put: function(o) { console.log(o.stringify()); }});
+      mythoJoe.children.select({put: function(_, o) { console.log(o.stringify()); }});
     }
   ]
 });
@@ -197,24 +197,24 @@ foam.CLASS({
       this.bDAO.put(i2 = this.B.create({name: 'I2'}));
       this.bDAO.put(i3 = this.B.create({name: 'I3'}));
 
-      b1.bs.put(i1);
-      b1.bs.put(i2);
+      b1.bs.add(i1);
+      b1.bs.add(i2);
 
-      b2.bs.put(i2);
+      b2.bs.add(i2);
 
-      b3.bs.put(i1);
-      b3.bs.put(i2);
+      b3.bs.add(i1);
+      b3.bs.add(i2);
 
       // Or, go the other way:
-      i3.as.put(b3);
+      i3.as.add(b3);
 
       this.ABJunctionDAO.select({
-        put: function(o) { console.log('***: ', o.sourceId, o.targetId); },
+        put: function(_, o) { console.log('***: ', o.sourceId, o.targetId); },
         eof: function() {}
       });
 
-      b3.bs.select({put: function(i) { console.log(i.id); }});
-      i3.as.select({put: function(i) { console.log(i.id); }});
+      b3.bs.dao.select(foam.dao.QuickSink.create({ putFn: function(_, i) { console.log(i.id); }}));
+      i3.as.dao.select(foam.dao.QuickSink.create({ putFn: function(_, i) { console.log(i.id); }}));
 
       var b1is, b3i2;
 
@@ -238,7 +238,7 @@ foam.CLASS({
                 .where(self.EQ(ABJunction.SOURCE_ID, s2.id))
                 .select(self.MAP(ABJunction.TARGET_ID))
           ]).then(function(ids) {
-            var i1s = ids[0].delegate.a, i2s = ids[1].delegate.a;
+            var i1s = ids[0].delegate.array, i2s = ids[1].delegate.array;
             resolve(intersect(i1s, i2s));
           });
         });
@@ -261,11 +261,11 @@ foam.CLASS({
       });
 
       this.ABJunctionDAO.select(this.UNIQUE(ABJunction.SOURCE_ID)).then(function (u) {
-        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+        console.log(u.delegate.array.join(','), ' unique values: ', u.values);
       });
 
       this.ABJunctionDAO.select(this.UNIQUE(ABJunction.TARGET_ID)).then(function (u) {
-        console.log(u.delegate.a.join(','), ' unique values: ', u.values);
+        console.log(u.delegate.array.join(','), ' unique values: ', u.values);
       });
     }
   ]

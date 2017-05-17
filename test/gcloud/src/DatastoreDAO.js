@@ -191,7 +191,7 @@ describe('DatastoreDAO', function() {
     it('should fetch multiple batches for a full result set', function(done) {
       initDAO().then(function() {
         dao.select().then(function(sink) {
-          expect(sink.a.length).toBe(numRecords);
+          expect(sink.array.length).toBe(numRecords);
           expect(dao.handledMultipleBatches).toBe(true);
           done();
         });

@@ -471,6 +471,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
@@ -490,10 +491,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       this.reset();
     },
-    function remove(s, obj) {
+    function remove(obj, s) {
       this.reset();
     },
     function reset() {
@@ -511,7 +512,7 @@ foam.CLASS({
           // Check if this is a stale render
           if ( self.batch !== batch ) return;
 
-          var objs = a.a;
+          var objs = a.array;
           self.cleanup();
           for ( var i = 0 ; i < objs.length ; i++ ) {
             self.addRow(objs[i]);
@@ -521,6 +522,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -621,9 +623,10 @@ foam.CLASS({
     },
 
     // Keys which respond to keydown but not keypress
-    KEYPRESS_CODES: { 8: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    KEYPRESS_CODES: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
 
     NAMED_CODES: {
+      '13': 'enter',
       '37': 'left',
       '38': 'up',
       '39': 'right',
@@ -773,6 +776,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'scrollHeight',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -793,6 +799,22 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function observeScrollHeight() {
+      // TODO: This should be handled by an onsub event when someone subscribes to
+      // scroll height changes.
+      var self = this;
+      this.onload.sub(function(s) {
+        s.detach();
+        var observer = new MutationObserver(function(mutations) {
+          self.scrollHeight = self.el().scrollHeight;
+        });
+        var config = { attributes: true, childList: true, characterData: true };
+        observer.observe(self.el(), config);
+        self.onDetach(function() { observer.disconnect() });
+      });
+      return this;
     },
 
     function evtToCharCode(evt) {
@@ -1918,7 +1940,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW      
+      value: foam.u2.Visibility.RW
     }
   ],
 

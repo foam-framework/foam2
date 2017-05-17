@@ -265,6 +265,7 @@ foam.CLASS({
   ],
 
   properties: [
+    { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       class: 'Int',
       name: 'ordinal',
@@ -278,7 +279,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      final: true
+      final: true,
+      factory: function() {
+        return this.name;
+      }
     }
   ],
 

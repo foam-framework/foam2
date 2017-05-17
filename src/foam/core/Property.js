@@ -593,9 +593,16 @@ foam.CLASS({
       return prop;
     },
 
-    function exportAs(obj) {
+    function exportAs(obj, sourcePath) {
       /** Export obj.name$ instead of just obj.name. */
-      return this.toSlot(obj);
+
+      var slot = this.toSlot(obj);
+
+      for ( var i = 0 ; sourcePath && i < sourcePath.length ; i++ ) {
+        slot = slot.dot(sourcePath[i]);
+      }
+
+      return slot;
     },
 
     function toSlot(obj) {
