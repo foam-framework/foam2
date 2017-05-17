@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [
     'foam.dao.ProxyListener'
   ],
@@ -44,6 +45,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function listen(sink, skip, limit, order, predicate) {
       var listener = this.ProxyListener.create({
@@ -58,10 +60,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyListener',
+
   implements: ['foam.dao.Sink'],
+
   properties: [
     'args',
     'delegate',
@@ -80,18 +85,22 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function put(obj, s) {
       this.delegate.put(this, obj);
     },
+
     function remove(obj, s) {
       this.delegate.remove(this, obj);
     },
+
     function reset(s) {
       this.delegate.reset(this);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -126,6 +135,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Promised',
@@ -189,10 +199,12 @@ foam.LIB({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'InvalidArgumentException',
   extends: 'foam.dao.ExternalException',
+
   properties: [
     {
       class: 'String',
