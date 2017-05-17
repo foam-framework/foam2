@@ -361,7 +361,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return ( b === null || b === undefined ) ? 1 :
+      return ( b === null || b === undefined || foam.typeOf(b).id === 'foam.core.FObject') ? 1 :
           a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
