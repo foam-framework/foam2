@@ -38,4 +38,27 @@ public class CompoundKey
 
     return out.toString();
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if(o instanceof CompoundKey) {
+      Object[] v1 = getValues(), v2 = ((CompoundKey) o).getValues();
+      if ( v1.length != v2.length ) return false;
+      for ( int i = 0 ; i < v1.length ; i++ ) {
+        if ( ! v1[i].equals(v2[i]) ) return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    Object[] v = getValues();
+    int hash = 17;
+    for (Object aV : v) {
+      hash = 37 * hash + aV.hashCode();
+    }
+    return hash;
+  }
 }
