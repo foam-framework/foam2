@@ -55,7 +55,7 @@ foam.CLASS({
     'foam.dao.TimingDAO'
   ],
 
-  imports: [ 'document', 'log' ],
+  imports: [ 'document' ],
 
   constants: {
     // Aliases for daoType

@@ -254,6 +254,7 @@ foam.CLASS({
   extends: 'Exception'
 })
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FilteredDAO',
@@ -290,6 +291,7 @@ foam.CLASS({
         return predicate.f(o) ? o : null;
       });
     },
+
     function select(sink, skip, limit, order, predicate) {
       return this.delegate.select(
         sink, skip, limit, order,
