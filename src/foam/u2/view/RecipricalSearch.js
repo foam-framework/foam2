@@ -21,6 +21,9 @@ foam.CLASS({
   requires: [
     'foam.u2.search.SearchManager'
   ],
+  imports: [
+    'dao'
+  ],
   exports: [
     'as filterController',
     'as data'
@@ -34,17 +37,11 @@ foam.CLASS({
       name: 'data'
     },
     {
-      class: 'foam.dao.DAOProperty',
-      name: 'dao',
-      expression: function(of) {
-        return of ? this.__context__[foam.String.daoize(of.name)] : foam.dao.NullDAO.create();
-      }
-    },
-    {
       class: 'Array',
       name: 'filters',
       factory: null,
-      expression: function(of) {
+      expression: function(dao) {
+        var of = dao && dao.of;
         return ! of ? [] :
           of.model_.tableColumns ? of.model_.tableColumns :
           of.getAxiomsByClass(foam.core.Property).
@@ -72,9 +69,9 @@ foam.CLASS({
           e.forEach(filters, function(f) {
             // TODO: See if this can be cleaned up somehow, if searchView didn't require the proprety explicitly, or
             // could find the search manager via the context and add itself to that.
-            var axiom = self.of.getAxiomByName(f);
+            var axiom = self.dao.of.getAxiomByName(f);
             var spec  = axiom.searchView;
-            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao$proxy }, this, this.__subSubContext__);
+            var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao }, this, this.__subSubContext__);
 
             searchManager.add(view);
             this.add(axiom.label, view);

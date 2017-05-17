@@ -17,11 +17,12 @@ public class Boot {
 
   public Boot() {
     serviceDAO_ = new MapDAO();
-    loadTestData();
     ((MapDAO) serviceDAO_).setOf(NSpec.getOwnClassInfo());
+    ((MapDAO) serviceDAO_).setX(root_);
+    loadTestData();
 
     ((AbstractDAO) serviceDAO_).select(new AbstractSink() {
-      public void put(Detachable sub, FObject obj) {
+      public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("NSpec: " + sp.getName());
 
@@ -45,14 +46,12 @@ public class Boot {
   protected void loadTestData() {
     NSpec s = new NSpec();
     s.setName("http");
-    s.setServiceClass("foam.nano.http.HttpServer");
+    s.setServiceClass("foam.nanos.http.NanoHttpServer");
     serviceDAO_.put(s);
   }
 
-  public void main (String[] args) throws Exception {
+  public static void main (String[] args) throws Exception {
     new Boot();
-
-    Thread.currentThread().setDaemon(true);
   }
 
 }

@@ -167,7 +167,7 @@ describe('ValueIndex', function() {
   it('selects when skip and limit allow', function() {
     idx.put(data[0]);
 
-    var sink = { put: function(_, o) { this.putted = o; } };
+    var sink = { put: function(o) { this.putted = o; } };
 
     idx.select(sink);
     expect(sink.putted).toBe(data[0]);
@@ -215,7 +215,7 @@ describe('ValueIndex', function() {
   it('selects when predicate allows', function() {
     idx.put(data[0]);
 
-    var sink = { put: function(_, o) { this.putted = o; } };
+    var sink = { put: function(o) { this.putted = o; } };
 
     var predicate = { f: function() { return false; } };
     idx.select(sink, undefined, undefined, undefined, predicate);
@@ -263,7 +263,7 @@ describe('ValueIndex (as Plan)', function() {
   it('plans for no value', function() {
     plan = idx.plan();
 
-    var sink = { put: function(_, o) { this.putted = o; } };
+    var sink = { put: function(o) { this.putted = o; } };
 
     expect(plan.cost).toEqual(1);
     plan.execute([/*promise*/], sink);
@@ -276,7 +276,7 @@ describe('ValueIndex (as Plan)', function() {
     idx.put(data[0]);
     plan = idx.plan();
 
-    var sink = { put: function(_, o) { this.putted = o; } };
+    var sink = { put: function(o) { this.putted = o; } };
 
     expect(plan.cost).toEqual(1);
     plan.execute([/*promise*/], sink);
@@ -329,10 +329,10 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(3);
-    expect(sink.a[0].int).toEqual(0);
-    expect(sink.a[1].int).toEqual(1);
-    expect(sink.a[2].int).toEqual(2);
+    expect(sink.array.length).toEqual(3);
+    expect(sink.array[0].int).toEqual(0);
+    expect(sink.array[1].int).toEqual(1);
+    expect(sink.array[2].int).toEqual(2);
   });
 
   it('optimizes IN with a cloned predicate', function() {
@@ -348,10 +348,10 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(3);
-    expect(sink.a[0].int).toEqual(0);
-    expect(sink.a[1].int).toEqual(1);
-    expect(sink.a[2].int).toEqual(2);
+    expect(sink.array.length).toEqual(3);
+    expect(sink.array[0].int).toEqual(0);
+    expect(sink.array[1].int).toEqual(1);
+    expect(sink.array[2].int).toEqual(2);
   });
 
   it('optimizes not found IN', function() {
@@ -362,7 +362,7 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(0);
+    expect(sink.array.length).toEqual(0);
   });
 
   it('optimizes EQ', function() {
@@ -375,8 +375,8 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(1);
-    expect(sink.a[0].int).toEqual(4);
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0].int).toEqual(4);
   });
 
   it('optimizes not found EQ', function() {
@@ -387,7 +387,7 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(0);
+    expect(sink.array.length).toEqual(0);
   });
 
   it('optimizes False', function() {
@@ -397,7 +397,7 @@ describe('TreeIndex', function() {
     expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
 
     plan.execute([], sink);
-    expect(sink.a.length).toEqual(0);
+    expect(sink.array.length).toEqual(0);
   });
 
 
@@ -412,12 +412,12 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink, undefined, undefined, undefined, pred);
 
-    expect(sink.a.length).toEqual(5);
-    expect(sink.a[0].int).toEqual(3);
-    expect(sink.a[1].int).toEqual(4);
-    expect(sink.a[2].int).toEqual(5);
-    expect(sink.a[3].int).toEqual(6);
-    expect(sink.a[4].int).toEqual(7);
+    expect(sink.array.length).toEqual(5);
+    expect(sink.array[0].int).toEqual(3);
+    expect(sink.array[1].int).toEqual(4);
+    expect(sink.array[2].int).toEqual(5);
+    expect(sink.array[3].int).toEqual(6);
+    expect(sink.array[4].int).toEqual(7);
 
   });
 
@@ -437,31 +437,31 @@ describe('TreeIndex', function() {
 
     plan.execute([], sink, undefined, undefined, order);
 
-    expect(sink.a.length).toEqual(20);
-    expect(sink.a[0].int).toEqual(0);
-    expect(sink.a[1].int).toEqual(5);
-    expect(sink.a[2].int).toEqual(10);
-    expect(sink.a[3].int).toEqual(15);
+    expect(sink.array.length).toEqual(20);
+    expect(sink.array[0].int).toEqual(0);
+    expect(sink.array[1].int).toEqual(5);
+    expect(sink.array[2].int).toEqual(10);
+    expect(sink.array[3].int).toEqual(15);
 
-    expect(sink.a[4].int).toEqual(1);
-    expect(sink.a[5].int).toEqual(6);
-    expect(sink.a[6].int).toEqual(11);
-    expect(sink.a[7].int).toEqual(16);
+    expect(sink.array[4].int).toEqual(1);
+    expect(sink.array[5].int).toEqual(6);
+    expect(sink.array[6].int).toEqual(11);
+    expect(sink.array[7].int).toEqual(16);
 
-    expect(sink.a[8].int).toEqual(2);
-    expect(sink.a[9].int).toEqual(7);
-    expect(sink.a[10].int).toEqual(12);
-    expect(sink.a[11].int).toEqual(17);
+    expect(sink.array[8].int).toEqual(2);
+    expect(sink.array[9].int).toEqual(7);
+    expect(sink.array[10].int).toEqual(12);
+    expect(sink.array[11].int).toEqual(17);
 
-    expect(sink.a[12].int).toEqual(3);
-    expect(sink.a[13].int).toEqual(8);
-    expect(sink.a[14].int).toEqual(13);
-    expect(sink.a[15].int).toEqual(18);
+    expect(sink.array[12].int).toEqual(3);
+    expect(sink.array[13].int).toEqual(8);
+    expect(sink.array[14].int).toEqual(13);
+    expect(sink.array[15].int).toEqual(18);
 
-    expect(sink.a[16].int).toEqual(4);
-    expect(sink.a[17].int).toEqual(9);
-    expect(sink.a[18].int).toEqual(14);
-    expect(sink.a[19].int).toEqual(19);
+    expect(sink.array[16].int).toEqual(4);
+    expect(sink.array[17].int).toEqual(9);
+    expect(sink.array[18].int).toEqual(14);
+    expect(sink.array[19].int).toEqual(19);
   });
 
   it('orders reverse scans', function() {
@@ -483,38 +483,38 @@ describe('TreeIndex', function() {
     // string is generated in groups of 5, so sort by string
     // then reverse sort int will have reversed groups of 5
     // ints
-    expect(sink.a.length).toEqual(20);
+    expect(sink.array.length).toEqual(20);
 
 
-    expect(sink.a[0].string).toEqual('hello0');
-    expect(sink.a[0].int).toEqual(15);
-    expect(sink.a[1].int).toEqual(10);
-    expect(sink.a[2].int).toEqual(5);
-    expect(sink.a[3].int).toEqual(0);
+    expect(sink.array[0].string).toEqual('hello0');
+    expect(sink.array[0].int).toEqual(15);
+    expect(sink.array[1].int).toEqual(10);
+    expect(sink.array[2].int).toEqual(5);
+    expect(sink.array[3].int).toEqual(0);
 
-    expect(sink.a[4].string).toEqual('hello1');
-    expect(sink.a[4].int).toEqual(16);
-    expect(sink.a[5].int).toEqual(11);
-    expect(sink.a[6].int).toEqual(6);
-    expect(sink.a[7].int).toEqual(1);
+    expect(sink.array[4].string).toEqual('hello1');
+    expect(sink.array[4].int).toEqual(16);
+    expect(sink.array[5].int).toEqual(11);
+    expect(sink.array[6].int).toEqual(6);
+    expect(sink.array[7].int).toEqual(1);
 
-    expect(sink.a[8].string).toEqual('hello2');
-    expect(sink.a[8].int).toEqual(17);
-    expect(sink.a[9].int).toEqual(12);
-    expect(sink.a[10].int).toEqual(7);
-    expect(sink.a[11].int).toEqual(2);
+    expect(sink.array[8].string).toEqual('hello2');
+    expect(sink.array[8].int).toEqual(17);
+    expect(sink.array[9].int).toEqual(12);
+    expect(sink.array[10].int).toEqual(7);
+    expect(sink.array[11].int).toEqual(2);
 
-    expect(sink.a[12].string).toEqual('hello3');
-    expect(sink.a[12].int).toEqual(18);
-    expect(sink.a[13].int).toEqual(13);
-    expect(sink.a[14].int).toEqual(8);
-    expect(sink.a[15].int).toEqual(3);
+    expect(sink.array[12].string).toEqual('hello3');
+    expect(sink.array[12].int).toEqual(18);
+    expect(sink.array[13].int).toEqual(13);
+    expect(sink.array[14].int).toEqual(8);
+    expect(sink.array[15].int).toEqual(3);
 
-    expect(sink.a[16].string).toEqual('hello4');
-    expect(sink.a[16].int).toEqual(19);
-    expect(sink.a[17].int).toEqual(14);
-    expect(sink.a[18].int).toEqual(9);
-    expect(sink.a[19].int).toEqual(4);
+    expect(sink.array[16].string).toEqual('hello4');
+    expect(sink.array[16].int).toEqual(19);
+    expect(sink.array[17].int).toEqual(14);
+    expect(sink.array[18].int).toEqual(9);
+    expect(sink.array[19].int).toEqual(4);
 
 
   });
@@ -542,38 +542,38 @@ describe('TreeIndex', function() {
     // string is generated in groups of 5, so sort by string
     // then reverse sort int will have reversed groups of 5
     // ints
-    expect(sink.a.length).toEqual(20);
+    expect(sink.array.length).toEqual(20);
 
 
-    expect(sink.a[0].string).toEqual('hello0');
-    expect(sink.a[0].int).toEqual(15);
-    expect(sink.a[1].int).toEqual(10);
-    expect(sink.a[2].int).toEqual(5);
-    expect(sink.a[3].int).toEqual(0);
+    expect(sink.array[0].string).toEqual('hello0');
+    expect(sink.array[0].int).toEqual(15);
+    expect(sink.array[1].int).toEqual(10);
+    expect(sink.array[2].int).toEqual(5);
+    expect(sink.array[3].int).toEqual(0);
 
-    expect(sink.a[4].string).toEqual('hello1');
-    expect(sink.a[4].int).toEqual(16);
-    expect(sink.a[5].int).toEqual(11);
-    expect(sink.a[6].int).toEqual(6);
-    expect(sink.a[7].int).toEqual(1);
+    expect(sink.array[4].string).toEqual('hello1');
+    expect(sink.array[4].int).toEqual(16);
+    expect(sink.array[5].int).toEqual(11);
+    expect(sink.array[6].int).toEqual(6);
+    expect(sink.array[7].int).toEqual(1);
 
-    expect(sink.a[8].string).toEqual('hello2');
-    expect(sink.a[8].int).toEqual(17);
-    expect(sink.a[9].int).toEqual(12);
-    expect(sink.a[10].int).toEqual(7);
-    expect(sink.a[11].int).toEqual(2);
+    expect(sink.array[8].string).toEqual('hello2');
+    expect(sink.array[8].int).toEqual(17);
+    expect(sink.array[9].int).toEqual(12);
+    expect(sink.array[10].int).toEqual(7);
+    expect(sink.array[11].int).toEqual(2);
 
-    expect(sink.a[12].string).toEqual('hello3');
-    expect(sink.a[12].int).toEqual(18);
-    expect(sink.a[13].int).toEqual(13);
-    expect(sink.a[14].int).toEqual(8);
-    expect(sink.a[15].int).toEqual(3);
+    expect(sink.array[12].string).toEqual('hello3');
+    expect(sink.array[12].int).toEqual(18);
+    expect(sink.array[13].int).toEqual(13);
+    expect(sink.array[14].int).toEqual(8);
+    expect(sink.array[15].int).toEqual(3);
 
-    expect(sink.a[16].string).toEqual('hello4');
-    expect(sink.a[16].int).toEqual(19);
-    expect(sink.a[17].int).toEqual(14);
-    expect(sink.a[18].int).toEqual(9);
-    expect(sink.a[19].int).toEqual(4);
+    expect(sink.array[16].string).toEqual('hello4');
+    expect(sink.array[16].int).toEqual(19);
+    expect(sink.array[17].int).toEqual(14);
+    expect(sink.array[18].int).toEqual(9);
+    expect(sink.array[19].int).toEqual(4);
 
 
   });
@@ -598,7 +598,7 @@ describe('TreeIndex', function() {
 //     //expect(foam.dao.index.NotFoundPlan.isInstance(plan)).toEqual(true);
 
 //     plan.execute([], sink);
-//     expect(sink.a.length).toEqual(data.length);
+//     expect(sink.array.length).toEqual(data.length);
 //   });
 
 
@@ -633,8 +633,8 @@ describe('Case-Insensitive TreeIndex', function() {
     plan.execute([], sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.STRING, 'three'));
 
-    expect(sink.a.length).toEqual(1);
-    expect(sink.a[0].string).toEqual('three');
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0].string).toEqual('three');
 
 
     plan = idx.plan(sink, undefined, undefined, undefined,
@@ -642,9 +642,9 @@ describe('Case-Insensitive TreeIndex', function() {
     plan.execute([], sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.STRING, 'one!'));
 
-    expect(sink.a.length).toEqual(3);
-    expect(sink.a[1].string).toEqual('one!');
-    expect(sink.a[2].string).toEqual('one!');
+    expect(sink.array.length).toEqual(3);
+    expect(sink.array[1].string).toEqual('one!');
+    expect(sink.array[2].string).toEqual('one!');
   });
 
   it('removes case-insensitive', function() {
@@ -663,7 +663,7 @@ describe('Case-Insensitive TreeIndex', function() {
     );
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(0);
+    expect(sink.array.length).toEqual(0);
   });
 });
 
@@ -692,16 +692,16 @@ describe('SetIndex', function() {
     );
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(1);
-    expect(sink.a[0].int).toEqual(1);
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0].int).toEqual(1);
 
     plan = idx.plan(sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.ARRAY, 'hello')
     );
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(2);
-    expect(sink.a[1].int).toEqual(0);
+    expect(sink.array.length).toEqual(2);
+    expect(sink.array[1].int).toEqual(0);
   });
 
   it('removes based on array values', function() {
@@ -712,15 +712,15 @@ describe('SetIndex', function() {
     );
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(1);
-    expect(sink.a[0].int).toEqual(1);
+    expect(sink.array.length).toEqual(1);
+    expect(sink.array[0].int).toEqual(1);
 
     plan = idx.plan(sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.ARRAY, 'hello')
     );
     plan.execute([], sink);
 
-    expect(sink.a.length).toEqual(1);
+    expect(sink.array.length).toEqual(1);
 
   });
 
@@ -787,18 +787,18 @@ describe('AltIndex', function() {
     idx.remove(data[0]);
 
     plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
-    expect(sink.a.length).toEqual(0);
+    expect(sink.array.length).toEqual(0);
 
     plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
-    expect(sink.a.length).toEqual(0);
+    expect(sink.array.length).toEqual(0);
 
     // puts back
     idx.put(data[0]);
     plan = callPlan(idx, sink, m.EQ(test.Indexable.FLOAT, data[0].float));
-    expect(sink.a.length).toEqual(1);
+    expect(sink.array.length).toEqual(1);
 
     plan = callPlan(idx, sink, m.EQ(test.Indexable.INT, data[0].int));
-    expect(sink.a.length).toEqual(2);
+    expect(sink.array.length).toEqual(2);
   });
 
   it('covers get()', function() {
@@ -1058,14 +1058,14 @@ describe('MergePlan', function() {
 
   it('handles empty input', function() {
     plan.execute([], sink);
-    expect(sink.a.length).toBe(0);
+    expect(sink.array.length).toBe(0);
   });
 
   it('handles empty input with ordering', function() {
     var ordering = test.MergePlanTestData.B;
 
     plan.execute([], sink, undefined, undefined, ordering);
-    expect(sink.a.length).toBe(0);
+    expect(sink.array.length).toBe(0);
   });
 
   it('handles a single subplan', function() {
@@ -1075,14 +1075,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 10; i++ ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       })
     ];
 
     plan.execute([], sink);
-    expect(sink.a.length).toBe(10);
+    expect(sink.array.length).toBe(10);
   });
 
   it('handles a single subplan with ordering', function() {
@@ -1094,16 +1094,16 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 10; i++ ) {
-            sink.put(null, data.setA[9 - i]);
+            sink.put(data.setA[9 - i]);
           }
         }
       })
     ];
 
     plan.execute([], sink, undefined, undefined, ordering);
-    expect(sink.a.length).toBe(10);
-    expect(sink.a[0].b).toBe(1); // should be ordered by 'b'
-    expect(sink.a[9].b).toBe(10);
+    expect(sink.array.length).toBe(10);
+    expect(sink.array[0].b).toBe(1); // should be ordered by 'b'
+    expect(sink.array[9].b).toBe(10);
   });
 
   it('deduplicates with ordering', function() {
@@ -1115,32 +1115,32 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
     ];
 
     plan.execute([], sink, undefined, undefined, ordering);
-    expect(sink.a.length).toBe(10);
-    expect(sink.a[0].a).toBe(0);
-    expect(sink.a[1].a).toBe(1);
-    expect(sink.a[2].a).toBe(2);
-    expect(sink.a[9].a).toBe(9);
+    expect(sink.array.length).toBe(10);
+    expect(sink.array[0].a).toBe(0);
+    expect(sink.array[1].a).toBe(1);
+    expect(sink.array[2].a).toBe(2);
+    expect(sink.array[9].a).toBe(9);
   });
 
   it('deduplicates', function() {
@@ -1150,32 +1150,32 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) { // put dupes of first 5
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
     ];
 
     plan.execute([], sink);
-    expect(sink.a.length).toBe(10);
-    expect(sink.a[0].a).toBe(0);
-    expect(sink.a[1].a).toBe(1);
-    expect(sink.a[2].a).toBe(2);
-    expect(sink.a[9].a).toBe(9);
+    expect(sink.array.length).toBe(10);
+    expect(sink.array[0].a).toBe(0);
+    expect(sink.array[1].a).toBe(1);
+    expect(sink.array[2].a).toBe(2);
+    expect(sink.array[9].a).toBe(9);
   });
 
 
@@ -1186,32 +1186,32 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 5; i++ ) { // put cloned dupes of first 5
-            sink.put(null, data.setA[i].clone());
+            sink.put(data.setA[i].clone());
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 5; i < 10; i++ ) { // finish last 5 items
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
     ];
 
     plan.execute([], sink);
-    expect(sink.a.length).toBe(10);
-    expect(sink.a[0].a).toBe(0);
-    expect(sink.a[1].a).toBe(1);
-    expect(sink.a[2].a).toBe(2);
-    expect(sink.a[9].a).toBe(9);
+    expect(sink.array.length).toBe(10);
+    expect(sink.array[0].a).toBe(0);
+    expect(sink.array[1].a).toBe(1);
+    expect(sink.array[2].a).toBe(2);
+    expect(sink.array[9].a).toBe(9);
   });
 
   it('merges results', function() {
@@ -1222,14 +1222,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(null, data.setB[i]);
+            sink.put(data.setB[i]);
           }
         }
       }),
@@ -1237,23 +1237,23 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, undefined, undefined, ordering);
 
-    expect(sink.a.length).toBe(15);
+    expect(sink.array.length).toBe(15);
 
-    expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
-    expect(sink.a[1].a).toBe(13); expect(sink.a[1].b).toBe(-3);
-    expect(sink.a[2].a).toBe(12); expect(sink.a[2].b).toBe(-2);
-    expect(sink.a[3].a).toBe(11); expect(sink.a[3].b).toBe(-1);
-    expect(sink.a[4].a).toBe(10); expect(sink.a[4].b).toBe(0);
-    expect(sink.a[5].a).toBe(9); expect(sink.a[5].b).toBe(1);
-    expect(sink.a[6].a).toBe(8); expect(sink.a[6].b).toBe(2);
-    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(3);
-    expect(sink.a[8].a).toBe(6); expect(sink.a[8].b).toBe(4);
-    expect(sink.a[9].a).toBe(5); expect(sink.a[9].b).toBe(5);
-    expect(sink.a[10].a).toBe(4); expect(sink.a[10].b).toBe(6);
-    expect(sink.a[11].a).toBe(3); expect(sink.a[11].b).toBe(7);
-    expect(sink.a[12].a).toBe(2); expect(sink.a[12].b).toBe(8);
-    expect(sink.a[13].a).toBe(1); expect(sink.a[13].b).toBe(9);
-    expect(sink.a[14].a).toBe(0); expect(sink.a[14].b).toBe(10);
+    expect(sink.array[0].a).toBe(14); expect(sink.array[0].b).toBe(-4);
+    expect(sink.array[1].a).toBe(13); expect(sink.array[1].b).toBe(-3);
+    expect(sink.array[2].a).toBe(12); expect(sink.array[2].b).toBe(-2);
+    expect(sink.array[3].a).toBe(11); expect(sink.array[3].b).toBe(-1);
+    expect(sink.array[4].a).toBe(10); expect(sink.array[4].b).toBe(0);
+    expect(sink.array[5].a).toBe(9); expect(sink.array[5].b).toBe(1);
+    expect(sink.array[6].a).toBe(8); expect(sink.array[6].b).toBe(2);
+    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toBe(3);
+    expect(sink.array[8].a).toBe(6); expect(sink.array[8].b).toBe(4);
+    expect(sink.array[9].a).toBe(5); expect(sink.array[9].b).toBe(5);
+    expect(sink.array[10].a).toBe(4); expect(sink.array[10].b).toBe(6);
+    expect(sink.array[11].a).toBe(3); expect(sink.array[11].b).toBe(7);
+    expect(sink.array[12].a).toBe(2); expect(sink.array[12].b).toBe(8);
+    expect(sink.array[13].a).toBe(1); expect(sink.array[13].b).toBe(9);
+    expect(sink.array[14].a).toBe(0); expect(sink.array[14].b).toBe(10);
 
 
   });
@@ -1266,14 +1266,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(null, data.setB[i]);
+            sink.put(data.setB[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
@@ -1281,23 +1281,23 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, undefined, undefined, ordering);
 
-    expect(sink.a.length).toBe(15);
+    expect(sink.array.length).toBe(15);
 
-    expect(sink.a[0].a).toBe(14); expect(sink.a[0].b).toBe(-4);
-    expect(sink.a[1].a).toBe(13); expect(sink.a[1].b).toBe(-3);
-    expect(sink.a[2].a).toBe(12); expect(sink.a[2].b).toBe(-2);
-    expect(sink.a[3].a).toBe(11); expect(sink.a[3].b).toBe(-1);
-    expect(sink.a[4].a).toBe(10); expect(sink.a[4].b).toBe(0);
-    expect(sink.a[5].a).toBe(9); expect(sink.a[5].b).toBe(1);
-    expect(sink.a[6].a).toBe(8); expect(sink.a[6].b).toBe(2);
-    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(3);
-    expect(sink.a[8].a).toBe(6); expect(sink.a[8].b).toBe(4);
-    expect(sink.a[9].a).toBe(5); expect(sink.a[9].b).toBe(5);
-    expect(sink.a[10].a).toBe(4); expect(sink.a[10].b).toBe(6);
-    expect(sink.a[11].a).toBe(3); expect(sink.a[11].b).toBe(7);
-    expect(sink.a[12].a).toBe(2); expect(sink.a[12].b).toBe(8);
-    expect(sink.a[13].a).toBe(1); expect(sink.a[13].b).toBe(9);
-    expect(sink.a[14].a).toBe(0); expect(sink.a[14].b).toBe(10);
+    expect(sink.array[0].a).toBe(14); expect(sink.array[0].b).toBe(-4);
+    expect(sink.array[1].a).toBe(13); expect(sink.array[1].b).toBe(-3);
+    expect(sink.array[2].a).toBe(12); expect(sink.array[2].b).toBe(-2);
+    expect(sink.array[3].a).toBe(11); expect(sink.array[3].b).toBe(-1);
+    expect(sink.array[4].a).toBe(10); expect(sink.array[4].b).toBe(0);
+    expect(sink.array[5].a).toBe(9); expect(sink.array[5].b).toBe(1);
+    expect(sink.array[6].a).toBe(8); expect(sink.array[6].b).toBe(2);
+    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toBe(3);
+    expect(sink.array[8].a).toBe(6); expect(sink.array[8].b).toBe(4);
+    expect(sink.array[9].a).toBe(5); expect(sink.array[9].b).toBe(5);
+    expect(sink.array[10].a).toBe(4); expect(sink.array[10].b).toBe(6);
+    expect(sink.array[11].a).toBe(3); expect(sink.array[11].b).toBe(7);
+    expect(sink.array[12].a).toBe(2); expect(sink.array[12].b).toBe(8);
+    expect(sink.array[13].a).toBe(1); expect(sink.array[13].b).toBe(9);
+    expect(sink.array[14].a).toBe(0); expect(sink.array[14].b).toBe(10);
 
   });
 
@@ -1309,14 +1309,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(null, data.setB[i]);
+            sink.put(data.setB[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 9; i >= 0; i-- ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
@@ -1324,13 +1324,13 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, 3, 5, ordering);
 
-    expect(sink.a.length).toBe(5);
+    expect(sink.array.length).toBe(5);
 
-    expect(sink.a[0].a).toBe(11); expect(sink.a[0].b).toBe(-1);
-    expect(sink.a[1].a).toBe(10); expect(sink.a[1].b).toBe(0);
-    expect(sink.a[2].a).toBe(9); expect(sink.a[2].b).toBe(1);
-    expect(sink.a[3].a).toBe(8); expect(sink.a[3].b).toBe(2);
-    expect(sink.a[4].a).toBe(7); expect(sink.a[4].b).toBe(3);
+    expect(sink.array[0].a).toBe(11); expect(sink.array[0].b).toBe(-1);
+    expect(sink.array[1].a).toBe(10); expect(sink.array[1].b).toBe(0);
+    expect(sink.array[2].a).toBe(9); expect(sink.array[2].b).toBe(1);
+    expect(sink.array[3].a).toBe(8); expect(sink.array[3].b).toBe(2);
+    expect(sink.array[4].a).toBe(7); expect(sink.array[4].b).toBe(3);
 
   });
 
@@ -1349,7 +1349,7 @@ describe('MergePlan', function() {
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           promise[0] = Promise.resolve().then(function() {
             for ( var i = 9; i >= 0; i-- ) {
-              sink.put(null, data.setB[i]);
+              sink.put(data.setB[i]);
             }
           });
         }
@@ -1360,7 +1360,7 @@ describe('MergePlan', function() {
             innerResolve = res; // intermediate promise we control
           }).then(function() {
             for ( var i = 9; i >= 0; i-- ) { // do final work
-              sink.put(null, data.setA[i]);
+              sink.put(data.setA[i]);
             }
           });
         }
@@ -1369,15 +1369,15 @@ describe('MergePlan', function() {
 
     plan.execute(promiseRef, sink, undefined, undefined, ordering);
     // Nothing resloved, no sink putting actually done by our customExecutes
-    for (var j =0; j<sink.a.length;j++) {
-      var item = sink.a[j];
-      console.log("item1", j, item.a, item.b);
+    for (var j =0; j<sink.array.length;j++) {
+      var item = sink.array[j];
+      console.log("item1", j, item.array, item.b);
     }
-    expect(sink.a.length).toBe(0);
+    expect(sink.array.length).toBe(0);
 
     promiseRef[0].then(function() {
       // all resolved, all sinks dumped to result sink
-      expect(sink.a.length).toBe(15);
+      expect(sink.array.length).toBe(15);
     }).then(done);
 
     // release both the first and second promises in the chain
@@ -1394,14 +1394,14 @@ describe('MergePlan', function() {
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 8; i++ ) {
-            sink.put(null, data.setA[i]);
+            sink.put(data.setA[i]);
           }
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
           for ( var i = 0; i < 8; i++ ) {
-            sink.put(null, data.setA[i].clone());
+            sink.put(data.setA[i].clone());
           }
         }
       }),
@@ -1409,16 +1409,16 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, undefined, undefined, ordering);
 
-    expect(sink.a.length).toBe(8);
+    expect(sink.array.length).toBe(8);
 
-    expect(sink.a[0].a).toBe(0); expect(sink.a[0].b).toBe(0);
-    expect(sink.a[1].a).toBe(1); expect(sink.a[1].b).toBe(0);
-    expect(sink.a[2].a).toBe(2); expect(sink.a[2].b).toBe(0);
-    expect(sink.a[3].a).toBe(3); expect(sink.a[3].b).toBe(0);
-    expect(sink.a[4].a).toBe(4); expect(sink.a[4].b).toBe(1);
-    expect(sink.a[5].a).toBe(5); expect(sink.a[5].b).toBe(1);
-    expect(sink.a[6].a).toBe(6); expect(sink.a[6].b).toBe(1);
-    expect(sink.a[7].a).toBe(7); expect(sink.a[7].b).toBe(1);
+    expect(sink.array[0].a).toBe(0); expect(sink.array[0].b).toBe(0);
+    expect(sink.array[1].a).toBe(1); expect(sink.array[1].b).toBe(0);
+    expect(sink.array[2].a).toBe(2); expect(sink.array[2].b).toBe(0);
+    expect(sink.array[3].a).toBe(3); expect(sink.array[3].b).toBe(0);
+    expect(sink.array[4].a).toBe(4); expect(sink.array[4].b).toBe(1);
+    expect(sink.array[5].a).toBe(5); expect(sink.array[5].b).toBe(1);
+    expect(sink.array[6].a).toBe(6); expect(sink.array[6].b).toBe(1);
+    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toBe(1);
 
   });
 
@@ -1428,43 +1428,43 @@ describe('MergePlan', function() {
     plan.subPlans = [
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
-          sink.put(null, data.setA[1]);
-          sink.put(null, data.setA[0]);
-          sink.put(null, data.setA[3]);
-          sink.put(null, data.setA[2]);
-          sink.put(null, data.setA[6]);
-          sink.put(null, data.setA[7]);
-          sink.put(null, data.setA[4]);
-          sink.put(null, data.setA[5]);
+          sink.put(data.setA[1]);
+          sink.put(data.setA[0]);
+          sink.put(data.setA[3]);
+          sink.put(data.setA[2]);
+          sink.put(data.setA[6]);
+          sink.put(data.setA[7]);
+          sink.put(data.setA[4]);
+          sink.put(data.setA[5]);
         }
       }),
       foam.dao.index.CustomPlan.create({
         customExecute: function(promise, sink, skip, limit, order, predicate) {
-          sink.put(null, data.setA[0]);
-          sink.put(null, data.setA[3]);
-          sink.put(null, data.setA[1]);
-          sink.put(null, data.setA[2]);
-          sink.put(null, data.setA[6]);
-          sink.put(null, data.setA[5]);
-          sink.put(null, data.setA[7]);
-          sink.put(null, data.setA[4]);
+          sink.put(data.setA[0]);
+          sink.put(data.setA[3]);
+          sink.put(data.setA[1]);
+          sink.put(data.setA[2]);
+          sink.put(data.setA[6]);
+          sink.put(data.setA[5]);
+          sink.put(data.setA[7]);
+          sink.put(data.setA[4]);
         }
       }),
     ];
 
     plan.execute([], sink);
 
-    expect(sink.a.length).toBe(8);
+    expect(sink.array.length).toBe(8);
 
     // The first set of items remains, in the order inserted
-    expect(sink.a[0].a).toBe(1);
-    expect(sink.a[1].a).toBe(0);
-    expect(sink.a[2].a).toBe(3);
-    expect(sink.a[3].a).toBe(2);
-    expect(sink.a[4].a).toBe(6);
-    expect(sink.a[5].a).toBe(7);
-    expect(sink.a[6].a).toBe(4);
-    expect(sink.a[7].a).toBe(5);
+    expect(sink.array[0].a).toBe(1);
+    expect(sink.array[1].a).toBe(0);
+    expect(sink.array[2].a).toBe(3);
+    expect(sink.array[3].a).toBe(2);
+    expect(sink.array[4].a).toBe(6);
+    expect(sink.array[5].a).toBe(7);
+    expect(sink.array[6].a).toBe(4);
+    expect(sink.array[7].a).toBe(5);
   });
 
 

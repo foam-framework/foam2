@@ -93,6 +93,10 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'HelloMessage'
+});
 
 foam.CLASS({
   package: 'foam.box',
@@ -175,6 +179,7 @@ foam.CLASS({
   properties: [
     {
       name: 'registry',
+      hidden: true,
       factory: function() { return {}; }
     }
   ],
@@ -264,6 +269,7 @@ foam.CLASS({
   requires: [
     'foam.box.SubBoxMessage',
     'foam.box.Message',
+    'foam.box.HelloMessage',
     'foam.box.SkeletonBox'
   ],
 
@@ -295,6 +301,7 @@ foam.CLASS({
                 }));
             }
           }
+        } else if ( this.HelloMessage.isInstance(msg.object) ) {
         } else {
           this.registrySkeleton.send(msg);
         }
@@ -629,12 +636,12 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(_, obj) {
+    function put(obj) {
       this.box.send(this.DAOEvent.create({
         name: 'put', obj: obj
       }));
     },
-    function remove(_, obj) {
+    function remove(obj) {
       this.box.send(this.DAOEvent.create({
         name: 'remove', obj: obj
       }));
@@ -696,7 +703,7 @@ foam.CLASS({
         var self = this;
 
         return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
-          var items = result.a;
+          var items = result.array;
 
           if ( ! sink ) return result;
 
@@ -707,7 +714,7 @@ foam.CLASS({
           for ( var i = 0 ; i < items.length ; i++ ) {
             if ( detached ) break;
 
-            sink.put(sub, items[i]);
+            sink.put(items[i], sub);
           }
 
           sink.eof();
@@ -1217,6 +1224,7 @@ foam.CLASS({
   properties: [
     {
       name: 'messagePortService',
+      hidden: true,
       factory: function() {
         var model = foam.lookup('foam.messageport.MessagePortService', true);
         if ( model ) {
@@ -1228,6 +1236,7 @@ foam.CLASS({
     },
     {
       name: 'socketService',
+      hidden: true,
       factory: function() {
         var model = foam.lookup('foam.net.node.SocketService', true);
         if ( model ) {
@@ -1239,6 +1248,7 @@ foam.CLASS({
     },
     {
       name: 'webSocketService',
+      hidden: true,
       factory: function() {
         var model = foam.lookup('foam.net.node.WebSocketService', true) ||
             foam.lookup('foam.net.web.WebSocketService', true);
@@ -1252,22 +1262,26 @@ foam.CLASS({
     },
     {
       name: 'registry',
+      hidden: true,
       factory: function() {
         return this.BoxRegistryBox.create();
       }
     },
     {
       name: 'root',
+      hidden: true,
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
       }
     },
     {
       class: 'String',
-      name: 'myname'
+      name: 'myname',
+      hidden: true,
     },
     {
       name: 'me',
+      hidden: true,
       factory: function() {
         var me = this.NamedBox.create({
           name: this.myname || ( '/com/foamdev/anonymous/' + foam.uuid.randomGUID() )
@@ -1464,6 +1478,67 @@ foam.CLASS({
 
 	return this.RawMessagePortBox.create({ port: channel.port1 });
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardedMessage',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      name: 'destination'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'payload'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.ForwardedMessage'
+  ],
+  properties: [
+    {
+      name: 'destination'
+    }
+  ],
+  methods: [
+    function send(m) {
+      m.object = this.ForwardedMessage.create({
+        destination: this.destination,
+        payload: m.object
+      });
+      this.SUPER(m);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardingBox',
+  implements: [ 'foam.box.Box' ],
+  requires: [
+    'foam.box.ForwardedMessage'
+  ],
+  methods: [
+    function send(m) {
+      if ( ! this.ForwardedMessage.isInstance(m.object) ) throw foam.box.InvalidMessageException.create();
+
+      var wrapper = m.object;
+      m.object = wrapper.payload;
+
+      wrapper.destination.describe();
+
+
+      wrapper.destination.send(m);
     }
   ]
 });

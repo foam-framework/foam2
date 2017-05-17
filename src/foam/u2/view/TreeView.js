@@ -86,7 +86,7 @@ foam.CLASS({
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
           var e2 = this.E('div');
-          e2.select(this.data[self.relationship.forwardName], function(obj) {
+          e2.select(this.data[self.relationship.forwardName].dao, function(obj) {
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
@@ -137,7 +137,7 @@ foam.CLASS({
         // We currently have to because the FLOW editor is not updating properly
         // on a put event for an object that it already has.
         dao.remove(obj).then(function() {
-          self.data[self.relationship.forwardName].put(obj).then(function(obj) {
+          self.data[self.relationship.forwardName].dao.put(obj).then(function(obj) {
             self.onObjDrop(obj, id);
           });
         });

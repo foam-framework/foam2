@@ -53,7 +53,10 @@ foam.CLASS({
       name: 'classes',
       factory: function() { return []; }
     },
-    'imports',
+    {
+      name: 'imports',
+      factory: function() { return []; }
+    },
     {
       class: 'Boolean',
       name: 'anonymous',
@@ -106,11 +109,11 @@ foam.CLASS({
       if ( this.anonymous ) {
         o.out('new ', this.extends, '()');
       } else if ( ! this.innerClass ) {
-        o.out('// DO NOT MODIFY BY HAND.\n');
-        o.out('// GENERATED CODE (adamvy@google.com)\n');
+        o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
+
         o.out('package ', this.package, ';\n\n');
 
-        this.imports && this.imports.forEach(function(i) {
+        this.imports.forEach(function(i) {
           o.out('import ' + i, ';\n');
         });
 
