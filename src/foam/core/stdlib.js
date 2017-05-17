@@ -361,7 +361,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return ( b === null || b === undefined || foam.typeOf(b).id === 'foam.core.FObject') ? 1 :
+      return ( b === null || b === undefined || foam.core.FObject.isInstance(b)) ? 1 :
           a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
@@ -568,6 +568,7 @@ foam.LIB({
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
+      if (!this.isInstance(b) && !foam.Number.isInstance(b)) return 1;
       a = this.getTime(a);
       b = this.getTime(b);
       return a < b ? -1 : a > b ? 1 : 0;

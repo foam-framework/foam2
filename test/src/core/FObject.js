@@ -216,6 +216,8 @@ describe('copyFrom', function() {
 });
 
 describe('FObject compare', function() {
+  var someObj;
+
   beforeAll(function() {
     foam.CLASS({
       name: 'SomeClass',
@@ -226,37 +228,48 @@ describe('FObject compare', function() {
         }
       ]
     });
+    someObj = SomeClass.create();
   });
 
   it('with undefined values', function() {
-    var someObj = SomeClass.create();
     expect(foam.util.compare(undefined, someObj)).toBe(1);
     expect(foam.util.compare(someObj, undefined)).toBe(-1);
   });
 
-  it('with boolean values', function() {
-    var someObj = SomeClass.create();
+  it('with null values', function() {
+    expect(foam.util.compare(null, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, null)).toBe(-1);
+  });
 
+  it('with boolean values', function() {
     // foam.Boolean does a loose comparison. Object is considered true
     expect(foam.util.compare(true, someObj)).toBe(0);
     expect(foam.util.compare(someObj, true)).toBe(0);
-
-    // Unlike other comparators, foam.Boolean return -1 when object is in 2nd
-    // param and 1 when object is in 1st param.
     expect(foam.util.compare(false, someObj)).toBe(-1);
     expect(foam.util.compare(someObj, false)).toBe(1);
   });
 
   it('with empty arrays', function() {
-    var someObj = SomeClass.create();
     var emptyArr = [];
     expect(foam.util.compare(emptyArr, someObj)).toBe(1);
     expect(foam.util.compare(someObj, emptyArr)).toBe(-1);
   });
 
-  it('with null values', function() {
-    var someObj = SomeClass.create();
-    expect(foam.util.compare(null, someObj)).toBe(1);
-    expect(foam.util.compare(someObj, null)).toBe(-1);
+  it('with empty strings', function() {
+    var emptyStr = "";
+    expect(foam.util.compare(emptyStr, someObj)).toBe(-1);
+    expect(foam.util.compare(someObj, emptyStr)).toBe(1);
+  });
+
+  it('with a function', function() {
+    var lambda = function() { };
+    expect(foam.util.compare(lambda, someObj)).toBe(-1);
+    expect(foam.util.compare(someObj, lambda)).toBe(1);
+  });
+
+  it('with a date', function() {
+    var epoch = new Date(0);
+    expect(foam.util.compare(epoch, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, epoch)).toBe(-1);
   });
 });

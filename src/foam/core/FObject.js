@@ -809,8 +809,8 @@ foam.CLASS({
     function compareTo(other) {
       if ( other === this ) return 0;
 
-      // Use primitive type comparator if available
-      if (foam.typeOf(other).id !== "foam.core.FObject") {
+      // Use comparator of other if it is not an FObject
+      if (!foam.core.FObject.isInstance(other)) {
         return -foam.typeOf(other).compare(other, this);
       }
 
