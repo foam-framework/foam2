@@ -12,7 +12,6 @@ public class DAOPMLogger extends ContextAwareSupport implements PerformanceLogge
   @Override
   public void log(PM pm) {
     MapDAO dao = (MapDAO)getX().get("pminfodao");
-    //System.out.println(dao);
     PMInfo pmi = new PMInfo()
             .setClsname(pm.getClassType().getName())
             .setPmname(pm.getName())
@@ -20,14 +19,10 @@ public class DAOPMLogger extends ContextAwareSupport implements PerformanceLogge
             .setMaxtime(pm.getTime())
             .setTotaltime(pm.getTime())
             .setNumoccurrences(1);
-    if(pmi == null) System.out.println("null pmi");
     if(dao.find(pmi) == null) {
-      System.out.println("Inserting new");
       dao.put(pmi);
-      if(pmi == null) System.out.println("now it's nul");
     } else {
       PMInfo dpmi = (PMInfo) dao.find(pmi);
-      System.out.println("Updating");
       if(pm.getTime() < dpmi.getMintime())
         dpmi.setMintime(pm.getTime());
       if(pm.getTime() > dpmi.getMaxtime())
@@ -39,7 +34,6 @@ public class DAOPMLogger extends ContextAwareSupport implements PerformanceLogge
 
   @Override
   public void start() {
-    System.out.println("pdl");
     MapDAO dao = new MapDAO();
     dao.setOf(PMInfo.getOwnClassInfo());
     dao.setX(getX());
