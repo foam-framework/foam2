@@ -1,42 +1,42 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.pm;
 
-/**
-* Created by nick on 15/05/17.
-*/
 public class PM {
-
-  private Class cls_;
-  private String name_;
-  private long startTime_;
-  private long endTime_;
+  protected Class  cls_;
+  protected String name_;
+  protected long   startTime_;
+  protected long   endTime_;
 
   public PM(Class cls, String name) {
-    cls_ = cls;
-    name_ = name;
+    cls_       = cls;
+    name_      = name;
     startTime_ = System.nanoTime();
   }
 
-  public void end(PMLogger x) {
-    if(x != null) {
-      endTime_ = System.nanoTime();
-      x.log(this);
-    }
+  public void end(X x) {
+    PMLogger logger = x.get('pmLogger');
+    endTime_ = System.nanoTime();
+    x.log(this);
   }
 
   public Class getClassType() {
-      return cls_;
+    return cls_;
   }
 
   public String getName() {
-      return name_;
+    return name_;
   }
 
   public long getStartTime() {
-      return startTime_;
+    return startTime_;
   }
 
   public long getTime() {
-      return endTime_ - startTime_;
+    return endTime_ - startTime_;
   }
-
 }
