@@ -11,12 +11,6 @@ import java.util.Map;
  */
 public class DAOPMLogger extends ContextAwareSupport implements PerformanceLogger {
 
-  private PMInfoDAO dao_;
-
-  public PMInfoDAO getPMDAO() {
-    return dao_;
-  }
-
   @Override
   public void log(PerformanceMonitor pm) {
     PMInfo pmi = new PMInfo();
@@ -26,12 +20,13 @@ public class DAOPMLogger extends ContextAwareSupport implements PerformanceLogge
             .setMaxtime(pm.getTime())
             .setTotaltime(pm.getTime())
             .setNumoccurrences(1);
-    dao_.put(pmi);
+    ((PMInfoDAO)(getX().get("pminfodao"))).put(pmi);
   }
 
   @Override
   public void start() {
-    dao_ = new PMInfoDAO();
-    dao_.setX(getX());
+    PMInfoDAO dao = new PMInfoDAO();
+    dao.setX(getX());
+    getX().put("pminfodao", dao);
   }
 }
