@@ -214,3 +214,49 @@ describe('copyFrom', function() {
     expect(obj.d).toBe(true);
   });
 });
+
+describe('FObject compare', function() {
+  beforeAll(function() {
+    foam.CLASS({
+      name: 'SomeClass',
+      properties: [
+        {
+          name: 'a',
+          value: 1
+        }
+      ]
+    });
+  });
+
+  it('with undefined values', function() {
+    var someObj = SomeClass.create();
+    expect(foam.util.compare(undefined, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, undefined)).toBe(-1);
+  });
+
+  it('with boolean values', function() {
+    var someObj = SomeClass.create();
+
+    // foam.Boolean does a loose comparison. Object is considered true
+    expect(foam.util.compare(true, someObj)).toBe(0);
+    expect(foam.util.compare(someObj, true)).toBe(0);
+
+    // Unlike other comparators, foam.Boolean return -1 when object is in 2nd
+    // param and 1 when object is in 1st param.
+    expect(foam.util.compare(false, someObj)).toBe(-1);
+    expect(foam.util.compare(someObj, false)).toBe(1);
+  });
+
+  it('with empty arrays', function() {
+    var someObj = SomeClass.create();
+    var emptyArr = [];
+    expect(foam.util.compare(emptyArr, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, emptyArr)).toBe(-1);
+  });
+
+  it('with null values', function() {
+    var someObj = SomeClass.create();
+    expect(foam.util.compare(null, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, null)).toBe(-1);
+  });
+});
