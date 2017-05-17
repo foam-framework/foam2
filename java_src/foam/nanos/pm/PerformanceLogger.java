@@ -5,8 +5,8 @@ import foam.nanos.NanoService;
 /**
  * Created by nick on 15/05/17.
  */
-public interface PerformanceLogger extends NanoService {
+public interface PerformanceLogger {
 
-  void log(PerformanceMonitor pm);
+  void log(PM pm);
 
 }

@@ -2,6 +2,8 @@ foam.CLASS({
   package: 'foam.nanos.pm',
   name: 'PMInfo',
   documentation: '',
+  
+  ids: [ 'clsname', 'pmname' ],
 
   properties: [
     {

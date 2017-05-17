@@ -5,14 +5,14 @@ import foam.core.X;
 /**
 * Created by nick on 15/05/17.
 */
-public class PerformanceMonitor {
+public class PM {
 
   private Class cls_;
   private String name_;
   private long startTime_;
   private long endTime_;
 
-  public PerformanceMonitor(Class cls, String name) {
+  public PM(Class cls, String name) {
     cls_ = cls;
     name_ = name;
     startTime_ = System.nanoTime();

@@ -40,7 +40,11 @@ public class MapDAO
   }
 
   public FObject put(FObject obj) {
+    if(obj == null) System.out.println("wutface1");
     getData().put(getPrimaryKey().get(obj), obj);
+    System.out.println("Putting with key:" + getPrimaryKey().get(obj));
+
+    if(getPrimaryKey().get(obj).equals(getPrimaryKey().get(obj))) System.out.println("this should work");
     return obj;
   }
 
@@ -49,8 +53,12 @@ public class MapDAO
     return obj;
   }
 
-  public FObject find(Object id) {
-    FObject result = getData().get(id);
+  public FObject find(Object o) {
+    //Object id = this.getOf().getClass().isInstance(o) ? getPrimaryKey().get(o) : o;
+    Object key = getPrimaryKey().get(o);
+    FObject result = getData().get(key);
+    System.out.println("Getting with key:" + key);
+    if(result == null) System.out.println("null though");
     return result;
   }
 
