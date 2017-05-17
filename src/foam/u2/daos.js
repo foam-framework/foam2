@@ -68,9 +68,7 @@ foam.CLASS({
               addClass(this.slot(function(selection) {
                 if ( obj === selection ) return view.myClass('selected');
                   return '';
-                }, view.selection$)
-              ).
-            end();
+              }, view.selection$));
         });
     }
   ]
