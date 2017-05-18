@@ -17,7 +17,6 @@ public class LastModifiedAwareDAO
 {
   public FObject put(FObject value) {
     ((LastModifiedAware)value).lastModified = LocalDateTime.now();
-    super.put(value);
-    return value;
+    return super.put(value);
   }
 }
