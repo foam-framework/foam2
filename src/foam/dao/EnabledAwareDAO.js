@@ -4,9 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-// TODO: Test
 foam.CLASS({
-  package: 'foam.nanos.auth',
+  package: 'foam.dao',
   name: 'EnabledAwareDAO',
   extends: 'foam.dao.FilteredDAO',
 
