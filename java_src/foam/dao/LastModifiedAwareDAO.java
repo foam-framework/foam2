@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 public class LastModifiedAwareDAO
   extends ProxyDAO
-  implements DAO, LastModifiedAware
+  implements LastModifiedAware
 {
   public FObject put(FObject value) {
     ((LastModifiedAware)value).lastModified = LocalDateTime.now();
