@@ -750,9 +750,9 @@ foam.LIB({
       function compare(a, b) {
         // To ensure that symmetry is present within compare,
         // we will always use the comparator of higher precedence
-        var types = [ foam.Array, foam.Boolean, foam.Date,
-          foam.Function, foam.Null, foam.Number, foam.String,
-          foam.Undefined, foam.Object, foam.core.FObject ];
+        var types = [ foam.Undefined, foam.Null, foam.Array,
+          foam.Boolean, foam.Date, foam.Function, foam.Null,
+          foam.Number, foam.String, foam.Object, foam.core.FObject ];
         var typeID = function(obj) {
           return types.findIndex(function(type) {
             return type.isInstance(obj);
