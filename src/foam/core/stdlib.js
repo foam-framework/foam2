@@ -752,7 +752,7 @@ foam.LIB({
         // we will always use the comparator of higher precedence.
         var types = [ foam.Undefined, foam.Null, foam.Array,
           foam.Boolean, foam.Date, foam.Function, foam.String,
-          foam.Number, foam.Object, foam.core.FObject ];
+          foam.Number, foam.core.FObject, foam.Object ];
         var typeID = function(obj) {
           return types.findIndex(function(type) {
             return type.isInstance(obj);
