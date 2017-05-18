@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.auth;
+package foam.dao;
 
 import foam.dao.*;
 import foam.core.*;

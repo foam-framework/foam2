@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.auth;
+package foam.dao;
 import foam.dao.*;
 import foam.mlang.MLang.*;
 import foam.mlang.predicate.Predicate;
@@ -17,10 +17,10 @@ public class EnabledAwareDAO
   implements EnabledAware
 {
   public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    return super.select(s, skip, limit, order, EQ(this.ENABLED, true));
+    return super.select(s, skip, limit, order, EQ(this.EnabledAware.ENABLED, true));
   }
 
   public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    super.removeAll(skip, limit, order, EQ(this.ENABLED, true));
+    super.removeAll(skip, limit, order, EQ(this.EnabledAware.ENABLED, true));
   }
 }
