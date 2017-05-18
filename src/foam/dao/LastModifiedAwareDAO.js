@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'LastModifiedAwareDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  documentation: 'Sets lastModified timestamp on put() of LastModifiedAware objects.',
+
   methods: [
     {
       name: 'put',
