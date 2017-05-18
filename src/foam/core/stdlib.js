@@ -568,7 +568,7 @@ foam.LIB({
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
-      if (!this.isInstance(b) && !foam.Number.isInstance(b)) return 1;
+      if ( ! this.isInstance(b) && ! foam.Number.isInstance(b) ) return 1;
       a = this.getTime(a);
       b = this.getTime(b);
       return a < b ? -1 : a > b ? 1 : 0;
@@ -751,8 +751,8 @@ foam.LIB({
         // To ensure that symmetry is present within compare,
         // we will always use the comparator of higher precedence
         var types = [ foam.Undefined, foam.Null, foam.Array,
-          foam.Boolean, foam.Date, foam.Function, foam.Null,
-          foam.Number, foam.String, foam.Object, foam.core.FObject ];
+          foam.Boolean, foam.Date, foam.Function, foam.Number,
+          foam.String, foam.Object, foam.core.FObject ];
         var typeID = function(obj) {
           return types.findIndex(function(type) {
             return type.isInstance(obj);
