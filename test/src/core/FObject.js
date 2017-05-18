@@ -242,7 +242,7 @@ describe('FObject compare', function() {
   });
 
   it('with boolean values', function() {
-    // foam.Boolean does a loose comparison. Object is considered true
+    // foam.Boolean does a loose comparison. Object is considered true.
     expect(foam.util.compare(true, someObj)).toBe(0);
     expect(foam.util.compare(someObj, true)).toBe(0);
     expect(foam.util.compare(false, someObj)).toBe(-1);
