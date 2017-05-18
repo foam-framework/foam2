@@ -26,11 +26,16 @@ foam.CLASS({
       https://developers.google.com/identity/protocols/OAuth2ServiceAccount`,
 
   requires: [
-    'foam.net.auth.TokenBearerCredential',
-    'foam.net.HTTPRequest'
+    'foam.net.HTTPRequest',
+    'foam.net.auth.CredentialType',
+    'foam.net.auth.TokenBearerCredential'
   ],
 
   properties: [
+    {
+      name: 'credentialType',
+      factory: function() { return this.CredentialType.TOKEN_BEARER; }
+    },
     {
       class: 'String',
       name: 'tokenURL',

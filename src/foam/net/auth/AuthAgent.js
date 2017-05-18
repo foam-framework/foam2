@@ -21,6 +21,12 @@ foam.INTERFACE({
 
   properties: [
     {
+      class: 'Enum',
+      of: 'foam.net.auth.CredentialType',
+      name: 'credentialType',
+      required: true
+    },
+    {
       class: 'Function',
       documentation: `Determine whether or not a URL should be authenticated
           using this agent. This procedure is treated as data rather than a
