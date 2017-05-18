@@ -6,17 +6,21 @@
 
 package foam.nanos.auth;
 import foam.dao.*;
-import foam.core.*;
+import foam.mlang.MLang.*;
+import foam.mlang.predicate.Predicate;
+import foam.mlang.order.Comparator;
+import foam.dao.Sink;
 import foam.nanos.auth.EnabledAware;
 
 public class EnabledAwareDAO
-  extends FilteredDAO
+  extends ProxyDAO
   implements DAO, EnabledAware
 {
-  public DAO predicate() {
-    if (this.enabled == true) {
-      return this;
-    }
-    return null;
+  public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    return super.select(s, skip, limit, order, EQ(this.ENABLED, true));
+  }
+
+  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    super.removeAll(skip, limit, order, EQ(this.ENABLED, true));
   }
 }
