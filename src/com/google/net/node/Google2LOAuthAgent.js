@@ -18,30 +18,16 @@
 foam.CLASS({
   package: 'com.google.net.node',
   name: 'Google2LOAuthAgent',
-  implements: [ 'foam.net.AuthAgent' ],
+  implements: [ 'foam.net.auth.AuthAgent' ],
 
   documentation: `Implements "two-legged OAuth" (2LO) for Google APIs for
       server-to-server authentication over HTTPRequest objects. The correct
       procedure is documented at:
       https://developers.google.com/identity/protocols/OAuth2ServiceAccount`,
 
-  requires: [ 'foam.net.node.HTTPRequest' ],
-
-  classes: [
-    {
-      name: 'Credential',
-
-      properties: [
-        {
-          class: 'String',
-          name: 'accessToken',
-        },
-        {
-          class: 'Int',
-          name: 'expiry',
-        },
-      ]
-    }
+  requires: [
+    'foam.net.auth.TokenBearerCredential',
+    'foam.net.HTTPRequest'
   ],
 
   properties: [
@@ -114,7 +100,7 @@ foam.CLASS({
     function getCredential() {
       if ( ! this.needsRefresh_() ) return Promise.resolve(this.credential_);
 
-      var iat = Math.floor(new Date().getTime() / 1000);
+      var iat = this.getIat();
       var headerDotClaimSet =
           this.base64urlEncodedJWTHeader_ + '.' +
           this.base64url(this.getJWTClaimSetString(iat));
@@ -129,10 +115,23 @@ foam.CLASS({
         method: 'POST',
         url: this.tokenURL,
         headers: headers,
+        responseType: 'json',
         payload: payload
       }).send().then(this.onAuthAttemptResponse)
           .then(this.onAuthAccept.bind(this, iat))
           .catch(this.onError);
+    },
+    {
+      name: 'getIat',
+      documentation: `Get "iat" for token request payload. This value should be
+          a current timestamp.`,
+      code: function() { return Math.floor(new Date().getTime() / 1000); }
+    },
+    {
+      name: 'getExp',
+      documentation: `Get "exp" for token request payload. This value should be
+          a desired expiration time, sometime after "iat".`,
+      code: function(iat) { return iat + 3600; }
     },
     {
       name: 'base64url',
@@ -154,7 +153,7 @@ foam.CLASS({
       name: 'getJWTClaimSetString',
       documentation: 'Get a string representation of a fresh JWT claim set.',
       code: function(iat) {
-        var exp = iat + 3600;
+        var exp = this.getExp(iat);
         return JSON.stringify({
           iss: this.email,
           scope: this.scope_,
@@ -200,10 +199,9 @@ foam.CLASS({
       return response.payload;
     },
     function onAuthAccept(iat, payload) {
-      var data = JSON.parse(payload);
-      this.credential_ = this.Credential.create({
-        accessToken: data.access_token,
-        expiry: (iat + data.expires_in) * 1000
+      this.credential_ = this.TokenBearerCredential.create({
+        accessToken: payload.access_token,
+        expiry: (iat + payload.expires_in) * 1000
       });
       return this.credential_;
     },
