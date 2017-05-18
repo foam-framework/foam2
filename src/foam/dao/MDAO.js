@@ -138,7 +138,7 @@ foam.CLASS({
       var self = this;
       var sink = self.ArraySink.create();
       return dao.select(sink).then(function() {
-        var a = sink.a;
+        var a = sink.array;
         self.index.bulkLoad(a);
         for ( var i = 0; i < a.length; ++i ) {
           var obj = a[i];
@@ -199,7 +199,7 @@ foam.CLASS({
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
-          var a = sink.a;
+          var a = sink.array;
           for ( var i = 0 ; i < a.length ; i++ ) {
             self.index.remove(a[i]);
             self.pub('on', 'remove', a[i]);

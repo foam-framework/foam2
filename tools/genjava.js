@@ -5,7 +5,7 @@
  */
 
 // enable FOAM java support.
-global.FOAM_FLAGS = { 'java': true, 'debug': true };
+global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
 
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
