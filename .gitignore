@@ -1,6 +1,4 @@
 
-foam-bin.js
-java_src/
 node_modules
 npm-debug.log
 server.bat
