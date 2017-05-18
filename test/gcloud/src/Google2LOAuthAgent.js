@@ -98,11 +98,11 @@ describe('Google2LOAuthAgent', function() {
     });
   });
 
-  xit('should generate the correct token request payload', function(done) {
+  it('should generate the correct token request payload', function(done) {
     mkAgent().getCredential().then(done, done.fail);
   });
 
-  xit('should authenticate in context with "authAgent" and "TokenBearerHTTPRequest" as "HTTPRequest"', function(done) {
+  it('should authenticate in context with "authAgent" and "TokenBearerHTTPRequest" as "HTTPRequest"', function(done) {
     expect(getCredentialSpy).not.toHaveBeenCalled();
     var ctx = foam.__context__.createSubContext({});
     ctx.register(
@@ -120,7 +120,7 @@ describe('Google2LOAuthAgent', function() {
     }, done.fail);
   });
 
-  xit('should not authenticate against unrelated URLs', function(done) {
+  it('should not authenticate against unrelated URLs', function(done) {
     var ctx = foam.__context__.createSubContext({});
     ctx.register(
         foam.lookup('foam.net.auth.TokenBearerHTTPRequest'),
