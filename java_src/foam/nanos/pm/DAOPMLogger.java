@@ -18,9 +18,9 @@ public class DAOPMLogger
   @Override
   public void log(PM pm) {
     MapDAO dao = (MapDAO) getX().get("pminfodao");
-    PMInfo pmi = (PMInfo) dao.find(pmi);
+    PMInfo pmi = (PMInfo) dao.find(pm);
 
-    if ( ! pmi ) {
+    if ( pmi != null ) {
       pmi = new PMInfo()
           .setClsname(pm.getClassType().getName())
           .setPmname(pm.getName())
@@ -44,7 +44,9 @@ public class DAOPMLogger
 
   @Override
   public void start() {
-    MapDAO dao = new MapDAO().setOf(PMInfo.getOwnClassInfo()).setX(getX());
+    MapDAO dao = new MapDAO();
+    dao.setOf(PMInfo.getOwnClassInfo());
+    dao.setX(getX());
     getX().put("pminfodao", dao);
   }
 }
