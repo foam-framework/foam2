@@ -16,8 +16,21 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.net',
+  package: 'foam.net.auth',
   name: 'AuthAgent',
+
+  properties: [
+    {
+      class: 'Function',
+      documentation: `Determine whether or not a URL should be authenticated
+          using this agent. This procedure is treated as data rather than a
+          method because it is typically injected for an agent at runtime. E.g.,
+          a particular Google 2LO agent would be bound to particular URLs and
+          particular scopes.`,
+      name: 'shouldAuthenticate',
+      required: true
+    },
+  ],
 
   methods: [
     {
