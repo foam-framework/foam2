@@ -1939,7 +1939,7 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.u2.Visibility',
-      name: 'view_visibility',
+      name: 'visibility',
       value: foam.u2.Visibility.RW
     }
   ],
