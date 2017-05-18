@@ -6,6 +6,8 @@
 
 package foam.nanos.pm;
 
+import foam.core.X;
+
 public class PM {
   protected Class  cls_;
   protected String name_;
@@ -19,9 +21,9 @@ public class PM {
   }
 
   public void end(X x) {
-    PMLogger logger = x.get('pmLogger');
+    PMLogger logger = (PMLogger) x.get("pmLogger");
     endTime_ = System.nanoTime();
-    x.log(this);
+    logger.log(this);
   }
 
   public Class getClassType() {
