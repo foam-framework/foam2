@@ -149,11 +149,11 @@ foam.CLASS({
 
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
-      }).forEach(function(f) { o.out(f, '\n'); });
+      }).forEach(function(f) { o.out(f, '\n\n'); });
 
-      this.methods.forEach(function(f) { o.out(f, '\n'); });
-      this.classes.forEach(function(c) { o.out(c, '\n'); });
-      this.extras.forEach(function(c) { o.out(c, '\n'); });
+      this.methods.forEach(function(f) { o.out(f, '\n\n'); });
+      this.classes.forEach(function(c) { o.out(c, '\n\n'); });
+      this.extras.forEach(function(c) { o.out(c, '\n\n'); });
       o.decreaseIndent();
       o.indent();
       o.out('}');
