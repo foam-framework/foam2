@@ -37,6 +37,12 @@ foam.CLASS({
       name: 'javaFactory'
     },
     {
+      // TODO: Make into ENUM
+      class: 'String',
+      name: 'visibility',
+      value: 'public'
+    },
+    {
       class: 'String',
       name: 'javaValue',
       expression: function(value) {
@@ -86,7 +92,7 @@ foam.CLASS({
         method({
           name: 'get' + capitalized,
           type: this.javaType,
-          visibility: 'public',
+          visibility: this.visibility,
           body: 'if ( ! ' + isSet + ' ) {\n' +
             ( this.hasOwnProperty('javaFactory') ? '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
@@ -95,7 +101,7 @@ foam.CLASS({
         }).
         method({
           name: 'set' + capitalized,
-          visibility: 'public',
+          visibility: this.visibility,
           args: [
             {
               type: this.javaType,
