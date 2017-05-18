@@ -361,8 +361,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return ( b === null || b === undefined || foam.core.FObject.isInstance(b)) ? 1 :
-          a < b ? -1 : a > b ? 1 : 0;
+      return ( b === null || b === undefined || foam.Object.isInstance(b) ||
+          foam.core.FObject.isInstance(b) ) ? 1 : a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
       var bufForHash = new ArrayBuffer(8);
@@ -748,11 +748,11 @@ foam.LIB({
       function clone(o)      { return typeOf(o).clone(o); },
       function equals(a, b)  { return typeOf(a).equals(a, b); },
       function compare(a, b) {
-        // To ensure that symmetry is present within compare,
-        // we will always use the comparator of higher precedence
+        // To ensure that symmetry is present when comparing,
+        // we will always use the comparator of higher precedence.
         var types = [ foam.Undefined, foam.Null, foam.Array,
-          foam.Boolean, foam.Date, foam.Function, foam.Number,
-          foam.String, foam.Object, foam.core.FObject ];
+          foam.Boolean, foam.Date, foam.Function, foam.String,
+          foam.Number, foam.Object, foam.core.FObject ];
         var typeID = function(obj) {
           return types.findIndex(function(type) {
             return type.isInstance(obj);

@@ -750,7 +750,7 @@ describe('foam.Date', function() {
     expect(foam.util.compare(new Date(7487474), new Date(7487474))).toEqual(0);
     expect(foam.util.compare(new Date(234324), new Date(23423432))).toEqual(-1);
 
-    expect(foam.util.compare(new Date(234324), null)).toEqual(1);
+    expect(foam.util.compare(new Date(234324), null)).not.toEqual(0);
     var date = new Date(2423);
     expect(foam.util.compare(date, date)).toEqual(0);
   });
@@ -972,10 +972,19 @@ describe('foam.util', function() {
       { a: 'A' },
       [ 2, 4 ]
     ];
-    types.forEach(function(t) {
+    types.forEach(function(t, i) {
+      // Creating array of other types to verify symmetry property.
+      var typesDiff = types.slice();
+      typesDiff.splice(i);
+
       expect(foam.util.equals(foam.util.clone(t), t)).toBe(true);
       expect(foam.util.equals(t, t)).toBe(true);
       expect(foam.util.compare(t, t)).toBe(0);
+
+      typesDiff.forEach(function(d) {
+        expect(foam.util.compare(t, d)).not.toBe(foam.util.compare(d, t));
+      });
+
       expect(foam.util.hashCode(t)).not.toBeUndefined();
       expect(foam.util.hashCode(t)).not.toBeNull();
       if ( foam.typeOf(t).diff ) {
