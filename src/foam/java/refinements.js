@@ -38,11 +38,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'visibility',
-      value: 'public'
-    },
-    {
-      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -93,7 +88,7 @@ foam.CLASS({
         method({
           name: 'get' + capitalized,
           type: this.javaType,
-          visibility: this.visibility,
+          visibility: 'public',
           body: 'if ( ! ' + isSet + ' ) {\n' +
             ( this.hasOwnProperty('javaFactory') ? '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
@@ -104,7 +99,7 @@ foam.CLASS({
       if (!this.final) {
         cls.method({
               name: 'set' + capitalized,
-              visibility: this.visibility,
+              visibility: 'public',
               args: [
                 {
                   type: this.javaType,
