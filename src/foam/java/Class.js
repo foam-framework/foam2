@@ -110,11 +110,11 @@ foam.CLASS({
         o.out('new ', this.extends, '()');
       } else if ( ! this.innerClass ) {
         o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
-        
+
         o.out('package ', this.package, ';\n\n');
 
-        this.imports && this.imports.forEach(function(i) {
-          o.out(i, ';\n');
+        this.imports.forEach(function(i) {
+          o.out('import ' + i, ';\n');
         });
 
         o.out('\n');

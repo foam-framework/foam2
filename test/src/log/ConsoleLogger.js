@@ -21,6 +21,11 @@ describe('ConsoleLogger', function() {
   var LogLevel;
   var logLevels = [ 'debug', 'info', 'warn', 'error' ];
 
+  beforeAll(function() {
+    var path = require('path');
+    require(path.join(__dirname, '../../../src/foam/nanos/nanos.js'));
+  });
+
   beforeEach(function() {
     foam.CLASS({
       package: 'foam.nanos.log.test',
@@ -70,6 +75,12 @@ describe('ConsoleLogger', function() {
       captureLogger =
           foam.lookup('foam.nanos.log.test.CaptureLogger').create()
     ).__subContext__;
+  });
+
+  it('should construct in default context', function() {
+    expect(function() {
+      foam.lookup('foam.nanos.log.ConsoleLogger').create();
+    }).not.toThrow();
   });
 
   it('should output strings', function() {
