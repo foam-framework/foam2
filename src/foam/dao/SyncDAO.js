@@ -171,7 +171,7 @@ foam.CLASS({
     */
     function removeAll(skip, limit, order, predicate) {
       this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
-        a = a.a;
+        a = a.array;
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.remove(a[i]);
         }
@@ -198,7 +198,7 @@ foam.CLASS({
           .where(
             E.GT(this.syncProperty, m.value))
           .select().then(function(a) {
-            a = a.a;
+            a = a.array;
             for ( var i = 0 ; i < a.length ; i++ ) {
               this.processFromServer(a[i]);
             }
@@ -214,7 +214,7 @@ foam.CLASS({
       this.syncRecordDAO
         .where(E.EQ(this.SyncRecord.SYNC_NO, -1))
         .select().then(function(records) {
-          records = records.a;
+          records = records.array;
 
           for ( var i = 0 ; i < records.length ; i++ ) {
             var record = records[i]

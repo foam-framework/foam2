@@ -11,7 +11,6 @@ public class MapDAO
 {
   private Map<Object, FObject> data_ = null;
   private ClassInfo            of_ = null;
-  private PropertyInfo         primaryKey_ = null;
 
   private synchronized void data_factory() {
     if ( data_ == null ) {
@@ -19,7 +18,7 @@ public class MapDAO
     }
   }
 
-  private Map<Object, FObject> getData() {
+  protected Map<Object, FObject> getData() {
     if ( data_ == null ) {
       data_factory();
     }
@@ -50,9 +49,9 @@ public class MapDAO
     return obj;
   }
 
-  public FObject find(Object id) {
-    FObject result = getData().get(id);
-    return result;
+  public FObject find(Object o) {
+    Object id = getOf().getClass().isInstance(o) || true ? getPrimaryKey().get(o) : o;
+    return getData().get(id);
   }
 
   public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {

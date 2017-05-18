@@ -574,9 +574,9 @@ foam.CLASS({
 
     function updateMemento() {
       return this.properties.skip(4).select().then(function(s) {
-        console.log('*************** updateMemento: ', s.a.length);
+        console.log('*************** updateMemento: ', s.array.length);
         this.feedback_ = true;
-        this.memento = foam.Array.clone(s.a);
+        this.memento = foam.Array.clone(s.array);
         this.feedback_ = false;
       }.bind(this));
     },

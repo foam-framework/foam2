@@ -207,7 +207,7 @@ foam.CLASS({
 
   listeners: [
     function onRemoveAll(arraySink) {
-      var arr = arraySink.a;
+      var arr = arraySink.array;
       if ( arr.length === 0 ) return undefined;
 
       return this.getRequest('beginTransaction').send()
