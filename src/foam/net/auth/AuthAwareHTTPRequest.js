@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'AuthAwareHTTPRequest',
   extends: 'foam.net.BaseHTTPRequest',
 
+  documentation: 'Abstract class for authenticating HTTP requests.',
+
   requires: [ 'foam.net.BaseHTTPRequest' ],
   imports: [ 'authAgent? as ctxAuthAgent' ],
 

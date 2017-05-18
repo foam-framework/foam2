@@ -19,6 +19,11 @@ foam.CLASS({
   package: 'foam.net.auth',
   name: 'EasyAuthController',
 
+  documentation: `Controller that acts as a contextual container for
+      authenticating HTTP requests. Uses data associated with the injected
+      "authAgent" to setup a context that will automatically authorize
+      requests that "authAgent" provide authorization for.`,
+
   imports: [ 'authAgent? as ctxAuthAgent' ],
   exports: [ 'authAgent' ],
 
