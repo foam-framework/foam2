@@ -19,6 +19,9 @@ foam.INTERFACE({
   package: 'foam.net',
   name: 'AuthAgent',
 
+  documentation: `An agent that is able to authenticate on application's behalf
+      for HTTP requests that require authorization.`,
+
   properties: [
     {
       class: 'Enum',

@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'TokenBearerHTTPRequest',
   extends: 'foam.net.auth.AuthAwareHTTPRequest',
 
+  documentation: `Auth-aware HTTP request that uses the TOKEN_BEARER
+      CredentialType for "Authorization: Bearer <access token>"-style
+      authorization.`,
+
   listeners: [
     function onGetCredential(credential) {
       this.delegate.headers['Authorization'] =

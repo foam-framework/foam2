@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.net.auth',
   name: 'TokenBearerCredential',
 
+  documentation: `Data class for "Authorization: Bearer <access token>"-style
+      authentication.`,
+
   properties: [
     {
       class: 'String',
