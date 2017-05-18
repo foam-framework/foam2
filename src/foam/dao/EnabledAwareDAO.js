@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'EnabledAwareDAO',
   extends: 'foam.dao.FilteredDAO',
 
+  documentation: 'Filter out disabled EnabledAware objects.',
+
   properties: [
     {
       name: 'predicate',
