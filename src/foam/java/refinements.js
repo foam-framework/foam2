@@ -82,14 +82,14 @@ foam.CLASS({
           name: privateName,
           type: this.javaType,
           final: this.final,
-          initializer: this.value,
+          initializer: this.javaValue,
           visibility: 'private'
         }).
         field({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false;'
+          initializer: (Boolean(this.final)) + ';'
         }).
         method({
           name: 'get' + capitalized,
