@@ -37,7 +37,6 @@ foam.CLASS({
       name: 'javaFactory'
     },
     {
-      // TODO: Make into ENUM
       class: 'String',
       name: 'visibility',
       value: 'public'
@@ -232,6 +231,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'javaSupport',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'override',
+      value: false
     }
   ],
 
@@ -264,6 +268,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        override: this.override,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
