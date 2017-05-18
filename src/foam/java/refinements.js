@@ -81,6 +81,8 @@ foam.CLASS({
         field({
           name: privateName,
           type: this.javaType,
+          final: this.final,
+          initializer: this.value,
           visibility: 'private'
         }).
         field({
