@@ -19,6 +19,10 @@ foam.ENUM({
   package: 'foam.net.auth',
   name: 'CredentialType',
 
+  documentation: `Enum of known authentication types, including where to find
+      an HTTPRequest class that can automatically broker
+      authentication/authorization.`,
+
   properties: [
     {
       class: 'Class',
