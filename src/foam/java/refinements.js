@@ -98,21 +98,24 @@ foam.CLASS({
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';'
-        }).
-        method({
-          name: 'set' + capitalized,
-          visibility: this.visibility,
-          args: [
-            {
-              type: this.javaType,
-              name: 'val'
-            }
-          ],
-          type: cls.name,
-          body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
         });
+        
+      if (!this.final) {
+        cls.method({
+              name: 'set' + capitalized,
+              visibility: this.visibility,
+              args: [
+                {
+                  type: this.javaType,
+                  name: 'val'
+                }
+              ],
+              type: cls.name,
+              body: privateName + ' = val;\n'
+                  + isSet + ' = true;\n'
+                  + 'return this;'
+            });
+      }
 
       if ( this.hasOwnProperty('javaFactory') ) {
         cls.method({
