@@ -163,7 +163,6 @@ foam.RELATIONSHIP({
 });
 
 
-
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'MenuBar',

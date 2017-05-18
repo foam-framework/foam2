@@ -85,7 +85,7 @@ foam.CLASS({
                       type: 'String' 
                     },
                   ],
-            body: 'ordinal_ = ordinal;\nlabel_ = label;'
+            body: 'setOrdinal(ordinal);\nsetLabel(label);\nsetName(name());'
           },
           {
             name: 'forOrdinal',

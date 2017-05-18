@@ -703,7 +703,7 @@ foam.CLASS({
         var self = this;
 
         return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
-          var items = result.a;
+          var items = result.array;
 
           if ( ! sink ) return result;
 
