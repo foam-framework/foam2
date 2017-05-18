@@ -5,13 +5,16 @@
  */
 package foam.nanos.test;
 
+import bsh.EvalError;
+import bsh.Interpreter;
 import foam.core.*;
-import foam.dao.*;
-import foam.nanos.*;
-import bsh.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import foam.dao.AbstractSink;
+import foam.dao.MapDAO;
+import foam.nanos.NanoService;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
 
 public class TestRunner extends ContextAwareSupport implements NanoService {
 
@@ -22,7 +25,7 @@ public class TestRunner extends ContextAwareSupport implements NanoService {
       public void put(FObject o, Detachable sub) {
         Test                  test = (Test) o;
         ByteArrayOutputStream bas  = new ByteArrayOutputStream();
-        PrintStream           ps   = new PrintStream(bas);
+        PrintStream ps   = new PrintStream(bas);
         // Creates a new Interpreter at each call
         final Interpreter    shell = new Interpreter();
 
@@ -57,7 +60,7 @@ public class TestRunner extends ContextAwareSupport implements NanoService {
 
   public static void main(String[] args){
     MapDAO tests = new MapDAO();
-    X      x     = EmptyX.instance().put("TestDAO", tests);
+    X x     = EmptyX.instance().put("TestDAO", tests);
 
     tests.setX(x);
     tests.setOf(Test.getOwnClassInfo());
