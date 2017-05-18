@@ -747,7 +747,26 @@ foam.LIB({
     methods: [
       function clone(o)      { return typeOf(o).clone(o); },
       function equals(a, b)  { return typeOf(a).equals(a, b); },
-      function compare(a, b) { return typeOf(a).compare(a, b); },
+      function compare(a, b) {
+        // To ensure that symmetry is present within compare,
+        // we will always use the comparator of higher precedence
+        var types = [ foam.Array, foam.Boolean, foam.Date,
+          foam.Function, foam.Null, foam.Number, foam.String,
+          foam.Undefined, foam.Object, foam.core.FObject ];
+        var typeID = function(obj) {
+          return types.findIndex(function(type) {
+            return type.isInstance(obj);
+          });
+        };
+
+        var aTypeID = typeID(a);
+        var bTypeID = typeID(b);
+        foam.assert(aTypeID !== undefined && bTypeID !== undefined,
+            'comparator cannot operate on unknown types');
+
+        return (aTypeID <= bTypeID) ? typeOf(a).compare(a, b) :
+            -typeOf(b).compare(b, a);
+      },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {
         var t = typeOf(a);
