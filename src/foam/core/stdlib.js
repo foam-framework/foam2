@@ -361,8 +361,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return ( b === null || b === undefined || foam.Object.isInstance(b) ||
-          foam.core.FObject.isInstance(b) ) ? 1 : a < b ? -1 : a > b ? 1 : 0;
+      return ( ! this.isInstance(b) ) ? 1 :
+          a < b ? -1 : a > b ? 1 : 0
     },
     (function() {
       var bufForHash = new ArrayBuffer(8);
@@ -698,6 +698,9 @@ foam.typeOf = (function() {
   };
 })();
 
+foam.typeOrder = [ foam.Undefined, foam.Null, foam.Array,
+    foam.Boolean, foam.Date, foam.Function, foam.String,
+    foam.Number, foam.core.FObject, foam.Object ];
 
 foam.LIB({
   name: 'foam',
@@ -750,9 +753,7 @@ foam.LIB({
       function compare(a, b) {
         // To ensure that symmetry is present when comparing,
         // we will always use the comparator of higher precedence.
-        var types = [ foam.Undefined, foam.Null, foam.Array,
-          foam.Boolean, foam.Date, foam.Function, foam.String,
-          foam.Number, foam.core.FObject, foam.Object ];
+        var types = foam.typeOrder;
         var typeID = function(obj) {
           return types.findIndex(function(type) {
             return type.isInstance(obj);
@@ -865,7 +866,6 @@ foam.LIB({
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
-
       if ( cs.lengh === 1 ) return cs[0];
 
       var f = {
