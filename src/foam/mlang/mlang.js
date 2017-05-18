@@ -564,7 +564,7 @@ foam.CLASS({
           sortedArgs[costKey] = arg;
           costs.push(costKey);
         }
-        costs = costs.sort(foam.Number.compare);
+        costs = costs.sort(foam.util.compare);
 
         // Sort, build list up starting at the end (most expensive
         //   will end up deepest in the index)
