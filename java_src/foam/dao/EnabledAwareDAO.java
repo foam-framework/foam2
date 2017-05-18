@@ -15,7 +15,7 @@ import foam.nanos.auth.EnabledAware;
 public class EnabledAwareDAO
   extends ProxyDAO
 {
-  private Predicate PREDICATE_ = EQ(this.EnabledAware.ENABLED, true);
+  private static final Predicate PREDICATE_ = EQ(this.EnabledAware.ENABLED, true);
   public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
     return super.select(s, skip, limit, order, PREDICATE_);
   }
