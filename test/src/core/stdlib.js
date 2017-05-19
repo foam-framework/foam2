@@ -112,7 +112,7 @@ describe('foam.Undefined', function() {
   });
   it('compare', function() {
     expect(foam.Undefined.compare("unused", undefined)).toBe(0);
-    expect(foam.Undefined.compare("unused", "defined!")).toBe(-1);
+    expect(foam.Undefined.compare("unused", "defined!")).toBe(1);
   });
   it('hashCode', function() {
     expect(foam.Undefined.hashCode(undefined)).toBe(-2);
@@ -133,8 +133,8 @@ describe('foam.Null', function() {
     expect(foam.Null.equals("unused", "bad")).toBe(false);
   });
   it('compare', function() {
-    expect(foam.Null.compare("unused", undefined)).toBe(-1);
-    expect(foam.Null.compare("unused", "defined!")).toBe(-1);
+    expect(foam.Null.compare("unused", undefined)).toBe(1);
+    expect(foam.Null.compare("unused", "defined!")).toBe(1);
     expect(foam.Null.compare("unused", null)).toBe(0);
   });
   it('hashCode', function() {
@@ -166,10 +166,10 @@ describe('foam.Boolean', function() {
     expect(foam.Boolean.compare(true, true)).toBe(0);
     expect(foam.Boolean.compare(false, false)).toBe(0);
 
-    expect(foam.Boolean.compare(true, 0)).toBe(-1);
-    expect(foam.Boolean.compare(false, 66)).toBe(-1);
-    expect(foam.Boolean.compare(true, 9)).toBe(-1);
-    expect(foam.Boolean.compare(false, 0)).toBe(-1);
+    expect(foam.Boolean.compare(true, 0)).toBe(1);
+    expect(foam.Boolean.compare(false, 66)).toBe(1);
+    expect(foam.Boolean.compare(true, 9)).toBe(1);
+    expect(foam.Boolean.compare(false, 0)).toBe(1);
   });
   it('hashCode', function() {
     expect(foam.Boolean.hashCode(true)).toBe(1);
@@ -201,7 +201,7 @@ describe('foam.Function', function() {
     expect(foam.Function.compare(fn1, fn2)).toBe(0);
     expect(foam.Function.compare(fn1, fnNoMatch)).toBe(-1);
     expect(foam.Function.compare(fnNoMatch, fn1)).toBe(1);
-    expect(foam.Function.compare(fnNoMatch, undefined)).toBe(-1);
+    expect(foam.Function.compare(fnNoMatch, undefined)).toBe(1);
   });
   it('hashCode', function() {
     var fn1 = function(a) { return a + 1; };
@@ -419,8 +419,8 @@ describe('foam.Number', function() {
     expect(foam.Number.compare(4, 3)).toBe(1);
     expect(foam.Number.compare(24, 24)).toBe(0);
 
-    expect(foam.Number.compare(3, null)).toBe(-1);
-    expect(foam.Number.compare(3, undefined)).toBe(-1);
+    expect(foam.Number.compare(3, null)).toBe(1);
+    expect(foam.Number.compare(3, undefined)).toBe(1);
 
   });
   it('hashCode', function() {
@@ -451,8 +451,8 @@ describe('foam.String', function() {
     expect(foam.String.compare('string b', 'string a')).toBeGreaterThan(0);
     expect(foam.String.compare('string d', 'string d')).toBe(0);
 
-    expect(foam.String.compare('string d', null)).toBe(-1);
-    expect(foam.String.compare('string d', undefined)).toBe(-1);
+    expect(foam.String.compare('string d', null)).toBe(1);
+    expect(foam.String.compare('string d', undefined)).toBe(1);
   });
   it('hashCode', function() {
     expect(foam.String.hashCode('a short string'))
@@ -655,7 +655,7 @@ describe('foam.Array', function() {
       var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
       var b = foam.util.clone(a);
       expect(a).not.toBe(b);
-      expect(foam.util.compare(a[1], b[1])).toEqual(0);
+      expect(foam.util.compare(a[1], b[1])).toBe(0);
       expect(a[1]).not.toBe(b[1]);
     });
   });
@@ -687,7 +687,7 @@ describe('foam.Array', function() {
     expect(foam.Array.compare([1, 2, 3], [1, 2])).toBe(1);
     expect(foam.Array.compare([1, 2], [1, 2, 3])).toBe(-1);
 
-    expect(foam.Array.compare([1, 2], null)).toBe(-1);
+    expect(foam.Array.compare([1, 2], null)).toBe(1);
   });
 
   it('hashCode', function() {
@@ -747,12 +747,12 @@ describe('foam.Date', function() {
   });
 
   it('compare', function() {
-    expect(foam.util.compare(new Date(7487474), new Date(7487474))).toEqual(0);
-    expect(foam.util.compare(new Date(234324), new Date(23423432))).toEqual(-1);
+    expect(foam.util.compare(new Date(7487474), new Date(7487474))).toBe(0);
+    expect(foam.util.compare(new Date(234324), new Date(23423432))).toBe(-1);
 
-    expect(foam.util.compare(new Date(234324), null)).not.toEqual(0);
+    expect(foam.util.compare(new Date(234324), null)).not.toBe(0);
     var date = new Date(2423);
-    expect(foam.util.compare(date, date)).toEqual(0);
+    expect(foam.util.compare(date, date)).toBe(0);
   });
 
   it('relativeDateString', function() {
@@ -858,7 +858,7 @@ describe('foam.Object', function() {
     b.$UID;
     expect(foam.Object.compare(a, b)).toBe(-1);
     expect(foam.Object.compare(b, a)).toBe(1);
-    expect(foam.Object.compare(a, undefined)).toBe(-1);
+    expect(foam.Object.compare(a, undefined)).toBe(1);
   });
   it('hashCode', function() {
     expect(foam.Object.hashCode({ key: 'anything' })).toEqual(
