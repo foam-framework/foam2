@@ -69,7 +69,7 @@ foam.LIB({
     function isInstance(o) { return o === undefined; },
     function clone(o) { return o; },
     function equals(_, b) { return b === undefined; },
-    function compare(_, b) { return b === undefined ? 0 : 1; },
+    function compare(_, b) { return b === undefined ? 0 : -1; },
     function hashCode() { return -2; }
   ]
 });
@@ -82,7 +82,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
     function compare(_, b) {
-      return b === null ? 0 : b === undefined ? -1 : 1;
+      return b === null ? 0 : -1;
     },
     function hashCode() { return -3; }
   ]
@@ -95,7 +95,10 @@ foam.LIB({
     function isInstance(o) { return typeof o === 'boolean'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
+    function compare(a, b) {
+      if ( ! this.isInstance(b) ) return -1;
+      return a ? (b ? 0 : 1) : (b ? -1 : 0);
+    },
     function hashCode(o) { return o ? 1 : -1; }
   ]
 });
@@ -108,6 +111,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
+      if ( ! this.isInstance(b) ) return -1;
       return b ? foam.String.compare(a.toString(), b.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
@@ -361,8 +365,9 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return ( ! this.isInstance(b) ) ? 1 :
-          a < b ? -1 : a > b ? 1 : 0
+      if ( ! this.isInstance(b) || ( isNaN(a) && ! isNaN(b)) ) return -1;
+      else if ( ! isNaN(a) && isNaN(b) ) return 1;
+      return a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
       var bufForHash = new ArrayBuffer(8);
@@ -388,7 +393,10 @@ foam.LIB({
     function isInstance(o) { return typeof o === 'string'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
+    function compare(a, b) {
+      if ( ! this.isInstance(b) ) return -1;
+      return b != null ? a.localeCompare(b) : 1 ;
+    },
     function hashCode(s) {
       var hash = -4;
 
@@ -532,7 +540,7 @@ foam.LIB({
       return true;
     },
     function compare(a, b) {
-      if ( ! b || ! Array.isArray(b) ) return 1;
+      if ( ! b || ! Array.isArray(b) ) return -1;
       var l = Math.min(a.length, b.length);
       for ( var i = 0 ; i < l ; i++ ) {
         var c = foam.util.compare(a[i], b[i]);
@@ -568,10 +576,10 @@ foam.LIB({
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
-      if ( ! this.isInstance(b) && ! foam.Number.isInstance(b) ) return 1;
+      if ( ! this.isInstance(b) && ! foam.Number.isInstance(b) ) return -1;
       a = this.getTime(a);
-      b = this.getTime(b);
-      return a < b ? -1 : a > b ? 1 : 0;
+      b = foam.Number.isInstance(b) ? b : this.getTime(b);
+      return foam.Number.compare(a, b);
     },
     // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
@@ -648,6 +656,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
+      if ( ! this.isInstance(b) ) return -1;
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
     function hashCode(o) {
@@ -698,9 +707,9 @@ foam.typeOf = (function() {
   };
 })();
 
-foam.typeOrder = [ foam.Undefined, foam.Null, foam.Array,
-    foam.Boolean, foam.Date, foam.Function, foam.String,
-    foam.Number, foam.core.FObject, foam.Object ];
+foam.typeOrder = [ foam.Undefined, foam.Null, foam.Boolean,
+    foam.Date, foam.Number, foam.String, foam.Array,
+    foam.Function, foam.Object, foam.core.FObject ];
 
 foam.LIB({
   name: 'foam',
