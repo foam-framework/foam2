@@ -264,7 +264,7 @@ function onMessage(m) {
 
 
 client.messageDAO.select().then(function(a) {
-  a.a.map(onMessage);
+  a.array.map(onMessage);
 });
 
 client.messageDAO.on.put.sub(function(s, _, __, m) {
