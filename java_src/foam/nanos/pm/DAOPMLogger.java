@@ -8,6 +8,7 @@ package foam.nanos.pm;
 
 import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
+import foam.dao.PMDAO;
 import foam.nanos.NanoService;
 
 public class DAOPMLogger
@@ -20,7 +21,7 @@ public class DAOPMLogger
     MapDAO dao = (MapDAO) getX().get("pminfodao");
     PMInfo pmi = (PMInfo) dao.find(pm);
 
-    if ( pmi != null ) {
+    if ( pmi == null ) {
       pmi = new PMInfo()
           .setClsname(pm.getClassType().getName())
           .setPmname(pm.getName())
@@ -44,9 +45,9 @@ public class DAOPMLogger
 
   @Override
   public void start() {
-    MapDAO dao = new MapDAO();
-    dao.setOf(PMInfo.getOwnClassInfo());
-    dao.setX(getX());
-    getX().put("pminfodao", dao);
+    MapDAO del = new MapDAO();
+    del.setOf(PMInfo.getOwnClassInfo());
+    del.setX(getX());
+    getX().put("pminfodao", del);
   }
 }
