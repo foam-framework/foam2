@@ -226,7 +226,6 @@ FOAM_FILES([
   { name: "foam/net/auth/TokenBearerCredential" },
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
-  { name: "foam/net/auth/CredentialType" },
   { name: "foam/net/auth/AuthAgent" },
   { name: "foam/doc/DocBrowser", flags: ['debug'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
