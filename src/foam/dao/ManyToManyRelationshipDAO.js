@@ -56,7 +56,7 @@ foam.CLASS({
         select(self.MAP(self.junctionProperty)).then(function(map) {
           return self.delegate.select(sink, skip, limit, order, self.AND(
             predicate || self.TRUE,
-            self.IN(self.targetProperty, map.delegate.a)));
+            self.IN(self.targetProperty, map.delegate.array)));
         });
     }
   ]

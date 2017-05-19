@@ -52,7 +52,10 @@ var classes = [
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
-  'foam.nanos.auth.User'
+  'foam.nanos.auth.User',
+  'foam.nanos.pm.PMInfo',
+  'foam.nanos.script.Script',
+  'foam.nanos.test.Test'
 ];
 
 var abstractClasses = [
