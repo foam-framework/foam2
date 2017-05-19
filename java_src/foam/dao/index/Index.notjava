@@ -19,6 +19,9 @@ public interface SelectPlan
 
 
 public interface Index {
+  // Called when an Index is added 
+  public void onAdd(Sink sink);
+
   public Object put(Object state, FObject value);
   public Object remove(Object state, FObject value);
   public Object removeAll();
