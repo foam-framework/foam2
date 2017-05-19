@@ -96,7 +96,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      if ( ! this.isInstance(b) ) return -1;
+      if ( ! foam.Boolean.isInstance(b) ) return -1;
       return a ? (b ? 0 : 1) : (b ? -1 : 0);
     },
     function hashCode(o) { return o ? 1 : -1; }
@@ -111,7 +111,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
-      if ( ! this.isInstance(b) ) return -1;
+      if ( ! foam.Function.isInstance(b) ) return -1;
       return b ? foam.String.compare(a.toString(), b.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
@@ -365,7 +365,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      if ( ! this.isInstance(b) && isNaN(parseFloat(b))
+      if ( ! foam.Number.isInstance(b) && isNaN(parseFloat(b))
           || ( isNaN(a) && ! isNaN(b)) ) return -1;
       else if ( ! isNaN(a) && isNaN(b) ) return 1;
       return a < b ? -1 : a > b ? 1 : 0;
@@ -395,7 +395,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      if ( ! this.isInstance(b) ) return -1;
+      if ( ! foam.String.isInstance(b) ) return -1;
       return b != null ? a.localeCompare(b) : 1 ;
     },
     function hashCode(s) {
@@ -577,7 +577,7 @@ foam.LIB({
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
-      if ( ! this.isInstance(b) && ! foam.Number.isInstance(b) ) return -1;
+      if ( ! foam.Date.isInstance(b) && ! foam.Number.isInstance(b) ) return -1;
       a = this.getTime(a);
       b = foam.Number.isInstance(b) ? b : this.getTime(b);
       return foam.Number.compare(a, b);
@@ -652,12 +652,13 @@ foam.LIB({
       }
     },
     function isInstance(o) {
-      return typeof o === 'object' && ! Array.isArray(o);
+      return typeof o === 'object' && ! Array.isArray(o) &&
+          ! foam.core.FObject.isInstance(o);
     },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      if ( ! this.isInstance(b) ) return -1;
+      if ( ! foam.Object.isInstance(b) ) return -1;
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
     function hashCode(o) {
@@ -708,9 +709,22 @@ foam.typeOf = (function() {
   };
 })();
 
-foam.typeOrder = [ foam.Undefined, foam.Null, foam.Boolean,
-    foam.Date, foam.Number, foam.String, foam.Array,
-    foam.Function, foam.Object, foam.core.FObject ];
+/**
+  Defining an ordinal property to establish a precedence
+  in which items should be compared in. Items are arrange
+  from least complex to most complex.
+*/
+
+foam.Undefined.ordinal = 0;
+foam.Null.ordinal = 1;
+foam.Boolean.ordinal = 2;
+foam.Date.ordinal = 3; // Dates are compared as Numbers, thus it is more simple
+foam.Number.ordinal = 4;
+foam.String.ordinal = 5;
+foam.Array.ordinal = 6;
+foam.Function.ordinal = 7;
+foam.Object.ordinal = 8;
+foam.core.FObject.ordinal = 9;
 
 foam.LIB({
   name: 'foam',
@@ -763,19 +777,12 @@ foam.LIB({
       function compare(a, b) {
         // To ensure that symmetry is present when comparing,
         // we will always use the comparator of higher precedence.
-        var types = foam.typeOrder;
-        var typeID = function(obj) {
-          return types.findIndex(function(type) {
-            return type.isInstance(obj);
-          });
-        };
-
-        var aTypeID = typeID(a);
-        var bTypeID = typeID(b);
-        foam.assert(aTypeID !== undefined && bTypeID !== undefined,
+        var aOrdinal = typeOf(a).ordinal;
+        var bOrdinal = typeOf(b).ordinal;
+        foam.assert(aOrdinal !== undefined && bOrdinal !== undefined,
             'comparator cannot operate on unknown types');
 
-        return (aTypeID <= bTypeID) ? typeOf(a).compare(a, b) :
+        return (aOrdinal <= bOrdinal) ? typeOf(a).compare(a, b) :
             -typeOf(b).compare(b, a);
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
