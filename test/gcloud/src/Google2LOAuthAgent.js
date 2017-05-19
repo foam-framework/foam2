@@ -155,4 +155,35 @@ describe('Google2LOAuthAgent', function() {
       payload: '{"data":true}'
     }, testCtx).send().then(done.fail, done);
   });
+
+  it('should work with multiple context mixins', function(done) {
+    foam.CLASS({
+      package: 'com.google.net.node.test',
+      name: 'OuterContextMixin',
+
+      exports: [ 'as authAgent' ],
+
+      methods: [
+        function requiresAuthorization(request) {
+          throw new Error('OuterContextMixin.requiresAuthorization: ' +
+              'this should not be exercised auth agent');
+        },
+        function getCredential() {
+          throw new Error('OuterContextMixin.getCredential: ' +
+              'this should not be exercised auth agent');
+        }
+      ]
+    });
+
+    var ctx = foam.__context__.createSubContext({});
+    var agent = mkAgent(foam.__context__.createSubContext(
+        foam.lookup('com.google.net.node.test.OuterContextMixin')
+            .create(null, ctx)))
+    var testCtx = agent.__subContext__;
+    testCtx.lookup('foam.net.HTTPRequest').create({
+      method: 'POST',
+      url: 'https://api.example.com/api',
+      payload: '{"data":true}'
+    }, agent).send().then(done, done.fail);
+  });
 });
