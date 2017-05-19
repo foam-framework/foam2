@@ -33,7 +33,7 @@ describe('Google2LOAuthAgent', function() {
       tokenURL: TOKEN_URL,
       email: EMAIL,
       privateKey: PRIVATE_KEY,
-      shouldAuthenticate: function(request) {
+      requiresAuthorization: function(request) {
         if ( request.url ) request.fromUrl(request.url);
 
         return request.protocol === 'https' &&
@@ -104,33 +104,23 @@ describe('Google2LOAuthAgent', function() {
 
   it('should authenticate in context with "authAgent" and "TokenBearerHTTPRequest" as "HTTPRequest"', function(done) {
     expect(getCredentialSpy).not.toHaveBeenCalled();
-    var ctx = foam.__context__.createSubContext({});
-    ctx.register(
-        foam.lookup('foam.net.auth.TokenBearerHTTPRequest'),
-        'foam.net.HTTPRequest');
-    var testCtx = ctx.createSubContext({authAgent: mkAgent(ctx)});
-
-    testCtx.lookup('foam.net.HTTPRequest').create({
+    var ctx = mkAgent().__subContext__;
+    ctx.lookup('foam.net.HTTPRequest').create({
       method: 'POST',
       url: 'https://api.example.com/api',
       payload: '{"data":true}'
-    }, testCtx).send().then(function() {
+    }, ctx).send().then(function() {
       expect(getCredentialSpy).toHaveBeenCalled();
       done();
     }, done.fail);
   });
 
   it('should not authenticate against unrelated URLs', function(done) {
-    var ctx = foam.__context__.createSubContext({});
-    ctx.register(
-        foam.lookup('foam.net.auth.TokenBearerHTTPRequest'),
-        'foam.net.HTTPRequest');
-    var testCtx = ctx.createSubContext({authAgent: mkAgent(ctx)});
-
-    testCtx.lookup('foam.net.HTTPRequest').create({
+    var ctx = mkAgent().__subContext__;
+    ctx.lookup('foam.net.HTTPRequest').create({
       method: 'POST',
       url: 'https://static.example.com/example.png'
-    }, testCtx).send().then(function() {
+    }, ctx).send().then(function() {
       expect(getCredentialSpy).not.toHaveBeenCalled();
       done();
     }, done.fail);
@@ -157,7 +147,7 @@ describe('Google2LOAuthAgent', function() {
     ctx.register(
         foam.lookup('foam.net.auth.TokenBearerHTTPRequest'),
         'foam.net.HTTPRequest');
-    var testCtx = ctx.createSubContext({authAgent: mkAgent(ctx)});
+    var testCtx = mkAgent(ctx).__subContext__;
 
     testCtx.lookup('foam.net.HTTPRequest').create({
       method: 'POST',
