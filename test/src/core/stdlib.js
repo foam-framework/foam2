@@ -201,7 +201,7 @@ describe('foam.Function', function() {
     expect(foam.Function.compare(fn1, fn2)).toBe(0);
     expect(foam.Function.compare(fn1, fnNoMatch)).toBe(-1);
     expect(foam.Function.compare(fnNoMatch, fn1)).toBe(1);
-    expect(foam.Function.compare(fnNoMatch, undefined)).toBe(1);
+    expect(foam.Function.compare(fnNoMatch, undefined)).toBe(-1);
   });
   it('hashCode', function() {
     var fn1 = function(a) { return a + 1; };
@@ -687,7 +687,7 @@ describe('foam.Array', function() {
     expect(foam.Array.compare([1, 2, 3], [1, 2])).toBe(1);
     expect(foam.Array.compare([1, 2], [1, 2, 3])).toBe(-1);
 
-    expect(foam.Array.compare([1, 2], null)).toBe(1);
+    expect(foam.Array.compare([1, 2], null)).toBe(-1);
   });
 
   it('hashCode', function() {
@@ -858,7 +858,7 @@ describe('foam.Object', function() {
     b.$UID;
     expect(foam.Object.compare(a, b)).toBe(-1);
     expect(foam.Object.compare(b, a)).toBe(1);
-    expect(foam.Object.compare(a, undefined)).toBe(1);
+    expect(foam.Object.compare(a, undefined)).toBe(-1);
   });
   it('hashCode', function() {
     expect(foam.Object.hashCode({ key: 'anything' })).toEqual(
