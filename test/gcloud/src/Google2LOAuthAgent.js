@@ -178,7 +178,7 @@ describe('Google2LOAuthAgent', function() {
     var ctx = foam.__context__.createSubContext({});
     var agent = mkAgent(foam.__context__.createSubContext(
         foam.lookup('com.google.net.node.test.OuterContextMixin')
-            .create(null, ctx)))
+            .create(null, ctx)));
     var testCtx = agent.__subContext__;
     testCtx.lookup('foam.net.HTTPRequest').create({
       method: 'POST',
