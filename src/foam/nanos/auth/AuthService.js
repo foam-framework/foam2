@@ -22,11 +22,11 @@ foam.INTERFACE({
     {
       name: 'challengedLogin',
       javaReturns: 'void',
-      javaThrows: [ 'LoginException' ],
+      javaThrows: [ 'javax.security.auth.login.LoginException' ],
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          javaType: 'foam.core.X'
         },
         {
           name: 'response',
@@ -64,7 +64,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          javaType: 'foam.core.X'
         },
         {
           name: 'principal',
@@ -83,7 +83,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          javaType: 'foam.core.X'
         },
         {
           name: 'principal',
@@ -106,7 +106,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'X'
+          javaType: 'foam.core.X'
         },
         {
           name: 'oldValue',
