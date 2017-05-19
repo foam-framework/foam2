@@ -7,116 +7,116 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
-	// javaImports: ['foam.core.X', 'javax.security.auth.login.LoginException'],
+  // javaImports: ['foam.core.X', 'javax.security.auth.login.LoginException'],
   methods: [
-		{
-  		name: 'generateChallenge',
-			javaReturns: 'String',
-			args: [
-				{
-					name: 'username',
-					javaType: 'String'
-				}
-			]
+    {
+      name: 'generateChallenge',
+      javaReturns: 'String',
+      args: [
+        {
+          name: 'username',
+          javaType: 'String'
+        }
+      ]
     },
-		{
-			name: 'loginWithContext',
-			javaReturns: 'void',
-			javaThrows: [ 'LoginException' ],
-			args: [
-				{
-					name: 'x',
-					javaType: 'X'
-				},
-				{
-					name: 'response',
-					javaType: 'String'
-				}
-			]
-		},
-		{
-			name: 'login',
-			javaReturns: 'Boolean',
-			args: [
-				{
-					name: 'username',
-					javaType: 'String'
-				},
-				{
-					name: 'password',
-					javaType: 'String'
-				}
-			]
-		},
-		{
-			name: 'logout',
-			javaReturns: 'void',
-			args: [
-				{
-					name: 'username',
-					javaType: 'String'
-				}
-			]
-		},
-		{
-			name: 'check',
-			javaReturns: 'Boolean',
-			args: [
-				{
-					name: 'x',
-					javaType: 'X'
-				},
-				{
-					name: 'principal',
-					javaType: 'java.security.Principal'
-				},
-				{
-					name: 'permission',
-					javaType: 'java.security.Permission'
-				}
-			]
-		},
-		{
-			name: 'updatePassword',
-			javaReturns: 'void',
-			javaThrows: [ 'IllegalStateException' ],
-			args: [
-				{
-					name: 'x',
-					javaType: 'X'
-				},
-				{
-					name: 'principal',
-					javaType: 'java.security.Principal'
-				},
-				{
-					name: 'oldPassword',
-					javaType: 'String'
-				},
-				{
-					name: 'newPassword',
-					javaType: 'String'
-				}
-			]
-		},
-		{
-			name: 'validatePrincipal',
-			javaReturns: 'void',
-			javaThrows: [ 'IllegalStateException' ],
-			args: [
-				{
-					name: 'x',
-					javaType: 'X'
-				},
-				{
-					name: 'oldValue',
-					javaType: 'java.security.Principal'
-				},
-				{
-					name: 'newValue',
-					javaType: 'java.security.Principal'
-				}
-			]
-		}
+    {
+      name: 'challengedLogin',
+      javaReturns: 'void',
+      javaThrows: [ 'LoginException' ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'X'
+        },
+        {
+          name: 'response',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'login',
+      javaReturns: 'Boolean',
+      args: [
+        {
+          name: 'username',
+          javaType: 'String'
+        },
+        {
+          name: 'password',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'logout',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'username',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'check',
+      javaReturns: 'Boolean',
+      args: [
+        {
+          name: 'x',
+          javaType: 'X'
+        },
+        {
+          name: 'principal',
+          javaType: 'java.security.Principal'
+        },
+        {
+          name: 'permission',
+          javaType: 'java.security.Permission'
+        }
+      ]
+    },
+    {
+      name: 'updatePassword',
+      javaReturns: 'void',
+      javaThrows: [ 'IllegalStateException' ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'X'
+        },
+        {
+          name: 'principal',
+          javaType: 'java.security.Principal'
+        },
+        {
+          name: 'oldPassword',
+          javaType: 'String'
+        },
+        {
+          name: 'newPassword',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'validatePrincipal',
+      javaReturns: 'void',
+      javaThrows: [ 'IllegalStateException' ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'X'
+        },
+        {
+          name: 'oldValue',
+          javaType: 'java.security.Principal'
+        },
+        {
+          name: 'newValue',
+          javaType: 'java.security.Principal'
+        }
+      ]
+    }
   ]
 });
