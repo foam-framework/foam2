@@ -446,3 +446,25 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+	refines: 'foam.mlang.sink.Count',
+
+	methods: [
+		{
+			name: 'put',
+			javaReturns: 'void',
+			args: [
+				{
+					name: 'obj',
+					javaType: 'foam.core.FObject'
+				},
+				{
+					name: 'sub',
+					javaType: 'foam.core.Detachable'
+				}
+			],
+			javaCode: 'setValue(this.getValue() + 1);\n return;'
+		}
+	]
+});
