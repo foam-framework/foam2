@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'com.google.net.node',
   name: 'Google2LOAuthAgent',
-  implements: [ 'foam.net.auth.AuthAgent' ],
+  extends: 'foam.net.auth.AuthAgent',
 
   documentation: `Implements "two-legged OAuth" (2LO) for Google APIs for
       server-to-server authentication over HTTPRequest objects. The correct
@@ -27,15 +27,10 @@ foam.CLASS({
 
   requires: [
     'foam.net.HTTPRequest',
-    'foam.net.auth.CredentialType',
     'foam.net.auth.TokenBearerCredential'
   ],
 
   properties: [
-    {
-      name: 'credentialType',
-      factory: function() { return this.CredentialType.TOKEN_BEARER; }
-    },
     {
       class: 'String',
       name: 'tokenURL',
@@ -102,6 +97,12 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.__subContext__.register(
+          this.lookup('foam.net.auth.TokenBearerHTTPRequest'),
+          'foam.net.HTTPRequest');
+      this.SUPER();
+    },
     function getCredential() {
       if ( ! this.needsRefresh_() ) return Promise.resolve(this.credential_);
 

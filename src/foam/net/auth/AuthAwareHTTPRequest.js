@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'AuthAwareHTTPRequest',
   extends: 'foam.net.BaseHTTPRequest',
 
-  documentation: 'Abstract class for authenticating HTTP requests.',
+  documentation: 'Abstract class for HTTP requests that require authorization.',
 
   requires: [ 'foam.net.BaseHTTPRequest' ],
   imports: [ 'authAgent? as ctxAuthAgent' ],
@@ -46,7 +46,7 @@ foam.CLASS({
     function send() {
       var send = this.delegate.send.bind(this.delegate);
       if ( ! this.authAgent ) return send();
-      if ( ! this.authAgent.shouldAuthenticate(this) ) return send();
+      if ( ! this.authAgent.requiresAuthorization(this) ) return send();
 
       return this.authAgent.getCredential().then(this.onGetCredentail)
           .then(send);
