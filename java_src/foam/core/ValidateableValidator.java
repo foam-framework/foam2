@@ -7,16 +7,15 @@
 package foam.core;
 
 import foam.core.*;
-import java.lang.IllegalStateException;
 
 public class ValidateableValidator {
-  private static ValidateableValidator sharedInstance = new ValidateableValidator();
+  private static ValidateableValidator instance_ = new ValidateableValidator();
 
-  public static ValidateableValidator getInstance() { return sharedInstance; }
+  public static ValidateableValidator instance() { return instance_; }
 
   private ValidateableValidator() {}
 
   public static void validate(Object obj) throws IllegalStateException {
-    (Validateable)obj.validate();
+    ((Validateable)obj).validate();
   }
 }
