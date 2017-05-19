@@ -48,7 +48,7 @@ foam.CLASS({
       if ( ! this.authAgent ) return send();
       if ( ! this.authAgent.requiresAuthorization(this) ) return send();
 
-      return this.authAgent.getCredential().then(this.onGetCredentail)
+      return this.authAgent.getCredential().then(this.onGetCredential)
           .then(send);
     }
   ],
