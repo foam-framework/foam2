@@ -204,15 +204,15 @@ describe('Property default comparators', function() {
   });
   it('accepts left falsey', function() {
     expect(c(false, 6)).toEqual(-1);
-//    expect(c(NaN, 6)).toEqual(-1); // Is this really what we expect?
+    expect(c(NaN, 6)).toEqual(-1); // Is this really what we expect?
     expect(c(0, 6)).toEqual(-1);
-    expect(c('', 6)).toEqual(-1);
+    expect(c('', 6)).toEqual(1);
   });
   it('accepts right falsey', function() {
-//    expect(c(4, false)).toEqual(1);
-//    expect(c(4, NaN)).toEqual(1);
+    expect(c(4, false)).toEqual(1);
+    expect(c(4, NaN)).toEqual(1);
     expect(c(4, 0)).toEqual(1);
-    expect(c(4, '')).toEqual(1);
+    expect(c(4, '')).toEqual(-1);
   });
   it('falls back on $UID.compareTo', function() {
     var o1 = {};

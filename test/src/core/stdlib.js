@@ -112,7 +112,7 @@ describe('foam.Undefined', function() {
   });
   it('compare', function() {
     expect(foam.Undefined.compare("unused", undefined)).toBe(0);
-    expect(foam.Undefined.compare("unused", "defined!")).toBe(1);
+    expect(foam.Undefined.compare("unused", "defined!")).toBe(-1);
   });
   it('hashCode', function() {
     expect(foam.Undefined.hashCode(undefined)).toBe(-2);
@@ -134,7 +134,7 @@ describe('foam.Null', function() {
   });
   it('compare', function() {
     expect(foam.Null.compare("unused", undefined)).toBe(-1);
-    expect(foam.Null.compare("unused", "defined!")).toBe(1);
+    expect(foam.Null.compare("unused", "defined!")).toBe(-1);
     expect(foam.Null.compare("unused", null)).toBe(0);
   });
   it('hashCode', function() {
@@ -166,10 +166,10 @@ describe('foam.Boolean', function() {
     expect(foam.Boolean.compare(true, true)).toBe(0);
     expect(foam.Boolean.compare(false, false)).toBe(0);
 
-    expect(foam.Boolean.compare(true, 0)).toBe(1);
+    expect(foam.Boolean.compare(true, 0)).toBe(-1);
     expect(foam.Boolean.compare(false, 66)).toBe(-1);
-    expect(foam.Boolean.compare(true, 9)).toBe(0);
-    expect(foam.Boolean.compare(false, 0)).toBe(0);
+    expect(foam.Boolean.compare(true, 9)).toBe(-1);
+    expect(foam.Boolean.compare(false, 0)).toBe(-1);
   });
   it('hashCode', function() {
     expect(foam.Boolean.hashCode(true)).toBe(1);
@@ -419,8 +419,8 @@ describe('foam.Number', function() {
     expect(foam.Number.compare(4, 3)).toBe(1);
     expect(foam.Number.compare(24, 24)).toBe(0);
 
-    expect(foam.Number.compare(3, null)).toBe(1);
-    expect(foam.Number.compare(3, undefined)).toBe(1);
+    expect(foam.Number.compare(3, null)).toBe(-1);
+    expect(foam.Number.compare(3, undefined)).toBe(-1);
 
   });
   it('hashCode', function() {
@@ -451,8 +451,8 @@ describe('foam.String', function() {
     expect(foam.String.compare('string b', 'string a')).toBeGreaterThan(0);
     expect(foam.String.compare('string d', 'string d')).toBe(0);
 
-    expect(foam.String.compare('string d', null)).toBe(1);
-    expect(foam.String.compare('string d', undefined)).toBe(1);
+    expect(foam.String.compare('string d', null)).toBe(-1);
+    expect(foam.String.compare('string d', undefined)).toBe(-1);
   });
   it('hashCode', function() {
     expect(foam.String.hashCode('a short string'))
