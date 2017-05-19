@@ -8,15 +8,14 @@ package foam.dao;
 
 import foam.dao.*;
 import foam.core.*;
-import foam.nanos.auth.LastModifiedAware;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class LastModifiedAwareDAO
   extends ProxyDAO
-  implements LastModifiedAware
 {
   public FObject put(FObject value) {
-    ((LastModifiedAware)value).lastModified = LocalDateTime.now();
+    ((LastModifiedAware) value).setLastModified(new Date());
+
     return super.put(value);
   }
 }
