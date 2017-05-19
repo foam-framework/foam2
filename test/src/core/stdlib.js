@@ -993,10 +993,25 @@ describe('foam.util', function() {
         expect(foam.util.diff(t, t)).toBeUndefined();
       }
     });
-
-
   });
 
+  it('handles a more indepth comparison of types', function() {
+    var obj1 = {};
+    var obj2 = {};
+    var refObj1 = obj1;
+
+    var items = [ undefined, null, false, true, 0, 1, '', 'potato',
+      obj1, obj2, refObj1, new Date(0), new Date(0), new Date(),
+      foam.core.FObject.create(), foam.core.FObject.create() ];
+    var len = items.length;
+
+    for (var i = 0; i < len; i++) {
+      for (var j = i; j < len; j++) {
+        expect(foam.util.compare(items[i], items[j]))
+            .toBe(-foam.util.compare(items[j], items[i]));
+      }
+    }
+  });
 });
 
 
