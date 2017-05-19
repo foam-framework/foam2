@@ -6,7 +6,7 @@
 
 package foam.core;
 
-import java.lang.IllegalStateException;
+import foam.core.*;
 
 public interface Validator {
   public void validate(FObject obj) throws IllegalStateException;

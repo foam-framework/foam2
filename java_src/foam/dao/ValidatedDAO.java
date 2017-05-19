@@ -6,18 +6,15 @@
 
 package foam.dao;
 
-import foam.core.Validator;
-
 import foam.dao.*;
 import foam.core.*;
-import java.lang.IllegalStateException;
 
 public class ValidatedDAO
   extends ProxyDAO
   implements Validator
 {
   public void validate(FObject obj) throws IllegalStateException {
-    (Validateable)obj.validate();
+    ((Validateable)obj).validate();
   }
 
   public FObject put(FObject value) throws IllegalStateException {
