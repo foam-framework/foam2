@@ -365,7 +365,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      if ( ! this.isInstance(b) || ( isNaN(a) && ! isNaN(b)) ) return -1;
+      if ( ! this.isInstance(b) && isNaN(parseFloat(b))
+          || ( isNaN(a) && ! isNaN(b)) ) return -1;
       else if ( ! isNaN(a) && isNaN(b) ) return 1;
       return a < b ? -1 : a > b ? 1 : 0;
     },
