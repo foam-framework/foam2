@@ -43,8 +43,22 @@
      * @param opt_suppress Suppress throwing an error.
      **/
     lookup: function(id, opt_suppress) {
-      var ret = typeof id === 'string' && this.__cache__[id];
-
+      // If it's an interface extending other interfaces, it won't
+      // be string, it'll an array of strings
+      var ret;
+      if ( typeof id === 'string' && this.__cache__[id] ) {
+        ret = this.__cache__[id];
+      }
+      else if ( id && id.length > 0 ) {
+        for ( i = 0 ; i < id.length ; i++ ) {
+          if( typeof id[i] === 'string' && this.__cache__[id[i]] ) {
+            ret = this.__cache__[id[i]];
+          } else {
+            ret = false;
+            break;
+          }
+        }
+      }
       if ( ! opt_suppress ) {
         foam.assert(
             ret,
