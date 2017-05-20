@@ -74,9 +74,8 @@ foam.CLASS({
       value: 'urn:ietf:params:oauth:grant-type:jwt-bearer'
     },
     {
-      class: 'FObjectProperty',
       name: 'credential_',
-      value: null
+      value: Promise.reject(new Error('No credential'))
     },
     {
       class: 'String',
@@ -104,28 +103,9 @@ foam.CLASS({
       this.SUPER();
     },
     function getCredential() {
-      if ( ! this.needsRefresh_() ) return Promise.resolve(this.credential_);
-
-      var iat = this.getIat();
-      var headerDotClaimSet =
-          this.base64urlEncodedJWTHeader_ + '.' +
-          this.base64url(this.getJWTClaimSetString(iat));
-      var signature = this.signEncodedHeaderAndClaimSet(headerDotClaimSet);
-      var assertion = headerDotClaimSet + '.' + signature;
-      var payload = 'grant_type=' + encodeURIComponent(this.grantType) + '&' +
-          'assertion=' + assertion;
-
-      var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
-
-      return this.HTTPRequest.create({
-        method: 'POST',
-        url: this.tokenURL,
-        headers: headers,
-        responseType: 'json',
-        payload: payload
-      }).send().then(this.onAuthAttemptResponse)
-          .then(this.onAuthAccept.bind(this, iat))
-          .catch(this.onError);
+      return this.credential_ = this.credential_.then(
+        this.onGetCredential,
+        this.onNoCredential);
     },
     {
       name: 'getIat',
@@ -182,20 +162,40 @@ foam.CLASS({
       name: 'needsRefresh_',
       documentation: `Report whether or not a fresh access token request is
           necessary at this time.`,
-      code: function() {
-        if ( ! this.credential_ ) return true;
+      code: function(credential) {
+        if ( ! credential ) return true;
 
-        return new Date().getTime() >= this.credential_.expiry;
+        return new Date().getTime() >= credential.expiry;
       }
-    },
-    {
-      name: 'reset_',
-      documentation: 'Reset access token and expiry state',
-      code: function() { this.credential_ = null; }
     }
   ],
 
   listeners: [
+    function onNoCredential(error) { return this.onGetCredential(null); },
+    function onGetCredential(credential) {
+      if ( ! this.needsRefresh_(credential) )
+        return credential;
+
+      var iat = this.getIat();
+      var headerDotClaimSet =
+          this.base64urlEncodedJWTHeader_ + '.' +
+          this.base64url(this.getJWTClaimSetString(iat));
+      var signature = this.signEncodedHeaderAndClaimSet(headerDotClaimSet);
+      var assertion = headerDotClaimSet + '.' + signature;
+      var payload = 'grant_type=' + encodeURIComponent(this.grantType) + '&' +
+          'assertion=' + assertion;
+
+      var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+
+      return this.HTTPRequest.create({
+        method: 'POST',
+        url: this.tokenURL,
+        headers: headers,
+        responseType: 'json',
+        payload: payload
+      }).send().then(this.onAuthAttemptResponse)
+          .then(this.onAuthAccept.bind(this, iat));
+    },
     function onAuthAttemptResponse(response) {
       if ( response.status !== 200 ) {
         throw new Error(
@@ -205,15 +205,10 @@ foam.CLASS({
       return response.payload;
     },
     function onAuthAccept(iat, payload) {
-      this.credential_ = this.TokenBearerCredential.create({
+      return this.TokenBearerCredential.create({
         accessToken: payload.access_token,
         expiry: (iat + payload.expires_in) * 1000
       });
-      return this.credential_;
-    },
-    function onError(error) {
-      this.reset_();
-      throw error;
     }
   ]
 });
