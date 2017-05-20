@@ -84,8 +84,13 @@ foam.CLASS({
   properties: [
     {
       class: 'Int',
+      documentation: `Maximum number of operations to include in a batch.
+          Since each entity may be in a different entity group, default to
+          transaction entity group limit of 25 [1].
+
+          [1] https://cloud.google.com/datastore/docs/concepts/transactions#transactions_and_entity_groups`,
       name: 'batchSize',
-      value: 500
+      value: 25
     },
     {
       class: 'FObjectArray',
