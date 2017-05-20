@@ -98,94 +98,94 @@ describe('Google2LOAuthAgent', function() {
     });
   });
 
-  // it('should generate the correct token request payload', function(done) {
-  //   mkAgent().getCredential().then(done, done.fail);
-  // });
+  it('should generate the correct token request payload', function(done) {
+    mkAgent().getCredential().then(done, done.fail);
+  });
 
-  // it('should authenticate in context with "authAgent" and "TokenBearerHTTPRequest" as "HTTPRequest"', function(done) {
-  //   expect(getCredentialSpy).not.toHaveBeenCalled();
-  //   var ctx = mkAgent().__subContext__;
-  //   ctx.lookup('foam.net.HTTPRequest').create({
-  //     method: 'POST',
-  //     url: 'https://api.example.com/api',
-  //     payload: '{"data":true}'
-  //   }, ctx).send().then(function() {
-  //     expect(getCredentialSpy).toHaveBeenCalled();
-  //     done();
-  //   }, done.fail);
-  // });
+  it('should authenticate in context with "authAgent" and "TokenBearerHTTPRequest" as "HTTPRequest"', function(done) {
+    expect(getCredentialSpy).not.toHaveBeenCalled();
+    var ctx = mkAgent().__subContext__;
+    ctx.lookup('foam.net.HTTPRequest').create({
+      method: 'POST',
+      url: 'https://api.example.com/api',
+      payload: '{"data":true}'
+    }, ctx).send().then(function() {
+      expect(getCredentialSpy).toHaveBeenCalled();
+      done();
+    }, done.fail);
+  });
 
-  // it('should not authenticate against unrelated URLs', function(done) {
-  //   var ctx = mkAgent().__subContext__;
-  //   ctx.lookup('foam.net.HTTPRequest').create({
-  //     method: 'POST',
-  //     url: 'https://static.example.com/example.png'
-  //   }, ctx).send().then(function() {
-  //     expect(getCredentialSpy).not.toHaveBeenCalled();
-  //     done();
-  //   }, done.fail);
-  // });
+  it('should not authenticate against unrelated URLs', function(done) {
+    var ctx = mkAgent().__subContext__;
+    ctx.lookup('foam.net.HTTPRequest').create({
+      method: 'POST',
+      url: 'https://static.example.com/example.png'
+    }, ctx).send().then(function() {
+      expect(getCredentialSpy).not.toHaveBeenCalled();
+      done();
+    }, done.fail);
+  });
 
-  // it('should reject on bad auth attempt', function(done) {
-  //   foam.CLASS({
-  //     package: 'com.google.net.node.test.reject',
-  //     name: 'HTTPRequest',
-  //     extends: 'com.google.net.node.test.HTTPRequest',
+  it('should reject on bad auth attempt', function(done) {
+    foam.CLASS({
+      package: 'com.google.net.node.test.reject',
+      name: 'HTTPRequest',
+      extends: 'com.google.net.node.test.HTTPRequest',
 
-  //     requires: [ 'foam.net.HTTPResponse' ],
+      requires: [ 'foam.net.HTTPResponse' ],
 
-  //     methods: [
-  //       function checkTokenURLPayload() {
-  //         return Promise.reject(this.HTTPResponse.create({status: 401}));
-  //       }
-  //     ]
-  //   });
+      methods: [
+        function checkTokenURLPayload() {
+          return Promise.reject(this.HTTPResponse.create({status: 401}));
+        }
+      ]
+    });
 
-  //   var ctx = foam.__context__.createSubContext({});
-  //   ctx.register(foam.lookup('com.google.net.node.test.reject.HTTPRequest'),
-  //                'foam.net.BaseHTTPRequest');
-  //   ctx.register(
-  //       foam.lookup('foam.net.auth.TokenBearerHTTPRequest'),
-  //       'foam.net.HTTPRequest');
-  //   var testCtx = mkAgent(ctx).__subContext__;
+    var ctx = foam.__context__.createSubContext({});
+    ctx.register(foam.lookup('com.google.net.node.test.reject.HTTPRequest'),
+                 'foam.net.BaseHTTPRequest');
+    ctx.register(
+        foam.lookup('foam.net.auth.TokenBearerHTTPRequest'),
+        'foam.net.HTTPRequest');
+    var testCtx = mkAgent(ctx).__subContext__;
 
-  //   testCtx.lookup('foam.net.HTTPRequest').create({
-  //     method: 'POST',
-  //     url: 'https://api.example.com/api',
-  //     payload: '{"data":true}'
-  //   }, testCtx).send().then(done.fail, done);
-  // });
+    testCtx.lookup('foam.net.HTTPRequest').create({
+      method: 'POST',
+      url: 'https://api.example.com/api',
+      payload: '{"data":true}'
+    }, testCtx).send().then(done.fail, done);
+  });
 
-  // it('should work with multiple context mixins', function(done) {
-  //   foam.CLASS({
-  //     package: 'com.google.net.node.test',
-  //     name: 'OuterContextMixin',
+  it('should work with multiple context mixins', function(done) {
+    foam.CLASS({
+      package: 'com.google.net.node.test',
+      name: 'OuterContextMixin',
 
-  //     exports: [ 'as authAgent' ],
+      exports: [ 'as authAgent' ],
 
-  //     methods: [
-  //       function requiresAuthorization(request) {
-  //         throw new Error('OuterContextMixin.requiresAuthorization: ' +
-  //             'this should not be exercised auth agent');
-  //       },
-  //       function getCredential() {
-  //         throw new Error('OuterContextMixin.getCredential: ' +
-  //             'this should not be exercised auth agent');
-  //       }
-  //     ]
-  //   });
+      methods: [
+        function requiresAuthorization(request) {
+          throw new Error('OuterContextMixin.requiresAuthorization: ' +
+              'this should not be exercised auth agent');
+        },
+        function getCredential() {
+          throw new Error('OuterContextMixin.getCredential: ' +
+              'this should not be exercised auth agent');
+        }
+      ]
+    });
 
-  //   var ctx = foam.__context__.createSubContext({});
-  //   var agent = mkAgent(foam.__context__.createSubContext(
-  //       foam.lookup('com.google.net.node.test.OuterContextMixin')
-  //           .create(null, ctx)));
-  //   var testCtx = agent.__subContext__;
-  //   testCtx.lookup('foam.net.HTTPRequest').create({
-  //     method: 'POST',
-  //     url: 'https://api.example.com/api',
-  //     payload: '{"data":true}'
-  //   }, agent).send().then(done, done.fail);
-  // });
+    var ctx = foam.__context__.createSubContext({});
+    var agent = mkAgent(foam.__context__.createSubContext(
+        foam.lookup('com.google.net.node.test.OuterContextMixin')
+            .create(null, ctx)));
+    var testCtx = agent.__subContext__;
+    testCtx.lookup('foam.net.HTTPRequest').create({
+      method: 'POST',
+      url: 'https://api.example.com/api',
+      payload: '{"data":true}'
+    }, agent).send().then(done, done.fail);
+  });
 
   it('should yield the same token with multiple synchronous calls', function(done) {
     // Use classes that:
