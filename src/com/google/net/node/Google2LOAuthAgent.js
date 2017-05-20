@@ -75,7 +75,12 @@ foam.CLASS({
     },
     {
       name: 'credential_',
-      value: Promise.reject(new Error('No credential'))
+      factory: function() {
+        var promise = Promise.reject(new Error('No credential'));
+        // Suppress Node JS unhandled/handled warning messages.
+        promise.catch(function() {});
+        return promise;
+      }
     },
     {
       class: 'String',
