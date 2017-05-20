@@ -356,6 +356,8 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
+      // TODO(kgr): Instead of checking type, use polymorphims and add a
+      // type-specific has() method to the Property.
       javaCode: `Object value = getArg1().f(obj);
         return ! (value == null ||
           (value instanceof String && ((String)value).length() == 0) ||
