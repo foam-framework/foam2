@@ -3,6 +3,7 @@ package foam.dao;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.Journal;
+
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
