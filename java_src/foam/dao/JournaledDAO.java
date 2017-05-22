@@ -3,30 +3,61 @@ package foam.dao;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.Journal;
+import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
 
-public class JournaledDAO implements Journal {
+import java.io.FileDescriptor;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+/**
+ * Created by carlos on 2017-05-22.
+ */
+public class JournaledDAO extends ProxyDAO {
+
+    private FileJournal journal;
+
+    public JournaledDAO(DAO delegate, FileJournal journal) {
+        this.journal = journal;
+        this.setDelegate(delegate);
+    }
+
+    public void setJournal(FileJournal journal) {
+        this.journal = journal;
+    }
+
+    /**
+     *
+     * persists data into FileJournal then calls the delegated DAO.
+     *
+     * @param obj
+     * @returns FObject
+     */
     @Override
-    public void put(FObject obj, Detachable sub) {
-
+    public FObject put(FObject obj) {
+        this.journal.put(obj, null);
+        return this.getDelegate().put(obj);
     }
 
     @Override
-    public void remove(FObject obj, Detachable sub) {
-
+    public FObject remove(FObject obj) {
+        this.journal.remove(obj, null);
+        return this.getDelegate().remove(obj);
     }
 
     @Override
-    public void eof() {
-
-    }
-
-    @Override
-    public void reset(Detachable sub) {
-
-    }
-
-    @Override
-    public String replay(FObject obj) {
+    public FObject find(Object id) {
         return null;
+    }
+
+    @Override
+    public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+        return null;
+    }
+
+    @Override
+    public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+
     }
 }
