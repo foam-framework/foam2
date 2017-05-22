@@ -69,6 +69,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.expr.Dot',
 
@@ -81,6 +82,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 //
 // Refine constants to produce datastore values. This is needed because
@@ -105,6 +107,7 @@ foam.CLASS({
   ]
 });
 
+
 //
 // Refine AND and subset of binary ops to support toDatastoreFilter().
 //
@@ -128,6 +131,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.And',
 
@@ -150,11 +154,13 @@ foam.CLASS({
         return { op: 'AND', filters: filters };
       }
     },
+
     function toDatastoreFilter() {
       return { compositeFilter: this.toOwnDatastoreFilter() };
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
@@ -183,11 +189,13 @@ foam.CLASS({
         value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
       };
     },
+
     function toDatastoreFilter() {
       return { propertyFilter: this.toOwnDatastoreFilter() };
     }
   ]
 });
+
 
 //
 // Use above Binary implementation on Google Cloud Datastore-supported
@@ -224,6 +232,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.order.ThenBy',
