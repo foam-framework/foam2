@@ -16,6 +16,39 @@
  */
 
 //
+// Refine COUNT to perform two optimizations:
+// (1) Perform a key-only query when the sink is a COUNT;
+// (2) Do not bother construction FObjects on query result batches.
+//
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Count',
+
+  methods: [
+    {
+      name: 'decorateDatastoreQuery',
+      documentation: `Optimize plain COUNT() queries by requesting keys only.
+          This entails filling in runQuery.projection [1] with the magic
+          "__key__" key.
+
+          [1] https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Projection`,
+      code: function(query) {
+        query.projection = [ { property: { name: "__key__" } } ];
+      }
+    },
+    {
+      name: 'fromDatastoreEntityResults',
+      documentation: `Optimize plain COUNT() queries by not constructing
+          FObjects to store results. Input paramter is
+          QueryResultBatch.entityResults [1].
+
+          [1] https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#QueryResultBatch`,
+      code: function(entityResults) { this.value += entityResults.length; }
+    }
+  ]
+});
+
+//
 // Refine Property and DOT to produce datastore property.
 //
 
