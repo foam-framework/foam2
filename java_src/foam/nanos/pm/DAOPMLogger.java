@@ -8,7 +8,6 @@ package foam.nanos.pm;
 
 import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
-import foam.dao.PMDAO;
 import foam.nanos.NanoService;
 
 public class DAOPMLogger
