@@ -3,46 +3,51 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 package foam.nanos.test;
 
+import bsh.EvalError;
+import bsh.Interpreter;
 import foam.core.*;
-import foam.dao.*;
-import foam.nanos.*;
-import bsh.*;
-import java.io.*;
-import java.util.*;
-import java.lang.*;
+import foam.dao.AbstractSink;
+import foam.dao.MapDAO;
+import foam.nanos.NanoService;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Date;
 
-public class TestRunner extends ContextAwareSupport implements NanoService {
+public class TestRunner
+  extends    ContextAwareSupport
+  implements NanoService
+{
 
   public void start() {
     final MapDAO tests = (MapDAO) getX().get("TestDAO");
-    
+
     tests.select(new AbstractSink() {
       public void put(FObject o, Detachable sub) {
-        Test                  test = (Test) o;
-        ByteArrayOutputStream bas  = new ByteArrayOutputStream();
-        PrintStream           ps   = new PrintStream(bas);
-        // Creates a new Interpreter at each call
-        final Interpreter    shell = new Interpreter();
+        Test                  test  = (Test) o;
+        ByteArrayOutputStream bas   = new ByteArrayOutputStream();
+        PrintStream           ps    = new PrintStream(bas);
+        final Interpreter     shell = new Interpreter(); // Creates a new Interpreter at each call
 
-        try {  
+        try {
           shell.set("currentTest", test);
           test.setPassed(0);
           test.setFailed(0);
           test.setOutput("");
 
-          // Sets the shell output to a Stream that will later be redirected to the output parameter  
+          // Sets the shell output to a Stream that will later be redirected to the output parameter
           shell.setOut(ps);
 
-          // creates the testing method 
+          // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else currentTest.setFailed(currentTest.getFailed()+1); print((exp ? \"SUCCESS: \" : \"FAILURE:\")+message);}");
-        
+
           shell.eval(test.getCode());
         } catch (EvalError e) {
           e.printStackTrace();
         }
-  
+
         test.setLastRun(new Date());
 
         // sets stream to output property
