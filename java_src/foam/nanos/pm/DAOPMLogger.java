@@ -16,10 +16,11 @@ public class DAOPMLogger
   implements PMLogger, NanoService
 {
 
+  MapDAO dao_;
+
   @Override
   public void log(PM pm) {
-    MapDAO dao = (MapDAO) getX().get("pminfodao");
-    PMInfo pmi = (PMInfo) dao.find(pm);
+    PMInfo pmi = (PMInfo) dao_.find(pm);
 
     if ( pmi == null ) {
       pmi = new PMInfo()
@@ -40,14 +41,13 @@ public class DAOPMLogger
     pmi.setNumoccurrences(pmi.getNumoccurrences() + 1);
     pmi.setTotaltime(pmi.getTotaltime() + pm.getTime());
 
-    dao.put(pmi);
+    dao_.put(pmi);
   }
 
   @Override
   public void start() {
-    MapDAO del = new MapDAO();
-    del.setOf(PMInfo.getOwnClassInfo());
-    del.setX(getX());
-    getX().put("pminfodao", del);
+    dao_ = new MapDAO();
+    dao_.setOf(PMInfo.getOwnClassInfo());
+    dao_.setX(getX());
   }
 }
