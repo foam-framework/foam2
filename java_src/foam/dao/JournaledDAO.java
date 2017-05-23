@@ -5,7 +5,6 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
  * Created by carlos on 2017-05-22.
@@ -15,15 +14,11 @@ public class JournaledDAO extends ProxyDAO {
     private FileJournal journal;
 
     public JournaledDAO(DAO delegate, String filename) throws IOException {
-
-        RandomAccessFile file = new RandomAccessFile(filename, "rw");
-        FileJournal fileJournal = new FileJournal(file.getFD());
-        this.journal = fileJournal;
+        this.journal = new FileJournal(filename);
         this.setDelegate(delegate);
     }
 
     /**
-     *
      * persists data into FileJournal then calls the delegated DAO.
      *
      * @param obj

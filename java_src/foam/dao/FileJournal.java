@@ -3,25 +3,30 @@ package foam.dao;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.Journal;
+import foam.lib.json.Outputter;
 
-import java.io.FileDescriptor;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by carlos on 2017-05-22.
  */
 public class FileJournal implements Journal {
 
-    protected FileDescriptor fd;
     protected FileWriter fout;
+    protected BufferedWriter bw;
     protected FileReader fin;
 
-    public FileJournal(FileDescriptor fd) {
-        this.fd = fd;
-        this.fout = new FileWriter(fd);
-        this.fin = new FileReader(fd);
+    public FileJournal(String filename) throws IOException {
+
+        File file = new File(filename);
+
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        this.fin = new FileReader(file);
+        this.fout = new FileWriter(file, true);
+        this.bw = new BufferedWriter(this.fout);
     }
 
     /**
@@ -33,7 +38,10 @@ public class FileJournal implements Journal {
     @Override
     public void put(FObject obj, Detachable sub) {
         try {
-            fout.write("put(foam.json.parse(" + obj.toString() + "));\\n");
+            Outputter outputter = new Outputter();
+            this.bw.write("put(foam.json.parse(" + outputter.stringify(obj) + "))");
+            this.bw.newLine();
+            this.bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,7 +49,14 @@ public class FileJournal implements Journal {
 
     @Override
     public void remove(FObject obj, Detachable sub) {
-
+        try {
+            Outputter outputter = new Outputter();
+            this.bw.write("remove(foam.json.parse(" + outputter.stringify(obj) + "))");
+            this.bw.newLine();
+            this.bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
