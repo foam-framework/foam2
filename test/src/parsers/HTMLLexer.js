@@ -139,6 +139,49 @@ describe('HTMLLexer', function() {
     ].forEach(testParse.bind(this, 'label'));
   });
 
+  it('should parse tags with one attribute', function() {
+    [
+        '<div name="TestDiv1" />',
+        '<label id=3 />',
+        '<pre class="idl">Some stuff here</pre>'
+    ].forEach(function(str) {
+      var value = testParse('htmlPart', str);
+      if ( ! value ) return;
+
+      expect(Array.isArray(value.attributes)).toBe(true);
+      expect(value.attributes.length).toBe(1);
+      expect(value.attributes[0]).toBeDefined();
+    });
+  });
+
+  it('should parse tags multiple attributes', function() {
+    [
+        '<div id=1 name="TestDiv2" value="someValue" visible=true>Some Content</div>',
+        '<label name="TestLabel" id=2 visible />',
+        '<pre class="idl" visible=false id=3>Potato content</pre>'
+    ].forEach(function(str, index) {
+      var value = testParse('htmlPart', str);
+      if ( ! value ) return;
+
+      expect(Array.isArray(value.attributes)).toBe(true);
+      expect(value.attributes).toBeDefined();
+      expect(value.attributes.length > 2).toBe(true);
+      expect(value.attributes[index].element).toBe('id');
+      expect(value.attributes[index].value).toBe((index + 1).toString());
+    });
+  });
+
+//  it('should parse attributes', function() {
+//    [
+//        '<div name="TestDiv1"/>',
+//        '<div id=1 visible=false name="TestDiv2">Some sort of content here</div>',
+//        '<pre class="idl">More test content</pre>'
+//    ].forEach(function(str) {
+//      var value = testParse('htmlPart', str);
+//      if ( ! value ) return;
+//    }
+//  });
+
   it('should parse comments', function() {
     [
       '<!-- -- > <\n<\t<\r->-->'
