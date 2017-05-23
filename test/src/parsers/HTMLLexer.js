@@ -69,7 +69,7 @@ describe('HTMLLexer', function() {
       var value = testParse('maybeEmbed', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
+      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
       expect(Array.isArray(value.content)).toBe(true);
       expect(value.content.length).toBe(1);
       expect(value.content[0]).toBe('if ( x < 3 ) return true');
@@ -84,7 +84,7 @@ describe('HTMLLexer', function() {
       var value = testParse('maybeEmbed', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
+      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
       expect(Array.isArray(value.content)).toBe(true);
       expect(value.content.length).toBe(3);
       expect(value.content[1]).toBe('text');
@@ -99,7 +99,7 @@ describe('HTMLLexer', function() {
       var value = testParse('maybeEmbed', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
+      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
       expect(Array.isArray(value.content)).toBe(true);
       expect(value.content.length).toBe(1);
       expect(value.content[0]).toBe('if ( x < 3 ) return true');
@@ -115,7 +115,7 @@ describe('HTMLLexer', function() {
       var value = testParse('embed', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
+      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
       expect(Array.isArray(value.content)).toBe(true);
       expect(value.content.length).toBe(1);
       expect(value.content[0]).toBe('sc < ri ? p &gt; t : en');
@@ -166,7 +166,7 @@ describe('HTMLLexer', function() {
       expect(Array.isArray(value.attributes)).toBe(true);
       expect(value.attributes).toBeDefined();
       expect(value.attributes.length > 2).toBe(true);
-      expect(value.attributes[index].element).toBe('id');
+      expect(value.attributes[index].name).toBe('id');
       expect(value.attributes[index].value).toBe((index + 1).toString());
     });
   });
