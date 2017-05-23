@@ -582,7 +582,24 @@ describe('ContextualizingDAO', function() {
 });
 
 
-describe('SyncDAO', function() {
+// TODO(jacksonic): FOAM2 has a partial port of the components required for a
+// correct SyncDAO. The folowing issues have not been resolved:
+//
+// - Implement VersionNoDAO decorate server's DAO and automatically bump version
+//   numbers
+//
+// - Assert that "versionProperty" is a foam.core.Int. Possibly also assert a
+//   default value of 0.
+//
+// - Well written tests should:
+//
+//   + Always define version numbers on instances;
+//
+//   + Use a second client to contrive "stale" version numbers in a realistic
+//     multi-client scenario;
+//
+//   + More comments on why expectation is what it is.
+xdescribe('SyncDAO', function() {
 
   // NOTE: Test assumes polling can be simulated by calling SyncDAO.sync()
 
