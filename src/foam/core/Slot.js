@@ -418,7 +418,11 @@ foam.CLASS({
 
         var args = foam.Function.argNames(this.code);
         for ( var i = 0 ; i < args.length ; i++ ) {
-          args[i] = obj.slot(args[i]);
+          var argSlots = args[i].split('$');
+          args[i] = obj.slot(argSlots.shift());
+          argSlots.forEach(function(s) {
+            args[i] = args[i].dot(s);
+          });
         }
 
         // this.invalidate(); // ???: Is this needed?
