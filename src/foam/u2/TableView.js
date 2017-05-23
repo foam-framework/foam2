@@ -326,6 +326,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'data'
     },
@@ -352,6 +357,16 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      // Configure columns if 'config' set.
+      if ( this.config ) {
+        for ( var i = 0 ; i < this.columns_.length ; i++ ) {
+          var col = this.columns_[i];
+          var cfg = this.config[col.name];
+
+          if ( cfg ) this.columns_[i] = col.clone().copyFrom(cfg);
+        }
+      }
+
       this.onDAOUpdate();
       this.data$proxy.sub('on', this.onDAOUpdate);
 
