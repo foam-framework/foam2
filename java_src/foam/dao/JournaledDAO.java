@@ -1,14 +1,9 @@
 package foam.dao;
 
-import foam.core.Detachable;
 import foam.core.FObject;
-import foam.core.Journal;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-import java.io.FileDescriptor;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -18,17 +13,13 @@ public class JournaledDAO extends ProxyDAO {
 
     private FileJournal journal;
 
-    public JournaledDAO(DAO delegate, FileJournal journal) {
-        this.journal = journal;
+    public JournaledDAO(DAO delegate, String filename) throws IOException {
+        this.journal = new FileJournal(filename);
         this.setDelegate(delegate);
-    }
-
-    public void setJournal(FileJournal journal) {
-        this.journal = journal;
+        this.journal.replay(delegate);
     }
 
     /**
-     *
      * persists data into FileJournal then calls the delegated DAO.
      *
      * @param obj
@@ -58,6 +49,7 @@ public class JournaledDAO extends ProxyDAO {
 
     @Override
     public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-
+        this.journal.removeAll();
+        this.getDelegate().removeAll(skip, limit, order, predicate);
     }
 }

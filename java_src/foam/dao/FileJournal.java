@@ -14,22 +14,14 @@ import java.io.IOException;
  */
 public class FileJournal implements Journal {
 
-    private FileDescriptor fd;
-    private FileWriter fin;
-    private FileReader fout;
+    protected FileDescriptor fd;
+    protected FileWriter fout;
+    protected FileReader fin;
 
     public FileJournal(FileDescriptor fd) {
         this.fd = fd;
-        this.fin = new FileWriter(fd);
-        this.fout = new FileReader(fd);
-    }
-
-    public FileDescriptor getFd() {
-        return fd;
-    }
-
-    public void setJournal(FileDescriptor fd) {
-        this.fd = fd;
+        this.fout = new FileWriter(fd);
+        this.fin = new FileReader(fd);
     }
 
     /**
@@ -41,7 +33,7 @@ public class FileJournal implements Journal {
     @Override
     public void put(FObject obj, Detachable sub) {
         try {
-            fin.write("Persistind data into file.");
+            fout.write("put(foam.json.parse(" + obj.toString() + "));\\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,8 +54,15 @@ public class FileJournal implements Journal {
 
     }
 
+    /**
+     * "replays" the persisted journaled file history into a dao.
+     *
+     * @param sink
+     * @return
+     * @throws IOException
+     */
     @Override
-    public String replay(FObject obj) throws IOException {
+    public String replay(Sink sink) throws IOException {
         return null;
     }
 }
