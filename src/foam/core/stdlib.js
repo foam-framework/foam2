@@ -81,9 +81,7 @@ foam.LIB({
     function isInstance(o) { return o === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
-    function compare(_, b) {
-      return b === null ? 0 : 1;
-    },
+    function compare(_, b) { return b === null ? 0 : 1; },
     function hashCode() { return -3; }
   ]
 });
@@ -777,13 +775,14 @@ foam.LIB({
       function compare(a, b) {
         // To ensure that symmetry is present when comparing,
         // we will always use the comparator of higher precedence.
-        var aOrdinal = typeOf(a).ordinal;
-        var bOrdinal = typeOf(b).ordinal;
-        foam.assert(aOrdinal !== undefined && bOrdinal !== undefined,
-            'comparator cannot operate on unknown types');
-
-        return (aOrdinal > bOrdinal) ? typeOf(a).compare(a, b) :
-            -typeOf(b).compare(b, a);
+        var aType = typeOf(a);
+        var bType = typeOf(b);
+        return (aType.ordinal >= bType.ordinal) ? aType.compare(a, b) :
+            this.comparatorNegate(bType.compare(b, a));
+      },
+      function comparatorNegate(num) {
+        if (num === 0) return 0;
+        return -num;
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {
