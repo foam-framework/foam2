@@ -42,10 +42,16 @@ foam.CLASS({
       name: 'nSpecDAO',
       factory: function() {
         return this.createDAO({
-          of: this.User,
+          of: this.NSpec,
           seqNo: true,
           testData: [
-            { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' }
+            { name: 'http',   serve: false, serviceClass: 'foam.nanos.http.NanoHttpServer' },
+            { name: 'log',    serve: false, serviceClass: 'foam.nanos.log.FileLogger' },
+            { name: 'pmlog',  serve: false, serviceClass: 'foam.nanos.pm.DAOPMLogger' },
+            { name: 'auth',   serve: true,  serviceClass: 'foam.nanos.auth.UserAndGroupAuthService' },
+            { name: 'test',   serve: true,  serviceClass: 'foam.nanos.test.TestRunner' },
+            { name: 'script', serve: true,  serviceClass: 'foam.nanos.script.ScriptRunner' },
+            { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
       }
@@ -102,7 +108,7 @@ foam.CLASS({
                 { parent: 'auth', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
                 { parent: 'auth', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
                 { parent: 'auth', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
-              { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO' }  },
+              { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', summaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
               { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' }  },
               { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },
               { parent: 'admin', id: 'pm',           label: 'Performance' },

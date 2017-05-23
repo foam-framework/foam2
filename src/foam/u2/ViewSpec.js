@@ -29,7 +29,7 @@ foam.CLASS({
       installInClass: function(cls) {
         cls.createView = function(spec, args, self, ctx) {
           if ( foam.u2.Element.isInstance(spec) )
-            return spec;
+            return spec.copyFrom(args);
 
           if ( foam.core.Slot.isInstance(spec) )
             return spec;
