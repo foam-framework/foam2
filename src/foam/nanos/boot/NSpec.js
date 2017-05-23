@@ -16,6 +16,11 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'Boolean',
+      name: 'serve',
+      documentation: 'If true, this service is served over the network.'
+    },
+    {
       class: 'String',
       name: 'serviceClass'
     }
@@ -34,4 +39,4 @@ foam.CLASS({
       ],
     }
   ]
-})
+});

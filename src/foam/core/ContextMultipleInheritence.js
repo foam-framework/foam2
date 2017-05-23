@@ -16,7 +16,7 @@ foam.CLASS({
 
           var exports = obj.cls_.getAxiomsByClass(foam.core.Export);
 
-          if ( ! exports ) return X;
+          if ( ( ! exports ) || ( ! exports.length ) ) return X;
 
           opt_args = exports[0].getExportMap.call(obj);
         }
