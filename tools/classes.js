@@ -16,6 +16,7 @@ var classes = [
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
+  'foam.mlang.predicate.Has',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
@@ -52,7 +53,11 @@ var classes = [
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
-  'foam.nanos.auth.User'
+  'foam.nanos.auth.User',
+  'foam.nanos.auth.AuthService',
+  'foam.nanos.pm.PMInfo',
+  'foam.nanos.script.Script',
+  'foam.nanos.test.Test'
 ];
 
 var abstractClasses = [
