@@ -29,6 +29,23 @@ foam.ENUM({
 
 foam.CLASS({
   package: 'foam.parsers',
+  name: 'Attribute',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'element'
+    },
+    {
+      class: 'String',
+      name: 'value'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.parsers',
   name: 'Tag',
 
   properties: [
@@ -42,8 +59,11 @@ foam.CLASS({
       class: 'String',
       name: 'nodeName',
       value: 'div'
+    },
+    {
+      class: 'Array',
+      name: 'attributes',
     }
-    // TODO(markdittmer): Add attributes.
   ]
 });
 
@@ -75,6 +95,7 @@ foam.CLASS({
     'foam.parse.ImperativeGrammar',
     'foam.parse.Parsers',
     'foam.parse.StringPS',
+    'foam.parsers.Attribute',
     'foam.parsers.Embed',
     'foam.parsers.Tag',
     'foam.parsers.TagType'
@@ -223,16 +244,17 @@ foam.CLASS({
         var lib   = self.lib;
         var Tag   = self.Tag;
         var Embed = self.Embed;
+        var Attribute = self.Attribute;
         var OPEN  = self.TagType.OPEN;
         var CLOSE = self.TagType.CLOSE;
         var OPEN_CLOSE = self.TagType.OPEN_CLOSE;
 
         return {
           openTag: function(v) {
-            // TODO(markdittmer): Add attributes.
             return Tag.create({
               type: v[6] || lib.isSelfClosing(v[2]) ? OPEN_CLOSE : OPEN,
-              nodeName: v[2]
+              nodeName: v[2],
+              attributes: v[4],
             });
           },
 
@@ -252,7 +274,11 @@ foam.CLASS({
             //   content string,
             //   deconstructed close tag
             // ]
-            return Embed.create({ nodeName: v[0][2], content: [ v[1] ] });
+            return Embed.create({
+              nodeName: v[0][2],
+              content: [ v[1] ],
+              attributes: v[0][4]
+            });
           },
 
           maybeEmbed: function(v) {
@@ -262,8 +288,12 @@ foam.CLASS({
             //   deconstructed close tag
             // ]
             var nodeName = v[0][2];
+            var attributes = v[0][4];
             var str = v[1];
-            var ret = Embed.create({ nodeName: nodeName });
+            var ret = Embed.create({
+              nodeName: nodeName,
+              attributes: attributes
+            });
 
             // Attempt to parse maybeEmbeds. Returns "html" parse or string.
             var ps = self.StringPS.create();
@@ -283,9 +313,11 @@ foam.CLASS({
           doctypePart: function(v) { return null; },
           cdata: function(v) { return null; },
           comment: function(v) { return null; },
-          attributes: function(v) { return null; },
-          attribute: function(v) { return null; },
-          value: function(v) { return null; }
+          attributes: function(v) { return v; },
+          attribute: function(v) {
+            return Attribute.create({ element: v[0], value: v[1] });
+          },
+          value: function(v) { return v; }
         };
       }
     },
