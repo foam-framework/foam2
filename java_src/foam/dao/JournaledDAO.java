@@ -1,16 +1,11 @@
 package foam.dao;
 
-import foam.core.Detachable;
 import foam.core.FObject;
-import foam.core.Journal;
-
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-import java.io.FileDescriptor;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * Created by carlos on 2017-05-22.
@@ -19,13 +14,12 @@ public class JournaledDAO extends ProxyDAO {
 
     private FileJournal journal;
 
-    public JournaledDAO(DAO delegate, FileJournal journal) {
-        this.journal = journal;
-        this.setDelegate(delegate);
-    }
+    public JournaledDAO(DAO delegate, String filename) throws IOException {
 
-    public void setJournal(FileJournal journal) {
-        this.journal = journal;
+        RandomAccessFile file = new RandomAccessFile(filename, "rw");
+        FileJournal fileJournal = new FileJournal(file.getFD());
+        this.journal = fileJournal;
+        this.setDelegate(delegate);
     }
 
     /**
