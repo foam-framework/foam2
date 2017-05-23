@@ -29,63 +29,6 @@ foam.ENUM({
 
 foam.CLASS({
   package: 'foam.parsers',
-  name: 'Attribute',
-
-  properties: [
-    {
-      class: 'String',
-      name: 'element'
-    },
-    {
-      class: 'String',
-      name: 'value'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parsers',
-  name: 'Tag',
-
-  properties: [
-    {
-      class: 'Enum',
-      of: 'foam.parsers.TagType',
-      name: 'type',
-      factory: function() { return foam.parser.TagType.OPEN; }
-    },
-    {
-      class: 'String',
-      name: 'nodeName',
-      value: 'div'
-    },
-    {
-      class: 'Array',
-      name: 'attributes',
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.parsers',
-  name: 'Embed',
-  extends: 'foam.parsers.Tag',
-
-  properties: [
-    {
-      name: 'type',
-      factory: function() { return foam.parser.TagType.OPEN_CLOSE; }
-    },
-    'content'
-  ]
-
-});
-
-
-foam.CLASS({
-  package: 'foam.parsers',
   name: 'HTMLLexer',
 
   documentation: `Parse an HTML string into a flat sequence of tags and
@@ -95,9 +38,9 @@ foam.CLASS({
     'foam.parse.ImperativeGrammar',
     'foam.parse.Parsers',
     'foam.parse.StringPS',
-    'foam.parsers.Attribute',
-    'foam.parsers.Embed',
-    'foam.parsers.Tag',
+    'foam.parsers.html.Attribute',
+    'foam.parsers.html.Embed',
+    'foam.parsers.html.Tag',
     'foam.parsers.TagType'
   ],
 
@@ -315,7 +258,7 @@ foam.CLASS({
           comment: function(v) { return null; },
           attributes: function(v) { return v; },
           attribute: function(v) {
-            return Attribute.create({ element: v[0], value: v[1] });
+            return Attribute.create({ name: v[0], value: v[1] });
           },
           value: function(v) { return v; }
         };
