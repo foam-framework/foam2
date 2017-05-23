@@ -781,6 +781,9 @@ foam.LIB({
             this.comparatorNegate(bType.compare(b, a));
       },
       function comparatorNegate(num) {
+        // When negating comparisons, a -0 may be returned and
+        // this may cause unexpected behaviour. To migate this,
+        // we will only negate the result if result is not 0.
         if (num === 0) return 0;
         return -num;
       },
