@@ -156,9 +156,9 @@ describe('HTMLLexer', function() {
 
   it('should parse tags multiple attributes', function() {
     [
-        '<div id=1 name="TestDiv2" value="someValue" visible=true>Some Content</div>',
+        '<div id=1 name="TestDiv2" visible=true />',
         '<label name="TestLabel" id=2 visible />',
-        '<pre class="idl" visible=false id=3>Potato content</pre>'
+        '<pre class="idl" visible=false id=3><div>Some more content</div></pre>'
     ].forEach(function(str, index) {
       var value = testParse('htmlPart', str);
       if ( ! value ) return;
@@ -170,17 +170,6 @@ describe('HTMLLexer', function() {
       expect(value.attributes[index].value).toBe((index + 1).toString());
     });
   });
-
-//  it('should parse attributes', function() {
-//    [
-//        '<div name="TestDiv1"/>',
-//        '<div id=1 visible=false name="TestDiv2">Some sort of content here</div>',
-//        '<pre class="idl">More test content</pre>'
-//    ].forEach(function(str) {
-//      var value = testParse('htmlPart', str);
-//      if ( ! value ) return;
-//    }
-//  });
 
   it('should parse comments', function() {
     [
