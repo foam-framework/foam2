@@ -237,9 +237,8 @@ foam.CLASS({
       }
 
       // Special merging behaviour for args.
-      var argCount = Math.max(this.args.length, child.args.length)
-      for ( var i = 0 ; i < argCount ; i++ ) {
-        result.args[i] = (this.args.length <= i) ? child.args[i] : this.args[i].clone().copyFrom(child.args[i]);
+      for (var i = child.args.length ; i < this.args.length ; i++ ) {
+        result.args[i] = this.args[i].clone().copyFrom(child.args[i]);
       }
 
       return result;
