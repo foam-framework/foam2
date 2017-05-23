@@ -11,12 +11,10 @@ public class PMDAO extends ProxyDAO {
 
   @Override
   public FObject put(FObject obj) {
-    if(obj instanceof PMInfo) {
-      PMInfo pmi = (PMInfo)obj;
-      PM pm = new PM(PMDAO.class, pmi.getClsname() + ":" + pmi.getPmname());
-      getDelegate().put(pmi);
-      pm.end(getX());
-    }
+    PMInfo pmi = (PMInfo)obj;
+    PM pm = new PM(PMDAO.class, pmi.getClsname() + ":" + pmi.getPmname());
+    getDelegate().put(obj);
+    pm.end(getX());
     return obj;
   }
 
