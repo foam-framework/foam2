@@ -773,6 +773,10 @@ foam.CLASS({
     }
   ]
 });
+// Registering BaseHTTPRequest facilitates decoration when HTTPRequest has been
+// re-overridden.
+foam.register(foam.lookup('foam.net.node.HTTPRequest'),
+              'foam.net.node.BaseHTTPRequest');
 
 
 foam.CLASS({

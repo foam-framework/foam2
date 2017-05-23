@@ -350,6 +350,23 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Has',
+
+  methods: [
+    {
+      name: 'f',
+      // TODO(kgr): Instead of checking type, use polymorphims and add a
+      // type-specific has() method to the Property.
+      javaCode: `Object value = getArg1().f(obj);
+        return ! (value == null ||
+          (value instanceof String && ((String)value).length() == 0) ||
+          (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
+    }
+  ]
+});
+
+
 foam.INTERFACE({
   refines: 'foam.mlang.order.Comparator',
 
@@ -443,6 +460,28 @@ foam.CLASS({
     {
       name: 'orderDirection',
       javaCode: 'return 1;'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Count',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'setValue(this.getValue() + 1);'
     }
   ]
 });

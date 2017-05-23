@@ -333,13 +333,13 @@ foam.CLASS({
 
   methods: [
     function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(sink, skip, limit, order ? order : this.comparator, predicate);
+      return this.delegate.select(sink, skip, limit, order || this.comparator, predicate);
     },
     function removeAll(skip, limit, order, predicate) {
-      return this.delegate.removeAll(skip, limit, order ? order : this.comparator, predicate);
+      return this.delegate.removeAll(skip, limit, order || this.comparator, predicate);
     },
     function listen(sink, skip, limit, order, predicate) {
-      return this.delegate.listen(sink, skip, limit, order ? order : this.comparator, predicate);
+      return this.delegate.listen(sink, skip, limit, order || this.comparator, predicate);
     }
   ]
 });
