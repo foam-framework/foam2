@@ -64,10 +64,10 @@ public class Boot {
     http.setServiceClass("foam.nanos.http.NanoHttpServer");
     serviceDAO_.put(http);
 
-    NSpec auth = new NSpec();
-    auth.setName("auth");
-    auth.setServiceClass("foam.nanos.auth.UserAndGroupAuthService");
-    serviceDAO_.put(auth);
+    NSpec authTest = new NSpec();
+    authTest.setName("authTest");
+    authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
+    serviceDAO_.put(authTest);
   }
 
   public static void main (String[] args) throws Exception {
