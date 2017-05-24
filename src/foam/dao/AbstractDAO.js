@@ -24,22 +24,23 @@ foam.CLASS({
 
   requires: [
     'foam.dao.ExternalException',
-    'foam.dao.InternalException',
-    'foam.dao.ObjectNotFoundException',
-    'foam.dao.LimitedSink',
-    'foam.dao.SkipSink',
-    'foam.dao.OrderedSink',
-    'foam.dao.PredicatedSink',
-    'foam.dao.PipeSink',
-    'foam.dao.ResetListener',
-    'foam.dao.PredicatedListener',
-    'foam.dao.SkipListener',
-    'foam.dao.LimitedListener',
-    'foam.dao.OrderedListener',
     'foam.dao.FilteredDAO',
+    'foam.dao.InternalException',
+    'foam.dao.LimitedDAO',
+    'foam.dao.LimitedListener',
+    'foam.dao.LimitedSink',
+    'foam.dao.ObjectNotFoundException',
     'foam.dao.OrderedDAO',
+    'foam.dao.OrderedListener',
+    'foam.dao.OrderedSink',
+    'foam.dao.PipeSink',
+    'foam.dao.PredicatedListener',
+    'foam.dao.PredicatedSink',
+    'foam.dao.ProxyDAO',
+    'foam.dao.ResetListener',
     'foam.dao.SkipDAO',
-    'foam.dao.LimitedDAO'
+    'foam.dao.SkipListener',
+    'foam.dao.SkipSink'
   ],
 
   topics: [
@@ -65,6 +66,17 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      /**
+        Returns a filtered DAO that only returns objects which match the
+        given predicate.
+      */
+      name: 'inX',
+      code: function(x) {
+        return this.ProxyDAO.create({delegate: this}, x);
+      }
+    },
+
     {
       /**
         Returns a filtered DAO that only returns objects which match the
