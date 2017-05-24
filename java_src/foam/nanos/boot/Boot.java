@@ -11,7 +11,6 @@ import foam.dao.*;
 import foam.nanos.*;
 
 public class Boot {
-
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
 
@@ -27,11 +26,12 @@ public class Boot {
         System.out.println("NSpec: " + sp.getName());
 
         try {
-          NanoService ns = sp.createService();
+          // NanoService ns = sp.createService();
 
-          ((ContextAwareSupport) ns).setX(root_);
-          ns.start();
-          root_.put(sp.getName(), ns);
+          // ((ContextAwareSupport) ns).setX(root_);
+          // ns.start();
+
+          root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
         } catch (ClassNotFoundException e) {
            e.printStackTrace();
         } catch (InstantiationException e) {
