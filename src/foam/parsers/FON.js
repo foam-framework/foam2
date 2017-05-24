@@ -53,7 +53,7 @@ foam.CLASS({
             '_',
             '$'),
 
-          'identifier': str(seq0(
+          'identifier': substring(seq0(
             sym('id_start'),
             repeat0(alt(range('0', '9'), sym('id_start'))))),
 
@@ -68,7 +68,7 @@ foam.CLASS({
 
           'null': literal('null', null),
           'undefined': literal('undefined', undefined),
-          'number': str(seq0(optional('-'),
+          'number': substring(seq0(optional('-'),
                              repeat0(range('0', '9'), null, 1),
                              optional(seq0('.',
                                            repeat0(range('0', '9')))))),
