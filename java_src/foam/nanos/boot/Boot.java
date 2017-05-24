@@ -25,20 +25,7 @@ public class Boot {
         NSpec sp = (NSpec) obj;
         System.out.println("NSpec: " + sp.getName());
 
-        try {
-          // NanoService ns = sp.createService();
-
-          // ((ContextAwareSupport) ns).setX(root_);
-          // ns.start();
-
-          root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
-        } catch (ClassNotFoundException e) {
-           e.printStackTrace();
-        } catch (InstantiationException e) {
-           e.printStackTrace();
-        } catch (IllegalAccessException e) {
-           e.printStackTrace();
-        }
+        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
       }
     });
   }
