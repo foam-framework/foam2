@@ -17,6 +17,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'lazy',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'serve',
       tableCellView: function(obj, e) {
         var e = e.E();
