@@ -454,6 +454,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined;
+        this.clearPrivate_(name);
 
         // Avoid creating slot and publishing event if nobody is listening.
         if ( this.hasListeners('propertyChange', name) ) {
