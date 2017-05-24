@@ -7,8 +7,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import foam.dao.*;
 
 /**
@@ -24,80 +22,13 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
 		userDAO_ = (MapDAO) getX().get("userDAO");
 		groupDAO_ = (MapDAO) getX().get("groupDAO");
 
-		//TODO: Implement LRU map using LinkedHashMap
-		//Set max size to 20000
-		challengeMap = new LinkedHashMap<String, Challenge>();
-
-		//Adding some test users
-		for (int i = 0; i < 10; i++) {
-			User user = new User();
-			user.setId("" + i);
-			user.setEmail("marc" + i + "@nanopay.net");
-			user.setFirstName("Marc" + i);
-			user.setLastName("R" + i);
-			user.setPassword("marc" + i);
-			userDAO_.put(user);
-		}
-
-		Group adminGroup = new Group();
-		adminGroup.setId("1");
-
-
-		//Login
-//		try {
-//			X test = login("0", "marc1");
-//			User user = (User) test.get("user");
-//			System.out.println(user.getEmail());
-//		}
-//		catch (LoginException e) {
-//			e.printStackTrace();
-//		}
-
-		//Challenged Login
-//		try {
-//			String challenge = generateChallenge("0");
-//
-//			//Use the following line below to test the timeout of the challenge
-//			//TimeUnit.SECONDS.sleep(6);
-//
-//			X test = challengedLogin("0", challenge);
-//			User user = (User) test.get("user");
-//			System.out.println(user.getEmail());
-//		}
-//		catch (LoginException e) {
-//			e.printStackTrace();
-////		} catch (InterruptedException e) {
-////			e.printStackTrace();
-//		}
-
-		//Update Password
-//		try {
-//			X test = login("0", "marc0");
-//
-//			X newX = updatePassword(test, "marc0", "marc55");
-//			User user = (User) newX.get("user");
-//			System.out.println(user.getPassword());
-//		}
-//		catch (LoginException e) {
-//			e.printStackTrace();
-//		}
-
-		//Logout
-		try {
-			X test = login("0", "marc0");
-
-			X newX = updatePassword(test, "marc0", "marc55");
-			User user = (User) newX.get("user");
-			System.out.println(user.getPassword());
-		}
-		catch (LoginException e) {
-			e.printStackTrace();
-		}
+		//TODO: Implement LRU LinkedHashMap
+		challengeMap = new LinkedHashMap<String, Challenge>(20000);
 	}
 
 	/**
 	 * A challenge is generated from the userID provided
-	 * This is saved and has a time to live of 5 seconds
+	 * This is saved in a LinkedHashMap with ttl of 5
 	 *
 	 * Should this throw an exception?
 	 * */
@@ -120,12 +51,14 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
 	}
 
 	/**
-	 * Check LinkedHashMap to see if the the challenge supplied is correct
-	 * and the TTL is still valid
+	 * Checks the LinkedHashMap to see if the the challenge supplied is correct
+	 * and the ttl is still valid
+	 *
+	 * How often should we purge this map for challenges that have expired?
 	 * */
 	public X challengedLogin(String userId, String challenge) throws LoginException {
 		if (userId == null || challenge == null || userId == "" || challenge == "") {
-			throw new LoginException("Invalid Parameters");
+				throw new LoginException("Invalid Parameters");
 		}
 
 		Challenge c = (Challenge) challengeMap.get(userId);
@@ -152,8 +85,8 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
 	}
 
 	/**
-	 * Find user in the userDAO by id. If the user exist, validate password
-	 * Set the user in the context and return context
+	 * Login a user by the id provided, validate the password
+	 * and return the user in the context.
 	 * */
 	public X login(String userId, String password) throws LoginException {
 		if (userId == null || password == null || userId == "" || password == "") {
@@ -200,9 +133,12 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
 	 * and return a context with the updated user information
 	 * */
 	public X updatePassword(foam.core.X x, String oldPassword, String newPassword) throws IllegalStateException {
-		if (x == null || oldPassword == null || newPassword == null || oldPassword == ""
-				|| newPassword == "" || (oldPassword == newPassword)) {
+		if (x == null || oldPassword == null || newPassword == null || oldPassword == "" || newPassword == "") {
 			throw new IllegalStateException("Invalid Parameters");
+		}
+
+		if (oldPassword == newPassword) {
+			throw new IllegalStateException("New Password must be different from the old password");
 		}
 
 		User user = (User) userDAO_.find(((User) x.get("user")).getId());
