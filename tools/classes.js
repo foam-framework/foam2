@@ -63,6 +63,7 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.AuthService',
   'foam.nanos.pm.PMInfo',
+  'foam.nanos.script.Language',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test'
 ];
