@@ -7,53 +7,44 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
-  // javaImports: ['foam.core.X', 'javax.security.auth.login.LoginException'],
+  extends: 'foam.nanos.NanoService',
   methods: [
     {
       name: 'generateChallenge',
       javaReturns: 'String',
       args: [
         {
-          name: 'username',
+          name: 'userId',
           javaType: 'String'
         }
       ]
     },
     {
       name: 'challengedLogin',
-      javaReturns: 'void',
+      javaReturns: 'foam.core.X',
       javaThrows: [ 'javax.security.auth.login.LoginException' ],
       args: [
         {
-          name: 'x',
-          javaType: 'foam.core.X'
+          name: 'userId',
+          javaType: 'String'
         },
         {
-          name: 'response',
+          name: 'challenge',
           javaType: 'String'
         }
       ]
     },
     {
       name: 'login',
-      javaReturns: 'Boolean',
+      javaReturns: 'foam.core.X',
+      javaThrows: [ 'javax.security.auth.login.LoginException' ],
       args: [
         {
-          name: 'username',
+          name: 'userId',
           javaType: 'String'
         },
         {
           name: 'password',
-          javaType: 'String'
-        }
-      ]
-    },
-    {
-      name: 'logout',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'username',
           javaType: 'String'
         }
       ]
@@ -67,10 +58,6 @@ foam.INTERFACE({
           javaType: 'foam.core.X'
         },
         {
-          name: 'principal',
-          javaType: 'java.security.Principal'
-        },
-        {
           name: 'permission',
           javaType: 'java.security.Permission'
         }
@@ -78,16 +65,12 @@ foam.INTERFACE({
     },
     {
       name: 'updatePassword',
-      javaReturns: 'void',
+      javaReturns: 'foam.core.X',
       javaThrows: [ 'IllegalStateException' ],
       args: [
         {
           name: 'x',
           javaType: 'foam.core.X'
-        },
-        {
-          name: 'principal',
-          javaType: 'java.security.Principal'
         },
         {
           name: 'oldPassword',
@@ -100,21 +83,23 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'validatePrincipal',
-      javaReturns: 'void',
+      name: 'validateUser',
+      javaReturns: 'Boolean',
       javaThrows: [ 'IllegalStateException' ],
+      args: [
+        {
+          name: 'user',
+          javaType: 'User'
+        }
+      ]
+    },
+    {
+      name: 'logout',
+      javaReturns: 'foam.core.X',
       args: [
         {
           name: 'x',
           javaType: 'foam.core.X'
-        },
-        {
-          name: 'oldValue',
-          javaType: 'java.security.Principal'
-        },
-        {
-          name: 'newValue',
-          javaType: 'java.security.Principal'
         }
       ]
     }
