@@ -30,7 +30,7 @@ public class Boot {
       }
     });
 
-    ((AbstractDAO) serviceDAO_).where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
+    ((AbstractDAO) serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false))).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
