@@ -333,9 +333,8 @@ foam.CLASS({
   extends: 'foam.parse.ParserDecorator',
   methods: [
     function parse(ps, obj) {
-      var start = ps;
       ps = this.p.parse(ps, obj);
-      return ps ? ps.setValue(start.substring(ps)) : undefined;
+      return ps ? ps.setValue(ps.value.join('')) : undefined;
     },
 
     function toString() {
@@ -616,9 +615,9 @@ foam.CLASS({
         ps = res;
       }
 
-      if ( this.minimum >= 0 && i < this.minimum ) return undefined;
+      if ( this.minimum > 0 && i < this.minimum ) return undefined;
 
-      return ps;
+      return ps.setValue('');
     },
 
     function toString() {
