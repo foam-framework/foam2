@@ -19,7 +19,7 @@ public class CountPlan implements SelectPlan
   public long cost() { return 0; }
 
   public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
-    ((Count) sink).setValue((int)count_);
+    ((Count) sink).setValue(count_);
   }
 
   public String toString() { return "short-circuit-count(" + count_ + ")"; }
