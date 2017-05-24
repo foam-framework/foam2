@@ -165,7 +165,7 @@ describe('HTMLLexer', function() {
 
       expect(Array.isArray(value.attributes)).toBe(true);
       expect(value.attributes).toBeDefined();
-      expect(value.attributes.length > 2).toBe(true);
+      expect(value.attributes.length).toBeGreaterThan(2);
       expect(value.attributes[index].name).toBe('id');
       expect(value.attributes[index].value).toBe((index + 1).toString());
     });

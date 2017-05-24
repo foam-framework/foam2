@@ -256,11 +256,9 @@ foam.CLASS({
           doctypePart: function(v) { return null; },
           cdata: function(v) { return null; },
           comment: function(v) { return null; },
-          attributes: function(v) { return v; },
           attribute: function(v) {
-            return Attribute.create({ name: v[0], value: v[1] });
+            return Attribute.create({ name: v[0], value: v[1] || null });
           },
-          value: function(v) { return v; }
         };
       }
     },
