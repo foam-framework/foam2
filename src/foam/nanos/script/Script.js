@@ -9,6 +9,9 @@ foam.CLASS({
   name: 'Script',
 
   implements: [ 'foam.nanos.auth.EnabledAware' ],
+
+  imports: [ 'scriptDAO' ],
+
   properties: [
     {
       class: 'String',
@@ -16,12 +19,21 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'lastRun'
+      name: 'lastRun',
+      visibility: foam.u2.Visibility.RO
     },
+    /*
     {
-      class: 'String',
-      name: 'notes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 80 }
+      class: 'Enum',
+      of: 'foam.nanos.script.Language',
+      name: 'language',
+      value: foam.nanos.script.Language.BEANSHELL
+    },
+    */
+    {
+      class: 'Boolean',
+      name: 'scheduled',
+      hidden: true
     },
     {
       class: 'String',
@@ -33,6 +45,31 @@ foam.CLASS({
       name: 'output',
       visibility: foam.u2.Visibility.RO,
       view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
+    },
+    {
+      class: 'String',
+      name: 'notes',
+      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 80 }
+    }
+  ],
+
+  actions: [
+    {
+      name: 'run',
+      code: function() {
+        if ( false /* this.language === foam.nanos.script.Language.BEANSHELL */ ) {
+          this.scheduled = true;
+          this.output = '';
+          this.scriptDAO.put(this);
+        } else {
+          var log = function() { this.output = this.output + Array.join.call(arguments, ''); };
+
+          with ( { log: log } ) {
+            var ret = eval(this.code);
+            console.log('ret: ', ret);
+          }
+        }
+      }
     }
   ]
 });
