@@ -333,7 +333,6 @@ foam.CLASS({
   extends: 'foam.parse.ParserDecorator',
   methods: [
     function parse(ps, obj) {
-      var start = ps;
       ps = this.p.parse(ps, obj);
       return ps ? ps.setValue(ps.value.join('')) : undefined;
     },
