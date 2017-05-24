@@ -17,11 +17,21 @@ public class NSpecFactory implements XFactory {
   }
 
   public Object create(X x) {
-    NanoService ns = spec_.createService();
+    NanoService ns = null;
 
-    ((ContextAwareSupport) ns).setX(x);
-    ns.start();
-    
+    try {
+      ns = spec_.createService();
+
+      ((ContextAwareSupport) ns).setX(x);
+      ns.start();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+    }
+
     return ns;
   }
 }
