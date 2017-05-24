@@ -41,12 +41,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'daoKey'
-    }
+    },
+    'summaryView'
   ],
 
   methods: [
     function createView(X) {
-      return { class: 'foam.u2.ListCreateController', dao: X[this.daoKey] };
+      var view = { class: 'foam.u2.ListCreateController', dao: X[this.daoKey] };
+
+      if ( this.summaryView ) view.summaryView = this.summaryView;
+      return view;
     }
   ]
 });
@@ -148,7 +152,7 @@ foam.CLASS({
 });
 
 
-foam.RELATIONSHIP({
+var MenuRelationship = foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.menu.Menu',
   targetModel: 'foam.nanos.menu.Menu',
   forwardName: 'children',

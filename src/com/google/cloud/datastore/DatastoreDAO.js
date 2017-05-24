@@ -145,6 +145,10 @@ foam.CLASS({
       if ( order ) query.order = order.toDatastoreOrder();
       if ( skip ) query.offset = skip;
       if ( limit ) query.limit = limit;
+      // Optional Sink interface extension:
+      // Allow datastore-aware sinks to decorate query.
+      if ( sink.decorateDatastoreQuery )
+        sink.decorateDatastoreQuery(query);
 
       return this.getRequest('runQuery', JSON.stringify(payload)).send()
           .then(this.onResponse.bind(this, 'select'))
@@ -267,11 +271,19 @@ foam.CLASS({
         return data.sink;
       }
 
-      var fromDatastoreEntity = com.google.cloud.datastore.fromDatastoreEntity;
-      for ( var i = 0; i < entities.length; i++ ) {
-        var obj = fromDatastoreEntity(entities[i].entity);
-        data.results.push(obj);
-        data.sink && data.sink.put && data.sink.put(obj);
+      // Optional Sink interface extension:
+      // Allow datastore-aware sinks to unpack query result batches manually
+      // instead of DAO put()ing to them.
+      if ( data.sink && data.sink.fromDatastoreEntityResults ) {
+        data.sink.fromDatastoreEntityResults(entities);
+      } else {
+        var fromDatastoreEntity =
+            com.google.cloud.datastore.fromDatastoreEntity;
+        for ( var i = 0; i < entities.length; i++ ) {
+          var obj = fromDatastoreEntity(entities[i].entity);
+          data.results.push(obj);
+          data.sink && data.sink.put && data.sink.put(obj);
+        }
       }
 
       if ( this.resultsAreIncomplete_(batch) ) {

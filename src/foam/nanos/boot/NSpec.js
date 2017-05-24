@@ -16,6 +16,17 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'Boolean',
+      name: 'serve',
+      tableCellView: function(obj, e) {
+        var e = e.E();
+        if ( obj.serve ) { e.style({color: 'green'}); } else { e.entity('nbsp'); }
+        e.add(obj.serve ? ' Y' : '-');
+        return e;
+      },
+      documentation: 'If true, this service is served over the network.'
+    },
+    {
       class: 'String',
       name: 'serviceClass'
     }
@@ -34,4 +45,4 @@ foam.CLASS({
       ],
     }
   ]
-})
+});
