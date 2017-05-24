@@ -21,22 +21,11 @@ foam.CLASS({
   properties: [
     {
       name: 'validateObj',
-      adapt: function(_, n) {
-        if (typeof n === 'function') {
-          return {
-            args: foam.Function.argNames(n),
-            code: n,
-          }
-        }
-        return n;
-      },
       expression: function(name, label, required) {
-        return !required ? null : {
-          args: [name],
-          code: function() {
+        return !required ? null : [[name],
+          function() {
             return !this.hasOwnProperty(name) && (label + ' is required.');
-          },
-        };
+          }]
       },
     },
   ]
@@ -101,8 +90,7 @@ foam.CLASS({
 
       for ( var i = 0 ; i < ps.length ; i++ ) {
         var p = ps[i];
-        var slots = p.validateObj.args.map(obj.slot.bind(obj));
-        args.push(obj.slot.apply(obj, [p.validateObj.code].concat(slots)));
+        args.push(obj.slot(p.validateObj));
       }
 
       function validateObject() {

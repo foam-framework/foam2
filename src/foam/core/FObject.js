@@ -753,6 +753,14 @@ foam.CLASS({
                 });
       }
 
+      if ( foam.Array.isInstance(obj) ) {
+        return foam.core.ExpressionSlot.create({
+          obj: this,
+          args: obj[0].map(this.slot.bind(this)),
+          code: obj[1],
+        });
+      }
+
       var names = obj.split('$');
       var axiom = this.cls_.getAxiomByName(names.shift());
 
@@ -763,7 +771,6 @@ foam.CLASS({
       names.forEach(function(n) {
         slot = slot.dot(n);
       });
-
 
       return slot;
     },
