@@ -7,7 +7,7 @@
 package foam.core;
 
 public class SingletonFactory implements XFactory {
-  XFactory delegate_;
+  XFactory delegate_ = null;
   Object instance_;
 
   public SingletonFactory(XFactory delegate) {
@@ -15,7 +15,7 @@ public class SingletonFactory implements XFactory {
   }
   
   public Object create(X x) {
-    if ( delegate_ ) {
+    if ( delegate_ != null ) {
       instance_ = delegate_.create(x);
       delegate_ = null;
     }
