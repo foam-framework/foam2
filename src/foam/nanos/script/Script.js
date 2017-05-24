@@ -57,17 +57,21 @@ foam.CLASS({
     {
       name: 'run',
       code: function() {
+        this.output = '';
+
         if ( false /* this.language === foam.nanos.script.Language.BEANSHELL */ ) {
           this.scheduled = true;
-          this.output = '';
           this.scriptDAO.put(this);
         } else {
-          var log = function() { this.output = this.output + Array.join.call(arguments, ''); };
+          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
 
           with ( { log: log } ) {
             var ret = eval(this.code);
             console.log('ret: ', ret);
+            // TODO: if Promise returned, then wait
           }
+
+          this.scriptDAO.put(this);
         }
       }
     }
