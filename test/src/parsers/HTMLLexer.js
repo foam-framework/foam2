@@ -211,14 +211,32 @@ describe('HTMLLexer', function() {
     expect(value.attributes[0].value).toBe('Potato');
   });
 
-  it('should parse attributes with escaped characters', function() {
+  it('should parse attributes with escaped characters with quotes', function() {
     var value = testParse('htmlPart', '<option value="&amp;Potato" />');
     expect(value.attributes).toBeDefined();
     expect(value.attributes[0].name).toBe('value');
     expect(value.attributes[0].value).toBe('&Potato');
   });
 
-  it('should parse attributes with illegitmate', function() {
+  it('should parse attributes with escaped characters with no quotes', function() {
+    var value = testParse('htmlPart', '<option value=&amp;Potato />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&Potato');
+  });
+
+  it('should parse attributes with illegitmate escape with quotes', function() {
+    var value = testParse('htmlPart', '<label value="&Potato;" />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&Potato;');
+  });
+
+  it('should parse attributes with illegimate escape with no quotes',  function() {
+    var value = testParse('htmlPart', '<label value=&Potato; />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&Potato;');
   });
 
   it('should parse attributes containing whitespace', function() {
