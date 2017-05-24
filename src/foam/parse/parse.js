@@ -345,6 +345,23 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.parse',
+  name: 'Substring',
+  extends: 'foam.parse.ParserDecorator',
+  methods: [
+    function parse(ps, obj) {
+      var start = ps;
+      ps = this.p.parse(ps, obj);
+      return ps ? ps.setValue(start.substring(ps)) : undefined;
+    },
+
+    function toString() {
+      return 'str(' + this.SUPER() + ')';
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.parse',
   name: 'Sequence0',
 
   properties: [
@@ -607,17 +624,22 @@ foam.CLASS({
 
   methods: [
     function parse(ps, obj) {
-      var res;
       var p = this.p;
+      var last;
+      var delim = this.delimiter;
       var i = 0;
-      while ( res = p.parse(ps, obj) ) {
-        i++;
-        ps = res;
+
+      while ( ps ) {
+        last = ps;
+        ps = p.parse(ps, obj);
+        if ( ps ) i++;
+        if ( delim && ps ) {
+          ps = delim.parse(ps, obj) || ps;
+        }
       }
 
       if ( this.minimum > 0 && i < this.minimum ) return undefined;
-
-      return ps.setValue('');
+      return last;
     },
 
     function toString() {
@@ -776,6 +798,12 @@ foam.CLASS({
 
     function str(p) {
       return foam.lookup('foam.parse.String').create({
+        p: p
+      });
+    },
+
+    function substring(p) {
+      return foam.lookup('foam.parse.Substring').create({
         p: p
       });
     },

@@ -194,30 +194,33 @@ describe('Property default comparators', function() {
 
   it('accepts ===', function() {
     var s = '';
-    expect(c(s, s)).toEqual(0);
+    expect(c(s, s)).toBe(0);
   });
   it('accepts double falsey', function() {
-    expect(c(false, false)).toEqual(0);
-    expect(c(NaN, NaN)).toEqual(0);
-    expect(c(0, 0)).toEqual(0);
-    expect(c('', '')).toEqual(0);
+    expect(c(false, false)).toBe(0);
+    expect(c(NaN, NaN)).toBe(0);
+    expect(c(0, 0)).toBe(0);
+    expect(c('', '')).toBe(0);
   });
   it('accepts left falsey', function() {
-    expect(c(false, 6)).toEqual(-1);
-//    expect(c(NaN, 6)).toEqual(-1); // Is this really what we expect?
+    expect(c(false, 6)).toEqual(1);
+    expect(c(NaN, 6)).toEqual(1); // Is this really what we expect?
     expect(c(0, 6)).toEqual(-1);
     expect(c('', 6)).toEqual(-1);
   });
   it('accepts right falsey', function() {
-//    expect(c(4, false)).toEqual(1);
-//    expect(c(4, NaN)).toEqual(1);
+    expect(c(4, false)).toEqual(-1);
+    expect(c(4, NaN)).toEqual(-1);
     expect(c(4, 0)).toEqual(1);
     expect(c(4, '')).toEqual(1);
   });
   it('falls back on $UID.compareTo', function() {
-    var o1 = {};
-    var o2 = {};
-    expect(c(o1, o2)).toEqual(-1);
+    var o1 = Object.create(null);
+    o1.$UID = 26;
+    var o2 = Object.create(null);
+    o2.$UID = 27;
+    expect(c(o1, o2)).toBe(-1);
+    expect(c(o2, o1)).toBe(1);
   });
 });
 
@@ -733,7 +736,7 @@ describe('Property Mlang interop', function() {
   });
   it('compare support works', function() {
     var t2 = test.MTest.create({ a: 45 }, foam.__context__);
-    expect(test.MTest.A.compare(t, t2)).toEqual(0);
+    expect(test.MTest.A.compare(t, t2)).toBe(0);
     t2.a = 2;
     expect(test.MTest.A.compare(t, t2)).toEqual(1);
     t.a = 1;
