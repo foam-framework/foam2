@@ -47,7 +47,7 @@ foam.CLASS({
 
   methods: [
     function createView(X) {
-      var view = { class: 'foam.u2.ListCreateController', dao: X[this.daoKey] };
+      var view = { class: 'foam.comics.BrowserView', data: X[this.daoKey] };
 
       if ( this.summaryView ) view.summaryView = this.summaryView;
       return view;
