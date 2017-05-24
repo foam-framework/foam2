@@ -1,11 +1,7 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
+// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!
 package foam.nanos;
 
 public interface NanoService {
-  public void start();
+    public void start();
+
 }
