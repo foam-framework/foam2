@@ -48,6 +48,7 @@ public class JournaledDAO extends ProxyDAO {
 
     @Override
     public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-
+        this.journal.removeAll();
+        this.getDelegate().removeAll(skip, limit, order, predicate);
     }
 }

@@ -15,10 +15,11 @@ public class FileJournal implements Journal {
     protected FileWriter fout;
     protected BufferedWriter bw;
     protected FileReader fin;
+    protected File file;
 
     public FileJournal(String filename) throws IOException {
 
-        File file = new File(filename);
+        this.file = new File(filename);
 
         if (!file.exists()) {
             file.createNewFile();
@@ -45,6 +46,13 @@ public class FileJournal implements Journal {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * deletes the entire journal file
+     */
+    public void removeAll() {
+        this.file.delete();
     }
 
     @Override
