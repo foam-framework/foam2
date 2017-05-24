@@ -134,8 +134,8 @@ foam.CLASS({
           value: str(alt(
               plus(notChars('\'" \t\r\n<>')),
               // TODO(markdittmer): Support proper escaping inside strings.
-              seq1(1, '"', repeat(notChars('"', anyChar())), '"'),
-              seq1(1, "'", repeat(notChars("'", anyChar())), "'"))),
+              seq1(1, '"', repeat(alt(sym('escape'), notChars('"', anyChar()))), '"'),
+              seq1(1, "'", repeat(alt(sym('escape'), notChars("'", anyChar()))), "'"))),
 
           embed: alt(sym('script'), sym('style'), sym('xmp')),
 

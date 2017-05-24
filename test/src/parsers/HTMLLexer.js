@@ -154,7 +154,7 @@ describe('HTMLLexer', function() {
     });
   });
 
-  it('should parse tags multiple attributes', function() {
+  it('should parse tags with multiple attributes (Part 1)', function() {
     [
         '<div id=1 name="TestDiv2" visible=true />',
         '<label name="TestLabel" id=2 visible />',
@@ -169,6 +169,63 @@ describe('HTMLLexer', function() {
       expect(value.attributes[index].name).toBe('id');
       expect(value.attributes[index].value).toBe((index + 1).toString());
     });
+  });
+
+  it('should parse tags with multiple attributes (Part 2)', function() {
+    var value = testParse('htmlPart',
+        '<div id=3 name=multiAttributeTest visible disabled=false />');
+    var attributes = [
+      { name: 'id', value: '3' },
+      { name: 'name', value: 'multiAttributeTest' },
+      { name: 'visible', value: '' },
+      { name: 'disabled', value: 'false' }
+    ];
+    expect(value).toBeDefined();
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes.length).toBe(4);
+
+    for (var i = 0; i < attributes.length; i++) {
+      expect(value.attributes[i].name).toBe(attributes[i].name);
+      expect(value.attributes[i].value).toBe(attributes[i].value);
+    }
+  });
+
+  it('should parse attributes without value', function() {
+    var value = testParse('htmlPart', '<pre visible />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('visible');
+    expect(value.attributes[0].value).toBe('');
+  });
+
+  it('should parse attributes without quotes', function() {
+    var value = testParse('htmlPart', '<pre name=someUniqueName />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('name');
+    expect(value.attributes[0].value).toBe('someUniqueName');
+  });
+
+  it('should parse attributes in single quotes', function() {
+    var value = testParse('htmlPart', '<div type=\'Potato\' />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('type');
+    expect(value.attributes[0].value).toBe('Potato');
+  });
+
+  it('should parse attributes with escaped characters', function() {
+    var value = testParse('htmlPart', '<option value="&amp;Potato" />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&Potato');
+  });
+
+  it('should parse attributes with illegitmate', function() {
+  });
+
+  it('should parse attributes containing whitespace', function() {
+    var value = testParse('htmlPart', '<label value="Fish\nPotato" />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('Fish\nPotato');
   });
 
   it('should parse comments', function() {
