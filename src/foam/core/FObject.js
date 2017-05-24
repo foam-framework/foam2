@@ -108,6 +108,10 @@ foam.LIB({
       return this;
     },
 
+    function getSuperClass() {
+      return this.model_.__context__.lookup(this.model_.extends);
+    },
+
     function installAxioms(axs) {
       /**
        * Install Axioms into the class and prototype.

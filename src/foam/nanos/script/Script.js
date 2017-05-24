@@ -4,15 +4,35 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+foam.ENUM({
+  package: 'foam.nanos.script',
+  name: 'Language',
+
+  documentation: 'Scripting language',
+
+  values: [
+    { name: 'JS',        label: 'Javascript' },
+    { name: 'BEANSHELL', label: 'BeanShell'  }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
   implements: [ 'foam.nanos.auth.EnabledAware' ],
+
   properties: [
     {
       class: 'String',
       name: 'id'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.script.Language',
+      name: 'language',
+      value: foam.nanos.script.Language.BEANSHELL
     },
     {
       class: 'DateTime',
