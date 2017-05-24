@@ -19,13 +19,16 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'BrowserView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.DAOController',
     'foam.comics.DAOControllerView'
   ],
+
   exports: [
     'controller as data'
   ],
+
   properties: [
     {
       name: 'data',
@@ -37,6 +40,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       this.tag(this.DAOControllerView);
