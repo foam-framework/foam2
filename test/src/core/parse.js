@@ -390,14 +390,14 @@ describe('basic parsers', function() {
     it('should parse many repetitions, and return ""', function() {
       var ps = parser.parse(mkStream('   !'));
       expect(ps).toBeDefined();
-      expect(ps.value).toBe('');
+      expect(ps.value).toBeDefined();
       expect(ps.head).toBe('!');
     });
 
     it('should parse 0 repetitions correctly', function() {
       var ps = parser.parse(mkStream('!'));
       expect(ps).toBeDefined();
-      expect(ps.value).toBe('');
+      expect(ps.value).toBeDefined();
       expect(ps.head).toBe('!');
     });
   });

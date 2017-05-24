@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 var classes = [
   'foam.core.Serializable',
   'foam.mlang.predicate.Predicate',
@@ -16,6 +22,7 @@ var classes = [
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
+  'foam.mlang.predicate.Has',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
@@ -46,6 +53,7 @@ var classes = [
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count',
+  'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.Group',
@@ -53,7 +61,9 @@ var classes = [
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
+  'foam.nanos.auth.AuthService',
   'foam.nanos.pm.PMInfo',
+  'foam.nanos.script.Language',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test'
 ];
