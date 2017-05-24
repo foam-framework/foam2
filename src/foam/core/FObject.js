@@ -108,6 +108,10 @@ foam.LIB({
       return this;
     },
 
+    function getSuperClass() {
+      return this.model_.__context__.lookup(this.model_.extends);
+    },
+
     function installAxioms(axs) {
       /**
        * Install Axioms into the class and prototype.
@@ -808,6 +812,12 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
+
+      // Use comparator of other if it is not an FObject.
+      if ( ! foam.core.FObject.isInstance(other) ) {
+        return foam.util.compare(this, other);
+      }
+
       if ( ! other        ) return 1;
 
       if ( this.model_ !== other.model_ ) {
