@@ -2060,6 +2060,12 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [ [ 'view', { class: 'foam.u2.EnumView' } ] ]
+})
+
+
+foam.CLASS({
   package: 'foam.u2',
   name: 'ControllerViewTrait',
 
