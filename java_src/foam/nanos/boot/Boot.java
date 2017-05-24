@@ -9,6 +9,7 @@ package foam.nanos.boot;
 import foam.core.*;
 import foam.dao.*;
 import foam.nanos.*;
+import foam.mlang.*;
 
 public class Boot {
   protected DAO serviceDAO_;
@@ -29,7 +30,7 @@ public class Boot {
       }
     });
 
-    ((AbstractDAO) serviceDAO_).where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
+    ((AbstractDAO) serviceDAO_).where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
