@@ -753,12 +753,19 @@ foam.CLASS({
                 });
       }
 
-      var axiom = this.cls_.getAxiomByName(obj);
+      var names = obj.split('$');
+      var axiom = this.cls_.getAxiomByName(names.shift());
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
       foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
-      return axiom.toSlot(this);
+      var slot = axiom.toSlot(this)
+      names.forEach(function(n) {
+        slot = slot.dot(n);
+      });
+
+
+      return slot;
     },
 
 

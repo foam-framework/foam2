@@ -544,9 +544,7 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].detach();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
-          var argSlots = argNames[i].split('$');
-          var slot = this.slot(argSlots.shift())
-          argSlots.forEach(function(s) { slot = slot.dot(s) });
+          var slot = this.slot(argNames[i]);
           var s = slot.sub(l);
           s && subs.push(s);
           args[i] = slot.get();
