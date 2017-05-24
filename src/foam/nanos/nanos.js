@@ -25,6 +25,7 @@ FOAM_FILES([
   { name: "foam/nanos/log/Logger" },
   { name: "foam/nanos/log/ConsoleLogger" },
   { name: "foam/nanos/menu/Menu" },
+  { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
 
