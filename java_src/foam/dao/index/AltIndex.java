@@ -19,9 +19,8 @@ public class AltIndex implements Index {
   protected ArrayList<Index> delegates_ = new ArrayList();
 
   public AltIndex(Index... indices) {
-    for (Index indice : indices) {
-      addIndex(indice);
-    }
+    for ( int i = 0 ; i < indices.length ; i++ )
+      addIndex(indices[i]);
   }
 
   public void addIndex(Index i) {
