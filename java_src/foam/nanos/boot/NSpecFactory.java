@@ -7,13 +7,19 @@
 package foam.nanos.boot;
 
 import foam.core.*;
+import foam.nanos.*;
 
 public class NSpecFactory implements XFactory {
-  public NSpecFactory(NSpec spec);
+  NSpec spec_;
+
+  public NSpecFactory(NSpec spec) {
+    spec_ = spec;
+  }
 
   public Object create(X x) {
-    NanoService ns = spec.createService();
-    ns.setX(x);
+    NanoService ns = spec_.createService();
+
+    ((ContextAwareSupport) ns).setX(x);
     ns.start();
     
     return ns;

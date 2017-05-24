@@ -28,6 +28,14 @@ public class Boot {
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
       }
     });
+
+    ((AbstractDAO) serviceDAO_).where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
+      public void put(FObject obj, Detachable sub) {
+        NSpec sp = (NSpec) obj;
+
+        root_.get(sp.getName());
+      }
+    });
   }
 
   protected void loadTestData() {
