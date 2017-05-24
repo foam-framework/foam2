@@ -63,6 +63,8 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/parse/parse" },
+  { name: "foam/parse/json" },
+  { name: "foam/parsers/FON" },
   { name: "foam/core/templates" },
   { name: "foam/i18n/Messages" },
   { name: "foam/core/Action" },
