@@ -26,7 +26,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'controller as data'
+    'controller as data',
+    'summaryView'
   ],
 
   properties: [
@@ -38,6 +39,11 @@ foam.CLASS({
       expression: function(data) {
         return this.DAOController.create({ data: data });
       }
+    },
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'summaryView',
+      value: { class: 'foam.u2.view.ScrollTableView' }
     }
   ],
 
