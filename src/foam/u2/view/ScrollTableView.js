@@ -21,10 +21,10 @@
   extends: 'foam.u2.Element',
 
   requires: [
-    'foam.u2.view.TableView',
-    'foam.graphics.ScrollCView',
     'foam.dao.FnSink',
+    'foam.graphics.ScrollCView',
     'foam.mlang.sink.Count',
+    'foam.u2.view.TableView'
   ],
 
   properties: [
@@ -90,6 +90,7 @@
     function init() {
       this.onDetach(this.data$proxy.pipe(this.FnSink.create({fn:this.onDaoUpdate})));
     },
+
     function initE() {
       // TODO probably shouldn't be using a table.
       this.start('table').
