@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.dao.*;
 import foam.nanos.*;
 import foam.mlang.*;
+import foam.nanos.pm.DAOPMLogger;
 
 public class Boot {
   protected DAO serviceDAO_;
@@ -43,7 +44,12 @@ public class Boot {
     NSpec s = new NSpec();
     s.setName("http");
     s.setServiceClass("foam.nanos.http.NanoHttpServer");
+    s.setLazy(false);
     serviceDAO_.put(s);
+    NSpec dpl = new NSpec();
+    dpl.setName(DAOPMLogger.ServiceName);
+    dpl.setServiceClass(DAOPMLogger.class.getName());
+    serviceDAO_.put(dpl);
   }
 
   public static void main (String[] args) throws Exception {
