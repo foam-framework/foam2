@@ -142,8 +142,8 @@ foam.CLASS({
         if ( tableColumns ) return tableColumns.columns;
 
         return of.getAxiomsByClass(foam.core.Property).
-          filter(function(p) { return ! p.hidden; }).
-          map(foam.core.Property.NAME.f);
+            filter(function(p) { return ! p.hidden; }).
+            map(foam.core.Property.NAME.f);
       }
     },
     'selection',
