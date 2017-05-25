@@ -16,6 +16,10 @@
 
    documentation: '',
 
+   tableColumns: [
+     'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
+   ],
+
    properties: [
      {
        class: 'String',
