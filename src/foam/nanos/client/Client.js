@@ -99,7 +99,7 @@ foam.CLASS({
         return this.createDAO({
           of: this.Menu,
           testData: [
-            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ }  },
+            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ } },
               { parent: 'admin', id: 'auth',         label: 'Authentication', handler: { class: 'foam.nanos.menu.TabsMenu' } },
                 { parent: 'auth', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
                 { parent: 'auth', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
@@ -113,7 +113,7 @@ foam.CLASS({
               { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },
               { parent: 'admin', id: 'pm',           label: 'Performance' },
               { parent: 'admin', id: 'log',          label: 'View Logs' },
-            { id: 'debug',                           label: 'Debug' },
+            { id: 'debug',                           label: 'Debug',         handler: { class: 'foam.nanos.menu.TabsMenu' } },
               { parent: 'debug', id: 'api',          label: 'API Reference' },
               { parent: 'debug', id: 'context',      label: 'Context Walker' },
               { parent: 'debug', id: 'data',         label: 'View Data' }
