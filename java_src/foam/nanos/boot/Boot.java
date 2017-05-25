@@ -44,6 +44,11 @@ public class Boot {
       }
     });
 
+    /**
+     * Revert root_ to non ProxyX to avoid letting children add new bindings.
+     */
+    root_ = root_.put("firewall", "firewall");
+
     ((AbstractDAO) serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false))).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
@@ -57,11 +62,13 @@ public class Boot {
     NSpec http = new NSpec();
     http.setName("http");
     http.setServiceClass("foam.nanos.http.NanoHttpServer");
+    http.setLazy(false);
     serviceDAO_.put(http);
 
     NSpec authTest = new NSpec();
     authTest.setName("authTest");
     authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
+    authTest.setLazy(false);
     serviceDAO_.put(authTest);
   }
 
