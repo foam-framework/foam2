@@ -119,6 +119,7 @@ foam.CLASS({
 
       cls.field({
         name: constantize,
+        visibility: 'public',
         static: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)
@@ -626,7 +627,7 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-  
+
   if ( values1.length > values2.length ) return 1;
   if ( values1.length < values2.length ) return -1;
 
