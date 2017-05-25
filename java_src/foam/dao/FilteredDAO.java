@@ -16,19 +16,20 @@ public class FilteredDAO
   }
 
   private Predicate getPredicate(Predicate arg) {
-    if ( arg != null ) return predicate_;
-
-    return ((And) getX().create(And.class))
-      .setArgs(new Predicate[] {
-          predicate_,
-          arg
-        });
+    return arg == null ? predicate_ : foam.mlang.MLang.AND(predicate_, arg);
   }
 
+  @Override
+  public Sink select(Sink s) {
+    return super.select(s);
+  }
+
+  @Override
   public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
     return super.select(s, skip, limit, order, getPredicate(predicate));
   }
 
+  @Override
   public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
     super.removeAll(skip, limit, order, getPredicate(predicate));
   }
