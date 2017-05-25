@@ -15,7 +15,7 @@ public class DAOPMLogger
   implements PMLogger, NanoService
 {
 
-  public static final String ServiceName = "XpmLogger";
+  public static final String ServiceName = "pmLogger";
 
   private MapDAO dao_;
 
