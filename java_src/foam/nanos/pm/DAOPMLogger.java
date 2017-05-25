@@ -15,32 +15,33 @@ public class DAOPMLogger
   implements PMLogger, NanoService
 {
 
-  MapDAO dao_;
+  public static final String ServiceName = "XpmLogger";
+
+  private MapDAO dao_;
 
   @Override
   public void log(PM pm) {
-    PMInfo pmi = (PMInfo) dao_.find(pm);
+    PMInfo pmi = new PMInfo()
+            .setClsname(pm.getClassType().getName())
+            .setPmname(pm.getName())
+            .setMintime(pm.getTime())
+            .setMaxtime(pm.getTime())
+            .setTotaltime(pm.getTime())
+            .setNumoccurrences(1);
 
-    if ( pmi == null ) {
-      pmi = new PMInfo()
-          .setClsname(pm.getClassType().getName())
-          .setPmname(pm.getName())
-          .setMintime(pm.getTime())
-          .setMaxtime(pm.getTime())
-          .setTotaltime(pm.getTime())
-          .setNumoccurrences(1);
+    PMInfo dpmi = (PMInfo) dao_.find(pmi);
+    if ( dpmi == null ) {
+      dao_.put(pmi);
+    } else {
+      if ( pmi.getMintime() < dpmi.getMintime() )
+        dpmi.setMintime(pmi.getMintime());
+
+      if ( pmi.getMaxtime() > dpmi.getMaxtime() )
+        dpmi.setMaxtime(pmi.getMaxtime());
+
+      dpmi.setNumoccurrences(dpmi.getNumoccurrences() + 1);
+      dpmi.setTotaltime(dpmi.getTotaltime() + pmi.getTotaltime());
     }
-
-    if ( pm.getTime() < pmi.getMintime() )
-      pmi.setMintime(pm.getTime());
-
-    if ( pm.getTime() > pmi.getMaxtime() )
-      pmi.setMaxtime(pm.getTime());
-
-    pmi.setNumoccurrences(pmi.getNumoccurrences() + 1);
-    pmi.setTotaltime(pmi.getTotaltime() + pm.getTime());
-
-    dao_.put(pmi);
   }
 
   @Override
