@@ -23,7 +23,7 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'length'
-    }
+    },
     {
       name: 'data',
       factory: function() {
