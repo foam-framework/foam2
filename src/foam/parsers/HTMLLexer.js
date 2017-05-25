@@ -219,7 +219,8 @@ foam.CLASS({
             return Embed.create({
               nodeName: v[0][2],
               content: [ v[1] ],
-              attributes: v[0][4]
+              attributes: v[0][4],
+              type: OPEN_CLOSE
             });
           },
 
@@ -234,7 +235,8 @@ foam.CLASS({
             var str = v[1];
             var ret = Embed.create({
               nodeName: nodeName,
-              attributes: attributes
+              attributes: attributes,
+              type: OPEN_CLOSE
             });
 
             // Attempt to parse maybeEmbeds. Returns "html" parse or string.
