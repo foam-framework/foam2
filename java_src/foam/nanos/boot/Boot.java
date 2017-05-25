@@ -9,9 +9,9 @@ package foam.nanos.boot;
 import foam.core.*;
 import foam.dao.*;
 import foam.nanos.*;
+import foam.mlang.*;
 
 public class Boot {
-
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
 
@@ -26,19 +26,15 @@ public class Boot {
         NSpec sp = (NSpec) obj;
         System.out.println("NSpec: " + sp.getName());
 
-        try {
-          NanoService ns = sp.createService();
+        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
+      }
+    });
 
-          ((ContextAwareSupport) ns).setX(root_);
-          ns.start();
-          root_.put(sp.getName(), ns);
-        } catch (ClassNotFoundException e) {
-           e.printStackTrace();
-        } catch (InstantiationException e) {
-           e.printStackTrace();
-        } catch (IllegalAccessException e) {
-           e.printStackTrace();
-        }
+    ((AbstractDAO) serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false))).select(new AbstractSink() {
+      public void put(FObject obj, Detachable sub) {
+        NSpec sp = (NSpec) obj;
+
+        root_.get(sp.getName());
       }
     });
   }

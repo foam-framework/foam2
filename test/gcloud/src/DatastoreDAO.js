@@ -199,6 +199,83 @@ describe('DatastoreDAO', function() {
     });
   });
 
+  describe('count', function() {
+    foam.CLASS({
+      package: 'com.google.cloud.datastore.count',
+      name: 'DatastoreDAO',
+      extends: 'com.google.cloud.datastore.DatastoreDAO',
+
+      properties: [
+        {
+          class: 'Boolean',
+          name: 'handledMultipleBatches'
+        }
+      ],
+
+      methods: [
+        function getRequest(op, payload) {
+          var data = JSON.parse(payload);
+
+          // Skip non-select() requests.
+          if ( ! data.query ) return this.SUPER.apply(this, arguments);
+
+          expect(data.query.projection).toEqual([ { property: {name: "__key__" } } ]);
+          return this.SUPER.apply(this, arguments);
+        },
+        function selectNextBatch_() {
+          this.handledMultipleBatches = true;
+          return this.SUPER.apply(this, arguments);
+        }
+      ]
+    });
+    function daoFactory(cls) {
+      return clearCDS().then(function() {
+        return foam.lookup('com.google.cloud.datastore.count.DatastoreDAO')
+            .create({
+              of: cls,
+              protocol: env.CDS_EMULATOR_PROTOCOL,
+              host: env.CDS_EMULATOR_HOST,
+              port: env.CDS_EMULATOR_PORT,
+              projectId: env.CDS_PROJECT_ID
+            });
+      });
+    }
+
+    var E;
+    var Sheep;
+    beforeEach(function() {
+      var sheepNum = 1;
+      foam.CLASS({
+        package: 'test.dao.count',
+        name: 'Sheep',
+
+        properties: [
+          {
+            class: 'Int',
+            name: 'id',
+            factory: function() { return sheepNum++; }
+          }
+        ]
+      });
+      Sheep = foam.lookup('test.dao.count.Sheep');
+      E = foam.lookup('foam.mlang.ExpressionsSingleton').create();
+    });
+    it('should perform key-only queries over multiple batches', function(done) {
+      var expectedCount = 1000;
+      daoFactory(Sheep).then(function(dao) {
+        var promises = [];
+        for ( var i = 0; i < expectedCount; i++ ) {
+          promises.push(dao.put(Sheep.create()));
+        }
+        return Promise.all(promises).then(function() {
+          return dao.select(E.COUNT());
+        }).then(function() {
+          expect(dao.handledMultipleBatches).toBe(true);
+        }).then(done, done.fail);
+      });
+    });
+  });
+
   function unreliableDAOFactory(cls) {
     return clearCDS().then(function() {
       return foam.lookup('com.google.cloud.datastore.DatastoreDAO')

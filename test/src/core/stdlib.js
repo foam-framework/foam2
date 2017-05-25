@@ -133,7 +133,7 @@ describe('foam.Null', function() {
     expect(foam.Null.equals("unused", "bad")).toBe(false);
   });
   it('compare', function() {
-    expect(foam.Null.compare("unused", undefined)).toBe(-1);
+    expect(foam.Null.compare("unused", undefined)).toBe(1);
     expect(foam.Null.compare("unused", "defined!")).toBe(1);
     expect(foam.Null.compare("unused", null)).toBe(0);
   });
@@ -167,9 +167,9 @@ describe('foam.Boolean', function() {
     expect(foam.Boolean.compare(false, false)).toBe(0);
 
     expect(foam.Boolean.compare(true, 0)).toBe(1);
-    expect(foam.Boolean.compare(false, 66)).toBe(-1);
-    expect(foam.Boolean.compare(true, 9)).toBe(0);
-    expect(foam.Boolean.compare(false, 0)).toBe(0);
+    expect(foam.Boolean.compare(false, 66)).toBe(1);
+    expect(foam.Boolean.compare(true, 9)).toBe(1);
+    expect(foam.Boolean.compare(false, 0)).toBe(1);
   });
   it('hashCode', function() {
     expect(foam.Boolean.hashCode(true)).toBe(1);
@@ -655,7 +655,7 @@ describe('foam.Array', function() {
       var a = [2, foam.core.Property.create({ name: 'hello' }), 4];
       var b = foam.util.clone(a);
       expect(a).not.toBe(b);
-      expect(foam.util.compare(a[1], b[1])).toEqual(0);
+      expect(foam.util.compare(a[1], b[1])).toBe(0);
       expect(a[1]).not.toBe(b[1]);
     });
   });
@@ -747,12 +747,12 @@ describe('foam.Date', function() {
   });
 
   it('compare', function() {
-    expect(foam.util.compare(new Date(7487474), new Date(7487474))).toEqual(0);
-    expect(foam.util.compare(new Date(234324), new Date(23423432))).toEqual(-1);
+    expect(foam.util.compare(new Date(7487474), new Date(7487474))).toBe(0);
+    expect(foam.util.compare(new Date(234324), new Date(23423432))).toBe(-1);
 
-    expect(foam.util.compare(new Date(234324), null)).toEqual(1);
+    expect(foam.util.compare(new Date(234324), null)).not.toBe(0);
     var date = new Date(2423);
-    expect(foam.util.compare(date, date)).toEqual(0);
+    expect(foam.util.compare(date, date)).toBe(0);
   });
 
   it('relativeDateString', function() {
@@ -972,10 +972,19 @@ describe('foam.util', function() {
       { a: 'A' },
       [ 2, 4 ]
     ];
-    types.forEach(function(t) {
+    types.forEach(function(t, i) {
+      // Creating array of other types to verify symmetry property.
+      var typesDiff = types.slice();
+      typesDiff.splice(i);
+
       expect(foam.util.equals(foam.util.clone(t), t)).toBe(true);
       expect(foam.util.equals(t, t)).toBe(true);
       expect(foam.util.compare(t, t)).toBe(0);
+
+      typesDiff.forEach(function(d) {
+        expect(foam.util.compare(t, d)).not.toBe(foam.util.compare(d, t));
+      });
+
       expect(foam.util.hashCode(t)).not.toBeUndefined();
       expect(foam.util.hashCode(t)).not.toBeNull();
       if ( foam.typeOf(t).diff ) {
@@ -984,10 +993,25 @@ describe('foam.util', function() {
         expect(foam.util.diff(t, t)).toBeUndefined();
       }
     });
-
-
   });
 
+  it('handles a more indepth comparison of types', function() {
+    var obj1 = {};
+    var obj2 = {};
+    var refObj1 = obj1;
+
+    var items = [ undefined, null, false, true, 0, 1, '', 'potato',
+      obj1, obj2, refObj1, new Date(0), new Date(0), new Date(),
+      foam.core.FObject.create(), foam.core.FObject.create() ];
+    var len = items.length;
+
+    for (var i = 0; i < len; i++) {
+      for (var j = i; j < len; j++) {
+        expect(foam.util.compare(items[i], items[j]))
+            .toBe(-foam.util.compare(items[j], items[i]));
+      }
+    }
+  });
 });
 
 

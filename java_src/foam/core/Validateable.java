@@ -4,8 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos;
+package foam.core;
 
-public interface NanoService {
-  public void start();
+public interface Validateable {
+  public void validate() throws IllegalStateException;
 }
