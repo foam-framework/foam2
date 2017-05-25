@@ -1203,13 +1203,77 @@ foam.CLASS({
 });
 
 
+// TODO: Find the right package for this.
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ClassWhitelist',
+  exports: [
+    'lookup'
+  ],
+  properties: [
+    {
+      class: 'StringArray',
+      name: 'whitelist'
+    },
+    {
+      name: 'whitelist_',
+      expression: function(whitelist) {
+        var w = {};
+        for ( var i = 0 ; i < whitelist.length ; i++ ) {
+          w[whitelist[i]] = true;
+        }
+        return w;
+      }
+    }
+  ],
+  methods: [
+    {
+      class: 'ContextMethod',
+      name: 'lookup',
+      code: function(X, id) {
+        if ( ! this.whitelist_[id] ) {
+          throw new Error('Class "' + id + '" is not whitelisted.');
+        }
+        return this.__context__.lookup.call(X, id);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'LoggedLookupContext',
+  exports: [
+    'lookup',
+  ],
+  properties: [
+    {
+      class: 'Map',
+      name: 'record'
+    }
+  ],
+  methods: [
+    {
+      class: 'ContextMethod',
+      name: 'lookup',
+      code: function(X, id) {
+        this.record[id] = id;
+        return this.__context__.lookup.call(X, id);
+      }
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
 
   requires: [
     'foam.box.BoxRegistryBox',
-    'foam.box.NamedBox'
+    'foam.box.NamedBox',
+    'foam.parsers.FON',
+    'foam.box.ClassWhitelistContext',
+    'foam.box.LoggedLookupContext',
   ],
 
   exports: [
@@ -1218,7 +1282,8 @@ foam.CLASS({
     'webSocketService',
     'registry',
     'root',
-    'me'
+    'me',
+    'fonParser'
   ],
 
   properties: [
@@ -1288,6 +1353,31 @@ foam.CLASS({
         });
         me.delegate = this.registry;
         return me;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'unsafe',
+      value: false
+    },
+    {
+      class: 'StringArray',
+      name: 'classWhitelist'
+    },
+    {
+      name: 'fonParser',
+      hidden: true,
+      factory: function() {
+        // TODO: Better way to inject the class whitelist.
+        if ( this.unsafe ) {
+          var context = this.LoggedLookupContext.create();
+        } else {
+          var context = this.ClassWhitelistContext.create({
+            whitelist: this.classWhitelist
+          });
+        }
+
+        return this.FON.create({ creationContext: context.__subContext__ });
       }
     }
   ]
@@ -1394,7 +1484,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'me'
+    'me',
+    'fonParser'
   ],
 
   properties: [
@@ -1442,7 +1533,7 @@ foam.CLASS({
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          this.me.send(foam.json.parseString(p, this));
+          this.me.send(this.fonParser.parseString(p));
         }.bind(this));
       }
     }
