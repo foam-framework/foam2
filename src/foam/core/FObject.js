@@ -503,7 +503,9 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
 
-    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
+
+    // Bootstrap form replaced after this.__context__ is added.
+    function lookup() { return foam.lookup.apply(foam, arguments); },
 
     function error() { this.__context__.error.apply(null, arguments); },
 
