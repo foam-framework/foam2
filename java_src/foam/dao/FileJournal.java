@@ -3,6 +3,7 @@ package foam.dao;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.Journal;
+import foam.lib.json.JournalParser;
 import foam.lib.json.Outputter;
 
 import java.io.*;
@@ -15,6 +16,7 @@ public class FileJournal implements Journal {
     protected FileWriter fout;
     protected BufferedWriter bw;
     protected FileReader fin;
+    protected BufferedReader br;
     protected File file;
 
     public FileJournal(String filename) throws IOException {
@@ -28,6 +30,7 @@ public class FileJournal implements Journal {
         this.fin = new FileReader(file);
         this.fout = new FileWriter(file, true);
         this.bw = new BufferedWriter(this.fout);
+        this.br = new BufferedReader(this.fin);
     }
 
     /**
@@ -80,12 +83,24 @@ public class FileJournal implements Journal {
     /**
      * "replays" the persisted journaled file history into a dao.
      *
-     * @param sink
+     * @param delegate
      * @return
      * @throws IOException
      */
     @Override
-    public String replay(Sink sink) throws IOException {
-        return null;
+    public void replay(DAO delegate) throws IOException {
+        JournalParser journalParser = new JournalParser();
+
+        String line;
+        while ((line = this.br.readLine()) != null) {
+            String operation = journalParser.parseOperation(line);
+            FObject object = journalParser.parseObject(line);
+            switch (operation) {
+                case "put":
+                    delegate.put(object);
+                case "remove":
+                    delegate.remove(object);
+            }
+        }
     }
 }

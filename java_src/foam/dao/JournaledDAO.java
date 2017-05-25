@@ -16,6 +16,7 @@ public class JournaledDAO extends ProxyDAO {
     public JournaledDAO(DAO delegate, String filename) throws IOException {
         this.journal = new FileJournal(filename);
         this.setDelegate(delegate);
+        this.journal.replay(delegate);
     }
 
     /**
