@@ -1226,7 +1226,7 @@ foam.CLASS({
       name: 'messagePortService',
       hidden: true,
       factory: function() {
-        var model = foam.lookup('foam.messageport.MessagePortService', true);
+        var model = this.lookup('foam.messageport.MessagePortService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
@@ -1238,7 +1238,7 @@ foam.CLASS({
       name: 'socketService',
       hidden: true,
       factory: function() {
-        var model = foam.lookup('foam.net.node.SocketService', true);
+        var model = this.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
@@ -1250,8 +1250,8 @@ foam.CLASS({
       name: 'webSocketService',
       hidden: true,
       factory: function() {
-        var model = foam.lookup('foam.net.node.WebSocketService', true) ||
-            foam.lookup('foam.net.web.WebSocketService', true);
+        var model = this.lookup('foam.net.node.WebSocketService', true) ||
+            this.lookup('foam.net.web.WebSocketService', true);
 
         if ( model ) {
           return model.create({
