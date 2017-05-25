@@ -458,6 +458,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined;
+        this.clearPrivate_(name);
 
         // Avoid creating slot and publishing event if nobody is listening.
         if ( this.hasListeners('propertyChange', name) ) {
@@ -759,12 +760,26 @@ foam.CLASS({
                 });
       }
 
-      var axiom = this.cls_.getAxiomByName(obj);
+      if ( foam.Array.isInstance(obj) ) {
+        return foam.core.ExpressionSlot.create({
+          obj: this,
+          args: obj[0].map(this.slot.bind(this)),
+          code: obj[1],
+        });
+      }
+
+      var names = obj.split('$');
+      var axiom = this.cls_.getAxiomByName(names.shift());
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
       foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
-      return axiom.toSlot(this);
+      var slot = axiom.toSlot(this)
+      names.forEach(function(n) {
+        slot = slot.dot(n);
+      });
+
+      return slot;
     },
 
 
