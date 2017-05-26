@@ -14,18 +14,22 @@ import foam.core.X;
  */
 public class JournalParser extends ContextAwareSupport {
 
+    protected JSONParser jsonParser;
+
+    public JournalParser() {
+        // do not fail if context is null
+        X ctx = (getX() == null) ? new ProxyX() : getX();
+        this.jsonParser = new JSONParser();
+        jsonParser.setX(ctx);
+    }
+
     public FObject parseObject(String journalLine) {
 
         // get the actual object
         int objectIndex = journalLine.indexOf("{");
         String object = journalLine.substring(objectIndex, journalLine.lastIndexOf("}") + 1);
 
-        // do not fail if context is null
-        X ctx = (getX() == null) ? new ProxyX() : getX();
-        JSONParser jsonParser = new JSONParser();
-        jsonParser.setX(ctx);
-
-        return jsonParser.parseString(object);
+        return this.jsonParser.parseString(object);
     }
 
     /**
