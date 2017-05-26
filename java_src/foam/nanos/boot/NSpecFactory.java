@@ -9,7 +9,9 @@ package foam.nanos.boot;
 import foam.core.*;
 import foam.nanos.*;
 
-public class NSpecFactory implements XFactory {
+public class NSpecFactory
+  implements XFactory
+{
   NSpec spec_;
 
   public NSpecFactory(NSpec spec) {
