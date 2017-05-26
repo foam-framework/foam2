@@ -74,7 +74,20 @@ if ( foam.isServer ) {
               return;
             }
 
-            with(dao) eval(data_);
+
+            var context = {
+              put: function(o) { return dao.put(o); },
+              remove: function(o) { return dao.remove(o); },
+              foam: {
+                json: {
+                  parse: function(obj) {
+                    return foam.json.parse(obj, null, dao.__context__);
+                  }
+                }
+              }
+            };
+
+            with(context) eval(data_);
 
             resolve(dao);
           });

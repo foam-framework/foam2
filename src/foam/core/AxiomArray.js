@@ -50,8 +50,7 @@ foam.CLASS({
         foam.assert(Array.isArray(v),
             'Tried to set', prop.name, 'to non array value');
 
-        // FUTURE: Use __context__.lookup ?
-        var of = foam.lookup(prop.of, true);
+        var of = this.lookup(prop.of, true);
         foam.assert(
             of,
             'Unknown "of" Model in AxiomArray: property=',
@@ -68,8 +67,7 @@ foam.CLASS({
     {
       name: 'adaptArrayElement',
       value: function(a, prop) {
-        // FUTURE: Use __context__.lookup ?
-        var of = foam.lookup(prop.of);
+        var of = this.lookup(prop.of);
         return of.isInstance(a) ? a : of.create(a, this);
       }
     },
