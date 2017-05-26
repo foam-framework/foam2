@@ -141,6 +141,7 @@ FOAM_FILES([
   { name: "foam/dao/RestDAO" },
   { name: "foam/dao/EnabledAwareDAO" },
   { name: "foam/dao/LastModifiedAwareDAO" },
+  { name: "foam/dao/ValidationDAO" },
   { name: "foam/dao/SQL", flags: ['sql'] },
   { name: "foam/parse/QueryParser" },
   { name: "foam/physics/Physical" },
