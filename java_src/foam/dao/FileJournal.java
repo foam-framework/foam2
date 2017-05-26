@@ -88,10 +88,10 @@ public class FileJournal implements Journal {
         JournalParser journalParser = new JournalParser();
 
         String line;
-        while ((line = this.br.readLine()) != null) {
+        while ( ( line = this.br.readLine() ) != null ) {
             String operation = journalParser.parseOperation(line);
             FObject object = journalParser.parseObject(line);
-            switch (operation) {
+            switch ( operation ) {
                 case "p":
                     delegate.put(object);
                 case "r":
