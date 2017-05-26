@@ -13,9 +13,7 @@ import java.io.*;
  */
 public class FileJournal implements Journal {
 
-    protected FileWriter fout;
     protected BufferedWriter bw;
-    protected FileReader fin;
     protected BufferedReader br;
     protected File file;
 
@@ -27,10 +25,8 @@ public class FileJournal implements Journal {
             file.createNewFile();
         }
 
-        this.fin = new FileReader(file);
-        this.fout = new FileWriter(file, true);
-        this.bw = new BufferedWriter(this.fout);
-        this.br = new BufferedReader(this.fin);
+        this.bw = new BufferedWriter(new FileWriter(file, true));
+        this.br = new BufferedReader(new FileReader(file));
     }
 
     /**
