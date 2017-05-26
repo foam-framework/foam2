@@ -1206,7 +1206,7 @@ foam.CLASS({
 // TODO: Find the right package for this.
 foam.CLASS({
   package: 'foam.box',
-  name: 'ClassWhitelist',
+  name: 'ClassWhitelistContext',
   exports: [
     'lookup'
   ],
