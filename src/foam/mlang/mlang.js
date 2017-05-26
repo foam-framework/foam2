@@ -1568,7 +1568,10 @@ foam.CLASS({
   name: 'Max',
   extends: 'foam.dao.AbstractSink',
 
-  implements: ['foam.core.Serializable'],
+  implements: [
+    'foam.mlang.predicate.Unary',
+    'foam.core.Serializable',
+  ],
 
   documentation: 'A Sink which remembers the maximum value put().',
 
