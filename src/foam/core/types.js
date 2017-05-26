@@ -404,6 +404,31 @@ foam.CLASS({
 
   properties: [
     [ 'factory', function() { return {} } ],
+    [
+      'comparePropertyValues',
+      function(o1, o2) {
+        if ( foam.typeOf(o1) != foam.typeOf(o2) ) return -1;
+
+        var keys1 = Object.keys(o1).sort();
+        var keys2 = Object.keys(o2).sort();
+        if ( keys1.length < keys2.length ) return -1;
+        if ( keys1.length > keys2.length ) return 1;
+        for ( var i = 0 ; i < keys1.length ; i++ ) {
+          var c = foam.String.compare(keys1[i], keys2[i]);
+          if ( c != 0 ) return c;
+          c = foam.util.compare(o1[keys1[i]], o2[keys2[i]]);
+          if ( c != 0 ) return c;
+        }
+
+        return 0;
+      }
+    ],
+    [
+      'diffPropertyValues',
+      function(o1, o2) {
+        // TODO
+      }
+    ],
     'of'
   ]
 });
@@ -437,7 +462,7 @@ foam.CLASS({
         return of.isInstance(v) ?
             v :
             ( v.class ?
-                foam.lookup(v.class) :
+                this.lookup(v.class) :
                 of ).create(v, this.__subContext__);
       }
     }

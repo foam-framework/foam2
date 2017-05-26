@@ -253,7 +253,7 @@ foam.CLASS({
         // NOTE: we pass sink here, but it's not going to be the one eventually
         // used.
         plans.push(
-          this.index.plan(sink, undefined, subLimit, undefined, args[i], this.index)
+          this.index.plan(sink, undefined, subLimit, order, args[i], this.index)
         );
       }
 
