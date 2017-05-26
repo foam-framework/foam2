@@ -485,3 +485,29 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Max',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: function() {/*
+if (this.getValue().compareTo(obj) < 0) {
+  this.setValue(obj);
+}
+      */}
+    }
+  ]
+});
