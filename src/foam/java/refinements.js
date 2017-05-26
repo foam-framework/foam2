@@ -346,9 +346,23 @@ foam.CLASS({
         cls.buildJavaClass =  function(cls) {
           cls = cls || foam.java.Interface.create();
 
-          cls.name = this.name;
-          cls.package = this.package;
-          cls.extends = this.extends;
+          cls.name = this.model_.name;
+          cls.package = this.model_.package;
+          // Checking if it's a string to then make it be an array
+          cls.extends = typeof this.model_.extends === 'string' ?
+                        ( this.model_.extends ===  'foam.core.AbstractInterface' ?
+                          [] : [this.model_.extends] ) :
+                        this.model_.extends;
+          // An interface in java never implements, it always extends other interfaces
+          if( this.model_.implements && this.model_.implements.length > 0 ) {
+            for ( var i = 0; i < this.model_.implements.length; i++ ) {
+              if( this.model_.implements[i].instance_.path &&
+                  this.model_.implements[i].instance_.path &&
+                  this.model_.implements[i].instance_.path !== 'foam.core.AbstractInterface' ) {
+                cls.extends.push(this.model_.implements[i].instance_.path);
+              }
+            }
+          }
 
           var axioms = this.getAxioms();
 
@@ -626,7 +640,7 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-  
+
   if ( values1.length > values2.length ) return 1;
   if ( values1.length < values2.length ) return -1;
 
