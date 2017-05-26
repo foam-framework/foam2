@@ -39,7 +39,7 @@ public class FileJournal implements Journal {
     public void put(FObject obj, Detachable sub) {
         try {
             Outputter outputter = new Outputter();
-            this.bw.write("put(foam.json.parse(" + outputter.stringify(obj) + "))");
+            this.bw.write("p(foam.json.parse(" + outputter.stringify(obj) + "))");
             this.bw.newLine();
             this.bw.flush();
         } catch (IOException e) {
@@ -58,7 +58,7 @@ public class FileJournal implements Journal {
     public void remove(FObject obj, Detachable sub) {
         try {
             Outputter outputter = new Outputter();
-            this.bw.write("remove(foam.json.parse(" + outputter.stringify(obj) + "))");
+            this.bw.write("r(foam.json.parse(" + outputter.stringify(obj) + "))");
             this.bw.newLine();
             this.bw.flush();
         } catch (IOException e) {
@@ -92,9 +92,9 @@ public class FileJournal implements Journal {
             String operation = journalParser.parseOperation(line);
             FObject object = journalParser.parseObject(line);
             switch (operation) {
-                case "put":
+                case "p":
                     delegate.put(object);
-                case "remove":
+                case "r":
                     delegate.remove(object);
             }
         }
