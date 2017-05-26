@@ -23,6 +23,8 @@ public class JournalParser extends ContextAwareSupport {
         jsonParser.setX(ctx);
     }
 
+
+    // TODO(drish): do not generate a second copy of the journalLine
     public FObject parseObject(String journalLine) {
 
         // get the actual object
