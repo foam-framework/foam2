@@ -1591,6 +1591,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Min',
@@ -1618,6 +1619,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.mlang.sink',
