@@ -119,6 +119,7 @@ foam.CLASS({
 
       cls.field({
         name: constantize,
+        visibility: 'public',
         static: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)

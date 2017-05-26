@@ -214,3 +214,61 @@ describe('copyFrom', function() {
     expect(obj.d).toBe(true);
   });
 });
+
+describe('FObject compare', function() {
+  var someObj;
+
+  beforeAll(function() {
+    foam.CLASS({
+      name: 'SomeClass',
+      properties: [
+        {
+          name: 'a',
+          value: 1
+        }
+      ]
+    });
+    someObj = SomeClass.create();
+  });
+
+  it('with undefined values', function() {
+    expect(foam.util.compare(undefined, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, undefined)).toBe(-1);
+  });
+
+  it('with null values', function() {
+    expect(foam.util.compare(null, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, null)).toBe(-1);
+  });
+
+  it('with boolean values', function() {
+    expect(foam.util.compare(true, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, true)).toBe(-1);
+    expect(foam.util.compare(false, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, false)).toBe(-1);
+  });
+
+  it('with empty arrays', function() {
+    var emptyArr = [];
+    expect(foam.util.compare(emptyArr, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, emptyArr)).toBe(-1);
+  });
+
+  it('with empty strings', function() {
+    var emptyStr = "";
+    expect(foam.util.compare(emptyStr, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, emptyStr)).toBe(-1);
+  });
+
+  it('with a function', function() {
+    var lambda = function() { };
+    expect(foam.util.compare(lambda, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, lambda)).toBe(-1);
+  });
+
+  it('with a date', function() {
+    var epoch = new Date(0);
+    expect(foam.util.compare(epoch, someObj)).toBe(1);
+    expect(foam.util.compare(someObj, epoch)).toBe(-1);
+  });
+});
