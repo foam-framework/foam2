@@ -37,7 +37,7 @@ foam.LIB({
         cls = foam[typeStr];
         if ( cls ) return cls;
 
-        var cls = this.lookup(typeStr, true);
+        var cls = foam.lookup(typeStr, true);
         if ( cls ) return cls;
 
         // could not resolve
