@@ -152,7 +152,7 @@ foam.CLASS({
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :
-            foam.lookup(prop.of).create(o) ;
+            this.lookup(prop.of).create(o) ;
       }
     }
   ]

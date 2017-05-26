@@ -329,7 +329,7 @@ foam.CLASS({
         if ( o ) this.of = o.cls_;
       }
 
-      this.prevSub = o && o.sub('propertyChange', this.name, this.valueChange);
+      this.prevSub = o && o.slot(this.name).sub(this.valueChange);
       this.valueChange();
     },
 
