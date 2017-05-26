@@ -503,11 +503,11 @@ foam.CLASS({
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: function() {/*
-if (this.getValue().compareTo(obj) < 0) {
+      javaCode: function() {
+/*if (obj.compareTo(this.getValue()) < 0) {
   this.setValue(obj);
-}
-      */}
+}*/
+      }
     }
   ]
 });
