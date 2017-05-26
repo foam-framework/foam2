@@ -1358,7 +1358,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'unsafe',
-      value: false
+      value: true
     },
     {
       class: 'StringArray',
