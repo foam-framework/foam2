@@ -1371,6 +1371,7 @@ foam.CLASS({
         // TODO: Better way to inject the class whitelist.
         if ( this.unsafe ) {
           var context = this.LoggedLookupContext.create();
+          console.warn('**** Boxes are running in UNSAFE mode.  Turn this off before you go to production!');
         } else {
           var context = this.ClassWhitelistContext.create({
             whitelist: this.classWhitelist
