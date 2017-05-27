@@ -46,6 +46,7 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.Sink',
   'foam.dao.AbstractSink',
+  'foam.mlang.sink.AbstractUnarySink',
   'foam.dao.PredicatedSink',
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
