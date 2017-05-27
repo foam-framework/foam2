@@ -1570,15 +1570,15 @@ foam.CLASS({
 
   implements: [
     'foam.mlang.predicate.Unary',
-    'foam.core.Serializable'
+    'foam.core.Serializable',
   ],
 
   documentation: 'A Sink which remembers the maximum value put().',
 
   properties: [
     {
-      name: 'value',
-      value: 0
+      class: 'Object',
+      name: 'value'
     }
   ],
 
