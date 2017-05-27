@@ -47,7 +47,7 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
-      isEnabled: function(inProgress) { return !inProgress },
+      isEnabled: function(data$errors_, inProgress) { return !inProgress && ! data$errors_; },
       code: function() {
         this.inProgress = true;
         this.clearProperty('exception');
