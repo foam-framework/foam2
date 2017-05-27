@@ -8,14 +8,14 @@ import foam.dao.Sink;
 public class FilteredDAO
   extends ProxyDAO
 {
-  private Predicate predicate_;
+  protected Predicate predicate_;
 
   public FilteredDAO setPredicate(Predicate predicate) {
     predicate_ = predicate;
     return this;
   }
 
-  private Predicate getPredicate(Predicate arg) {
+  protected Predicate getPredicate(Predicate arg) {
     if ( arg != null ) return predicate_;
 
     return ((And) getX().create(And.class))

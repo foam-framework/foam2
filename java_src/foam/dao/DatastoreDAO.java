@@ -12,11 +12,11 @@ import foam.mlang.predicate.Predicate;
 public class DatastoreDAO
   extends AbstractDAO
 {
-  private ClassInfo        of_ = null;
-  private PropertyInfo     primaryKey_ = null;
-  private DatastoreService datastore_ = DatastoreServiceFactory.getDatastoreService();
+  protected ClassInfo        of_ = null;
+  protected PropertyInfo     primaryKey_ = null;
+  protected DatastoreService datastore_ = DatastoreServiceFactory.getDatastoreService();
 
-  private DatastoreService getData() { return datastore_; }
+  protected DatastoreService getData() { return datastore_; }
 
   public ClassInfo getOf() {
     return of_;
@@ -32,15 +32,15 @@ public class DatastoreDAO
     return primaryKey_;
   }
 
-  private List<PropertyInfo> getProperties(ClassInfo c) {
+  protected List<PropertyInfo> getProperties(ClassInfo c) {
     return (List<PropertyInfo>)c.getAxiomsByClass(PropertyInfo.class);
   }
 
-  private Key keyFromPK(Object key) {
+  protected Key keyFromPK(Object key) {
     return KeyFactory.createKey(getOf().getId(), key.toString());
   }
 
-  private Key keyFromFObject(FObject obj) {
+  protected Key keyFromFObject(FObject obj) {
     return keyFromPK(getPrimaryKey().get(obj));
   }
 
@@ -65,7 +65,7 @@ public class DatastoreDAO
     return deserialize(result);
   }
 
-  private PropertyContainer serialize(PropertyContainer target, FObject obj) {
+  protected PropertyContainer serialize(PropertyContainer target, FObject obj) {
     ClassInfo info = obj.getClassInfo();
 
     List<PropertyInfo> properties = getProperties(info);
@@ -88,7 +88,7 @@ public class DatastoreDAO
     return target;
   }
 
-  private Entity serializeFObject(FObject o) {
+  protected Entity serializeFObject(FObject o) {
     Entity entity = new Entity(keyFromFObject(o));
 
     serialize(entity, o);
@@ -96,7 +96,7 @@ public class DatastoreDAO
     return entity;
   }
 
-  private FObject deserialize(PropertyContainer e) {
+  protected FObject deserialize(PropertyContainer e) {
     String classId = (String)e.getProperty("cls_");
 
     FObject obj;
