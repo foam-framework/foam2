@@ -53,6 +53,7 @@ var classes = [
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count',
+  'foam.mlang.sink.Max',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
