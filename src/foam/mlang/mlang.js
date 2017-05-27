@@ -1609,8 +1609,8 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'value',
-      value: 0
+      class: 'Object',
+      name: 'value'
     }
   ],
 
