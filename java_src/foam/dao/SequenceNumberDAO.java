@@ -30,11 +30,10 @@ public class SequenceNumberDAO
   }
   
   private PropertyInfo getProperty_() {
-    if (property_ != null) {
-      return property_;
+    if (property_ == null) {
+      property_ = (PropertyInfo) this.of_.getAxiomByName(property);
     }
     
-    property_ = (PropertyInfo) this.of_.getAxiomByName(property);
     return property_;
   }
   
