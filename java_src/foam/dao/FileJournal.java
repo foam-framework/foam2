@@ -38,13 +38,19 @@ public class FileJournal implements Journal {
     @Override
     public void put(FObject obj, Detachable sub) {
         try {
+            // TODO(drish): supress class name from output
             Outputter outputter = new Outputter();
-            this.bw.write("p(foam.json.parse(" + outputter.stringify(obj) + "))");
+            this.bw.write("p(" + outputter.stringify(obj) + ")");
             this.bw.newLine();
             this.bw.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void remove(FObject obj, Detachable sub) {
+
     }
 
     /**
@@ -54,11 +60,10 @@ public class FileJournal implements Journal {
         this.file.delete();
     }
 
-    @Override
-    public void remove(FObject obj, Detachable sub) {
+    public void remove(Object id, Detachable sub) {
         try {
             Outputter outputter = new Outputter();
-            this.bw.write("r(foam.json.parse(" + outputter.stringify(obj) + "))");
+            this.bw.write("r({\"id\":" + id + "})");
             this.bw.newLine();
             this.bw.flush();
         } catch (IOException e) {
@@ -89,13 +94,15 @@ public class FileJournal implements Journal {
 
         String line;
         while ((line = this.br.readLine()) != null) {
-            String operation = journalParser.parseOperation(line);
-            FObject object = journalParser.parseObject(line);
+
+            String operation = line.substring(0, 1);
             switch (operation) {
                 case "p":
+                    FObject object = journalParser.parseObject(line);
                     delegate.put(object);
                 case "r":
-                    delegate.remove(object);
+                    Object id = journalParser.parseObjectId(line);
+                    delegate.remove(delegate.find(id));
             }
         }
     }

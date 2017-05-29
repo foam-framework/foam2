@@ -33,7 +33,8 @@ public class JournaledDAO extends ProxyDAO {
 
     @Override
     public FObject remove(FObject obj) {
-        this.journal.remove(obj, null);
+        Object id = ((AbstractDAO) this.getDelegate()).getPrimaryKey().get(obj);
+        this.journal.remove(id, null);
         return this.getDelegate().remove(obj);
     }
 
