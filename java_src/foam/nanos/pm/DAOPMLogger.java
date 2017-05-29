@@ -8,38 +8,44 @@ package foam.nanos.pm;
 
 import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
+import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
 
 public class DAOPMLogger
-  extends    ContextAwareSupport
+  extends ContextAwareSupport
   implements PMLogger, NanoService
 {
 
+  public static final String ServiceName = "pmLogger";
+  public static final String DAOName = "pmInfoDAO";
+
   @Override
   public void log(PM pm) {
-    MapDAO dao = (MapDAO) getX().get("pminfodao");
-    PMInfo pmi = (PMInfo) dao.find(pm);
+    PMInfo pmi = new PMInfo()
+            .setClsname(pm.getClassType().getName())
+            .setPmname(pm.getName());
 
-    if ( pmi != null ) {
-      pmi = new PMInfo()
-          .setClsname(pm.getClassType().getName())
-          .setPmname(pm.getName())
-          .setMintime(pm.getTime())
-          .setMaxtime(pm.getTime())
-          .setTotaltime(pm.getTime())
-          .setNumoccurrences(1);
+    MapDAO pmd = (MapDAO) getX().get("pmInfoDAO");
+
+    PMInfo dpmi = (PMInfo) pmd.find(pmi);
+    if ( dpmi == null ) {
+      pmi.setMintime(pm.getTime())
+              .setMaxtime(pm.getTime())
+              .setTotaltime(pm.getTime())
+              .setNumoccurrences(1);
+
+      pmd.put(pmi);
+    } else {
+      if ( pm.getTime() < dpmi.getMintime() )
+        dpmi.setMintime(pm.getTime());
+
+      if ( pm.getTime() > dpmi.getMaxtime() )
+        dpmi.setMaxtime(pm.getTime());
+
+      dpmi.setNumoccurrences(dpmi.getNumoccurrences() + 1);
+      dpmi.setTotaltime(dpmi.getTotaltime() + pm.getTime());
+      pmd.put(dpmi);
     }
-
-    if ( pm.getTime() < pmi.getMintime() )
-      pmi.setMintime(pm.getTime());
-
-    if ( pm.getTime() > pmi.getMaxtime() )
-      pmi.setMaxtime(pm.getTime());
-
-    pmi.setNumoccurrences(pmi.getNumoccurrences() + 1);
-    pmi.setTotaltime(pmi.getTotaltime() + pm.getTime());
-
-    dao.put(pmi);
   }
 
   @Override
@@ -47,6 +53,6 @@ public class DAOPMLogger
     MapDAO dao = new MapDAO();
     dao.setOf(PMInfo.getOwnClassInfo());
     dao.setX(getX());
-    getX().put("pminfodao", dao);
+    getX().put(DAOName, dao);
   }
 }

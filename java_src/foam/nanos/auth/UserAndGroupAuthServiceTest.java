@@ -37,13 +37,6 @@ public class UserAndGroupAuthServiceTest extends UserAndGroupAuthService {
     System.out.println("Duration: " + durationInMilliseconds + "ms \n");
   }
 
-  public void addTestGroups() {
-    Group admin = new Group();
-    admin.setId("1");
-    admin.setDescription("Admin Users");
-    admin.setUsers(new RelationshipPropertyValue());
-  }
-
   public void testlogin() {
     System.out.println("Login 1 million Users");
     long startTime = System.nanoTime();
@@ -56,7 +49,7 @@ public class UserAndGroupAuthServiceTest extends UserAndGroupAuthService {
         e.printStackTrace();
       }
     }
-    
+
     long endTime = System.nanoTime();
     long durationInMilliseconds = (endTime - startTime) / 1000000;
     System.out.println("Duration: " + durationInMilliseconds + "ms \n");
