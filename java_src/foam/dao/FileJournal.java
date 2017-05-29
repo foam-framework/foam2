@@ -58,6 +58,9 @@ public class FileJournal
     file.delete();
   }
 
+  public void remove(FObject obj, Detachable sub) {
+  }
+
   public void remove(Object id, Detachable sub) {
     try {
       bw.write("r({\"id\":" + id + "})");
