@@ -33,16 +33,12 @@ public class JournalParser extends ContextAwareSupport {
         return this.jsonParser.parseString(object);
     }
 
-    /**
-     * Extract the operation (put/remove) from the journal file line.
-     *
-     * @param journalLine
-     * @return operation
-     */
-    public String parseOperation(String journalLine) {
-        // get put/remove index.
-        int operationIndex = journalLine.indexOf("(");
-        String operation = journalLine.substring(0, operationIndex);
-        return operation;
+    public Object parseObjectId(String journalLine) {
+
+        // get the actual object
+        int idIndex = journalLine.lastIndexOf(":");
+        String id = journalLine.substring(idIndex + 1, journalLine.lastIndexOf("}"));
+
+        return id;
     }
 }
