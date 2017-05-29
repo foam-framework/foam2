@@ -6,8 +6,6 @@
 
 package foam.nanos.pm;
 
-import foam.core.ContextAwareSupport;
-import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
