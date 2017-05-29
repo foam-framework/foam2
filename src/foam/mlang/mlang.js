@@ -1633,12 +1633,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.mlang.ExprProperty',
-      name: 'arg1'
-    },
-    {
-      name: 'value',
-      value: 0
+      class: 'Object',
+      name: 'value'
     }
   ],
 

@@ -511,3 +511,29 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Min',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: function() {
+/*if (obj.compareTo(this.getValue()) > 0) {
+  this.setValue(obj);
+}*/
+      }
+    }
+  ]
+});
