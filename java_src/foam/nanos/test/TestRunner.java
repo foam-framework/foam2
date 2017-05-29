@@ -9,9 +9,7 @@ package foam.nanos.test;
 import bsh.EvalError;
 import bsh.Interpreter;
 import foam.core.*;
-import foam.core.PropertyInfo;
-import foam.dao.AbstractSink;
-import foam.dao.MapDAO;
+import foam.dao.*;
 import foam.nanos.NanoService;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -73,7 +71,7 @@ public class TestRunner
 
   public void runAllTests() {
     final MapDAO tests = (MapDAO) getX().get("TestDAO");
-    tests.where(EQ(Test.SCHEDULED, true)).select(new AbstractSink() {
+    ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE))).select(new AbstractSink() {
       public void put(FObject o, Detachable sub) {
         Test     test  = (Test) o;
         runTest(test);
