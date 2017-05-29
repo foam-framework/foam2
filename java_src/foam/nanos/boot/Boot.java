@@ -8,7 +8,8 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
-import foam.nanos.*;
+import foam.nanos.auth.*;
+import foam.nanos.pm.*;
 import foam.mlang.*;
 
 public class Boot {
@@ -35,7 +36,7 @@ public class Boot {
     ((MapDAO) groupDAO_).setX(root_);
     root_.put("groupDAO", groupDAO_);
 
-    loadServices();
+    // loadServices();
 
     ((AbstractDAO) serviceDAO_).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -57,19 +58,19 @@ public class Boot {
       }
     });
   }
-  
+
   protected void loadTestData() {
     NSpec s = new NSpec();
     s.setName("http");
     s.setServiceClass("foam.nanos.http.NanoHttpServer");
     s.setLazy(false);
     serviceDAO_.put(s);
-  
+
     NSpec dpl = new NSpec();
     dpl.setName(DAOPMLogger.ServiceName);
     dpl.setServiceClass(DAOPMLogger.class.getName());
     serviceDAO_.put(dpl);
-  
+
     NSpec authTest = new NSpec();
     authTest.setName("authTest");
     authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
