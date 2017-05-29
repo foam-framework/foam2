@@ -1,107 +1,102 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.Journal;
+import java.io.*;
 import foam.lib.json.JournalParser;
 import foam.lib.json.Outputter;
 
-import java.io.*;
+public class FileJournal
+  implements Journal
+{
+  protected BufferedWriter bw;
+  protected BufferedReader br;
+  protected File           file;
 
-/**
- * Created by carlos on 2017-05-22.
- */
-public class FileJournal implements Journal {
+  public FileJournal(String filename) throws IOException {
 
-    protected BufferedWriter bw;
-    protected BufferedReader br;
-    protected File file;
+    file = new File(filename);
 
-    public FileJournal(String filename) throws IOException {
-
-        this.file = new File(filename);
-
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-
-        this.bw = new BufferedWriter(new FileWriter(file, true));
-        this.br = new BufferedReader(new FileReader(file));
+    if ( ! file.exists() ) {
+      file.createNewFile();
     }
 
-    /**
-     * Persists data into the File System.
-     *
-     * @param obj
-     * @param sub
-     */
-    @Override
-    public void put(FObject obj, Detachable sub) {
-        try {
-            // TODO(drish): supress class name from output
-            Outputter outputter = new Outputter();
-            this.bw.write("p(" + outputter.stringify(obj) + ")");
-            this.bw.newLine();
-            this.bw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    bw = new BufferedWriter(new FileWriter(file, true));
+    br = new BufferedReader(new FileReader(file));
+  }
+
+  /**
+   * Persists data into the File System.
+   *
+   * @param obj
+   * @param sub
+   */
+  @Override
+  public void put(FObject obj, Detachable sub) {
+    try {
+      // TODO(drish): supress class name from output
+      Outputter outputter = new Outputter();
+      bw.write("p(" + outputter.stringify(obj) + ")");
+      bw.newLine();
+      bw.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    @Override
-    public void remove(FObject obj, Detachable sub) {
+  /**
+   * deletes the entire journal file
+   */
+  public void removeAll() {
+    file.delete();
+  }
 
+  public void remove(Object id, Detachable sub) {
+    try {
+      bw.write("r({\"id\":" + id + "})");
+      bw.newLine();
+      bw.flush();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    /**
-     * deletes the entire journal file
-     */
-    public void removeAll() {
-        this.file.delete();
+  @Override
+  public void eof() {}
+
+  @Override
+  public void reset(Detachable sub) {}
+
+  /**
+   * "replays" the persisted journaled file history into a dao.
+   *
+   * @param delegate
+   * @return
+   * @throws IOException
+   */
+  @Override
+  public void replay(DAO delegate) throws IOException {
+    JournalParser journalParser = new JournalParser();
+
+    String line;
+    while ( ( line = br.readLine() ) != null ) {
+      String operation = line.substring(0, 1);
+      switch (operation) {
+        case "p":
+          FObject object = journalParser.parseObject(line);
+          delegate.put(object);
+          break;
+        case "r":
+          Object id = journalParser.parseObjectId(line);
+          delegate.remove(delegate.find(id));
+      }
     }
-
-    public void remove(Object id, Detachable sub) {
-        try {
-            this.bw.write("r({\"id\":" + id + "})");
-            this.bw.newLine();
-            this.bw.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void eof() {
-
-    }
-
-    @Override
-    public void reset(Detachable sub) {
-
-    }
-
-    /**
-     * "replays" the persisted journaled file history into a dao.
-     *
-     * @param delegate
-     * @return
-     * @throws IOException
-     */
-    @Override
-    public void replay(DAO delegate) throws IOException {
-        JournalParser journalParser = new JournalParser();
-
-        String line;
-        while ( ( line = this.br.readLine() ) != null ) {
-            String operation = line.substring(0, 1);
-            switch (operation) {
-                case "p":
-                    FObject object = journalParser.parseObject(line);
-                    delegate.put(object);
-                case "r":
-                    Object id = journalParser.parseObjectId(line);
-                    delegate.remove(delegate.find(id));
-            }
-        }
-    }
+  }
 }
