@@ -14,7 +14,7 @@ public class ClassInfoImpl
   private ClassInfo parent_       = null;
   private List      allAxioms_    = null;
   private HashMap   axiomMap_     = new HashMap();
-
+  private Class     class_;
 
   public ClassInfoImpl() {
     axioms = new ArrayList();
@@ -22,6 +22,15 @@ public class ClassInfoImpl
 
   public String getId() {
     return id;
+  }
+
+  public ClassInfo setObjClass(Class cls) {
+    class_ = cls;
+    return this;
+  }
+
+  public Class getObjClass() {
+    return class_;
   }
 
   public ClassInfo setId(String id) {
