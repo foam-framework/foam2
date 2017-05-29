@@ -62,7 +62,6 @@ public class FileJournal implements Journal {
 
     public void remove(Object id, Detachable sub) {
         try {
-            Outputter outputter = new Outputter();
             this.bw.write("r({\"id\":" + id + "})");
             this.bw.newLine();
             this.bw.flush();
