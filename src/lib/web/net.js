@@ -316,6 +316,7 @@ foam.CLASS({
       this.hostname = u.hostname;
       if ( u.port ) this.port = u.port;
       this.path = u.pathname + u.search;
+      return this;
     },
 
     function send() {

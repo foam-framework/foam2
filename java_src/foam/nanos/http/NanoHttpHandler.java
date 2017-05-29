@@ -14,7 +14,9 @@ import com.sun.net.httpserver.*;
 import foam.core.*;
 import foam.nanos.*;
 
-public class NanoHttpHandler implements HttpHandler {
+public class NanoHttpHandler
+  implements HttpHandler
+{
 
   protected X x_;
 
@@ -24,9 +26,9 @@ public class NanoHttpHandler implements HttpHandler {
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {
-    URI requestURI = exchange.getRequestURI();
-    String path = requestURI.getPath();
-    String query = requestURI.getQuery();
+    URI    requestURI = exchange.getRequestURI();
+    String path       = requestURI.getPath();
+    String query      = requestURI.getQuery();
 
     // AuthService auth = this.X.get(AuthService);
 

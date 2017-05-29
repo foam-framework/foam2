@@ -12,14 +12,17 @@ import foam.dao.*;
 /**
  * Created by marcroopchand on 2017-05-12.
  */
-public class UserAndGroupAuthService extends ContextAwareSupport implements AuthService {
-  protected MapDAO userDAO_;
-  protected MapDAO groupDAO_;
+public class UserAndGroupAuthService
+  extends    ContextAwareSupport
+  implements AuthService
+{
+  protected MapDAO        userDAO_;
+  protected MapDAO        groupDAO_;
   protected LinkedHashMap challengeMap;
 
   @Override
   public void start() {
-    userDAO_ = (MapDAO) getX().get("userDAO");
+    userDAO_  = (MapDAO) getX().get("userDAO");
     groupDAO_ = (MapDAO) getX().get("groupDAO");
 
     //TODO: Implement LRU LinkedHashMap
@@ -33,16 +36,16 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
    * Should this throw an exception?
    */
   public String generateChallenge(String userId) {
-    if (userId == null || userId == "") {
+    if ( userId == null || userId == "" ) {
       return null;
     }
 
-    if (userDAO_.find(userId) == null) {
+    if ( userDAO_.find(userId) == null ) {
       return null;
     }
 
-    String generatedChallenge = UUID.randomUUID() + userId;
-    Calendar calendar = Calendar.getInstance();
+    String   generatedChallenge = UUID.randomUUID() + userId;
+    Calendar calendar           = Calendar.getInstance();
     calendar.add(Calendar.SECOND, 5);
 
     challengeMap.put(userId, new Challenge(generatedChallenge, calendar.getTime()));
@@ -57,26 +60,26 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
    * How often should we purge this map for challenges that have expired?
    */
   public X challengedLogin(String userId, String challenge) throws LoginException {
-    if (userId == null || challenge == null || userId == "" || challenge == "") {
+    if ( userId == null || challenge == null || userId == "" || challenge == "" ) {
       throw new LoginException("Invalid Parameters");
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if (c == null) {
+    if ( c == null ) {
       throw new LoginException("Invalid userId");
     }
 
-    if (!c.getChallenge().equals(challenge)) {
+    if ( ! c.getChallenge().equals(challenge) ) {
       throw new LoginException("Invalid Challenge");
     }
 
-    if (new Date().after(c.getTtl())) {
+    if ( new Date().after(c.getTtl()) ) {
       challengeMap.remove(userId);
       throw new LoginException("Challenge expired");
     }
 
     User user = (User) userDAO_.find(userId);
-    if (user == null) {
+    if ( user == null ) {
       throw new LoginException("User not found");
     }
 
@@ -89,17 +92,17 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
    * and return the user in the context.
    */
   public X login(String userId, String password) throws LoginException {
-    if (userId == null || password == null || userId == "" || password == "") {
+    if ( userId == null || password == null || userId == "" || password == "" ) {
       throw new LoginException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find(userId);
 
-    if (user == null) {
+    if ( user == null ) {
       throw new LoginException("User not found.");
     }
 
-    if (!user.getPassword().equals(password)) {
+    if ( ! user.getPassword().equals(password) ) {
       throw new LoginException("Invalid Password");
     }
 
@@ -111,20 +114,20 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
    * Return Boolean for this
    */
   public Boolean check(foam.core.X x, java.security.Permission permission) {
-    if (x == null || permission == null) {
+    if ( x == null || permission == null ) {
       return false;
     }
 
     User user = (User) x.get("user");
-    if (user == null) {
+    if ( user == null ) {
       return false;
     }
 
-    if (userDAO_.find(user.getId()) == null) {
+    if ( userDAO_.find(user.getId()) == null ) {
       return false;
     }
 
-    //TODO: Figure out how permissions work
+    // TODO: Figure out how permissions work
     return true;
   }
 
@@ -133,20 +136,20 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
    * and return a context with the updated user information
    */
   public X updatePassword(foam.core.X x, String oldPassword, String newPassword) throws IllegalStateException {
-    if (x == null || oldPassword == null || newPassword == null || oldPassword == "" || newPassword == "") {
+    if ( x == null || oldPassword == null || newPassword == null || oldPassword == "" || newPassword == "" ) {
       throw new IllegalStateException("Invalid Parameters");
     }
 
-    if (oldPassword == newPassword) {
+    if ( oldPassword.equals(newPassword) ) {
       throw new IllegalStateException("New Password must be different from the old password");
     }
 
     User user = (User) userDAO_.find(((User) x.get("user")).getId());
-    if (user == null) {
+    if ( user == null ) {
       throw new IllegalStateException("User not found");
     }
 
-    if (!oldPassword.equals(user.getPassword())) {
+    if ( ! oldPassword.equals(user.getPassword()) ) {
       throw new IllegalStateException("Invalid Password");
     }
 
@@ -161,27 +164,27 @@ public class UserAndGroupAuthService extends ContextAwareSupport implements Auth
    * Users should have id, email, first name, last name, password for registration
    */
   public Boolean validateUser(User user) throws IllegalStateException {
-    if (user == null) {
+    if ( user == null ) {
       throw new IllegalStateException("Invalid User");
     }
 
-    if (user.getId() == "") {
+    if ( user.getId() == "" ) {
       throw new IllegalStateException("ID is required for creating a user");
     }
 
-    if (user.getEmail() == "") {
+    if ( user.getEmail() == "" ) {
       throw new IllegalStateException("Email is required for creating a user");
     }
 
-    if (user.getFirstName() == "") {
+    if ( user.getFirstName() == "" ) {
       throw new IllegalStateException("First Name is required for creating a user");
     }
 
-    if (user.getLastName() == "") {
+    if ( user.getLastName() == "" ) {
       throw new IllegalStateException("Last Name is required for creating a user");
     }
 
-    if (user.getPassword() == "") {
+    if ( user.getPassword() == "" ) {
       throw new IllegalStateException("Password is required for creating a user");
     }
 
