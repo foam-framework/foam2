@@ -50,7 +50,7 @@ public class MapDAO
   }
 
   public FObject find(Object o) {
-    if(getOf().getObjClass().isInstance(o)) {
+    if( getOf().getObjClass().isInstance(o) ) {
       return getData().get(getPrimaryKey().get(o));
     } else {
       return getData().get(o);
