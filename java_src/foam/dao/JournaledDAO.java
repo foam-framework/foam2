@@ -1,56 +1,59 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.FObject;
+import java.io.IOException;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-import java.io.IOException;
+public class JournaledDAO
+  extends ProxyDAO
+{
+  protected FileJournal journal;
 
-/**
- * Created by carlos on 2017-05-22.
- */
-public class JournaledDAO extends ProxyDAO {
+  public JournaledDAO(DAO delegate, String filename) throws IOException {
+    journal = new FileJournal(filename);
+    setDelegate(delegate);
+    journal.replay(delegate);
+  }
 
-    private FileJournal journal;
+  /**
+   * persists data into FileJournal then calls the delegated DAO.
+   *
+   * @param obj
+   * @returns FObject
+   */
+  @Override
+  public FObject put(FObject obj) {
+    journal.put(obj, null);
+    return getDelegate().put(obj);
+  }
 
-    public JournaledDAO(DAO delegate, String filename) throws IOException {
-        this.journal = new FileJournal(filename);
-        this.setDelegate(delegate);
-        this.journal.replay(delegate);
-    }
+  @Override
+  public FObject remove(FObject obj) {
+    Object id = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
+    journal.remove(id, null);
+    return getDelegate().remove(obj);
+  }
 
-    /**
-     * persists data into FileJournal then calls the delegated DAO.
-     *
-     * @param obj
-     * @returns FObject
-     */
-    @Override
-    public FObject put(FObject obj) {
-        this.journal.put(obj, null);
-        return this.getDelegate().put(obj);
-    }
+  @Override
+  public FObject find(Object id) {
+    return null;
+  }
 
-    @Override
-    public FObject remove(FObject obj) {
-        Object id = ((AbstractDAO) this.getDelegate()).getPrimaryKey().get(obj);
-        this.journal.remove(id, null);
-        return this.getDelegate().remove(obj);
-    }
+  @Override
+  public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    return null;
+  }
 
-    @Override
-    public FObject find(Object id) {
-        return null;
-    }
-
-    @Override
-    public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-        return null;
-    }
-
-    @Override
-    public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-        this.journal.removeAll();
-        this.getDelegate().removeAll(skip, limit, order, predicate);
-    }
+  @Override
+  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    journal.removeAll();
+    getDelegate().removeAll(skip, limit, order, predicate);
+  }
 }
