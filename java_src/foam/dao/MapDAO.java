@@ -50,8 +50,11 @@ public class MapDAO
   }
 
   public FObject find(Object o) {
-    Object id = getOf().getClass().isInstance(o) || false ? getPrimaryKey().get(o) : o;
-    return getData().get(id);
+    if( getOf().getObjClass().isInstance(o) ) {
+      return getData().get(getPrimaryKey().get(o));
+    } else {
+      return getData().get(o);
+    }
   }
 
   public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
