@@ -55,6 +55,7 @@ var classes = [
   'foam.mlang.order.Comparator',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
+  'foam.mlang.sink.Min',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
