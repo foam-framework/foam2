@@ -7,17 +7,17 @@
 package foam.nanos.pm;
 
 import foam.core.ContextAwareSupport;
+import foam.dao.DAO;
 import foam.dao.MapDAO;
+import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
 
 public class DAOPMLogger
-  extends    ContextAwareSupport
+  extends    ProxyDAO
   implements PMLogger, NanoService
 {
 
   public static final String ServiceName = "pmLogger";
-
-  private MapDAO dao_;
 
   @Override
   public void log(PM pm) {
@@ -29,9 +29,9 @@ public class DAOPMLogger
             .setTotaltime(pm.getTime())
             .setNumoccurrences(1);
 
-    PMInfo dpmi = (PMInfo) dao_.find(pmi);
+    PMInfo dpmi = (PMInfo) getDelegate().find(pmi);
     if ( dpmi == null ) {
-      dao_.put(pmi);
+      getDelegate().put(pmi);
     } else {
       if ( pmi.getMintime() < dpmi.getMintime() )
         dpmi.setMintime(pmi.getMintime());
@@ -46,8 +46,9 @@ public class DAOPMLogger
 
   @Override
   public void start() {
-    dao_ = new MapDAO();
-    dao_.setOf(PMInfo.getOwnClassInfo());
-    dao_.setX(getX());
+    MapDAO dao = new MapDAO();
+    dao.setOf(PMInfo.getOwnClassInfo());
+    dao.setX(getX());
+    setDelegate(dao);
   }
 }
