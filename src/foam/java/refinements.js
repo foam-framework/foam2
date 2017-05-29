@@ -75,13 +75,15 @@ foam.CLASS({
         field({
           name: privateName,
           type: this.javaType,
+          final: this.final,
+          initializer: this.javaValue,
           visibility: 'private'
         }).
         field({
           name: isSet,
           type: 'boolean',
           visibility: 'private',
-          initializer: 'false;'
+          initializer: (Boolean(this.final)) + ';'
         }).
         method({
           name: 'get' + capitalized,
@@ -92,21 +94,24 @@ foam.CLASS({
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';'
-        }).
-        method({
-          name: 'set' + capitalized,
-          visibility: 'public',
-          args: [
-            {
-              type: this.javaType,
-              name: 'val'
-            }
-          ],
-          type: cls.name,
-          body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
         });
+        
+      if (!this.final) {
+        cls.method({
+              name: 'set' + capitalized,
+              visibility: 'public',
+              args: [
+                {
+                  type: this.javaType,
+                  name: 'val'
+                }
+              ],
+              type: cls.name,
+              body: privateName + ' = val;\n'
+                  + isSet + ' = true;\n'
+                  + 'return this;'
+            });
+      }
 
       if ( this.hasOwnProperty('javaFactory') ) {
         cls.method({
@@ -222,6 +227,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'javaSupport',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'override',
+      value: false
     }
   ],
 
@@ -253,6 +263,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        override: this.override,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
