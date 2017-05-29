@@ -21,24 +21,26 @@ public class DAOPMLogger
   public void log(PM pm) {
     PMInfo pmi = new PMInfo()
             .setClsname(pm.getClassType().getName())
-            .setPmname(pm.getName())
-            .setMintime(pm.getTime())
-            .setMaxtime(pm.getTime())
-            .setTotaltime(pm.getTime())
-            .setNumoccurrences(1);
+            .setPmname(pm.getName());
 
     PMInfo dpmi = (PMInfo) getDelegate().find(pmi);
     if ( dpmi == null ) {
+      pmi.setMintime(pm.getTime())
+              .setMaxtime(pm.getTime())
+              .setTotaltime(pm.getTime())
+              .setNumoccurrences(1);
+
       getDelegate().put(pmi);
     } else {
-      if ( pmi.getMintime() < dpmi.getMintime() )
-        dpmi.setMintime(pmi.getMintime());
+      if ( pm.getTime() < dpmi.getMintime() )
+        dpmi.setMintime(pm.getTime());
 
-      if ( pmi.getMaxtime() > dpmi.getMaxtime() )
-        dpmi.setMaxtime(pmi.getMaxtime());
+      if ( pm.getTime() > dpmi.getMaxtime() )
+        dpmi.setMaxtime(pm.getTime());
 
       dpmi.setNumoccurrences(dpmi.getNumoccurrences() + 1);
-      dpmi.setTotaltime(dpmi.getTotaltime() + pmi.getTotaltime());
+      dpmi.setTotaltime(dpmi.getTotaltime() + pm.getTime());
+      getDelegate().put(dpmi);
     }
   }
 
