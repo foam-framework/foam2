@@ -6,7 +6,7 @@ import foam.mlang.order.Comparator;
 public class FilteredDAO
   extends ProxyDAO
 {
-  private Predicate predicate_;
+  protected Predicate predicate_;
 
   public FilteredDAO setPredicate(Predicate predicate) {
     predicate_ = predicate;

@@ -63,7 +63,7 @@ foam.CLASS({
           start('tr').
             start('td').style({ display: 'block' }).add(this.cls.PREDICATE).end().
             start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
-                tag(this.summaryView, {data: this.data.filteredDAO}).
+                tag(this.summaryView, {data$: this.data.filteredDAO$}).
             end().
           end().
           start('tr').
