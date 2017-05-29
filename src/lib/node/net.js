@@ -611,14 +611,26 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      class: 'String',
+      name: 'privateKey'
+    },
+    {
+      class: 'String',
+      name: 'cert'
     }
   ],
 
   methods: [
     function init() {
-      this.server = require('http').createServer(this.onRequest);
-      this.server.listen(this.port);
+      if ( this.cert && this.privateKey )
+        this.server = require('https').createServer({ key: this.privateKey, cert: this.cert });
+      else
+        this.server = require('http').createServer();
+
       this.server.on('upgrade', this.onUpgrade);
+      this.server.listen(this.port);
     }
   ],
 
