@@ -6,16 +6,18 @@
 
 package foam.nanos.pm;
 
+import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
 
 public class DAOPMLogger
-  extends    ProxyDAO
+  extends ContextAwareSupport
   implements PMLogger, NanoService
 {
 
   public static final String ServiceName = "pmLogger";
+  public static final String DAOName = "pmInfoDAO";
 
   @Override
   public void log(PM pm) {
@@ -23,14 +25,16 @@ public class DAOPMLogger
             .setClsname(pm.getClassType().getName())
             .setPmname(pm.getName());
 
-    PMInfo dpmi = (PMInfo) getDelegate().find(pmi);
+    MapDAO pmd = (MapDAO) getX().get("pmInfoDAO");
+
+    PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
       pmi.setMintime(pm.getTime())
               .setMaxtime(pm.getTime())
               .setTotaltime(pm.getTime())
               .setNumoccurrences(1);
 
-      getDelegate().put(pmi);
+      pmd.put(pmi);
     } else {
       if ( pm.getTime() < dpmi.getMintime() )
         dpmi.setMintime(pm.getTime());
@@ -40,7 +44,7 @@ public class DAOPMLogger
 
       dpmi.setNumoccurrences(dpmi.getNumoccurrences() + 1);
       dpmi.setTotaltime(dpmi.getTotaltime() + pm.getTime());
-      getDelegate().put(dpmi);
+      pmd.put(dpmi);
     }
   }
 
@@ -49,6 +53,6 @@ public class DAOPMLogger
     MapDAO dao = new MapDAO();
     dao.setOf(PMInfo.getOwnClassInfo());
     dao.setX(getX());
-    setDelegate(dao);
+    getX().put(DAOName, dao);
   }
 }
