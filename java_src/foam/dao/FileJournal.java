@@ -92,7 +92,7 @@ public class FileJournal implements Journal {
         JournalParser journalParser = new JournalParser();
 
         String line;
-        while ((line = this.br.readLine()) != null) {
+        while ( ( line = this.br.readLine() ) != null ) {
             String operation = line.substring(0, 1);
             switch (operation) {
                 case "p":
