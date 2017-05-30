@@ -45,7 +45,9 @@ foam.CLASS({
                 spec.create(args, ctx) :
                 ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {});
 
-            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec result must extend foam.u2.Element or be toE()-able.');
+            foam.assert(
+                foam.u2.Element.isInstance(ret) || ret.toE,
+                'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
