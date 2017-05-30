@@ -15,8 +15,11 @@ if ( process.argv.length != 4 ) {
   process.exit(1);
 }
 
+var path_ = require('path');
+var fs_ = require('fs');
+
 var indir = process.argv[2];
-indir = require('path').resolve(require('path').normalize(indir));
+indir = path_.resolve(path_.normalize(indir));
 
 var externalFile = require(indir);
 var classes = externalFile.classes;
@@ -25,22 +28,22 @@ var skeletons = externalFile.skeletons;
 var proxies = externalFile.proxies;
 
 var outdir = process.argv[3];
-outdir = require('path').resolve(require('path').normalize(outdir));
+outdir = path_.resolve(path_.normalize(outdir));
 
 function ensurePath(p) {
   var i = 1 ;
-  var parts = p.split(require('path').sep);
+  var parts = p.split(path_.sep);
   var path = '/' + parts[0];
 
   while ( i < parts.length ) {
     try {
-      var stat = require('fs').statSync(path);
+      var stat = fs_.statSync(path);
       if ( ! stat.isDirectory() ) throw path + 'is not a directory';
     } catch(e) {
-      require('fs').mkdirSync(path);
+      fs_.mkdirSync(path);
     }
 
-    path += require('path').sep + parts[i++];
+    path += path_.sep + parts[i++];
   }
 }
 
@@ -53,38 +56,38 @@ function generateClass(cls) {
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
-  var outfile = outdir + require('path').sep +
-    cls.id.replace(/\./g, require('path').sep) + '.java';
+  var outfile = outdir + path_.sep +
+    cls.id.replace(/\./g, path_.sep) + '.java';
 
   ensurePath(outfile);
 
-  require('fs').writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
+  fs_.writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
 }
 
 function generateAbstractClass(cls) {
   cls = foam.lookup(cls);
 
-  var outfile = outdir + require('path').sep +
-    cls.id.replace(/\./g, require('path').sep) + '.java';
+  var outfile = outdir + path_.sep +
+    cls.id.replace(/\./g, path_.sep) + '.java';
 
   ensurePath(outfile);
 
   var javaclass = cls.buildJavaClass();
   javaclass.abstract = true;
 
-  require('fs').writeFileSync(outfile, javaclass.toJavaSource());
+  fs_.writeFileSync(outfile, javaclass.toJavaSource());
 }
 
 function generateSkeleton(cls) {
   cls = foam.lookup(cls);
 
-  var outfile = outdir + require('path').sep +
-    cls.package.replace(/\./g, require('path').sep) +
-    require('path').sep + cls.name + 'Skeleton.java';
+  var outfile = outdir + path_.sep +
+    cls.package.replace(/\./g, path_.sep) +
+    path_.sep + cls.name + 'Skeleton.java';
 
   ensurePath(outfile);
 
-  require('fs').writeFileSync(
+  fs_.writeFileSync(
     outfile,
     foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
 }
