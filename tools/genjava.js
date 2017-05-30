@@ -136,8 +136,6 @@ function copyJavaClassesToBuildFolder(startPath) {
     } else {
       fs_.writeFileSync(outputPath, fs_.readFileSync(filePath));
       result.push(outputPath);
-
-      console.log(outputPath);
     }
   });
 
