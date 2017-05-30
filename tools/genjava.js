@@ -118,13 +118,42 @@ function generateProxy(intf) {
   generateClass(proxy.buildClass());
 }
 
+function copyJavaClassesToBuildFolder(startPath) {
+  var files = fs_.readdirSync(startPath);
+  var result = [];
+
+  files.forEach(function (f) {
+    var filePath = path_.join(startPath, f);
+    var fileStat = fs_.statSync(filePath);
+    var outputPath = path_.join(__dirname, '../build/', filePath.split('src/').pop());
+
+    if (fileStat.isDirectory()) {
+      if (!fs_.existsSync(outputPath)) {
+        fs_.mkdirSync(outputPath);
+      }
+
+      result = result.concat(copyJavaClassesToBuildFolder(filePath));
+    } else {
+      fs_.writeFileSync(outputPath, fs_.readFileSync(filePath));
+      result.push(outputPath);
+
+      console.log(outputPath);
+    }
+  });
+
+  return result;
+}
+
 classes.forEach(loadClass);
 abstractClasses.forEach(loadClass);
 skeletons.forEach(loadClass);
 proxies.forEach(loadClass);
 
-
 classes.forEach(generateClass);
 abstractClasses.forEach(generateAbstractClass);
 skeletons.forEach(generateSkeleton);
 proxies.forEach(generateProxy);
+
+var srcFolder = path_.join(__dirname, '../src/');
+
+copyJavaClassesToBuildFolder(srcFolder);
