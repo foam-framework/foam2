@@ -215,6 +215,11 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'synchronized',
+      value: false
+    },
+    {
       class: 'StringArray',
       name: 'javaThrows'
     },
@@ -253,6 +258,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
