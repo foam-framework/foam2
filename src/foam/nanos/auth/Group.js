@@ -30,6 +30,11 @@ foam.CLASS({
       name: 'parent',
       documentation: 'Parent group to inherit permissions from.'
     },
+    {
+      class: 'StringArray',
+      name: 'permissions',
+      documentation: 'List of Permissions for Group'
+    }
     /*
       FUTURE
     {

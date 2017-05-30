@@ -123,12 +123,12 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    if ( userDAO_.find(user.getId()) == null ) {
+    Group group = (Group) user.getGroup();
+    if ( group == null ) {
       return false;
     }
 
-    // TODO: Figure out how permissions work
-    return true;
+    return group.implies(permission.getName());
   }
 
   /**
