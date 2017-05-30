@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
  * Created by marcroopchand on 2017-05-24.
  */
 
-public class UserAndGroupAuthServiceTest extends UserAndGroupAuthService {
+public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
+
   private int numUsers = 30;
   private ArrayList<X> xArray = new ArrayList<>();
 
@@ -129,7 +130,7 @@ public class UserAndGroupAuthServiceTest extends UserAndGroupAuthService {
      * */
     for (int i = 0; i < xArray.size(); i++) {
       AuthPermission authAdminpermission = new AuthPermission(permissions.get(0).getId());
-      System.out.println(check(xArray.get(i), authAdminpermission));
+      check(xArray.get(i), authAdminpermission);
     }
   }
 
