@@ -78,6 +78,19 @@ public class TestRunner
     tests.setOf(Test.getOwnClassInfo());
     try {
       JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
+      Test test1 = new Test();
+      test1.setId("Test 1");
+      test1.setCode("test(2==2 ,\"TRUE\");");  
+      jTests.put(test1);
+      Test test2 = new Test();
+      test2.setId("Test 2");
+      test2.setCode("test(1==2 ,\"FALSE\");");  
+      test2.setScheduled(true);
+      jTests.put(test2);
+      Test test3 = new Test();
+      test3.setId("Test 3");
+      test3.setCode("print(\"All Done.\");");  
+      jTests.put(test3);
       TestRunner runner = new TestRunner();
       runner.setX(x);
       runner.start();
