@@ -458,6 +458,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined;
+        this.clearPrivate_(name);
 
         // Avoid creating slot and publishing event if nobody is listening.
         if ( this.hasListeners('propertyChange', name) ) {
@@ -503,7 +504,9 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
 
-    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
+
+    // Bootstrap form replaced after this.__context__ is added.
+    function lookup() { return foam.lookup.apply(foam, arguments); },
 
     function error() { this.__context__.error.apply(null, arguments); },
 
@@ -757,12 +760,26 @@ foam.CLASS({
                 });
       }
 
-      var axiom = this.cls_.getAxiomByName(obj);
+      if ( foam.Array.isInstance(obj) ) {
+        return foam.core.ExpressionSlot.create({
+          obj: this,
+          args: obj[0].map(this.slot.bind(this)),
+          code: obj[1],
+        });
+      }
+
+      var names = obj.split('$');
+      var axiom = this.cls_.getAxiomByName(names.shift());
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
       foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
-      return axiom.toSlot(this);
+      var slot = axiom.toSlot(this)
+      names.forEach(function(n) {
+        slot = slot.dot(n);
+      });
+
+      return slot;
     },
 
 
@@ -812,6 +829,12 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
+
+      // Use comparator of other if it is not an FObject.
+      if ( ! foam.core.FObject.isInstance(other) ) {
+        return foam.util.compare(this, other);
+      }
+
       if ( ! other        ) return 1;
 
       if ( this.model_ !== other.model_ ) {

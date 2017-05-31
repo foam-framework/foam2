@@ -18,11 +18,18 @@
 foam.CLASS({
   package: 'foam.parsers',
   name: 'FON',
+  properties: [
+    {
+      name: 'creationContext'
+    }
+  ],
   methods: [
-    function parseString(str) {
+    function parseString(str, X) {
+      foam.assert(this.creationContext, 'No creation context assigned.');
+
       var res = this.grammar.parseString(str, 'obj');
       if ( ! res ) return null;
-      return foam.json.parse(res, null, this);
+      return foam.json.parse(res, null, this.creationContext);
     }
   ],
   grammars: [
@@ -31,7 +38,8 @@ foam.CLASS({
       language: 'foam.parse.json.Parsers',
       symbols: function() {
         return {
-          'obj': seq(sym('ws'),
+          'obj': seq1(3,
+                      sym('ws'),
                      '{', sym('ws'),
                      repeat(sym('keyValue'), seq0(',', sym('ws'))),
                      sym('ws'),
@@ -53,7 +61,7 @@ foam.CLASS({
             '_',
             '$'),
 
-          'identifier': str(seq0(
+          'identifier': substring(seq0(
             sym('id_start'),
             repeat0(alt(range('0', '9'), sym('id_start'))))),
 
@@ -68,7 +76,7 @@ foam.CLASS({
 
           'null': literal('null', null),
           'undefined': literal('undefined', undefined),
-          'number': str(seq0(optional('-'),
+          'number': substring(seq0(optional('-'),
                              repeat0(range('0', '9'), null, 1),
                              optional(seq0('.',
                                            repeat0(range('0', '9')))))),
@@ -84,8 +92,8 @@ foam.CLASS({
       actions: [
         function obj(a) {
           var obj = {};
-          for ( var i = 0 ; i < a[3].length ; i++ ) {
-            obj[a[3][i][0]] = a[3][i][4];
+          for ( var i = 0 ; i < a.length ; i++ ) {
+            obj[a[i][0]] = a[i][4];
           }
           return obj
         },

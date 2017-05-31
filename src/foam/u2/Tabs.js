@@ -52,7 +52,7 @@ foam.CLASS({
           border-top-right-radius: 4px;
           border-top-left-radius: 4px;
           float: left;
-          padding: 5px;
+          padding: 6px;
         }
         ^tab.selected {
           background: white;
