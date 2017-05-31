@@ -92,6 +92,7 @@ foam.CLASS({
     function clear() {
       this.view.data = '';
     },
+
     function initE() {
       this.addClass(this.myClass());
       this.view = this.start(this.viewSpec, {
@@ -109,6 +110,7 @@ foam.CLASS({
 
       this.view.data$.sub(this.updatePredicate);
     },
+
     function updatePredicate_(choice) {
       var exists = typeof choice !== 'undefined' && choice !== '';
       this.predicate = exists ? this.op.create({

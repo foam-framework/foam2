@@ -376,7 +376,8 @@ foam.CLASS({
 
     function splitName(key) {
       var match = key.match(/^(.*)_(\d+)$/);
-      return match ? { name: match[1], count: match[2] } :
+      return match ?
+          { name: match[1], count: match[2] } :
           { name: key, count: 1 };
     }
   ],
