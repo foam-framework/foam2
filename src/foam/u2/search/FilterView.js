@@ -24,7 +24,6 @@ foam.CLASS({
     'filterController'
   ],
 
-
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -86,6 +85,7 @@ foam.CLASS({
       }
       return this;
     },
+
     function initE() {
       this.overrideAdd_ = false;
 
