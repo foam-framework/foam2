@@ -17,7 +17,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'RecipricalSearch',
+  name: 'RecipricalSearch', // Correct spelling: "reciprocal"
   extends: 'foam.u2.Element', // TODO: make be a View
 
   requires: [
@@ -50,7 +50,7 @@ foam.CLASS({
 
         if ( ! of ) return [];
 
-        return of.model_.tableColumns ||
+        return of.model_.searchColumns || of.model_.tableColumns ||
             of.getAxiomsByClass(foam.core.Property)
                 .filter(function(p) { return ! p.hidden })
                 .map(foam.core.Property.NAME.f);
