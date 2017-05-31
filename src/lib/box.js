@@ -1206,7 +1206,7 @@ foam.CLASS({
 // TODO: Find the right package for this.
 foam.CLASS({
   package: 'foam.box',
-  name: 'ClassWhitelist',
+  name: 'ClassWhitelistContext',
   exports: [
     'lookup'
   ],
@@ -1358,7 +1358,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'unsafe',
-      value: false
+      value: true
     },
     {
       class: 'StringArray',
@@ -1371,6 +1371,7 @@ foam.CLASS({
         // TODO: Better way to inject the class whitelist.
         if ( this.unsafe ) {
           var context = this.LoggedLookupContext.create();
+          console.warn('**** Boxes are running in UNSAFE mode.  Turn this off before you go to production!');
         } else {
           var context = this.ClassWhitelistContext.create({
             whitelist: this.classWhitelist

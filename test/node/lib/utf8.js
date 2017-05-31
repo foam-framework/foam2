@@ -20,7 +20,7 @@ describe('UTF-8 decoder', function() {
     var decoder = foam.encodings.UTF8.create();
     var string = "Hello world! 23048alsdf alskl234";
 
-    var buffer = new Buffer(string, 'utf8');
+    var buffer = Buffer.from(string, 'utf8');
     decoder.put(new Uint8Array(buffer));
 
     expect(decoder.string).toBe(string);
