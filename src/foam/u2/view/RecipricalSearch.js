@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'RecipricalSearch',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.Element', // TODO: make be a View
 
   requires: [
     'foam.u2.search.SearchManager'
@@ -47,11 +47,13 @@ foam.CLASS({
       factory: null,
       expression: function(dao) {
         var of = dao && dao.of;
-        return ! of ? [] :
-          of.model_.tableColumns ? of.model_.tableColumns :
-          of.getAxiomsByClass(foam.core.Property).
-          filter(function(p) { return ! p.hidden }).
-          map(foam.core.Property.NAME.f);
+
+        if ( ! of ) return [];
+
+        return of.model_.tableColumns ||
+            of.getAxiomsByClass(foam.core.Property)
+                .filter(function(p) { return ! p.hidden })
+                .map(foam.core.Property.NAME.f);
       }
     }
   ],
