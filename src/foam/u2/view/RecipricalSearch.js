@@ -14,20 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'RecipricalSearch',
   extends: 'foam.u2.Element',
+
   requires: [
     'foam.u2.search.SearchManager'
   ],
+
   imports: [
     'dao'
   ],
+
   exports: [
     'as filterController',
     'as data'
   ],
+
   properties: [
     {
       class: 'Class',
@@ -50,6 +55,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function initE() {
       var self = this;
@@ -80,15 +86,18 @@ foam.CLASS({
           return e;
         }, this.filters$), this.CLEAR);
     },
+
     function addFilter(key) {
       this.filters = this.filters.concat(key);
     },
+
     function removeFilter(key) {
       this.filters = this.filters.filter(function(k) {
         return key !== k;
       });
     }
   ],
+
   actions: [
     {
       name: 'clear',
