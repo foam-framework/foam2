@@ -2217,6 +2217,19 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'SearchColumns',
+
+  documentation: 'Axiom for storing Table Search Columns information in Class. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
+  properties: [
+    [ 'name', 'searchColumns' ],
+    'columns'
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
@@ -2231,6 +2244,12 @@ foam.CLASS({
       name: 'tableColumns',
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
+      }
+    },
+    {
+      name: 'searchColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
     }
   ]
