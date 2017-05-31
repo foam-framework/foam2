@@ -27,7 +27,8 @@ public class Outputter {
   }
 
   public String escape(String s) {
-    return s.replace("\"", "\\\"");
+    
+    return s.replace("\n","\\n").replace("\"", "\\\"");
   }
 
   protected void outputNumber(StringBuilder out, Number value) {
