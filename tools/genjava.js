@@ -133,7 +133,7 @@ function copyJavaClassesToBuildFolder(startPath) {
       }
 
       result = result.concat(copyJavaClassesToBuildFolder(filePath));
-    } else {
+    } else if (f.search('.js') < 0) {
       fs_.writeFileSync(outputPath, fs_.readFileSync(filePath));
       result.push(outputPath);
     }
