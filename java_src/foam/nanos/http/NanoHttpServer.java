@@ -6,18 +6,19 @@
 
 package foam.nanos.http;
 
+import com.sun.net.httpserver.*;
+import foam.core.*;
+import foam.nanos.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import com.sun.net.httpserver.*;
-
-import foam.core.*;
-import foam.nanos.*;
-
-public class NanoHttpServer extends ContextAwareSupport implements NanoService {
+public class NanoHttpServer
+  extends    ContextAwareSupport
+  implements NanoService
+{
 
   protected HttpServer server_;
-  protected int port_ = 8080;
+  protected int        port_ = 8080;
 
   public void start() {
     try {

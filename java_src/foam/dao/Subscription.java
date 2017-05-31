@@ -3,7 +3,7 @@ package foam.dao;
 public class Subscription
   implements foam.core.Detachable
 {
-  private boolean detached_ = false;
+  protected boolean detached_ = false;
 
   public Subscription() { }
 
