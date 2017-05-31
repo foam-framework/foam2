@@ -62,6 +62,7 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
 
       Boolean permissionCheck = group.implies(permission.getName());
       userMap.put(user.getId(), permissionCheck);
+      permissionMap.put(permission.getName(), userMap);
       return permissionCheck;
     }
     else {
