@@ -10,25 +10,6 @@ foam.CLASS({
   extends: 'foam.nanos.script.Script',
 
   properties: [
-    {
-      class: 'Int',
-      name: 'minute'
-    },
-    {
-      class: 'Int',
-      name: 'hour'
-    },
-    {
-      class: 'Int',
-      name: 'day'
-    },
-    {
-      class: 'Int',
-      name: 'month'
-    },
-    {
-      class: 'Int',
-      name: 'weekday'
-    }
+    // TODO: Add scheduling properties
   ]
 });

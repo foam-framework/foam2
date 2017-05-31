@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Date;
 import foam.mlang.MLang.*;
+import java.io.IOException;
 
 public class TestRunner
   extends    ContextAwareSupport
@@ -23,21 +24,12 @@ public class TestRunner
 
   public void start() {
     final MapDAO tests = (MapDAO) getX().get("TestDAO");
-    /* TODO   
-     * If the test's schedule flag has changed to true then run that test
-     
-    tests.listen(
-      function listener (newValue, oldValue){
-        if(newValue !== oldValue){
-      runTest(newValue);
-    );
-    
+    /* TODO add listener for when test is scheduled
     */
     runAllTests();
   }
 
-  public void runTest(Test test) {
-    final MapDAO tests = (MapDAO) getX().get("TestDAO");
+  public Test runTest(Test test) {
     ByteArrayOutputStream bas   = new ByteArrayOutputStream();
     PrintStream           ps    = new PrintStream(bas);
     final Interpreter     shell = new Interpreter(); // Creates a new Interpreter at each call
@@ -53,7 +45,6 @@ public class TestRunner
 
       // creates the testing method
       shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else currentTest.setFailed(currentTest.getFailed()+1); print((exp ? \"SUCCESS: \" : \"FAILURE: \")+message);}");
-
       shell.eval(test.getCode());
     } catch (EvalError e) {
       e.printStackTrace();
@@ -64,35 +55,47 @@ public class TestRunner
     // sets stream to output property
     ps.flush();
     test.setOutput(bas.toString());
+
+    //TODO: get rid of line: Testing perposes
+    System.out.println(test.getOutput());
+
+    test.setScheduled(false);
     // increment lastRun, success, failures
-    tests.put(test);
+    return test;
 
   }
 
   public void runAllTests() {
     final MapDAO tests = (MapDAO) getX().get("TestDAO");
+     try {
+     final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
     ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE))).select(new AbstractSink() {
       public void put(FObject o, Detachable sub) {
         Test     test  = (Test) o;
-        runTest(test);
+        test = runTest(test);
+        jTests.put(test);
       }
     });
+    } catch (IOException e){
+      e.printStackTrace();
+    }
   }
 
   public static void main(String[] args){
     MapDAO tests = new MapDAO();
+    
     X      x     = EmptyX.instance().put("TestDAO", tests);
 
     tests.setX(x);
     tests.setOf(Test.getOwnClassInfo());
-
-    Test test1 = new Test();
-    test1.setId("Test 1");
-    test1.setCode("test(2==2 ,\"WORKS\");test(1==2 ,\"BROKEN\");print(\"All Done.\");");
-    tests.put(test1);
-
-    TestRunner runner = new TestRunner();
-    runner.setX(x);
-    runner.start();
+    try {
+      JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
+      TestRunner runner = new TestRunner();
+      runner.setX(x);
+      runner.start();
+    } catch (IOException e){
+      e.printStackTrace();
+    }
+    
   }
 }
