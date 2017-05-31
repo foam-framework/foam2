@@ -9,23 +9,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
   /**
    * The cached data structure will look like this
-   *
    *{
    *  permission1: {
    *    user1: true,
-   *    user2: false
-   *},
+   *    user2: falsex
+   *    ...
+   *  },
    *  permission2: {
    *    user1: false,
    *    user2: true
+   *    ...
    *  }
+   *  ...
    *}
-   *
-   * Its still a quick operation to read, just grab the permisson, supplied
-   * and get the value for the user.
-   *
-   * When a user logout, walk through all the permissions and remove the user
-   * from each if it exist
    */
 
   //TODO: Limit the size of this map to 10000
@@ -53,6 +49,10 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
       return false;
     }
 
+    /**
+     * Check if data is already cached, if it is return this data
+     * If not, save it to the maps
+     * */
     if (permissionMap.containsKey(permission.getName())) {
       ConcurrentHashMap<String, Boolean> userMap = permissionMap.get(permission.getName());
 
@@ -75,6 +75,9 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
     }
   }
 
+  /**
+   * On logout, walk through entire map and remove all instances of the user
+   * */
   @Override
   public X logout(X x) {
     if (x == null) {
