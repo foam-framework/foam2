@@ -24,6 +24,7 @@ foam.CLASS({
     { class: 'String', name: 'visibility' },
     'static',
     'type',
+    'synchronized',
     {
       class: 'FObjectArray',
       of: 'foam.java.Argument',
@@ -38,6 +39,7 @@ foam.CLASS({
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.static ? 'static ' : '',
+        this.synchronized ? 'synchronized ' : '',
         this.type ? this.type + ' ' : '',
         this.name, '(');
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
