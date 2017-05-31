@@ -7,6 +7,23 @@ public abstract class AbstractFObject
   extends ContextAwareSupport
   implements FObject
 {
+  public FObject fclone() {
+    FObject ret;
+    try {
+      ret = (FObject) getClassInfo().getObjClass().newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      e.printStackTrace();
+      return null;
+    }
+
+    List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for(PropertyInfo pi : props) {
+      pi.set(ret, pi.get(this));
+    }
+
+    return ret;
+  }
+
   public int compareTo(Object o) {
     if ( o == this ) return 0;
     if ( o == null ) return 1;
