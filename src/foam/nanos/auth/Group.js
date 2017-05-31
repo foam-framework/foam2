@@ -29,7 +29,13 @@ foam.CLASS({
       class: 'String',
       name: 'parent',
       documentation: 'Parent group to inherit permissions from.'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.nanos.auth.Permission',
+      name: 'permissions'
     }
+
     /*
       FUTURE
     {
@@ -38,5 +44,25 @@ foam.CLASS({
       documentation: 'Custom authentication settings for this group.'
     }
     */
+  ],
+  methods: [
+    {
+      name: 'implies',
+      javaReturns: 'Boolean',
+      args: [
+        {
+          name: 'name',
+          javaType: 'String'
+        }
+      ],
+      javaCode:
+        'if (getPermissions() == null) {return false;} \n' +
+        'for (int i = 0; i < permissions_.length; i++) { \n' +
+        '  if (permissions_[i].getId().equals(name)) { \n' +
+        '    return true; \n' +
+        '  } \n' +
+        '} \n' +
+        'return false;'
+    }
   ]
 });
