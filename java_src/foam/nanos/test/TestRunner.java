@@ -39,8 +39,6 @@ public class TestRunner
       test.setPassed(0);
       test.setFailed(0);
       test.setOutput("");
-
-      // Sets the shell output to a Stream that will later be redirected to the output parameter
       shell.setOut(ps);
 
       // creates the testing method
@@ -49,33 +47,25 @@ public class TestRunner
     } catch (EvalError e) {
       e.printStackTrace();
     }
-
     test.setLastRun(new Date());
-
-    // sets stream to output property
     ps.flush();
     test.setOutput(bas.toString());
-
-    //TODO: get rid of line: Testing perposes
-    System.out.println(test.getOutput());
-
     test.setScheduled(false);
     // increment lastRun, success, failures
     return test;
-
   }
 
   public void runAllTests() {
     final MapDAO tests = (MapDAO) getX().get("TestDAO");
-     try {
-     final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
-    ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE))).select(new AbstractSink() {
-      public void put(FObject o, Detachable sub) {
-        Test     test  = (Test) o;
-        test = runTest(test);
-        jTests.put(test);
-      }
-    });
+    try {
+      final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
+      ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE))).select(new AbstractSink() {
+        public void put(FObject o, Detachable sub) {
+          Test     test  = (Test) o;
+          test = runTest(test);
+          jTests.put(test);
+        }
+      });
     } catch (IOException e){
       e.printStackTrace();
     }
@@ -83,9 +73,7 @@ public class TestRunner
 
   public static void main(String[] args){
     MapDAO tests = new MapDAO();
-    
     X      x     = EmptyX.instance().put("TestDAO", tests);
-
     tests.setX(x);
     tests.setOf(Test.getOwnClassInfo());
     try {
