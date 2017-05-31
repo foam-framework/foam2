@@ -26,8 +26,7 @@ public class Outputter {
     out.append("\"");
   }
 
-  public String escape(String s) {
-    
+  public String escape(String s) { 
     return s.replace("\n","\\n").replace("\"", "\\\"");
   }
 
