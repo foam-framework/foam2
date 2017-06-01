@@ -96,7 +96,7 @@
       this.start('table').
         start('tr').
           start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').add(this.scrollView).end().
+          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
         end().
       end();
     }
