@@ -18,12 +18,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'id',
-      documenation: 'Unique name of the Group.'
+      documentation: 'Unique name of the Group.'
     },
     {
       class: 'String',
       name: 'description',
-      documenation: 'Description of the Group.'
+      documentation: 'Description of the Group.'
     },
     {
       class: 'String',
