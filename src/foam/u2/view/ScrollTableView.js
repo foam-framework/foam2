@@ -57,7 +57,7 @@
           value$: this.skip$,
           extent$: this.limit$,
           height: 600, // TODO use window height.
-          width: 40,
+          width: 24,
           handleSize: 40,
           // TODO wire up mouse wheel
           // TODO clicking away from scroller should deselect it.
