@@ -171,6 +171,7 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
+        addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
         start('thead').
           add(this.slot(function(columns_) {
