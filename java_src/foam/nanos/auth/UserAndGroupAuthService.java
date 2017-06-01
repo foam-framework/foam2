@@ -2,12 +2,9 @@ package foam.nanos.auth;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import javax.security.auth.login.LoginException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.UUID;
 import foam.dao.*;
+import javax.security.auth.login.LoginException;
+import java.util.*;
 
 /**
  * Created by marcroopchand on 2017-05-12.
@@ -18,31 +15,24 @@ public class UserAndGroupAuthService
 {
   protected MapDAO        userDAO_;
   protected MapDAO        groupDAO_;
-  protected LinkedHashMap challengeMap;
+  protected Map           challengeMap;
 
   @Override
   public void start() {
-    userDAO_  = (MapDAO) getX().get("userDAO");
-    groupDAO_ = (MapDAO) getX().get("groupDAO");
-
-    //TODO: Implement LRU LinkedHashMap
-    challengeMap = new LinkedHashMap<String, Challenge>(20000);
+    userDAO_      = (MapDAO) getX().get("userDAO");
+    groupDAO_     = (MapDAO) getX().get("groupDAO");
+    challengeMap  = new LRULinkedHashMap<String, Challenge>(20000);
   }
 
   /**
    * A challenge is generated from the userID provided
    * This is saved in a LinkedHashMap with ttl of 5
-   * <p>
+   *
    * Should this throw an exception?
    */
   public String generateChallenge(String userId) {
-    if ( userId == null || userId == "" ) {
-      return null;
-    }
-
-    if ( userDAO_.find(userId) == null ) {
-      return null;
-    }
+    if ( userId == null || userId == "" ) return null;
+    if ( userDAO_.find(userId) == null )  return null;
 
     String   generatedChallenge = UUID.randomUUID() + userId;
     Calendar calendar           = Calendar.getInstance();
@@ -56,7 +46,7 @@ public class UserAndGroupAuthService
   /**
    * Checks the LinkedHashMap to see if the the challenge supplied is correct
    * and the ttl is still valid
-   * <p>
+   *
    * How often should we purge this map for challenges that have expired?
    */
   public X challengedLogin(String userId, String challenge) throws LoginException {
@@ -65,9 +55,7 @@ public class UserAndGroupAuthService
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) {
-      throw new LoginException("Invalid userId");
-    }
+    if ( c == null ) throw new LoginException("Invalid userId");
 
     if ( ! c.getChallenge().equals(challenge) ) {
       throw new LoginException("Invalid Challenge");
@@ -79,9 +67,7 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) {
-      throw new LoginException("User not found");
-    }
+    if ( user == null ) throw new LoginException("User not found");
 
     challengeMap.remove(userId);
     return this.getX().put("user", user);
@@ -97,10 +83,7 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(userId);
-
-    if ( user == null ) {
-      throw new LoginException("User not found.");
-    }
+    if ( user == null ) throw new LoginException("User not found.");
 
     if ( ! user.getPassword().equals(password) ) {
       throw new LoginException("Invalid Password");
@@ -114,19 +97,13 @@ public class UserAndGroupAuthService
    * Return Boolean for this
    */
   public Boolean check(foam.core.X x, java.security.Permission permission) {
-    if ( x == null || permission == null ) {
-      return false;
-    }
+    if ( x == null || permission == null ) return false;
 
     User user = (User) x.get("user");
-    if ( user == null ) {
-      return false;
-    }
+    if ( user == null ) return false;
 
     Group group = (Group) user.getGroup();
-    if ( group == null ) {
-      return false;
-    }
+    if ( group == null ) return false;
 
     return group.implies(permission.getName());
   }
@@ -135,19 +112,20 @@ public class UserAndGroupAuthService
    * Given a context with a user, validate the password to be updated
    * and return a context with the updated user information
    */
-  public X updatePassword(foam.core.X x, String oldPassword, String newPassword) throws IllegalStateException {
-    if ( x == null || oldPassword == null || newPassword == null || oldPassword == "" || newPassword == "" ) {
+  public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
+    throws IllegalStateException {
+
+    if ( x == null || oldPassword == null || newPassword == null
+      || oldPassword == "" || newPassword == "" ) {
       throw new IllegalStateException("Invalid Parameters");
     }
 
     if ( oldPassword.equals(newPassword) ) {
-      throw new IllegalStateException("New Password must be different from the old password");
+      throw new IllegalStateException("New Password must be different");
     }
 
     User user = (User) userDAO_.find(((User) x.get("user")).getId());
-    if ( user == null ) {
-      throw new IllegalStateException("User not found");
-    }
+    if ( user == null ) throw new IllegalStateException("User not found");
 
     if ( ! oldPassword.equals(user.getPassword()) ) {
       throw new IllegalStateException("Invalid Password");
@@ -164,9 +142,7 @@ public class UserAndGroupAuthService
    * Users should have id, email, first name, last name, password for registration
    */
   public Boolean validateUser(User user) throws IllegalStateException {
-    if ( user == null ) {
-      throw new IllegalStateException("Invalid User");
-    }
+    if ( user == null ) throw new IllegalStateException("Invalid User");
 
     if ( user.getId() == "" ) {
       throw new IllegalStateException("ID is required for creating a user");
@@ -195,7 +171,7 @@ public class UserAndGroupAuthService
    * Just return a null user for now. Not sure how to handle the cleanup
    * of the current context
    */
-  public X logout(X x) {
-    return this.getX().put("user", null);
+  public void logout(X x) {
+    this.getX().put("user", null);
   }
 }
