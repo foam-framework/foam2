@@ -106,7 +106,10 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data'
+      name: 'data',
+      postSet: function(_, data) {
+        if ( ! this.of && data ) this.of = data.of;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -120,8 +123,8 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, data, of) {
-        var of = this.of || ( data && data.of);
+      expression: function(columns, of) {
+        var of = this.of;
         if ( ! of ) return [];
 
         return columns.map(function(p) {
@@ -133,8 +136,8 @@ foam.CLASS({
     },
     {
       name: 'columns',
-      expression: function(data, of) {
-        var of = this.of || ( data && data.of);
+      expression: function(of) {
+        var of = this.of;
         if ( ! of ) return [];
 
         var tableColumns = of.getAxiomByName('tableColumns');
@@ -168,6 +171,7 @@ foam.CLASS({
             return this.E('tr').
               forEach(columns_, function(column) {
                 this.start('th').
+                  addClass(view.myClass('th-' + column.name)).
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   add(' ', this.slot(function(order) {
