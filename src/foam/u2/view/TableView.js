@@ -128,10 +128,16 @@ foam.CLASS({
         if ( ! of ) return [];
 
         return columns.map(function(p) {
-          return typeof p == 'string' ?
+          var c = typeof p == 'string' ?
             of.getAxiomByName(p) :
             p ;
-        });
+
+           if ( ! c ) {
+             console.error('Unknown table column: ', p);
+           }
+
+          return c;
+        }).filter(function(c) { return c; });
       }
     },
     {
@@ -165,6 +171,7 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
+        addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
         start('thead').
           add(this.slot(function(columns_) {
