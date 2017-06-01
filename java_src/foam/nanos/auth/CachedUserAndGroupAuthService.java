@@ -1,7 +1,6 @@
 package foam.nanos.auth;
 
 import foam.core.X;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,13 +23,12 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
    *  ...
    *}
    */
-
   protected Map<String, Map<String, Boolean>> permissionMap;
 
   @Override
   public void start() {
     super.start();
-    permissionMap = new LRULinkedHashMap<>(100);
+    permissionMap = new LRULinkedHashMap<>(1000);
   }
 
   @Override
