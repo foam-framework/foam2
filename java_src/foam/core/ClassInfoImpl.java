@@ -65,6 +65,10 @@ public class ClassInfoImpl
     return this;
   }
 
+  public boolean isInstance(Object o) {
+    return class_.isInstance(o);
+  }
+
   public List getAxioms() {
     if ( allAxioms_ == null ) {
       allAxioms_ = new ArrayList();

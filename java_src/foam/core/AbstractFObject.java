@@ -7,6 +7,11 @@ public abstract class AbstractFObject
   extends ContextAwareSupport
   implements FObject
 {
+
+  public static FObject maybeClone(FObject fo) {
+    return (fo == null ? null : ((AbstractFObject)fo).fclone());
+  }
+
   public FObject fclone() {
     FObject ret;
     try {
@@ -17,7 +22,7 @@ public abstract class AbstractFObject
     }
 
     List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    for(PropertyInfo pi : props) {
+    for( PropertyInfo pi : props ) {
       pi.set(ret, pi.get(this));
     }
 

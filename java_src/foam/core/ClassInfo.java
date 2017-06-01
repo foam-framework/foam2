@@ -14,6 +14,8 @@ public interface ClassInfo {
   public ClassInfo getParent();
   public ClassInfo addProperty(PropertyInfo p);
 
+  public boolean isInstance(Object o);
+
   public ClassInfo setObjClass(Class cls);
   public Class     getObjClass();
 

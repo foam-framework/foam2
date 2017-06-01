@@ -23,6 +23,10 @@ public class EmptyClassInfo
     return this;
   }
 
+  public boolean isInstance(Object o) {
+    return o instanceof EmptyClassInfo;
+  }
+
   public ClassInfo setObjClass(Class cls) {
     return null;
   }
