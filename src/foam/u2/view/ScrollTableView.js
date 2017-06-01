@@ -21,10 +21,10 @@
   extends: 'foam.u2.Element',
 
   requires: [
-    'foam.u2.view.TableView',
-    'foam.graphics.ScrollCView',
     'foam.dao.FnSink',
+    'foam.graphics.ScrollCView',
     'foam.mlang.sink.Count',
+    'foam.u2.view.TableView'
   ],
 
   properties: [
@@ -57,7 +57,7 @@
           value$: this.skip$,
           extent$: this.limit$,
           height: 600, // TODO use window height.
-          width: 40,
+          width: 24,
           handleSize: 40,
           // TODO wire up mouse wheel
           // TODO clicking away from scroller should deselect it.
@@ -90,12 +90,13 @@
     function init() {
       this.onDetach(this.data$proxy.pipe(this.FnSink.create({fn:this.onDaoUpdate})));
     },
+
     function initE() {
       // TODO probably shouldn't be using a table.
       this.start('table').
         start('tr').
           start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').add(this.scrollView).end().
+          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
         end().
       end();
     }

@@ -48,6 +48,7 @@ foam.CLASS({
       o.increaseIndent();
       o.indent();
       o.out('.setId("', this.id, '")');
+      o.out('.setObjClass(', this.id, '.class)');
       for ( var i = 0 ; i < this.properties.length ; i++ ) {
         o.out('\n');
         o.indent();

@@ -222,6 +222,9 @@ foam.CLASS({
       name: 'name'
     },
     {
+      name: 'of'
+    },
+    {
       /**
        * The string name of the type
        * (either a model name or foam.String, foam.Function, etc. or [])

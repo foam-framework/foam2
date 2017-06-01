@@ -6,7 +6,7 @@ public class ListSink
   extends    AbstractSink
   implements foam.lib.json.OutputJSON
 {
-  private ArrayList data_ = new ArrayList();
+  protected ArrayList data_ = new ArrayList();
 
   public List getData() {
     return data_;
@@ -18,7 +18,7 @@ public class ListSink
 
   public void outputJSON(StringBuilder out, foam.lib.json.Outputter outputter) {
     Object[] data = getData().toArray();
-    out.append("{\"class\":\"foam.dao.ArraySink\",\"a\":");
+    out.append("{\"class\":\"foam.dao.ArraySink\",\"array\":");
     outputter.output(out, data);
     out.append("}");
   }
