@@ -128,10 +128,16 @@ foam.CLASS({
         if ( ! of ) return [];
 
         return columns.map(function(p) {
-          return typeof p == 'string' ?
+          var c = typeof p == 'string' ?
             of.getAxiomByName(p) :
             p ;
-        });
+
+           if ( ! c ) {
+             console.error('Unknown table column: ', p);
+           }
+
+          return c;
+        }).filter(function(c) { return c; });
       }
     },
     {
