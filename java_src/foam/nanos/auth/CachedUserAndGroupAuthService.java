@@ -25,13 +25,12 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
    *}
    */
 
-  //TODO: Limit the size of this map to 10000
   protected Map<String, Map<String, Boolean>> permissionMap;
 
   @Override
   public void start() {
     super.start();
-    permissionMap = new HashMap<>();
+    permissionMap = new LRULinkedHashMap<>(100);
   }
 
   @Override
@@ -52,16 +51,16 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
       Map<String, Boolean> userMap = permissionMap.get(permission.getName());
       if ( userMap.containsKey(user.getId()) ) return userMap.get(user.getId());
 
-      Boolean permissionCheck = group.implies(permission.getName());
+      boolean permissionCheck = group.implies(permission);
       userMap.put(user.getId(), permissionCheck);
       permissionMap.put(permission.getName(), userMap);
+
       return permissionCheck;
     }
 
-    Map<String, Boolean> userMap = new HashMap<>();
-    boolean permissionCheck = group.implies(permission.getName());
+    Map<String, Boolean> userMap = new LRULinkedHashMap<>(1000000);
+    boolean permissionCheck = group.implies(permission);
     userMap.put(user.getId(), permissionCheck);
-
     permissionMap.put(permission.getName(), userMap);
 
     return permissionCheck;
