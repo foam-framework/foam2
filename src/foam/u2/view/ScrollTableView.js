@@ -57,7 +57,7 @@
           value$: this.skip$,
           extent$: this.limit$,
           height: 600, // TODO use window height.
-          width: 40,
+          width: 24,
           handleSize: 40,
           // TODO wire up mouse wheel
           // TODO clicking away from scroller should deselect it.
@@ -96,7 +96,7 @@
       this.start('table').
         start('tr').
           start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').add(this.scrollView).end().
+          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
         end().
       end();
     }
