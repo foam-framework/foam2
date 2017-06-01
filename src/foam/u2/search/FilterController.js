@@ -80,12 +80,10 @@ foam.CLASS({
           flex-grow: 1;
           overflow: hidden;
         }
-
         ^filter-area {
           flex-grow: 1;
           overflow-y: auto;
         }
-
         ^filter-header {
           align-items: center;
           display: flex;
