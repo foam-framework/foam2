@@ -1,9 +1,11 @@
 package foam.nanos.auth;
 
 import foam.core.X;
+import foam.dao.ListSink;
 import javax.security.auth.AuthPermission;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 /**
  * Created by marcroopchand on 2017-05-24.
@@ -11,9 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
   private int numUsers = 1000000;
+  private int numGroups = 10;
+  private int numPermissions = 100;
   private ArrayList<X> xArray = new ArrayList<>();
-  private Group adminGroup = new Group();
-  private Group memberGroup = new Group();
 
   @Override
   public void start() {
@@ -22,63 +24,43 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
     addTestUsers();
     testlogin();
     testCheck();
-    testCheck();
     testChallengedLogin();
     testUpdatePassword();
   }
 
-  /**
-   * Setup two groups and two different permissions for each group
-   *  Admin
-   *    - Admin Permission 1
-   *    - Admin Permission 2
-   *  Member
-   *    - Member Permission 1
-   *    - Member Permission 2
-   * */
   public void createGroupsAndPermissions() {
-    /**
-     * Admin group with some permissions
-     * */
-    adminGroup.setId("1");
-    adminGroup.setDescription("Admin Users");
+    System.out.println("Creating " + numGroups + " groups with " + numPermissions + " permissions each");
+    long startTime = System.nanoTime();
 
-    foam.nanos.auth.Permission adminPermission1 = new foam.nanos.auth.Permission();
-    adminPermission1.setId("1");
-    adminPermission1.setDescription("Admin permissions 1");
+    for ( int i = 0; i < numGroups; i++ ) {
+      Group group = new Group();
+      group.setId("" + i);
+      group.setDescription("Group " + i + " users");
 
-    foam.nanos.auth.Permission adminPermission2 = new foam.nanos.auth.Permission();
-    adminPermission2.setId("2");
-    adminPermission2.setDescription("Admin permissions 2");
+      Permission[] permissions = new Permission[numPermissions];
+      for ( int j = 0; j < numPermissions; j++ ) {
+        foam.nanos.auth.Permission permission = new foam.nanos.auth.Permission();
+        permission.setId("" + j);
+        permission.setDescription("Group" + i + " permissions-" + j);
+        permissions[j] = permission;
+      }
 
-    Permission[] adminPermissions = {adminPermission1, adminPermission2};
-    adminGroup.setPermissions(adminPermissions);
-    groupDAO_.put(adminGroup);
+      group.setPermissions(permissions);
+      groupDAO_.put(group);
+    }
 
-    /**
-     * Memeber group with some permissions
-     * */
-    memberGroup.setId("2");
-    memberGroup.setDescription("Member Users");
-
-    foam.nanos.auth.Permission memberPermission1 = new foam.nanos.auth.Permission();
-    memberPermission1.setId("3");
-    memberPermission1.setDescription("Member permisssions 1");
-
-    foam.nanos.auth.Permission memberPermission2 = new foam.nanos.auth.Permission();
-    memberPermission2.setId("4");
-    memberPermission2.setDescription("Member permisssion 2");
-
-    Permission[] memberPermissions = {memberPermission1, memberPermission2};
-    memberGroup.setPermissions(memberPermissions);
-    groupDAO_.put(memberGroup);
+    long endTime = System.nanoTime();
+    long durationInMilliseconds = (endTime - startTime) / 1000000;
+    System.out.println("Duration: " + durationInMilliseconds + "ms \n");
   }
 
   public void addTestUsers() {
-    System.out.println("Registering 1 million Users");
+    System.out.println("Registering " + numUsers + " Users");
     long startTime = System.nanoTime();
 
-    for (int i = 0; i < numUsers; i++) {
+    ListSink sink = (ListSink) groupDAO_.select(new ListSink(), null, null, null, null);
+
+    for ( int i = 0; i < numUsers; i++ ) {
       User user = new User();
       user.setId("" + i);
       user.setEmail("marc" + i + "@nanopay.net");
@@ -87,16 +69,12 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
       user.setPassword("marc" + i);
 
       /**
-       * Just set 3 users as admin for now, everyone
-       * else will be members
+       * Generate a random number to put a user in a group
        * */
-      if (i == 5 || i == 15 || i == 20) {
-        user.setGroup(adminGroup);
-      }
-      else {
-        user.setGroup(memberGroup);
-      }
+      int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
+      Group group = (Group) sink.getData().get(randomGroup);
 
+      user.setGroup(group);
       userDAO_.put(user);
     }
 
@@ -106,14 +84,14 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
   }
 
   public void testlogin() {
-    System.out.println("Login 1 million Users");
+    System.out.println("Login " + numUsers + " Users");
     long startTime = System.nanoTime();
 
-    for (int i = 0; i < numUsers; i++) {
+    for ( int i = 0; i < numUsers; i++ ) {
       try {
         xArray.add(login("" + i, "marc" + i));
       }
-      catch (LoginException e) {
+      catch ( LoginException e ) {
         e.printStackTrace();
       }
     }
@@ -124,27 +102,52 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
   }
 
   public void testCheck() {
-    System.out.println("Permissions Check for 1 million users");
+    System.out.println("Permissions Check for " + numUsers + " users");
     long startTime = System.nanoTime();
 
-    /**
-     * Go through all logged in users and check if a user has the permission above
-     * */
-    for (int i = 0; i < xArray.size(); i++) {
-      AuthPermission authAdminpermission = new AuthPermission(adminGroup.getPermissions()[0].getId());
+    ListSink sink = (ListSink) groupDAO_.select(new ListSink(), null, null, null, null);
+
+    ArrayList<Integer> groups = new ArrayList<>();
+    ArrayList<Integer> permissions = new ArrayList<>();
+
+    for ( int i = 0; i < xArray.size(); i++ ) {
+      int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
+      groups.add(randomGroup);
+      Group group = (Group) sink.getData().get(randomGroup);
+
+      int randomPermission = ThreadLocalRandom.current().nextInt(0, group.getPermissions().length);
+      permissions.add(randomPermission);
+      Permission permission = group.getPermissions()[randomPermission];
+
+      AuthPermission authAdminpermission = new AuthPermission(permission.getId());
+      check(xArray.get(i), authAdminpermission);
+    }
+    long endTime = System.nanoTime();
+    long durationInMilliseconds = (endTime - startTime) / 1000000;
+    System.out.println("Duration: " + durationInMilliseconds + "ms \n");
+
+
+    System.out.println("Cached Permissions Check for " + numUsers + " users");
+    startTime = System.nanoTime();
+
+    for ( int i = 0; i < xArray.size(); i++ ) {
+      Group group = (Group) sink.getData().get(groups.get(i));
+      Permission permission = group.getPermissions()[permissions.get(i)];
+
+      AuthPermission authAdminpermission = new AuthPermission(permission.getId());
       check(xArray.get(i), authAdminpermission);
     }
 
-    long endTime = System.nanoTime();
-    long durationInMilliseconds = (endTime - startTime) / 1000000;
+    endTime = System.nanoTime();
+    durationInMilliseconds = (endTime - startTime) / 1000000;
     System.out.println("Duration: " + durationInMilliseconds + "ms \n");
   }
 
   public void testChallengedLogin() {
-    System.out.println("Challenge Login 1 million Users");
+    System.out.println("Challenge Login " + numUsers + " Users");
     long startTime = System.nanoTime();
 
-    for (int i = 0; i < numUsers; i++) {
+    for ( int i = 0; i < numUsers; i++ ) {
       try {
         challengedLogin("" + i, generateChallenge("" + i));
       }
@@ -174,10 +177,10 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
   }
 
   public void testUpdatePassword() {
-    System.out.println("Update Password for 1 million Users");
+    System.out.println("Update Password for " + numUsers + " Users");
     long startTime = System.nanoTime();
 
-    for (int i = 0; i < numUsers; i++) {
+    for ( int i = 0; i < numUsers; i++ ) {
       try {
         X x = login("" + i, "marc" + i);
         updatePassword(x, "marc" + i, "marcasdf");
