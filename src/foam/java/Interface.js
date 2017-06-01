@@ -42,6 +42,10 @@ foam.CLASS({
       of: 'foam.java.InterfaceMethod',
       name: 'methods',
       factory: function() { return []; }
+    },
+    {
+      name: 'imports',
+      factory: function() { return []; }
     }
   ],
 
@@ -68,6 +72,12 @@ foam.CLASS({
       o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
 
       if ( this.package ) { o.out('package ', this.package, ';\n\n'); }
+
+      this.imports.forEach(function(i) {
+        o.out('import ' + i, ';\n');
+      });
+      
+      o.out('\n');
 
       o.out(this.visibility, this.visibility ? ' ' : '',
         'interface ', this.name);
