@@ -18,7 +18,7 @@
      {
        class: 'String',
        name: 'description',
-       documenation: 'Description of the Group.'
+       documentation: 'Description of the Group.'
      }
    ]
  });
