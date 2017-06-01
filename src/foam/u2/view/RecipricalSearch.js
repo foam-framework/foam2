@@ -87,7 +87,9 @@ foam.CLASS({
                 .addClass(self.myClass('filter-header'))
                 .add(axiom.label)
               .end()
-              .add(view);
+              .start(view)
+                .addClass(self.myClass('filter'))
+            .end()
           });
 
           return e;
