@@ -227,6 +227,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'javaSupport',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'override',
+      value: false
     }
   ],
 
@@ -258,6 +263,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        override: this.override,
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {

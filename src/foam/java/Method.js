@@ -30,12 +30,22 @@ foam.CLASS({
       of: 'foam.java.Argument',
       name: 'args'
     },
+    {
+      class: 'Boolean',
+      name: 'override',
+      value: false
+    },
     { class: 'StringArray', name: 'throws' },
     { class: 'foam.java.CodeProperty', name: 'body' }
   ],
 
   methods: [
     function outputJava(o) {
+      if (this.override) {
+        o.indent();
+        o.out("@Override\n");
+      }
+
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.static ? 'static ' : '',
