@@ -17,8 +17,8 @@ foam.CLASS({
     },
     {
       name: 'choices',
-      factory: function() {
-        return this.of.VALUES.map(function(v) { return [ v, v.label ]; });
+      expression: function(of) {
+        return of ? of.VALUES.map(function(v) { return [ v, v.label ]; }) : [];
       }
     }
   ],
