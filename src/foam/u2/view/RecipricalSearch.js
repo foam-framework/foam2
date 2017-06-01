@@ -82,7 +82,14 @@ foam.CLASS({
             var view  = foam.u2.ViewSpec.createView(spec, { property: axiom, dao: self.dao }, this, this.__subSubContext__);
 
             searchManager.add(view);
-            this.add(axiom.label, view);
+            this
+              .start()
+                .addClass(self.myClass('filter-header'))
+                .add(axiom.label)
+              .end()
+              .start(view)
+                .addClass(self.myClass('filter'))
+            .end()
           });
 
           return e;
