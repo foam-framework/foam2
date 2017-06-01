@@ -51,14 +51,14 @@ foam.CLASS({
       javaReturns: 'Boolean',
       args: [
         {
-          name: 'name',
-          javaType: 'String'
+          name: 'permission',
+          javaType: 'java.security.Permission'
         }
       ],
       javaCode:
-        'if (getPermissions() == null) {return false;} \n' +
-        'for (int i = 0; i < permissions_.length; i++) { \n' +
-        '  if (permissions_[i].getId().equals(name)) { \n' +
+        'if ( getPermissions() == null ) return false; \n' +
+        'for ( int i = 0; i < permissions_.length; i++ ) { \n' +
+        '  if ( permission.implies(new javax.security.auth.AuthPermission(permissions_[i].getId())) ) { \n' +
         '    return true; \n' +
         '  } \n' +
         '} \n' +

@@ -105,7 +105,7 @@ public class UserAndGroupAuthService
     Group group = (Group) user.getGroup();
     if ( group == null ) return false;
 
-    return group.implies(permission.getName());
+    return group.implies(permission);
   }
 
   /**
