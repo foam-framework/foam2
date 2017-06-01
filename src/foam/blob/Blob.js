@@ -53,7 +53,7 @@ foam.CLASS({
       var self = this;
 
       var offset = 0;
-      var buf = new Buffer(8192 * 4);
+      var buf = Buffer.alloc(8192 * 4);
       var limit = self.size;
 
       function a() {
@@ -65,7 +65,7 @@ foam.CLASS({
 
         return self.read(buf, offset).then(function(buf2) {
           offset += buf2.length;
-          return writeFn(new Buffer(buf2));
+          return writeFn(Buffer.from(buf2));
         }).then(a);
       };
 
@@ -357,7 +357,7 @@ foam.CLASS({
       var hash = require('crypto').createHash('sha256');
 
       var bufsize = 8192;
-      var buffer = new Buffer(bufsize);
+      var buffer = Buffer.alloc(bufsize);
 
       var size = obj.size
       var remaining = size;

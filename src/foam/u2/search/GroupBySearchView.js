@@ -85,6 +85,11 @@ foam.CLASS({
       expression: function(property) {
         return property.label;
       }
+    },
+    {
+      class: 'Function',
+      name: 'aFormatLabel',
+      value: function(key) { return Promise.resolve(''+key); }
     }
   ],
 
@@ -92,6 +97,7 @@ foam.CLASS({
     function clear() {
       this.view.data = '';
     },
+
     function initE() {
       this.addClass(this.myClass());
       this.view = this.start(this.viewSpec, {
@@ -109,12 +115,17 @@ foam.CLASS({
 
       this.view.data$.sub(this.updatePredicate);
     },
+
     function updatePredicate_(choice) {
       var exists = typeof choice !== 'undefined' && choice !== '';
       this.predicate = exists ? this.op.create({
         arg1: this.property,
         arg2: this.Constant.create({ value: choice })
       }) : this.True.create();
+    },
+
+    function formatLabels(keys) {
+      return Promise.all(keys.map(this.aFormatLabel.bind(this)));
     }
   ],
 
@@ -132,41 +143,43 @@ foam.CLASS({
           var options = [];
           var selected;
           var sortedKeys = groups.sortedKeys();
-          for ( var i = 0; i < sortedKeys.length; i++ ) {
-            var key = sortedKeys[i];
-            if ( typeof key === 'undefined' ) continue;
-            if ( key === '' ) continue;
-            var count = foam.String.intern(
-                '(' + groups.groups[key].value + ')');
-            var subKey = ('' + key)
-                .substring(0, self.width - count.length - 3);
-            var cleanKey = foam.core.Enum.isInstance(self.property) ?
-                self.property.of[key].label :
-                subKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;');
+          self.formatLabels(sortedKeys).then(function (labels) {
+            for ( var i = 0 ; i < sortedKeys.length ; i++ ) {
+              var key = sortedKeys[i];
+              if ( typeof key === 'undefined' ) continue;
+              if ( key === '' ) continue;
+              var count = foam.String.intern(
+                  '(' + groups.groups[key].value + ')');
+              var subKey = labels[i].substring(0, self.width - count.length - 3);
+              // ???: Why do we need to clean the key?
+              var cleanKey = foam.core.Enum.isInstance(self.property) ?
+                  self.property.of[key].label :
+                  subKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;');
 
-            if ( self.view && self.view.data === key ) {
-              selected = key;
+              if ( self.view && self.view.data === key ) {
+                selected = key;
+              }
+
+              options.push([
+                key,
+                cleanKey + foam.String.intern(
+                    Array(self.width - subKey.length - count.length).join(' ')) +
+                    count
+              ]);
             }
 
-            options.push([
-              key,
-              cleanKey + foam.String.intern(
-                  Array(self.width - subKey.length - count.length).join(' ')) +
-                  count
-            ]);
-          }
+            options.splice(0, 0, [ '', '--' ]);
 
-          options.splice(0, 0, [ '', '--' ]);
-
-          self.view.choices = options;
-          if ( typeof selected !== 'undefined' ) {
-            var oldData = self.view.data;
-            self.view.data = selected;
-            if ( typeof oldData === 'undefined' || oldData === '' ) {
-              self.updatePredicate_(selected);
+            self.view.choices = options;
+            if ( typeof selected !== 'undefined' ) {
+              var oldData = self.view.data;
+              self.view.data = selected;
+              if ( typeof oldData === 'undefined' || oldData === '' ) {
+                self.updatePredicate_(selected);
+              }
             }
-          }
+          });
         });
       }
     },

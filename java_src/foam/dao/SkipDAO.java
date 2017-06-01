@@ -8,7 +8,7 @@ import foam.dao.Sink;
 public class SkipDAO
   extends ProxyDAO
 {
-  private int skip_;
+  protected int skip_;
 
   public SkipDAO setSkip(int skip) {
     skip_ = skip;
