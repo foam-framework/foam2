@@ -106,7 +106,10 @@ foam.CLASS({
     },
     {
       class: 'foam.dao.DAOProperty',
-      name: 'data'
+      name: 'data',
+      postSet: function(_, data) {
+        if ( ! this.of && data ) this.of = data.of;
+      }
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -120,8 +123,8 @@ foam.CLASS({
     },
     {
       name: 'columns_',
-      expression: function(columns, data, of) {
-        var of = this.of || ( data && data.of);
+      expression: function(columns, of) {
+        var of = this.of;
         if ( ! of ) return [];
 
         return columns.map(function(p) {
@@ -133,8 +136,8 @@ foam.CLASS({
     },
     {
       name: 'columns',
-      expression: function(data, of) {
-        var of = this.of || ( data && data.of);
+      expression: function(of) {
+        var of = this.of;
         if ( ! of ) return [];
 
         var tableColumns = of.getAxiomByName('tableColumns');
@@ -164,49 +167,49 @@ foam.CLASS({
         addClass(this.myClass()).
         setNodeName('table').
         start('thead').
-        add(this.slot(function(columns_) {
-          return this.E('tr').
-            forEach(columns_, function(column) {
-              this.
-                start('th').
-                on('click', function(e) { view.sortBy(column); }).
-                call(column.tableHeaderFormatter, [column]).
-                add(' ', this.slot(function(order) {
-                  return column === order ? this.Entity.create({ name: '#9651' }) :
-                      (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
-                      ''
-                }, view.order$)).
+          add(this.slot(function(columns_) {
+            return this.E('tr').
+              forEach(columns_, function(column) {
+                this.start('th').
+                  addClass(view.myClass('th-' + column.name)).
+                  on('click', function(e) { view.sortBy(column); }).
+                  call(column.tableHeaderFormatter, [column]).
+                  add(' ', this.slot(function(order) {
+                    return column === order ? this.Entity.create({ name: '#9651' }) :
+                        (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
+                        ''
+                  }, view.order$)).
                 end();
-            });
-        })).
-        add(this.slot(function(columns_) {
-          return this.
-            E('tbody').
-            select(this.orderedDAO$proxy, function(obj) {
-              return this.
-                E('tr').
-                start('tr').
-                on('mouseover', function() { view.hoverSelection = obj; }).
-                on('click', function() {
-                  view.selection = obj;
-                  if ( view.importSelection$ ) view.importSelection = obj;
-                  if ( view.editRecord$ ) view.editRecord(obj);
-                }).
-                addClass(this.slot(function(selection) {
-                  if ( obj === selection ) return view.myClass('selected');
-                  return '';
-                }, view.selection$)).
-                addClass(view.myClass('row')).
-                forEach(columns_, function(column) {
-                  this.
-                    start('td').
-                    call(column.tableCellFormatter, [
-                      column.f ? column.f(obj) : null, obj, column
-                    ]).
-                    end();
-                });
-            });
-        }));
+              });
+          })).
+          add(this.slot(function(columns_) {
+            return this.
+              E('tbody').
+              select(this.orderedDAO$proxy, function(obj) {
+                return this.
+                  E('tr').
+                    start('tr').
+                      on('mouseover', function() { view.hoverSelection = obj; }).
+                      on('click', function() {
+                        view.selection = obj;
+                        if ( view.importSelection$ ) view.importSelection = obj;
+                        if ( view.editRecord$ ) view.editRecord(obj);
+                      }).
+                      addClass(this.slot(function(selection) {
+                        if ( obj === selection ) return view.myClass('selected');
+                        return '';
+                      }, view.selection$)).
+                      addClass(view.myClass('row')).
+                      forEach(columns_, function(column) {
+                        this.
+                          start('td').
+                          call(column.tableCellFormatter, [
+                            column.f ? column.f(obj) : null, obj, column
+                          ]).
+                          end();
+                      });
+              });
+          }));
     }
   ]
 });
