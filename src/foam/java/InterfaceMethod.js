@@ -53,6 +53,7 @@ foam.CLASS({
       if (this.override) {
         o.indent();
         o.out("@Override\n");
+        o.indent();
       }
 
       o.indent();
