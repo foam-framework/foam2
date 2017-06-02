@@ -72,7 +72,33 @@
     },
   ],
 
+  methods: [
+    function init() {
+      this.onDetach(this.data$proxy.pipe(this.FnSink.create({fn:this.onDaoUpdate})));
+    },
+
+    function initE() {
+      // TODO probably shouldn't be using a table.
+      this.start('table').
+        on('wheel', this.onWheel).
+        start('tr').
+          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
+          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
+        end().
+      end();
+    }
+  ],
+
   listeners: [
+    {
+      name: 'onWheel',
+      code: function(e) {
+        var negative = e.deltaY < 0;
+        // Convert to rows, rounding up. (Therefore minumum 1.)
+        var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
+        this.skip += negative ? -rows : rows;
+      }
+    },
     {
       // TODO Avoid onDaoUpdate approaches.
       name: 'onDaoUpdate',
@@ -84,21 +110,5 @@
         })
       },
     },
-  ],
-
-  methods: [
-    function init() {
-      this.onDetach(this.data$proxy.pipe(this.FnSink.create({fn:this.onDaoUpdate})));
-    },
-
-    function initE() {
-      // TODO probably shouldn't be using a table.
-      this.start('table').
-        start('tr').
-          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
-        end().
-      end();
-    }
   ]
 });
