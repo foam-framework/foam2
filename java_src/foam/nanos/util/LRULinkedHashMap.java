@@ -1,4 +1,4 @@
-package foam.nanos.auth;
+package foam.nanos.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

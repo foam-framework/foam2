@@ -3,6 +3,8 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.*;
+import foam.nanos.util.LRULinkedHashMap;
+
 import javax.security.auth.login.LoginException;
 import java.util.*;
 

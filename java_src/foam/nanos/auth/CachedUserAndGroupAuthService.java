@@ -1,6 +1,8 @@
 package foam.nanos.auth;
 
 import foam.core.X;
+import foam.nanos.util.LRULinkedHashMap;
+
 import java.util.Map;
 
 /**
