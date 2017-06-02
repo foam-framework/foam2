@@ -42,7 +42,6 @@ foam.CLASS({
     'data as unfilteredDAO'
   ],
 
-
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -80,12 +79,10 @@ foam.CLASS({
           flex-grow: 1;
           overflow: hidden;
         }
-
         ^filter-area {
           flex-grow: 1;
           overflow-y: auto;
         }
-
         ^filter-header {
           align-items: center;
           display: flex;
