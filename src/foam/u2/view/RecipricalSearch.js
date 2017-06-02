@@ -33,6 +33,17 @@ foam.CLASS({
     'as data'
   ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^count {
+          font-size: 16pt;
+          color: #555;
+        }
+      */}
+    })
+  ],
+
   properties: [
     {
       class: 'Class',
@@ -55,20 +66,34 @@ foam.CLASS({
                 .filter(function(p) { return ! p.hidden })
                 .map(foam.core.Property.NAME.f);
       }
-    }
+    },
+    {
+      class: 'Int',
+      name: 'selectedCount'
+    },
+    {
+      class: 'Int',
+      name: 'totalCount'
+    },
   ],
 
   methods: [
     function initE() {
       var self = this;
 
-      // TODO: Add "n of m selected" header.
+      this.dao.on.sub(this.updateTotalCount);
+      this.updateTotalCount();
+
       this.
         add(this.slot(function(filters) {
           var searchManager = self.SearchManager.create({
             dao$: self.dao$,
             predicate$: self.data$
           });
+
+//          searchManager.filteredDAO.on.sub(self.updateSelectedCount);
+          searchManager.filteredDAO$.sub(self.updateSelectedCount);
+          self.updateSelectedCount(0,0,0,searchManager.filteredDAO$);
 
           var e = this.E('div');
 
@@ -93,7 +118,12 @@ foam.CLASS({
           });
 
           return e;
-        }, this.filters$), this.CLEAR);
+        }, this.filters$))
+        .start()
+          .addClass(self.myClass('count'))
+          .add(self.selectedCount$, ' of ', self.totalCount$, ' selected')
+        .end()
+        .start(this.CLEAR).style({float: 'right'}).end();
     },
 
     function addFilter(key) {
@@ -113,6 +143,33 @@ foam.CLASS({
       code: function() {
         this.data = undefined;
         this.filters = this.filters.slice();
+      }
+    }
+  ],
+
+  /*
+  reactions: [
+    [ 'data', 'on', 'updateTotalCount' ]
+  ],
+  */
+
+  listeners: [
+    {
+      name: 'updateTotalCount',
+      isFramed: true,
+      code: function() {
+        this.dao.select(foam.mlang.sink.Count.create()).then(function(c) {
+          this.totalCount = c.value;
+        }.bind(this));
+      }
+    },
+    {
+      name: 'updateSelectedCount',
+      isFramed: true,
+      code: function(_, __, ___, dao) {
+        dao.get().select(foam.mlang.sink.Count.create()).then(function(c) {
+          this.selectedCount = c.value;
+        }.bind(this));
       }
     }
   ]
