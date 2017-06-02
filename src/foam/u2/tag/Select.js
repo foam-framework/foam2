@@ -91,6 +91,5 @@ foam.CLASS({
         'disabled',
         mode === foam.u2.DisplayMode.DISABLED || mode === foam.u2.DisplayMode.RO);
     }
-
   ]
 });
