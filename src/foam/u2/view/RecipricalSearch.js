@@ -37,7 +37,7 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function CSS() {/*
         ^count {
-          font-size: 16pt;
+          font-size: 14pt;
           color: #555;
         }
       */}
@@ -121,7 +121,12 @@ foam.CLASS({
         }, this.filters$))
         .start()
           .addClass(self.myClass('count'))
-          .add(self.selectedCount$, ' of ', self.totalCount$, ' selected')
+          // TODO: move formatting function to stdlib
+          .add(
+            self.selectedCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }),
+            ' of ',
+            self.totalCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }),
+            ' selected')
         .end()
         .start(this.CLEAR).style({float: 'right'}).end();
     },
