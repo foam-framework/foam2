@@ -79,7 +79,5 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
     for ( String key: permissionMap.keySet() ) {
       permissionMap.get(key).remove(user.getId());
     }
-
-    this.getX().put("user", null);
   }
 }

@@ -173,7 +173,5 @@ public class UserAndGroupAuthService
    * Just return a null user for now. Not sure how to handle the cleanup
    * of the current context
    */
-  public void logout(X x) {
-    this.getX().put("user", null);
-  }
+  public void logout(X x) {}
 }
