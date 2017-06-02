@@ -170,7 +170,7 @@ foam.CLASS({
       Marks all the removed objects' sync records as deleted.
     */
     function removeAll(skip, limit, order, predicate) {
-      this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
+      this.delegate.select_(null, skip, limit, order, predicate).then(function(a) {
         a = a.array;
         for ( var i = 0 ; i < a.length ; i++ ) {
           this.remove(a[i]);

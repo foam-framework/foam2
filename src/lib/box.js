@@ -698,7 +698,7 @@ foam.CLASS({
     'foam.dao.BoxDAOListener'
   ],
   methods: [
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 

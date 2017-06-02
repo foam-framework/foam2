@@ -15,8 +15,8 @@ public class OrderedDAO
     return this;
   }
 
-  public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    return super.select(s, skip, limit, order_ == null ? order : order_, predicate);
+  public Sink select_(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    return super.select_(s, skip, limit, order_ == null ? order : order_, predicate);
   }
 
   public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {

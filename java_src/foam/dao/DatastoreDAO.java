@@ -132,7 +132,7 @@ public class DatastoreDAO
         return obj;
     }
 
-    public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    public Sink select_(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
         if (sink == null) {
             sink = new ListSink();
         }

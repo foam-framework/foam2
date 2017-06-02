@@ -209,7 +209,7 @@ foam.CLASS({
       );
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var plan;
 //console.log("----select");

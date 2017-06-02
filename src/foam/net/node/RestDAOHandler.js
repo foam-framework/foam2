@@ -140,7 +140,7 @@ foam.CLASS({
             var limit = data.limit;
             var order = data.order;
             var predicate = data.predicate;
-            self.dao.select(sink, skip, limit, order, predicate)
+            self.dao.select_(sink, skip, limit, order, predicate)
                 .then(function(sink) {
                   // Prevent caching of select() responses.
                   var dateString = new Date().toUTCString();

@@ -52,7 +52,7 @@ foam.CLASS({
       return this.SUPER(obj);
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
       this.logger('select', skip, limit, order, predicate);
       sink = sink || this.ArraySink.create();
       if ( this.logReads ) {

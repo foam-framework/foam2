@@ -64,7 +64,7 @@ foam.CLASS({
       // NOTE: grabbing the first object as we have no other access
       // to the relationship.
 
-      return self.delegate.select(skip, limit, order, predicate).then(function(sink) {
+      return self.delegate.select_(skip, limit, order, predicate).then(function(sink) {
         return Promise.all(
             sink.array.map(function(obj) {
               if (self.pending_.has(obj.id)) {

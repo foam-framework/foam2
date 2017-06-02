@@ -234,6 +234,10 @@ foam.CLASS({
       return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
     },
 
+    function select(sink) {
+      return this.select_(sink, undefined, undefined, undefined, undefined);
+    },
+
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
@@ -292,7 +296,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ]
+      forwards: [ 'put', 'remove', 'find', 'select_', 'removeAll' ]
     }
   ],
 
@@ -304,8 +308,8 @@ foam.CLASS({
       });
     },
 
-    function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(
+    function select_(sink, skip, limit, order, predicate) {
+      return this.delegate.select_(
         sink, skip, limit, order,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
@@ -344,8 +348,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(sink, skip, limit, order || this.comparator, predicate);
+    function select_(sink, skip, limit, order, predicate) {
+      return this.delegate.select_(sink, skip, limit, order || this.comparator, predicate);
     },
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(skip, limit, order || this.comparator, predicate);
@@ -369,8 +373,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(sink, this.skip_, limit, order, predicate);
+    function select_(sink, skip, limit, order, predicate) {
+      return this.delegate.select_(sink, this.skip_, limit, order, predicate);
     },
     function removeAll(skip, limit, order, predicate) {
       return this.delegate.removeAll(this.skip_, limit, order, predicate);
@@ -394,8 +398,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function select(sink, skip, limit, order, predicate) {
-      return this.delegate.select(
+    function select_(sink, skip, limit, order, predicate) {
+      return this.delegate.select_(
         sink, skip,
         limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
         order, predicate);
