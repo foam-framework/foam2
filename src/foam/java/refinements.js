@@ -353,8 +353,8 @@ foam.CLASS({
         cls.buildJavaClass =  function(cls) {
           cls = cls || foam.java.Interface.create();
 
-          cls.name = this.name;
-          cls.package = this.package;
+          cls.name = this.model_.name;
+          cls.package = this.model_.package;
           cls.extends = this.extends;
 
           var axioms = this.getAxioms();
