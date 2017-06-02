@@ -76,10 +76,20 @@ foam.CLASS({
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
           var c = choices[i];
-          cs.push(self.E('option').attrs({
+          let value = c[1];
+          let e = self.E('option').attrs({
             value: i,
             selected: self.data === i ? true : undefined
-          }).add(c[1]));
+          }).add(value);
+
+          if ( value.indexOf('  ') != -1 ) {
+            // Hack to display spaces as nbsp's
+            e.onload.sub(function() {
+              e.el().innerHTML = value.replace(/ /g, '&nbsp;');
+            });
+          }
+
+          cs.push(e);
         }
 
         return cs;
@@ -91,6 +101,5 @@ foam.CLASS({
         'disabled',
         mode === foam.u2.DisplayMode.DISABLED || mode === foam.u2.DisplayMode.RO);
     }
-
   ]
 });
