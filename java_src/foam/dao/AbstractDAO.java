@@ -76,6 +76,6 @@ public abstract class AbstractDAO
   }
 
   public Sink select(Sink sink) {
-    return this.select(sink, 0, Integer.MAX_VALUE, null, null);
+    return this.select_(sink, null, null, null, null);
   }
 }

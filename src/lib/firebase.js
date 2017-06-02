@@ -193,7 +193,7 @@ foam.CLASS({
       }
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
 

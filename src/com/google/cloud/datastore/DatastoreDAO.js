@@ -135,7 +135,7 @@ foam.CLASS({
       })).send().then(this.onResponse.bind(this, 'remove'))
           .then(this.onRemoveResponse.bind(this, o));
     },
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var payload = { query: { kind: [
         this.of.getClassDatastoreKind()
@@ -159,7 +159,7 @@ foam.CLASS({
               })));
     },
     function removeAll(skip, limit, order, predicate) {
-      return this.select(undefined, skip, limit, order, predicate)
+      return this.select_(undefined, skip, limit, order, predicate)
           .then(this.onRemoveAll);
     },
 

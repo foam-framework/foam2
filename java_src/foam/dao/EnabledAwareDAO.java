@@ -15,8 +15,8 @@ public class EnabledAwareDAO
 {
   public static final Predicate PREDICATE = foam.mlang.MLang.EQ(EnabledAware.ENABLED, true);
 
-  public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    return super.select(s, skip, limit, order, PREDICATE);
+  public Sink select_(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    return super.select_(s, skip, limit, order, PREDICATE);
   }
 
   public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {

@@ -40,6 +40,11 @@ foam.INTERFACE({
     {
       name: 'select',
       returns: 'Promise',
+      args: [ 'sink' ]
+    },
+    {
+      name: 'select_',
+      returns: 'Promise',
       args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
     {

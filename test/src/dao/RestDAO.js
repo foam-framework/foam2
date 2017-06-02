@@ -100,7 +100,7 @@ describe('RestDAO', function() {
             limit = data.limit;
             order = data.order;
             predicate = data.predicate;
-            return dao.select(sink, skip, limit, order, predicate)
+            return dao.select_(sink, skip, limit, order, predicate)
               .then(function(sink) {
                 var payload = jsonify(sink);
                 return createResponse({ status: 200, payload: payload });

@@ -56,6 +56,16 @@ foam.INTERFACE({
         {
           name: 'sink',
           javaType: 'foam.dao.Sink'
+        }
+      ]
+    },
+    {
+      name: 'select_',
+      javaReturns: 'foam.dao.Sink',
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
         },
         {
           name: 'skip',

@@ -220,7 +220,7 @@ foam.CLASS({
       If .cacheOnSelect is false, the select()
       bypasses the cache and goes directly to the delegate.
     */
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
       if ( ! this.cacheOnSelect ) {
         return this.SUPER(sink, skip, limit, order, predicate);
       }
@@ -239,7 +239,7 @@ foam.CLASS({
         self.selects_[key] = entry = {
           time: Date.now(),
           promise:
-            self.delegate.select(self.DAOSink.create({ dao: self.cache }), skip, limit, order, predicate)
+            self.delegate.select_(self.DAOSink.create({ dao: self.cache }), skip, limit, order, predicate)
               .then(function(cache) {
                 self.onCacheUpdate();
                 return cache;
@@ -248,13 +248,13 @@ foam.CLASS({
       }
 
       function readFromCache() {
-        return self.cache.select(sink, skip, limit, order, predicate);
+        return self.cache.select_(sink, skip, limit, order, predicate);
       }
 
       // If anything exists in the cache for this query, return it (updates
       // may arrive later and trigger a reset notification). If nothing,
       // wait on the pending cache update.
-      return self.cache.select(this.COUNT(), skip, limit, order, predicate)
+      return self.cache.select_(this.COUNT(), skip, limit, order, predicate)
         .then(function(c) {
           if ( c.value > 0 ) {
             return readFromCache();

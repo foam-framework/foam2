@@ -29,13 +29,13 @@ foam.CLASS({
   documentation: 'DAO Decorator which prevents \'select all\', ie. a select() with no query, limit, or skip.',
 
   methods: [
-    function select(sink, skip, limit, order, predicate) {
+    function select_(sink, skip, limit, order, predicate) {
         if ( predicate &&
              ( ! this.True.isInstance(predicate) &&
                ! this.False.isInstance(predicate) ) ||
           ( foam.Number.isInstance(limit) && Number.isFinite(limit) && limit != 0 ) ||
           ( foam.Number.isInstance(skip) && Number.isFinite(skip) && skip != 0 ) ) {
-        return this.delegate.select(sink, skip, limit, order, predicate);
+        return this.delegate.select_(sink, skip, limit, order, predicate);
       } else {
         sink && sink.eof();
         return Promise.resolve(sink || this.ArraySink.create());
