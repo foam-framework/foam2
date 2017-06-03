@@ -99,18 +99,18 @@ foam.CLASS({
     },
 
     function initE() {
-      this.addClass(this.myClass());
-      this.view = this.start(this.viewSpec, {
-        label$: this.label$,
-        alwaysFloatLabel: true
-      });
-      this.view.end();
+      this
+        .addClass(this.myClass())
+        .tag(this.viewSpec, {
+          label$: this.label$,
+          alwaysFloatLabel: true
+        }, this.view$)
+        .onDetach(
+          this.dao$proxy.listen(
+            this.FnSink.create({fn: this.updateDAO})
+          )
+        );
 
-      this.onDetach(
-        this.dao$proxy.listen(
-          this.FnSink.create({fn: this.updateDAO})
-        )
-      );
       this.updateDAO();
 
       this.view.data$.sub(this.updatePredicate);
