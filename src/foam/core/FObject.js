@@ -69,6 +69,11 @@ foam.LIB({
       // initArgs() is the standard argument extraction method.
       obj.initArgs(args, opt_parent);
 
+      var axioms = this.getInitAgents();
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
+        axioms[i].initObject(obj);
+      }
+
       // init() is called when object is created.
       // This is where class-specific initialization code should
       // be put (not in initArgs).
@@ -101,6 +106,10 @@ foam.LIB({
       };
 
       return this;
+    },
+
+    function getSuperClass() {
+      return this.model_.__context__.lookup(this.model_.extends);
     },
 
     function installAxioms(axs) {
@@ -279,6 +288,17 @@ foam.LIB({
       return as;
     },
 
+    function getInitAgents() {
+      if ( ! this.private_.initAgentsCache ) {
+        this.private_.initAgentsCache = [];
+        for ( var key in this.axiomMap_ ) {
+          var axiom = this.axiomMap_[key];
+          if (axiom.initObject) this.private_.initAgentsCache.push(axiom);
+        }
+      }
+      return this.private_.initAgentsCache;
+    },
+
     // NOP, is replaced if debug.js is loaded
     function validate() { },
 
@@ -438,6 +458,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined;
+        this.clearPrivate_(name);
 
         // Avoid creating slot and publishing event if nobody is listening.
         if ( this.hasListeners('propertyChange', name) ) {
@@ -483,7 +504,9 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
 
-    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
+
+    // Bootstrap form replaced after this.__context__ is added.
+    function lookup() { return foam.lookup.apply(foam, arguments); },
 
     function error() { this.__context__.error.apply(null, arguments); },
 
@@ -737,12 +760,26 @@ foam.CLASS({
                 });
       }
 
-      var axiom = this.cls_.getAxiomByName(obj);
+      if ( foam.Array.isInstance(obj) ) {
+        return foam.core.ExpressionSlot.create({
+          obj: this,
+          args: obj[0].map(this.slot.bind(this)),
+          code: obj[1],
+        });
+      }
+
+      var names = obj.split('$');
+      var axiom = this.cls_.getAxiomByName(names.shift());
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
       foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
-      return axiom.toSlot(this);
+      var slot = axiom.toSlot(this)
+      names.forEach(function(n) {
+        slot = slot.dot(n);
+      });
+
+      return slot;
     },
 
 
@@ -792,6 +829,12 @@ foam.CLASS({
 
     function compareTo(other) {
       if ( other === this ) return 0;
+
+      // Use comparator of other if it is not an FObject.
+      if ( ! foam.core.FObject.isInstance(other) ) {
+        return foam.util.compare(this, other);
+      }
+
       if ( ! other        ) return 1;
 
       if ( this.model_ !== other.model_ ) {
@@ -959,6 +1002,12 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
+    },
+
+    function dot(name) {
+      // Behaves just like Slot.dot().  Makes it easy for creating sub-slots
+      // without worrying if you're holding an FObject or a slot.
+      return this[name + '$'];
     }
   ]
 });

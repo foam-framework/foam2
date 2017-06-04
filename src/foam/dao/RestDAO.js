@@ -69,10 +69,11 @@ foam.CLASS({
           .then(this.onRemoveResponse);
     },
 
-    function find(id) {
+    function find(key) {
       /**
        * GET baseURL/<network-foam-jsonified FOAM object id>
        */
+      var id = this.of.isInstance(key) ? key.id : key;
       return this.createRequest_({
         method: 'GET',
         url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(id))
@@ -180,7 +181,7 @@ foam.CLASS({
       // If not proxying a local unserializable sink, just return the remote.
       if ( wasSerializable ) return remoteSink;
 
-      var array = remoteSink.a;
+      var array = remoteSink.array;
       if ( ! array )
         throw new Error('Expected ArraySink from REST endpoint when proxying local sink');
 

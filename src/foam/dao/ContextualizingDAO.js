@@ -29,12 +29,11 @@ foam.CLASS({
   */},
 
   methods: [
-    /** Found objects are re-created as if this DAO had created them, giving
-      them access to the exports that this DAO has access to. */
+    /** Found objects are cloned into the same context as this DAO */
     function find(id) {
       var self = this;
       return self.delegate.find(id).then(function(obj) {
-        if ( obj ) return obj.cls_.create(obj, self);
+        if ( obj ) return obj.clone(self);
         return null;
       });
     }

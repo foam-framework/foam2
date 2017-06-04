@@ -29,6 +29,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Class',
+      name: 'of',
+      factory: function() {
+        if (this.array.length === 0) return this.lookup('foam.core.FObject');
+        return this.array[0].cls_;
+      },
+    },
+    {
       name: 'array',
       factory: function() { return []; }
     }
@@ -66,21 +74,23 @@ foam.CLASS({
 
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var fc = this.FlowControl.create();
-      for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( fc.stopped ) break;
+      var detached = false;
+      var sub = foam.core.FObject.create();
+      sub.onDetach(function() { detached = true; });
 
-        if ( fc.errorEvt ) {
-          sink.error(fc.errorEvt);
-          return Promise.reject(fc.errorEvt);
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        for ( var i = 0 ; i < self.array.length ; i++ ) {
+          if ( detached ) break;
+
+          sink.put(self.array[i], sub);
         }
 
-        sink.put(this.array[i], fc);
-      }
+        sink.eof();
 
-      sink.eof();
-
-      return Promise.resolve(resultSink);
+        resolve(resultSink);
+      });
     },
 
     function removeAll(skip, limit, order, predicate) {
@@ -104,7 +114,8 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function find(id) {
+    function find(key) {
+      var id = this.of.isInstance(key) ? key.id : key;
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
           return Promise.resolve(this.array[i]);

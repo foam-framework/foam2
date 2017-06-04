@@ -16,6 +16,39 @@
  */
 
 //
+// Refine COUNT to perform two optimizations:
+// (1) Perform a key-only query when the sink is a COUNT;
+// (2) Do not bother construction FObjects on query result batches.
+//
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Count',
+
+  methods: [
+    {
+      name: 'decorateDatastoreQuery',
+      documentation: `Optimize plain COUNT() queries by requesting keys only.
+          This entails filling in runQuery.projection [1] with the magic
+          "__key__" key.
+
+          [1] https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Projection`,
+      code: function(query) {
+        query.projection = [ { property: { name: "__key__" } } ];
+      }
+    },
+    {
+      name: 'fromDatastoreEntityResults',
+      documentation: `Optimize plain COUNT() queries by not constructing
+          FObjects to store results. Input paramter is
+          QueryResultBatch.entityResults [1].
+
+          [1] https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#QueryResultBatch`,
+      code: function(entityResults) { this.value += entityResults.length; }
+    }
+  ]
+});
+
+//
 // Refine Property and DOT to produce datastore property.
 //
 
@@ -36,6 +69,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.expr.Dot',
 
@@ -48,6 +82,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 //
 // Refine constants to produce datastore values. This is needed because
@@ -72,6 +107,7 @@ foam.CLASS({
   ]
 });
 
+
 //
 // Refine AND and subset of binary ops to support toDatastoreFilter().
 //
@@ -95,6 +131,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.predicate.And',
 
@@ -117,11 +154,13 @@ foam.CLASS({
         return { op: 'AND', filters: filters };
       }
     },
+
     function toDatastoreFilter() {
       return { compositeFilter: this.toOwnDatastoreFilter() };
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
@@ -150,11 +189,13 @@ foam.CLASS({
         value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
       };
     },
+
     function toDatastoreFilter() {
       return { propertyFilter: this.toOwnDatastoreFilter() };
     }
   ]
 });
+
 
 //
 // Use above Binary implementation on Google Cloud Datastore-supported
@@ -191,6 +232,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.order.ThenBy',

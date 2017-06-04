@@ -34,7 +34,7 @@
 //       ],
 //       methods: [
 //         function pooledDetach() {
-//           this.a = 0;
+//           this.array = 0;
 //           this.b = 6;
 //         }
 //       ],
@@ -73,7 +73,7 @@
 //     var p = test.PooledClass.create({ a: 5, b: 6 });
 //     p.detach();
 
-//     expect(p.a).toBeUndefined();
+//     expect(p.array).toBeUndefined();
 //     expect(p.b).toBeUndefined();
 //   });
 
@@ -85,8 +85,8 @@
 
 //     // should pull from pool
 //     p = test.PooledClass.create({ a: 5, b: 6 });
-//     i_.a = 99; // hack in a value
-//     expect(p.a).toEqual(99);
+//     i_.array = 99; // hack in a value
+//     expect(p.array).toEqual(99);
 //     expect(p.private_).toBe(p_);
 //   });
 
@@ -98,7 +98,7 @@
 
 //   it('uses the fast pooledDetach() if available', function() {
 //     var p = test.PooledDetachClass.create();
-//     expect(p.a).toEqual(55);
+//     expect(p.array).toEqual(55);
 //     expect(p.b).toEqual(99);
 //     var called = 0;
 //     p.onDetach(function() { called += 1; });
@@ -106,14 +106,14 @@
 
 //     p = test.PooledDetachClass.create();
 //     expect(called).toEqual(1);
-//     expect(p.a).toEqual(0);
+//     expect(p.array).toEqual(0);
 //     expect(p.b).toEqual(6);
 
 //   });
 
 //   it('pooledDetach() can leave private_ intact', function() {
 //     var p = test.PooledDetachClass.create();
-//     expect(p.a).toEqual(55);
+//     expect(p.array).toEqual(55);
 //     expect(p.b).toEqual(99);
 //     var called = 0;
 //     p.onDetach(function() { called += 1; });
@@ -121,15 +121,15 @@
 
 //     p = test.PooledDetachClass.create();
 //     expect(called).toEqual(1);
-//     expect(p.a).toEqual(0);
+//     expect(p.array).toEqual(0);
 //     expect(p.b).toEqual(6);
 
-//     p.a = 88;
+//     p.array = 88;
 //     p.b = 33;
 //     p.detach(); // the destructors from last time are still there
 //     p = test.PooledDetachClass.create();
 //     expect(called).toEqual(2);
-//     expect(p.a).toEqual(0);
+//     expect(p.array).toEqual(0);
 //     expect(p.b).toEqual(6);
 //   });
 

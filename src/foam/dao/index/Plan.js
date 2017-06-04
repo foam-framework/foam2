@@ -42,7 +42,7 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
-    { name: 'cost', value: Number.MAX_VALUE }
+    { name: 'cost', value: 0 }
   ],
 
   methods: [
@@ -301,13 +301,17 @@ foam.CLASS({
 
       // result reading may by async, so define it but don't call it yet
       var resultSink = this.decorateSink_(sink, skip, limit);
-      var fc = this.FlowControl.create();
+
+      var sub = foam.core.FObject.create();
+      var detached = false;
+      sub.onDetach(function() { detached = true; });
+
       function scanResults() {
         // The list starting at head now contains the results plus possible
         //  overflow of skip+limit
         var node = head.next;
-        while ( node && ( ! fc.stopped ) ) {
-          resultSink.put(node.data, fc);
+        while ( node && ! detached ) {
+          resultSink.put(node.data, sub);
           node = node.next;
         }
       }
@@ -328,7 +332,7 @@ foam.CLASS({
       }
     },
 
-    function executeFallback(promise, sink, skip, limit, unusedOrder, predicate) {
+    function executeFallback(promise, sink, skip, limit, order, predicate) {
        /**
         * Executes a merge where ordering is unknown, therefore no
         * sorting is done and deduplication must be done separately.
@@ -347,7 +351,7 @@ foam.CLASS({
            resultSink,
            undefined,
            subLimit,
-           undefined,
+           order,
            predicates[i]
          );
        }
@@ -382,4 +386,3 @@ foam.CLASS({
 
   ]
 });
-

@@ -83,6 +83,16 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Int',
+      documentation: `Maximum number of operations to include in a batch.
+          Since each entity may be in a different entity group, default to
+          transaction entity group limit of 25 [1].
+
+          [1] https://cloud.google.com/datastore/docs/concepts/transactions#transactions_and_entity_groups`,
+      name: 'batchSize',
+      value: 25
+    },
+    {
       class: 'FObjectArray',
       of: 'com.google.cloud.datastore.DatastoreMutation',
       name: 'mutations_'
@@ -145,9 +155,9 @@ foam.CLASS({
     function onBatchTransactionResponse(json) {
       var transaction = json.transaction;
 
-      var mutations = this.mutations_;
+      var mutations = this.mutations_.slice(0, this.batchSize);
       var mutationData = new Array(mutations.length);
-      this.mutations_ = [];
+      this.mutations_ = this.mutations_.slice(this.batchSize);
 
       for ( var i = 0; i < mutations.length; i++ ) {
         mutationData[i] = {};
@@ -179,6 +189,8 @@ foam.CLASS({
       for ( var i = 0; i < mutations.length; i++ ) {
         mutations[i].resolve(operationComplete);
       }
+
+      if ( this.mutations_.length > 0 ) this.onBatchedOperation();
     },
     function onBatchFailure(mutations) {
       for ( var i = 0; i < mutations.length; i++ ) {

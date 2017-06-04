@@ -119,7 +119,7 @@ foam.CLASS({
     function maybeCall(ctx, data) {
       if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
-        data.pub('action', this.name, this);
+        data && data.pub('action', this.name, this);
         return true;
       }
 
@@ -152,7 +152,7 @@ foam.CLASS({
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :
-            foam.lookup(prop.of).create(o) ;
+            this.lookup(prop.of).create(o) ;
       }
     }
   ]

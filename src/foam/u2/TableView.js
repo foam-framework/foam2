@@ -221,7 +221,7 @@ foam.CLASS({
 
       var e = this.start('tr');
       if ( this.selectionQuery$ ) {
-        e.start('td').end();
+        e.tag('td');
       }
 
       for ( var i = 0 ; i < this.columns_.length ; i++ ) {
@@ -286,7 +286,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      factory: function() { return this.data.of; }
     },
     [ 'nodeName', 'table' ],
     {
@@ -325,6 +326,11 @@ foam.CLASS({
       }
     },
     {
+      name: 'config'
+      // Map of property-name: {map of property overrides} for configuring properties
+      // values include 'label', 'units', and 'view'
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'data'
     },
@@ -350,7 +356,23 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.SUPER();
+
+      console.log('Deprecated use of foam.u2.TableView. Use foam.u2.view.TableView instead.');
+    },
+
     function initE() {
+      // Configure columns if 'config' set.
+      if ( this.config ) {
+        for ( var i = 0 ; i < this.columns_.length ; i++ ) {
+          var col = this.columns_[i];
+          var cfg = this.config[col.name];
+
+          if ( cfg ) this.columns_[i] = col.clone().copyFrom(cfg);
+        }
+      }
+
       this.onDAOUpdate();
       this.data$proxy.sub('on', this.onDAOUpdate);
 

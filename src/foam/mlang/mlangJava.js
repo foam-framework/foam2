@@ -16,7 +16,7 @@
  */
 
 foam.INTERFACE({
-  refines: 'foam.mlang.Expr',
+  refines: 'foam.mlang.F',
 
   methods: [
     {
@@ -28,7 +28,14 @@ foam.INTERFACE({
         }
       ],
       javaReturns: 'Object'
-    },
+    }
+  ]
+});
+
+foam.INTERFACE({
+  refines: 'foam.mlang.Expr',
+
+  methods: [
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
@@ -46,7 +53,7 @@ foam.CLASS({
   ]
 });
 
-
+debugger;
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
@@ -107,6 +114,33 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
 
   methods: [
+    {
+      // TODO: This is a duplicate of the method in Predicate,
+      // but it's necessary because when we refine Predicate, it doesn't
+      // update classes that copied their axioms in from Predicate as a trait.
+      // If we were more careful about the ordering of classes this wouldn't be
+      // necessary.
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: 'return false;',
+      javaReturns: 'boolean'
+    },
+    {
+      // TODO: Same TODO as .f method above
+      name: 'toIndex',
+      javaSupport: false
+    },
+    {
+      // TODO: Same TODO as .f
+      name: 'toDisjunctiveNormalForm',
+      javaSupport: false,
+      javaReturns: 'foam.mlang.predicate.Predicate'
+    },
     {
       name: 'partialEval',
       javaCode: 'return this;',
@@ -323,6 +357,23 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Has',
+
+  methods: [
+    {
+      name: 'f',
+      // TODO(kgr): Instead of checking type, use polymorphims and add a
+      // type-specific has() method to the Property.
+      javaCode: `Object value = getArg1().f(obj);
+        return ! (value == null ||
+          (value instanceof String && ((String)value).length() == 0) ||
+          (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
+    }
+  ]
+});
+
+
 foam.INTERFACE({
   refines: 'foam.mlang.order.Comparator',
 
@@ -386,14 +437,6 @@ foam.CLASS({
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     },
     {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
-        'if ( arg1 != null ) {' +
-          'return arg1.toIndex(tail);'+
-        '}'+
-        'return null;'
-    },
-    {
       name: 'orderTail',
       javaCode: 'return null;'
     },
@@ -408,47 +451,6 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  refines: 'foam.mlang.order.ThenBy',
-
-  methods: [
-    {
-      name: 'compare',
-      javaCode: 'int c = getArg1().compare(o1, o2); ' +
-        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
-        'return c;'
-    },
-    {
-      name: 'toString',
-      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
-        '"," + getArg1().toString() + ")";'
-    },
-    {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
-        'foam.mlang.order.Comparator arg2 = getArg2();' +
-        'if ( arg1 != null && arg2 != null ) {' +
-          'return arg1.toIndex(arg2.toIndex(tail));' +
-        '}' +
-        'return null;'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return getArg2();'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1().orderPrimaryProperty();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'return getArg1().orderDirection();'
-    }
-  ]
-});
-
 
 foam.CLASS({
   refines: 'foam.mlang.order.CustomComparator',
@@ -465,6 +467,80 @@ foam.CLASS({
     {
       name: 'orderDirection',
       javaCode: 'return 1;'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Count',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'setValue(this.getValue() + 1);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Max',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: function() {
+/*if (obj.compareTo(this.getValue()) < 0) {
+  this.setValue(obj);
+}*/
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Min',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: function() {
+/*if (obj.compareTo(this.getValue()) > 0) {
+  this.setValue(obj);
+}*/
+      }
     }
   ]
 });

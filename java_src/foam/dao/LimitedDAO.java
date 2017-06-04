@@ -5,8 +5,10 @@ import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
 import foam.dao.Sink;
 
-public class LimitedDAO extends ProxyDAO {
-  private int limit_;
+public class LimitedDAO
+  extends ProxyDAO
+{
+  protected int limit_;
 
   public LimitedDAO setLimit(int limit) {
     limit_ = limit;

@@ -50,12 +50,12 @@ foam.INTERFACE({
     {
       name: 'listen',
       returns: '',
-      args: [ 'sink', 'predicate' ]
+      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
-      args: [ 'sink' ]
+      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'where',

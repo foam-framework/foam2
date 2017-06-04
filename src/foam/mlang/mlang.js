@@ -27,14 +27,15 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Long',
       name: 'value'
     }
   ],
 
   methods: [
     function put() { this.value++; },
-
+    function remove() { this.value--; },
+    function reset() { this.value = 0; },
     function toString() { return 'COUNT()'; }
   ]
 });
@@ -56,15 +57,32 @@ foam.CLASS({
 
 foam.INTERFACE({
   package: 'foam.mlang',
-  name: 'Expr',
+  name: 'F',
 
-  documentation: 'Expression interface: f(obj) -> val.',
+  documentation: 'F interface: f(obj) -> val.',
 
   methods: [
     {
       name: 'f',
-      args: [ 'obj' ]
-    },
+      args: [
+        'obj'
+      ]
+    }
+  ]
+});
+
+// Investigate: If we use "extends: 'foam.mlang.F'" it generates the content properly for both F and Expr.
+// But we have the Constant that extends the AbstractExpr that implements Expr and in this case, the f method
+// (that comes from the F) interface is "losing" its type and returning void instead of returning the same defined
+// on the interface as it should.
+foam.INTERFACE({
+  package: 'foam.mlang',
+  name: 'Expr',
+  implements: ['foam.mlang.F'],
+
+  documentation: 'Expr interface extends F interface: partialEval -> Expr.',
+
+  methods: [
     {
       name: 'partialEval'
     }
@@ -1129,16 +1147,26 @@ foam.CLASS({
   extends: 'foam.dao.ProxySink',
 
   implements: [
-    'foam.mlang.predicate.Unary',
     'foam.core.Serializable'
   ],
 
   documentation: 'Sink Decorator which applies a map function to put() values before passing to delegate.',
 
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+
   methods: [
     function f(o) { return this.arg1.f(o); },
 
-    function put(o) { this.delegate.put( this.f(o) ); }
+    function put(o, sub) { this.delegate.put(this.f(o), sub); },
+
+    function toString() {
+      return 'MAP(' + this.arg1.toString() + ')';
+    }
   ]
 });
 
@@ -1205,30 +1233,30 @@ foam.CLASS({
       return this.groupKeys;
     },
 
-    function putInGroup_(key, obj) {
+    function putInGroup_(sub, key, obj) {
       var group = this.groups.hasOwnProperty(key) && this.groups[key];
       if ( ! group ) {
         group = this.arg2.clone();
         this.groups[key] = group;
         this.groupKeys.push(key);
       }
-      group.put(obj);
+      group.put(obj, sub);
     },
 
-    function put(obj) {
+    function put(obj, sub) {
       var key = this.arg1.f(obj);
       if ( this.processArrayValuesIndividually && Array.isArray(key) ) {
         if ( key.length ) {
-          for ( var i = 0 ; i < key.length ; i++ ) {
-            this.putInGroup_(key[i], obj);
+          for ( var i = 0; i < key.length; i++ ) {
+            this.putInGroup_(sub, key[i], obj);
           }
         } else {
           // Perhaps this should be a key value of null, not '', since '' might
           // actually be a valid key.
-          this.putInGroup_('', obj);
+          this.putInGroup_(sub, '', obj);
         }
       } else {
-        this.putInGroup_(key, obj);
+        this.putInGroup_(sub, key, obj);
       }
     },
 
@@ -1276,7 +1304,7 @@ foam.CLASS({
       group.put(obj);
     },
 
-    function put(obj) {
+    function put(sub, obj) {
       var value = this.expr.f(obj);
       if ( Array.isArray(value) ) {
         throw 'Unique doesn\'t Array values.';
@@ -1564,28 +1592,72 @@ foam.LIB({
 
 foam.CLASS({
   package: 'foam.mlang.sink',
-  name: 'Max',
+  name: 'AbstractUnarySink',
   extends: 'foam.dao.AbstractSink',
 
   implements: [
-    'foam.mlang.predicate.Unary',
     'foam.core.Serializable'
   ],
+
+  documentation: 'An Abstract Sink baseclass which takes only one argument.',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    }
+  ],
+
+  methods: [
+    function toString() {
+      return foam.String.constantize(this.cls_.name) +
+          '(' + this.arg1.toString() + ')';
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Max',
+  extends: 'foam.mlang.sink.AbstractUnarySink',
 
   documentation: 'A Sink which remembers the maximum value put().',
 
   properties: [
     {
-      name: 'value',
-      value: 0
+      class: 'Object',
+      name: 'value'
     }
   ],
 
   methods: [
-    function put(obj) {
-      if ( ! this.hasOwnProperty('value') ) {
+    function put(obj, sub) {
+      if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
         this.value = this.arg1.f(obj);
-      } else if ( foam.util.compare(this.value, this.arg1.f(obj)) < 0 ) {
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.sink',
+  name: 'Min',
+  extends: 'foam.mlang.sink.AbstractUnarySink',
+
+  documentation: 'A Sink which remembers the minimum value put().',
+
+  properties: [
+    {
+      class: 'Object',
+      name: 'value'
+    }
+  ],
+
+  methods: [
+    function put(obj, s) {
+      if ( ! this.hasOwnProperty('value') || foam.util.compare(this.value, this.arg1.f(obj) ) > 0) {
         this.value = this.arg1.f(obj);
       }
     }
@@ -1596,16 +1668,15 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Sum',
-  extends: 'foam.dao.AbstractSink',
-
-  implements: [
-    'foam.mlang.predicate.Unary',
-    'foam.core.Serializable',
-  ],
+  extends: 'foam.mlang.sink.AbstractUnarySink',
 
   documentation: 'A Sink which sums put() values.',
 
   properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1'
+    },
     {
       name: 'value',
       value: 0
@@ -1613,7 +1684,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) { this.value += this.arg1.f(obj); }
+    function put(obj, sub) { this.value += this.arg1.f(obj); }
   ]
 });
 
@@ -1676,10 +1747,11 @@ foam.CLASS({
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
     'foam.mlang.sink.GroupBy',
-    'foam.mlang.sink.Unique',
     'foam.mlang.sink.Map',
     'foam.mlang.sink.Max',
-    'foam.mlang.sink.Sum'
+    'foam.mlang.sink.Min',
+    'foam.mlang.sink.Sum',
+    'foam.mlang.sink.Unique'
   ],
 
   constants: {
@@ -1726,10 +1798,11 @@ foam.CLASS({
     function EXPLAIN(sink) { return this.Explain.create({ delegate: sink }); },
     function COUNT() { return this.Count.create(); },
     function MAX(arg1) { return this.Max.create({ arg1: arg1 }); },
+    function MIN(arg1) { return this.Min.create({ arg1: arg1 }); },
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); },
+    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); }
   ]
 });
 

@@ -93,6 +93,10 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'HelloMessage'
+});
 
 foam.CLASS({
   package: 'foam.box',
@@ -175,6 +179,7 @@ foam.CLASS({
   properties: [
     {
       name: 'registry',
+      hidden: true,
       factory: function() { return {}; }
     }
   ],
@@ -216,6 +221,8 @@ foam.CLASS({
       name: 'register',
       returns: 'foam.box.Box',
       code: function(name, service, localBox) {
+        name = name || foam.next$UID();
+
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
         exportBox = service ? service.clientBox(exportBox) : exportBox;
 
@@ -232,6 +239,16 @@ foam.CLASS({
       name: 'unregister',
       returns: '',
       code: function(name) {
+        if ( foam.box.Box.isInstance(name) ) {
+          for ( var key in this.registry ) {
+            if ( this.registry[key] === name ) {
+              delete this.registry[key];
+              return;
+            }
+          }
+          return;
+        }
+
         delete this.registry[name];
       },
       args: [
@@ -252,6 +269,7 @@ foam.CLASS({
   requires: [
     'foam.box.SubBoxMessage',
     'foam.box.Message',
+    'foam.box.HelloMessage',
     'foam.box.SkeletonBox'
   ],
 
@@ -283,6 +301,7 @@ foam.CLASS({
                 }));
             }
           }
+        } else if ( this.HelloMessage.isInstance(msg.object) ) {
         } else {
           this.registrySkeleton.send(msg);
         }
@@ -466,6 +485,23 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.box',
+  name: 'FunctionBox',
+  implements: ['foam.box.Box'],
+  properties: [
+    {
+      class: 'Function',
+      name: 'fn'
+    }
+  ],
+  methods: [
+    function send(m) {
+      this.fn(m.object);
+    }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -485,6 +521,9 @@ foam.CLASS({
   properties: [
     {
       name: 'topic'
+    },
+    {
+      name: 'destination'
     }
   ]
 });
@@ -592,7 +631,8 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      name: 'box'
+      of: 'foam.box.Box',
+      name: 'box',
     }
   ],
   methods: [
@@ -663,17 +703,18 @@ foam.CLASS({
         var self = this;
 
         return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
-          var items = result.a;
-          var fc = self.FlowControl.create();
+          var items = result.array;
+
+          if ( ! sink ) return result;
+
+          var sub = foam.core.FObject.create();
+          var detached = false;
+          sub.onDetach(function() { detached = true; });
 
           for ( var i = 0 ; i < items.length ; i++ ) {
-            if ( fc.stopped ) break;
-            if ( fc.errorEvt ) {
-              sink.error(fc.errorEvt);
-              return Promise.reject(fc.errorEvt);
-            }
+            if ( detached ) break;
 
-            sink.put(items[i], fc);
+            sink.put(items[i], sub);
           }
 
           sink.eof();
@@ -686,6 +727,7 @@ foam.CLASS({
     },
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
+      // TODO: Unsubscribe support.
       var id = foam.next$UID();
       var replyBox = this.__context__.registry.register(
         id,
@@ -695,15 +737,15 @@ foam.CLASS({
             switch(m.object.name) {
               case 'put':
               case 'remove':
-                sink[m.object.name](m.object.obj);
+                sink[m.object.name](null, m.object.obj);
               break;
               case 'reset':
-                sink.reset();
+                sink.reset(null);
             }
           }
         });
 
-      this.SUPER(this.BoxDAOListener({
+      this.SUPER(this.BoxDAOListener.create({
         box: replyBox
       }), predicate);
     }
@@ -736,7 +778,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'PollingClientDAO',
-  extends: 'foam.dao.EventlessClientDAO',
+  extends: 'foam.dao.ClientDAO',
 
   requires: [
     'foam.dao.ArraySink'
@@ -756,30 +798,6 @@ foam.CLASS({
       return this.SUPER(obj).then(function(o) {
         self.on.remove.pub(obj);
         return o;
-      });
-    },
-
-    function select(sink, skip, limit, order, predicate) {
-      // TODO: Determine which sinks are serializable.
-      sink = sink || this.ArraySink.create();
-
-      var self = this;
-      return this.SUPER(null, skip, limit, order, predicate).then(function(a) {
-        var fc = self.FlowControl.create();
-
-        for ( var i = 0 ; i < a.a.length ; i++ ) {
-          if ( fc.stopped ) break;
-          if ( fc.errorEvt ) {
-            sink.error(fc.errorEvt);
-            throw fc.errorEvt;
-          }
-
-          sink.put(a.a[i], fc);
-        }
-
-        sink.eof();
-
-        return sink;
       });
     },
 
@@ -851,8 +869,6 @@ foam.CLASS({
 
   requires: [
     'foam.box.Message',
-    'foam.box.SubscribeMessage',
-    'foam.box.EventMessage',
     'foam.box.RPCMessage',
     'foam.box.RPCReturnMessage',
     'foam.box.InvalidMessageException'
@@ -896,7 +912,7 @@ foam.CLASS({
               }));
           });
       } else {
-        replyBox.send(this.Message.create({
+        replyBox && replyBox.send(this.Message.create({
           object: this.RPCReturnMessage.create({ data: p })
         }));
       }
@@ -905,28 +921,6 @@ foam.CLASS({
     function send(message) {
       if ( this.RPCMessage.isInstance(message.object) ) {
         this.call(message);
-        return;
-      } else if ( this.SubscribeMessage.isInstance(message.object) ) {
-        // TODO: Unsub support
-        var dest = message.attributes.replyBox;
-        var args = message.object.topic.slice();
-
-        var self = this;
-
-        args.push(function() {
-          var args = Array.from(arguments);
-
-          // Cannot serialize the subscription object.
-          args.shift();
-
-          dest.send(self.Message.create({
-            object: self.EventMessage.create({
-              args: args
-            })
-          }));
-        });
-
-        this.data.sub.apply(this.data, args);
         return;
       }
 
@@ -1209,13 +1203,77 @@ foam.CLASS({
 });
 
 
+// TODO: Find the right package for this.
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ClassWhitelistContext',
+  exports: [
+    'lookup'
+  ],
+  properties: [
+    {
+      class: 'StringArray',
+      name: 'whitelist'
+    },
+    {
+      name: 'whitelist_',
+      expression: function(whitelist) {
+        var w = {};
+        for ( var i = 0 ; i < whitelist.length ; i++ ) {
+          w[whitelist[i]] = true;
+        }
+        return w;
+      }
+    }
+  ],
+  methods: [
+    {
+      class: 'ContextMethod',
+      name: 'lookup',
+      code: function(X, id) {
+        if ( ! this.whitelist_[id] ) {
+          throw new Error('Class "' + id + '" is not whitelisted.');
+        }
+        return this.__context__.lookup.call(X, id);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'LoggedLookupContext',
+  exports: [
+    'lookup',
+  ],
+  properties: [
+    {
+      class: 'Map',
+      name: 'record'
+    }
+  ],
+  methods: [
+    {
+      class: 'ContextMethod',
+      name: 'lookup',
+      code: function(X, id) {
+        this.record[id] = id;
+        return this.__context__.lookup.call(X, id);
+      }
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
 
   requires: [
     'foam.box.BoxRegistryBox',
-    'foam.box.NamedBox'
+    'foam.box.NamedBox',
+    'foam.parsers.FON',
+    'foam.box.ClassWhitelistContext',
+    'foam.box.LoggedLookupContext',
   ],
 
   exports: [
@@ -1224,14 +1282,16 @@ foam.CLASS({
     'webSocketService',
     'registry',
     'root',
-    'me'
+    'me',
+    'fonParser'
   ],
 
   properties: [
     {
       name: 'messagePortService',
+      hidden: true,
       factory: function() {
-        var model = foam.lookup('foam.messageport.MessagePortService', true);
+        var model = this.lookup('foam.messageport.MessagePortService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
@@ -1241,8 +1301,9 @@ foam.CLASS({
     },
     {
       name: 'socketService',
+      hidden: true,
       factory: function() {
-        var model = foam.lookup('foam.net.node.SocketService', true);
+        var model = this.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
             delegate: this.registry
@@ -1252,9 +1313,10 @@ foam.CLASS({
     },
     {
       name: 'webSocketService',
+      hidden: true,
       factory: function() {
-        var model = foam.lookup('foam.net.node.WebSocketService', true) ||
-            foam.lookup('foam.net.web.WebSocketService', true);
+        var model = this.lookup('foam.net.node.WebSocketService', true) ||
+            this.lookup('foam.net.web.WebSocketService', true);
 
         if ( model ) {
           return model.create({
@@ -1265,28 +1327,58 @@ foam.CLASS({
     },
     {
       name: 'registry',
+      hidden: true,
       factory: function() {
         return this.BoxRegistryBox.create();
       }
     },
     {
       name: 'root',
+      hidden: true,
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
       }
     },
     {
       class: 'String',
-      name: 'myname'
+      name: 'myname',
+      hidden: true,
     },
     {
       name: 'me',
+      hidden: true,
       factory: function() {
         var me = this.NamedBox.create({
           name: this.myname || ( '/com/foamdev/anonymous/' + foam.uuid.randomGUID() )
         });
         me.delegate = this.registry;
         return me;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'unsafe',
+      value: true
+    },
+    {
+      class: 'StringArray',
+      name: 'classWhitelist'
+    },
+    {
+      name: 'fonParser',
+      hidden: true,
+      factory: function() {
+        // TODO: Better way to inject the class whitelist.
+        if ( this.unsafe ) {
+          var context = this.LoggedLookupContext.create();
+          console.warn('**** Boxes are running in UNSAFE mode.  Turn this off before you go to production!');
+        } else {
+          var context = this.ClassWhitelistContext.create({
+            whitelist: this.classWhitelist
+          });
+        }
+
+        return this.FON.create({ creationContext: context.__subContext__ });
       }
     }
   ]
@@ -1393,7 +1485,8 @@ foam.CLASS({
   ],
 
   imports: [
-    'me'
+    'me',
+    'fonParser'
   ],
 
   properties: [
@@ -1441,7 +1534,7 @@ foam.CLASS({
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          this.me.send(foam.json.parseString(p, this));
+          this.me.send(this.fonParser.parseString(p));
         }.bind(this));
       }
     }
@@ -1477,6 +1570,67 @@ foam.CLASS({
 
 	return this.RawMessagePortBox.create({ port: channel.port1 });
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardedMessage',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      name: 'destination'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'payload'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.ForwardedMessage'
+  ],
+  properties: [
+    {
+      name: 'destination'
+    }
+  ],
+  methods: [
+    function send(m) {
+      m.object = this.ForwardedMessage.create({
+        destination: this.destination,
+        payload: m.object
+      });
+      this.SUPER(m);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'ForwardingBox',
+  implements: [ 'foam.box.Box' ],
+  requires: [
+    'foam.box.ForwardedMessage'
+  ],
+  methods: [
+    function send(m) {
+      if ( ! this.ForwardedMessage.isInstance(m.object) ) throw foam.box.InvalidMessageException.create();
+
+      var wrapper = m.object;
+      m.object = wrapper.payload;
+
+      wrapper.destination.describe();
+
+
+      wrapper.destination.send(m);
     }
   ]
 });

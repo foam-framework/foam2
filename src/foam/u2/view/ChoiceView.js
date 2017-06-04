@@ -155,7 +155,8 @@ foam.CLASS({
       name: 'view_'
     },
     'feedback_',
-    'defaultValue'
+    'defaultValue',
+    'size'
   ],
 
   methods: [
@@ -173,7 +174,9 @@ foam.CLASS({
         label$: this.label$,
         alwaysFloatLabel: this.alwaysFloatLabel,
         choices$: this.choices$,
-        placeholder$: this.placeholder$
+        placeholder$: this.placeholder$,
+        mode$: this.mode$,
+        size: this.size
       }).end();
 
       this.dao$proxy.on.sub(this.onDAOUpdate);
@@ -184,7 +187,7 @@ foam.CLASS({
       var choices = this.choices;
       var data = choice[0];
       for ( var i = 0 ; i < choices.length ; i++ ) {
-        if ( choices[i][0] === data ) return i;
+        if ( foam.util.equals(choices[i][0], data) ) return i;
       }
       var text = choice[1];
       for ( var i = 0 ; i < choices.length ; i++ ) {
@@ -196,7 +199,7 @@ foam.CLASS({
     function findChoiceByData(data) {
       var choices = this.choices;
       for ( var i = 0 ; i < choices.length ; i++ ) {
-        if ( choices[i][0] === data ) return choices[i];
+        if ( foam.util.equals(choices[i][0], data) ) return choices[i];
       }
       return null;
     },
@@ -210,6 +213,7 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
+      this.SUPER(p);
       this.defaultValue = p.value;
     }
   ],
@@ -219,11 +223,8 @@ foam.CLASS({
       name: 'onDAOUpdate',
       isFramed: true,
       code: function() {
-        this.dao.select(foam.mlang.sink.Map.create({
-          arg1: this.objToChoice,
-          delegate: foam.dao.ArraySink.create()
-        })).then(function(map) {
-          this.choices = map.delegate.a;
+        this.dao.select().then(function(s) {
+          this.choices = s.array.map(this.objToChoice);
           if ( ! this.data && this.index === -1 ) this.index = this.placeholder ? -1 : 0;
         }.bind(this));
       }
