@@ -307,6 +307,10 @@ foam.CLASS({
     },
     {
       name: 'value',
+      adapt: function(_, n) {
+        if ( foam.String.isInstance(n) ) n = this.of[n];
+        return n
+      },
       expression: function(of) {
         return of && of.VALUES[0];
       },
