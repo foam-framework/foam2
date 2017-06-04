@@ -86,6 +86,7 @@ foam.CLASS({
         this.pending[modelId] = modelDao.find(modelId).then(function(m) {
           // Model validation may make use of deps. Require them first, then
           // validate the model.
+          foam.assert(m, 'Cannot find ' + modelId);
           return m.arequire(deps).then(function() {
             m.validate();
             return m;

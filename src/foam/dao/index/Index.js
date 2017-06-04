@@ -58,14 +58,13 @@ foam.CLASS({
       }
     }
   ],
-  methods: [
 
+  methods: [
     function estimate(size, sink, skip, limit, order, predicate) {
       /** Estimates the performance of this index given the number of items
         it will hold and the planned parameters. */
       return size * size; // n^2 is a good worst-case estimate by default
     },
-
 
     function toPrettyString(indent) {
       /** Output a minimal, human readable, indented (2 spaces per level)
@@ -79,6 +78,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 /**
   The IndexNode interface represents a piece of the index that actually
@@ -124,9 +124,6 @@ foam.CLASS({
     function select(sink, skip, limit, order, predicate, cache) { },
 
     /** Efficiently (if possible) loads the contents of the given DAO into the index */
-    function bulkLoad(dao) {},
+    function bulkLoad(dao) {}
   ]
 });
-
-
-

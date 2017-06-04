@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  requires: [
+    'foam.dao.ProxyListener'
+  ],
+
   documentation: 'Proxy implementation for the DAO interface.',
 
   properties: [
@@ -27,14 +31,11 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      topics: [ 'on' ],
       forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
+      factory: function() { return foam.dao.NullDAO.create() },
       postSet: function(old, nu) {
-        // Only fire a 'reset' when the delegate is actually changing, not being
-        // set for the first time.
-        if ( old ) {
-          this.on.reset.pub();
-        }
+        if ( old ) this.on.reset.pub();
       }
     },
     {
@@ -42,6 +43,60 @@ foam.CLASS({
       factory: function() {
         return this.delegate.of;
       }
+    }
+  ],
+
+  methods: [
+    function listen(sink, skip, limit, order, predicate) {
+      var listener = this.ProxyListener.create({
+        delegate: sink,
+        args: [skip, limit, order, predicate]
+      });
+
+      listener.onDetach(listener.dao$.follow(this.delegate$));
+
+      return listener;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyListener',
+
+  implements: ['foam.dao.Sink'],
+
+  properties: [
+    'args',
+    'delegate',
+    {
+      name: 'innerSub',
+      postSet: function(_, s) {
+        if (s) this.onDetach(s);
+      }
+    },
+    {
+      name: 'dao',
+      postSet: function(old, nu) {
+        this.innerSub && this.innerSub.detach();
+        this.innerSub = nu && nu.listen.apply(nu, [this].concat(this.args));
+        if ( old ) this.reset();
+      }
+    }
+  ],
+
+  methods: [
+    function put(obj, s) {
+      this.delegate.put(this, obj);
+    },
+
+    function remove(obj, s) {
+      this.delegate.remove(this, obj);
+    },
+
+    function reset(s) {
+      this.delegate.reset(this);
     }
   ]
 });
@@ -54,17 +109,21 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Array',
+      name: 'array'
+    },
+    {
       name: 'a',
-      factory: function() { return []; },
-      fromJSON: function(json, ctx) {
-        return foam.json.parse(json, null, ctx);
+      getter: function() {
+        this.warn('Use of deprecated ArraySink.a');
+        return this.array;
       }
-    }
+    },
   ],
 
   methods: [
-    function put(o) {
-      this.a.push(o);
+    function put(o, sub) {
+      this.array.push(o);
     }
   ]
 });
@@ -79,8 +138,7 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
-      topics: [ 'on' ],
+      methods: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
       name: 'promise'
     }
   ]
@@ -135,6 +193,20 @@ foam.LIB({
         // of package.ClassName into package.ClassNameDAO
         return str.substring(0, 1).toLowerCase() + str.substring(1) + 'DAO';
       })
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'InvalidArgumentException',
+  extends: 'foam.dao.ExternalException',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'message'
     }
   ]
 });

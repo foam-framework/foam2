@@ -46,7 +46,7 @@ foam.CLASS({
 
     function send400(req, res, error) {
       this.sendMessage(req, res, 400, 'Bad request');
-      this.error('Bad request: ' + error);
+      this.reportErrorMsg(req, ' Bad request: ' + error);
     },
 
     function send404(req, res) {
@@ -55,7 +55,7 @@ foam.CLASS({
 
     function send500(req, res, error) {
       this.sendMessage(req, res, 500, 'Internal server error');
-      this.error('Internal server error: ' + error);
+      this.reportErrorMsg(req, 'Internal server error: ' + error);
     },
     function sendMessage(req, res, status, msg) {
       if ( req.headers.accept &&
@@ -64,6 +64,12 @@ foam.CLASS({
       } else {
         this.send(res, status, msg);
       }
+    },
+    function reportWarnMsg(req, msg) {
+      this.warn(req.socket.remoteAddress, msg);
+    },
+    function reportErrorMsg(req, msg) {
+      this.error(req.socket.remoteAddress, msg);
     }
   ]
 });

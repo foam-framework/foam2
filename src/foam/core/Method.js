@@ -138,7 +138,7 @@ foam.CLASS({
     function installInClass(cls, superMethod, existingMethod) {
       var method = this;
 
-      var parent = existingMethod || superMethod;
+      var parent = superMethod;
       if ( parent && foam.core.AbstractMethod.isInstance(parent) ) {
         method = parent.createChildMethod_(method);
       }

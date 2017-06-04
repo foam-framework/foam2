@@ -55,6 +55,12 @@ foam.CLASS({
       this.attrSlot(
         'value',
         this.onKey ? 'input' : 'change').linkFrom(this.data$);
+    },
+
+    function updateMode_(mode) {
+      // TODO: make sure that DOM is updated if values don't change
+      this.setAttribute('readonly', mode === foam.u2.DisplayMode.RO);
+      this.setAttribute('disabled', mode === foam.u2.DisplayMode.DISABLED);
     }
   ]
 });

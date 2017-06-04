@@ -32,7 +32,8 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.dao.PromisedDAO'
+    'foam.dao.PromisedDAO',
+    'foam.dao.DAOSink',
   ],
 
   properties: [
@@ -68,7 +69,7 @@ foam.CLASS({
         var self = this;
         var cacheFilled = cache.removeAll().then(function() {
           // First clear cache, then load the src into the cache
-          return src.select(cache).then(function() {
+          return src.select(self.DAOSink.create({dao: cache})).then(function() {
             return cache;
           });
         });

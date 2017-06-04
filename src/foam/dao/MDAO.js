@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
+    'foam.dao.InvalidArgumentException',
     'foam.dao.ObjectNotFoundException',
     'foam.dao.index.AltIndex',
     'foam.dao.index.AutoIndex',
@@ -137,7 +138,7 @@ foam.CLASS({
       var self = this;
       var sink = self.ArraySink.create();
       return dao.select(sink).then(function() {
-        var a = sink.a;
+        var a = sink.array;
         self.index.bulkLoad(a);
         for ( var i = 0; i < a.length; ++i ) {
           var obj = a[i];
@@ -155,12 +156,15 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function find(key) {
-      if ( key === undefined ) {
-        return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
+    function find(objOrKey) {
+      if ( objOrKey === undefined ) {
+        return Promise.reject(this.InvalidArgumentException.create({
+          message: '"key" cannot be undefined/null'
+        }));
       }
 
-      return Promise.resolve(this.find_(key));
+      return Promise.resolve(this.find_(
+          this.of.isInstance(objOrKey) ? objOrKey.id : objOrKey));
     },
 
     /** internal, synchronous version of find, does not throw */
@@ -195,7 +199,7 @@ foam.CLASS({
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
-          var a = sink.a;
+          var a = sink.array;
           for ( var i = 0 ; i < a.length ; i++ ) {
             self.index.remove(a[i]);
             self.pub('on', 'remove', a[i]);
@@ -231,7 +235,6 @@ foam.CLASS({
           return Promise.resolve(sink);
         },
         function(err) {
-          sink && sink.error && sink.error(err);
           return Promise.reject(err);
         }
       );
@@ -250,7 +253,7 @@ foam.CLASS({
         // NOTE: we pass sink here, but it's not going to be the one eventually
         // used.
         plans.push(
-          this.index.plan(sink, undefined, subLimit, undefined, args[i], this.index)
+          this.index.plan(sink, undefined, subLimit, order, args[i], this.index)
         );
       }
 

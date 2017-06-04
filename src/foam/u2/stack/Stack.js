@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.u2.stack',
   name: 'Stack',
+
   properties: [
     {
       name: 'stack_',
@@ -48,6 +49,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function slotAt(i) {
       return this.StackSlot.create({
@@ -55,38 +57,45 @@ foam.CLASS({
         stack: this
       });
     },
+
     function at(i) {
       return i < 0 ? this.stack_[this.pos + i + 1] : this.stack_[i];
     },
-    function push(v) {
+
+    function push(v, parent) {
+      // "parent" is the parent object for this view spec.  A view of this stack
+      // should ensure that the context that "v" is rendered in extends from
+      // both the u2.Element is it being rendered under, and from the "parent"
+      // parameter.  This way views on the stack can export values to views
+      // that get rendered after them.
       var pos = this.pos + 1;
 
       this.depth = pos + 1;
       this.stack_.length = this.depth;
-      this.stack_[pos] = v;
+      this.stack_[pos] = [v, parent];
       this.pos = pos;
     }
   ],
+
   actions: [
     {
       name: 'back',
       isEnabled: function(pos) { return pos > 0; },
-      code: function() {
-        this.pos--;
-      }
+      code: function() { this.pos--; }
     },
     {
       name: 'forward',
       isEnabled: function(pos, depth) { return pos < depth - 1; },
-      code: function() {
-        this.pos++;
-      }
+      code: function() { this.pos++; }
     }
   ],
+
   classes: [
     {
       name: 'StackSlot',
+
       implements: [ 'foam.core.Slot' ],
+
       properties: [
         {
           name: 'stack'
@@ -96,27 +105,32 @@ foam.CLASS({
           name: 'pos'
         }
       ],
+
       methods: [
         function init() {
           this.onDetach(this.stack.pos$.sub(this.onStackChange));
         },
+
         function get() {
           return this.stack.at(this.pos);
         },
+
         function set() {
           // unimplemnted.
         },
+
         function sub(l) {
           return this.SUPER('update', l);
         },
+
         function toString() {
           return 'StackSlot(' + this.pos + ')';
         }
       ],
+
       listeners: [
         function onStackChange(s) {
-          if ( this.pos < 0 ||
-              this.pos === this.stack.pos ) {
+          if ( this.pos < 0 || this.pos === this.stack.pos ) {
             this.pub('update');
           }
         }

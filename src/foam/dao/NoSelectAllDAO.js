@@ -20,7 +20,11 @@ foam.CLASS({
   name: 'NoSelectAllDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  requires: [ 'foam.dao.ArraySink' ],
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.mlang.predicate.True',
+    'foam.mlang.predicate.False'
+  ],
 
   documentation: 'DAO Decorator which prevents \'select all\', ie. a select() with no query, limit, or skip.',
 

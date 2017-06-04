@@ -123,10 +123,10 @@ describe('MDAO with TreeIndex', function() {
 
   it('bulk loads', function(done) {
     AlbumDAO.select().then(function(s) {
-      expect(s.a.length).toEqual(NUM_ALBUMS);
+      expect(s.array.length).toEqual(NUM_ALBUMS);
     }).then(function() {
       PhotoDAO.select().then(function(s) {
-        expect(s.a.length).toEqual(NUM_PHOTOS);
+        expect(s.array.length).toEqual(NUM_PHOTOS);
       }).then(done);
     })
   });
@@ -134,13 +134,13 @@ describe('MDAO with TreeIndex', function() {
   it('selects with mutliple keys', function(done) {
     PhotoDAO.where(M.IN(test.Photo.ID, KEYS_SINGLE)).select()
       .then(
-        function(s) { expect(s.a.length).toEqual(KEYS_SINGLE.length); }
+        function(s) { expect(s.array.length).toEqual(KEYS_SINGLE.length); }
       ).then(
         PhotoDAO.where(M.IN(test.Photo.ID, KEYS_A_FEW)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_A_FEW.length); })
+          .then(function(s) { expect(s.array.length).toEqual(KEYS_A_FEW.length); })
       ).then(
         PhotoDAO.where(M.IN(test.Photo.ID, KEYS_LOTS)).select()
-          .then(function(s) { expect(s.a.length).toEqual(KEYS_LOTS.length); })
+          .then(function(s) { expect(s.array.length).toEqual(KEYS_LOTS.length); })
       ).then(done);
   });
 
@@ -148,8 +148,8 @@ describe('MDAO with TreeIndex', function() {
     var idsink = foam.dao.ArraySink.create();
     return AlbumDAO.where(M.EQ(test.Album.IS_LOCAL, false)).select(M.MAP(test.Album.ID, idsink))
       .then(function (idsmapsink) {
-        return PhotoDAO.where(M.IN(test.Photo.ALBUM_ID, idsink.a)).select().then(function(csink) {
-          expect(csink.a.length).toEqual(NUM_PHOTOS / 2);
+        return PhotoDAO.where(M.IN(test.Photo.ALBUM_ID, idsink.array)).select().then(function(csink) {
+          expect(csink.array.length).toEqual(NUM_PHOTOS / 2);
         });
       }).then(done);
   });
@@ -158,7 +158,7 @@ describe('MDAO with TreeIndex', function() {
     var asink = foam.dao.ArraySink.create();
     PhotoDAO.where(M.EQ(test.Photo.ALBUM_ID, avgAlbumKey))
       .orderBy(M.DESC(test.Photo.TIMESTAMP)).select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
@@ -174,7 +174,7 @@ describe('MDAO with TreeIndex', function() {
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.GT(test.Photo.TIMESTAMP, cutOff))
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
@@ -191,7 +191,7 @@ describe('MDAO with TreeIndex', function() {
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.GT(test.Photo.TIMESTAMP, cutOff))
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
@@ -208,7 +208,7 @@ describe('MDAO with TreeIndex', function() {
       .orderBy(M.DESC(test.Photo.TIMESTAMP))
       .where(M.LT(test.Photo.TIMESTAMP, cutOff))
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() >= a[i].timestamp.getTime()).toEqual(true);
@@ -225,7 +225,7 @@ describe('MDAO with TreeIndex', function() {
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.LT(test.Photo.TIMESTAMP, cutOff))
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
@@ -243,7 +243,7 @@ describe('MDAO with TreeIndex', function() {
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
@@ -270,7 +270,7 @@ describe('MDAO with TreeIndex', function() {
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
       .limit(countSink.value - 5)
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         expect(a.length).toEqual(countSink.value - 5);
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
@@ -298,7 +298,7 @@ describe('MDAO with TreeIndex', function() {
       .where(M.AND(M.LT(test.Photo.TIMESTAMP, upper), M.GT(test.Photo.TIMESTAMP, lower)))
       .skip(countSink.value - 5) // skip all but 5
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         expect(a.length).toEqual(5);
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
@@ -319,7 +319,7 @@ describe('MDAO with TreeIndex', function() {
       .orderBy(test.Photo.TIMESTAMP)
       .where(M.OR(M.GT(test.Photo.TIMESTAMP, upper), M.LT(test.Photo.TIMESTAMP, lower)))
       .select(asink).then(function() {
-        var a = asink.a;
+        var a = asink.array;
         var prev = a[0];
         for ( var i = 1; i < a.length; ++i ) {
           expect(prev.timestamp.getTime() <= a[i].timestamp.getTime()).toEqual(true);
@@ -333,13 +333,13 @@ describe('MDAO with TreeIndex', function() {
   it('selects negated queries', function(done) {
     PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_SINGLE))).select()
       .then(
-        function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_SINGLE.length); }
+        function(s) { expect(s.array.length).toEqual(NUM_PHOTOS - KEYS_SINGLE.length); }
       ).then(
         PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_A_FEW))).select()
-          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_A_FEW.length); })
+          .then(function(s) { expect(s.array.length).toEqual(NUM_PHOTOS - KEYS_A_FEW.length); })
       ).then(
         PhotoDAO.where(M.NOT(M.IN(test.Photo.ID, KEYS_LOTS))).select()
-          .then(function(s) { expect(s.a.length).toEqual(NUM_PHOTOS - KEYS_LOTS.length); })
+          .then(function(s) { expect(s.array.length).toEqual(NUM_PHOTOS - KEYS_LOTS.length); })
       ).then(done);
   });
 

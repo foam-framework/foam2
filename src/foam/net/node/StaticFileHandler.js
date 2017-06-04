@@ -43,8 +43,7 @@ foam.CLASS({
 
   imports: [
     'log',
-    'info',
-    'warn'
+    'info'
   ],
 
   properties: [
@@ -113,7 +112,8 @@ foam.CLASS({
       // The relative path can't start with .. or it's outside the dir.
       if ( rel.startsWith('..') ) {
         this.send404(req, res);
-        this.warn('Attempt to read static file outside directory: ' + target);
+        this.reportWarnMsg(
+          req, 'Attempt to read static file outside directory: ' + target);
         return true;
       }
 
@@ -121,14 +121,14 @@ foam.CLASS({
       // We try to stream the file to the other end.
       if ( ! this.fs.existsSync(target) ) {
         this.send404(req, res);
-        this.warn('File not found: ' + target);
+        this.reportWarnMsg(req, 'File not found: ' + target);
         return true;
       }
 
       var stats = this.fs.statSync(target);
       if ( stats.isDirectory() ) {
         this.send404(req, res);
-        this.warn('Attempt to read directory: ' + target);
+        this.reportWarnMsg(req, 'Attempt to read directory: ' + target);
         return true;
       }
 

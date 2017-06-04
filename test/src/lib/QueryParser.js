@@ -87,9 +87,9 @@ describe('Query parser', function() {
     return function(actual) {
       // Check there were no extras.
       var seen = {};
-      for ( var i = 0; i < actual.a.length; i++ ) {
-        seen[actual.a[i].id] = true;
-        expect(expected.indexOf(actual.a[i].id)).toBeGreaterThan(-1);
+      for ( var i = 0; i < actual.array.length; i++ ) {
+        seen[actual.array[i].id] = true;
+        expect(expected.indexOf(actual.array[i].id)).toBeGreaterThan(-1);
       }
 
       // And all expected values were covered.
@@ -241,7 +241,7 @@ describe('Query parser', function() {
     var dao2 = foam.dao.ArrayDAO.create({
       of: Item
     }, foam.__context__);
-    dao.select(dao2);
+    dao.select(foam.dao.DAOSink.create({ dao: dao2 }));
 
     var todayItem = Item.create({
       id: 6,

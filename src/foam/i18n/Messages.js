@@ -23,31 +23,31 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'name',
-      class: 'String'
+      class: 'String',
+      name: 'name'
     },
     {
-      name: 'description',
-      class: 'String'
+      class: 'String',
+      name: 'description'
     },
     {
+      class: 'Object',
       name: 'messageMap',
       help: 'Map of language codes to the message in that language.',
-      class: 'Object',
+      factory: function() { return {}; }
     },
     {
-      name: 'message',
       class: 'String',
-      getter: function() {
-        return this.message_ || this.messageMap[foam.locale];
-      },
-      setter: function(m) { this.message_ = m; },
+      name: 'message',
+      getter: function() { return this.message_ || this.messageMap[foam.locale]; },
+      setter: function(m) { this.message_ = this.messageMap[foam.locale] = m; }
     },
     {
-      name: 'message_',
       class: 'Simple',
-    },
+      name: 'message_'
+    }
   ],
+
   methods: [
     function installInClass(cls) {
       Object.defineProperty(
@@ -58,11 +58,13 @@ foam.CLASS({
           configurable: false
         });
     },
+
     function installInProto(proto) {
       this.installInClass(proto);
-    },
-  ],
+    }
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.i18n',
@@ -77,4 +79,3 @@ foam.CLASS({
     }
   ]
 });
-

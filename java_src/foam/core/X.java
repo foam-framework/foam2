@@ -24,8 +24,7 @@ public interface X
   public X put(String name, Object value);
   public X putFactory(String name, XFactory factory);
 
-
-  // Facet manager
+  // Facet Manager
   public Object getInstanceOf(Object value, Class type);
   public <T> T create(Class<T> type);
 }

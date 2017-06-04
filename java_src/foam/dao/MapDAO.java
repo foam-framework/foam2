@@ -6,16 +6,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-public class MapDAO extends AbstractDAO {
-  private Map<Object, FObject> data_ = null;
+public class MapDAO
+  extends AbstractDAO
+{
+  protected Map<Object, FObject> data_ = null;
+  protected ClassInfo            of_ = null;
 
-  private synchronized void data_factory() {
+  protected synchronized void data_factory() {
     if ( data_ == null ) {
-      data_ = (Map<Object, FObject>)getX().create(ConcurrentHashMap.class);
+      data_ = (Map<Object, FObject>) new ConcurrentHashMap();
     }
   }
 
-  private Map<Object, FObject> getData() {
+  protected Map<Object, FObject> getData() {
     if ( data_ == null ) {
       data_factory();
     }
@@ -24,6 +27,16 @@ public class MapDAO extends AbstractDAO {
 
   public void setData(Map<Object, FObject> data) {
     data_ = data;
+  }
+
+  public ClassInfo getOf() {
+    return of_;
+  }
+
+  public MapDAO setOf(ClassInfo of) {
+    of_ = of;
+    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
+    return this;
   }
 
   public FObject put(FObject obj) {
@@ -36,9 +49,12 @@ public class MapDAO extends AbstractDAO {
     return obj;
   }
 
-  public FObject find(Object id) {
-    FObject result = getData().get(id);
-    return result;
+  public FObject find(Object o) {
+    if( getOf().getObjClass().isInstance(o) ) {
+      return getData().get(getPrimaryKey().get(o));
+    } else {
+      return getData().get(o);
+    }
   }
 
   public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
@@ -46,21 +62,13 @@ public class MapDAO extends AbstractDAO {
       sink = new ListSink();
     }
 
-    Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
-
-    FlowControl fc = (FlowControl)getX().create(FlowControl.class);
+    Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
+    Subscription sub       = getX().create(Subscription.class);
 
     for ( FObject obj : getData().values() ) {
-      if ( fc.getStopped() || fc.getErrorEvt() != null ) {
-        break;
-      }
+      if ( sub.getDetached() ) break;
 
-      decorated.put(obj, fc);
-    }
-
-    if ( fc.getErrorEvt() != null ) {
-      decorated.error();
-      return sink;
+      decorated.put(obj, sub);
     }
 
     decorated.eof();

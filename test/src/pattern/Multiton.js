@@ -48,4 +48,37 @@ describe('Multiton axiom', function() {
     expect(a1.equals(b)).toBe(false);
     expect(b.equals(a1)).toBe(false);
   });
+
+  it('should work when overwriting Singleton', function() {
+    foam.CLASS({
+      name: 'SingletonClass',
+      axioms: [
+        foam.pattern.Singleton.create()
+      ],
+    });
+    foam.CLASS({
+      name: 'MultitonSubClass',
+      extends: 'SingletonClass',
+      axioms: [
+        foam.pattern.Multiton.create({property: 'id'})
+      ],
+      properties: [ 'id' ],
+
+      methods: [
+        function toString() { return 'Multiton<' + this.id + '>'; }
+      ]
+    });
+
+    var s1 = SingletonClass.create();
+    var s2 = SingletonClass.create();
+
+    expect(s2).toBe(s1);
+
+    var m1 = MultitonSubClass.create({ id: 'a' });
+    var m2 = MultitonSubClass.create({ id: 'a' });
+    var m3 = MultitonSubClass.create({ id: 'b' });
+
+    expect(m2).toBe(m1);
+    expect(m3).not.toBe(m2);
+  });
 });

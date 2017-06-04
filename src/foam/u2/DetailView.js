@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'DetailView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
 
   documentation: 'A generic property-sheet style View for editing an FObject.',
 
@@ -30,6 +30,10 @@ foam.CLASS({
   exports: [
     'currentData as data',
     'controllerMode'
+  ],
+
+  axioms: [
+    foam.pattern.Faceted.create()
   ],
 
   properties: [
@@ -85,10 +89,6 @@ foam.CLASS({
       expression: function(of) {
         return this.of.getAxiomsByClass(foam.core.Action);
       }
-    },
-    {
-      name: 'controllerMode',
-      attribute: true
     },
     {
       name: 'title',

@@ -28,7 +28,10 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
-  requires: [ 'foam.dao.ArraySink' ],
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.dao.DAOSink'
+  ],
 
   properties: [
     {
@@ -137,6 +140,17 @@ foam.CLASS({
     },
 
     /**
+      Explicitly update cache, else caller will query stale data if
+      the staleTimeout is large
+    */
+    function put(obj) {
+      var self = this;
+      return self.delegate.put(obj).then(function(o) {
+        return self.cache.put(o);
+      });
+    },
+
+    /**
       Executes the find on the cache first, and if it fails triggers an
       update from the delegate.
     */
@@ -225,12 +239,12 @@ foam.CLASS({
         self.selects_[key] = entry = {
           time: Date.now(),
           promise:
-            self.delegate.select(self.cache, skip, limit, order, predicate)
+            self.delegate.select(self.DAOSink.create({ dao: self.cache }), skip, limit, order, predicate)
               .then(function(cache) {
-                self.pub('on', 'reset');
+                self.onCacheUpdate();
                 return cache;
               })
-        }
+        };
       }
 
       function readFromCache() {
@@ -242,12 +256,24 @@ foam.CLASS({
       // wait on the pending cache update.
       return self.cache.select(this.COUNT(), skip, limit, order, predicate)
         .then(function(c) {
-          if ( c.count > 0 ) {
+          if ( c.value > 0 ) {
             return readFromCache();
           } else {
             return entry.promise.then(readFromCache);
           }
         });
+    }
+  ],
+
+  listeners: [
+    {
+      /* replaces self.pub('on', 'reset') in select promise select
+         which was triggering repeated/cyclic onDAOUpdate in caller */
+      name: 'onCacheUpdate',
+      isMerged: true,
+      code: function() {
+        this.pub('on', 'reset');
+      }
     }
   ]
 });

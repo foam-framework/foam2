@@ -74,6 +74,11 @@ foam.CLASS({
     'hoverSelection'
   ],
 
+  imports: [
+    'editRecord?',
+    'selection? as importSelection'
+  ],
+
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -103,14 +108,14 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'data',
       postSet: function(_, data) {
-        if ( ! this.of ) this.of = data.of;
+        if ( ! this.of && data ) this.of = data.of;
       }
     },
     {
       class: 'foam.dao.DAOProperty',
       name: 'orderedDAO',
       expression: function(data, order) {
-        return data.orderBy(order);
+        return data ? data.orderBy(order) : foam.dao.NullDAO.create();
       }
     },
     {
@@ -119,27 +124,35 @@ foam.CLASS({
     {
       name: 'columns_',
       expression: function(columns, of) {
+        var of = this.of;
         if ( ! of ) return [];
 
         return columns.map(function(p) {
-          return typeof p == 'string' ?
+          var c = typeof p == 'string' ?
             of.getAxiomByName(p) :
             p ;
-        });
+
+           if ( ! c ) {
+             console.error('Unknown table column: ', p);
+           }
+
+          return c;
+        }).filter(function(c) { return c; });
       }
     },
     {
       name: 'columns',
       expression: function(of) {
+        var of = this.of;
         if ( ! of ) return [];
 
-        var tableColumns = this.of.getAxiomByName('tableColumns');
+        var tableColumns = of.getAxiomByName('tableColumns');
 
         if ( tableColumns ) return tableColumns.columns;
 
         return of.getAxiomsByClass(foam.core.Property).
-          filter(function(p) { return ! p.hidden; }).
-          map(foam.core.Property.NAME.f);
+            filter(function(p) { return ! p.hidden; }).
+            map(foam.core.Property.NAME.f);
       }
     },
     'selection',
@@ -158,47 +171,52 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
+        addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
         start('thead').
-        add(this.slot(function(columns_) {
-          return this.E('tr').
-            forEach(columns_, function(column) {
-              this.
-                start('th').
-                on('click', function(e) { view.sortBy(column); }).
-                call(column.tableHeaderFormatter, [column]).
-                add(' ', this.slot(function(order) {
-                  return column === order ? this.Entity.create({ name: '#9651' }) :
-                      (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
-                      ''
-                }, view.order$)).
+          add(this.slot(function(columns_) {
+            return this.E('tr').
+              forEach(columns_, function(column) {
+                this.start('th').
+                  addClass(view.myClass('th-' + column.name)).
+                  on('click', function(e) { view.sortBy(column); }).
+                  call(column.tableHeaderFormatter, [column]).
+                  add(' ', this.slot(function(order) {
+                    return column === order ? this.Entity.create({ name: '#9651' }) :
+                        (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
+                        ''
+                  }, view.order$)).
                 end();
-            });
-        })).
-        add(this.slot(function(columns_) {
-          return this.
-            E('tbody').
-            select(this.orderedDAO$proxy, function(obj) {
-              return this.
-                E('tr').
-                start('tr').
-                on('mouseover', function() { view.hoverSelection = obj; }).
-                on('click', function() { view.selection = obj; }).
-                addClass(this.slot(function(selection) {
-                  if ( obj === selection ) return view.myClass('selected');
-                  return '';
-                }, view.selection$)).
-                addClass(view.myClass('row')).
-                forEach(columns_, function(column) {
-                  this.
-                    start('td').
-                    call(column.tableCellFormatter, [
-                      column.f ? column.f(obj) : null, obj, column
-                    ]).
-                    end();
-                });
-            });
-        }));
+              });
+          })).
+          add(this.slot(function(columns_) {
+            return this.
+              E('tbody').
+              select(this.orderedDAO$proxy, function(obj) {
+                return this.
+                  E('tr').
+                    start('tr').
+                      on('mouseover', function() { view.hoverSelection = obj; }).
+                      on('click', function() {
+                        view.selection = obj;
+                        if ( view.importSelection$ ) view.importSelection = obj;
+                        if ( view.editRecord$ ) view.editRecord(obj);
+                      }).
+                      addClass(this.slot(function(selection) {
+                        if ( obj === selection ) return view.myClass('selected');
+                        return '';
+                      }, view.selection$)).
+                      addClass(view.myClass('row')).
+                      forEach(columns_, function(column) {
+                        this.
+                          start('td').
+                          call(column.tableCellFormatter, [
+                            column.f ? column.f(obj) : null, obj, column
+                          ]).
+                          end();
+                      });
+              });
+          }));
     }
   ]
 });

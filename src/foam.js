@@ -20,11 +20,12 @@
   var isServer = typeof window === 'undefined';
   var isWorker = typeof importScripts !== 'undefined';
 
-  var flags = this.FOAM_FLAGS || {};
-  flags.web = ! isServer,
-  flags.node = isServer;
+  var flags    = this.FOAM_FLAGS || {};
+  flags.web    = ! isServer,
+  flags.node   = isServer;
   flags.loader = ! isServer;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
+  if ( ! flags.hasOwnProperty('js')    ) flags.js    = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
@@ -76,7 +77,7 @@
       map(function(f) { return f.name; }).
       forEach(load);
 
-    delete this.FOAM_FILES;
+  //  delete this.FOAM_FILES;
   };
 
   load('files');

@@ -98,9 +98,9 @@ foam.CLASS({
         var self = this;
         var model = X.lookup('com.chrome.origintrials.model.Application');
         this.where(X.selectionQuery).select().then(function(sink) {
-          for ( var i = 0; i < sink.a.length; i++ ) {
-            model.APPROVE.maybeCall(X, sink.a[i]);
-            self.put(sink.a[i]);
+          for ( var i = 0; i < sink.array.length; i++ ) {
+            model.APPROVE.maybeCall(X, sink.array[i]);
+            self.put(sink.array[i]);
           }
         });
       }

@@ -421,3 +421,49 @@ var d = Test.create();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
+
+
+foam.CLASS({
+  name: 'ActionDemo',
+  properties: [ 'foo' ],
+  actions: [
+    function add() {
+      console.log('add');
+    },
+    {
+      name: 'add2',
+      label: 'Add',
+      icon: 'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png',
+      code: function() { console.log('add'); }
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'ActionDemoView',
+  extends: 'foam.u2.View',
+  methods: [
+    function initE() {
+      this
+        // Default Button
+        .add(ActionDemo.ADD)
+
+        // Embed an Image manually
+        .start(ActionDemo.ADD).start('img').attr('src','https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png').end().end()
+
+        // Set the ActionView's icon
+        .start(ActionDemo.ADD, {icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).end()
+
+        // Set the ActionView's icon and hide the label
+        .start(ActionDemo.ADD, {showLabel: false, icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).end()
+
+        // Set the ActionView's icon and hide the label and make an anchor to avoid button decoration
+        .start(ActionDemo.ADD, {showLabel: false, icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).setNodeName('a').end()
+
+        // Show an Action that already has an icon defined
+        .start(ActionDemo.ADD2).end();
+    }
+  ]
+})
+
+ActionDemoView.create({data: ActionDemo.create()}).write();

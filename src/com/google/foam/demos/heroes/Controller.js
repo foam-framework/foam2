@@ -68,7 +68,7 @@ foam.CLASS({
           font-height: 18px;
           font-size: 1em;
           font-weight: 500;
-          margin: 0 3px;
+          margin: 10px 3px;
           padding: 10px 12px;
         }
         ^nav .foam-u2-ActionView:hover {
@@ -112,7 +112,7 @@ foam.CLASS({
     {
       name: 'filteredDAO',
       expression: function(heroDAO, query) {
-// console.log('******************************** query: ', query);
+ // console.log('******************************** query: ', query);
         return heroDAO.where(this.CONTAINS_IC(this.Hero.NAME, query));
       },
       view: {

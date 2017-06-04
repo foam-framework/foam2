@@ -45,7 +45,7 @@ foam.CLASS({
       for ( var i = els.length-1 ; i >= 0 ; i-- ) {
         var el = els[i];
         var modelName = el.getAttribute('class');
-        var cls = foam.lookup(modelName, true);
+        var cls = this.lookup(modelName, true);
 
         if ( cls ) {
           var view = cls.create(null, foam.__context__);
