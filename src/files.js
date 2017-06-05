@@ -247,5 +247,18 @@ FOAM_FILES([
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
   { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
   { name: "foam/parsers/html" },
-  { name: "foam/parsers/HTMLLexer" }
+  { name: "foam/parsers/HTMLLexer" },
+  { name: "foam/nanos/NanoService" },
+  { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/auth/EnabledAware" },
+  { name: "foam/nanos/auth/Group" },
+  { name: "foam/nanos/auth/LastModifiedAware" },
+  { name: "foam/nanos/auth/LastModifiedByAware" },
+  { name: "foam/nanos/auth/Permission" },
+  { name: "foam/nanos/auth/User" },
+  { name: "foam/nanos/auth/AuthService" },
+  { name: "foam/nanos/pm/PMInfo" },
+  { name: "foam/nanos/script/Language" },
+  { name: "foam/nanos/script/Script" },
+  { name: "foam/nanos/test/Test" }
 ]);
