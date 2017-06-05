@@ -21,9 +21,9 @@ foam.CLASS({
           name: 'selectedProperties'
       },
       {
-          type: 'Boolean',
+          class: 'Boolean',
           name: 'displaySorted',
-          defaultView: false
+          value: false
       }
   ],
   
@@ -33,11 +33,16 @@ foam.CLASS({
       for (var i = 0; i < this.selectedProperties.length; i++) {
         selected[this.selectedProperties[i].name] = true;
       }
+
+      console.log('selected: ')
+      console.log(selected)
       return selected;
     },
 
     function initE() {
       var selected = this.selectedMap();
+      console.log('selected')
+      console.log(selected)
       var props = this.properties;
 
       if ( this.displaySorted ) {
@@ -48,12 +53,13 @@ foam.CLASS({
       }
 
       for (var i = 0; i < props.length; i++) {
-        var cb = this.Checkbox.create({
-          label: props[i].label,
+        var cb = this.CheckBox.create({
+          //label: props[i].label,
           data: selected[props[i].name]
         });
 
-        cb.data$.addListener(this.onPropChange.bind(this, props[i]));
+        // TODO: Determine link
+        // cb.data$.linkTo(this.onPropChange.bind(this, props[i]));
         this.add(cb);
       }
     }

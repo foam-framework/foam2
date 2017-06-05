@@ -10,7 +10,6 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   imports: [
-    'document',
     'window'
   ],
 
@@ -24,24 +23,24 @@ foam.CLASS({
 
   properties: [
     {
-      type: 'Float',
+      class: 'Float',
       name: 'height',
-      defaultValue: 0
+      value: 0
     },
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'opened',
       documentation: 'True when the overlay has been commanded to be open. ' +
           'It might still be animating; see $$DOC{ref:".animationComplete"}.',
-      defaultValue: false
+      value: false
     },
     {
-      type: 'Boolean',
+      class: 'Boolean',
       name: 'animationComplete',
       documentation: 'True when an animation is running. The overlay hasn\'t ' +
           'really reached the state commanded by $$DOC{ref:".opened"} until ' +
           'this is true.',
-      defaultValue: true
+      value: true
     },
     {
       name: 'dropdownE_',
@@ -52,7 +51,7 @@ foam.CLASS({
     },
     {
       name: 'addToSelf_',
-      defaultValue: false
+      value: false
     },
   ],
 
