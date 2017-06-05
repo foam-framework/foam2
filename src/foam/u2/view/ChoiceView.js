@@ -90,12 +90,6 @@ foam.CLASS({
 
         return nu;
       },
-      postSet: function() {
-        var d = this.data;
-        if ( this.choices.length ) {
-          this.choice = ( d && this.findChoiceByData(d) ) || this.defaultValue;
-        }
-      }
     },
     {
       class: 'Int',
@@ -160,6 +154,9 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      this.onDetach(this.choices$.sub(this.onChoicesUpdate));
+    },
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
@@ -219,6 +216,16 @@ foam.CLASS({
   ],
 
   listeners: [
+    {
+      name: 'onChoicesUpdate',
+      isFramed: true,
+      code: function() {
+        var d = this.data;
+        if ( this.choices.length ) {
+          this.choice = ( d && this.findChoiceByData(d) ) || this.defaultValue;
+        }
+      }
+    },
     {
       name: 'onDAOUpdate',
       isFramed: true,
