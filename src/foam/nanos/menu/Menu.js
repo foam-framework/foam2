@@ -125,6 +125,13 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.PopupMenu' ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+      */}
+    })
+  ],
+
   methods: [
     function createView(X, menu) {
       var popup = this.PopupMenu.create(undefined, X);
