@@ -194,7 +194,7 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       if ( ! predicate ) predicate = this.True.create();
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(

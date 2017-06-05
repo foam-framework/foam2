@@ -165,7 +165,7 @@ foam.CLASS({
             var limit = data.limit;
             var order = data.order;
             var predicate = data.predicate;
-            return self.dao.removeAll(skip, limit, order, predicate);
+            return self.dao.removeAll_(skip, limit, order, predicate);
           }).then(function() {
             self.sendJSON(res, 200, '{}');
             self.info('200 OK: removeAll()');
