@@ -247,5 +247,6 @@ FOAM_FILES([
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
   { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
   { name: "foam/parsers/html" },
-  { name: "foam/parsers/HTMLLexer" }
+  { name: "foam/parsers/HTMLLexer" },
+  { name: "foam/core/ContextAware", flags: ['java'] }
 ]);
