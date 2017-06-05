@@ -76,6 +76,10 @@ public class MapDAO
     return sink;
   }
 
+  public void removeAll() {
+    this.removeAll_(null, null, null, null);
+  }
+
   public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
     setData(null);
   }
