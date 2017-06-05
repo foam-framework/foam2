@@ -110,19 +110,23 @@ foam.CLASS({
           alwaysFloatLabel: true
         }, this.view$)
         .on('click', function(e) {
-          self.previewMode = false;
-          var data         = self.view.choices[e.target.value][0];
-          self.hardData    = data;
+          try {
+            self.previewMode = false;
+            var data         = self.view.choices[e.target.value][0];
+            self.hardData    = data;
+          } catch(x) {}
         })
         .on('mouseover', function(e) {
-          var data = self.view.choices[e.target.value][0];
+          try {
+            var data = self.view.choices[e.target.value][0];
 
-          if ( ! self.previewMode ) {
-            self.previewMode = true;
-            self.hardData = self.view.data;
-          }
+            if ( ! self.previewMode ) {
+              self.previewMode = true;
+              self.hardData = self.view.data;
+            }
 
-          self.view.data = data;
+            self.view.data = data;
+          } catch(x) {}
         })
         .on('mouseout', function(e) {
           if ( e.relatedTarget.nodeName === 'OPTION' ) return;
