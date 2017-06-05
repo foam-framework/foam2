@@ -31,7 +31,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll_', 'removeAll' ],
+      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return foam.dao.NullDAO.create() },
       postSet: function(old, nu) {
@@ -56,6 +56,10 @@ foam.CLASS({
       listener.onDetach(listener.dao$.follow(this.delegate$));
 
       return listener;
+    },
+
+    function removeAll() {
+      return this.removeAll_(undefined, undefined, undefined, undefined);
     }
   ]
 });
