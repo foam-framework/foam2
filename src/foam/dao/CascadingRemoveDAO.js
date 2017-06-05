@@ -58,7 +58,7 @@ foam.CLASS({
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       var self = this;
 
       // NOTE: grabbing the first object as we have no other access
@@ -73,7 +73,7 @@ foam.CLASS({
                 self.pending_.set(obj.id, true);
                 return new Promise(function(resolve, reject) {
                   return obj[self.name].removeAll().then(function() {
-                    return self.delegate.removeAll(skip, limit, order, predicate).then(function() {
+                    return self.delegate.removeAll_(skip, limit, order, predicate).then(function() {
                       self.pending_.delete(obj.id);
                       resolve(obj);
                     });

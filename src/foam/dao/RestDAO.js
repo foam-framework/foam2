@@ -112,7 +112,7 @@ foam.CLASS({
               this, sink || this.ArraySink.create()));
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       /**
        * POST baseURL/removeAll
        * { skip, limit, order, predicate }

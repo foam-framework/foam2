@@ -111,10 +111,10 @@ foam.CLASS({
     },
    /** removeAll is executed on the cache and the source, ensuring both
       are up to date. */
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       var self = this;
-      return self.src.removeAll(skip, limit, order, predicate).then(function() {
-        return self.delegate.removeAll(skip, limit, order, predicate);
+      return self.src.removeAll_(skip, limit, order, predicate).then(function() {
+        return self.delegate.removeAll_(skip, limit, order, predicate);
       })
     }
   ],
