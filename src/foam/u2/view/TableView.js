@@ -68,6 +68,11 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
+  requires: [
+    'foam.u2.view.EditColumnsView',
+    'foam.u2.md.OverlayDropdown'
+  ],
+
   exports: [
     'columns',
     'selection',
@@ -155,8 +160,55 @@ foam.CLASS({
             map(foam.core.Property.NAME.f);
       }
     },
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      documentation: 'Set this to true to let the user select columns.',
+      value: true // TODO: Return to false after testing
+    },
+    {
+      name: 'columnSelectionE',
+      factory: function() {
+        var editor = this.EditColumnsView.create({
+          properties$: this.columns_$,
+          selectedProperties$: this.columns_$
+        });
+
+        for (var i = 0; i < this.columns_.length; ++i) {
+          console.log(editor.properties[i].name)
+        }
+
+        console.log(editor)
+
+        editor.initE();
+
+        console.log('returning from columnSelectionE')
+        return this.OverlayDropdown.create().add(editor);
+      }
+    },
     'selection',
     'hoverSelection'
+  ],
+
+
+  actions: [
+    {
+      name: 'clearSelection',
+      icon: 'https://www.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png',
+      isAvailable: function() { return !!this.hardSelection; },
+      code: function() {
+        this.hardSelection = null;
+      }
+    },
+    {
+      name: 'editColumns',
+      icon: 'https://www.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png',
+      isAvailable: function() { return this.editColumnsEnabled; },
+      code: function() {
+        console.log('should never be shown')
+        // this.columnSelectionE.open();
+      }
+    }
   ],
 
   methods: [
@@ -187,7 +239,17 @@ foam.CLASS({
                         ''
                   }, view.order$)).
                 end();
-              });
+
+                if (column == columns_[columns_.length - 1]) {
+                  this.start('th').addClass(view.myClass('th-editColumns')).
+                on('click', function(e) {
+                  console.log('editing columns')
+                  
+                  view.columnSelectionE.open();
+
+                }).start('img').attr('src','https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png').end();
+                }
+              })
           })).
           add(this.slot(function(columns_) {
             return this.
@@ -214,9 +276,18 @@ foam.CLASS({
                             column.f ? column.f(obj) : null, obj, column
                           ]).
                           end();
+
+                        if (column == columns_[columns_.length - 1]) {
+                          this.start('td').
+                          call(column.tableCellFormatter, [
+                            null, obj, column
+                          ]).
+                          end();
+                        }
                       });
               });
           }));
+
     }
   ]
 });
