@@ -832,8 +832,10 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      var lhs = this.arg1.f(o).toUpperCase();
+      var lhs = this.arg1.f(o);
       var rhs = this.arg2.f(o);
+
+      if ( lhs.toUpperCase ) lhs = lhs.toUpperCase();
 
       // If arg2 is a constant array, we use valueSet for it.
       if ( foam.mlang.Constant.isInstance(this.arg2) ) {
