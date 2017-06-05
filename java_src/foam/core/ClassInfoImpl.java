@@ -65,8 +65,19 @@ public class ClassInfoImpl
     return this;
   }
 
+  @Override
   public boolean isInstance(Object o) {
     return class_.isInstance(o);
+  }
+
+  @Override
+  public Object newInstance() {
+    try {
+      return class_.getClass().newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
   public List getAxioms() {
