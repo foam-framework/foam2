@@ -57,11 +57,11 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
     // Is this the right key to use?
     PM pm = new PM(PMDAO.class, getOwnClassInfo().getId() + ":removeAll");
     try {
-      super.removeAll(skip, limit, order, predicate);
+      super.removeAll_(skip, limit, order, predicate);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

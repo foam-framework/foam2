@@ -76,7 +76,7 @@ public class MapDAO
     return sink;
   }
 
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
     setData(null);
   }
 
