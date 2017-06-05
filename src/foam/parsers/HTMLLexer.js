@@ -69,30 +69,21 @@ foam.CLASS({
           htmlPart: alt(
               sym('cdata'),
               sym('comment'),
-              sym('text'),
-
-              // "embed" is specific tag types; must come before "openTag".
-              sym('embed'),
-              sym('maybeEmbed'),
-
               sym('closeTag'),
-              sym('openTag')),
+              sym('openTag'),
+              sym('text')),
 
           openTag: seq(
               '<',
-              sym('whitespace'),
               sym('tagName'),
               sym('whitespace'),
               sym('attributes'),
               sym('whitespace'),
               optional('/'),
-              sym('whitespace'),
               '>'),
 
-          closeTag: seq1(3,
-                       '<',
-                       sym('whitespace'),
-                       '/',
+          closeTag: seq1(1,
+                       '</',
                        sym('tagName'),
                        sym('whitespace'),
                        '>'),
@@ -123,7 +114,8 @@ foam.CLASS({
 
           tagName: sym('label'),
 
-          text: str(plus(alt(sym('escape'), notChars('<')))),
+          text: str(plus(not(alt(sym('closeTag'), sym('openTag')),
+                  alt(sym('escape'), anyChar())))),
 
           escape: str(seq1(1, '&', repeat(range('a', 'z')), ';')),
 
@@ -135,35 +127,6 @@ foam.CLASS({
               plus(alt(sym('escape'), notChars('\'" \t\r\n<>'))),
               seq1(1, '"', repeat(alt(sym('escape'), notChars('"', anyChar()))), '"'),
               seq1(1, "'", repeat(alt(sym('escape'), notChars("'", anyChar()))), "'"))),
-
-          embed: alt(sym('script'), sym('style'), sym('xmp')),
-
-          maybeEmbed: alt(sym('pre'), sym('code')),
-
-          script: seq(
-              openTag('script'),
-              str(repeat(not(closeTag('script'), anyChar()))),
-              closeTag('script')),
-
-          style: seq(
-              openTag('style'),
-              str(repeat(not(closeTag('style'), anyChar()))),
-              closeTag('style')),
-
-          xmp: seq(
-              openTag('xmp'),
-              str(repeat(not(closeTag('xmp'), anyChar()))),
-              closeTag('xmp')),
-
-          pre: seq(
-              openTag('pre'),
-              str(repeat(not(closeTag('pre'), anyChar()))),
-              closeTag('pre')),
-
-          code: seq(
-              openTag('code'),
-              str(repeat(not(closeTag('code'), anyChar()))),
-              closeTag('code')),
 
           whitespace: repeat0(alt(' ', '\t', '\r', '\n'))
         };
@@ -194,9 +157,9 @@ foam.CLASS({
         return {
           openTag: function(v) {
             return Tag.create({
-              type: v[6] || lib.isSelfClosing(v[2]) ? OPEN_CLOSE : OPEN,
-              nodeName: v[2],
-              attributes: v[4],
+              type: v[5] || lib.isSelfClosing(v[1]) ? OPEN_CLOSE : OPEN,
+              nodeName: v[1],
+              attributes: v[3],
             });
           },
 
@@ -208,46 +171,6 @@ foam.CLASS({
             var char = lib.getHtmlEscapeChar(v);
             if ( char || typeof char === 'string' ) return char;
             return '&' + v + ';';
-          },
-
-          embed: function(v) {
-            // v = [
-            //   deconstructed open tag,
-            //   content string,
-            //   deconstructed close tag
-            // ]
-            return Embed.create({
-              nodeName: v[0][2],
-              content: [ v[1] ],
-              attributes: v[0][4],
-              type: OPEN_CLOSE
-            });
-          },
-
-          maybeEmbed: function(v) {
-            // v = [
-            //   deconstructed open tag,
-            //   content string,
-            //   deconstructed close tag
-            // ]
-            var nodeName = v[0][2];
-            var attributes = v[0][4];
-            var str = v[1];
-            var ret = Embed.create({
-              nodeName: nodeName,
-              attributes: attributes,
-              type: OPEN_CLOSE
-            });
-
-            // Attempt to parse maybeEmbeds. Returns "html" parse or string.
-            var ps = self.StringPS.create();
-            ps.setString(str);
-            var start  = self.grammar.getSymbol('html');
-            var result = start.parse(ps, self.grammar);
-            ret.content = ( result && result.value && result.pos === str.length ) ?
-                result.value :
-                [ str ];
-            return ret;
           },
 
           // TODO(markdittmer): Do something with these values.
@@ -293,7 +216,6 @@ foam.CLASS({
     function openTag_(seq, sym, tagName) {
       return seq(
           '<',
-          sym('whitespace'),
           tagName,
           sym('whitespace'),
           sym('attributes'),
@@ -304,7 +226,6 @@ foam.CLASS({
     function closeTag_(seq, sym, tagName) {
       return seq(
           '<',
-          sym('whitespace'),
           '/',
           sym('whitespace'),
           tagName,

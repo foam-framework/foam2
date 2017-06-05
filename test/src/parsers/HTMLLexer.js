@@ -66,13 +66,14 @@ describe('HTMLLexer', function() {
       '<pre>if ( x < 3 ) return true</pre>',
       '<code>if ( x < 3 ) return true</code>',
     ].forEach(function(str) {
-      var value = testParse('maybeEmbed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(1);
-      expect(value.content[0]).toBe('if ( x < 3 ) return true');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(3);
+      expect(value[0].type.name).toBe(parser.TagType.OPEN.name);
+      expect(value[1]).toBe('if ( x < 3 ) return true');
+      expect(value[2].type.name).toBe(parser.TagType.CLOSE.name);
     });
   });
 
@@ -81,13 +82,37 @@ describe('HTMLLexer', function() {
       '<pre><div>text</div></pre>',
       '<code><div>text</div></code>',
     ].forEach(function(str) {
-      var value = testParse('maybeEmbed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(3);
-      expect(value.content[1]).toBe('text');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(5);
+      expect(value[1].type.name).toBe(parser.TagType.OPEN.name);
+      expect(value[1].nodeName).toBe('div');
+      expect(value[2]).toBe('text');
+      expect(value[3].type.name).toBe(parser.TagType.CLOSE.name);
+      expect(value[3].nodeName).toBe('div');
+    });
+  });
+
+  it('should parse nested markup inside escaped <pre>/<code>', function() {
+    [
+        '<pre><div>text</div><code>if (x < 3) return true;</code></pre>',
+        '<code><div>text</div><code>if (x < 3) return true;</code></code>'
+    ].forEach(function(str) {
+      var value = testParse('html', str);
+      if ( ! value ) return;
+
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(8);
+      expect(value[1].nodeName).toBe('div');
+      expect(value[2]).toBe('text');
+      expect(value[3].nodeName).toBe('div');
+      expect(value[4].nodeName).toBe('code');
+      expect(value[4].type.name).toBe(parser.TagType.OPEN.name);
+      expect(value[5]).toBe('if (x < 3) return true;');
+      expect(value[6].nodeName).toBe('code');
+      expect(value[6].type.name).toBe(parser.TagType.CLOSE.name);
     });
   });
 
@@ -96,29 +121,27 @@ describe('HTMLLexer', function() {
       '<pre>if ( x &lt; 3 ) return true</pre>',
       '<code>if ( x &lt; 3 ) return true</code>',
     ].forEach(function(str) {
-      var value = testParse('maybeEmbed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(1);
-      expect(value.content[0]).toBe('if ( x < 3 ) return true');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(3);
+      expect(value[1]).toBe('if ( x < 3 ) return true');
     });
   });
 
-  it('should parse <script>/<style>/<xmp> as embedded content', function() {
+  it('should parse <script>/<style>/<xmp>', function() {
     [
       '<script type="text/javascript">sc < ri ? p &gt; t : en</script>',
       '<style type="text/css">sc < ri ? p &gt; t : en</style>',
       '<xmp class="noescape">sc < ri ? p &gt; t : en</xmp>',
     ].forEach(function(str) {
-      var value = testParse('embed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.html.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(1);
-      expect(value.content[0]).toBe('sc < ri ? p &gt; t : en');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(3);
+      expect(value[1]).toBe('sc < ri ? p > t : en');
     });
   });
 
