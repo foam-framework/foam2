@@ -11,13 +11,14 @@ import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
 
+import java.lang.reflect.Proxy;
+
 public class DAOPMLogger
   extends ContextAwareSupport
   implements PMLogger, NanoService
 {
 
   public static final String ServiceName = "pmLogger";
-  public static final String DAOName = "pmInfoDAO";
 
   @Override
   public void log(PM pm) {
@@ -25,7 +26,7 @@ public class DAOPMLogger
             .setClsname(pm.getClassType().getName())
             .setPmname(pm.getName());
 
-    MapDAO pmd = (MapDAO) getX().get("pmInfoDAO");
+    ProxyDAO pmd = (ProxyDAO) getX().get(PMDAO.ServiceName);
 
     PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
@@ -49,10 +50,5 @@ public class DAOPMLogger
   }
 
   @Override
-  public void start() {
-    MapDAO dao = new MapDAO();
-    dao.setOf(PMInfo.getOwnClassInfo());
-    dao.setX(getX());
-    getX().put(DAOName, dao);
-  }
+  public void start() {}
 }
