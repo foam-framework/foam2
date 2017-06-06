@@ -58,21 +58,6 @@ foam.INTERFACE({
 });
 
 foam.CLASS({
-  package: 'foam.dao',
-  name: 'ResetListener',
-  extends: 'foam.dao.ProxySink',
-  documentation: 'Turns all sink events into a reset event.',
-  methods: [
-    function put(sub) {
-      this.reset(sub);
-    },
-    function remove(sub) {
-      this.reset(sub);
-    }
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.dao.ResetListener',
   methods: [
     {

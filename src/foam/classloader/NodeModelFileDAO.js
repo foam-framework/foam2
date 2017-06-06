@@ -22,6 +22,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'surpressWarning',
+    },
+    {
       name: 'classpath'
     }
   ],
@@ -44,7 +48,7 @@ foam.CLASS({
       try {
         require(path);
       } catch(e) {
-        console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
+        ! self.surpressWarning && console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
         return Promise.resolve(null);
       } finally {
         foam.CLASS = foamCLASS;

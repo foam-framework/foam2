@@ -1026,7 +1026,7 @@ foam.CLASS({
       }
 
       for ( var i = 0 ; i < this.actions.length ; i++ ) {
-        g.addAction(this.actions[i].name, this.actions[i].code || this.actions[i]);
+        g.addAction(this.actions[i].name, (this.actions[i].code || this.actions[i]).bind(obj));
       }
 
       return g;
