@@ -48,7 +48,7 @@ foam.CLASS({
       value: -1,
       documentation: `Day of week to execute script.
           Ranges from 0 - 6, where 0 is Sunday. -1 for wildcard`
-
+    },
     {
       class: 'DateTime',
       name: 'scheduledTime',
