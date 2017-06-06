@@ -56,6 +56,11 @@ foam.CLASS({
   ],
 
   methods: [
+    /*function detach() {
+      if ( this.opened ) return;
+      this.SUPER();
+    },*/
+
     function add() {
       if (this.addToSelf_) this.SUPER.apply(this, arguments);
       else this.dropdownE_.add.apply(this.dropdownE_, arguments);
@@ -74,6 +79,7 @@ foam.CLASS({
       this.height = 0;
       this.dropdownE_.style({ height: 0 + 'px' });
       this.opened = false;
+      // this.detach();
     },
 
     function getFullHeight() {
@@ -137,12 +143,14 @@ foam.CLASS({
         position: fixed;
         z-index: 1009;
       }
+
       ^container {
-        position: absolute;
+        position: relative;
         right: 0;
         top: 0;
         z-index: 100;
       }
+
       ^ {
         background: white;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
@@ -152,20 +160,27 @@ foam.CLASS({
         overflow-x: hidden;
         overflow-y: hidden;
         position: absolute;
+        width: 125px;
+        padding: 10px;
+        padding-bottom: -20px;
+        margin-bottom: -20px;
         right: 3px;
         top: 4px;
         transition: height 0.25s cubic-bezier(0, .3, .8, 1);
         z-index: 1010;
       }
+
       ^open {
         overflow-y: auto;
       }
+
       ^zeroOverlay {
         top: 0;
         bottom: 0;
         left: 0;
         right: 0;
       }
+
       ^initialOverlay {
         top: initial;
         bottom: initial;
@@ -196,6 +211,7 @@ foam.CLASS({
      * Block them before they reach the overlay.
      */
     function onClick(e) {
+      console.log('PROPAGATION STOPPED')
       e.stopPropagation();
     }
   ]
