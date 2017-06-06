@@ -216,22 +216,35 @@ foam.CLASS({
                     Provides PropertyOrder for the Cloud Datastore REST API.
                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#propertyorder
                   */},
-      code: function() {
-      return this.orderDirection() === 1 ?
-          [ { property: { name: this.name } } ] :
-          [ { property: { name: this.name }, direction: 'DESCENDING' } ];
+      code: function(opt_orderDirection) {
+        var orderDirection = opt_orderDirection || 1;
+        return orderDirection === 1 ?
+            [ { property: { name: this.name } } ] :
+            [ { property: { name: this.name }, direction: 'DESCENDING' } ];
       }
     }
   ]
 });
 
 foam.CLASS({
+  refines: 'foam.mlang.order.Desc',
+
+  methods: [
+    function toDatastoreOrder(opt_orderDirection) {
+      var orderDirection = -1 * (opt_orderDirection || 1);
+      return this.arg1.toDatastoreOrder(orderDirection);
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.order.ThenBy',
 
   methods: [
-    function toDatastoreOrder() {
-      var order1 = this.arg1.toDatastoreOrder();
-      var order2 = this.arg2.toDatastoreOrder();
+    function toDatastoreOrder(opt_orderDirection) {
+      var order1 = this.arg1.toDatastoreOrder(opt_orderDirection);
+      var order2 = this.arg2.toDatastoreOrder(opt_orderDirection);
       return order1.concat(order2);
     }
   ]
