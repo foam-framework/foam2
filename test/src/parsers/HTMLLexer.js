@@ -126,7 +126,7 @@ describe('HTMLLexer', function() {
 
       expect(Array.isArray(value)).toBe(true);
       expect(value.length).toBe(3);
-      expect(value[1]).toBe('if ( x < 3 ) return true');
+      expect(value[1]).toBe('if ( x &lt; 3 ) return true');
     });
   });
 
@@ -141,7 +141,7 @@ describe('HTMLLexer', function() {
 
       expect(Array.isArray(value)).toBe(true);
       expect(value.length).toBe(3);
-      expect(value[1]).toBe('sc < ri ? p > t : en');
+      expect(value[1]).toBe('sc < ri ? p &gt; t : en');
     });
   });
 
@@ -166,14 +166,15 @@ describe('HTMLLexer', function() {
     [
         '<div name="TestDiv1" />',
         '<label id=3 />',
-        '<pre class="idl">Some stuff here</pre>'
+        '<pre class="idl" />Some stuff here</pre>'
     ].forEach(function(str) {
-      var value = testParse('htmlPart', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(Array.isArray(value.attributes)).toBe(true);
-      expect(value.attributes.length).toBe(1);
-      expect(value.attributes[0]).toBeDefined();
+      expect(Array.isArray(value)).toBe(true);
+      expect(Array.isArray(value[0].attributes)).toBe(true);
+      expect(value[0].attributes.length).toBe(1);
+      expect(value[0].attributes[0]).toBeDefined();
     });
   });
 
@@ -183,14 +184,15 @@ describe('HTMLLexer', function() {
         '<label name="TestLabel" id=2 visible />',
         '<pre class="idl" visible=false id=3><div>Some more content</div></pre>'
     ].forEach(function(str, index) {
-      var value = testParse('htmlPart', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(Array.isArray(value.attributes)).toBe(true);
-      expect(value.attributes).toBeDefined();
-      expect(value.attributes.length).toBeGreaterThan(2);
-      expect(value.attributes[index].name).toBe('id');
-      expect(value.attributes[index].value).toBe((index + 1).toString());
+      expect(Array.isArray(value)).toBe(true);
+      expect(Array.isArray(value[0].attributes)).toBe(true);
+      expect(value[0].attributes).toBeDefined();
+      expect(value[0].attributes.length).toBeGreaterThan(2);
+      expect(value[0].attributes[index].name).toBe('id');
+      expect(value[0].attributes[index].value).toBe((index + 1).toString());
     });
   });
 
@@ -238,14 +240,14 @@ describe('HTMLLexer', function() {
     var value = testParse('htmlPart', '<option value="&amp;Potato" />');
     expect(value.attributes).toBeDefined();
     expect(value.attributes[0].name).toBe('value');
-    expect(value.attributes[0].value).toBe('&Potato');
+    expect(value.attributes[0].value).toBe('&amp;Potato');
   });
 
   it('should parse attributes with escaped characters with no quotes', function() {
     var value = testParse('htmlPart', '<option value=&amp;Potato />');
     expect(value.attributes).toBeDefined();
     expect(value.attributes[0].name).toBe('value');
-    expect(value.attributes[0].value).toBe('&Potato');
+    expect(value.attributes[0].value).toBe('&amp;Potato');
   });
 
   it('should parse attributes with illegitmate escape with quotes', function() {
