@@ -18,6 +18,8 @@ foam.CLASS({
           name: 'properties'
       },
       {
+        class: 'FObjectArray',
+        of: 'foam.core.Property',
           name: 'selectedProperties'
       },
       {
@@ -54,7 +56,13 @@ foam.CLASS({
           data: selected[props[i].name]
         });
 
-        cb.attrSlot('checked').element.on('change', this.onPropChange.bind(this, props[i], cb));
+        cb.attrSlot('checked').element.on('change', 
+          this.onPropChange.bind(this, props[i], cb));
+
+      // TODO: this:
+      // cb.data$.sub(function() {this.onPropChange.bind(this, props[i], cb)}.bind(this));
+
+
 
         this.add(cb);
       }
@@ -63,11 +71,7 @@ foam.CLASS({
 
   listeners: [
     function onPropChange(prop, _, cb, old, nu) {
-      // console.log('CHANGE prop', prop, '_', _, 'cb', cb, 'old', old, 'new', nu)
-      console.log(prop.name, 'was changed. It is now', cb.target.checked)
       var selected = this.selectedMap();
-      //
-      console.log(selected)
 
       var out = [];
 
@@ -92,9 +96,8 @@ foam.CLASS({
         }
       }
 
-      console.log('out', out)
-
       this.selectedProperties = out;
+      this.propertyChange.pub('selectedProperties');      
     }
   ]
 });

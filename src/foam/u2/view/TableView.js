@@ -171,8 +171,12 @@ foam.CLASS({
       factory: function() {
         var editor = this.EditColumnsView.create({
           properties: this.columns_,
-          selectedProperties$: this.columns_$
+          selectedProperties: this.columns_
         });
+
+        editor.selectedProperties$.sub(function() {
+          this.columns = editor.selectedProperties.map(function(c) { return c.name; });
+        }.bind(this));
 
         return this.OverlayDropdown.create().add(editor);
       }
@@ -206,8 +210,9 @@ foam.CLASS({
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
-        start('thead').
-          add(this.slot(function(columns_) {
+        start('thead')
+          .start('div').style({ 'position': 'relative' }).add(view.columnSelectionE).end()
+          .add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
                 this.start('th').
@@ -223,13 +228,12 @@ foam.CLASS({
 
                 if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
                   this.start('th')
-                  .start('div').style({ 'position': 'relative' }).add(view.columnSelectionE).end()
                   .addClass(view.myClass('th-editColumns')).
                   on('click', function(e) {
                     view.columnSelectionE.open();
-                  }).style(view.vertMenuIcon).end()
+                  }).style(view.vertMenuIcon).end();
                 }
-              })
+              });
           })).
           add(this.slot(function(columns_) {
             return this.
