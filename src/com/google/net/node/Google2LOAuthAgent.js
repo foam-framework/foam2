@@ -130,7 +130,7 @@ foam.CLASS({
           "opt_enc" encoding. Default encoding is UTF-8.`,
       code: function(str, opt_enc) {
         return this.stripBase64ForURL(
-            new Buffer(str, opt_enc || 'utf8').toString('base64'));
+            Buffer.from(str, opt_enc || 'utf8').toString('base64'));
       }
     },
     {

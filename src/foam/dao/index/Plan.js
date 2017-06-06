@@ -332,7 +332,7 @@ foam.CLASS({
       }
     },
 
-    function executeFallback(promise, sink, skip, limit, unusedOrder, predicate) {
+    function executeFallback(promise, sink, skip, limit, order, predicate) {
        /**
         * Executes a merge where ordering is unknown, therefore no
         * sorting is done and deduplication must be done separately.
@@ -351,7 +351,7 @@ foam.CLASS({
            resultSink,
            undefined,
            subLimit,
-           undefined,
+           order,
            predicates[i]
          );
        }

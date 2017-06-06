@@ -70,7 +70,7 @@ foam.CLASS({
         return foam.Array.isInstance(e) ?
           foam.core.Reaction.create({target: e[0], topic: e[1].split('.'), listener: e[2] }) :
           e.class ? this.lookup(e.class).create(e, this) :
-          foam.lookup(prop.of).create(e, this);
+          this.lookup(prop.of).create(e, this);
       }
     }
   ]

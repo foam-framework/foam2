@@ -1,6 +1,8 @@
 package foam.mlang;
 
+import foam.dao.Sink;
 import foam.mlang.predicate.*;
+import foam.mlang.sink.*;
 
 /**
  * Static helper functions for creating MLangs.
@@ -40,5 +42,13 @@ public class MLang
 
   public static Predicate OR(Predicate... args) {
     return new Or().setArgs(args);
+  }
+  
+  public static Sink MAX(Object o1) {
+    return new Max().setArg1(MLang.prepare(o1));
+  }
+  
+  public static Sink MIN(Object o1) {
+    return new Min().setArg1(MLang.prepare(o1));
   }
 }

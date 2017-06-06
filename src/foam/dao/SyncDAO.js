@@ -195,8 +195,7 @@ foam.CLASS({
 
       this.syncRecordDAO.select(E.MAX(this.SyncRecord.SYNC_NO)).then(function(m) {
         this.remoteDAO
-          .where(
-            E.GT(this.syncProperty, m.value))
+          .where(E.GT(this.syncProperty, m.value || 0))
           .select().then(function(a) {
             a = a.array;
             for ( var i = 0 ; i < a.length ; i++ ) {

@@ -8,7 +8,7 @@ import foam.dao.Sink;
 public class LimitedDAO
   extends ProxyDAO
 {
-  private int limit_;
+  protected int limit_;
 
   public LimitedDAO setLimit(int limit) {
     limit_ = limit;

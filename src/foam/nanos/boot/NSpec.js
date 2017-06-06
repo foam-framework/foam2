@@ -17,7 +17,23 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'lazy',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'serve',
+      // Used by u2.view.TableView
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); } else { this.entity('nbsp'); }
+            })
+            .add(obj.serve ? ' Y' : '-')
+          .end();
+      },
+      // Used by u2.TableView
       tableCellView: function(obj, e) {
         var e = e.E();
         if ( obj.serve ) { e.style({color: 'green'}); } else { e.entity('nbsp'); }

@@ -14,6 +14,9 @@ public interface ClassInfo {
   public ClassInfo getParent();
   public ClassInfo addProperty(PropertyInfo p);
 
+  public ClassInfo setObjClass(Class cls);
+  public Class     getObjClass();
+
   public List      getAxioms();
   public Object    getAxiomByName(String name);
   public List      getAxiomsByClass(Class cls);
