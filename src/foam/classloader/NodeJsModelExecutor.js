@@ -54,6 +54,7 @@ foam.CLASS({
             delegate: modelDao,
             primary: this.NodeModelFileDAO.create({
               classpath: classpath,
+              surpressWarning: true,
             })
           });
         }

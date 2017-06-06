@@ -434,7 +434,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        of = of ? foam.lookup(of).model_.swiftName : 'FObject';
+        of = of ? of.model_.swiftName : 'FObject';
         return of + (required ? '' : '?');
       },
     },
