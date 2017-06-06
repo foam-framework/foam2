@@ -518,45 +518,4 @@
       }
     ]
   });
-
-  foam.CLASS({
-    package: 'foam.parsers.html',
-    name: 'Attribute',
-
-    properties: [
-      {
-        class: 'String',
-        name: 'name'
-      },
-      {
-        class: 'String',
-        name: 'value'
-      }
-    ]
-  });
-
-
-  foam.CLASS({
-    package: 'foam.parsers.html',
-    name: 'Tag',
-
-    properties: [
-      {
-        class: 'Enum',
-        of: 'foam.parsers.TagType',
-        name: 'type',
-        factory: function() { return foam.parser.TagType.OPEN; }
-      },
-      {
-        class: 'String',
-        name: 'nodeName',
-        value: 'div'
-      },
-      {
-        class: 'FObjectArray',
-        of: 'foam.parsers.html.Attribute',
-        name: 'attributes',
-      }
-    ]
-  });
 })();
