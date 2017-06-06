@@ -100,6 +100,21 @@ foam.CLASS({
           background: #eee;
           outline: 1px solid #f00;
         }
+
+        ^vertDots {
+          font-size: 20px;
+          font-weight: bold;
+          padding-right: 10px;
+        }
+
+        ^noselect {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
     */}
     })
   ],
@@ -181,17 +196,6 @@ foam.CLASS({
         return this.OverlayDropdown.create().add(editor);
       }
     },
-    {
-      name: 'vertMenuIcon',
-      factory: function() {
-        return {
-                    'background': 
-                    'url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDE2QTIsMiAwIDAsMSAxNCwxOEEyLDIgMCAwLDEgMTIsMjBBMiwyIDAgMCwxIDEwLDE4QTIsMiAwIDAsMSAxMiwxNk0xMiwxMEEyLDIgMCAwLDEgMTQsMTJBMiwyIDAgMCwxIDEyLDE0QTIsMiAwIDAsMSAxMCwxMkEyLDIgMCAwLDEgMTIsMTBNMTIsNEEyLDIgMCAwLDEgMTQsNkEyLDIgMCAwLDEgMTIsOEEyLDIgMCAwLDEgMTAsNkEyLDIgMCAwLDEgMTIsNFoiIC8+PC9zdmc+) no-repeat left center'
-                    // ZEPLIN Icon
-                    // data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4gICAgPGcgZmlsbD0iIzA5MzY0OSIgZmlsbC1ydWxlPSJldmVub2RkIiBvcGFjaXR5PSIuNyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAgMikiPiAgICAgICAgPGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiLz4gICAgICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIxMCIgcj0iMiIvPiAgICAgICAgPGNpcmNsZSBjeD0iMiIgY3k9IjE4IiByPSIyIi8+ICAgIDwvZz48L3N2Zz4=
-                }
-      }
-    },
     'selection',
     'hoverSelection'
   ],
@@ -210,9 +214,12 @@ foam.CLASS({
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
-        start('thead')
-          .start('div').style({ 'position': 'relative' }).add(view.columnSelectionE).end()
-          .add(this.slot(function(columns_) {
+        start('thead').
+          start('div').
+            style({ 'position': 'relative' }).
+              add(view.columnSelectionE).
+          end().
+          add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
                 this.start('th').
@@ -227,11 +234,14 @@ foam.CLASS({
                 end();
 
                 if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
-                  this.start('th')
-                  .addClass(view.myClass('th-editColumns')).
-                  on('click', function(e) {
-                    view.columnSelectionE.open();
-                  }).style(view.vertMenuIcon).end();
+                  this.start('th').
+                    addClass(view.myClass('th-editColumns')).
+                    on('click', function(e) {
+                      view.columnSelectionE.open();
+                    }).
+                    add(' ', this.Entity.create({ name: '#8942' })).
+                      addClass(view.myClass('vertDots')).addClass(view.myClass('noselect')).
+                  end();
                 }
               });
           })).
@@ -263,10 +273,10 @@ foam.CLASS({
 
                         if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
                           this.start('td').
-                          call(column.tableCellFormatter, [
-                            null, obj, column
-                          ]).
-                          end();
+                            call(column.tableCellFormatter, [
+                              null, obj, column
+                            ]).
+                            end();
                         }
                       });
               });
