@@ -207,6 +207,17 @@ foam.CLASS({
         column;
     },
 
+    // Adds offset for edit columns menu dropdown
+    function positionOverlayDropdown() {
+      /*  Dynamic position calculation
+      var origin = document.getElementsByClassName('EditColumnsDropdownOrigin')[0];
+      var current = document.getElementsByClassName('foam-u2-md-OverlayDropdown-container')[0];
+      var boundingBox = origin.getBoundingClientRect();
+      var dropdownMenu = current.getBoundingClientRect();*/
+
+      this.columnSelectionE.style({ top: 90 + 'px'});
+    },
+
     function initE() {
       var view = this;
 
@@ -215,10 +226,7 @@ foam.CLASS({
         addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
         start('thead').
-          start('div').
-            style({ 'position': 'relative' }).
-              add(view.columnSelectionE).
-          end().
+          add(view.columnSelectionE).
           add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
@@ -237,10 +245,12 @@ foam.CLASS({
                   this.start('th').
                     addClass(view.myClass('th-editColumns')).
                     on('click', function(e) {
+                      view.positionOverlayDropdown();
                       view.columnSelectionE.open();
                     }).
                     add(' ', this.Entity.create({ name: '#8942' })).
                       addClass(view.myClass('vertDots')).addClass(view.myClass('noselect')).
+                      start('div').addClass('EditColumnsDropdownOrigin').end().
                   end();
                 }
               });
