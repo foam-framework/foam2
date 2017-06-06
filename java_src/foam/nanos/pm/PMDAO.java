@@ -1,5 +1,6 @@
 package foam.nanos.pm;
 
+import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
 
@@ -11,8 +12,13 @@ public class PMDAO
   implements NanoService
 {
 
-  public static final String ServiceName = "pmDAO";
+  public static final String ServiceName = "pmInfoDAO";
 
   @Override
-  public void start() {}
+  public void start() {
+    MapDAO mpd = new MapDAO();
+    mpd.setOf(PMInfo.getOwnClassInfo());
+    mpd.setX(getX());
+    setDelegate(mpd);
+  }
 }
