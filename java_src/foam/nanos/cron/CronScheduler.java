@@ -60,6 +60,8 @@ public class CronScheduler
     cron.setLastRun(new Date());
     ps.flush();
     cron.setOutput(baos.toString());
+    // set to next scheduled time
+    cron.setScheduledTime(cron.getNextScheduledTime());
   }
 
   private final Thread cronJobs = new Thread() {
@@ -94,8 +96,8 @@ public class CronScheduler
     Cron cron = new Cron()
         .setHour(23)
         .setMinute(59)
-        .setMonth(6)
-        .setDayOfWeek(6);
+        .setDayOfMonth(31)
+        .setMonth(1);
     System.out.println(cron.getNextScheduledTime());
   }
 }
