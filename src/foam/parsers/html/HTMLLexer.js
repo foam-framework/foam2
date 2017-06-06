@@ -15,20 +15,8 @@
  * limitations under the License.
  */
 
-foam.ENUM({
-  package: 'foam.parsers',
-  name: 'TagType',
-
-  values: [
-    { name: 'OPEN',       label: 'Open' },
-    { name: 'CLOSE',      label: 'Close' },
-    { name: 'OPEN_CLOSE', label: 'Open & Close' }
-  ]
-});
-
-
 foam.CLASS({
-  package: 'foam.parsers',
+  package: 'foam.parsers.html',
   name: 'HTMLLexer',
 
   documentation: `Parse an HTML string into a flat sequence of tags and
@@ -40,7 +28,7 @@ foam.CLASS({
     'foam.parse.StringPS',
     'foam.parsers.html.Attribute',
     'foam.parsers.html.Tag',
-    'foam.parsers.TagType'
+    'foam.parsers.html.TagType'
   ],
 
   axioms: [
@@ -57,8 +45,6 @@ foam.CLASS({
       value: function(
           seq1, sym, seq, repeat, alt, optional, str, plus, notChars, repeat0,
           not, anyChar, range, literalIC) {
-        var openTag = this.openTag_.bind(this, seq, sym);
-        var closeTag = this.closeTag_.bind(this, seq, sym);
 
         return {
           START: seq1(1, optional(sym('header')), sym('html')),
@@ -163,12 +149,6 @@ foam.CLASS({
             return Tag.create({ type: CLOSE, nodeName: v });
           },
 
-          escape: function(v) {
-            var char = lib.getHtmlEscapeChar(v);
-            if ( char || typeof char === 'string' ) return char;
-            return '&' + v + ';';
-          },
-
           // TODO(markdittmer): Do something with these values.
           header: function(v) { return null; },
           langTag: function(v) { return null; },
@@ -207,26 +187,6 @@ foam.CLASS({
       foam.assert(start, 'No symbol found for', opt_name);
 
       return start.parse(this.ps, this.grammar);
-    },
-
-    function openTag_(seq, sym, tagName) {
-      return seq(
-          '<',
-          tagName,
-          sym('whitespace'),
-          sym('attributes'),
-          sym('whitespace'),
-          '>');
-    },
-
-    function closeTag_(seq, sym, tagName) {
-      return seq(
-          '<',
-          '/',
-          sym('whitespace'),
-          tagName,
-          sym('whitespace'),
-          '>');
     }
   ]
 });

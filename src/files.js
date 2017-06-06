@@ -246,7 +246,10 @@ FOAM_FILES([
   { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
   { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
-  { name: "foam/parsers/html" },
-  { name: "foam/parsers/HTMLLexer" },
+  { name: "foam/parsers/html/Attribute" },
+  { name: "foam/parsers/html/HTMLLexer" },
+  { name: "foam/parsers/html/lib" },
+  { name: "foam/parsers/html/Tag" },
+  { name: "foam/parsers/html/TagType" },
   { name: "foam/core/ContextAware", flags: ['java'] }
 ]);
