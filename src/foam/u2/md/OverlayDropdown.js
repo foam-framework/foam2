@@ -52,7 +52,7 @@ foam.CLASS({
     {
       name: 'addToSelf_',
       value: false
-    },
+    }
   ],
 
   methods: [
@@ -65,13 +65,14 @@ foam.CLASS({
     function open() {
       if (this.opened) return;
       this.opened = true;
-      this.height = -1;
+      this.dropdownE_.style({ height: this.getFullHeight() + 'px' });
       this.animationComplete = false;
     },
 
     function close() {
       if (!this.opened) return;
       this.height = 0;
+      this.dropdownE_.style({ height: 0 + 'px' });
       this.opened = false;
     },
 
@@ -96,38 +97,32 @@ foam.CLASS({
 
     function initE() {
       this.addToSelf_ = true;
-      this.cls(this.myCls('container'));
+      this.addClass(this.myClass('container'));
+      var view = this;
 
-      this.style({
-        display: this.dynamic(function(open) {
-          return open ? 'block' : 'none';
-        }, this.opened$)
-      });
+      this.addClass(this.slot(function(open) {
+        this.shown = open;
+      }, this.opened$));
 
-      var overlayStyle = this.dynamic(function(open) {
-        return open ? '0' : 'initial';
-      }, this.opened$);
 
       this.start('dropdown-overlay')
-          .cls(this.myCls('overlay'))
-          .style({
-            top: overlayStyle,
-            bottom: overlayStyle,
-            left: overlayStyle,
-            right: overlayStyle
-          })
+          .addClass(this.myClass('overlay'))
+          .addClass(this.slot(function(open) {
+            return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
+          }, this.opened$))
           .on('click', this.onCancel)
           .end();
 
-      this.dropdownE_.cls(this.myCls())
-          .cls(this.dynamic(function(open, complete) {
-            return open && complete ? this.myCls('open') : '';
-          }.bind(this), this.opened$, this.animationComplete$))
+      this.dropdownE_.addClass(this.myClass())
+          .addClass(this.slot(function(openComplete) {
+            return openComplete ? this.myClass('open') : '';
+          }, this.opened$ && this.animationComplete$))
+          /*.addClass(this.dynamic(function(open, complete) {
+            return open && complete ? this.myClass('open') : '';
+          }.bind(this), this.opened$, this.animationComplete$))*/
           .on('transitionend', this.onTransitionEnd)
           .on('mouseleave', this.onMouseLeave)
           .on('click', this.onClick);
-
-      this.dropdownE_.dynamic(this.onHeightChange, this.height$);
 
       this.add(this.dropdownE_);
 
@@ -135,8 +130,9 @@ foam.CLASS({
     }
   ],
 
-  templates: [
-    function CSS() {/*
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
       ^overlay {
         position: fixed;
         z-index: 1009;
@@ -164,7 +160,20 @@ foam.CLASS({
       ^open {
         overflow-y: auto;
       }
-    */},
+      ^zeroOverlay {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      ^initialOverlay {
+        top: initial;
+        bottom: initial;
+        left: initial;
+        right: initial;
+      }
+    */}
+    })
   ],
 
   listeners: [
@@ -188,11 +197,6 @@ foam.CLASS({
      */
     function onClick(e) {
       e.stopPropagation();
-    },
-
-    function onHeightChange() {
-      var height = this.height < 0 ? this.getFullHeight() : this.height;
-      this.dropdownE_.style({ height: height + 'px' });
     }
   ]
 });
