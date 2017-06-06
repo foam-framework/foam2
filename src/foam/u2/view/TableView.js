@@ -170,45 +170,26 @@ foam.CLASS({
       name: 'columnSelectionE',
       factory: function() {
         var editor = this.EditColumnsView.create({
-          properties$: this.columns_$,
+          properties: this.columns_,
           selectedProperties$: this.columns_$
         });
 
-        for (var i = 0; i < this.columns_.length; ++i) {
-          console.log(editor.properties[i].name)
-        }
-
-        console.log(editor)
-
-        editor.initE();
-
-        console.log('returning from columnSelectionE')
         return this.OverlayDropdown.create().add(editor);
+      }
+    },
+    {
+      name: 'vertMenuIcon',
+      factory: function() {
+        return {
+                    'background': 
+                    'url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEyLDE2QTIsMiAwIDAsMSAxNCwxOEEyLDIgMCAwLDEgMTIsMjBBMiwyIDAgMCwxIDEwLDE4QTIsMiAwIDAsMSAxMiwxNk0xMiwxMEEyLDIgMCAwLDEgMTQsMTJBMiwyIDAgMCwxIDEyLDE0QTIsMiAwIDAsMSAxMCwxMkEyLDIgMCAwLDEgMTIsMTBNMTIsNEEyLDIgMCAwLDEgMTQsNkEyLDIgMCAwLDEgMTIsOEEyLDIgMCAwLDEgMTAsNkEyLDIgMCAwLDEgMTIsNFoiIC8+PC9zdmc+) no-repeat left center'
+                    // ZEPLIN Icon
+                    // data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4gICAgPGcgZmlsbD0iIzA5MzY0OSIgZmlsbC1ydWxlPSJldmVub2RkIiBvcGFjaXR5PSIuNyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAgMikiPiAgICAgICAgPGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiLz4gICAgICAgIDxjaXJjbGUgY3g9IjIiIGN5PSIxMCIgcj0iMiIvPiAgICAgICAgPGNpcmNsZSBjeD0iMiIgY3k9IjE4IiByPSIyIi8+ICAgIDwvZz48L3N2Zz4=
+                }
       }
     },
     'selection',
     'hoverSelection'
-  ],
-
-
-  actions: [
-    {
-      name: 'clearSelection',
-      icon: 'https://www.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png',
-      isAvailable: function() { return !!this.hardSelection; },
-      code: function() {
-        this.hardSelection = null;
-      }
-    },
-    {
-      name: 'editColumns',
-      icon: 'https://www.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png',
-      isAvailable: function() { return this.editColumnsEnabled; },
-      code: function() {
-        console.log('should never be shown')
-        // this.columnSelectionE.open();
-      }
-    }
   ],
 
   methods: [
@@ -240,14 +221,13 @@ foam.CLASS({
                   }, view.order$)).
                 end();
 
-                if (column == columns_[columns_.length - 1]) {
-                  this.start('th').addClass(view.myClass('th-editColumns')).
-                on('click', function(e) {
-                  console.log('editing columns')
-                  
-                  view.columnSelectionE.open();
-
-                }).start('img').attr('src','https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png').end();
+                if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
+                  this.start('th')
+                  .start('div').style({ 'position': 'relative' }).add(view.columnSelectionE).end()
+                  .addClass(view.myClass('th-editColumns')).
+                  on('click', function(e) {
+                    view.columnSelectionE.open();
+                  }).style(view.vertMenuIcon).end()
                 }
               })
           })).
@@ -277,7 +257,7 @@ foam.CLASS({
                           ]).
                           end();
 
-                        if (column == columns_[columns_.length - 1]) {
+                        if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
                           this.start('td').
                           call(column.tableCellFormatter, [
                             null, obj, column
