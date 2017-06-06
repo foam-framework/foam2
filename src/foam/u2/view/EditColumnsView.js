@@ -34,15 +34,11 @@ foam.CLASS({
         selected[this.selectedProperties[i].name] = true;
       }
 
-      console.log('selected: ')
-      console.log(selected)
       return selected;
     },
 
     function initE() {
       var selected = this.selectedMap();
-      console.log('selected')
-      console.log(selected)
       var props = this.properties;
 
       if ( this.displaySorted ) {
@@ -52,22 +48,27 @@ foam.CLASS({
         });
       }
 
-      for (var i = 0; i < props.length; i++) {
+      for (let i = 0; i < props.length; i++) {
         var cb = this.CheckBox.create({
-          //label: props[i].label,
+          label: props[i].label,
           data: selected[props[i].name]
         });
 
-        // TODO: Determine link
-        // cb.data$.linkTo(this.onPropChange.bind(this, props[i]));
+        cb.attrSlot('checked').element.on('change', this.onPropChange.bind(this, props[i], cb));
+
         this.add(cb);
       }
     }
   ],
 
   listeners: [
-    function onPropChange(prop, _, __, old, nu) {
+    function onPropChange(prop, _, cb, old, nu) {
+      // console.log('CHANGE prop', prop, '_', _, 'cb', cb, 'old', old, 'new', nu)
+      console.log(prop.name, 'was changed. It is now', cb.target.checked)
       var selected = this.selectedMap();
+      //
+      console.log(selected)
+
       var out = [];
 
       if ( this.displaySorted ) {
@@ -84,11 +85,14 @@ foam.CLASS({
 
           // Push under two conditions: selected and not just removed,
           // or not selected but just added.
-          if ((p === prop && nu) || (selected[p.name] && (p !== prop || nu))) {
+          // TODO: Handle newly added columns dynamically
+          if ((p === prop && cb.target.checked) || (selected[p.name] && (p !== prop || cb.target.checked))) {
             out.push(p);
           }
         }
       }
+
+      console.log('out', out)
 
       this.selectedProperties = out;
     }
