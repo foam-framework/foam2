@@ -8,7 +8,7 @@ import foam.dao.Sink;
 public class OrderedDAO
   extends ProxyDAO
 {
-  private foam.mlang.order.Comparator order_;
+  protected foam.mlang.order.Comparator order_;
 
   public OrderedDAO setOrder(foam.mlang.order.Comparator order) {
     order_ = order;

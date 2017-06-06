@@ -28,6 +28,9 @@ FOAM_FILES([
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
-
-  { name: "foam/nanos/auth/Relationships" }
+  { name: "foam/nanos/cron/Cron" },
+  { name: "foam/nanos/auth/Relationships" },
+  { name: "foam/nanos/NanoService" },
+  { name: "foam/nanos/auth/AuthService" },
+  { name: "foam/nanos/pm/PMInfo" }
 ]);

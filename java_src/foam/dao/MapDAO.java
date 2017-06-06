@@ -9,10 +9,10 @@ import foam.mlang.predicate.Predicate;
 public class MapDAO
   extends AbstractDAO
 {
-  private Map<Object, FObject> data_ = null;
-  private ClassInfo            of_ = null;
+  protected Map<Object, FObject> data_ = null;
+  protected ClassInfo            of_ = null;
 
-  private synchronized void data_factory() {
+  protected synchronized void data_factory() {
     if ( data_ == null ) {
       data_ = (Map<Object, FObject>) new ConcurrentHashMap();
     }
@@ -50,8 +50,11 @@ public class MapDAO
   }
 
   public FObject find(Object o) {
-    Object id = getOf().getClass().isInstance(o) || false ? getPrimaryKey().get(o) : o;
-    return getData().get(id);
+    if( getOf().getObjClass().isInstance(o) ) {
+      return getData().get(getPrimaryKey().get(o));
+    } else {
+      return getData().get(o);
+    }
   }
 
   public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {

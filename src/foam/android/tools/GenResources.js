@@ -18,9 +18,11 @@
 foam.CLASS({
   package: 'foam.android.tools',
   name: 'GenResources',
+
   imports: [
     'arequire',
   ],
+
   properties: [
     {
       class: 'StringArray',
@@ -35,6 +37,7 @@ foam.CLASS({
       factory: function() { return require('fs'); }
     },
   ],
+
   methods: [
     function execute() {
       var self = this;
@@ -61,11 +64,12 @@ foam.CLASS({
     },
     function classToResources(cls) { foam.assert(false, 'Implement') },
   ],
+
   templates: [
     {
       name: 'genResource',
       args: ['resources'],
       template: '<% foam.assert(false, "Implement") %>',
     }
-  ],
+  ]
 });

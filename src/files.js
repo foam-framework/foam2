@@ -141,6 +141,7 @@ FOAM_FILES([
   { name: "foam/dao/RestDAO" },
   { name: "foam/dao/EnabledAwareDAO" },
   { name: "foam/dao/LastModifiedAwareDAO" },
+  { name: "foam/dao/ValidationDAODecorator" },
   { name: "foam/dao/SQL", flags: ['sql'] },
   { name: "foam/parse/QueryParser" },
   { name: "foam/physics/Physical" },
@@ -246,5 +247,6 @@ FOAM_FILES([
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
   { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
   { name: "foam/parsers/html" },
-  { name: "foam/parsers/HTMLLexer" }
+  { name: "foam/parsers/HTMLLexer" },
+  { name: "foam/core/ContextAware", flags: ['java'] }
 ]);

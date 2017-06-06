@@ -23,6 +23,14 @@ public class EmptyClassInfo
     return this;
   }
 
+  public ClassInfo setObjClass(Class cls) {
+    return null;
+  }
+
+  public Class getObjClass() {
+    return null;
+  }
+
   public List getAxioms() {
     return Collections.emptyList();
   }

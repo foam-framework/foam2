@@ -9,8 +9,6 @@ foam.CLASS({
   name: 'Test',
   extends: 'foam.nanos.script.Script',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
-
   properties: [
     {
       class: 'Int',

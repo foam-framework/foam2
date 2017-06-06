@@ -7,10 +7,10 @@ import foam.mlang.predicate.*;
 import foam.mlang.order.*;
 
 public abstract class AbstractDAO
-  extends ContextAwareSupport
+  extends    ContextAwareSupport
   implements DAO
 {
-  private ClassInfo    of_         = null;
+  protected ClassInfo    of_         = null;
   protected PropertyInfo primaryKey_ = null;
 
   public DAO where(Predicate predicate) {

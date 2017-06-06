@@ -20,9 +20,9 @@ public class PM {
     startTime_ = System.nanoTime();
   }
 
-  public void end(X x) {
-    PMLogger logger = (PMLogger) x.get("pmLogger");
+  public void log(X x) {
     endTime_ = System.nanoTime();
+    PMLogger logger = (PMLogger) x.get(DAOPMLogger.ServiceName);
     logger.log(this);
   }
 

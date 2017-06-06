@@ -558,6 +558,8 @@ foam.CLASS({
         },
         customToString: function() {
           return 'scan(key=' + prop.name + ', cost=' + this.cost +
+              ', sorting=' + ( sortRequired ? order.toString() : 'none' ) +
+              ', reverseScan=' + reverseSort +
               (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
               ')';
         }
