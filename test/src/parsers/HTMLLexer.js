@@ -21,7 +21,7 @@ describe('HTMLLexer', function() {
   var parser;
 
   beforeAll(function() {
-    parser = foam.parsers.HTMLLexer.create();
+    parser = foam.parsers.html.HTMLLexer.create();
   });
 
   function gist(str) {
