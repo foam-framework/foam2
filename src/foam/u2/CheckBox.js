@@ -23,16 +23,58 @@ foam.CLASS({
   documentation: 'Checkbox View.',
 
   properties: [
-    { class: 'Boolean', name: 'data' }
+    { 
+      class: 'Boolean', 
+      name: 'data' 
+    },
+    {
+      class: 'Boolean',
+      name: 'showLabel',
+      value: true
+    },
+    { 
+      class: 'String', 
+      name: 'label' 
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'checkbox');
+
+      if (this.showLabel) { 
+        this.start('span')
+              .addClass(this.myClass('label')).addClass('noselect')
+              .add(this.label$)
+              .end();
+      }
     },
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
     }
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+      ^ {
+        align-items: center;
+        display: flex;
+        margin: 8px;
+        padding: 8px;
+      }
+      ^label {
+        color: #444;
+        flex-grow: 1;
+        margin-right: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      ^read-only {
+        opacity: 0.54;
+      }
+    */}
+    })
   ]
 });
