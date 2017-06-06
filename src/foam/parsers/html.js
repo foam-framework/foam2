@@ -559,19 +559,4 @@
       }
     ]
   });
-
-
-  foam.CLASS({
-    package: 'foam.parsers.html',
-    name: 'Embed',
-    extends: 'foam.parsers.html.Tag',
-
-    properties: [
-      {
-        name: 'type',
-        factory: function() { return foam.parser.TagType.OPEN_CLOSE; }
-      },
-      'content'
-    ]
-  });
 })();

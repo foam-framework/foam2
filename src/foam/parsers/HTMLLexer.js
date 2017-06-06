@@ -39,7 +39,6 @@ foam.CLASS({
     'foam.parse.Parsers',
     'foam.parse.StringPS',
     'foam.parsers.html.Attribute',
-    'foam.parsers.html.Embed',
     'foam.parsers.html.Tag',
     'foam.parsers.TagType'
   ],
@@ -116,9 +115,6 @@ foam.CLASS({
 
           text: str(plus(not(alt(sym('closeTag'), sym('openTag')),
                   anyChar()))),
-                  //alt(sym('escape'), anyChar())))),
-
-//          escape: str(seq1(1, '&', repeat(range('a', 'z')), ';')),
 
           attribute: seq(sym('label'), optional(
               seq1(3, sym('whitespace'), '=', sym('whitespace'),
@@ -126,11 +122,8 @@ foam.CLASS({
 
           value: str(alt(
               plus(notChars('\'" \t\r\n<>')),
-              //plus(alt(sym('escape'), notChars('\'" \t\r\n<>'))),
               seq1(1, '"', repeat(notChars('"', anyChar())), '"'),
-              //seq1(1, '"', repeat(alt(sym('escape'), notChars('"', anyChar()))), '"'),
               seq1(1, "'", repeat(notChars("'", anyChar())), "'"))),
-              //seq1(1, "'", repeat(alt(sym('escape'), notChars("'", anyChar()))), "'"))),
 
           whitespace: repeat0(alt(' ', '\t', '\r', '\n'))
         };
@@ -152,7 +145,6 @@ foam.CLASS({
         var self  = this;
         var lib   = self.lib;
         var Tag   = self.Tag;
-        var Embed = self.Embed;
         var Attribute = self.Attribute;
         var OPEN  = self.TagType.OPEN;
         var CLOSE = self.TagType.CLOSE;
