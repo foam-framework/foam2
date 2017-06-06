@@ -8,6 +8,9 @@ package foam.nanos.cron;
 
 import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
+import foam.nanos.NanoService;
+
+import java.util.Date;
 
 public class CronScheduler
   extends    ContextAwareSupport
@@ -15,8 +18,20 @@ public class CronScheduler
 {
   protected MapDAO cronDAO_;
 
+  private void getMinScheduledCronJob() {
+
+
+  }
+
+  public void runCronJob(Cron cron) {
+
+  }
+
+  public void runAllCronJobs() {
+
+  }
+
   public void start() {
     cronDAO_ = (MapDAO) getX().get("MapDAO");
   }
-
 }
