@@ -39,11 +39,6 @@ public class Boot {
     ((MapDAO) groupDAO_).setX(root_);
     root_.put("groupDAO", groupDAO_);
 
-//    pmDAO_ = new MapDAO();
-//    pmDAO_.setOf(PMInfo.getOwnClassInfo());
-//    pmDAO_.setX(root_);
-//    root_.put(DAOPMLogger.DAOName, pmDAO_);
-
     loadServices();
     //loadTestData();
 
