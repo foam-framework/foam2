@@ -57,15 +57,32 @@ foam.CLASS({
 
 foam.INTERFACE({
   package: 'foam.mlang',
-  name: 'Expr',
+  name: 'F',
 
-  documentation: 'Expression interface: f(obj) -> val.',
+  documentation: 'F interface: f(obj) -> val.',
 
   methods: [
     {
       name: 'f',
-      args: [ 'obj' ]
-    },
+      args: [
+        'obj'
+      ]
+    }
+  ]
+});
+
+// Investigate: If we use "extends: 'foam.mlang.F'" it generates the content properly for both F and Expr.
+// But we have the Constant that extends the AbstractExpr that implements Expr and in this case, the f method
+// (that comes from the F) interface is "losing" its type and returning void instead of returning the same defined
+// on the interface as it should.
+foam.INTERFACE({
+  package: 'foam.mlang',
+  name: 'Expr',
+  implements: ['foam.mlang.F'],
+
+  documentation: 'Expr interface extends F interface: partialEval -> Expr.',
+
+  methods: [
     {
       name: 'partialEval'
     }
@@ -815,8 +832,10 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      var lhs = this.arg1.f(o).toUpperCase();
+      var lhs = this.arg1.f(o);
       var rhs = this.arg2.f(o);
+
+      if ( lhs.toUpperCase ) lhs = lhs.toUpperCase();
 
       // If arg2 is a constant array, we use valueSet for it.
       if ( foam.mlang.Constant.isInstance(this.arg2) ) {

@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -31,6 +20,17 @@ foam.CLASS({
   exports: [
     'as filterController',
     'as data'
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^count {
+          font-size: 14pt;
+          color: #555;
+        }
+      */}
+    })
   ],
 
   properties: [
@@ -55,20 +55,34 @@ foam.CLASS({
                 .filter(function(p) { return ! p.hidden })
                 .map(foam.core.Property.NAME.f);
       }
-    }
+    },
+    {
+      class: 'Int',
+      name: 'selectedCount'
+    },
+    {
+      class: 'Int',
+      name: 'totalCount'
+    },
   ],
 
   methods: [
     function initE() {
       var self = this;
 
-      // TODO: Add "n of m selected" header.
+      this.dao.on.sub(this.updateTotalCount);
+      this.updateTotalCount();
+
       this.
         add(this.slot(function(filters) {
           var searchManager = self.SearchManager.create({
             dao$: self.dao$,
             predicate$: self.data$
           });
+
+//          searchManager.filteredDAO.on.sub(self.updateSelectedCount);
+          searchManager.filteredDAO$.sub(self.updateSelectedCount);
+          self.updateSelectedCount(0,0,0,searchManager.filteredDAO$);
 
           var e = this.E('div');
 
@@ -87,11 +101,23 @@ foam.CLASS({
                 .addClass(self.myClass('filter-header'))
                 .add(axiom.label)
               .end()
-              .add(view);
+              .start(view)
+                .addClass(self.myClass('filter'))
+            .end()
           });
 
           return e;
-        }, this.filters$), this.CLEAR);
+        }, this.filters$))
+        .start()
+          .addClass(self.myClass('count'))
+          // TODO: move formatting function to stdlib
+          .add(
+            self.selectedCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }),
+            ' of ',
+            self.totalCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }),
+            ' selected')
+        .end()
+        .start(this.CLEAR).style({float: 'right'}).end();
     },
 
     function addFilter(key) {
@@ -111,6 +137,33 @@ foam.CLASS({
       code: function() {
         this.data = undefined;
         this.filters = this.filters.slice();
+      }
+    }
+  ],
+
+  /*
+  reactions: [
+    [ 'data', 'on', 'updateTotalCount' ]
+  ],
+  */
+
+  listeners: [
+    {
+      name: 'updateTotalCount',
+      isFramed: true,
+      code: function() {
+        this.dao.select(foam.mlang.sink.Count.create()).then(function(c) {
+          this.totalCount = c.value;
+        }.bind(this));
+      }
+    },
+    {
+      name: 'updateSelectedCount',
+      isFramed: true,
+      code: function(_, __, ___, dao) {
+        dao.get().select(foam.mlang.sink.Count.create()).then(function(c) {
+          this.selectedCount = c.value;
+        }.bind(this));
       }
     }
   ]
