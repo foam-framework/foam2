@@ -19,7 +19,6 @@ public class DAOPMLogger
 {
 
   public static final String ServiceName = "pmLogger";
-  public static final String DAOName = "pmInfoDAO";
 
   @Override
   public void log(PM pm) {
@@ -51,11 +50,5 @@ public class DAOPMLogger
   }
 
   @Override
-  public void start() {
-    ProxyDAO pd = (ProxyDAO) getX().get(PMDAO.ServiceName);
-    MapDAO mpd = new MapDAO();
-    mpd.setOf(PMInfo.getOwnClassInfo());
-    mpd.setX(getX());
-    pd.setDelegate(mpd);
-  }
+  public void start() {}
 }
