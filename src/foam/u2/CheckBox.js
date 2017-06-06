@@ -44,9 +44,13 @@ foam.CLASS({
       this.setAttribute('type', 'checkbox');
 
       if (this.showLabel) { 
-        this.start('span')
-              .addClass(this.myClass('label')).addClass('noselect')
+        this.start('label')
+              .addClass(this.myClass('label'))
+              .addClass(this.myClass('noselect'))
               .add(this.label$)
+              .on('click', function() { 
+                this.data = !this.data; 
+              }.bind(this))
               .end();
       }
     },
@@ -59,20 +63,26 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function CSS() {/*
       ^ {
-        align-items: center;
-        display: flex;
         margin: 8px;
         padding: 8px;
       }
+
       ^label {
         color: #444;
         flex-grow: 1;
         margin-right: 12px;
         overflow: hidden;
         white-space: nowrap;
+        display: inline;
       }
-      ^read-only {
-        opacity: 0.54;
+
+      ^noselect {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
     */}
     })
