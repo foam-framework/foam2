@@ -78,10 +78,12 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAODecorator',
   implements: ['foam.dao.DAODecorator'],
+
   methods: [
     function write(X, dao, obj, existing) {
       return Promise.resolve(obj);
@@ -95,16 +97,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'CompoundDAODecorator',
+
   implements: ['foam.dao.DAODecorator'],
+
   properties: [
     {
       class: 'Array',
       name: 'decorators'
     }
   ],
+
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
@@ -114,6 +120,7 @@ foam.CLASS({
         return d[i] ? d[i++].write(X, dao, obj, existing).then(a) : obj;
       });
     },
+
     function read(X, dao, obj) {
       var i = 0;
       var d = this.decorators;
@@ -122,6 +129,7 @@ foam.CLASS({
         return d[i] ? d[i++].read(X, dao, obj).then(a) : obj;
       });
     },
+
     function remove(X, dao, obj) {
       var i = 0;
       var d = this.decorators;
@@ -132,6 +140,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -164,6 +173,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'remove',
       code: function(obj) {
@@ -173,6 +183,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'find',
       code: function(id) {
