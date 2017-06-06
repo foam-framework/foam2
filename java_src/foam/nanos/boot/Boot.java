@@ -45,7 +45,7 @@ public class Boot {
 //    root_.put(DAOPMLogger.DAOName, pmDAO_);
 
     loadServices();
-    loadTestData();
+    //loadTestData();
 
     ((AbstractDAO) serviceDAO_).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -87,17 +87,11 @@ public class Boot {
     s.setLazy(false);
     serviceDAO_.put(s);
 
-    NSpec pmt = new NSpec();
-    pmt.setName("tester");
-    pmt.setServiceClass(PMTest.class.getName());
-    pmt.setLazy(false);
-    serviceDAO_.put(pmt);
-
-//    NSpec authTest = new NSpec();
-//    authTest.setName("authTest");
-//    authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
-//    authTest.setLazy(false);
-//    serviceDAO_.put(authTest);
+    NSpec authTest = new NSpec();
+    authTest.setName("authTest");
+    authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
+    authTest.setLazy(false);
+    serviceDAO_.put(authTest);
   }
 
   public static void main (String[] args) throws Exception {
