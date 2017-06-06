@@ -7,19 +7,24 @@ import java.sql.SQLException;
 
 public abstract class PgConnectionPool {
 
-    // TODO(drish) get this data from env or configuration file
-    protected static String url = "jdbc:postgresql://localhost:5432/postgres";
-    protected static String username = "postgres";
+    protected static String base = "jdbc:postgresql://";
+    // TODO(drish) get an accurate number for pool size.
     protected static int poolSize = 4;
 
     protected static BasicDataSource pool;
 
-    public static void setup() {
-        pool = new BasicDataSource();
-        pool.setUsername(username);
-        pool.setDriverClassName("org.postgresql.Driver");
-        pool.setUrl(url);
-        pool.setInitialSize(poolSize);
+    public static void setup(String host, String port, String dbName, String username, String password) {
+       String url =  base + host + ":" + port + "/" + dbName;
+
+        try {
+            pool = new BasicDataSource();
+            pool.setUsername(username);
+            pool.setDriverClassName("org.postgresql.Driver");
+            pool.setUrl(url);
+            pool.setInitialSize(poolSize);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static Connection getConnection() throws SQLException {
