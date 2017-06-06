@@ -116,9 +116,11 @@ foam.CLASS({
               { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' }  },
               { parent: 'admin', id: 'pm',           label: 'Performance' },
               { parent: 'admin', id: 'log',          label: 'View Logs' },
+              /*
             { id: 'support',                         label: 'Support',         handler: { class: 'foam.nanos.menu.TabsMenu' } },
               { parent: 'support', id: 'api',        label: 'API Reference' },
               { parent: 'support', id: 'context',    label: 'Context Walker' }
+              */
           ]
         });
       }
