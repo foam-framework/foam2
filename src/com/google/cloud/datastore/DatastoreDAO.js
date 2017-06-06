@@ -63,6 +63,51 @@ foam.CLASS({
   ],
   imports: [ 'gcloudProjectId?' ],
 
+  classes: [
+    {
+      name: 'RetryHTTPRequest',
+
+      imports: [ 'error', 'warn' ],
+
+      properties: [
+        {
+          class: 'Int',
+          name: 'numTries',
+          value: 4
+        },
+        {
+          class: 'Proxy',
+          of: 'foam.net.HTTPRequest',
+          name: 'delegate'
+        },
+        {
+          class: 'Int',
+          name: 'currentTry_'
+        }
+      ],
+
+      methods: [
+        function send() {
+          return this.delegate.send().catch(this.onError);
+        }
+      ],
+
+      listeners: [
+        function onError(error) {
+          this.currentTry_++;
+          this.warn('RetryHTTPRequest: Try #' + this.currentTry_ +
+              ' failed on ' + error);
+          if ( this.currentTry_ < this.numTries ) {
+            return this.send();
+          } else {
+            this.error('RetryHTTPRequest: Max tries reached');
+            throw 'RetryHTTPRequest: Max tries reached';
+          }
+        }
+      ]
+    }
+  ],
+
   properties: [
     {
       class: 'String',
@@ -106,12 +151,14 @@ foam.CLASS({
     function getRequest(name, payload) {
       var headers = { Accept: 'application/json' };
       if ( payload ) headers['Content-Type'] = 'application/json';
-      return this.HTTPRequest.create({
-        method: 'POST',
-        url: this.baseURL + ':' + name,
-        headers: headers,
-        responseType: 'json',
-        payload: payload
+      return this.RetryHTTPRequest.create({
+        delegate: this.HTTPRequest.create({
+          method: 'POST',
+          url: this.baseURL + ':' + name,
+          headers: headers,
+          responseType: 'json',
+          payload: payload
+        })
       });
     },
 
@@ -221,9 +268,17 @@ foam.CLASS({
 
     function onResponse(name, response) {
       if ( response.status !== 200 ) {
-        throw new Error('Unexpected ' + name + ' response code from Cloud ' +
-            'Datastore endpoint: ' + response.status);
+        return response.payload.then(function(payload) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status + '\nPayload: ' +
+              JSON.parse(payload, null, 2));
+        }, function(error) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status +
+              '\nError retrieving payload: ' + error);
+        });
       }
+
       return response.payload;
     },
     function onFindResponse(json) {
