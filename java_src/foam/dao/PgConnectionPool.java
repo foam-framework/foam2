@@ -10,7 +10,6 @@ public abstract class PgConnectionPool {
     protected static String base = "jdbc:postgresql://";
     // TODO(drish) get an accurate number for pool size.
     protected static int poolSize = 4;
-
     protected static BasicDataSource pool;
 
     public static void setup(String host, String port, String dbName, String username, String password) {
