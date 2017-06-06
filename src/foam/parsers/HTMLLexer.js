@@ -115,18 +115,22 @@ foam.CLASS({
           tagName: sym('label'),
 
           text: str(plus(not(alt(sym('closeTag'), sym('openTag')),
-                  alt(sym('escape'), anyChar())))),
+                  anyChar()))),
+                  //alt(sym('escape'), anyChar())))),
 
-          escape: str(seq1(1, '&', repeat(range('a', 'z')), ';')),
+//          escape: str(seq1(1, '&', repeat(range('a', 'z')), ';')),
 
           attribute: seq(sym('label'), optional(
               seq1(3, sym('whitespace'), '=', sym('whitespace'),
                    sym('value')))),
 
           value: str(alt(
-              plus(alt(sym('escape'), notChars('\'" \t\r\n<>'))),
-              seq1(1, '"', repeat(alt(sym('escape'), notChars('"', anyChar()))), '"'),
-              seq1(1, "'", repeat(alt(sym('escape'), notChars("'", anyChar()))), "'"))),
+              plus(notChars('\'" \t\r\n<>')),
+              //plus(alt(sym('escape'), notChars('\'" \t\r\n<>'))),
+              seq1(1, '"', repeat(notChars('"', anyChar())), '"'),
+              //seq1(1, '"', repeat(alt(sym('escape'), notChars('"', anyChar()))), '"'),
+              seq1(1, "'", repeat(notChars("'", anyChar())), "'"))),
+              //seq1(1, "'", repeat(alt(sym('escape'), notChars("'", anyChar()))), "'"))),
 
           whitespace: repeat0(alt(' ', '\t', '\r', '\n'))
         };
