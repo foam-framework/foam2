@@ -71,13 +71,8 @@ public class ClassInfoImpl
   }
 
   @Override
-  public Object newInstance() {
-    try {
-      return class_.getClass().newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      e.printStackTrace();
-      return null;
-    }
+  public Object newInstance() throws IllegalAccessException, InstantiationException {
+    return class_.getClass().newInstance();
   }
 
   public List getAxioms() {
