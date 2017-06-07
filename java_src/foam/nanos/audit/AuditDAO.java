@@ -41,7 +41,7 @@ public class AuditDAO
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
     FObject current = this.find(obj);
-    logger.info(formatMessage(current, obj));
+    logger.info("CHANGE", obj.getClassInfo().getId(), user.getId(), formatMessage(current, obj));
     return super.put(obj);
   }
 }
