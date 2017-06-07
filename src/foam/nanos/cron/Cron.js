@@ -53,8 +53,8 @@ foam.CLASS({
       class: 'DateTime',
       name: 'scheduledTime',
       documentation: `Scheduled time to run Cron script.`,
-      javaFactory: function() {
-/*Calendar now = Calendar.getInstance();
+      javaFactory:
+`Calendar now = Calendar.getInstance();
 now.set(Calendar.MILLISECOND, 0);
 now.set(Calendar.SECOND, 0);
 if ( getMinute() >= 0 && getMinute() <= 59 ) now.set(Calendar.MINUTE, getMinute());
@@ -62,8 +62,7 @@ if ( getHour() >= 0 && getHour() <= 23 ) now.set(Calendar.HOUR_OF_DAY, getHour()
 if ( getDayOfMonth() >= 1 && getDayOfMonth() <= 31 ) now.set(Calendar.DAY_OF_MONTH, getDayOfMonth());
 if ( getMonth() >= 1 && getMonth() <= 12 ) now.set(Calendar.MONTH, getMonth() - 1);
 if ( getDayOfWeek() >= 0 && getDayOfWeek() <= 6 ) now.set(Calendar.DAY_OF_WEEK, getDayOfWeek() + 1);
-return now.getTime();*/
-      }
+return now.getTime();`
     }
   ],
 
@@ -71,8 +70,8 @@ return now.getTime();*/
     {
       name: 'getNextScheduledTime',
       javaReturns: 'Date',
-      javaCode: function() {
-/*Calendar next = Calendar.getInstance();
+      javaCode:
+`Calendar next = Calendar.getInstance();
 next.add(Calendar.MINUTE, 1);
 next.set(Calendar.MILLISECOND, 0);
 next.set(Calendar.SECOND, 0);
@@ -108,8 +107,7 @@ while ( next.get(Calendar.YEAR) < 3000 ) {
 if ( !dateFound ) {
   throw new IllegalArgumentException("Unable to get next scheduled time");
 }
-return next.getTime();*/
-      }
+return next.getTime();`
     }
   ]
 });
