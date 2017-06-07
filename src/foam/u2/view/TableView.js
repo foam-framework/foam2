@@ -196,6 +196,27 @@ foam.CLASS({
         return this.OverlayDropdown.create().add(editor);
       }
     },
+    {
+      name: 'ascIcon',
+      documentation: 'HTML entity representing unicode Up-Pointing Triangle',
+      factory: function() {
+        return this.Entity.create({ name: '#9651' });
+      }
+    },
+    {
+      name: 'descIcon',
+      documentation: 'HTML entity representing unicode Down-Pointing Triangle',
+      factory: function() {
+        return this.Entity.create({ name: '#9661' });
+      }
+    },
+    {
+      name: 'vertMenuIcon',
+      documentation: 'HTML entity representing unicode Vertical Ellipsis',
+      factory: function() {
+        return this.Entity.create({ name: '#8942' });
+      }
+    },
     'selection',
     'hoverSelection'
   ],
@@ -240,9 +261,8 @@ foam.CLASS({
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   add(' ', this.slot(function(order) {
-                    return column === order ? this.Entity.create({ name: '#9651' }) :
-                        (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
-                        ''
+                    return column === order ? view.ascIcon :
+                        (view.Desc.isInstance(order) && order.arg1 === column) ? view.descIcon : ''
                   }, view.order$)).
                 end();
 
@@ -253,7 +273,7 @@ foam.CLASS({
                       view.positionOverlayDropdown();
                       view.columnSelectionE.open();
                     }).
-                    add(' ', this.Entity.create({ name: '#8942' })).
+                    add(' ', view.vertMenuIcon).
                       addClass(view.myClass('vertDots')).addClass(view.myClass('noselect')).
                       start('div').addClass('EditColumnsDropdownOrigin').end().
                   end();
