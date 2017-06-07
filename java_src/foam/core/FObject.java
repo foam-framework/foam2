@@ -7,5 +7,5 @@ public interface FObject
 {
   ClassInfo getClassInfo();
   FObject fclone();
-  Map diff(Object obj);
+  Map diff(FObject obj);
 }

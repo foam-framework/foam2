@@ -36,7 +36,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void diff(FObject o1, FObject o2, Map<String, Object> diff, PropertyInfo prop) {
+  public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop) {
     if ( ! prop.f(o1).equals(prop.f(o2)) ) {
       diff.put(prop.getName(), prop.f(o2));
     }
