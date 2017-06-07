@@ -519,7 +519,7 @@
       function unescapeString(str) {
         if ( ! foam.String.isInstance(str) ) return '';
         var escapeKeys = Object.keys(escapes).map(function(key) {
-          return `&${key};`
+          return `&${key};`;
         });
 
         var exp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
