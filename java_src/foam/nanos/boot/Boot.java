@@ -8,10 +8,9 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
-import foam.nanos.PMTest;
+import foam.mlang.*;
 import foam.nanos.auth.*;
 import foam.nanos.pm.*;
-import foam.mlang.*;
 import foam.nanos.pm.PMDAO;
 
 public class Boot {
