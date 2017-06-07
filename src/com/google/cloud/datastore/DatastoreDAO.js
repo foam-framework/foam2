@@ -217,7 +217,7 @@ foam.CLASS({
         return response.payload.then(function(payload) {
           throw new Error('Unexpected ' + name + ' response code from Cloud ' +
               'Datastore endpoint: ' + response.status + '\nPayload: ' +
-              JSON.parse(payload, null, 2));
+              JSON.stringify(payload, null, 2));
         }, function(error) {
           throw new Error('Unexpected ' + name + ' response code from Cloud ' +
               'Datastore endpoint: ' + response.status +
