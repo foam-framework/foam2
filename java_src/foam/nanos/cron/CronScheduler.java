@@ -91,13 +91,4 @@ public class CronScheduler
     cronDAO_ = (MapDAO) getX().get("MapDAO");
     cronJobs.start();
   }
-
-  public static void main(String[] args) {
-    Cron cron = new Cron()
-        .setHour(23)
-        .setMinute(59)
-        .setDayOfMonth(29)
-        .setMonth(2);
-    System.out.println(cron.getNextScheduledTime());
-  }
 }
