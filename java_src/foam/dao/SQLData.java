@@ -47,13 +47,13 @@ public class SQLData {
      */
     public String getFormatedColumnNames() {
         StringJoiner joiner = new StringJoiner(",");
-        String output = "( ";
+        StringBuilder output = new StringBuilder("( ");
         for (String columnName: columnNames) {
             joiner.add(columnName);
         }
-        output += joiner.toString();
-        output += " )";
-        return output;
+        output.append(joiner.toString());
+        output.append(" )");
+        return output.toString();
     }
 
     /**
@@ -65,14 +65,14 @@ public class SQLData {
      * @return String
      */
     public String getFormatedPlaceholders() {
-        String output = "( ";
+        StringBuilder output = new StringBuilder("( ");
         StringJoiner joiner = new StringJoiner(",");
         for (int i = 0; i < columnNames.size(); i++) {
             joiner.add("?");
         }
-        output += joiner.toString();
-        output += " )";
-        return output;
+        output.append(joiner.toString());
+        output.append(" )");
+        return output.toString();
     }
 
     public Map getValues() {
