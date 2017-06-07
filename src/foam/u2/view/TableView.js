@@ -231,12 +231,11 @@ foam.CLASS({
     /** Adds offset for edit columns overlay dropdown
      * OverlayDropdown adds element to top right of parent container.
      * We want the table dropdown to appear below the dropdown icon.
-     * Must be done via styling (not element output position in `initE`)
-     * to avoid destruction of overlay each time the columns are edited.
      */
     function positionOverlayDropdown() {
       // Dynamic position calculation
-      var origin = document.getElementsByClassName('EditColumnsDropdownOrigin')[0];
+      var origin = document.getElementsByClassName(this.of.id.replace(/\./g,'-') 
+                                                  + '-EditColumnsDropdownOrigin')[0];
       var current = document.getElementsByClassName('foam-u2-md-OverlayDropdown-container')[0].parentElement;
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
@@ -275,7 +274,9 @@ foam.CLASS({
                     }).
                     add(' ', view.vertMenuIcon).
                       addClass(view.myClass('vertDots')).addClass(view.myClass('noselect')).
-                      start('div').addClass('EditColumnsDropdownOrigin').end().
+                      start('div')
+                      .addClass(view.of.id.replace(/\./g,'-') +
+                          '-EditColumnsDropdownOrigin').end().
                   end();
                 }
               });
