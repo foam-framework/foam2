@@ -13,19 +13,13 @@ public abstract class AbstractFObject
   }
 
   public FObject fclone() {
-    FObject ret;
-    try {
-      ret = (FObject) getClassInfo().getObjClass().newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      e.printStackTrace();
-      return null;
+    FObject ret = (FObject) getClassInfo().newInstance();
+    if(ret != null) {
+      List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      for( PropertyInfo pi : props ) {
+        pi.set(ret, pi.get(this));
+      }
     }
-
-    List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    for( PropertyInfo pi : props ) {
-      pi.set(ret, pi.get(this));
-    }
-
     return ret;
   }
 
