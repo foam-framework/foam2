@@ -25,7 +25,7 @@ public abstract class AbstractFObject
     return ret;
   }
 
-  public Map<String, Object> diff(FObject obj) {
+  public Map diff(FObject obj) {
     List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();
 
