@@ -30,41 +30,14 @@ public class TestRunner
     runAllTests();
   }
 
-  public Test runTest(Test test) {
-    ByteArrayOutputStream bas   = new ByteArrayOutputStream();
-    PrintStream           ps    = new PrintStream(bas);
-    final Interpreter     shell = new Interpreter(); // Creates a new Interpreter at each call
-
-    try {
-      shell.set("currentTest", test);
-      test.setPassed(0);
-      test.setFailed(0);
-      test.setOutput("");
-      shell.setOut(ps);
-
-      // creates the testing method
-      shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else currentTest.setFailed(currentTest.getFailed()+1); print((exp ? \"SUCCESS: \" : \"FAILURE: \")+message);}");
-      shell.eval(test.getCode());
-    } catch (EvalError e) {
-      e.printStackTrace();
-    }
-    test.setLastRun(new Date());
-    ps.flush();
-    test.setOutput(bas.toString());
-    test.setScheduled(false);
-    // increment lastRun, success, failures
-    return test;
-  }
-
   public void runAllTests() {
     final MapDAO tests = (MapDAO) getX().get("TestDAO");
     try {
       final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
       ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE))).select(new AbstractSink() {
-        public void put(FObject o, Detachable sub) {
-          Test     test  = (Test) o;
-          test = runTest(test);
-          jTests.put(test);
+        public void put(FObject obj, Detachable sub) {
+          ((Test) obj).runScript();
+          jTests.put(obj);
         }
       });
     } catch (IOException e){

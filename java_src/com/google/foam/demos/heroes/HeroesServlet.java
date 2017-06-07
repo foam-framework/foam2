@@ -16,34 +16,32 @@
 
 package com.google.foam.demos.heroes;
 
+import com.google.foam.demos.heroes.Hero;
+import foam.box.*;
+import foam.core.*;
+import foam.core.FObject;
+import foam.dao.*;
+import foam.lib.json.JSONParser;
+import foam.lib.json.Outputter;
+import foam.lib.parse.*;
+import foam.lib.parse.StringPS;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.CharBuffer;
-
-import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import foam.core.FObject;
-import foam.lib.json.Outputter;
-import foam.lib.json.JSONParser;
-import foam.lib.parse.StringPS;
-import foam.lib.parse.*;
-
-import com.google.foam.demos.heroes.Hero;
-import foam.box.*;
-import foam.core.*;
-import foam.dao.*;
+import javax.servlet.ServletException;
 
 @SuppressWarnings("serial")
-public class HeroesServlet extends HttpServlet {
+public class HeroesServlet
+  extends HttpServlet
+{
   private X x = EmptyX.instance();
 
-  private DAO dao = ((DatastoreDAO)x.create(DatastoreDAO.class)).setOf(Hero.getOwnClassInfo());
-  private foam.box.Box daoSkeleton = ((DAOSkeleton)x.create(DAOSkeleton.class)).setDelegate(dao);
+  private DAO dao = ((DatastoreDAO) x.create(DatastoreDAO.class)).setOf(Hero.getOwnClassInfo());
+  private foam.box.Box daoSkeleton = ((DAOSkeleton) x.create(DAOSkeleton.class)).setDelegate(dao);
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -58,12 +56,12 @@ public class HeroesServlet extends HttpServlet {
     resp.setHeader("Access-Control-Allow-Origin", "*");
     CharBuffer buffer_ = CharBuffer.allocate(65535);
     Reader reader = req.getReader();
-    int count = reader.read(buffer_);
+    int    count  = reader.read(buffer_);
     buffer_.rewind();
 
     X requestContext = x.put("httpRequest", req).put("httpResponse", resp);
 
-    FObject result =  requestContext.create(JSONParser.class).parseString(buffer_.toString());
+    FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
     if ( result == null ) {
       resp.setStatus(resp.SC_BAD_REQUEST);
