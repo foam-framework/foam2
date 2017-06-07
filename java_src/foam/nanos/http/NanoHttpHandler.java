@@ -6,13 +6,11 @@
 
 package foam.nanos.http;
 
-import java.io.IOException;
-import java.net.URI;
-
 import com.sun.net.httpserver.*;
-
 import foam.core.*;
 import foam.nanos.*;
+import java.io.IOException;
+import java.net.URI;
 
 public class NanoHttpHandler
   implements HttpHandler
