@@ -2,17 +2,7 @@ describe('HTML Lib', function() {
   var lib;
 
   beforeAll(function() {
-    foam.CLASS({
-      package: 'foam.parsers.html',
-      name: 'HTTPLibTest',
-      properties: [
-        {
-          name: 'lib',
-          factory: function() { return foam.parsers.html; }
-        }
-      ]
-    });
-    lib = foam.parsers.html.HTTPLibTest.create().lib;
+    lib = foam.parsers.html;
   });
 
   it('getHTMLEscapeChar should return unescaped character', function() {

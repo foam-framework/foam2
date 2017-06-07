@@ -506,6 +506,12 @@
     'yen': '¥',
   };
 
+  var escapeKeys = Object.keys(escapes).map(function(key) {
+    return `&${key};`;
+  });
+
+  var escapeSequenceRegExp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
+
   foam.LIB({
     name: 'foam.parsers.html',
 
@@ -518,12 +524,8 @@
       },
       function unescapeString(str) {
         if ( ! foam.String.isInstance(str) ) return '';
-        var escapeKeys = Object.keys(escapes).map(function(key) {
-          return `&${key};`;
-        });
 
-        var exp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
-        return str.replace(exp, function(m) {
+        return str.replace(escapeSequenceRegExp, function(m) {
           // m is in the form of &id; We drop first and last character.
           var id = m.slice(1, -1);
           return escapes[id];
