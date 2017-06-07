@@ -55,7 +55,6 @@ foam.CLASS({
       documentation: `Scheduled time to run Cron script.`,
       javaFactory: function() {
 /*Calendar now = Calendar.getInstance();
-now.setLenient(false);
 now.set(Calendar.MILLISECOND, 0);
 now.set(Calendar.SECOND, 0);
 if ( getMinute() >= 0 && getMinute() <= 59 ) now.set(Calendar.MINUTE, getMinute());
@@ -73,23 +72,43 @@ return now.getTime();*/
       name: 'getNextScheduledTime',
       javaReturns: 'Date',
       javaCode: function() {
-/*Calendar now = Calendar.getInstance();
-Calendar scheduled = Calendar.getInstance();
+/*Calendar next = Calendar.getInstance();
+next.add(Calendar.MINUTE, 1);
+next.set(Calendar.MILLISECOND, 0);
+next.set(Calendar.SECOND, 0);
 
-scheduled.setLenient(false);
-scheduled.setTime(getScheduledTime());
-
-if ( getMinute() < 0)
-  scheduled.set(Calendar.MINUTE, (getMinute() + 1) % 60);
-if ( getHour() < 0)
-  scheduled.set(Calendar.HOUR_OF_DAY, (getHour() + 1) % 24);
-if ( getMonth() < 0)
-  scheduled.set(Calendar.MONTH, getMonth() % 12);
-if (getDayOfWeek() < 0)
-  scheduled.set(Calendar.DAY_OF_WEEK, ((getDayOfWeek() + 1) % 7) + 1);
-if (now.compareTo(scheduled) > 0)
-  scheduled.set(Calendar.YEAR, scheduled.get(Calendar.YEAR) + 1); // update year
-return scheduled.getTime();*/
+boolean dateFound = false;
+while ( next.get(Calendar.YEAR) < 3000 ) {
+  if ( getMonth() >= 0 && next.get(Calendar.MONTH) != getMonth() - 1 ) {
+    next.add(Calendar.MONTH, 1);
+    next.set(Calendar.DAY_OF_MONTH, 1);
+    next.set(Calendar.HOUR_OF_DAY, 0);
+    next.set(Calendar.MINUTE, 0);
+    continue;
+  }
+  if ( ( getDayOfMonth() >= 0 && next.get(Calendar.DAY_OF_MONTH) != getDayOfMonth() ) ||
+      ( getDayOfWeek() >= 0 && next.get(Calendar.DAY_OF_WEEK) != getDayOfWeek() + 1) ) {
+    next.add(Calendar.DAY_OF_MONTH, 1);
+    next.set(Calendar.HOUR_OF_DAY, 0);
+    next.set(Calendar.MINUTE, 0);
+    continue;
+  }
+  if ( getHour() >= 0 && next.get(Calendar.HOUR_OF_DAY) != getHour() ) {
+    next.add(Calendar.HOUR_OF_DAY, 1);
+    next.set(Calendar.MINUTE, 0);
+    continue;
+  }
+  if ( getMinute() >= 0 && next.get(Calendar.MINUTE) != getMinute() ) {
+    next.add(Calendar.MINUTE, 1);
+    continue;
+  }
+  dateFound = true;
+  break;
+}
+if ( !dateFound ) {
+  throw new Exception("Unable to get next scheduled time");
+}
+return next.getTime();*/
       }
     }
   ]
