@@ -86,6 +86,12 @@ public class Boot {
     authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
     authTest.setLazy(false);
     serviceDAO_.put(authTest);
+
+    NSpec logger = new NSpec();
+    logger.setName("logger");
+    logger.setServiceClass("foam.nanos.logger.NanoLogger");
+    logger.setLazy(false);
+    serviceDAO_.put(logger);
   }
 
   public static void main (String[] args) throws Exception {
