@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-describe('RetryHTTPrequest', function() {
+describe('RetryHTTPRequest', function() {
   var RetryHTTPRequest;
   var FailTwiceHTTPRequest;
   beforeEach(function() {
