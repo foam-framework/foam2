@@ -21,7 +21,6 @@ public abstract class AbstractFObject
       }
       return ret;
     } catch (IllegalAccessException | InstantiationException e) {
-      e.printStackTrace();
       return null;
     }
   }
