@@ -69,7 +69,8 @@ var classes = [
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.script.Script',
-  'foam.nanos.test.Test'
+  'foam.nanos.test.Test',
+  'foam.nanos.cron.Cron'
 ];
 
 var abstractClasses = [
