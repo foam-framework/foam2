@@ -10,30 +10,28 @@ import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
-
 import java.lang.reflect.Proxy;
 
 public class DAOPMLogger
-  extends ContextAwareSupport
+  extends    ContextAwareSupport
   implements PMLogger, NanoService
 {
-
   public static final String ServiceName = "pmLogger";
 
   @Override
   public void log(PM pm) {
     PMInfo pmi = new PMInfo()
-            .setClsname(pm.getClassType().getName())
-            .setPmname(pm.getName());
+        .setClsname(pm.getClassType().getName())
+        .setPmname(pm.getName());
 
     ProxyDAO pmd = (ProxyDAO) getX().get(PMDAO.ServiceName);
 
     PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
       pmi.setMintime(pm.getTime())
-              .setMaxtime(pm.getTime())
-              .setTotaltime(pm.getTime())
-              .setNumoccurrences(1);
+          .setMaxtime(pm.getTime())
+          .setTotaltime(pm.getTime())
+          .setNumoccurrences(1);
 
       pmd.put(pmi);
     } else {
