@@ -96,8 +96,8 @@ public class CronScheduler
     Cron cron = new Cron()
         .setHour(23)
         .setMinute(59)
-        .setDayOfMonth(31)
-        .setMonth(1);
+        .setDayOfMonth(29)
+        .setMonth(2);
     System.out.println(cron.getNextScheduledTime());
   }
 }
