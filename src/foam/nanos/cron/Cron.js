@@ -59,6 +59,13 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'runScript',
+      javaReturns: 'void',
+      javaCode:
+`super.runScript();
+setScheduledTime(getNextScheduledTime());`
+    },
+    {
       name: 'getNextScheduledTime',
       javaReturns: 'Date',
       javaCode:
