@@ -60,15 +60,14 @@ public class NanoLogger
 
     @Override
     public String format(LogRecord record) {
+      int           lev = record.getLevel().intValue();
+      String        msg = record.getMessage();
+      StringBuilder str = sb.get();
+
       if ( prevTime / 1000 != System.currentTimeMillis() / 1000 ) {
         prevTime = System.currentTimeMillis();
         prevTimestamp = sdf.get().format(new Timestamp(prevTime));
       }
-
-      StringBuilder str = sb.get();
-
-      int lev = record.getLevel().intValue();
-      String msg = record.getMessage();
 
       str.append(prevTimestamp);
       str.append(',');
@@ -80,31 +79,39 @@ public class NanoLogger
         str.append(record.getLevel());
       }
 
-      str.append(',');
       str.append(msg);
       str.append('\n');
       return str.toString();
     }
   }
 
-  public void log(String msg) {
-    logger.info(msg);
+  public String combine(Object[] args) {
+    StringBuilder str = sb.get();
+    for (Object n : args) {
+      str.append(',');
+      str.append(n.toString());
+    }
+    return str.toString();
   }
 
-  public void info(String msg) {
-    logger.info(msg);
+  public void log(Object... args) {
+    logger.info(combine(args));
   }
 
-  public void warning(String msg) {
-    logger.warning(msg);
+  public void info(Object... args) {
+    logger.info(combine(args));
   }
 
-  public void error(String msg) {
-    logger.severe(msg);
+  public void warning(Object... args) {
+    logger.warning(combine(args));
+  }
+
+  public void error(Object... args) {
+    logger.severe(combine(args));
   }
 
   // can't normally do .debug() with custom formatter: use fine instead
-  public void debug(String msg) {
-    logger.fine(msg);
+  public void debug(Object...  args) {
+    logger.fine(combine(args));
   }
 }
