@@ -18,5 +18,5 @@ public interface PropertyInfo
   public void set(Object obj, Object value);
   public Parser jsonParser();
   public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
-  public void diff(Object o1, Object o2, Map diff, PropertyInfo prop);
+  public void diff(FObject o1, FObject o2, Map<String, Object> diff, PropertyInfo prop);
 }
