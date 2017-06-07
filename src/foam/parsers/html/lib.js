@@ -506,10 +506,10 @@
     'yen': '¥',
   };
 
+  // FUTURE: Lazily instantiate RegExp to save memory.
   var escapeKeys = Object.keys(escapes).map(function(key) {
     return `&${key};`;
   });
-
   var escapeSequenceRegExp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
 
   foam.LIB({
