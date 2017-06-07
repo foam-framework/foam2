@@ -2,6 +2,8 @@ package foam.core;
 
 import foam.lib.parse.Parser;
 
+import java.util.Map;
+
 public abstract class AbstractPropertyInfo
   implements PropertyInfo
 {
@@ -31,5 +33,12 @@ public abstract class AbstractPropertyInfo
   @Override
   public Object f(FObject o) {
     return get(o);
+  }
+
+  @Override
+  public void diff(FObject o1, FObject o2, Map<String, Object> diff, PropertyInfo prop) {
+    if ( ! prop.f(o1).equals(prop.f(o2)) ) {
+      diff.put(prop.getName(), prop.f(o2));
+    }
   }
 }

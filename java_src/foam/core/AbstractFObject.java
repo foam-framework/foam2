@@ -1,7 +1,9 @@
 package foam.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Map;
 
 public abstract class AbstractFObject
   extends ContextAwareSupport
@@ -21,6 +23,19 @@ public abstract class AbstractFObject
       }
     }
     return ret;
+  }
+
+  public Map<String, Object> diff(FObject obj) {
+    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+
+    Map result = new HashMap();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      prop.diff(this, obj, result, prop);
+    }
+
+    return result;
   }
 
   public int compareTo(Object o) {
