@@ -106,7 +106,7 @@ while ( next.get(Calendar.YEAR) < 3000 ) {
   break;
 }
 if ( !dateFound ) {
-  throw new Exception("Unable to get next scheduled time");
+  throw new IllegalArgumentException("Unable to get next scheduled time");
 }
 return next.getTime();*/
       }
