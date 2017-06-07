@@ -13,9 +13,12 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
 
-public class NanoLogger extends ContextAwareSupport implements NanoService {
-  Logger logger;
-  StringBuffer sb;
+public class NanoLogger
+  extends    ContextAwareSupport
+  implements NanoService
+{
+  protected Logger       logger;
+  protected StringBuffer sb = new StringBuffer();
 
   private static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -28,7 +31,9 @@ public class NanoLogger extends ContextAwareSupport implements NanoService {
     logger = Logger.getAnonymousLogger();
     logger.setUseParentHandlers(false);
     logger.setLevel(Level.ALL);
+
     sb = new StringBuffer();
+
     try {
       Handler handler = new FileHandler("nano.log");
       handler.setFormatter(new CustomFormatter());
@@ -39,14 +44,16 @@ public class NanoLogger extends ContextAwareSupport implements NanoService {
   }
 
   private class CustomFormatter extends Formatter {
-    long prevTime;
+    long   prevTime;
     String prevTimestamp;
+
     @Override
     public String format(LogRecord record) {
-      if (prevTime / 1000 != System.currentTimeMillis() / 1000) {
+      if ( prevTime / 1000 != System.currentTimeMillis() / 1000 ) {
         prevTime = System.currentTimeMillis();
         prevTimestamp = sdf.get().format(new Timestamp(prevTime));
       }
+
       sb.setLength(0);
       int lev = record.getLevel().intValue();
       String msg = record.getMessage();
