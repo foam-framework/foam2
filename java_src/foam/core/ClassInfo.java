@@ -14,8 +14,8 @@ public interface ClassInfo {
   ClassInfo getParent();
   ClassInfo addProperty(PropertyInfo p);
 
-  boolean isInstance(Object o);
-  Object newInstance();
+  boolean   isInstance(Object o);
+  Object    newInstance() throws IllegalAccessException, InstantiationException;
 
   ClassInfo setObjClass(Class cls);
   Class     getObjClass();
