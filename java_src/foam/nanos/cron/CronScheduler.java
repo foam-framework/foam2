@@ -6,18 +6,16 @@
 
 package foam.nanos.cron;
 
-import bsh.EvalError;
-import bsh.Interpreter;
 import foam.core.ContextAwareSupport;
 import foam.core.Detachable;
 import foam.core.FObject;
-import foam.dao.*;
+import foam.dao.AbstractDAO;
+import foam.dao.AbstractSink;
+import foam.dao.MapDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Min;
 import foam.nanos.NanoService;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.Date;
 
 public class CronScheduler
@@ -37,33 +35,6 @@ public class CronScheduler
     return ((Cron) min.getValue()).getScheduledTime();
   }
 
-  /**
-   * Runs a Cron job script
-   *
-   * @param cron the cron job to run
-   * @return the updated cron job
-   */
-  private void runCronJob(Cron cron) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    PrintStream ps = new PrintStream(baos);
-    Interpreter shell = new Interpreter();
-
-    try {
-      shell.set("currentCron", cron);
-      cron.setOutput("");
-      shell.setOut(ps);
-      shell.eval(cron.getCode());
-    } catch (EvalError e) {
-      e.printStackTrace();
-    }
-
-    cron.setLastRun(new Date());
-    ps.flush();
-    cron.setOutput(baos.toString());
-    // set to next scheduled time
-    cron.setScheduledTime(cron.getNextScheduledTime());
-  }
-
   private final Thread cronJobs = new Thread() {
     @Override
     public void run() {
@@ -73,7 +44,7 @@ public class CronScheduler
           ((AbstractDAO) cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, dtnow))).select(new AbstractSink() {
             @Override
             public void put(FObject obj, Detachable sub) {
-              runCronJob((Cron) obj);
+              ((Cron) obj).runScript();
               cronDAO_.put(obj);
             }
           });
@@ -88,7 +59,18 @@ public class CronScheduler
   };
 
   public void start() {
-    cronDAO_ = (MapDAO) getX().get("CronDAO");
+    cronDAO_ = (MapDAO) getX().get("MapDAO");
     cronJobs.start();
+  }
+
+  public static void main(String[] args) {
+    Cron cron = new Cron()
+        .setHour(23)
+        .setMinute(59)
+        .setDayOfMonth(8)
+        .setMonth(6)
+        .setDayOfWeek(0);
+    System.out.println(cron.getScheduledTime());
+    System.out.println(cron.getNextScheduledTime());
   }
 }
