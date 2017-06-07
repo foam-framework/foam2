@@ -62,7 +62,7 @@ foam.CLASS({
         return this.send();
       } else {
         this.error('RetryHTTPRequest: Max tries reached');
-        throw 'RetryHTTPRequest: Max tries reached';
+        throw new Error('RetryHTTPRequest: Max tries reached');
       }
     }
   ]
