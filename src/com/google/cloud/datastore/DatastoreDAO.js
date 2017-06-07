@@ -19,13 +19,10 @@ foam.CLASS({
   package: 'com.google.cloud.datastore',
   name: 'SelectData',
 
-  documentation: function() {/*
-                               State passed around by intermediate callbacks
-                               during a select() in progress. These data must
-                               be retained to notify the sink, send the
-                               correct payload to subsequent API calls, and
-                               return results in the Promise.
-                              */},
+  documentation: `State passed around by intermediate callbacks during a
+      select() in progress. These data must be retained to notify the sink, send
+      the correct payload to subsequent API calls, and return results in the
+      Promise.`,
 
   properties: [
     {
@@ -46,15 +43,11 @@ foam.CLASS({
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
-  documentation: function() {/*
-                               DAO implementation for the Google Cloud
-                               Datastore v1 REST API.
+  documentation: `DAO implementation for the Google Cloud Datastore v1 REST API.
 
-                               https://cloud.google.com/datastore/docs/reference/rest/
+      https://cloud.google.com/datastore/docs/reference/rest/
 
-                               This implementation uses structured queries,
-                               not GQL queries.
-                              */},
+      This implementation uses structured queries, not GQL queries.`,
 
   requires: [
     'com.google.cloud.datastore.SelectData',
@@ -62,51 +55,6 @@ foam.CLASS({
     'foam.net.HTTPRequest'
   ],
   imports: [ 'gcloudProjectId?' ],
-
-  classes: [
-    {
-      name: 'RetryHTTPRequest',
-
-      imports: [ 'error', 'warn' ],
-
-      properties: [
-        {
-          class: 'Int',
-          name: 'numTries',
-          value: 4
-        },
-        {
-          class: 'Proxy',
-          of: 'foam.net.HTTPRequest',
-          name: 'delegate'
-        },
-        {
-          class: 'Int',
-          name: 'currentTry_'
-        }
-      ],
-
-      methods: [
-        function send() {
-          return this.delegate.send().catch(this.onError);
-        }
-      ],
-
-      listeners: [
-        function onError(error) {
-          this.currentTry_++;
-          this.warn('RetryHTTPRequest: Try #' + this.currentTry_ +
-              ' failed on ' + error);
-          if ( this.currentTry_ < this.numTries ) {
-            return this.send();
-          } else {
-            this.error('RetryHTTPRequest: Max tries reached');
-            throw 'RetryHTTPRequest: Max tries reached';
-          }
-        }
-      ]
-    }
-  ],
 
   properties: [
     {
@@ -151,14 +99,12 @@ foam.CLASS({
     function getRequest(name, payload) {
       var headers = { Accept: 'application/json' };
       if ( payload ) headers['Content-Type'] = 'application/json';
-      return this.RetryHTTPRequest.create({
-        delegate: this.HTTPRequest.create({
-          method: 'POST',
-          url: this.baseURL + ':' + name,
-          headers: headers,
-          responseType: 'json',
-          payload: payload
-        })
+      return this.HTTPRequest.create({
+        method: 'POST',
+        url: this.baseURL + ':' + name,
+        headers: headers,
+        responseType: 'json',
+        payload: payload
       });
     },
 
