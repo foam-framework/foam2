@@ -58,7 +58,7 @@ foam.CLASS({
         vertical-align: middle;
       }
 
-      ^:disabled { color: #bbb; -webkit-filter: grayscale(0.8); }
+      ^:disabled { filter: grayscale(80%); }
     */}})
   ],
 
