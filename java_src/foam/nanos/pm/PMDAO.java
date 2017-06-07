@@ -8,10 +8,9 @@ import foam.nanos.NanoService;
  * Created by nick on 06/06/17.
  */
 public class PMDAO
-  extends ProxyDAO
+  extends    ProxyDAO
   implements NanoService
 {
-
   public static final String ServiceName = "pmInfoDAO";
 
   @Override
