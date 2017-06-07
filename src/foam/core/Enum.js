@@ -264,6 +264,8 @@ foam.CLASS({
     }
   ],
 
+  ids: [ 'name' ],
+
   properties: [
     {
       class: 'Int',
