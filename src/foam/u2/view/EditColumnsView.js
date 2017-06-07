@@ -56,21 +56,17 @@ foam.CLASS({
           data: selected[props[i].name]
         });
 
-        cb.attrSlot('checked').element.on('change', 
-          this.onPropChange.bind(this, props[i], cb));
-
-      // TODO: this:
-      // cb.data$.sub(function() {this.onPropChange.bind(this, props[i], cb)}.bind(this));
-
-
+        cb.data$.sub(this.onPropChange.bind(this, props[i], cb));
 
         this.add(cb);
+
+        if (i != props.length - 1) this.start('br').end();
       }
     }
   ],
 
   listeners: [
-    function onPropChange(prop, _, cb, old, nu) {
+    function onPropChange(prop, cb, _, old, nu) {
       var selected = this.selectedMap();
 
       var out = [];
@@ -87,17 +83,15 @@ foam.CLASS({
         for (var i = 0; i < this.properties.length; i++) {
           var p = this.properties[i];
 
-          // Push under two conditions: selected and not just removed,
-          // or not selected but just added.
-          // TODO: Handle newly added columns dynamically
-          if ((p === prop && cb.target.checked) || (selected[p.name] && (p !== prop || cb.target.checked))) {
+          if ((p === prop && cb.data) || 
+              (selected[p.name] && 
+                (p !== prop || cb.data))) {
             out.push(p);
           }
         }
       }
 
-      this.selectedProperties = out;
-      this.propertyChange.pub('selectedProperties');      
+      this.selectedProperties = out; 
     }
   ]
 });
