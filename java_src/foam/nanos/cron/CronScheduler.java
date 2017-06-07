@@ -88,7 +88,7 @@ public class CronScheduler
   };
 
   public void start() {
-    cronDAO_ = (MapDAO) getX().get("MapDAO");
+    cronDAO_ = (MapDAO) getX().get("CronDAO");
     cronJobs.start();
   }
 }
