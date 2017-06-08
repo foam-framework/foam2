@@ -69,7 +69,7 @@ public class HistoryDAO
     FObject current = this.find(obj);
 
     // add new history record
-    String objectId = (String) ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     HistoryRecord historyRecord = new HistoryRecord();
     historyRecord.setObjectId(objectId);
     historyRecord.setUser(formatUserName(user));
@@ -83,7 +83,7 @@ public class HistoryDAO
   @Override
   public FObject remove(FObject obj) {
     // TODO: use context-oriented context when available.
-    String objectId = (String) ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
     historyDAO.removeAll(null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
     return super.remove(obj);
