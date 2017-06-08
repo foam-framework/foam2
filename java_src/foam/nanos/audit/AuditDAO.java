@@ -46,7 +46,7 @@ public class AuditDAO
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
     FObject current = this.find(obj);
-    String objectId = (String) ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
     return super.put(obj);
   }
@@ -58,7 +58,7 @@ public class AuditDAO
     NanoLogger logger = (NanoLogger) getX().get("logger");
     StringBuilder sb = new StringBuilder();
     outputter.output(sb, obj);
-    String objectId = (String) ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     logger.info("REMOVE", objectId, user.getId(), sb);
     return super.remove(obj);
   }
