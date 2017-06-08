@@ -598,7 +598,7 @@ foam.CLASS({
         'remove_',
         'removeAll_',
         'select_',
-        'find'
+        'find_'
       ]
     }
   ]
@@ -767,7 +767,7 @@ foam.CLASS({
         'remove_',
         'select_',
         'removeAll_',
-        'find'
+        'find_'
       ],
       eventProxy: false
     }

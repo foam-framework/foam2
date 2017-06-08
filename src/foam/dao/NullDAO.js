@@ -38,7 +38,7 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function find(id) {
+    function find_(id) {
       return Promise.resolve(null);
     },
 

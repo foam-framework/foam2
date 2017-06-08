@@ -226,7 +226,7 @@ foam.CLASS({
               self.remoteDAO.remove_(obj);
             } else {
               // TODO: Stop sending updates if the first one fails.
-              self.delegate.find(id).then(function(obj) {
+              self.delegate.find_(id).then(function(obj) {
                 if ( obj ) return self.remoteDAO.put_(obj).then(function(obj) {
                   self.processFromServer(obj);
                 });

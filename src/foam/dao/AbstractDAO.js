@@ -250,6 +250,10 @@ foam.CLASS({
       return this.select_(sink, undefined, undefined, undefined, undefined);
     },
 
+    function find(id) {
+      return this.find_(id);
+    },
+
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
@@ -308,14 +312,14 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      forwards: [ 'put_', 'remove_', 'find', 'select_', 'removeAll_' ]
+      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_' ]
     }
   ],
 
   methods: [
-    function find(key) {
+    function find_(key) {
       var predicate = this.predicate;
-      return this.delegate.find(key).then(function(o) {
+      return this.delegate.find_(key).then(function(o) {
         return predicate.f(o) ? o : null;
       });
     },

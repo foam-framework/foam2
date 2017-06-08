@@ -108,7 +108,7 @@ foam.CLASS({
       });
     },
 
-    function find(idOrObj) {
+    function find_(idOrObj) {
       var key = foam.core.FObject.isInstance(idOrObj) ?
           idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
       return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()

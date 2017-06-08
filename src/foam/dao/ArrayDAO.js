@@ -114,7 +114,7 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function find(key) {
+    function find_(key) {
       var id = this.of.isInstance(key) ? key.id : key;
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {

@@ -147,7 +147,7 @@ foam.CLASS({
     },
 
     function put_(obj) {
-      var oldValue = this.find_(obj.id);
+      var oldValue = this.find__(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
       }
@@ -156,19 +156,19 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function find(objOrKey) {
+    function find_(objOrKey) {
       if ( objOrKey === undefined ) {
         return Promise.reject(this.InvalidArgumentException.create({
           message: '"key" cannot be undefined/null'
         }));
       }
 
-      return Promise.resolve(this.find_(
+      return Promise.resolve(this.find__(
           this.of.isInstance(objOrKey) ? objOrKey.id : objOrKey));
     },
 
     /** internal, synchronous version of find, does not throw */
-    function find_(key) {
+    function find__(key) {
       var index = this.idIndex;
       index = index.get(key);
 
@@ -185,7 +185,7 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      var found = this.find_(id);
+      var found = this.find__(id);
       if ( found ) {
         self.index.remove(found);
         self.pub('on', 'remove', found);

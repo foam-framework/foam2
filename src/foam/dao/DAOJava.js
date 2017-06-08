@@ -70,6 +70,16 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'find_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'id',
+          javaType: 'Object'
+        }
+      ]
+    },
+    {
       name: 'select',
       javaReturns: 'foam.dao.Sink',
       args: [
