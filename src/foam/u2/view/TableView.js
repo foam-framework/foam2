@@ -214,19 +214,19 @@ foam.CLASS({
     },
 
     function createColumnSelection() {
+      console.log('creating selections')
       var editor = this.EditColumnsView.create({
-        properties: this.columns_,
-        selectedProperties: this.columns_
+        properties: this.columns_
       });
 
-      editor.selectedProperties$.sub(function() {
+      editor.properties$.sub(function() {
         console.log('selections changed')
-        console.log('before', this.columns)
-        console.log('after', editor.selectedProperties.map(function(c) { return c.name; }))
 
         console.log('columns_ before', this.columns_)
-        this.columns = editor.selectedProperties.map(function(c) { return c.name; });
-        console.log('columns_ before', this.columns_)
+        this.columns = editor.properties
+                          .filter(function(c) { return c.visible; })
+                          .map(function(c) { return c.prop.name; });
+        console.log('columns_ after', this.columns_)
 
       }.bind(this));
 
