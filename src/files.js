@@ -226,6 +226,7 @@ FOAM_FILES([
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
   { name: "lib/net" },
+  { name: "foam/net/RetryHTTPRequest" },
   { name: "foam/net/auth/TokenBearerCredential" },
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
