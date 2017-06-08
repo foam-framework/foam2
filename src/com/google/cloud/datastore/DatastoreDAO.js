@@ -235,7 +235,7 @@ foam.CLASS({
       }
 
       return com.google.cloud.datastore.fromDatastoreEntity(
-          json.found[0].entity);
+          json.found[0].entity, this);
     },
     function onPutResponse(o, json) {
       var results = json.mutationResults;
@@ -275,12 +275,12 @@ foam.CLASS({
       // Allow datastore-aware sinks to unpack query result batches manually
       // instead of DAO put()ing to them.
       if ( data.sink && data.sink.fromDatastoreEntityResults ) {
-        data.sink.fromDatastoreEntityResults(entities);
+        data.sink.fromDatastoreEntityResults(entities, this);
       } else {
         var fromDatastoreEntity =
             com.google.cloud.datastore.fromDatastoreEntity;
         for ( var i = 0; i < entities.length; i++ ) {
-          var obj = fromDatastoreEntity(entities[i].entity);
+          var obj = fromDatastoreEntity(entities[i].entity, this);
           data.results.push(obj);
           data.sink && data.sink.put && data.sink.put(obj);
         }

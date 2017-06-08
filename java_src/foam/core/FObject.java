@@ -1,7 +1,11 @@
 package foam.core;
 
+import java.util.Map;
+
 public interface FObject
   extends ContextAware, Comparable
 {
-  public ClassInfo getClassInfo();
+  ClassInfo getClassInfo();
+  FObject fclone();
+  Map diff(FObject obj);
 }
