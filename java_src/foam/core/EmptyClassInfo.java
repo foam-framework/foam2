@@ -23,6 +23,16 @@ public class EmptyClassInfo
     return this;
   }
 
+  @Override
+  public boolean isInstance(Object o) {
+    return false;
+  }
+
+  @Override
+  public Object newInstance() {
+    return null;
+  }
+
   public ClassInfo setObjClass(Class cls) {
     return null;
   }
