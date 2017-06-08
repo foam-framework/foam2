@@ -62,7 +62,7 @@ foam.CLASS({
       isEnabled: function(obj) { return !! obj; },
       code: function() {
         var self = this;
-        this.dao.remove(this.obj).then(function() {
+        this.dao.remove_(this.obj).then(function() {
           self.finished.pub();
         }, function(e) {
           // TODO: Display error in view.

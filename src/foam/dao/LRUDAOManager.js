@@ -93,7 +93,7 @@ foam.CLASS({
         .skip(self.maxSize)
         .select({
           put: function(obj) {
-            self.dao.remove(obj);
+            self.dao.remove_(obj);
           }
         });
     }
@@ -117,7 +117,7 @@ foam.CLASS({
     /** Clears the remove()'d item from the tracking dao. */
     function onRemove(s, on, remove, obj) {
       // ensure tracking DAO is cleaned up
-      this.trackingDAO.remove(obj);
+      this.trackingDAO.remove_(obj);
     },
 
     /** On reset, clear the tracking dao. */

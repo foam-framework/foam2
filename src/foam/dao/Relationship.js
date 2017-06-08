@@ -359,7 +359,7 @@ foam.CLASS({
         sourceId: this.sourceId || obj.id,
         targetId: this.targetId || obj.id
       });
-      return this.junctionDAO.remove(junction);
+      return this.junctionDAO.remove_(junction);
     }
   ],
 });

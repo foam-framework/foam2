@@ -50,6 +50,16 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'remove_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
       name: 'find',
       javaReturns: 'foam.core.FObject',
       args: [
