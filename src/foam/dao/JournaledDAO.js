@@ -76,7 +76,7 @@ if ( foam.isServer ) {
 
 
             var context = {
-              put: function(o) { return dao.put(o); },
+              put: function(o) { return dao.put_(o); },
               remove: function(o) { return dao.remove(o); },
               foam: {
                 json: {

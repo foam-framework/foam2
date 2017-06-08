@@ -351,7 +351,7 @@ foam.CLASS({
         sourceId: this.sourceId || obj.id,
         targetId: this.targetId || obj.id
       });
-      return this.junctionDAO.put(junction);
+      return this.junctionDAO.put_(junction);
     },
 
     function remove(obj) {

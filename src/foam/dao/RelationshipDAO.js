@@ -50,7 +50,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(obj) {
       return this.SUPER(this.relationship.adaptTarget(this.obj, obj));
     },
     function clone() {

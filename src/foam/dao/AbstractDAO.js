@@ -133,6 +133,10 @@ foam.CLASS({
       }
     },
 
+    function put(obj) {
+      return this.put_(obj);
+    },
+
     /**
       Selects the contents of this DAO into a sink, then listens to keep
       the sink up to date. Returns a promise that resolves with the subscription.
@@ -296,7 +300,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      forwards: [ 'put', 'remove', 'find', 'select_', 'removeAll' ]
+      forwards: [ 'put_', 'remove', 'find', 'select_', 'removeAll' ]
     }
   ],
 

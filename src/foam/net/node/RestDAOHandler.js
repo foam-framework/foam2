@@ -77,7 +77,7 @@ foam.CLASS({
         }
 
         self.getPayload_(req).then(function(o) {
-          return self.dao.put(o);
+          return self.dao.put_(o);
         }).then(function(o) {
           self.sendJSON(res, 200, self.fo2o_(o));
           self.info('200 OK: put() ' + o.id);

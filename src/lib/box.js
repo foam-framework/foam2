@@ -785,7 +785,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(obj) {
       var self = this;
       return this.SUPER(obj).then(function(o) {
         self.on.put.pub(o);

@@ -28,7 +28,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(obj) {
       this.pub('on', 'pub', obj);
       return Promise.resolve(obj);
     },

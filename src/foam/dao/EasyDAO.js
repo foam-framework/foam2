@@ -373,7 +373,7 @@ foam.CLASS({
 
               self.log("Loading test data");
               Promise.all(foam.json.parse(self.testData, self.of).map(
-                function(o) { return delegate.put(o); }
+                function(o) { return delegate.put_(o); }
               )).then(function() {
                 self.log("Loaded", self.testData.length, "records.");
                 resolve(delegate);

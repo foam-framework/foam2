@@ -102,9 +102,9 @@ foam.CLASS({
   listeners: [
     /** Adds the put() item to the tracking dao, runs cleanup() to check
       the dao size. */
-    function onPut(s, on, put, obj) {
+    function onPut(s, on, put_, obj) {
       var self = this;
-      this.trackingDAO.put(
+      this.trackingDAO.put_(
         this.LRUCacheItem.create({
           id: obj.id,
           timestamp: self.getTimestamp()

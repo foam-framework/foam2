@@ -162,11 +162,11 @@ foam.CLASS({
       });
     },
 
-    function put(value) {
+    function put_(value) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
-          var request = store.put(self.serialize(value), value.id);
+          var request = store.put_(self.serialize(value), value.id);
           request.transaction.addEventListener(
             'complete',
             function(e) {

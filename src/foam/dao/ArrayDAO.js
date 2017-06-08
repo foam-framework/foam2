@@ -43,7 +43,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( obj.ID.compare(obj, this.array[i]) === 0 ) {
           this.array[i] = obj;

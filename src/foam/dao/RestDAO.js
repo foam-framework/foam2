@@ -45,7 +45,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(o) {
+    function put_(o) {
       /**
        * PUT baseURL
        * <network-foam-jsonified FOAM object>

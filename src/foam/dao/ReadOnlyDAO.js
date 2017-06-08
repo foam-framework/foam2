@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   documentation: 'DAO decorator that throws errors on put and remove.',
   methods: [
-    function put() {
+    function put_() {
       return Promise.reject('Cannot put into ReadOnlyDAO');
     },
     function remove() {

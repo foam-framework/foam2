@@ -146,7 +146,7 @@ foam.CLASS({
       });
     },
 
-    function put(obj) {
+    function put_(obj) {
       var oldValue = this.find_(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
