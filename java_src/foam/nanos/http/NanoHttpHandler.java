@@ -36,11 +36,9 @@ public class NanoHttpHandler
      * E.g.: /foo/bar => ['', 'foo', 'bar']
     */
     String serviceKey = urlParams[1];
+    Object service    = x_.get(serviceKey);
 
-    // DAO services = (DAO) this.X.get('serviceFactoryDAO');
-    // NSSpec serviceFactory = services.find(serviceKey);
-
-    NanoService service = (NanoService) x_.get(serviceKey);
+    System.out.println("HTTP Request: " + path + ", " + serviceKey);
 
     if ( service instanceof HttpHandler ) {
       // if ( auth.checkPermission(...) ) {}
