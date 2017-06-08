@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.dao.history',
   name: 'HistoryRecord',
-  documentation: `Contains an array of property updates`,
+  documentation: 'Contains an array of property updates',
   properties: [
     {
       class: 'FObjectProperty',
