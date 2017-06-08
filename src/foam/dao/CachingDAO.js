@@ -62,7 +62,7 @@ foam.CLASS({
       name: 'delegate',
       hidden: true,
       topics: [ 'on' ],
-      forwards: [ 'find', 'select' ],
+      forwards: [ 'find_', 'select_' ],
       expression: function(src, cache) {
         // Preload src into cache, then proxy everything to cache that we
         // don't override explicitly.

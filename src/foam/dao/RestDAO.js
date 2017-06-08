@@ -69,7 +69,7 @@ foam.CLASS({
           .then(this.onRemoveResponse);
     },
 
-    function find(key) {
+    function find_(key) {
       /**
        * GET baseURL/<network-foam-jsonified FOAM object id>
        */

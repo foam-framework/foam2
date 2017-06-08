@@ -42,7 +42,7 @@ public class JournaledDAO
   }
 
   @Override
-  public FObject find(Object id) {
+  public FObject find_(Object id) {
     return null;
   }
 

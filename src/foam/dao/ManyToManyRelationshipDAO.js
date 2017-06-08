@@ -41,11 +41,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function find(key) {
+    function find_(key) {
       var id = foam.core.FObject.isInstance(key) ? key.id : key;
       var self = this;
-      return self.junctionDAO.find(self.junctionKeyFactory(id)).then(function(a) {
-        return a && self.delegate.find(id);
+      return self.junctionDAO.find_(self.junctionKeyFactory(id)).then(function(a) {
+        return a && self.delegate.find_(id);
       });
     },
     function select_(sink, skip, limit, order, predicate) {

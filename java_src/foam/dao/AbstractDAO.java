@@ -90,4 +90,8 @@ public abstract class AbstractDAO
   public Sink select(Sink sink) {
     return this.select_(sink, null, null, null, null);
   }
+
+  public FObject find(Object id) {
+    return this.find_(id);
+  }
 }

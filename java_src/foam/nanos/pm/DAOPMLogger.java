@@ -26,7 +26,7 @@ public class DAOPMLogger
 
     ProxyDAO pmd = (ProxyDAO) getX().get(PMDAO.ServiceName);
 
-    PMInfo dpmi = (PMInfo) pmd.find(pmi);
+    PMInfo dpmi = (PMInfo) pmd.find_(pmi);
     if ( dpmi == null ) {
       pmi.setMintime(pm.getTime())
           .setMaxtime(pm.getTime())

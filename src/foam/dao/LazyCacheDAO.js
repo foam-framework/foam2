@@ -154,7 +154,7 @@ foam.CLASS({
       Executes the find on the cache first, and if it fails triggers an
       update from the delegate.
     */
-    function find(id) {
+    function find_(id) {
       var self = this;
       // TODO: Express this better.
       // Assigning to unused variable to keep Closure happy.
@@ -168,14 +168,14 @@ foam.CLASS({
         return self.finds_[id];
       } else {
         // Try the cache
-        return self.cache.find(id).then(
+        return self.cache.find_(id).then(
 
           function (val) {
             // Cache hit, but create background request if required
             if ( val ) {
               if ( self.refreshOnCacheHit ) {
                 // Don't record in finds_, since we don't want anyone waiting for it
-                self.delegate.find(id).then(function (val) {
+                self.delegate.find_(id).then(function (val) {
                   val && self.cache.put_(val);
                 });
               }
@@ -185,7 +185,7 @@ foam.CLASS({
             // Another request may have come in the meantime, so check again for
             // an in-flight find for this ID.
             if ( ! self.finds_[id] ) {
-              self.finds_[id] = self.delegate.find(id);
+              self.finds_[id] = self.delegate.find_(id);
               // we created the remote request, so clean up finds_ later
               var errorHandler = function(err) {
                 delete self.finds_[id]; // in error case, still clean up

@@ -41,14 +41,14 @@ public class AuditDAO
 
 
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
-    FObject current = this.find(obj);
+    FObject current = this.find_(obj);
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
-    return super.put(obj);
+    return super.put_(obj);
   }
 
   @Override

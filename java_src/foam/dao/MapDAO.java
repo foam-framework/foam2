@@ -49,7 +49,7 @@ public class MapDAO
     return obj;
   }
 
-  public FObject find(Object o) {
+  public FObject find_(Object o) {
     return AbstractFObject.maybeClone(
             getOf().isInstance(o)
             ? getData().get(getPrimaryKey().get(o))

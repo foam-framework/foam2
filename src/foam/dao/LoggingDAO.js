@@ -74,7 +74,7 @@ foam.CLASS({
       return this.SUPER(sink, skip, limit, order, predicate);
     },
 
-    function find(id) {
+    function find_(id) {
       this.logger('find', id);
       return this.SUPER(id);
     }
