@@ -75,6 +75,10 @@ public abstract class AbstractDAO
     // TODO
   }
 
+  public FObject put(FObject obj) {
+    return this.put_(obj);
+  }
+
   public Sink select(Sink sink) {
     return this.select_(sink, null, null, null, null);
   }

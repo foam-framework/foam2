@@ -29,9 +29,9 @@ public class JournaledDAO
    * @returns FObject
    */
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(FObject obj) {
     journal.put(obj, null);
-    return getDelegate().put(obj);
+    return getDelegate().put_(obj);
   }
 
   @Override

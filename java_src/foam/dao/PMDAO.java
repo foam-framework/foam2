@@ -11,10 +11,10 @@ import foam.nanos.pm.PM;
 public class PMDAO extends ProxyDAO {
 
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(FObject obj) {
     PM pm = new PM(PMDAO.class, obj.getClassInfo().getId() + ":put");
     try {
-      super.put(obj);
+      super.put_(obj);
     } catch(Exception e) {
       e.printStackTrace();
     } finally {
