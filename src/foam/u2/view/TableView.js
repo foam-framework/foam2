@@ -251,9 +251,12 @@ foam.CLASS({
     function initE() {
       console.log('***************************** initE');
       var view = this;
-      var columnSelectionE = view.createColumnSelection();
+      var columnSelectionE;
 
-      if (view.editColumnsEnabled) this.add(columnSelectionE);
+      if (view.editColumnsEnabled) {
+        columnSelectionE = view.createColumnSelection();
+        this.add(columnSelectionE);
+      }
 
       this.
         addClass(this.myClass()).
@@ -273,19 +276,22 @@ foam.CLASS({
                   }, view.order$)).
                 end();
               }).
-              start('th').
-                addClass(view.myClass('th-editColumns')).
-                  on('click', function(e) {
-                    view.positionOverlayDropdown(columnSelectionE);
-                    columnSelectionE.open();
-                  }).
-                  add(' ', view.vertMenuIcon).
-                    addClass(view.myClass('vertDots')).
-                    addClass(view.myClass('noselect')).
-                    start('div').
-                    addClass(view.of.id.replace(/\./g,'-') +
-                        '-EditColumnsDropdownOrigin').end().
-              end();
+              add(this.slot(function(editColumnsEnabled) { 
+                if (editColumnsEnabled) {
+                  return this.E('th').
+                    addClass(view.myClass('th-editColumns')).
+                      on('click', function(e) {
+                        view.positionOverlayDropdown(columnSelectionE);
+                        columnSelectionE.open();
+                      }).
+                      add(' ', view.vertMenuIcon).
+                        addClass(view.myClass('vertDots')).
+                        addClass(view.myClass('noselect')).
+                        start('div').
+                        addClass(view.of.id.replace(/\./g,'-') +
+                            '-EditColumnsDropdownOrigin').end();
+               }
+              }.bind(this), view.editColumnsEnabled$));
           })).
           add(this.slot(function(columns_) {
             return this.
@@ -312,7 +318,10 @@ foam.CLASS({
                             column.f ? column.f(obj) : null, obj, column
                           ]).
                           end();
-                      }).start('td').end();
+                      }).
+                      add(this.slot(function(editColumnsEnabled) { 
+                        if (editColumnsEnabled) return this.E('td'); }, 
+                        view.editColumnsEnabled$))
               });
           }));
     }
