@@ -90,6 +90,11 @@ public class Boot {
     logger.setName("logger");
     logger.setServiceClass("foam.nanos.logger.NanoLogger");
     serviceDAO_.put(logger);
+
+    NSpec ping = new NSpec();
+    ping.setName("ping");
+    ping.setServiceClass("foam.nanos.http.PingService");
+    serviceDAO_.put(ping);
   }
 
   public static void main (String[] args)
