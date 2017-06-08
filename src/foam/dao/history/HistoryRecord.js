@@ -8,27 +8,20 @@ foam.CLASS({
   package: 'foam.dao.history',
   name: 'HistoryRecord',
   documentation: `Contains an array of property updates`,
-  javaImports: [
-    'java.util.ArrayList'
-  ],
   properties: [
     {
-      class: 'ArrayList',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.User',
+      name: 'user'
+    },
+    {
+      class: 'Long',
+      name: 'timestamp'
+    },
+    {
+      class: 'FObjectArray',
       of: 'PropertyUpdate',
       name: 'updates'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'addUpdate',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'PropertyUpdate'
-        }
-      ],
-      javaCode: `getUpdates().add(obj);`
     }
   ]
 });
