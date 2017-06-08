@@ -14,11 +14,11 @@ import foam.nanos.pm.*;
 import foam.nanos.pm.PMDAO;
 
 public class Boot {
-  protected DAO serviceDAO_;
-  protected DAO userDAO_;
-  protected DAO groupDAO_;
+  protected DAO    serviceDAO_;
+  protected DAO    userDAO_;
+  protected DAO    groupDAO_;
   protected MapDAO pmDAO_;
-  protected X   root_ = new ProxyX();
+  protected X      root_ = new ProxyX();
 
   public Boot() {
     //Used for all the services that will be required when Booting
@@ -39,11 +39,11 @@ public class Boot {
     root_.put("groupDAO", groupDAO_);
 
     loadServices();
-    //loadTestData();
 
     ((AbstractDAO) serviceDAO_).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
+        System.out.println("Registering: " + sp.getName());
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
       }
     });
@@ -57,12 +57,19 @@ public class Boot {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
+        System.out.println("Starting: " + sp.getName());
         root_.get(sp.getName());
       }
     });
   }
 
   protected void loadServices() {
+    NSpec s = new NSpec();
+    s.setName("http");
+    s.setServiceClass("foam.nanos.http.NanoHttpServer");
+    s.setLazy(false);
+    serviceDAO_.put(s);
+
     NSpec dpl = new NSpec();
     dpl.setName(DAOPMLogger.ServiceName);
     dpl.setServiceClass(DAOPMLogger.class.getName());
@@ -72,29 +79,23 @@ public class Boot {
     pmd.setName(PMDAO.ServiceName);
     pmd.setServiceClass(PMDAO.class.getName());
     serviceDAO_.put(pmd);
-  }
-
-  protected void loadTestData() {
-    NSpec s = new NSpec();
-    s.setName("http");
-    s.setServiceClass("foam.nanos.http.NanoHttpServer");
-    s.setLazy(false);
-    serviceDAO_.put(s);
 
     NSpec authTest = new NSpec();
     authTest.setName("authTest");
     authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
-    authTest.setLazy(false);
+    // authTest.setLazy(false);
     serviceDAO_.put(authTest);
 
     NSpec logger = new NSpec();
     logger.setName("logger");
     logger.setServiceClass("foam.nanos.logger.NanoLogger");
-    logger.setLazy(false);
     serviceDAO_.put(logger);
   }
 
-  public static void main (String[] args) throws Exception {
+  public static void main (String[] args)
+    throws Exception
+  {
+    System.out.println("Starting Nanos Server");
     new Boot();
   }
 }
