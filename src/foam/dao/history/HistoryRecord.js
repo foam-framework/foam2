@@ -10,12 +10,11 @@ foam.CLASS({
   documentation: 'Contains an array of property updates',
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.User',
+      class: 'String',
       name: 'user'
     },
     {
-      class: 'Long',
+      class: 'DateTime',
       name: 'timestamp'
     },
     {
