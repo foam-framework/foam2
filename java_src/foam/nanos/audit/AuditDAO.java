@@ -3,6 +3,8 @@ package foam.nanos.audit;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
+import foam.lib.json.JSONParser;
+import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
 
@@ -51,7 +53,9 @@ public class AuditDAO
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
-    logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), obj);
+    StringBuilder sb = new StringBuilder();
+    new Outputter().output(sb, obj);
+    logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), sb.toString());
     return super.remove(obj);
   }
 }
