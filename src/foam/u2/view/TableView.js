@@ -182,28 +182,6 @@ foam.CLASS({
       value: true // TODO: Return to false after testing
     },
     {
-      name: 'columnSelectionE',
-      factory: function() {
-        var editor = this.EditColumnsView.create({
-          properties: this.columns_,
-          selectedProperties: this.columns_
-        });
-
-        editor.selectedProperties$.sub(function() {
-          console.log('selections changed')
-          console.log('before', this.columns)
-          console.log('after', editor.selectedProperties.map(function(c) { return c.name; }))
-
-          console.log('columns_ before', this.columns_)
-          this.columns = editor.selectedProperties.map(function(c) { return c.name; });
-          console.log('columns_ before', this.columns_)
-
-        }.bind(this));
-
-        return this.OverlayDropdown.create().add(editor);
-      }
-    },
-    {
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
@@ -235,11 +213,31 @@ foam.CLASS({
         column;
     },
 
+    function createColumnSelection() {
+      var editor = this.EditColumnsView.create({
+        properties: this.columns_,
+        selectedProperties: this.columns_
+      });
+
+      editor.selectedProperties$.sub(function() {
+        console.log('selections changed')
+        console.log('before', this.columns)
+        console.log('after', editor.selectedProperties.map(function(c) { return c.name; }))
+
+        console.log('columns_ before', this.columns_)
+        this.columns = editor.selectedProperties.map(function(c) { return c.name; });
+        console.log('columns_ before', this.columns_)
+
+      }.bind(this));
+
+      return this.OverlayDropdown.create().add(editor);
+    },
+
     /** Adds offset for edit columns overlay dropdown
      * OverlayDropdown adds element to top right of parent container.
      * We want the table dropdown to appear below the dropdown icon.
      */
-    function positionOverlayDropdown() {
+    function positionOverlayDropdown(columnSelectionE) {
       // Dynamic position calculation
       var origin = document.getElementsByClassName(this.of.id.replace(/\./g,'-') 
                                                   + '-EditColumnsDropdownOrigin')[0];
@@ -247,15 +245,15 @@ foam.CLASS({
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
-      this.columnSelectionE.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
+      columnSelectionE.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
     },
 
     function initE() {
-      this.columnSelectionE = undefined;
       console.log('***************************** initE');
       var view = this;
+      var columnSelectionE = view.createColumnSelection();
 
-      if (view.editColumnsEnabled) this.add(view.columnSelectionE);
+      if (view.editColumnsEnabled) this.add(columnSelectionE);
 
       this.
         addClass(this.myClass()).
@@ -278,8 +276,8 @@ foam.CLASS({
               start('th').
                 addClass(view.myClass('th-editColumns')).
                   on('click', function(e) {
-                    view.positionOverlayDropdown();
-                    view.columnSelectionE.open();
+                    view.positionOverlayDropdown(columnSelectionE);
+                    columnSelectionE.open();
                   }).
                   add(' ', view.vertMenuIcon).
                     addClass(view.myClass('vertDots')).
