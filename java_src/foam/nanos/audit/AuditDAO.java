@@ -16,6 +16,8 @@ import java.util.Map;
 public class AuditDAO
   extends ProxyDAO
 {
+  private final Outputter outputter = new Outputter();
+
   /**
    * Creates a format message containing the
    * list of properties that have changed
@@ -54,7 +56,7 @@ public class AuditDAO
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
     StringBuilder sb = new StringBuilder();
-    new Outputter().output(sb, obj);
+    outputter.output(sb, obj);
     logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), sb);
     return super.remove(obj);
   }
