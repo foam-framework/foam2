@@ -56,11 +56,6 @@ foam.CLASS({
   ],
 
   methods: [
-    /*function detach() {
-      if ( this.opened ) return;
-      this.SUPER();
-    },*/
-
     function add() {
       if (this.addToSelf_) this.SUPER.apply(this, arguments);
       else this.dropdownE_.add.apply(this.dropdownE_, arguments);
@@ -79,7 +74,6 @@ foam.CLASS({
       this.height = 0;
       this.dropdownE_.style({ height: 0 + 'px' });
       this.opened = false;
-      // this.detach();
     },
 
     function getFullHeight() {
@@ -110,7 +104,6 @@ foam.CLASS({
         this.shown = open;
       }, this.opened$));
 
-
       this.start('dropdown-overlay')
           .addClass(this.myClass('overlay'))
           .addClass(this.slot(function(open) {
@@ -123,9 +116,6 @@ foam.CLASS({
           .addClass(this.slot(function(openComplete) {
             return openComplete ? this.myClass('open') : '';
           }, this.opened$ && this.animationComplete$))
-          /*.addClass(this.dynamic(function(open, complete) {
-            return open && complete ? this.myClass('open') : '';
-          }.bind(this), this.opened$, this.animationComplete$))*/
           .on('transitionend', this.onTransitionEnd)
           .on('mouseleave', this.onMouseLeave)
           .on('click', this.onClick);
