@@ -90,7 +90,6 @@ public class AltIndex implements Index {
     return delegates_.get(0).size(state);
   }
 
-  @Override
   public void onAdd(Sink sink) {
   }
 }
