@@ -55,7 +55,7 @@ public class AuditDAO
     NanoLogger logger = (NanoLogger) getX().get("logger");
     StringBuilder sb = new StringBuilder();
     new Outputter().output(sb, obj);
-    logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), sb.toString());
+    logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), sb);
     return super.remove(obj);
   }
 }
