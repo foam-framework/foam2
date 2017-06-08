@@ -26,6 +26,9 @@ foam.CLASS({
           class: 'Boolean',
           name: 'displaySorted',
           value: false
+      },
+      {
+        name: 'checkboxes'
       }
   ],
   
@@ -45,6 +48,7 @@ foam.CLASS({
     },
 
     function initE() {
+      this.checkboxes = []
       var selected = this.selectedMap();
       var props = this.properties;
 
@@ -64,7 +68,7 @@ foam.CLASS({
 
         // Subscribes onPropChange listener to checkbox data
         cb.data$.sub(this.onPropChange.bind(this, props[i], cb));
-
+        this.checkboxes.push(cb);
         this.add(cb);
 
         if (i != props.length - 1) this.start('br').end();
@@ -99,7 +103,17 @@ foam.CLASS({
         }
       }
 
+      /*for (var i = 0; i < this.selectedProperties; ++i) {
+        this.selectedProperties.pop();
+      }
+
+      for (var i = 0; i < this.out; ++i) {
+        this.selectedProperties.push(out[i]);
+      }*/
+
       this.selectedProperties = out;
+
+      this.propertyChange.pub('selectedProperties')
     }
   ]
 });

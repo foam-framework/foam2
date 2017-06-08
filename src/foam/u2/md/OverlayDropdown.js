@@ -104,13 +104,13 @@ foam.CLASS({
         this.shown = open;
       }, this.opened$));
 
-      this.start('dropdown-overlay')
+      /*this.start('dropdown-overlay')
           .addClass(this.myClass('overlay'))
           .addClass(this.slot(function(open) {
             return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
           }, this.opened$))
           .on('click', this.onCancel)
-          .end();
+          .end();*/
 
       this.dropdownE_.addClass(this.myClass())
           .addClass(this.slot(function(openComplete) {
@@ -183,7 +183,7 @@ foam.CLASS({
 
   listeners: [
     function onCancel() {
-      this.close();
+      //this.close();
     },
 
     function onTransitionEnd() {
@@ -193,7 +193,7 @@ foam.CLASS({
     function onMouseLeave(e) {
       console.assert(e.target === this.dropdownE_.el(),
           'mouseleave should only fire on this, not on children');
-      this.close();
+      //this.close();
     },
 
     /**
