@@ -58,7 +58,7 @@ foam.CLASS({
           .then(this.onPutResponse);
     },
 
-    function remove(o) {
+    function remove_(o) {
       /**
        * DELETE baseURL/<network-foam-jsonified FOAM object id>
        */

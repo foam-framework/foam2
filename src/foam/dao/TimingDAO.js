@@ -70,7 +70,7 @@ foam.CLASS({
       var self = this;
       return this.SUPER(obj).then(function(o) { self.end(act); return o; });
     },
-    function remove(obj) {
+    function remove_(obj) {
       var act = this.start('remove');
       var self = this;
       return this.SUPER(obj).then(function() { self.end(act); });

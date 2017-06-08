@@ -237,6 +237,10 @@ foam.CLASS({
       return this.removeAll_(undefined, undefined, undefined, undefined);
     },
 
+    function remove(obj) {
+      return this.remove_(obj);
+    },
+
     function compareTo(other) {
       if ( ! other ) return 1;
       return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
@@ -304,7 +308,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      forwards: [ 'put_', 'remove', 'find', 'select_', 'removeAll_' ]
+      forwards: [ 'put_', 'remove_', 'find', 'select_', 'removeAll_' ]
     }
   ],
 

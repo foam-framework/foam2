@@ -205,7 +205,7 @@ foam.CLASS({
       });
     },
 
-    function remove(obj) {
+    function remove_(obj) {
       var self = this;
       var key = obj.id != undefined ? obj.id : obj;
       return new Promise(function(resolve, reject) {

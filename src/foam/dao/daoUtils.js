@@ -31,7 +31,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put_', 'remove', 'find', 'select_', 'removeAll_' ],
+      forwards: [ 'put_', 'remove_', 'find', 'select_', 'removeAll_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return foam.dao.NullDAO.create() },
       postSet: function(old, nu) {
@@ -142,7 +142,7 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put_', 'remove', 'find', 'select_', 'removeAll_', 'listen' ],
+      methods: [ 'put_', 'remove_', 'find', 'select_', 'removeAll_', 'listen' ],
       name: 'promise'
     }
   ]

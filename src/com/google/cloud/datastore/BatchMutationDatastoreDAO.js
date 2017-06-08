@@ -117,7 +117,7 @@ foam.CLASS({
         self.onBatchedOperation();
       });
     },
-    function remove(o) {
+    function remove_(o) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({

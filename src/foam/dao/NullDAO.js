@@ -33,7 +33,7 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function remove(obj) {
+    function remove_(obj) {
       this.pub('on', 'remove', obj);
       return Promise.resolve();
     },

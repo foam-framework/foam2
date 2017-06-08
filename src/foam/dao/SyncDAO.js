@@ -155,8 +155,8 @@ foam.CLASS({
     /**
       Marks the object as deleted.
     */
-    function remove(obj) {
-      return this.delegate.remove(obj).then(function(o) {
+    function remove_(obj) {
+      return this.delegate.remove_(obj).then(function(o) {
         this.syncRecordDAO.put_(
           this.SyncRecord.create({
             id: obj.id,
@@ -173,7 +173,7 @@ foam.CLASS({
       this.delegate.select_(null, skip, limit, order, predicate).then(function(a) {
         a = a.array;
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.remove(a[i]);
+          this.remove_(a[i]);
         }
       }.bind(this));
     },
@@ -223,7 +223,7 @@ foam.CLASS({
             if ( deleted ) {
               var obj = self.of.create(undefined, self);
               obj.id = id;
-              self.remoteDAO.remove(obj);
+              self.remoteDAO.remove_(obj);
             } else {
               // TODO: Stop sending updates if the first one fails.
               self.delegate.find(id).then(function(obj) {
@@ -250,7 +250,7 @@ foam.CLASS({
       if ( event == 'put' ) {
         this.processFromServer(obj);
       } else if ( event === 'remove' ) {
-        this.delegate.remove(obj);
+        this.delegate.remove_(obj);
       } else if ( event === 'reset' ) {
         this.delegate.removeAll();
       }

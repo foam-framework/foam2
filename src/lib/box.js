@@ -594,10 +594,10 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       methods: [
-        'put',
-        'remove',
+        'put_',
+        'remove_',
         'removeAll_',
-        'select',
+        'select_',
         'find'
       ]
     }
@@ -763,9 +763,9 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       methods: [
-        'put',
-        'remove',
-        'select',
+        'put_',
+        'remove_',
+        'select_',
         'removeAll_',
         'find'
       ],
@@ -793,7 +793,7 @@ foam.CLASS({
       });
     },
 
-    function remove(obj) {
+    function remove_(obj) {
       var self = this;
       return this.SUPER(obj).then(function(o) {
         self.on.remove.pub(obj);

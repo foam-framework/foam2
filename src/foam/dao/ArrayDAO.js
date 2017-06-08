@@ -57,7 +57,7 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function remove(obj) {
+    function remove_(obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];

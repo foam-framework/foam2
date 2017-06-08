@@ -51,10 +51,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function remove(obj) {
+    function remove_(obj) {
       var self = this;
       return obj[this.name].removeAll().then(function() {
-        return self.delegate.remove(obj);
+        return self.delegate.remove_(obj);
       });
     },
 

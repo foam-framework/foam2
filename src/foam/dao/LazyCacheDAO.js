@@ -52,7 +52,7 @@ foam.CLASS({
       expression: function(delegate, cache) {
         var s = this.cacheSyncSub_ = delegate.on.remove.sub(
           function(sub_, on_, remove_, obj) {
-            cache.remove(obj);
+            cache.remove_(obj);
           }
         );
         return s;
@@ -132,10 +132,10 @@ foam.CLASS({
 
   methods: [
     /** Ensures removal from both cache and delegate before resolving. */
-    function remove(obj) {
+    function remove_(obj) {
       var self = this;
-      return self.cache.remove(obj).then(function() {
-        return self.delegate.remove(obj);
+      return self.cache.remove_(obj).then(function() {
+        return self.delegate.remove_(obj);
       });
     },
 
