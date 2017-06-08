@@ -8,7 +8,12 @@ foam.CLASS({
   package: 'foam.dao.history',
   name: 'HistoryRecord',
   documentation: 'Contains an array of property updates',
+  ids: [ 'objectId', 'seqNo' ],
   properties: [
+    {
+      class: 'Long',
+      name: 'seqNo'
+    },
     {
       class: 'String',
       name: 'objectId'

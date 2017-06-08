@@ -8,13 +8,15 @@ package foam.dao.history;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
-import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
+import foam.dao.SequenceNumberDAO;
 import foam.nanos.auth.User;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+
+import static foam.mlang.MLang.EQ;
 
 public class HistoryDAO
   extends ProxyDAO
@@ -63,7 +65,7 @@ public class HistoryDAO
   public FObject put(FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
-    MapDAO historyDAO = (MapDAO) getX().get("historyDAO");
+    SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
     FObject current = this.find(obj);
 
     // add new history record
@@ -75,5 +77,14 @@ public class HistoryDAO
     historyDAO.put(historyRecord);
 
     return super.put(obj);
+  }
+
+  @Override
+  public FObject remove(FObject obj) {
+    // TODO: use context-oriented context when available.
+    User user = (User) getX().get("user");
+    SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
+    historyDAO.removeAll(null, null, null, EQ(HistoryRecord.OBJECT_ID, obj.getClassInfo().getId()));
+    return super.remove(obj);
   }
 }
