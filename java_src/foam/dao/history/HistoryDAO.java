@@ -68,6 +68,7 @@ public class HistoryDAO
 
     // add new history record
     HistoryRecord historyRecord = new HistoryRecord();
+    historyRecord.setObjectId(obj.getClassInfo().getId());
     historyRecord.setUser(formatUserName(user));
     historyRecord.setTimestamp(new Date());
     historyRecord.setUpdates(getUpdatedProperties(current, obj));

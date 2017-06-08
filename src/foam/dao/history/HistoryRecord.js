@@ -11,6 +11,10 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'objectId'
+    },
+    {
+      class: 'String',
       name: 'user'
     },
     {
