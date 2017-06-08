@@ -13,9 +13,9 @@ import java.util.Date;
 public class LastModifiedAwareDAO
   extends ProxyDAO
 {
-  public FObject put(FObject value) {
+  public FObject put_(FObject value) {
     ((LastModifiedAware) value).setLastModified(new Date());
 
-    return super.put(value);
+    return super.put_(value);
   }
 }

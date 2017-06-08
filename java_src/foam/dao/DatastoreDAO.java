@@ -50,7 +50,7 @@ public class DatastoreDAO
         return keyFromPK(getPrimaryKey().get(obj));
     }
 
-    public FObject put(FObject obj) {
+    public FObject put_(FObject obj) {
         getData().put(serializeFObject(obj));
         return obj;
     }
