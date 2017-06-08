@@ -51,13 +51,13 @@ public class AuditDAO
   }
 
   @Override
-  public FObject remove(FObject obj) {
+  public FObject remove_(FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
     StringBuilder sb = new StringBuilder();
     outputter.output(sb, obj);
     logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), sb);
-    return super.remove(obj);
+    return super.remove_(obj);
   }
 }

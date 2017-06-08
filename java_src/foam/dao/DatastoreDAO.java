@@ -55,7 +55,7 @@ public class DatastoreDAO
         return obj;
     }
 
-    public FObject remove(FObject obj) {
+    public FObject remove_(FObject obj) {
         getData().delete(keyFromFObject(obj));
         return obj;
     }
@@ -158,10 +158,6 @@ public class DatastoreDAO
         decorated.eof();
 
         return sink;
-    }
-
-    public void removeAll() {
-      this.removeAll_(null, null, null, null);
     }
 
     public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {

@@ -79,6 +79,14 @@ public abstract class AbstractDAO
     return this.put_(obj);
   }
 
+  public FObject remove(FObject obj) {
+    return this.remove_(obj);
+  }
+
+  public void removeAll() {
+    this.removeAll_(null, null, null, null);
+  }
+
   public Sink select(Sink sink) {
     return this.select_(sink, null, null, null, null);
   }
