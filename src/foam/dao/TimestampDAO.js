@@ -36,9 +36,9 @@ foam.CLASS({
   methods: [
     /** For each put() object, set the timestamp if .property is not
       set for that object. */
-    function put(obj) {
+    function put_(obj) {
       if ( ! obj.hasOwnProperty(this.property) ) obj[this.property] = this.nextTimestamp();
-      return this.delegate.put(obj);
+      return this.delegate.put_(obj);
     },
 
     /** Generates a timestamp. Override to change the way timestamps are

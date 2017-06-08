@@ -141,9 +141,9 @@ foam.CLASS({
     /**
       Updates the object's last seen info.
     */
-    function put(obj) {
-      return this.delegate.put(obj).then(function(o) {
-        this.syncRecordDAO.put(
+    function put_(obj) {
+      return this.delegate.put_(obj).then(function(o) {
+        this.syncRecordDAO.put_(
           this.SyncRecord.create({
             id: o.id,
             syncNo: -1
@@ -157,7 +157,7 @@ foam.CLASS({
     */
     function remove(obj) {
       return this.delegate.remove(obj).then(function(o) {
-        this.syncRecordDAO.put(
+        this.syncRecordDAO.put_(
           this.SyncRecord.create({
             id: obj.id,
             deleted: true,
@@ -180,8 +180,8 @@ foam.CLASS({
 
     /** @private */
     function processFromServer(obj) {
-      this.delegate.put(obj).then(function(obj) {
-        this.syncRecordDAO.put(
+      this.delegate.put_(obj).then(function(obj) {
+        this.syncRecordDAO.put_(
           this.SyncRecord.create({
             id: obj.id,
             syncNo: obj[this.syncProperty.name]
@@ -227,7 +227,7 @@ foam.CLASS({
             } else {
               // TODO: Stop sending updates if the first one fails.
               self.delegate.find(id).then(function(obj) {
-                if ( obj ) return self.remoteDAO.put(obj).then(function(obj) {
+                if ( obj ) return self.remoteDAO.put_(obj).then(function(obj) {
                   self.processFromServer(obj);
                 });
                 return null;

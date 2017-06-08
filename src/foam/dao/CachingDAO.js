@@ -93,11 +93,11 @@ foam.CLASS({
 
     /** Puts are sent to the cache and to the source, ensuring both
       are up to date. */
-    function put(o) {
+    function put_(o) {
       var self = this;
       // ensure the returned object from src is cached.
       return self.src.put(o).then(function(srcObj) {
-        return self.delegate.put(srcObj);
+        return self.delegate.put_(srcObj);
       })
     },
 
@@ -123,7 +123,7 @@ foam.CLASS({
     /** Keeps the cache in sync with changes from the source.
       @private */
     function onSrcPut(s, on, put, obj) {
-      this.delegate.put(obj);
+      this.delegate.put_(obj);
     },
 
     /** Keeps the cache in sync with changes from the source.

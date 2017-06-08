@@ -30,6 +30,16 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'put_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
       name: 'remove',
       javaReturns: 'foam.core.FObject',
       args: [
