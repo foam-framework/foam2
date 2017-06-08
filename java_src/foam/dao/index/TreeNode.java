@@ -19,7 +19,8 @@ public class TreeNode {
   protected TreeNode left;
   protected TreeNode right;
   
-  protected static TreeNode nullNode;
+  protected final static TreeNode nullNode = new TreeNode(null, null, null, 
+                                                          0, 0, null, null);
   
   public TreeNode(Index tail, Object key, Object value) {
     this.tail = tail;
@@ -50,12 +51,6 @@ public class TreeNode {
     return s;
   }
   public static TreeNode getNullNode() {
-    if ( nullNode != null ) {
-      return nullNode;
-    }
-    nullNode = new TreeNode(null, null, null);
-    nullNode.level = nullNode.size = 0;
-    nullNode.left = nullNode.right = null;
     return nullNode;
   }
   
