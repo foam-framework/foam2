@@ -49,7 +49,7 @@ foam.CLASS({
       if ( ! this.authAgent.requiresAuthorization(this) ) return send();
 
       return this.authAgent.getCredential().then(this.onGetCredential)
-          .then(send);
+          .then(send).then(this.onAuthorizedResponse);
     }
   ],
 
@@ -60,6 +60,28 @@ foam.CLASS({
       code: function() {
         throw new Error("Abstract AuthAwareHTTPRequest doesn't understand " +
             'credentials');
+      }
+    },
+    {
+      name: 'onAuthorizedResponse',
+      documentation: `Check response on authorized request for HTTP 401, in
+          which case, retry.`,
+      code: function(response) {
+        if ( response.status !== 401 ) return response;
+
+        var send = this.delegate.send.bind(this.delegate);
+        return this.authAgent.refreshCredential().then(this.onGetCredential)
+            .then(send).then(this.onRetryResponse);
+      }
+    },
+    {
+      name: 'onRetryResponse',
+      documentation: `Check response on authorized request for HTTP 401, in
+          which case, throw: forced  credential refresh didn't work.`,
+      code: function(response) {
+        if ( response.status !== 401 ) return response;
+
+        throw new Error('Authorization failed: Request rejected after forced credential refresh');
       }
     }
   ]
