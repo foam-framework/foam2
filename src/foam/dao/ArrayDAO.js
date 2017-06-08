@@ -93,7 +93,7 @@ foam.CLASS({
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       predicate = predicate || this.True.create();
       skip = skip || 0;
       limit = foam.Number.isInstance(limit) ? limit : Number.MAX_VALUE;
