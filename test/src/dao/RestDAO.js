@@ -118,7 +118,7 @@ describe('RestDAO', function() {
             limit = data.limit;
             order = data.order;
             predicate = data.predicate;
-            return dao.removeAll(skip, limit, order, predicate)
+            return dao.removeAll_(skip, limit, order, predicate)
               .then(function() {
                 return Promise.resolve(createResponse({ status: 200 }));
               });

@@ -19,7 +19,7 @@ public class LimitedDAO
     return super.select_(s, skip, limit_, order, predicate);
   }
 
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    super.removeAll(skip, limit_, order, predicate);
+  public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    super.removeAll_(skip, limit_, order, predicate);
   }
 }

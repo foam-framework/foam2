@@ -55,6 +55,11 @@ foam.INTERFACE({
     {
       name: 'removeAll',
       returns: '',
+      args: [ ]
+    },
+    {
+      name: 'removeAll_',
+      returns: '',
       args: [ 'skip', 'limit', 'order', 'predicate' ]
     },
     {

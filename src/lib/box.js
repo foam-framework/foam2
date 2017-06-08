@@ -596,7 +596,7 @@ foam.CLASS({
       methods: [
         'put',
         'remove',
-        'removeAll',
+        'removeAll_',
         'select',
         'find'
       ]
@@ -766,7 +766,7 @@ foam.CLASS({
         'put',
         'remove',
         'select',
-        'removeAll',
+        'removeAll_',
         'find'
       ],
       eventProxy: false
@@ -801,7 +801,7 @@ foam.CLASS({
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       this.SUPER(skip, limit, order, predicate);
       this.on.reset.pub();
     }

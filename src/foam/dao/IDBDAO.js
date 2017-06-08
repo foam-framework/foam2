@@ -235,7 +235,7 @@ foam.CLASS({
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(skip, limit, order, predicate) {
       var query = predicate || this.True.create();
 
       var self = this;

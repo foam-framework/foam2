@@ -98,6 +98,11 @@ foam.INTERFACE({
     {
       name: 'removeAll',
       javaReturns: 'void',
+      args: [ ]
+    },
+    {
+      name: 'removeAll_',
+      javaReturns: 'void',
       args: [
         {
           name: 'skip',

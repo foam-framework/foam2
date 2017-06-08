@@ -19,7 +19,7 @@ public class EnabledAwareDAO
     return super.select_(s, skip, limit, order, PREDICATE);
   }
 
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    super.removeAll(skip, limit, order, PREDICATE);
+  public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    super.removeAll_(skip, limit, order, PREDICATE);
   }
 }
