@@ -11,7 +11,6 @@ import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
 import foam.dao.SequenceNumberDAO;
 import foam.nanos.auth.User;
-import javafx.beans.property.Property;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -70,9 +69,8 @@ public class HistoryDAO
     FObject current = this.find(obj);
 
     // add new history record
-    String objectId = (String) ((PropertyInfo) obj.getClassInfo().getAxiomByName("objectId")).f(obj);
     HistoryRecord historyRecord = new HistoryRecord();
-    historyRecord.setObjectId(objectId);
+    historyRecord.setObjectId(obj.getClassInfo().getId());
     historyRecord.setUser(formatUserName(user));
     historyRecord.setTimestamp(new Date());
     historyRecord.setUpdates(getUpdatedProperties(current, obj));
@@ -84,9 +82,9 @@ public class HistoryDAO
   @Override
   public FObject remove(FObject obj) {
     // TODO: use context-oriented context when available.
+    User user = (User) getX().get("user");
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    String objectId = (String) ((PropertyInfo) obj.getClassInfo().getAxiomByName("objectId")).f(obj);
-    historyDAO.removeAll(null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
+    historyDAO.removeAll(null, null, null, EQ(HistoryRecord.OBJECT_ID, obj.getClassInfo().getId()));
     return super.remove(obj);
   }
 }
