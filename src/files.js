@@ -252,5 +252,7 @@ FOAM_FILES([
   { name: "foam/parsers/html/TagType" },
   { name: "foam/parsers/html/Tag" },
   { name: "foam/parsers/html/HTMLLexer" },
-  { name: "foam/core/ContextAware", flags: ['java'] }
+  { name: "foam/core/ContextAware", flags: ['java'] },
+  { name: "foam/dao/history/PropertyUpdate" },
+  { name: "foam/dao/history/HistoryRecord" }
 ]);
