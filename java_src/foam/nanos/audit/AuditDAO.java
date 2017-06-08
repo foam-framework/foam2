@@ -38,10 +38,20 @@ public class AuditDAO
 
   @Override
   public FObject put(FObject obj) {
+    // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
     FObject current = this.find(obj);
     logger.info("CHANGE", obj.getClassInfo().getId(), user.getId(), formatMessage(current, obj));
     return super.put(obj);
+  }
+
+  @Override
+  public FObject remove(FObject obj) {
+    // TODO: use context-oriented context when available.
+    User user = (User) getX().get("user");
+    NanoLogger logger = (NanoLogger) getX().get("logger");
+    logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), obj);
+    return super.remove(obj);
   }
 }
