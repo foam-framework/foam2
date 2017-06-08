@@ -56,10 +56,6 @@ foam.CLASS({
       listener.onDetach(listener.dao$.follow(this.delegate$));
 
       return listener;
-    },
-
-    function removeAll() {
-      return this.removeAll_(undefined, undefined, undefined, undefined);
     }
   ]
 });

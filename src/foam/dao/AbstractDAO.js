@@ -233,12 +233,12 @@ foam.CLASS({
       return sink;
     },
 
-    function removeAll() {
-      return this.removeAll_(undefined, undefined, undefined, undefined);
-    },
-
     function remove(obj) {
       return this.remove_(obj);
+    },
+
+    function removeAll() {
+      return this.removeAll_(undefined, undefined, undefined, undefined);
     },
 
     function compareTo(other) {

@@ -98,7 +98,7 @@ public class FileJournal
           break;
         case "r":
           Object id = journalParser.parseObjectId(line);
-          delegate.remove(delegate.find(id));
+          delegate.remove_(delegate.find(id));
       }
     }
   }

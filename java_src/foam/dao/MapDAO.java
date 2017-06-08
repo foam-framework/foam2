@@ -44,7 +44,7 @@ public class MapDAO
     return obj;
   }
 
-  public FObject remove(FObject obj) {
+  public FObject remove_(FObject obj) {
     getData().remove(getPrimaryKey().get(obj));
     return obj;
   }
@@ -74,10 +74,6 @@ public class MapDAO
     decorated.eof();
 
     return sink;
-  }
-
-  public void removeAll() {
-    this.removeAll_(null, null, null, null);
   }
 
   public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
