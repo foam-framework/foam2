@@ -21,6 +21,18 @@ public class HistoryDAO
 {
 
   /**
+   * Formats a User record to the following string
+   * LastName, FirstName (ID)
+   * @param user The user to format
+   * @return The formatted string
+   */
+  private String formatUserName(User user) {
+    return user.getLastName() +", " +
+        user.getFirstName() +
+        "(" + user.getId() + ")";
+  }
+
+  /**
    * Returns an array of updated properties
    *
    * @param currentValue current value
@@ -56,8 +68,8 @@ public class HistoryDAO
 
     // add new history record
     HistoryRecord historyRecord = new HistoryRecord();
-    historyRecord.setUser(user);
-    historyRecord.setTimestamp(new Date().getTime());
+    historyRecord.setUser(formatUserName(user));
+    historyRecord.setTimestamp(new Date());
     historyRecord.setUpdates(getUpdatedProperties(current, obj));
     historyDAO.put(historyRecord);
 
