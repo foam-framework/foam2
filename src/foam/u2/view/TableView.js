@@ -190,7 +190,14 @@ foam.CLASS({
         });
 
         editor.selectedProperties$.sub(function() {
+          console.log('selections changed')
+          console.log('before', this.columns)
+          console.log('after', editor.selectedProperties.map(function(c) { return c.name; }))
+
+          console.log('columns_ before', this.columns_)
           this.columns = editor.selectedProperties.map(function(c) { return c.name; });
+          console.log('columns_ before', this.columns_)
+
         }.bind(this));
 
         return this.OverlayDropdown.create().add(editor);
@@ -244,14 +251,17 @@ foam.CLASS({
     },
 
     function initE() {
+      this.columnSelectionE = undefined;
+      console.log('***************************** initE');
       var view = this;
+
+      if (view.editColumnsEnabled) this.add(view.columnSelectionE);
 
       this.
         addClass(this.myClass()).
         addClass(this.myClass(this.of.id.replace(/\./g,'-'))).
         setNodeName('table').
         start('thead').
-          add(view.columnSelectionE).
           add(this.slot(function(columns_) {
             return this.E('tr').
               forEach(columns_, function(column) {
@@ -264,22 +274,20 @@ foam.CLASS({
                         (view.Desc.isInstance(order) && order.arg1 === column) ? view.descIcon : ''
                   }, view.order$)).
                 end();
-
-                if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
-                  this.start('th').
-                    addClass(view.myClass('th-editColumns')).
-                    on('click', function(e) {
-                      view.positionOverlayDropdown();
-                      view.columnSelectionE.open();
-                    }).
-                    add(' ', view.vertMenuIcon).
-                      addClass(view.myClass('vertDots')).addClass(view.myClass('noselect')).
-                      start('div')
-                      .addClass(view.of.id.replace(/\./g,'-') +
-                          '-EditColumnsDropdownOrigin').end().
-                  end();
-                }
-              });
+              }).
+              start('th').
+                addClass(view.myClass('th-editColumns')).
+                  on('click', function(e) {
+                    view.positionOverlayDropdown();
+                    view.columnSelectionE.open();
+                  }).
+                  add(' ', view.vertMenuIcon).
+                    addClass(view.myClass('vertDots')).
+                    addClass(view.myClass('noselect')).
+                    start('div').
+                    addClass(view.of.id.replace(/\./g,'-') +
+                        '-EditColumnsDropdownOrigin').end().
+              end();
           })).
           add(this.slot(function(columns_) {
             return this.
@@ -306,14 +314,9 @@ foam.CLASS({
                             column.f ? column.f(obj) : null, obj, column
                           ]).
                           end();
-
-                        if (column == columns_[columns_.length - 1] && view.editColumnsEnabled) {
-                          this.start('td').end();
-                        }
-                      });
+                      }).start('td').end();
               });
           }));
-
     }
   ]
 });

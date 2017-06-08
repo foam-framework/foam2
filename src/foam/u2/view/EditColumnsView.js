@@ -30,8 +30,13 @@ foam.CLASS({
   ],
   
   methods: [
+    function init() {
+      console.log('********************* init', this.properties.map(function(p) { return p.name; }).join(','));
+    },
+
     function selectedMap() {
       var selected = {};
+
       for (var i = 0; i < this.selectedProperties.length; i++) {
         selected[this.selectedProperties[i].name] = true;
       }
@@ -44,6 +49,7 @@ foam.CLASS({
       var props = this.properties;
 
       if ( this.displaySorted ) {
+        // TODO: How should this block be tested?
         props = this.properties.slice();
         props.sort(function(a, b) {
           return a.label.toLowerCase().compareTo(b.label.toLowerCase());
@@ -56,6 +62,7 @@ foam.CLASS({
           data: selected[props[i].name]
         });
 
+        // Subscribes onPropChange listener to checkbox data
         cb.data$.sub(this.onPropChange.bind(this, props[i], cb));
 
         this.add(cb);
@@ -72,6 +79,7 @@ foam.CLASS({
       var out = [];
 
       if ( this.displaySorted ) {
+        // TODO: How should this block be tested?
         out = this.selectedProperties.slice();
         if ( nu && !selected[prop.name] ) {
           out.push(prop);
@@ -91,7 +99,7 @@ foam.CLASS({
         }
       }
 
-      this.selectedProperties = out; 
+      this.selectedProperties = out;
     }
   ]
 });
