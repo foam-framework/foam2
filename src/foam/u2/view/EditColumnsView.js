@@ -18,11 +18,6 @@ foam.CLASS({
           name: 'properties'
       },
       {
-        class: 'FObjectArray',
-        of: 'foam.core.Property',
-          name: 'selectedProperties'
-      },
-      {
           class: 'Boolean',
           name: 'displaySorted',
           value: false
@@ -31,75 +26,67 @@ foam.CLASS({
   
   methods: [
     function init() {
-      console.log('********************* init', this.properties.map(function(p) { return p.name; }).join(','));
-    },
+      console.log('init***************************************')
+      var props = [];
 
-    function selectedMap() {
-      var selected = {};
-
-      for (var i = 0; i < this.selectedProperties.length; i++) {
-        selected[this.selectedProperties[i].name] = true;
+      for (var i = 0; i < this.properties.length; ++i) {
+        props.push({prop: this.properties[i], visible: true})
       }
 
-      return selected;
+      this.properties = props;
     },
-
+    
     function initE() {
-      var selected = this.selectedMap();
-      var props = this.properties;
-
       if ( this.displaySorted ) {
         // TODO: How should this block be tested?
+        var props = this.properties;
         props = this.properties.slice();
         props.sort(function(a, b) {
           return a.label.toLowerCase().compareTo(b.label.toLowerCase());
         });
       }
 
-      for (let i = 0; i < props.length; i++) {
+      for (let i = 0; i < this.properties.length; i++) {
+        this.properties[i].visible = true;
+
         var cb = this.CheckBox.create({
-          label: props[i].label,
-          data: selected[props[i].name]
+          label: this.properties[i].prop.label,
+          data: this.properties[i].visible
         });
 
         // Subscribes onPropChange listener to checkbox data
-        cb.data$.sub(this.onPropChange.bind(this, props[i], cb));
+        cb.data$.sub(this.onPropChange.bind(this, this.properties[i].prop, cb));
 
         this.add(cb);
 
-        if (i != props.length - 1) this.start('br').end();
+        if (i != this.properties.length - 1) this.start('br').end();
       }
     }
   ],
 
   listeners: [
-    function onPropChange(prop, cb, _, old, nu) {
-      var selected = this.selectedMap();
-
-      var out = [];
+    function onPropChange(changedProp, cb, _, old, nu) {
+      console.log('onPropChange ------------------------')
 
       if ( this.displaySorted ) {
         // TODO: How should this block be tested?
         out = this.selectedProperties.slice();
-        if ( nu && !selected[prop.name] ) {
-          out.push(prop);
+        if ( nu && !selected[changedProp.name] ) {
+          out.push(changedProp);
         }
-        if ( !nu && selected[prop.name] ) {
-          out.splice(out.indexOf(prop), 1);
+        if ( !nu && selected[changedProp.name] ) {
+          out.splice(out.indexOf(changedProp), 1);
         }
       } else {
         for (var i = 0; i < this.properties.length; i++) {
           var p = this.properties[i];
-
-          if ((p === prop && cb.data) || 
-              (selected[p.name] && 
-                (p !== prop || cb.data))) {
-            out.push(p);
-          }
+          
+          p.visible = ((p.prop === changedProp && cb.data) || 
+                        (p.visible && (p.prop !== changedProp || cb.data)));
         }
       }
 
-      this.selectedProperties = out;
+      this.propertyChange.pub('properties')
     }
   ]
 });
