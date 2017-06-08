@@ -15,7 +15,6 @@ import java.net.URI;
 public class NanoHttpHandler
   implements HttpHandler
 {
-
   protected X x_;
 
   public NanoHttpHandler(X x) {
