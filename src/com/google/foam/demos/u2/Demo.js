@@ -417,83 +417,10 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  name: 'Linking',
-
-  requires: [
-    'foam.u2.view.EditColumnsView',
-    'foam.u2.md.OverlayDropdown'
-  ],
-
-  properties: [
-    {
-      name: 'columns_',
-      value: [
-        {
-          name: 'col1',
-        },
-        { name: 'col2'},
-        {name: 'col3'}
-      ]
-    },
-    {
-      class: 'Boolean',
-      name: 'editColumnsEnabled',
-      documentation: 'Set this to true to let the user select columns.',
-      value: true // TODO: Return to false after testing
-    },
-    {
-      name: 'vertMenuIcon',
-      documentation: 'HTML entity representing unicode Vertical Ellipsis',
-      factory: function() {
-        return this.Entity.create({ name: '#8942' });
-      }
-    },
-    'columns'
-  ],
-
-  methods: [
-    function init() {
-      console.log('inititted')
-            //createColumnSelection();
-    },
-
-    function createColumnSelection() {
-      var editor = this.EditColumnsView.create({
-        properties: this.columns_,
-        selectedProperties$: this.columns_$
-      });
-
-      editor.selectedProperties$.sub(function() {
-        console.log('changeee')
-        this.columns_ = editor.selectedProperties//.map(function(c) { return c.name; });
-
-      }.bind(this));
-
-      return this.OverlayDropdown.create().add(editor);
-    },
-  ],
-});
-
-var link = Linking.create();
-var cols1 = link.createColumnSelection();
-cols1.write();
-cols1.open();
-
-
-
-
 var d = Test.create();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
-
-
-
-
-var cols2 = link.createColumnSelection();
-cols2.write();
-cols2.open();
 
 
 foam.CLASS({
