@@ -76,8 +76,9 @@ public class Boot {
     serviceDAO_.put(dpl);
 
     NSpec pmd = new NSpec();
-    pmd.setName(PMDAO.ServiceName);
+    pmd.setName(PMDAO.ServiceName); // pmInfoDAO
     pmd.setServiceClass(PMDAO.class.getName());
+    pmd.setServe(true);
     serviceDAO_.put(pmd);
 
     NSpec authTest = new NSpec();
