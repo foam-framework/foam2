@@ -1,9 +1,14 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.audit;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
-import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
