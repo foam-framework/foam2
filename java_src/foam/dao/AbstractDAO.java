@@ -29,7 +29,7 @@ public abstract class AbstractDAO
     return new LimitedDAO().setLimit(count).setDelegate(this);
   }
 
-  public void pipe(foam.dao.Sink sink) {
+  public void pipe_(foam.dao.Sink sink) {
     throw new UnsupportedOperationException();
   }
 
@@ -97,5 +97,9 @@ public abstract class AbstractDAO
 
   public FObject find(Object id) {
     return this.find_(id);
+  }
+
+  public void pipe(Sink sink) {
+    this.pipe_(sink);
   }
 }

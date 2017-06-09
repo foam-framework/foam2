@@ -163,7 +163,7 @@ public class DatastoreDAO
     public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
     }
 
-    public void pipe(Sink s) {
+    public void pipe_(Sink s) {
         // TODO
     }
 }

@@ -163,6 +163,16 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ]
+    },
+    {
       name: 'where',
       javaReturns: 'foam.dao.DAO',
       args: [
