@@ -144,6 +144,10 @@ foam.CLASS({
       listen call.  We should check if this is the case and fix it if so.
     */
     function pipe(sink) {//, skip, limit, order, predicate) {
+      this.pipe_(sink, undefined);
+    },
+    
+    function pipe_(sink, predicate) {
       var dao = this;
 
       var sink = this.PipeSink.create({
