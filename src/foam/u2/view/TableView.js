@@ -182,6 +182,12 @@ foam.CLASS({
       value: true // TODO: Return to false after testing
     },
     {
+      class: 'Boolean',
+      name: 'refreshDisplay',
+      documentation: 'Will be removed when better refresh strategy is found',
+      value: true
+    },
+    {
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
@@ -207,6 +213,7 @@ foam.CLASS({
   ],
 
   methods: [
+    function detach() { console.log('table view detaching')},
     function sortBy(column) {
       this.order = this.order === column ?
         this.DESC(column) :
@@ -220,6 +227,7 @@ foam.CLASS({
       });
 
       editor.properties$.sub(function() {
+        console.log('this is focused is a', this.focused, 'statement');
         console.log('selections changed')
 
         console.log('columns_ before', this.columns_)
@@ -248,14 +256,22 @@ foam.CLASS({
       columnSelectionE.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
     },
 
+    function init() {
+      console.log('table view init')
+      this.onFocus(function() {console.log('focusing table view')});
+    },
+
     function initE() {
       console.log('***************************** initE');
       var view = this;
       var columnSelectionE;
 
       if (view.editColumnsEnabled) {
-        columnSelectionE = view.createColumnSelection();
-        this.add(columnSelectionE);
+        // There has to be a better way to do this
+        this.add(this.slot(function(refresh) {
+                        columnSelectionE = view.createColumnSelection();
+                        return this.E('div').add(columnSelectionE); }, 
+                        view.refreshDisplay$));
       }
 
       this.
@@ -281,7 +297,10 @@ foam.CLASS({
                   return this.E('th').
                     addClass(view.myClass('th-editColumns')).
                       on('click', function(e) {
-                        view.positionOverlayDropdown(columnSelectionE);
+                        e.stopPropagation();
+                        view.refreshDisplay = !view.refreshDisplay;
+                        columnSelectionE.shown = true;
+                        //view.positionOverlayDropdown(columnSelectionE);
                         columnSelectionE.open();
                       }).
                       add(' ', view.vertMenuIcon).
