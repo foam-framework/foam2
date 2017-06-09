@@ -5,10 +5,7 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * prepares sql info based on a FObject
@@ -23,21 +20,25 @@ public class SQLData {
 
     public SQLData(FObject obj) throws IllegalStateException, IllegalAccessException {
 
-        Field[] fields = obj.getClass().getFields();
         table = getTableName(obj.getClassInfo().getId());
         columnNames = new ArrayList<String>();
+        List<PropertyInfo> props = obj.getClassInfo().getAxioms();
 
         // TODO(drish): throw in case where class has no fields ?
-        if (fields.length <= 0) {
+        if (props.size() <= 0) {
             return;
         }
         values = new HashMap<String, Object>();
 
-        for (Field f: fields) {
-            String fieldName = f.getName();
-            columnNames.add(fieldName.toLowerCase());
-            Object value = ((PropertyInfo) f.get(obj)).get(obj);
-            values.put(fieldName, value);
+        for (PropertyInfo p: props) {
+
+            // do include ID into columns, since its auto-incremented
+            if (p.getName().equals("id")) {
+                continue;
+            }
+            columnNames.add(p.getName());
+            Object value = p.get(obj);
+            values.put(p.getName(), value);
         }
     }
 
