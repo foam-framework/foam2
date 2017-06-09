@@ -13,17 +13,18 @@ foam.INTERFACE({
   methods: [
     {
       name: 'get',
-      returns: 'Promise'
+      returns: 'Promise',
+      args: [ 'x' ]
     },
     {
       name: 'setProperty',
       returns: '',
-      args: [ 'name', 'value' ]
+      args: [ 'x', 'name', 'value' ]
     },
     {
       name: 'setProperties',
       returns: '',
-      args: [ 'values' ]
+      args: [ 'x', 'values' ]
     }
   ]
-})
+});
