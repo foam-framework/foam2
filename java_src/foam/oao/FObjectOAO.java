@@ -15,7 +15,11 @@ import java.util.Map;
 public class FObjectOAO
     implements OAO
 {
-  protected FObject obj;
+  protected final FObject obj;
+
+  public FObjectOAO(FObject obj) {
+    this.obj = obj;
+  }
 
   @Override
   public FObject get(X x) {
