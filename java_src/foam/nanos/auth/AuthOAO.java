@@ -21,6 +21,7 @@ public class AuthOAO
     AuthService authService = (AuthService) x.get("authService");
     java.security.Permission permission = new AuthPermission("." + getDelegate().get(x).getClassInfo().getId());
     if ( ! authService.check(x, permission) ) {
+      // TODO: figure out what to do here
       return null;
     }
     return super.get(x);
@@ -31,6 +32,7 @@ public class AuthOAO
     AuthService authService = (AuthService) x.get("authService");
     java.security.Permission permission = new AuthPermission("." + name);
     if ( ! authService.check(x, permission) ) {
+      // TODO: figure out what to do here
       return;
     }
     super.setProperty(x, name, value);
@@ -43,6 +45,7 @@ public class AuthOAO
       String key = (String) o;
       java.security.Permission permission = new AuthPermission("." + key);
       if ( ! authService.check(x, permission) ) {
+        // TODO: figure out what to do here
         return;
       }
     }
