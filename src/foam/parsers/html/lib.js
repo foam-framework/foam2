@@ -506,6 +506,12 @@
     'yen': '¥',
   };
 
+  // FUTURE: Lazily instantiate RegExp to save memory.
+  var escapeKeys = Object.keys(escapes).map(function(key) {
+    return `&${key};`;
+  });
+  var escapeSequenceRegExp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
+
   foam.LIB({
     name: 'foam.parsers.html',
 
@@ -515,6 +521,15 @@
       },
       function isSelfClosing(nodeName) {
         return selfClosingNodeNames[nodeName];
+      },
+      function unescapeString(str) {
+        if ( ! foam.String.isInstance(str) ) return '';
+
+        return str.replace(escapeSequenceRegExp, function(m) {
+          // m is in the form of &id; We drop first and last character.
+          var id = m.slice(1, -1);
+          return escapes[id];
+        });
       }
     ]
   });
