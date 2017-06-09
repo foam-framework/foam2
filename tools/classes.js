@@ -73,7 +73,8 @@ var classes = [
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
-  'foam.oao.OAO'
+  'foam.oao.OAO',
+  'foam.oao.FObjectOAO'
 ];
 
 var abstractClasses = [
