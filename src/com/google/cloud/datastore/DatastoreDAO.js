@@ -19,13 +19,10 @@ foam.CLASS({
   package: 'com.google.cloud.datastore',
   name: 'SelectData',
 
-  documentation: function() {/*
-                               State passed around by intermediate callbacks
-                               during a select() in progress. These data must
-                               be retained to notify the sink, send the
-                               correct payload to subsequent API calls, and
-                               return results in the Promise.
-                              */},
+  documentation: `State passed around by intermediate callbacks during a
+      select() in progress. These data must be retained to notify the sink, send
+      the correct payload to subsequent API calls, and return results in the
+      Promise.`,
 
   properties: [
     {
@@ -46,15 +43,11 @@ foam.CLASS({
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
-  documentation: function() {/*
-                               DAO implementation for the Google Cloud
-                               Datastore v1 REST API.
+  documentation: `DAO implementation for the Google Cloud Datastore v1 REST API.
 
-                               https://cloud.google.com/datastore/docs/reference/rest/
+      https://cloud.google.com/datastore/docs/reference/rest/
 
-                               This implementation uses structured queries,
-                               not GQL queries.
-                              */},
+      This implementation uses structured queries, not GQL queries.`,
 
   requires: [
     'com.google.cloud.datastore.SelectData',
@@ -221,9 +214,17 @@ foam.CLASS({
 
     function onResponse(name, response) {
       if ( response.status !== 200 ) {
-        throw new Error('Unexpected ' + name + ' response code from Cloud ' +
-            'Datastore endpoint: ' + response.status);
+        return response.payload.then(function(payload) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status + '\nPayload: ' +
+              JSON.stringify(payload, null, 2));
+        }, function(error) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status +
+              '\nError retrieving payload: ' + error);
+        });
       }
+
       return response.payload;
     },
     function onFindResponse(json) {
