@@ -1,4 +1,10 @@
-package foam.nanos.http;
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+ package foam.nanos.http;
 
 // Import required java libraries
 import java.io.*;
