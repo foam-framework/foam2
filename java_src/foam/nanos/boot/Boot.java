@@ -95,6 +95,12 @@ public class Boot {
     ping.setName("ping");
     ping.setServiceClass("foam.nanos.http.PingService");
     serviceDAO_.put(ping);
+
+    NSpec uptime = new NSpec();
+    uptime.setName("uptime");
+    uptime.setServiceClass("foam.nanos.http.UptimeServlet");
+    uptime.setLazy(false);
+    serviceDAO_.put(uptime);
   }
 
   public static void main (String[] args)

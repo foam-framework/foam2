@@ -11,6 +11,7 @@ import foam.core.*;
 import foam.nanos.*;
 import java.io.IOException;
 import java.net.URI;
+import javax.servlet.http.HttpServlet;
 
 public class NanoHttpHandler
   implements HttpHandler
@@ -44,6 +45,10 @@ public class NanoHttpHandler
       // if ( auth.checkPermission(...) ) {}
 
       ((HttpHandler) service).handle(exchange);
+    } if ( service instanceof HttpServlet ) {
+      // if ( auth.checkPermission(...) ) {}
+
+      new ServletHandler((HttpServlet) service).handle(exchange);
     } else {
       String errorMsg = "Service " + serviceKey + " does not have a HttpHandler";
 
