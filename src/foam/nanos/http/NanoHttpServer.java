@@ -21,6 +21,8 @@ public class NanoHttpServer
   protected int        port_ = 8080;
 
   public void start() {
+    System.out.println("Starting HTTP Server on port " + port_);
+
     try {
       server_ = HttpServer.create(new InetSocketAddress(port_), 0);
     } catch(IOException e) {

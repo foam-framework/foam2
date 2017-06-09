@@ -292,7 +292,6 @@ foam.CLASS({
 });
 
 
-// TODO(adamvy): Support default values.
 foam.CLASS({
   package: 'foam.core',
   name: 'Enum',
@@ -305,6 +304,16 @@ foam.CLASS({
       class: 'Class',
       name: 'of',
       required: true
+    },
+    {
+      name: 'value',
+      adapt: function(_, n) {
+        if ( foam.String.isInstance(n) ) n = this.of[n];
+        return n
+      },
+      expression: function(of) {
+        return of && of.VALUES[0];
+      },
     },
     [
       'adapt',

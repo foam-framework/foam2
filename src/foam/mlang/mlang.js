@@ -101,12 +101,13 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( o === null )                       return foam.mlang.Constant.create({ value: null });
-        if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== 'object' )            return foam.mlang.Constant.create({ value: o });
-        if ( o instanceof Date )                return foam.mlang.Constant.create({ value: o });
-        if ( Array.isArray(o) )                 return foam.mlang.Constant.create({ value: o });
-        if ( foam.core.FObject.isInstance(o) )  return o;
+        if ( o === null )                           return foam.mlang.Constant.create({ value: null });
+        if ( ! o.f && typeof o === 'function' )     return foam.mlang.predicate.Func.create({ fn: o });
+        if ( typeof o !== 'object' )                return foam.mlang.Constant.create({ value: o });
+        if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
+        if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
+        if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
+        if ( foam.core.FObject.isInstance(o) )      return o;
 
         console.error('Invalid expression value: ', o);
       }
@@ -832,8 +833,10 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      var lhs = this.arg1.f(o).toUpperCase();
+      var lhs = this.arg1.f(o);
       var rhs = this.arg2.f(o);
+
+      if ( lhs.toUpperCase ) lhs = lhs.toUpperCase();
 
       // If arg2 is a constant array, we use valueSet for it.
       if ( foam.mlang.Constant.isInstance(this.arg2) ) {

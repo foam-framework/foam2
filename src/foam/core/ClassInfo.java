@@ -8,16 +8,19 @@ import java.util.Iterator;
 /** Provides runtime information about a Class. **/
 // KGR: Why is this mutable?
 public interface ClassInfo {
-  public String    getId();
-  public ClassInfo setId(String id);
+  String    getId();
+  ClassInfo setId(String id);
 
-  public ClassInfo getParent();
-  public ClassInfo addProperty(PropertyInfo p);
+  ClassInfo getParent();
+  ClassInfo addProperty(PropertyInfo p);
 
-  public ClassInfo setObjClass(Class cls);
-  public Class     getObjClass();
+  boolean   isInstance(Object o);
+  Object    newInstance() throws IllegalAccessException, InstantiationException;
 
-  public List      getAxioms();
-  public Object    getAxiomByName(String name);
-  public List      getAxiomsByClass(Class cls);
+  ClassInfo setObjClass(Class cls);
+  Class     getObjClass();
+
+  List      getAxioms();
+  Object    getAxiomByName(String name);
+  List      getAxiomsByClass(Class cls);
 }
