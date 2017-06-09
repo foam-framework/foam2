@@ -81,11 +81,11 @@ public class HistoryDAO
   }
 
   @Override
-  public FObject remove(FObject obj) {
+  public FObject remove_(FObject obj) {
     // TODO: use context-oriented context when available.
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    historyDAO.removeAll(null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
-    return super.remove(obj);
+    historyDAO.removeAll_(null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
+    return super.remove_(obj);
   }
 }
