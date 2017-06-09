@@ -47,10 +47,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function listen(sink, skip, limit, order, predicate) {
+    function listen_(sink, predicate) {
       var listener = this.ProxyListener.create({
         delegate: sink,
-        args: [skip, limit, order, predicate]
+        args: [ predicate ]
       });
 
       listener.onDetach(listener.dao$.follow(this.delegate$));
@@ -138,7 +138,7 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen' ],
+      methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_' ],
       name: 'promise'
     }
   ]

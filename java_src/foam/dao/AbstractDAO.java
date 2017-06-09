@@ -72,6 +72,10 @@ public abstract class AbstractDAO
   }
 
   public void listen() {
+    this.listen_();
+  }
+
+  public void listen_() {
     // TODO
   }
 
