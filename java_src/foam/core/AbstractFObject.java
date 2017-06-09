@@ -1,7 +1,9 @@
 package foam.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Map;
 
 public abstract class AbstractFObject
   extends ContextAwareSupport
@@ -9,18 +11,33 @@ public abstract class AbstractFObject
 {
 
   public static FObject maybeClone(FObject fo) {
-    return (fo == null ? null : ((AbstractFObject)fo).fclone());
+    return ( fo == null ? null : fo.fclone() );
   }
 
   public FObject fclone() {
-    FObject ret = (FObject) getClassInfo().newInstance();
-    if(ret != null) {
+    try {
+      FObject ret = (FObject) getClassInfo().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for( PropertyInfo pi : props ) {
         pi.set(ret, pi.get(this));
       }
+      return ret;
+    } catch (IllegalAccessException | InstantiationException e) {
+      return null;
     }
-    return ret;
+  }
+
+  public Map diff(FObject obj) {
+    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+
+    Map result = new HashMap();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      prop.diff(this, obj, result, prop);
+    }
+
+    return result;
   }
 
   public int compareTo(Object o) {

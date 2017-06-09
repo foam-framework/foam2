@@ -17,8 +17,7 @@ public class NanoLogger
   extends    ContextAwareSupport
   implements NanoService
 {
-  protected Logger       logger;
-  protected StringBuffer sb = new StringBuffer();
+  protected Logger logger;
 
   private static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -27,12 +26,24 @@ public class NanoLogger
     }
   };
 
+  private ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
+
   public void start() {
     logger = Logger.getAnonymousLogger();
     logger.setUseParentHandlers(false);
     logger.setLevel(Level.ALL);
-
-    sb = new StringBuffer();
 
     try {
       Handler handler = new FileHandler("nano.log");
@@ -49,50 +60,58 @@ public class NanoLogger
 
     @Override
     public String format(LogRecord record) {
+      int           lev = record.getLevel().intValue();
+      String        msg = record.getMessage();
+      StringBuilder str = sb.get();
+
       if ( prevTime / 1000 != System.currentTimeMillis() / 1000 ) {
         prevTime = System.currentTimeMillis();
         prevTimestamp = sdf.get().format(new Timestamp(prevTime));
       }
 
-      sb.setLength(0);
-      int lev = record.getLevel().intValue();
-      String msg = record.getMessage();
-
-      sb.append(prevTimestamp);
-      sb.append(',');
+      str.append(prevTimestamp);
+      str.append(',');
 
       // debug special case, fine level == 500
       if (lev == 500) {
-        sb.append("DEBUG");
+        str.append("DEBUG");
       } else {
-        sb.append(record.getLevel());
+        str.append(record.getLevel());
       }
 
-      sb.append(',');
-      sb.append(msg);
-      sb.append('\n');
-      return sb.toString();
+      str.append(msg);
+      str.append('\n');
+      return str.toString();
     }
   }
 
-  public void log(String msg) {
-    logger.info(msg);
+  public String combine(Object[] args) {
+    StringBuilder str = sb.get();
+    for (Object n : args) {
+      str.append(',');
+      str.append(n.toString());
+    }
+    return str.toString();
   }
 
-  public void info(String msg) {
-    logger.info(msg);
+  public void log(Object... args) {
+    logger.info(combine(args));
   }
 
-  public void warning(String msg) {
-    logger.warning(msg);
+  public void info(Object... args) {
+    logger.info(combine(args));
   }
 
-  public void error(String msg) {
-    logger.severe(msg);
+  public void warning(Object... args) {
+    logger.warning(combine(args));
+  }
+
+  public void error(Object... args) {
+    logger.severe(combine(args));
   }
 
   // can't normally do .debug() with custom formatter: use fine instead
-  public void debug(String msg) {
-    logger.fine(msg);
+  public void debug(Object...  args) {
+    logger.fine(combine(args));
   }
 }
