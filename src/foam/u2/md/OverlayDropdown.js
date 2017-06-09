@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'opened',
       documentation: 'True when the overlay has been commanded to be open. ' +
           'It might still be animating; see $$DOC{ref:".animationComplete"}.',
-      value: false
+      value: true
     },
     {
       class: 'Boolean',
@@ -56,6 +56,7 @@ foam.CLASS({
   ],
 
   methods: [
+    function detach() { console.log("DETACHING")},
     function add() {
       if (this.addToSelf_) this.SUPER.apply(this, arguments);
       else this.dropdownE_.add.apply(this.dropdownE_, arguments);
@@ -74,6 +75,7 @@ foam.CLASS({
       this.height = 0;
       this.dropdownE_.style({ height: 0 + 'px' });
       this.opened = false;
+      this.detach();
     },
 
     function getFullHeight() {
@@ -123,6 +125,7 @@ foam.CLASS({
       this.add(this.dropdownE_);
 
       this.addToSelf_ = false;
+      this.shown = true;
     }
   ],
 
@@ -202,6 +205,7 @@ foam.CLASS({
      */
     function onClick(e) {
       console.log('PROPAGATION STOPPED')
+      this.close();
       e.stopPropagation();
     }
   ]
