@@ -254,5 +254,7 @@ FOAM_FILES([
   { name: "foam/parsers/html/HTMLLexer" },
   { name: "foam/core/ContextAware", flags: ['java'] },
   { name: "foam/dao/history/PropertyUpdate" },
-  { name: "foam/dao/history/HistoryRecord" }
+  { name: "foam/dao/history/HistoryRecord" },
+  { name: "foam/oao/OAO" },
+  { name: "foam/oao/OAOJava", flags: ['java'] },
 ]);
