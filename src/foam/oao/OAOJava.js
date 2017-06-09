@@ -11,18 +11,28 @@ foam.INTERFACE({
     {
       name: 'get',
       javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ]
     },
     {
       name: 'setProperty',
       javaReturns: 'void',
       args: [
         {
-          class: 'String',
-          name: 'name',
+          name: 'x',
+          javaType: 'foam.core.X'
         },
         {
-          class: 'Object',
-          name: 'value'
+          name: 'name',
+          javaType: 'String'
+        },
+        {
+          name: 'value',
+          javaType: 'Object'
         }
       ]
     },
@@ -31,10 +41,14 @@ foam.INTERFACE({
       javaReturns: 'void',
       args: [
         {
-          class: 'Map',
-          name: 'values'
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'values',
+          javaType: 'java.util.Map'
         }
       ]
     }
   ]
-})
+});
