@@ -112,6 +112,9 @@ foam.CLASS({
         this.onGetCredential,
         this.onNoCredential);
     },
+    function refreshCredential() {
+      return this.onNoCredential(new Error('Forced credential refresh'));
+    },
     {
       name: 'getIat',
       documentation: `Get "iat" for token request payload. This value should be

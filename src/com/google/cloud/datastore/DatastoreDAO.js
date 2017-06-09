@@ -19,13 +19,10 @@ foam.CLASS({
   package: 'com.google.cloud.datastore',
   name: 'SelectData',
 
-  documentation: function() {/*
-                               State passed around by intermediate callbacks
-                               during a select() in progress. These data must
-                               be retained to notify the sink, send the
-                               correct payload to subsequent API calls, and
-                               return results in the Promise.
-                              */},
+  documentation: `State passed around by intermediate callbacks during a
+      select() in progress. These data must be retained to notify the sink, send
+      the correct payload to subsequent API calls, and return results in the
+      Promise.`,
 
   properties: [
     {
@@ -46,15 +43,11 @@ foam.CLASS({
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
-  documentation: function() {/*
-                               DAO implementation for the Google Cloud
-                               Datastore v1 REST API.
+  documentation: `DAO implementation for the Google Cloud Datastore v1 REST API.
 
-                               https://cloud.google.com/datastore/docs/reference/rest/
+      https://cloud.google.com/datastore/docs/reference/rest/
 
-                               This implementation uses structured queries,
-                               not GQL queries.
-                              */},
+      This implementation uses structured queries, not GQL queries.`,
 
   requires: [
     'com.google.cloud.datastore.SelectData',
@@ -221,9 +214,17 @@ foam.CLASS({
 
     function onResponse(name, response) {
       if ( response.status !== 200 ) {
-        throw new Error('Unexpected ' + name + ' response code from Cloud ' +
-            'Datastore endpoint: ' + response.status);
+        return response.payload.then(function(payload) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status + '\nPayload: ' +
+              JSON.stringify(payload, null, 2));
+        }, function(error) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status +
+              '\nError retrieving payload: ' + error);
+        });
       }
+
       return response.payload;
     },
     function onFindResponse(json) {
@@ -235,7 +236,7 @@ foam.CLASS({
       }
 
       return com.google.cloud.datastore.fromDatastoreEntity(
-          json.found[0].entity);
+          json.found[0].entity, this);
     },
     function onPutResponse(o, json) {
       var results = json.mutationResults;
@@ -275,12 +276,12 @@ foam.CLASS({
       // Allow datastore-aware sinks to unpack query result batches manually
       // instead of DAO put()ing to them.
       if ( data.sink && data.sink.fromDatastoreEntityResults ) {
-        data.sink.fromDatastoreEntityResults(entities);
+        data.sink.fromDatastoreEntityResults(entities, this);
       } else {
         var fromDatastoreEntity =
             com.google.cloud.datastore.fromDatastoreEntity;
         for ( var i = 0; i < entities.length; i++ ) {
-          var obj = fromDatastoreEntity(entities[i].entity);
+          var obj = fromDatastoreEntity(entities[i].entity, this);
           data.results.push(obj);
           data.sink && data.sink.put && data.sink.put(obj);
         }
