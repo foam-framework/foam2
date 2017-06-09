@@ -111,6 +111,11 @@ foam.INTERFACE({
       name: 'limit',
       returns: 'foam.dao.DAO',
       args: [ 'count' ]
+    },
+    {
+      name: 'inX',
+      returns: 'foam.dao.DAO',
+      args: [ 'x' ]
     }
   ]
 });
