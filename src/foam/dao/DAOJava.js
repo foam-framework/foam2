@@ -211,6 +211,16 @@ foam.INTERFACE({
           javaType: 'int'
         }
       ]
+    },
+    {
+      name: 'inX',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          javaType:  'foam.core.X'
+        }
+      ]
     }
   ]
 });

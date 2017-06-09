@@ -102,4 +102,11 @@ public abstract class AbstractDAO
   public void pipe(Sink sink) {
     this.pipe_(sink);
   }
+
+  public DAO inX(X x) {
+    ProxyDAO dao = new ProxyDAO();
+    dao.setDelegate(this);
+    dao.setX(x);
+    return dao;
+  }
 }
