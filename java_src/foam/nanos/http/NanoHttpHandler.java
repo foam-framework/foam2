@@ -8,15 +8,16 @@ package foam.nanos.http;
 
 import com.sun.net.httpserver.*;
 import foam.core.*;
+import foam.dao.DAO;
 import foam.nanos.*;
 import java.io.IOException;
 import java.net.URI;
 import javax.servlet.http.HttpServlet;
 
 public class NanoHttpHandler
+  extends    ContextAwareSupport
   implements HttpHandler
 {
-  protected X x_;
 
   public NanoHttpHandler(X x) {
     x_ = x;
@@ -48,11 +49,21 @@ public class NanoHttpHandler
     } if ( service instanceof HttpServlet ) {
       // if ( auth.checkPermission(...) ) {}
 
-      new ServletHandler((HttpServlet) service).handle(exchange);
+      this.handleServlet((HttpServlet) service, exchange);
+    } if ( service instanceof DAO ) {
+      // todo auth check, server==true check
+
+      this.handleServlet(new ServiceServlet(service), exchange);
     } else {
       String errorMsg = "Service " + serviceKey + " does not have a HttpHandler";
 
       throw new RuntimeException(errorMsg);
     }
+  }
+
+  public void handleServlet(HttpServlet s, HttpExchange exchange) throws IOException {
+    if ( s instanceof ContextAware ) ((ContextAware) s).setX(this.getX());
+
+    new ServletHandler(s).handle(exchange);
   }
 }
