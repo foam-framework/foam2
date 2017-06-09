@@ -257,7 +257,7 @@ foam.CLASS({
         );
       }
 
-      return this.MergePlan.create({ of: this.of, subPlans: plans });
+      return this.MergePlan.create({ of: this.of, subPlans: plans, predicates: args });
     },
 
     function toString() {
