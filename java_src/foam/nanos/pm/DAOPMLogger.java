@@ -9,12 +9,11 @@ package foam.nanos.pm;
 import foam.core.ContextAwareSupport;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
-import foam.nanos.NanoService;
 import java.lang.reflect.Proxy;
 
 public class DAOPMLogger
   extends    ContextAwareSupport
-  implements PMLogger, NanoService
+  implements PMLogger
 {
   public static final String ServiceName = "pmLogger";
 
@@ -46,7 +45,4 @@ public class DAOPMLogger
       pmd.put(dpmi);
     }
   }
-
-  @Override
-  public void start() {}
 }
