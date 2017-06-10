@@ -26,7 +26,7 @@ foam.CLASS({
       (0) Export self as "authAgent" (already done in base class);
       (1) Register an auto-authenticating HTTPRequest as 'foam.net.HTTPRequest'
           in agents' sub-contexts;
-      (2) Implement getCredential().
+      (2) Implement getCredential() and refreshCredential().
 
       Clients instantiating agents must provide a requiresAuthorization(request)
       implementation; this allows authenticating HTTPRequests to determine
@@ -65,6 +65,13 @@ foam.CLASS({
       documentation: 'Aynchronously get an unexpired credential.',
       code: function() {
         return Promise.reject(new Error('Unable to get credential'));
+      }
+    },
+    {
+      name: 'refreshCredential',
+      documentation: 'Aynchronously get a new credential.',
+      code: function() {
+        return Promise.reject(new Error('Unable to refresh credential'));
       }
     }
   ]

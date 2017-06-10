@@ -328,6 +328,20 @@ foam.CLASS({
 });
 
 //
+// Refine Enum values to output integer: enumValue.ordinal.
+//
+
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+
+  methods: [
+    function toDatastoreValue() {
+      return { integerValue: this.ordinal };
+    }
+  ]
+});
+
+//
 // Refine foam.core.FObject to support datastore's:
 // (1) "kinds" (i.e., types);
 // (2) "keys" (i.e., <type, name|auto-generated-id> pairs);

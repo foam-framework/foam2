@@ -8,15 +8,16 @@ package foam.nanos.http;
 
 import com.sun.net.httpserver.*;
 import foam.core.*;
+import foam.dao.DAO;
 import foam.nanos.*;
 import java.io.IOException;
 import java.net.URI;
+import javax.servlet.http.HttpServlet;
 
 public class NanoHttpHandler
+  extends    ContextAwareSupport
   implements HttpHandler
 {
-
-  protected X x_;
 
   public NanoHttpHandler(X x) {
     x_ = x;
@@ -37,20 +38,32 @@ public class NanoHttpHandler
      * E.g.: /foo/bar => ['', 'foo', 'bar']
     */
     String serviceKey = urlParams[1];
+    Object service    = x_.get(serviceKey);
 
-    // DAO services = (DAO) this.X.get('serviceFactoryDAO');
-    // NSSpec serviceFactory = services.find(serviceKey);
-
-    NanoService service = (NanoService) x_.get(serviceKey);
+    System.out.println("HTTP Request: " + path + ", " + serviceKey);
 
     if ( service instanceof HttpHandler ) {
       // if ( auth.checkPermission(...) ) {}
 
       ((HttpHandler) service).handle(exchange);
+    } if ( service instanceof HttpServlet ) {
+      // if ( auth.checkPermission(...) ) {}
+
+      this.handleServlet((HttpServlet) service, exchange);
+    } if ( service instanceof DAO ) {
+      // todo auth check, server==true check
+
+      this.handleServlet(new ServiceServlet(service), exchange);
     } else {
       String errorMsg = "Service " + serviceKey + " does not have a HttpHandler";
 
       throw new RuntimeException(errorMsg);
     }
+  }
+
+  public void handleServlet(HttpServlet s, HttpExchange exchange) throws IOException {
+    if ( s instanceof ContextAware ) ((ContextAware) s).setX(this.getX());
+
+    new ServletHandler(s).handle(exchange);
   }
 }

@@ -226,6 +226,7 @@ FOAM_FILES([
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
   { name: "lib/net" },
+  { name: "foam/net/RetryHTTPRequest" },
   { name: "foam/net/auth/TokenBearerCredential" },
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
@@ -251,5 +252,9 @@ FOAM_FILES([
   { name: "foam/parsers/html/TagType" },
   { name: "foam/parsers/html/Tag" },
   { name: "foam/parsers/html/HTMLLexer" },
-  { name: "foam/core/ContextAware", flags: ['java'] }
+  { name: "foam/core/ContextAware", flags: ['java'] },
+  { name: "foam/dao/history/PropertyUpdate" },
+  { name: "foam/dao/history/HistoryRecord" },
+  { name: "foam/oao/OAO" },
+  { name: "foam/oao/OAOJava", flags: ['java'] },
 ]);

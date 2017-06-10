@@ -1,9 +1,14 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.audit;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
-import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
@@ -46,7 +51,8 @@ public class AuditDAO
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
     FObject current = this.find(obj);
-    logger.info("CHANGE", obj.getClassInfo().getId(), user.getId(), formatMessage(current, obj));
+    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
     return super.put(obj);
   }
 
@@ -57,7 +63,8 @@ public class AuditDAO
     NanoLogger logger = (NanoLogger) getX().get("logger");
     StringBuilder sb = new StringBuilder();
     outputter.output(sb, obj);
-    logger.info("REMOVE", obj.getClassInfo().getId(), user.getId(), sb);
+    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    logger.info("REMOVE", objectId, user.getId(), sb);
     return super.remove(obj);
   }
 }
