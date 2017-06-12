@@ -13,21 +13,21 @@ public class CachedUserAndGroupAuthService
   /**
    * The cached data structure will look like this
    *{
-   *  permission1: {
-   *    user1: true,
-   *    user2: false
+   *  user1: {
+   *    permission1: true,
+   *    permission2: false
    *    ...
    *  },
-   *  permission2: {
-   *    user1: false,
-   *    user2: true
+   *  user2: {
+   *    permission1: false,
+   *    permission2: true
    *    ...
    *  }
    *  ...
    *}
    */
-  protected Map<String, Map<String, Boolean>> permissionMap = new LRULinkedHashMap<>(1000);
-  protected Map<String, Boolean> userMap;
+  protected Map<String, Map<String, Boolean>> userMap = new LRULinkedHashMap<>(1000000);
+  protected Map<String, Boolean> permissionMap;
 
   @Override
   public void start() {
@@ -44,18 +44,20 @@ public class CachedUserAndGroupAuthService
     Group group = (Group) user.getGroup();
     if ( group == null ) return false;
 
-    if ( permissionMap.containsKey(permission.getName()) ) {
-      userMap = permissionMap.get(permission.getName());
+    if ( userMap.containsKey(user.getId()) ) {
+      permissionMap = userMap.get(user.getId());
     }
     else {
-      userMap = new LRULinkedHashMap<>(100000);
+      permissionMap = new LRULinkedHashMap<>(1000);
     }
 
-    if ( userMap.containsKey(user.getId()) ) return userMap.get(user.getId());
+    if ( permissionMap.containsKey(permission.getName()) ) {
+      return permissionMap.get(permission.getName());
+    }
 
     boolean permissionCheck = group.implies(permission);
-    userMap.put(user.getId(), permissionCheck);
-    permissionMap.put(permission.getName(), userMap);
+    permissionMap.put(permission.getName(), permissionCheck);
+    userMap.put(user.getId(), permissionMap);
 
     return permissionCheck;
   }
@@ -67,8 +69,6 @@ public class CachedUserAndGroupAuthService
     User user = (User) x.get("user");
     if ( user == null ) return;
 
-    for ( String key: permissionMap.keySet() ) {
-      permissionMap.get(key).remove(user.getId());
-    }
+    userMap.remove(user.getId());
   }
 }
