@@ -4,19 +4,19 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.oao;
+package foam.mop;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import java.util.Map;
 
-public class FObjectOAO
-  implements OAO
+public class FObjectMOP
+    implements MOP
 {
   protected final FObject obj_;
 
-  public FObjectOAO(FObject obj) {
+  public FObjectMOP(FObject obj) {
     obj_ = obj;
   }
 
