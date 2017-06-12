@@ -8,4 +8,6 @@ public interface FObject
   ClassInfo getClassInfo();
   FObject fclone();
   Map diff(FObject obj);
+  Object setProperty(String prop, Object value);
+  Object getProperty(String prop);
 }
