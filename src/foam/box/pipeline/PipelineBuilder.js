@@ -125,6 +125,13 @@ foam.CLASS({
       }
       return ret;
     },
+    function first(runnable) {
+      var prev = this.clone();
+      var prevPL = prev.pipeline = this.Pipeline.create();
+      prevPL.runnable = runnable;
+      prev.delegates = [ this ];
+      return prev;
+    },
     function build() {
       var pl = this.pipeline;
       var onRegisteredBox = this.RPCReturnBox.create();
