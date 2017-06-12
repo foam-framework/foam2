@@ -1,13 +1,17 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.audit;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
-import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +20,7 @@ import java.util.Map;
 public class AuditDAO
   extends ProxyDAO
 {
-  private final Outputter outputter = new Outputter();
+  protected final Outputter outputter = new Outputter();
 
   /**
    * Creates a format message containing the
@@ -26,7 +30,7 @@ public class AuditDAO
    * @param newValue new value
    * @return String array of changes
    */
-  private String formatMessage(FObject currentValue, FObject newValue) {
+  String formatMessage(FObject currentValue, FObject newValue) {
     Map diff = currentValue.diff(newValue);
     Iterator i = diff.keySet().iterator();
 
@@ -38,7 +42,6 @@ public class AuditDAO
     }
     return result.toString();
   }
-
 
   @Override
   public FObject put(FObject obj) {

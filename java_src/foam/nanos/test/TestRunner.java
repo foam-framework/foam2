@@ -10,12 +10,12 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import foam.core.*;
 import foam.dao.*;
+import foam.mlang.MLang.*;
 import foam.nanos.NanoService;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Date;
-import foam.mlang.MLang.*;
-import java.io.IOException;
 
 public class TestRunner
   extends    ContextAwareSupport
@@ -51,32 +51,25 @@ public class TestRunner
     tests.setX(x);
     tests.setOf(Test.getOwnClassInfo());
     try {
-      final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
-      // Test test1 = new Test();
-      // test1.setId("Test 1");
-      // test1.setCode("test(2==2 ,\"TRUE\");");  
-      // jTests.put(test1);
-      // Test test2 = new Test();
-      // test2.setId("Test 2");
-      // test2.setCode("test(1==2 ,\"FALSE\");");  
-      // jTests.put(test2);
-      // Test test3 = new Test();
-      // test3.setId("Test 3");
-      // test3.setCode("print(\"All Done.\");");  
-      // jTests.put(test3);
-      ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.FALSE))).select(new AbstractSink() {
-        public void put(FObject o, Detachable sub) {
-          Test     test  = (Test) o;
-          test.setScheduled(true);
-          jTests.put(test);
-        }
-      });
+      JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
+      Test test1 = new Test();
+      test1.setId("Test 1");
+      test1.setCode("test(2==2 ,\"TRUE\");");
+      jTests.put(test1);
+      Test test2 = new Test();
+      test2.setId("Test 2");
+      test2.setCode("test(1==2 ,\"FALSE\");");
+      test2.setScheduled(true);
+      jTests.put(test2);
+      Test test3 = new Test();
+      test3.setId("Test 3");
+      test3.setCode("print(\"All Done.\");");
+      jTests.put(test3);
       TestRunner runner = new TestRunner();
       runner.setX(x);
       runner.start();
     } catch (IOException e){
       e.printStackTrace();
     }
-    
   }
 }
