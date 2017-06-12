@@ -7,7 +7,9 @@ import java.util.Map;
 /**
  * Created by marcroopchand on 2017-05-30.
  */
-public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
+public class CachedUserAndGroupAuthService
+  extends UserAndGroupAuthService
+{
   /**
    * The cached data structure will look like this
    *{

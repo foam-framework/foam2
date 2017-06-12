@@ -19,7 +19,7 @@ var env = require('process').env;
 
 describe('DatastoreDAO', function() {
   var clearCDS = com.google.cloud.datastore.clear;
-  function daoFactory(cls) {
+  function daoFactory(cls, opt_ctx) {
     return clearCDS().then(function() {
       return foam.lookup('com.google.cloud.datastore.DatastoreDAO')
           .create({
@@ -28,7 +28,7 @@ describe('DatastoreDAO', function() {
             host: env.CDS_EMULATOR_HOST,
             port: env.CDS_EMULATOR_PORT,
             projectId: env.CDS_PROJECT_ID
-          });
+          }, opt_ctx);
     });
   }
 
@@ -272,6 +272,36 @@ describe('DatastoreDAO', function() {
         }).then(function() {
           expect(dao.handledMultipleBatches).toBe(true);
         }).then(done, done.fail);
+      });
+    });
+  });
+
+  describe('context', function() {
+    it('should create objects in DAO context', function(done) {
+      var ID = 'alpha';
+      var MSG = 'Defined in DAO context';
+      var ctx = foam.__context__.createSubContext({
+        datastoreTestInformation: MSG
+      });
+      foam.CLASS({
+        package: 'test.dao.import',
+        name: 'InfoImporter',
+        imports: [ 'datastoreTestInformation' ],
+
+        properties: [ { class: 'String', name: 'id' } ]
+      });
+      var InfoImporter = foam.lookup('test.dao.import.InfoImporter');
+      var alphaPut = InfoImporter.create({ id: ID }, ctx);
+      daoFactory(InfoImporter, ctx).then(function(dao) {
+        return dao.put(alphaPut)
+            .then(function() { return dao.find(ID); })
+            .then(function(alphaFind) {
+              // Find should yield new object created in context that contains
+              // imported string.
+              expect(alphaFind.datastoreTestInformation).toBe(MSG);
+              expect(alphaFind).not.toBe(alphaPut);
+              done();
+            }).catch(done.fail);
       });
     });
   });

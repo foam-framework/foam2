@@ -42,7 +42,6 @@ foam.CLASS({
     'data as unfilteredDAO'
   ],
 
-
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*

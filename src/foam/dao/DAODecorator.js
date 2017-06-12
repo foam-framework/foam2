@@ -78,10 +78,12 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAODecorator',
   implements: ['foam.dao.DAODecorator'],
+
   methods: [
     function write(X, dao, obj, existing) {
       return Promise.resolve(obj);
@@ -95,16 +97,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'CompoundDAODecorator',
+
   implements: ['foam.dao.DAODecorator'],
+
   properties: [
     {
       class: 'Array',
       name: 'decorators'
     }
   ],
+
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
@@ -114,6 +120,7 @@ foam.CLASS({
         return d[i] ? d[i++].write(X, dao, obj, existing).then(a) : obj;
       });
     },
+
     function read(X, dao, obj) {
       var i = 0;
       var d = this.decorators;
@@ -122,6 +129,7 @@ foam.CLASS({
         return d[i] ? d[i++].read(X, dao, obj).then(a) : obj;
       });
     },
+
     function remove(X, dao, obj) {
       var i = 0;
       var d = this.decorators;
@@ -133,19 +141,27 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DecoratedDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  requires: [
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy'
+  ],
+
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.DAODecorator',
+//      class: 'FObjectProperty',
+//      of: 'foam.dao.DAODecorator',
       name: 'decorator'
     },
     {
-      name: 'dao'
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      factory: function() { return this.delegate; }
     }
   ],
 
@@ -164,6 +180,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'remove',
       code: function(obj) {
@@ -173,6 +190,7 @@ foam.CLASS({
         });
       }
     },
+
     {
       name: 'find',
       code: function(id) {
@@ -181,7 +199,44 @@ foam.CLASS({
           return self.decorator.read(self.__context__, self.dao, obj);
         });
       }
+    },
+
+    /*
+    TODO: works, but is expensive, so shouldn't be used if decorator.read isn't set
+    function select(sink, skip, limit, order, predicate) {
+      if ( ! sink ) sink = foam.dao.ArraySink.create();
+      // No need to decorate if we're just counting.
+      if ( this.Count.isInstance(sink) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      }
+
+      // TODO: This is too simplistic, fix
+      if ( this.GroupBy.isInstance(sink) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      }
+
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        var ps = [];
+
+        self.delegate.select({
+          put: function(o) {
+            var p = self.decorator.read(self.__context__, self.dao, o);
+            p.then(function(o) { sink.put(o); })
+            ps.push(p);
+          },
+          eof: function() {
+          }
+        }, skip, limit, order, predicate).then(function() {
+          Promise.all(ps).then(function() {
+            resolve(sink);
+          });
+        })
+      });
     }
+    */
+
     // TODO: Select/removeAll support.  How do we do select
     // without breaking MDAO optimizations?
     // {
