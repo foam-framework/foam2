@@ -20,9 +20,30 @@ foam.CLASS({
   package: 'foam.box',
   name: 'Runnable',
 
+  documentation: `An asynchronous computation that produces one or more outputs,
+      and sends them to its outputBox, reporting any errors to errorBox.`,
+
   requires: [ 'foam.box.Message' ],
 
   properties: [
+    {
+      class: 'String',
+      name: 'ioRelationshipType',
+      documentation: 'The n:m relationship type of input-to-output.',
+      value: '1:1'
+    },
+    {
+      class: 'Class',
+      documentation: 'Type of input parameter of run().',
+      name: 'inputType',
+      factory: function() { return foam.core.FObject; }
+    },
+    {
+      class: 'Class',
+      documentation: 'Type of input vaules produced by run().',
+      name: 'outputType',
+      factory: function() { return foam.core.FObject; }
+    },
     {
       class: 'FObjectProperty',
       of: 'foam.box.Box',
@@ -30,10 +51,10 @@ foam.CLASS({
       name: 'outputBox'
     },
     {
-      class: 'String',
-      name: 'ioRelationshipType',
-      documentation: 'The n:m relationship type of input-to-output.',
-      value: '1:1'
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      documentation: 'Box to send to for internal errors(s).',
+      name: 'errorBox'
     }
   ],
 
@@ -43,10 +64,33 @@ foam.CLASS({
       documentation: 'Modeled computation for outputing to a box.',
       code: function() {}
     },
-    function output(value) {
-      this.outputBox.send(this.Message.create({
-        object: value
-      }));
+    {
+      name: 'output',
+      args: [
+        {
+          typeName: 'this.outputType',
+          documentation: 'Helper function for outputing a value.',
+        }
+      ],
+      code: function(value) {
+        this.outputBox.send(this.Message.create({
+          object: value
+        }));
+      }
+    },
+    {
+      name: 'error',
+      args: [
+        {
+          typeName: 'Error',
+          documentation: 'Helper function for reporting an error.',
+        }
+      ],
+      code: function(error) {
+        this.errorBox.send(this.Message.create({
+          object: error
+        }));
+      }
     }
   ]
 });

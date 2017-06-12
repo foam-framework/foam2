@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'BroadcastBox',
   implements: [ 'foam.box.Box' ],
 
+  documentation: `Broadcast all messages to multiple delegate boxes.`,
+
   properties: [
     {
       class: 'FObjectArray',
