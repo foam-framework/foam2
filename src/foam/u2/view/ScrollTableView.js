@@ -63,7 +63,8 @@
 
   methods: [
     function init() {
-      this.onDetach(this.data$proxy.pipe(this.FnSink.create({fn:this.onDaoUpdate})));
+      this.onDetach(this.data$proxy.listen(this.FnSink.create({fn:this.onDaoUpdate})));
+      this.onDaoUpdate();
     },
 
     function initE() {
