@@ -26,16 +26,24 @@ public class AuthOAO
     return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_;
   }
 
+  /**
+   * Checks if given context has access to property of object
+   *
+   * @param x context to check
+   * @param authService auth service to check with
+   * @param name name of property
+   * @return true if has access, false otherwise
+   */
   private Boolean checkPermission_(X x, AuthService authService, String name) {
-    java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + name);
+    String permissionString = (name == null ? getRootPermission_(x) : getRootPermission_(x) + "." + name);
+    java.security.Permission permission = new AuthPermission(permissionString);
     return authService.check(x, permission);
   }
 
   @Override
   public FObject get(X x) {
     AuthService authService = (AuthService) x.get("authService");
-    java.security.Permission permission = new AuthPermission(getRootPermission_(x));
-    if ( ! authService.check(x, permission) ) {
+    if ( ! checkPermission_(x, authService, null) ) {
       // TODO figure out what to do here
       return null;
     }
