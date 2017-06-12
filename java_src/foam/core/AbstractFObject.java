@@ -60,4 +60,15 @@ public abstract class AbstractFObject
 
     return 0;
   }
+
+  public FObject setProperty(String prop, Object value) {
+    PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
+    if (property != null) property.set(this, value);
+    return this;
+  }
+
+  public Object getProperty(String prop) {
+    PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
+    return property == null ? null : property.get(this);
+  }
 }
