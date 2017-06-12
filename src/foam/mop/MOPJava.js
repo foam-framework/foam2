@@ -5,7 +5,7 @@
  */
 
 foam.INTERFACE({
-  refines: 'foam.oao.OAO',
+  refines: 'foam.mop.MOP',
 
   methods: [
     {
