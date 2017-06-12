@@ -80,7 +80,7 @@ public class MapDAO
     setData(null);
   }
 
-  public void pipe_(Sink s) {
+  public void pipe_(X x, Sink s) {
     // TODO
   }
 }
