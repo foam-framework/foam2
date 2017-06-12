@@ -90,7 +90,9 @@ foam.CLASS({
       class: 'Function',
       name: 'aFormatLabel',
       value: function(key) { return Promise.resolve(''+key); }
-    }
+    },
+    'previewMode',
+    'hardData'
   ],
 
   methods: [
@@ -99,18 +101,45 @@ foam.CLASS({
     },
 
     function initE() {
-      this.addClass(this.myClass());
-      this.view = this.start(this.viewSpec, {
-        label$: this.label$,
-        alwaysFloatLabel: true
-      });
-      this.view.end();
+      var self = this;
 
-      this.onDetach(
-        this.dao$proxy.listen(
-          this.FnSink.create({fn: this.updateDAO})
-        )
-      );
+      this
+        .addClass(this.myClass())
+        .tag(this.viewSpec, {
+          label$: this.label$,
+          alwaysFloatLabel: true
+        }, this.view$)
+        .on('click', function(e) {
+          try {
+            self.previewMode = false;
+            var data         = self.view.choices[e.target.value][0];
+            self.hardData    = data;
+          } catch(x) {}
+        })
+        .on('mouseover', function(e) {
+          try {
+            var data = self.view.choices[e.target.value][0];
+
+            if ( ! self.previewMode ) {
+              self.previewMode = true;
+              self.hardData = self.view.data;
+            }
+
+            self.view.data = data;
+          } catch(x) {}
+        })
+        .on('mouseout', function(e) {
+          if ( e.relatedTarget.nodeName === 'OPTION' ) return;
+          self.view.data   = self.hardData;
+          self.hardData    = undefined;
+          self.previewMode = false;
+        })
+        .onDetach(
+          this.dao$proxy.listen(
+            this.FnSink.create({fn: this.updateDAO})
+          )
+        );
+
       this.updateDAO();
 
       this.view.data$.sub(this.updatePredicate);

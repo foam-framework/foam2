@@ -65,6 +65,16 @@ public class ClassInfoImpl
     return this;
   }
 
+  @Override
+  public boolean isInstance(Object o) {
+    return class_.isInstance(o);
+  }
+
+  @Override
+  public Object newInstance() throws IllegalAccessException, InstantiationException {
+    return class_.getClass().newInstance();
+  }
+
   public List getAxioms() {
     if ( allAxioms_ == null ) {
       allAxioms_ = new ArrayList();
