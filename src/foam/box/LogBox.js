@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -39,6 +38,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.log.LogLevel',
+      name: 'logLevel',
       factory: function() { return this.LogLevel.INFO; }
     }
   ],
