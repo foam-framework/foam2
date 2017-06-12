@@ -151,7 +151,7 @@ foam.CLASS({
                 requestPayload: payload
               })));
     },
-    function removeAll_(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       return this.select_(x, undefined, skip, limit, order, predicate)
           .then(this.onRemoveAll);
     },

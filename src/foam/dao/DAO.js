@@ -70,7 +70,7 @@ foam.INTERFACE({
     {
       name: 'removeAll_',
       returns: '',
-      args: [ 'skip', 'limit', 'order', 'predicate' ]
+      args: [ 'x', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'listen',

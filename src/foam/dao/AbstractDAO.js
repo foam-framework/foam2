@@ -246,7 +246,7 @@ foam.CLASS({
     },
 
     function removeAll() {
-      return this.removeAll_(undefined, undefined, undefined, undefined);
+      return this.removeAll_(this.__context__, undefined, undefined, undefined, undefined);
     },
 
     function compareTo(other) {
@@ -340,9 +340,9 @@ foam.CLASS({
           this.predicate);
     },
 
-    function removeAll_(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       return this.delegate.removeAll_(
-        skip, limit, order,
+        x, skip, limit, order,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
@@ -374,8 +374,8 @@ foam.CLASS({
     function select_(x, sink, skip, limit, order, predicate) {
       return this.delegate.select_(x, sink, skip, limit, order || this.comparator, predicate);
     },
-    function removeAll_(skip, limit, order, predicate) {
-      return this.delegate.removeAll_(skip, limit, order || this.comparator, predicate);
+    function removeAll_(x, skip, limit, order, predicate) {
+      return this.delegate.removeAll_(x, skip, limit, order || this.comparator, predicate);
     }
   ]
 });
@@ -396,8 +396,8 @@ foam.CLASS({
     function select_(x, sink, skip, limit, order, predicate) {
       return this.delegate.select_(x, sink, this.skip_, limit, order, predicate);
     },
-    function removeAll_(skip, limit, order, predicate) {
-      return this.delegate.removeAll_(this.skip_, limit, order, predicate);
+    function removeAll_(x, skip, limit, order, predicate) {
+      return this.delegate.removeAll_(x, this.skip_, limit, order, predicate);
     }
   ]
 });
@@ -422,9 +422,9 @@ foam.CLASS({
         order, predicate);
     },
 
-    function removeAll_(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       return this.delegate.removeAll_(
-        skip,
+        x, skip,
         limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
         order, predicate);
     }

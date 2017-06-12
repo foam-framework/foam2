@@ -69,9 +69,9 @@ foam.CLASS({
       return this.SUPER(x, sink, skip, limit, order, predicate);
     },
 
-    function removeAll_(sink, skip, limit, order, predicate) {
+    function removeAll_(x, sink, skip, limit, order, predicate) {
       this.logger('removeAll_', skip, limit, order, predicate);
-      return this.SUPER(sink, skip, limit, order, predicate);
+      return this.SUPER(x, sink, skip, limit, order, predicate);
     },
 
     function find_(x, id) {

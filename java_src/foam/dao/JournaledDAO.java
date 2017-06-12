@@ -53,8 +53,8 @@ public class JournaledDAO
   }
 
   @Override
-  public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, Integer skip, Integer limit, Comparator order, Predicate predicate) {
     journal.removeAll();
-    getDelegate().removeAll_(skip, limit, order, predicate);
+    getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 }
