@@ -20,12 +20,14 @@ foam.CLASS({
   package: 'foam.box',
   name: 'Runnable',
 
+  requires: [ 'foam.box.Message' ],
+
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.box.Runnable',
+      of: 'foam.box.Box',
       documentation: 'Box to send to for computation output(s).',
-      name: 'output'
+      name: 'outputBox'
     },
     {
       class: 'String',
@@ -40,6 +42,11 @@ foam.CLASS({
       name: 'run',
       documentation: 'Modeled computation for outputing to a box.',
       code: function() {}
+    },
+    function output(value) {
+      this.outputBox.send(this.Message.create({
+        object: value
+      }));
     }
   ]
 });
