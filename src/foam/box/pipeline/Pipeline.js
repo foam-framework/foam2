@@ -20,6 +20,9 @@ foam.CLASS({
   package: 'foam.box.pipeline',
   name: 'Pipeline',
 
+  documentation: `foam.box.PipelineBuilder object that encapsulates data related
+      to runnable.`,
+
   requires: [
     'foam.box.LogBox',
     'foam.box.PromisedBox',
@@ -31,10 +34,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.box.Runnable',
-      name: 'runnable',
-      postSet: function(old, nu) {
-        nu.outputBox = this.output;
-      }
+      name: 'runnable'
     },
     {
       class: 'FObjectProperty',
@@ -56,22 +56,8 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.box.Box',
-      name: 'output',
-      postSet: function(old, nu) {
-        if ( this.runnable ) this.runnable.outputBox = nu;
-      },
-      factory: function() { return this.defaultOutput; }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.Box',
-      name: 'defaultOutput',
-      factory: function() { return this.LogBox.create(); }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.Box',
       name: 'errorBox',
+      documentation: 'Error box for RPC-related errors external to runnable.',
       factory: function() {
         return this.LogBox.create({
           logLevel: this.LogLevel.ERROR
