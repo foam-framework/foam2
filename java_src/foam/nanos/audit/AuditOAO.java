@@ -29,8 +29,7 @@ public class AuditOAO
     List<String> result = new ArrayList<>();
     for ( Object o : values.keySet() ) {
       String key = (String) o;
-      PropertyInfo prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(key);
-      result.add(key + ": [" + prop.f(obj) + "," + values.get(key) + "]");
+      result.add(key + ": [" + obj.getProperty(key) + "," + values.get(key) + "]");
     }
     return result.toString();
   }
@@ -40,7 +39,7 @@ public class AuditOAO
     User user = (User) x.get("user");
     NanoLogger logger = (NanoLogger) x.get("logger");
     FObject obj = getDelegate().get(x);
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = obj.getProperty("id");
     Map values = new HashMap();
     values.put(name, value);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
@@ -52,7 +51,7 @@ public class AuditOAO
     User user = (User) x.get("user");
     NanoLogger logger = (NanoLogger) x.get("logger");
     FObject obj = getDelegate().get(x);
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = obj.getProperty("id");
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
     return super.setProperties(x, values);
   }
