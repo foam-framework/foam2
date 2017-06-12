@@ -25,9 +25,9 @@ public class AuthOAO
   public AuthOAO(String rootPermission_) {
     this.rootPermission_ = rootPermission_;
   }
-  
+
   private String getRootPermission_(X x) throws IllegalAccessException {
-    return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_
+    return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_;
   }
 
   @Override
