@@ -37,7 +37,7 @@ public class AuditOAO
   }
 
   @Override
-  public void setProperty(X x, String name, Object value) {
+  public FObject setProperty(X x, String name, Object value) {
     User user = (User) x.get("user");
     NanoLogger logger = (NanoLogger) x.get("logger");
     FObject obj = getDelegate().get(x);
@@ -45,16 +45,16 @@ public class AuditOAO
     Map values = new HashMap();
     values.put(name, value);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
-    super.setProperty(x, name, value);
+    return super.setProperty(x, name, value);
   }
 
   @Override
-  public void setProperties(X x, Map values) {
+  public FObject setProperties(X x, Map values) {
     User user = (User) x.get("user");
     NanoLogger logger = (NanoLogger) x.get("logger");
     FObject obj = getDelegate().get(x);
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
-    super.setProperties(x, values);
+    return super.setProperties(x, values);
   }
 }

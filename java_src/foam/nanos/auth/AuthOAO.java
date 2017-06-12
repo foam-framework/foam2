@@ -26,40 +26,42 @@ public class AuthOAO
     this.rootPermission_ = rootPermission_;
   }
 
-  protected String getRootPermission_(X x) throws IllegalAccessException {
+  protected String getRootPermission_(X x) {
     return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_;
   }
 
   @Override
-  public FObject get(X x) throws IllegalAccessException {
+  public FObject get(X x) {
     AuthService authService = (AuthService) x.get("authService");
     java.security.Permission permission = new AuthPermission(getRootPermission_(x));
     if ( ! authService.check(x, permission) ) {
-      throw new IllegalAccessException("Invalid permissions");
+      // TODO figure out what to do here
+      return null;
     }
     return super.get(x);
   }
 
   @Override
-  public void setProperty(X x, String name, Object value) throws IllegalAccessException {
+  public FObject setProperty(X x, String name, Object value) {
     AuthService authService = (AuthService) x.get("authService");
     java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + name);
     if ( ! authService.check(x, permission) ) {
-      throw new IllegalAccessException("Invalid permissions");
+      // TODO figure out what to do here
+      return null;
     }
-    super.setProperty(x, name, value);
+    return super.setProperty(x, name, value);
   }
 
   @Override
-  public void setProperties(X x, Map values) throws IllegalAccessException {
+  public FObject setProperties(X x, Map values) {
     AuthService authService = (AuthService) x.get("authService");
     for ( Object o : values.keySet() ) {
       String key = (String) o;
       java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + key);
       if ( ! authService.check(x, permission) ) {
-        throw new IllegalAccessException("Invalid permissions");
+        return null;
       }
     }
-    super.setProperties(x, values);
+    return super.setProperties(x, values);
   }
 }

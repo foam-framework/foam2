@@ -11,7 +11,6 @@ foam.INTERFACE({
     {
       name: 'get',
       javaReturns: 'foam.core.FObject',
-      javaThrows: ['java.lang.IllegalAccessException'],
       args: [
         {
           name: 'x',
@@ -21,8 +20,7 @@ foam.INTERFACE({
     },
     {
       name: 'setProperty',
-      javaReturns: 'void',
-      javaThrows: ['java.lang.IllegalAccessException'],
+      javaReturns: 'foam.core.FObject',
       args: [
         {
           name: 'x',
@@ -40,8 +38,7 @@ foam.INTERFACE({
     },
     {
       name: 'setProperties',
-      javaReturns: 'void',
-      javaThrows: ['java.lang.IllegalAccessException'],
+      javaReturns: 'foam.core.FObject',
       args: [
         {
           name: 'x',
