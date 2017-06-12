@@ -9,21 +9,20 @@ package foam.oao;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
-
 import java.util.Map;
 
 public class FObjectOAO
-    implements OAO
+  implements OAO
 {
-  protected final FObject obj;
+  protected final FObject obj_;
 
   public FObjectOAO(FObject obj) {
-    this.obj = obj;
+    obj_ = obj;
   }
 
   @Override
   public FObject get(X x) {
-    return obj;
+    return obj_;
   }
 
   @Override
@@ -37,8 +36,8 @@ public class FObjectOAO
   public FObject setProperties(X x, Map values) {
     for (Object o : values.keySet()) {
       String key = (String) o;
-      PropertyInfo prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(key);
-      if ( prop != null ) prop.set(obj, values.get(key));
+      PropertyInfo prop = (PropertyInfo) obj_.getClassInfo().getAxiomByName(key);
+      if ( prop != null ) prop.set(obj_, values.get(key));
     }
     return obj;
   }

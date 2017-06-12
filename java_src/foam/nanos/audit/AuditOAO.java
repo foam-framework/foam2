@@ -12,7 +12,6 @@ import foam.core.X;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
 import foam.oao.ProxyOAO;
-
 import java.util.*;
 
 public class AuditOAO
