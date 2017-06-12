@@ -15,78 +15,95 @@ foam.CLASS({
 
   properties: [
       {
-          name: 'properties'
+        name: 'columns'
       },
       {
-          class: 'Boolean',
-          name: 'displaySorted',
-          value: false
+        name: 'table'
+      },
+      {
+        name: 'columns_'
+      },
+      {
+        name: 'selected'
+      },
+      {
+        class: 'Boolean',
+        name: 'displaySorted',
+        value: false
       }
   ],
   
   methods: [
-    function init() {
-      console.log('init***************************************')
-      var props = [];
-
-      for (var i = 0; i < this.properties.length; ++i) {
-        props.push({prop: this.properties[i], visible: true})
-      }
-
-      this.properties = props;
-    },
-    
     function initE() {
-      if ( this.displaySorted ) {
-        // TODO: How should this block be tested?
-        var props = this.properties;
-        props = this.properties.slice();
-        props.sort(function(a, b) {
-          return a.label.toLowerCase().compareTo(b.label.toLowerCase());
-        });
-      }
+      // if ( this.displaySorted ) {
+      //   // TODO: How should this block be tested?
+      //   var props = this.properties;
+      //   props = this.properties.slice();
+      //   props.sort(function(a, b) {
+      //     return a.label.toLowerCase().compareTo(b.label.toLowerCase());
+      //   });
+      // }
+      this.selected = []
 
-      for (let i = 0; i < this.properties.length; i++) {
-        this.properties[i].visible = true;
-
+      for (let i = 0; i < this.columns_.length; i++) {
         var cb = this.CheckBox.create({
-          label: this.properties[i].prop.label,
-          data: this.properties[i].visible
+          label: this.columns_[i].label,
+          data: true
         });
 
-        // Subscribes onPropChange listener to checkbox data
-        cb.data$.sub(this.onPropChange.bind(this, this.properties[i].prop, cb));
+        this.selected.push(cb.data$);
+
+        // Subscribes updateTable listener to checkbox data
+        cb.data$.sub(this.updateTable.bind(this));
 
         this.add(cb);
 
-        if (i != this.properties.length - 1) this.start('br').end();
+        console.log(this.selected)
+
+        if (i != this.columns_.length - 1) this.start('br').end();
       }
     }
   ],
 
   listeners: [
-    function onPropChange(changedProp, cb, _, old, nu) {
+    /*function onPropChange(changedProp, cb, _, old, nu) {
       console.log('onPropChange ------------------------')
 
-      if ( this.displaySorted ) {
-        // TODO: How should this block be tested?
-        out = this.selectedProperties.slice();
-        if ( nu && !selected[changedProp.name] ) {
-          out.push(changedProp);
-        }
-        if ( !nu && selected[changedProp.name] ) {
-          out.splice(out.indexOf(changedProp), 1);
-        }
-      } else {
-        for (var i = 0; i < this.properties.length; i++) {
+      // if ( this.displaySorted ) {
+      //   // TODO: How should this block be tested?
+      //   out = this.selectedProperties.slice();
+      //   if ( nu && !selected[changedProp.name] ) {
+      //     out.push(changedProp);
+      //   }
+      //   if ( !nu && selected[changedProp.name] ) {
+      //     out.splice(out.indexOf(changedProp), 1);
+      //   }
+      // } else {
+        for (var i = 0; i < this.allColumns.length; i++) {
           var p = this.properties[i];
           
           p.visible = ((p.prop === changedProp && cb.data) || 
                         (p.visible && (p.prop !== changedProp || cb.data)));
         }
-      }
+      // }
 
       this.propertyChange.pub('properties')
+    }*/
+    function updateTable() {
+      console.log('updating table')
+      var cols = [];
+
+      for (var i = 0; i < this.columns.length; i++) {
+        console.log('selected', this.selected[i].obj.data)
+        if (this.selected[i].obj.data) 
+          //cols.push(this.table.getAxiomByName(this.columns[i]))
+          cols.push({name: this.columns[i]})
+      }
+
+      console.log('before', this.columns_)
+      this.columns_ = cols;
+      this.propertyChange.pub('columns_')
+      console.log('after', this.columns_)
     }
   ]
 });

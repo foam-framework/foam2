@@ -182,12 +182,6 @@ foam.CLASS({
       value: true // TODO: Return to false after testing
     },
     {
-      class: 'Boolean',
-      name: 'refreshDisplay',
-      documentation: 'Will be removed when better refresh strategy is found',
-      value: true
-    },
-    {
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
@@ -221,22 +215,11 @@ foam.CLASS({
     },
 
     function createColumnSelection() {
-      console.log('creating selections')
       var editor = this.EditColumnsView.create({
-        properties: this.columns_
+        columns: this.columns,
+        columns_$: this.columns_$,
+        table: this.of
       });
-
-      editor.properties$.sub(function() {
-        console.log('this is focused is a', this.focused, 'statement');
-        console.log('selections changed')
-
-        console.log('columns_ before', this.columns_)
-        this.columns = editor.properties
-                          .filter(function(c) { return c.visible; })
-                          .map(function(c) { return c.prop.name; });
-        console.log('columns_ after', this.columns_)
-
-      }.bind(this));
 
       return this.OverlayDropdown.create().add(editor);
     },
@@ -257,8 +240,8 @@ foam.CLASS({
     },
 
     function init() {
-      console.log('table view init')
-      this.onFocus(function() {console.log('focusing table view')});
+      // console.log('table view init')
+      // this.onFocus(function() {console.log('focusing table view')});
     },
 
     function initE() {
@@ -267,11 +250,8 @@ foam.CLASS({
       var columnSelectionE;
 
       if (view.editColumnsEnabled) {
-        // There has to be a better way to do this
-        this.add(this.slot(function(refresh) {
-                        columnSelectionE = view.createColumnSelection();
-                        return this.E('div').add(columnSelectionE); }, 
-                        view.refreshDisplay$));
+        columnSelectionE = view.createColumnSelection();
+        this.add(columnSelectionE);
       }
 
       this.
@@ -297,10 +277,7 @@ foam.CLASS({
                   return this.E('th').
                     addClass(view.myClass('th-editColumns')).
                       on('click', function(e) {
-                        e.stopPropagation();
-                        view.refreshDisplay = !view.refreshDisplay;
-                        columnSelectionE.shown = true;
-                        //view.positionOverlayDropdown(columnSelectionE);
+                        view.positionOverlayDropdown(columnSelectionE);
                         columnSelectionE.open();
                       }).
                       add(' ', view.vertMenuIcon).
