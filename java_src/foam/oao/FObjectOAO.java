@@ -34,7 +34,7 @@ public class FObjectOAO
 
   @Override
   public FObject setProperties(X x, Map values) {
-    for (Object o : values.keySet()) {
+    for ( Object o : values.keySet() ) {
       String key = (String) o;
       PropertyInfo prop = (PropertyInfo) obj_.getClassInfo().getAxiomByName(key);
       if ( prop != null ) prop.set(obj_, values.get(key));
