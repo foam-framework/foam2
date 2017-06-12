@@ -255,6 +255,6 @@ FOAM_FILES([
   { name: "foam/core/ContextAware", flags: ['java'] },
   { name: "foam/dao/history/PropertyUpdate" },
   { name: "foam/dao/history/HistoryRecord" },
-  { name: "foam/oao/OAO" },
-  { name: "foam/oao/OAOJava", flags: ['java'] },
+  { name: "foam/mop/MOP" },
+  { name: "foam/mop/MOPJava", flags: ['java'] },
 ]);

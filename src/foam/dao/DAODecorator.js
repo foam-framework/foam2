@@ -147,14 +147,21 @@ foam.CLASS({
   name: 'DecoratedDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  requires: [
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy'
+  ],
+
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.DAODecorator',
+//      class: 'FObjectProperty',
+//      of: 'foam.dao.DAODecorator',
       name: 'decorator'
     },
     {
-      name: 'dao'
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      factory: function() { return this.delegate; }
     }
   ],
 
@@ -192,7 +199,44 @@ foam.CLASS({
           return self.decorator.read(self.__context__, self.dao, obj);
         });
       }
+    },
+
+    /*
+    TODO: works, but is expensive, so shouldn't be used if decorator.read isn't set
+    function select(sink, skip, limit, order, predicate) {
+      if ( ! sink ) sink = foam.dao.ArraySink.create();
+      // No need to decorate if we're just counting.
+      if ( this.Count.isInstance(sink) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      }
+
+      // TODO: This is too simplistic, fix
+      if ( this.GroupBy.isInstance(sink) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      }
+
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        var ps = [];
+
+        self.delegate.select({
+          put: function(o) {
+            var p = self.decorator.read(self.__context__, self.dao, o);
+            p.then(function(o) { sink.put(o); })
+            ps.push(p);
+          },
+          eof: function() {
+          }
+        }, skip, limit, order, predicate).then(function() {
+          Promise.all(ps).then(function() {
+            resolve(sink);
+          });
+        })
+      });
     }
+    */
+
     // TODO: Select/removeAll support.  How do we do select
     // without breaking MDAO optimizations?
     // {

@@ -5,7 +5,7 @@
  */
 
 foam.INTERFACE({
-  refines: 'foam.oao.OAO',
+  refines: 'foam.mop.MOP',
 
   methods: [
     {
@@ -20,7 +20,7 @@ foam.INTERFACE({
     },
     {
       name: 'setProperty',
-      javaReturns: 'void',
+      javaReturns: 'foam.core.FObject',
       args: [
         {
           name: 'x',
@@ -38,7 +38,7 @@ foam.INTERFACE({
     },
     {
       name: 'setProperties',
-      javaReturns: 'void',
+      javaReturns: 'foam.core.FObject',
       args: [
         {
           name: 'x',

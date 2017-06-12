@@ -5,10 +5,10 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.oao',
-  name: 'OAO',
+  package: 'foam.mop',
+  name: 'MOP',
 
-  documentation: 'OAO Interface',
+  documentation: 'MOP Interface',
 
   methods: [
     {
@@ -18,12 +18,12 @@ foam.INTERFACE({
     },
     {
       name: 'setProperty',
-      returns: '',
+      returns: 'Promise',
       args: [ 'x', 'name', 'value' ]
     },
     {
       name: 'setProperties',
-      returns: '',
+      returns: 'Promise',
       args: [ 'x', 'values' ]
     }
   ]
