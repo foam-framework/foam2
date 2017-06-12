@@ -25,7 +25,7 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
    *}
    */
   protected Map<String, Map<String, Boolean>> permissionMap = new LRULinkedHashMap<>(1000);
-  protected Map<String, Boolean> userMap = new LRULinkedHashMap<>(1000001);
+  protected Map<String, Boolean> userMap;
 
   @Override
   public void start() {
@@ -44,8 +44,12 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
 
     if ( permissionMap.containsKey(permission.getName()) ) {
       userMap = permissionMap.get(permission.getName());
-      if ( userMap.containsKey(user.getId()) ) return userMap.get(user.getId());
     }
+    else {
+      userMap = new LRULinkedHashMap<>(100000);
+    }
+
+    if ( userMap.containsKey(user.getId()) ) return userMap.get(user.getId());
 
     boolean permissionCheck = group.implies(permission);
     userMap.put(user.getId(), permissionCheck);
@@ -61,6 +65,8 @@ public class CachedUserAndGroupAuthService extends UserAndGroupAuthService {
     User user = (User) x.get("user");
     if ( user == null ) return;
 
-    userMap.remove(user.getId());
+    for ( String key: permissionMap.keySet() ) {
+      permissionMap.get(key).remove(user.getId());
+    }
   }
 }
