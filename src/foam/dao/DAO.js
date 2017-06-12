@@ -80,7 +80,7 @@ foam.INTERFACE({
     {
       name: 'listen_',
       returns: '',
-      args: [ 'sink', 'predicate' ]
+      args: [ 'x', 'sink', 'predicate' ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
