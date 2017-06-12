@@ -8,17 +8,17 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
-import foam.oao.ProxyOAO;
+import foam.mop.ProxyMOP;
 
 import javax.security.auth.AuthPermission;
 import java.util.Map;
 
-public class AuthOAO
-  extends ProxyOAO
+public class AuthMOP
+  extends ProxyMOP
 {
   protected String rootPermission_ = null;
 
-  public AuthOAO(String rootPermission) {
+  public AuthMOP(String rootPermission) {
     rootPermission_ = rootPermission;
   }
 
