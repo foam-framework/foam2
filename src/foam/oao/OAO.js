@@ -18,12 +18,12 @@ foam.INTERFACE({
     },
     {
       name: 'setProperty',
-      returns: '',
+      returns: 'Promise',
       args: [ 'x', 'name', 'value' ]
     },
     {
       name: 'setProperties',
-      returns: '',
+      returns: 'Promise',
       args: [ 'x', 'values' ]
     }
   ]
