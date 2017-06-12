@@ -56,7 +56,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function detach() { console.log("DETACHING")},
     function add() {
       if (this.addToSelf_) this.SUPER.apply(this, arguments);
       else this.dropdownE_.add.apply(this.dropdownE_, arguments);
@@ -75,7 +74,6 @@ foam.CLASS({
       this.height = 0;
       this.dropdownE_.style({ height: 0 + 'px' });
       this.opened = false;
-      this.detach();
     },
 
     function getFullHeight() {
@@ -106,13 +104,13 @@ foam.CLASS({
         this.shown = open;
       }, this.opened$));
 
-      this.start('dropdown-overlay')
-          .addClass(this.myClass('overlay'))
-          .addClass(this.slot(function(open) {
-            return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
-          }, this.opened$))
-          .on('click', this.onCancel)
-          .end();
+      // this.start('dropdown-overlay')
+      //     .addClass(this.myClass('overlay'))
+      //     .addClass(this.slot(function(open) {
+      //       return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
+      //     }, this.opened$))
+      //     .on('click', this.onCancel)
+      //     .end();
 
       this.dropdownE_.addClass(this.myClass())
           .addClass(this.slot(function(openComplete) {
@@ -125,7 +123,6 @@ foam.CLASS({
       this.add(this.dropdownE_);
 
       this.addToSelf_ = false;
-      this.shown = true;
     }
   ],
 
@@ -186,7 +183,7 @@ foam.CLASS({
 
   listeners: [
     function onCancel() {
-      this.close();
+      //this.close();
     },
 
     function onTransitionEnd() {
@@ -196,7 +193,7 @@ foam.CLASS({
     function onMouseLeave(e) {
       console.assert(e.target === this.dropdownE_.el(),
           'mouseleave should only fire on this, not on children');
-      this.close();
+      //this.close();
     },
 
     /**
@@ -205,7 +202,6 @@ foam.CLASS({
      */
     function onClick(e) {
       console.log('PROPAGATION STOPPED')
-      this.close();
       e.stopPropagation();
     }
   ]

@@ -213,6 +213,72 @@ var i = E('image').attrs({
 i.write();
 
 foam.CLASS({
+  name: 'Linking',
+
+  requires: [
+    'foam.u2.view.EditColumnsView',
+    'foam.u2.md.OverlayDropdown'
+  ],
+
+  properties: [
+    {
+      name: 'columns_',
+      value: [
+        {
+          name: 'col1',
+        },
+        { name: 'col2'},
+        {name: 'col3'}
+      ]
+    },
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      documentation: 'Set this to true to let the user select columns.',
+      value: true // TODO: Return to false after testing
+    },
+    {
+      name: 'vertMenuIcon',
+      documentation: 'HTML entity representing unicode Vertical Ellipsis',
+      factory: function() {
+        return this.Entity.create({ name: '#8942' });
+      }
+    },
+    {
+      name: 'columns',
+      value: ['col1', 'col2', 'col3']
+    },
+    'overlay',
+    'selected'
+  ],
+
+  methods: [
+    function createColumnSelection() {
+      var editor = this.EditColumnsView.create({
+        columns: this.columns,
+        columns_$: this.columns_$,
+        table: this.of
+      });
+
+      setTimeout(function() {
+        this.selected$ = editor.selected$;
+        console.log('stuffs', this.selected)
+      }.bind(this), 1000)
+      
+      
+
+      return this.OverlayDropdown.create().add(editor);
+    },
+  ],
+});
+
+var link = Linking.create();
+var cols1 = link.createColumnSelection();
+cols1.write();
+cols1.open();
+
+
+foam.CLASS({
   name: 'Person',
   properties: [ 'firstName', 'lastName', 'age' ],
   actions: [
@@ -266,6 +332,12 @@ foam.u2.DetailView.create({
   properties: [ foam.util.Timer.INTERVAL, foam.util.Timer.I ],
   actions: [ foam.util.Timer.STOP, foam.util.Timer.START ]
 }).write();
+
+var cols2 = link.createColumnSelection();
+setTimeout(function() {cols2.selected$ = cols1.selected$;}, 1500)
+
+cols2.write();
+cols2.open();
 
 foam.CLASS({
   name: 'CustomDetailView',
