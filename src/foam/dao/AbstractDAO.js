@@ -242,7 +242,7 @@ foam.CLASS({
     },
 
     function remove(obj) {
-      return this.remove_(obj);
+      return this.remove_(this.__context__, obj);
     },
 
     function removeAll() {

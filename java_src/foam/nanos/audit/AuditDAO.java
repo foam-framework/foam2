@@ -58,7 +58,7 @@ public class AuditDAO
   }
 
   @Override
-  public FObject remove_(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
@@ -66,6 +66,6 @@ public class AuditDAO
     outputter.output(sb, obj);
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     logger.info("REMOVE", objectId, user.getId(), sb);
-    return super.remove_(obj);
+    return super.remove_(x, obj);
   }
 }

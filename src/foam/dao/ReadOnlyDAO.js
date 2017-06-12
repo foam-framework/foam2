@@ -24,7 +24,7 @@ foam.CLASS({
     function put_(x, obj) {
       return Promise.reject('Cannot put into ReadOnlyDAO');
     },
-    function remove_() {
+    function remove_(x, obj) {
       return Promise.reject('Cannot remove from ReadOnlyDAO');
     },
     function removeAll() {

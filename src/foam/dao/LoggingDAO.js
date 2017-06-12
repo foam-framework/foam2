@@ -47,9 +47,9 @@ foam.CLASS({
       return this.SUPER(x, obj);
     },
 
-    function remove_(obj) {
+    function remove_(x, obj) {
       this.logger('remove', obj);
-      return this.SUPER(obj);
+      return this.SUPER(x, obj);
     },
 
     function select_(sink, skip, limit, order, predicate) {

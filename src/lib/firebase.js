@@ -112,7 +112,7 @@ foam.CLASS({
       });
     },
 
-    function remove_(obj) {
+    function remove_(x, obj) {
       var req = this.HTTPRequest.create();
       req.method = 'DELETE',
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";

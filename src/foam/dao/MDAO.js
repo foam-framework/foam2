@@ -177,7 +177,7 @@ foam.CLASS({
       return null;
     },
 
-    function remove_(obj) {
+    function remove_(x, obj) {
       if ( ! obj || obj.id === undefined ) {
         return Promise.reject(this.ExternalException.create({ id: 'no_id' })); // TODO: err
       }

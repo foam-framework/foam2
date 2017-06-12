@@ -58,6 +58,10 @@ foam.INTERFACE({
       javaReturns: 'foam.core.FObject',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'obj',
           javaType: 'foam.core.FObject'
         }

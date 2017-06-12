@@ -176,10 +176,10 @@ foam.CLASS({
 
     {
       name: 'remove_',
-      code: function(obj) {
+      code: function(x, obj) {
         var self = this;
         return this.decorator.remove(self.__context__, self.dao, self.obj).then(function(obj) {
-          self.delegate.remove_(obj);
+          self.delegate.remove_(x, obj);
         });
       }
     },

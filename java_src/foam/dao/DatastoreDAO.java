@@ -56,7 +56,7 @@ public class DatastoreDAO
         return obj;
     }
 
-    public FObject remove_(FObject obj) {
+    public FObject remove_(X x, FObject obj) {
         getData().delete(keyFromFObject(obj));
         return obj;
     }

@@ -97,7 +97,7 @@ foam.CLASS({
 
         self.dao.find_(id).then(function(o) {
           payload = self.fo2o_(o);
-          return self.dao.remove_(o);
+          return self.dao.remove(o);
         }).then(function() {
           self.sendJSON(res, 200, payload);
           self.info('200 OK: remove() ' + id);
