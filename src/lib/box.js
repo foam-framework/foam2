@@ -801,8 +801,8 @@ foam.CLASS({
       });
     },
 
-    function removeAll_(skip, limit, order, predicate) {
-      this.SUPER(skip, limit, order, predicate);
+    function removeAll_(x, skip, limit, order, predicate) {
+      this.SUPER(x, skip, limit, order, predicate);
       this.on.reset.pub();
     }
   ]

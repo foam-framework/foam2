@@ -88,7 +88,7 @@ public abstract class AbstractDAO
   }
 
   public void removeAll() {
-    this.removeAll_(null, null, null, null);
+    this.removeAll_(this.getX(), null, null, null, null);
   }
 
   public Sink select(Sink sink) {

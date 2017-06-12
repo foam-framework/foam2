@@ -24,7 +24,7 @@ public class FilteredDAO
   }
 
   @Override
-  public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    super.removeAll_(skip, limit, order, getPredicate(predicate));
+  public void removeAll_(X x, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    super.removeAll_(x, skip, limit, order, getPredicate(predicate));
   }
 }
