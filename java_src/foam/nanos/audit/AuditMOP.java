@@ -7,15 +7,15 @@
 package foam.nanos.audit;
 
 import foam.core.FObject;
-import foam.core.PropertyInfo;
 import foam.core.X;
+import foam.mop.ProxyMOP;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
-import foam.oao.ProxyOAO;
+
 import java.util.*;
 
-public class AuditOAO
-  extends ProxyOAO
+public class AuditMOP
+  extends ProxyMOP
 {
   /**
    * Creates a formatted message containing the list
