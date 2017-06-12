@@ -29,33 +29,30 @@ public class AuditOAO
     List<String> result = new ArrayList<>();
     for ( Object o : values.keySet() ) {
       String key = (String) o;
-      PropertyInfo prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(key);
-      result.add(key + ": [" + prop.f(obj) + "," + values.get(key) + "]");
+      result.add(key + ": [" + obj.getProperty(key) + "," + values.get(key) + "]");
     }
     return result.toString();
   }
 
   @Override
-  public void setProperty(X x, String name, Object value) {
-    User       user     = (User) x.get("user");
-    NanoLogger logger   = (NanoLogger) x.get("logger");
-    FObject    obj      = getDelegate().get(x);
-    Object     objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-    Map        values   = new HashMap();
-
+  public FObject setProperty(X x, String name, Object value) {
+    User user = (User) x.get("user");
+    NanoLogger logger = (NanoLogger) x.get("logger");
+    FObject obj = getDelegate().get(x);
+    Object objectId = obj.getProperty("id");
+    Map values = new HashMap();
     values.put(name, value);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
-    super.setProperty(x, name, value);
+    return super.setProperty(x, name, value);
   }
 
   @Override
-  public void setProperties(X x, Map values) {
-    User       user     = (User) x.get("user");
-    NanoLogger logger   = (NanoLogger) x.get("logger");
-    FObject    obj      = getDelegate().get(x);
-    Object     objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-
+  public FObject setProperties(X x, Map values) {
+    User user = (User) x.get("user");
+    NanoLogger logger = (NanoLogger) x.get("logger");
+    FObject obj = getDelegate().get(x);
+    Object objectId = obj.getProperty("id");
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
-    super.setProperties(x, values);
+    return super.setProperties(x, values);
   }
 }
