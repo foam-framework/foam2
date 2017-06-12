@@ -16,10 +16,20 @@ import java.util.Map;
 public class AuthOAO
   extends ProxyOAO
 {
+  private final String rootPermission;
+
+  public AuthOAO() {
+    this.rootPermission = getClass().getSimpleName();
+  }
+
+  public AuthOAO(String rootPermission) {
+    this.rootPermission = rootPermission;
+  }
+
   @Override
   public FObject get(X x) throws IllegalAccessException {
     AuthService authService = (AuthService) x.get("authService");
-    java.security.Permission permission = new AuthPermission("." + getDelegate().get(x).getClassInfo().getId());
+    java.security.Permission permission = new AuthPermission(rootPermission + "." + getDelegate().get(x).getClassInfo().getId());
     if ( ! authService.check(x, permission) ) {
       throw new IllegalAccessException("Invalid permissions");
     }
@@ -29,7 +39,7 @@ public class AuthOAO
   @Override
   public void setProperty(X x, String name, Object value) throws IllegalAccessException {
     AuthService authService = (AuthService) x.get("authService");
-    java.security.Permission permission = new AuthPermission("." + name);
+    java.security.Permission permission = new AuthPermission(rootPermission + "." + name);
     if ( ! authService.check(x, permission) ) {
       throw new IllegalAccessException("Invalid permissions");
     }
@@ -41,7 +51,7 @@ public class AuthOAO
     AuthService authService = (AuthService) x.get("authService");
     for ( Object o : values.keySet() ) {
       String key = (String) o;
-      java.security.Permission permission = new AuthPermission("." + key);
+      java.security.Permission permission = new AuthPermission(rootPermission + "." + key);
       if ( ! authService.check(x, permission) ) {
         throw new IllegalAccessException("Invalid permissions");
       }
