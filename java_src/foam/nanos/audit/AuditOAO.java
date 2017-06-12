@@ -12,7 +12,6 @@ import foam.core.X;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
 import foam.oao.ProxyOAO;
-
 import java.util.*;
 
 public class AuditOAO
@@ -38,11 +37,12 @@ public class AuditOAO
 
   @Override
   public void setProperty(X x, String name, Object value) {
-    User user = (User) x.get("user");
-    NanoLogger logger = (NanoLogger) x.get("logger");
-    FObject obj = getDelegate().get(x);
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-    Map values = new HashMap();
+    User       user     = (User) x.get("user");
+    NanoLogger logger   = (NanoLogger) x.get("logger");
+    FObject    obj      = getDelegate().get(x);
+    Object     objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Map        values   = new HashMap();
+
     values.put(name, value);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
     super.setProperty(x, name, value);
@@ -50,10 +50,11 @@ public class AuditOAO
 
   @Override
   public void setProperties(X x, Map values) {
-    User user = (User) x.get("user");
-    NanoLogger logger = (NanoLogger) x.get("logger");
-    FObject obj = getDelegate().get(x);
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    User       user     = (User) x.get("user");
+    NanoLogger logger   = (NanoLogger) x.get("logger");
+    FObject    obj      = getDelegate().get(x);
+    Object     objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
     super.setProperties(x, values);
   }
