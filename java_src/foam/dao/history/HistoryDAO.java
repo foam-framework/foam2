@@ -67,7 +67,7 @@ public class HistoryDAO
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    FObject current = this.find_(obj);
+    FObject current = this.find_(x, obj);
 
     // add new history record
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);

@@ -182,7 +182,7 @@ foam.CLASS({
       });
     },
 
-    function find_(key) {
+    function find_(x, key) {
       var self = this;
 
       return new Promise(function(resolve, reject) {

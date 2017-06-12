@@ -96,7 +96,7 @@ public abstract class AbstractDAO
   }
 
   public FObject find(Object id) {
-    return this.find_(id);
+    return this.find_(this.getX(), id);
   }
 
   public void pipe(Sink sink) {

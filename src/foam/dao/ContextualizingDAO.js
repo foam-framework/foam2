@@ -30,9 +30,9 @@ foam.CLASS({
 
   methods: [
     /** Found objects are cloned into the same context as this DAO */
-    function find_(id) {
+    function find_(x, id) {
       var self = this;
-      return self.delegate.find_(id).then(function(obj) {
+      return self.delegate.find_(x, id).then(function(obj) {
         if ( obj ) return obj.clone(self);
         return null;
       });

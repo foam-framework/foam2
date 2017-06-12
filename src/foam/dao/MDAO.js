@@ -156,7 +156,7 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function find_(objOrKey) {
+    function find_(x, objOrKey) {
       if ( objOrKey === undefined ) {
         return Promise.reject(this.InvalidArgumentException.create({
           message: '"key" cannot be undefined/null'

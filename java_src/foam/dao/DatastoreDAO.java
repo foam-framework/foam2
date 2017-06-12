@@ -61,7 +61,7 @@ public class DatastoreDAO
         return obj;
     }
 
-    public FObject find_(Object id) {
+    public FObject find_(X x, Object id) {
         Entity result;
         try {
             result = getData().get(keyFromPK(id));
