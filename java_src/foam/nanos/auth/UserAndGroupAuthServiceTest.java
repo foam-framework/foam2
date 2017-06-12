@@ -40,7 +40,7 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
       Permission[] permissions = new Permission[numPermissions];
       for ( int j = 0; j < numPermissions; j++ ) {
         foam.nanos.auth.Permission permission = new foam.nanos.auth.Permission();
-        permission.setId("" + j);
+        permission.setId(i + "" + j);
         permission.setDescription("Group" + i + " permissions-" + j);
         permissions[j] = permission;
       }
@@ -125,7 +125,6 @@ public class UserAndGroupAuthServiceTest extends CachedUserAndGroupAuthService {
     long endTime = System.nanoTime();
     long durationInMilliseconds = (endTime - startTime) / 1000000;
     System.out.println("Duration: " + durationInMilliseconds + "ms \n");
-
 
     System.out.println("Cached Permissions Check for " + numUsers + " users");
     startTime = System.nanoTime();
