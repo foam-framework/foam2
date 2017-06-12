@@ -1,9 +1,13 @@
 package foam.dao;
 
 import foam.core.FObject;
-import foam.core.PropertyInfo;
 
 import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class PostgresDAO extends ProxyDAO {
 
@@ -43,13 +47,6 @@ public class PostgresDAO extends ProxyDAO {
 //        return null;
 //    }
 
-    public FObject setId(FObject obj, Object id) {
-
-        PropertyInfo prop = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id"));
-        prop.set(obj, id);
-        return obj;
-    }
-
     @Override
     public FObject put(FObject obj) {
 
@@ -63,7 +60,6 @@ public class PostgresDAO extends ProxyDAO {
 
             PreparedStatement smt = c.prepareStatement(sql.toString(), Statement.RETURN_GENERATED_KEYS);
 
-            // set values in order for prepared statement
             int i = 1;
             for (Object key: data.getValues().keySet()) {
                 smt.setObject(i, data.getValues().get(key));
@@ -80,7 +76,7 @@ public class PostgresDAO extends ProxyDAO {
             try (ResultSet generatedKeys = smt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     long pgKey = generatedKeys.getLong(1);
-                    setId(obj, pgKey);
+//                    setId(obj, pgKey);
                     System.out.println(pgKey);
                 }
                 else {
@@ -88,6 +84,8 @@ public class PostgresDAO extends ProxyDAO {
                 }
             }
 
+            ResultSet rs = smt.executeQuery();
+            System.out.println(rs);
             smt.close();
             c.close();
         } catch (Exception e) {
