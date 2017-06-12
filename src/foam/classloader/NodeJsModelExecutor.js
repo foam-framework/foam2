@@ -29,7 +29,7 @@ foam.CLASS({
   ],
 
   exports: [
-    foam.String.daoize(foam.core.Model.name),
+    foam.String.daoize(foam.core.Model.name)
   ],
 
   properties: [
@@ -76,6 +76,7 @@ foam.CLASS({
       }
       return this;
     },
+
     function execute() {
       var self = this;
       var modelArgs = this.modelArgs;
