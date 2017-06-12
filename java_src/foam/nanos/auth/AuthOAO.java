@@ -16,11 +16,7 @@ import java.util.Map;
 public class AuthOAO
   extends ProxyOAO
 {
-  protected final String rootPermission_;
-
-  public AuthOAO() {
-    this.rootPermission_ = null;
-  }
+  protected String rootPermission_ = null;
 
   public AuthOAO(String rootPermission_) {
     this.rootPermission_ = rootPermission_;
