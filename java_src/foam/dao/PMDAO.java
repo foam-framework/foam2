@@ -45,10 +45,10 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public FObject remove_(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     PM pm = new PM(PMDAO.class, obj.getClassInfo().getId() + ":remove");
     try {
-      super.remove_(obj);
+      super.remove_(x, obj);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

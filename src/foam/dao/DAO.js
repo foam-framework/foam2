@@ -40,7 +40,7 @@ foam.INTERFACE({
     {
       name: 'remove_',
       returns: 'Promise',
-      args: [ 'obj' ]
+      args: [ 'x', 'obj' ]
     },
     {
       name: 'find',

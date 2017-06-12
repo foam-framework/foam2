@@ -44,7 +44,7 @@ public class MapDAO
     return obj;
   }
 
-  public FObject remove_(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     getData().remove(getPrimaryKey().get(obj));
     return obj;
   }

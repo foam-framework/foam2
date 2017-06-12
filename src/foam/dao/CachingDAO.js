@@ -103,10 +103,10 @@ foam.CLASS({
 
     /** Removes are sent to the cache and to the source, ensuring both
       are up to date. */
-    function remove_(o) {
+    function remove_(x, o) {
       var self = this;
       return self.src.remove(o).then(function() {
-        return self.delegate.remove_(o);
+        return self.delegate.remove_(x, o);
       })
     },
    /** removeAll is executed on the cache and the source, ensuring both
@@ -129,7 +129,7 @@ foam.CLASS({
     /** Keeps the cache in sync with changes from the source.
       @private */
     function onSrcRemove(s, on, remove, obj) {
-      this.delegate.remove_(obj);
+      this.delegate.remove(obj);
     },
 
     /** Keeps the cache in sync with changes from the source.

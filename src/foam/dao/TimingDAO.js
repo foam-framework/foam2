@@ -70,10 +70,10 @@ foam.CLASS({
       var self = this;
       return this.SUPER(x, obj).then(function(o) { self.end(act); return o; });
     },
-    function remove_(obj) {
+    function remove_(x, obj) {
       var act = this.start('remove');
       var self = this;
-      return this.SUPER(obj).then(function() { self.end(act); });
+      return this.SUPER(x, obj).then(function() { self.end(act); });
     },
     function find_(key) {
       var act = this.start('find');

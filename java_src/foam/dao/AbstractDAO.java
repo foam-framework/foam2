@@ -84,7 +84,7 @@ public abstract class AbstractDAO
   }
 
   public FObject remove(FObject obj) {
-    return this.remove_(obj);
+    return this.remove_(this.getX(), obj);
   }
 
   public void removeAll() {

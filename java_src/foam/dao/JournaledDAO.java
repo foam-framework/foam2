@@ -36,10 +36,10 @@ public class JournaledDAO
   }
 
   @Override
-  public FObject remove_(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     Object id = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
     journal.remove(id, null);
-    return getDelegate().remove_(obj);
+    return getDelegate().remove_(x, obj);
   }
 
   @Override

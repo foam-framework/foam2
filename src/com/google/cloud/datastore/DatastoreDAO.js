@@ -121,7 +121,7 @@ foam.CLASS({
       })).send().then(this.onResponse.bind(this, 'put'))
           .then(this.onPutResponse.bind(this, o));
     },
-    function remove_(o) {
+    function remove_(x, o) {
       return this.getRequest('commit', JSON.stringify({
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { delete: o.getDatastoreKey() } ]

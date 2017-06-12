@@ -793,9 +793,9 @@ foam.CLASS({
       });
     },
 
-    function remove_(obj) {
+    function remove_(x, obj) {
       var self = this;
-      return this.SUPER(obj).then(function(o) {
+      return this.SUPER(x, obj).then(function(o) {
         self.on.remove.pub(obj);
         return o;
       });
