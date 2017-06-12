@@ -127,7 +127,7 @@ foam.CLASS({
     },
     function build() {
       var pl = this.pipeline;
-      var onRegisteredBox = ;
+      var onRegisteredBox = this.RPCReturnBox.create();
       var onRegisteredPromise = onRegisteredBox.promise;
       this.registry.send(this.Message.create({
         object: this.RPCMessage.create({
@@ -135,7 +135,7 @@ foam.CLASS({
           args: [ null, null, pl.localInput ]
         }),
         attributes: {
-          replyBox: onRegisteredBox.RPCReturnBox.create(),
+          replyBox: onRegisteredBox,
           errorBox: pl.errorBox
         }
       }));
