@@ -19,17 +19,21 @@ public class AuthOAO
   protected final String rootPermission_;
 
   public AuthOAO() {
-    this.rootPermission_ = getClass().getSimpleName();
+    this.rootPermission_ = null;
   }
 
-  public AuthOAO(String rootPermission) {
-    this.rootPermission_ = rootPermission;
+  public AuthOAO(String rootPermission_) {
+    this.rootPermission_ = rootPermission_;
+  }
+  
+  private String getRootPermission_(X x) throws IllegalAccessException {
+    return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_
   }
 
   @Override
   public FObject get(X x) throws IllegalAccessException {
     AuthService authService = (AuthService) x.get("authService");
-    java.security.Permission permission = new AuthPermission(rootPermission_ + "." + getDelegate().get(x).getClassInfo().getId());
+    java.security.Permission permission = new AuthPermission(getRootPermission_(x));
     if ( ! authService.check(x, permission) ) {
       throw new IllegalAccessException("Invalid permissions");
     }
@@ -39,7 +43,7 @@ public class AuthOAO
   @Override
   public void setProperty(X x, String name, Object value) throws IllegalAccessException {
     AuthService authService = (AuthService) x.get("authService");
-    java.security.Permission permission = new AuthPermission(rootPermission_ + "." + name);
+    java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + name);
     if ( ! authService.check(x, permission) ) {
       throw new IllegalAccessException("Invalid permissions");
     }
@@ -51,7 +55,7 @@ public class AuthOAO
     AuthService authService = (AuthService) x.get("authService");
     for ( Object o : values.keySet() ) {
       String key = (String) o;
-      java.security.Permission permission = new AuthPermission(rootPermission_ + "." + key);
+      java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + key);
       if ( ! authService.check(x, permission) ) {
         throw new IllegalAccessException("Invalid permissions");
       }
