@@ -26,17 +26,17 @@ public class FObjectOAO
   }
 
   @Override
-  public void setProperty(X x, String name, Object value) {
-    PropertyInfo prop = (PropertyInfo) obj_.getClassInfo().getAxiomByName(name);
-    if ( prop != null ) prop.set(obj_, value);
+  public FObject setProperty(X x, String name, Object value) {
+    obj_.setProperty(name, value);
+    return obj_;
   }
 
   @Override
-  public void setProperties(X x, Map values) {
+  public FObject setProperties(X x, Map values) {
     for ( Object o : values.keySet() ) {
       String key = (String) o;
-      PropertyInfo prop = (PropertyInfo) obj_.getClassInfo().getAxiomByName(key);
-      if ( prop != null ) prop.set(obj_, values.get(key));
+      obj_.setProperty(key, values.get(key));
     }
+    return obj_;
   }
 }
