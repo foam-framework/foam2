@@ -115,11 +115,11 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'limit',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'order',
@@ -146,11 +146,11 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'limit',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'order',

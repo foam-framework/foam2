@@ -70,7 +70,7 @@ foam.CLASS({
     },
 
     function removeAll_(x, sink, skip, limit, order, predicate) {
-      this.logger('removeAll_', skip, limit, order, predicate);
+      this.logger('removeAll', skip, limit, order, predicate);
       return this.SUPER(x, sink, skip, limit, order, predicate);
     },
 

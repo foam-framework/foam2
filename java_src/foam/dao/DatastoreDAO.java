@@ -133,7 +133,7 @@ public class DatastoreDAO
         return obj;
     }
 
-    public Sink select_(X x, Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
         if (sink == null) {
             sink = new ListSink();
         }
@@ -161,7 +161,7 @@ public class DatastoreDAO
         return sink;
     }
 
-    public void removeAll_(X x, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
     }
 
     public void pipe_(X x, Sink s) {
