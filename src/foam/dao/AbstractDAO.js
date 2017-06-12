@@ -162,13 +162,13 @@ foam.CLASS({
     },
 
     function listen(sink) {
-      return listen_(sink, undefined);
+      return listen_(this.__context__, sink, undefined);
     },
 
     /**
       Keeps the given sink up to date with changes to this DAO.
     */
-    function listen_(sink, predicate) {
+    function listen_(x, sink, predicate) {
       var mySink = this.decorateListener_(sink, predicate);
 
       var sub = foam.core.FObject.create();
@@ -348,9 +348,9 @@ foam.CLASS({
           this.predicate);
     },
 
-    function listen_(sink, predicate) {
+    function listen_(x, sink, predicate) {
       return this.delegate.listen_(
-        sink,
+        x, sink,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
