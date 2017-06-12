@@ -104,7 +104,7 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.box.pipeline.PipelineBuilder',
-      name: 'parents_',
+      name: 'parents',
     },
     {
       class: 'FObjectProperty',
@@ -128,11 +128,11 @@ foam.CLASS({
         return this;
       }
 
-      var next = this.clone();
-      var nextPL = next.pipeline = this.Pipeline.create();
-      nextPL.runnable = runnable;
-      next.parents_ = [ this ];
-      this.delegates = this.delegates.concat([next]);
+      var next = this.cls_.create({
+        pipeline: this.Pipeline.create({ runnable: runnable }),
+        parents: [ this ]
+      }, this.__subContext__);
+      this.delegates = this.delegates.concat([ next ]);
       return next;
     },
     function all() {
@@ -143,23 +143,27 @@ foam.CLASS({
       return ret;
     },
     function first(runnable) {
-      var prev = this.clone();
-      var prevPL = prev.pipeline = this.Pipeline.create();
-      prevPL.runnable = runnable;
-      prev.delegates = [ this ];
-      this.parents_ = this.parents_.concat([ prev ]);
+      var prev = this.cls_.create({
+        pipeline: this.Pipeline.create({ runnable: runnable }),
+        delegates: [ this ]
+      }, this.__subContext__);
+      this.parents = this.parents.concat([ prev ]);
       return prev;
     },
     function build() {
-      if ( this.parents_.length === 0 ) return this.build_();
-      else if ( this.parents_.length === 1 ) return this.parents_[0].build_();
+      if ( this.parents.length === 0 ) {
+        return this.build_();
+      } else if ( this.parents.length === 1 ) {
+        this.build_();
+        return this.parents[0].build_();
+      }
 
       throw new Error('Attempted PipelineBuilder.build() with multiple parents. Use PipelineBuilder.buildAll() on pipelines with mulitiple heads.');
     },
     function buildAll() {
-      if ( this.parents_.length === 0 ) return [ this.build_() ];
+      if ( this.parents.length === 0 ) return [ this.build_() ];
 
-      return this.parents_.map(function(parent) { return parent.build_(); })
+      return this.parents.map(function(parent) { return parent.build_(); })
           .reduce(function(acc, v) { return acc.concat(v); });
     },
     function build_() {
