@@ -1,5 +1,6 @@
 package foam.dao;
 
+import foam.core.X;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
 
@@ -18,8 +19,8 @@ public class FilteredDAO
   }
 
   @Override
-  public Sink select_(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    return super.select_(s, skip, limit, order, getPredicate(predicate));
+  public Sink select_(X x, Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    return super.select_(x, s, skip, limit, order, getPredicate(predicate));
   }
 
   @Override

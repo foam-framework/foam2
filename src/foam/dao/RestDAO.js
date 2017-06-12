@@ -81,7 +81,7 @@ foam.CLASS({
           .then(this.onFindResponse);
     },
 
-    function select_(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       /**
        * GET baseURL
        * { skip, limit, order, predicate }

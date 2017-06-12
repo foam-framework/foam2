@@ -106,6 +106,10 @@ foam.INTERFACE({
       javaReturns: 'foam.dao.Sink',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'sink',
           javaType: 'foam.dao.Sink'
         },

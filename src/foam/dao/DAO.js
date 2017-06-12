@@ -60,7 +60,7 @@ foam.INTERFACE({
     {
       name: 'select_',
       returns: 'Promise',
-      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
+      args: [ 'x', 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'removeAll',
