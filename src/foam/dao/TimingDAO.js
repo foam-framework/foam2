@@ -65,10 +65,10 @@ foam.CLASS({
       console.log('Timing: ', act[1], ' ', (this.now()-act[2]).toFixed(3), ' ms');
     },
 
-    function put_(obj) {
+    function put_(x, obj) {
       var act = this.start('put');
       var self = this;
-      return this.SUPER(obj).then(function(o) { self.end(act); return o; });
+      return this.SUPER(x, obj).then(function(o) { self.end(act); return o; });
     },
     function remove_(obj) {
       var act = this.start('remove');

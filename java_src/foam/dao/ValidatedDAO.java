@@ -17,8 +17,8 @@ public class ValidatedDAO
     ((Validateable)obj).validate();
   }
 
-  public FObject put_(FObject value) throws IllegalStateException {
+  public FObject put_(X x, FObject value) throws IllegalStateException {
     this.validate(value);
-    return super.put_(value);
+    return super.put_(x, value);
   }
 }

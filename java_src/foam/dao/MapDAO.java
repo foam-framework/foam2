@@ -39,7 +39,7 @@ public class MapDAO
     return this;
   }
 
-  public FObject put_(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     getData().put(getPrimaryKey().get(obj), obj);
     return obj;
   }

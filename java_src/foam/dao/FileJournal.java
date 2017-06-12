@@ -94,7 +94,7 @@ public class FileJournal
       switch (operation) {
         case "p":
           FObject object = journalParser.parseObject(line);
-          delegate.put_(object);
+          delegate.put(object);
           break;
         case "r":
           Object id = journalParser.parseObjectId(line);

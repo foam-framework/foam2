@@ -42,12 +42,12 @@ foam.CLASS({
   methods: [
     /** Ensures all objects put() in have a unique id set.
       @param obj the object to process. */
-    function put_(obj) {
+    function put_(x, obj) {
       if ( ! obj.hasOwnProperty(this.property) ) {
         obj[this.property] = foam.uuid.randomGUID();
       }
 
-      return this.delegate.put_(obj);
+      return this.delegate.put_(x, obj);
     }
   ]
 });

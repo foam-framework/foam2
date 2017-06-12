@@ -2,6 +2,7 @@ package foam.dao;
 
 import foam.core.ClassInfo;
 import foam.core.FObject;
+import foam.core.X;
 import foam.core.PropertyInfo;
 import foam.mlang.sink.Max;
 
@@ -48,7 +49,7 @@ public class SequenceNumberDAO
     this.setValue(maxValue + 1);
   }
 
-  public FObject put_(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     calcDelegateMax_();
     int val = (int) getProperty_().f(obj);
     if (val < 1) {
@@ -56,6 +57,6 @@ public class SequenceNumberDAO
     } else if (val >= this.value ) {
       this.value = (int) val + 1;
     }
-    return getDelegate().put_(obj);
+    return getDelegate().put_(x, obj);
   }
 }

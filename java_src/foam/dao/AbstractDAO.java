@@ -80,7 +80,7 @@ public abstract class AbstractDAO
   }
 
   public FObject put(FObject obj) {
-    return this.put_(obj);
+    return this.put_(this.getX(), obj);
   }
 
   public FObject remove(FObject obj) {

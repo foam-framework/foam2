@@ -1,6 +1,7 @@
 package foam.dao;
 
 import foam.core.FObject;
+import foam.core.X;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.pm.PM;
@@ -11,10 +12,10 @@ import foam.nanos.pm.PM;
 public class PMDAO extends ProxyDAO {
 
   @Override
-  public FObject put_(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     PM pm = new PM(PMDAO.class, obj.getClassInfo().getId() + ":put");
     try {
-      super.put_(obj);
+      super.put_(x, obj);
     } catch(Exception e) {
       e.printStackTrace();
     } finally {

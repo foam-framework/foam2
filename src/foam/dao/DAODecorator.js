@@ -161,7 +161,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code: function(obj) {
+      code: function(x, obj) {
         // TODO: obj.id can generate garbase, would be
         // slightly faster if DAO.find() could take an object
         // as well.
@@ -169,7 +169,7 @@ foam.CLASS({
         return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find_(obj.id) ).then(function(existing) {
           return self.decorator.write(self.__context__, self.dao, obj, existing);
         }).then(function(obj) {
-          return self.delegate.put_(obj);
+          return self.delegate.put_(x, obj);
         });
       }
     },
