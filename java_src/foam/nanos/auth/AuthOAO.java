@@ -18,8 +18,8 @@ public class AuthOAO
 {
   protected String rootPermission_ = null;
 
-  public AuthOAO(String rootPermission_) {
-    this.rootPermission_ = rootPermission_;
+  public AuthOAO(String rootPermission) {
+    rootPermission_ = rootPermission;
   }
 
   protected String getRootPermission_(X x) {
