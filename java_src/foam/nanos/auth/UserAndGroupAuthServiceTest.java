@@ -17,8 +17,9 @@ public class UserAndGroupAuthServiceTest
   private int numUsers        = 1000000;
   private int numGroups       = 10;
   private int numPermissions  = 100;
-  private ArrayList<X> xArray = new ArrayList<>();
-  private ArrayList<Permission> permissions  = new ArrayList<>();
+
+  private ArrayList<X> xArray               = new ArrayList<>();
+  private ArrayList<Permission> permissions = new ArrayList<>();
 
   @Override
   public void start() {
