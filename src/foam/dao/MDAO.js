@@ -147,7 +147,7 @@ foam.CLASS({
     },
 
     function put_(x, obj) {
-      var oldValue = this.find__(obj.id);
+      var oldValue = this.findSync_(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
       }
@@ -163,12 +163,12 @@ foam.CLASS({
         }));
       }
 
-      return Promise.resolve(this.find__(
+      return Promise.resolve(this.findSync_(
           this.of.isInstance(objOrKey) ? objOrKey.id : objOrKey));
     },
 
     /** internal, synchronous version of find, does not throw */
-    function find__(key) {
+    function findSync_(key) {
       var index = this.idIndex;
       index = index.get(key);
 
@@ -185,7 +185,7 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      var found = this.find__(id);
+      var found = this.findSync_(id);
       if ( found ) {
         self.index.remove(found);
         self.pub('on', 'remove', found);

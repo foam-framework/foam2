@@ -33,7 +33,7 @@ public abstract class AbstractDAO
     throw new UnsupportedOperationException();
   }
 
-  protected Sink decorateSink_(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  protected Sink decorateSink_(Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
     if ( limit != null ) {
       sink = new LimitedSink().setLimit(limit.intValue()).setDelegate(sink);
     }
