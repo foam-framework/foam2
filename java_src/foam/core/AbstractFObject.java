@@ -63,18 +63,12 @@ public abstract class AbstractFObject
 
   public FObject setProperty(String prop, Object value) {
     PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
-    if (property == null) {
-      return null;
-    }
-    property.set(this, value);
+    if (property != null) property.set(this, value);
     return this;
   }
 
   public Object getProperty(String prop) {
     PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
-    if (property == null) {
-      return null;
-    }
-    return property.get(this);
+    return property == null ? null: property.get(this);
   }
 }
