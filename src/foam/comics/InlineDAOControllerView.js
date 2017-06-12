@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'InlineDAOControllerView',
   extends: 'foam.comics.DAOControllerView',
+  
   methods: [
     function initE() {
       this.

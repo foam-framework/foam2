@@ -7,16 +7,15 @@
 package foam.nanos.audit;
 
 import foam.core.FObject;
-import foam.core.PropertyInfo;
 import foam.core.X;
+import foam.mop.ProxyMOP;
 import foam.nanos.auth.User;
 import foam.nanos.logger.NanoLogger;
-import foam.oao.ProxyOAO;
 
 import java.util.*;
 
-public class AuditOAO
-  extends ProxyOAO
+public class AuditMOP
+  extends ProxyMOP
 {
   /**
    * Creates a formatted message containing the list
@@ -30,31 +29,30 @@ public class AuditOAO
     List<String> result = new ArrayList<>();
     for ( Object o : values.keySet() ) {
       String key = (String) o;
-      PropertyInfo prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(key);
-      result.add(key + ": [" + prop.f(obj) + "," + values.get(key) + "]");
+      result.add(key + ": [" + obj.getProperty(key) + "," + values.get(key) + "]");
     }
     return result.toString();
   }
 
   @Override
-  public void setProperty(X x, String name, Object value) {
+  public FObject setProperty(X x, String name, Object value) {
     User user = (User) x.get("user");
     NanoLogger logger = (NanoLogger) x.get("logger");
     FObject obj = getDelegate().get(x);
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = obj.getProperty("id");
     Map values = new HashMap();
     values.put(name, value);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
-    super.setProperty(x, name, value);
+    return super.setProperty(x, name, value);
   }
 
   @Override
-  public void setProperties(X x, Map values) {
+  public FObject setProperties(X x, Map values) {
     User user = (User) x.get("user");
     NanoLogger logger = (NanoLogger) x.get("logger");
     FObject obj = getDelegate().get(x);
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+    Object objectId = obj.getProperty("id");
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
-    super.setProperties(x, values);
+    return super.setProperties(x, values);
   }
 }

@@ -88,11 +88,11 @@ foam.CLASS({
 
   methods: [
     function put(obj, s) {
-      this.delegate.put(this, obj);
+      this.delegate.put(obj, this);
     },
 
     function remove(obj, s) {
-      this.delegate.remove(this, obj);
+      this.delegate.remove(obj, this);
     },
 
     function reset(s) {
