@@ -163,6 +163,7 @@ foam.CLASS({
     function buildAll() {
       if ( this.parents.length === 0 ) return [ this.build_() ];
 
+      this.build_();
       return this.parents.map(function(parent) { return parent.build_(); })
           .reduce(function(acc, v) { return acc.concat(v); });
     },
