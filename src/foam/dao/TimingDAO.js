@@ -75,10 +75,10 @@ foam.CLASS({
       var self = this;
       return this.SUPER(x, obj).then(function() { self.end(act); });
     },
-    function find_(key) {
+    function find_(x, key) {
       var act = this.start('find');
       var self = this;
-      return this.SUPER(key).then(function(o) { self.end(act); return o; });
+      return this.SUPER(x, key).then(function(o) { self.end(act); return o; });
     },
     function select() {
       var act = this.start('select');

@@ -13,7 +13,7 @@ public class ApplicationDAO extends foam.dao.ProxyDAO {
     PropertyInfo primaryKey = (PropertyInfo)obj.getClassInfo().getAxiomByName("id");
 
 
-    Application existing = (Application)(getDelegate().find_(primaryKey.get(obj)));
+    Application existing = (Application)(getDelegate().find_(x, primaryKey.get(obj)));
 
     Application incoming = (Application)super.put_(x, obj);
 

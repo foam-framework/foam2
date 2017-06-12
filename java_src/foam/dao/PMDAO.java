@@ -25,7 +25,7 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public FObject find_(Object id) {
+  public FObject find_(X x,Object id) {
     PM pm;
     if (id instanceof FObject) {
       FObject obj = (FObject)id;
@@ -35,7 +35,7 @@ public class PMDAO extends ProxyDAO {
     }
     FObject fobj = null;
     try {
-      fobj = super.find_(id);
+      fobj = super.find_(x, id);
     } catch(Exception e) {
       e.printStackTrace();
     } finally {

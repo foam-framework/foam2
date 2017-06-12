@@ -173,7 +173,7 @@ foam.CLASS({
       this.delegate.select_(null, skip, limit, order, predicate).then(function(a) {
         a = a.array;
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.remove(a[i]); //TODO: CHANGE ME!!
+          this.remove(a[i]); // TODO: CHANGE ME!!
         }
       }.bind(this));
     },
@@ -226,7 +226,7 @@ foam.CLASS({
               self.remoteDAO.remove(obj);
             } else {
               // TODO: Stop sending updates if the first one fails.
-              self.delegate.find_(id).then(function(obj) {
+              self.delegate.find(id).then(function(obj) {
                 if ( obj ) return self.remoteDAO.put(obj).then(function(obj) {
                   self.processFromServer(obj);
                 });

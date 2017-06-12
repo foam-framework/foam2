@@ -50,7 +50,7 @@ foam.INTERFACE({
     {
       name: 'find_',
       returns: 'Promise',
-      args: [ 'id' ]
+      args: [ 'x', 'id' ]
     },
     {
       name: 'select',

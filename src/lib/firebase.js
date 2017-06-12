@@ -128,7 +128,7 @@ foam.CLASS({
       });
     },
 
-    function find_(id) {
+    function find_(x, id) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
       req.url = this.basepath + "/" + encodeURIComponent(id) + ".json";
@@ -304,7 +304,7 @@ foam.CLASS({
         debugger;
         var id = path.substring(1);
         id = id.substring(0, id.indexOf('/'));
-        this.find_(id).then(function(obj) {
+        this.find(id).then(function(obj) {
           if ( ! obj ) throw com.firebase.ExpectedObjectNotFound.create();
           this.on.put.pub(obj);
         }.bind(this));
@@ -319,7 +319,7 @@ foam.CLASS({
         debugger;
         var id = path.substring(1);
         id = id.substring(0, id.indexOf('/'));
-        this.find_(id).then(function(obj) {
+        this.find(id).then(function(obj) {
           if ( ! obj ) throw com.firebase.ExpectedObjectNotFound.create();
           this.on.put.pub(obj);
         }.bind(this));

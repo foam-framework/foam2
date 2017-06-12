@@ -95,7 +95,7 @@ foam.CLASS({
           return true;
         }
 
-        self.dao.find_(id).then(function(o) {
+        self.dao.find(id).then(function(o) {
           payload = self.fo2o_(o);
           return self.dao.remove(o);
         }).then(function() {
@@ -117,7 +117,7 @@ foam.CLASS({
             return true;
           }
 
-          self.dao.find_(id).then(function(o) {
+          self.dao.find(id).then(function(o) {
             self.sendJSON(res, 200, self.fo2o_(o));
             self.info('200 OK: find() ' + id);
           }).catch(send500);

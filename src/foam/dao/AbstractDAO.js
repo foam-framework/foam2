@@ -259,7 +259,7 @@ foam.CLASS({
     },
 
     function find(id) {
-      return this.find_(id);
+      return this.find_(this.__context__, id);
     },
 
     // Placeholder functions to that selecting from DAO to DAO works.
@@ -325,9 +325,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function find_(key) {
+    function find_(x, key) {
       var predicate = this.predicate;
-      return this.delegate.find_(key).then(function(o) {
+      return this.delegate.find_(x, key).then(function(o) {
         return predicate.f(o) ? o : null;
       });
     },

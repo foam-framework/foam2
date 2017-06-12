@@ -166,7 +166,7 @@ foam.CLASS({
         // slightly faster if DAO.find() could take an object
         // as well.
         var self = this;
-        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find_(obj.id) ).then(function(existing) {
+        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find_(x, obj.id) ).then(function(existing) {
           return self.decorator.write(self.__context__, self.dao, obj, existing);
         }).then(function(obj) {
           return self.delegate.put_(x, obj);
@@ -186,9 +186,9 @@ foam.CLASS({
 
     {
       name: 'find_',
-      code: function(id) {
+      code: function(x, id) {
         var self = this;
-        return this.delegate.find_(id).then(function(obj) {
+        return this.delegate.find_(x, id).then(function(obj) {
           return self.decorator.read(self.__context__, self.dao, obj);
         });
       }

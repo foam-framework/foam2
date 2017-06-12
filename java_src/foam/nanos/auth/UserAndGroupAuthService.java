@@ -40,7 +40,7 @@ public class UserAndGroupAuthService
       return null;
     }
 
-    if ( userDAO_.find_(userId) == null ) {
+    if ( userDAO_.find(userId) == null ) {
       return null;
     }
 
@@ -78,7 +78,7 @@ public class UserAndGroupAuthService
       throw new LoginException("Challenge expired");
     }
 
-    User user = (User) userDAO_.find_(userId);
+    User user = (User) userDAO_.find(userId);
     if ( user == null ) {
       throw new LoginException("User not found");
     }
@@ -96,7 +96,7 @@ public class UserAndGroupAuthService
       throw new LoginException("Invalid Parameters");
     }
 
-    User user = (User) userDAO_.find_(userId);
+    User user = (User) userDAO_.find(userId);
 
     if ( user == null ) {
       throw new LoginException("User not found.");
@@ -123,7 +123,7 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    if ( userDAO_.find_(user.getId()) == null ) {
+    if ( userDAO_.find_(x, user.getId()) == null ) {
       return false;
     }
 
@@ -144,7 +144,7 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("New Password must be different from the old password");
     }
 
-    User user = (User) userDAO_.find_(((User) x.get("user")).getId());
+    User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
     if ( user == null ) {
       throw new IllegalStateException("User not found");
     }

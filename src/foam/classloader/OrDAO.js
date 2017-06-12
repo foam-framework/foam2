@@ -30,10 +30,10 @@ foam.CLASS({
   ],
 
   methods: [
-    function find_(id) {
+    function find_(x, id) {
       var self = this;
-      return this.primary.find_(id).then(function(o) {
-        return o || self.delegate.find_(id);
+      return this.primary.find_(x, id).then(function(o) {
+        return o || self.delegate.find_(x, id);
       });
     }
   ]

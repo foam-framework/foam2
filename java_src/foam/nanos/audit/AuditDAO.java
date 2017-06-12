@@ -51,7 +51,7 @@ public class AuditDAO
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
-    FObject current = this.find_(obj);
+    FObject current = this.find_(x, obj);
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
     return super.put_(x, obj);
