@@ -42,9 +42,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function put_(obj) {
+    function put_(x, obj) {
       this.logger('put', obj);
-      return this.SUPER(obj);
+      return this.SUPER(x, obj);
     },
 
     function remove_(obj) {

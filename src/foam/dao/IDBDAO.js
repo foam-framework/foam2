@@ -162,7 +162,7 @@ foam.CLASS({
       });
     },
 
-    function put_(value) {
+    function put_(x, value) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {

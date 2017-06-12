@@ -65,7 +65,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put_(obj) {
+    function put_(x, obj) {
       var req = this.HTTPRequest.create();
 
       if ( obj.id ) {

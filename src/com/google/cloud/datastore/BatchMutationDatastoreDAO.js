@@ -100,7 +100,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put_(o) {
+    function put_(x, o) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({

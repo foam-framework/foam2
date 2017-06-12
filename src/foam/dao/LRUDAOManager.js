@@ -104,7 +104,7 @@ foam.CLASS({
       the dao size. */
     function onPut(s, on, put_, obj) {
       var self = this;
-      this.trackingDAO.put_(
+      this.trackingDAO.put(
         this.LRUCacheItem.create({
           id: obj.id,
           timestamp: self.getTimestamp()

@@ -30,7 +30,7 @@ foam.INTERFACE({
     {
       name: 'put_',
       returns: 'Promise',
-      args: [ 'obj' ]
+      args: [ 'x', 'obj' ]
     },
     {
       name: 'remove',

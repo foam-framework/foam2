@@ -143,10 +143,10 @@ foam.CLASS({
       Explicitly update cache, else caller will query stale data if
       the staleTimeout is large
     */
-    function put_(obj) {
+    function put_(x, obj) {
       var self = this;
-      return self.delegate.put_(obj).then(function(o) {
-        return self.cache.put_(o);
+      return self.delegate.put_(x, obj).then(function(o) {
+        return self.cache.put_(x, o);
       });
     },
 
@@ -176,7 +176,7 @@ foam.CLASS({
               if ( self.refreshOnCacheHit ) {
                 // Don't record in finds_, since we don't want anyone waiting for it
                 self.delegate.find_(id).then(function (val) {
-                  val && self.cache.put_(val);
+                  val && self.cache.put(val);
                 });
               }
               return val;
@@ -199,7 +199,7 @@ foam.CLASS({
                   return null;
                 }
 
-                return self.cache.put_(val).then(function(val) {
+                return self.cache.put(val).then(function(val) {
                   delete self.finds_[id];
                   return val;
                 }, errorHandler);

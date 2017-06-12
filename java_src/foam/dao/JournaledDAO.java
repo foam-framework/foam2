@@ -7,6 +7,7 @@
 package foam.dao;
 
 import foam.core.FObject;
+import foam.core.X;
 import java.io.IOException;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -29,9 +30,9 @@ public class JournaledDAO
    * @returns FObject
    */
   @Override
-  public FObject put_(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     journal.put(obj, null);
-    return getDelegate().put_(obj);
+    return getDelegate().put_(x, obj);
   }
 
   @Override

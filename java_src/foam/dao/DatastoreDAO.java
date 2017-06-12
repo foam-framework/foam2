@@ -3,6 +3,7 @@ package foam.dao;
 import com.google.appengine.api.datastore.*;
 import foam.core.ClassInfo;
 import foam.core.FObject;
+import foam.core.X;
 import foam.core.PropertyInfo;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -50,7 +51,7 @@ public class DatastoreDAO
         return keyFromPK(getPrimaryKey().get(obj));
     }
 
-    public FObject put_(FObject obj) {
+    public FObject put_(X x, FObject obj) {
         getData().put(serializeFObject(obj));
         return obj;
     }

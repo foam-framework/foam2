@@ -134,7 +134,7 @@ foam.CLASS({
     },
 
     function put(obj) {
-      return this.put_(obj);
+      return this.put_(this.__context__, obj);
     },
 
     /**
@@ -146,7 +146,7 @@ foam.CLASS({
     function pipe(sink) {//, skip, limit, order, predicate) {
       this.pipe_(sink, undefined);
     },
-    
+
     function pipe_(sink, predicate) {
       var dao = this;
 

@@ -114,7 +114,7 @@ foam.CLASS({
       return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
           .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
     },
-    function put_(o) {
+    function put_(x, o) {
       return this.getRequest('commit', JSON.stringify({
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { upsert: o.toDatastoreEntity() } ]
