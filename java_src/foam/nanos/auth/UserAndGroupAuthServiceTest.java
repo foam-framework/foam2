@@ -199,8 +199,15 @@ public class UserAndGroupAuthServiceTest
   }
 
   public void testLogout() {
+    System.out.println("Logout " + numUsers + " Users");
+    long startTime = System.nanoTime();
+
     for ( int i = 0; i < xArray.size(); i++ ) {
       logout(xArray.get(i));
     }
+
+    long endTime                = System.nanoTime();
+    long durationInMilliseconds = (endTime - startTime) / 1000000;
+    System.out.println("Duration: " + durationInMilliseconds + "ms \n");
   }
 }
