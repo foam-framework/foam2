@@ -26,6 +26,11 @@ public class AuthOAO
     return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_;
   }
 
+  private Boolean checkPermission_(X x, AuthService authService, String name) {
+    java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + name);
+    return authService.check(x, permission);
+  }
+
   @Override
   public FObject get(X x) {
     AuthService authService = (AuthService) x.get("authService");
@@ -40,8 +45,7 @@ public class AuthOAO
   @Override
   public FObject setProperty(X x, String name, Object value) {
     AuthService authService = (AuthService) x.get("authService");
-    java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + name);
-    if ( ! authService.check(x, permission) ) {
+    if ( ! checkPermission_(x, authService, name) ) {
       // TODO figure out what to do here
       return null;
     }
@@ -52,9 +56,8 @@ public class AuthOAO
   public FObject setProperties(X x, Map values) {
     AuthService authService = (AuthService) x.get("authService");
     for ( Object o : values.keySet() ) {
-      String key = (String) o;
-      java.security.Permission permission = new AuthPermission(getRootPermission_(x) + "." + key);
-      if ( ! authService.check(x, permission) ) {
+      if ( ! checkPermission_(x, authService, (String) o) ) {
+        // TODO figure out what to do here
         return null;
       }
     }
