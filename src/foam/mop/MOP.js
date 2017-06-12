@@ -5,10 +5,10 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.oao',
-  name: 'OAO',
+  package: 'foam.mop',
+  name: 'MOP',
 
-  documentation: 'OAO Interface',
+  documentation: 'MOP Interface',
 
   methods: [
     {
