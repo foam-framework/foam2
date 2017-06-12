@@ -95,6 +95,12 @@ foam.CLASS({
           });
         }
       }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      name: 'builtInputBox_',
+      value: null
     }
   ],
 
@@ -133,6 +139,8 @@ foam.CLASS({
       return prev;
     },
     function build() {
+      if ( this.builtInputBox_ ) return this.builtInputBox_;
+
       var pl = this.pipeline;
       var onRegisteredBox = this.RPCReturnBox.create();
       var onRegisteredPromise = onRegisteredBox.promise;
@@ -150,7 +158,7 @@ foam.CLASS({
 
       // Accept input objects as input; return box that will wrap them in RPCs
       // to runnable.
-      return this.RunnableRPCBox.create({
+      return this.builtInputBox_ = this.RunnableRPCBox.create({
         delegate: pl.remoteInput,
         errorBox: pl.errorBox
       });
