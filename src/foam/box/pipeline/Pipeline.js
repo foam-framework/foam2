@@ -33,14 +33,8 @@ foam.CLASS({
       of: 'foam.box.Runnable',
       name: 'runnable',
       postSet: function(old, nu) {
-        nu.output = this.output;
+        nu.outputBox = this.output;
       }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.Box',
-      name: 'defaultOutput',
-      factory: function() { return this.LogBox.create(); }
     },
     {
       class: 'FObjectProperty',
@@ -64,9 +58,15 @@ foam.CLASS({
       of: 'foam.box.Box',
       name: 'output',
       postSet: function(old, nu) {
-        this.runnable && this.runnable.output = nu;
+        if ( this.runnable ) this.runnable.outputBox = nu;
       },
       factory: function() { return this.defaultOutput; }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      name: 'defaultOutput',
+      factory: function() { return this.LogBox.create(); }
     },
     {
       class: 'FObjectProperty',

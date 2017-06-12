@@ -37,6 +37,11 @@ foam.CLASS({
       name: 'RunnableRPCBox',
       extends: 'foam.box.ProxyBox',
 
+      requires: [
+        'foam.box.Message',
+        'foam.box.RPCMessage'
+      ],
+
       properties: [
         {
           class: 'FObjectProperty',
@@ -47,13 +52,13 @@ foam.CLASS({
 
       methods: [
         function send(inputMessage) {
-          return this.Message.create({
+          return this.delegate && this.delegate.send(this.Message.create({
             object: this.RPCMessage.create({
               name: 'run',
               args: [ inputMessage.object ],
             }),
             attributes: { errorBox: this.errorBox }
-          });
+          }));
         }
       ]
     }
@@ -79,8 +84,8 @@ foam.CLASS({
         } else if ( this.delegates.length === 1 ) {
           // Just one delegate. Wrap RPCMessage around output value.
           pl.output = this.RunnableRPCBox.create({
-            delegate: nu[0].remoteInput,
-            errorBox: nu[0].errorBox
+            delegate: nu[0].pipeline.remoteInput,
+            errorBox: nu[0].pipeline.errorBox
           });
         } else {
           // Many delegates. Wrap RPCMessage around output value and pass along
@@ -118,8 +123,8 @@ foam.CLASS({
     },
     function then(runnable) {
       var pl = this.pipeline;
-      if ( ! pl.runnable ) {
-        pl.runnable = runnable;
+      if ( ! pl ) {
+        this.pipeline = this.Pipeline.create({ runnable: runnable });
         return this;
       }
 
@@ -147,7 +152,7 @@ foam.CLASS({
     },
     function build() {
       if ( this.parents_.length === 0 ) return this.build_();
-      else if ( this.parents_.length === 1 ) return this.parents[0].build_();
+      else if ( this.parents_.length === 1 ) return this.parents_[0].build_();
 
       throw new Error('Attempted PipelineBuilder.build() with multiple parents. Use PipelineBuilder.buildAll() on pipelines with mulitiple heads.');
     },
