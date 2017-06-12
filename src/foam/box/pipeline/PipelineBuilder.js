@@ -96,7 +96,7 @@ foam.CLASS({
                   delegate: pipelineBuilder.pipeline.remoteInput,
                   errorBox: pipelineBuilder.pipeline.errorBox
                 });
-              })
+              }.bind(this))
           });
         }
       }
@@ -165,9 +165,13 @@ foam.CLASS({
 
       this.build_();
       return this.parents.map(function(parent) { return parent.build_(); })
-          .reduce(function(acc, v) { return acc.concat(v); });
+          .reduce(function(acc, v) { return acc.concat(v); }, []);
     },
     function build_() {
+      // Build forward, just in case build() was initiated in the middle of a
+      // pipeline. NOTE: This is incompatible with circular pipelines.
+      this.delegates.map(function(delegate) { return delegate.build_(); });
+
       if ( this.builtInputBox_ ) return this.builtInputBox_;
 
       var pl = this.pipeline;
