@@ -97,6 +97,11 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectArray',
+      of: 'foam.box.pipeline.PipelineBuilder',
+      name: 'parents_',
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.box.Box',
       name: 'builtInputBox_',
@@ -121,6 +126,7 @@ foam.CLASS({
       var next = this.clone();
       var nextPL = next.pipeline = this.Pipeline.create();
       nextPL.runnable = runnable;
+      next.parents_ = [ this ];
       this.delegates = this.delegates.concat([next]);
       return next;
     },
@@ -136,9 +142,22 @@ foam.CLASS({
       var prevPL = prev.pipeline = this.Pipeline.create();
       prevPL.runnable = runnable;
       prev.delegates = [ this ];
+      this.parents_ = this.parents_.concat([ prev ]);
       return prev;
     },
     function build() {
+      if ( this.parents_.length === 0 ) return this.build_();
+      else if ( this.parents_.length === 1 ) return this.parents[0].build_();
+
+      throw new Error('Attempted PipelineBuilder.build() with multiple parents. Use PipelineBuilder.buildAll() on pipelines with mulitiple heads.');
+    },
+    function buildAll() {
+      if ( this.parents_.length === 0 ) return [ this.build_() ];
+
+      return this.parents_.map(function(parent) { return parent.build_(); })
+          .reduce(function(acc, v) { return acc.concat(v); });
+    },
+    function build_() {
       if ( this.builtInputBox_ ) return this.builtInputBox_;
 
       var pl = this.pipeline;
