@@ -25,8 +25,8 @@ foam.CLASS({
       name: 'classpath'
     },
     {
-      name: 'surpressWarning',
-    },
+      name: 'surpressWarning'
+    }
   ],
 
   methods: [
