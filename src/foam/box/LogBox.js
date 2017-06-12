@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'LogBox',
   extends: 'foam.box.ProxyBox',
 
+  documentation: 'Log input messages before passing to optional delegate.',
+
   requires: [ 'foam.nanos.log.LogLevel' ],
   imports: [
     'debug',
@@ -49,6 +51,7 @@ foam.CLASS({
         this.name,
         foam.isServer ? foam.json.Pretty.stringify(message) : message
       ]);
+      this.delegate && this.delegate.send(message);
     }
   ]
 });
