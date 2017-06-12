@@ -48,7 +48,7 @@ public class JournaledDAO
   }
 
   @Override
-  public Sink select_(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
     return null;
   }
 

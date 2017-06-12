@@ -255,7 +255,7 @@ foam.CLASS({
     },
 
     function select(sink) {
-      return this.select_(sink, undefined, undefined, undefined, undefined);
+      return this.select_(this.__context__, sink, undefined, undefined, undefined, undefined);
     },
 
     function find(id) {
@@ -332,9 +332,9 @@ foam.CLASS({
       });
     },
 
-    function select_(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       return this.delegate.select_(
-        sink, skip, limit, order,
+        x, sink, skip, limit, order,
         predicate ?
           this.And.create({ args: [this.predicate, predicate] }) :
           this.predicate);
@@ -371,8 +371,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function select_(sink, skip, limit, order, predicate) {
-      return this.delegate.select_(sink, skip, limit, order || this.comparator, predicate);
+    function select_(x, sink, skip, limit, order, predicate) {
+      return this.delegate.select_(x, sink, skip, limit, order || this.comparator, predicate);
     },
     function removeAll_(skip, limit, order, predicate) {
       return this.delegate.removeAll_(skip, limit, order || this.comparator, predicate);
@@ -393,8 +393,8 @@ foam.CLASS({
   ],
 
   methods: [
-    function select_(sink, skip, limit, order, predicate) {
-      return this.delegate.select_(sink, this.skip_, limit, order, predicate);
+    function select_(x, sink, skip, limit, order, predicate) {
+      return this.delegate.select_(x, sink, this.skip_, limit, order, predicate);
     },
     function removeAll_(skip, limit, order, predicate) {
       return this.delegate.removeAll_(this.skip_, limit, order, predicate);
@@ -415,9 +415,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function select_(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       return this.delegate.select_(
-        sink, skip,
+        x, sink, skip,
         limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
         order, predicate);
     },

@@ -1,5 +1,6 @@
 package foam.dao;
 
+import foam.core.X;
 import foam.mlang.predicate.And;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
@@ -15,8 +16,8 @@ public class LimitedDAO
     return this;
   }
 
-  public Sink select_(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    return super.select_(s, skip, limit_, order, predicate);
+  public Sink select_(X x, Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    return super.select_(x, s, skip, limit_, order, predicate);
   }
 
   public void removeAll_(Integer skip, Integer limit, Comparator order, Predicate predicate) {

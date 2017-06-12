@@ -287,7 +287,7 @@ foam.CLASS({
       }
     },
 
-    function select_(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
