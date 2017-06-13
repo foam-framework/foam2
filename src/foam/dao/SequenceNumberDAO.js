@@ -82,7 +82,7 @@ foam.CLASS({
     /** Sets the property on the given object and increments the next value.
       If the unique starting value has not finished calculating, the returned
       promise will not resolve until it is ready. */
-    function put(obj) {
+    function put_(x, obj) {
       var self = this;
       return this.calcDelegateMax_.then(function() {
         var val = self.property_.f(obj);
@@ -95,7 +95,7 @@ foam.CLASS({
           self.value = val + 1;
         }
 
-        return self.delegate.put(obj);
+        return self.delegate.put_(x, obj);
       });
     }
   ]
