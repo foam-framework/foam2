@@ -22,23 +22,23 @@ public class Boot {
 
   public Boot() {
     // Used for all the services that will be required when Booting
-    MapDAO serviceDAOConstruct = new MapDAO();
-    serviceDAOConstruct.setOf(NSpec.getOwnClassInfo());
-    serviceDAOConstruct.setX(root_);
-    serviceDAO_ = serviceDAOConstruct;
+    MapDAO serviceDAO = new MapDAO();
+    serviceDAO.setOf(NSpec.getOwnClassInfo());
+    serviceDAO.setX(root_);
+    serviceDAO_ = serviceDAO;
 
     // Used to hold all of the users in our system
-    MapDAO userDAOConstruct = new MapDAO();
-    userDAOConstruct.setOf(User.getOwnClassInfo());
-    userDAOConstruct.setX(root_);
-    userDAO_ = userDAOConstruct;
+    MapDAO userDAO = new MapDAO();
+    userDAO.setOf(User.getOwnClassInfo());
+    userDAO.setX(root_);
+    userDAO_ = userDAO;
     root_.put("userDAO", userDAO_);
 
     // Used for groups. We have multiple groups that contain different users
-    MapDAO groupDAOConstruct = new MapDAO();
-    groupDAOConstruct.setOf(Group.getOwnClassInfo());
-    groupDAOConstruct.setX(root_);
-    groupDAO_ = groupDAOConstruct;
+    MapDAO groupDAO = new MapDAO();
+    groupDAO.setOf(Group.getOwnClassInfo());
+    groupDAO.setX(root_);
+    groupDAO_ = groupDAO;
     root_.put("groupDAO", groupDAO_);
 
     loadServices();
