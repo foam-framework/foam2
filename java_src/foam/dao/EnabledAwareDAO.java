@@ -6,6 +6,7 @@
 
 package foam.dao;
 
+import foam.core.X;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
 import foam.dao.Sink;
@@ -15,11 +16,11 @@ public class EnabledAwareDAO
 {
   public static final Predicate PREDICATE = foam.mlang.MLang.EQ(EnabledAware.ENABLED, true);
 
-  public Sink select(Sink s, Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    return super.select(s, skip, limit, order, PREDICATE);
+  public Sink select_(X x, Sink s, Long skip, Long limit, Comparator order, Predicate predicate) {
+    return super.select_(x, s, skip, limit, order, PREDICATE);
   }
 
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
-    super.removeAll(skip, limit, order, PREDICATE);
+  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+    super.removeAll_(x, skip, limit, order, PREDICATE);
   }
 }

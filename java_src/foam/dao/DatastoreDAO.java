@@ -3,6 +3,7 @@ package foam.dao;
 import com.google.appengine.api.datastore.*;
 import foam.core.ClassInfo;
 import foam.core.FObject;
+import foam.core.X;
 import foam.core.PropertyInfo;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -50,17 +51,17 @@ public class DatastoreDAO
         return keyFromPK(getPrimaryKey().get(obj));
     }
 
-    public FObject put(FObject obj) {
+    public FObject put_(X x, FObject obj) {
         getData().put(serializeFObject(obj));
         return obj;
     }
 
-    public FObject remove(FObject obj) {
+    public FObject remove_(X x, FObject obj) {
         getData().delete(keyFromFObject(obj));
         return obj;
     }
 
-    public FObject find(Object id) {
+    public FObject find_(X x, Object id) {
         Entity result;
         try {
             result = getData().get(keyFromPK(id));
@@ -132,7 +133,7 @@ public class DatastoreDAO
         return obj;
     }
 
-    public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
         if (sink == null) {
             sink = new ListSink();
         }
@@ -160,10 +161,10 @@ public class DatastoreDAO
         return sink;
     }
 
-    public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+    public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
     }
 
-    public void pipe(Sink s) {
+    public void pipe_(X x, Sink s) {
         // TODO
     }
 }

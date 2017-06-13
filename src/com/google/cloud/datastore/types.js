@@ -107,11 +107,12 @@ foam.LIB({
       }
       return { arrayValue: { values: values } };
     },
-    function fromDatastoreValue(v) {
+    function fromDatastoreValue(v, opt_ctx) {
       var values = v.arrayValue;
       var arr = new Array(values.length);
       for ( var i = 0; i < values.length; i++ ) {
-        arr[i] = com.google.cloud.datastore.fromDatastoreValue(values[i]);
+        arr[i] = com.google.cloud.datastore.fromDatastoreValue(
+            values[i], opt_ctx);
       }
       return arr;
     }
@@ -136,16 +137,16 @@ foam.LIB({
 
   methods: [
     function toDatastoreValue(o) { return o.toDatastoreValue(); },
-    function fromDatastoreValue(v) {
-      return this.fromDatastoreEntity(v.entityValue);
+    function fromDatastoreValue(v, opt_ctx) {
+      return this.fromDatastoreEntity(v.entityValue, opt_ctx);
     },
-    function fromDatastoreEntity(entity) {
+    function fromDatastoreEntity(entity, opt_ctx) {
       var keys = entity.key.path;
       var key = keys[keys.length - 1];
       var cls = foam.lookup(key.kind);
       var id = key.name;
 
-      var o = cls.create();
+      var o = cls.create(null, opt_ctx);
 
       if ( cls.ids && cls.ids.length > 1 ) {
         throw new Error('Not implemented: Deserialization of Cloud Datastore ' +
@@ -161,7 +162,8 @@ foam.LIB({
       var props = entity.properties;
       for ( var name in props ) {
         if ( props.hasOwnProperty(name) ) {
-          o[name] = com.google.cloud.datastore.fromDatastoreValue(props[name]);
+          o[name] = com.google.cloud.datastore.fromDatastoreValue(
+              props[name], opt_ctx);
         }
       }
 
@@ -193,11 +195,11 @@ foam.LIB({
 
       return t.toDatastoreValue(o);
     },
-    function fromDatastoreValue(v) {
-      return this.typeOfDatastoreValue(v).fromDatastoreValue(v);
+    function fromDatastoreValue(v, opt_ctx) {
+      return this.typeOfDatastoreValue(v).fromDatastoreValue(v, opt_ctx);
     },
-    function fromDatastoreEntity(v) {
-      return foam.core.FObject.fromDatastoreEntity(v);
+    function fromDatastoreEntity(v, opt_ctx) {
+      return foam.core.FObject.fromDatastoreEntity(v, opt_ctx);
     },
     {
       name: 'typeOfDatastoreValue',
@@ -321,6 +323,20 @@ foam.CLASS({
         if ( i !== props.length - 1 ) str += sep;
       }
       return str;
+    }
+  ]
+});
+
+//
+// Refine Enum values to output integer: enumValue.ordinal.
+//
+
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+
+  methods: [
+    function toDatastoreValue() {
+      return { integerValue: this.ordinal };
     }
   ]
 });

@@ -52,8 +52,8 @@ foam.CLASS({
   methods: [
     {
       name: 'createService',
-      javaReturns: 'foam.nanos.NanoService',
-      javaCode: `return (foam.nanos.NanoService) Class.forName(getServiceClass()).newInstance();`,
+      javaReturns: 'java.lang.Object',
+      javaCode: `return Class.forName(getServiceClass()).newInstance();`,
       javaThrows: [
         'java.lang.ClassNotFoundException',
         'java.lang.InstantiationException',
