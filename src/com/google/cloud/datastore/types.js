@@ -157,7 +157,7 @@ foam.LIB({
           cls.getAxiomByName(cls.ids[0]) :
           cls.getAxiomByName('id');
 
-      if ( idProp ) o[idProp.name] = id;
+      if ( idProp ) o[idProp.name] = idProp.fromDatastoreKeyName(id);
 
       var props = entity.properties;
       for ( var name in props ) {
@@ -323,6 +323,9 @@ foam.CLASS({
         if ( i !== props.length - 1 ) str += sep;
       }
       return str;
+    },
+    function fromDatastoreKeyName(name) {
+      return name.split(this.stringSeparator);
     }
   ]
 });
@@ -407,6 +410,7 @@ foam.CLASS({
     },
     function toDatastoreValue() {
       return { entityValue: this.toDatastoreEntity() };
-    }
+    },
+    function fromDatastoreKeyName(name) { return name; }
   ]
 });
