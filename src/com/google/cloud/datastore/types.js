@@ -220,6 +220,7 @@ foam.LIB({
           doubleValue: foam.Number,
           timestampValue: foam.Date,
           stringValue: foam.String,
+          arrayValue: foam.Array,
           entityValue: foam.core.FObject
         };
         return function typeOfDatastoreValue(v) {
