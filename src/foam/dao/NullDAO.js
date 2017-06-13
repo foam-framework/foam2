@@ -42,13 +42,13 @@ foam.CLASS({
       return Promise.resolve(null);
     },
 
-    function select(sink) {
+    function select_(x, sink, skip, limit, order, predicate) {
       sink = sink || foam.dao.ArraySink.create();
       sink.eof();
       return Promise.resolve(sink);
     },
 
-    function removeAll() {
+    function removeAll_(x, skip, limit, order, predicate) {
       return Promise.resolve();
     }
   ]
