@@ -7,6 +7,7 @@
 package foam.dao.history;
 
 import foam.core.FObject;
+import foam.core.X;
 import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
 import foam.dao.SequenceNumberDAO;
@@ -62,11 +63,11 @@ public class HistoryDAO
   }
 
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    FObject current = this.find(obj);
+    FObject current = this.find_(x, obj);
 
     // add new history record
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
@@ -75,17 +76,17 @@ public class HistoryDAO
     historyRecord.setUser(formatUserName(user));
     historyRecord.setTimestamp(new Date());
     historyRecord.setUpdates(getUpdatedProperties(current, obj));
-    historyDAO.put(historyRecord);
+    historyDAO.put_(x, historyRecord);
 
-    return super.put(obj);
+    return super.put_(x, obj);
   }
 
   @Override
-  public FObject remove(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     // TODO: use context-oriented context when available.
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    historyDAO.removeAll(null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
-    return super.remove(obj);
+    historyDAO.removeAll_(x, null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
+    return super.remove_(x, obj);
   }
 }

@@ -30,7 +30,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function find(id) {
+    function find_(x, id) {
       var foamCLASS = foam.CLASS;
       var self = this;
       var model;
