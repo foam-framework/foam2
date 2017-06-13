@@ -15,8 +15,8 @@ public class UserAndGroupAuthService
   extends    ContextAwareSupport
   implements AuthService
 {
-  protected DAO        userDAO_;
-  protected DAO        groupDAO_;
+  protected DAO userDAO_;
+  protected DAO groupDAO_;
   protected Map challengeMap;
 
   @Override
