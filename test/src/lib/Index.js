@@ -324,7 +324,6 @@ describe('TreeIndex', function() {
 
     // Note: this is checking an implementation detail
     // Each item in the In array produces a plan
-    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
     expect(plan.subPlans.length).toEqual(3);
 
     plan.execute([], sink);
@@ -343,7 +342,6 @@ describe('TreeIndex', function() {
 
     // Note: this is checking an implementation detail
     // Each item in the In array produces a plan
-    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
     expect(plan.subPlans.length).toEqual(3);
 
     plan.execute([], sink);
@@ -368,10 +366,6 @@ describe('TreeIndex', function() {
   it('optimizes EQ', function() {
     plan = idx.plan(sink, undefined, undefined, undefined,
       m.EQ(test.Indexable.INT, 4));
-
-    // Note: this is checking an implementation detail
-    expect(foam.dao.index.AltPlan.isInstance(plan)).toEqual(true);
-    expect(plan.subPlans.length).toEqual(1);
 
     plan.execute([], sink);
 
@@ -735,6 +729,7 @@ describe('Plan', function() {
     foam.dao.index.CustomPlan.create().toString();
     foam.dao.index.CountPlan.create().toString();
     foam.dao.index.AltPlan.create().toString();
+    foam.dao.index.MergePlan.create().toString();
   });
 });
 
@@ -1048,7 +1043,7 @@ describe('MergePlan', function() {
       ids: ['a'],
       properties: [
         { name: 'a' },
-        { name: 'b' }
+        { name: 'b', class:'Date' }
       ]
     });
 
@@ -1102,8 +1097,8 @@ describe('MergePlan', function() {
 
     plan.execute([], sink, undefined, undefined, ordering);
     expect(sink.array.length).toBe(10);
-    expect(sink.array[0].b).toBe(1); // should be ordered by 'b'
-    expect(sink.array[9].b).toBe(10);
+    expect(sink.array[0].b).toEqual(new Date(1)); // should be ordered by 'b'
+    expect(sink.array[9].b).toEqual(new Date(10));
   });
 
   it('deduplicates with ordering', function() {
@@ -1239,21 +1234,21 @@ describe('MergePlan', function() {
 
     expect(sink.array.length).toBe(15);
 
-    expect(sink.array[0].a).toBe(14); expect(sink.array[0].b).toBe(-4);
-    expect(sink.array[1].a).toBe(13); expect(sink.array[1].b).toBe(-3);
-    expect(sink.array[2].a).toBe(12); expect(sink.array[2].b).toBe(-2);
-    expect(sink.array[3].a).toBe(11); expect(sink.array[3].b).toBe(-1);
-    expect(sink.array[4].a).toBe(10); expect(sink.array[4].b).toBe(0);
-    expect(sink.array[5].a).toBe(9); expect(sink.array[5].b).toBe(1);
-    expect(sink.array[6].a).toBe(8); expect(sink.array[6].b).toBe(2);
-    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toBe(3);
-    expect(sink.array[8].a).toBe(6); expect(sink.array[8].b).toBe(4);
-    expect(sink.array[9].a).toBe(5); expect(sink.array[9].b).toBe(5);
-    expect(sink.array[10].a).toBe(4); expect(sink.array[10].b).toBe(6);
-    expect(sink.array[11].a).toBe(3); expect(sink.array[11].b).toBe(7);
-    expect(sink.array[12].a).toBe(2); expect(sink.array[12].b).toBe(8);
-    expect(sink.array[13].a).toBe(1); expect(sink.array[13].b).toBe(9);
-    expect(sink.array[14].a).toBe(0); expect(sink.array[14].b).toBe(10);
+      expect(sink.array[0].a).toBe(14); expect(sink.array[0].b).toEqual(new Date(-4));
+    expect(sink.array[1].a).toBe(13); expect(sink.array[1].b).toEqual(new Date(-3));
+    expect(sink.array[2].a).toBe(12); expect(sink.array[2].b).toEqual(new Date(-2));
+    expect(sink.array[3].a).toBe(11); expect(sink.array[3].b).toEqual(new Date(-1));
+    expect(sink.array[4].a).toBe(10); expect(sink.array[4].b).toEqual(new Date(0));
+    expect(sink.array[5].a).toBe(9); expect(sink.array[5].b).toEqual(new Date(1));
+    expect(sink.array[6].a).toBe(8); expect(sink.array[6].b).toEqual(new Date(2));
+    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toEqual(new Date(3));
+    expect(sink.array[8].a).toBe(6); expect(sink.array[8].b).toEqual(new Date(4));
+    expect(sink.array[9].a).toBe(5); expect(sink.array[9].b).toEqual(new Date(5));
+    expect(sink.array[10].a).toBe(4); expect(sink.array[10].b).toEqual(new Date(6));
+    expect(sink.array[11].a).toBe(3); expect(sink.array[11].b).toEqual(new Date(7));
+    expect(sink.array[12].a).toBe(2); expect(sink.array[12].b).toEqual(new Date(8));
+    expect(sink.array[13].a).toBe(1); expect(sink.array[13].b).toEqual(new Date(9));
+    expect(sink.array[14].a).toBe(0); expect(sink.array[14].b).toEqual(new Date(10));
 
 
   });
@@ -1283,21 +1278,21 @@ describe('MergePlan', function() {
 
     expect(sink.array.length).toBe(15);
 
-    expect(sink.array[0].a).toBe(14); expect(sink.array[0].b).toBe(-4);
-    expect(sink.array[1].a).toBe(13); expect(sink.array[1].b).toBe(-3);
-    expect(sink.array[2].a).toBe(12); expect(sink.array[2].b).toBe(-2);
-    expect(sink.array[3].a).toBe(11); expect(sink.array[3].b).toBe(-1);
-    expect(sink.array[4].a).toBe(10); expect(sink.array[4].b).toBe(0);
-    expect(sink.array[5].a).toBe(9); expect(sink.array[5].b).toBe(1);
-    expect(sink.array[6].a).toBe(8); expect(sink.array[6].b).toBe(2);
-    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toBe(3);
-    expect(sink.array[8].a).toBe(6); expect(sink.array[8].b).toBe(4);
-    expect(sink.array[9].a).toBe(5); expect(sink.array[9].b).toBe(5);
-    expect(sink.array[10].a).toBe(4); expect(sink.array[10].b).toBe(6);
-    expect(sink.array[11].a).toBe(3); expect(sink.array[11].b).toBe(7);
-    expect(sink.array[12].a).toBe(2); expect(sink.array[12].b).toBe(8);
-    expect(sink.array[13].a).toBe(1); expect(sink.array[13].b).toBe(9);
-    expect(sink.array[14].a).toBe(0); expect(sink.array[14].b).toBe(10);
+    expect(sink.array[0].a).toBe(14); expect(sink.array[0].b).toEqual(new Date(-4));
+    expect(sink.array[1].a).toBe(13); expect(sink.array[1].b).toEqual(new Date(-3));
+    expect(sink.array[2].a).toBe(12); expect(sink.array[2].b).toEqual(new Date(-2));
+    expect(sink.array[3].a).toBe(11); expect(sink.array[3].b).toEqual(new Date(-1));
+    expect(sink.array[4].a).toBe(10); expect(sink.array[4].b).toEqual(new Date(0));
+    expect(sink.array[5].a).toBe(9); expect(sink.array[5].b).toEqual(new Date(1));
+    expect(sink.array[6].a).toBe(8); expect(sink.array[6].b).toEqual(new Date(2));
+    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toEqual(new Date(3));
+    expect(sink.array[8].a).toBe(6); expect(sink.array[8].b).toEqual(new Date(4));
+    expect(sink.array[9].a).toBe(5); expect(sink.array[9].b).toEqual(new Date(5));
+    expect(sink.array[10].a).toBe(4); expect(sink.array[10].b).toEqual(new Date(6));
+    expect(sink.array[11].a).toBe(3); expect(sink.array[11].b).toEqual(new Date(7));
+    expect(sink.array[12].a).toBe(2); expect(sink.array[12].b).toEqual(new Date(8));
+    expect(sink.array[13].a).toBe(1); expect(sink.array[13].b).toEqual(new Date(9));
+    expect(sink.array[14].a).toBe(0); expect(sink.array[14].b).toEqual(new Date(10));
 
   });
 
@@ -1326,11 +1321,11 @@ describe('MergePlan', function() {
 
     expect(sink.array.length).toBe(5);
 
-    expect(sink.array[0].a).toBe(11); expect(sink.array[0].b).toBe(-1);
-    expect(sink.array[1].a).toBe(10); expect(sink.array[1].b).toBe(0);
-    expect(sink.array[2].a).toBe(9); expect(sink.array[2].b).toBe(1);
-    expect(sink.array[3].a).toBe(8); expect(sink.array[3].b).toBe(2);
-    expect(sink.array[4].a).toBe(7); expect(sink.array[4].b).toBe(3);
+    expect(sink.array[0].a).toBe(11); expect(sink.array[0].b).toEqual(new Date(-1));
+    expect(sink.array[1].a).toBe(10); expect(sink.array[1].b).toEqual(new Date(0));
+    expect(sink.array[2].a).toBe(9); expect(sink.array[2].b).toEqual(new Date(1));
+    expect(sink.array[3].a).toBe(8); expect(sink.array[3].b).toEqual(new Date(2));
+    expect(sink.array[4].a).toBe(7); expect(sink.array[4].b).toEqual(new Date(3));
 
   });
 
@@ -1411,14 +1406,14 @@ describe('MergePlan', function() {
 
     expect(sink.array.length).toBe(8);
 
-    expect(sink.array[0].a).toBe(0); expect(sink.array[0].b).toBe(0);
-    expect(sink.array[1].a).toBe(1); expect(sink.array[1].b).toBe(0);
-    expect(sink.array[2].a).toBe(2); expect(sink.array[2].b).toBe(0);
-    expect(sink.array[3].a).toBe(3); expect(sink.array[3].b).toBe(0);
-    expect(sink.array[4].a).toBe(4); expect(sink.array[4].b).toBe(1);
-    expect(sink.array[5].a).toBe(5); expect(sink.array[5].b).toBe(1);
-    expect(sink.array[6].a).toBe(6); expect(sink.array[6].b).toBe(1);
-    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toBe(1);
+    expect(sink.array[0].a).toBe(0); expect(sink.array[0].b).toEqual(new Date(0));
+    expect(sink.array[1].a).toBe(1); expect(sink.array[1].b).toEqual(new Date(0));
+    expect(sink.array[2].a).toBe(2); expect(sink.array[2].b).toEqual(new Date(0));
+    expect(sink.array[3].a).toBe(3); expect(sink.array[3].b).toEqual(new Date(0));
+    expect(sink.array[4].a).toBe(4); expect(sink.array[4].b).toEqual(new Date(1));
+    expect(sink.array[5].a).toBe(5); expect(sink.array[5].b).toEqual(new Date(1));
+    expect(sink.array[6].a).toBe(6); expect(sink.array[6].b).toEqual(new Date(1));
+    expect(sink.array[7].a).toBe(7); expect(sink.array[7].b).toEqual(new Date(1));
 
   });
 
