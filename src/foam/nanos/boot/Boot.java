@@ -8,8 +8,9 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
-import foam.mlang.*;
-import foam.nanos.auth.*;
+import foam.nanos.auth.Group;
+import foam.nanos.auth.User;
+import foam.nanos.http.FileServlet;
 import foam.nanos.pm.*;
 import foam.nanos.pm.PMDAO;
 
@@ -105,6 +106,11 @@ public class Boot {
     uptime.setServiceClass("foam.nanos.http.UptimeServlet");
     uptime.setLazy(false);
     serviceDAO_.put(uptime);
+
+    NSpec file = new NSpec();
+    file.setName(FileServlet.SERVLET_NAME);
+    file.setServiceClass(FileServlet.class.getName());
+    serviceDAO_.put(file);
   }
 
   public static void main (String[] args)
