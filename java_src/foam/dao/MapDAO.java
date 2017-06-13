@@ -39,17 +39,17 @@ public class MapDAO
     return this;
   }
 
-  public FObject put(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     getData().put(getPrimaryKey().get(obj), obj);
     return obj;
   }
 
-  public FObject remove(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     getData().remove(getPrimaryKey().get(obj));
     return obj;
   }
 
-  public FObject find(Object o) {
+  public FObject find_(X x, Object o) {
     return AbstractFObject.maybeClone(
             getOf().isInstance(o)
             ? getData().get(getPrimaryKey().get(o))
@@ -57,7 +57,7 @@ public class MapDAO
     );
   }
 
-  public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
     if ( sink == null ) {
       sink = new ListSink();
     }
@@ -76,11 +76,11 @@ public class MapDAO
     return sink;
   }
 
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
     setData(null);
   }
 
-  public void pipe(Sink s) {
+  public void pipe_(X x, Sink s) {
     // TODO
   }
 }

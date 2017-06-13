@@ -62,7 +62,7 @@ foam.CLASS({
       name: 'delegate',
       hidden: true,
       topics: [ 'on' ],
-      forwards: [ 'find', 'select' ],
+      forwards: [ 'find_', 'select_' ],
       expression: function(src, cache) {
         // Preload src into cache, then proxy everything to cache that we
         // don't override explicitly.
@@ -93,28 +93,28 @@ foam.CLASS({
 
     /** Puts are sent to the cache and to the source, ensuring both
       are up to date. */
-    function put(o) {
+    function put_(x, o) {
       var self = this;
       // ensure the returned object from src is cached.
       return self.src.put(o).then(function(srcObj) {
-        return self.delegate.put(srcObj);
+        return self.delegate.put_(x, srcObj);
       })
     },
 
     /** Removes are sent to the cache and to the source, ensuring both
       are up to date. */
-    function remove(o) {
+    function remove_(x, o) {
       var self = this;
       return self.src.remove(o).then(function() {
-        return self.delegate.remove(o);
+        return self.delegate.remove_(x, o);
       })
     },
    /** removeAll is executed on the cache and the source, ensuring both
       are up to date. */
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       var self = this;
-      return self.src.removeAll(skip, limit, order, predicate).then(function() {
-        return self.delegate.removeAll(skip, limit, order, predicate);
+      return self.src.removeAll_(x, skip, limit, order, predicate).then(function() {
+        return self.delegate.removeAll_(x, skip, limit, order, predicate);
       })
     }
   ],

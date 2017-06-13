@@ -108,27 +108,27 @@ foam.CLASS({
       });
     },
 
-    function find(idOrObj) {
+    function find_(x, idOrObj) {
       var key = foam.core.FObject.isInstance(idOrObj) ?
           idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
       return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
           .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
     },
-    function put(o) {
+    function put_(x, o) {
       return this.getRequest('commit', JSON.stringify({
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { upsert: o.toDatastoreEntity() } ]
       })).send().then(this.onResponse.bind(this, 'put'))
           .then(this.onPutResponse.bind(this, o));
     },
-    function remove(o) {
+    function remove_(x, o) {
       return this.getRequest('commit', JSON.stringify({
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { delete: o.getDatastoreKey() } ]
       })).send().then(this.onResponse.bind(this, 'remove'))
           .then(this.onRemoveResponse.bind(this, o));
     },
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var payload = { query: { kind: [
         this.of.getClassDatastoreKind()
@@ -151,8 +151,8 @@ foam.CLASS({
                 requestPayload: payload
               })));
     },
-    function removeAll(skip, limit, order, predicate) {
-      return this.select(undefined, skip, limit, order, predicate)
+    function removeAll_(x, skip, limit, order, predicate) {
+      return this.select_(x, undefined, skip, limit, order, predicate)
           .then(this.onRemoveAll);
     },
 

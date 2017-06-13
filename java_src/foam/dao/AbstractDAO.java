@@ -29,11 +29,11 @@ public abstract class AbstractDAO
     return new LimitedDAO().setLimit(count).setDelegate(this);
   }
 
-  public void pipe(foam.dao.Sink sink) {
+  public void pipe_(X x, foam.dao.Sink sink) {
     throw new UnsupportedOperationException();
   }
 
-  protected Sink decorateSink_(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  protected Sink decorateSink_(Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
     if ( limit != null ) {
       sink = new LimitedSink().setLimit(limit.intValue()).setDelegate(sink);
     }
@@ -72,10 +72,41 @@ public abstract class AbstractDAO
   }
 
   public void listen() {
+    this.listen_(this.getX());
+  }
+
+  public void listen_(X x) {
     // TODO
   }
 
+  public FObject put(FObject obj) {
+    return this.put_(this.getX(), obj);
+  }
+
+  public FObject remove(FObject obj) {
+    return this.remove_(this.getX(), obj);
+  }
+
+  public void removeAll() {
+    this.removeAll_(this.getX(), null, null, null, null);
+  }
+
   public Sink select(Sink sink) {
-    return this.select(sink, 0, Integer.MAX_VALUE, null, null);
+    return this.select_(this.getX(), sink, null, null, null, null);
+  }
+
+  public FObject find(Object id) {
+    return this.find_(this.getX(), id);
+  }
+
+  public void pipe(Sink sink) {
+    this.pipe_(this.getX(), sink);
+  }
+
+  public DAO inX(X x) {
+    ProxyDAO dao = new ProxyDAO();
+    dao.setDelegate(this);
+    dao.setX(x);
+    return dao;
   }
 }
