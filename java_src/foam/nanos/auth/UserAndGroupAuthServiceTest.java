@@ -66,7 +66,7 @@ public class UserAndGroupAuthServiceTest
   public void addTestUsers() {
     System.out.println("Registering " + numUsers + " Users");
     long startTime  = System.nanoTime();
-    ListSink sink   = (ListSink) groupDAO_.select(new ListSink(), null, null, null, null);
+    ListSink sink   = (ListSink) groupDAO_.select(new ListSink());
 
     /**
      * For each user, randomly select a group from the groups created
@@ -116,7 +116,7 @@ public class UserAndGroupAuthServiceTest
   public void testCheck() {
     System.out.println("Permissions Check for " + numUsers + " users");
     long startTime = System.nanoTime();
-    ListSink sink  = (ListSink) groupDAO_.select(new ListSink(), null, null, null, null);
+    ListSink sink  = (ListSink) groupDAO_.select(new ListSink());
 
     /**
      * For each user, we check if they have access to a random permission
