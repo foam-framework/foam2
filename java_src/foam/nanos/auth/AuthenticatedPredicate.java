@@ -5,7 +5,7 @@ package foam.nanos.auth;
 public class AuthenticatedPredicate 
 {
 
-  class AuthenticatedDAO (String rootPermission)
+  class AuthenticatedPredicate (String rootPermission)
   {
     
   }
