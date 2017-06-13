@@ -122,7 +122,7 @@ foam.CLASS({
   name: 'SubMenuView',
   extends: 'foam.nanos.menu.PopupMenu',
 
-  properties: [ 'menu', 'X' ],
+  properties: [ 'X', 'menu' ],
 
   methods: [
     function initE() {
@@ -180,6 +180,11 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'handler'
+    },
+    {
+      class: 'Int',
+      name: 'order',
+      value: 1000
     }
   ],
 
