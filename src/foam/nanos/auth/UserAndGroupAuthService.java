@@ -16,14 +16,14 @@ public class UserAndGroupAuthService
   extends    ContextAwareSupport
   implements AuthService
 {
-  protected MapDAO        userDAO_;
-  protected MapDAO        groupDAO_;
+  protected DAO        userDAO_;
+  protected DAO        groupDAO_;
   protected LinkedHashMap challengeMap;
 
   @Override
   public void start() {
-    userDAO_  = (MapDAO) getX().get("userDAO");
-    groupDAO_ = (MapDAO) getX().get("groupDAO");
+    userDAO_  = (DAO) getX().get("userDAO");
+    groupDAO_ = (DAO) getX().get("groupDAO");
 
     //TODO: Implement LRU LinkedHashMap
     challengeMap = new LinkedHashMap<String, Challenge>(20000);

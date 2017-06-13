@@ -17,30 +17,33 @@ public class Boot {
   protected DAO    serviceDAO_;
   protected DAO    userDAO_;
   protected DAO    groupDAO_;
-  protected MapDAO pmDAO_;
-  protected X      root_ = new ProxyX();
+  protected DAO    pmDAO_;
+  protected X         root_ = new ProxyX();
 
   public Boot() {
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new MapDAO();
-    ((MapDAO) serviceDAO_).setOf(NSpec.getOwnClassInfo());
-    ((MapDAO) serviceDAO_).setX(root_);
+    MapDAO serviceDAOConstruct = new MapDAO();
+    serviceDAOConstruct.setOf(NSpec.getOwnClassInfo());
+    serviceDAOConstruct.setX(root_);
+    serviceDAO_ = serviceDAOConstruct;
 
     // Used to hold all of the users in our system
-    userDAO_ = new MapDAO();
-    ((MapDAO) userDAO_).setOf(User.getOwnClassInfo());
-    ((MapDAO) userDAO_).setX(root_);
+    MapDAO userDAOConstruct = new MapDAO();
+    userDAOConstruct.setOf(User.getOwnClassInfo());
+    userDAOConstruct.setX(root_);
+    userDAO_ = userDAOConstruct;
     root_.put("userDAO", userDAO_);
 
     // Used for groups. We have multiple groups that contain different users
-    groupDAO_ = new MapDAO();
-    ((MapDAO) groupDAO_).setOf(Group.getOwnClassInfo());
-    ((MapDAO) groupDAO_).setX(root_);
+    MapDAO groupDAOConstruct = new MapDAO();
+    groupDAOConstruct.setOf(Group.getOwnClassInfo());
+    groupDAOConstruct.setX(root_);
+    groupDAO_ = groupDAOConstruct;
     root_.put("groupDAO", groupDAO_);
 
     loadServices();
 
-    ((AbstractDAO) serviceDAO_).select(new AbstractSink() {
+    serviceDAO_.select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("Registering: " + sp.getName());
@@ -53,7 +56,7 @@ public class Boot {
      */
     root_ = root_.put("firewall", "firewall");
 
-    ((AbstractDAO) serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false))).select(new AbstractSink() {
+    serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
