@@ -36,23 +36,27 @@ public class AuditMOP
 
   @Override
   public FObject setProperty(X x, String name, Object value) {
-    User user = (User) x.get("user");
-    NanoLogger logger = (NanoLogger) x.get("logger");
-    FObject obj = getDelegate().get(x);
-    Object objectId = obj.getProperty("id");
-    Map values = new HashMap();
+    User       user     = (User) x.get("user");
+    NanoLogger logger   = (NanoLogger) x.get("logger");
+    FObject    obj      = getDelegate().get(x);
+    Object     objectId = obj.getProperty("id");
+    Map        values   = new HashMap();
+
     values.put(name, value);
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
+
     return super.setProperty(x, name, value);
   }
 
   @Override
   public FObject setProperties(X x, Map values) {
-    User user = (User) x.get("user");
-    NanoLogger logger = (NanoLogger) x.get("logger");
-    FObject obj = getDelegate().get(x);
-    Object objectId = obj.getProperty("id");
+    User       user     = (User) x.get("user");
+    NanoLogger logger   = (NanoLogger) x.get("logger");
+    FObject    obj      = getDelegate().get(x);
+    Object     objectId = obj.getProperty("id");
+
     logger.info("CHANGE", objectId, user.getId(), formatMessage(obj, values));
+
     return super.setProperties(x, values);
   }
 }
