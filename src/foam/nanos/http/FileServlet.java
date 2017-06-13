@@ -5,11 +5,11 @@ import com.google.api.client.util.IOUtils;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-/**
- * Created by nick on 12/06/17.
- */
 public class FileServlet
     extends HttpServlet
 {
