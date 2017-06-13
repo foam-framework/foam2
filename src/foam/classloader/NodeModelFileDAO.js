@@ -23,11 +23,14 @@ foam.CLASS({
   properties: [
     {
       name: 'classpath'
+    },
+    {
+      name: 'surpressWarning'
     }
   ],
 
   methods: [
-    function find(id) {
+    function find_(x, id) {
       var foamCLASS = foam.CLASS;
       var self = this;
       var model;
@@ -44,7 +47,7 @@ foam.CLASS({
       try {
         require(path);
       } catch(e) {
-        console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
+        !self.surpressWarning && console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
         return Promise.resolve(null);
       } finally {
         foam.CLASS = foamCLASS;
