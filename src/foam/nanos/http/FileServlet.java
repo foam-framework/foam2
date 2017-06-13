@@ -16,14 +16,14 @@ public class FileServlet
     extends HttpServlet
 {
 
-  public static final String SERVLET_NAME = "file";
+  public static final String SERVLET_NAME = "static";
 
   private static final HashMap<String, String> extLookup;
   private static final String defaultExt = "application/octet-stream";
 
   static {
     extLookup = new HashMap<>();
-    
+
     extLookup.put("js", "application/javascript");
     extLookup.put("class", "application/java-vm");
     extLookup.put("xml", "application/xml");
