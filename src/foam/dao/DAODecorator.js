@@ -167,35 +167,35 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put',
-      code: function(obj) {
+      name: 'put_',
+      code: function(x, obj) {
         // TODO: obj.id can generate garbase, would be
         // slightly faster if DAO.find() could take an object
         // as well.
         var self = this;
-        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find(obj.id) ).then(function(existing) {
+        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find_(x, obj.id) ).then(function(existing) {
           return self.decorator.write(self.__context__, self.dao, obj, existing);
         }).then(function(obj) {
-          return self.delegate.put(obj);
+          return self.delegate.put_(x, obj);
         });
       }
     },
 
     {
-      name: 'remove',
-      code: function(obj) {
+      name: 'remove_',
+      code: function(x, obj) {
         var self = this;
         return this.decorator.remove(self.__context__, self.dao, self.obj).then(function(obj) {
-          self.delegate.remove(obj);
+          self.delegate.remove_(x, obj);
         });
       }
     },
 
     {
-      name: 'find',
-      code: function(id) {
+      name: 'find_',
+      code: function(x, id) {
         var self = this;
-        return this.delegate.find(id).then(function(obj) {
+        return this.delegate.find_(x, id).then(function(obj) {
           return self.decorator.read(self.__context__, self.dao, obj);
         });
       }

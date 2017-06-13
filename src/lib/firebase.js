@@ -65,7 +65,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(x, obj) {
       var req = this.HTTPRequest.create();
 
       if ( obj.id ) {
@@ -112,7 +112,7 @@ foam.CLASS({
       });
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       var req = this.HTTPRequest.create();
       req.method = 'DELETE',
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";
@@ -128,7 +128,7 @@ foam.CLASS({
       });
     },
 
-    function find(id) {
+    function find_(x, id) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
       req.url = this.basepath + "/" + encodeURIComponent(id) + ".json";
@@ -193,7 +193,7 @@ foam.CLASS({
       }
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
 
