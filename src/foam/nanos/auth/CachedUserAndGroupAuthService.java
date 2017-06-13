@@ -3,6 +3,7 @@ package foam.nanos.auth;
 import foam.core.X;
 import foam.nanos.util.LRULinkedHashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Created by marcroopchand on 2017-05-30.
@@ -30,11 +31,6 @@ public class CachedUserAndGroupAuthService
   protected Map<String, Boolean> permissionMap;
 
   @Override
-  public void start() {
-    super.start();
-  }
-
-  @Override
   public Boolean check(foam.core.X x, java.security.Permission permission) {
     if ( x == null || permission == null ) return false;
 
@@ -48,7 +44,7 @@ public class CachedUserAndGroupAuthService
       permissionMap = userMap.get(user.getId());
     }
     else {
-      permissionMap = new LRULinkedHashMap<>(1000);
+      permissionMap = new HashMap<>();
     }
 
     if ( permissionMap.containsKey(permission.getName()) ) {
