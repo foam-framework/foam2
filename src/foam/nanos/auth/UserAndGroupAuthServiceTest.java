@@ -41,13 +41,13 @@ public class UserAndGroupAuthServiceTest
     /**
      * Create numGroups and and add numPermissions to each group
      * */
-    for ( int i = 0; i < numGroups; i++ ) {
+    for ( int i = 0 ; i < numGroups ; i++ ) {
       Group group = new Group();
       group.setId("" + i);
       group.setDescription("Group " + i + " users");
 
       Permission[] permissions = new Permission[numPermissions];
-      for ( int j = 0; j < numPermissions; j++ ) {
+      for ( int j = 0 ; j < numPermissions ; j++ ) {
         foam.nanos.auth.Permission permission = new foam.nanos.auth.Permission();
         permission.setId(i + "" + j);
         permission.setDescription("Group" + i + " permissions-" + j);
@@ -72,7 +72,7 @@ public class UserAndGroupAuthServiceTest
      * For each user, randomly select a group from the groups created
      * and assign the user to this group
      * */
-    for ( int i = 0; i < numUsers; i++ ) {
+    for ( int i = 0 ; i < numUsers ; i++ ) {
       User user = new User();
       user.setId("" + i);
       user.setEmail("marc" + i + "@nanopay.net");
@@ -122,7 +122,7 @@ public class UserAndGroupAuthServiceTest
      * For each user, we check if they have access to a random permission
      * We store these permissions in an array to test caching
      * */
-    for ( int i = 0; i < xArray.size(); i++ ) {
+    for ( int i = 0 ; i < xArray.size() ; i++ ) {
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
       Group group     = (Group) sink.getData().get(randomGroup);
 
@@ -142,7 +142,7 @@ public class UserAndGroupAuthServiceTest
     System.out.println("Cached Permissions Check for " + numUsers + " users");
     long startTime = System.nanoTime();
 
-    for ( int i = 0; i < xArray.size(); i++ ) {
+    for ( int i = 0 ; i < xArray.size() ; i++ ) {
       AuthPermission authAdminpermission = new AuthPermission(permissions.get(i).getId());
       check(xArray.get(i), authAdminpermission);
     }
@@ -156,7 +156,7 @@ public class UserAndGroupAuthServiceTest
     System.out.println("Challenge Login " + numUsers + " Users");
     long startTime = System.nanoTime();
 
-    for ( int i = 0; i < numUsers; i++ ) {
+    for ( int i = 0 ; i < numUsers ; i++ ) {
       try {
         challengedLogin("" + i, generateChallenge("" + i));
       } catch (LoginException e) {
@@ -185,7 +185,7 @@ public class UserAndGroupAuthServiceTest
     System.out.println("Update Password for " + numUsers + " Users");
     long startTime = System.nanoTime();
 
-    for ( int i = 0; i < xArray.size(); i++ ) {
+    for ( int i = 0 ; i < xArray.size() ; i++ ) {
       try {
         updatePassword(xArray.get(i), "marc" + i, "marcasdf");
       } catch (IllegalStateException e) {
