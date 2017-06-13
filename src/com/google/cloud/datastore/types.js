@@ -108,7 +108,7 @@ foam.LIB({
       return { arrayValue: { values: values } };
     },
     function fromDatastoreValue(v, opt_ctx) {
-      var values = v.arrayValue;
+      var values = v.arrayValue.values;
       var arr = new Array(values.length);
       for ( var i = 0; i < values.length; i++ ) {
         arr[i] = com.google.cloud.datastore.fromDatastoreValue(
@@ -157,7 +157,7 @@ foam.LIB({
           cls.getAxiomByName(cls.ids[0]) :
           cls.getAxiomByName('id');
 
-      if ( idProp ) o[idProp.name] = id;
+      if ( idProp ) o[idProp.name] = idProp.fromDatastoreKeyName(id);
 
       var props = entity.properties;
       for ( var name in props ) {
@@ -220,6 +220,7 @@ foam.LIB({
           doubleValue: foam.Number,
           timestampValue: foam.Date,
           stringValue: foam.String,
+          arrayValue: foam.Array,
           entityValue: foam.core.FObject
         };
         return function typeOfDatastoreValue(v) {
@@ -323,6 +324,9 @@ foam.CLASS({
         if ( i !== props.length - 1 ) str += sep;
       }
       return str;
+    },
+    function fromDatastoreKeyName(name) {
+      return name.split(this.stringSeparator);
     }
   ]
 });
@@ -407,6 +411,7 @@ foam.CLASS({
     },
     function toDatastoreValue() {
       return { entityValue: this.toDatastoreEntity() };
-    }
+    },
+    function fromDatastoreKeyName(name) { return name; }
   ]
 });

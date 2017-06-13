@@ -69,7 +69,7 @@ describe('DatastoreDAO', function() {
         package: 'test.dao.mpid',
         name: 'Person',
 
-        ids: [ 'firstName', 'lastName', 'dob' ],
+        ids: [ 'firstName', 'iq', 'dob' ],
 
         properties: [
           {
@@ -79,6 +79,10 @@ describe('DatastoreDAO', function() {
           {
             class: 'String',
             name: 'lastName'
+          },
+          {
+            class: 'Int',
+            name: 'iq'
           },
           {
             class: 'Date',
@@ -94,6 +98,7 @@ describe('DatastoreDAO', function() {
         var putPerson = Person.create({
           firstName: 'Born',
           lastName: 'JustNow',
+          iq: 7,
           dob: Date.now()
         });
         dao.put(putPerson).then(function() {
@@ -112,6 +117,7 @@ describe('DatastoreDAO', function() {
         var putPerson = Person.create({
           firstName: 'Born',
           lastName: 'JustNow',
+          iq: 7,
           dob: Date.now()
         });
         dao.put(putPerson).then(function() {
@@ -121,6 +127,25 @@ describe('DatastoreDAO', function() {
                 passing the array could break inversion of control for
                 multi-part ids`);
         }).catch(done);
+      });
+    });
+
+    it('should correctly deserialize multi-part-ids on select()', function(done) {
+      var justNow = new Date(Date.now());
+      daoFactory(Person).then(function(dao) {
+        var putPerson = Person.create({
+          firstName: 'Born',
+          lastName: 'JustNow',
+          iq: 7,
+          dob: justNow
+        });
+        dao.put(putPerson).then(function() {
+          return dao.select();
+        }).then(function(sink) {
+          var gotPerson = sink.array[0];
+          expect(gotPerson.id).toEqual([ 'Born', 7, justNow ]);
+          done();
+        }).catch(done.fail);
       });
     });
   });
