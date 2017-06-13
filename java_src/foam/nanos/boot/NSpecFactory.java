@@ -19,13 +19,13 @@ public class NSpecFactory
   }
 
   public Object create(X x) {
-    NanoService ns = null;
+    Object ns = null;
 
     try {
       ns = spec_.createService();
 
-      ((ContextAwareSupport) ns).setX(x);
-      ns.start();
+      if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x);
+      if ( ns instanceof NanoService  ) ((NanoService)  ns).start();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     } catch (InstantiationException e) {

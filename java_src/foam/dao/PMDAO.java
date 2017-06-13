@@ -1,6 +1,7 @@
 package foam.dao;
 
 import foam.core.FObject;
+import foam.core.X;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.pm.PM;
@@ -11,10 +12,10 @@ import foam.nanos.pm.PM;
 public class PMDAO extends ProxyDAO {
 
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     PM pm = new PM(PMDAO.class, obj.getClassInfo().getId() + ":put");
     try {
-      super.put(obj);
+      super.put_(x, obj);
     } catch(Exception e) {
       e.printStackTrace();
     } finally {
@@ -24,7 +25,7 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public FObject find(Object id) {
+  public FObject find_(X x,Object id) {
     PM pm;
     if (id instanceof FObject) {
       FObject obj = (FObject)id;
@@ -34,7 +35,7 @@ public class PMDAO extends ProxyDAO {
     }
     FObject fobj = null;
     try {
-      fobj = super.find(id);
+      fobj = super.find_(x, id);
     } catch(Exception e) {
       e.printStackTrace();
     } finally {
@@ -44,10 +45,10 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public FObject remove(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     PM pm = new PM(PMDAO.class, obj.getClassInfo().getId() + ":remove");
     try {
-      super.remove(obj);
+      super.remove_(x, obj);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -57,11 +58,11 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
     // Is this the right key to use?
     PM pm = new PM(PMDAO.class, getOwnClassInfo().getId() + ":removeAll");
     try {
-      super.removeAll(skip, limit, order, predicate);
+      super.removeAll_(x, skip, limit, order, predicate);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

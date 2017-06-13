@@ -2,6 +2,7 @@ package foam.core;
 
 import foam.lib.parse.Parser;
 import java.util.Comparator;
+import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
@@ -17,4 +18,5 @@ public interface PropertyInfo
   public void set(Object obj, Object value);
   public Parser jsonParser();
   public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
+  public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
 }

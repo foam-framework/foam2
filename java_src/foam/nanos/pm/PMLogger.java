@@ -7,5 +7,5 @@
 package foam.nanos.pm;
 
 public interface PMLogger {
-  void log(PM pm);
+  public void log(PM pm);
 }

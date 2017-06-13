@@ -12,6 +12,14 @@ foam.CLASS({
 
   imports: [ 'scriptDAO' ],
 
+  javaImports: [
+    'bsh.EvalError',
+    'bsh.Interpreter',
+    'java.io.ByteArrayOutputStream',
+    'java.io.PrintStream',
+    'java.util.Date'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -50,6 +58,30 @@ foam.CLASS({
       class: 'String',
       name: 'notes',
       view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 80 }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'runScript',
+      javaReturns: 'void',
+      javaCode:
+`ByteArrayOutputStream baos = new ByteArrayOutputStream();
+PrintStream ps = new PrintStream(baos);
+Interpreter shell = new Interpreter();
+try {
+  shell.set("currentScript", this);
+  setOutput("");
+  shell.setOut(ps);
+  shell.eval(getCode());
+} catch (EvalError e) {
+  e.printStackTrace();
+}
+
+setLastRun(new Date());
+ps.flush();
+setOutput(baos.toString());
+`
     }
   ],
 
