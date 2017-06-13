@@ -108,7 +108,7 @@ foam.LIB({
       return { arrayValue: { values: values } };
     },
     function fromDatastoreValue(v, opt_ctx) {
-      var values = v.arrayValue;
+      var values = v.arrayValue.values;
       var arr = new Array(values.length);
       for ( var i = 0; i < values.length; i++ ) {
         arr[i] = com.google.cloud.datastore.fromDatastoreValue(
