@@ -39,6 +39,7 @@ public class FileServlet
       fileName = paths[paths.length - 1];
     } else {
       fileNotFoundError(resp, filePath);
+      return;
     }
 
     try {
