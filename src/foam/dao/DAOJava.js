@@ -30,9 +30,37 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'put_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
       name: 'remove',
       javaReturns: 'foam.core.FObject',
       args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
+      name: 'remove_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'obj',
           javaType: 'foam.core.FObject'
@@ -50,20 +78,48 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'find_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'id',
+          javaType: 'Object'
+        }
+      ]
+    },
+    {
       name: 'select',
       javaReturns: 'foam.dao.Sink',
       args: [
         {
           name: 'sink',
           javaType: 'foam.dao.Sink'
+        }
+      ]
+    },
+    {
+      name: 'select_',
+      javaReturns: 'foam.dao.Sink',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
         },
         {
           name: 'skip',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'limit',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'order',
@@ -78,14 +134,23 @@ foam.INTERFACE({
     {
       name: 'removeAll',
       javaReturns: 'void',
+      args: [ ]
+    },
+    {
+      name: 'removeAll_',
+      javaReturns: 'void',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'skip',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'limit',
-          javaType: 'Integer'
+          javaType: 'Long'
         },
         {
           name: 'order',
@@ -103,9 +168,33 @@ foam.INTERFACE({
       args: []
     },
     {
+      name: 'listen_',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ]
+    },
+    {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       javaReturns: 'void',
       args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ]
+    },
+    {
+      name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'sink',
           javaType: 'foam.dao.Sink'
@@ -149,6 +238,16 @@ foam.INTERFACE({
         {
           name: 'count',
           javaType: 'int'
+        }
+      ]
+    },
+    {
+      name: 'inX',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          javaType:  'foam.core.X'
         }
       ]
     }

@@ -65,20 +65,20 @@ foam.CLASS({
       console.log('Timing: ', act[1], ' ', (this.now()-act[2]).toFixed(3), ' ms');
     },
 
-    function put(obj) {
+    function put_(x, obj) {
       var act = this.start('put');
       var self = this;
-      return this.SUPER(obj).then(function(o) { self.end(act); return o; });
+      return this.SUPER(x, obj).then(function(o) { self.end(act); return o; });
     },
-    function remove(obj) {
+    function remove_(x, obj) {
       var act = this.start('remove');
       var self = this;
-      return this.SUPER(obj).then(function() { self.end(act); });
+      return this.SUPER(x, obj).then(function() { self.end(act); });
     },
-    function find(key) {
+    function find_(x, key) {
       var act = this.start('find');
       var self = this;
-      return this.SUPER(key).then(function(o) { self.end(act); return o; });
+      return this.SUPER(x, key).then(function(o) { self.end(act); return o; });
     },
     function select() {
       var act = this.start('select');

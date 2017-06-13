@@ -141,9 +141,9 @@ foam.CLASS({
     /**
       Updates the object's last seen info.
     */
-    function put(obj) {
-      return this.delegate.put(obj).then(function(o) {
-        this.syncRecordDAO.put(
+    function put_(x, obj) {
+      return this.delegate.put_(x, obj).then(function(o) {
+        this.syncRecordDAO.put_(x,
           this.SyncRecord.create({
             id: o.id,
             syncNo: -1
@@ -155,9 +155,9 @@ foam.CLASS({
     /**
       Marks the object as deleted.
     */
-    function remove(obj) {
-      return this.delegate.remove(obj).then(function(o) {
-        this.syncRecordDAO.put(
+    function remove_(x, obj) {
+      return this.delegate.remove_(x, obj).then(function(o) {
+        this.syncRecordDAO.put_(x,
           this.SyncRecord.create({
             id: obj.id,
             deleted: true,
@@ -169,11 +169,11 @@ foam.CLASS({
     /**
       Marks all the removed objects' sync records as deleted.
     */
-    function removeAll(skip, limit, order, predicate) {
-      this.delegate.select(null, skip, limit, order, predicate).then(function(a) {
+    function removeAll_(x, skip, limit, order, predicate) {
+      this.delegate.select_(x, null, skip, limit, order, predicate).then(function(a) {
         a = a.array;
         for ( var i = 0 ; i < a.length ; i++ ) {
-          this.remove(a[i]);
+          this.remove_(x, a[i]);
         }
       }.bind(this));
     },
