@@ -105,7 +105,7 @@ public class Boot {
     serviceDAO_.put(uptime);
 
     NSpec file = new NSpec();
-    file.setName("file");
+    file.setName(FileServlet.SERVLET_NAME);
     file.setServiceClass(FileServlet.class.getName());
     serviceDAO_.put(file);
   }
