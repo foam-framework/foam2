@@ -1,6 +1,5 @@
 package foam.dao;
 
-import com.sun.istack.internal.NotNull;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 
@@ -15,11 +14,11 @@ import java.util.StringJoiner;
  */
 public class SQLData {
 
+    //TODO(drish): long id
+    protected Object id;
     protected String table;
     protected ArrayList<String> columnNames;
-
-    // table column, value
-    protected Map<String, Object> values;
+    protected ArrayList<Object> values;
 
     public SQLData(FObject obj) throws IllegalStateException, IllegalAccessException {
 
@@ -27,27 +26,42 @@ public class SQLData {
         columnNames = new ArrayList<String>();
         List<PropertyInfo> props = obj.getClassInfo().getAxioms();
 
-        // TODO(drish): throw in case where class has no fields ?
+        // TODO(drish): throw in case where fobject has no properties ?
         if (props.size() <= 0) {
             return;
         }
 
-        values = new HashMap<String, Object>();
-
+        values = new ArrayList<Object>();
         for (PropertyInfo p: props) {
 
-            // do include ID into columns, since its auto-incremented
+            // do not include ID into columns, since its auto-incremented
             if (p.getName().equals("id")) {
+                id = p.get(obj);
                 continue;
             }
             columnNames.add(p.getName());
-            Object value = p.get(obj);
-            values.put(p.getName(), value);
+            values.add(p.get(obj));
         }
     }
 
+    public String createUpdateStatement() {
+        StringBuilder sql = new StringBuilder("update " + getTableName() + " set");
+        sql.append(getFormatedColumnNames());
+        sql.append(" = ");
+        sql.append(getFormatedColumnPlaceholders());
+        sql.append(" where id = " + id);
+        return sql.toString();
+    }
+
+    public String createInsertStatement() {
+        StringBuilder sql = new StringBuilder("insert into " + getTableName());
+        sql.append(getFormatedColumnNames());
+        sql.append("values " + getFormatedColumnPlaceholders());
+        return sql.toString();
+    }
+
     /**
-     * get formated column names
+     * get insert-formated column names
      * @return String
      */
     public String getFormatedColumnNames() {
@@ -62,14 +76,14 @@ public class SQLData {
     }
 
     /**
-     * get formated placeholders for prepared statements
+     * get formated placeholders for prepared statements insert/update
      * in the following format:
      *
      * (?, ?, ?)
      *
      * @return String
      */
-    public String getFormatedPlaceholders() {
+    public String getFormatedColumnPlaceholders() {
         StringBuilder output = new StringBuilder("( ");
         StringJoiner joiner = new StringJoiner(",");
         for (int i = 0; i < columnNames.size(); i++) {
@@ -80,15 +94,18 @@ public class SQLData {
         return output.toString();
     }
 
-    public Map getValues() {
+    public ArrayList<Object> getValues() {
         return values;
+    }
+
+    public ArrayList<String> getColumnNames() {
+        return columnNames;
     }
 
     public String getTableName() {
         return table;
     }
 
-    @NotNull
     private String getTableName(String classId) {
         // TODO(drish): pluralize table name ?
         return classId.substring(classId.lastIndexOf(".") + 1, classId.length()).toLowerCase();
