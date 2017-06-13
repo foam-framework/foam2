@@ -7,6 +7,7 @@
 package foam.nanos.audit;
 
 import foam.core.FObject;
+import foam.core.X;
 import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
 import foam.lib.json.Outputter;
@@ -43,18 +44,18 @@ public class AuditDAO
   }
 
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
-    FObject current = this.find(obj);
+    FObject current = this.find_(x, obj);
     Object objectId = obj.getProperty("id");
     logger.info("CHANGE", objectId, user.getId(), formatMessage(current, obj));
-    return super.put(obj);
+    return super.put_(x, obj);
   }
 
   @Override
-  public FObject remove(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     // TODO: use context-oriented context when available.
     User user = (User) getX().get("user");
     NanoLogger logger = (NanoLogger) getX().get("logger");
@@ -62,6 +63,6 @@ public class AuditDAO
     outputter.output(sb, obj);
     Object objectId = obj.getProperty("id");
     logger.info("REMOVE", objectId, user.getId(), sb);
-    return super.remove(obj);
+    return super.remove_(x, obj);
   }
 }

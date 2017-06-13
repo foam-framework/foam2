@@ -28,17 +28,17 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(x, obj) {
       this.pub('on', 'pub', obj);
       return Promise.resolve(obj);
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       this.pub('on', 'remove', obj);
       return Promise.resolve();
     },
 
-    function find(id) {
+    function find_(x, id) {
       return Promise.resolve(null);
     },
 
