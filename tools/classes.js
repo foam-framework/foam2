@@ -72,7 +72,8 @@ var classes = [
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
-  'foam.dao.history.HistoryRecord'
+  'foam.dao.history.HistoryRecord',
+  'foam.mop.MOP'
 ];
 
 var abstractClasses = [
@@ -81,13 +82,15 @@ var abstractClasses = [
 
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',
-  'foam.dao.DAO'
+  'foam.dao.DAO',
+  'foam.mop.MOP'
 ];
 
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'com.google.foam.demos.appengine.TestService'
+  'com.google.foam.demos.appengine.TestService',
+  'foam.mop.MOP'
 ];
 
 module.exports = {
