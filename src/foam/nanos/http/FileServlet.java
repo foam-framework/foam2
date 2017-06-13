@@ -9,12 +9,33 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class FileServlet
     extends HttpServlet
 {
 
   public static final String SERVLET_NAME = "file";
+
+  private static final HashMap<String, String> extLookup;
+  private static final String defaultExt = "application/octet-stream";
+
+  static {
+    extLookup = new HashMap<>();
+    
+    extLookup.put("js", "application/javascript");
+    extLookup.put("class", "application/java-vm");
+    extLookup.put("xml", "application/xml");
+
+    extLookup.put("gif", "image/gif");
+    extLookup.put("png", "image/png");
+
+    extLookup.put("java", "text/x-java-source");
+    extLookup.put("csv", "text/csv");
+    extLookup.put("txt", "text/plain");
+    extLookup.put("html", "text/html");
+  }
 
   private void fileNotFoundError(HttpServletResponse resp, String file) {
     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -35,12 +56,16 @@ public class FileServlet
     String fileName = "";
 
     String[] paths = filePath.split("/");
-    if(paths.length > 0) {
+    System.out.println(Arrays.toString(paths));
+    if( paths.length > 0 ) {
       fileName = paths[paths.length - 1];
     } else {
       fileNotFoundError(resp, filePath);
       return;
     }
+
+    String[] tokens = fileName.split("\\.");
+    String extension = tokens.length > 0 ? tokens[tokens.length-1 ] : "unknown";
 
     try {
       File srcFile = new File(filePath);
@@ -49,7 +74,8 @@ public class FileServlet
       String cwd = System.getProperty("user.dir");
 
       if ( srcFile.isFile() && srcFile.canRead() && cwd.equals(path.substring(0, cwd.length())) ) {
-        resp.setContentType("application/octet-stream");
+        String ext = extLookup.get(extension);
+        resp.setContentType(ext != null ? ext : defaultExt);
         resp.setHeader("Content-Disposition", "filename=\"" + fileName + "\"");
         FileInputStream fis = new FileInputStream(srcFile);
         IOUtils.copy(fis, resp.getOutputStream());
