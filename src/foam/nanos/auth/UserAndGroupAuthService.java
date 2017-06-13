@@ -123,7 +123,7 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    if ( userDAO_.find(user.getId()) == null ) {
+    if ( userDAO_.find_(x, user.getId()) == null ) {
       return false;
     }
 
@@ -144,7 +144,7 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("New Password must be different from the old password");
     }
 
-    User user = (User) userDAO_.find(((User) x.get("user")).getId());
+    User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
     if ( user == null ) {
       throw new IllegalStateException("User not found");
     }

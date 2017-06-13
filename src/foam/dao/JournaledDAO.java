@@ -7,6 +7,7 @@
 package foam.dao;
 
 import foam.core.FObject;
+import foam.core.X;
 import java.io.IOException;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -29,31 +30,31 @@ public class JournaledDAO
    * @returns FObject
    */
   @Override
-  public FObject put(FObject obj) {
+  public FObject put_(X x, FObject obj) {
     journal.put(obj, null);
-    return getDelegate().put(obj);
+    return getDelegate().put_(x, obj);
   }
 
   @Override
-  public FObject remove(FObject obj) {
+  public FObject remove_(X x, FObject obj) {
     Object id = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
     journal.remove(id, null);
-    return getDelegate().remove(obj);
+    return getDelegate().remove_(x, obj);
   }
 
   @Override
-  public FObject find(Object id) {
+  public FObject find_(X x, Object id) {
     return null;
   }
 
   @Override
-  public Sink select(Sink sink, Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
     return null;
   }
 
   @Override
-  public void removeAll(Integer skip, Integer limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
     journal.removeAll();
-    getDelegate().removeAll(skip, limit, order, predicate);
+    getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 }
