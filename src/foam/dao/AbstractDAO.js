@@ -162,7 +162,7 @@ foam.CLASS({
     },
 
     function listen(sink) {
-      return listen_(this.__context__, sink, undefined);
+      return this.listen_(this.__context__, sink, undefined);
     },
 
     /**
@@ -191,11 +191,7 @@ foam.CLASS({
     },
 
     function decorateListener_(sink, predicate) {
-      // TODO: There are probably optimizations we can make here
-      // but every time I try it comes out broken.  So for the time being,
-      // if you have any sort of skip/limit/order/predicate we will just
-      // issue reset events for everything.
-      if ( skip != undefined || predicate != undefined ) {
+      if ( predicate ) {
         return this.ResetListener.create({ delegate: sink });
       }
 
