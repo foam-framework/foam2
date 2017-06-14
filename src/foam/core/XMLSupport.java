@@ -1,13 +1,12 @@
 package foam.core;
 
-
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.FileWriter;
 import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
 import foam.dao.XMLDAO;
 import foam.dao.ListSink;
-import java.io.FileWriter;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,7 @@ public class XMLSupport {
             XMLStreamReader xmlr = xmlInputFactory.createXMLStreamReader(new FileReader(fileName));
             int eventType;
             Object clsInstance = null;
-            while (xmlr.hasNext()){
+            while (xmlr.hasNext()) {
                 eventType = xmlr.next();
                 switch (eventType) {
                     case XMLStreamConstants.START_DOCUMENT:
@@ -75,7 +74,7 @@ public class XMLSupport {
             PropertyInfo prop = null;
             while (reader.hasNext()) {
                 eventType = reader.next();
-                switch (eventType){
+                switch (eventType) {
                     case XMLStreamConstants.START_ELEMENT:
                         prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
                         if (prop == null) {
