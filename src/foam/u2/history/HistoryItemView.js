@@ -6,6 +6,6 @@ foam.INTERFACE({
   documentation: 'View displaying history item',
 
   methods: [
-    function outputItems(parentView, record) {}
+    function outputRecord(parentView, record) {}
   ]
 });
