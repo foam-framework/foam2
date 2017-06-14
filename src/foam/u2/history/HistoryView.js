@@ -4,7 +4,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
   requires: [ 'foam.u2.history.HistoryItemView' ],
 
-  documentation: 'View displaying invoice history',
+  documentation: 'View displaying history',
 
   axioms: [
     foam.u2.CSS.create({
