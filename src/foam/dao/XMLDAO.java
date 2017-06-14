@@ -16,61 +16,61 @@ public class XMLDAO
     private String fileName;
 
     public void setFileName(String filename) {
-        if (filename.contains(".xml")){
-            fileName = System.getProperty("user.dir") + filename;
-        } else {
-            fileName = System.getProperty("user.dir") + filename.concat(".xml");
-        }
+      if (filename.contains(".xml")){
+        fileName = System.getProperty("user.dir") + filename;
+      } else {
+        fileName = System.getProperty("user.dir") + filename.concat(".xml");
+      }
     }
 
     public String getFileName() { return fileName; }
 
     // Read file and read data in the DAO
     public void init() throws IOException {
-        X x = new ProxyX();
-        this.setX(x);
+      X x = new ProxyX();
+      this.setX(x);
 
-        try {
-            XMLSupport.XMLToFObject(fileName, this);
-        } catch (IllegalAccessException | XMLStreamException | FileNotFoundException ex) {
-        }
+      try {
+        XMLSupport.XMLToFObject(fileName, this);
+      } catch (IllegalAccessException | XMLStreamException | FileNotFoundException ex) {
+      }
     }
 
     // Rewrites file when new object is put into DAO
     public FObject put(FObject obj) {
-        this.setOf(obj.getClassInfo());
-        FObject s =  super.put(obj);
-        try {
-            XMLSupport.FObjectToXML(fileName, this);
-        } catch (XMLStreamException ex) {
+      this.setOf(obj.getClassInfo());
+      FObject s =  super.put(obj);
+      try {
+        XMLSupport.FObjectToXML(fileName, this);
+      } catch (XMLStreamException ex) {
 
-        }
-        return s;
+      }
+      return s;
     }
 
     // Used for xml to FObject conversion where re-write is not required
     public FObject putOnly(FObject obj) {
-        this.setOf(obj.getClassInfo());
-        return super.put(obj);
+      this.setOf(obj.getClassInfo());
+      return super.put(obj);
     }
 
     public FObject remove(FObject obj) {
-        FObject s = super.remove(obj);
-        try {
-            XMLSupport.FObjectToXML(fileName, this);
-        } catch (XMLStreamException ex) {
+      FObject s = super.remove(obj);
+      try {
+        XMLSupport.FObjectToXML(fileName, this);
+      } catch (XMLStreamException ex) {
 
-        }
-        return s;
+      }
+      return s;
     }
 
     public void removeAll() {
-        super.removeAll();
-        try {
-            XMLSupport.FObjectToXML(fileName, this);
-        } catch (XMLStreamException ex) {
+      super.removeAll();
+      try {
+        XMLSupport.FObjectToXML(fileName, this);
+      } catch (XMLStreamException ex) {
 
-        }
+      }
     }
 
 }
