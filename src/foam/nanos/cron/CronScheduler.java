@@ -9,6 +9,7 @@ package foam.nanos.cron;
 import foam.core.ContextAwareSupport;
 import foam.core.Detachable;
 import foam.core.FObject;
+import foam.dao.DAO;
 import foam.dao.AbstractDAO;
 import foam.dao.AbstractSink;
 import foam.dao.MapDAO;
@@ -22,7 +23,7 @@ public class CronScheduler
     extends    ContextAwareSupport
     implements NanoService
 {
-  protected MapDAO cronDAO_;
+  protected DAO cronDAO_;
 
   /**
    * Gets the minimum scheduled cron job
@@ -41,7 +42,7 @@ public class CronScheduler
       try {
         while (true) {
           Date dtnow = new Date();
-          ((AbstractDAO) cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, dtnow))).select(new AbstractSink() {
+          cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, dtnow)).select(new AbstractSink() {
             @Override
             public void put(FObject obj, Detachable sub) {
               ((Cron) obj).runScript();
@@ -59,7 +60,7 @@ public class CronScheduler
   };
 
   public void start() {
-    cronDAO_ = (MapDAO) getX().get("MapDAO");
+    cronDAO_ = (DAO) getX().get("MapDAO");
     cronJobs.start();
   }
 
