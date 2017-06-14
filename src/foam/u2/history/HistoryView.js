@@ -64,7 +64,7 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('h2').add(this.title).end()
-        .call(function outputItems() {
+        .call(function outputRecords() {
           // Gets records from DAO
           view.data.select().then(function(records) {
             // Reverses records array for chronological output
@@ -73,7 +73,7 @@ foam.CLASS({
                 .addClass(view.myClass('timelineRecord'))
                 .start('div').addClass(view.myClass('timeline')).end()
                 .call(function() {
-                  view.historyItemView.outputItem(this, record)
+                  view.historyItemView.outputRecord(this, record)
                 })
               .end();
             })
