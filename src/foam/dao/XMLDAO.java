@@ -13,9 +13,9 @@ public class XMLDAO
         extends MapDAO
 {
 
-    private String fileName;
+    protected String fileName_;
 
-    public void setFileName(String filename) {
+    public void setFileName_(String filename) {
       if (filename.contains(".xml")){
         fileName = System.getProperty("user.dir") + filename;
       } else {
@@ -23,7 +23,7 @@ public class XMLDAO
       }
     }
 
-    public String getFileName() { return fileName; }
+    public String getFileName_() { return fileName; }
 
     // Read file and read data in the DAO
     public void init() throws IOException {
