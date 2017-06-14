@@ -14,7 +14,7 @@ import java.util.StringJoiner;
  */
 public class SQLData {
 
-    //TODO(drish): long id
+    //TODO(drish): use uuids ?
     protected Object id;
     protected String table;
     protected ArrayList<String> columnNames;
@@ -22,7 +22,7 @@ public class SQLData {
 
     public SQLData(FObject obj) throws IllegalStateException, IllegalAccessException {
 
-        table = getTableName(obj.getClassInfo().getId());
+        table = obj.getClass().getSimpleName().toLowerCase();
         columnNames = new ArrayList<String>();
         List<PropertyInfo> props = obj.getClassInfo().getAxioms();
 
@@ -42,6 +42,13 @@ public class SQLData {
             columnNames.add(p.getName());
             values.add(p.get(obj));
         }
+    }
+
+    public String createDeleteStatement() {
+        StringBuilder sql = new StringBuilder("delete from " + getTableName());
+        sql.append(" where id = ?");
+        System.out.println(sql.toString());
+        return sql.toString();
     }
 
     public String createUpdateStatement() {
@@ -104,10 +111,5 @@ public class SQLData {
 
     public String getTableName() {
         return table;
-    }
-
-    private String getTableName(String classId) {
-        // TODO(drish): pluralize table name ?
-        return classId.substring(classId.lastIndexOf(".") + 1, classId.length()).toLowerCase();
     }
 }

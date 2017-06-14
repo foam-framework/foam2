@@ -1,6 +1,6 @@
 package foam.dao;
 
-import foam.core.FObject;
+import foam.core.*;
 
 import java.sql.*;
 
@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class PostgresDAO extends ProxyDAO {
 
@@ -24,28 +25,78 @@ public class PostgresDAO extends ProxyDAO {
         PgConnectionPool.setup(host, port, dbName, username, password);
     }
 
-//    @Override
-//    public FObject find(Object o) {
-//        Field f = ((FObject) o).getClassInfo().get
-//
-//        Object value = ((PropertyInfo) f.get(o)).get(o);
-//
-//        try {
-//            SQLData data = new SQLData(((FObject) o));
-//            Connection c = PgConnectionPool.getConnection();
-//
-//            //TODO(drish)
-//            String sql = "select * from " + data.getTableName();
-//            sql += " where id=?";
-//
-//            System.out.println(data.getTableName());
-//            System.out.println(data.getValues());
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
+    @Override
+    public FObject remove(FObject o) {
+
+        try {
+
+            SQLData data = new SQLData(o);
+            Connection c = PgConnectionPool.getConnection();
+
+            PreparedStatement smt = c.prepareStatement(data.createDeleteStatement());
+
+            smt.setLong(1, ((Long) o.getProperty("id")));
+
+            int removed = smt.executeUpdate();
+            if (removed == 0) {
+                throw new SQLException("Error while removing.");
+            }
+            return o;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * maps a database result row to an FObject
+     *
+     * @param row
+     * @return FObject
+     * @throws SQLException
+     */
+    private FObject createFObject(ResultSet row) throws Exception {
+
+        if (getOf() == null) {
+            throw new Exception("`Of` is not set");
+        }
+
+        List<PropertyInfo> props = getOf().getAxioms();
+        FObject result = (FObject) getOf().getObjClass().newInstance();
+
+        // set fields
+        for(int i = 0; i < props.size(); i++ ) {
+            String propName = props.get(i).getName();
+            Object value = row.getObject(i + 1);
+            result.setProperty(propName, value);
+        }
+        return result;
+    }
+
+    @Override
+    public FObject find(Object o) {
+
+        try {
+
+            String tableName = getOf().getObjClass().getSimpleName().toLowerCase();
+            Connection c = PgConnectionPool.getConnection();
+
+            String sql = "select * from " + tableName;
+            sql += " where id = ?";
+
+            PreparedStatement smt = c.prepareStatement(sql);
+            smt.setLong(1, ((Long) o));
+            ResultSet rs = smt.executeQuery();
+            if (rs.next()) {
+                return createFObject(rs);
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     public FObject put(FObject obj) {
