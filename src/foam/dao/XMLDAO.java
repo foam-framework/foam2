@@ -2,12 +2,12 @@ package foam.dao;
 
 import foam.core.FObject;
 import foam.core.XMLSupport;
-
+import foam.core.X;
+import foam.core.ProxyX;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import javax.xml.stream.XMLStreamException;
-import foam.core.X;
-import foam.core.ProxyX;
+
 
 public class XMLDAO
         extends MapDAO
