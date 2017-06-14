@@ -16,7 +16,7 @@ public abstract class AbstractFObject
 
   public FObject fclone() {
     try {
-      FObject ret = (FObject) getClassInfo().newInstance();
+      FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for( PropertyInfo pi : props ) {
         pi.set(ret, pi.get(this));
