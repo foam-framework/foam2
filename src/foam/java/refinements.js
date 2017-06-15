@@ -391,7 +391,7 @@ foam.CLASS({
          return Integer.valueOf((String) o);
       } else {
          return (int)o;
-      }`
+      }`;
 
       return info;
     }
@@ -418,7 +418,7 @@ foam.CLASS({
         return Byte.valueOf((String) o);
       } else {
         return (byte)o;
-      }`
+      }`;
 
       return info;
     }
@@ -445,7 +445,7 @@ foam.CLASS({
         return Short.valueOf((String) o);
       } else {
         return (short)o;
-      }`
+      }`;
       return info;
     }
   ]
@@ -471,7 +471,7 @@ foam.CLASS({
         return Long.valueOf((String) o);
       } else {
         return (long)o;
-      }`
+      }`;
       return info;
     }
   ]
@@ -497,7 +497,7 @@ foam.CLASS({
         return Float.parseFloat((String) o);
       } else {
         return (double)o;
-      }`
+      }`;
 
       return info;
     }
@@ -581,7 +581,7 @@ foam.CLASS({
           return java.util.Date.from(date.atZone(java.time.ZoneId.of("UTC")).toInstant());
         } else {
           return (java.util.Date)o;
-        }`
+        }`;
 
         info.method({
           name: 'getDateFormat',
@@ -615,7 +615,7 @@ foam.CLASS({
          return java.util.Date.from(date.atZone(java.time.ZoneId.of("UTC")).toInstant());
        } else {
          return (java.util.Date)o;
-       }`
+       }`;
 
        info.method({
          name: 'getDateFormat',
