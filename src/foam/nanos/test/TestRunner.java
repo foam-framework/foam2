@@ -23,18 +23,19 @@ public class TestRunner
 {
 
   public void start() {
-    final MapDAO tests = (MapDAO) getX().get("TestDAO");
-    /* 
-    TODO add listener for when test is scheduled
+
+    final DAO tests = (DAO) getX().get("TestDAO");
+    /* TODO add listener for when test is scheduled
+
     */
     runAllTests();
   }
 
   public void runAllTests() {
-    final MapDAO tests = (MapDAO) getX().get("TestDAO");
+    final DAO tests = (DAO) getX().get("TestDAO");
     try {
       final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
-      ((AbstractDAO) tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE))).select(new AbstractSink() {
+      tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE)).select(new AbstractSink() {
         public void put(FObject obj, Detachable sub) {
           ((Test) obj).runScript();
           jTests.put(obj);

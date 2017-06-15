@@ -99,6 +99,7 @@ foam.CLASS({
       name: 'menuDAO',
       factory: function() {
         return this.createDAO({
+
           of: this.Menu,
           testData: [
             { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ } },
@@ -122,7 +123,7 @@ foam.CLASS({
               { parent: 'support', id: 'context',    label: 'Context Walker' }
               */
           ]
-        });
+        }).orderBy(this.Menu.ORDER, this.Menu.ID);
       }
     },
 

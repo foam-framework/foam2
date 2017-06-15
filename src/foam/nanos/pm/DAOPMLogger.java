@@ -7,6 +7,7 @@
 package foam.nanos.pm;
 
 import foam.core.ContextAwareSupport;
+import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import java.lang.reflect.Proxy;
@@ -23,7 +24,7 @@ public class DAOPMLogger
         .setClsname(pm.getClassType().getName())
         .setPmname(pm.getName());
 
-    ProxyDAO pmd = (ProxyDAO) getX().get(PMDAO.ServiceName);
+    DAO pmd = (DAO) getX().get(PMDAO.ServiceName);
 
     PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
