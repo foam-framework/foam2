@@ -20,30 +20,26 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateController',
 
-  imports: [
-    'stack'
-  ],
-
-  exports: [
-    'data'
+  topics: [
+    'finished'
   ],
 
   properties: [
     {
-      name: 'dao',
-      hidden: true,
-      required: true
+      name: 'dao'
+    },
+    {
+      class: 'Boolean',
+      name: 'inProgress'
+    },
+    {
+      name: 'exception'
     },
     {
       name: 'data',
-      label: '',
-      view: function(args, X) {
-        var e = foam.u2.DetailView.create({ showActions: true, of: X.data.dao.of }, X).copyFrom(args);
-        e.data$ = X.data$.dot(this.name);
-        return e;
-      },
+      view: { class: 'foam.u2.DetailView' },
       factory: function() {
-        return this.dao.of.create(null, this.dao);
+        return this.dao.of.create();
       }
     }
   ],
@@ -51,20 +47,24 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(data$errors_, inProgress) { return !inProgress && ! data$errors_; },
       code: function() {
-        var stack = this.stack;
-
-        this.dao.put(this.data.clone(this.dao)).then(function() {
-          if ( stack ) stack.back();
+        this.inProgress = true;
+        this.clearProperty('exception');
+        var self = this;
+        this.dao.put(this.data.clone()).then(function() {
+          self.inProgress = false;
+          self.finished.pub();
         }, function(e) {
-          console.error(e);
+          self.inProgress = false;
+          self.exception = e;
         });
       }
     },
     {
       name: 'cancel',
       code: function() {
-        this.stack && this.stack.back();
+        this.finished.pub();
       }
     }
   ]

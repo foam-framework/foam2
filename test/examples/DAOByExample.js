@@ -161,7 +161,7 @@ var examples = [
       // Generate accounts for each customer. Select into an in-line
       // sink to process results as they come in.
       return app.customerDAO.select(foam.dao.QuickSink.create({
-        putFn: function(_, customer) {
+        putFn: function(customer) {
           // create accounts, add to accountDAO, save the promises for later
           // so we know all the puts have completed.
           accountPuts.push(customer.accounts.put(app.Account.create({ type: 'chq' })));
@@ -214,7 +214,7 @@ var examples = [
       // Select 'chq' accounts first
       return app.accountDAO.where(M.EQ(app.Account.TYPE, 'chq'))
         .select().then(function(defaultArraySink) {
-          var accounts = defaultArraySink.a;
+          var accounts = defaultArraySink.array;
           for ( var i = 0; i < accounts.length; i++ ) {
             generateAccountChq(accounts[i]);
           }
@@ -224,7 +224,7 @@ var examples = [
         date = new Date(0);
         app.accountDAO.where(M.EQ(app.Account.TYPE, 'sav'))
           .select().then(function(defaultArraySink) {
-            var accounts = defaultArraySink.a;
+            var accounts = defaultArraySink.array;
             for ( var i = 0; i < accounts.length; i++ ) {
               generateAccountSav(accounts[i]);
             }
@@ -252,7 +252,7 @@ var examples = [
         .then(function(customer) {
           var transactionSelectPromises = [];
           return customer.accounts.select(foam.dao.QuickSink.create({
-            putFn: function(_, account) {
+            putFn: function(account) {
               // no route to return promise here, since Sink.put doesn't return a promise...
               transactionSelectPromises.push(account.transactions.select(tsink));
             }
@@ -286,11 +286,11 @@ var examples = [
         .select(M.MAP(app.Customer.ID, customerIds)) // extract ID from results
         .then(function() {
           return app.accountDAO // query matches for the array of customer IDs
-            .where(M.IN(app.Account.OWNER, customerIds.a))
+            .where(M.IN(app.Account.OWNER, customerIds.array))
             .select(M.MAP(app.Account.ID, accountIds)) // extract account ID
             .then(function() {
                 return app.transactionDAO // query matches for list of accounts
-                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.a))
+                  .where(M.IN(app.Transaction.ACCOUNT, accountIds.array))
                   .select(tsink) // could dedup, but no duplicates in this case
             });
         });

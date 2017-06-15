@@ -47,7 +47,18 @@ foam.CLASS({
         this.add(this.Stack.BACK, this.Stack.FORWARD);
 
       this.add(this.slot(function(s) {
-        return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
+        if ( ! s ) return this.E('span');
+
+        var view = s[0];
+        var parent = s[1];
+
+
+        // Do a bit of a dance with the context, to ensure that exports from "parent"
+        // are available to "view"
+        var X = parent ? this.__subSubContext__.createSubContext(parent) : this.__subSubContext__;
+
+        return foam.u2.ViewSpec.createView(view, null, this, X);
+
       }, this.data$.dot('top')));
     }
   ]

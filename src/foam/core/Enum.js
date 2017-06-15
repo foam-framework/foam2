@@ -265,6 +265,7 @@ foam.CLASS({
   ],
 
   properties: [
+    { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       class: 'Int',
       name: 'ordinal',
@@ -278,7 +279,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      final: true
+      final: true,
+      factory: function() {
+        return this.name;
+      }
     }
   ],
 
@@ -288,7 +292,6 @@ foam.CLASS({
 });
 
 
-// TODO(adamvy): Support default values.
 foam.CLASS({
   package: 'foam.core',
   name: 'Enum',
@@ -301,6 +304,16 @@ foam.CLASS({
       class: 'Class',
       name: 'of',
       required: true
+    },
+    {
+      name: 'value',
+      adapt: function(_, n) {
+        if ( foam.String.isInstance(n) ) n = this.of[n];
+        return n
+      },
+      expression: function(of) {
+        return of && of.VALUES[0];
+      },
     },
     [
       'adapt',

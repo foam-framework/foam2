@@ -126,7 +126,7 @@ describe('MLang', function() {
 
   it('basic select() returns every row', function(done) {
     dao.select().then(function(sink) {
-      var a = sink.a;
+      var a = sink.array;
       expect(a.length).toBe(8);
       var ids = {};
       for ( var i = 0 ; i < a.length ; i++ ) ids[a[i].id] = true;
@@ -147,9 +147,9 @@ describe('MLang', function() {
     it('works on strings', function(done) {
       dao.where(EQ(test.mlang.Person.NAME, 'Carlos Santana')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(1);
-        expect(sink.a[0].name).toBe('Carlos Santana');
-        expect(sink.a[0].id).toBe(2);
+        expect(sink.array.length).toBe(1);
+        expect(sink.array[0].name).toBe('Carlos Santana');
+        expect(sink.array[0].id).toBe(2);
         done();
       });
     });
@@ -157,8 +157,8 @@ describe('MLang', function() {
     it('works on numbers', function(done) {
       dao.where(EQ(test.mlang.Person.ID, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(1);
-        expect(sink.a[0].name).toBe('Mark Knopfler');
+        expect(sink.array.length).toBe(1);
+        expect(sink.array[0].name).toBe('Mark Knopfler');
         done();
       });
     });
@@ -166,7 +166,7 @@ describe('MLang', function() {
     it('works on booleans, even false', function(done) {
       dao.where(EQ(test.mlang.Person.DECEASED, false)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(6);
+        expect(sink.array.length).toBe(6);
         done();
       });
     });
@@ -191,9 +191,9 @@ describe('MLang', function() {
     it('works on strings', function(done) {
       dao.where(NEQ(test.mlang.Person.NAME, 'Carlos Santana')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(7);
-        for ( var i = 0 ; i < sink.a.length ; i++ ) {
-          expect(sink.a[i].name).not.toBe('Carlos Santana');
+        expect(sink.array.length).toBe(7);
+        for ( var i = 0 ; i < sink.array.length ; i++ ) {
+          expect(sink.array[i].name).not.toBe('Carlos Santana');
         }
         done();
       });
@@ -202,7 +202,7 @@ describe('MLang', function() {
     it('works on numbers', function(done) {
       dao.where(NEQ(test.mlang.Person.ID, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(7);
+        expect(sink.array.length).toBe(7);
         done();
       });
     });
@@ -210,7 +210,7 @@ describe('MLang', function() {
     it('works on booleans, even false', function(done) {
       dao.where(NEQ(test.mlang.Person.DECEASED, false)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2);
+        expect(sink.array.length).toBe(2);
         done();
       });
     });
@@ -235,7 +235,7 @@ describe('MLang', function() {
     it('works on strings', function(done) {
       dao.where(LT(test.mlang.Person.NAME, 'Mark Knopfler')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(5);
+        expect(sink.array.length).toBe(5);
         done();
       });
     });
@@ -243,7 +243,7 @@ describe('MLang', function() {
     it('works on numbers', function(done) {
       dao.where(LT(test.mlang.Person.ID, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(3);
+        expect(sink.array.length).toBe(3);
         done();
       });
     });
@@ -251,7 +251,7 @@ describe('MLang', function() {
     it('works on dates', function(done) {
       dao.where(LT(test.mlang.Person.BIRTHDAY, new Date(1947, 0, 1))).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(4);
+        expect(sink.array.length).toBe(4);
         done();
       });
     });
@@ -276,7 +276,7 @@ describe('MLang', function() {
     it('works on strings', function(done) {
       dao.where(LTE(test.mlang.Person.NAME, 'Mark Knopfler')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(6);
+        expect(sink.array.length).toBe(6);
         done();
       });
     });
@@ -284,7 +284,7 @@ describe('MLang', function() {
     it('works on numbers', function(done) {
       dao.where(LTE(test.mlang.Person.ID, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(4);
+        expect(sink.array.length).toBe(4);
         done();
       });
     });
@@ -293,7 +293,7 @@ describe('MLang', function() {
       // March 10 1947 is Tom Scholz's birthday, so this includes him.
       dao.where(LTE(test.mlang.Person.BIRTHDAY, new Date('1947-03-10'))).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(6);
+        expect(sink.array.length).toBe(6);
         done();
       });
     });
@@ -318,7 +318,7 @@ describe('MLang', function() {
     it('works on strings', function(done) {
       dao.where(GT(test.mlang.Person.NAME, 'Mark Knopfler')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2);
+        expect(sink.array.length).toBe(2);
         done();
       });
     });
@@ -326,7 +326,7 @@ describe('MLang', function() {
     it('works on numbers', function(done) {
       dao.where(GT(test.mlang.Person.ID, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(4);
+        expect(sink.array.length).toBe(4);
         done();
       });
     });
@@ -334,7 +334,7 @@ describe('MLang', function() {
     it('works on dates', function(done) {
       dao.where(GT(test.mlang.Person.BIRTHDAY, new Date(1947, 0, 1))).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(4);
+        expect(sink.array.length).toBe(4);
         done();
       });
     });
@@ -359,7 +359,7 @@ describe('MLang', function() {
     it('works on strings', function(done) {
       dao.where(GTE(test.mlang.Person.NAME, 'Mark Knopfler')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(3);
+        expect(sink.array.length).toBe(3);
         done();
       });
     });
@@ -367,7 +367,7 @@ describe('MLang', function() {
     it('works on numbers', function(done) {
       dao.where(GTE(test.mlang.Person.ID, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(5);
+        expect(sink.array.length).toBe(5);
         done();
       });
     });
@@ -376,7 +376,7 @@ describe('MLang', function() {
       // March 10 1947 is Tom Scholz's birthday, so this includes him.
       dao.where(GTE(test.mlang.Person.BIRTHDAY, new Date('1947-03-10'))).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(3);
+        expect(sink.array.length).toBe(3);
         done();
       });
     });
@@ -403,7 +403,7 @@ describe('MLang', function() {
     it('works on solitary Boolean properties', function(done) {
       dao.where(NOT(test.mlang.Person.DECEASED)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(6);
+        expect(sink.array.length).toBe(6);
         done();
       });
     });
@@ -418,10 +418,10 @@ describe('MLang', function() {
       Promise.all([p1, p2]).then(function(arr) {
         var keys = {};
         for ( var i = 1 ; i <= 8 ; i++ ) keys[i] = 0;
-        for ( var i = 0 ; i < arr[0].a.length ; i++ )
-          keys[arr[0].a[i].id]++;
-        for ( var i = 0 ; i < arr[1].a.length ; i++ )
-          keys[arr[1].a[i].id]++;
+        for ( var i = 0 ; i < arr[0].array.length ; i++ )
+          keys[arr[0].array[i].id]++;
+        for ( var i = 0 ; i < arr[1].array.length ; i++ )
+          keys[arr[1].array[i].id]++;
 
         for ( var i = 1 ; i <= 8 ; i++ )
           expect(keys[i]).toBe(1);
@@ -446,7 +446,7 @@ describe('MLang', function() {
     it('returns true for set values, even false', function(done) {
       dao.where(HAS(test.mlang.Person.DECEASED)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(8);
+        expect(sink.array.length).toBe(8);
         done();
       });
     });
@@ -454,7 +454,7 @@ describe('MLang', function() {
     it('returns true for set values, even empty arrays', function(done) {
       dao.where(HAS(test.mlang.Person.SOME_ARRAY)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(3);
+        expect(sink.array.length).toBe(3);
         done();
       });
     });
@@ -462,7 +462,7 @@ describe('MLang', function() {
     it('returns NOT(true for set values, even empty arrays)', function(done) {
       dao.where(NOT(HAS(test.mlang.Person.SOME_ARRAY))).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(5);
+        expect(sink.array.length).toBe(5);
         done();
       });
     });
@@ -470,7 +470,7 @@ describe('MLang', function() {
     it('returns false for undefined values like ""', function(done) {
       dao.where(HAS(test.mlang.Person.NEVER_SET)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(0);
+        expect(sink.array.length).toBe(0);
         done();
       });
     });
@@ -490,7 +490,7 @@ describe('MLang', function() {
     it('works on substrings', function(done) {
       dao.where(CONTAINS(test.mlang.Person.NAME, 'Jim')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        expect(sink.array.length).toBe(2); // Jimi Hendrix and Jimmy Page
         done();
       });
     });
@@ -498,7 +498,7 @@ describe('MLang', function() {
     it('works on arrays', function(done) {
       dao.where(CONTAINS(test.mlang.Person.SOME_ARRAY, 4)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2);
+        expect(sink.array.length).toBe(2);
         done();
       });
     });
@@ -519,7 +519,7 @@ describe('MLang', function() {
     it('works on substrings, ignoring case', function(done) {
       dao.where(CONTAINS_IC(test.mlang.Person.NAME, 'JIM')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        expect(sink.array.length).toBe(2); // Jimi Hendrix and Jimmy Page
         done();
       });
     });
@@ -626,7 +626,7 @@ describe('MLang', function() {
     it('works with a .f()\'d left-hand side and a constant array', function(done) {
       dao.where(IN(test.mlang.Person.NAME, ['Jimi Hendrix', 'Mark Knopfler'])).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2);
+        expect(sink.array.length).toBe(2);
         done();
       });
     });
@@ -634,7 +634,7 @@ describe('MLang', function() {
     it('works with a constant left-hand side and a .f()\'d array', function(done) {
       dao.where(IN(6, test.mlang.Person.SOME_ARRAY)).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2);
+        expect(sink.array.length).toBe(2);
         done();
       });
     });
@@ -658,7 +658,7 @@ describe('MLang', function() {
       dao.select(
         MAP(test.mlang.Person.NAME, foam.dao.ArraySink.create())
       ).then(function(sink) {
-        var a = sink.delegate.a;
+        var a = sink.delegate.array;
         expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
         expect(a[0]).toEqual('Jimi Hendrix');
         expect(a[1]).toEqual('Carlos Santana');
@@ -676,7 +676,7 @@ describe('MLang', function() {
           return o.name;
         }, foam.dao.ArraySink.create())
       ).then(function(sink) {
-        var a = sink.delegate.a;
+        var a = sink.delegate.array;
         expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
         expect(a[0]).toEqual('Jimi Hendrix');
         expect(a[1]).toEqual('Carlos Santana');
@@ -692,7 +692,7 @@ describe('MLang', function() {
       dao.select(
         MAP(55, foam.dao.ArraySink.create())
       ).then(function(sink) {
-        var a = sink.delegate.a;
+        var a = sink.delegate.array;
         expect(a.length).toBe(8); // Jimi Hendrix and Jimmy Page
         expect(a[0]).toEqual(55);
         expect(a[1]).toEqual(55);
@@ -719,7 +719,7 @@ describe('MLang', function() {
 
     it('finds substrings of any String properties', function(done) {
       dao.where(KEYWORD('Hendrix')).select().then(function(sink) {
-        var a = sink.a;
+        var a = sink.array;
         expect(a.length).toBe(1);
         expect(a[0].name).toBe('Jimi Hendrix');
         done();
@@ -728,7 +728,7 @@ describe('MLang', function() {
 
     it('always fails if the input is empty', function(done) {
       dao.where(KEYWORD('')).select().then(function(sink) {
-        var a = sink.a;
+        var a = sink.array;
         expect(a.length).toBe(0);
         done();
       });
@@ -752,7 +752,7 @@ describe('MLang', function() {
     it('works on DAO', function(done) {
       dao.where(STARTS_WITH(test.mlang.Person.NAME, 'J')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        expect(sink.array.length).toBe(2); // Jimi Hendrix and Jimmy Page
         done();
       });
     });
@@ -781,7 +781,7 @@ describe('MLang', function() {
     it('works on DAO', function(done) {
       dao.where(STARTS_WITH_IC(test.mlang.Person.NAME, 'j')).select()
       .then(function(sink) {
-        expect(sink.a.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        expect(sink.array.length).toBe(2); // Jimi Hendrix and Jimmy Page
         done();
       });
     });

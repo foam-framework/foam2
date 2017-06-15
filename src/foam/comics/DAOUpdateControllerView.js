@@ -18,30 +18,53 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOUpdateControllerView',
-  extends: 'foam.u2.Element',
+  extends: 'foam.u2.View',
   requires: [
     'foam.comics.DAOUpdateController'
   ],
+
+  imports: [
+    'stack',
+    'dao'
+  ],
+
+  exports: [
+    'data'
+  ],
+
   properties: [
-    'data',
-    'dao',
     {
-      name: 'controller',
+      name: 'key'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOUpdateController',
+      name: 'data',
       factory: function() {
-        var controller = this.DAOUpdateController.create();
-        this.onDetach(controller.dao$.follow(this.dao$));
-        this.onDetach(controller.data$.follow(this.data$));
-        return controller;
+        return this.DAOUpdateController.create({
+          data: this.key,
+          dao: this.dao
+        });
       }
     }
   ],
+
+  reactions: [
+    [ 'data', 'finished', 'onFinished' ]
+  ],
+
   methods: [
     function initE() {
-      this.startContext({ data: this.controller }).
-        tag(this.DAOUpdateController.STATUS, { visibility: foam.u2.Visibility.RO }).
+      this.
         add(this.DAOUpdateController.OBJ,
-            this.DAOUpdateController.SAVE, this.DAOUpdateController.DELETE).
-        endContext();
+            this.DAOUpdateController.SAVE,
+            this.DAOUpdateController.DELETE);
+    }
+  ],
+
+  listeners: [
+    function onFinished() {
+      this.stack.back();
     }
   ]
 });

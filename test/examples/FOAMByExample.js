@@ -1865,11 +1865,11 @@ var examples = [
           function init() {
             this.f$.relateTo(
               this.c$,
-              function f2c(c) {
-                console.log('f2c', c); return 5/9 * ( c - 32 );
+              function f2c(f) {
+                console.log('f2c', f); return 5/9 * ( f - 32 );
               },
-              function c2f(f) {
-                console.log('c2f', f); return 9/5 * f + 32;
+              function c2f(c) {
+                console.log('c2f', c); return 9/5 * c + 32;
               }
             );
           }
@@ -2218,10 +2218,13 @@ var examples = [
         ]
       });
       var sink = Sink.create();
-      source.sub(sink.l);
+      source.sub('ping', sink.l);
       source.pub('ping');
+      source.pub('pong'); // There is no subscriber to the topic 'pong'
       source.pub('ping');
-      sink.detach();
+
+      // Detaching object and unsubscribing all subscribers
+      source.detach();
       source.pub('ping');
     },
     postTestCode: function() {
@@ -2894,7 +2897,6 @@ var examples = [
     code: function() {
       var a = {}, b = [], c = Person.create();
       console.log(a.$UID, b.$UID, c.$UID);
-      console.log(a.$UID, b.$UID, c.$UID);
     },
     postTestCode: function() {
       //toBeAssertedThat(a.$UID).not.toEqual(b.$UID);
@@ -2917,20 +2919,22 @@ var examples = [
   },
   {
     name: 'Function memoize1',
-    description: 'foam.Function.memoize1() memozies a one-argument function',
+    description: 'foam.Function.memoize1() memoizes a one-argument function',
     dependencies: [  ],
     code: function() {
       // if called again with the same argument, the previously generated
       // value will be returned rather than calling the function again.
       var calls = 0;
       var f = foam.Function.memoize1(function(x) {
-        console.log('calculating ', x, "=>", x*x); return x*x;
         calls += 1;
+        console.log('calculating ', x, "=>", x*x);
+        return x*x;
       });
 
       console.log(f(2));
       console.log(f(2));
       console.log(f(4));
+      console.log("Total number of calls:", calls);
     },
     postTestCode: function() {
       //toBeAssertedThat(calls).toEqual(2);
@@ -2938,7 +2942,7 @@ var examples = [
   },
   {
     name: 'Function memoize1 one arg only',
-    description: 'A call to memoize1() with no arguments will trigger a failed assertion',
+    description: 'A call to memoize1\'ed function with no arguments or too many arguments will trigger a failed assertion',
     dependencies: [ 'Function memoize1' ],
     code: function() {
       f();
@@ -3463,4 +3467,3 @@ examples.forEach(function(def) {
 // // TODO: StringProperty
 
 // // TODO: ArrayProperty
-

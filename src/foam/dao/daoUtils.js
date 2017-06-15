@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
+
   requires: [
     'foam.dao.ProxyListener'
   ],
@@ -30,7 +31,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return foam.dao.NullDAO.create() },
       postSet: function(old, nu) {
@@ -44,11 +45,12 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
-    function listen(sink, skip, limit, order, predicate) {
+    function listen_(x, sink, predicate) {
       var listener = this.ProxyListener.create({
         delegate: sink,
-        args: [skip, limit, order, predicate]
+        args: [ predicate ]
       });
 
       listener.onDetach(listener.dao$.follow(this.delegate$));
@@ -58,10 +60,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ProxyListener',
+
   implements: ['foam.dao.Sink'],
+
   properties: [
     'args',
     'delegate',
@@ -80,18 +85,22 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
-    function put(s, obj) {
-      this.delegate.put(this, obj);
+    function put(obj, s) {
+      this.delegate.put(obj, this);
     },
-    function remove(s, obj) {
-      this.delegate.remove(this, obj);
+
+    function remove(obj, s) {
+      this.delegate.remove(obj, this);
     },
+
     function reset(s) {
       this.delegate.reset(this);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -101,13 +110,20 @@ foam.CLASS({
   properties: [
     {
       class: 'Array',
-      name: 'a'
-    }
+      name: 'array'
+    },
+    {
+      name: 'a',
+      getter: function() {
+        this.warn('Use of deprecated ArraySink.a');
+        return this.array;
+      }
+    },
   ],
 
   methods: [
-    function put(sub, o) {
-      this.a.push(o);
+    function put(o, sub) {
+      this.array.push(o);
     }
   ]
 });
@@ -117,11 +133,12 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'PromisedDAO',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
+      methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_' ],
       name: 'promise'
     }
   ]
@@ -180,10 +197,12 @@ foam.LIB({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'InvalidArgumentException',
   extends: 'foam.dao.ExternalException',
+
   properties: [
     {
       class: 'String',

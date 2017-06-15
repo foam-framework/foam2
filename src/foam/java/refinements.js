@@ -14,6 +14,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
@@ -53,6 +54,7 @@ foam.CLASS({
         sourceCls: cls,
         propName: this.name,
         propType: this.javaType,
+        propRequired: this.required,
         jsonParser: this.javaJSONParser,
         extends: this.javaInfoType,
         transient: this.transient
@@ -66,7 +68,7 @@ foam.CLASS({
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
-      var isSet = this.name + 'IsSet_';
+      var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
 
       cls.
@@ -117,6 +119,7 @@ foam.CLASS({
 
       cls.field({
         name: constantize,
+        visibility: 'public',
         static: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)
@@ -128,6 +131,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Implements',
   methods: [
@@ -136,6 +140,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.InnerClass',
@@ -150,6 +155,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.LIB({
   name: 'foam.core.FObject',
@@ -180,6 +186,7 @@ foam.LIB({
       });
 
       var axioms = this.getOwnAxioms();
+
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
@@ -188,6 +195,7 @@ foam.LIB({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
@@ -205,6 +213,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'abstract',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'synchronized',
+      value: false
     },
     {
       class: 'StringArray',
@@ -227,14 +240,12 @@ foam.CLASS({
         if ( ! child.hasOwnProperty(prop.name) ) {
           prop.set(result, prop.get(this));
         }
-
       }
 
       // Special merging behaviour for args.
-      var argCount = Math.max(this.args.length, child.args.length)
-      for ( var i = 0 ; i < argCount ; i++ ) {
-        result.args[i] = this.args[i].clone().copyFrom(child.args[i]);
-      }
+      var i = 0;
+      for ( ; i < this.args.length ; i++ ) result.args[i] = this.args[i].clone().copyFrom(child.args[i]);
+      for ( ; i < child.args.length ; i++ ) result.args[i] = child.args[i];
 
       return result;
     },
@@ -247,6 +258,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
@@ -260,6 +272,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Method',
   properties: [
@@ -270,6 +283,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.ProxiedMethod',
@@ -302,6 +316,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Import',
 
@@ -317,6 +332,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObject',
   methods: [
@@ -328,6 +344,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.AbstractInterface',
   axioms: [
@@ -336,8 +353,8 @@ foam.CLASS({
         cls.buildJavaClass =  function(cls) {
           cls = cls || foam.java.Interface.create();
 
-          cls.name = this.name;
-          cls.package = this.package;
+          cls.name = this.model_.name;
+          cls.package = this.model_.package;
           cls.extends = this.extends;
 
           var axioms = this.getAxioms();
@@ -352,6 +369,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Int',
@@ -472,9 +490,49 @@ foam.CLASS({
       if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
         var of = this.of.id;
+
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
       return info;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Enum',
+
+  properties: [
+    ['javaType', 'java.lang.Enum'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.buildJavaClass =  function(cls) {
+          cls = cls || foam.java.Enum.create();
+
+          cls.name = this.name;
+          cls.package = this.package;
+          cls.extends = this.extends;
+          cls.values = this.VALUES;
+
+          var axioms = this.getAxioms();
+
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
+            axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+          }
+
+          return cls;
+        };
+      }
     }
   ]
 });
@@ -502,6 +560,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.List',
 
@@ -509,6 +568,7 @@ foam.CLASS({
     ['javaType', 'java.util.List']
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.String',
@@ -573,15 +633,16 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-        if ( values1.length > values2.length ) return 1;
-        if ( values1.length < values2.length ) return -1;
 
-        int result;
-        for ( int i = 0 ; i < values1.length ; i++ ) {
-          result = ((Comparable)values1[i]).compareTo(values2[i]);
-          if ( result != 0 ) return result;
-        }
-        return 0;*/}
+  if ( values1.length > values2.length ) return 1;
+  if ( values1.length < values2.length ) return -1;
+
+  int result;
+  for ( int i = 0 ; i < values1.length ; i++ ) {
+    result = ((Comparable)values1[i]).compareTo(values2[i]);
+    if ( result != 0 ) return result;
+  }
+  return 0;*/}
     }
   ]
 });
@@ -624,21 +685,61 @@ foam.CLASS({
     {
       name: 'compareTemplate',
       template: function() {/*
-<%= this.javaType %> values1 = get_(o1);
-<%= this.javaType %> values2 = get_(o2);
-if ( values1.length > values2.length ) return 1;
-if ( values1.length < values2.length ) return -1;
+  <%= this.javaType %> values1 = get_(o1);
+  <%= this.javaType %> values2 = get_(o2);
+  if ( values1.length > values2.length ) return 1;
+  if ( values1.length < values2.length ) return -1;
 
-int result;
-for ( int i = 0 ; i < values1.length ; i++ ) {
-result = ((Comparable)values1[i]).compareTo(values2[i]);
-if ( result != 0 ) return result;
-}
-return 0;
-*/}
+  int result;
+  for ( int i = 0 ; i < values1.length ; i++ ) {
+  result = ((Comparable)values1[i]).compareTo(values2[i]);
+  if ( result != 0 ) return result;
+  }
+  return 0;
+  */}
       }
   ]
+});
 
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'ArrayList',
+  extends: 'foam.core.Array',
+
+  properties: [
+    ['javaType', 'ArrayList'],
+    ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.ArrayParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = this.compareTemplate();
+      return info;
+    }
+  ],
+
+  templates: [
+    {
+      name: 'compareTemplate',
+      template: function() {/*
+  <%= this.javaType %> values1 = get_(o1);
+  <%= this.javaType %> values2 = get_(o2);
+
+  if ( values1.size() > values2.size() ) return 1;
+  if ( values1.size() < values2.size() ) return -1;
+
+  int result;
+  for ( int i = 0 ; i < values1.size() ; i++ ) {
+    result = ((Comparable)values1.get(i)).compareTo(values2.get(i));
+    if ( result != 0 ) return result;
+  }
+  return 0;*/}
+    }
+  ]
 });
 
 
@@ -684,6 +785,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
@@ -715,6 +817,24 @@ foam.CLASS({
         props: props,
         clsName: cls.name
       });
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Model',
+
+  properties: [
+    {
+      class: 'AxiomArray',
+      of: 'foam.java.JavaImport',
+      name: 'javaImports',
+      adaptArrayElement: function(o) {
+        return typeof o === 'string' ?
+          foam.java.JavaImport.create({import: o}) :
+          foam.java.JavaImport.create(o) ;
+      }
     }
   ]
 });

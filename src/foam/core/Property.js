@@ -544,9 +544,10 @@ foam.CLASS({
           for ( var i = 0 ; i < subs.length ; i++ ) subs[i].detach();
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
-          var s = this.slot(argNames[i]).sub(l);
+          var slot = this.slot(argNames[i]);
+          var s = slot.sub(l);
           s && subs.push(s);
-          args[i] = this[argNames[i]];
+          args[i] = slot.get();
         }
         var ret = e.apply(this, args);
         if ( ret === undefined ) this.warn('Expression returned undefined');
@@ -593,9 +594,16 @@ foam.CLASS({
       return prop;
     },
 
-    function exportAs(obj) {
+    function exportAs(obj, sourcePath) {
       /** Export obj.name$ instead of just obj.name. */
-      return this.toSlot(obj);
+
+      var slot = this.toSlot(obj);
+
+      for ( var i = 0 ; sourcePath && i < sourcePath.length ; i++ ) {
+        slot = slot.dot(sourcePath[i]);
+      }
+
+      return slot;
     },
 
     function toSlot(obj) {

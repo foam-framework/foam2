@@ -244,7 +244,7 @@ foam.CLASS({
         // Consume inbound journal
         var self = this;
         return this.inboundJournal.select().then(function(a) {
-          var records = a.a;
+          var records = a.array;
           var i = 0;
 
           function processRecord() {
@@ -318,7 +318,7 @@ foam.CLASS({
       // and writing the result to the server journal.
       var self = this;
       return this.outboundJournal.select().then(function(a) {
-        var records = a.a;
+        var records = a.array;
         var i = 0;
 
         function processRecord() {
@@ -365,7 +365,7 @@ foam.CLASS({
           .orderBy(self.timestampProperty)
           .select()
       }).then(function(a) {
-        var records = a.a;
+        var records = a.array;
         var i = 0;
         var last = syncStatus.latestServerTimestamp;
 

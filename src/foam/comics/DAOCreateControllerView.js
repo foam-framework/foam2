@@ -18,31 +18,47 @@
 foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateControllerView',
-  extends: 'foam.u2.Element',
-
+  extends: 'foam.u2.View',
   requires: [
-    'foam.comics.DAOCreateController'
+    'foam.comics.DAOCreateController',
+  ],
+
+  imports: [
+    'stack',
+    'dao'
+  ],
+
+  exports: [
+    'data'
   ],
 
   properties: [
-    'dao',
     {
-      name: 'controller',
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOCreateController',
+      name: 'data',
       factory: function() {
-        var c = this.DAOCreateController.create();
-        this.onDetach(c.dao$.follow(this.dao$));
-        return c;
+        return this.DAOCreateController.create({ dao: this.dao });
       }
     }
   ],
 
+  reactions: [
+    [ 'data', 'finished', 'onFinished' ]
+  ],
+
   methods: [
     function initE() {
-      this.startContext({ data: this.controller }).
+      this.
         add(this.DAOCreateController.DATA,
             this.DAOCreateController.SAVE,
-            this.DAOCreateController.CANCEL).
-        endContext();
+            this.DAOCreateController.CANCEL);
+    }
+  ],
+
+  listeners: [
+    function onFinished() {
+      this.stack.back();
     }
   ]
 });
