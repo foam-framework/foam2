@@ -103,12 +103,12 @@ foam.CLASS({
       }, this.opened$));
 
       this.start('dropdown-overlay')
-          .addClass(this.myClass('overlay'))
-          .addClass(this.slot(function(open) {
-            return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
-          }, this.opened$))
-          .on('click', this.onCancel)
-          .end();
+        .addClass(this.myClass('overlay'))
+        .addClass(this.slot(function(open) {
+          return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
+        }, this.opened$))
+        .on('click', this.onCancel)
+      .end();
 
       this.dropdownE_.addClass(this.myClass())
           .addClass(this.slot(function(openComplete) {
