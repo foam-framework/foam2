@@ -178,8 +178,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
-      documentation: 'Set this to true to let the user select columns.',
-      value: false
+      documentation: 'Set this to true to let the user select columns.'
     },
     {
       name: 'ascIcon',
@@ -203,7 +202,9 @@ foam.CLASS({
       }
     },
     'selection',
-    'hoverSelection'
+    'hoverSelection',
+    'dropdownOrigin',
+    'overlayOrigin'
   ],
 
   methods: [
@@ -229,9 +230,9 @@ foam.CLASS({
      */
     function positionOverlayDropdown(columnSelectionE) {
       // Dynamic position calculation
-      var origin = document.getElementsByClassName(this.of.id.replace(/\./g,'-') 
-                                                  + '-EditColumnsDropdownOrigin')[0];
-      var current = document.getElementsByClassName('foam-u2-md-OverlayDropdown-container')[0].parentElement;
+      var origin = this.dropdownOrigin.el();
+      var current = this.overlayOrigin.el();
+      
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
@@ -242,9 +243,9 @@ foam.CLASS({
       var view = this;
       var columnSelectionE;
 
-      if (view.editColumnsEnabled) {
+      if ( view.editColumnsEnabled ) {
         columnSelectionE = view.createColumnSelection();
-        this.add(columnSelectionE);
+        this.start('div', null, this.overlayOrigin$).add(columnSelectionE).end();
       }
 
       this.
@@ -266,7 +267,7 @@ foam.CLASS({
                 end();
               }).
               add(this.slot(function(editColumnsEnabled) { 
-                if (editColumnsEnabled) {
+                if ( editColumnsEnabled ) {
                   return this.E('th').
                     addClass(view.myClass('th-editColumns')).
                       on('click', function(e) {
@@ -276,9 +277,7 @@ foam.CLASS({
                       add(' ', view.vertMenuIcon).
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
-                        start('div').
-                        addClass(view.of.id.replace(/\./g,'-') +
-                            '-EditColumnsDropdownOrigin').end();
+                        start('div', null, this.dropdownOrigin$).end();
                }
               }.bind(this), view.editColumnsEnabled$));
           })).
@@ -309,7 +308,7 @@ foam.CLASS({
                           end();
                       }).
                       add(this.slot(function(editColumnsEnabled) { 
-                        if (editColumnsEnabled) return this.E('td'); }, 
+                        if ( editColumnsEnabled ) return this.E('td'); }, 
                         view.editColumnsEnabled$))
               });
           }));
