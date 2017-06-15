@@ -27,7 +27,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView(X) { return this.view; }
+    function createView(X) { return this.view.clone(); }
   ]
 });
 
