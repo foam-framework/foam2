@@ -7,9 +7,9 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
 public class AltIndex implements Index {
@@ -26,7 +26,11 @@ public class AltIndex implements Index {
   public void addIndex(Index i) {
     delegates_.add(i);
   }
-
+  
+  public Object get(Object state, Object key) {
+    return this.delegates_.get(0).get(state, key);
+  }
+  
   public Object put(Object state, FObject value) {
     Object[] newState = new Object[((Object[])state).length];
 

@@ -7,8 +7,8 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import java.util.Comparator;
 
 /** Have-no-plan Plan. **/
 public class NoPlan implements FindPlan, SelectPlan
@@ -28,4 +28,5 @@ public class NoPlan implements FindPlan, SelectPlan
   public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
     throw new IllegalStateException("Attempt to use NoPlan.");
   }
+  
 }

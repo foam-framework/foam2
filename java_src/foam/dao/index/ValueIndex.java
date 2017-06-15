@@ -7,12 +7,12 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import java.util.Comparator;
 
 public class ValueIndex implements Index {
   
-  protected static ValueIndex instance_ = null;
+  protected static ValueIndex instance_ = new ValueIndex();
   
   protected FObject value;
   protected Plan plan;
@@ -23,14 +23,14 @@ public class ValueIndex implements Index {
   }
   
   public static ValueIndex instance() {
-    if ( instance_ != null ) {
-      return instance_;
-    }
-    instance_ = new ValueIndex();
     return instance_;
   }
   
   public void onAdd(Sink sink) {
+  }
+  
+  public Object get(Object state, Object key) {
+    return this.value;
   }
   
   public Object put(Object state, FObject value) {

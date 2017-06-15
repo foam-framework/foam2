@@ -8,8 +8,9 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import java.util.Comparator;
+
 
 public class ValuePlan implements FindPlan, SelectPlan {
   protected final static ValuePlan instance_ = new ValuePlan();

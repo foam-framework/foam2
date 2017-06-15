@@ -11,7 +11,6 @@ import foam.core.PropertyInfo;
 
 public class TreeNode {
   
-  protected Index tail;
   protected Object key;
   protected Object value;
   protected long size;
@@ -19,19 +18,17 @@ public class TreeNode {
   protected TreeNode left;
   protected TreeNode right;
   
-  protected final static TreeNode nullNode = new TreeNode(null, null, null, 
+  protected final static TreeNode nullNode = new TreeNode(null, null, 
                                                           0, 0, null, null);
   
-  public TreeNode(Index tail, Object key, Object value) {
-    this.tail = tail;
+  public TreeNode(Object key, Object value) {
     this.key = key;
     
     this.value = value;
   }
   
-  public TreeNode(Index tail, Object key, Object value, long size, long level,
+  public TreeNode(Object key, Object value, long size, long level,
                   TreeNode left, TreeNode right) {
-    this.tail = tail;
     this.key = key;
     this.value = value;
     this.size = size;
@@ -40,7 +37,7 @@ public class TreeNode {
     this.right = right;
   }
   public TreeNode cloneNode() {
-    return new TreeNode(this.tail, this.key, this.value, this.size, 
+    return new TreeNode( this.key, this.value, this.size, 
                                this.level, this.left, this.right);
     
   } 
@@ -54,49 +51,49 @@ public class TreeNode {
     return nullNode;
   }
   
-  public Object bulkLoad(PropertyInfo prop, int start, int end, FObject... a) {
+  public Object bulkLoad(Index tail, PropertyInfo prop, int start, int end, FObject... a) {
     if( end < start ) {
       return null;
     }
     int m = start + (int)Math.floor((end-start+1)/2);
-    TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), a[m]);
-    tree.left = (TreeNode)this.bulkLoad(prop, start, m-1, a);
-    tree.right = (TreeNode)this.bulkLoad(prop, m+1, end, a);
+    TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), a[m], tail);
+    tree.left = (TreeNode)this.bulkLoad(tail, prop, start, m-1, a);
+    tree.right = (TreeNode)this.bulkLoad(tail, prop, m+1, end, a);
     tree.size = this.size(tree.left) + this.size(tree.right);
     return tree;
   }
   
   public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key,
-    FObject value) {
+    FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
-      return new TreeNode(this.tail, key, value, 1, 1, null, null);
+      return new TreeNode(key, value, 1, 1, null, null);
     }
     state = maybeClone(state);
     int r = prop.compare(state.key, key);
     
     if ( r == 0 ) {
-      state.size -= this.tail.size(state.value);
-      state.value = this.tail.put(state.value, value);
-      state.size += this.tail.size(state.value);
+      state.size -= tail.size(state.value);
+      state.value = tail.put(state.value, value);
+      state.size += tail.size(state.value);
     } else {
       if ( r > 0 ) {
         if ( state.left != null ) {
           state.size -= state.left.size;
         }
-        state.left = this.putKeyValue(state.left, prop, key, value);
+        state.left = this.putKeyValue(state.left, prop, key, value, tail);
         state.size += state.left.size;
       } else {
         if ( state.right != null ) {
           state.size -= state.right.size;
         }
-        state.right = this.putKeyValue(state.right, prop, key, value);
+        state.right = this.putKeyValue(state.right, prop, key, value, tail);
         state.size += state.right.size;
       }
     }
-    return split(skew(state));
+    return split(skew(state, tail), tail);
   }
   
-  public TreeNode skew(TreeNode node) {
+  public TreeNode skew(TreeNode node, Index tail) {
     if ( node != null && node.left != null && node.left.level == node.level ) {
       // Swap the pointers of horizontal left links.
       TreeNode l = maybeClone(node.left);
@@ -104,14 +101,14 @@ public class TreeNode {
       node.left = l.right;
       l.right = node;
       
-      updateSize(node);
-      updateSize(l);
+      updateSize(node, tail);
+      updateSize(l, tail);
       return l;
     }
     return node;
   }
   
-  public TreeNode split(TreeNode node) {
+  public TreeNode split(TreeNode node, Index tail) {
     if ( node != null && node.right != null && node.right.right != null &&
         node.level == node.right.right.level ) {
       // Swap the pointers of horizontal left links.
@@ -121,15 +118,15 @@ public class TreeNode {
       r.left = node;
       r.level++;
       
-      updateSize(node);
-      updateSize(r);
+      updateSize(node, tail);
+      updateSize(r, tail);
       return r;
     }
     return node;
   }
   
   public TreeNode removeKeyValue(TreeNode state, PropertyInfo prop, Object key,
-    FObject value) {
+    FObject value, Index tail) {
     if ( state == null ) {
       return state;
     }
@@ -138,11 +135,11 @@ public class TreeNode {
     long compareValue = prop.compare(state.key, key);
     
     if ( compareValue == 0 ) {
-      state.size -= this.tail.size(state.value);
-      state.value = this.tail.remove(state.value, value);
+      state.size -= tail.size(state.value);
+      state.value = tail.remove(state.value, value);
       
       if ( state.value != null ) {
-        state.size += this.tail.size(state.value);
+        state.size += tail.size(state.value);
         return state;
       }
       
@@ -161,33 +158,33 @@ public class TreeNode {
     } else {
       if ( compareValue > 0 ) {
         state.size -= size(state.left);
-        state.left = removeKeyValue(state.left, prop, key, value);
+        state.left = removeKeyValue(state.left, prop, key, value, tail);
         state.size += size(state.left);
       } else {
         state.size -= size(state.right);
-        state.right = removeKeyValue(state.right, prop, key, value);
+        state.right = removeKeyValue(state.right, prop, key, value, tail);
         state.size += size(state.right);
       }
     }
     // Rebalance the tree. Decrease the level of all nodes in this level if
     // necessary, and then skew and split all nodes in the new level.
-    state = skew(decreaseLevel(state));
+    state = skew(decreaseLevel(state), tail);
     if ( state.right != null ) {
-      state.right = skew(maybeClone(state.right));
+      state.right = skew(maybeClone(state.right), tail);
       if ( state.right.right != null ) {
-        state.right.right = skew(maybeClone(state.right.right));
+        state.right.right = skew(maybeClone(state.right.right), tail);
       }
     }
-    state = split(state);
-    state.right = split(maybeClone(state.right));
+    state = split(state, tail);
+    state.right = split(maybeClone(state.right), tail);
     
     return state;
   }
   
   private void removeSideKeyValueNode(TreeNode parent, TreeNode side, PropertyInfo prop,
-    Object key, FObject value) {
+    Object key, FObject value, Index tail) {
     parent.size -= size(side);
-    side = removeKeyValue(side, prop, key, value);
+    side = removeKeyValue(side, prop, key, value, tail);
     parent.size += size(side);
   }
   
@@ -253,8 +250,8 @@ public class TreeNode {
     return node;
   }
   
-  private void updateSize(TreeNode node) {
-    node.size = size(node.left) + size(node.right) + this.tail.size(node.value);
+  private void updateSize(TreeNode node, Index tail) {
+    node.size = size(node.left) + size(node.right) + tail.size(node.value);
   }
   
   private long size (TreeNode node) {
@@ -271,11 +268,12 @@ public class TreeNode {
     int r = prop.compare(s.key, key);
     if ( r == 0 ) {
       return s.value;
-    } else if ( r > 0 ) {
+    } 
+    if ( r > 0 ) {
       return get(s.left, key, prop);
-    } else {
-      return get(s.right, key, prop);
-    }
+    } 
+    return get(s.right, key, prop);
+    
   }
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
@@ -285,7 +283,7 @@ public class TreeNode {
     if ( r < 0 ) {
       TreeNode l = gt(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
-      return new TreeNode(s.tail, s.key, s.value, newSize, 
+      return new TreeNode(s.key, s.value, newSize, 
         s.level, l, s.right);
     } 
     if ( r > 0 ) {
@@ -303,14 +301,14 @@ public class TreeNode {
     if ( r < 0 ) {
       TreeNode l = gte(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
-      return new TreeNode(s.tail, s.key, s.value, newSize, 
+      return new TreeNode(s.key, s.value, newSize, 
         s.level, l, s.right);
     } 
     if ( r > 0 ) {
       return gte(s.right, key, prop);
     }
     
-    return new TreeNode(s.tail, s.key, s.value, size(s) - size(s.left), 
+    return new TreeNode(s.key, s.value, size(s) - size(s.left), 
       s.level, null, s.right);
   }
   public TreeNode lt(TreeNode s, Object key, PropertyInfo prop) {
@@ -321,7 +319,7 @@ public class TreeNode {
     if ( r > 0 ) {
       TreeNode right = lt(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
-      return new TreeNode(s.tail, s.key, s.value, newSize, 
+      return new TreeNode(s.key, s.value, newSize, 
         s.level, s.left, right);
     } 
     if ( r < 0 ) {
@@ -338,14 +336,14 @@ public class TreeNode {
     if ( r > 0 ) {
       TreeNode right = lte(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
-      return new TreeNode(s.tail, s.key, s.value, newSize, 
+      return new TreeNode(s.key, s.value, newSize, 
         s.level, s.left, right);
     } 
     if ( r < 0 ) {
       return lte(s.left, key, prop);
     }
     
-    return new TreeNode(s.tail, s.key, s.value, size(s) - size(s.right), 
+    return new TreeNode(s.key, s.value, size(s) - size(s.right), 
       s.level, s.left, null);
   }
   
