@@ -30,7 +30,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'PropertyUpdate',
+      of: 'foam.dao.history.PropertyUpdate',
       name: 'updates'
     }
   ]

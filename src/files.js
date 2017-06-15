@@ -183,6 +183,8 @@ FOAM_FILES([
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
+  { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
+  { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
