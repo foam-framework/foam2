@@ -124,10 +124,10 @@ foam.CLASS({
         this.cssClass(this.iconFontClass); // required by font package
         this.style({'font-family': this.iconFontFamily});
         this.add(this.iconFontName);
-        this.setAttribute('title', this.action.toolTip); // hover text
       } else if ( this.showLabel ) {
         this.add(this.label$);
       }
+      this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
