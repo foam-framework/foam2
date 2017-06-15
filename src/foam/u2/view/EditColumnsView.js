@@ -61,7 +61,7 @@ foam.CLASS({
         this.add(cb);
 
         // Ensures each selection is on a new line
-        if (i != this.columns_.length - 1) this.start('br').end();
+        if ( i != this.columns_.length - 1 ) this.start('br').end();
       }
     }
   ],

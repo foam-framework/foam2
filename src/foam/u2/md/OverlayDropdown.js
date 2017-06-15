@@ -44,7 +44,6 @@ foam.CLASS({
     {
       name: 'dropdownE_',
       factory: function() {
-        // This needs to be created early so it's safe to add() things to it.
         return this.E('dropdown');
       }
     },
@@ -56,34 +55,34 @@ foam.CLASS({
 
   methods: [
     function add() {
-      if (this.addToSelf_) this.SUPER.apply(this, arguments);
+      if ( this.addToSelf_ ) this.SUPER.apply(this, arguments);
       else this.dropdownE_.add.apply(this.dropdownE_, arguments);
       return this;
     },
 
     function open() {
-      if (this.opened) return;
+      if ( this.opened ) return;
       this.opened = true;
       this.dropdownE_.style({ height: this.getFullHeight() + 'px' });
       this.animationComplete = false;
     },
 
     function close() {
-      if (!this.opened) return;
+      if ( ! this.opened ) return;
       this.height = 0;
       this.dropdownE_.style({ height: 0 + 'px' });
       this.opened = false;
     },
 
     function getFullHeight() {
-      if (this.state !== this.LOADED) return;
+      if ( this.state !== this.LOADED ) return;
 
       var myStyle = this.window.getComputedStyle(this.dropdownE_.el());
 
       var border = 0;
       ['border-top', 'border-bottom'].forEach(function(name) {
         var match = myStyle[name].match(/^([0-9]+)px/);
-        if (match) border += parseInt(match[1]);
+        if ( match ) border += parseInt(match[1]);
       });
 
       var last = this.dropdownE_.children[this.dropdownE_.children.length - 1].el();
