@@ -290,7 +290,7 @@ foam.CLASS({
             var log = this.log;
             var first = true;
             self.flows.select({
-              put: function(_, o) {
+              put: function(o) {
                 if ( first ) {
                   first = false;
                   log('\n');
@@ -574,9 +574,9 @@ foam.CLASS({
 
     function updateMemento() {
       return this.properties.skip(4).select().then(function(s) {
-        console.log('*************** updateMemento: ', s.a.length);
+        console.log('*************** updateMemento: ', s.array.length);
         this.feedback_ = true;
-        this.memento = foam.Array.clone(s.a);
+        this.memento = foam.Array.clone(s.array);
         this.feedback_ = false;
       }.bind(this));
     },
@@ -605,7 +605,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onPropertyPut(_, __, ___, p) {
+    function onPropertyPut(_, __, p) {
       var o = p.value;
 
       this.scope[p.name] = p.value;
@@ -624,7 +624,7 @@ foam.CLASS({
       }
     },
 
-    function onPropertyRemove(_, __, ___, p) {
+    function onPropertyRemove(_, __, p) {
       var o = p.value;
 
       delete this.scope[p.name];

@@ -20,10 +20,7 @@ foam.CLASS({
   name: 'RestDAOHandler',
   extends: 'foam.net.node.Handler',
 
-  imports: [
-    'info',
-    'warn'
-  ],
+  imports: [ 'info' ],
 
   properties: [
     {
@@ -75,7 +72,7 @@ foam.CLASS({
         // No suffix on put() requests.
         if ( target !== '' ) {
           self.send404(req, res);
-          self.warn('Attempt to put() with path suffix');
+          self.reportWarnMsg(req, 'Attempt to put() with path suffix');
           return true;
         }
 
@@ -126,7 +123,8 @@ foam.CLASS({
           }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unrecognized DAO GET URL fragment: '  + sep + target);
+          self.reportWarnMsg(
+            req, 'Unrecognized DAO GET URL fragment: '  + sep + target);
         }
       } else if ( req.method === 'POST' ) {
         if ( sep === ':' && target === 'select' ) {
@@ -142,7 +140,7 @@ foam.CLASS({
             var limit = data.limit;
             var order = data.order;
             var predicate = data.predicate;
-            self.dao.select(sink, skip, limit, order, predicate)
+            self.dao.select_(self.dao.__context__, sink, skip, limit, order, predicate)
                 .then(function(sink) {
                   // Prevent caching of select() responses.
                   var dateString = new Date().toUTCString();
@@ -167,18 +165,18 @@ foam.CLASS({
             var limit = data.limit;
             var order = data.order;
             var predicate = data.predicate;
-            return self.dao.removeAll(skip, limit, order, predicate);
+            return self.dao.removeAll_(self.dao.__context__, skip, limit, order, predicate);
           }).then(function() {
             self.sendJSON(res, 200, '{}');
             self.info('200 OK: removeAll()');
           }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unknown POST request: ' + target);
+          self.reportWarnMsg(req, 'Unknown POST request: ' + target);
         }
       } else {
         self.send404(req, res);
-        self.warn('Method not supported: '  + req.method);
+        self.reportWarnMsg(req, 'Method not supported: '  + req.method);
       }
 
       return true;

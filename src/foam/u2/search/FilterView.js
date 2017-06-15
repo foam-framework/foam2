@@ -24,7 +24,6 @@ foam.CLASS({
     'filterController'
   ],
 
-
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -84,8 +83,10 @@ foam.CLASS({
       } else {
         this.SUPER.apply(this, arguments);
       }
+
       return this;
     },
+
     function initE() {
       this.overrideAdd_ = false;
 
@@ -95,11 +96,11 @@ foam.CLASS({
           .start()
               .addClass(this.myClass('label'))
               .add(this.label)
-              .end()
+          .end()
           .startContext({ data: this })
-          .add(this.showRemove ? this.REMOVE_FILTER : undefined)
+            .add(this.showRemove ? this.REMOVE_FILTER : undefined)
           .endContext()
-          .end();
+        .end();
 
       this.bodyE = this.start('div').addClass(this.myClass('body'));
       for ( var i = 0; i < this.addQueue_.length; i++ ) {

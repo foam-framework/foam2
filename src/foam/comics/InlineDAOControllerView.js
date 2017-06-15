@@ -19,12 +19,15 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'InlineDAOControllerView',
   extends: 'foam.comics.DAOControllerView',
+  
   methods: [
     function initE() {
-      this.startContext({ data: this.controller }).
-        add(this.DAOController.FILTERED_DAO,
-            this.DAOController.CREATE).
-        endContext();
+      this.
+        add(this.cls.FILTERED_DAO).
+        start('span').
+          show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+          add(this.cls.getAxiomsByClass(foam.core.Action)).
+        end();
     }
   ]
 });

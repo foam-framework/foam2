@@ -5,37 +5,107 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.test',
+  package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: [ 'foam.pattern.EnabledAware' ],
+  implements: [ 'foam.nanos.auth.EnabledAware' ],
 
-  ids: [ 'name' ],
+  imports: [ 'scriptDAO' ],
+
+  javaImports: [
+    'bsh.EvalError',
+    'bsh.Interpreter',
+    'java.io.ByteArrayOutputStream',
+    'java.io.PrintStream',
+    'java.util.Date'
+  ],
 
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'id'
     },
     {
       class: 'DateTime',
-      name: 'lastRun'
+      name: 'lastRun',
+      visibility: foam.u2.Visibility.RO
     },
+    /*
     {
-      class: 'String',
-      name: 'notes',
-      displayHeight: 20
+      class: 'Enum',
+      of: 'foam.nanos.script.Language',
+      name: 'language',
+      value: foam.nanos.script.Language.BEANSHELL
+    },
+    */
+    {
+      class: 'Boolean',
+      name: 'scheduled',
+      hidden: true
     },
     {
       class: 'String',
       name: 'code',
-      displayHeight: 20
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
     },
     {
       class: 'String',
       name: 'output',
       visibility: foam.u2.Visibility.RO,
-      displayHeight: 20
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
+    },
+    {
+      class: 'String',
+      name: 'notes',
+      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 80 }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'runScript',
+      javaReturns: 'void',
+      javaCode:
+`ByteArrayOutputStream baos = new ByteArrayOutputStream();
+PrintStream ps = new PrintStream(baos);
+Interpreter shell = new Interpreter();
+try {
+  shell.set("currentScript", this);
+  setOutput("");
+  shell.setOut(ps);
+  shell.eval(getCode());
+} catch (EvalError e) {
+  e.printStackTrace();
+}
+
+setLastRun(new Date());
+ps.flush();
+setOutput(baos.toString());
+`
+    }
+  ],
+
+  actions: [
+    {
+      name: 'run',
+      code: function() {
+        this.output = '';
+
+        if ( false /* this.language === foam.nanos.script.Language.BEANSHELL */ ) {
+          this.scheduled = true;
+          this.scriptDAO.put(this);
+        } else {
+          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
+
+          with ( { log: log } ) {
+            var ret = eval(this.code);
+            console.log('ret: ', ret);
+            // TODO: if Promise returned, then wait
+          }
+
+          this.scriptDAO.put(this);
+        }
+      }
     }
   ]
 });

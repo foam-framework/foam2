@@ -65,11 +65,11 @@ foam.CLASS({
         vertical-align: middle;
       }
 
+      ^:disabled { filter: grayscale(80%); }
+
       ^.material-icons {
         cursor: pointer;
       }
-
-      ^:disabled { color: #bbb; -webkit-filter: grayscale(0.8); }
     */}})
   ],
 
@@ -142,6 +142,7 @@ foam.CLASS({
 
     function initCls() {
       this.addClass(this.myClass());
+      this.addClass(this.myClass(this.action.name));
     }
   ],
 

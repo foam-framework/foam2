@@ -53,7 +53,10 @@ foam.CLASS({
       name: 'classes',
       factory: function() { return []; }
     },
-    'imports',
+    {
+      name: 'imports',
+      factory: function() { return []; }
+    },
     {
       class: 'Boolean',
       name: 'anonymous',
@@ -62,6 +65,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'innerClass',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'isEnum',
       value: false
     },
     {
@@ -85,7 +93,7 @@ foam.CLASS({
 
     function field(f) {
       if ( ! foam.core.FObject.isInstance(f) ) {
-        f = ( f.class ? foam.lookup(f.class) : foam.java.Field ).create(f, this);
+        f = ( f.class ? this.lookup(f.class) : foam.java.Field ).create(f, this);
       }
 
       this.fields.push(f);
@@ -101,12 +109,12 @@ foam.CLASS({
       if ( this.anonymous ) {
         o.out('new ', this.extends, '()');
       } else if ( ! this.innerClass ) {
-        o.out('// DO NOT MODIFY BY HAND.\n');
-        o.out('// GENERATED CODE (adamvy@google.com)\n');
+        o.out('// WARNING: GENERATED CODE, DO NOT MODIFY BY HAND!\n');
+
         o.out('package ', this.package, ';\n\n');
 
-        this.imports && this.imports.forEach(function(i) {
-          o.out(i, ';\n');
+        this.imports.forEach(function(i) {
+          o.out('import ' + i, ';\n');
         });
 
         o.out('\n');
@@ -116,7 +124,9 @@ foam.CLASS({
 
       if ( ! this.anonymous ) {
         o.out(this.visibility, ' ', this.static ? 'static ' : '');
-        o.out(this.abstract ? 'abstract ' : '', 'class ', this.name);
+
+        o.out(this.abstract ? 'abstract ' : '');
+        o.out(this.isEnum ? 'enum ' : 'class ', this.name);
 
         if ( this.extends ) {
           o.out(' extends ', this.extends);
@@ -134,6 +144,8 @@ foam.CLASS({
       o.out(' {\n');
 
       o.increaseIndent();
+
+      if (this.isEnum) this.writeDeclarations(o);
 
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order

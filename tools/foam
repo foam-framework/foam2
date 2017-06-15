@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+require('../src/foam.js');
+
+foam.classloader.NodeJsModelExecutor.create().fromArgs(process.argv.slice(2)).execute();

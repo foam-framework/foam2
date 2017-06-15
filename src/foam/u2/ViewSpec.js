@@ -29,7 +29,7 @@ foam.CLASS({
       installInClass: function(cls) {
         cls.createView = function(spec, args, self, ctx) {
           if ( foam.u2.Element.isInstance(spec) )
-            return spec;
+            return spec.copyFrom(args);
 
           if ( foam.core.Slot.isInstance(spec) )
             return spec;
@@ -45,7 +45,9 @@ foam.CLASS({
                 spec.create(args, ctx) :
                 ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {});
 
-            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec result must extend foam.u2.Element or be toE()-able.');
+            foam.assert(
+                foam.u2.Element.isInstance(ret) || ret.toE,
+                'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }

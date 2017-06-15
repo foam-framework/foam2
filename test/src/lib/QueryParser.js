@@ -87,9 +87,9 @@ describe('Query parser', function() {
     return function(actual) {
       // Check there were no extras.
       var seen = {};
-      for ( var i = 0; i < actual.a.length; i++ ) {
-        seen[actual.a[i].id] = true;
-        expect(expected.indexOf(actual.a[i].id)).toBeGreaterThan(-1);
+      for ( var i = 0; i < actual.array.length; i++ ) {
+        seen[actual.array[i].id] = true;
+        expect(expected.indexOf(actual.array[i].id)).toBeGreaterThan(-1);
       }
 
       // And all expected values were covered.

@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /*
@@ -471,6 +460,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
@@ -490,10 +480,10 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(s, obj) {
+    function put(obj, s) {
       this.reset();
     },
-    function remove(s, obj) {
+    function remove(obj, s) {
       this.reset();
     },
     function reset() {
@@ -511,7 +501,7 @@ foam.CLASS({
           // Check if this is a stale render
           if ( self.batch !== batch ) return;
 
-          var objs = a.a;
+          var objs = a.array;
           self.cleanup();
           for ( var i = 0 ; i < objs.length ; i++ ) {
             self.addRow(objs[i]);
@@ -521,6 +511,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -621,9 +612,10 @@ foam.CLASS({
     },
 
     // Keys which respond to keydown but not keypress
-    KEYPRESS_CODES: { 8: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    KEYPRESS_CODES: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
 
     NAMED_CODES: {
+      '13': 'enter',
       '37': 'left',
       '38': 'up',
       '39': 'right',
@@ -773,6 +765,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'scrollHeight',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -793,6 +788,22 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function observeScrollHeight() {
+      // TODO: This should be handled by an onsub event when someone subscribes to
+      // scroll height changes.
+      var self = this;
+      this.onload.sub(function(s) {
+        s.detach();
+        var observer = new MutationObserver(function(mutations) {
+          self.scrollHeight = self.el().scrollHeight;
+        });
+        var config = { attributes: true, childList: true, characterData: true };
+        observer.observe(self.el(), config);
+        self.onDetach(function() { observer.disconnect() });
+      });
+      return this;
     },
 
     function evtToCharCode(evt) {
@@ -1918,7 +1929,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW      
+      value: foam.u2.Visibility.RW
     }
   ],
 
@@ -2033,6 +2044,15 @@ foam.CLASS({
         class: 'foam.u2.view.ReferenceView'
       }
     }
+  ]
+})
+
+
+foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [
+    [ 'view',          { class: 'foam.u2.EnumView' } ],
+    [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
   ]
 })
 
@@ -2186,6 +2206,19 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'SearchColumns',
+
+  documentation: 'Axiom for storing Table Search Columns information in Class. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
+  properties: [
+    [ 'name', 'searchColumns' ],
+    'columns'
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
@@ -2200,6 +2233,12 @@ foam.CLASS({
       name: 'tableColumns',
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
+      }
+    },
+    {
+      name: 'searchColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
     }
   ]

@@ -163,34 +163,45 @@ foam.CLASS({
   ],
 
   methods: [
+    function getExportMap() {
+      var m = {};
+      var bs = this.cls_.getAxiomsByClass(foam.core.Export);
+      for ( var i = 0 ; i < bs.length ; i++ ) {
+        var b = bs[i];
+
+        if ( b.key ) {
+          var path = b.key.split('.');
+
+          var a = this.cls_.getAxiomByName(path[0]);
+
+          foam.assert(!!a, 'Unknown axiom: "', path[0], '" in model: ',
+                      this.cls_.id, ", trying to export: '", b.key, "'");
+
+          // Axioms have an option of wrapping a value for export.
+          // This could be used to bind a method to 'this', for example.
+          var e = a.exportAs ? a.exportAs(this, path.slice(1)) : this[path[0]];
+
+          m[b.exportName] = e;
+        } else {
+          // Ex. 'as Bank', which exports an implicit 'this'
+          m[b.exportName] = this;
+        }
+      }
+      return m;
+    },
+
     function installInProto(proto) {
       if ( Object.prototype.hasOwnProperty.call(proto, '__subContext__' ) ) {
         return;
       }
 
+      var axiom = this;
+
       Object.defineProperty(proto, '__subContext__', {
         get: function YGetter() {
           if ( ! this.hasOwnPrivate_('__subContext__') ) {
             var ctx = this.__context__;
-            var m = {};
-            var bs = proto.cls_.getAxiomsByClass(foam.core.Export);
-            for ( var i = 0 ; i < bs.length ; i++ ) {
-              var b = bs[i];
-
-              if ( b.key ) {
-                var a = this.cls_.getAxiomByName(b.key);
-
-                foam.assert(!!a, 'Unknown export: "', b.key, '" in model: ',
-                    this.cls_.id);
-
-                // Axioms have an option of wrapping a value for export.
-                // This could be used to bind a method to 'this', for example.
-                m[b.exportName] = a.exportAs ? a.exportAs(this) : this[b.key] ;
-              } else {
-                // Ex. 'as Bank', which exports an implicit 'this'
-                m[b.exportName] = this;
-              }
-            }
+            var m = axiom.getExportMap.call(this);
             this.setPrivate_('__subContext__', ctx.createSubContext(m));
           }
 

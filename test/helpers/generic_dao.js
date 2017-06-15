@@ -246,7 +246,7 @@ global.genericDAOTestBattery = function(daoFactory) {
             expect(obj).toBe(null);
           }).then(function() {
             return dao.select().then(function(sink) {
-              expect(sink.a.length).toEqual(0);
+              expect(sink.array.length).toEqual(0);
             });
           }).then(done);
         });
@@ -323,7 +323,7 @@ global.genericDAOTestBattery = function(daoFactory) {
           var eofCalled = false;
           var seen = {};
           var sink = {
-            put: function(_, o) {
+            put: function(o) {
               expect(o).toBeDefined();
               expect(seen[o.id]).toBeUndefined();
               seen[o.id] = true;
@@ -370,8 +370,8 @@ global.genericDAOTestBattery = function(daoFactory) {
         it('should honour where() on select()', function(done) {
           dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).select().then(function(a) {
             expect(a).toBeDefined();
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(1);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(1);
           }).catch(function(e) {
             fail(e);
           }).then(done);
@@ -414,8 +414,8 @@ global.genericDAOTestBattery = function(daoFactory) {
         it('should honour limit()', function(done) {
           dao.limit(1).select().then(function(a) {
             expect(a).toBeDefined();
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(1);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(1);
           }).catch(function(e) {
             fail(e);
           }).then(done);
@@ -428,12 +428,12 @@ global.genericDAOTestBattery = function(daoFactory) {
             dao.limit(1).select(first),
             dao.skip(1).limit(1).select(second)
           ]).then(function() {
-            expect(first.a).toBeDefined();
-            expect(first.a.length).toBe(1);
-            expect(second.a).toBeDefined();
-            expect(second.a.length).toBe(1);
+            expect(first.array).toBeDefined();
+            expect(first.array.length).toBe(1);
+            expect(second.array).toBeDefined();
+            expect(second.array.length).toBe(1);
 
-            expect(first.a[0].id).not.toEqual(second.a[0].id);
+            expect(first.array[0].id).not.toEqual(second.array[0].id);
           }).catch(function(e) {
             fail(e);
           }).then(done);
@@ -441,18 +441,18 @@ global.genericDAOTestBattery = function(daoFactory) {
 
         it('should honour orderBy()', function(done) {
           dao.orderBy(test.dao.generic.Person.LAST_NAME).select().then(function(a) {
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(2);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(2);
 
-            expect(a.a[0].lastName).toBe('Bonham');
-            expect(a.a[1].lastName).toBe('Young');
+            expect(a.array[0].lastName).toBe('Bonham');
+            expect(a.array[1].lastName).toBe('Young');
             return dao.orderBy(test.dao.generic.Person.FIRST_NAME).select();
           }).then(function(a) {
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(2);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(2);
 
-            expect(a.a[0].firstName).toBe('Angus');
-            expect(a.a[1].firstName).toBe('Jon');
+            expect(a.array[0].firstName).toBe('Angus');
+            expect(a.array[1].firstName).toBe('Jon');
           }).then(done);
         });
       });
