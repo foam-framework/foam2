@@ -3,10 +3,12 @@ package foam.core;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.FileWriter;
 import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
 import foam.dao.XMLDAO;
 import foam.dao.ListSink;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -19,139 +21,186 @@ import java.time.ZoneId;
 
 public class XMLSupport {
 
-    // TODO: Planning to add support for other date formats in the future
+  // TODO: Planning to add support for other date formats in the future
 
-    // Parsing xml for FObjects and inserting into provided XMLDAO
-    public static void XMLToFObject (String fileName, XMLDAO xmlDAO) throws FileNotFoundException, XMLStreamException, IllegalAccessException {
-      XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-      try {
-        XMLStreamReader xmlr = xmlInputFactory.createXMLStreamReader(new FileReader(fileName));
-        int eventType;
-        Object clsInstance = null;
-        while (xmlr.hasNext()) {
-          eventType = xmlr.next();
-          switch (eventType) {
-            case XMLStreamConstants.START_DOCUMENT:
-              break;
-            case XMLStreamConstants.START_ELEMENT:
-              if (xmlr.getLocalName().equals("object")){
-                // Create new fObject
-                String objClass = xmlr.getAttributeValue(null, "class");
-                Class<?> cls;
+  public static List<FObject> fromXML (XMLStreamReader xmlr) {
+    List<FObject> objList = new ArrayList<FObject>();
+    try {
+      int eventType;
+      Object clsInstance = null;
+      while (xmlr.hasNext()) {
+        eventType = xmlr.next();
+        switch (eventType) {
+          case XMLStreamConstants.START_DOCUMENT:
+            break;
+          case XMLStreamConstants.START_ELEMENT:
+            if (xmlr.getLocalName().equals("object")){
+              // Create new fObject
+              String objClass = xmlr.getAttributeValue(null, "class");
+              Class<?> cls;
 
-                try {
-                  cls = Class.forName(objClass);
-                  clsInstance = cls.newInstance();
-                  ClassInfo csInfo = ((FObject)clsInstance).getClassInfo();
-                  xmlDAO.setOf(csInfo);
-                } catch (ClassNotFoundException | InstantiationException ex) {
+              try {
+                cls = Class.forName(objClass);
+                clsInstance = cls.newInstance();
+              } catch (ClassNotFoundException | InstantiationException ex) {
 
-                }
-                // Object properties
-                copyFromXML((FObject) clsInstance, xmlr);
-                if (clsInstance != null){
-                  xmlDAO.putOnly( (FObject) clsInstance);
-                }
               }
-              break;
-            case XMLStreamConstants.END_ELEMENT:
-              break;
-            case XMLStreamConstants.END_DOCUMENT:
-              break;
-          }
+              // Object properties
+              copyFromXML((FObject) clsInstance, xmlr);
+              if (clsInstance != null){
+                objList.add((FObject) clsInstance);
+              }
+            }
+            break;
+          case XMLStreamConstants.END_ELEMENT:
+            break;
+          case XMLStreamConstants.END_DOCUMENT:
+            break;
         }
-        xmlr.close();
-      } catch (FileNotFoundException ex) {
-          throw new FileNotFoundException("Xml file not found with given filename: " + fileName);
-      } catch (XMLStreamException ex) {
-          throw new XMLStreamException("Premature end of xml file");
       }
-    }
+      xmlr.close();
+    } catch (XMLStreamException | IllegalAccessException ex) {
 
-    public static void copyFromXML(FObject obj, XMLStreamReader reader) throws XMLStreamException {
-      try {
-        PropertyInfo prop = null;
-        while (reader.hasNext()) {
+    }
+    return objList;
+  }
+
+  public static List<FObject> fromXML (String fileName) throws IOException {
+    XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    XMLStreamReader xmlr = null;
+    try {
+      xmlr = xmlInputFactory.createXMLStreamReader(new FileReader(fileName));
+    } catch (IOException ex) {
+      throw new IOException("Could not create/file with given fileName");
+    } catch (XMLStreamException ex) {
+
+    }
+    return fromXML(xmlr);
+  }
+
+  public static void copyFromXML(FObject obj, XMLStreamReader reader) throws XMLStreamException {
+    try {
+      PropertyInfo prop = null;
+      while (reader.hasNext()) {
         int eventType;
         eventType = reader.next();
-          switch (eventType) {
-            case XMLStreamConstants.START_ELEMENT:
-              prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
-              if (prop == null) {
-                  throw new XMLStreamException("Could not find property " + reader.getLocalName());
-              }
-              break;
-            case XMLStreamConstants.CHARACTERS:
-              if (prop != null) {
-                  prop.set(obj, reader.getText());
-                  prop = null;
-              }
-              break;
-            case XMLStreamConstants.END_ELEMENT:
-              if(reader.getLocalName().equals("object")) { return; }
-              break;
-          }
-      }
-      } catch (XMLStreamException ex ) {
-          throw new XMLStreamException("Premature end of xml file");
-      }
-    }
-
-    // FObjects taken from XMLDAO and written to file with specified filename given
-    public static void FObjectToXML (String fileName, XMLDAO xmlDAO) throws XMLStreamException {
-      // Returns all objects into a list iterator
-      ListSink ls = new ListSink();
-      xmlDAO.select(ls);
-      List objList = ls.getData();
-      Iterator objItr = objList.iterator();
-
-      try {
-        XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
-        XMLStreamWriter xmlStreamWriter = xMLOutputFactory.createXMLStreamWriter(new FileWriter(fileName));
-        xmlStreamWriter = new IndentingXMLStreamWriter(xmlStreamWriter);
-
-        xmlStreamWriter.writeStartDocument();
-        //Root tag
-        xmlStreamWriter.writeStartElement("objects");
-
-        while (objItr.hasNext()) {
-          FObject currentObj = (FObject)objItr.next();
-          xmlStreamWriter.writeStartElement("object");
-          xmlStreamWriter.writeAttribute("class", currentObj.getClass().toString().replaceAll("class ",""));
-
-          List props = currentObj.getClassInfo().getAxioms();
-          Iterator propItr = props.iterator();
-
-          while (propItr.hasNext()) {
-            PropertyInfo currentProp = (PropertyInfo)propItr.next();
-            Object value = currentProp.f(currentObj);
-            if (value != null && value != "" ) {
-              xmlStreamWriter.writeStartElement(currentProp.getName());
-              // Case for date
-              if (value instanceof java.util.Date) {
-                String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-                LocalDateTime ldt = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.of("UTC"));
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat).withZone(java.time.ZoneOffset.UTC);
-                String s = formatter.format(ldt);
-                xmlStreamWriter.writeCharacters(s);
-              } else {
-                xmlStreamWriter.writeCharacters(value.toString());
-              }
-              xmlStreamWriter.writeEndElement();
+        switch (eventType) {
+          case XMLStreamConstants.START_ELEMENT:
+            prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
+            if (prop == null) {
+              throw new XMLStreamException("Could not find property " + reader.getLocalName());
             }
-          }
-
-            xmlStreamWriter.writeEndElement();
+            break;
+          case XMLStreamConstants.CHARACTERS:
+            if (prop != null) {
+              prop.set(obj, reader.getText());
+              prop = null;
+            }
+            break;
+          case XMLStreamConstants.END_ELEMENT:
+            if(reader.getLocalName().equals("object")) { return; }
+            break;
         }
-
-        xmlStreamWriter.writeEndElement();
-        xmlStreamWriter.writeEndDocument();
-        xmlStreamWriter.flush();
-        xmlStreamWriter.close();
-
-      } catch (XMLStreamException ex) {
-          throw new XMLStreamException("Error while writing xml file");
-      } catch (IOException ex) {
       }
+    } catch (XMLStreamException ex ) {
+      throw new XMLStreamException("Premature end of xml file");
     }
+  }
+
+  public static void toXML(List<FObject> objList, XMLStreamWriter xmlStreamWriter) {
+    try {
+      xmlStreamWriter = new IndentingXMLStreamWriter(xmlStreamWriter);
+      Iterator i = objList.iterator();
+      xmlStreamWriter.writeStartDocument();
+      //Root tag
+      xmlStreamWriter.writeStartElement("objects");
+
+      while (i.hasNext()) {
+        toXML((FObject) i.next(), xmlStreamWriter);
+      }
+
+      xmlStreamWriter.writeEndElement();
+      xmlStreamWriter.writeEndDocument();
+
+    } catch (XMLStreamException ex) {
+
+    }
+  }
+
+  public static void toXML(FObject obj, XMLStreamWriter xmlStreamWriter) throws XMLStreamException {
+    try {
+      writeObject(obj, xmlStreamWriter);
+    } catch (XMLStreamException ex) {
+      throw new XMLStreamException("Error while writing xml file");
+    }
+  }
+
+  public static void writeObject(FObject obj, XMLStreamWriter writer) throws XMLStreamException {
+    writer.writeStartElement("object");
+    writer.writeAttribute("class", obj.getClass().toString().replaceAll("class ",""));
+    writeObjectProperties(obj, writer);
+    writer.writeEndElement();
+  }
+
+  // Write properties from given FObject
+  public static void writeObjectProperties(FObject obj, XMLStreamWriter writer) {
+    List props = obj.getClassInfo().getAxioms();
+    Iterator propItr = props.iterator();
+
+    try {
+      while (propItr.hasNext()) {
+        PropertyInfo currentProp = (PropertyInfo)propItr.next();
+        Object value = currentProp.f(obj);
+        if (value != null && value != "" ) {
+          writer.writeStartElement(currentProp.getName());
+          // Case for date
+          if (value instanceof java.util.Date) {
+            String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+            LocalDateTime ldt = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.of("UTC"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat).withZone(java.time.ZoneOffset.UTC);
+            String s = formatter.format(ldt);
+            writer.writeCharacters(s);
+          } else {
+            writer.writeCharacters(value.toString());
+          }
+          writer.writeEndElement();
+        }
+      }
+    } catch (XMLStreamException ex ) {
+
+    }
+  }
+
+  // Returns XML string as partial XML string with only object tags
+  public static String toXMLString(FObject obj) {
+    XMLOutputFactory factory = XMLOutputFactory.newInstance();
+    StringWriter sw = new StringWriter();
+    try {
+      XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
+      writer = new IndentingXMLStreamWriter(writer);
+      writeObject(obj, writer);
+    } catch (XMLStreamException ex ) {
+
+    }
+    return sw.toString();
+  }
+
+  // Returns XML string as full XML document string with document tags
+  public static String toXMLString(List<FObject> objArray){
+    XMLOutputFactory factory = XMLOutputFactory.newInstance();
+    StringWriter sw = new StringWriter();
+    try {
+      XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
+      writer = new IndentingXMLStreamWriter(writer);
+      writer.writeStartDocument();
+      Iterator i = objArray.iterator();
+      while (i.hasNext()){
+        writeObject((FObject) i.next(), writer);
+      }
+      writer.writeEndDocument();
+    } catch (XMLStreamException ex) {
+
+    }
+    return sw.toString();
+  }
 }
