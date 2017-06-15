@@ -42,7 +42,8 @@ foam.CLASS({
       //   props.sort(function(a, b) {
       //     return a.label.toLowerCase().compareTo(b.label.toLowerCase());
       //   });
-      // }
+      // } else { ...
+
       this.selected = []
 
       for (let i = 0; i < this.columns_.length; i++) {
@@ -52,22 +53,22 @@ foam.CLASS({
         });
 
         this.selected.push(cb.data$);
+        var name = this.columns_[i].name;
 
         // Subscribes updateTable listener to checkbox data
-        cb.data$.sub(this.updateTable.bind(this));
+        cb.data$.sub(this.updateTable.bind(this, name));
 
         this.add(cb);
 
-        console.log(this.selected)
-
+        // Ensures each selection is on a new line
         if (i != this.columns_.length - 1) this.start('br').end();
       }
     }
   ],
 
   listeners: [
-    /*function onPropChange(changedProp, cb, _, old, nu) {
-      console.log('onPropChange ------------------------')
+    function updateTable(changedProp) {
+      var cols = [];
 
       // if ( this.displaySorted ) {
       //   // TODO: How should this block be tested?
@@ -78,32 +79,25 @@ foam.CLASS({
       //   if ( !nu && selected[changedProp.name] ) {
       //     out.splice(out.indexOf(changedProp), 1);
       //   }
-      // } else {
-        for (var i = 0; i < this.allColumns.length; i++) {
-          var p = this.properties[i];
-          
-          p.visible = ((p.prop === changedProp && cb.data) || 
-                        (p.visible && (p.prop !== changedProp || cb.data)));
-        }
       // }
-
-      this.propertyChange.pub('properties')
-    }*/
-    function updateTable() {
-      console.log('updating table')
-      var cols = [];
+      // else { ...
 
       for (var i = 0; i < this.columns.length; i++) {
-        console.log('selected', this.selected[i].obj.data)
-        if (this.selected[i].obj.data) 
-          //cols.push(this.table.getAxiomByName(this.columns[i]))
-          cols.push({name: this.columns[i]})
+        var cbData = this.selected[i].obj.data;
+        var isColShown = this.columns_.some(c => c.name === this.columns[i]);
+        var curProp = this.columns[i];
+
+        // Determines if the curProp is the one which has changed,
+        // if so adds col if cb is checked. Otherwise if curProp hasn't
+        // changed, then checks if it was previously shown, if so, keeps in view.
+        if ( ((changedProp == curProp) && cbData) ||
+             ((changedProp != curProp) && isColShown) ) {
+          // Gets the table column from the column name, and pushes to cols array
+          cols.push(this.table.getAxiomByName(curProp))
+        }
       }
 
-      console.log('before', this.columns_)
       this.columns_ = cols;
-      this.propertyChange.pub('columns_')
-      console.log('after', this.columns_)
     }
   ]
 });
