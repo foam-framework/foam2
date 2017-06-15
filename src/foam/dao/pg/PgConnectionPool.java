@@ -1,4 +1,4 @@
-package foam.dao;
+package foam.dao.pg;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 

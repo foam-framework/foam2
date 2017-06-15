@@ -1,4 +1,4 @@
-package foam.dao;
+package foam.dao.pg;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
