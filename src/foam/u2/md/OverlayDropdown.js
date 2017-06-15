@@ -32,7 +32,7 @@ foam.CLASS({
       name: 'opened',
       documentation: 'True when the overlay has been commanded to be open. ' +
           'It might still be animating; see $$DOC{ref:".animationComplete"}.',
-      value: true
+      value: false
     },
     {
       class: 'Boolean',
@@ -89,7 +89,7 @@ foam.CLASS({
 
       var last = this.dropdownE_.children[this.dropdownE_.children.length - 1].el();
       var margin = parseInt(this.window.getComputedStyle(last)['margin-bottom']);
-      if (Number.isNaN(margin)) margin = 0;
+      if ( Number.isNaN(margin) ) margin = 0;
 
       return Math.min(border + last.offsetTop + last.offsetHeight + margin,
           this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top);
@@ -104,13 +104,13 @@ foam.CLASS({
         this.shown = open;
       }, this.opened$));
 
-      // this.start('dropdown-overlay')
-      //     .addClass(this.myClass('overlay'))
-      //     .addClass(this.slot(function(open) {
-      //       return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
-      //     }, this.opened$))
-      //     .on('click', this.onCancel)
-      //     .end();
+      this.start('dropdown-overlay')
+          .addClass(this.myClass('overlay'))
+          .addClass(this.slot(function(open) {
+            return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
+          }, this.opened$))
+          .on('click', this.onCancel)
+          .end();
 
       this.dropdownE_.addClass(this.myClass())
           .addClass(this.slot(function(openComplete) {
@@ -183,7 +183,7 @@ foam.CLASS({
 
   listeners: [
     function onCancel() {
-      //this.close();
+      this.close();
     },
 
     function onTransitionEnd() {
@@ -193,7 +193,7 @@ foam.CLASS({
     function onMouseLeave(e) {
       console.assert(e.target === this.dropdownE_.el(),
           'mouseleave should only fire on this, not on children');
-      //this.close();
+      this.close();
     },
 
     /**
@@ -201,7 +201,6 @@ foam.CLASS({
      * Block them before they reach the overlay.
      */
     function onClick(e) {
-      console.log('PROPAGATION STOPPED')
       e.stopPropagation();
     }
   ]
