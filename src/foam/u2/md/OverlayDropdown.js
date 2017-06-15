@@ -32,7 +32,6 @@ foam.CLASS({
       name: 'opened',
       documentation: 'True when the overlay has been commanded to be open. ' +
           'It might still be animating; see $$DOC{ref:".animationComplete"}.',
-      value: false
     },
     {
       class: 'Boolean',
