@@ -179,7 +179,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'editColumnsEnabled',
       documentation: 'Set this to true to let the user select columns.',
-      value: true // TODO: Return to false after testing
+      value: false
     },
     {
       name: 'ascIcon',
@@ -207,7 +207,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function detach() { console.log('table view detaching')},
     function sortBy(column) {
       this.order = this.order === column ?
         this.DESC(column) :
@@ -239,13 +238,7 @@ foam.CLASS({
       columnSelectionE.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
     },
 
-    function init() {
-      // console.log('table view init')
-      // this.onFocus(function() {console.log('focusing table view')});
-    },
-
     function initE() {
-      console.log('***************************** initE');
       var view = this;
       var columnSelectionE;
 
