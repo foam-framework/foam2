@@ -25,6 +25,11 @@ for any language or platform, including Android Java and iOS Swift.
 
 # Development
 
+## Building Java
+
+_cd src; ./gen.sh_
+_cd ..; mvn compile_
+
 ## Installing Dependencies
 
 FOAM has no runtime dependencies, but uses a number of third party tools for
@@ -38,7 +43,7 @@ tools by doing the following.
 
 ## Style Guide
 
-All code should folow the [style guide.](doc/guides/StyleGuide.md)
+All code should follow the [style guide.](doc/guides/StyleGuide.md)
 
 ## Testing
 
