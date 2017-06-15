@@ -46,7 +46,7 @@ foam.CLASS({
 
       this.selected = []
 
-      for (let i = 0; i < this.columns_.length; i++) {
+      for ( var i = 0; i < this.columns_.length; i++ ) {
         var cb = this.CheckBox.create({
           label: this.columns_[i].label,
           data: true
@@ -82,7 +82,7 @@ foam.CLASS({
       // }
       // else { ...
 
-      for (var i = 0; i < this.columns.length; i++) {
+      for ( var i = 0; i < this.columns.length; i++ ) {
         var cbData = this.selected[i].obj.data;
         var isColShown = this.columns_.some(c => c.name === this.columns[i]);
         var curProp = this.columns[i];
