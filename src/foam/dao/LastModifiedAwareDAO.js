@@ -13,7 +13,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       code: function(value) {
         value.lastModified = new Date();
         return SUPER(value);
