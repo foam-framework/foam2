@@ -95,7 +95,7 @@ foam.INTERFACE({
     },
     {
       name: 'logout',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'void',
       args: [
         {
           name: 'x',

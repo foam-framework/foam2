@@ -78,10 +78,12 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'AbstractDAODecorator',
   implements: ['foam.dao.DAODecorator'],
+
   methods: [
     function write(X, dao, obj, existing) {
       return Promise.resolve(obj);
@@ -95,16 +97,20 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'CompoundDAODecorator',
+
   implements: ['foam.dao.DAODecorator'],
+
   properties: [
     {
       class: 'Array',
       name: 'decorators'
     }
   ],
+
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
@@ -114,6 +120,7 @@ foam.CLASS({
         return d[i] ? d[i++].write(X, dao, obj, existing).then(a) : obj;
       });
     },
+
     function read(X, dao, obj) {
       var i = 0;
       var d = this.decorators;
@@ -122,6 +129,7 @@ foam.CLASS({
         return d[i] ? d[i++].read(X, dao, obj).then(a) : obj;
       });
     },
+
     function remove(X, dao, obj) {
       var i = 0;
       var d = this.decorators;
@@ -133,55 +141,102 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DecoratedDAO',
   extends: 'foam.dao.ProxyDAO',
 
+  requires: [
+    'foam.mlang.sink.Count',
+    'foam.mlang.sink.GroupBy'
+  ],
+
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.dao.DAODecorator',
+//      class: 'FObjectProperty',
+//      of: 'foam.dao.DAODecorator',
       name: 'decorator'
     },
     {
-      name: 'dao'
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+      factory: function() { return this.delegate; }
     }
   ],
 
   methods: [
     {
-      name: 'put',
-      code: function(obj) {
+      name: 'put_',
+      code: function(x, obj) {
         // TODO: obj.id can generate garbase, would be
         // slightly faster if DAO.find() could take an object
         // as well.
         var self = this;
-        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find(obj.id) ).then(function(existing) {
+        return ( ( ! obj.id ) ? Promise.resolve(null) : this.dao.find_(x, obj.id) ).then(function(existing) {
           return self.decorator.write(self.__context__, self.dao, obj, existing);
         }).then(function(obj) {
-          return self.delegate.put(obj);
+          return self.delegate.put_(x, obj);
         });
       }
     },
+
     {
-      name: 'remove',
-      code: function(obj) {
+      name: 'remove_',
+      code: function(x, obj) {
         var self = this;
         return this.decorator.remove(self.__context__, self.dao, self.obj).then(function(obj) {
-          self.delegate.remove(obj);
+          self.delegate.remove_(x, obj);
         });
       }
     },
+
     {
-      name: 'find',
-      code: function(id) {
+      name: 'find_',
+      code: function(x, id) {
         var self = this;
-        return this.delegate.find(id).then(function(obj) {
+        return this.delegate.find_(x, id).then(function(obj) {
           return self.decorator.read(self.__context__, self.dao, obj);
         });
       }
+    },
+
+    /*
+    TODO: works, but is expensive, so shouldn't be used if decorator.read isn't set
+    function select(sink, skip, limit, order, predicate) {
+      if ( ! sink ) sink = foam.dao.ArraySink.create();
+      // No need to decorate if we're just counting.
+      if ( this.Count.isInstance(sink) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      }
+
+      // TODO: This is too simplistic, fix
+      if ( this.GroupBy.isInstance(sink) ) {
+        return this.delegate.select(sink, skip, limit, order, predicate);
+      }
+
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        var ps = [];
+
+        self.delegate.select({
+          put: function(o) {
+            var p = self.decorator.read(self.__context__, self.dao, o);
+            p.then(function(o) { sink.put(o); })
+            ps.push(p);
+          },
+          eof: function() {
+          }
+        }, skip, limit, order, predicate).then(function() {
+          Promise.all(ps).then(function() {
+            resolve(sink);
+          });
+        })
+      });
     }
+    */
+
     // TODO: Select/removeAll support.  How do we do select
     // without breaking MDAO optimizations?
     // {
