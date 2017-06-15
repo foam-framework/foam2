@@ -216,19 +216,16 @@ foam.CLASS({
   name: 'Linking',
 
   requires: [
-    'foam.u2.view.EditColumnsView',
-    'foam.u2.md.OverlayDropdown'
+    'foam.u2.view.EditColumnsView'
   ],
 
   properties: [
     {
       name: 'columns_',
       value: [
-        {
-          name: 'col1',
-        },
-        { name: 'col2'},
-        {name: 'col3'}
+        { name: 'col1' },
+        { name: 'col2' },
+        { name: 'col3' }
       ]
     },
     {
@@ -247,9 +244,7 @@ foam.CLASS({
     {
       name: 'columns',
       value: ['col1', 'col2', 'col3']
-    },
-    'overlay',
-    'selected'
+    }
   ],
 
   methods: [
@@ -260,23 +255,48 @@ foam.CLASS({
         table: this.of
       });
 
-      setTimeout(function() {
-        this.selected$ = editor.selected$;
-        console.log('stuffs', this.selected)
-      }.bind(this), 1000)
-      
-      
-
-      return this.OverlayDropdown.create().add(editor);
+      return editor;
+      // return this.OverlayDropdown.create().add(editor);
     },
   ],
 });
 
 var link = Linking.create();
-var cols1 = link.createColumnSelection();
-cols1.write();
-cols1.open();
 
+E('h3').add('Columns: ').write();
+E('div').add(
+  foam.core.ExpressionSlot.create({
+    args: [ link.columns_$ ],
+    code: function(c) {
+      return c.find(col => col.name == 'col1') ?
+        E('span').add('COL1   ') :
+        E('span').add('COL1   ').style({display: 'none'});
+    }
+  }),
+  foam.core.ExpressionSlot.create({
+    args: [ link.columns_$ ],
+    code: function(c) {
+      return c.find(col => col.name == 'col2') ?
+        E('span').add('COL2    '):
+        E('span').add('COL2    ').style({display: 'none'});
+    }
+  }),
+  foam.core.ExpressionSlot.create({
+    args: [ link.columns_$ ],
+    code: function(c) {
+      return c.find(col => col.name == 'col3') ?
+        E('span').add('COL3   ') :
+        E('span').add('COL3   ').style({display: 'none'});
+    }
+  })).write()
+
+var cols1 = link.createColumnSelection();
+var cols2 = link.createColumnSelection();
+// Note: For this to work make the following change in Edit Columns View
+// cols.push(this.table.getAxiomByName(this.columns[i]))
+          // => cols.push({name: this.columns[i]})
+E('div').style({'width': '50%', 'float': 'left', 'padding-bottom':'200px'}).add(cols1).write();
+E('div').style({'width': '50%', 'float': 'right', 'padding-bottom':'200px'}).add(cols2).write();
 
 foam.CLASS({
   name: 'Person',
@@ -332,12 +352,6 @@ foam.u2.DetailView.create({
   properties: [ foam.util.Timer.INTERVAL, foam.util.Timer.I ],
   actions: [ foam.util.Timer.STOP, foam.util.Timer.START ]
 }).write();
-
-var cols2 = link.createColumnSelection();
-setTimeout(function() {cols2.selected$ = cols1.selected$;}, 1500)
-
-cols2.write();
-cols2.open();
 
 foam.CLASS({
   name: 'CustomDetailView',
