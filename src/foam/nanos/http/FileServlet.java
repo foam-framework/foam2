@@ -68,9 +68,9 @@ public class FileServlet
                 "<ul style=\"list-style-type:disc\">");
 
         File[] files = srcFile.listFiles();
-        if(files != null && files.length > 0) {
-          for(File file : files) {
-            pw.write("<li>" + "<a href=\"./" + filePath + (filePath.isEmpty() ? "" : "/") + file.getName() + "\"?>"
+        if ( files != null && files.length > 0 ) {
+          for ( File file : files ) {
+            pw.write("<li>" + "<a href=\"/static/" + filePath + (filePath.isEmpty() ? "" : "/") + file.getName() + "\"?>"
                 + file.getName()
                 + "</a></li>");
           }
