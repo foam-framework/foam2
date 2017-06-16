@@ -110,6 +110,7 @@ foam.CLASS({
 
   methods: [
     function add() {
+      // TODO: Replace with content @kgr
       if ( this.addToSelf_ ) {
         this.SUPER.apply(this, arguments);
       } else {
