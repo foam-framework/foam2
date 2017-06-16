@@ -51,7 +51,27 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      documentation: 'displayed on :hover',
+      class: 'String',
+      name: 'toolTip',
+      expression: function(label) { return label; }
+    },
+    {
       name: 'icon'
+    },
+    {
+      class: 'String',
+      name: 'iconFontFamily',
+      value: 'Material Icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontClass',
+      value: 'material-icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontName'
     },
     {
       class: 'Array',
@@ -152,7 +172,7 @@ foam.CLASS({
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :
-            foam.lookup(prop.of).create(o) ;
+            this.lookup(prop.of).create(o) ;
       }
     }
   ]
