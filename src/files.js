@@ -192,6 +192,8 @@ FOAM_FILES([
   { name: "foam/u2/view/DualView", flags: ['web'] },
   { name: "foam/u2/view/ColorPicker", flags: ['web'] },
   { name: "foam/u2/view/TableView", flags: ['web'] },
+  { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
+  { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
   { name: "foam/u2/view/BlobView", flags: ['web'] },
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
