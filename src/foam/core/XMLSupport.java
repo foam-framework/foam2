@@ -23,7 +23,7 @@ public class XMLSupport {
 
   // TODO: Planning to add support for other date formats in the future
 
-  public static List<FObject> fromXML (XMLStreamReader xmlr) {
+  public static List<FObject> fromXML(XMLStreamReader xmlr) {
     List<FObject> objList = new ArrayList<FObject>();
     try {
       int eventType;
@@ -34,7 +34,7 @@ public class XMLSupport {
           case XMLStreamConstants.START_DOCUMENT:
             break;
           case XMLStreamConstants.START_ELEMENT:
-            if (xmlr.getLocalName().equals("object")){
+            if (xmlr.getLocalName().equals("object")) {
               // Create new fObject
               String objClass = xmlr.getAttributeValue(null, "class");
               Class<?> cls;
@@ -47,7 +47,7 @@ public class XMLSupport {
               }
               // Object properties
               copyFromXML((FObject) clsInstance, xmlr);
-              if (clsInstance != null){
+              if (clsInstance != null) {
                 objList.add((FObject) clsInstance);
               }
             }
@@ -60,12 +60,11 @@ public class XMLSupport {
       }
       xmlr.close();
     } catch (XMLStreamException | IllegalAccessException ex) {
-
     }
     return objList;
   }
 
-  public static List<FObject> fromXML (String fileName) throws IOException {
+  public static List<FObject> fromXML(String fileName) throws IOException {
     XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     XMLStreamReader xmlr = null;
     try {
@@ -98,11 +97,13 @@ public class XMLSupport {
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
-            if(reader.getLocalName().equals("object")) { return; }
+            if (reader.getLocalName().equals("object")) {
+              return;
+            }
             break;
         }
       }
-    } catch (XMLStreamException ex ) {
+    } catch (XMLStreamException ex) {
       throw new XMLStreamException("Premature end of xml file");
     }
   }
@@ -123,14 +124,13 @@ public class XMLSupport {
       xmlStreamWriter.writeEndDocument();
 
     } catch (XMLStreamException ex) {
-
     }
   }
 
   public static void toXML(FObject obj, XMLStreamWriter xmlStreamWriter) throws XMLStreamException {
     try {
       xmlStreamWriter.writeStartElement("object");
-      xmlStreamWriter.writeAttribute("class", obj.getClass().toString().replaceAll("class ",""));
+      xmlStreamWriter.writeAttribute("class", obj.getClass().toString().replaceAll("class ", ""));
       writeObjectProperties(obj, xmlStreamWriter);
       xmlStreamWriter.writeEndElement();
     } catch (XMLStreamException ex) {
@@ -145,9 +145,9 @@ public class XMLSupport {
 
     try {
       while (propItr.hasNext()) {
-        PropertyInfo currentProp = (PropertyInfo)propItr.next();
+        PropertyInfo currentProp = (PropertyInfo) propItr.next();
         Object value = currentProp.f(obj);
-        if (value != null && value != "" ) {
+        if (value != null && value != "") {
           writer.writeStartElement(currentProp.getName());
           // Case for date
           if (value instanceof java.util.Date) {
@@ -162,8 +162,7 @@ public class XMLSupport {
           writer.writeEndElement();
         }
       }
-    } catch (XMLStreamException ex ) {
-
+    } catch (XMLStreamException ex) {
     }
   }
 
@@ -175,14 +174,13 @@ public class XMLSupport {
       XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
       writer = new IndentingXMLStreamWriter(writer);
       toXML(obj, writer);
-    } catch (XMLStreamException ex ) {
-
+    } catch (XMLStreamException ex) {
     }
     return sw.toString();
   }
 
   // Returns XML string as full XML document string with document tags
-  public static String toXMLString(List<FObject> objArray){
+  public static String toXMLString(List<FObject> objArray) {
     XMLOutputFactory factory = XMLOutputFactory.newInstance();
     StringWriter sw = new StringWriter();
     try {
@@ -190,12 +188,12 @@ public class XMLSupport {
       writer = new IndentingXMLStreamWriter(writer);
       writer.writeStartDocument();
       Iterator i = objArray.iterator();
-      while (i.hasNext()){
+      while (i.hasNext()) {
         toXML((FObject) i.next(), writer);
       }
       writer.writeEndDocument();
     } catch (XMLStreamException ex) {
-
     }
     return sw.toString();
   }
+}
