@@ -86,6 +86,9 @@ public class XMLSupport {
         switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
+            if ( prop == null ) {
+              throw new XMLStreamException("Could not find property " + reader.getLocalName());
+            }
             break;
           case XMLStreamConstants.CHARACTERS:
             if ( prop != null ) {
@@ -144,6 +147,7 @@ public class XMLSupport {
       while ( propItr.hasNext() ) {
         PropertyInfo currentProp = (PropertyInfo) propItr.next();
         Object value = currentProp.f(obj);
+        if (currentProp.getTransient() ) continue;
         if ( value != null && value != "" ) {
           writer.writeStartElement(currentProp.getName());
           // Case for date
