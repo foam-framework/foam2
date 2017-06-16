@@ -86,9 +86,6 @@ public class XMLSupport {
         switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
-            if ( prop == null ) {
-              throw new XMLStreamException("Could not find property " + reader.getLocalName());
-            }
             break;
           case XMLStreamConstants.CHARACTERS:
             if ( prop != null ) {
