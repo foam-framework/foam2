@@ -28,9 +28,9 @@ public class XMLSupport {
     try {
       int eventType;
       Object clsInstance = null;
-      while (xmlr.hasNext()) {
+      while ( xmlr.hasNext() ) {
         eventType = xmlr.next();
-        switch (eventType) {
+        switch ( eventType ) {
           case XMLStreamConstants.START_DOCUMENT:
             break;
           case XMLStreamConstants.START_ELEMENT:
@@ -80,24 +80,24 @@ public class XMLSupport {
   public static void copyFromXML(FObject obj, XMLStreamReader reader) throws XMLStreamException {
     try {
       PropertyInfo prop = null;
-      while (reader.hasNext()) {
+      while ( reader.hasNext() ) {
         int eventType;
         eventType = reader.next();
-        switch (eventType) {
+        switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
-            if (prop == null) {
+            if ( prop == null ) {
               throw new XMLStreamException("Could not find property " + reader.getLocalName());
             }
             break;
           case XMLStreamConstants.CHARACTERS:
-            if (prop != null) {
+            if ( prop != null ) {
               prop.setFromString(obj, reader.getText());
               prop = null;
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
-            if (reader.getLocalName().equals("object")) {
+            if ( reader.getLocalName().equals("object") ) {
               return;
             }
             break;
@@ -116,7 +116,7 @@ public class XMLSupport {
       //Root tag
       xmlStreamWriter.writeStartElement("objects");
 
-      while (i.hasNext()) {
+      while ( i.hasNext() ) {
         toXML((FObject) i.next(), xmlStreamWriter);
       }
 
@@ -144,13 +144,13 @@ public class XMLSupport {
     Iterator propItr = props.iterator();
 
     try {
-      while (propItr.hasNext()) {
+      while ( propItr.hasNext() ) {
         PropertyInfo currentProp = (PropertyInfo) propItr.next();
         Object value = currentProp.f(obj);
-        if (value != null && value != "") {
+        if ( value != null && value != "" ) {
           writer.writeStartElement(currentProp.getName());
           // Case for date
-          if (value instanceof java.util.Date) {
+          if ( value instanceof java.util.Date ) {
             String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
             LocalDateTime ldt = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.of("UTC"));
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat).withZone(java.time.ZoneOffset.UTC);
@@ -188,7 +188,7 @@ public class XMLSupport {
       writer = new IndentingXMLStreamWriter(writer);
       writer.writeStartDocument();
       Iterator i = objArray.iterator();
-      while (i.hasNext()) {
+      while ( i.hasNext() ) {
         toXML((FObject) i.next(), writer);
       }
       writer.writeEndDocument();
