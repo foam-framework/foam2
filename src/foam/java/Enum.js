@@ -118,7 +118,7 @@ foam.CLASS({
 
   methods: [
     function labelForValue(value) {
-        return '"' + value.label + '"';
+      return '"' + value.label + '"';
     },
     function writeDeclarations(o) {
       o.indent();
