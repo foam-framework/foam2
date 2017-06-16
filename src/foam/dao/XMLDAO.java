@@ -17,7 +17,7 @@ public class XMLDAO
   protected String fileName;
 
   public void setFileName(String filename) {
-    if (filename.contains(".xml")){
+    if ( filename.contains(".xml") ){
       fileName = System.getProperty("user.dir") + filename;
     } else {
       fileName = System.getProperty("user.dir") + filename.concat(".xml");
@@ -35,7 +35,7 @@ public class XMLDAO
     try {
       objList = XMLSupport.fromXML(fileName);
       Iterator i = objList.iterator();
-      while (i.hasNext()) {
+      while ( i.hasNext() ) {
         FObject currentObj = (FObject)i.next();
         ClassInfo clsInfo = currentObj.getClassInfo();
         this.setOf(clsInfo);
@@ -49,7 +49,7 @@ public class XMLDAO
   // Rewrites file when new object is put into DAO
   public FObject put(FObject obj) {
     this.setOf(obj.getClassInfo());
-    FObject s =  super.put(obj);
+    FObject s = super.put(obj);
     daoToXML(this);
     return s;
   }
@@ -87,8 +87,6 @@ public class XMLDAO
       xmlStreamWriter.flush();
       xmlStreamWriter.close();
     } catch (IOException | XMLStreamException ex) {
-
     }
   }
-
 }
