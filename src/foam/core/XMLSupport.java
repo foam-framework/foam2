@@ -154,10 +154,7 @@ public class XMLSupport {
           writer.writeStartElement(prop.getName());
           // Case for date
           if ( value instanceof java.util.Date ) {
-            String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-            LocalDateTime ldt = LocalDateTime.ofInstant(((Date) value).toInstant(), ZoneId.of("UTC"));
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat).withZone(java.time.ZoneOffset.UTC);
-            String s = formatter.format(ldt);
+            String s = value.toString();
             writer.writeCharacters(s);
           } else {
             writer.writeCharacters(value.toString());

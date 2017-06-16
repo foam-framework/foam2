@@ -101,7 +101,6 @@ foam.CLASS({
         return foam.Date.compare(o1, o2);
       }
     },
-    { name: 'dateFormat', class: 'String', value: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" }
   ]
 });
 
@@ -114,9 +113,6 @@ foam.CLASS({
   documentation: 'Describes properties of type DateTime.',
   label: 'Date and time',
 
-  properties: [
-    { name: 'dateFormat', class: 'String', value: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" }
-  ]
 });
 
 
