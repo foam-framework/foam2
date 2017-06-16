@@ -31,9 +31,9 @@ foam.CLASS({
       expression: function() {
         var out = 'return new String[] { ';
 
-        for (var i = 0, value; value = this.values[i]; i++) {
+        for ( var i = 0, value ; value = this.values[i] ; i++ ) {
           out += this.labelForValue(value);
-          if (i < this.values.length - 1) out += ', ';
+          if ( i < this.values.length - 1 ) out += ', ';
         }
 
         out += ' };';
@@ -46,7 +46,7 @@ foam.CLASS({
       expression: function() {
         var out = 'switch (ordinal) {\n';
 
-        for (var i = 0, value; value = this.values[i]; i++) {
+        for ( var i = 0, value ; value = this.values[i] ; i++ ) {
           out += '  case ' + value.ordinal + ': return ' + this.name + '.' + value.name + ';\n';
         }
 
@@ -60,8 +60,9 @@ foam.CLASS({
       expression: function() {
         var out = 'switch (label) {\n';
 
-        for (var i = 0, value; value = this.values[i]; i++) {
-          out += '  case ' + '"' + value.label + '"' + ': return ' + this.name + '.' + value.name + ';\n';
+        for ( var i = 0, value ; value = this.values[i] ; i++ ) {
+          out += '  case ' + '"' + value.label + '"' + 
+                  ': return ' + this.name + '.' + value.name + ';\n';
         }
 
         out += '}\nreturn null;';
@@ -126,9 +127,7 @@ foam.CLASS({
       for ( var i = 0 ; i < this.values.length ; i++ ) {
         var value = this.values[i];
         o.out(value.name, '(', value.ordinal, ',', this.labelForValue(value),')');
-        
-        if ( i == this.values.length - 1 ) { o.out(';\n\n')}
-        else {o.out(', ')}
+        o.out(( i == this.values.length - 1 ) ? ';\n\n' : ', ');
       }
 
       this.out = o;
