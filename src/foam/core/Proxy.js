@@ -121,7 +121,7 @@ foam.CLASS({
       this.SUPER(cls);
 
       var name     = this.name;
-      var delegate = foam.lookup(this.of);
+      var delegate = this.lookup(this.of);
 
       function resolveName(name) {
         var m = delegate.getAxiomByName(name);

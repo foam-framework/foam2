@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.nanos.auth.Region',
     'foam.nanos.auth.User',
     'foam.nanos.boot.NSpec',
+    'foam.nanos.cron.Cron',
     'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test'
@@ -26,6 +27,7 @@ foam.CLASS({
 
   exports: [
     'countryDAO',
+    'cronDAO',
     'groupDAO',
     'languageDAO',
     'menuDAO',
@@ -42,10 +44,16 @@ foam.CLASS({
       name: 'nSpecDAO',
       factory: function() {
         return this.createDAO({
-          of: this.User,
+          of: this.NSpec,
           seqNo: true,
           testData: [
-            { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' }
+            { name: 'http',   serve: false, serviceClass: 'foam.nanos.http.NanoHttpServer' },
+            { name: 'log',    serve: false, serviceClass: 'foam.nanos.log.FileLogger' },
+            { name: 'pmlog',  serve: false, serviceClass: 'foam.nanos.pm.DAOPMLogger' },
+            { name: 'auth',   serve: true,  serviceClass: 'foam.nanos.auth.UserAndGroupAuthService' },
+            { name: 'test',   serve: true,  serviceClass: 'foam.nanos.test.TestRunner' },
+            { name: 'script', serve: true,  serviceClass: 'foam.nanos.script.ScriptRunner' },
+            { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
       }
@@ -91,10 +99,10 @@ foam.CLASS({
       name: 'menuDAO',
       factory: function() {
         return this.createDAO({
+
           of: this.Menu,
           testData: [
-            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ }  },
-              { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ } },
               { parent: 'admin', id: 'auth',         label: 'Authentication', handler: { class: 'foam.nanos.menu.TabsMenu' } },
                 { parent: 'auth', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
                 { parent: 'auth', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
@@ -102,17 +110,20 @@ foam.CLASS({
                 { parent: 'auth', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
                 { parent: 'auth', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
                 { parent: 'auth', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
-              { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO' }  },
+              { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+              { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', summaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
               { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' }  },
               { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },
+              { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' }  },
               { parent: 'admin', id: 'pm',           label: 'Performance' },
               { parent: 'admin', id: 'log',          label: 'View Logs' },
-            { id: 'debug',                           label: 'Debug' },
-              { parent: 'debug', id: 'api',          label: 'API Reference' },
-              { parent: 'debug', id: 'context',      label: 'Context Walker' },
-              { parent: 'debug', id: 'data',         label: 'View Data' }
+              /*
+            { id: 'support',                         label: 'Support',         handler: { class: 'foam.nanos.menu.TabsMenu' } },
+              { parent: 'support', id: 'api',        label: 'API Reference' },
+              { parent: 'support', id: 'context',    label: 'Context Walker' }
+              */
           ]
-        });
+        }).orderBy(this.Menu.ORDER, this.Menu.ID);
       }
     },
 
@@ -176,6 +187,18 @@ foam.CLASS({
           factory: function() {
             return this.createDAO({
               of: this.Script,
+              seqNo: true,
+              testData: [
+              ]
+            });
+          }
+        },
+
+        {
+          name: 'cronDAO',
+          factory: function() {
+            return this.createDAO({
+              of: this.Cron,
               seqNo: true,
               testData: [
               ]

@@ -40,6 +40,7 @@ foam.CLASS({
     'label',
     'alwaysFloatLabel',
     'type',
+    'placeholder',
     'autocompleter',
     'autocompleteList_'
   ],
@@ -52,6 +53,9 @@ foam.CLASS({
         alwaysFloatLabel: this.alwaysFloatLabel,
         type:             this.type,
         onKey:            this.onKey
+      });
+      e.attrs({
+        placeholder: this.placeholder$,
       });
       e.end();
 

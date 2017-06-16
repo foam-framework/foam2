@@ -86,7 +86,7 @@ foam.CLASS({
         add(this.slot(function(e) {
           if ( ! e ) return this.E('div');
           var e2 = this.E('div');
-          e2.select(this.data[self.relationship.forwardName].dao, function(obj) {
+          e2.select(this.data[self.relationship.forwardName]/*.dao*/, function(obj) {
             return self.cls_.create({
               data: obj,
               formatter: self.formatter,
@@ -198,8 +198,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      var M = this.ExpressionsSingleton.create();
-      var of = foam.lookup(this.relationship.sourceModel);
+      var M  = this.ExpressionsSingleton.create();
+      var of = this.lookup(this.relationship.sourceModel);
 
       var dao = this.data$proxy.where(
         M.NOT(M.HAS(of.getAxiomByName(this.relationship.inverseName))));

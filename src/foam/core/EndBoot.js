@@ -56,7 +56,7 @@ foam.CLASS({
         }
 
         if ( o.class ) {
-          var m = foam.lookup(o.class);
+          var m = this.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
           return m.create(o, this);
         }
@@ -71,12 +71,12 @@ foam.CLASS({
       adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
           foam.assert(o.name, 'Method must be named');
-          var m = foam.lookup(prop.of).create();
+          var m = this.lookup(prop.of).create();
           m.name = o.name;
           m.code = o;
           return m;
         }
-        if ( foam.lookup(prop.of).isInstance(o) ) return o;
+        if ( this.lookup(prop.of).isInstance(o) ) return o;
         if ( o.class ) return this.lookup(o.class).create(o, this);
         return foam.lookup(prop.of).create(o);
       }
@@ -157,10 +157,11 @@ foam.CLASS({
     */
     function unknownArg(key, value) {
       // NOP
-    }
+    },
+
+    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
   ]
 });
-
 
 foam.boot.end();
 

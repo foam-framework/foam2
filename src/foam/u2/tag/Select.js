@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -76,10 +65,20 @@ foam.CLASS({
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
           var c = choices[i];
-          cs.push(self.E('option').attrs({
+          let value = c[1];
+          let e = self.E('option').attrs({
             value: i,
             selected: self.data === i ? true : undefined
-          }).add(c[1]));
+          }).add(value);
+
+          if ( value.indexOf('  ') != -1 ) {
+            // Hack to display spaces as nbsp's
+            e.onload.sub(function() {
+              e.el().innerHTML = value.replace(/ /g, '&nbsp;');
+            });
+          }
+
+          cs.push(e);
         }
 
         return cs;
@@ -91,6 +90,5 @@ foam.CLASS({
         'disabled',
         mode === foam.u2.DisplayMode.DISABLED || mode === foam.u2.DisplayMode.RO);
     }
-
   ]
 });

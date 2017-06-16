@@ -19,22 +19,22 @@
 
 describe('basic parsers', function() {
   var parsers = foam.parse.Parsers.create();
-  var seq = parsers.seq;
-  var repeat0 = parsers.repeat0;
-  var simpleAlt = parsers.simpleAlt;
-  var alt = parsers.alt;
-  var sym = parsers.sym;
-  var seq1 = parsers.seq1;
-  var repeat = parsers.repeat;
-  var plus = parsers.plus;
-  var str = parsers.str;
-  var range = parsers.range;
-  var notChars = parsers.notChars;
-  var not = parsers.not;
-  var optional = parsers.optional;
-  var literal = parsers.literal;
-  var literalIC = parsers.literalIC;
-  var anyChar = parsers.anyChar;
+  var seq = parsers.seq.bind(parsers);
+  var repeat0 = parsers.repeat0.bind(parsers);
+  var simpleAlt = parsers.simpleAlt.bind(parsers);
+  var alt = parsers.alt.bind(parsers);
+  var sym = parsers.sym.bind(parsers);
+  var seq1 = parsers.seq1.bind(parsers);
+  var repeat = parsers.repeat.bind(parsers);
+  var plus = parsers.plus.bind(parsers);
+  var str = parsers.str.bind(parsers);
+  var range = parsers.range.bind(parsers);
+  var notChars = parsers.notChars.bind(parsers);
+  var not = parsers.not.bind(parsers);
+  var optional = parsers.optional.bind(parsers);
+  var literal = parsers.literal.bind(parsers);
+  var literalIC = parsers.literalIC.bind(parsers);
+  var anyChar = parsers.anyChar.bind(parsers);
 
   var mkStream = function(str) {
     var ps = foam.parse.StringPS.create();
@@ -390,14 +390,14 @@ describe('basic parsers', function() {
     it('should parse many repetitions, and return ""', function() {
       var ps = parser.parse(mkStream('   !'));
       expect(ps).toBeDefined();
-      expect(ps.value).toBe('');
+      expect(ps.value).toBeDefined();
       expect(ps.head).toBe('!');
     });
 
     it('should parse 0 repetitions correctly', function() {
       var ps = parser.parse(mkStream('!'));
       expect(ps).toBeDefined();
-      expect(ps.value).toBe('');
+      expect(ps.value).toBeDefined();
       expect(ps.head).toBe('!');
     });
   });

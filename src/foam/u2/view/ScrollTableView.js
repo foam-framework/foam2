@@ -1,18 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
  foam.CLASS({
@@ -21,10 +10,10 @@
   extends: 'foam.u2.Element',
 
   requires: [
-    'foam.u2.view.TableView',
-    'foam.graphics.ScrollCView',
     'foam.dao.FnSink',
+    'foam.graphics.ScrollCView',
     'foam.mlang.sink.Count',
+    'foam.u2.view.TableView'
   ],
 
   properties: [
@@ -35,7 +24,7 @@
     {
       class: 'Int',
       name: 'limit',
-      value: 30,
+      value: 18,
       // TODO make this a funciton of the height.
     },
     {
@@ -56,8 +45,8 @@
         return this.ScrollCView.create({
           value$: this.skip$,
           extent$: this.limit$,
-          height: 600, // TODO use window height.
-          width: 40,
+          height: 40*18+48, // TODO use window height.
+          width: 22,
           handleSize: 40,
           // TODO wire up mouse wheel
           // TODO clicking away from scroller should deselect it.
@@ -72,7 +61,34 @@
     },
   ],
 
+  methods: [
+    function init() {
+      this.onDetach(this.data$proxy.listen(this.FnSink.create({fn:this.onDaoUpdate})));
+      this.onDaoUpdate();
+    },
+
+    function initE() {
+      // TODO probably shouldn't be using a table.
+      this.start('table').
+        on('wheel', this.onWheel).
+        start('tr').
+          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
+          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
+        end().
+      end();
+    }
+  ],
+
   listeners: [
+    {
+      name: 'onWheel',
+      code: function(e) {
+        var negative = e.deltaY < 0;
+        // Convert to rows, rounding up. (Therefore minumum 1.)
+        var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
+        this.skip += negative ? -rows : rows;
+      }
+    },
     {
       // TODO Avoid onDaoUpdate approaches.
       name: 'onDaoUpdate',
@@ -84,20 +100,5 @@
         })
       },
     },
-  ],
-
-  methods: [
-    function init() {
-      this.onDetach(this.data$proxy.pipe(this.FnSink.create({fn:this.onDaoUpdate})));
-    },
-    function initE() {
-      // TODO probably shouldn't be using a table.
-      this.start('table').
-        start('tr').
-          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').add(this.scrollView).end().
-        end().
-      end();
-    }
   ]
 });
