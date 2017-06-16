@@ -147,11 +147,11 @@ public class XMLSupport {
 
     try {
       while ( propItr.hasNext() ) {
-        PropertyInfo currentProp = (PropertyInfo) propItr.next();
-        Object value = currentProp.f(obj);
-        if (currentProp.getTransient() ) continue;
+        PropertyInfo prop = (PropertyInfo) propItr.next();
+        Object value = prop.f(obj);
+        if (prop.getTransient() ) continue;
         if ( value != null && value != "" ) {
-          writer.writeStartElement(currentProp.getName());
+          writer.writeStartElement(prop.getName());
           // Case for date
           if ( value instanceof java.util.Date ) {
             String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
