@@ -394,7 +394,7 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = `if ( o instanceof Number ) {
       return ((Number)o).intValue();
-      } else if ( o instanceof String) {
+      } if ( o instanceof String) {
          return Integer.valueOf((String) o);
       } else {
          return (int)o;
@@ -421,7 +421,7 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = `if ( o instanceof Number ) {
         return ((Number)o).byteValue();
-      } else if ( o instanceof String ) {
+      } if ( o instanceof String ) {
         return Byte.valueOf((String) o);
       } else {
         return (byte)o;
@@ -448,7 +448,7 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = `if ( o instanceof Number ) {
         return ((Number)o).shortValue();
-      } else if ( o instanceof String ) {
+      } if ( o instanceof String ) {
         return Short.valueOf((String) o);
       } else {
         return (short)o;
@@ -474,7 +474,7 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = `if ( o instanceof Number ) {
         return ((Number)o).longValue();
-      } else if ( o instanceof String ) {
+      } if ( o instanceof String ) {
         return Long.valueOf((String) o);
       } else {
         return (long)o;
@@ -500,7 +500,7 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = `if ( o instanceof Number ) {
         return ((Number)o).doubleValue();
-      } else if ( o instanceof String ) {
+      } if ( o instanceof String ) {
         return Float.parseFloat((String) o);
       } else {
         return (double)o;
