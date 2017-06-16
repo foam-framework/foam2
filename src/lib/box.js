@@ -699,20 +699,19 @@ foam.CLASS({
   ],
   methods: [
     function put_(x, obj) {
-      return this.SUPER(this.Serializable.isInstance(x) ? x : null, obj);
+      return this.SUPER(null, obj);
     },
     function remove_(x, obj) {
-      return this.SUPER(this.Serializable.isInstance(x) ? x : null, obj);
+      return this.SUPER(null, obj);
     },
     function find_(x, key) {
-      return this.SUPER(this.Serializable.isInstance(x) ? x : null, key);
+      return this.SUPER(null, key);
     },
     function select_(x, sink, skip, limit, order, predicate) {
-      var y = this.Serializable.isInstance(x) ? x : null;
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 
-        return this.SUPER(y, null, skip, limit, order, predicate).then(function(result) {
+        return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
           var items = result.array;
 
           if ( ! sink ) return result;
@@ -733,10 +732,10 @@ foam.CLASS({
         });
       }
 
-      return this.SUPER(y, sink, skip, limit, order, predicate);
+      return this.SUPER(null, sink, skip, limit, order, predicate);
     },
     function removeAll_(x, skip, limit, order, predicate) {
-        return this.SUPER(this.Serializable.isInstance(x) ? x : null, skip, limit, order, predicate);
+        return this.SUPER(null, skip, limit, order, predicate);
     },
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
