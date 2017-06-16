@@ -33,7 +33,7 @@ public class XMLDAO
     List<FObject> objList;
 
     try {
-      objList = XMLSupport.fromXML(fileName);
+      objList = XMLSupport.fromXML(x, fileName);
       Iterator i = objList.iterator();
       while ( i.hasNext() ) {
         FObject currentObj = (FObject)i.next();
