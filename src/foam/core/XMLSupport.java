@@ -1,23 +1,23 @@
 package foam.core;
 
-import java.io.FileReader;
+import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
+import foam.dao.ListSink;
+import foam.dao.XMLDAO;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.FileWriter;
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
-import foam.dao.XMLDAO;
-import foam.dao.ListSink;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.stream.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.ZoneId;
 
 public class XMLSupport {
 
