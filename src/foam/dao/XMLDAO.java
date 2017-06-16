@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Iterator;
 
 public class XMLDAO
-        extends MapDAO
+  extends MapDAO
 {
 
   protected String fileName;
@@ -50,7 +50,7 @@ public class XMLDAO
   public FObject put(FObject obj) {
     this.setOf(obj.getClassInfo());
     FObject s = super.put(obj);
-    daoToXML(this);
+    daoToXML();
     return s;
   }
 
@@ -63,21 +63,21 @@ public class XMLDAO
 
   public FObject remove(FObject obj) {
     FObject s = super.remove(obj);
-    daoToXML(this);
+    daoToXML();
     return s;
   }
 
 
   public void removeAll() {
     super.removeAll();
-    daoToXML(this);
+    daoToXML();
   }
 
-  public void daoToXML (XMLDAO xmldao) {
+  public void daoToXML () {
     X x = new ProxyX();
     this.setX(x);
     ListSink ls = new ListSink();
-    xmldao.select(ls);
+    this.select(ls);
     List objList = ls.getData();
 
     try {
