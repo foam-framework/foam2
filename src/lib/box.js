@@ -988,6 +988,7 @@ foam.CLASS({
     },
     {
       name: 'delegate',
+      transient: true,
       factory: function() {
         return foam.box.SocketConnectBox.create({
           address: this.address
@@ -1326,6 +1327,7 @@ foam.CLASS({
         var model = this.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
+            port: Math.floor( 10000 + ( Math.random() * 10000 ) ),
             delegate: this.registry
           }, this);
         }
