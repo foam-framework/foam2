@@ -10,27 +10,27 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
-      'foam.u2.CheckBox'
+    'foam.u2.CheckBox'
   ],
 
   properties: [
-      {
-        name: 'columns'
-      },
-      {
-        name: 'table'
-      },
-      {
-        name: 'columns_'
-      },
-      {
-        name: 'selected'
-      },
-      {
-        class: 'Boolean',
-        name: 'displaySorted',
-        value: false
-      }
+    {
+      name: 'columns'
+    },
+    {
+      name: 'table'
+    },
+    {
+      name: 'columns_'
+    },
+    {
+      name: 'selected'
+    },
+    {
+      class: 'Boolean',
+      name: 'displaySorted',
+      value: false
+    }
   ],
   
   methods: [
