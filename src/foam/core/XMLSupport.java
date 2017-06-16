@@ -34,7 +34,7 @@ public class XMLSupport {
           case XMLStreamConstants.START_DOCUMENT:
             break;
           case XMLStreamConstants.START_ELEMENT:
-            if (xmlr.getLocalName().equals("object")) {
+            if ( xmlr.getLocalName().equals("object") ) {
               // Create new fObject
               String objClass = xmlr.getAttributeValue(null, "class");
               Class<?> cls;
@@ -47,7 +47,7 @@ public class XMLSupport {
               }
               // Object properties
               copyFromXML((FObject) clsInstance, xmlr);
-              if (clsInstance != null) {
+              if ( clsInstance != null ) {
                 objList.add((FObject) clsInstance);
               }
             }
