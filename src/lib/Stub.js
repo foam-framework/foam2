@@ -49,14 +49,10 @@ foam.CLASS({
             }
           }
 
-          // TODO: replace with support in JSON to null out unserializable items
-          var args = Array.from(arguments);
-          args[0] = null; // null out context
-
           var msg = this.Message.create({
             object: this.RPCMessage.create({
               name: name,
-              args: args
+              args: Array.from(arguments)
             })
           });
 

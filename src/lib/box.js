@@ -699,10 +699,11 @@ foam.CLASS({
   ],
   methods: [
     function select_(x, sink, skip, limit, order, predicate) {
+      var y = this.Serializable.isInstance(x) ? x : null;
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 
-        return this.SUPER(x, null, skip, limit, order, predicate).then(function(result) {
+        return this.SUPER(y, null, skip, limit, order, predicate).then(function(result) {
           var items = result.array;
 
           if ( ! sink ) return result;
@@ -723,7 +724,7 @@ foam.CLASS({
         });
       }
 
-      return this.SUPER(x, sink, skip, limit, order, predicate);
+      return this.SUPER(y, sink, skip, limit, order, predicate);
     },
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
