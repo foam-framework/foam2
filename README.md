@@ -27,7 +27,7 @@ for any language or platform, including Android Java and iOS Swift.
 
 ## Building Java
 
-_cd src; ./gen.sh; cd ..; mvn compile_
+_cd src; ./gen.sh; cd ../build; mvn compile; mvn package_
 
 ## Installing Dependencies
 
