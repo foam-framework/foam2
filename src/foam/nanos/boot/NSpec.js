@@ -16,6 +16,33 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'Boolean',
+      name: 'lazy',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'serve',
+      // Used by u2.view.TableView
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); } else { this.entity('nbsp'); }
+            })
+            .add(obj.serve ? ' Y' : '-')
+          .end();
+      },
+      // Used by u2.TableView
+      tableCellView: function(obj, e) {
+        var e = e.E();
+        if ( obj.serve ) { e.style({color: 'green'}); } else { e.entity('nbsp'); }
+        e.add(obj.serve ? ' Y' : '-');
+        return e;
+      },
+      documentation: 'If true, this service is served over the network.'
+    },
+    {
       class: 'String',
       name: 'serviceClass'
     }
@@ -25,8 +52,8 @@ foam.CLASS({
   methods: [
     {
       name: 'createService',
-      javaReturns: 'foam.nanos.NanoService',
-      javaCode: `return (foam.nanos.NanoService) Class.forName(getServiceClass()).newInstance();`,
+      javaReturns: 'java.lang.Object',
+      javaCode: `return Class.forName(getServiceClass()).newInstance();`,
       javaThrows: [
         'java.lang.ClassNotFoundException',
         'java.lang.InstantiationException',
@@ -34,4 +61,4 @@ foam.CLASS({
       ],
     }
   ]
-})
+});

@@ -81,9 +81,7 @@ foam.LIB({
     function isInstance(o) { return o === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
-    function compare(_, b) {
-      return b === null ? 0 : b === undefined ? -1 : 1;
-    },
+    function compare(_, b) { return b === null ? 0 : 1; },
     function hashCode() { return -3; }
   ]
 });
@@ -95,7 +93,10 @@ foam.LIB({
     function isInstance(o) { return typeof o === 'boolean'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return a ? (b ? 0 : 1) : (b ? -1 : 0); },
+    function compare(a, b) {
+      if ( ! foam.Boolean.isInstance(b) ) return 1;
+      return a ? (b ? 0 : 1) : (b ? -1 : 0);
+    },
     function hashCode(o) { return o ? 1 : -1; }
   ]
 });
@@ -108,6 +109,7 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
+      if ( ! foam.Function.isInstance(b) ) return 1;
       return b ? foam.String.compare(a.toString(), b.toString()) :  1;
     },
     function hashCode(o) { return foam.String.hashCode(o.toString()); },
@@ -361,8 +363,10 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
-      return ( b === null || b === undefined ) ? 1 :
-          a < b ? -1 : a > b ? 1 : 0;
+      if ( ! foam.Number.isInstance(b) && isNaN(parseFloat(b))
+          || ( isNaN(a) && ! isNaN(b)) ) return 1;
+      else if ( ! isNaN(a) && isNaN(b) ) return -1;
+      return a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
       var bufForHash = new ArrayBuffer(8);
@@ -388,7 +392,10 @@ foam.LIB({
     function isInstance(o) { return typeof o === 'string'; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
-    function compare(a, b) { return b != null ? a.localeCompare(b) : 1 ; },
+    function compare(a, b) {
+      if ( ! foam.String.isInstance(b) ) return 1;
+      return b != null ? a.localeCompare(b) : 1 ;
+    },
     function hashCode(s) {
       var hash = -4;
 
@@ -568,9 +575,10 @@ foam.LIB({
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
+      if ( ! foam.Date.isInstance(b) && ! foam.Number.isInstance(b) ) return 1;
       a = this.getTime(a);
-      b = this.getTime(b);
-      return a < b ? -1 : a > b ? 1 : 0;
+      b = foam.Number.isInstance(b) ? b : this.getTime(b);
+      return foam.Number.compare(a, b);
     },
     // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
@@ -642,11 +650,13 @@ foam.LIB({
       }
     },
     function isInstance(o) {
-      return typeof o === 'object' && ! Array.isArray(o);
+      return typeof o === 'object' && ! Array.isArray(o) &&
+          ! foam.core.FObject.isInstance(o);
     },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
+      if ( ! foam.Object.isInstance(b) ) return 1;
       return foam.Number.compare(a.$UID, b ? b.$UID : -1);
     },
     function hashCode(o) {
@@ -697,6 +707,22 @@ foam.typeOf = (function() {
   };
 })();
 
+/**
+  Defining an ordinal property to establish a precedence
+  in which items should be compared in. Items are arranged
+  by complexity of the type
+*/
+
+foam.core.FObject.ordinal = 0;
+foam.Object.ordinal = 1;
+foam.Function.ordinal = 2;
+foam.Array.ordinal = 3;
+foam.String.ordinal = 4;
+foam.Number.ordinal = 5;
+foam.Date.ordinal = 6; // Dates are compared as Number, thus more simple
+foam.Boolean.ordinal = 7;
+foam.Null.ordinal = 8;
+foam.Undefined.ordinal = 9;
 
 foam.LIB({
   name: 'foam',
@@ -746,7 +772,21 @@ foam.LIB({
     methods: [
       function clone(o)      { return typeOf(o).clone(o); },
       function equals(a, b)  { return typeOf(a).equals(a, b); },
-      function compare(a, b) { return typeOf(a).compare(a, b); },
+      function compare(a, b) {
+        // To ensure that symmetry is present when comparing,
+        // we will always use the comparator of higher precedence.
+        var aType = typeOf(a);
+        var bType = typeOf(b);
+        return (aType.ordinal >= bType.ordinal) ? aType.compare(a, b) :
+            this.comparatorNegate(bType.compare(b, a));
+      },
+      function comparatorNegate(num) {
+        // When negating comparisons, a -0 may be returned and
+        // this may cause unexpected behaviour. Since -0 === 0
+        // is true, we return 0 and avoid returning -0.
+        if (num === 0) return 0;
+        return -num;
+      },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {
         var t = typeOf(a);
@@ -845,7 +885,6 @@ foam.LIB({
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
-
       if ( cs.lengh === 1 ) return cs[0];
 
       var f = {

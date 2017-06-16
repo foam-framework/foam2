@@ -488,7 +488,9 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
-      useShortNames: true,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
       strict: false
     }),
 
@@ -497,7 +499,9 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
-      useShortNames: true,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
       strict: false,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
@@ -507,7 +511,9 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
-      useShortNames: true,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
       strict: false,
       propertyPredicate: function(o, p) { return ! p.storageTransient; }
     })
@@ -530,7 +536,7 @@ foam.LIB({
           var cls = json.class || opt_class;
 
           if ( cls ) {
-            var c = typeof cls === 'string' ? foam.lookup(cls) : cls;
+            var c = typeof cls === 'string' ? ( opt_ctx || foam ).lookup(cls) : cls;
 
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);

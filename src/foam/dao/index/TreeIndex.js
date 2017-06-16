@@ -87,7 +87,7 @@ foam.CLASS({
     'foam.core.Property',
     'foam.dao.ArraySink',
     'foam.mlang.sink.NullSink',
-    'foam.dao.index.AltPlan',
+    'foam.dao.index.MergePlan',
     'foam.dao.index.CountPlan',
     'foam.dao.index.CustomPlan',
     'foam.dao.index.NotFoundPlan',
@@ -421,8 +421,7 @@ foam.CLASS({
 
           if ( subPlans.length === 0 ) return m.NotFoundPlan.create();
 
-          // TODO: If ordering, AltPlan may need to sort like MergePlan.
-          return m.AltPlan.create({
+          return m.MergePlan.create({
             subPlans: subPlans,
             prop: prop
           });
@@ -439,11 +438,7 @@ foam.CLASS({
 
         subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
-        // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return m.AltPlan.create({
-          subPlans: [subPlan],
-          prop: prop
-        });
+        return subPlan;
       }
 
       var ic = false;
@@ -480,8 +475,7 @@ foam.CLASS({
           subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate, root));
         }
 
-        // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return m.AltPlan.create({
+        return m.MergePlan.create({
           subPlans: subPlans,
           prop: prop
         });
@@ -558,6 +552,8 @@ foam.CLASS({
         },
         customToString: function() {
           return 'scan(key=' + prop.name + ', cost=' + this.cost +
+              ', sorting=' + ( sortRequired ? order.toString() : 'none' ) +
+              ', reverseScan=' + reverseSort +
               (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
               ')';
         }
