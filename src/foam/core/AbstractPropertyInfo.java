@@ -5,7 +5,7 @@ import foam.lib.parse.Parser;
 import java.util.Map;
 
 public abstract class AbstractPropertyInfo
-        implements PropertyInfo
+  implements PropertyInfo
 {
   protected ClassInfo parent;
 
