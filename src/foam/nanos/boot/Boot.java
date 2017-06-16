@@ -15,11 +15,11 @@ import foam.nanos.pm.*;
 import foam.nanos.pm.PMDAO;
 
 public class Boot {
-  protected DAO    serviceDAO_;
-  protected DAO    userDAO_;
-  protected DAO    groupDAO_;
-  protected DAO    pmDAO_;
-  protected X         root_ = new ProxyX();
+  protected DAO serviceDAO_;
+  protected DAO userDAO_;
+  protected DAO groupDAO_;
+  protected DAO pmDAO_;
+  protected X   root_ = new ProxyX();
 
   public Boot() {
     // Used for all the services that will be required when Booting
