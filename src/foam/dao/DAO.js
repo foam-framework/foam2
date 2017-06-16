@@ -28,9 +28,19 @@ foam.INTERFACE({
       args: [ 'obj' ]
     },
     {
+      name: 'put_',
+      returns: 'Promise',
+      args: [ 'x', 'obj' ]
+    },
+    {
       name: 'remove',
       returns: 'Promise',
       args: [ 'obj' ]
+    },
+    {
+      name: 'remove_',
+      returns: 'Promise',
+      args: [ 'x', 'obj' ]
     },
     {
       name: 'find',
@@ -38,24 +48,49 @@ foam.INTERFACE({
       args: [ 'id' ]
     },
     {
+      name: 'find_',
+      returns: 'Promise',
+      args: [ 'x', 'id' ]
+    },
+    {
       name: 'select',
       returns: 'Promise',
-      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
+      args: [ 'sink' ]
+    },
+    {
+      name: 'select_',
+      returns: 'Promise',
+      args: [ 'x', 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'removeAll',
       returns: '',
-      args: [ 'skip', 'limit', 'order', 'predicate' ]
+      args: [ ]
+    },
+    {
+      name: 'removeAll_',
+      returns: '',
+      args: [ 'x', 'skip', 'limit', 'order', 'predicate' ]
     },
     {
       name: 'listen',
       returns: '',
-      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
+      args: [ 'sink' ]
+    },
+    {
+      name: 'listen_',
+      returns: '',
+      args: [ 'x', 'sink', 'predicate' ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
-      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
+      args: [ 'sink' ]
+    },
+    {
+      name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
+      returns: '',
+      args: [ 'x', 'sink', 'predicate' ]
     },
     {
       name: 'where',
@@ -76,6 +111,11 @@ foam.INTERFACE({
       name: 'limit',
       returns: 'foam.dao.DAO',
       args: [ 'count' ]
+    },
+    {
+      name: 'inX',
+      returns: 'foam.dao.DAO',
+      args: [ 'x' ]
     }
   ]
 });

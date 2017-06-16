@@ -45,7 +45,7 @@ foam.CLASS({
 
             // TODO: Move this into RPCReturnBox ?
             if ( returns !== 'Promise' ) {
-              ret = foam.lookup(returns).create({ delegate: ret });
+              ret = this.lookup(returns).create({ delegate: ret });
             }
           }
 
@@ -124,7 +124,7 @@ foam.CLASS({
     {
       name: 'methods_',
       expression: function(of, name, methods, replyPolicyName) {
-        var cls = foam.lookup(of);
+        var cls = this.lookup(of);
 
         return (
           methods ?
@@ -155,7 +155,7 @@ foam.CLASS({
     {
       name: 'actions_',
       expression: function(of, name, actions, replyPolicyName) {
-        var cls = foam.lookup(of);
+        var cls = this.lookup(of);
 
         return (
           actions ? actions.map(function(a) { return cls.getAxiomByName(a); }) :
@@ -174,7 +174,7 @@ foam.CLASS({
 
   methods: [
     function installInClass(cls) {
-      var model = foam.lookup(this.of);
+      var model = this.lookup(this.of);
       var propName = this.name;
 
       cls.installAxiom(foam.core.Property.create({
