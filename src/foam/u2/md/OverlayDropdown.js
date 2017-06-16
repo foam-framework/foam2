@@ -146,6 +146,7 @@ foam.CLASS({
 
       var last = this.dropdownE_.children[this.dropdownE_.children.length - 1].el();
       var margin = parseInt(this.window.getComputedStyle(last)['margin-bottom']);
+      
       if ( Number.isNaN(margin) ) margin = 0;
 
       return Math.min(border + last.offsetTop + last.offsetHeight + margin,
@@ -170,12 +171,12 @@ foam.CLASS({
       .end();
 
       this.dropdownE_.addClass(this.myClass())
-          .addClass(this.slot(function(openComplete) {
-            return openComplete ? this.myClass('open') : '';
-          }, this.opened$ && this.animationComplete$))
-          .on('transitionend', this.onTransitionEnd)
-          .on('mouseleave', this.onMouseLeave)
-          .on('click', this.onClick);
+        .addClass(this.slot(function(openComplete) {
+          return openComplete ? this.myClass('open') : '';
+        }, this.opened$ && this.animationComplete$))
+        .on('transitionend', this.onTransitionEnd)
+        .on('mouseleave', this.onMouseLeave)
+        .on('click', this.onClick);
 
       this.add(this.dropdownE_);
 

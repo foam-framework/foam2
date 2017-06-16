@@ -266,50 +266,49 @@ foam.CLASS({
                   }, view.order$)).
                 end();
               }).
-              add(this.slot(function(editColumnsEnabled) { 
-                if ( editColumnsEnabled ) {
-                  return this.E('th').
+              call(function() {
+                if ( view.editColumnsEnabled ) {
+                  this.start('th').
                     addClass(view.myClass('th-editColumns')).
-                      on('click', function(e) {
-                        view.positionOverlayDropdown(columnSelectionE);
-                        columnSelectionE.open();
-                      }).
-                      add(' ', view.vertMenuIcon).
-                        addClass(view.myClass('vertDots')).
-                        addClass(view.myClass('noselect')).
-                        start('div', null, this.dropdownOrigin$).end();
-               }
-              }.bind(this), view.editColumnsEnabled$));
+                    on('click', function(e) {
+                      view.positionOverlayDropdown(columnSelectionE);
+                      columnSelectionE.open();
+                    }).
+                    add(' ', view.vertMenuIcon).
+                    addClass(view.myClass('vertDots')).
+                    addClass(view.myClass('noselect')).
+                    tag('div', null, view.dropdownOrigin$)
+                  .end();
+                }
+              })
           })).
           add(this.slot(function(columns_) {
             return this.
               E('tbody').
               select(this.orderedDAO$proxy, function(obj) {
-                return this.
-                  E('tr').
-                    start('tr').
-                      on('mouseover', function() { view.hoverSelection = obj; }).
-                      on('click', function() {
-                        view.selection = obj;
-                        if ( view.importSelection$ ) view.importSelection = obj;
-                        if ( view.editRecord$ ) view.editRecord(obj);
-                      }).
-                      addClass(this.slot(function(selection) {
-                        if ( obj === selection ) return view.myClass('selected');
-                        return '';
-                      }, view.selection$)).
-                      addClass(view.myClass('row')).
-                      forEach(columns_, function(column) {
-                        this.
-                          start('td').
-                          call(column.tableCellFormatter, [
-                            column.f ? column.f(obj) : null, obj, column
-                          ]).
-                          end();
-                      }).
-                      add(this.slot(function(editColumnsEnabled) { 
-                        if ( editColumnsEnabled ) return this.E('td'); }, 
-                        view.editColumnsEnabled$))
+                this.start('tr').
+                  on('mouseover', function() { view.hoverSelection = obj; }).
+                  on('click', function() {
+                    view.selection = obj;
+                    if ( view.importSelection$ ) view.importSelection = obj;
+                    if ( view.editRecord$ ) view.editRecord(obj);
+                  }).
+                  addClass(this.slot(function(selection) {
+                    return ( obj === selection ) ? view.myClass('selected') : '';
+                  }, view.selection$)).
+                  addClass(view.myClass('row')).
+                  forEach(columns_, function(column) {
+                    this.
+                      start('td').
+                        call(column.tableCellFormatter, [
+                          column.f ? column.f(obj) : null, obj, column
+                        ]).
+                      end();
+                  }).
+                  call(function() {
+                    if ( view.editColumnsEnabled ) return this.tag('td'); 
+                  }).
+                end();
               });
           }));
     }
