@@ -23,7 +23,7 @@ public class XMLSupport {
 
   // TODO: Planning to add support for other date formats in the future
 
-  public static List<FObject> fromXML(XMLStreamReader xmlr) {
+  public static List<FObject> fromXML(X x, XMLStreamReader xmlr) {
     List<FObject> objList = new ArrayList<FObject>();
     try {
       int eventType;
@@ -41,8 +41,8 @@ public class XMLSupport {
 
               try {
                 cls = Class.forName(objClass);
-                clsInstance = cls.newInstance();
-              } catch (ClassNotFoundException | InstantiationException ex) {
+                clsInstance = x.create(cls);
+              } catch (ClassNotFoundException ex) {
 
               }
               // Object properties
@@ -59,12 +59,12 @@ public class XMLSupport {
         }
       }
       xmlr.close();
-    } catch (XMLStreamException | IllegalAccessException ex) {
+    } catch (XMLStreamException ex) {
     }
     return objList;
   }
 
-  public static List<FObject> fromXML(String fileName) throws IOException {
+  public static List<FObject> fromXML(X x, String fileName) throws IOException {
     XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     XMLStreamReader xmlr = null;
     try {
@@ -74,7 +74,7 @@ public class XMLSupport {
     } catch (XMLStreamException ex) {
 
     }
-    return fromXML(xmlr);
+    return fromXML(x, xmlr);
   }
 
   public static void copyFromXML(FObject obj, XMLStreamReader reader) throws XMLStreamException {
@@ -85,7 +85,8 @@ public class XMLSupport {
         eventType = reader.next();
         switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
-            prop = (PropertyInfo) obj.getClassInfo().getAxiomByName(reader.getLocalName());
+            ClassInfo cInfo = obj.getClassInfo();
+            prop = (PropertyInfo) cInfo.getAxiomByName(reader.getLocalName());
             if ( prop == null ) {
               throw new XMLStreamException("Could not find property " + reader.getLocalName());
             }
@@ -140,7 +141,8 @@ public class XMLSupport {
 
   // Write properties from given FObject
   public static void writeObjectProperties(FObject obj, XMLStreamWriter writer) {
-    List props = obj.getClassInfo().getAxioms();
+    ClassInfo cInfo = obj.getClassInfo();
+    List props = cInfo.getAxioms();
     Iterator propItr = props.iterator();
 
     try {
