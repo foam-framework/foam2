@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-foam.CLASS({
-  package: 'foam.box.node',
-  name: 'SocketAddressable',
+require(require('path').resolve(`${__dirname}/../../../foam.js`));
 
-  documentation: 'Properties associated with a socket address.',
+var ctx = foam.box.Context.create();
 
-  properties: [
-    {
-      class: 'String',
-      name: 'ipAddress',
-      value: '0.0.0.0'
-    },
-    {
-      class: 'Int',
-      name: 'port'
-    },
-    {
-      class: 'String',
-      name: 'socketAddress',
-      transient: true,
-      expression: function(ipAddress, port) {
-        return `${ipAddress}:${port}`;
-      }
-    }
-  ]
+ctx.socketService.listening$.sub(function(sub, _, __, slot) {
+  if ( ! slot.get() ) return;
+
+  sub.detach();
+  var stdin = require('process').stdin;
+  var buf = '';
+  stdin.on('data', function(data) {
+    buf += data.toString();
+  });
+  stdin.on('end', function() {
+    // TODO(markdittmer): Use secure parser.
+    foam.json.parseString(buf, ctx).send(foam.box.Message.create({
+      object: foam.box.SocketBox.create({
+        address: `0.0.0.0:${ctx.socketService.port}`
+      })
+    }));
+  });
 });
