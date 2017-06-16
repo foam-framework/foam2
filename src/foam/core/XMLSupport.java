@@ -93,7 +93,7 @@ public class XMLSupport {
             break;
           case XMLStreamConstants.CHARACTERS:
             if (prop != null) {
-              prop.set(obj, reader.getText());
+              prop.setFromString(obj, reader.getText());
               prop = null;
             }
             break;
