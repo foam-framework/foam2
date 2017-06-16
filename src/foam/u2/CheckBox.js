@@ -43,15 +43,15 @@ foam.CLASS({
       this.SUPER();
       this.setAttribute('type', 'checkbox');
 
-      if (this.showLabel) { 
+      if ( this.showLabel ) { 
         this.start('label')
-              .addClass(this.myClass('label'))
-              .addClass(this.myClass('noselect'))
-              .add(this.label$)
-              .on('click', function() { 
-                this.data = !this.data; 
-              }.bind(this))
-              .end();
+          .addClass(this.myClass('label'))
+          .addClass(this.myClass('noselect'))
+          .add(this.label$)
+          .on('click', function() { 
+            this.data = !this.data; 
+          }.bind(this))
+          .end();
       }
     },
     function link() {
