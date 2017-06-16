@@ -17,7 +17,7 @@ public class XMLDAO
   protected String fileName;
 
   public void setFileName(String filename) {
-    if ( filename.contains(".xml") ){
+    if ( filename.contains(".xml") ) {
       fileName = System.getProperty("user.dir") + filename;
     } else {
       fileName = System.getProperty("user.dir") + filename.concat(".xml");
