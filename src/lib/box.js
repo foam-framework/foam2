@@ -698,6 +698,15 @@ foam.CLASS({
     'foam.dao.BoxDAOListener'
   ],
   methods: [
+    function put_(x, obj) {
+      return this.SUPER(this.Serializable.isInstance(x) ? x : null, obj);
+    },
+    function remove_(x, obj) {
+      return this.SUPER(this.Serializable.isInstance(x) ? x : null, obj);
+    },
+    function find_(x, key) {
+      return this.SUPER(this.Serializable.isInstance(x) ? x : null, key);
+    },
     function select_(x, sink, skip, limit, order, predicate) {
       var y = this.Serializable.isInstance(x) ? x : null;
       if ( ! this.Serializable.isInstance(sink) ) {
@@ -725,6 +734,9 @@ foam.CLASS({
       }
 
       return this.SUPER(y, sink, skip, limit, order, predicate);
+    },
+    function removeAll_(x, skip, limit, order, predicate) {
+        return this.SUPER(this.Serializable.isInstance(x) ? x : null, skip, limit, order, predicate);
     },
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
