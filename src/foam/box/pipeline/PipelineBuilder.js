@@ -227,7 +227,7 @@ foam.CLASS({
           return this.build_();
         } else if ( this.parents.length === 1 ) {
           this.build_();
-          return this.parents[0].build_();
+          return this.parents[0].build();
         }
 
         throw new Error('Attempted PipelineBuilder.build() with multiple parents. Use PipelineBuilder.buildAll() on pipelines with mulitiple heads.');
@@ -243,12 +243,12 @@ foam.CLASS({
             the merge points in the pipeline.`
       },
       code: function() {
-        if ( this.parents.length === 0 ) return [ this.build_() ];
+        if ( this.parents.length === 0 ) return [ this.buildAll() ];
 
         this.build_();
 
         // Flatten arrays of heads build_()ing backwards in the pipeline.
-        return this.parents.map(function(parent) { return parent.build_(); })
+        return this.parents.map(function(parent) { return parent.buildAll(); })
             .reduce(function(acc, v) { return acc.concat(v); }, []);
       }
     },
