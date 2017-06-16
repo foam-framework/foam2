@@ -129,17 +129,13 @@ public class XMLSupport {
 
   public static void toXML(FObject obj, XMLStreamWriter xmlStreamWriter) throws XMLStreamException {
     try {
-      writeObject(obj, xmlStreamWriter);
+      xmlStreamWriter.writeStartElement("object");
+      xmlStreamWriter.writeAttribute("class", obj.getClass().toString().replaceAll("class ",""));
+      writeObjectProperties(obj, xmlStreamWriter);
+      xmlStreamWriter.writeEndElement();
     } catch (XMLStreamException ex) {
       throw new XMLStreamException("Error while writing xml file");
     }
-  }
-
-  public static void writeObject(FObject obj, XMLStreamWriter writer) throws XMLStreamException {
-    writer.writeStartElement("object");
-    writer.writeAttribute("class", obj.getClass().toString().replaceAll("class ",""));
-    writeObjectProperties(obj, writer);
-    writer.writeEndElement();
   }
 
   // Write properties from given FObject
@@ -178,7 +174,7 @@ public class XMLSupport {
     try {
       XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
       writer = new IndentingXMLStreamWriter(writer);
-      writeObject(obj, writer);
+      toXML(obj, writer);
     } catch (XMLStreamException ex ) {
 
     }
@@ -195,7 +191,7 @@ public class XMLSupport {
       writer.writeStartDocument();
       Iterator i = objArray.iterator();
       while (i.hasNext()){
-        writeObject((FObject) i.next(), writer);
+        toXML((FObject) i.next(), writer);
       }
       writer.writeEndDocument();
     } catch (XMLStreamException ex) {
@@ -203,4 +199,3 @@ public class XMLSupport {
     }
     return sw.toString();
   }
-}
