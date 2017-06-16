@@ -51,7 +51,7 @@ foam.CLASS({
           .on('click', function() { 
             this.data = !this.data; 
           }.bind(this))
-          .end();
+        .end();
       }
     },
     function link() {
