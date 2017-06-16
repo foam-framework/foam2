@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class FileServlet
@@ -53,28 +52,41 @@ public class FileServlet
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
     String   pathInfo = req.getPathInfo();
     String   filePath = pathInfo.substring(SERVLET_NAME.length() + 2);
-    String   fileName = "";
-    String[] paths    = filePath.split("/");
-
-    if( paths.length > 0 ) {
-      fileName = paths[paths.length - 1];
-    } else {
-      fileNotFoundError(resp, filePath);
-      return;
-    }
-
-    String[] tokens = fileName.split("\\.");
-    String extension = tokens.length > 0 ? tokens[tokens.length-1 ] : "unknown";
 
     try {
-      File   srcFile = new File(filePath);
+      File   srcFile = new File(filePath.isEmpty() ? "./" : filePath);
       String path    = srcFile.getAbsolutePath();
       String cwd     = System.getProperty("user.dir");
 
-      if ( srcFile.isFile() && srcFile.canRead() && cwd.equals(path.substring(0, cwd.length())) ) {
+      if ( srcFile.isDirectory() && srcFile.canRead() && cwd.equals(path.substring(0, cwd.length())) ) {
+        resp.setContentType(extLookup.get("html"));
+        PrintWriter pw = resp.getWriter();
+        pw.write(
+            "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "<body>\n" +
+                "<ul style=\"list-style-type:disc\">");
+
+        File[] files = srcFile.listFiles();
+        if(files != null && files.length > 0) {
+          for(File file : files) {
+            pw.write("<li>" + "<a href=\"./" + filePath + (filePath.isEmpty() ? "" : "/") + file.getName() + "\"?>"
+                + file.getName()
+                + "</a></li>");
+          }
+        }
+
+        pw.write("</ul>  \n" +
+            "</body>\n" +
+            "</html>");
+
+      } else if ( srcFile.isFile() && srcFile.canRead() && cwd.equals(path.substring(0, cwd.length())) ) {
+        String tokens[] = srcFile.getName().split("\\.");
+
+        String extension = tokens.length > 0 ? tokens[tokens.length-1 ] : "unknown";
         String ext = extLookup.get(extension);
         resp.setContentType(ext != null ? ext : defaultExt);
-        resp.setHeader("Content-Disposition", "filename=\"" + fileName + "\"");
+        resp.setHeader("Content-Disposition", "filename=\"" + srcFile.getName() + "\"");
         FileInputStream fis = new FileInputStream(srcFile);
         IOUtils.copy(fis, resp.getOutputStream());
       } else {
