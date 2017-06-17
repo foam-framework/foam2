@@ -392,13 +392,13 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof Number ) {
+      m.body =
+      `if ( o instanceof Number ) {
       return ((Number)o).intValue();
       } if ( o instanceof String) {
          return Integer.valueOf((String) o);
-      } else {
-         return (int)o;
-      }`;
+      }
+         return (int)o;`;
 
       return info;
     }
@@ -419,13 +419,13 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof Number ) {
+      m.body =
+      `if ( o instanceof Number ) {
         return ((Number)o).byteValue();
       } if ( o instanceof String ) {
         return Byte.valueOf((String) o);
-      } else {
-        return (byte)o;
-      }`;
+      }
+        return (byte)o;`;
 
       return info;
     }
@@ -446,13 +446,14 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof Number ) {
+      m.body =
+      `if ( o instanceof Number ) {
         return ((Number)o).shortValue();
       } if ( o instanceof String ) {
         return Short.valueOf((String) o);
-      } else {
-        return (short)o;
-      }`;
+      }
+        return (short)o;`;
+
       return info;
     }
   ]
@@ -472,13 +473,14 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof Number ) {
+      m.body =
+      `if ( o instanceof Number ) {
         return ((Number)o).longValue();
       } if ( o instanceof String ) {
         return Long.valueOf((String) o);
-      } else {
-        return (long)o;
-      }`;
+      }
+        return (long)o;`;
+
       return info;
     }
   ]
@@ -498,13 +500,13 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = `if ( o instanceof Number ) {
+      m.body =
+      `if ( o instanceof Number ) {
         return ((Number)o).doubleValue();
       } if ( o instanceof String ) {
         return Float.parseFloat((String) o);
-      } else {
-        return (double)o;
-      }`;
+      }
+        return (double)o; }`;
 
       return info;
     }
@@ -574,32 +576,24 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.Date'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DateParser'],
   ],
 
   methods: [
-      function createJavaPropertyInfo_(cls) {
-        var info = this.SUPER(cls);
-        var m = info.getMethod('cast');
-        m.body = `if ( o instanceof String ) {
-          java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(getDateFormat()).withZone(java.time.ZoneOffset.UTC);
-          java.time.LocalDateTime date = java.time.LocalDateTime.parse((String) o, formatter);
-          return java.util.Date.from(date.atZone(java.time.ZoneId.of("UTC")).toInstant());
-        } else {
-          return (java.util.Date)o;
-        }`;
-
-        info.method({
-          name: 'getDateFormat',
-          visibility: 'public',
-          type: 'String',
-          body: 'return "' + this.dateFormat + '";'
-        });
-
-        return info;
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body =
+      `if ( o instanceof String ) {
+        java.util.Date date = new java.util.Date((String) o);
+        return date;
       }
-   ]
+        return (java.util.Date)o;`;
+
+      return info;
+  }
+  ]
 });
 
 
@@ -608,7 +602,7 @@ foam.CLASS({
 
    properties: [
        ['javaType', 'java.util.Date'],
-       ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+       ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'foam.lib.json.DateParser']
    ],
 
@@ -616,20 +610,12 @@ foam.CLASS({
      function createJavaPropertyInfo_(cls) {
        var info = this.SUPER(cls);
        var m = info.getMethod('cast');
-       m.body = `if ( o instanceof String ) {
-         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(getDateFormat()).withZone(java.time.ZoneOffset.UTC);
-         java.time.LocalDateTime date = java.time.LocalDateTime.parse((String) o, formatter);
-         return java.util.Date.from(date.atZone(java.time.ZoneId.of("UTC")).toInstant());
-       } else {
-         return (java.util.Date)o;
-       }`;
-
-       info.method({
-         name: 'getDateFormat',
-         visibility: 'public',
-         type: 'String',
-         body: 'return "' + this.dateFormat + '";'
-       });
+       m.body =
+       `if ( o instanceof String ) {
+         java.util.Date date = new java.util.Date((String) o);
+         return date;
+       }
+         return (java.util.Date)o;`;
 
        return info;
      }
