@@ -60,14 +60,12 @@ public class XMLDAO
     return super.put(obj);
   }
 
-
   public FObject remove(FObject obj) {
     FObject s = super.remove(obj);
     daoToXML();
     return s;
   }
-
-
+  
   public void removeAll() {
     super.removeAll();
     daoToXML();
