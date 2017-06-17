@@ -45,7 +45,6 @@ public class XMLDAO
     }
   }
 
-
   // Rewrites file when new object is put into DAO
   public FObject put(FObject obj) {
     this.setOf(obj.getClassInfo());
@@ -65,7 +64,7 @@ public class XMLDAO
     daoToXML();
     return s;
   }
-  
+
   public void removeAll() {
     super.removeAll();
     daoToXML();
