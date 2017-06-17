@@ -23,6 +23,8 @@ var classes = [
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
+  'foam.mlang.sink.Count',
+  'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
