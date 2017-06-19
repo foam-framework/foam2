@@ -81,7 +81,7 @@ public class FileServlet
         resp.setContentType(ext != null ? ext : DEFAULT_EXT);
         resp.setHeader("Content-Disposition", "filename=\"" + srcFile.getName() + "\"");
 
-        byte[] buffer = new byte[16384];
+        byte[] buffer = new byte[4096];
         int bytesread;
         while((bytesread = fis.read(buffer)) != -1) {
           resp.getOutputStream().write(buffer, 0, bytesread);
