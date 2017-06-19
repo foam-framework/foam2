@@ -334,7 +334,11 @@ foam.CLASS({
 
         throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
-    ]
+    ],
+    {
+      name: 'toJSON',
+      value: function(value) { return value.ordinal; }
+    }
   ]
 });
 
