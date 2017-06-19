@@ -1,6 +1,5 @@
 package foam.nanos.http;
 
-import com.google.api.client.util.IOUtils;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,7 +80,14 @@ public class FileServlet
 
         resp.setContentType(ext != null ? ext : DEFAULT_EXT);
         resp.setHeader("Content-Disposition", "filename=\"" + srcFile.getName() + "\"");
-        IOUtils.copy(fis, resp.getOutputStream());
+
+        byte[] buffer = new byte[4096];
+        int bytesread;
+        while((bytesread = fis.read(buffer)) != -1) {
+          resp.getOutputStream().write(buffer, 0, bytesread);
+        }
+
+        fis.close();
       } else {
         fileNotFoundError(resp, filePath);
       }
