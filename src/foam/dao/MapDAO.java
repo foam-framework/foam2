@@ -10,7 +10,7 @@ public class MapDAO
   extends AbstractDAO
 {
   protected Map<Object, FObject> data_ = null;
-  protected ClassInfo            of_ = null;
+  protected ClassInfo            of_   = null;
 
   protected synchronized void data_factory() {
     if ( data_ == null ) {

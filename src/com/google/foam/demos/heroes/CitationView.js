@@ -60,6 +60,9 @@ foam.CLASS({
           background: gray;
           color: white;
         }
+        ^ i {
+          margin-top: 5px;
+        }
       */}
     })
   ],
@@ -83,6 +86,9 @@ foam.CLASS({
     {
       name: 'removeHero',
       label: 'X',
+      speechLabel: 'delete',
+      toolTip: 'delete',
+      iconFontName: 'delete_forever',
       code: function() { this.heroDAO.remove(this.data); }
     }
   ],
