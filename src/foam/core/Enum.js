@@ -319,8 +319,7 @@ foam.CLASS({
       name: 'javaValue',
       expression: function(of) {
         var val = (of && of.VALUES[0]);
-        var prefix = this.of.package + '.' + this.of.name + '.';
-        return foam.String.isInstance(val) ? val : prefix + val;
+        return foam.String.isInstance(val) ? val : this.of.id + '.' + val;
       },
     },
     [
