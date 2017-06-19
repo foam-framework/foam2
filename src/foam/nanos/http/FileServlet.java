@@ -12,26 +12,22 @@ import java.util.HashMap;
 public class FileServlet
     extends HttpServlet
 {
-
-  public static final String SERVLET_NAME = "static";
-
-  protected static final HashMap<String, String> extLookup;
-  protected static final String                  defaultExt = "application/octet-stream";
+  public    static final String                  SERVLET_NAME = "static";
+  protected static final String                  DEFAULT_EXT  = "application/octet-stream";
+  protected static final HashMap<String, String> EXTS         = new HashMap();
 
   static {
-    extLookup = new HashMap<>();
+    EXTS.put("js",    "application/javascript");
+    EXTS.put("class", "application/java-vm");
+    EXTS.put("xml",   "application/xml");
 
-    extLookup.put("js",    "application/javascript");
-    extLookup.put("class", "application/java-vm");
-    extLookup.put("xml",   "application/xml");
+    EXTS.put("gif",   "image/gif");
+    EXTS.put("png",   "image/png");
 
-    extLookup.put("gif",   "image/gif");
-    extLookup.put("png",   "image/png");
-
-    extLookup.put("java",  "text/x-java-source");
-    extLookup.put("csv",   "text/csv");
-    extLookup.put("txt",   "text/plain");
-    extLookup.put("html",  "text/html");
+    EXTS.put("java",  "text/x-java-source");
+    EXTS.put("csv",   "text/csv");
+    EXTS.put("txt",   "text/plain");
+    EXTS.put("html",  "text/html");
   }
 
   private void fileNotFoundError(HttpServletResponse resp, String file) {
@@ -39,17 +35,14 @@ public class FileServlet
     resp.setContentType("application/json");
 
     try {
-      PrintWriter pw = resp.getWriter();
-      pw.write(
-          "{\"error\": \"File not found\"," +
-              "\"filename\": \""+file+"\"}");
+      resp.getWriter().write("{\"error\": \"File not found\"," + "\"filename\": \"" + file + "\"}");
     } catch (IOException ignore) {}
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-    String   pathInfo = req.getPathInfo();
-    String   filePath = pathInfo.substring(SERVLET_NAME.length() + 2);
+    String pathInfo = req.getPathInfo();
+    String filePath = pathInfo.substring(SERVLET_NAME.length() + 2);
 
     try {
       File   srcFile = new File(filePath.isEmpty() ? "./" : filePath);
@@ -57,7 +50,7 @@ public class FileServlet
       String cwd     = System.getProperty("user.dir");
 
       if ( srcFile.isDirectory() && srcFile.canRead() && cwd.equals(path.substring(0, cwd.length())) ) {
-        resp.setContentType(extLookup.get("html"));
+        resp.setContentType(EXTS.get("html"));
         PrintWriter pw = resp.getWriter();
         pw.write(
             "<!DOCTYPE html>\n" +
@@ -66,6 +59,7 @@ public class FileServlet
                 "<ul style=\"list-style-type:disc\">");
 
         File[] files = srcFile.listFiles();
+
         if ( files != null && files.length > 0 ) {
           for ( File file : files ) {
             pw.write("<li>" + "<a href=\"/static/" + filePath + (filePath.isEmpty() ? "" : "/") + file.getName() + "\"?>"
@@ -79,18 +73,20 @@ public class FileServlet
             "</html>");
 
       } else if ( srcFile.isFile() && srcFile.canRead() && cwd.equals(path.substring(0, cwd.length())) ) {
-        String tokens[] = srcFile.getName().split("\\.");
+        String          tokens[]  = srcFile.getName().split("\\.");
+        String          extension = tokens.length > 0 ? tokens[tokens.length-1 ] : "unknown";
+        String          ext       = EXTS.get(extension);
+        FileInputStream fis       = new FileInputStream(srcFile);
 
-        String extension = tokens.length > 0 ? tokens[tokens.length-1 ] : "unknown";
-        String ext = extLookup.get(extension);
-        resp.setContentType(ext != null ? ext : defaultExt);
+        resp.setContentType(ext != null ? ext : DEFAULT_EXT);
         resp.setHeader("Content-Disposition", "filename=\"" + srcFile.getName() + "\"");
-        FileInputStream fis = new FileInputStream(srcFile);
+
         byte[] buffer = new byte[16384];
         int bytesread;
         while((bytesread = fis.read(buffer)) != -1) {
           resp.getOutputStream().write(buffer, 0, bytesread);
         }
+
         fis.close();
       } else {
         fileNotFoundError(resp, filePath);
