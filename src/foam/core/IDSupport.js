@@ -78,9 +78,12 @@ foam.CLASS({
     {
       name: 'toJSON',
       value: function toJSON(value, outputer) {
-        var ret = new Array(value.length);
         var props = this.props;
-        for ( var i = 0; i < value.length; i++ ) {
+
+        if ( props.length === 1 ) return value;
+
+        var ret = new Array(props.length);
+        for ( var i = 0; i < props.length; i++ ) {
           ret[i] = props[i].toJSON(value[i], outputer);
         }
         return ret;
