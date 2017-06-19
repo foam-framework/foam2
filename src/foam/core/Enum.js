@@ -318,7 +318,9 @@ foam.CLASS({
     {
       name: 'javaValue',
       expression: function(of) {
-        return this.of.package + '.' + this.of.name + '.' + (of && of.VALUES[0]);
+        var val = (of && of.VALUES[0].name);
+        var prefix = this.of.package + '.' + this.of.name + '.';
+        return val.includes(prefix) ? val : prefix + val;
       },
     },
     [
