@@ -317,7 +317,8 @@ foam.CLASS({
       return foam.String.constantize(this.cls_.name) + '(' +
           this.arg1.toString() + ', ' +
           this.arg2.toString() + ')';
-    }
+    },
+    function contradicts(other) { return false; }
   ]
 });
 
@@ -347,6 +348,19 @@ foam.CLASS({
       }
       return s + ')';
     },
+    function dedupArgs_() {
+      var args = this.args;
+      var argsMap = {};
+      for ( var i = 0; i < args.length; i++ ) {
+        argsMap[args[i].toString()] = args[i];
+      }
+
+      var newArgs = [];
+      for ( var key in argsMap ) {
+        if ( argsMap.hasOwnProperty(key) ) newArgs.push(argsMap[key]);
+      }
+      this.args = newArgs;
+    }
   ]
 });
 
@@ -381,6 +395,8 @@ foam.CLASS({
 
       var TRUE  = this.True.create();
       var FALSE = this.False.create();
+
+      this.dedupArgs_();
 
       for ( var i = 0 ; i < this.args.length ; i++ ) {
         var a    = this.args[i];
@@ -463,6 +479,7 @@ foam.CLASS({
   documentation: 'Logical And n-ary Predicate.',
 
   requires: [
+    'foam.mlang.predicate.Binary',
     'foam.mlang.predicate.Or'
   ],
 
@@ -484,6 +501,8 @@ foam.CLASS({
       var FALSE = foam.mlang.predicate.False.create();
       var TRUE = foam.mlang.predicate.True.create();
 
+      this.dedupArgs_();
+
       for ( var i = 0; i < this.args.length; i++ ) {
         var a    = this.args[i];
         var newA = this.args[i].partialEval();
@@ -504,6 +523,14 @@ foam.CLASS({
             newArgs.push(newA);
             if ( a !== newA ) updated = true;
           }
+        }
+      }
+
+      for ( var i = 0; i < newArgs.length - 1; i++ ) {
+        for ( var j = i + 1; j < newArgs.length; j++ ) {
+          if ( this.Binary.isInstance(newArgs[i]) &&
+               newArgs[i].contradicts(newArgs[j]) )
+            return FALSE;
         }
       }
 
@@ -763,6 +790,12 @@ foam.CLASS({
 
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2.',
 
+  requires: [
+    'foam.mlang.Constant',
+    'foam.mlang.predicate.Eq',
+    'foam.mlang.predicate.Or'
+  ],
+
   properties: [
     {
       name: 'arg1',
@@ -807,6 +840,18 @@ foam.CLASS({
       }
 
       return rhs ? rhs.indexOf(lhs) !== -1 : false;
+    },
+    function toDisjunctiveNormalForm() {
+      foam.assert(this.Constant.isInstance(this.arg2),
+                  'IN.toDNF() expects constant arg2');
+
+      var orArgs = [];
+      var arg2 = this.arg2.value;
+
+      for ( var i = 0; i < arg2.length; i++ ) {
+        orArgs.push(this.Eq.create({ arg1: this.arg1, arg2: arg2[i] }));
+      }
+      return this.Or.create({ args: orArgs });
     }
   ]
 });
@@ -938,6 +983,11 @@ foam.CLASS({
         // First check is so that EQ(Class.PROPERTY, null | undefined) works.
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       }
+    },
+    function contradicts(other) {
+      var lhs = foam.util.equals(this.arg1, other.arg1);
+      var rhs = foam.util.equals(this.arg2, other.arg2);
+      return lhs !== rhs;
     }
   ]
 });
