@@ -106,7 +106,7 @@ wait $JASMINE_PID
 # OR
 
 # Debug tests
-# node --inspect "$BASE_DIR/inspect.es6.js" "$BASE_DIR/../../node_modules/.bin/jasmine"
+# node --inspect --debug-brk "$BASE_DIR/../../node_modules/.bin/jasmine"
 
 JASMINE_CODE=$?
 
