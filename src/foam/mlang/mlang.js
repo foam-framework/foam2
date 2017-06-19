@@ -842,8 +842,8 @@ foam.CLASS({
       return rhs ? rhs.indexOf(lhs) !== -1 : false;
     },
     function toDisjunctiveNormalForm() {
-      foam.assert(this.Constant.isInstance(this.arg2),
-                  'IN.toDNF() expects constant arg2');
+      if ( ! this.Constant.isInstance(this.arg2) )
+        return this;
 
       var orArgs = [];
       var arg2 = this.arg2.value;
