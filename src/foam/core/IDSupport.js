@@ -74,6 +74,17 @@ foam.CLASS({
         }
         return 0;
       }
+    },
+    {
+      name: 'toJSON',
+      value: function toJSON(value, outputer) {
+        var ret = new Array(value.length);
+        var props = this.props;
+        for ( var i = 0; i < value.length; i++ ) {
+          ret[i] = props[i].toJSON(value[i], outputer);
+        }
+        return ret;
+      }
     }
   ],
 
