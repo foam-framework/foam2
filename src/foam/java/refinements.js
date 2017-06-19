@@ -90,11 +90,7 @@ foam.CLASS({
           body: 'if ( ! ' + isSet + ' ) {\n' +
             ( this.hasOwnProperty('javaFactory') ? 
                 '  set' + capitalized + '(' + factoryName + '());\n' :
-                ' return ' + 
-                ( this.javaType == 'java.lang.Enum' ? 
-                    this.of.package + '.' + this.of.name + '.' : 
-                    '' )  +
-                this.javaValue  + ';\n' ) +
+                ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';'
         }).
