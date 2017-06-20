@@ -69,7 +69,7 @@ public class TreeIndex implements Index {
   }
 
   public Object remove(Object state, FObject value) {
-    return ((TreeNode) state).removeKeyValue((TreeNode)state, this.prop, this.prop.f(value), value, this.tail);
+    return ((TreeNode) state).removeKeyValue((TreeNode) state, this.prop, this.prop.f(value), value, this.tail);
   }
 
   public Object removeAll() {
@@ -83,12 +83,6 @@ public class TreeIndex implements Index {
 
   //TODO
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( skip < 0 ) {
-      skip = 0;
-    }
-    if ( limit < 0 ) {
-      limit = 0;
-    }
     if ( predicate == null && sink instanceof Count ) {
       return new CountPlan(((TreeNode) state).size);
     }
