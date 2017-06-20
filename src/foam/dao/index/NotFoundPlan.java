@@ -7,8 +7,8 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import java.util.Comparator;
 
 /** Found that no data exists for the query. **/
 public class NotFoundPlan implements FindPlan, SelectPlan
@@ -27,4 +27,5 @@ public class NotFoundPlan implements FindPlan, SelectPlan
 
   public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
   }
+  
 }
