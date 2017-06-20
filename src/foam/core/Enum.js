@@ -317,8 +317,8 @@ foam.CLASS({
     },
     {
       name: 'javaValue',
-      expression: function(of) {
-        return this.of.id + '.' + this.value;
+      expression: function(of, value) {
+        return of.id + '.' + value;
       },
     },
     [
