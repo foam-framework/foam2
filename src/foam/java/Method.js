@@ -42,10 +42,12 @@ foam.CLASS({
         this.synchronized ? 'synchronized ' : '',
         this.type ? this.type + ' ' : '',
         this.name, '(');
+
       for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
         o.out(this.args[i]);
         if ( i != this.args.length - 1 ) o.out(', ');
       }
+
       o.out(')');
 
       if ( this.throws.length > 0 ) {
