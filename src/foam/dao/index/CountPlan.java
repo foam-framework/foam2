@@ -8,7 +8,7 @@ package foam.dao.index;
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.Count;
-import java.util.Comparator;
+import foam.mlang.order.Comparator;
 
 public class CountPlan implements SelectPlan
 {
@@ -23,4 +23,5 @@ public class CountPlan implements SelectPlan
   }
 
   public String toString() { return "short-circuit-count(" + count_ + ")"; }
+
 }

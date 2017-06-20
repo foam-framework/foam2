@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -10,23 +11,20 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-/** Have-no-plan Plan. **/
-public class NoPlan implements FindPlan, SelectPlan
-{
-  protected final static NoPlan instance_ = new NoPlan();
 
-  public static NoPlan instance() { return instance_; }
+public class ValuePlan implements FindPlan, SelectPlan {
+  protected final static ValuePlan instance_ = new ValuePlan();
 
-  protected NoPlan() {}
+  public static ValuePlan instance() { return instance_; }
 
-  public long cost() { return Long.MAX_VALUE; }
+  protected ValuePlan() {}
+
+  public long cost() { return 1; }
 
   public FObject find(Object state, Object key) {
-    throw new IllegalStateException("Attempt to use NoPlan.");
+    return null;
   }
 
   public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
-    throw new IllegalStateException("Attempt to use NoPlan.");
   }
-  
 }

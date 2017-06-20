@@ -7,9 +7,9 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
+import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
 public class AltIndex implements Index {
@@ -26,21 +26,30 @@ public class AltIndex implements Index {
   public void addIndex(Index i) {
     delegates_.add(i);
   }
-
+  
+  public Object get(Object state, FObject obj) {
+	if ( state == null ) state = new Object[delegates_.size()];
+    
+	return this.delegates_.get(0).get(((Object[]) state)[0], obj);
+  }
+  
   public Object put(Object state, FObject value) {
-    Object[] newState = new Object[((Object[])state).length];
+	if ( state == null ) state = new Object[delegates_.size()];
+    
+	Object[] newState = new Object[((Object[])state).length];
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
-      newState[i] = delegates_.get(i).put(state, value);
+      newState[i] = delegates_.get(i).put(((Object[]) state)[i], value);
 
     return newState;
   }
 
   public Object remove(Object state, FObject value) {
+	if ( state == null ) state = new Object[delegates_.size()];  
     Object[] newState = new Object[((Object[])state).length];
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
-      newState[i] = delegates_.get(i).remove(state, value);
+      newState[i] = delegates_.get(i).remove(((Object[]) state)[i], value);
 
     return newState;
   }
@@ -90,7 +99,6 @@ public class AltIndex implements Index {
     return delegates_.get(0).size(state);
   }
 
-  @Override
   public void onAdd(Sink sink) {
   }
 }
