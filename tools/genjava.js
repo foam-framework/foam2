@@ -18,7 +18,10 @@ if ( !(process.argv.length == 4 || process.argv.length == 5) ) {
 }
 
 if( process.argv.length == 5 ) {
-  srcPath = process.argv[4] + '/';
+  srcPath = process.argv[4];
+  if ( !srcPath.endsWith('/') ) {
+    srcPath = srcPath + '/';
+  }
 }
 
 var path_ = require('path');
