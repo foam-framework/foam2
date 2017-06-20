@@ -124,8 +124,8 @@ public class Boot {
     serviceDAO_.put(s);
 
     s = new NSpec();
-    s.setName("driverRegistry");
-    s.setServiceClass("foam.nanos.export.DriverRegistry");
+    s.setName("export");
+    s.setServiceClass("foam.nanos.export.ExportService");
     serviceDAO_.put(s);
   }
 

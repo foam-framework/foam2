@@ -84,6 +84,7 @@ foam.CLASS({
       }
     },
 
+    // TODO: change to client DAO
     {
       name: 'exportDriverRegistryDAO',
       factory: function() {
