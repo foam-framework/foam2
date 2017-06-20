@@ -8,9 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.client',
   name: 'Client',
 
+  implements: [ 'foam.box.Context' ],
+
   documentation: 'Client for connecting to NANOS server.',
 
   requires: [
+    'foam.box.HTTPBox',
+    'foam.dao.ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
@@ -43,6 +47,13 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
+        return this.ClientDAO.create({
+          of: this.NSpec,
+          delegate: this.HTTPBox.create({
+            method: 'POST',
+            url: 'http://localhost:8080/nSpecDAO'
+          })});
+        /*
         return this.createDAO({
           of: this.NSpec,
           seqNo: true,
@@ -56,6 +67,7 @@ foam.CLASS({
             { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
+        */
       }
     },
 
