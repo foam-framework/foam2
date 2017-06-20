@@ -10,7 +10,7 @@
    implements: [ 'foam.nanos.export.ExportDriver' ],
    documentation: 'Class for exporting data from a DAO to XML',
    methods: [
-     function export(X, dao) {
+     function exportDAO(X, dao) {
        // TODO: add XML exporting when ready
        return Promise.resolve();
      }

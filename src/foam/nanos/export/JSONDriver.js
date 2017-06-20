@@ -8,11 +8,12 @@
    package: 'foam.nanos.export',
    name: 'JSONDriver',
    implements: [ 'foam.nanos.export.ExportDriver' ],
-   documentation: 'Class for exporting data from a DAO to JSON',
+
    methods: [
-     function export(X, dao) {
-       // TODO: add JSON exporting when ready
-       return Promise.resolve();
+     function exportDAO(X, dao) {
+       return dao.select().then(function (sink) {
+
+       });
      }
    ]
  });
