@@ -25,6 +25,8 @@ foam.CLASS({
   requires: [
     'foam.dao.DAOSink',
     'foam.dao.MDAO',
+    'foam.mlang.Constant',
+    'foam.mlang.predicate.Eq',
     'foam.mlang.predicate.Or'
   ],
 
@@ -33,22 +35,17 @@ foam.CLASS({
       if ( ! predicate )
         return this.SUPER(x, sink, skip, limit, order, predicate);
 
-      var prevPredicate;
-      var dnfPredicate = predicate;
-      // This might as well be while ( ! equals(prev, dnf) ), but counter
-      // limits time spent simplifying expression.
-      for ( var i = 0; i < 5; i++ ) {
-        if ( foam.util.equals(prevPredicate, dnfPredicate) ) break;
-        prevPredicate = dnfPredicate;
-        dnfPredicate = dnfPredicate.partialEval().toDisjunctiveNormalForm();
-      }
-      dnfPredicate = dnfPredicate.partialEval();
+      // Get predicate in reduced form of OR( ... <no ORs or INs> ... ).
+      var newPredicate = this.inToOr_(predicate)
+          .toDisjunctiveNormalForm()
+          .partialEval();
 
-      if ( ! this.Or.isInstance(dnfPredicate) )
-        return this.SUPER(x, sink, skip, limit, order, dnfPredicate);
+      if ( ! this.Or.isInstance(newPredicate) )
+        return this.SUPER(x, sink, skip, limit, order, newPredicate);
 
-      var predicates = dnfPredicate.args;
-      var dao = this.MDAO.create({of: this.of});
+      // Perform query over each arg of top-level OR.
+      var predicates = newPredicate.args;
+      var dao = this.MDAO.create({ of: this.of });
       // TODO(markdittmer): Create indices based on predicate.
       var sharedSink = this.DAOSink.create({ dao: dao });
       var promises = [];
@@ -58,8 +55,56 @@ foam.CLASS({
       }
 
       return Promise.all(promises).then(function() {
+        // Perform "actual" query over DAO of merged results.
         return dao.select_(x, sink, skip, limit, order, predicate);
       });
+    },
+    {
+      name: 'inToOr_',
+      documentation: 'Convert IN() mLangs in input to OR(EQ(...), ...).',
+      code: foam.mmethod({
+        'foam.mlang.predicate.In': function(predicate) {
+          foam.assert(this.Constant.isInstance(predicate.arg2),
+                      'NoDisjunctionDAO expects constant IN.arg2');
+
+          var orArgs = [];
+          var arg2 = predicate.arg2.value;
+
+          for ( var i = 0; i < arg2.length; i++ ) {
+            orArgs.push(this.Eq.create({
+              arg1: predicate.arg1.clone(),
+              arg2: arg2[i]
+            }, predicate));
+          }
+          return this.Or.create({ args: orArgs }, predicate);
+        },
+        'foam.mlang.predicate.Binary': function(predicate) {
+          return predicate.cls_.create({
+            arg1: this.inToOr_(predicate.arg1),
+            arg2: this.inToOr_(predicate.arg2)
+          }, predicate);
+        },
+        'foam.mlang.predicate.Nary': function(predicate) {
+          var oldArgs = predicate.args;
+          var newArgs = new Array(oldArgs.length);
+          for ( var i = 0; i < oldArgs.length; i++ ) {
+            newArgs[i] = this.inToOr_(oldArgs[i]);
+          }
+          return predicate.cls_.create({ args: newArgs });
+        },
+        'foam.mlang.predicate.AbstractPredicate': function(predicate) {
+          return predicate.clone();
+        },
+        'foam.mlang.AbstractExpr': function(expr) {
+          return expr.clone();
+        },
+        'foam.core.Property': function(property) {
+          return property;
+        }
+      }, function(predicate) {
+        throw new Error('Unrecognized predicate: ' +
+                        ( predicate && predicate.cls_ && predicate.cls_.id ));
+      })
     }
   ]
 });
