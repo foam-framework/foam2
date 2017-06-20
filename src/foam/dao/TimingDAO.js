@@ -28,6 +28,13 @@ foam.CLASS({
       name: 'id',
       value: 0
     },
+    {
+      class: 'Function',
+      name: 'logger',
+      expression: function(name, id) {
+        return console.log.bind(console, name || id);
+      }
+    },
     ['activeOps', {put: 0, remove:0, find: 0, select: 0}],
     {
       /** High resolution time value function */
@@ -62,7 +69,7 @@ foam.CLASS({
       this.activeOps[act[3]]--;
       this.id--;
       console.timeEnd(act[0]);
-      console.log('Timing: ', act[1], ' ', (this.now()-act[2]).toFixed(3), ' ms');
+      this.logger('Timing: ', act[1], ' ', (this.now()-act[2]).toFixed(3), ' ms');
     },
 
     function put_(x, obj) {
