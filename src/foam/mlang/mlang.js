@@ -840,18 +840,6 @@ foam.CLASS({
       }
 
       return rhs ? rhs.indexOf(lhs) !== -1 : false;
-    },
-    function toDisjunctiveNormalForm() {
-      if ( ! this.Constant.isInstance(this.arg2) )
-        return this;
-
-      var orArgs = [];
-      var arg2 = this.arg2.value;
-
-      for ( var i = 0; i < arg2.length; i++ ) {
-        orArgs.push(this.Eq.create({ arg1: this.arg1, arg2: arg2[i] }));
-      }
-      return this.Or.create({ args: orArgs });
     }
   ]
 });
