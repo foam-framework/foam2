@@ -12,8 +12,8 @@ public class ExportService
 {
 
   public void start() {
-    DAO dao = new JournaledDAO(new MapDAO(), "driverRegistry.txt");
-    dao.setOf(DriverRegistry.class);
+    DAO dao = new JournaledDAO(new MapDAO(), "ExportDriverRegistry.txt");
+    dao.setOf(ExportDriverRegistry.class);
     setDelegate(dao);
   }
 }

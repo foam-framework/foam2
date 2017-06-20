@@ -29,7 +29,7 @@ FOAM_FILES([
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/cron/Cron" },
-  { name: "foam/nanos/export/DriverRegistry"},
+  { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/JSONDriver"},
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/CSVDriver"},
