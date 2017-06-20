@@ -471,7 +471,6 @@ foam.CLASS({
   documentation: 'Logical And n-ary Predicate.',
 
   requires: [
-    'foam.mlang.predicate.Binary',
     'foam.mlang.predicate.Or'
   ],
 
@@ -754,15 +753,14 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'In',
   extends: 'foam.mlang.predicate.Binary',
-  implements: [ 'foam.core.Serializable' ],
+  implements: [
+    'foam.core.Serializable',
+    'foam.mlang.Expressions'
+  ],
 
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2.',
 
-  requires: [
-    'foam.mlang.Constant',
-    'foam.mlang.predicate.Eq',
-    'foam.mlang.predicate.Or'
-  ],
+  requires: [ 'foam.mlang.Constant' ],
 
   properties: [
     {
@@ -793,7 +791,7 @@ foam.CLASS({
       var rhs = this.arg2.f(o);
 
       // If arg2 is a constant array, we use valueSet for it.
-      if ( foam.mlang.Constant.isInstance(this.arg2) ) {
+      if ( this.Constant.isInstance(this.arg2) ) {
         if ( ! this.valueSet_ ) {
           var set = {};
           for ( var i = 0 ; i < rhs.length ; i++ ) {
@@ -808,6 +806,11 @@ foam.CLASS({
       }
 
       return rhs ? rhs.indexOf(lhs) !== -1 : false;
+    },
+    function partialEval() {
+      if ( ! this.Constant.isInstance(this.arg2) ) return this;
+
+      return this.arg2.value.length === 0 ? this.FALSE : this;
     }
   ]
 });
