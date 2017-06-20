@@ -11,7 +11,8 @@
 
    properties: [
      {
-       class: 'foam.json.Outputer',
+       class: 'FObjectProperty',
+       of: 'foam.json.Outputer',
        name: 'outputer',
        factory: function() { return foam.json.PrettyStrict; }
      }
@@ -20,7 +21,7 @@
    methods: [
      function exportDAO(X, dao) {
        return dao.select().then(function (sink) {
-         return outputer.stringify(sink.a);
+         return outputer.stringify(sink.array);
        });
      }
    ]
