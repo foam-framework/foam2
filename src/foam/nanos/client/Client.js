@@ -29,8 +29,8 @@ foam.CLASS({
   exports: [
     'countryDAO',
     'cronDAO',
-    'groupDAO',
     'exportDriverRegistryDAO',
+    'groupDAO',
     'languageDAO',
     'menuDAO',
     'nSpecDAO',
