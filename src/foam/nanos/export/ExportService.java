@@ -6,14 +6,24 @@
 
 package foam.nanos.export;
 
+import foam.dao.DAO;
+import foam.dao.JournaledDAO;
+import foam.dao.MapDAO;
+import foam.dao.ProxyDAO;
+import foam.nanos.NanoService;
+
 public class ExportService
   extends    ProxyDAO
   implements NanoService
 {
 
   public void start() {
-    DAO dao = new JournaledDAO(new MapDAO(), "ExportDriverRegistry.txt");
-    dao.setOf(ExportDriverRegistry.class);
-    setDelegate(dao);
+    try {
+      DAO dao = new JournaledDAO(new MapDAO(), "ExportDriverRegistry.txt");
+      ((JournaledDAO) dao).setOf(ExportDriverRegistry.getOwnClassInfo());
+      setDelegate(dao);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
