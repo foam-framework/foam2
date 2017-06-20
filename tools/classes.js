@@ -75,7 +75,8 @@ var classes = [
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.nanos.export.ExportDriverRegistry'
 ];
 
 var abstractClasses = [

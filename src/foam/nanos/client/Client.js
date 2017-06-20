@@ -24,6 +24,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.boot.NSpec',
     'foam.nanos.cron.Cron',
+    'foam.nanos.export.ExportDriverRegistry',
     'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test'
@@ -32,6 +33,7 @@ foam.CLASS({
   exports: [
     'countryDAO',
     'cronDAO',
+    'exportDriverRegistryDAO',
     'groupDAO',
     'languageDAO',
     'menuDAO',
@@ -94,6 +96,21 @@ foam.CLASS({
       }
     },
 
+    // TODO: change to client DAO
+    {
+      name: 'exportDriverRegistryDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.ExportDriverRegistry,
+          testData: [
+            { id: 'CSV',  driverName: 'net.nanopay.export.CSVDriver' },
+            { id: 'JSON', driverName: 'net.nanopay.export.JSONDriver' },
+            { id: 'XML',  driverName: 'net.nanopay.export.XMLDriver' }
+          ]
+        });
+      }
+    },
+
     {
       name: 'regionDAO',
       factory: function() {
@@ -123,6 +140,7 @@ foam.CLASS({
                 { parent: 'auth', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
                 { parent: 'auth', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
               { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+              { parent: 'admin', id: 'export',        label: 'Export Drivers',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
               { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', summaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
               { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' }  },
               { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },

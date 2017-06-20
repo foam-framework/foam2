@@ -122,6 +122,11 @@ public class Boot {
     s.setName(FileServlet.SERVLET_NAME);
     s.setServiceClass(FileServlet.class.getName());
     serviceDAO_.put(s);
+
+    s = new NSpec();
+    s.setName("export");
+    s.setServiceClass("foam.nanos.export.ExportService");
+    serviceDAO_.put(s);
   }
 
   public static void main (String[] args)
