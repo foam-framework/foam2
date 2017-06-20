@@ -7,6 +7,7 @@
 foam.INTERFACE({
   package: 'foam.nanos.export',
   name: 'ExportDriver',
+  documentation: 'Interface for exporting data from a DAO',
   methods: [
     {
       name: 'export',

@@ -8,7 +8,7 @@
    package: 'foam.nanos.export',
    name: 'CSVDriver',
    implements: [ 'foam.nanos.export.ExportDriver' ],
-
+   documentation: 'Class for exporting data from a DAO to CSV',
    methods: [
      function export(X, dao) {
        return 'todo output as json string';
