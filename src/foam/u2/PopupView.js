@@ -38,6 +38,8 @@ foam.CLASS({
     })
   ],
 
+  imports: ['setTimeout'],
+
   properties: [
     'x',
     'y',
@@ -52,8 +54,8 @@ foam.CLASS({
       var self     = this;
       var parent   = this.parentNode;
       var close    = function() {
+//        document.removeEventListener('click', close);
         self.remove();
-        bg.remove();
       };
 
       if ( ! this.y       ) this.y = (parent.el().clientHeight - this.height)/2;
@@ -65,17 +67,12 @@ foam.CLASS({
 
       // Make a full-screen transparent background, which when clicked,
       // closes this Popup
-      var bg = this.E('div').
-        style({
-          position: 'absolute',
-          width: '10000px',
-          height: '10000px',
-          opacity: 0,
-          top: 0,
-          zIndex: 998
-        }).
-        on('click', close).
-        write();
+
+      this.onload.sub(function() {
+        self.setTimeout(function() {
+          self.document.addEventListener('click', close);
+        }, 250);
+      });
 
       this.
         addClass(this.myClass()).
