@@ -122,6 +122,11 @@ public class Boot {
     s.setName(FileServlet.SERVLET_NAME);
     s.setServiceClass(FileServlet.class.getName());
     serviceDAO_.put(s);
+
+    s = new NSpec();
+    s.setName("driverRegistry");
+    s.setServiceClass("foam.nanos.export.DriverRegistry");
+    serviceDAO_.put(s);
   }
 
   public static void main (String[] args)
