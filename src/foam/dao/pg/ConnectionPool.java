@@ -5,7 +5,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public abstract class PgConnectionPool {
+public abstract class ConnectionPool {
 
     protected static String base = "jdbc:postgresql://";
     // TODO(drish) get an accurate number for pool size.

@@ -91,14 +91,14 @@ public class SQLData {
     return sql.toString();
   }
 
-    /**
-     * get prepared statement-formated column names
-     * in the following format
-     *
-     * (col1, col2, col3)
-     *
-     * @return String
-     */
+  /**
+   * get prepared statement-formated column names
+   * in the following format
+   *
+   * (col1, col2, col3)
+   *
+   * @return String
+   */
   public String getFormatedColumnNames() {
     StringJoiner joiner = new StringJoiner(",");
     StringBuilder output = new StringBuilder("( ");
@@ -110,7 +110,7 @@ public class SQLData {
     return output.toString();
   }
 
-    /**
+  /**
     * get formated placeholders for prepared statements insert/update
     * in the following format:
     *
@@ -119,28 +119,29 @@ public class SQLData {
     * @return String
     *
     */
-    public String getFormatedColumnPlaceholders() {
-      StringBuilder output = new StringBuilder("( ");
-      StringJoiner joiner = new StringJoiner(",");
+  public String getFormatedColumnPlaceholders() {
+    StringBuilder output = new StringBuilder("( ");
+    StringJoiner joiner = new StringJoiner(",");
 
-      for (int i = 0; i < columnNames.size(); i++) {
-        joiner.add("?");
-      }
-
-      output.append(joiner.toString());
-      output.append(" )");
-      return output.toString();
+    for (int i = 0; i < columnNames.size(); i++) {
+      joiner.add("?");
     }
 
-    public ArrayList<Object> getValues() {
-      return values;
-    }
+    output.append(joiner.toString());
+    output.append(" )");
+    return output.toString();
+  }
 
-    public ArrayList<String> getColumnNames() {
-      return columnNames;
-    }
+  public ArrayList<Object> getValues() {
+    return values;
+  }
 
-    public String getTableName() {
-      return table;
-    }
+  public ArrayList<String> getColumnNames() {
+    return columnNames;
+  }
+
+  public String getTableName() {
+    return table;
+  }
+
 }
