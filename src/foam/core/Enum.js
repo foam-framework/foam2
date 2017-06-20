@@ -318,8 +318,7 @@ foam.CLASS({
     {
       name: 'javaValue',
       expression: function(of) {
-        var val = (of && of.VALUES[0]);
-        return foam.String.isInstance(val) ? val : this.of.id + '.' + val;
+        return this.of.id + '.' + this.value;
       },
     },
     [
