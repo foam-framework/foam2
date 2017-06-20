@@ -9,10 +9,18 @@
    name: 'JSONDriver',
    implements: [ 'foam.nanos.export.ExportDriver' ],
 
+   properties: [
+     {
+       class: 'foam.json.Outputer',
+       name: 'outputer',
+       factory: function() { return foam.json.PrettyStrict; }
+     }
+   ],
+
    methods: [
      function exportDAO(X, dao) {
        return dao.select().then(function (sink) {
-
+         return outputer.stringify(sink.a);
        });
      }
    ]
