@@ -94,11 +94,10 @@ ${JAVA:="java"} -cp "$CDS_EMULATOR_JAR" \
                 --store_index_configuration_on_disk=false --consistency=0.0 &
 export UNRELIABLE_CDS_EMULATOR_PID=$!
 
-sleep 5
-
 export JASMINE_CONFIG_PATH="$BASE_DIR/../../jasmine_gcloud.json"
 
 # Run tests
+sleep 5
 node "$BASE_DIR/../../node_modules/.bin/jasmine" &
 JASMINE_PID=$!
 wait $JASMINE_PID
