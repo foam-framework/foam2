@@ -21,7 +21,7 @@ public class ExportService
 
   public void start() {
     try {
-      DAO dao = new JournaledDAO(new MapDAO(), "ExportDriverRegistry.txt");
+      DAO dao = new JournaledDAO(new MapDAO(), "ExportDriverRegistry");
       ((JournaledDAO) dao).setOf(ExportDriverRegistry.getOwnClassInfo());
       setDelegate(dao);
     } catch (IOException e) {
