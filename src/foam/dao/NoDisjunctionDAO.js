@@ -35,6 +35,7 @@ foam.CLASS({
       if ( ! predicate )
         return this.SUPER(x, sink, skip, limit, order, predicate);
 
+      // Get predicate in reduced form of OR( ... <no ORs or INs> ... ).
       var newPredicate = this.inToOr_(predicate)
           .toDisjunctiveNormalForm()
           .partialEval();
@@ -42,6 +43,7 @@ foam.CLASS({
       if ( ! this.Or.isInstance(newPredicate) )
         return this.SUPER(x, sink, skip, limit, order, newPredicate);
 
+      // Perform query over each arg of top-level OR.
       var predicates = newPredicate.args;
       var dao = this.MDAO.create({ of: this.of });
       // TODO(markdittmer): Create indices based on predicate.
@@ -53,6 +55,7 @@ foam.CLASS({
       }
 
       return Promise.all(promises).then(function() {
+        // Perform "actual" query over DAO of merged results.
         return dao.select_(x, sink, skip, limit, order, predicate);
       });
     },
@@ -95,6 +98,9 @@ foam.CLASS({
         'foam.mlang.AbstractExpr': function(expr) {
           return expr.clone();
         },
+        'foam.core.Property': function(property) {
+          return property;
+        }
       }, function(predicate) {
         throw new Error('Unrecognized predicate: ' +
                         ( predicate && predicate.cls_ && predicate.cls_.id ));

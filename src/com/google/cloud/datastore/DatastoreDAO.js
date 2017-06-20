@@ -301,7 +301,7 @@ foam.CLASS({
         deletes[i] = { delete: arr[i].getDatastoreKey() };
       }
 
-      this.getRequest('commit', JSON.stringify({
+      return this.getRequest('commit', JSON.stringify({
         mode: 'TRANSACTIONAL',
         mutations: deletes,
         transaction: transaction
