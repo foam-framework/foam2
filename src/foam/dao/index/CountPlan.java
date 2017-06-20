@@ -18,7 +18,7 @@ public class CountPlan implements SelectPlan
 
   public long cost() { return 0; }
 
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     ((Count) sink).setValue(count_);
   }
 

@@ -79,7 +79,13 @@ public class AltIndex implements Index {
     return (FindPlan) bestPlan;
   }
 
-  public SelectPlan planSelect(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
+  public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( skip < 0 ) {
+      skip = 0;
+    }
+    if ( limit < 0 ) {
+      limit = 0;
+    }
     Object[] states   = (Object[]) state;
     Plan     bestPlan = NoPlan.instance();
 

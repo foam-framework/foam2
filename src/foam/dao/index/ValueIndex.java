@@ -47,7 +47,7 @@ public class ValueIndex implements Index {
     return (FindPlan)this.plan;
   }
 
-  public SelectPlan planSelect(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
+  public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     return (SelectPlan)this.plan;
   }
 
@@ -55,7 +55,7 @@ public class ValueIndex implements Index {
     return ( state != null ) ? 1 : 0;
   }
   
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {    
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {    
     if( predicate != null && !predicate.f((FObject) state) ) return;
     if( skip-- > 0 ) return;
     if( limit <= 0 ) return;

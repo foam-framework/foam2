@@ -20,13 +20,13 @@ public class MDAO extends AbstractDAO {
 
   protected AltIndex index_;
   protected Object state_;
-
+  
   public MDAO(ClassInfo of) {
     of_ = of;
     state_ = null;
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
   }
-
+  
   public void addIndex(PropertyInfo prop) {
     index_.addIndex(new TreeIndex(prop));
   }
@@ -39,9 +39,9 @@ public class MDAO extends AbstractDAO {
     state_ = index_.put(state_, obj);
     return obj;
   }
-
-  public FObject remove_(X x, FObject obj) {
-    if ( obj == null ) {
+	
+	public FObject remove_(X x, FObject obj) {
+	  if ( obj == null ) {
       return null;
     }
     FObject found = find(obj);
@@ -49,24 +49,24 @@ public class MDAO extends AbstractDAO {
       state_ = index_.remove(state_, obj);
     }
     return obj;
-  }
-
-  public FObject find_(X x, Object id) {
-    if ( id == null ) {
+	}
+	
+	public FObject find_(X x, Object id) {
+	  if ( id == null ) {
       return null;
     }
     return (FObject)index_.get(state_, (FObject)id);
-  }
-
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
-    SelectPlan plan = index_.planSelect(state_, sink, skip.intValue(), limit.intValue(), order, predicate);
-    plan.select(state_, sink, skip.intValue(), limit.intValue(), order, predicate);
-    sink.eof();
-    return sink;
-  }
-
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
-    state_ = null;
-  }
-
+	}
+	
+	public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
+		SelectPlan plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
+	    plan.select(state_, sink, skip, limit, order, predicate);
+	    sink.eof();
+	    return sink;
+	}
+	
+	public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+		state_ = null;
+	}
+  
 }
