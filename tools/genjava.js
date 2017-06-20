@@ -10,9 +10,15 @@ global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
 
-if ( process.argv.length != 4 ) {
-  console.log("USAGE: genjava.js input-path output-path");
+var srcPath = "../src/";
+
+if ( !(process.argv.length == 4 || process.argv.length == 5) ) {
+  console.log("USAGE: genjava.js input-path output-path src-path(optional)");
   process.exit(1);
+}
+
+if( process.argv.length == 5 ) {
+  srcPath = process.argv[4] + '/';
 }
 
 var path_ = require('path');
@@ -48,7 +54,7 @@ function ensurePath(p) {
 }
 
 function loadClass(c) {
-  if ( ! foam.lookup(c, true) ) require('../src/' + c.replace(/\./g, '/') + '.js');
+  if ( ! foam.lookup(c, true) ) require(srcPath + c.replace(/\./g, '/') + '.js');
   return foam.lookup(c);
 }
 
