@@ -22,11 +22,10 @@ public class NoPlan implements FindPlan, SelectPlan
   public long cost() { return Long.MAX_VALUE; }
 
   public FObject find(Object state, Object key) {
-    throw new IllegalStateException("Attempt to use NoPlan.");
+    return null;
   }
 
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
-    throw new IllegalStateException("Attempt to use NoPlan.");
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
   }
   
 }

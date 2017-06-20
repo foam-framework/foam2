@@ -82,8 +82,13 @@ public class TreeIndex implements Index {
   }
   
   //TODO
-  public SelectPlan planSelect(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
-    
+  public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( skip < 0 ) {
+      skip = 0;
+    }
+    if ( limit < 0 ) {
+      limit = 0;
+    }
     if ( predicate == null && sink instanceof Count ) {
       return new CountPlan(((TreeNode) state).size);
     }

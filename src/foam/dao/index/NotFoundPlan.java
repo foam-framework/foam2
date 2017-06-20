@@ -25,7 +25,7 @@ public class NotFoundPlan implements FindPlan, SelectPlan
     return null;
   }
 
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
   }
   
 }
