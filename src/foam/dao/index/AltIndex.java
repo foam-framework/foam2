@@ -26,50 +26,53 @@ public class AltIndex implements Index {
   public void addIndex(Index i) {
     delegates_.add(i);
   }
+  
+  private Object[] toArrayObject(Object state) {
+    if ( state == null ) return new Object[delegates_.size()];
 
+    return (Object[]) state;
+  }
+  
   public Object get(Object state, FObject obj) {
-    if ( state == null ) state = new Object[delegates_.size()];
+    Object[] s = toArrayObject(state);  
 
-    return this.delegates_.get(0).get(((Object[]) state)[0], obj);
+    return this.delegates_.get(0).get(s[0], obj);
   }
 
   public Object put(Object state, FObject value) {
-    if ( state == null ) state = new Object[delegates_.size()];
-
-    Object[] newState = new Object[((Object[])state).length];
+    Object[] s = toArrayObject(state);
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
-      newState[i] = delegates_.get(i).put(((Object[]) state)[i], value);
+      s[i] = delegates_.get(i).put(s[i], value);
 
-    return newState;
+    return s;
   }
-
+  
+  
   public Object remove(Object state, FObject value) {
-    if ( state == null ) state = new Object[delegates_.size()];
-
-    Object[] newState = new Object[((Object[])state).length];
-
+    Object[] s = toArrayObject(state);
+    
     for ( int i = 0 ; i < delegates_.size() ; i++ )
-      newState[i] = delegates_.get(i).remove(((Object[]) state)[i], value);
+      s[i] = delegates_.get(i).remove(s[i], value);
 
-    return newState;
+    return s;
   }
 
   public Object removeAll() {
-    Object[] newState = new Object[delegates_.size()];
+    Object[] s = toArrayObject(null);
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
-      newState[i] = delegates_.get(i).removeAll();
+      s[i] = delegates_.get(i).removeAll();
 
-    return newState;
+    return s;
   }
 
   public FindPlan planFind(Object state, Object key) {
-    Object[] states   = (Object[]) state;
-    Plan     bestPlan = NoPlan.instance();
+    Object[] s = toArrayObject(state);
+    Plan bestPlan = NoPlan.instance();
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      Plan plan = delegates_.get(i).planFind(states[i], key);
+      Plan plan = delegates_.get(i).planFind(s[i], key);
 
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
@@ -81,17 +84,11 @@ public class AltIndex implements Index {
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( skip < 0 ) {
-      skip = 0;
-    }
-    if ( limit < 0 ) {
-      limit = 0;
-    }
-    Object[] states   = (Object[]) state;
+    Object[] s = toArrayObject(state);
     Plan     bestPlan = NoPlan.instance();
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      Plan plan = delegates_.get(i).planSelect(states[i], sink, skip, limit, order, predicate);
+      Plan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
 
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
@@ -99,11 +96,12 @@ public class AltIndex implements Index {
       }
     }
 
-    return (SelectPlan)bestPlan;
+    return (SelectPlan) bestPlan;
   }
 
   public long size(Object state) {
-    return delegates_.get(0).size(state);
+    Object[] s = toArrayObject(state);
+    return s.length > 0 ? delegates_.get(0).size(s[0]) : 0;
   }
 
   public void onAdd(Sink sink) {

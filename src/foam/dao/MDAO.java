@@ -10,7 +10,6 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.index.AltIndex;
-import foam.dao.index.Plan;
 import foam.dao.index.SelectPlan;
 import foam.dao.index.TreeIndex;
 import foam.mlang.order.Comparator;

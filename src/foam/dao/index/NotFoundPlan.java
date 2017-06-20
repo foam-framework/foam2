@@ -22,10 +22,11 @@ public class NotFoundPlan implements FindPlan, SelectPlan
   public long cost() { return 0; }
 
   public FObject find(Object state, Object key) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    throw new UnsupportedOperationException();
   }
   
 }

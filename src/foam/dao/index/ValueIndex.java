@@ -14,11 +14,8 @@ public class ValueIndex implements Index {
   
   protected static ValueIndex instance_ = new ValueIndex();
   
-  protected Plan plan;
+  protected Plan plan = ValuePlan.instance();
   
-  protected ValueIndex() {
-    this.plan = ValuePlan.instance();
-  }
   
   public static ValueIndex instance() {
     return instance_;
@@ -44,11 +41,11 @@ public class ValueIndex implements Index {
   }
 
   public FindPlan planFind(Object state, Object key) {
-    return (FindPlan)this.plan;
+    return (FindPlan) this.plan;
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    return (SelectPlan)this.plan;
+    return (SelectPlan) this.plan;
   }
 
   public long size(Object state) {
@@ -56,7 +53,7 @@ public class ValueIndex implements Index {
   }
   
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {    
-    if( predicate != null && !predicate.f((FObject) state) ) return;
+    if( predicate != null && ! predicate.f((FObject) state) ) return;
     if( skip-- > 0 ) return;
     if( limit <= 0 ) return;
     //We need to check whether we'll do with this detachable parameter inside this index

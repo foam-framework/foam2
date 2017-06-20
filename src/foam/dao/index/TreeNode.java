@@ -51,14 +51,14 @@ public class TreeNode {
     return nullNode;
   }
   
-  public Object bulkLoad(Index tail, PropertyInfo prop, int start, int end, FObject... a) {
-    if( end < start ) {
+  public Object bulkLoad(Index tail, PropertyInfo prop, int start, int end, FObject[] a) {
+    if ( end < start ) {
       return null;
     }
-    int m = start + (int)Math.floor((end-start+1)/2);
+    int m = start + (int) Math.floor((end-start+1)/2);
     TreeNode tree = this.putKeyValue(this, prop, prop.f(a[m]), a[m], tail);
-    tree.left = (TreeNode)this.bulkLoad(tail, prop, start, m-1, a);
-    tree.right = (TreeNode)this.bulkLoad(tail, prop, m+1, end, a);
+    tree.left = (TreeNode) this.bulkLoad(tail, prop, start, m-1, a);
+    tree.right = (TreeNode) this.bulkLoad(tail, prop, m+1, end, a);
     tree.size = this.size(tree.left) + this.size(tree.right);
     return tree;
   }
@@ -302,6 +302,7 @@ public class TreeNode {
     return new TreeNode(s.key, s.value, size(s) - size(s.left), 
       s.level, null, s.right);
   }
+  
   public TreeNode lt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
