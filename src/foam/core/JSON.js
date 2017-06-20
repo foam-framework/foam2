@@ -558,6 +558,7 @@ foam.LIB({
       }, function(o) { return o; })
     },
 
+    // TODO: unsafe and only used by LocalStorageDAO, so remove.
     function parseString(jsonStr, opt_ctx) {
       return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
     },

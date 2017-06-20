@@ -15,11 +15,11 @@ import foam.nanos.pm.*;
 import foam.nanos.pm.PMDAO;
 
 public class Boot {
-  protected DAO    serviceDAO_;
-  protected DAO    userDAO_;
-  protected DAO    groupDAO_;
-  protected DAO    pmDAO_;
-  protected X         root_ = new ProxyX();
+  protected DAO serviceDAO_;
+  protected DAO userDAO_;
+  protected DAO groupDAO_;
+  protected DAO pmDAO_;
+  protected X   root_ = new ProxyX();
 
   public Boot() {
     // Used for all the services that will be required when Booting
@@ -57,6 +57,9 @@ public class Boot {
      */
     root_ = root_.put("firewall", "firewall");
 
+    // Export the ServiceDAO
+    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+
     serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
@@ -68,49 +71,62 @@ public class Boot {
   }
 
   protected void loadServices() {
-    NSpec s = new NSpec();
+    NSpec s;
+
+    s = new NSpec();
+    s.setName("nSpecDAO");
+    s.setServiceClass("foam.dao.ProxyDAO");
+    s.setServe(true);
+    serviceDAO_.put(s);
+
+    s = new NSpec();
     s.setName("http");
     s.setServiceClass("foam.nanos.http.NanoHttpServer");
     s.setLazy(false);
     serviceDAO_.put(s);
 
-    NSpec dpl = new NSpec();
-    dpl.setName(DAOPMLogger.ServiceName);
-    dpl.setServiceClass(DAOPMLogger.class.getName());
-    serviceDAO_.put(dpl);
+    s = new NSpec();
+    s.setName(DAOPMLogger.ServiceName);
+    s.setServiceClass(DAOPMLogger.class.getName());
+    serviceDAO_.put(s);
 
-    NSpec pmd = new NSpec();
-    pmd.setName(PMDAO.ServiceName); // pmInfoDAO
-    pmd.setServiceClass(PMDAO.class.getName());
-    pmd.setServe(true);
-    serviceDAO_.put(pmd);
+    s = new NSpec();
+    s.setName(PMDAO.ServiceName); // pmInfoDAO
+    s.setServiceClass(PMDAO.class.getName());
+    s.setServe(true);
+    serviceDAO_.put(s);
 
-    NSpec authTest = new NSpec();
-    authTest.setName("authTest");
-    authTest.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
-    // authTest.setLazy(false);
-    serviceDAO_.put(authTest);
+    s = new NSpec();
+    s.setName("authTest");
+    s.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
+    // s.setLazy(false);
+    serviceDAO_.put(s);
 
-    NSpec logger = new NSpec();
-    logger.setName("logger");
-    logger.setServiceClass("foam.nanos.logger.NanoLogger");
-    serviceDAO_.put(logger);
+    s = new NSpec();
+    s.setName("logger");
+    s.setServiceClass("foam.nanos.logger.NanoLogger");
+    serviceDAO_.put(s);
 
-    NSpec ping = new NSpec();
-    ping.setName("ping");
-    ping.setServiceClass("foam.nanos.http.PingService");
-    serviceDAO_.put(ping);
+    s = new NSpec();
+    s.setName("ping");
+    s.setServiceClass("foam.nanos.http.PingService");
+    serviceDAO_.put(s);
 
-    NSpec uptime = new NSpec();
-    uptime.setName("uptime");
-    uptime.setServiceClass("foam.nanos.http.UptimeServlet");
-    uptime.setLazy(false);
-    serviceDAO_.put(uptime);
+    s = new NSpec();
+    s.setName("uptime");
+    s.setServiceClass("foam.nanos.http.UptimeServlet");
+    s.setLazy(false);
+    serviceDAO_.put(s);
 
-    NSpec file = new NSpec();
-    file.setName(FileServlet.SERVLET_NAME);
-    file.setServiceClass(FileServlet.class.getName());
-    serviceDAO_.put(file);
+    s = new NSpec();
+    s.setName(FileServlet.SERVLET_NAME);
+    s.setServiceClass(FileServlet.class.getName());
+    serviceDAO_.put(s);
+
+    s = new NSpec();
+    s.setName("export");
+    s.setServiceClass("foam.nanos.export.ExportService");
+    serviceDAO_.put(s);
   }
 
   public static void main (String[] args)
