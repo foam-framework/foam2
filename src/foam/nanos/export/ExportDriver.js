@@ -10,7 +10,7 @@ foam.INTERFACE({
   documentation: 'Interface for exporting data from a DAO',
   methods: [
     {
-      name: 'export',
+      name: 'exportDAO',
       returns: 'Promise',
       args: ['X', 'dao']
     }
