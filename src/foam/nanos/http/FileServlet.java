@@ -1,6 +1,11 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.http;
 
-import com.google.api.client.util.IOUtils;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,9 +68,9 @@ public class FileServlet
 
         if ( files != null && files.length > 0 ) {
           for ( File file : files ) {
-            pw.write("<li>" + "<a href=\"/static/" + filePath + (filePath.isEmpty() ? "" : "/") + file.getName() + "\"?>"
-                + file.getName()
-                + "</a></li>");
+            pw.write("<li>" + "<a href=\"/static/" + filePath
+                + ( ! filePath.isEmpty() && ! filePath.endsWith("/") ? "/" : "" )
+                + file.getName() + "\"?>" + file.getName() + "</a></li>");
           }
         }
 
@@ -81,7 +86,14 @@ public class FileServlet
 
         resp.setContentType(ext != null ? ext : DEFAULT_EXT);
         resp.setHeader("Content-Disposition", "filename=\"" + srcFile.getName() + "\"");
-        IOUtils.copy(fis, resp.getOutputStream());
+
+        byte[] buffer = new byte[4096];
+        int bytesread;
+        while((bytesread = fis.read(buffer)) != -1) {
+          resp.getOutputStream().write(buffer, 0, bytesread);
+        }
+
+        fis.close();
       } else {
         fileNotFoundError(resp, filePath);
       }

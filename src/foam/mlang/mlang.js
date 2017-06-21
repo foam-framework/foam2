@@ -116,6 +116,15 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'SinkProperty',
+  extends: 'FObjectProperty',
+
+  documentation: 'Property for Sink values.'
+});
+
+
 foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
@@ -1252,7 +1261,7 @@ foam.CLASS({
       name: 'arg1'
     },
     {
-      class: 'foam.mlang.ExprProperty',
+      class: 'foam.mlang.SinkProperty',
       name: 'arg2'
     },
     {
