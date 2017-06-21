@@ -86,7 +86,7 @@ public class HistoryDAO
     // TODO: use context-oriented context when available.
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    historyDAO.removeAll_(x, null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
+    historyDAO.removeAll_(x, 0, 0, null, EQ(HistoryRecord.OBJECT_ID, objectId));
     return super.remove_(x, obj);
   }
 }

@@ -21,11 +21,11 @@ public abstract class AbstractDAO
     return new OrderedDAO().setOrder(comparator).setDelegate(this);
   }
 
-  public DAO skip(int count) {
+  public DAO skip(long count) {
     return new SkipDAO().setSkip(count).setDelegate(this);
   }
 
-  public DAO limit(int count) {
+  public DAO limit(long count) {
     return new LimitedDAO().setLimit(count).setDelegate(this);
   }
 
@@ -33,13 +33,13 @@ public abstract class AbstractDAO
     throw new UnsupportedOperationException();
   }
 
-  protected Sink decorateSink_(Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
-    if ( limit != null ) {
-      sink = new LimitedSink().setLimit(limit.intValue()).setDelegate(sink);
+  protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( limit > 0 ) {
+      sink = new LimitedSink().setLimit(limit).setDelegate(sink);
     }
 
-    if ( skip != null ) {
-      sink = new SkipSink().setSkip(skip.intValue()).setDelegate(sink);
+    if ( skip > 0 ) {
+      sink = new SkipSink().setSkip(skip).setDelegate(sink);
     }
 
     if ( order != null ) {
@@ -88,11 +88,11 @@ public abstract class AbstractDAO
   }
 
   public void removeAll() {
-    this.removeAll_(this.getX(), null, null, null, null);
+    this.removeAll_(this.getX(), 0, 0, null, null);
   }
 
   public Sink select(Sink sink) {
-    return this.select_(this.getX(), sink, null, null, null, null);
+    return this.select_(this.getX(), sink, 0, 0, null, null);
   }
 
   public FObject find(Object id) {
