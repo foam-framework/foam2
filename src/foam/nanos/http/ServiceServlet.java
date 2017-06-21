@@ -56,7 +56,7 @@ public class ServiceServlet
   }
 
   public X    getX() { return x_; }
-  public void setX(X x) { x_ = x; }
+  public void setX(X x) { x_ = x; skeleton_.setX(x); }
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -66,21 +66,24 @@ public class ServiceServlet
   }
 
   public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    System.out.println("Service Request");
+    try {
+    CharBuffer buffer_        = CharBuffer.allocate(65535);
+    Reader     reader         = req.getReader();
+    int        count          = reader.read(buffer_);
+    X          requestContext = getX().put("httpRequest", req).put("httpResponse", resp);
 
+    System.out.println("Service Request");
     resp.setHeader("Access-Control-Allow-Origin", "*");
-    CharBuffer buffer_ = CharBuffer.allocate(65535);
-    Reader     reader = req.getReader();
-    int        count  = reader.read(buffer_);
     buffer_.rewind();
 
-    X requestContext = getX().put("httpRequest", req).put("httpResponse", resp);
+System.out.println("Request: " + buffer_.toString()); buffer_.rewind();
 
     FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
     if ( result == null ) {
       resp.setStatus(resp.SC_BAD_REQUEST);
       PrintWriter out = resp.getWriter();
+      System.err.println("Failed to parse request");
       out.print("Failed to parse request");
       out.flush();
       return;
@@ -89,6 +92,7 @@ public class ServiceServlet
     if ( ! ( result instanceof foam.box.Message ) ) {
       resp.setStatus(resp.SC_BAD_REQUEST);
       PrintWriter out = resp.getWriter();
+      System.err.println("Expected instance of foam.box.Message");
       out.print("Expected instance of foam.box.Message");
       out.flush();
       return;
@@ -98,10 +102,18 @@ public class ServiceServlet
 
     skeleton_.send(msg);
 
+    System.err.println("Response: " + msg.getObject().toString());
+
     if ( ! ( msg.getAttributes().get("replyBox") instanceof foam.box.HTTPReplyBox ) ) {
-      resp.setStatus(resp.SC_OK);
-      resp.flushBuffer();
+      // resp.complete(); //flushBuffer();
+      System.err.println("No ReplyBox");
     }
+    resp.setStatus(resp.SC_OK);
+    resp.flushBuffer();
+  } catch (Throwable t) {
+    System.err.println("Error: " + t);
+    t.printStackTrace();
+  }
   }
 
   public void doOptions(HttpServletRequest req, HttpServletResponse resp)
