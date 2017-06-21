@@ -127,7 +127,17 @@ foam.LIB({
       return { timestampValue: d.toISOString() };
     },
     function fromDatastoreValue(v) {
-      return new Date(Date.parse(v.timestampValue));
+      var tv = v.timestampValue;
+      if ( typeof tv === 'string' )
+        return new Date(Date.parse(tv));
+
+      var seconds = parseInt(tv.seconds);
+      var nanos = tv.nanos;
+      foam.assert( ! isNaN(seconds),
+                   'Expected non-string Datastore timestampValue to contain: ' +
+                   '{ seconds: "<seconds-since-epoch>", nanos: <nanos> }');
+
+      return new Date( ( seconds * 1000 ) + Math.floor(nanos / 1000000) );
     }
   ]
 });
