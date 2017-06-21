@@ -594,11 +594,11 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       methods: [
-        'put',
-        'remove',
-        'removeAll',
-        'select',
-        'find'
+        'put_',
+        'remove_',
+        'removeAll_',
+        'select_',
+        'find_'
       ]
     }
   ]
@@ -698,11 +698,20 @@ foam.CLASS({
     'foam.dao.BoxDAOListener'
   ],
   methods: [
-    function select(sink, skip, limit, order, predicate) {
+    function put_(x, obj) {
+      return this.SUPER(null, obj);
+    },
+    function remove_(x, obj) {
+      return this.SUPER(null, obj);
+    },
+    function find_(x, key) {
+      return this.SUPER(null, key);
+    },
+    function select_(x, sink, skip, limit, order, predicate) {
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 
-        return this.SUPER(null, skip, limit, order, predicate).then(function(result) {
+        return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
           var items = result.array;
 
           if ( ! sink ) return result;
@@ -723,7 +732,10 @@ foam.CLASS({
         });
       }
 
-      return this.SUPER(sink, skip, limit, order, predicate);
+      return this.SUPER(null, sink, skip, limit, order, predicate);
+    },
+    function removeAll_(x, skip, limit, order, predicate) {
+        return this.SUPER(null, skip, limit, order, predicate);
     },
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
@@ -763,11 +775,11 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       methods: [
-        'put',
-        'remove',
-        'select',
-        'removeAll',
-        'find'
+        'put_',
+        'remove_',
+        'select_',
+        'removeAll_',
+        'find_'
       ],
       eventProxy: false
     }
@@ -785,24 +797,24 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(x, obj) {
       var self = this;
-      return this.SUPER(obj).then(function(o) {
+      return this.SUPER(x, obj).then(function(o) {
         self.on.put.pub(o);
         return o;
       });
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       var self = this;
-      return this.SUPER(obj).then(function(o) {
+      return this.SUPER(x, obj).then(function(o) {
         self.on.remove.pub(obj);
         return o;
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
-      this.SUPER(skip, limit, order, predicate);
+    function removeAll_(x, skip, limit, order, predicate) {
+      this.SUPER(x, skip, limit, order, predicate);
       this.on.reset.pub();
     }
   ]

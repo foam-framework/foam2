@@ -108,7 +108,7 @@ foam.LIB({
       return { arrayValue: { values: values } };
     },
     function fromDatastoreValue(v, opt_ctx) {
-      var values = v.arrayValue;
+      var values = v.arrayValue.values || [];
       var arr = new Array(values.length);
       for ( var i = 0; i < values.length; i++ ) {
         arr[i] = com.google.cloud.datastore.fromDatastoreValue(
@@ -127,56 +127,64 @@ foam.LIB({
       return { timestampValue: d.toISOString() };
     },
     function fromDatastoreValue(v) {
-      return new Date(Date.parse(v.timestampValue));
+      var tv = v.timestampValue;
+      if ( typeof tv === 'string' )
+        return new Date(Date.parse(tv));
+
+      var seconds = parseInt(tv.seconds);
+      var nanos = tv.nanos;
+      foam.assert( ! isNaN(seconds),
+                   'Expected non-string Datastore timestampValue to contain: ' +
+                   '{ seconds: "<seconds-since-epoch>", nanos: <nanos> }');
+
+      return new Date( ( seconds * 1000 ) + Math.floor(nanos / 1000000) );
     }
   ]
 });
 
-foam.LIB({
-  name: 'foam.core.FObject',
+(function() {
+  var MultiPartID = foam.core.MultiPartID;
 
-  methods: [
-    function toDatastoreValue(o) { return o.toDatastoreValue(); },
-    function fromDatastoreValue(v, opt_ctx) {
-      return this.fromDatastoreEntity(v.entityValue, opt_ctx);
-    },
-    function fromDatastoreEntity(entity, opt_ctx) {
-      var keys = entity.key.path;
-      var key = keys[keys.length - 1];
-      var cls = foam.lookup(key.kind);
-      var id = key.name;
+  foam.LIB({
+    name: 'foam.core.FObject',
 
-      var o = cls.create(null, opt_ctx);
+    methods: [
+      function toDatastoreValue(o) { return o.toDatastoreValue(); },
+      function fromDatastoreValue(v, opt_ctx) {
+        return this.fromDatastoreEntity(v.entityValue, opt_ctx);
+      },
+      function fromDatastoreEntity(entity, opt_ctx) {
+        var keys = entity.key.path;
+        var key = keys[keys.length - 1];
+        var cls = foam.lookup(key.kind);
+        var id = key.name;
+        var idProp = cls.ids && cls.ids.length === 1 ?
+            cls.getAxiomByName(cls.ids[0]) :
+            cls.getAxiomByName('id');
+        var opts = {};
 
-      if ( cls.ids && cls.ids.length > 1 ) {
-        throw new Error('Not implemented: Deserialization of Cloud Datastore ' +
-            'multi-part ids');
-      }
+        if ( idProp && ! MultiPartID.isInstance(idProp) )
+          opts[idProp.name] = idProp.fromDatastoreKeyName(id);
 
-      var idProp = cls.ids && cls.ids.length === 1 ?
-          cls.getAxiomByName(cls.ids[0]) :
-          cls.getAxiomByName('id');
-
-      if ( idProp ) o[idProp.name] = id;
-
-      var props = entity.properties;
-      for ( var name in props ) {
-        if ( props.hasOwnProperty(name) ) {
-          o[name] = com.google.cloud.datastore.fromDatastoreValue(
-              props[name], opt_ctx);
+        var props = entity.properties;
+        for ( var name in props ) {
+          if ( props.hasOwnProperty(name) ) {
+            opts[name] = com.google.cloud.datastore.fromDatastoreValue(
+                props[name], opt_ctx);
+          }
         }
-      }
 
-      return o;
-    },
-    function getOwnClassDatastoreKind() {
-      return this.id;
-    },
-    function getClassDatastoreKind() {
-      return { name: this.getOwnClassDatastoreKind() };
-    }
-  ]
-});
+        return cls.create(opts, opt_ctx);
+      },
+      function getOwnClassDatastoreKind() {
+        return this.id;
+      },
+      function getClassDatastoreKind() {
+        return { name: this.getOwnClassDatastoreKind() };
+      }
+    ]
+  });
+})();
 
 //
 // Provide base to/from datastore value operations.
@@ -220,9 +228,16 @@ foam.LIB({
           doubleValue: foam.Number,
           timestampValue: foam.Date,
           stringValue: foam.String,
+          arrayValue: foam.Array,
           entityValue: foam.core.FObject
         };
         return function typeOfDatastoreValue(v) {
+          if ( v.hasOwnProperty('value_type') ) {
+            foam.assert(typeMap[v.value_type],
+                        'Expected datastore value with "value_type" to have ' +
+                        'known type; value_type = ' + v.value_type);
+            return typeMap[v.value_type];
+          }
           for ( var key in v ) {
             if ( typeMap[key] && v.hasOwnProperty(key) ) return typeMap[key];
           }
@@ -323,6 +338,23 @@ foam.CLASS({
         if ( i !== props.length - 1 ) str += sep;
       }
       return str;
+    },
+    function fromDatastoreKeyName(name) {
+      return name.split(this.stringSeparator);
+    }
+  ]
+});
+
+//
+// Refine Enum values to output integer: enumValue.ordinal.
+//
+
+foam.CLASS({
+  refines: 'foam.core.AbstractEnum',
+
+  methods: [
+    function toDatastoreValue() {
+      return { integerValue: this.ordinal };
     }
   ]
 });
@@ -393,6 +425,7 @@ foam.CLASS({
     },
     function toDatastoreValue() {
       return { entityValue: this.toDatastoreEntity() };
-    }
+    },
+    function fromDatastoreKeyName(name) { return name; }
   ]
 });
