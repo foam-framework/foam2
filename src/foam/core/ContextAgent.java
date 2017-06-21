@@ -6,7 +6,6 @@
 
 package foam.core;
 
-public interface ContextAware {
-  public X    getX();
-  public void setX(X x);
+public interface ContextAgent {
+  public void execute(X x);
 }

@@ -127,7 +127,17 @@ foam.LIB({
       return { timestampValue: d.toISOString() };
     },
     function fromDatastoreValue(v) {
-      return new Date(Date.parse(v.timestampValue));
+      var tv = v.timestampValue;
+      if ( typeof tv === 'string' )
+        return new Date(Date.parse(tv));
+
+      var seconds = parseInt(tv.seconds);
+      var nanos = tv.nanos;
+      foam.assert( ! isNaN(seconds),
+                   'Expected non-string Datastore timestampValue to contain: ' +
+                   '{ seconds: "<seconds-since-epoch>", nanos: <nanos> }');
+
+      return new Date( ( seconds * 1000 ) + Math.floor(nanos / 1000000) );
     }
   ]
 });
@@ -148,27 +158,23 @@ foam.LIB({
         var key = keys[keys.length - 1];
         var cls = foam.lookup(key.kind);
         var id = key.name;
-
-        var o = cls.create(null, opt_ctx);
-
         var idProp = cls.ids && cls.ids.length === 1 ?
             cls.getAxiomByName(cls.ids[0]) :
             cls.getAxiomByName('id');
+        var opts = {};
 
-        // Multi-part IDs just set their sub-properties, which will be set using
-        // entity.properties anyway.
         if ( idProp && ! MultiPartID.isInstance(idProp) )
-          o[idProp.name] = idProp.fromDatastoreKeyName(id);
+          opts[idProp.name] = idProp.fromDatastoreKeyName(id);
 
         var props = entity.properties;
         for ( var name in props ) {
           if ( props.hasOwnProperty(name) ) {
-            o[name] = com.google.cloud.datastore.fromDatastoreValue(
+            opts[name] = com.google.cloud.datastore.fromDatastoreValue(
                 props[name], opt_ctx);
           }
         }
 
-        return o;
+        return cls.create(opts, opt_ctx);
       },
       function getOwnClassDatastoreKind() {
         return this.id;
@@ -226,6 +232,12 @@ foam.LIB({
           entityValue: foam.core.FObject
         };
         return function typeOfDatastoreValue(v) {
+          if ( v.hasOwnProperty('value_type') ) {
+            foam.assert(typeMap[v.value_type],
+                        'Expected datastore value with "value_type" to have ' +
+                        'known type; value_type = ' + v.value_type);
+            return typeMap[v.value_type];
+          }
           for ( var key in v ) {
             if ( typeMap[key] && v.hasOwnProperty(key) ) return typeMap[key];
           }
