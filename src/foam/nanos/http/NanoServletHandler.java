@@ -16,13 +16,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-/** Adapt a Servlet into an HttpHandler. **/
-public class ServletHandler
+/** Adapt a NanoServlet into an HttpHandler. **/
+public class NanoServletHandler
   implements HttpHandler
 {
-  protected HttpServlet servlet_;
+  protected NanoServlet servlet_;
 
-  public ServletHandler(HttpServlet servlet) {
+  public NanoServletHandler(NanoServlet servlet) {
     servlet_ = servlet;
   }
 
