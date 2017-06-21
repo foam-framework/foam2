@@ -10,9 +10,10 @@ public abstract class AbstractDAO
   extends    ContextAwareSupport
   implements DAO
 {
+  public final static long MAX_SAFE_INTEGER = 9007199254740991;
+
   protected ClassInfo    of_                = null;
   protected PropertyInfo primaryKey_        = null;
-  public static final long MAX_SAFE_INTEGER = 9007199254740991;
 
   public DAO where(Predicate predicate) {
     return new FilteredDAO().setPredicate(predicate).setDelegate(this);
