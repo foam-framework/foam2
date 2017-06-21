@@ -69,6 +69,16 @@ foam.INTERFACE({
       javaReturns: 'boolean'
     },
     {
+      name: 'toSQL',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaReturns: 'String'
+    },
+    {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate'
     },
@@ -149,7 +159,18 @@ foam.CLASS({
     {
       name: 'toString',
       javaCode: 'return classInfo_.getId();'
-    }
+    },
+    {
+      name: 'toSQL',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: 'return null;',
+      javaReturns: 'String'
+    },
   ]
 });
 
@@ -217,6 +238,10 @@ foam.CLASS({
                 + '  if ( ! getArgs()[i].f(obj) ) return false;\n'
                 + '}\n'
                 + 'return true;'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -280,6 +305,10 @@ foam.CLASS({
       name: 'f',
       // TODO(adamvy): Is there a better option than all the Comparable casts?
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return getArg1().f(obj).toString() + "=" + getArg2().f(obj).toString();'
     }
   ]
 });
@@ -292,6 +321,10 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) != 0;'
+    },
+    {
+     name: 'toSQL',
+     javaCode: 'return null;'
     }
   ]
 });
@@ -304,6 +337,10 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) < 0;'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -316,6 +353,10 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) <= 0;'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -328,6 +369,10 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) > 0;'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -340,6 +385,10 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) >= 0;'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -352,6 +401,10 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ! getArg1().f(obj);'
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -369,6 +422,10 @@ foam.CLASS({
         return ! (value == null ||
           (value instanceof String && ((String)value).length() == 0) ||
           (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
+    },
+    {
+      name: 'toSQL',
+      javaCode: 'return null;'
     }
   ]
 });
@@ -403,7 +460,6 @@ foam.INTERFACE({
   ]
 });
 
-
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -422,7 +478,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.mlang.order.Desc',
