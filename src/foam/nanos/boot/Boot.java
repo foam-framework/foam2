@@ -13,6 +13,7 @@ import foam.nanos.auth.User;
 import foam.nanos.http.FileServlet;
 import foam.nanos.pm.*;
 import foam.nanos.pm.PMDAO;
+import java.io.IOException;
 
 public class Boot {
   protected DAO serviceDAO_;
@@ -28,19 +29,24 @@ public class Boot {
     serviceDAO.setX(root_);
     serviceDAO_ = serviceDAO;
 
-    // Used to hold all of the users in our system
-    MapDAO userDAO = new MapDAO();
-    userDAO.setOf(User.getOwnClassInfo());
-    userDAO.setX(root_);
-    userDAO_ = userDAO;
-    root_.put("userDAO", userDAO_);
+    try {
+      // Used to hold all of the users in our system
+      MapDAO userDAO = new MapDAO();
+      userDAO.setOf(User.getOwnClassInfo());
+      userDAO.setX(root_);
+      userDAO_ = new JournaledDAO(userDAO, "users");
+      root_.put("userDAO", userDAO_);
 
-    // Used for groups. We have multiple groups that contain different users
-    MapDAO groupDAO = new MapDAO();
-    groupDAO.setOf(Group.getOwnClassInfo());
-    groupDAO.setX(root_);
-    groupDAO_ = groupDAO;
-    root_.put("groupDAO", groupDAO_);
+      // Used for groups. We have multiple groups that contain different users
+      MapDAO groupDAO = new MapDAO();
+      groupDAO.setOf(Group.getOwnClassInfo());
+      groupDAO.setX(root_);
+      groupDAO_ = new JournaledDAO(groupDAO, "groups");
+      root_.put("groupDAO", groupDAO_);
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     loadServices();
 
@@ -99,7 +105,7 @@ public class Boot {
     s = new NSpec();
     s.setName("authTest");
     s.setServiceClass("foam.nanos.auth.UserAndGroupAuthServiceTest");
-    // s.setLazy(false);
+//    s.setLazy(false);
     serviceDAO_.put(s);
 
     s = new NSpec();
