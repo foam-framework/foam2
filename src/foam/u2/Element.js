@@ -794,14 +794,16 @@ foam.CLASS({
       // TODO: This should be handled by an onsub event when someone subscribes to
       // scroll height changes.
       var self = this;
+      var observer = new MutationObserver(function(mutations) {
+        self.scrollHeight = self.el().scrollHeight;
+      });
+      var config = { attributes: true, childList: true, characterData: true };
+
       this.onload.sub(function(s) {
-        s.detach();
-        var observer = new MutationObserver(function(mutations) {
-          self.scrollHeight = self.el().scrollHeight;
-        });
-        var config = { attributes: true, childList: true, characterData: true };
         observer.observe(self.el(), config);
-        self.onDetach(function() { observer.disconnect() });
+      });
+      this.onunload.sub(function(s) {
+        observer.disconnect()
       });
       return this;
     },
