@@ -69,7 +69,7 @@ public class FileServlet
         if ( files != null && files.length > 0 ) {
           for ( File file : files ) {
             pw.write("<li>" + "<a href=\"/static/" + filePath
-                + ( !filePath.isEmpty() && !filePath.endsWith("/") ? "/" : "" )
+                + ( ! filePath.isEmpty() && ! filePath.endsWith("/") ? "/" : "" )
                 + file.getName() + "\"?>" + file.getName() + "</a></li>");
           }
         }
