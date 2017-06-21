@@ -598,6 +598,7 @@ foam.CLASS({
         'remove_',
         'removeAll_',
         'select_',
+        'listen_',
         'find_'
       ]
     }
@@ -626,7 +627,8 @@ foam.CLASS({
     'foam.dao.Sink'
   ],
   requires: [
-    'foam.dao.DAOEvent'
+    'foam.box.Message',
+    'foam.dao.DAOEvent',
   ],
   properties: [
     {
@@ -637,18 +639,24 @@ foam.CLASS({
   ],
   methods: [
     function put(obj) {
-      this.box.send(this.DAOEvent.create({
-        name: 'put', obj: obj
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'put', obj: obj
+        })
       }));
     },
     function remove(obj) {
-      this.box.send(this.DAOEvent.create({
-        name: 'remove', obj: obj
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'remove', obj: obj
+        })
       }));
     },
     function reset() {
-      this.box.send(this.DAOEvent.create({
-        name: 'reset'
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'reset'
+        })
       }));
     }
   ]
@@ -737,7 +745,7 @@ foam.CLASS({
     function removeAll_(x, skip, limit, order, predicate) {
         return this.SUPER(null, skip, limit, order, predicate);
     },
-    function listen(sink, predicate) {
+    function listen_(x, sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
       // TODO: Unsubscribe support.
       var id = foam.next$UID();
@@ -757,7 +765,7 @@ foam.CLASS({
           }
         });
 
-      this.SUPER(this.BoxDAOListener.create({
+      this.SUPER(null, this.BoxDAOListener.create({
         box: replyBox
       }), predicate);
     }
