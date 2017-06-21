@@ -258,6 +258,10 @@ foam.CLASS({
       return this.find_(this.__context__, id);
     },
 
+    function cmd_(x, obj) {
+      return true;
+    },
+
     function cmd(obj) {
       return this.cmd_(this.__context__, obj);
     },

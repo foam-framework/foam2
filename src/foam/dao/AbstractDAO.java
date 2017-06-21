@@ -110,6 +110,11 @@ public abstract class AbstractDAO
     return dao;
   }
 
+  public Object cmd_(X x, Object obj) {
+    // TODO
+    return true;
+  }
+
   public Object cmd(Object obj) {
     return this.cmd_(this.getX(), obj);
   }
