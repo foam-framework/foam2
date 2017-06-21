@@ -44,12 +44,12 @@ public class JournaledDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    return null;
+    return getDelegate().find_(x, id);
   }
 
   @Override
-  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    return null;
+    public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    return getDelegate().select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
