@@ -37,6 +37,12 @@ foam.CLASS({
     'extends',
     {
       class: 'FObjectArray',
+      of: 'foam.java.Constant',
+      name: 'constants',
+      factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
       of: 'foam.java.Method',
       name: 'methods',
       factory: function() { return []; }
@@ -85,6 +91,12 @@ foam.CLASS({
       }
     },
 
+    function getConstant(name) {
+      for ( var i  = 0 ; this.constants && i < this.constants.length ; i++ ) {
+        if ( this.constants[i].name === name ) return this.constants[i];
+      }
+    },
+
     function getMethod(name) {
       for ( var i  = 0 ; this.methods && i < this.methods.length ; i++ ) {
         if ( this.methods[i].name === name ) return this.methods[i];
@@ -97,6 +109,11 @@ foam.CLASS({
       }
 
       this.fields.push(f);
+      return this;
+    },
+
+    function constant(c) {
+      this.constants.push(foam.java.constant.create(c));
       return this;
     },
 
@@ -146,6 +163,8 @@ foam.CLASS({
       o.increaseIndent();
 
       if (this.isEnum) this.writeDeclarations(o);
+
+      this.constants.forEach(function(c) { o.out(c, '\n'); });
 
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
