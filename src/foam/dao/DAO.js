@@ -116,6 +116,16 @@ foam.INTERFACE({
       name: 'inX',
       returns: 'foam.dao.DAO',
       args: [ 'x' ]
+    },
+    {
+      name: 'cmd',
+      returns: 'obj',
+      args: [ 'obj' ]
+    },
+    {
+      name: 'cmd_',
+      returns: 'obj',
+      args: [ 'x', 'obj' ]
     }
   ]
 });
