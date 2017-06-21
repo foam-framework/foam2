@@ -18,5 +18,5 @@
 package foam.core;
 
 public interface XFactory {
-    public Object create(X x);
+  public Object create(X x);
 }
