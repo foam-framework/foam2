@@ -10,8 +10,9 @@ public abstract class AbstractDAO
   extends    ContextAwareSupport
   implements DAO
 {
-  protected ClassInfo    of_         = null;
-  protected PropertyInfo primaryKey_ = null;
+  protected ClassInfo    of_                = null;
+  protected PropertyInfo primaryKey_        = null;
+  public static final long MAX_SAFE_INTEGER = 9007199254740991;
 
   public DAO where(Predicate predicate) {
     return new FilteredDAO().setPredicate(predicate).setDelegate(this);
@@ -34,11 +35,11 @@ public abstract class AbstractDAO
   }
 
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( limit >= 0 ) {
+    if ( limit < this.MAX_SAFE_INTEGER ) {
       sink = new LimitedSink().setLimit(limit).setDelegate(sink);
     }
 
-    if ( skip >= 0 ) {
+    if ( skip > 0 ) {
       sink = new SkipSink().setSkip(skip).setDelegate(sink);
     }
 
@@ -88,11 +89,11 @@ public abstract class AbstractDAO
   }
 
   public void removeAll() {
-    this.removeAll_(this.getX(), 0, 0, null, null);
+    this.removeAll_(this.getX(), 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
   public Sink select(Sink sink) {
-    return this.select_(this.getX(), sink, 0, 0, null, null);
+    return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
   public FObject find(Object id) {
