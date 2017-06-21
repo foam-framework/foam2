@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'data',
       view: { class: 'foam.u2.DetailView' },
       factory: function() {
-        return this.dao.of.create();
+        return this.dao ? this.dao.of.create() : null;
       }
     }
   ],
@@ -47,7 +47,7 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
-      isEnabled: function(data$errors_, inProgress) { return !inProgress && ! data$errors_; },
+      isEnabled: function(dao, data$errors_, inProgress) { return !! dao && ! inProgress && ! data$errors_; },
       code: function() {
         this.inProgress = true;
         this.clearProperty('exception');
