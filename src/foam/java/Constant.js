@@ -56,7 +56,7 @@ foam.CLASS({
 
       // if the user has declared a type that requires a custom instantiation,
       // but not declare a javaType for it, the Java code should break on compile
-      if( this.javaValue == undefined ) {
+      if ( this.javaValue == undefined ) {
         if( foam.String.isInstance(this.value) ) {
           o.out('\"' + this.value + '\"');
         } else {
