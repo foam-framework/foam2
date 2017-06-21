@@ -222,6 +222,12 @@ foam.LIB({
           entityValue: foam.core.FObject
         };
         return function typeOfDatastoreValue(v) {
+          if ( v.hasOwnProperty('value_type') ) {
+            foam.assert(typeMap[v.value_type],
+                        'Expected datastore value with "value_type" to have ' +
+                        'known type; value_type = ' + v.value_type);
+            return typeMap[v.value_type];
+          }
           for ( var key in v ) {
             if ( typeMap[key] && v.hasOwnProperty(key) ) return typeMap[key];
           }
