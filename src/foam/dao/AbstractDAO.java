@@ -34,11 +34,11 @@ public abstract class AbstractDAO
   }
 
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( limit > 0 ) {
+    if ( limit >= 0 ) {
       sink = new LimitedSink().setLimit(limit).setDelegate(sink);
     }
 
-    if ( skip > 0 ) {
+    if ( skip >= 0 ) {
       sink = new SkipSink().setSkip(skip).setDelegate(sink);
     }
 
