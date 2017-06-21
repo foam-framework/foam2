@@ -1733,7 +1733,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.detach, s));
+      this.onDetach(s);
 
       return e;
     },
