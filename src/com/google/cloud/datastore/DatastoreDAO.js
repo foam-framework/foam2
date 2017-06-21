@@ -115,7 +115,8 @@ foam.CLASS({
       var key = foam.core.FObject.isInstance(idOrObj) ?
           idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
       return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
-          .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
+          .then(this.onResponse.bind(this, 'find'))
+          .then(this.onFindResponse.bind(this, x));
     },
     function put_(x, o) {
       return this.getRequest('commit', JSON.stringify({
@@ -231,7 +232,7 @@ foam.CLASS({
 
       return response.payload;
     },
-    function onFindResponse(json) {
+    function onFindResponse(x, json) {
       if ( ! ( json.found && json.found[0] && json.found[0].entity ) )
         return null;
       if ( json.found.length > 1 ) {
@@ -240,7 +241,7 @@ foam.CLASS({
       }
 
       return com.google.cloud.datastore.fromDatastoreEntity(
-          json.found[0].entity, this);
+          json.found[0].entity, x);
     },
     function onPutResponse(x, o, json) {
       var results = json.mutationResults;
