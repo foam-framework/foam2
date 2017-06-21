@@ -83,4 +83,9 @@ public class MapDAO
   public void pipe_(X x, Sink s) {
     // TODO
   }
+
+  public Object cmd_(X x, Object obj) {
+    // TODO
+    return true;
+  }
 }
