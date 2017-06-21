@@ -112,7 +112,7 @@ public abstract class AbstractDAO
 
   public Object cmd_(X x, Object obj) {
     // TODO
-    return true;
+    return null;
   }
 
   public Object cmd(Object obj) {
