@@ -134,7 +134,7 @@ public class DatastoreDAO
     }
 
     public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-        if (sink == null) {
+        if ( sink == null ) {
             sink = new ListSink();
         }
 
