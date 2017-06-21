@@ -48,12 +48,12 @@ public class JournaledDAO
   }
 
   @Override
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     return null;
   }
 
   @Override
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     journal.removeAll();
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
