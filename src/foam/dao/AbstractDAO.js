@@ -259,7 +259,7 @@ foam.CLASS({
     },
 
     function cmd_(x, obj) {
-      return true;
+      return undefined;
     },
 
     function cmd(obj) {
