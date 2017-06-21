@@ -10,6 +10,8 @@ foam.CLASS({
 
   ids: [ 'name' ],
 
+  searchColumns: [ ],
+
   properties: [
     {
       class: 'String',
