@@ -12,14 +12,14 @@ require('../src/foam/nanos/nanos.js');
 
 var srcPath = "../src/";
 
-if ( !(process.argv.length == 4 || process.argv.length == 5) ) {
+if ( ! (process.argv.length == 4 || process.argv.length == 5) ) {
   console.log("USAGE: genjava.js input-path output-path src-path(optional)");
   process.exit(1);
 }
 
-if( process.argv.length == 5 ) {
+if ( process.argv.length == 5 ) {
   srcPath = process.argv[4];
-  if ( !srcPath.endsWith('/') ) {
+  if ( ! srcPath.endsWith('/') ) {
     srcPath = srcPath + '/';
   }
 }
