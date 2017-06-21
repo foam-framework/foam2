@@ -302,6 +302,12 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return getValue();'
+    },
+    {
+      name: 'toSQLValue',
+      // TODO(drish): java preparedStatement already protects against sql injection
+      // add more sanitization here ?
+      javaCode: 'return getValue();'
     }
   ]
 });
@@ -318,7 +324,7 @@ foam.CLASS({
     },
     {
       name: 'toSQL',
-      javaCode: 'return getArg1().f(obj).toString() + "=" + getArg2().f(obj).toString();'
+      javaCode: 'return getArg1().toSQLValue(obj) + "=" + getArg2().toSQLValue(obj);'
     }
   ]
 });
@@ -350,6 +356,7 @@ foam.CLASS({
     },
     {
       name: 'toSQL',
+      // placeholder
       javaCode: 'return null;'
     }
   ]
