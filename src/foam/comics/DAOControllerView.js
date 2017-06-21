@@ -113,5 +113,5 @@ foam.CLASS({
     function onFinished() {
       this.stack.back();
     }
-  ],
+  ]
 });

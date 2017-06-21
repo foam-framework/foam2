@@ -155,6 +155,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'outputOwnPropertiesOnly',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'outputClassNames',
       value: true
     },
@@ -288,6 +293,7 @@ foam.CLASS({
     function outputProperty(o, p, includeComma) {
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
+      if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) ) return;
 
       var v = o[p.name];
 
@@ -558,6 +564,7 @@ foam.LIB({
       }, function(o) { return o; })
     },
 
+    // TODO: unsafe and only used by LocalStorageDAO, so remove.
     function parseString(jsonStr, opt_ctx) {
       return this.parse(eval('(' + jsonStr + ')'), undefined, opt_ctx);
     },

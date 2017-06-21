@@ -51,7 +51,27 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      documentation: 'displayed on :hover',
+      class: 'String',
+      name: 'toolTip',
+      expression: function(label) { return label; }
+    },
+    {
       name: 'icon'
+    },
+    {
+      class: 'String',
+      name: 'iconFontFamily',
+      value: 'Material Icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontClass',
+      value: 'material-icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontName'
     },
     {
       class: 'Array',

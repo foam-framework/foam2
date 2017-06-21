@@ -101,17 +101,27 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o) {
-        if ( o === null )                       return foam.mlang.Constant.create({ value: null });
-        if ( ! o.f && typeof o === 'function' ) return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== 'object' )            return foam.mlang.Constant.create({ value: o });
-        if ( o instanceof Date )                return foam.mlang.Constant.create({ value: o });
-        if ( Array.isArray(o) )                 return foam.mlang.Constant.create({ value: o });
-        if ( foam.core.FObject.isInstance(o) )  return o;
+        if ( o === null )                           return foam.mlang.Constant.create({ value: null });
+        if ( ! o.f && typeof o === 'function' )     return foam.mlang.predicate.Func.create({ fn: o });
+        if ( typeof o !== 'object' )                return foam.mlang.Constant.create({ value: o });
+        if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
+        if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
+        if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
+        if ( foam.core.FObject.isInstance(o) )      return o;
 
         console.error('Invalid expression value: ', o);
       }
     }
   ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'SinkProperty',
+  extends: 'FObjectProperty',
+
+  documentation: 'Property for Sink values.'
 });
 
 
@@ -1206,7 +1216,7 @@ foam.CLASS({
       name: 'arg1'
     },
     {
-      class: 'foam.mlang.ExprProperty',
+      class: 'foam.mlang.SinkProperty',
       name: 'arg2'
     },
     {
