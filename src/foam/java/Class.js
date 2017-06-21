@@ -113,7 +113,7 @@ foam.CLASS({
     },
 
     function constant(c) {
-      this.constants.push(foam.java.constant.create(c));
+      this.constants.push(foam.java.Constant.create(c));
       return this;
     },
 
