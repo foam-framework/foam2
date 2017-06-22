@@ -6,11 +6,20 @@ foam.CLASS({
   extends: 'foam.u2.stack.StackView',
 
   requires: [
-    'foam.u2.TableView',
-    'foam.u2.DetailView'
+    'foam.u2.DetailView',
+    'foam.u2.TableView'
   ],
 
-  exports: [ 'as controller', 'dao', 'factory', 'createLabel' ],
+  exports: [
+    'back',
+    'createLabel',
+    'dao',
+    'data',
+    'detailView',
+    'factory',
+    'push',
+    'summaryView'
+  ],
 
   properties: [
     'dao',
@@ -35,7 +44,11 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.data.push(this.ListController);
+      this.push(this.ListController);
+    },
+
+    function push(view) {
+      this.data.push(view);
     },
 
     function back() {
@@ -57,7 +70,12 @@ foam.CLASS({
       name: 'ListController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'controller', 'dao', 'createLabel' ],
+      requires: [
+        'foam.u2.ListCreateController.CreateController',
+        'foam.u2.ListCreateController.ViewController'
+      ],
+
+      imports: [ 'data', 'push', 'summaryView', 'dao', 'createLabel' ],
 
       properties: [
         {
@@ -69,12 +87,12 @@ foam.CLASS({
         function initE() {
           this
             .start(this.CREATE, this.createLabel && {label: this.createLabel}).style({float: 'right'}).end()
-            .tag(this.controller.summaryView, {data: this.dao, selection$: this.selection$});
+            .tag(this.summaryView, {data: this.dao, selection$: this.selection$});
 
           var self = this;
           this.selection$.sub(function() {
             if ( self.selection ) {
-              self.controller.data.push(self.controller.ViewController.create({obj: self.selection}));
+              self.data.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, this));
               self.selection = undefined;
             }
           });
@@ -83,7 +101,7 @@ foam.CLASS({
 
       actions: [
         function create(X) {
-          X.controller.data.push(X.controller.CreateController.create());
+          this.push(foam.u2.ListCreateController.CreateController.create(null, X));
         }
       ]
     },
@@ -92,7 +110,7 @@ foam.CLASS({
       name: 'CreateController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'controller', 'dao', 'factory' ],
+      imports: [ 'detailView', 'back', 'dao', 'factory' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -104,18 +122,18 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.tag(this.controller.detailView, {data: this.obj}).add(this.CANCEL, this.SAVE);
+          this.tag(this.detailView, {data: this.obj}).add(this.CANCEL, this.SAVE);
         }
       ],
 
       actions: [
         function cancel(X) {
-          this.controller.back();
+          this.back();
         },
 
         function save(X) {
           this.dao.put(this.obj);
-          this.controller.back();
+          this.back();
         }
       ]
     },
@@ -124,7 +142,7 @@ foam.CLASS({
       name: 'ViewController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'controller' ],
+      imports: [ 'detailView' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -136,13 +154,13 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.tag(this.controller.detailView, {data: this.obj, controllerMode: foam.u2.ControllerMode.VIEW}).add(this.BACK);
+          this.tag(this.detailView, {data: this.obj, controllerMode: foam.u2.ControllerMode.VIEW}).add(this.BACK);
         }
       ],
 
       actions: [
         function back(X) {
-          this.controller.back();
+          this.back();
         }
       ]
     }
