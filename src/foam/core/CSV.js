@@ -326,6 +326,55 @@ foam.CLASS({
           }
         }
       })
+    },
+
+    function objectify(s) {
+      if (!s) throw 'Invalid CSV Input'
+      var lines = s.split('\n');
+
+      if (lines.length == 0) throw 'Insufficient CSV Input'
+
+      var props = lines[0].slice(1, -1).split('","');
+      var values = lines[1].slice(1, -1).split('","'); // Account for array of values (TODO?)
+      var model = this.createModel(props, values)
+
+      return model;
+    },
+
+    function createModel(props, values) {
+      foam.assert(props.length == values.length,
+        'Invalid CSV Input, header and value rows must be the same number of cells');
+      
+      var model = {};
+
+      for (var i = 0; i < props.length; ++i) {
+        var p = props[i];
+        var v = values[i];
+
+        // Adds nested prop
+        if (p.includes('__')) {
+          p = p.split('__');
+          foam.assert(p.length >= 2, 'Invalid CSV object nesting, properties of inner objects are identified by `__`');
+          var prefix = p[0] + '__';
+
+          for (var j = i; j <= props.length; ++j) {
+            // If last element, or prefix no longer matches prop
+            if ((j == props.length) || (!props[j].startsWith(prefix))) {
+              // Creates a new model for the inner object
+              model[p[0]] = createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
+                                        values.slice(i, j))
+
+              i = j - 1;
+              break;
+            }
+          }
+        // Adds regular prop
+        } else {
+          model[p] = v;
+        }
+      }
+
+      return model;
     }
   ]
 });
@@ -342,6 +391,10 @@ foam.LIB({
   methods: [
     function stringify(o) {
       return foam.csv.Compact.stringify(o);
+    },
+
+    function objectify(s) {
+      return foam.csv.Compact.objectify(s);
     }
   ]
 });
