@@ -10,10 +10,20 @@ foam.CLASS({
 
   properties: [
     'name',
-    'javaType',
+    'type',
     'value',
-    'javaValue',
     'documentation'
+  ],
+
+  constants: [
+    {
+      name: 'MIN_INT_VALUE',
+      value: -2147483648
+    },
+    {
+      name: 'MAX_INT_VALUE',
+      value: 2147483647
+    },
   ],
 
   methods: [
@@ -28,13 +38,13 @@ foam.CLASS({
 
       o.out('public static final ');
 
-      if ( this.type == undefined ) {
+      if ( ! this.type ) {
         if ( foam.Boolean.isInstance(this.value) ) {
           o.out('Boolean');
         }
         else if ( foam.Number.isInstance(this.value) ) {
           if ( Number.isInteger(this.value) ) {
-            if ( this.value < 2147483647 ) { //MAX INT VALUE
+            if ( this.value >= this.MIN_INT_VALUE && this.value <= this.MAX_INT_VALUE ) {
               o.out('int');
             } else {
               o.out('long');
@@ -45,7 +55,7 @@ foam.CLASS({
         } else if ( foam.String.isInstance(this.value) ) {
           o.out('String');
         } else {
-          throw 'Constant type not defined';
+          throw 'Constant type needs to be defined';
         }
       } else {
         o.out(this.type);
@@ -56,17 +66,35 @@ foam.CLASS({
 
       // if the user has declared a type that requires a custom instantiation,
       // but not declare a javaType for it, the Java code should break on compile
-      if ( this.javaValue == undefined ) {
-        if ( foam.String.isInstance(this.value) ) {
-          o.out('\"' + this.value + '\"');
-        } else {
-          o.out(this.value);
-        }
+      if ( ( ! this.type && ! foam.String.isInstance(this.value) ) || this.type != 'String' ) {
+        o.out(this.value);
       } else {
-        o.out(this.javaValue);
+        let escapedValue = this.escapeString(this.value);
+        o.out('\"' + escapedValue + '\"');
       }
 
       o.out(';\n');
+    },
+
+    function escapeString(s) {
+      var escapedValue = '';
+      for ( var i = 0 ; i < this.value.length ; i++ ) {
+        let c = this.value.charAt(i);
+        switch(c) {
+          case '\\' :
+            escapedValue += '\\\\';
+            break;
+          case '\"' :
+            escapedValue += '\\\"';
+            break;
+          case '\n' :
+            escapedValue += '\\n';
+            break;
+          default:
+            escapedValue += c;
+        }
+      }
+      return escapedValue;
     }
   ]
 });
