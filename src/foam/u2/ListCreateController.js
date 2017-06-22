@@ -14,7 +14,7 @@ foam.CLASS({
     'back',
     'createLabel',
     'dao',
-    'data',
+    'data', // TODO: output as 'stack'
     'detailView',
     'factory',
     'push',
@@ -48,7 +48,7 @@ foam.CLASS({
     },
 
     function push(view) {
-      this.data.push(view);
+      this.data.push(view, this);
     },
 
     function back() {
@@ -87,7 +87,7 @@ foam.CLASS({
           var self = this;
           this.selection$.sub(function() {
             if ( self.selection ) {
-              self.data.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, this));
+              self.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, self));
               self.selection = undefined;
             }
           });
