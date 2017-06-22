@@ -11,13 +11,12 @@ foam.CLASS({
   ],
 
   exports: [
-    'back',
     'createLabel',
     'dao',
-    'data',
+    'data as stack',
+    'data', // TODO: output as 'stack'
     'detailView',
     'factory',
-    'push',
     'summaryView'
   ],
 
@@ -48,7 +47,7 @@ foam.CLASS({
     },
 
     function push(view) {
-      this.data.push(view);
+      this.data.push(view, this);
     },
 
     function back() {
@@ -70,12 +69,8 @@ foam.CLASS({
       name: 'ListController',
       extends: 'foam.u2.Element',
 
-      requires: [
-        'foam.u2.ListCreateController.CreateController',
-        'foam.u2.ListCreateController.ViewController'
-      ],
-
-      imports: [ 'data', 'push', 'summaryView', 'dao', 'createLabel' ],
+      imports: [ 'stack', 'summaryView', 'dao', 'createLabel' ],
+      exports: [ 'as data' ],
 
       properties: [
         {
@@ -92,7 +87,7 @@ foam.CLASS({
           var self = this;
           this.selection$.sub(function() {
             if ( self.selection ) {
-              self.data.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, this));
+              self.stack.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, self));
               self.selection = undefined;
             }
           });
@@ -101,7 +96,7 @@ foam.CLASS({
 
       actions: [
         function create(X) {
-          this.push(foam.u2.ListCreateController.CreateController.create(null, X));
+          this.stack.push(foam.u2.ListCreateController.CreateController.create(null, X));
         }
       ]
     },
@@ -110,7 +105,7 @@ foam.CLASS({
       name: 'CreateController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'detailView', 'back', 'dao', 'factory' ],
+      imports: [ 'detailView', 'stack', 'dao', 'factory' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -128,12 +123,12 @@ foam.CLASS({
 
       actions: [
         function cancel(X) {
-          this.back();
+          this.stack.back();
         },
 
         function save(X) {
           this.dao.put(this.obj);
-          this.back();
+          this.stack.back();
         }
       ]
     },
@@ -142,7 +137,7 @@ foam.CLASS({
       name: 'ViewController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'detailView' ],
+      imports: [ 'stack', 'detailView' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -160,7 +155,7 @@ foam.CLASS({
 
       actions: [
         function back(X) {
-          this.back();
+          this.stack.back();
         }
       ]
     }
