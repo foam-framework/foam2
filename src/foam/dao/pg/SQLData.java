@@ -25,16 +25,14 @@ public class SQLData {
     List<PropertyInfo> props = obj.getClassInfo().getAxioms();
 
     // TODO(drish): throw in case where fobject has no properties ?
-    if (props.size() <= 0) {
-      return;
-    }
+    if ( props.size() <= 0 ) return;
 
     values = new ArrayList<Object>();
 
-    for (PropertyInfo p: props) {
+    for ( PropertyInfo p: props ) {
 
       // do not include ID into columns, since its auto-incremented
-      if (p.getName().equals("id")) {
+      if ( p.getName().equals("id") ) {
         id = p.get(obj);
         continue;
       }
@@ -55,7 +53,6 @@ public class SQLData {
   public String createDeleteStatement() {
     StringBuilder sql = new StringBuilder("delete from " + getTableName());
     sql.append(" where id = ?");
-    System.out.println(sql.toString());
     return sql.toString();
   }
 
@@ -123,7 +120,7 @@ public class SQLData {
     StringBuilder output = new StringBuilder("( ");
     StringJoiner joiner = new StringJoiner(",");
 
-    for (int i = 0; i < columnNames.size(); i++) {
+    for ( int i = 0; i < columnNames.size(); i++ ) {
       joiner.add("?");
     }
 

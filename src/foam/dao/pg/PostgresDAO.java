@@ -1,6 +1,8 @@
 package foam.dao.pg;
 
 import foam.core.*;
+import foam.dao.DAO;
+import foam.dao.ProxyDAO;
 
 import java.sql.*;
 
@@ -22,7 +24,7 @@ public class PostgresDAO extends ProxyDAO {
         host = (host != null) ? host : "localhost";
         port = (port != null) ? port : "5432";
 
-        PgConnectionPool.setup(host, port, dbName, username, password);
+        ConnectionPool.setup(host, port, dbName, username, password);
     }
 
     @Override
@@ -31,7 +33,7 @@ public class PostgresDAO extends ProxyDAO {
         try {
 
             SQLData data = new SQLData(o);
-            Connection c = PgConnectionPool.getConnection();
+            Connection c = ConnectionPool.getConnection();
 
             PreparedStatement smt = c.prepareStatement(data.createDeleteStatement());
 
@@ -58,7 +60,7 @@ public class PostgresDAO extends ProxyDAO {
      */
     private FObject createFObject(ResultSet row) throws Exception {
 
-        if (getOf() == null) {
+        if ( getOf() == null ) {
             throw new Exception("`Of` is not set");
         }
 
@@ -66,7 +68,7 @@ public class PostgresDAO extends ProxyDAO {
         FObject result = (FObject) getOf().getObjClass().newInstance();
 
         // set fields
-        for(int i = 0; i < props.size(); i++ ) {
+        for( int i = 0; i < props.size(); i++ ) {
             String propName = props.get(i).getName();
             Object value = row.getObject(i + 1);
             result.setProperty(propName, value);
@@ -80,7 +82,7 @@ public class PostgresDAO extends ProxyDAO {
         try {
 
             String tableName = getOf().getObjClass().getSimpleName().toLowerCase();
-            Connection c = PgConnectionPool.getConnection();
+            Connection c = ConnectionPool.getConnection();
 
             String sql = "select * from " + tableName;
             sql += " where id = ?";
@@ -88,9 +90,8 @@ public class PostgresDAO extends ProxyDAO {
             PreparedStatement smt = c.prepareStatement(sql);
             smt.setLong(1, ((Long) o));
             ResultSet rs = smt.executeQuery();
-            if (rs.next()) {
-                return createFObject(rs);
-            }
+
+            if ( rs.next() ) return createFObject(rs);
             return null;
         } catch (Exception e) {
             e.printStackTrace();
@@ -102,11 +103,11 @@ public class PostgresDAO extends ProxyDAO {
     public FObject put(FObject obj) {
 
         try {
-            Connection c = PgConnectionPool.getConnection();
+            Connection c = ConnectionPool.getConnection();
 
             // updating existing one
             // when FObject isIdSet is null it returns 0 , is it ok ?
-            if ((Long) obj.getProperty("id") != 0) {
+            if ( (Long) obj.getProperty("id") != 0 ) {
                 SQLData data = new SQLData(obj);
                 PreparedStatement smt = c.prepareStatement(data.createUpdateStatement());
 
@@ -159,7 +160,7 @@ public class PostgresDAO extends ProxyDAO {
             e.printStackTrace();
         }
 
-        if (getDelegate() != null) return getDelegate().put(obj);
+        if ( getDelegate() != null ) return getDelegate().put(obj);
         return obj;
     }
 
