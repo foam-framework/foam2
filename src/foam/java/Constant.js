@@ -66,7 +66,7 @@ foam.CLASS({
 
       // if the user has declared a type that requires a custom instantiation,
       // but not declare a javaType for it, the Java code should break on compile
-      if ( ( ! this.type && ! foam.String.isInstance(this.value) ) || this.type != 'String' ) {
+      if ( ( ! this.type && ! foam.String.isInstance(this.value) ) || ( this.type && this.type != 'String' ) ) {
         o.out(this.value);
       } else {
         let escapedValue = this.escapeString(this.value);
