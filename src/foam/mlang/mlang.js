@@ -937,10 +937,8 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Eq',
   extends: 'foam.mlang.predicate.Binary',
-  implements: [
-    'foam.core.Serializable',
-    'foam.mlang.Expressions'
-  ],
+
+  implements: [ 'foam.core.Serializable' ],
 
   requires: [ 'foam.mlang.Constant' ],
 
@@ -967,6 +965,7 @@ foam.CLASS({
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       }
     },
+
     function reduceAnd(other) {
       var myArg1 = this.arg1;
       var myArg2 = this.arg2;
