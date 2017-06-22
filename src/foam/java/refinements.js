@@ -283,15 +283,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaType'
+      name: 'type'
     },
     {
       class: 'Object',
       name: 'value',
-    },
-    {
-      class: 'String',
-      name: 'javaValue',
     },
     {
       class: 'String',
@@ -305,7 +301,6 @@ foam.CLASS({
         name:  this.name,
         type:  this.type || undefined,
         value: this.value,
-        javaValue: this.javaValue || undefined,
         documentation: this.documentation || undefined
       });
     }
