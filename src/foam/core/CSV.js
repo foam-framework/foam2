@@ -18,13 +18,7 @@ foam.CLASS({
       name: 'toCSV',
       value: function toCSV(value, outputter) { return value; }
     }
-  ],
-
-  // methods: [
-  //   function outputCSV(o) {
-  //     o.output({ class: '__Property__', forClass_: this.forClass_ });
-  //   }
-  // ]
+  ]
 });
 
 /** CSV Outputer. **/
@@ -59,11 +53,6 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'nestedObjectNames'
-    },
-    {
-      class: 'Int',
-      name: 'nestedLevel_',
-      value: 0
     },
     {
       class: 'String',
@@ -107,42 +96,35 @@ foam.CLASS({
     },
 
     function outputHeader(o) {
-      if (!this.outputHeaderRow) return;
-
-      // this.start(o.name)
-      // Gets object axioms
-      // var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-
-      // for ( var i = 0 ; i < ps.length ; i++ ) {
-      //   this.outputPropertyName(o, ps[i]);
-      // }
+      if ( ! this.outputHeaderRow ) return;
 
       this.outputPropertyFilteredName(o);
-
       this.removeTrailingComma().nl();
     },
 
     function removeTrailingComma() {
       // Removes trailing comma
-      if (this.buf_.charAt(this.buf_.length - 1) == ',') this.buf_ = this.buf_.slice(0, -1);
+      if ( this.buf_.charAt(this.buf_.length - 1) == ',' ) this.buf_ = this.buf_.slice(0, -1);
       return this;
     },
 
     function stringify(o) {
-      // TODO: handle array of objects
+      // Outputs object headers
       this.outputHeader(o);
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
+
+      // Outputs object values
       this.output(o);
       this.removeTrailingComma().nl();
       ret += this.buf_;
       this.reset();
+
       return ret;
     },
 
-    // TODO: Change function name
     function externalProperty(o, p) {
-      if ( ! this.propertyPredicate(o, p ) ) return false;
+      if ( ! this.propertyPredicate(o, p) ) return false;
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return false;
 
       return true;
@@ -156,18 +138,14 @@ foam.CLASS({
       name: 'outputPropertyFilteredName',
       code: foam.mmethod({
         // Is there a `switch` like fall through so the function call isn't unecessarily repeated?
-        Undefined: function(o) { this.outputHeaderTitle(o) },
-        Null:      function(o) { this.outputHeaderTitle(o) },
-        String:    function(o) { this.outputHeaderTitle(o) },
-        Number:    function(o) { this.outputHeaderTitle(o) },
-        Boolean:   function(o) { this.outputHeaderTitle(o) },
-        Date:      function(o) { this.outputHeaderTitle(o) },
+        Undefined: function(o) { this.outputHeaderTitle(o); },
+        Null:      function(o) { this.outputHeaderTitle(o); },
+        String:    function(o) { this.outputHeaderTitle(o); },
+        Number:    function(o) { this.outputHeaderTitle(o); },
+        Boolean:   function(o) { this.outputHeaderTitle(o); },
+        Date:      function(o) { this.outputHeaderTitle(o); },
         FObject:   function(o) {
-          // if ( o.outputCSV ) {
-          //   o.outputCSV(this)
-          //   return;
-          // }
-          
+          // Gets and recurses through object properties
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
           for ( var i = 0 ; i < ps.length ; i++ ) {
@@ -177,7 +155,7 @@ foam.CLASS({
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) {
-          debugger;
+          // TODO: How to test?
           if ( o.outputCSV ) {
             o.outputCSV(this);
           } else {
@@ -192,24 +170,23 @@ foam.CLASS({
     },
 
     function outputPropertyName(o, p) {
-      if (!this.externalProperty(o, p)) return;
-      if (p.of) {
+      if ( ! this.externalProperty(o, p) ) return;
+
+      // Checks if property is object with properties of its own
+      // TODO: Is this correct way to check if object has relevant sub-properties
+      if ( p.of ) {
         this.start(p.name);
-      }
-
-      this.outputPropertyFilteredName(p.of ? o[p.name] : p.name);
-
-      if (p.of) {
+        this.outputPropertyFilteredName(o[p.name]);
         this.end();
+      } else {
+        this.outputPropertyFilteredName(p.name);
       }
     },
 
-
     function outputProperty(o, p) {
-      if (!this.externalProperty(o, p)) return;
+      if ( ! this.externalProperty(o, p) ) return;
 
-      var v = o[p.name];
-      this.output(v /* p.toCSV(v, this) */);
+      this.output(o[p.name]);
       this.out(this.delimiter);
     },
 
@@ -228,6 +205,7 @@ foam.CLASS({
       for ( var i = 0 ; i < this.nestedObjectNames.length ; i++ ) {
         this.out(this.nestedObjectNames[i] + this.nestedObjectSeperator);
       }
+
       return this;
     },
 
@@ -242,6 +220,7 @@ foam.CLASS({
       if ( this.nlStr && this.nlStr.length ) {
         this.out(this.nlStr);
       }
+
       return this;
     },
 
@@ -332,10 +311,13 @@ foam.CLASS({
       if (!s) throw 'Invalid CSV Input'
       var lines = s.split('\n');
 
-      if (lines.length == 0) throw 'Insufficient CSV Input'
+      if ( lines.length == 0 ) throw 'Insufficient CSV Input'
 
+      // Trims quotes and splits CSV row into array
       var props = lines[0].slice(1, -1).split('","');
       var values = lines[1].slice(1, -1).split('","'); // Account for array of values (TODO?)
+
+      // Calls for the creation of a new model
       var model = this.createModel(props, values)
 
       return model;
@@ -347,19 +329,19 @@ foam.CLASS({
       
       var model = {};
 
-      for (var i = 0; i < props.length; ++i) {
+      for ( var i = 0 ; i < props.length ; ++i ) {
         var p = props[i];
         var v = values[i];
 
         // Adds nested prop
-        if (p.includes('__')) {
+        if ( p.includes('__') ) {
           p = p.split('__');
           foam.assert(p.length >= 2, 'Invalid CSV object nesting, properties of inner objects are identified by `__`');
           var prefix = p[0] + '__';
 
-          for (var j = i; j <= props.length; ++j) {
+          for ( var j = i ; j <= props.length ; ++j ) {
             // If last element, or prefix no longer matches prop
-            if ((j == props.length) || (!props[j].startsWith(prefix))) {
+            if ( ( j == props.length ) || ( ! props[j].startsWith(prefix) ) ) {
               // Creates a new model for the inner object
               model[p[0]] = createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
                                         values.slice(i, j))
