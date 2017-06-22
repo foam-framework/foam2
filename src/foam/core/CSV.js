@@ -293,7 +293,7 @@ foam.CLASS({
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) {
-          debugger;
+          // TODO: How to test?
           if ( o.outputCSV ) {
             o.outputCSV(this);
           } else {
