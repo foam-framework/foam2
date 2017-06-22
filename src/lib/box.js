@@ -689,25 +689,35 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ClientDAO',
   extends: 'foam.dao.BaseClientDAO',
+
   requires: [
     'foam.core.Serializable',
     'foam.dao.BoxDAOListener'
   ],
+
   methods: [
     function put_(x, obj) {
       return this.SUPER(null, obj);
     },
+
     function remove_(x, obj) {
       return this.SUPER(null, obj);
     },
+
     function find_(x, key) {
       return this.SUPER(null, key);
     },
+
     function select_(x, sink, skip, limit, order, predicate) {
+      if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
+      if ( ! skip ) skip = 0;
+      if ( ! limit ) limit = Number.MAX_SAFE_INTEGER;
+
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 
@@ -734,9 +744,11 @@ foam.CLASS({
 
       return this.SUPER(null, sink, skip, limit, order, predicate);
     },
+
     function removeAll_(x, skip, limit, order, predicate) {
         return this.SUPER(null, skip, limit, order, predicate);
     },
+
     function listen(sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
       // TODO: Unsubscribe support.
@@ -763,6 +775,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -1546,7 +1559,8 @@ foam.CLASS({
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          this.me.send(this.fonParser.parseString(p));
+          var msg = this.fonParser.parseString(p);
+          msg && this.me.send(msg);
         }.bind(this));
       }
     }
