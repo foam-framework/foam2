@@ -22,16 +22,16 @@ package foam.core;
 abstract class AbstractX
   implements X
 {
-  public Object get(String name) {
-    return get(this, name);
+  public Object get(Object key) {
+    return get(this, key);
   }
 
-  public X put(String name, Object value) {
-    return new XI(this, name, value);
+  public X put(Object key, Object value) {
+    return new XI(this, key, value);
   }
 
-  public X putFactory(String name, XFactory factory) {
-    return new FactoryXI(this, name, factory);
+  public X putFactory(Object key, XFactory factory) {
+    return new FactoryXI(this, key, factory);
   }
 
   public Object getInstanceOf(Object value, Class type) {
@@ -49,19 +49,19 @@ class XI
   extends AbstractX
 {
   final X      parent_;
-  final String name_;
+  final Object key_;
   final Object value_;
 
-  XI(X parent, String name, Object value) {
+  XI(X parent, Object key, Object value) {
     parent_ = parent;
-    name_   = name;
+    key_    = key;
     value_  = value;
   }
 
   X parent() { return parent_; }
 
-  public Object get(X x, String name) {
-    return name.equals(name_) ? value_ : parent().get(name);
+  public Object get(X x, Object key) {
+    return key.equals(key_) ? value_ : parent().get(key);
   }
 }
 
@@ -71,12 +71,12 @@ class FactoryXI
   extends AbstractX
 {
   final X        parent_;
-  final String   name_;
+  final Object   key_;
   final XFactory factory_;
 
-  FactoryXI(X parent, String name, XFactory factory) {
+  FactoryXI(X parent, Object key, XFactory factory) {
     parent_  = parent;
-    name_    = name;
+    key_     = key;
     factory_ = factory;
   }
 
@@ -84,10 +84,10 @@ class FactoryXI
     return parent_;
   }
 
-  public Object get(X x, String name) {
-    return name.equals(name_) ?
+  public Object get(X x, Object key) {
+    return key.equals(key_) ?
       factory_.create(x)    :
-      parent().get(x, name) ;
+      parent().get(x, key) ;
   }
 }
 
@@ -102,5 +102,5 @@ public class EmptyX
 
   public static X instance() { return x_; }
 
-  public Object get(X x, String name) { return null; }
+  public Object get(X x, Object key) { return null; }
 }
