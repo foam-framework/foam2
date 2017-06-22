@@ -70,11 +70,6 @@ foam.CLASS({
       name: 'ListController',
       extends: 'foam.u2.Element',
 
-      requires: [
-        'foam.u2.ListCreateController.CreateController',
-        'foam.u2.ListCreateController.ViewController'
-      ],
-
       imports: [ 'data', 'push', 'summaryView', 'dao', 'createLabel' ],
 
       properties: [
