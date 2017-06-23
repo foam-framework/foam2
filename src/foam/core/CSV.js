@@ -76,13 +76,7 @@ foam.CLASS({
       if ( ! this.outputHeaderRow ) return;
 
       this.outputPropertyFilteredName(o);
-      this.removeTrailingComma().out(this.nlStr);
-    },
-
-    function removeTrailingComma() {
-      // Removes trailing comma
-      if ( this.buf_.charAt(this.buf_.length - 1) == ',' ) this.buf_ = this.buf_.slice(0, -1);
-      return this;
+      this.out(this.nlStr);
     },
 
     function toCSV(o) {
@@ -93,7 +87,7 @@ foam.CLASS({
 
       // Outputs object values
       this.output(o);
-      this.removeTrailingComma().out(this.nlStr);
+      this.out(this.nlStr);
       ret += this.buf_;
       this.reset();
 
@@ -101,31 +95,10 @@ foam.CLASS({
     },
 
     function outputHeaderTitle(o) {
-      this.out(this.includeQuotes ? '"' : '').writePrefix().out(o, this.includeQuotes ? '"' : '', this.delimiter);
-    },
-
-    {
-      name: 'outputPropertyFilteredName',
-      code: foam.mmethod({
-        // Is there a `switch` like fall through so the function call isn't unecessarily repeated?
-        Undefined: function(o) { this.outputHeaderTitle(o); },
-        Null:      function(o) { this.outputHeaderTitle(o); },
-        String:    function(o) { this.outputHeaderTitle(o); },
-        Number:    function(o) { this.outputHeaderTitle(o); },
-        Boolean:   function(o) { this.outputHeaderTitle(o); },
-        Date:      function(o) { this.outputHeaderTitle(o); },
-        FObject:   function(o) {
-          // Gets and recurses through object properties
-          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-
-          for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputPropertyName(o, ps[i]);
-          }
-        },
-        Array: function(o) { /* Ignore arrays in CSV */ },
-        Function: function(o) { /* Ignore functions in CSV */ },
-        Object: function(o) { /* Ignore functions in CSV */ }
-      })
+      this.out(this.buf_.length ? this.delimiter : '')
+          .out(this.includeQuotes ? '"' : '')
+          .writePrefix()
+          .out(o, this.includeQuotes ? '"' : '');
     },
 
     function outputPropertyName(o, p) {
@@ -144,11 +117,26 @@ foam.CLASS({
       }
     },
 
+    {
+      name: 'outputPropertyFilteredName',
+      code: foam.mmethod({
+        FObject:   function(o) {
+          // Gets and recurses through object properties
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            this.outputPropertyName(o, ps[i]);
+          }
+        },
+        Array: function(o) { /* Ignore arrays in CSV */ },
+        Function: function(o) { /* Ignore functions in CSV */ },
+        Object: function(o) { /* Ignore generic objects in CSV */ }
+      }, function(o) { this.outputHeaderTitle(o); })
+    },
+
     function outputProperty(o, p) {
       if ( ! this.propertyPredicate(o, p) ) return;
-
       this.output(o[p.name]);
-      this.out(this.delimiter);
     },
 
     function reset() {
@@ -181,7 +169,9 @@ foam.CLASS({
     },
 
     function outputPrimitive(val) {
-      this.out(this.includeQuotes ? ('"' + val + '"') : val);
+      this.out(this.buf_.length ? this.delimiter : '')
+          .out(this.includeQuotes ? ('"' + val + '"') : val);
+
       return this;
     },
 
@@ -191,9 +181,6 @@ foam.CLASS({
         Undefined: function(o) { this.outputPrimitive(this.undefinedStr); },
         Null:      function(o) { this.outputPrimitive(null); },
         String:    function(o) { this.outputPrimitive(this.escape(o)); },
-        Number:    function(o) { this.outputPrimitive(o); },
-        Boolean:   function(o) { this.outputPrimitive(o); },
-        Date:      function(o) { this.outputPrimitive(o); },
         FObject:   function(o) {
           if ( o.outputCSV ) {
             o.outputCSV(this)
@@ -202,7 +189,7 @@ foam.CLASS({
           
           // Outputs only the ordinal of ENUM
           if ( foam.core.AbstractEnum.isInstance(o) ) {
-            this.outputPrimitive(o.ordinal).out(this.delimiter);
+            this.outputPrimitive(o.ordinal);
           } else {
             var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
@@ -210,13 +197,11 @@ foam.CLASS({
               this.outputProperty(o, ps[i]);
             }
           }
-
-          this.removeTrailingComma();
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
-        Object: function(o) { /* Ignore functions in CSV */ }
-      })
+        Object: function(o) { /* Ignore generic objects in CSV */ }
+      }, function(o) { this.outputPrimitive(o); })
     },
 
     function fromCSV(className, s) {
