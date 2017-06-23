@@ -34,14 +34,14 @@ public class Boot {
       MapDAO userDAO = new MapDAO();
       userDAO.setOf(User.getOwnClassInfo());
       userDAO.setX(root_);
-      userDAO_ = new JournaledDAO(userDAO, "users");
+      userDAO_ = new JDAO(userDAO, "users");
       root_.put("userDAO", userDAO_);
 
       // Used for groups. We have multiple groups that contain different users
       MapDAO groupDAO = new MapDAO();
       groupDAO.setOf(Group.getOwnClassInfo());
       groupDAO.setX(root_);
-      groupDAO_ = new JournaledDAO(groupDAO, "groups");
+      groupDAO_ = new JDAO(groupDAO, "groups");
       root_.put("groupDAO", groupDAO_);
 
     } catch (IOException e) {
