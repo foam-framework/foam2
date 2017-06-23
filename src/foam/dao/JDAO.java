@@ -17,6 +17,12 @@ public class JDAO
 {
   protected FileJournal journal;
 
+  public JDAO(ClassInfo classInfo, String filename) throws IOException {
+    journal = new FileJournal(filename);
+    setDelegate(new MapDAO().setOf(classInfo));
+    journal.replay(getDelegate());
+  }
+
   public JDAO(DAO delegate, String filename) throws IOException {
     journal = new FileJournal(filename);
     setDelegate(delegate);
