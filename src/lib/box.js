@@ -350,6 +350,8 @@ foam.CLASS({
     'foam.box.LookupRetryBox'
   ],
 
+  imports: [ 'registry as ctxRegistry' ],
+
   properties: [
     {
       name: 'name'
@@ -370,7 +372,7 @@ foam.CLASS({
       name: 'delegate',
       transient: true,
       factory: function() {
-        return this.registry.doLookup(this.name)
+        return this.registry.doLookup(this.name);
       }
     }
   ]
@@ -615,7 +617,8 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      name: 'obj'
+      name: 'obj',
+      value: null
     }
   ]
 });
@@ -649,6 +652,13 @@ foam.CLASS({
       this.box.send(this.Message.create({
         object: this.DAOEvent.create({
           name: 'remove', obj: obj
+        })
+      }));
+    },
+    function eof() {
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'eof'
         })
       }));
     },
@@ -825,6 +835,85 @@ foam.CLASS({
       this.SUPER(x, skip, limit, order, predicate);
       this.on.reset.pub();
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'StreamingClientDAO',
+  extends: 'foam.dao.BaseClientDAO',
+
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.dao.BoxDAOListener'
+  ],
+  imports: [ 'registry' ],
+
+  classes: [
+    {
+      name: 'StreamingReplyBox',
+
+      properties: [
+        {
+          name: 'id',
+          factory: function() { return foam.next$UID(); }
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.dao.Sink',
+          name: 'sink'
+        },
+        {
+          name: 'promise',
+          factory: function() {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+              self.resolve_ = resolve;
+              self.reject_ = reject;
+            });
+          }
+        },
+        'resolve_',
+        'reject_'
+      ],
+
+      methods: [
+        function send(msg) {
+          // TODO(markdittmer): Error check message type.
+
+          switch ( msg.object.name ) {
+            case 'put':
+              // TODO(markdittmer): Manage sub.
+              this.sink.put(msg.object.obj);
+              break;
+            case 'eof':
+              this.sink.eof();
+              this.resolve_(this.sink);
+              break;
+          }
+        }
+      ]
+    }
+  ],
+
+  methods: [
+    function select_(x, sink, skip, limit, order, predicate) {
+      var replyBox = this.StreamingReplyBox.create({
+        sink: sink || this.ArraySink.create()
+      });
+      var promise = replyBox.promise;
+
+      replyBox = this.registry.register(replyBox.id, null, replyBox);
+
+      // TODO(markdittmer): Shouldn't there be an annotation for an errorBox
+      // somewhere here?
+      this.SUPER(
+          null, this.BoxDAOListener.create({ box: replyBox }),
+          skip, limit, order, predicate)
+              .catch(function(error) { replyBox.reject_(error); });
+      return promise;
+    }
+    // TODO(markdittmer): Implement listen() similar to ClientDAO.
   ]
 });
 
@@ -1584,7 +1673,7 @@ foam.CLASS({
 	var channel = new MessageChannel();
 	this.messagePortService.addPort(channel.port1);
 
-	this.target.postMessage('', '*', [channel.port2]);
+	this.target.postMessage(channel.port2, [ channel.port2 ]);
 
         channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
           object: this.RegisterSelfMessage.create({ name: this.me.name })
