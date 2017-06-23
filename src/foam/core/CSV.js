@@ -85,7 +85,7 @@ foam.CLASS({
       return this;
     },
 
-    function stringify(o) {
+    function toCSV(o) {
       // Outputs object headers
       this.outputHeader(o);
       var ret = this.buf_;
@@ -226,7 +226,7 @@ foam.CLASS({
       })
     },
 
-    function objectify(className, s) {
+    function fromCSV(className, s) {
       if ( ! s ) throw 'Invalid CSV Input'
       var lines = s.split('\n');
 
@@ -299,12 +299,12 @@ foam.LIB({
   },
 
   methods: [
-    function stringify(o) {
-      return foam.csv.Compact.stringify(o);
+    function toCSV(o) {
+      return foam.csv.Compact.toCSV(o);
     },
 
-    function objectify(className, s) {
-      return foam.csv.Compact.objectify(className, s);
+    function fromCSV(className, s) {
+      return foam.csv.Compact.fromCSV(className, s);
     }
   ]
 });
