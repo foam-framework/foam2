@@ -343,7 +343,7 @@ foam.LIB({
 
   constants: {
     Compact: foam.csv.Outputer.create({
-      includeQuotes: false
+      includeQuotes: true
     }),
   },
 
