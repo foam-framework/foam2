@@ -211,18 +211,41 @@ foam.CLASS({
       return this;
     },
 
+    function propertyName(p) {
+      return this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name)    
+    },
+
      function outputProperty(o, p) {
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
 
       var v = o[p.name]; 
-
-      this.nl().indent().out('<').outputPropertyName(p);
-      // Create attribute class='Array' in order for parsing later on if needed
-      if (v instanceof Array) this.out(" class='Array'");
-      this.out('>');
+      this.nl().indent();
+      // Create attribute class='Array' in order for parsing later on and check for nested objects
+      if ( v instanceof Array || typeof v === 'object' ) {
+        this.nestedObject(v, p);
+        return;
+      } 
+        
+      this.out('<').outputPropertyName(p).out('>');
       this.output(p.toXML(v, this));
       this.out('</').outputPropertyName(p).out('>');
+    },
+
+    function nestedObject(v, p) {
+      if ( v instanceof Array ) {
+        this.start("<" + this.propertyName(p) + " class='Array'>");
+      } else {
+          this.start("<" + this.propertyName(p) + ">");
+      }
+      // Check if object is enum or object with regular properties
+      if ( foam.core.AbstractEnum.isInstance( v ) ) {
+        this.outputProperty(v, v.cls_.getAxiomByName('ordinal'));
+      } else {
+        this.nl().indent();
+        this.output(p.toXML(v, this));
+      }
+      this.end('</' +  this.propertyName(p) + '>');
     },
 
     function outputDate(o) {
@@ -286,6 +309,7 @@ foam.CLASS({
           
           var clsName = o.cls_.id;
           this.start("<object class='" + clsName + "'>")
+          // Iterate through properties and output
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
             this.outputProperty(o, ps[i]);
@@ -294,11 +318,10 @@ foam.CLASS({
         },
         Array: function(o) {
           // Nested Objects and FObject Arrays Passed
-          this.nl();
           for ( var i = 0 ; i < o.length ; i++ ) {
-            if ( !o.of ) this.indent().out("<value>");
+            if ( !o[i].of ) this.nl().indent().out("<value>");
             this.output(o[i], this);
-            if ( !o.of ) this.out("</value>").nl();
+            if ( !o.of ) this.out("</value>");
           }
         },
         Object: function(o) {
@@ -353,7 +376,8 @@ foam.CLASS({
               prop.set(obj, arrayValue);
               continue;
             }
-            prop.set(obj, props[propIndex].firstChild.nodeValue);
+            // Check if there is value for currentProp. Otherwise, do not output
+            if ( currentProp.firstChild ) prop.set(obj, currentProp.firstChild.nodeValue);
           }
           fObjects.push(obj);
         }
