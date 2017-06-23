@@ -131,18 +131,7 @@ foam.CLASS({
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
-        Object: function(o) {
-          // TODO: How to test?
-          if ( o.outputCSV ) {
-            o.outputCSV(this);
-          } else {
-            if ( this.sortObjectKeys ) {
-              this.outputSortedObjectKeyValues_(o);
-            } else {
-              this.outputObjectKeyValues_(o);
-            }
-          }
-        }
+        Object: function(o) { /* Ignore functions in CSV */ }
       })
     },
 
@@ -198,33 +187,6 @@ foam.CLASS({
       return this.includeQuotes ? str.replace(/"/g, '\\"') : str;
     },
 
-    function outputObjectKeyValue_(key, value, first) {
-      if ( ! first ) this.out(',');
-      this.output(value);
-    },
-
-    function outputObjectKeyValues_(o) {
-      var first = true;
-      for ( var key in o ) {
-        this.outputObjectKeyValue_(key, o[key], first);
-        first = false;
-      }
-    },
-
-    function outputSortedObjectKeyValues_(o) {
-      var key, keys = [];
-
-      for ( key in o ) keys.push(key);
-      keys.sort();
-
-      var first = true;
-      for ( var i = 0 ; i < keys.length; i++ ) {
-        key = keys[i];
-        this.outputObjectKeyValue_(key, o[key], first);
-        first = false;
-      }
-    },
-
     function outputPrimitive(val) {
       this.out(this.includeQuotes ? ('"' + val + '"') : val);
       return this;
@@ -260,18 +222,7 @@ foam.CLASS({
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
-        Object: function(o) {
-          // TODO: How to test?
-          if ( o.outputCSV ) {
-            o.outputCSV(this);
-          } else {
-            if ( this.sortObjectKeys ) {
-              this.outputSortedObjectKeyValues_(o);
-            } else {
-              this.outputObjectKeyValues_(o);
-            }
-          }
-        }
+        Object: function(o) { /* Ignore functions in CSV */ }
       })
     },
 
