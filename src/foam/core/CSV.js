@@ -48,11 +48,6 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'outputDefaultValues',
-      value: true
-    },
-    {
-      class: 'Boolean',
       name: 'outputHeaderRow',
       value: true
     },
@@ -107,7 +102,7 @@ foam.CLASS({
 
     function externalProperty(o, p) {
       if ( ! this.propertyPredicate(o, p) ) return false;
-      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return false;
+      if ( p.isDefaultValue(o[p.name]) ) return false;
 
       return true;
     },
@@ -361,9 +356,7 @@ foam.LIB({
   name: 'foam.csv',
 
   constants: {
-    Compact: foam.csv.Outputer.create({
-      outputDefaultValues: false
-    }),
+    Compact: foam.csv.Outputer.create(),
   },
 
   methods: [
