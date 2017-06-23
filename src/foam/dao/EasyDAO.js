@@ -32,7 +32,7 @@ foam.CLASS({
 
   requires: [
     'foam.dao.MDAO',
-    'foam.dao.JournaledDAO',
+    'foam.dao.JDAO',
     'foam.dao.GUIDDAO',
     'foam.dao.IDBDAO',
     'foam.dao.SequenceNumberDAO',
@@ -272,7 +272,7 @@ foam.CLASS({
       }
 
       if ( this.journal ) {
-        dao = this.JournaledDAO.create({
+        dao = this.JDAO.create({
           delegate: dao,
           journal: this.journal
         });

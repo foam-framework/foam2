@@ -100,7 +100,7 @@ if ( foam.isServer ) {
 
 foam.CLASS({
   package: 'foam.dao',
-  name: 'JournaledDAO',
+  name: 'JDAO',
   extends: 'foam.dao.PromisedDAO',
   properties: [
     'delegate',
