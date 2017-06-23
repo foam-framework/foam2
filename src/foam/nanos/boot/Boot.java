@@ -23,7 +23,7 @@ public class Boot {
   public Boot() {
     try {
       // Used for all the services that will be required when Booting
-      serviceDAO_ = new JournaledDAO(NSpec.getOwnClassInfo(), "services");
+      serviceDAO_ = new JDAO(NSpec.getOwnClassInfo(), "services");
     } catch (IOException e) {
       e.printStackTrace();
     }
