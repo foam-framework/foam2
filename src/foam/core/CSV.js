@@ -76,7 +76,7 @@ foam.CLASS({
       if ( ! this.outputHeaderRow ) return;
 
       this.outputPropertyFilteredName(o);
-      this.removeTrailingComma().nl();
+      this.removeTrailingComma().out(this.nlStr);
     },
 
     function removeTrailingComma() {
@@ -93,7 +93,7 @@ foam.CLASS({
 
       // Outputs object values
       this.output(o);
-      this.removeTrailingComma().nl();
+      this.removeTrailingComma().out(this.nlStr);
       ret += this.buf_;
       this.reset();
 
@@ -151,7 +151,7 @@ foam.CLASS({
 
       // Checks if property is enum, or object with properties of its own
       // TODO: Is this correct way to check if object has relevant sub-properties
-      if ( foam.core.AbstractEnum.isInstance(o[p.name] ) ) {
+      if ( foam.core.AbstractEnum.isInstance( o[p.name] ) ) {
         this.outputPropertyFilteredName(p.name + "__ordinal");
       } else if ( p.of ) {
         this.start(p.name);
@@ -191,15 +191,6 @@ foam.CLASS({
     // End a nested object, 1 fewer `__` within object name
     function end() {
       this.nestedObjectNames.pop();
-      return this;
-    },
-
-    // TODO: Copied from foam.core.json (move to common library)
-    function nl() {
-      if ( this.nlStr && this.nlStr.length ) {
-        this.out(this.nlStr);
-      }
-
       return this;
     },
 
@@ -263,7 +254,7 @@ foam.CLASS({
           }
           
           // Outputs only the ordinal of ENUM
-          if (foam.core.AbstractEnum.isInstance(o)) {
+          if ( foam.core.AbstractEnum.isInstance(o) ) {
             this.outputPrimitive(o.ordinal).out(this.delimiter);
           } else {
             var ps = o.cls_.getAxiomsByClass(foam.core.Property);
@@ -293,7 +284,7 @@ foam.CLASS({
     },
 
     function objectify(className, s) {
-      if (!s) throw 'Invalid CSV Input'
+      if ( ! s ) throw 'Invalid CSV Input'
       var lines = s.split('\n');
 
       if ( lines.length == 0 ) throw 'Insufficient CSV Input'
@@ -312,7 +303,8 @@ foam.CLASS({
       
       var cls = foam.lookup(className);
 
-      if (props[0] == 'ordinal') {
+      // Checks if ENUM
+      if ( props[0] == 'ordinal' ) {
         return cls.create({ ordinal: values[0] })
       }
 
