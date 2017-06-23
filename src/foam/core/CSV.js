@@ -172,9 +172,11 @@ foam.CLASS({
     function outputPropertyName(o, p) {
       if ( ! this.externalProperty(o, p) ) return;
 
-      // Checks if property is object with properties of its own
+      // Checks if property is enum, or object with properties of its own
       // TODO: Is this correct way to check if object has relevant sub-properties
-      if ( p.of ) {
+      if ( foam.core.AbstractEnum.isInstance(o[p.name] ) ) {
+        this.outputPropertyFilteredName(p.name + "__ordinal");
+      } else if ( p.of ) {
         this.start(p.name);
         this.outputPropertyFilteredName(o[p.name]);
         this.end();
@@ -265,6 +267,7 @@ foam.CLASS({
 
     function outputPrimitive(val) {
       this.out(this.includeQuotes ? ('"' + val + '"') : val);
+      return this;
     },
 
     {
@@ -282,10 +285,15 @@ foam.CLASS({
             return;
           }
           
-          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          // Outputs only the ordinal of ENUM
+          if (foam.core.AbstractEnum.isInstance(o)) {
+            this.outputPrimitive(o.ordinal).out(this.delimiter);
+          } else {
+            var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
-          for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputProperty(o, ps[i]);
+            for ( var i = 0 ; i < ps.length ; i++ ) {
+              this.outputProperty(o, ps[i]);
+            }
           }
 
           this.removeTrailingComma();
@@ -307,7 +315,7 @@ foam.CLASS({
       })
     },
 
-    function objectify(s) {
+    function objectify(className, s) {
       if (!s) throw 'Invalid CSV Input'
       var lines = s.split('\n');
 
@@ -318,16 +326,20 @@ foam.CLASS({
       var values = lines[1].slice(1, -1).split('","'); // Account for array of values (TODO?)
 
       // Calls for the creation of a new model
-      var model = this.createModel(props, values)
-
-      return model;
+      return this.createModel(props, values, className);
     },
 
-    function createModel(props, values) {
+    function createModel(props, values, className) {
       foam.assert(props.length == values.length,
         'Invalid CSV Input, header and value rows must be the same number of cells');
       
-      var model = {};
+      var cls = foam.lookup(className);
+
+      if (props[0] == 'ordinal') {
+        return cls.create({ ordinal: values[0] })
+      }
+
+      var model = cls.create();
 
       for ( var i = 0 ; i < props.length ; ++i ) {
         var p = props[i];
@@ -343,16 +355,18 @@ foam.CLASS({
             // If last element, or prefix no longer matches prop
             if ( ( j == props.length ) || ( ! props[j].startsWith(prefix) ) ) {
               // Creates a new model for the inner object
-              model[p[0]] = createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
-                                        values.slice(i, j))
-
+              var prop = model.cls_.getAxiomByName(p[0]);
+              prop.set(model, createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
+                                        values.slice(i, j), prop.of.id));
+              
               i = j - 1;
               break;
             }
           }
         // Adds regular prop
-        } else {
-          model[p] = v;
+      } else {
+          var prop = model.cls_.getAxiomByName(p);
+          prop.set(model, v);
         }
       }
 
@@ -375,8 +389,8 @@ foam.LIB({
       return foam.csv.Compact.stringify(o);
     },
 
-    function objectify(s) {
-      return foam.csv.Compact.objectify(s);
+    function objectify(className, s) {
+      return foam.csv.Compact.objectify(className, s);
     }
   ]
 });
