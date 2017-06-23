@@ -100,13 +100,6 @@ foam.CLASS({
       return ret;
     },
 
-    function externalProperty(o, p) {
-      if ( ! this.propertyPredicate(o, p) ) return false;
-      if ( p.isDefaultValue(o[p.name]) ) return false;
-
-      return true;
-    },
-
     function outputHeaderTitle(o) {
       this.out(this.includeQuotes ? '"' : '').writePrefix().out(o, this.includeQuotes ? '"' : '', this.delimiter);
     },
@@ -136,7 +129,7 @@ foam.CLASS({
     },
 
     function outputPropertyName(o, p) {
-      if ( ! this.externalProperty(o, p) ) return;
+      if ( ! this.propertyPredicate(o, p) ) return;
 
       // Checks if property is enum, or object with properties of its own
       // TODO: Is this correct way to check if object has relevant sub-properties
@@ -152,7 +145,7 @@ foam.CLASS({
     },
 
     function outputProperty(o, p) {
-      if ( ! this.externalProperty(o, p) ) return;
+      if ( ! this.propertyPredicate(o, p) ) return;
 
       this.output(o[p.name]);
       this.out(this.delimiter);
