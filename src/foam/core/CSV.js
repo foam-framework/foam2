@@ -194,16 +194,9 @@ foam.CLASS({
       return this;
     },
 
-    // TODO: Copied from foam.core.json (move to common library)
     function escape(str) {
       return str
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"')
-        .replace(/[\x00-\x1f]/g, function(c) {
-          return "\\u00" + ((c.charCodeAt(0) < 0x10) ?
-              '0' + c.charCodeAt(0).toString(16) :
-              c.charCodeAt(0).toString(16));
-        });
+        .replace(/"/g, '\\"');
     },
 
     function outputObjectKeyValue_(key, value, first) {
