@@ -106,9 +106,7 @@ foam.CLASS({
 
       // Checks if property is enum, or object with properties of its own
       // TODO: Is this correct way to check if object has relevant sub-properties
-      if ( foam.core.AbstractEnum.isInstance( o[p.name] ) ) {
-        this.outputPropertyFilteredName(p.name + '__ordinal');
-      } else if ( p.of ) {
+      if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
         this.start(p.name);
         this.outputPropertyFilteredName(o[p.name]);
         this.end();
@@ -223,15 +221,8 @@ foam.CLASS({
     function createModel(props, values, className) {
       foam.assert(props.length == values.length,
         'Invalid CSV Input, header and value rows must be the same number of cells');
-      
-      var cls = foam.lookup(className);
 
-      // Checks if ENUM
-      if ( props[0] == 'ordinal' ) {
-        return cls.create({ ordinal: values[0] })
-      }
-
-      var model = cls.create();
+      var model = foam.lookup(className).create();
 
       for ( var i = 0 ; i < props.length ; ++i ) {
         var p = props[i];
@@ -256,9 +247,9 @@ foam.CLASS({
             }
           }
         // Adds regular prop
-      } else {
+        } else {
           var prop = model.cls_.getAxiomByName(p);
-          prop.set(model, v);
+          prop.set(model, prop.of ? foam.lookup(prop.of.id).create({ ordinal: v }) : v);
         }
       }
 
