@@ -12,12 +12,12 @@ import java.io.IOException;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-public class JournaledDAO
+public class JDAO
   extends ProxyDAO
 {
   protected FileJournal journal;
 
-  public JournaledDAO(DAO delegate, String filename) throws IOException {
+  public JDAO(DAO delegate, String filename) throws IOException {
     journal = new FileJournal(filename);
     setDelegate(delegate);
     journal.replay(delegate);
