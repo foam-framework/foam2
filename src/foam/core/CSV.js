@@ -5,24 +5,6 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.Property',
-
-  properties: [
-    {
-      name: 'fromCSV',
-      value: function fromCSV(value, ctx, prop, csv) {
-        return foam.csv.parse(value, null, ctx);
-      }
-    },
-    {
-      name: 'toCSV',
-      value: function toCSV(value, outputter) { return value; }
-    }
-  ]
-});
-
-/** CSV Outputer. **/
-foam.CLASS({
   package: 'foam.csv',
   name: 'Outputer',
 
