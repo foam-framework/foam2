@@ -108,7 +108,7 @@ foam.CLASS({
     },
 
     function outputHeaderTitle(o) {
-      this.out('"').writePrefix().out(o).out('"').out(this.delimiter);
+      this.out(this.includeQuotes ? '"' : '').writePrefix().out(o, this.includeQuotes ? '"' : '', this.delimiter);
     },
 
     {
@@ -152,7 +152,7 @@ foam.CLASS({
       // Checks if property is enum, or object with properties of its own
       // TODO: Is this correct way to check if object has relevant sub-properties
       if ( foam.core.AbstractEnum.isInstance( o[p.name] ) ) {
-        this.outputPropertyFilteredName(p.name + "__ordinal");
+        this.outputPropertyFilteredName(p.name + '__ordinal');
       } else if ( p.of ) {
         this.start(p.name);
         this.outputPropertyFilteredName(o[p.name]);
@@ -195,8 +195,7 @@ foam.CLASS({
     },
 
     function escape(str) {
-      return str
-        .replace(/"/g, '\\"');
+      return this.includeQuotes ? str.replace(/"/g, '\\"') : str;
     },
 
     function outputObjectKeyValue_(key, value, first) {
@@ -283,8 +282,10 @@ foam.CLASS({
       if ( lines.length == 0 ) throw 'Insufficient CSV Input'
 
       // Trims quotes and splits CSV row into array
-      var props = lines[0].slice(1, -1).split('","');
-      var values = lines[1].slice(1, -1).split('","'); // Account for array of values (TODO?)
+      var props = this.includeQuotes ? lines[0].slice(1, -1).split('","') : lines[0].split(',');
+
+      // Account for array of values (TODO?)
+      var values = this.includeQuotes ? lines[1].slice(1, -1).split('","') : lines[1].split(',');
 
       // Calls for the creation of a new model
       return this.createModel(props, values, className);
@@ -319,7 +320,7 @@ foam.CLASS({
               // Creates a new model for the inner object
               var prop = model.cls_.getAxiomByName(p[0]);
               prop.set(model, createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
-                                        values.slice(i, j), prop.of.id));
+                                          values.slice(i, j), prop.of.id));
               
               i = j - 1;
               break;
@@ -341,7 +342,9 @@ foam.LIB({
   name: 'foam.csv',
 
   constants: {
-    Compact: foam.csv.Outputer.create(),
+    Compact: foam.csv.Outputer.create({
+      includeQuotes: false
+    }),
   },
 
   methods: [
