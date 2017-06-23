@@ -6,9 +6,9 @@
 
 foam.CLASS({
   package: 'foam.csv',
-  name: 'Outputer',
+  name: 'Outputter',
 
-  documentation: 'CSV Outputer.',
+  documentation: 'CSV Outputter.',
 
   properties: [
     {
@@ -342,7 +342,7 @@ foam.LIB({
   name: 'foam.csv',
 
   constants: {
-    Compact: foam.csv.Outputer.create({
+    Compact: foam.csv.Outputter.create({
       includeQuotes: true
     }),
   },
