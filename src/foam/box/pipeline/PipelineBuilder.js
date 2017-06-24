@@ -243,7 +243,7 @@ foam.CLASS({
             the merge points in the pipeline.`
       },
       code: function() {
-        if ( this.parents.length === 0 ) return [ this.buildAll() ];
+        if ( this.parents.length === 0 ) return [ this.build_() ];
 
         this.build_();
 
