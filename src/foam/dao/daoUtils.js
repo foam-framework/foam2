@@ -80,6 +80,7 @@ foam.CLASS({
       name: 'dao',
       postSet: function(old, nu) {
         this.innerSub && this.innerSub.detach();
+        debugger;
         this.innerSub = nu && nu.listen.apply(nu, [this].concat(this.args));
         if ( old ) this.reset();
       }

@@ -525,11 +525,13 @@ foam.CLASS({
   methods: [
     function send(data) {
       if ( foam.box.Message.isInstance(data) ) {
+        console.log('Socket write', foam.json.Network.stringify(data));
         data = foam.json.Network.stringify(data);
       }
 
       if ( typeof data == "string" ) {
         var opcode = 1;
+        console.log('Socket write', data);
         data = Buffer.from(data);
       } else {
         opcode = 2;

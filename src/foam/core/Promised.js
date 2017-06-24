@@ -30,6 +30,7 @@ foam.CLASS({
               var self = this;
               var args = arguments;
               return this[property].then(function(d) {
+                self;
                 return d[name].apply(self, args);
               });
             } :
@@ -37,6 +38,7 @@ foam.CLASS({
               var self = this;
               var args = arguments;
               this[property].then(function(d) {
+                self;
                 d[name].apply(self, args);
               });
             };
@@ -46,6 +48,7 @@ foam.CLASS({
             var self = this;
             var args = arguments;
             return this[property].then(function(d) {
+              self;
               return d[name].apply(d, args);
             });
           } :
@@ -53,6 +56,7 @@ foam.CLASS({
             var self = this;
             var args = arguments;
             this[property].then(function(d) {
+              self;
               d[name].apply(d, args);
             });
           };

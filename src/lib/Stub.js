@@ -15,6 +15,85 @@
  * limitations under the License.
  */
 
+// foam.CLASS({
+//   package: 'foam.core',
+//   name: 'StubTopic',
+//   extends: 'foam.core.Topic',
+
+//   properties: [
+//     'replyPolicyName',
+//     'boxPropName',
+//     // Identical to super's topics, but StubTopics.
+//     {
+//       class: 'FObjectArray',
+//       of: 'StubTopic',
+//       name: 'topics',
+//       adaptArrayElement: function(o) {
+//         return typeof o === 'string' ?
+//           foam.core.StubTopic.create({ name: o }, this) :
+//           foam.core.StubTopic.create(o, this);
+//       }
+//     },
+//     {
+//       class: 'Function',
+//       name: 'subF',
+//       factory: function() {
+//         var replyPolicyName = this.replyPolicyName;
+//         var boxPropName = this.boxPropName;
+
+//         return function() {
+//           debugger;
+//           var replyBox = this.ReplyBox.create({
+//             delegate: this.RPCReturnBox.create()
+//           });
+
+//           var ret = replyBox.delegate.promise;
+
+//           replyBox = this.registry.register(
+//             replyBox.id,
+//             this[replyPolicyName],
+//             replyBox);
+
+//           var msg = this.Message.create({
+//             object: this.RPCMessage.create({
+//               name: 'subBox',
+//               args: Array.from(arguments)
+//             })
+//           });
+
+//           msg.attributes.replyBox = replyBox;
+//           msg.attributes.errorBox = replyBox;
+
+//           this[boxPropName].send(msg);
+
+//           return ret;
+//         };
+//       }
+//     }
+//   ],
+
+//   methods: [
+//     // Identical to super's makeTopic, but overwrite .sub.
+//     function makeTopic(topic, parent) {
+//       var name   = topic.name;
+//       var topics = topic.topics || [];
+
+//       var ret = {
+//         pub: foam.Function.bind(parent.pub, parent, name),
+//         sub: foam.Function.bind(this.subF, parent, name),
+//         hasListeners: foam.Function.bind(parent.hasListeners, parent, name),
+//         toString: function() { return 'Topic(' + name + ')'; }
+//       };
+
+//       for ( var i = 0 ; i < topics.length ; i++ ) {
+//         ret[topics[i].name] = makeTopic(topics[i], ret);
+//       }
+
+//       return ret;
+//     }
+//   ]
+// });
+
 foam.CLASS({
   package: 'foam.core',
   name: 'StubMethod',
@@ -166,8 +245,20 @@ foam.CLASS({
               isEnabled: m.isEnabled,
               replyPolicyName: replyPolicyName,
               boxPropName: name
-            })
+            });
           });
+      }
+    },
+    {
+      class: 'Array',
+      name: 'topics',
+      factory: function() { return null; }
+    },
+    {
+      name: 'topics_',
+      expression: function(of, name, topics, replyPolicyName) {
+        return topics ? topics :
+            foam.lookup(of).getAxiomsByClass(foam.core.Topic);
       }
     }
   ],
@@ -182,6 +273,70 @@ foam.CLASS({
         hidden: true
       }));
 
+      var replyPolicyName = this.replyPolicyName;
+      var topics = this.topics_;
+      var SUB = model.getAxiomByName('sub');
+      topics.length && SUB && cls.installAxiom(foam.core.Method.create({
+        name: 'sub',
+        code: function() {
+          var nextTopics = topics;
+          var idx = 0;
+          for ( var i = 0; i < nextTopics.length; i++ ) {
+            if ( nextTopics[i].name === arguments[idx] ) {
+              nextTopics = nextTopics[i].topics;
+              i = 0;
+              idx++;
+            }
+          }
+          if ( idx !== arguments.length - 1 )
+            return SUB.code.apply(this, arguments);
+
+          var replyBox = this.ReplyBox.create({
+            delegate: this.RPCReturnBox.create()
+          });
+
+          var promise = replyBox.delegate.promise;
+
+          replyBox = this.registry.register(
+            replyBox.id,
+            this[replyPolicyName],
+            replyBox);
+
+          var msg = this.Message.create({
+            object: this.RPCMessage.create({
+              name: 'subBox',
+              args: Array.from(arguments)
+            })
+          });
+
+          msg.attributes.replyBox = replyBox;
+          msg.attributes.errorBox = replyBox;
+
+          this[propName].send(msg);
+
+          // TODO(markdittmer): This seems wrong.
+          // Assumptions:
+          // - This's delegate chain leads to a "raw communication box".
+          // - Returned box is of the form SubBox(NamedBox()).
+          //
+          // Rebind returned box to "raw communication box".
+          var rawBox = this.delegate;
+          while ( rawBox.delegate ) rawBox = rawBox.delegate;
+          promise = promise.then(function(box) {
+            foam.assert(this.SubBox.isInstance(box),
+                        'Stub topic bindings: Expected subBox');
+            foam.assert(this.NamedBox.isInstance(box.delegate),
+                        'Stub topic bindings: Expected subBox');
+            box.delegate.delegate = rawBox;
+            return box;
+          }.bind(this));
+
+          return this.SubscriptionStub.create({
+            delegate: this.PromisedBox.create({ delegate: promise })
+          });
+        }
+      }));
+
       for ( var i = 0 ; i < this.methods_.length ; i++ ) {
         cls.installAxiom(this.methods_[i]);
       }
@@ -190,11 +345,20 @@ foam.CLASS({
         cls.installAxiom(this.actions_[i]);
       }
 
+      for ( i = 0 ; i < this.topics_.length ; i++ ) {
+        cls.installAxiom(this.topics_[i]);
+      }
+
       [
+        'foam.box.Event',
+        'foam.box.Message',
+        'foam.box.NamedBox',
+        'foam.box.PromisedBox',
+        'foam.box.RPCMessage',
         'foam.box.RPCReturnBox',
         'foam.box.ReplyBox',
-        'foam.box.RPCMessage',
-        'foam.box.Message'
+        'foam.box.SubBox',
+        'foam.box.SubscriptionStub'
       ].map(function(s) {
         var path = s.split('.');
         return foam.core.Requires.create({

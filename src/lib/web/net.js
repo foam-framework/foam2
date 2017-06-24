@@ -46,7 +46,12 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      this.socket.send(foam.json.Network.stringify(msg));
+      var data = foam.json.Network.stringify(msg);
+      if (data.indexOf('function') !== -1) {
+        console.log('SOCKET WRITE', data);
+        debugger;
+      } else { console.log('Socket write', data); }
+      this.socket.send(data);
     },
 
     function connect() {
@@ -80,6 +85,7 @@ foam.CLASS({
     {
       name: 'onMessage',
       code: function(msg) {
+        debugger;
         this.message.pub(msg.data);
       }
     }

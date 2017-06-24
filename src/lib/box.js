@@ -587,13 +587,87 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.box',
+  name: 'Event',
+
+  properties: [
+    {
+      name: 'topic'
+    },
+    {
+      name: 'args'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'Subscription',
+
+  properties: [
+    {
+      name: 'subscription',
+      transient: true
+    }
+  ],
+
+  methods: [ function detach() {
+    debugger;
+    return this.subscription.detach();
+  } ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'SubscriptionStub',
+
+  properties: [
+    {
+      class: 'Stub',
+      of: 'foam.box.Subscription',
+      name: 'delegate'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+
+  methods: [
+    function subBox() {
+      debugger;
+      var topic = Array.from(arguments);
+      topic.pop();
+
+      var box = arguments[arguments.length - 1];
+      arguments[arguments.length - 1] = function() {
+        return box.send(foam.box.Message.create({
+          object: foam.box.Event({ topic: topic, args: Array.from(arguments) })
+        }));
+      };
+      return this.__context__.registry.register(
+          null,
+          null,
+          // Self-unregistering box that implements .detach().
+          foam.box.ReplyBox.create({
+            delegate: foam.box.SkeletonBox.create({
+              data: foam.box.Subscription.create({
+                subscription: this.sub.apply(this, arguments)
+              }, this.__subContext__)
+            }, this.__subContext__)
+          }, this.__subContext__));
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.dao',
   name: 'BaseClientDAO',
   extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       class: 'Stub',
-      of: 'foam.dao.DAO',
+      of: 'foam.dao.AbstractDAO',
       name: 'delegate',
       methods: [
         'put_',
@@ -790,7 +864,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Stub',
-      of: 'foam.dao.DAO',
+      of: 'foam.dao.AbstractDAO',
       name: 'delegate',
       methods: [
         'put_',
@@ -863,6 +937,19 @@ foam.CLASS({
           of: 'foam.dao.Sink',
           name: 'sink'
         },
+        // TODO(markdittmer): Signal remote of detached and unregister
+        // reply box.
+        {
+          name: 'sinkSub_',
+          factory: function() {
+            var sub = foam.core.FObject.create();
+            sub.onDetach(function() { this.detached_ = true; }.bind(this));
+          }
+        },
+        {
+          class: 'Boolean',
+          name: 'detached_'
+        },
         {
           name: 'promise',
           factory: function() {
@@ -881,14 +968,20 @@ foam.CLASS({
         function send(msg) {
           // TODO(markdittmer): Error check message type.
 
+          if ( this.detached_ ) return;
           switch ( msg.object.name ) {
             case 'put':
-              // TODO(markdittmer): Manage sub.
-              this.sink.put(msg.object.obj);
+              this.sink.put(msg.object.obj, this.sinkSub_);
+              break;
+            case 'remove':
+              this.sink.remove(msg.object.obj, this.sinkSub_);
               break;
             case 'eof':
               this.sink.eof();
               this.resolve_(this.sink);
+              break;
+            case 'reset':
+              this.sink.reset();
               break;
           }
         }
@@ -912,8 +1005,18 @@ foam.CLASS({
           skip, limit, order, predicate)
               .catch(function(error) { replyBox.reject_(error); });
       return promise;
+    },
+    function listen_(x, sink, predicate) {
+      var replyBox = this.StreamingReplyBox.create({
+        sink: sink || this.ArraySink.create()
+      });
+      replyBox = this.registry.register(replyBox.id, null, replyBox);
+
+      // TODO(markdittmer): Shouldn't there be an annotation for an errorBox
+      // somewhere here?
+      this.SUPER(null, this.BoxDAOListener.create({ box: replyBox }),
+                 predicate);
     }
-    // TODO(markdittmer): Implement listen() similar to ClientDAO.
   ]
 });
 
