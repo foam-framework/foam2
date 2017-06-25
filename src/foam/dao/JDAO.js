@@ -19,6 +19,7 @@ foam.INTERFACE({
   package: 'foam.dao',
   name: 'Journal',
   extends: 'foam.dao.Sink',
+
   methods: [
     function replay(dao) {}
   ]
@@ -52,13 +53,13 @@ if ( foam.isServer ) {
       function put(obj) {
         this.write_(
           Buffer.from("put(foam.json.parse(" +
-                     foam.json.Storage.stringify(obj) + "));\n"));
+              foam.json.Storage.stringify(obj) + "));\n"));
       },
 
       function remove(obj) {
         this.write_(
           Buffer.from("remove(foam.json.parse(" +
-                     foam.json.Storage.stringify(obj) + "));\n"));
+              foam.json.Storage.stringify(obj) + "));\n"));
       },
 
       function write_(data) {
@@ -78,7 +79,6 @@ if ( foam.isServer ) {
               reject(err);
               return;
             }
-
 
             var context = {
               put: function(o) { return dao.put(o); },
