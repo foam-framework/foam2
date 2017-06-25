@@ -57,6 +57,7 @@ foam.CLASS({
     'foam.box.RPCReturnBox',
     'foam.box.pipeline.Pipeline'
   ],
+
   imports: [
     'registry'
   ],
