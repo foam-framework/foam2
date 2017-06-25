@@ -24,6 +24,7 @@ foam.INTERFACE({
   ]
 });
 
+
 if ( foam.isServer ) {
   foam.CLASS({
     package: 'foam.dao',
@@ -46,17 +47,20 @@ if ( foam.isServer ) {
         factory: function() { return require('fs'); }
       }
     ],
+
     methods: [
       function put(obj) {
         this.write_(
           Buffer.from("put(foam.json.parse(" +
                      foam.json.Storage.stringify(obj) + "));\n"));
       },
+
       function remove(obj) {
         this.write_(
           Buffer.from("remove(foam.json.parse(" +
                      foam.json.Storage.stringify(obj) + "));\n"));
       },
+
       function write_(data) {
         var offset = this.offset;
         this.offset += data.length;
@@ -65,6 +69,7 @@ if ( foam.isServer ) {
           if ( err ) throw err;
         });
       },
+
       function replay(dao) {
         var self = this;
         return new Promise(function(resolve, reject) {
@@ -98,10 +103,12 @@ if ( foam.isServer ) {
   });
 }
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'JDAO',
   extends: 'foam.dao.PromisedDAO',
+
   properties: [
     'delegate',
     'journal',
