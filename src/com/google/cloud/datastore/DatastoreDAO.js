@@ -99,6 +99,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function sendRequest(name, objPayload) {
+      return this.getRequest(name, objPayload && JSON.stringify(objPayload))
+          .send();
+    },
     function getRequest(name, payload) {
       var headers = { Accept: 'application/json' };
       if ( payload ) headers['Content-Type'] = 'application/json';
@@ -114,22 +118,22 @@ foam.CLASS({
     function find_(x, idOrObj) {
       var key = foam.core.FObject.isInstance(idOrObj) ?
           idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
-      return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
+      return this.sendRequest('lookup', { keys: [ key ] })
           .then(this.onResponse.bind(this, 'find'))
           .then(this.onFindResponse.bind(this, x));
     },
     function put_(x, o) {
-      return this.getRequest('commit', JSON.stringify({
+      return this.sendRequest('commit', {
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { upsert: o.toDatastoreEntity() } ]
-      })).send().then(this.onResponse.bind(this, 'put'))
+      }).then(this.onResponse.bind(this, 'put'))
           .then(this.onPutResponse.bind(this, x, o));
     },
     function remove_(x, o) {
-      return this.getRequest('commit', JSON.stringify({
+      return this.sendRequest('commit', {
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { delete: o.getDatastoreKey() } ]
-      })).send().then(this.onResponse.bind(this, 'remove'))
+      }).then(this.onResponse.bind(this, 'remove'))
           .then(this.onRemoveResponse.bind(this, x, o));
     },
     function select_(x, sink, skip, limit, order, predicate) {
@@ -147,7 +151,7 @@ foam.CLASS({
       if ( sink.decorateDatastoreQuery )
         sink.decorateDatastoreQuery(query);
 
-      return this.getRequest('runQuery', JSON.stringify(payload)).send()
+      return this.sendRequest('runQuery', payload)
           .then(this.onResponse.bind(this, 'select'))
           .then(this.onSelectResponse.bind(
               this, this.SelectData.create({
@@ -189,7 +193,7 @@ foam.CLASS({
         }
         query.startCursor = batch.endCursor;
 
-        return this.getRequest('runQuery', JSON.stringify(payload)).send()
+        return this.sendRequest('runQuery', payload)
             .then(this.onResponse.bind(this, 'select'))
             .then(this.onSelectResponse.bind(this, data));
       }
@@ -212,7 +216,7 @@ foam.CLASS({
       var arr = arraySink.array;
       if ( arr.length === 0 ) return undefined;
 
-      return this.getRequest('beginTransaction').send()
+      return this.sendRequest('beginTransaction')
           .then(this.onResponse.bind(this, 'removeAll transaction'))
           .then(this.onRemoveAllTransactionResponse.bind(this, arr));
     },
@@ -309,11 +313,11 @@ foam.CLASS({
         deletes[i] = { delete: arr[i].getDatastoreKey() };
       }
 
-      this.getRequest('commit', JSON.stringify({
+      this.sendRequest('commit', {
         mode: 'TRANSACTIONAL',
         mutations: deletes,
         transaction: transaction
-      })).send().then(this.onResponse.bind(this, 'removeAll commit'))
+      }).then(this.onResponse.bind(this, 'removeAll commit'))
           .then(this.onRemoveAllResponse);
     },
     function onRemoveAllResponse(json) {

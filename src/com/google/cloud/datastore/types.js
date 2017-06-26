@@ -36,7 +36,7 @@ foam.LIB({
     {
       name: 'toDatastoreValue',
       code: (function() {
-        var NULL = {nullValue: null};
+        var NULL = { nullValue: null };
         return function toDatastoreValue() { return NULL; };
       })()
     },
@@ -53,8 +53,8 @@ foam.LIB({
     {
       name: 'toDatastoreValue',
       code: (function() {
-        var TRUE = {booleanValue: true};
-        var FALSE = {booleanValue: false};
+        var TRUE = { booleanValue: true };
+        var FALSE = { booleanValue: false };
         return function toDatastoreValue(b) { return b ? TRUE : FALSE; };
       })()
     },
@@ -78,10 +78,15 @@ foam.LIB({
   methods: [
     function toDatastoreValue(n) {
       return Number.isInteger(n) ? { integerValue: n.toString(10) } :
-          {doubleValue: n};
+          { doubleValue: n };
     },
     function fromDatastoreValue(v) {
-      if (v.doubleValue !== undefined) return v.doubleValue;
+      if ( v.value_type === 'doubleValue' || v.integerValue === undefined ) {
+        foam.assert(v.doubleValue !== undefined,
+                    'Non-integer number expects doubleValue');
+        return v.doubleValue;
+      }
+
       return parseInt(v.integerValue);
     }
   ]
