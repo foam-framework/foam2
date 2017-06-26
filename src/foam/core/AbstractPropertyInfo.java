@@ -1,12 +1,7 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 package foam.core;
 
 import foam.lib.parse.Parser;
+
 import java.util.Map;
 
 public abstract class AbstractPropertyInfo
