@@ -370,7 +370,7 @@ foam.CLASS({
       name: 'delegate',
       transient: true,
       factory: function() {
-        return this.registry.doLookup(this.name)
+        return this.registry.doLookup(this.name);
       }
     }
   ]

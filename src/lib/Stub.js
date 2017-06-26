@@ -166,7 +166,7 @@ foam.CLASS({
               isEnabled: m.isEnabled,
               replyPolicyName: replyPolicyName,
               boxPropName: name
-            })
+            });
           });
       }
     }
