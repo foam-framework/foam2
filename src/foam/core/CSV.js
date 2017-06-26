@@ -45,11 +45,6 @@ foam.CLASS({
       class: 'Function',
       name: 'propertyPredicate',
       value: function(o, p) { return ! p.transient; }
-    },
-    {
-      class: 'Boolean',
-      name: 'sortObjectKeys',
-      value: false
     }
   ],
 
