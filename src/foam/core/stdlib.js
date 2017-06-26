@@ -798,7 +798,7 @@ foam.LIB({
         var bType = typeOf(b);
         return aType.ordinal >= bType.ordinal ? aType.compare(a, b) :
             -bType.compare(b, a);
-      }
+      },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {
         var t = typeOf(a);
