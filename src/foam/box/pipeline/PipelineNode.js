@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -18,9 +17,9 @@
 
 foam.CLASS({
   package: 'foam.box.pipeline',
-  name: 'Pipeline',
+  name: 'PipelineNode',
 
-  documentation: `foam.box.PipelineBuilder object that encapsulates data related
+  documentation: `foam.box.PipelineManager object that encapsulates data related
       to runnable.`,
 
   requires: [
@@ -29,6 +28,7 @@ foam.CLASS({
     'foam.box.SkeletonBox',
     'foam.nanos.log.LogLevel'
   ],
+  imports: [ 'defaultErrorBox?' ],
 
   properties: [
     {
@@ -59,7 +59,7 @@ foam.CLASS({
       name: 'errorBox',
       documentation: 'Error box for RPC-related errors external to runnable.',
       factory: function() {
-        return this.LogBox.create({
+        return this.defaultErrorBox || this.LogBox.create({
           logLevel: this.LogLevel.ERROR
         });
       }

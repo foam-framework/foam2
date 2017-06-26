@@ -18,30 +18,32 @@
 
 foam.CLASS({
   package: 'foam.box.pipeline',
-  name: 'PipelineBuilder',
+  name: 'PipelineManager',
 
-  documentation: `A builder pattern for composing pipelines of foam.box.Runnable
-    instances. Pipelines may fork via multiple then()s or an all(), and may
-    merge via multiple first()s. Pipelines may not contain cycles.
+  documentation: `A manager for composing pipelines of foam.box.Runnable
+    instances. Pipelines may fork via multiple then()s. Manager's current
+    runnables may be bound together with bind(); this can be used to merge
+    pipelines. Pipelines may not contain cycles.
 
     Note that each runnable is registered as a service exactly once, even if
     a builder referring to pipeline stages is built multiple times.
 
     E.g.,
 
-    var b = PipelineBuilder.create();
+    var b = PipelineManager.create();
     var shared = b.then(sharedRunnable);
 
-    // Equivalent to shared.all(forkRunnable1, forkRunnable2).
     shared.then(forkRunnable1);
     shared.then(forkRunnable2);
 
-    shared.first(mergeRunnable1);
-    shared.first(mergeRunnable2);
+    var merge1Builder = PipelineManager.create().then(mergeRunnable1);
+    var merge2Builder = PipelineManager.create().then(mergeRunnable1);
+    merge1Builder.bind(shared);
+    merge2Builder.bind(shared);
 
-    // A builder referring to any stage in the pipeline will do here:
-    (/* b or */ shared).build();
-    // Yields array of input boxes for: [ mergeRunnable1, mergeRunnable2 ]
+    var inputToMerge1Runnable = merge1Builder.build();
+    var inputToMerge2Runnable = merge2Builder.build();
+    // Yields input boxes for mergeRunnable1 and mergeRunnable2
     // on pipeline:
     //
     // mergeRunnable1 --                       -- forkRunnable1
@@ -55,11 +57,12 @@ foam.CLASS({
     'foam.box.Message',
     'foam.box.RPCMessage',
     'foam.box.RPCReturnBox',
-    'foam.box.pipeline.Pipeline'
+    'foam.box.pipeline.PipelineNode'
   ],
 
   imports: [
-    'registry'
+    'registry',
+    'defaultOutputBox? as ctxDefaultOutputBox'
   ],
 
   classes: [
@@ -103,18 +106,20 @@ foam.CLASS({
       name: 'defaultOutputBox',
       documentation: `Output box used for end-of-computation (when no
           next-to-run delegates bound to this step in the pipeline).`,
-      factory: function() { return this.LogBox.create(); }
+      factory: function() {
+        return this.ctxDefaultOutputBox || this.LogBox.create();
+      }
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.box.pipeline.Pipeline',
+      of: 'foam.box.pipeline.PipelineNode',
       name: 'pipeline',
-      documentation: 'Pipeline step for encapsulating runnable.',
-      factory: function() { this.Pipeline.create(); }
+      documentation: 'PipelineNode step for encapsulating runnable.',
+      factory: function() { this.PipelineNode.create(); }
     },
     {
       class: 'FObjectArray',
-      of: 'foam.box.pipeline.PipelineBuilder',
+      of: 'foam.box.pipeline.PipelineManager',
       name: 'delegates',
       documentation: `Immediate next step(s) in the pipeline after this runnable
           step.`,
@@ -146,7 +151,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'foam.box.pipeline.PipelineBuilder',
+      of: 'foam.box.pipeline.PipelineManager',
       name: 'parents',
       documentation: `Immediate previous step(s) in the pipeline before this
           runnable step.`,
@@ -165,23 +170,23 @@ foam.CLASS({
     function init() {
       this.validate();
       foam.assert(this.Box.isInstance(this.registry),
-                  'Pipeline requires registry that implements Box');
+                  'PipelineNode requires registry that implements Box');
       this.SUPER();
     },
     {
       name: 'then',
-      returns: { typeName: 'foam.box.PipelineBuilder' },
+      returns: { typeName: 'foam.box.pipeline.PipelineManager' },
       args: [ { typeName: 'foam.box.Runnable' } ],
       documentation: `Append an immediate next step to pipeline.`,
       code: function(runnable) {
         var pl = this.pipeline;
         if ( ! pl ) {
-          this.pipeline = this.Pipeline.create({ runnable: runnable });
+          this.pipeline = this.PipelineNode.create({ runnable: runnable });
           return this;
         }
 
         var next = this.cls_.create({
-          pipeline: this.Pipeline.create({ runnable: runnable }),
+          pipeline: this.PipelineNode.create({ runnable: runnable }),
           parents: [ this ]
         }, this.__subContext__);
         this.delegates = this.delegates.concat([ next ]);
@@ -189,53 +194,17 @@ foam.CLASS({
       }
     },
     {
-      name: 'all',
-      documentation: `Append multiple immediate next steps to pipeline.`,
-      returns: { typeName: 'foam.box.PipelineBuilder' },
-      args: [ { typeName: 'foam.box.Runnable', repeats: true } ],
-      code: function() {
-        var ret = [];
-        for ( var i = 0; i < arguments.length; i++ ) {
-          ret.push(this.then(arguments[i]));
-        }
-        return ret;
-      }
-    },
-    {
-      name: 'first',
-      documentation: `Prepend an immediate previous step in the pipeline.`,
-      returns: { typeName: 'foam.box.PipelineBuilder' },
-      args: [ { typeName: 'foam.box.Runnable' } ],
-      code: function(runnable) {
-        var prev = this.cls_.create({
-          pipeline: this.Pipeline.create({ runnable: runnable }),
-          delegates: [ this ]
-        }, this.__subContext__);
-        this.parents = this.parents.concat([ prev ]);
-        return prev;
+      name: 'bind',
+      args: [ { typeName: 'foam.box.pipeline.PipelineManager' } ],
+      documentation: `Bind this pipeline manager's current runnable to
+          parameter's current runnable. Not a continuation (no return value).`,
+      code: function(pipelineBuilder) {
+        this.delegates = this.delegates.concat([ pipelineBuilder ]);
+        pipelineBuilder.parents = pipelineBuilder.parents.concat([ this ]);
       }
     },
     {
       name: 'build',
-      documentation: `Build the entire pipeline, assuming one head.`,
-      returns: {
-        typeName: 'foam.box.Box',
-        documentation: `An input box accepting messages containing the inputType
-            of head's runnable.`
-      },
-      code: function() {
-        if ( this.parents.length === 0 ) {
-          return this.build_();
-        } else if ( this.parents.length === 1 ) {
-          this.build_();
-          return this.parents[0].build();
-        }
-
-        throw new Error('Attempted PipelineBuilder.build() with multiple parents. Use PipelineBuilder.buildAll() on pipelines with mulitiple heads.');
-      }
-    },
-    {
-      name: 'buildAll',
       documentation: `Build the entire pipeline, allowing multiple heads.`,
       returns: {
         typeName: 'Array[foam.box.Box]',
@@ -244,16 +213,19 @@ foam.CLASS({
             the merge points in the pipeline.`
       },
       code: function() {
-        if ( this.parents.length === 0 ) return [ this.build_() ];
-
-        this.build_();
+        var ret = this.build_();
+        if ( this.parents.length === 0 ) return ret;
 
         // Flatten arrays of heads build_()ing backwards in the pipeline.
-        return this.parents.map(function(parent) { return parent.buildAll(); })
+        this.parents.map(function(parent) { return parent.build(); })
             .reduce(function(acc, v) { return acc.concat(v); }, []);
+
+        return ret;
       }
     },
     function build_() {
+      if ( this.builtInputBox_ ) return this.builtInputBox_;
+
       // Build forward, just in case build() was initiated in the middle of a
       // pipeline. NOTE: This is incompatible with circular pipelines.
       this.delegates.map(function(delegate) { return delegate.build_(); });
