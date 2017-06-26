@@ -396,7 +396,7 @@ foam.CLASS({
       `if ( o instanceof Number ) {
       return ((Number)o).intValue();
       } 
-      if ( o instanceof String) {
+      if ( o instanceof String ) {
          return Integer.valueOf((String) o);
       }
          return (int)o;`;

@@ -100,7 +100,7 @@ foam.CLASS({
 
         return foam.Date.compare(o1, o2);
       }
-    },
+    }
   ]
 });
 
@@ -111,8 +111,7 @@ foam.CLASS({
   extends: 'Date',
 
   documentation: 'Describes properties of type DateTime.',
-  label: 'Date and time',
-
+  label: 'Date and time'
 });
 
 
