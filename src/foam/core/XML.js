@@ -75,6 +75,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'formatDatesAsNumbers',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'outputDefaultValues',
       value: true
     },
