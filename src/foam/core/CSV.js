@@ -122,7 +122,7 @@ foam.CLASS({
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) { /* Ignore generic objects in CSV */ }
-      }, function(o, prefix) { return this.outputHeaderTitle(o, prefix); })
+      }, function(o, prefix) { this.outputHeaderTitle(o, prefix); })
     },
 
     function outputProperty(o, p) {
@@ -235,18 +235,18 @@ foam.LIB({
   name: 'foam.csv',
 
   constants: {
-    Compact: foam.csv.Outputter.create({
+    Standard: foam.csv.Outputter.create({
       includeQuotes: true
     }),
   },
 
   methods: [
     function toCSV(o) {
-      return foam.csv.Compact.toCSV(o);
+      return foam.csv.Standard.toCSV(o);
     },
 
     function fromCSV(className, s) {
-      return foam.csv.Compact.fromCSV(className, s);
+      return foam.csv.Standard.fromCSV(className, s);
     }
   ]
 });
