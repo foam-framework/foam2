@@ -16,11 +16,11 @@ public class OrderedDAO
     return this;
   }
 
-  public Sink select_(X x,Sink s, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x,Sink s, long skip, long limit, Comparator order, Predicate predicate) {
     return super.select_(x, s, skip, limit, order_ == null ? order : order_, predicate);
   }
 
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     super.removeAll_(x, skip, limit, order_ == null ? order : order_, predicate);
   }
 }
