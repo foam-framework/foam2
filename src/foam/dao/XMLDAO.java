@@ -75,12 +75,11 @@ public class XMLDAO
     this.setX(x);
     ListSink ls = new ListSink();
     this.select(ls);
-    List objList = ls.getData();
 
     try {
       XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
       XMLStreamWriter xmlStreamWriter = xMLOutputFactory.createXMLStreamWriter(new FileWriter(fileName));
-      XMLSupport.toXML(objList, xmlStreamWriter);
+      XMLSupport.toXML(ls.getData(), xmlStreamWriter);
       xmlStreamWriter.flush();
       xmlStreamWriter.close();
     } catch (IOException | XMLStreamException ex) {
