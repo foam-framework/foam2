@@ -10,7 +10,7 @@ public abstract class AbstractDAO
   extends    ContextAwareSupport
   implements DAO
 {
-  public final static long MAX_SAFE_INTEGER = 9007199254740991;
+  public final static long MAX_SAFE_INTEGER = 9007199254740991l;
 
   protected ClassInfo    of_                = null;
   protected PropertyInfo primaryKey_        = null;
