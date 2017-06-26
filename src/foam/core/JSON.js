@@ -156,6 +156,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'outputOwnPropertiesOnly',
+      documentation: 'If true expressions are not stored.',
       value: true
     },
     {

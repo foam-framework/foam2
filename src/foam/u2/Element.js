@@ -1945,6 +1945,8 @@ foam.CLASS({
         e.data$ = X.data$.dot(this.name);
       }
 
+      e.addClass('property-' + this.name);
+
       return e;
     }
   ]
