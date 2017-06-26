@@ -36,7 +36,7 @@ foam.LIB({
     {
       name: 'toDatastoreValue',
       code: (function() {
-        var NULL = { nullValue: null };
+        var NULL = {nullValue: null};
         return function toDatastoreValue() { return NULL; };
       })()
     },
@@ -53,8 +53,8 @@ foam.LIB({
     {
       name: 'toDatastoreValue',
       code: (function() {
-        var TRUE = { booleanValue: true };
-        var FALSE = { booleanValue: false };
+        var TRUE = {booleanValue: true};
+        var FALSE = {booleanValue: false};
         return function toDatastoreValue(b) { return b ? TRUE : FALSE; };
       })()
     },
@@ -78,15 +78,10 @@ foam.LIB({
   methods: [
     function toDatastoreValue(n) {
       return Number.isInteger(n) ? { integerValue: n.toString(10) } :
-          { doubleValue: n };
+          {doubleValue: n};
     },
     function fromDatastoreValue(v) {
-      if ( v.value_type === 'doubleValue' || v.integerValue === undefined ) {
-        foam.assert(v.doubleValue !== undefined,
-                    'Non-integer number expects doubleValue');
-        return v.doubleValue;
-      }
-
+      if (v.doubleValue !== undefined) return v.doubleValue;
       return parseInt(v.integerValue);
     }
   ]
@@ -132,17 +127,7 @@ foam.LIB({
       return { timestampValue: d.toISOString() };
     },
     function fromDatastoreValue(v) {
-      var tv = v.timestampValue;
-      if ( typeof tv === 'string' )
-        return new Date(Date.parse(tv));
-
-      var seconds = parseInt(tv.seconds);
-      var nanos = tv.nanos;
-      foam.assert( ! isNaN(seconds),
-                   'Expected non-string Datastore timestampValue to contain: ' +
-                   '{ seconds: "<seconds-since-epoch>", nanos: <nanos> }');
-
-      return new Date( ( seconds * 1000 ) + Math.floor(nanos / 1000000) );
+      return new Date(Date.parse(v.timestampValue));
     }
   ]
 });
@@ -163,23 +148,27 @@ foam.LIB({
         var key = keys[keys.length - 1];
         var cls = foam.lookup(key.kind);
         var id = key.name;
+
+        var o = cls.create(null, opt_ctx);
+
         var idProp = cls.ids && cls.ids.length === 1 ?
             cls.getAxiomByName(cls.ids[0]) :
             cls.getAxiomByName('id');
-        var opts = {};
 
+        // Multi-part IDs just set their sub-properties, which will be set using
+        // entity.properties anyway.
         if ( idProp && ! MultiPartID.isInstance(idProp) )
-          opts[idProp.name] = idProp.fromDatastoreKeyName(id);
+          o[idProp.name] = idProp.fromDatastoreKeyName(id);
 
         var props = entity.properties;
         for ( var name in props ) {
           if ( props.hasOwnProperty(name) ) {
-            opts[name] = com.google.cloud.datastore.fromDatastoreValue(
+            o[name] = com.google.cloud.datastore.fromDatastoreValue(
                 props[name], opt_ctx);
           }
         }
 
-        return cls.create(opts, opt_ctx);
+        return o;
       },
       function getOwnClassDatastoreKind() {
         return this.id;
@@ -237,12 +226,6 @@ foam.LIB({
           entityValue: foam.core.FObject
         };
         return function typeOfDatastoreValue(v) {
-          if ( v.hasOwnProperty('value_type') ) {
-            foam.assert(typeMap[v.value_type],
-                        'Expected datastore value with "value_type" to have ' +
-                        'known type; value_type = ' + v.value_type);
-            return typeMap[v.value_type];
-          }
           for ( var key in v ) {
             if ( typeMap[key] && v.hasOwnProperty(key) ) return typeMap[key];
           }
