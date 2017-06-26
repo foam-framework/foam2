@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,27 @@
  * limitations under the License.
  */
 
-package foam.core;
+foam.CLASS({
+  package: 'foam.box',
+  name: 'BroadcastBox',
+  implements: [ 'foam.box.Box' ],
 
-public interface X
-{
-  public Object get(Object key);
-  public Object get(X x, Object key);
-  public X put(Object key, Object value);
-  public X putFactory(Object key, XFactory factory);
+  documentation: `Broadcast all messages to multiple delegate boxes.`,
 
-  // Facet Manager
-  public Object getInstanceOf(Object value, Class type);
-  public <T> T create(Class<T> type);
-}
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.box.Box',
+      name: 'delegates'
+    }
+  ],
+
+  methods: [
+    function send(message) {
+      var ds = this.delegates;
+      for ( var i = 0; i < ds.length; i++ ) {
+        ds[i].send(message);
+      }
+    }
+  ]
+});
