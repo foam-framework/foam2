@@ -17,12 +17,6 @@ foam.CLASS({
       value: ''
     },
     {
-      class: 'Boolean',
-      name: 'includeQuotes',
-      help: 'If true, values are quoted with the `"` char',
-      value: true
-    },
-    {
       class: 'String',
       name: 'delimiter',
       value: ','
@@ -92,7 +86,7 @@ foam.CLASS({
 
     function outputHeaderTitle(o, prefix) {
       this.out(this.buf_.length ? this.delimiter : '')
-          .out(this.includeQuotes ? '"' : '', prefix, o, this.includeQuotes ? '"' : '');
+          .out(prefix, o);
     },
 
     function outputPropertyName(o, p, prefix) {
@@ -135,14 +129,8 @@ foam.CLASS({
       return this;
     },
 
-    function escape(str) {
-      return this.includeQuotes ? str.replace(/"/g, '\\"') : str;
-    },
-
     function outputPrimitive(val) {
-      this.out(this.buf_.length ? this.delimiter : '')
-          .out(this.includeQuotes ? ('"' + val + '"') : val);
-
+      this.out(this.buf_.length ? this.delimiter : '', val);
       return this;
     },
 
@@ -151,7 +139,7 @@ foam.CLASS({
       code: foam.mmethod({
         Undefined: function(o) { this.outputPrimitive(this.undefinedStr); },
         Null:      function(o) { this.outputPrimitive(null); },
-        String:    function(o) { this.outputPrimitive(this.escape(o)); },
+        String:    function(o) { this.outputPrimitive(o); },
         FObject:   function(o) {
           if ( o.outputCSV ) {
             o.outputCSV(this)
@@ -182,10 +170,10 @@ foam.CLASS({
       if ( lines.length == 0 ) throw 'Insufficient CSV Input'
 
       // Trims quotes and splits CSV row into array
-      var props = this.includeQuotes ? lines[0].slice(1, -1).split('","') : lines[0].split(',');
+      var props = lines[0].split(',');
 
       // Account for array of values (TODO?)
-      var values = this.includeQuotes ? lines[1].slice(1, -1).split('","') : lines[1].split(',');
+      var values = lines[1].split(',');
 
       // Calls for the creation of a new model
       return this.createModel(props, values, className);
@@ -235,9 +223,7 @@ foam.LIB({
   name: 'foam.csv',
 
   constants: {
-    Standard: foam.csv.Outputter.create({
-      includeQuotes: true
-    }),
+    Standard: foam.csv.Outputter.create(),
   },
 
   methods: [
