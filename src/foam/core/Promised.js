@@ -132,7 +132,8 @@ foam.CLASS({
           forwards:  [],
           factory: function() {
             return this[pendingState].create();
-          }
+          },
+          transient: true
         }),
         foam.core.Property.create({
           name: delegateName,
