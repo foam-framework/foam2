@@ -1724,6 +1724,7 @@ foam.CLASS({
       name: 'arg1'
     },
     {
+      class: 'Double',
       name: 'value',
       value: 0
     }
