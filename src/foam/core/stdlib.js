@@ -60,6 +60,10 @@
  *
  *   // Returns a hash of 'a' useful for hash tables
  *   hashCode(a) -> Int
+ *
+ *   // Returns true if the two values are the same instance
+ *   // or the same value for primitive types.
+ *   is(a, b) -> Boolean
  * }
  */
 
@@ -67,6 +71,7 @@ foam.LIB({
   name: 'foam.Undefined',
   methods: [
     function isInstance(o) { return o === undefined; },
+    function is(a, b) { return b === undefined; },
     function clone(o) { return o; },
     function equals(_, b) { return b === undefined; },
     function compare(_, b) { return b === undefined ? 0 : 1; },
@@ -79,6 +84,7 @@ foam.LIB({
   name: 'foam.Null',
   methods: [
     function isInstance(o) { return o === null; },
+    function is(a, b) { return b === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
     function compare(_, b) { return b === null ? 0 : 1; },
@@ -91,6 +97,7 @@ foam.LIB({
   name: 'foam.Boolean',
   methods: [
     function isInstance(o) { return typeof o === 'boolean'; },
+    function is(a, b) { return a === b; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -106,6 +113,7 @@ foam.LIB({
   name: 'foam.Function',
   methods: [
     function isInstance(o) { return typeof o === 'function'; },
+    function is(a, b) { return a === b },
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
@@ -360,8 +368,9 @@ foam.LIB({
   name: 'foam.Number',
   methods: [
     function isInstance(o) { return typeof o === 'number'; },
+    function is(a, b) { return foam.Number.compare(a, b) == 0; },
     function clone(o) { return o; },
-    function equals(a, b) { return a === b; },
+    function equals(a, b) { return foam.Number.compare(a, b) == 0; },
     function compare(a, b) {
       if ( ! foam.Number.isInstance(b) && isNaN(parseFloat(b))
           || ( isNaN(a) && ! isNaN(b)) ) return 1;
@@ -390,6 +399,7 @@ foam.LIB({
   name: 'foam.String',
   methods: [
     function isInstance(o) { return typeof o === 'string'; },
+    function is(a, b) { return a === b; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -505,6 +515,7 @@ foam.LIB({
   name: 'foam.Array',
   methods: [
     function isInstance(o) { return Array.isArray(o); },
+    function is(a, b) { return a === b; },
     function clone(o) {
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(o.length);
@@ -571,6 +582,7 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
+    function is(a, b) { return a === b; },
     function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
@@ -632,6 +644,7 @@ foam.LIB({
     /* istanbul ignore next */
     function isInstance(o) { return false; },
     function clone(o)      { return o ? o.clone() : this; },
+    function is(a, b)      { return a === b; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
     function compare(a, b) { return a.compareTo(b); },
@@ -649,6 +662,7 @@ foam.LIB({
         if ( obj.hasOwnProperty(key) ) f(obj[key], key);
       }
     },
+    function is(a, b) { return a === b; },
     function isInstance(o) {
       return typeof o === 'object' && ! Array.isArray(o) &&
           ! foam.core.FObject.isInstance(o);
@@ -772,6 +786,11 @@ foam.LIB({
     methods: [
       function clone(o)      { return typeOf(o).clone(o); },
       function equals(a, b)  { return typeOf(a).equals(a, b); },
+      function is(a, b) {
+        var aType = typeOf(a);
+        var bType = typeOf(b);
+        return aType === bType && aType.is(a, b);
+      },
       function compare(a, b) {
         // To ensure that symmetry is present when comparing,
         // we will always use the comparator of higher precedence.

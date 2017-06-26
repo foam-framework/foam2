@@ -19,10 +19,10 @@ package foam.core;
 
 public interface X
 {
-  public Object get(String name);
-  public Object get(X x, String name);
-  public X put(String name, Object value);
-  public X putFactory(String name, XFactory factory);
+  public Object get(Object key);
+  public Object get(X x, Object key);
+  public X put(Object key, Object value);
+  public X putFactory(Object key, XFactory factory);
 
   // Facet Manager
   public Object getInstanceOf(Object value, Class type);
