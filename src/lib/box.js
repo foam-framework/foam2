@@ -585,13 +585,85 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.box',
+  name: 'Event',
+
+  properties: [
+    {
+      name: 'topic'
+    },
+    {
+      name: 'args'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'Subscription',
+
+  properties: [
+    {
+      name: 'subscription',
+      transient: true
+    }
+  ],
+
+  methods: [ function detach() {
+    return this.subscription.detach();
+  } ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
+  name: 'SubscriptionStub',
+
+  properties: [
+    {
+      class: 'Stub',
+      of: 'foam.box.Subscription',
+      name: 'delegate'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.FObject',
+
+  methods: [
+    function subBox() {
+      var topic = Array.from(arguments);
+      topic.pop();
+
+      var box = arguments[arguments.length - 1];
+      arguments[arguments.length - 1] = function() {
+        return box.send(foam.box.Message.create({
+          object: foam.box.Event({ topic: topic, args: Array.from(arguments) })
+        }));
+      };
+      return this.__context__.registry.register(
+          null,
+          null,
+          // Self-unregistering box that implements .detach().
+          foam.box.ReplyBox.create({
+            delegate: foam.box.SkeletonBox.create({
+              data: foam.box.Subscription.create({
+                subscription: this.sub.apply(this, arguments)
+              }, this.__subContext__)
+            }, this.__subContext__)
+          }, this.__subContext__));
+    }
+  ]
+});
+
+foam.CLASS({
   package: 'foam.dao',
   name: 'BaseClientDAO',
   extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       class: 'Stub',
-      of: 'foam.dao.DAO',
+      of: 'foam.dao.AbstractDAO',
       name: 'delegate',
       methods: [
         'put_',
@@ -788,7 +860,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Stub',
-      of: 'foam.dao.DAO',
+      of: 'foam.dao.AbstractDAO',
       name: 'delegate',
       methods: [
         'put_',
