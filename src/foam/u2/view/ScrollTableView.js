@@ -47,7 +47,8 @@
           extent$: this.limit$,
           height: 40*18+48, // TODO use window height.
           width: 22,
-          handleSize: 40
+          handleSize: 40,
+          // TODO wire up mouse wheel
           // TODO clicking away from scroller should deselect it.
         });
       },
@@ -86,7 +87,6 @@
         // Convert to rows, rounding up. (Therefore minumum 1.)
         var rows = Math.ceil(Math.abs(e.deltaY) / /*self.rowHeight*/ 40);
         this.skip += negative ? -rows : rows;
-        e.preventDefault();
       }
     },
     {

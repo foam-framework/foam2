@@ -286,7 +286,7 @@ foam.CLASS({
             return this.
               E('tbody').
               select(this.orderedDAO$proxy, function(obj) {
-                return this.E('tr').
+                this.start('tr').
                   on('mouseover', function() { view.hoverSelection = obj; }).
                   on('click', function() {
                     view.selection = obj;
@@ -307,7 +307,8 @@ foam.CLASS({
                   }).
                   call(function() {
                     if ( view.editColumnsEnabled ) return this.tag('td'); 
-                  })
+                  }).
+                end();
               });
           }));
     }

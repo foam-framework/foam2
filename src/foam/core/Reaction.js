@@ -1,13 +1,6 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 foam.CLASS({
   package: 'foam.core',
   name: 'Reaction',
-
   properties: [
     {
       name: 'name',
@@ -27,7 +20,6 @@ foam.CLASS({
       name: 'listener'
     },
   ],
-
   methods: [
     function initObject(obj) {
       var listener = obj[this.listener];
@@ -67,10 +59,8 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   refines: 'foam.core.Model',
-
   properties: [
     {
       class: 'AxiomArray',
