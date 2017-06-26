@@ -55,12 +55,12 @@ public class JDAO
   }
 
   @Override
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
+    public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     return getDelegate().select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     // TODO: this is wrong, should only call journal.removeAll() if neither limit nor predicate
     // are set.
     journal.removeAll();
