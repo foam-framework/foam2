@@ -598,6 +598,7 @@ foam.CLASS({
         'remove_',
         'removeAll_',
         'select_',
+        'listen_',
         'find_'
       ]
     }
@@ -737,7 +738,7 @@ foam.CLASS({
     function removeAll_(x, skip, limit, order, predicate) {
         return this.SUPER(null, skip, limit, order, predicate);
     },
-    function listen(sink, predicate) {
+    function listen_(x, sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
       // TODO: Unsubscribe support.
       var id = foam.next$UID();
@@ -757,7 +758,7 @@ foam.CLASS({
           }
         });
 
-      this.SUPER(this.BoxDAOListener.create({
+      this.SUPER(null, this.BoxDAOListener.create({
         box: replyBox
       }), predicate);
     }
