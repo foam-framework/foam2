@@ -1,21 +1,9 @@
 /**
- * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+@license
+Copyright 2017 The FOAM Authors. All Rights Reserved.
+http://www.apache.org/licenses/LICENSE-2.0
+*/
 
-// Property refinement
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -215,7 +203,7 @@ foam.CLASS({
       return this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name)    
     },
 
-     function outputProperty(o, p) {
+    function outputProperty(o, p) {
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
 
@@ -319,9 +307,10 @@ foam.CLASS({
         Array: function(o) {
           // Nested Objects and FObject Arrays Passed
           for ( var i = 0 ; i < o.length ; i++ ) {
+            // Output 'value' tags for arrays containing non-FObject values
             if ( !o[i].of ) this.nl().indent().out("<value>");
             this.output(o[i], this);
-            if ( !o.of ) this.out("</value>");
+            if ( !o[i].of ) this.out("</value>");
           }
         },
         Object: function(o) {
@@ -342,46 +331,86 @@ foam.CLASS({
     },
 
     function stringify(o) {
-      this.output(o);
+      // Root tags of objects for array of FObjects 
+      if ( o instanceof Array ) {
+        this.start("<objects>");
+        this.output(o);
+        this.end("</objects>");
+      } else {
+        this.output(o);
+      }
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
     },
 
-    function createFObj (objClass, propObj) {
+    function ma (objClass, propObj) {
       return foam.lookup(objClass).create(propObj);
+    },
+
+    {
+      name: 'createFObj',
+      code: foam.mmethod({
+        Object: function (o) {
+          // Create FObject 
+          var className = o.className;
+          var obj = foam.lookup(className).create();
+          var props = o.children;
+
+          // Populate FObject with properties 
+          for ( propIndex = 0; propIndex < props.length; propIndex++ ) {
+            var currentProp = props[propIndex];
+            var prop = obj.cls_.getAxiomByName(currentProp.tagName);
+            var childName = currentProp.firstChild.localName;
+            // Specific case for array
+            if ( currentProp.className === 'Array' ) {
+              // Array of FObjects
+              if ( childName === 'object' ) {
+                var nestObjArray = Array.from(currentProp.firstChild.childNodes);
+                prop.set(obj, this.createFObj(nestObjArray));
+              } else {
+                // Array of other objects
+                var arrayValue = (Array.from(currentProp.children)).map( function (x) { return x.innerHTML; });
+                prop.set(obj, arrayValue);
+              }
+              continue;
+            }
+            if ( childName === 'object' ) {
+              var nestObj = this.createFObj(prop.firstChild);
+              prop.set(obj, nestObj);
+              continue;
+            } 
+            if ( currentProp.firstChild.nodeValue ) prop.set(obj, currentProp.firstChild.nodeValue);
+            if ( currentProp.firstChild.innerHTML ) prop.set(obj, currentProp.firstChild.innerHTML);
+          }
+          return obj;
+        },
+        Array: function (o) {
+          var fObjects = []
+          for ( index = 0; index < o.length; index++ ) {
+              fObjects.push(this.createFObj(o[index]));
+          }
+          return fObjects;
+        }
+      })
     },
 
     function objectify(o) {
       if ( !o ) throw 'Invalid XML Input' 
+      // Checking for string and if string is not empty
       if ( typeof o === 'string' && o ) {
-        // Convert xml string into an xml DOM object for node traversal
+         // Convert xml string into an xml DOM object for node traversal
         var parser = new DOMParser();
         var xmlDoc = parser.parseFromString(o, "text/xml");
-        var objects = xmlDoc.getElementsByTagName("object");
-        var fObjects = [];
-      
-        for ( objectIndex = 0; objectIndex < objects.length; objectIndex++ ) {
-          var className = objects[objectIndex].className;
-          var props = objects[objectIndex].children;
-          var obj = foam.lookup(className).create();
-
-          for ( propIndex = 0; propIndex < props.length; propIndex++ ) {
-            var currentProp = props[propIndex];
-            var prop = obj.cls_.getAxiomByName(currentProp.tagName);
-            if ( currentProp.className === 'Array' ) {
-              var arrayValue = (Array.from(currentProp.children)).map( function (x) {
-                  return x.innerHTML;
-              });
-              prop.set(obj, arrayValue);
-              continue;
-            }
-            // Check if there is value for currentProp. Otherwise, do not output
-            if ( currentProp.firstChild ) prop.set(obj, currentProp.firstChild.nodeValue);
-          }
-          fObjects.push(obj);
-        }
-        return fObjects;     
+        var rootName = xmlDoc.firstChild.nodeName;
+        // Check if multiple objects
+        if ( rootName === 'objects' ) {
+          return this.createFObj(Array.from(xmlDoc.firstChild.childNodes));
+        } else if ( rootName === 'object' ) {
+          //Single Object
+          var obj = xmlDoc.firstChild;
+          return this.createFObj(obj);
+        } 
       }
       throw 'Invalid XML string'
     },
@@ -431,59 +460,3 @@ foam.LIB({
     },
   ]
 });
-
-
-// {
-    //   name: 'objectify',
-    //   code: foam.mmethod({
-    //     Date: function(o) {
-    //       return this.formatDatesAsNumbers ? o.valueOf() : o;
-    //     },
-    //     Function: function(o) {
-    //       return this.formatFunctionsAsStrings ? o.toString() : o;
-    //     },
-    //     FObject: function(o) {
-    //       var m = {};
-    //       if ( this.outputClassNames ) {
-    //         m.class = o.cls_.id;
-    //       }
-    //       var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-    //       for ( var i = 0 ; i < ps.length ; i++ ) {
-    //         var p = ps[i];
-    //         if ( ! this.propertyPredicate(o, p) ) continue;
-    //         if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) continue;
-
-    //         m[p.name] = this.objectify(p.toXML(o[p.name], this));
-    //       }
-    //       return m;
-    //     },
-    //     Array: function(o) {
-    //       var a = [];
-    //       for ( var i = 0 ; i < o.length ; i++ ) {
-    //         a[i] = this.objectify(o[i]);
-    //       }
-    //       return a;
-    //     },
-    //     Object: function(o) {
-    //       var ret = {};
-    //       for ( var key in o ) {
-    //         // NOTE: Could lazily construct "ret" first time
-    //         // this.objectify(o[key]) !== o[key].
-    //         if ( o.hasOwnProperty(key) ) ret[key] = this.objectify(o[key]);
-    //       }
-    //       return ret;
-    //     }
-    //   },
-    //   function(o) { return o; })
-    // }
-
-    // function unescapeAttr(str) {
-    //   return str && str.replace(/&quot;/g, '"');
-    // },
-
-        // function unescape(str) {
-    //   return str && str.toString()
-    //     .replace(/&lt;/g, '<')
-    //     .replace(/&gt;/g, '>')
-    //     .replace(/&amp;/g, '&');
-    // },
