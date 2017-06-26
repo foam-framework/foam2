@@ -503,7 +503,7 @@ foam.CLASS({
       if ( o instanceof String ) {
         return Float.parseFloat((String) o);
       }
-        return (double)o; }`;
+        return (double)o;`;
 
       return info;
     }
