@@ -34,7 +34,7 @@ foam.CLASS({
       var topic = this.topic;
 
       if ( this.target === '' ) {
-        obj.onDetach(obj.sub.apply(obj, this.topic.concat(obj[listener])));
+        obj.onDetach(obj.sub.apply(obj, this.topic.concat(listener)));
         return;
       }
 
@@ -54,7 +54,7 @@ foam.CLASS({
         listener = function() {
           prevSub && prevSub.detach();
           var target = slot.get();
-          if ( target ) {
+          if ( target && foam.core.FObject.isInstance(target) ) {
             obj.onDetach(prevSub = target.sub.apply(target, args));
           }
         };
@@ -78,7 +78,7 @@ foam.CLASS({
       of: 'foam.core.Reaction',
       adaptArrayElement: function(e, prop) {
         return foam.Array.isInstance(e) ?
-          foam.core.Reaction.create({target: e[0], topic: e[1].split('.'), listener: e[2] }) :
+          foam.core.Reaction.create({target: e[0], topic: e[1] ? e[1].split('.') : [], listener: e[2] }) :
           e.class ? this.lookup(e.class).create(e, this) :
           this.lookup(prop.of).create(e, this);
       }
