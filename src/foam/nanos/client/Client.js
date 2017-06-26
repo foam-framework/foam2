@@ -8,9 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.client',
   name: 'Client',
 
+  implements: [ 'foam.box.Context' ],
+
   documentation: 'Client for connecting to NANOS server.',
 
   requires: [
+    'foam.box.HTTPBox',
+    'foam.dao.ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
@@ -20,6 +24,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.boot.NSpec',
     'foam.nanos.cron.Cron',
+    'foam.nanos.export.ExportDriverRegistry',
     'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test'
@@ -28,6 +33,7 @@ foam.CLASS({
   exports: [
     'countryDAO',
     'cronDAO',
+    'exportDriverRegistryDAO',
     'groupDAO',
     'languageDAO',
     'menuDAO',
@@ -43,6 +49,13 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
+        return this.ClientDAO.create({
+          of: this.NSpec,
+          delegate: this.HTTPBox.create({
+            method: 'POST',
+            url: 'http://localhost:8080/nSpecDAO'
+          })});
+        /*
         return this.createDAO({
           of: this.NSpec,
           seqNo: true,
@@ -56,6 +69,7 @@ foam.CLASS({
             { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
+        */
       }
     },
 
@@ -77,6 +91,21 @@ foam.CLASS({
             { code: 'UK', name: 'United Kingdom' },
             { code: 'US', name: 'USA' },
             { code: 'ZA', name: 'South Africa' }
+          ]
+        });
+      }
+    },
+
+    // TODO: change to client DAO
+    {
+      name: 'exportDriverRegistryDAO',
+      factory: function() {
+        return this.createDAO({
+          of: this.ExportDriverRegistry,
+          testData: [
+            { id: 'CSV',  driverName: 'net.nanopay.export.CSVDriver' },
+            { id: 'JSON', driverName: 'net.nanopay.export.JSONDriver' },
+            { id: 'XML',  driverName: 'net.nanopay.export.XMLDriver' }
           ]
         });
       }
@@ -111,6 +140,7 @@ foam.CLASS({
                 { parent: 'auth', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
                 { parent: 'auth', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
               { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+              { parent: 'admin', id: 'export',        label: 'Export Drivers',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
               { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', summaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
               { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' }  },
               { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },
