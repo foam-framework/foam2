@@ -37,7 +37,7 @@ public class XMLSupport {
             if ( xmlr.getLocalName().equals("object") ) {
               // Create new fObject
               String objClass = xmlr.getAttributeValue(null, "class");
-              Class<?> cls;
+              Class cls;
 
               try {
                 cls = Class.forName(objClass);
