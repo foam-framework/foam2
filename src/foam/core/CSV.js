@@ -33,10 +33,6 @@ foam.CLASS({
       value: '__'
     },
     {
-      class: 'StringArray',
-      name: 'nestedObjectNames'
-    },
-    {
       class: 'String',
       name: 'nlStr',
       value: '\n'
@@ -75,7 +71,7 @@ foam.CLASS({
     function outputHeader(o) {
       if ( ! this.outputHeaderRow ) return;
 
-      this.outputPropertyFilteredName(o);
+      this.outputPropertyFilteredName(o, '');
       this.out(this.nlStr);
     },
 
@@ -94,42 +90,39 @@ foam.CLASS({
       return ret;
     },
 
-    function outputHeaderTitle(o) {
+    function outputHeaderTitle(o, prefix) {
       this.out(this.buf_.length ? this.delimiter : '')
-          .out(this.includeQuotes ? '"' : '')
-          .writePrefix()
-          .out(o, this.includeQuotes ? '"' : '');
+          .out(this.includeQuotes ? '"' : '', prefix, o, this.includeQuotes ? '"' : '');
     },
 
-    function outputPropertyName(o, p) {
+    function outputPropertyName(o, p, prefix) {
       if ( ! this.propertyPredicate(o, p) ) return;
 
       // Checks if property is enum, or object with properties of its own
-      // TODO: Is this correct way to check if object has relevant sub-properties
       if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
-        this.start(p.name);
-        this.outputPropertyFilteredName(o[p.name]);
-        this.end();
+        // Appends object name to prefix for CSV Header
+        prefix += p.name + this.nestedObjectSeperator;
+        this.outputPropertyFilteredName(o[p.name], prefix);
       } else {
-        this.outputPropertyFilteredName(p.name);
+        this.outputPropertyFilteredName(p.name, prefix);
       }
     },
 
     {
       name: 'outputPropertyFilteredName',
       code: foam.mmethod({
-        FObject:   function(o) {
+        FObject:   function(o, prefix) {
           // Gets and recurses through object properties
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputPropertyName(o, ps[i]);
+            this.outputPropertyName(o, ps[i], prefix);
           }
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) { /* Ignore generic objects in CSV */ }
-      }, function(o) { this.outputHeaderTitle(o); })
+      }, function(o, prefix) { return this.outputHeaderTitle(o, prefix); })
     },
 
     function outputProperty(o, p) {
@@ -139,26 +132,6 @@ foam.CLASS({
 
     function reset() {
       this.buf_ = '';
-      return this;
-    },
-
-    // Starts a nested object, 1 more `__` with object name
-    function start(objectName) {
-      this.nestedObjectNames.push(objectName);
-      return this;
-    },
-
-    function writePrefix() {
-      for ( var i = 0 ; i < this.nestedObjectNames.length ; i++ ) {
-        this.out(this.nestedObjectNames[i] + this.nestedObjectSeperator);
-      }
-
-      return this;
-    },
-
-    // End a nested object, 1 fewer `__` within object name
-    function end() {
-      this.nestedObjectNames.pop();
       return this;
     },
 
@@ -203,7 +176,7 @@ foam.CLASS({
     },
 
     function fromCSV(className, s) {
-      if ( ! s ) throw 'Invalid CSV Input'
+      if ( ! s ) throw 'Invalid CSV input to convert. Arguments must be (className, csvString).'
       var lines = s.split('\n');
 
       if ( lines.length == 0 ) throw 'Insufficient CSV Input'
