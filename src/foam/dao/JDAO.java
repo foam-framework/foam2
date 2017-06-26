@@ -6,6 +6,7 @@
 
 package foam.dao;
 
+import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.X;
 import foam.mlang.order.Comparator;
