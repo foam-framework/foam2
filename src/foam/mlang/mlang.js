@@ -105,15 +105,6 @@ foam.CLASS({
 });
 
 
-foam.CLASS({
-  package: 'foam.mlang',
-  name: 'SinkProperty',
-  extends: 'FObjectProperty',
-
-  documentation: 'Property for Sink values.'
-});
-
-
 foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
@@ -207,14 +198,6 @@ foam.CLASS({
     function toDisjunctiveNormalForm() { return this; },
 
     function partialEval() { return this; },
-
-    function reduceAnd(other) {
-      return foam.util.equals(this, other) ? this : null;
-    },
-
-    function reduceOr(other) {
-      return foam.util.equals(this, other) ? this : null;
-    },
 
     function toString() { return this.cls_.name; }
   ]
@@ -353,21 +336,6 @@ foam.CLASS({
       }
       return s + ')';
     },
-    function reduce_(args, shortCircuit, methodName) {
-      for ( var i = 0; i < args.length - 1; i++ ) {
-        for ( var j = i + 1; j < args.length; j++ ) {
-          if ( args[i][methodName] ) {
-            var newArg = args[i][methodName](args[j]);
-            if ( newArg ) {
-              if ( newArg === shortCircuit ) return shortCircuit;
-              args[i] = newArg;
-              args.splice(j, 1);
-            }
-          }
-        }
-      }
-      return args;
-    }
   ]
 });
 
@@ -424,7 +392,22 @@ foam.CLASS({
         }
       }
 
-      this.reduce_(newArgs, FALSE, 'reduceAnd');
+      /*
+      TODO(braden): Implement partialOr and PARTIAL_OR_RULES, for full partial
+      eval support. Currently this is only dropping FALSE, and short-circuiting
+      on TRUE.
+
+      for ( var i = 0 ; i < newArgs.length-1 ; i++ ) {
+        for ( var j = i+1 ; j < newArgs.length ; j++ ) {
+          var a = this.partialOr(newArgs[i], newArgs[j]);
+          if ( a ) {
+            if ( a === TRUE ) return TRUE;
+            newArgs[i] = a;
+            newArgs.splice(j, 1);
+          }
+        }
+      }
+      */
 
       if ( newArgs.length === 0 ) return FALSE;
       if ( newArgs.length === 1 ) return newArgs[0];
@@ -513,7 +496,21 @@ foam.CLASS({
         }
       }
 
-      this.reduce_(newArgs, TRUE, 'reduceOr');
+      /*
+      TODO(braden): Implement partialAnd and PARTIAL_AND_RULES, for full partial
+      eval support. Currently it just drops TRUE and bails on FALSE.
+
+      for ( var i = 0; i < newArgs.length - 1; i++ ) {
+        for ( var j = i + 1; j < newArgs.length; j++ ) {
+          var a = this.partialAnd(newArgs[i], newArgs[j]);
+          if ( a ) {
+            if ( a === FALSE ) return FALSE;
+            newArgs[i] = a;
+            newArgs.splice(j, 1);
+          }
+        }
+      }
+      */
 
       if ( newArgs.length === 0 ) return TRUE;
       if ( newArgs.length === 1 ) return newArgs[0];
@@ -751,14 +748,9 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'In',
   extends: 'foam.mlang.predicate.Binary',
-  implements: [
-    'foam.core.Serializable',
-    'foam.mlang.Expressions'
-  ],
+  implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2.',
-
-  requires: [ 'foam.mlang.Constant' ],
 
   properties: [
     {
@@ -789,7 +781,7 @@ foam.CLASS({
       var rhs = this.arg2.f(o);
 
       // If arg2 is a constant array, we use valueSet for it.
-      if ( this.Constant.isInstance(this.arg2) ) {
+      if ( foam.mlang.Constant.isInstance(this.arg2) ) {
         if ( ! this.valueSet_ ) {
           var set = {};
           for ( var i = 0 ; i < rhs.length ; i++ ) {
@@ -804,11 +796,6 @@ foam.CLASS({
       }
 
       return rhs ? rhs.indexOf(lhs) !== -1 : false;
-    },
-    function partialEval() {
-      if ( ! this.Constant.isInstance(this.arg2) ) return this;
-
-      return this.arg2.value.length === 0 ? this.FALSE : this;
     }
   ]
 });
@@ -926,7 +913,6 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Eq',
   extends: 'foam.mlang.predicate.Binary',
-
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Binary Predicate returns true iff arg1 EQUALS arg2.',
@@ -941,35 +927,6 @@ foam.CLASS({
         // First check is so that EQ(Class.PROPERTY, null | undefined) works.
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       }
-    },
-
-    function reduceAnd(other) {
-      var myArg1           = this.arg1;
-      var myArg2           = this.arg2;
-      var otherArg1        = other.arg1;
-      var otherArg2        = other.arg2;
-      var isConst          = foam.mlang.Constant.isInstance.bind(foam.mlang.Constant);
-      var myArg1IsConst    = isConst(myArg1);
-      var myArg2IsConst    = isConst(myArg2);
-      var otherArg1IsConst = isConst(otherArg1);
-      var otherArg2IsConst = isConst(otherArg2);
-
-      // Require one const, one non-const in this and other.
-      if ( myArg1IsConst === myArg2IsConst || otherArg1IsConst === otherArg2IsConst )
-        return this.SUPER(other);
-
-      // Require same expr.
-      var myExpr    = myArg1IsConst ? myArg2 : myArg1;
-      var otherExpr = otherArg1IsConst ? otherArg2 : otherArg1;
-      var equals    = foam.util.equals;
-
-      if ( ! equals(myExpr, otherExpr) ) return this.SUPER(other);
-
-      // Reduce to FALSE when consts are not equal.
-      var myConst    = myArg1IsConst    ? myArg1    : myArg2;
-      var otherConst = otherArg1IsConst ? otherArg1 : otherArg2;
-
-      return equals(myConst, otherConst) ? this.SUPER(other) : this.FALSE;
     }
   ]
 });
@@ -1239,7 +1196,7 @@ foam.CLASS({
       name: 'arg1'
     },
     {
-      class: 'foam.mlang.SinkProperty',
+      class: 'foam.mlang.ExprProperty',
       name: 'arg2'
     },
     {

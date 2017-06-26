@@ -9,22 +9,16 @@ package foam.dao;
 import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.X;
+import java.io.IOException;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import java.io.IOException;
 
-public class JDAO
+public class JournaledDAO
   extends ProxyDAO
 {
   protected FileJournal journal;
 
-  public JDAO(ClassInfo classInfo, String filename) throws IOException {
-    journal = new FileJournal(filename);
-    setDelegate(new MapDAO().setOf(classInfo));
-    journal.replay(getDelegate());
-  }
-
-  public JDAO(DAO delegate, String filename) throws IOException {
+  public JournaledDAO(DAO delegate, String filename) throws IOException {
     journal = new FileJournal(filename);
     setDelegate(delegate);
     journal.replay(delegate);
@@ -50,9 +44,23 @@ public class JDAO
   }
 
   @Override
+<<<<<<< HEAD:src/foam/dao/JDAO.java
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     // TODO: this is wrong, should only call journal.removeAll() if neither limit nor predicate
     // are set.
+=======
+  public FObject find_(X x, Object id) {
+    return null;
+  }
+
+  @Override
+  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
+    return null;
+  }
+
+  @Override
+  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+>>>>>>> Revert "Merge branch 'master' into master":src/foam/dao/JournaledDAO.java
     journal.removeAll();
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }

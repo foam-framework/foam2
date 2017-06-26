@@ -1,0 +1,1126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d45d6d93-9bd8-49e0-9b38-67eae8979302" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/BroadcastBox.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/LogBox.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/Runnable.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/node/ForkBox.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/node/forkScript.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/pipeline/Pipeline.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/pipeline/PipelineBuilder.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/box/pipeline/PipelineBuilderNonRPC.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/core/ContextAgent.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/dao/JDAO.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/dao/NoDisjunctionDAO.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/export/CSVDriver.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/export/ExportDriver.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/export/ExportDriverRegistry.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/export/ExportService.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/export/JSONDriver.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/export/XMLDriver.js" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/http/NanoServlet.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/http/NanoServletHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/foam/nanos/http/WebAgent.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/gcloud/src/NoDisjunctionDatastoreDAO.js" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/foam/dao/JDAO.js" afterPath="$PROJECT_DIR$/src/foam/dao/JournaledDAO.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AUTHORS" afterPath="$PROJECT_DIR$/AUTHORS" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/cloud/datastore/DatastoreDAO.js" afterPath="$PROJECT_DIR$/src/com/google/cloud/datastore/DatastoreDAO.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/cloud/datastore/types.js" afterPath="$PROJECT_DIR$/src/com/google/cloud/datastore/types.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/files.js" afterPath="$PROJECT_DIR$/src/files.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractBooleanPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractBooleanPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractBytePropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractBytePropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractDoublePropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractDoublePropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractFObject.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractFObject.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractFObjectPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractFObjectPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractIntPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractIntPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractLongPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractLongPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractObjectPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractObjectPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractShortPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractShortPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/AbstractStringPropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/AbstractStringPropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ClassInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/ClassInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ClassInfoImpl.java" afterPath="$PROJECT_DIR$/src/foam/core/ClassInfoImpl.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/CompoundKey.java" afterPath="$PROJECT_DIR$/src/foam/core/CompoundKey.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ContextAware.java" afterPath="$PROJECT_DIR$/src/foam/core/ContextAware.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ContextAwareSupport.java" afterPath="$PROJECT_DIR$/src/foam/core/ContextAwareSupport.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ContextMultipleInheritence.js" afterPath="$PROJECT_DIR$/src/foam/core/ContextMultipleInheritence.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/Detachable.java" afterPath="$PROJECT_DIR$/src/foam/core/Detachable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/EmptyClassInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/EmptyClassInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/EmptyX.java" afterPath="$PROJECT_DIR$/src/foam/core/EmptyX.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/Enum.js" afterPath="$PROJECT_DIR$/src/foam/core/Enum.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/FObject.java" afterPath="$PROJECT_DIR$/src/foam/core/FObject.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/FObject.js" afterPath="$PROJECT_DIR$/src/foam/core/FObject.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/FacetManager.java" afterPath="$PROJECT_DIR$/src/foam/core/FacetManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/IDSupport.js" afterPath="$PROJECT_DIR$/src/foam/core/IDSupport.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ImportsExports.js" afterPath="$PROJECT_DIR$/src/foam/core/ImportsExports.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/Interface.js" afterPath="$PROJECT_DIR$/src/foam/core/Interface.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/JSON.js" afterPath="$PROJECT_DIR$/src/foam/core/JSON.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/Journal.java" afterPath="$PROJECT_DIR$/src/foam/core/Journal.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/Promised.js" afterPath="$PROJECT_DIR$/src/foam/core/Promised.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/PropertyInfo.java" afterPath="$PROJECT_DIR$/src/foam/core/PropertyInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/ProxyX.java" afterPath="$PROJECT_DIR$/src/foam/core/ProxyX.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/Reaction.js" afterPath="$PROJECT_DIR$/src/foam/core/Reaction.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/SimpleFacetManager.java" afterPath="$PROJECT_DIR$/src/foam/core/SimpleFacetManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/SingletonFactory.java" afterPath="$PROJECT_DIR$/src/foam/core/SingletonFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/X.java" afterPath="$PROJECT_DIR$/src/foam/core/X.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/XFactory.java" afterPath="$PROJECT_DIR$/src/foam/core/XFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/core/types.js" afterPath="$PROJECT_DIR$/src/foam/core/types.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/AbstractDAO.java" afterPath="$PROJECT_DIR$/src/foam/dao/AbstractDAO.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/AbstractDAO.js" afterPath="$PROJECT_DIR$/src/foam/dao/AbstractDAO.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/DAO.js" afterPath="$PROJECT_DIR$/src/foam/dao/DAO.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/DAOJava.js" afterPath="$PROJECT_DIR$/src/foam/dao/DAOJava.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/EasyDAO.js" afterPath="$PROJECT_DIR$/src/foam/dao/EasyDAO.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/IDBDAO.js" afterPath="$PROJECT_DIR$/src/foam/dao/IDBDAO.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/JournaledDAO.java" afterPath="$PROJECT_DIR$/src/foam/dao/JournaledDAO.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/dao/daoUtils.js" afterPath="$PROJECT_DIR$/src/foam/dao/daoUtils.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/java/Interface.js" afterPath="$PROJECT_DIR$/src/foam/java/Interface.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/java/Method.js" afterPath="$PROJECT_DIR$/src/foam/java/Method.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/java/refinements.js" afterPath="$PROJECT_DIR$/src/foam/java/refinements.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/mlang/mlang.js" afterPath="$PROJECT_DIR$/src/foam/mlang/mlang.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/mlang/mlangJava.js" afterPath="$PROJECT_DIR$/src/foam/mlang/mlangJava.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/auth/AuthMOP.java" afterPath="$PROJECT_DIR$/src/foam/nanos/auth/AuthMOP.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/auth/UserAndGroupAuthServiceTest.java" afterPath="$PROJECT_DIR$/src/foam/nanos/auth/UserAndGroupAuthServiceTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/boot/Boot.java" afterPath="$PROJECT_DIR$/src/foam/nanos/boot/Boot.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/boot/NSpec.js" afterPath="$PROJECT_DIR$/src/foam/nanos/boot/NSpec.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/client/Client.js" afterPath="$PROJECT_DIR$/src/foam/nanos/client/Client.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/http/FileServlet.java" afterPath="$PROJECT_DIR$/src/foam/nanos/http/FileServlet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/http/NanoHttpHandler.java" afterPath="$PROJECT_DIR$/src/foam/nanos/http/NanoHttpHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/http/ServiceServlet.java" afterPath="$PROJECT_DIR$/src/foam/nanos/http/ServiceServlet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/http/ServicesWebAgent.java" afterPath="$PROJECT_DIR$/src/foam/nanos/http/ServicesWebAgent.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/http/ServletHandler.java" afterPath="$PROJECT_DIR$/src/foam/nanos/http/ServletHandler.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/http/WebAgentServlet.java" afterPath="$PROJECT_DIR$/src/foam/nanos/http/WebAgentServlet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/nanos.js" afterPath="$PROJECT_DIR$/src/foam/nanos/nanos.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/nanos/test/TestRunner.java" afterPath="$PROJECT_DIR$/src/foam/nanos/test/TestRunner.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/u2/Element.js" afterPath="$PROJECT_DIR$/src/foam/u2/Element.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/u2/ListCreateController.js" afterPath="$PROJECT_DIR$/src/foam/u2/ListCreateController.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/u2/view/ScrollTableView.js" afterPath="$PROJECT_DIR$/src/foam/u2/view/ScrollTableView.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/foam/u2/view/TableView.js" afterPath="$PROJECT_DIR$/src/foam/u2/view/TableView.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/lib/Stub.js" afterPath="$PROJECT_DIR$/src/lib/Stub.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/lib/box.js" afterPath="$PROJECT_DIR$/src/lib/box.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/lib/node/net.js" afterPath="$PROJECT_DIR$/src/lib/node/net.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/services" afterPath="$PROJECT_DIR$/src/services" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/browser/DAOByExample.html" afterPath="$PROJECT_DIR$/test/browser/DAOByExample.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/src/core/Enum.js" afterPath="$PROJECT_DIR$/test/src/core/Enum.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/src/core/types.js" afterPath="$PROJECT_DIR$/test/src/core/types.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/src/lib/node/journaledDao.js" afterPath="$PROJECT_DIR$/test/src/lib/node/journaledDao.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/third_party/run_tests.sh" afterPath="$PROJECT_DIR$/test/third_party/run_tests.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tools/classes.js" afterPath="$PROJECT_DIR$/tools/classes.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tools/genjava.js" afterPath="$PROJECT_DIR$/tools/genjava.js" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="XMLSupport.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/XMLSupport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="781">
+              <caret line="187" column="32" lean-forward="false" selection-start-line="187" selection-start-column="32" selection-end-line="187" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="box.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/lib/box.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="928">
+              <caret line="1739" column="0" lean-forward="true" selection-start-line="1739" selection-start-column="0" selection-end-line="1739" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractBooleanPropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractBooleanPropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#278#279#0" expanded="true" />
+                <element signature="e#318#319#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractLongPropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractLongPropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#269#270#0" expanded="true" />
+                <element signature="e#316#317#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractObjectPropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractObjectPropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#275#276#0" expanded="true" />
+                <element signature="e#322#323#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractPropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractPropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#445#446#0" expanded="true" />
+                <element signature="e#468#469#0" expanded="true" />
+                <element signature="e#664#665#0" expanded="true" />
+                <element signature="e#685#686#0" expanded="true" />
+                <element signature="e#729#730#0" expanded="true" />
+                <element signature="e#752#753#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractShortPropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractShortPropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#272#273#0" expanded="true" />
+                <element signature="e#310#311#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AbstractStringPropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractStringPropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="e#275#276#0" expanded="true" />
+                <element signature="e#308#309#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PropertyInfo.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/foam/core/PropertyInfo.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AUTHORS" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/AUTHORS">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>date</find>
+      <find>fileName</find>
+      <find>if</find>
+      <find>while</find>
+      <find>daoToXML</find>
+      <find>switch</find>
+      <find>getAxiu</find>
+      <find>c</find>
+      <find>cle</find>
+      <find>clea</find>
+      <find>clear</find>
+      <find>clearP</find>
+      <find>clearPropert</find>
+      <find>clearProper</find>
+      <find>o</find>
+      <find>clearPr</find>
+      <find>fi</find>
+      <find>ToXML</find>
+      <find>writeObje</find>
+      <find>writeToXML</find>
+      <find>&gt;&gt;&gt;</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/foam/core/types.js" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractDatePropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/files.js" />
+        <option value="$PROJECT_DIR$/src/foam/core/XML.js" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractFObject.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractFObjectPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/XMLSupport.java" />
+        <option value="$PROJECT_DIR$/src/foam/dao/XMLDAO.java" />
+        <option value="$PROJECT_DIR$/src/foam/java/refinements.js" />
+        <option value="$PROJECT_DIR$/src/foam/dao/JournaledDAO.java" />
+        <option value="$PROJECT_DIR$/src/lib/box.js" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractBooleanPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractBytePropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractDoublePropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractIntPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractLongPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractObjectPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractShortPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/AbstractStringPropertyInfo.java" />
+        <option value="$PROJECT_DIR$/src/foam/core/PropertyInfo.java" />
+        <option value="$PROJECT_DIR$/AUTHORS" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-253" />
+    <option name="y" value="-1080" />
+    <option name="width" value="1920" />
+    <option name="height" value="1080" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="FullScreen" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="JarApplication" factoryName="JAR Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Java Scratch" factoryName="Java Scratch">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="SCRATCH_FILE_ID" value="0" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d45d6d93-9bd8-49e0-9b38-67eae8979302" name="Default" comment="" />
+      <created>1497465693922</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1497465693922</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-253" y="-1080" width="1920" height="1080" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.09904154" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/foam/java/refinements.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8595">
+          <caret line="573" column="0" lean-forward="false" selection-start-line="573" selection-start-column="0" selection-end-line="573" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/XMLDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="555">
+          <caret line="45" column="3" lean-forward="false" selection-start-line="45" selection-start-column="3" selection-end-line="45" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/XMLSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="61" column="37" lean-forward="false" selection-start-line="61" selection-start-column="37" selection-end-line="61" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/X.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractDatePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/LoggingDAO.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/types.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1545">
+          <caret line="103" column="0" lean-forward="false" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/java/refinements.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5520">
+          <caret line="368" column="5" lean-forward="false" selection-start-line="368" selection-start-column="5" selection-end-line="368" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/XMLSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2340">
+          <caret line="156" column="40" lean-forward="false" selection-start-line="156" selection-start-column="40" selection-end-line="156" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractDatePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="14" column="3" lean-forward="false" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractObjectPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="2" lean-forward="false" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractDoublePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractBytePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/PropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="2" lean-forward="false" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="7" column="2" lean-forward="false" selection-start-line="7" selection-start-column="2" selection-end-line="7" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractIntPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="2" lean-forward="false" selection-start-line="3" selection-start-column="2" selection-end-line="3" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractDatePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/types.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1275">
+          <caret line="85" column="28" lean-forward="false" selection-start-line="85" selection-start-column="24" selection-end-line="85" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/java/refinements.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13815">
+          <caret line="921" column="0" lean-forward="false" selection-start-line="921" selection-start-column="0" selection-end-line="921" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/XMLDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1035">
+          <caret line="76" column="0" lean-forward="false" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/XMLSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="25" column="9" lean-forward="false" selection-start-line="25" selection-start-column="9" selection-end-line="25" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/index/XMLDAO.java" />
+    <entry file="file://$PROJECT_DIR$/src/foam/core/types.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="65">
+          <caret line="103" column="0" lean-forward="false" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/X.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/LoggingDAO.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/Slot.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/DAO.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="15" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/FObject.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4200">
+          <caret line="280" column="30" lean-forward="false" selection-start-line="280" selection-start-column="30" selection-end-line="280" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/Property.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6390">
+          <caret line="426" column="24" lean-forward="false" selection-start-line="426" selection-start-column="17" selection-end-line="426" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/files.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="945">
+          <caret line="63" column="29" lean-forward="false" selection-start-line="63" selection-start-column="29" selection-end-line="63" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractDatePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractFObjectPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="1" lean-forward="false" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractFObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="871">
+          <caret line="79" column="1" lean-forward="false" selection-start-line="79" selection-start-column="1" selection-end-line="79" selection-end-column="1" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/XMLDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="531">
+          <caret line="40" column="7" lean-forward="false" selection-start-line="40" selection-start-column="7" selection-end-line="40" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/java/refinements.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1108">
+          <caret line="851" column="6" lean-forward="false" selection-start-line="851" selection-start-column="6" selection-end-line="851" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/XML.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="3" lean-forward="false" selection-start-line="0" selection-start-column="3" selection-end-line="0" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/XMLSupport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="781">
+          <caret line="187" column="32" lean-forward="false" selection-start-line="187" selection-start-column="32" selection-end-line="187" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/dao/JournaledDAO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/lib/box.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="928">
+          <caret line="1739" column="0" lean-forward="true" selection-start-line="1739" selection-start-column="0" selection-end-line="1739" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractBooleanPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#278#279#0" expanded="true" />
+            <element signature="e#318#319#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractBytePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractDoublePropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="40" lean-forward="true" selection-start-line="8" selection-start-column="40" selection-end-line="8" selection-end-column="40" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractIntPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#266#267#0" expanded="true" />
+            <element signature="e#306#307#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractLongPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#269#270#0" expanded="true" />
+            <element signature="e#316#317#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractObjectPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="0" lean-forward="true" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#275#276#0" expanded="true" />
+            <element signature="e#322#323#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#445#446#0" expanded="true" />
+            <element signature="e#468#469#0" expanded="true" />
+            <element signature="e#664#665#0" expanded="true" />
+            <element signature="e#685#686#0" expanded="true" />
+            <element signature="e#729#730#0" expanded="true" />
+            <element signature="e#752#753#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractShortPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#272#273#0" expanded="true" />
+            <element signature="e#310#311#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/AbstractStringPropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="e#275#276#0" expanded="true" />
+            <element signature="e#308#309#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/foam/core/PropertyInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AUTHORS">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

@@ -258,14 +258,6 @@ foam.CLASS({
       return this.find_(this.__context__, id);
     },
 
-    function cmd_(x, obj) {
-      return undefined;
-    },
-
-    function cmd(obj) {
-      return this.cmd_(this.__context__, obj);
-    },
-
     // Placeholder functions to that selecting from DAO to DAO works.
     /** @private */
     function eof() {},
@@ -324,7 +316,7 @@ foam.CLASS({
       of: 'foam.dao.DAO',
       name: 'delegate',
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_' ]
+      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_' ]
     }
   ],
 

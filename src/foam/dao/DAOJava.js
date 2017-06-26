@@ -250,30 +250,6 @@ foam.INTERFACE({
           javaType:  'foam.core.X'
         }
       ]
-    },
-    {
-      name: 'cmd',
-      javaReturns: 'Object',
-      args: [
-        {
-          name: 'obj',
-          javaType:  'Object'
-        }
-      ]
-    },
-    {
-      name: 'cmd_',
-      javaReturns: 'Object',
-      args: [
-        {
-          name: 'x',
-          javaType:  'foam.core.X'
-        },
-        {
-          name: 'obj',
-          javaType:  'Object'
-        },
-      ]
     }
   ]
 });
