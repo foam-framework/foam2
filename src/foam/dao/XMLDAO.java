@@ -28,12 +28,10 @@ public class XMLDAO
 
   // Read file and read data in the DAO
   public void init() throws IOException {
-    X x = new ProxyX();
-    this.setX(x);
     List<FObject> objList;
 
     try {
-      objList = XMLSupport.fromXML(x, fileName);
+      objList = XMLSupport.fromXML(this.getX(), fileName);
       Iterator i = objList.iterator();
       while ( i.hasNext() ) {
         FObject currentObj = (FObject)i.next();
@@ -71,8 +69,6 @@ public class XMLDAO
   }
 
   public void daoToXML () {
-    X x = new ProxyX();
-    this.setX(x);
     ListSink ls = new ListSink();
     this.select(ls);
 
