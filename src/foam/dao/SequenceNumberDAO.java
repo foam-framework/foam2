@@ -56,7 +56,7 @@ public class SequenceNumberDAO
    */
   private void calcDelegateMax_() {
     Sink sink = MLang.MAX(getProperty_());
-    getDelegate().select(sink);
+    sink = getDelegate().select(sink);
     setValue((long) (((Max) sink).getValue() + 1.0));
     isValueSet_ = true;
   }
