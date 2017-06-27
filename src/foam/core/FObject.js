@@ -824,7 +824,7 @@ foam.CLASS({
 
       // Use comparator of other if it is not an FObject.
       if ( ! foam.core.FObject.isInstance(other) ) {
-        return foam.util.compare(this, other);
+        return -foam.typeOf(other).compare(other, this);
       }
 
       if ( ! other        ) return 1;

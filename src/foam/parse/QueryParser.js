@@ -259,16 +259,14 @@ foam.CLASS({
         };
 
         var self = this;
-        // Adapt second arg in binary predicates.
-        var bin = self.bin_;
 
         // TODO: Fix me to just build the object directly.
         var actions = {
           id: function(v) {
-            return self.Eq.create(bin({
+            return self.Eq.create({
               arg1: cls.ID,
               arg2: v
-            }));
+            });
           },
 
           or: function(v) {
@@ -312,10 +310,10 @@ foam.CLASS({
             if ( Array.isArray(v[2]) && v[2][0] instanceof Date ) {
               v[2] = v[1] === '<=' ? v[2][1] : v[2][0];
             }
-            return (v[1] === '<=' ? self.Lte : self.Lt).create(bin({
+            return (v[1] === '<=' ? self.Lte : self.Lt).create({
               arg1: v[0],
               arg2: v[2]
-            }));
+            });
           },
 
           after: function(v) {
@@ -328,10 +326,10 @@ foam.CLASS({
             if ( Array.isArray(v[2]) && v[2][0] instanceof Date ) {
               v[2] = v[1] === '>=' ? v[2][0] : v[2][1];
             }
-            return (v[1] === '>=' ? self.Gte : self.Gt).create(bin({
+            return (v[1] === '>=' ? self.Gte : self.Gt).create({
               arg1: v[0],
               arg2: v[2]
-            }));
+            });
           },
 
           equals: function(v) {
@@ -362,8 +360,8 @@ foam.CLASS({
               }
               return self.And.create({
                 args: [
-                  self.Gte.create(bin({ arg1: prop, arg2: values[0][0] })),
-                  self.Lt.create(bin({ arg1: prop, arg2: values[0][1] }))
+                  self.Gte.create({ arg1: prop, arg2: values[0][0] }),
+                  self.Lt.create({ arg1: prop, arg2: values[0][1] })
                 ]
               });
             }
@@ -376,18 +374,15 @@ foam.CLASS({
                     parseInt(values[i]);
               }
 
-              expr = self.In.create(bin({ arg1: prop, arg2: values }));
+              expr = self.In.create({ arg1: prop, arg2: values });
             } else if ( foam.core.Enum.isInstance(prop) ) {
-              expr = self.In.create(bin({ arg1: prop, arg2: values }));
+              expr = self.In.create({ arg1: prop, arg2: values });
             } else {
               expr = (v[1] === '=') ?
-                  self.InIC.create(bin({ arg1: prop, arg2: values })) :
+                  self.InIC.create({ arg1: prop, arg2: values }) :
                   self.Or.create({
                     args: values.map(function(v) {
-                      return self.ContainsIC.create(bin({
-                        arg1: prop,
-                        arg2: v
-                      }));
+                      return self.ContainsIC.create({ arg1: prop, arg2: v });
                     })
                   });
             }
@@ -397,7 +392,7 @@ foam.CLASS({
             } else if ( values.and ) {
               return self.And.create({
                 args: values.map(function(x) {
-                  expr.class_.create(bin({ arg1: expr.arg1, arg2: [ x ] }));
+                  expr.class_.create({ arg1: expr.arg1, arg2: [ x ] });
                 })
               });
             } else {
@@ -505,37 +500,6 @@ foam.CLASS({
     function parseString(str, opt_name) {
       var query = this.grammar_.parseString(str, opt_name);
       return query && query.partialEval ? query.partialEval() : query;
-    },
-    {
-      name: 'bin_',
-      documentation: `For binary ops like EQ(prop, value), the QueryParser may
-          need to adapt the string value to the type expected by prop. For
-          example, Int properties should be compared with values that have
-          already been adapted via parseInt(strValue).
-
-          This helper adapts options for binary op construction.`,
-      args: [
-        {
-          documentation: 'The options to be passed to SomeBinaryOp.create().',
-          name: 'opts'
-        },
-      ],
-      returns: { documentation: 'Modified input after adapting opts.arg2.' },
-      code: function(opts) {
-        if ( ! ( opts.arg1 && opts.arg1.adapt && opts.hasOwnProperty('arg2') ) )
-          return opts;
-
-        if ( Array.isArray(opts.arg2) ) {
-          var arg2 = opts.arg2;
-          for ( var i = 0; i < arg2.length; i++ ) {
-            arg2[i] = opts.arg1.adapt(undefined, opts.arg2[i]);
-          }
-        } else {
-          opts.arg2 = opts.arg1.adapt(undefined, opts.arg2);
-        }
-
-        return opts;
-      }
     }
   ]
 });
