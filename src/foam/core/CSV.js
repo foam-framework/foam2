@@ -88,6 +88,10 @@ foam.CLASS({
 
       // Checks if property is enum, or object with properties of its own
       if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
+        // Gets new empty object if FObjectProperty is currently undefined
+        // Done to permit appropriate headers for multi-line CSVs (multiple objects to convert)
+        if (o[p.name] == undefined) o[p.name] = foam.lookup(p.of.id);
+
         // Appends object name to prefix for CSV Header
         prefix += p.name + this.nestedObjectSeperator;
         this.outputPropertyFilteredName(o[p.name], prefix, first);
@@ -142,7 +146,7 @@ foam.CLASS({
           }
           
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-
+          
           for ( var i = 0 ; i < ps.length ; i++ ) {
             this.outputProperty(o, ps[i], (i == 0 && first));
           }
