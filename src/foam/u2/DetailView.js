@@ -87,6 +87,7 @@ foam.CLASS({
     {
       name: 'actions',
       expression: function(of) {
+        if ( ! of ) return [];
         return this.of.getAxiomsByClass(foam.core.Action);
       }
     },
@@ -153,7 +154,7 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.add(this.slot(function(of, properties) {
+      this.add(this.slot(function(of, properties, actions) {
         if ( ! of ) return '';
 
         // Binds view to currentData instead of data because there

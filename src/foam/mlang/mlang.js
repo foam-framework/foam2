@@ -940,19 +940,7 @@ foam.CLASS({
 
   implements: [ 'foam.core.Serializable' ],
 
-  requires: [ 'foam.mlang.Constant' ],
-
   documentation: 'Binary Predicate returns true iff arg1 EQUALS arg2.',
-
-  properties: [
-    {
-      class: 'Function',
-      name: 'isConst',
-      factory: function() {
-        return this.Constant.isInstance.bind(this.Constant);
-      }
-    }
-  ],
 
   methods: [
     {
@@ -967,29 +955,31 @@ foam.CLASS({
     },
 
     function reduceAnd(other) {
-      var myArg1 = this.arg1;
-      var myArg2 = this.arg2;
-      var otherArg1 = other.arg1;
-      var otherArg2 = other.arg2;
-      var isConst = this.isConst;
-      var myArg1IsConst = isConst(myArg1);
-      var myArg2IsConst = isConst(myArg2);
+      var myArg1           = this.arg1;
+      var myArg2           = this.arg2;
+      var otherArg1        = other.arg1;
+      var otherArg2        = other.arg2;
+      var isConst          = foam.mlang.Constant.isInstance.bind(foam.mlang.Constant);
+      var myArg1IsConst    = isConst(myArg1);
+      var myArg2IsConst    = isConst(myArg2);
       var otherArg1IsConst = isConst(otherArg1);
       var otherArg2IsConst = isConst(otherArg2);
 
       // Require one const, one non-const in this and other.
-      if ( myArg1IsConst === myArg2IsConst ||
-           otherArg1IsConst === otherArg2IsConst ) return this.SUPER(other);
+      if ( myArg1IsConst === myArg2IsConst || otherArg1IsConst === otherArg2IsConst )
+        return this.SUPER(other);
 
       // Require same expr.
-      var myExpr = myArg1IsConst ? myArg2 : myArg1;
+      var myExpr    = myArg1IsConst ? myArg2 : myArg1;
       var otherExpr = otherArg1IsConst ? otherArg2 : otherArg1;
-      var equals = foam.util.equals;
+      var equals    = foam.util.equals;
+
       if ( ! equals(myExpr, otherExpr) ) return this.SUPER(other);
 
       // Reduce to FALSE when consts are not equal.
-      var myConst = myArg1IsConst ? myArg1 : myArg2;
+      var myConst    = myArg1IsConst    ? myArg1    : myArg2;
       var otherConst = otherArg1IsConst ? otherArg1 : otherArg2;
+
       return equals(myConst, otherConst) ? this.SUPER(other) : this.FALSE;
     }
   ]
@@ -1734,6 +1724,7 @@ foam.CLASS({
       name: 'arg1'
     },
     {
+      class: 'Double',
       name: 'value',
       value: 0
     }
