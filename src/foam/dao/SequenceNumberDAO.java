@@ -4,13 +4,14 @@ import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.mlang.MLang;
 import foam.mlang.sink.Max;
 
 public class SequenceNumberDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
   protected String property = "id";
-  protected int value = 1;
+  protected long value = 1;
   private PropertyInfo property_ = null;
 
   public AbstractDAO setOf(ClassInfo of) {
@@ -25,7 +26,7 @@ public class SequenceNumberDAO
     return this;
   }
 
-  public SequenceNumberDAO setValue(int value) {
+  public SequenceNumberDAO setValue(long value) {
     this.value = value;
     return this;
   }
@@ -42,21 +43,23 @@ public class SequenceNumberDAO
    * Calculates the next largest value in the sequence
    */
   private void calcDelegateMax_() {
-    Max maxSink = (Max) new Max().setArg1(getProperty_());
-    ((AbstractDAO) getDelegate()).select(maxSink);
-    int maxValue = (int) maxSink.getValue();
-    if (maxValue < 1) return;
-    this.setValue(maxValue + 1);
+    Sink sink = MLang.MAX(getProperty_());
+    getDelegate().select(sink);
+    this.setValue((long) (((Max) sink).getValue() + 1.0));
+  }
+
+  public FObject put(FObject obj) {
+    return put_(getX(), obj);
   }
 
   public FObject put_(X x, FObject obj) {
     calcDelegateMax_();
-    int val = (int) getProperty_().f(obj);
-    if (val < 1) {
+    Number val = (Number) obj.getProperty(property);
+    if (val.longValue() < 1) {
       getProperty_().set(obj, this.value++);
-    } else if (val >= this.value ) {
-      this.value = (int) val + 1;
+    } else if (val.longValue() >= this.value ) {
+      this.value = (long) val + 1;
     }
-    return getDelegate().put_(x, obj);
+    return getDelegate().put(obj);
   }
 }
