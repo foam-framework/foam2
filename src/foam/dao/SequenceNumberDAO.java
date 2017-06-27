@@ -40,7 +40,6 @@ public class SequenceNumberDAO
 
   public SequenceNumberDAO setValue(long value) {
     value_ = value;
-    isValueSet_ = true;
     return this;
   }
 
@@ -59,6 +58,7 @@ public class SequenceNumberDAO
     Sink sink = MLang.MAX(getProperty_());
     getDelegate().select(sink);
     setValue((long) (((Max) sink).getValue() + 1.0));
+    isValueSet_ = true;
   }
 
   public FObject put(FObject obj) {
