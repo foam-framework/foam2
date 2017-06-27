@@ -17,6 +17,6 @@ public class ServicesWebAgent
   public void execute(X x) {
     PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
 
-    out.println("servcies");
+    out.println("services");
   }
 }
