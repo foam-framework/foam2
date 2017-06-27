@@ -152,13 +152,7 @@ public class XMLSupport {
         if (prop.getTransient() ) continue;
         if ( value != null && value != "" ) {
           writer.writeStartElement(prop.getName());
-          // Case for date
-          if ( value instanceof java.util.Date ) {
-            String s = value.toString();
-            writer.writeCharacters(s);
-          } else {
-            writer.writeCharacters(value.toString());
-          }
+          writer.writeCharacters(value.toString());
           writer.writeEndElement();
         }
       }
