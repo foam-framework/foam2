@@ -58,7 +58,7 @@ public class SequenceNumberDAO
   private void calcDelegateMax_() {
     Sink sink = MLang.MAX(getProperty_());
     getDelegate().select(sink);
-    this.setValue((long) (((Max) sink).getValue() + 1.0));
+    setValue((long) (((Max) sink).getValue() + 1.0));
   }
 
   public FObject put(FObject obj) {
@@ -72,7 +72,7 @@ public class SequenceNumberDAO
     if ( val.longValue() < 1 ) {
       getProperty_().set(obj, value_++);
     } else if ( val.longValue() >= value_ ) {
-      value_ = (long) val + 1;
+      setValue(val + 1);
     }
     return getDelegate().put(obj);
   }
