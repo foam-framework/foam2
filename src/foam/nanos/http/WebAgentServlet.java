@@ -34,6 +34,8 @@ public class WebAgentServlet
   public void service(HttpServletRequest req, HttpServletResponse resp)
     throws IOException
   {
+    resp.setContentType("text/html");
+
     agent_.execute(getX().put(req.getClass(), req).put(resp.getClass(), resp).put(PrintWriter.class, resp.getWriter()));
   }
 }
