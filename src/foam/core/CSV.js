@@ -162,7 +162,7 @@ foam.CLASS({
       if ( ! s ) throw 'Invalid CSV input to convert. Arguments must be (className, csvString).'
       var lines = s.split('\n');
 
-      if ( lines.length == 0 ) throw 'Insufficient CSV Input'
+      if ( lines.length == 0 ) throw 'Insufficient CSV Input';
 
       // Trims quotes and splits CSV row into array
       var props = lines[0].split(',');
