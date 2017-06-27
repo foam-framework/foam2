@@ -132,7 +132,7 @@ public class XMLSupport {
     try {
       xmlStreamWriter.writeStartElement("object");
       xmlStreamWriter.writeAttribute("class", obj.getClass().toString().replaceAll("class ", ""));
-      writeObjectProperties(obj, xmlStreamWriter);
+      writeToXML(obj, xmlStreamWriter);
       xmlStreamWriter.writeEndElement();
     } catch (XMLStreamException ex) {
       throw new XMLStreamException("Error while writing xml file");
@@ -140,7 +140,7 @@ public class XMLSupport {
   }
 
   // Write properties from given FObject
-  public static void writeObjectProperties(FObject obj, XMLStreamWriter writer) {
+  public static void writeToXML(FObject obj, XMLStreamWriter writer) {
     ClassInfo cInfo = obj.getClassInfo();
     List props = cInfo.getAxioms();
     Iterator propItr = props.iterator();
