@@ -11,16 +11,16 @@ public class SequenceNumberDAO
     extends ProxyDAO
 {
   protected String property = "id";
-  protected long value = 1;
+  protected long value_ = 1;
   private PropertyInfo property_ = null;
 
   public SequenceNumberDAO(DAO delegate) {
     setDelegate(delegate);
   }
 
-  public SequenceNumberDAO(DAO delegate, String property) {
+  public SequenceNumberDAO(PropertyInfo property, DAO delegate) {
     setDelegate(delegate);
-    this.property = property;
+    this.property_ = property;
   }
 
   public AbstractDAO setOf(ClassInfo of) {
@@ -36,7 +36,7 @@ public class SequenceNumberDAO
   }
 
   public SequenceNumberDAO setValue(long value) {
-    this.value = value;
+    value_ = value;
     return this;
   }
 
@@ -64,10 +64,10 @@ public class SequenceNumberDAO
   public FObject put_(X x, FObject obj) {
     calcDelegateMax_();
     Number val = (Number) obj.getProperty(property);
-    if (val.longValue() < 1) {
-      getProperty_().set(obj, this.value++);
-    } else if (val.longValue() >= this.value ) {
-      this.value = (long) val + 1;
+    if ( val.longValue() < 1 ) {
+      getProperty_().set(obj, value_++);
+    } else if ( val.longValue() >= value_ ) {
+      value_ = (long) val + 1;
     }
     return getDelegate().put(obj);
   }
