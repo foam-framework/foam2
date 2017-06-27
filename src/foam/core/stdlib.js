@@ -373,7 +373,7 @@ foam.LIB({
     function equals(a, b) { return foam.Number.compare(a, b) == 0; },
     function compare(a, b) {
       if ( ! foam.Number.isInstance(b) || ( isNaN(a) && ! isNaN(b)) ) return 1;
-      else if ( ! isNaN(a) && isNaN(b) ) return -1;
+      if ( ! isNaN(a) && isNaN(b) ) return -1;
       return a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {

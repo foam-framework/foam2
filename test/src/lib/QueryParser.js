@@ -89,7 +89,6 @@ describe('Query parser', function() {
       var seen = {};
       for ( var i = 0; i < actual.array.length; i++ ) {
         seen[actual.array[i].id] = true;
-        if ( ! ( expected.indexOf(actual.array[i].id) >-1 ) ) debugger;
         expect(expected.indexOf(actual.array[i].id)).toBeGreaterThan(-1);
       }
 

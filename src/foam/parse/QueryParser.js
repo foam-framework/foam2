@@ -506,21 +506,36 @@ foam.CLASS({
       var query = this.grammar_.parseString(str, opt_name);
       return query && query.partialEval ? query.partialEval() : query;
     },
-    // Adapt binary predicate values.
-    function bin_(opts) {
-      if ( ! ( opts.arg1 && opts.arg1.adapt && opts.hasOwnProperty('arg2') ) )
-        return opts;
+    {
+      name: 'bin_',
+      documentation: `For binary ops like EQ(prop, value), the QueryParser may
+          need to adapt the string value to the type expected by prop. For
+          example, Int properties should be compared with values that have
+          already been adapted via parseInt(strValue).
 
-      if ( Array.isArray(opts.arg2) ) {
-        var arg2 = opts.arg2;
-        for ( var i = 0; i < arg2.length; i++ ) {
-          arg2[i] = opts.arg1.adapt(undefined, opts.arg2[i]);
+          This helper adapts options for binary op construction.`,
+      args: [
+        {
+          documentation: 'The options to be passed to SomeBinaryOp.create().',
+          name: 'opts'
+        },
+      ],
+      returns: { documentation: 'Modified input after adapting opts.arg2.' },
+      code: function(opts) {
+        if ( ! ( opts.arg1 && opts.arg1.adapt && opts.hasOwnProperty('arg2') ) )
+          return opts;
+
+        if ( Array.isArray(opts.arg2) ) {
+          var arg2 = opts.arg2;
+          for ( var i = 0; i < arg2.length; i++ ) {
+            arg2[i] = opts.arg1.adapt(undefined, opts.arg2[i]);
+          }
+        } else {
+          opts.arg2 = opts.arg1.adapt(undefined, opts.arg2);
         }
-      } else {
-        opts.arg2 = opts.arg1.adapt(undefined, opts.arg2);
-      }
 
-      return opts;
+        return opts;
+      }
     }
   ]
 });
