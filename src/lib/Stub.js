@@ -217,6 +217,7 @@ foam.CLASS({
   ]
 });
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 foam.CLASS({
   package: 'foam.core',
@@ -317,3 +318,5 @@ foam.CLASS({
 });
 =======
 >>>>>>> Revert "Merge branch 'master' into master"
+=======
+>>>>>>> 19652573c04d56fb071e4fc044bd10ab23fc6586

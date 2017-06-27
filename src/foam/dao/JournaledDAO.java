@@ -44,11 +44,6 @@ public class JournaledDAO
   }
 
   @Override
-<<<<<<< HEAD:src/foam/dao/JDAO.java
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    // TODO: this is wrong, should only call journal.removeAll() if neither limit nor predicate
-    // are set.
-=======
   public FObject find_(X x, Object id) {
     return null;
   }
@@ -60,7 +55,6 @@ public class JournaledDAO
 
   @Override
   public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
->>>>>>> Revert "Merge branch 'master' into master":src/foam/dao/JournaledDAO.java
     journal.removeAll();
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }

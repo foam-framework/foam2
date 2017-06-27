@@ -645,6 +645,7 @@ foam.CLASS({
     function remove(obj) {
       this.box.send(this.DAOEvent.create({
         name: 'remove', obj: obj
+<<<<<<< HEAD
       }));
     },
     function eof() {
@@ -652,6 +653,8 @@ foam.CLASS({
         object: this.DAOEvent.create({
           name: 'eof'
         })
+=======
+>>>>>>> 19652573c04d56fb071e4fc044bd10ab23fc6586
       }));
     },
     function reset() {
@@ -1691,10 +1694,14 @@ foam.CLASS({
 	this.messagePortService.addPort(channel.port1);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	this.target.postMessage(channel.port2, [ channel.port2 ]);
 =======
 	this.target.postMessage('', '*', [channel.port2]);
 >>>>>>> Revert "Merge branch 'master' into master"
+=======
+	this.target.postMessage('', '*', [channel.port2]);
+>>>>>>> 19652573c04d56fb071e4fc044bd10ab23fc6586
 
         channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
           object: this.RegisterSelfMessage.create({ name: this.me.name })
