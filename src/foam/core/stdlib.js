@@ -644,7 +644,10 @@ foam.LIB({
     function is(a, b)      { return a === b; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
-    function compare(a, b) { return a.compareTo(b); },
+    function compare(a, b) {
+      if ( ! foam.core.FObject.isInstance(b) ) return 1;
+      return a.compareTo(b);
+    },
     function hashCode(o)   { return o.hashCode(); }
   ]
 });
