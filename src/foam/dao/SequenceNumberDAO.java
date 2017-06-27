@@ -10,8 +10,10 @@ import foam.mlang.sink.Max;
 public class SequenceNumberDAO
     extends ProxyDAO
 {
-  protected String property = "id";
   protected long value_ = 1;
+  protected boolean isValueSet_ = false;
+
+  protected String property = "id";
   private PropertyInfo property_ = null;
 
   public SequenceNumberDAO(DAO delegate) {
@@ -21,6 +23,7 @@ public class SequenceNumberDAO
   public SequenceNumberDAO(PropertyInfo property, DAO delegate) {
     setDelegate(delegate);
     this.property_ = property;
+    this.property = property.getName();
   }
 
   public AbstractDAO setOf(ClassInfo of) {
@@ -37,6 +40,7 @@ public class SequenceNumberDAO
 
   public SequenceNumberDAO setValue(long value) {
     value_ = value;
+    isValueSet_ = true;
     return this;
   }
 
@@ -58,11 +62,12 @@ public class SequenceNumberDAO
   }
 
   public FObject put(FObject obj) {
+    if ( ! isValueSet_ )
+      calcDelegateMax_();
     return put_(getX(), obj);
   }
 
   public FObject put_(X x, FObject obj) {
-    calcDelegateMax_();
     Number val = (Number) obj.getProperty(property);
     if ( val.longValue() < 1 ) {
       getProperty_().set(obj, value_++);
