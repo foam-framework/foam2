@@ -166,7 +166,7 @@ foam.CLASS({
               isEnabled: m.isEnabled,
               replyPolicyName: replyPolicyName,
               boxPropName: name
-            })
+            });
           });
       }
     }
@@ -222,7 +222,7 @@ foam.CLASS({
   name: 'StubClass',
 
   axioms: [
-    foam.pattern.Multiton.create({ property: 'id' })
+    foam.pattern.Multiton.create({ property: 'of' })
   ],
 
   requires: [
