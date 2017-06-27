@@ -315,6 +315,12 @@ foam.CLASS({
         return of && of.VALUES[0];
       },
     },
+    {
+      name: 'javaValue',
+      expression: function(of, value) {
+        return of.id + '.' + value;
+      },
+    },
     [
       'adapt',
       function(o, n, prop) {
