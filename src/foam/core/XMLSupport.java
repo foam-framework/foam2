@@ -142,7 +142,7 @@ public class XMLSupport {
   // Write properties from given FObject
   public static void writeToXML(FObject obj, XMLStreamWriter writer) {
     ClassInfo cInfo = obj.getClassInfo();
-    List props = cInfo.getAxioms();
+    List props = cInfo.getAxiomsByClass(PropertyInfo.class);
     Iterator propItr = props.iterator();
 
     try {
