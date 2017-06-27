@@ -49,8 +49,26 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isSelecting',
-      documentation: "True if we are in a state where we're selecting an item from the DAO.  This enables the 'Add' button.",
+      name: 'createEnabled',
+      documentation: 'True to enable the create button.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'editEnabled',
+      documentation: 'True to enable the edit button',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'selectEnabled',
+      documentation: 'True to enable the select button.',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'addEnabled',
+      documentation: 'True to enable the Add button for adding to a relationship',
       value: false
     }
   ],
@@ -58,11 +76,13 @@ foam.CLASS({
   actions: [
     {
       name: 'create',
+      isAvailable: function(createEnabled) { return createEnabled; },
       code: function() { }
     },
     {
       name: 'edit',
       isEnabled: function(selection) { return !! selection; },
+      isAvailable: function(editEnabled) { return editEnabled; },
       code: function() {
         this.pub('edit', this.selection.id);
       }
@@ -70,15 +90,16 @@ foam.CLASS({
     {
       name: 'findRelatedObject',
       label: 'Add',
-      isAvailable: function(relationship, isSelecting) {
-        return !! ( relationship && relationship.junctionDAO ) && ! isSelecting;
+      isAvailable: function(relationship, addEnabled) {
+        // Only enable the Add button if we're not already trying to choose a selected item for a relationship.
+        return !! ( relationship && relationship.junctionDAO ) && ! addEnabled;
       },
       code: function() { }
     },
     {
       name: 'addSelection',
       label: 'Add',
-      isAvailable: function(isSelecting) { return isSelecting; },
+      isAvailable: function(addEnabled) { return addEnabled; },
       code: function() {
         var self = this;
         this.relationship.add(this.selection).then(function() {
@@ -88,9 +109,11 @@ foam.CLASS({
     },
     {
       name: 'select',
-      isAvailable: function() { },
+      isAvailable: function(selectEnabled) { return selectEnabled; },
+      isEnabled: function(selection) { return !! selection; },
       code: function() {
         this.pub('select', this.selection.id);
+        this.finished.pub();
       }
     }
   ]

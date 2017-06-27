@@ -397,6 +397,8 @@ foam.CLASS({
   ],
 
   imports: [
+    'info',
+    'error',
     'fonParser'
   ],
 
@@ -405,6 +407,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'listen',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'listening'
     },
     {
       class: 'Int',
@@ -423,14 +429,28 @@ foam.CLASS({
     function init() {
       if ( ! this.listen ) return;
 
+      this.setupServer(this.port);
+    },
+
+    function setupServer(port) {
       var server = this.server = new require('net').Server();
       this.server.on('connection', this.onConnection);
-      this.server.on('error', function(e) {
-        console.log("Server error", e);
+      this.server.on('error', function(error) {
+        this.error('foam.net.node.SocketService: Server error', error);
         server.unref();
+        if ( error.code === 'EADDRINUSE' ) {
+          var port = Math.floor( 10000 + ( Math.random() * 10000 ) );
+          this.info('foam.net.node.SocketService: Retrying on port', port);
+          this.setupServer(port);
+        }
       }.bind(this));
 
-      if ( this.listen ) this.server.listen(this.port);
+      if ( this.listen ) {
+        this.server.on('listening', function() {
+          this.listening = true;
+        }.bind(this));
+        this.server.listen(this.port = port);
+      }
     },
 
     function addSocket(socket) {

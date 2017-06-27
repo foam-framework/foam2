@@ -166,7 +166,7 @@ foam.CLASS({
               isEnabled: m.isEnabled,
               replyPolicyName: replyPolicyName,
               boxPropName: name
-            })
+            });
           });
       }
     }
@@ -215,4 +215,102 @@ foam.CLASS({
       });
     }
   ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StubClass',
+
+  axioms: [
+    foam.pattern.Multiton.create({ property: 'of' })
+  ],
+
+  requires: [
+    'foam.core.Model',
+  ],
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      required: true
+    },
+    {
+      class: 'String',
+      name: 'package',
+      factory: function() { return this.of.package; }
+    },
+    {
+      class: 'String',
+      name: 'name',
+      factory: function() { return `${this.of.name}Stub`; }
+    },
+    {
+      class: 'String',
+      name: 'id',
+      factory: function() { return `${this.package}.${this.name}`; }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'Model',
+      name: 'stubModel',
+      factory: function() {
+        return this.Model.create({
+          package: this.package,
+          name: this.name,
+
+          properties: [
+            {
+              class: 'Stub',
+              of: this.of.id,
+              name: 'delegate'
+            }
+          ]
+        });
+      }
+    },
+    {
+      name: 'stubCls',
+      factory: function() {
+        return this.buildClass_();
+      }
+    }
+  ],
+
+  methods: [
+    function init() {
+      this.validate();
+      this.SUPER();
+    },
+    function buildClass_() {
+      this.stubModel.validate();
+      var cls = this.stubModel.buildClass();
+      cls.validate();
+      this.__subContext__.register(cls);
+      foam.package.registerClass(cls);
+
+      return this.stubModel.buildClass();
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StubFactory',
+
+  requires: [ 'foam.core.StubClass' ],
+
+  methods: [
+    function get(cls) {
+      return this.StubClass.create({ of: cls }).stubCls;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StubFactorySingleton',
+  extends: 'foam.core.StubFactory',
+
+  axioms: [ foam.pattern.Singleton.create() ],
 });
