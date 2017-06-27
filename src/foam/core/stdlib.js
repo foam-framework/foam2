@@ -793,16 +793,8 @@ foam.LIB({
         // we will always use the comparator of higher precedence.
         var aType = typeOf(a);
         var bType = typeOf(b);
-        return aType.ordinal > bType.ordinal ? 1 : aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
-        // return (aType.ordinal >= bType.ordinal) ? aType.compare(a, b) :
-        //     this.comparatorNegate(bType.compare(b, a));
-      },
-      function comparatorNegate(num) {
-        // When negating comparisons, a -0 may be returned and
-        // this may cause unexpected behaviour. Since -0 === 0
-        // is true, we return 0 and avoid returning -0.
-        if (num === 0) return 0;
-        return -num;
+        return aType.ordinal > bType.ordinal ? 1 :
+            aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {
