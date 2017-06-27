@@ -502,11 +502,7 @@ foam.CLASS({
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: function() {
-/*if (obj.compareTo(this.getValue()) > 0) {
-  this.setValue(obj);
-}*/
-      }
+      javaCode: 'setValue(Math.min(((Number) getArg1().f(obj)).doubleValue(), getValue()));'
     }
   ]
 });
