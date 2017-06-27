@@ -14,6 +14,15 @@ public class SequenceNumberDAO
   protected long value = 1;
   private PropertyInfo property_ = null;
 
+  public SequenceNumberDAO(DAO delegate) {
+    setDelegate(delegate);
+  }
+
+  public SequenceNumberDAO(DAO delegate, String property) {
+    setDelegate(delegate);
+    this.property = property;
+  }
+
   public AbstractDAO setOf(ClassInfo of) {
     AbstractDAO ret = super.setOf(of);
     this.property_ = null;
