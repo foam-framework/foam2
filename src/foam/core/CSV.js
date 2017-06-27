@@ -146,7 +146,7 @@ foam.CLASS({
           }
           
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-          
+
           for ( var i = 0 ; i < ps.length ; i++ ) {
             this.outputProperty(o, ps[i], (i == 0 && first));
           }
@@ -157,7 +157,7 @@ foam.CLASS({
       }, function(o, first) { this.outputPrimitive(o, first); })
     },
 
-    function fromCSV(className, s) {
+    function fromCSV(className, s, sink) {
       if ( ! s ) throw 'Invalid CSV input to convert. Arguments must be (className, csvString).'
       var lines = s.split('\n');
 
@@ -166,11 +166,14 @@ foam.CLASS({
       // Trims quotes and splits CSV row into array
       var props = lines[0].split(',');
 
-      // Account for array of values (TODO?)
-      var values = lines[1].split(',');
+      for (var i = 1; i < lines.length; ++i) {
+        var values = lines[i].split(',');
 
-      // Calls for the creation of a new model
-      return this.createModel(props, values, className);
+        // Calls for creation of new model, and `puts` into sink
+        sink.put(this.createModel(props, values, className));
+      }
+
+      return sink;
     },
 
     function createModel(props, values, className) {
@@ -225,8 +228,9 @@ foam.LIB({
       return foam.csv.Standard.toCSV(o);
     },
 
-    function fromCSV(className, s) {
-      return foam.csv.Standard.fromCSV(className, s);
+    function fromCSV(className, csvString, sink) {
+      return foam.csv.Standard.fromCSV(className, csvString, sink);
     }
   ]
 });
+
