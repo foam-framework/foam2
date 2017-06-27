@@ -39,6 +39,10 @@ foam.INTERFACE({
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String'
     }
   ]
 });
@@ -79,13 +83,7 @@ foam.INTERFACE({
       javaReturns: 'boolean'
     },
     {
-      name: 'toSQL',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
-      ],
+      name: 'createStatement',
       javaReturns: 'String'
     },
     {
@@ -169,18 +167,7 @@ foam.CLASS({
     {
       name: 'toString',
       javaCode: 'return classInfo_.getId();'
-    },
-    {
-      name: 'toSQL',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'foam.core.FObject'
-        }
-      ],
-      javaCode: 'return null;',
-      javaReturns: 'String'
-    },
+    }
   ]
 });
 
@@ -206,6 +193,11 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return true;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -218,6 +210,11 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return false;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -233,6 +230,11 @@ foam.CLASS({
                 + '  if ( getArgs()[i].f(obj) ) return true;\n'
                 + '}\n'
                 + 'return false;\n'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -250,8 +252,9 @@ foam.CLASS({
                 + 'return true;'
     },
     {
-      name: 'toSQL',
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -266,6 +269,11 @@ foam.CLASS({
       javaCode: 'String s1 = (String)getArg1().f(obj);\n'
                 + 'String s2 = (String)getArg2().f(obj);\n'
                 + 'return s1 != null ? s1.indexOf(s2) != -1 : false;\n'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -290,6 +298,11 @@ foam.CLASS({
                 + '}'
                 + 'String value = (String)arg1;\n'
                 + 'return value.toUpperCase().startsWith(arg2);\n'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -304,10 +317,19 @@ foam.CLASS({
       javaCode: 'return getValue();'
     },
     {
-      name: 'toSQLValue',
-      // TODO(drish): java preparedStatement already protects against sql injection
-      // add more sanitization here ?
-      javaCode: 'return getValue();'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " ? "; '
+    },
+    {
+      name: 'prepareStatement',
+      args: [
+        {
+          name: 'value',
+          javaType: 'String'
+        }
+      ],
+      javaCode: '//ps.setObject(getValue());'
     }
   ]
 });
@@ -323,8 +345,9 @@ foam.CLASS({
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
     },
     {
-      name: 'toSQL',
-      javaCode: 'return getArg1().toSQLValue(obj) + "=" + getArg2().toSQLValue(obj);'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return getArg1().createStatement() + " = " + getArg2().createStatement();'
     }
   ]
 });
@@ -339,8 +362,9 @@ foam.CLASS({
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) != 0;'
     },
     {
-     name: 'toSQL',
-     javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -355,9 +379,9 @@ foam.CLASS({
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) < 0;'
     },
     {
-      name: 'toSQL',
-      // placeholder
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -372,8 +396,9 @@ foam.CLASS({
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) <= 0;'
     },
     {
-      name: 'toSQL',
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -388,8 +413,9 @@ foam.CLASS({
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) > 0;'
     },
     {
-      name: 'toSQL',
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -404,8 +430,9 @@ foam.CLASS({
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) >= 0;'
     },
     {
-      name: 'toSQL',
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -420,8 +447,9 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
     {
-      name: 'toSQL',
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });
@@ -441,8 +469,9 @@ foam.CLASS({
           (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
     },
     {
-      name: 'toSQL',
-      javaCode: 'return null;'
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
     }
   ]
 });

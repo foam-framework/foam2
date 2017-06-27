@@ -36,6 +36,11 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public String createStatement() {
+    return getName();
+  }
+
+  @Override
   public Object f(FObject o) {
     return get(o);
   }
