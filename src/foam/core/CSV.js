@@ -57,66 +57,65 @@ foam.CLASS({
       return this;
     },
 
+    function toCSV(o) {
+      // Resets buffer
+      this.reset();
+
+      // Outputs object headers
+      this.outputHeader(o);
+
+      // Outputs object values
+      this.output(o, true);
+      this.out(this.nlStr);
+
+      return this.buf_;
+    },
+
     function outputHeader(o) {
       if ( ! this.outputHeaderRow ) return;
 
-      this.outputPropertyFilteredName(o, '');
+      this.outputPropertyFilteredName(o, '', true);
       this.out(this.nlStr);
     },
 
-    function toCSV(o) {
-      // Outputs object headers
-      this.outputHeader(o);
-      var ret = this.buf_;
-      this.reset(); // reset to avoid retaining garbage
-
-      // Outputs object values
-      this.output(o);
-      this.out(this.nlStr);
-      ret += this.buf_;
-      this.reset();
-
-      return ret;
-    },
-
-    function outputHeaderTitle(o, prefix) {
-      this.out(this.buf_.length ? this.delimiter : '')
+    function outputHeaderTitle(o, prefix, first) {
+      this.out(first ? '' : this.delimiter)
           .out(prefix, o);
     },
 
-    function outputPropertyName(o, p, prefix) {
+    function outputPropertyName(o, p, prefix, first) {
       if ( ! this.propertyPredicate(o, p) ) return;
 
       // Checks if property is enum, or object with properties of its own
       if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
         // Appends object name to prefix for CSV Header
         prefix += p.name + this.nestedObjectSeperator;
-        this.outputPropertyFilteredName(o[p.name], prefix);
+        this.outputPropertyFilteredName(o[p.name], prefix, first);
       } else {
-        this.outputPropertyFilteredName(p.name, prefix);
+        this.outputPropertyFilteredName(p.name, prefix, first);
       }
     },
 
     {
       name: 'outputPropertyFilteredName',
       code: foam.mmethod({
-        FObject:   function(o, prefix) {
+        FObject:   function(o, prefix, first) {
           // Gets and recurses through object properties
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputPropertyName(o, ps[i], prefix);
+            this.outputPropertyName(o, ps[i], prefix, (i == 0 && first));
           }
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) { /* Ignore generic objects in CSV */ }
-      }, function(o, prefix) { this.outputHeaderTitle(o, prefix); })
+      }, function(o, prefix, first) { this.outputHeaderTitle(o, prefix, first); })
     },
 
-    function outputProperty(o, p) {
+    function outputProperty(o, p, first) {
       if ( ! this.propertyPredicate(o, p) ) return;
-      this.output(o[p.name]);
+      this.output(o[p.name], first);
     },
 
     function reset() {
@@ -124,18 +123,18 @@ foam.CLASS({
       return this;
     },
 
-    function outputPrimitive(val) {
-      this.out(this.buf_.length ? this.delimiter : '', val);
+    function outputPrimitive(val, first) {
+      this.out(first ? '' : this.delimiter, val);
       return this;
     },
 
     {
       name: 'output',
       code: foam.mmethod({
-        Undefined: function(o) { this.outputPrimitive(this.undefinedStr); },
-        Null:      function(o) { this.outputPrimitive(null); },
-        String:    function(o) { this.outputPrimitive(o); },
-        FObject:   function(o) {
+        Undefined: function(o, first) { this.outputPrimitive(this.undefinedStr, first); },
+        Null:      function(o, first) { this.outputPrimitive(null, first); },
+        String:    function(o, first) { this.outputPrimitive(o, first); },
+        FObject:   function(o, first) {
           if ( o.outputCSV ) {
             o.outputCSV(this)
             return;
@@ -148,14 +147,14 @@ foam.CLASS({
             var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
             for ( var i = 0 ; i < ps.length ; i++ ) {
-              this.outputProperty(o, ps[i]);
+              this.outputProperty(o, ps[i], (i == 0 && first));
             }
           }
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) { /* Ignore generic objects in CSV */ }
-      }, function(o) { this.outputPrimitive(o); })
+      }, function(o, first) { this.outputPrimitive(o, first); })
     },
 
     function fromCSV(className, s) {
