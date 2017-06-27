@@ -1330,7 +1330,8 @@ foam.CLASS({
 
           ws.disconnected.sub(function(sub) {
             sub.detach();
-            this.socket = undefined;
+            this.clearProperty('socket');
+            this.socket;
           }.bind(this));
 
           ws.send(this.Message.create({
@@ -1351,7 +1352,7 @@ foam.CLASS({
         try {
           s.send(msg);
         } catch(e) {
-          this.socket = undefined;
+          this.clearProperty('socket');
           if ( msg.errorBox ) {
             msg.errorBox.send(foam.box.SendFailedError.create());
           }
@@ -1360,7 +1361,7 @@ foam.CLASS({
         if ( msg.errorBox ) {
           msg.errorBox.send(e);
         }
-        this.socket = undefined;
+        this.clearProperty('socket');
       }.bind(this));
     }
   ]
