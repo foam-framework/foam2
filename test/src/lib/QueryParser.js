@@ -89,6 +89,7 @@ describe('Query parser', function() {
       var seen = {};
       for ( var i = 0; i < actual.array.length; i++ ) {
         seen[actual.array[i].id] = true;
+        if ( ! ( expected.indexOf(actual.array[i].id) >-1 ) ) debugger;
         expect(expected.indexOf(actual.array[i].id)).toBeGreaterThan(-1);
       }
 
@@ -102,6 +103,7 @@ describe('Query parser', function() {
   var testQuery = function(str, expected, opt_dao) {
     return function(done) {
       var q = parser.parseString(str);
+      console.log('Test query', q.toString());
       expect(q).toBeDefined();
       (opt_dao || dao)
           .where(q)
