@@ -47,7 +47,7 @@ public class XMLDAO
   public FObject put(FObject obj) {
     this.setOf(obj.getClassInfo());
     FObject s = super.put(obj);
-    daoToXML();
+    saveToXML();
     return s;
   }
 
@@ -59,16 +59,16 @@ public class XMLDAO
 
   public FObject remove(FObject obj) {
     FObject s = super.remove(obj);
-    daoToXML();
+    saveToXML();
     return s;
   }
 
   public void removeAll() {
     super.removeAll();
-    daoToXML();
+    saveToXML();
   }
 
-  public void daoToXML () {
+  public void saveToXML () {
     ListSink ls = new ListSink();
     this.select(ls);
 
