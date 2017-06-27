@@ -41,8 +41,4 @@ public abstract class AbstractPropertyInfo
       diff.put(prop.getName(), prop.f(o2));
     }
   }
-
-  public void setFromString(Object obj, String value) {
-    // TODO: Need to write
-  }
 }
