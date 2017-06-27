@@ -131,29 +131,25 @@ foam.CLASS({
     {
       name: 'output',
       code: foam.mmethod({
-        Undefined: function(o, first) { this.outputPrimitive(this.undefinedStr, first); },
-        Null:      function(o, first) { this.outputPrimitive(null, first); },
-        String:    function(o, first) { this.outputPrimitive(o, first); },
+        Undefined:    function(o, first) { this.outputPrimitive(this.undefinedStr, first); },
+        Null:         function(o, first) { this.outputPrimitive(null, first); },
+        String:       function(o, first) { this.outputPrimitive(o, first); },
+        AbstractEnum: function(o, first) { this.outputPrimitive(o.ordinal, first); },
         FObject:   function(o, first) {
           if ( o.outputCSV ) {
             o.outputCSV(this)
             return;
           }
           
-          // Outputs only the ordinal of ENUM
-          if ( foam.core.AbstractEnum.isInstance(o) ) {
-            this.outputPrimitive(o.ordinal);
-          } else {
-            var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
-            for ( var i = 0 ; i < ps.length ; i++ ) {
-              this.outputProperty(o, ps[i], (i == 0 && first));
-            }
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            this.outputProperty(o, ps[i], (i == 0 && first));
           }
         },
-        Array: function(o) { /* Ignore arrays in CSV */ },
-        Function: function(o) { /* Ignore functions in CSV */ },
-        Object: function(o) { /* Ignore generic objects in CSV */ }
+        Array:        function(o) { /* Ignore arrays in CSV */ },
+        Function:     function(o) { /* Ignore functions in CSV */ },
+        Object:       function(o) { /* Ignore generic objects in CSV */ }
       }, function(o, first) { this.outputPrimitive(o, first); })
     },
 
