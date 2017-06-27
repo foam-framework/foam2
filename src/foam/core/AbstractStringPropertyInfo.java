@@ -8,4 +8,8 @@ public abstract class AbstractStringPropertyInfo
   }
 
   public abstract int getWidth();
+
+  public void setFromString(Object obj, String value) {
+    this.set(obj, value);
+  }
 }
