@@ -57,7 +57,7 @@ public class MapDAO
     );
   }
 
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( sink == null ) {
       sink = new ListSink();
     }
@@ -76,7 +76,7 @@ public class MapDAO
     return sink;
   }
 
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     setData(null);
   }
 
