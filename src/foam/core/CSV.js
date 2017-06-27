@@ -200,7 +200,7 @@ foam.CLASS({
         // Adds regular prop
         } else {
           var prop = model.cls_.getAxiomByName(p);
-          prop.set(model, prop.of ? foam.lookup(prop.of.id).create({ ordinal: v }) : v);
+          prop.set(model, prop.of ? prop.of.create({ ordinal: v }) : v);
         }
       }
 
