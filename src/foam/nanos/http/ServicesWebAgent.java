@@ -7,6 +7,9 @@
 package foam.nanos.http;
 
 import foam.core.*;
+import foam.dao.DAO;
+import foam.dao.AbstractSink;
+import foam.nanos.boot.NSpec;
 import java.io.PrintWriter;
 
 public class ServicesWebAgent
@@ -15,8 +18,16 @@ public class ServicesWebAgent
   public ServicesWebAgent() {}
 
   public void execute(X x) {
-    PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
+    final PrintWriter out  = (PrintWriter) x.get(PrintWriter.class);
+          DAO         dao  = (DAO)         x.get("nSpecDAO");
 
-    out.println("services");
+    out.println("<pre>");
+    dao.select(new AbstractSink() {
+      public void put(FObject o, Detachable d) {
+        NSpec s = (NSpec) o;
+        out.println(s.getName() + (s.getServe() ? " (S)" : ""));
+      }
+    });
+    out.println("</pre>");
   }
 }
