@@ -64,9 +64,11 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.dao.AbstractSink',
   methods: [
+    // TODO: have a method of put() that doesn't include the Detachable argument
     {
       name: 'put',
       javaCode: 'return;'
