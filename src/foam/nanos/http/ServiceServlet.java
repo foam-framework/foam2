@@ -14,6 +14,9 @@ import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.lib.parse.*;
 import foam.lib.parse.StringPS;
+import foam.nanos.auth.AuthService;
+import foam.nanos.auth.AuthServiceSkeleton;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -29,18 +32,27 @@ public class ServiceServlet
   implements ContextAware
 {
   protected Object      service_;
-  protected DAOSkeleton skeleton_;
+  protected Box skeleton_;
   protected X           x_;
 
   public ServiceServlet(Object service) {
     service_ = service;
     // TODO: Use FacetManager when ready
-    skeleton_ = new DAOSkeleton();
-    skeleton_.setDelegate((DAO) service);
+    if ( service instanceof DAO ) {
+      skeleton_ = new DAOSkeleton();
+      ((DAOSkeleton) skeleton_).setDelegate((DAO) service);
+    } else if ( service instanceof AuthService) {
+      skeleton_ = new AuthServiceSkeleton();
+      ((AuthServiceSkeleton) skeleton_).setDelegate((AuthService) service);
+    }
   }
 
   public X    getX() { return x_; }
-  public void setX(X x) { x_ = x; skeleton_.setX(x); }
+  public void setX(X x) {
+    x_ = x;
+    if ( skeleton_ instanceof ContextAware )
+      ((ContextAware) skeleton_).setX(x);
+  }
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
