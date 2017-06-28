@@ -2,7 +2,6 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.nanos.util.LRULinkedHashMap;
-
 import javax.security.auth.login.LoginException;
 import java.util.Map;
 
@@ -12,36 +11,53 @@ import java.util.Map;
 public class WebAuthService
   extends CachedUserAndGroupAuthService
 {
+  /**
+   * Map of { userId: X }
+   *
+   * This will be used for web clients logging in since they can't
+   * marshall a context
+   * */
   protected Map<String, X> loginMap = new LRULinkedHashMap<>(10000);
 
-  public X login(String userId, String password) {
-    if ( userId == null || userId == "" ) return null;
-    if ( password == null || password == "" ) return null;
-
-    if ( loginMap.containsKey(userId) ) {
-      return loginMap.get(userId);
-    }
+  public void webLogin(String userId, String password) {
+    if ( userId == null || userId == "" ) return;
+    if ( password == null || password == "" ) return;
 
     try {
-      X x = super.login(userId, password);
-      loginMap.put(userId, x);
-      return x;
-
+      if ( ! loginMap.containsKey(userId) ) {
+        X x = super.login(userId, password);
+        loginMap.put(userId, x);
+      }
     } catch (LoginException e) {
       e.printStackTrace();
     }
-
-    return null;
   }
 
-  public void logout(X x) {
-    if ( x == null ) return;
+  public Boolean check(String userId, java.security.Permission permission) {
+    if ( userId == null || userId == "" || permission == null ) return false;
 
-    User user = (User) x.get("user");
-    if ( user == null ) return;
+    if ( loginMap.containsKey(userId) ) {
+      return super.check(loginMap.get(userId), permission);
+    }
 
-    loginMap.remove(user.getEmail());
+    return false;
+  }
 
-    super.logout(x);
+  public void updatePassword(String userId, String oldPassword, String newPassword) {
+    if ( userId == null || userId == "" ) return;
+
+    if ( loginMap.containsKey(userId) ) {
+      super.updatePassword(loginMap.get(userId), oldPassword, newPassword);
+    }
+  }
+
+
+  public void logout(String userId) {
+    if ( userId == null || userId == "" ) return;
+
+    if ( loginMap.containsKey(userId) ) {
+      super.logout(loginMap.get(userId));
+      loginMap.remove(userId);
+    }
   }
 }
