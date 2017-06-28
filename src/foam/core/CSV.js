@@ -74,41 +74,41 @@ foam.CLASS({
     function outputHeader(o) {
       if ( ! this.outputHeaderRow ) return;
 
-      this.outputPropertyFilteredName(o, '', true);
+      this.outputPropertyName(o, '', true);
       this.out(this.nlStr);
     },
 
     function outputHeaderTitle(o, prefix, first) {
       this.out(first ? '' : this.delimiter)
-          .out(prefix, o);
+          .out(this.escapeString(prefix + o));
     },
 
-    function outputPropertyName(o, p, prefix, first) {
+    function outputPropertyName_(o, p, prefix, first) {
       if ( ! this.propertyPredicate(o, p) ) return;
 
       // Checks if property is enum, or object with properties of its own
       if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
         // Gets new empty object if FObjectProperty is currently undefined
         // Done to permit appropriate headers for multi-line CSVs (multiple objects to convert)
-        if (o[p.name] == undefined) o[p.name] = foam.lookup(p.of.id);
+        if ( o[p.name] == undefined ) o[p.name] = foam.lookup(p.of.id);
 
         // Appends object name to prefix for CSV Header
         prefix += p.name + this.nestedObjectSeperator;
-        this.outputPropertyFilteredName(o[p.name], prefix, first);
+        this.outputPropertyName(o[p.name], prefix, first);
       } else {
-        this.outputPropertyFilteredName(p.name, prefix, first);
+        this.outputPropertyName(p.name, prefix, first);
       }
     },
 
     {
-      name: 'outputPropertyFilteredName',
+      name: 'outputPropertyName',
       code: foam.mmethod({
         FObject:   function(o, prefix, first) {
           // Gets and recurses through object properties
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputPropertyName(o, ps[i], prefix, (i == 0 && first));
+            this.outputPropertyName_(o, ps[i], prefix, (i == 0 && first));
           }
         },
         Array: function(o) { /* Ignore arrays in CSV */ },
@@ -132,12 +132,22 @@ foam.CLASS({
       return this;
     },
 
+    function escapeString(s) {
+      if ( s.includes(',') ) {
+        // Surrounds fields with commas in quotes
+        // Escapes inner quotes by adding another quote char (Google Sheets strategy)
+        s = '"' + s.replace('"', '""') + '"';
+      }
+      
+      return s;
+    },
+
     {
       name: 'output',
       code: foam.mmethod({
         Undefined:    function(o, first) { this.outputPrimitive(this.undefinedStr, first); },
         Null:         function(o, first) { this.outputPrimitive(null, first); },
-        String:       function(o, first) { this.outputPrimitive(o, first); },
+        String:       function(o, first) { this.outputPrimitive(this.escapeString(o), first); },
         AbstractEnum: function(o, first) { this.outputPrimitive(o.ordinal, first); },
         FObject:   function(o, first) {
           if ( o.outputCSV ) {
@@ -164,16 +174,21 @@ foam.CLASS({
       if ( lines.length == 0 ) throw 'Insufficient CSV Input';
 
       // Trims quotes and splits CSV row into array
-      var props = lines[0].split(',');
+      var props = this.splitIntoValues(lines[0]);
 
-      for (var i = 1; i < lines.length; ++i) {
-        var values = lines[i].split(',');
+      for ( var i = 1 ; i < lines.length ; ++i ) {
+        var values = this.splitIntoValues(lines[i]);
 
         // Calls for creation of new model, and `puts` into sink
         sink.put(this.createModel(props, values, className));
       }
 
       return sink;
+    },
+
+    function splitIntoValues(csvString) {
+      // TODO: Implement CSV Parser
+      return csvString.split(',');
     },
 
     function createModel(props, values, className) {
@@ -229,7 +244,7 @@ foam.LIB({
     },
 
     function fromCSV(className, csvString, sink) {
-      return foam.csv.Standard.fromCSV(className, csvString, sink);
+      return foam.csv.Standard.fromCSV(className, csvString, sink).array;
     }
   ]
 });
