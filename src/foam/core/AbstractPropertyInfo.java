@@ -7,6 +7,8 @@
 package foam.core;
 
 import foam.lib.parse.Parser;
+
+import java.sql.PreparedStatement;
 import java.util.Map;
 
 public abstract class AbstractPropertyInfo
@@ -37,6 +39,11 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public String createStatement() {
+    return getName();
+  }
+
+  @Override
+  public Object prepareStatement() {
     return getName();
   }
 
