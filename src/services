@@ -2,7 +2,7 @@ p({"class":"foam.nanos.boot.NSpec","name":"nSpecDAO","lazy":true,"serve":true,"s
 p({"class":"foam.nanos.boot.NSpec","name":"http","lazy":false,"serve":false,"serviceClass":"foam.nanos.http.NanoHttpServer"})
 p({"class":"foam.nanos.boot.NSpec","name":"pmLogger","lazy":true,"serve":false,"serviceClass":"foam.nanos.pm.DAOPMLogger"})
 p({"class":"foam.nanos.boot.NSpec","name":"pmInfoDAO","lazy":true,"serve":true,"serviceClass":"foam.nanos.pm.PMDAO"})
-p({"class":"foam.nanos.boot.NSpec","name":"authTest","lazy":true,"serve":false,"serviceClass":"foam.nanos.auth.UserAndGroupAuthServiceTest"})
+p({"class":"foam.nanos.boot.NSpec","name":"auth","lazy":true,"serve":true,"serviceClass":"foam.nanos.auth.UserAndGroupAuthService"})
 p({"class":"foam.nanos.boot.NSpec","name":"logger","lazy":true,"serve":false,"serviceClass":"foam.nanos.logger.NanoLogger"})
 p({"class":"foam.nanos.boot.NSpec","name":"ping","lazy":true,"serve":false,"serviceClass":"foam.nanos.http.PingService"})
 p({"class":"foam.nanos.boot.NSpec","name":"uptime","lazy":false,"serve":false,"serviceClass":"foam.nanos.http.UptimeServlet"})
