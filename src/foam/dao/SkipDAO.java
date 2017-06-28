@@ -9,18 +9,18 @@ import foam.dao.Sink;
 public class SkipDAO
   extends ProxyDAO
 {
-  protected int skip_;
+  protected long skip_;
 
-  public SkipDAO setSkip(int skip) {
+  public SkipDAO setSkip(long skip) {
     skip_ = skip;
     return this;
   }
 
-  public Sink select_(X x, Sink s, Long skip, Long limit, Comparator order, Predicate predicate) {
-    return super.select_(x, s, Long.valueOf(skip_), limit, order, predicate);
+  public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+    return super.select_(x, s, skip_, limit, order, predicate);
   }
 
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
-    super.removeAll_(x, Long.valueOf(skip_), limit, order, predicate);
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    super.removeAll_(x, skip_, limit, order, predicate);
   }
 }

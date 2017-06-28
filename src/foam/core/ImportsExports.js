@@ -127,8 +127,10 @@ foam.CLASS({
         },
         set: function importsSetter(v) {
           var slot = this[slotName];
-          if ( slot ) slot.set(v);
-          else console.warn('Attempt to set missing import:', name);
+          if ( slot )
+            slot.set(v);
+          else
+            console.warn('Attempt to set missing import:', name);
         },
         configurable: true,
         enumerable: false

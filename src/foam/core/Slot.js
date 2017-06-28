@@ -87,10 +87,10 @@ foam.CLASS({
       var l1 = function(e) {
         if ( feedback1 ) return;
 
-        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+        if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback1 = true;
           s2.set(s1.get());
-          if ( ! foam.util.equals(s1.get(), s2.get()) )
+          if ( ! foam.util.is(s1.get(), s2.get()) )
             s1.set(s2.get());
           feedback1 = false;
         }
@@ -99,10 +99,10 @@ foam.CLASS({
       var l2 = function(e) {
         if ( feedback2 ) return;
 
-        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+        if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback2 = true;
           s1.set(s2.get());
-          if ( ! foam.util.equals(s1.get(), s2.get()) )
+          if ( ! foam.util.is(s1.get(), s2.get()) )
             s2.set(s1.get());
           feedback2 = false;
         }
@@ -134,7 +134,7 @@ foam.CLASS({
       foam.assert(other, 'Slot.follow requires Slot argument.');
       var self = this;
       var l = function() {
-        if ( ! foam.util.equals(self.get(), other.get()) ) {
+        if ( ! foam.util.is(self.get(), other.get()) ) {
           self.set(other.get());
         }
       };
