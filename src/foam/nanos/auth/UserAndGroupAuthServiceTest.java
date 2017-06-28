@@ -27,7 +27,6 @@ public class UserAndGroupAuthServiceTest
     createGroupsAndPermissions();
     addTestUsers();
     testlogin();
-    testlogin();
     testCheck();
     testCachedCheck();
     testChallengedLogin();

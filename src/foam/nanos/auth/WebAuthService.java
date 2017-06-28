@@ -51,7 +51,6 @@ public class WebAuthService
     }
   }
 
-
   public void logout(String userId) {
     if ( userId == null || userId == "" ) return;
 
