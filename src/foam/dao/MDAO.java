@@ -57,14 +57,14 @@ public class MDAO extends AbstractDAO {
     return (FObject)index_.get(state_, (FObject)id);
   }
 
-  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
     SelectPlan plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
     plan.select(state_, sink, skip, limit, order, predicate);
     sink.eof();
     return sink;
   }
 
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
     state_ = null;
   }
 
