@@ -72,7 +72,7 @@ public class SequenceNumberDAO
     if ( val.longValue() < 1 ) {
       getProperty_().set(obj, value_++);
     } else if ( val.longValue() >= value_ ) {
-      setValue(val + 1);
+      setValue(val.longValue() + 1);
     }
     return getDelegate().put(obj);
   }
