@@ -1,10 +1,16 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MapDAO
   extends AbstractDAO
@@ -35,7 +41,7 @@ public class MapDAO
 
   public MapDAO setOf(ClassInfo of) {
     of_ = of;
-    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
+    primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
     return this;
   }
 
@@ -57,13 +63,11 @@ public class MapDAO
     );
   }
 
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
-    if ( sink == null ) {
-      sink = new ListSink();
-    }
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( sink == null ) sink = new ListSink();
 
     Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
-    Subscription sub       = getX().create(Subscription.class);
+    Subscription sub       = new Subscription();
 
     for ( FObject obj : getData().values() ) {
       if ( sub.getDetached() ) break;
@@ -76,7 +80,7 @@ public class MapDAO
     return sink;
   }
 
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     setData(null);
   }
 
