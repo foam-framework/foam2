@@ -216,7 +216,6 @@ foam.CLASS({
     }
   ]
 });
-<<<<<<< HEAD
 
 foam.CLASS({
   package: 'foam.core',
@@ -315,5 +314,3 @@ foam.CLASS({
 
   axioms: [ foam.pattern.Singleton.create() ],
 });
-=======
->>>>>>> Revert "Merge branch 'master' into master"

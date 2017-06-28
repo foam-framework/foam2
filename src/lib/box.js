@@ -1687,14 +1687,10 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-	var channel = new MessageChannel();
-	this.messagePortService.addPort(channel.port1);
+	          var channel = new MessageChannel();
+	          this.messagePortService.addPort(channel.port1);
 
-<<<<<<< HEAD
-	this.target.postMessage(channel.port2, [ channel.port2 ]);
-=======
-	this.target.postMessage('', '*', [channel.port2]);
->>>>>>> Revert "Merge branch 'master' into master"
+	    this.target.postMessage(channel.port2, [ channel.port2 ]);
 
         channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
           object: this.RegisterSelfMessage.create({ name: this.me.name })
