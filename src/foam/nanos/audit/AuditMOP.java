@@ -10,7 +10,7 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.mop.ProxyMOP;
 import foam.nanos.auth.User;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.BaseLogger;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ public class AuditMOP
   @Override
   public FObject setProperty(X x, String name, Object value) {
     User       user     = (User) x.get("user");
-    NanoLogger logger   = (NanoLogger) x.get("logger");
+    BaseLogger logger   = (BaseLogger) x.get("logger");
     FObject    obj      = getDelegate().get(x);
     Object     objectId = obj.getProperty("id");
     Map        values   = new HashMap();
@@ -51,7 +51,7 @@ public class AuditMOP
   @Override
   public FObject setProperties(X x, Map values) {
     User       user     = (User) x.get("user");
-    NanoLogger logger   = (NanoLogger) x.get("logger");
+    BaseLogger logger   = (BaseLogger) x.get("logger");
     FObject    obj      = getDelegate().get(x);
     Object     objectId = obj.getProperty("id");
 
