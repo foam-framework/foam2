@@ -55,6 +55,10 @@
        name: 'organization'
      },
      {
+       class: 'Boolean',
+       name: 'verified'
+     },
+     {
        class: 'String',
        name: 'department'
      },
