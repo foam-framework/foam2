@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.csv',
+  package: 'foam.lib.csv',
   name: 'Outputter',
 
   documentation: 'CSV Outputter.',
@@ -232,19 +232,19 @@ foam.CLASS({
 });
 
 foam.LIB({
-  name: 'foam.csv',
+  name: 'foam.lib.csv',
 
   constants: {
-    Standard: foam.csv.Outputter.create(),
+    Standard: foam.lib.csv.Outputter.create(),
   },
 
   methods: [
     function toCSV(o) {
-      return foam.csv.Standard.toCSV(o);
+      return foam.lib.csv.Standard.toCSV(o);
     },
 
     function fromCSV(className, csvString, sink) {
-      return foam.csv.Standard.fromCSV(className, csvString, sink).array;
+      return foam.lib.csv.Standard.fromCSV(className, csvString, sink).array;
     }
   ]
 });
