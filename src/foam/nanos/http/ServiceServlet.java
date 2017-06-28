@@ -31,9 +31,9 @@ public class ServiceServlet
   extends    HttpServlet
   implements ContextAware
 {
-  protected Object      service_;
-  protected Box skeleton_;
-  protected X           x_;
+  protected Object  service_;
+  protected Box     skeleton_;
+  protected X       x_;
 
   public ServiceServlet(Object service) {
     service_ = service;
