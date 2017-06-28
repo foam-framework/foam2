@@ -86,6 +86,7 @@ foam.CLASS({
             { code: 'JM', name: 'Jamacia' },
             { code: 'LB', name: 'Lebanon' },
             { code: 'MX', name: 'Mexico' },
+            { code: 'MY', name: 'Malaysia' },
             { code: 'RS', name: 'Serbia' },
             { code: 'TT', name: 'Trinidad and Tobago' },
             { code: 'UK', name: 'United Kingdom' },
