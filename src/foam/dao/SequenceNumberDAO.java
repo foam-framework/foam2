@@ -61,18 +61,16 @@ public class SequenceNumberDAO
     isValueSet_ = true;
   }
 
-  public FObject put(FObject obj) {
-    if ( ! isValueSet_ )
-      calcDelegateMax_();
-    return put_(getX(), obj);
-  }
-
   public FObject put_(X x, FObject obj) {
-    Number val = (Number) obj.getProperty(property);
-    if ( val.longValue() < 1 ) {
-      getProperty_().set(obj, value_++);
-    } else if ( val.longValue() >= value_ ) {
-      setValue(val.longValue() + 1);
+    synchronized (this) {
+      if ( ! isValueSet_ )
+        calcDelegateMax_();
+      Number val = (Number) obj.getProperty(property);
+      if ( val.longValue() < 1 ) {
+        getProperty_().set(obj, value_++);
+      } else if ( val.longValue() >= value_ ) {
+        setValue(val.longValue() + 1);
+      }
     }
     return getDelegate().put(obj);
   }
