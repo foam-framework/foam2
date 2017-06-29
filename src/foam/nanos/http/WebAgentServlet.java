@@ -36,6 +36,6 @@ public class WebAgentServlet
   {
     resp.setContentType("text/html");
 
-    agent_.execute(getX().put(req.getClass(), req).put(resp.getClass(), resp).put(PrintWriter.class, resp.getWriter()));
+    agent_.execute(getX().put(HttpServletRequest.class, req).put(HttpServletResponse.class, resp).put(PrintWriter.class, resp.getWriter()));
   }
 }
