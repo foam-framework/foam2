@@ -954,6 +954,7 @@ foam.CLASS({
         sink: sink || this.ArraySink.create()
       });
       var promise = replyBox.promise;
+      var reject = replyBox.reject_;
 
       replyBox = this.registry.register(replyBox.id, null, replyBox);
 
@@ -962,7 +963,7 @@ foam.CLASS({
       this.SUPER(
           null, this.BoxDAOListener.create({ box: replyBox }),
           skip, limit, order, predicate)
-              .catch(function(error) { replyBox.reject_(error); });
+              .catch(reject);
       return promise;
     },
     function listen_(x, sink, predicate) {
