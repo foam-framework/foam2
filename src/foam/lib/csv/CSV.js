@@ -246,7 +246,7 @@ foam.LIB({
     },
 
     function fromCSV(className, csvString, sink) {
-      return foam.lib.csv.Standard.fromCSV(className, csvString, sink).array;
+      return foam.lib.csv.Standard.fromCSV(className, csvString, sink);
     }
   ]
 });
