@@ -35,12 +35,13 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      javaCode: function() {/*
-getDelegate().send(message.setObject(
-    getX().create(foam.box.SubBoxMessage.class)
-        .setName(getName())
-        .setObject(message.getObject())));
-*/}
+      javaCode: function() {
+/*foam.box.SubBoxMessage subBoxMessage = getX().create(foam.box.SubBoxMessage.class);
+subBoxMessage.setName(getName());
+subBoxMessage.setObject(message.getObject());
+message.setObject(subBoxMessage);
+getDelegate().send(message);*/
+      }
     }
   ]
 });
