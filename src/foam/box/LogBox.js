@@ -49,7 +49,7 @@ foam.CLASS({
     function send(message) {
       this[this.logLevel.consoleMethodName].apply(this, [
         this.name,
-        foam.isServer ? foam.json.Pretty.stringify(message) : message
+        foam.json.Pretty.stringify(message)
       ]);
       this.delegate && this.delegate.send(message);
     }
