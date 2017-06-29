@@ -63,6 +63,7 @@ FOAM_FILES([
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
   { name: "foam/lib/csv/CSV" },
+  { name: "foam/lib/csv/CSVParser" },
   { name: "foam/parse/parse" },
   { name: "foam/parse/json" },
   { name: "foam/parsers/FON" },
