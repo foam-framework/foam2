@@ -31,6 +31,7 @@ var classes = [
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
   'foam.box.Box',
+  'foam.box.Skeleton',
   'foam.box.ProxyBox',
   'foam.box.SubBox',
   'foam.box.Message',
