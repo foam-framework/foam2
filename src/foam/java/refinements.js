@@ -88,7 +88,7 @@ foam.CLASS({
           type: this.javaType,
           visibility: 'public',
           body: 'if ( ! ' + isSet + ' ) {\n' +
-            ( this.hasOwnProperty('javaFactory') ? 
+            ( this.hasOwnProperty('javaFactory') ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
@@ -356,7 +356,7 @@ foam.CLASS({
 
           cls.name = this.model_.name;
           cls.package = this.model_.package;
-          cls.extends = this.extends;
+          cls.implements = (this.implements || []).concat(this.model_.javaExtends || []);
 
           var axioms = this.getAxioms();
 
