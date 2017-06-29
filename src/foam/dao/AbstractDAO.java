@@ -16,19 +16,27 @@ public abstract class AbstractDAO
   protected PropertyInfo primaryKey_        = null;
 
   public DAO where(Predicate predicate) {
-    return new FilteredDAO().setPredicate(predicate).setDelegate(this);
+    FilteredDAO filteredDAO = new FilteredDAO().setPredicate(predicate);
+    filteredDAO.setDelegate(this);
+    return filteredDAO;
   }
 
   public DAO orderBy(Comparator comparator) {
-    return new OrderedDAO().setOrder(comparator).setDelegate(this);
+    OrderedDAO orderedDAO = new OrderedDAO().setOrder(comparator);
+    orderedDAO.setDelegate(this);
+    return orderedDAO;
   }
 
   public DAO skip(long count) {
-    return new SkipDAO().setSkip(count).setDelegate(this);
+    SkipDAO skipDAO = new SkipDAO().setSkip(count);
+    skipDAO.setDelegate(this);
+    return skipDAO;
   }
 
   public DAO limit(long count) {
-    return new LimitedDAO().setLimit(count).setDelegate(this);
+    LimitedDAO limitedDAO = new LimitedDAO().setLimit(count);
+    limitedDAO.setDelegate(this);
+    return limitedDAO;
   }
 
   public void pipe_(X x, foam.dao.Sink sink) {
@@ -37,19 +45,31 @@ public abstract class AbstractDAO
 
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( limit < this.MAX_SAFE_INTEGER ) {
-      sink = new LimitedSink().setLimit(limit).setDelegate(sink);
+      LimitedSink limitedSink = new LimitedSink();
+      limitedSink.setLimit(limit);
+      limitedSink.setDelegate(sink);
+      sink = limitedSink;
     }
 
     if ( skip > 0 ) {
-      sink = new SkipSink().setSkip(skip).setDelegate(sink);
+      SkipSink skipSink = new SkipSink();
+      skipSink.setSkip(skip);
+      skipSink.setDelegate(sink);
+      sink = skipSink;
     }
 
     if ( order != null ) {
-      sink = new OrderedSink().setComparator(order).setDelegate(sink);
+      OrderedSink orderedSink = new OrderedSink();
+      orderedSink.setComparator(order);
+      orderedSink.setDelegate(sink);
+      sink = orderedSink;
     }
 
     if ( predicate != null ) {
-      sink = new PredicatedSink().setPredicate(predicate).setDelegate(sink);
+      PredicatedSink predicatedSink = new PredicatedSink();
+      predicatedSink.setPredicate(predicate);
+      predicatedSink.setDelegate(sink);
+      sink = predicatedSink;
     }
 
     return sink;
