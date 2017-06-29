@@ -88,10 +88,17 @@ foam.CLASS({
           javaType: 'foam.box.Box'
         }
       ],
-      javaCode: 'foam.box.Box exportBox = getX().create(foam.box.SubBox.class).setName(name).setDelegate((foam.box.Box)getMe());\n'
-                + '// TODO(adamvy): Apply service policy\n'
-                + 'getRegistry().put(name, getX().create(Registration.class).setExportBox(exportBox).setLocalBox(box));\n'
-                + 'return exportBox;'
+      javaCode: function() {
+/*foam.box.Box exportBox = getX().create(foam.box.SubBox.class);
+((SubBox) exportBox).setName(name);
+((SubBox) exportBox).setDelegate((foam.box.Box) getMe());
+Registration registration = getX().create(Registration.class);
+registration.setExportBox(exportBox);
+registration.setLocalBox(box);
+// TODO(adamvy): Apply service policy
+getRegistry().put(name, registration);
+return exportBox;*/
+      }
     },
     {
       name: 'unregister',
