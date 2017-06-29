@@ -187,8 +187,8 @@ foam.CLASS({
     },
 
     function splitIntoValues(csvString) {
-      // TODO: Implement CSV Parser
-      return csvString.split(',');
+      var parser = foam.lookup('foam.lib.csv.CSVParser').create();
+      return parser.parseString(csvString);
     },
 
     function createModel(props, values, className) {
