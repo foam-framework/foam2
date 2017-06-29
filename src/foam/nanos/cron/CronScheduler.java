@@ -63,15 +63,4 @@ public class CronScheduler
     cronDAO_ = (DAO) getX().get("MapDAO");
     cronJobs.start();
   }
-
-  public static void main(String[] args) {
-    Cron cron = new Cron()
-        .setHour(23)
-        .setMinute(59)
-        .setDayOfMonth(8)
-        .setMonth(6)
-        .setDayOfWeek(0);
-    System.out.println(cron.getScheduledTime());
-    System.out.println(cron.getNextScheduledTime());
-  }
 }
