@@ -1,60 +1,32 @@
 package foam.core;
 
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
-import foam.dao.ListSink;
-import foam.dao.XMLDAO;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import javax.xml.stream.*;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.*;
 
 public class XMLSupport {
-
-  // TODO: Planning to add support for other date formats in the future
 
   public static List<FObject> fromXML(X x, XMLStreamReader xmlr) {
     List<FObject> objList = new ArrayList<FObject>();
     try {
       int eventType;
-      Object clsInstance = null;
       while ( xmlr.hasNext() ) {
         eventType = xmlr.next();
         switch ( eventType ) {
-          case XMLStreamConstants.START_DOCUMENT:
-            break;
           case XMLStreamConstants.START_ELEMENT:
             if ( xmlr.getLocalName().equals("object") ) {
-              // Create new fObject
-              String objClass = xmlr.getAttributeValue(null, "class");
-              Class cls;
-
-              try {
-                cls = Class.forName(objClass);
-                clsInstance = x.create(cls);
-              } catch (ClassNotFoundException ex) {
-
-              }
-              // Object properties
-              copyFromXML((FObject) clsInstance, xmlr);
-              if ( clsInstance != null ) {
-                objList.add((FObject) clsInstance);
+              FObject obj = createObj(x, xmlr);
+              if ( obj != null ) {
+                objList.add(obj);
               }
             }
-            break;
-          case XMLStreamConstants.END_ELEMENT:
-            break;
-          case XMLStreamConstants.END_DOCUMENT:
             break;
         }
       }
@@ -62,6 +34,23 @@ public class XMLSupport {
     } catch (XMLStreamException ex) {
     }
     return objList;
+  }
+
+  public static FObject createObj ( X x, XMLStreamReader xmlr ) {
+    Object clsInstance = null;
+    try {
+      // Create new fObject
+      String objClass = xmlr.getAttributeValue(null, "class");
+      Class cls = Class.forName(objClass);
+      clsInstance = x.create(cls);
+      // Object properties
+      copyFromXML(x, (FObject) clsInstance, xmlr);
+    } catch (ClassNotFoundException ex) {
+
+    } catch (XMLStreamException ex ) {
+
+    }
+    return (FObject) clsInstance;
   }
 
   public static List<FObject> fromXML(X x, String fileName) throws IOException {
@@ -77,7 +66,7 @@ public class XMLSupport {
     return fromXML(x, xmlr);
   }
 
-  public static void copyFromXML(FObject obj, XMLStreamReader reader) throws XMLStreamException {
+  public static void copyFromXML(X x, FObject obj, XMLStreamReader reader) throws XMLStreamException {
     try {
       PropertyInfo prop = null;
       while ( reader.hasNext() ) {
@@ -87,13 +76,8 @@ public class XMLSupport {
           case XMLStreamConstants.START_ELEMENT:
             ClassInfo cInfo = obj.getClassInfo();
             prop = (PropertyInfo) cInfo.getAxiomByName(reader.getLocalName());
-            if ( prop == null ) {
-              throw new XMLStreamException("Could not find property " + reader.getLocalName());
-            }
-            break;
-          case XMLStreamConstants.CHARACTERS:
             if ( prop != null ) {
-              prop.setFromString(obj, reader.getText());
+              prop.set(obj, prop.fromXML(x, reader));
               prop = null;
             }
             break;
@@ -145,24 +129,9 @@ public class XMLSupport {
     List props = cInfo.getAxiomsByClass(PropertyInfo.class);
     Iterator propItr = props.iterator();
 
-    try {
-      while ( propItr.hasNext() ) {
-        PropertyInfo prop = (PropertyInfo) propItr.next();
-        Object value = prop.f(obj);
-        if (prop.getTransient() ) continue;
-        if ( value != null && value != "" ) {
-          writer.writeStartElement(prop.getName());
-          // Case for date
-          if ( value instanceof java.util.Date ) {
-            String s = value.toString();
-            writer.writeCharacters(s);
-          } else {
-            writer.writeCharacters(value.toString());
-          }
-          writer.writeEndElement();
-        }
-      }
-    } catch (XMLStreamException ex) {
+    while ( propItr.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) propItr.next();
+      prop.toXML(obj, writer);
     }
   }
 
@@ -188,9 +157,11 @@ public class XMLSupport {
       writer = new IndentingXMLStreamWriter(writer);
       writer.writeStartDocument();
       Iterator i = objArray.iterator();
+      writer.writeStartElement("objects");
       while ( i.hasNext() ) {
         toXML((FObject) i.next(), writer);
       }
+      writer.writeEndElement();
       writer.writeEndDocument();
     } catch (XMLStreamException ex) {
     }
