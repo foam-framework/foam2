@@ -8,4 +8,5 @@ p({"class":"foam.nanos.boot.NSpec","name":"ping","lazy":true,"serve":false,"serv
 p({"class":"foam.nanos.boot.NSpec","name":"uptime","lazy":false,"serve":false,"serviceClass":"foam.nanos.http.UptimeServlet"})
 p({"class":"foam.nanos.boot.NSpec","name":"static","lazy":true,"serve":false,"serviceClass":"foam.nanos.http.FileServlet"})
 p({"class":"foam.nanos.boot.NSpec","name":"export","lazy":true,"serve":false,"serviceClass":"foam.nanos.export.ExportService"})
+p({"class":"foam.nanos.boot.NSpec","name":"trace","lazy":true,"serve":false,"serviceClass":"foam.nanos.http.TraceWebAgent"})
 p({"class":"foam.nanos.boot.NSpec","name":"services","lazy":true,"serve":false,"serviceClass":"foam.nanos.http.ServicesWebAgent"})
