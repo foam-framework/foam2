@@ -41,8 +41,6 @@ foam.CLASS({
         o.indent();
         o.out('set', foam.String.capitalize(props[i].name), '((', props[i].javaType, ')values[', i, ']);\n');
       }
-      o.indent();
-      o.out('return this;\n');
     }
   ]
 });
