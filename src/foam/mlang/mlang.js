@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 // TODO(braden): Port the partialEval() code over here.
@@ -1415,43 +1404,6 @@ foam.CLASS({
 });
 
 
-foam.INTERFACE({
-  package: 'foam.mlang.order',
-  name: 'Comparator',
-
-  documentation: 'Interface for comparing two values: -1: o1 < o2, 0: o1 == o2, 1: o1 > o2.',
-
-  methods: [
-    {
-      name: 'compare',
-      args: [
-        'o1',
-        'o2'
-      ]
-    },
-    {
-      name: 'toIndex',
-      args: [
-        'tail'
-      ]
-    },
-    {
-      /** Returns remaning ordering without this first one, which may be the
-        only one. */
-      name: 'orderTail'
-    },
-    {
-      /** The property, if any, sorted by this ordering. */
-      name: 'orderPrimaryProperty'
-    },
-    {
-      /** Returns 1 or -1 for ascending/descending */
-      name: 'orderDirection'
-    }
-  ]
-});
-
-
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -1689,7 +1641,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Object',
+      class: 'Double',
       name: 'value'
     }
   ],
