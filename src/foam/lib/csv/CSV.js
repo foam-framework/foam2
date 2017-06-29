@@ -187,7 +187,7 @@ foam.CLASS({
     },
 
     function splitIntoValues(csvString) {
-      if (csvString == undefined || csvString.length == 0) return [];
+      if ( ( csvString == undefined ) || ( csvString.length == 0) ) return [];
 
       var parser = foam.lookup('foam.lib.csv.CSVParser').create();
       return parser.parseString(csvString).map(field => field.value == undefined ? '' : field.value);
