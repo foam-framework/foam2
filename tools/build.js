@@ -27,7 +27,7 @@ if ( process.argv.length > 2 ) {
 
   // Default to language = javascript.
   if ( ! flags.js ) {
-    flags.js = ! otherLanguage.some(function(lang) {
+    flags.js = ! otherLanguages.some(function(lang) {
       return flags[lang];
     });
   }
