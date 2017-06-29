@@ -19,42 +19,69 @@ public class MLang
 {
 
   public static Expr prepare(Object o) {
-    return o instanceof Expr ? (Expr) o : new Constant().setValue(o);
+    if ( o instanceof Expr )
+      return (Expr) o;
+    Constant constant = new Constant();
+    constant.setValue(o);
+    return constant;
   }
 
   public static Predicate LT(Object o1, Object o2) {
-    return new Lt().setArg1(MLang.prepare(o1)).setArg2(MLang.prepare(o2));
+    Lt lt = new Lt();
+    lt.setArg1(MLang.prepare(o1));
+    lt.setArg2(MLang.prepare(o2));
+    return lt;
   }
 
   public static Predicate LTE(Object o1, Object o2) {
-    return new Lte().setArg1(MLang.prepare(o1)).setArg2(MLang.prepare(o2));
+    Lte lte = new Lte();
+    lte.setArg1(MLang.prepare(o1));
+    lte.setArg2(MLang.prepare(o2));
+    return lte;
   }
 
   public static Predicate EQ(Object o1, Object o2) {
-    return new Eq().setArg1(MLang.prepare(o1)).setArg2(MLang.prepare(o2));
+    Eq eq = new Eq();
+    eq.setArg1(MLang.prepare(o1));
+    eq.setArg2(MLang.prepare(o2));
+    return eq;
   }
 
   public static Predicate GTE(Object o1, Object o2) {
-    return new Gte().setArg1(MLang.prepare(o1)).setArg2(MLang.prepare(o2));
+    Gte gte = new Gte();
+    gte.setArg1(MLang.prepare(o1));
+    gte.setArg2(MLang.prepare(o2));
+    return gte;
   }
 
   public static Predicate GT(Object o1, Object o2) {
-    return new Gt().setArg1(MLang.prepare(o1)).setArg2(MLang.prepare(o2));
+    Gt gt = new Gt();
+    gt.setArg1(MLang.prepare(o1));
+    gt.setArg2(MLang.prepare(o2));
+    return gt;
   }
 
   public static Predicate AND(Predicate... args) {
-    return new And().setArgs(args);
+    And and = new And();
+    and.setArgs(args);
+    return and;
   }
 
   public static Predicate OR(Predicate... args) {
-    return new Or().setArgs(args);
+    Or or = new Or();
+    or.setArgs(args);
+    return or;
   }
 
   public static Sink MAX(Object o1) {
-    return new Max().setArg1(MLang.prepare(o1));
+    Max max = new Max();
+    max.setArg1(MLang.prepare(o1));
+    return max;
   }
 
   public static Sink MIN(Object o1) {
-    return new Min().setArg1(MLang.prepare(o1));
+    Min min = new Min();
+    min.setArg1(MLang.prepare(o1));
+    return min;
   }
 }

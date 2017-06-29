@@ -88,7 +88,7 @@ foam.CLASS({
           type: this.javaType,
           visibility: 'public',
           body: 'if ( ! ' + isSet + ' ) {\n' +
-            ( this.hasOwnProperty('javaFactory') ? 
+            ( this.hasOwnProperty('javaFactory') ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
@@ -103,10 +103,9 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: cls.name,
+          type: 'void',
           body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
+              + isSet + ' = true;'
         });
 
       if ( this.hasOwnProperty('javaFactory') ) {

@@ -52,10 +52,10 @@ public class HistoryDAO
       String key = (String) i.next();
       PropertyInfo prop = (PropertyInfo) currentValue.getClassInfo().getAxiomByName(key);
 
-      PropertyUpdate update = new PropertyUpdate()
-          .setName(key)
-          .setOldValue(prop.f(currentValue))
-          .setNewValue(diff.get(key));
+      PropertyUpdate update = new PropertyUpdate();
+      update.setName(key);
+      update.setOldValue(prop.f(currentValue));
+      update.setNewValue(diff.get(key));
       updates[index++] = update;
     }
 
