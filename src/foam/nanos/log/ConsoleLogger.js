@@ -24,19 +24,21 @@ foam.CLASS({
       name) and date string`,
 
   requires: [ 'foam.nanos.log.LogLevel' ],
+
   imports: [
     'debug as debug_',
     'log as log_',
     'info as info_',
     'warn as warn_',
-    'error as error_',
+    'error as error_'
   ],
+
   exports: [
     'debug',
     'log',
     'info',
     'warn',
-    'error',
+    'error'
   ],
 
   properties: [

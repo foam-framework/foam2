@@ -53,6 +53,10 @@ foam.CLASS({
       class: 'AxiomArray',
       name: 'methods',
       of: 'foam.core.internal.InterfaceMethod'
+    },
+    {
+      class: 'StringArray',
+      name: 'javaExtends'
     }
   ]
 });
