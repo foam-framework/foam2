@@ -1,15 +1,19 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.json;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
-
-import java.lang.reflect.InvocationTargetException;
 
 import foam.core.ClassInfo;
 import foam.core.PropertyInfo;
 import foam.lib.parse.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ModelParserFactory {
   private static HashMap<Class, Parser> parsers_ = new HashMap<Class, Parser>();

@@ -115,11 +115,11 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'limit',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -146,11 +146,11 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'limit',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -227,7 +227,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
@@ -237,7 +237,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
@@ -249,6 +249,30 @@ foam.INTERFACE({
           name: 'x',
           javaType:  'foam.core.X'
         }
+      ]
+    },
+    {
+      name: 'cmd',
+      javaReturns: 'Object',
+      args: [
+        {
+          name: 'obj',
+          javaType:  'Object'
+        }
+      ]
+    },
+    {
+      name: 'cmd_',
+      javaReturns: 'Object',
+      args: [
+        {
+          name: 'x',
+          javaType:  'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType:  'Object'
+        },
       ]
     }
   ]

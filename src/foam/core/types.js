@@ -483,7 +483,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) { return of + 'DAO'; }
+      expression: function(of) { return foam.String.daoize(of.name); }
     },
     {
       name: 'adapt',
