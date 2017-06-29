@@ -1046,6 +1046,8 @@ foam.CLASS({
     'foam.box.InvalidMessageException'
   ],
 
+  imports: [ 'error' ],
+
   properties: [
     {
       name: 'data'
@@ -1058,9 +1060,10 @@ foam.CLASS({
 
       try {
         p = this.data[message.object.name].apply(this.data, message.object.args);
-      } catch(e) {
+      } catch(error) {
+        this.onError(message.object, error);
         message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
-          object: e
+          object: error
         }));
 
         return;
@@ -1078,6 +1081,7 @@ foam.CLASS({
             }));
           },
           function(error) {
+            self.onError(message.object, error);
             message.attributes.errorBox && message.attributes.errorBox.send(
               self.Message.create({
                 object: error
@@ -1099,6 +1103,13 @@ foam.CLASS({
       throw this.InvalidMessageException.create({
         messageType: message.cls_ && message.cls_.id
       });
+    }
+  ],
+
+  listeners: [
+    function onError(rpc, error) {
+      this.error('SkeletonBox: error on RPC invocation:',
+                 this.data, rpc.name, rpc.args, error);
     }
   ]
 });
