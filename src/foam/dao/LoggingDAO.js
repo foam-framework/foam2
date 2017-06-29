@@ -53,7 +53,11 @@ foam.CLASS({
     },
 
     function select_(x, sink, skip, limit, order, predicate) {
-      this.logger('select', skip, limit, order, predicate);
+      this.logger('select',
+                  '\nskip', skip,
+                  '\nlimit', limit,
+                  '\norder', order && order.toString(),
+                  '\npredicate', predicate && predicate.toString());
       sink = sink || this.ArraySink.create();
       if ( this.logReads ) {
         var put = sink.put.bind(sink);
