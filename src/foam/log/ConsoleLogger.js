@@ -16,15 +16,14 @@
  */
 
 foam.CLASS({
-  package: 'foam.nanos.log',
+  package: 'foam.log',
   name: 'ConsoleLogger',
-  implements: [ 'foam.nanos.log.Logger' ],
+  implements: [ 'foam.log.Logger' ],
 
   documentation: `Decorate contextual logging methods with log level (short
       name) and date string`,
 
-  requires: [ 'foam.nanos.log.LogLevel' ],
-
+  requires: [ 'foam.log.LogLevel' ],
   imports: [
     'debug as debug_',
     'log as log_',

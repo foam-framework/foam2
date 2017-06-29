@@ -61,7 +61,6 @@ foam.CLASS({
           seqNo: true,
           testData: [
             { name: 'http',   serve: false, serviceClass: 'foam.nanos.http.NanoHttpServer' },
-            { name: 'log',    serve: false, serviceClass: 'foam.nanos.log.FileLogger' },
             { name: 'pmlog',  serve: false, serviceClass: 'foam.nanos.pm.DAOPMLogger' },
             { name: 'auth',   serve: true,  serviceClass: 'foam.nanos.auth.UserAndGroupAuthService' },
             { name: 'test',   serve: true,  serviceClass: 'foam.nanos.test.TestRunner' },
