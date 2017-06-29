@@ -13,10 +13,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class PostgresDAO
-  extends ProxyDAO {
+  extends AbstractDAO {
 
-  public PostgresDAO(DAO delegate, String host, String port, String dbName, String username, String password) {
-    setDelegate(delegate);
+  public PostgresDAO(String host, String port, String dbName, String username, String password) {
 
     if ( dbName == null || username == null ) {
       throw new IllegalArgumentException("Illegal arguments");
@@ -28,7 +27,8 @@ public class PostgresDAO
     ConnectionPool.setup(host, port, dbName, username, password);
   }
 
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+
     if ( sink == null ) {
       sink = new ListSink();
     }
@@ -54,7 +54,7 @@ public class PostgresDAO
   }
 
   @Override
-  public FObject remove(FObject o) {
+  public FObject remove_(X x, FObject o) {
 
     try {
       SQLData data = new SQLData(o);
@@ -101,7 +101,7 @@ public class PostgresDAO
   }
 
   @Override
-  public FObject find(Object o) {
+  public FObject find_(X x, Object o) {
 
     try {
 
@@ -124,7 +124,10 @@ public class PostgresDAO
   }
 
   @Override
-  public FObject put(FObject obj) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {}
+
+  @Override
+  public FObject put_(X x, FObject obj) {
 
     try {
       Connection c = ConnectionPool.getConnection();
@@ -183,8 +186,6 @@ public class PostgresDAO
         e.printStackTrace();
       }
 
-    if ( getDelegate() != null ) return getDelegate().put(obj);
     return obj;
   }
-
 }
