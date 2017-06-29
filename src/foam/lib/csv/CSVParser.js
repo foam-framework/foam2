@@ -20,9 +20,9 @@ foam.CLASS({
         return {
           START: seq1(1, sym('ws'), repeat(sym('field'), ','), sym('ws')),
 
-          field: alt(sym('quotedText'), sym('unquotedText')),
+          field: alt(sym('quotedText'), sym('unquotedText'), ''),
 
-          unquotedText: repeat(not(',', anyChar())),
+          unquotedText: repeat(not(',', anyChar()), '', 1),
 
           quotedText: seq1(1, '"', repeat(alt(sym('escapedQuote'), not('"', anyChar()))), '"'),
 
@@ -45,11 +45,11 @@ foam.CLASS({
 
         g.addActions({
           unquotedText: function(a) {
-            return { node: 'unquotedText', value: a };
+            return { node: 'unquotedText', value: a.join('') };
           },
 
           quotedText: function(a) {
-            return { node: 'quotedText', value: a[1].join('') };
+            return { node: 'quotedText', value: a.join('') };
           },
 
           escapedQuote: function() { return '"'; }
