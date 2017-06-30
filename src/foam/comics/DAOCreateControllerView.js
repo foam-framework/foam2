@@ -40,6 +40,13 @@ foam.CLASS({
       factory: function() {
         return this.DAOCreateController.create({ dao: this.dao });
       }
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$dao$of) {
+        return 'Create ' + data$dao$of.name;
+      }
     }
   ],
 
