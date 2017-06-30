@@ -145,7 +145,7 @@ foam.CLASS({
 
       o.increaseIndent();
 
-      if (this.isEnum) this.writeDeclarations(o);
+      if ( this.isEnum ) this.writeDeclarations(o);
 
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
