@@ -33,7 +33,7 @@ foam.CLASS({
 
           [1] https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Projection`,
       code: function(query) {
-        query.projection = [ { property: { name: "__key__" } } ];
+        query.projection = [ { property: { name: '__key__' } } ];
       }
     },
     {
@@ -57,6 +57,13 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'toDatastorePropertyName',
+      documentation: 'The "real name" of this property according in datastore.',
+      code: function() {
+        return this.name === 'id' ? '__key__' : this.name;
+      }
+    },
+    {
       name: 'toDatastorePropertyReference',
       documentation:
       function() {/*
@@ -64,7 +71,9 @@ foam.CLASS({
                     API.
                     https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#PropertyReference
                   */},
-      code: function() { return { name: this.name }; }
+      code: function() {
+        return { name: this.toDatastorePropertyName() };
+      }
     }
   ]
 });
@@ -77,7 +86,12 @@ foam.CLASS({
     {
       name: 'toDatastorePropertyReference',
       code: function() {
-        return { name: this.arg1.name + '.' + this.arg2.name };
+        // TODO(markdittmer): "id" should be swapped for "__key__" only on
+        // leftmost arg in chain.
+        return {
+          name: this.arg1.toDatastorePropertyName() + '.' +
+              this.arg2.toDatastorePropertyName()
+        };
       }
     }
   ]
@@ -227,8 +241,9 @@ foam.CLASS({
       code: function(opt_orderDirection) {
         var orderDirection = opt_orderDirection || 1;
         return orderDirection === 1 ?
-            [ { property: { name: this.name } } ] :
-            [ { property: { name: this.name }, direction: 'DESCENDING' } ];
+            [ { property: { name: this.toDatastorePropertyName() } } ] :
+            [ { property: { name: this.toDatastorePropertyName() },
+                direction: 'DESCENDING' } ];
       }
     }
   ]
