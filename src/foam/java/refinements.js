@@ -164,7 +164,7 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name = this.model_.name;
+      cls.name    = this.model_.name;
       cls.package = this.model_.package;
       cls.extends = this.model_.extends === 'FObject' ?
         'foam.core.AbstractFObject' : this.model_.extends;
@@ -191,6 +191,14 @@ foam.LIB({
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
+
+      // TODO: instead of doing this here, we should walk all Axioms
+      // and introuce a new buildJavaAncestorClass() method
+      cls.allProperties = this.getAxiomsByClass(foam.core.Property)
+        .filter(function(p) { return !!p.javaType && p.javaInfoType; })
+        .map(function(p) {
+          return foam.java.Field.create({name: p.name, type: p.javaType});
+        });
 
       return cls;
     }
