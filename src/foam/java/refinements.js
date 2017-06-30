@@ -75,7 +75,7 @@ foam.CLASS({
         field({
           name: privateName,
           type: this.javaType,
-          visibility: 'private'
+          visibility: 'protected'
         }).
         field({
           name: isSet,
