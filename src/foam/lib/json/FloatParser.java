@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.json;
 
 import foam.lib.parse.*;
@@ -29,9 +35,7 @@ public class FloatParser implements Parser {
       if ( Character.isDigit(c) ) {
           n.append(c);
       } else if ( c == '.' ) { // TODO: localization
-        if (decimalFound) {
-          return null;
-        }
+        if ( decimalFound ) return null;
         decimalFound = true;
         n.append(c);
       } else {

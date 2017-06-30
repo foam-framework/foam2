@@ -6,6 +6,7 @@
 
 package foam.dao;
 
+import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.X;
 import foam.mlang.order.Comparator;
@@ -49,17 +50,7 @@ public class JDAO
   }
 
   @Override
-  public FObject find_(X x, Object id) {
-    return getDelegate().find_(x, id);
-  }
-
-  @Override
-  public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
-    return getDelegate().select_(x, sink, skip, limit, order, predicate);
-  }
-
-  @Override
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     // TODO: this is wrong, should only call journal.removeAll() if neither limit nor predicate
     // are set.
     journal.removeAll();
