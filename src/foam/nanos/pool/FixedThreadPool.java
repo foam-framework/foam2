@@ -73,7 +73,7 @@ public class FixedThreadPool
     return pool_;
   }
 
-  public void pool(X x, ContextAgent agent) {
+  public void submit(X x, ContextAgent agent) {
     incrQueued();
     getPool().submit(new ContextAgentRunnable(x, agent));
   }
