@@ -70,6 +70,7 @@ var classes = [
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.script.Script',
