@@ -70,7 +70,7 @@ foam.CLASS({
       value: function(value) {
         this.add(value.label)
       }
-    },
+    }
   ]
 });
 
@@ -246,7 +246,7 @@ foam.CLASS({
       // Dynamic position calculation
       var origin = this.dropdownOrigin.el();
       var current = this.overlayOrigin.el();
-      
+
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
@@ -320,7 +320,7 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    if ( view.editColumnsEnabled ) return this.tag('td'); 
+                    if ( view.editColumnsEnabled ) return this.tag('td');
                   })
               });
           }));
