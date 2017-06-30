@@ -316,7 +316,8 @@ foam.CLASS({
       class: 'foam.mlang.ExprProperty',
       name: 'arg2',
       adapt: function(old, nu, prop) {
-        if ( this.arg1 && this.arg1.adapt ) nu = this.arg1.adapt(old, nu);
+        if ( this.arg1 && this.arg1.adapt )
+          nu = this.arg1.adapt.call(null, old, nu, this.arg1);
         return prop.adaptValue(nu);
       }
     }
@@ -771,7 +772,7 @@ foam.CLASS({
       adapt: function(old, nu, prop) {
         if ( this.arg1 && this.arg1.adapt ) {
           for ( var i = 0; i < nu.length; i++ ) {
-            nu[i] = this.arg1.adapt(old && old[i], nu[i]);
+            nu[i] = this.arg1.adapt.call(null, old && old[i], nu[i], this.arg1);
           }
         }
         return prop.adaptValue(nu);
