@@ -23,14 +23,13 @@ describe('ConsoleLogger', function() {
 
   beforeAll(function() {
     var path = require('path');
-    require(path.join(__dirname, '../../../src/foam/nanos/nanos.js'));
   });
 
   beforeEach(function() {
     foam.CLASS({
-      package: 'foam.nanos.log.test',
+      package: 'foam.log.test',
       name: 'CaptureLogger',
-      implements: [ 'foam.nanos.log.Logger' ],
+      implements: [ 'foam.log.Logger' ],
 
       exports: [
         'debug',
@@ -61,25 +60,25 @@ describe('ConsoleLogger', function() {
       }])
     });
     foam.CLASS({
-      package: 'foam.nanos.log.test',
+      package: 'foam.log.test',
       name: 'ConsoleLogger',
-      extends: 'foam.nanos.log.ConsoleLogger',
+      extends: 'foam.log.ConsoleLogger',
 
       properties: [
         ['getDateString', function() { return 'DATE'; }]
       ]
     });
-    LogLevel = foam.lookup('foam.nanos.log.LogLevel');
-    testCtx = foam.lookup('foam.nanos.log.test.ConsoleLogger').create(
+    LogLevel = foam.lookup('foam.log.LogLevel');
+    testCtx = foam.lookup('foam.log.test.ConsoleLogger').create(
       null,
       captureLogger =
-          foam.lookup('foam.nanos.log.test.CaptureLogger').create()
+          foam.lookup('foam.log.test.CaptureLogger').create()
     ).__subContext__;
   });
 
   it('should construct in default context', function() {
     expect(function() {
-      foam.lookup('foam.nanos.log.ConsoleLogger').create();
+      foam.lookup('foam.log.ConsoleLogger').create();
     }).not.toThrow();
   });
 
