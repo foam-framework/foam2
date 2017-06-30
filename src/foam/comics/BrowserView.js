@@ -35,6 +35,12 @@ foam.CLASS({
       name: 'data',
     },
     {
+      name: 'title',
+      expression: function(data$of) {
+        return 'Browse ' + data$of.name;
+      }
+    },
+    {
       name: 'controller',
       expression: function(data) {
         return this.DAOController.create({ data: data });
