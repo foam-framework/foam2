@@ -62,6 +62,20 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Enum',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.label)
+      }
+    },
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
