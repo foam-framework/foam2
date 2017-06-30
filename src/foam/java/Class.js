@@ -19,6 +19,11 @@ foam.CLASS({
   package: 'foam.java',
   name: 'Class',
 
+  requires: [
+    'foam.java.Argument',
+    'foam.java.Method'
+  ],
+
   properties: [
     'name',
     'package',
@@ -45,6 +50,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.java.Field',
       name: 'fields',
+      factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.java.Field',
+      name: 'allProperties',
       factory: function() { return []; }
     },
     {
@@ -106,6 +117,8 @@ foam.CLASS({
     },
 
     function outputJava(o) {
+      var self = this;
+
       if ( this.anonymous ) {
         o.out('new ', this.extends, '()');
       } else if ( ! this.innerClass ) {
@@ -126,7 +139,7 @@ foam.CLASS({
         o.out(this.visibility, ' ', this.static ? 'static ' : '');
 
         o.out(this.abstract ? 'abstract ' : '');
-        o.out(this.isEnum ? 'enum ' : 'class ', this.name);
+        o.out(this.isEnum   ? 'enum '     : 'class ', this.name);
 
         if ( this.extends ) {
           o.out(' extends ', this.extends);
@@ -150,6 +163,29 @@ foam.CLASS({
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
       }).forEach(function(f) { o.out(f, '\n'); });
+
+      if ( this.name && ! this.isEnum ) {
+        var props = this.allProperties;
+
+        // No-arg constructor
+        this.method(this.Method.create({
+          visibility: 'public',
+          name: this.name,
+          type: '',
+          body: ''
+        }));
+
+        // All-property constructor
+        if ( props.length ) {
+          this.method(this.Method.create({
+            visibility: 'public',
+            name: this.name,
+            type: '',
+            args: props.map(function(f) { return self.Argument.create({name: f.name, type: f.type}); }),
+            body: props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; }).join(';\n') + ';'
+          }));
+        }
+      }
 
       this.methods.forEach(function(f) { o.out(f, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });
