@@ -62,6 +62,90 @@ describe('DatastoreDAO', function() {
     });
   });
 
+  describe('id-as-property', function() {
+    var Person;
+    var Identified;
+    var E;
+    beforeEach(function() {
+      foam.CLASS({
+        package: 'test.dao.id',
+        name: 'Person',
+
+        ids: [ 'firstName', 'iq', 'dob' ],
+
+        properties: [
+          {
+            class: 'String',
+            name: 'firstName'
+          },
+          {
+            class: 'String',
+            name: 'lastName'
+          },
+          {
+            class: 'Int',
+            name: 'iq'
+          },
+          {
+            class: 'Date',
+            name: 'dob'
+          }
+        ]
+      });
+      Person = foam.lookup('test.dao.id.Person');
+      foam.CLASS({
+        package: 'test.dao.id',
+        name: 'Identified',
+
+        properties: [
+          {
+            class: 'String',
+            name: 'id'
+          },
+          {
+            class: 'Int',
+            name: 'num'
+          }
+        ]
+      });
+      Identified = foam.lookup('test.dao.id.Identified');
+      E = foam.lookup('foam.mlang.ExpressionsSingleton').create();
+    });
+
+    it('should support ids order and predicate', function(done) {
+      var dob = Date.now()
+      daoFactory(Person).then(function(dao) {
+        var person1 = Person.create({
+          firstName: 'Born',
+          lastName: 'JustNow',
+          iq: 7,
+          dob: dob
+        });
+        var person2 = Person.create({
+          firstName: 'Brighter',
+          lastName: 'JustNow',
+          iq: 8,
+          dob: dob
+        });
+        Promise.all([
+          dao.put(person1),
+          dao.put(person2)
+        ]).then(function() {
+          return dao.where(E.EQ(Person.ID, ['Brighter', 8, dob])).select();
+        }).then(function(sink) {
+          expect(sink.array.length).toBe(1);
+        }).then(function() {
+          return dao.orderBy(E.DESC(Person.ID)).select();
+        }).then(function(sink) {
+          expect(sink.array.length).toBe(2);
+          expect(foam.util.equals(sink.array[0], person2)).toBe(true);
+          expect(foam.util.equals(sink.array[1], person1)).toBe(true);
+        }).then(done, done.fail);
+        // TODO(markdittmer): Test non-multi-part-id case.
+      });
+    });
+  });
+
   describe('multi-part id', function() {
     var Person;
     beforeEach(function() {
@@ -343,7 +427,10 @@ describe('DatastoreDAO', function() {
           });
     });
   }
-  describe('unreliable server', function() {
+
+  // TODO(markdittmer): Mock unreliable server manually. "Unreliable" means
+  // something else in Datastore emulator.
+  xdescribe('unreliable server', function() {
     beforeEach(function() {
       foam.CLASS({
         package: 'test.dao.unreliable',
