@@ -41,6 +41,7 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.box',
   name: 'PromisedBox',
+  implements: [ 'foam.box.Box' ],
 
   properties: [
     {
