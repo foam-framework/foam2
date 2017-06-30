@@ -22,7 +22,7 @@ foam.CLASS({
 
   documentation: 'Log input messages before passing to optional delegate.',
 
-  requires: [ 'foam.nanos.log.LogLevel' ],
+  requires: [ 'foam.log.LogLevel' ],
   imports: [
     'debug',
     'log',
@@ -39,7 +39,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.nanos.log.LogLevel',
+      of: 'foam.log.LogLevel',
       name: 'logLevel',
       factory: function() { return this.LogLevel.INFO; }
     }
@@ -49,7 +49,7 @@ foam.CLASS({
     function send(message) {
       this[this.logLevel.consoleMethodName].apply(this, [
         this.name,
-        foam.isServer ? foam.json.Pretty.stringify(message) : message
+        foam.json.Pretty.stringify(message)
       ]);
       this.delegate && this.delegate.send(message);
     }
