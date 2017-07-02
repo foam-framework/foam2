@@ -239,12 +239,21 @@ foam.CLASS({
         {
           name: 'testDAO',
           factory: function() {
+            return this.ClientDAO.create({
+                      of: this.NSpec,
+                      delegate: this.HTTPBox.create({
+                        method: 'POST',
+                        url: 'http://localhost:8080/nSpecDAO'
+                      })});
+
+            /*
             return this.createDAO({
               of: this.Test,
               seqNo: true,
               testData: [
               ]
             });
+            */
           }
         }
 
