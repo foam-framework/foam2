@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.box.SocketBox',
     'foam.box.SubBox'
   ],
+
   imports: [
     'registry',
     'socketService'

@@ -50,9 +50,8 @@ foam.CLASS({
       cls = cls || foam.java.Class.create();
 
       cls.package = this.package;
-      cls.name = this.name;
-      cls.extends = 'foam.core.ContextAwareSupport',
-      cls.implements = ['foam.box.Box'];
+      cls.name    = this.name;
+      cls.extends = 'foam.box.AbstractSkeleton',
 
       foam.core.Object.create({
         name: 'delegate',
@@ -79,8 +78,8 @@ foam.CLASS({
       return;
     }
 
-    foam.box.RPCMessage rpc = (foam.box.RPCMessage)message.getObject();
-    foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+    foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
+    foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
     Object result = null;
 
     switch ( rpc.getName() ) {<%
@@ -91,7 +90,12 @@ foam.CLASS({
         <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(
           <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
-      %>(<%= m.args[j].javaType %>)(rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? rpc.getArgs()[<%= j %>] : null)<%
+      if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {
+        %>to<%= m.args[j].javaType %><%
+      } else {
+        %>(<%= m.args[j].javaType %>)<%
+      }
+      %>(rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? rpc.getArgs()[<%= j %>] : null)<%
       if ( j != m.args.length - 1 ) { %>,
           <% }
     }
