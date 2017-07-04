@@ -49,7 +49,7 @@ describe('round robin box', function() {
       boxes.push(OutputIDBox.create({ id: i }));
     }
 
-    // Create RoundRobinBox with n OutputIDBoxes.
+    // Create RoundRobinBox with outputLen number of OutputIDBoxes.
     var roundRobinBox = RoundRobinBox.create({ delegates: boxes });
 
     // Sending between 10 - 100 outputs.
