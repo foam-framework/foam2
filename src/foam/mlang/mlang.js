@@ -89,17 +89,21 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      value: function(_, o) {
-        if ( o === null )                           return foam.mlang.Constant.create({ value: null });
-        if ( ! o.f && typeof o === 'function' )     return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== 'object' )                return foam.mlang.Constant.create({ value: o });
-        if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
-        if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
-        if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
-        if ( foam.core.FObject.isInstance(o) )      return o;
+      value: function(_, o, p) { return p.adaptValue(o); }
+    }
+  ],
 
-        console.error('Invalid expression value: ', o);
-      }
+  methods: [
+    function adaptValue(o) {
+      if ( o === null )                           return foam.mlang.Constant.create({ value: null });
+      if ( ! o.f && typeof o === 'function' )     return foam.mlang.predicate.Func.create({ fn: o });
+      if ( typeof o !== 'object' )                return foam.mlang.Constant.create({ value: o });
+      if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
+      if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
+      if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
+      if ( foam.core.FObject.isInstance(o) )      return o;
+
+      console.error('Invalid expression value: ', o);
     }
   ]
 });
@@ -310,7 +314,15 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'arg2'
+      name: 'arg2',
+      adapt: function(old, nu, prop) {
+        var value = prop.adaptValue(nu);
+        var arg1 = this.arg1;
+        if ( foam.mlang.Constant.isInstance(value) && arg1 && arg1.adapt )
+          value.value = this.arg1.adapt.call(null, old, value.value, arg1);
+
+        return value;
+      }
     }
   ],
 
@@ -749,8 +761,42 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
-  name: 'In',
+  name: 'ArrayBinary',
   extends: 'foam.mlang.predicate.Binary',
+
+  documentation: 'Binary predicate that accepts an array in "arg2".',
+
+  properties: [
+    {
+      name: 'arg2',
+      postSet: function() {
+        this.valueSet_ = null;
+      },
+      adapt: function(old, nu, prop) {
+        var value = prop.adaptValue(nu);
+        var arg1 = this.arg1;
+        if ( foam.mlang.Constant.isInstance(value) && arg1 && arg1.adapt ) {
+          var arrayValue = value.value;
+          for ( var i = 0; i < arrayValue.length; i++ ) {
+            arrayValue[i] = arg1.adapt.call(null, old && old[i], arrayValue[i], arg1);
+          }
+        }
+
+        return value;
+      }
+    },
+    {
+      // TODO: simpler to make an expression
+      name: 'valueSet_'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'In',
+  extends: 'foam.mlang.predicate.ArrayBinary',
   implements: [
     'foam.core.Serializable',
     'foam.mlang.Expressions'
@@ -767,16 +813,6 @@ foam.CLASS({
         // this is slightly slower when an expression on upperCase_
         this.upperCase_ = nu && foam.core.Enum.isInstance(nu);
       }
-    },
-    {
-      name: 'arg2',
-      postSet: function() {
-        this.valueSet_ = null;
-      }
-    },
-    {
-      // TODO: simpler to make an expression
-      name: 'valueSet_'
     },
     {
       name: 'upperCase_',
@@ -817,21 +853,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'InIC',
-  extends: 'foam.mlang.predicate.Binary',
+  extends: 'foam.mlang.predicate.ArrayBinary',
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2, case insensitive.',
-
-  properties: [
-    {
-      name: 'arg2',
-      postSet: function() { this.valueSet_ = null; }
-    },
-    {
-      // TODO: simpler to make an expression
-      name: 'valueSet_'
-    }
-  ],
 
   methods: [
     function f(o) {
