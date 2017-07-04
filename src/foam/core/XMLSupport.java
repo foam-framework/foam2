@@ -133,6 +133,20 @@ public class XMLSupport {
     }
   }
 
+  public static void toXMLFile (Document doc, String fileName) {
+    try {
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = transformerFactory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+      DOMSource source = new DOMSource(doc);
+      StreamResult result = new StreamResult(new File(fileName));
+      transformer.transform(source, result);
+    } catch (TransformerConfigurationException ex) {
+    } catch (TransformerException ex ) {
+    }
+  }
+
   // Returns XML string as partial XML string with only object tags
   public static String toXMLString(FObject obj) {
     XMLOutputFactory factory = XMLOutputFactory.newInstance();
