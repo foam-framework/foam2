@@ -179,6 +179,9 @@ foam.CLASS({
       for ( var i = 1 ; i < lines.length ; ++i ) {
         var values = this.splitIntoValues(lines[i]);
 
+        // Skips blank lines
+        if ( values.length == 0 ) continue;
+
         // Calls for creation of new model, and `puts` into sink
         sink.put(this.createModel(props, values, className));
       }
