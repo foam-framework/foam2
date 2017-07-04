@@ -37,31 +37,19 @@ public abstract class AbstractDAO
 
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( limit < this.MAX_SAFE_INTEGER ) {
-      LimitedSink limitedSink = new LimitedSink();
-      limitedSink.setLimit(limit);
-      limitedSink.setDelegate(sink);
-      sink = limitedSink;
+      sink = new LimitedSink(limit, 0, sink);
     }
 
     if ( skip > 0 ) {
-      SkipSink skipSink = new SkipSink();
-      skipSink.setSkip(skip);
-      skipSink.setDelegate(sink);
-      sink = skipSink;
+      sink = new SkipSink(skip, 0, sink);
     }
 
     if ( order != null ) {
-      OrderedSink orderedSink = new OrderedSink();
-      orderedSink.setComparator(order);
-      orderedSink.setDelegate(sink);
-      sink = orderedSink;
+      sink = new OrderedSink(order, null, sink);
     }
 
     if ( predicate != null ) {
-      PredicatedSink predicatedSink = new PredicatedSink();
-      predicatedSink.setPredicate(predicate);
-      predicatedSink.setDelegate(sink);
-      sink = predicatedSink;
+      sink = new PredicatedSink(predicate, sink);
     }
 
     return sink;
@@ -118,8 +106,7 @@ public abstract class AbstractDAO
   }
 
   public DAO inX(X x) {
-    ProxyDAO dao = new ProxyDAO();
-    dao.setDelegate(this);
+    ProxyDAO dao = new ProxyDAO(this);
     dao.setX(x);
     return dao;
   }
