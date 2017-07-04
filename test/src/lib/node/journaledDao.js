@@ -17,7 +17,7 @@
 
 
 // TODO(drish): Fix this test on Node JS 4.
-xdescribe('JDAO', function() {
+xdescribe('JournaledDAO', function() {
 
   var fs = require('fs');
   var filename = 'journal_file.txt';
@@ -39,7 +39,7 @@ xdescribe('JDAO', function() {
 
     cars = foam.dao.ArrayDAO.create();
 
-    inboundDAO = foam.dao.JDAO.create({
+    inboundDAO = foam.dao.JournaledDAO.create({
       delegate: cars,
       journal: foam.dao.NodeFileJournal.create({
         fd: fs.openSync(filename, 'w+') // write permisson
@@ -66,7 +66,7 @@ xdescribe('JDAO', function() {
 
     var arrayDao = foam.dao.ArrayDAO.create({});
 
-    foam.dao.JDAO.create({
+    foam.dao.JournaledDAO.create({
       delegate: arrayDao,
       journal: foam.dao.NodeFileJournal.create({
         fd: fs.openSync(filename, 'r+')

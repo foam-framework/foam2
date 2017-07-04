@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
 public class UserAndGroupAuthServiceTest
   extends CachedUserAndGroupAuthService
 {
-  private int numUsers        = 100;
-  private int numGroups       = 5;
-  private int numPermissions  = 10;
+  private int numUsers        = 1000000;
+  private int numGroups       = 10;
+  private int numPermissions  = 100;
 
   private ArrayList<X> xArray               = new ArrayList<>();
   private ArrayList<Permission> permissions = new ArrayList<>();

@@ -1,12 +1,7 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 package foam.core;
 
 import foam.lib.parse.Parser;
+
 import java.util.Map;
 
 public abstract class AbstractPropertyInfo
@@ -45,5 +40,9 @@ public abstract class AbstractPropertyInfo
     if ( ! prop.f(o1).equals(prop.f(o2)) ) {
       diff.put(prop.getName(), prop.f(o2));
     }
+  }
+
+  public void setFromString(Object obj, String value) {
+    // TODO: Need to write
   }
 }

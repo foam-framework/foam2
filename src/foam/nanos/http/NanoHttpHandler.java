@@ -50,12 +50,6 @@ public class NanoHttpHandler
       // if ( auth.checkPermission(...) ) {}
 
       this.handleServlet((HttpServlet) service, exchange);
-    } if ( service instanceof WebAgent ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      if ( service instanceof ContextAware ) ((ContextAware) service).setX(this.getX());
-
-      this.handleServlet(new WebAgentServlet((WebAgent) service), exchange);
     } if ( service instanceof DAO ) {
       // todo auth check, server==true check
 

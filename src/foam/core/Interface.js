@@ -48,7 +48,7 @@ foam.CLASS({
   documentation: 'An Interface Mode/definition. Created with foam.INTERFACE().',
 
   properties: [
-    [ 'extends', 'foam.core.AbstractInterface' ],
+    ['extends', 'foam.core.AbstractInterface'],
     {
       class: 'AxiomArray',
       name: 'methods',
@@ -89,7 +89,7 @@ foam.LIB({
       m.class = m.class || 'foam.core.InterfaceModel';
       // if m.implements not defined, add it as an array, otherwise add its content
       // in an array
-      if ( ! m.implements ) {
+      if ( !m.implements ) {
         m.implements = [];
       } else if ( typeof m.implements === 'string' ) {
         m.implements = [m.implements];

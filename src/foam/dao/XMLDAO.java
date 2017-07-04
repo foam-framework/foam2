@@ -16,7 +16,7 @@ public class XMLDAO
 
   protected String fileName;
 
-  public void setFileName(String filename) {
+  public void setFileName(String filename) {git
     if ( filename.contains(".xml") ) {
       fileName = System.getProperty("user.dir") + filename;
     } else {
