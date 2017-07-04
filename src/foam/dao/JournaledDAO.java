@@ -9,9 +9,9 @@ package foam.dao;
 import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.X;
-import java.io.IOException;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+import java.io.IOException;
 
 public class JournaledDAO
   extends ProxyDAO
