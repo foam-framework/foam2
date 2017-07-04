@@ -103,8 +103,105 @@ entities exported to the box context's FOAM context:
 
 ## Stubs and skeletons
 
-TODO: Write this sections
+The `Stub` and `SkeletonBox` constructs elevate box-based message passing to
+the level of the interface. `foam.core.StubFactorySingleton` implements:
+
+```
+interface StubFactory {
+  Class get(Class);
+}
+```
+
+The `get()` method returns a stub class for the input class. Stub class
+instances have a `delegate` property that should be set to a box that accepts
+RPC messages over the unerlying class's interface.
+
+The dual to a stub class is a `SkeletonBox`. Such a box accepts RPC messages
+and replies with RPC return messages when the underlying method has a
+well-defined return type. Skeleton boxes have a `delegate` property that
+should be set to the implementation of the interface that is to receive RPC
+messages (and emit replies).
+
+### Implementation details
+
+There is an unfortunate asymmetry between `foam.core.Stub` (which should not
+be confused with a "stub class" mentioned above) and a
+`foam.box.SkeletonBox`. One might expect these to be duals of each other, but
+they are not. A `Stub` is class of property that augments its containing
+class with the interface being stubbed, and expects the property value to be
+set to a box (the destination for RPC messages over the stubbed interface).
+
+E.g.,
+
+```js
+foam.CLASS({
+  name: 'MyInterface',
+
+  methods: [
+    function helloWorld() {
+      console.log('Hello world!');
+      return 'Hello to you, too.';
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'MyInterfaceStub',
+
+  properties: [
+    {
+      class: 'Stub',
+      of: 'MyInterface', // helloWorld() automatically added to MyInterfaceStub.
+      name: 'delegate'
+    }
+  ]
+});
+
+var stub = MyInterfaceStub.create(); // Create stub instance.
+//
+// ... after setting stub.delegate...
+//
+stub.helloWorld().then(function(resp) {
+  console.log('Hello world response:', resp);
+  // "Hello world response: Hello to you, too."
+})
+```
+
+`SkeletonBox` is a wrapper class that has a `delegate` pointing to the
+underlying implementation that is used to run RPCs.
+
+E.g.,
+
+```js
+// Continued from "Create stub instance." above.
+var skeleton = foam.box.SkeletonBox.create({ delegate: MyInterface.create() });
+stub.delegate = skeleton;
+```
+
+The stub factory interface was created in an attempt to establish better
+symmetry:
+
+```js
+// With MyInterface above.
+var impl = MyInterface.create();
+var stub = foam.core.StubFactorySingleton.create().get(MyInterface);
+var skeleton = foam.box.SkeletonBox.create({delegate: impl});
+stub.delegate = skeleton;
+stub.helloWorld();
+```
+
+Of course, in a distributed scenario, the flow would look more like:
+
+- Create skeleton of `SomeInterface` on server;
+- Register skeleton, yielding a "portable" box that refers to the implementation;
+- Send the portable box over some channel (socket, web socket, etc.) to a
+  client;
+- Client recieves protable box and binds it to the channel from whence it came;
+- Client creates a stub of `SomeInterface` and sets its delegate to the
+  portable box.
 
 ## Box-based DAOs
 
-TODO: Write this sections
+The box library contains several "client DAO" implementations that are stub
+classes over the `foam.dao.DAO` interface with different messaging strateges
+(e.g., streaming, polling).
