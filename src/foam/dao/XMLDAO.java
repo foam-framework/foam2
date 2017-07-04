@@ -77,7 +77,7 @@ public class XMLDAO
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       Document doc = dBuilder.newDocument();
-      XMLSupport.toXML(ls.getData(), doc);
+      XMLSupport.toXML(ls.getData(), doc, null);
       XMLSupport.toXMLFile(doc, fileName);
     } catch (ParserConfigurationException ex) {
     }
