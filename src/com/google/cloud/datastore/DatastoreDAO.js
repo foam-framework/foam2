@@ -26,9 +26,6 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'ctx'
-    },
-    {
       name: 'sink'
     },
     {
@@ -99,10 +96,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function sendRequest(name, objPayload) {
-      return this.getRequest(name, objPayload && JSON.stringify(objPayload))
-          .send();
-    },
     function getRequest(name, payload) {
       var headers = { Accept: 'application/json' };
       if ( payload ) headers['Content-Type'] = 'application/json';
@@ -118,23 +111,22 @@ foam.CLASS({
     function find_(x, idOrObj) {
       var key = foam.core.FObject.isInstance(idOrObj) ?
           idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
-      return this.sendRequest('lookup', { keys: [ key ] })
-          .then(this.onResponse.bind(this, 'find'))
-          .then(this.onFindResponse.bind(this, x));
+      return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
+          .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
     },
     function put_(x, o) {
-      return this.sendRequest('commit', {
+      return this.getRequest('commit', JSON.stringify({
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { upsert: o.toDatastoreEntity() } ]
-      }).then(this.onResponse.bind(this, 'put'))
-          .then(this.onPutResponse.bind(this, x, o));
+      })).send().then(this.onResponse.bind(this, 'put'))
+          .then(this.onPutResponse.bind(this, o));
     },
     function remove_(x, o) {
-      return this.sendRequest('commit', {
+      return this.getRequest('commit', JSON.stringify({
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { delete: o.getDatastoreKey() } ]
-      }).then(this.onResponse.bind(this, 'remove'))
-          .then(this.onRemoveResponse.bind(this, x, o));
+      })).send().then(this.onResponse.bind(this, 'remove'))
+          .then(this.onRemoveResponse.bind(this, o));
     },
     function select_(x, sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
@@ -151,11 +143,10 @@ foam.CLASS({
       if ( sink.decorateDatastoreQuery )
         sink.decorateDatastoreQuery(query);
 
-      return this.sendRequest('runQuery', payload)
+      return this.getRequest('runQuery', JSON.stringify(payload)).send()
           .then(this.onResponse.bind(this, 'select'))
           .then(this.onSelectResponse.bind(
               this, this.SelectData.create({
-                ctx: x,
                 sink: sink,
                 requestPayload: payload
               })));
@@ -193,7 +184,7 @@ foam.CLASS({
         }
         query.startCursor = batch.endCursor;
 
-        return this.sendRequest('runQuery', payload)
+        return this.getRequest('runQuery', JSON.stringify(payload)).send()
             .then(this.onResponse.bind(this, 'select'))
             .then(this.onSelectResponse.bind(this, data));
       }
@@ -216,7 +207,7 @@ foam.CLASS({
       var arr = arraySink.array;
       if ( arr.length === 0 ) return undefined;
 
-      return this.sendRequest('beginTransaction')
+      return this.getRequest('beginTransaction').send()
           .then(this.onResponse.bind(this, 'removeAll transaction'))
           .then(this.onRemoveAllTransactionResponse.bind(this, arr));
     },
@@ -236,7 +227,7 @@ foam.CLASS({
 
       return response.payload;
     },
-    function onFindResponse(x, json) {
+    function onFindResponse(json) {
       if ( ! ( json.found && json.found[0] && json.found[0].entity ) )
         return null;
       if ( json.found.length > 1 ) {
@@ -245,35 +236,32 @@ foam.CLASS({
       }
 
       return com.google.cloud.datastore.fromDatastoreEntity(
-          json.found[0].entity, x);
+          json.found[0].entity, this);
     },
-    function onPutResponse(x, o, json) {
+    function onPutResponse(o, json) {
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
         if ( results[i].conflictDetected )
           throw new Error('Put to Cloud Datastore yielded conflict');
       }
 
-      var newO = o.cls_.create(o, x);
-      this.pub('on', 'put', newO);
-      return newO;
+      this.pub('on', 'put', o);
+      return o;
     },
-    function onRemoveResponse(x, o, json) {
+    function onRemoveResponse(o, json) {
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
         if ( results[i].conflictDetected )
           throw new Error('Remove from Cloud Datastore yielded conflict');
       }
 
-      var newO = o.cls_.create(o, x);
-
       // Cloud Datastore will provide results with version numbers even if
       // the entity did not exist. Use indexUpdates defined-and-non-0 as a
       // proxy found-and-deleted.
       if ( json.indexUpdates ) {
-        this.pub('on', 'remove', newO);
+        this.pub('on', 'remove', o);
       }
-      return newO;
+      return o;
     },
     function onSelectResponse(data, json) {
       var batch = json.batch;
@@ -288,12 +276,12 @@ foam.CLASS({
       // Allow datastore-aware sinks to unpack query result batches manually
       // instead of DAO put()ing to them.
       if ( data.sink && data.sink.fromDatastoreEntityResults ) {
-        data.sink.fromDatastoreEntityResults(entities, data.x);
+        data.sink.fromDatastoreEntityResults(entities, this);
       } else {
         var fromDatastoreEntity =
             com.google.cloud.datastore.fromDatastoreEntity;
         for ( var i = 0; i < entities.length; i++ ) {
-          var obj = fromDatastoreEntity(entities[i].entity, data.ctx);
+          var obj = fromDatastoreEntity(entities[i].entity, this);
           data.results.push(obj);
           data.sink && data.sink.put && data.sink.put(obj);
         }
@@ -313,11 +301,11 @@ foam.CLASS({
         deletes[i] = { delete: arr[i].getDatastoreKey() };
       }
 
-      this.sendRequest('commit', {
+      this.getRequest('commit', JSON.stringify({
         mode: 'TRANSACTIONAL',
         mutations: deletes,
         transaction: transaction
-      }).then(this.onResponse.bind(this, 'removeAll commit'))
+      })).send().then(this.onResponse.bind(this, 'removeAll commit'))
           .then(this.onRemoveAllResponse);
     },
     function onRemoveAllResponse(json) {

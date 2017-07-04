@@ -55,6 +55,7 @@ foam.CLASS({
         propName: this.name,
         propType: this.javaType,
         propRequired: this.required,
+        of: this.of,
         jsonParser: this.javaJSONParser,
         extends: this.javaInfoType,
         transient: this.transient
@@ -393,8 +394,11 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).intValue() :'
-            + '(int)o;';
+        + ' ((Number)o).intValue() :'
+        + ' ( o instanceof String ) ?'
+        + ' Integer.valueOf((String) o) :'
+        + ' (int)o;';
+
       return info;
     }
   ]
@@ -415,8 +419,11 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).byteValue() :'
-            + '(byte)o;';
+        + ' ((Number)o).byteValue() :'
+        + ' ( o instanceof String ) ?'
+        + ' Byte.valueOf((String) o) :'
+        + ' (byte)o;';
+
       return info;
     }
   ]
@@ -437,8 +444,11 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).shortValue() :'
-            + '(short)o;';
+        + ' ((Number)o).shortValue() :'
+        + ' ( o instanceof String ) ?'
+        + ' Short.valueOf((String) o) :'
+        + ' (short)o;';
+
       return info;
     }
   ]
@@ -459,8 +469,11 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).longValue() :'
-            + '(long)o;';
+        + ' ((Number)o).longValue() :'
+        + ' ( o instanceof String ) ?'
+        + ' Long.valueOf((String) o) :'
+        + ' (long)o;';
+
       return info;
     }
   ]
@@ -481,8 +494,11 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).doubleValue() :'
-            + '(double)o;';
+        + ' ((Number)o).doubleValue() :'
+        + ' ( o instanceof String ) ?'
+        + ' Float.parseFloat((String) o) :'
+        + ' (double)o;';
+
       return info;
     }
   ]
@@ -551,9 +567,48 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.Date'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.DateParser']
+    ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.DateParser'],
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'if ( o instanceof String ) {'
+        + 'java.util.Date date = new java.util.Date((String) o);'
+        + 'return date;'
+        + '}'
+        + 'return (java.util.Date)o;';
+
+      return info;
+  }
   ]
+});
+
+
+foam.CLASS({
+   refines: 'foam.core.Date',
+
+   properties: [
+       ['javaType', 'java.util.Date'],
+       ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
+       ['javaJSONParser', 'foam.lib.json.DateParser']
+   ],
+
+   methods: [
+     function createJavaPropertyInfo_(cls) {
+       var info = this.SUPER(cls);
+       var m = info.getMethod('cast');
+       m.body = 'if ( o instanceof String ) {'
+         + 'java.util.Date date = new java.util.Date((String) o);'
+         + 'return date;'
+         + '}'
+         + 'return (java.util.Date)o;';
+
+       return info;
+     }
+   ]
 });
 
 
@@ -846,3 +901,4 @@ foam.CLASS({
     }
   ]
 });
+

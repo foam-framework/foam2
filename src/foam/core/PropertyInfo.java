@@ -1,14 +1,10 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 package foam.core;
 
 import foam.lib.parse.Parser;
 import java.util.Comparator;
 import java.util.Map;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
@@ -22,7 +18,11 @@ public interface PropertyInfo
   public String getName();
   public Object get(Object obj);
   public void set(Object obj, Object value);
+  public String of();
   public Parser jsonParser();
   public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
+  public void setFromString(Object obj, String value);
+  public Object fromXML(X x, XMLStreamReader reader);
+  public void toXML(FObject obj, Document doc, Element objElement);
 }

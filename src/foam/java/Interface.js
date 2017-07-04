@@ -76,7 +76,7 @@ foam.CLASS({
       this.imports.forEach(function(i) {
         o.out('import ' + i, ';\n');
       });
-
+      
       o.out('\n');
 
       o.out(this.visibility, this.visibility ? ' ' : '',
@@ -93,9 +93,6 @@ foam.CLASS({
       o.out(' {\n');
 
       o.increaseIndent();
-
-      // TODO: output constants
-
       for ( var i = 0 ; i < this.methods.length ; i++ ) {
         o.indent();
         o.out(this.methods[i]);

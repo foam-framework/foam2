@@ -6,8 +6,10 @@
 
 package foam.core;
 
+import javax.xml.stream.XMLStreamReader;
+
 public abstract class AbstractLongPropertyInfo
-  extends AbstractPropertyInfo
+        extends AbstractPropertyInfo
 {
   public int compareValues(long o1, long o2) {
     return java.lang.Long.compare(o1, o2);
@@ -15,5 +17,15 @@ public abstract class AbstractLongPropertyInfo
 
   public foam.lib.parse.Parser jsonParser() {
     return new foam.lib.json.LongParser();
+
+  @Override
+  public void setFromString(Object obj, String value) {
+    this.set(obj, Long.valueOf(value));
+  }
+
+  @Override
+  public Object fromXML(X x, XMLStreamReader reader) {
+    super.fromXML(x, reader);
+    return Long.valueOf(reader.getText());
   }
 }

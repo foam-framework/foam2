@@ -171,10 +171,6 @@ public class ServletHandler
       return printWriter;
     }
 
-    public void flushBuffer() throws IOException {
-      this.getWriter().flush();
-    }
-
     public void complete() throws IOException {
       try {
         printWriter.flush();

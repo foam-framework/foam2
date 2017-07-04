@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import javax.xml.stream.XMLStreamReader;
+
 public abstract class AbstractStringPropertyInfo
   extends AbstractPropertyInfo
 {
@@ -14,4 +16,14 @@ public abstract class AbstractStringPropertyInfo
   }
 
   public abstract int getWidth();
+
+  public void setFromString(Object obj, String value) {
+    this.set(obj, value);
+  }
+
+  @Override
+  public Object fromXML(X x, XMLStreamReader reader) {
+    super.fromXML(x, reader);
+    return reader.getText();
+  }
 }
