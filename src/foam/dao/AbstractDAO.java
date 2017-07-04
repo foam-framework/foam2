@@ -16,27 +16,19 @@ public abstract class AbstractDAO
   protected PropertyInfo primaryKey_        = null;
 
   public DAO where(Predicate predicate) {
-    FilteredDAO filteredDAO = new FilteredDAO().setPredicate(predicate);
-    filteredDAO.setDelegate(this);
-    return filteredDAO;
+    return new FilteredDAO(predicate, this);
   }
 
   public DAO orderBy(Comparator comparator) {
-    OrderedDAO orderedDAO = new OrderedDAO().setOrder(comparator);
-    orderedDAO.setDelegate(this);
-    return orderedDAO;
+    return new OrderedDAO(comparator, this);
   }
 
   public DAO skip(long count) {
-    SkipDAO skipDAO = new SkipDAO().setSkip(count);
-    skipDAO.setDelegate(this);
-    return skipDAO;
+    return new SkipDAO(count, this);
   }
 
   public DAO limit(long count) {
-    LimitedDAO limitedDAO = new LimitedDAO().setLimit(count);
-    limitedDAO.setDelegate(this);
-    return limitedDAO;
+    return new LimitedDAO(count, this);
   }
 
   public void pipe_(X x, foam.dao.Sink sink) {

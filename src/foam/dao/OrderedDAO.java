@@ -11,6 +11,11 @@ public class OrderedDAO
 {
   protected foam.mlang.order.Comparator order_;
 
+  public OrderedDAO(Comparator order, DAO delegate) {
+    order_ = order;
+    setDelegate(delegate);
+  }
+
   public OrderedDAO setOrder(foam.mlang.order.Comparator order) {
     order_ = order;
     return this;
