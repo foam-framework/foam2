@@ -22,12 +22,13 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.comics.DAOController'
+    'foam.comics.DAOController',
+    'foam.u2.view.ScrollTableView'
   ],
 
   imports: [
     'stack',
-    'summaryView',
+    'summaryView? as importedSummaryView',
     'data? as importedData'
   ],
 
@@ -46,6 +47,19 @@ foam.CLASS({
     {
       name: 'cls',
       expression: function(data) { return data.cls_; }
+    },
+    {
+      name: 'summaryView',
+      factory: function() {
+        return this.importedSummaryView$ ? this.importedSummaryView : { class: 'foam.u2.view.ScrollTableView' };
+      }
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$of) {
+        return 'Browse ' + data$of.name;
+      }
     }
   ],
 
@@ -93,7 +107,7 @@ foam.CLASS({
     function onFindRelated() {
       var data = this.DAOController.create({
         data: this.data.relationship.targetDAO,
-        isSelecting: true,
+        addEnabled: true,
         relationship: this.data.relationship
       });
 

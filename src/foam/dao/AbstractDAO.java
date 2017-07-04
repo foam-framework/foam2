@@ -10,44 +10,46 @@ public abstract class AbstractDAO
   extends    ContextAwareSupport
   implements DAO
 {
-  protected ClassInfo    of_         = null;
-  protected PropertyInfo primaryKey_ = null;
+  public final static long MAX_SAFE_INTEGER = 9007199254740991l;
+
+  protected ClassInfo    of_                = null;
+  protected PropertyInfo primaryKey_        = null;
 
   public DAO where(Predicate predicate) {
-    return new FilteredDAO().setPredicate(predicate).setDelegate(this);
+    return new FilteredDAO(predicate, this);
   }
 
   public DAO orderBy(Comparator comparator) {
-    return new OrderedDAO().setOrder(comparator).setDelegate(this);
+    return new OrderedDAO(comparator, this);
   }
 
-  public DAO skip(int count) {
-    return new SkipDAO().setSkip(count).setDelegate(this);
+  public DAO skip(long count) {
+    return new SkipDAO(count, this);
   }
 
-  public DAO limit(int count) {
-    return new LimitedDAO().setLimit(count).setDelegate(this);
+  public DAO limit(long count) {
+    return new LimitedDAO(count, this);
   }
 
   public void pipe_(X x, foam.dao.Sink sink) {
     throw new UnsupportedOperationException();
   }
 
-  protected Sink decorateSink_(Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
-    if ( limit != null ) {
-      sink = new LimitedSink().setLimit(limit.intValue()).setDelegate(sink);
+  protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( limit < this.MAX_SAFE_INTEGER ) {
+      sink = new LimitedSink(limit, 0, sink);
     }
 
-    if ( skip != null ) {
-      sink = new SkipSink().setSkip(skip.intValue()).setDelegate(sink);
+    if ( skip > 0 ) {
+      sink = new SkipSink(skip, 0, sink);
     }
 
     if ( order != null ) {
-      sink = new OrderedSink().setComparator(order).setDelegate(sink);
+      sink = new OrderedSink(order, null, sink);
     }
 
     if ( predicate != null ) {
-      sink = new PredicatedSink().setPredicate(predicate).setDelegate(sink);
+      sink = new PredicatedSink(predicate, sink);
     }
 
     return sink;
@@ -88,11 +90,11 @@ public abstract class AbstractDAO
   }
 
   public void removeAll() {
-    this.removeAll_(this.getX(), null, null, null, null);
+    this.removeAll_(this.getX(), 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
   public Sink select(Sink sink) {
-    return this.select_(this.getX(), sink, null, null, null, null);
+    return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
   public FObject find(Object id) {
@@ -104,8 +106,7 @@ public abstract class AbstractDAO
   }
 
   public DAO inX(X x) {
-    ProxyDAO dao = new ProxyDAO();
-    dao.setDelegate(this);
+    ProxyDAO dao = new ProxyDAO(this);
     dao.setX(x);
     return dao;
   }

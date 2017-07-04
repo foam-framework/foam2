@@ -16,7 +16,7 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.nanos.log',
+  package: 'foam.log',
   name: 'Logger',
 
   methods: [

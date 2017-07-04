@@ -20,7 +20,7 @@ import java.util.Map;
 import static foam.mlang.MLang.EQ;
 
 public class HistoryDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
 
   /**
@@ -51,12 +51,7 @@ public class HistoryDAO
     while ( i.hasNext() ) {
       String key = (String) i.next();
       PropertyInfo prop = (PropertyInfo) currentValue.getClassInfo().getAxiomByName(key);
-
-      PropertyUpdate update = new PropertyUpdate()
-          .setName(key)
-          .setOldValue(prop.f(currentValue))
-          .setNewValue(diff.get(key));
-      updates[index++] = update;
+      updates[index++] = new PropertyUpdate(key, prop.f(currentValue), diff.get(key));
     }
 
     return updates;
@@ -86,7 +81,7 @@ public class HistoryDAO
     // TODO: use context-oriented context when available.
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
     SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    historyDAO.removeAll_(x, null, null, null, EQ(HistoryRecord.OBJECT_ID, objectId));
+    historyDAO.where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
     return super.remove_(x, obj);
   }
 }
