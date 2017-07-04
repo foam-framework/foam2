@@ -1,5 +1,6 @@
 package foam.dao;
 
+import org.w3c.dom.Document;
 import foam.core.*;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -73,12 +74,12 @@ public class XMLDAO
     this.select(ls);
 
     try {
-      XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
-      XMLStreamWriter xmlStreamWriter = xMLOutputFactory.createXMLStreamWriter(new FileWriter(fileName));
-      XMLSupport.toXML(ls.getData(), xmlStreamWriter);
-      xmlStreamWriter.flush();
-      xmlStreamWriter.close();
-    } catch (IOException | XMLStreamException ex) {
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.newDocument();
+      XMLSupport.toXML(ls.getData(), doc);
+      XMLSupport.toXMLFile(doc, fileName);
+    } catch (ParserConfigurationException ex) {
     }
   }
 }
