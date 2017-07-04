@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateControllerView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.DAOCreateController',
   ],
@@ -40,6 +41,13 @@ foam.CLASS({
       factory: function() {
         return this.DAOCreateController.create({ dao: this.dao });
       }
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$dao$of) {
+        return 'Create ' + data$dao$of.name;
+      }
     }
   ],
 
@@ -51,8 +59,7 @@ foam.CLASS({
     function initE() {
       this.
         add(this.DAOCreateController.DATA,
-            this.DAOCreateController.SAVE,
-            this.DAOCreateController.CANCEL);
+            this.data.cls_.getAxiomsByClass(foam.core.Action))
     }
   ],
 

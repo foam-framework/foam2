@@ -22,7 +22,8 @@ foam.CLASS({
 
   documentation: 'Log input messages before passing to optional delegate.',
 
-  requires: [ 'foam.nanos.log.LogLevel' ],
+  requires: [ 'foam.log.LogLevel' ],
+
   imports: [
     'debug',
     'log',
@@ -39,7 +40,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.nanos.log.LogLevel',
+      of: 'foam.log.LogLevel',
       name: 'logLevel',
       factory: function() { return this.LogLevel.INFO; }
     }

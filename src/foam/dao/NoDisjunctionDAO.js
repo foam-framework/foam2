@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'NoDisjunctionDAO',
   extends: 'foam.dao.ProxyDAO',
+  implements: [ 'foam.mlang.Expressions' ],
 
   documentation: 'DAO decorator for DAOs that do not support disjunction.',
 
@@ -39,6 +40,14 @@ foam.CLASS({
       var newPredicate = this.inToOr_(predicate)
           .toDisjunctiveNormalForm()
           .partialEval();
+
+      // Do not bother disjunction-only DAOs with returning empty set or
+      // implementing select(..., TRUE) = select(..., <no predicate>).
+      if ( this.FALSE.equals(newPredicate) ) {
+        sink.eof && sink.eof();
+        return Promise.resolve(sink);
+      }
+      if ( this.TRUE.equals(newPredicate) ) newPredicate = undefined;
 
       if ( ! this.Or.isInstance(newPredicate) )
         return this.SUPER(x, sink, skip, limit, order, newPredicate);

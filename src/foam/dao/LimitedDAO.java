@@ -11,6 +11,11 @@ public class LimitedDAO
 {
   protected long limit_;
 
+  public LimitedDAO(long limit, DAO delegate) {
+    limit_ = limit;
+    setDelegate(delegate);
+  }
+
   public LimitedDAO setLimit(long limit) {
     limit_ = limit;
     return this;
