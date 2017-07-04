@@ -9,6 +9,11 @@ public class FilteredDAO
 {
   protected Predicate predicate_;
 
+  public FilteredDAO(Predicate predicate, DAO delegate) {
+    predicate_ = predicate;
+    setDelegate(delegate);
+  }
+
   public FilteredDAO setPredicate(Predicate predicate) {
     predicate_ = predicate;
     return this;
