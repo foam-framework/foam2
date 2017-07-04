@@ -20,7 +20,7 @@ import java.util.Map;
 import static foam.mlang.MLang.EQ;
 
 public class HistoryDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
 
   /**
@@ -51,12 +51,7 @@ public class HistoryDAO
     while ( i.hasNext() ) {
       String key = (String) i.next();
       PropertyInfo prop = (PropertyInfo) currentValue.getClassInfo().getAxiomByName(key);
-
-      PropertyUpdate update = new PropertyUpdate();
-      update.setName(key);
-      update.setOldValue(prop.f(currentValue));
-      update.setNewValue(diff.get(key));
-      updates[index++] = update;
+      updates[index++] = new PropertyUpdate(key, prop.f(currentValue), diff.get(key));
     }
 
     return updates;
