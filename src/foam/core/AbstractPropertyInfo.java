@@ -66,17 +66,13 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void toXML(FObject obj, XMLStreamWriter writer) {
+  public void toXML(FObject obj, Document doc, Element objElement) {
     Object value = this.f(obj);
-    if (this.getTransient() ) return;
-    try {
-      if ( value != null && value != "" ) {
-        writer.writeStartElement(this.getName());
-        writer.writeCharacters(value.toString());
-        writer.writeEndElement();
-      }
-    } catch (XMLStreamException ex) {
-
+    if ( this.getTransient() ) return;
+    if ( value != null && value != "" ) {
+      Element prop = doc.createElement(this.getName());
+      prop.appendChild(doc.createTextNode(value.toString()));
+      objElement.appendChild(prop);
     }
   }
 }

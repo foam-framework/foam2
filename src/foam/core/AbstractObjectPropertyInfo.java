@@ -24,5 +24,5 @@ public abstract class AbstractObjectPropertyInfo
   }
 
   @Override
-  public void toXML(FObject obj, XMLStreamWriter writer) { }
+  public void toXML(FObject obj, Document dom, Element objElement) { }
 }
