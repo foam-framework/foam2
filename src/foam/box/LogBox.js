@@ -23,6 +23,7 @@ foam.CLASS({
   documentation: 'Log input messages before passing to optional delegate.',
 
   requires: [ 'foam.log.LogLevel' ],
+
   imports: [
     'debug',
     'log',
