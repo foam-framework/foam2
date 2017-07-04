@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 package foam.core;
 
 public abstract class AbstractLongPropertyInfo
@@ -15,5 +9,8 @@ public abstract class AbstractLongPropertyInfo
 
   public foam.lib.parse.Parser jsonParser() {
     return new foam.lib.json.LongParser();
+  
+  public void setFromString(Object obj, String value) {
+    this.set(obj, Long.valueOf(value));
   }
 }

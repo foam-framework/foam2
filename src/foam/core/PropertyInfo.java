@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0
- */
-
 package foam.core;
 
 import foam.lib.parse.Parser;
@@ -25,4 +19,5 @@ public interface PropertyInfo
   public Parser jsonParser();
   public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
+  public void setFromString(Object obj, String value);
 }
