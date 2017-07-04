@@ -1,11 +1,19 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.core;
 
 import foam.lib.parse.Parser;
-
 import java.util.Map;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 public abstract class AbstractPropertyInfo
-  implements PropertyInfo
+        implements PropertyInfo
 {
   protected ClassInfo parent;
 
@@ -39,6 +47,36 @@ public abstract class AbstractPropertyInfo
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop) {
     if ( ! prop.f(o1).equals(prop.f(o2)) ) {
       diff.put(prop.getName(), prop.f(o2));
+    }
+  }
+
+  public void setFromString(Object obj, String value) {
+    // TODO: Need to write
+  }
+
+  @Override
+  public Object fromXML(X x, XMLStreamReader reader) {
+    // Moves reader to characters state in order for value reading
+    try {
+      reader.next();
+    } catch (XMLStreamException ex) {
+
+    }
+    return "";
+  }
+
+  @Override
+  public void toXML(FObject obj, XMLStreamWriter writer) {
+    Object value = this.f(obj);
+    if (this.getTransient() ) return;
+    try {
+      if ( value != null && value != "" ) {
+        writer.writeStartElement(this.getName());
+        writer.writeCharacters(value.toString());
+        writer.writeEndElement();
+      }
+    } catch (XMLStreamException ex) {
+
     }
   }
 }
