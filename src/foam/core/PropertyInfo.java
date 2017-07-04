@@ -24,5 +24,5 @@ public interface PropertyInfo
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   public void setFromString(Object obj, String value);
   public Object fromXML(X x, XMLStreamReader reader);
-  public void toXML(FObject obj, XMLStreamWriter writer);
+  public void toXML(FObject obj, Document doc, Element objElement);
 }
