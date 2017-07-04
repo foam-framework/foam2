@@ -30,6 +30,7 @@ var classes = [
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
+  'foam.mlang.order.Desc',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.ProxyBox',
