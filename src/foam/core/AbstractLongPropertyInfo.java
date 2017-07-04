@@ -28,5 +28,4 @@ public abstract class AbstractLongPropertyInfo
     super.fromXML(x, reader);
     return Long.valueOf(reader.getText());
   }
-
 }
