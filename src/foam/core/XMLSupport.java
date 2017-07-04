@@ -1,21 +1,23 @@
 package foam.core;
 
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.StringReader;
 import java.io.File;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 public class XMLSupport {
 
@@ -135,15 +137,12 @@ public class XMLSupport {
 
   public static void toXMLFile (Document doc, String fileName) {
     try {
-
       DOMSource source = new DOMSource(doc);
       StreamResult result = new StreamResult(new File(fileName));
       Transformer transformer = createTransformer();
       transformer.transform(source, result);
     } catch (TransformerConfigurationException ex) {
-
     } catch (TransformerException ex ) {
-
     }
   }
 
@@ -168,7 +167,6 @@ public class XMLSupport {
       DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
       doc = dBuilder.newDocument();
     } catch (ParserConfigurationException ex) {
-
     }
     return doc;
   }
@@ -195,6 +193,6 @@ public class XMLSupport {
       return writer.toString();
     } catch (TransformerException ex) {
     }
-    return "";
+    return null;
   }
 }
