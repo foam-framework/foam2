@@ -101,26 +101,36 @@ public class XMLSupport {
     }
   }
 
-  public static void toXML(List<FObject> objList, Document doc) {
+  public static void toXML(List<FObject> objList, Document doc, Element e) {
     Iterator i = objList.iterator();
     Element rootElement = doc.createElement("objects");
-    doc.appendChild(rootElement);
+    // Case for nested object arrays
+    if (doc.hasChildNodes() ) {
+      e.appendChild(rootElement);
+    } else {
+      doc.appendChild(rootElement);
+    }
 
     while ( i.hasNext() ) {
-      toXML((FObject) i.next(), doc) ;
+      toXML((FObject) i.next(), doc, e) ;
     }
   }
 
-  public static void toXML(FObject obj, Document doc) {
+  public static void toXML(FObject obj, Document doc, Element e) {
     Element objElement = doc.createElement("object");
     objElement.setAttribute("class", obj.getClass().toString().replaceAll("class ", ""));
-    if ( doc.hasChildNodes() ) {
+    writeToXML(obj, doc, objElement);
+    if ( e != null ) {
+      // Append to element (nested object)
+      e.appendChild(objElement);
+    } else if ( doc.hasChildNodes() ) {
+      // Append to existing root
       Element root = doc.getDocumentElement();
       root.appendChild(objElement);
     } else {
+      // New root element
       doc.appendChild(objElement);
     }
-    writeToXML(obj, doc, objElement);
   }
 
   // Write properties from given FObject

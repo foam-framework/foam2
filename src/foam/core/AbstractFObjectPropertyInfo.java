@@ -34,6 +34,6 @@ public abstract class AbstractFObjectPropertyInfo
   @Override
   public void toXML(FObject obj, Document doc, Element objElement) {
     Object nestObj = this.f(obj);
-    XMLSupport.toXML((FObject) nestObj, doc);
+    XMLSupport.toXML((FObject) nestObj, doc, objElement);
   }
 }
