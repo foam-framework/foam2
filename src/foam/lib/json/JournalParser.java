@@ -14,37 +14,38 @@ import foam.core.X;
 /**
  * Class responsible for parsing journal files.
  * journal files follows this structure.
- * put(foam.json.parse({"class":"foam.nanos.boot.NSpec","name":"Gibs1" }))
- * remove(foam.json.parse({"class":"foam.nanos.boot.NSpec","name":"Gibs" }))
+ *
+ * p({"class":"foam.dao.Guitar","name":"Gibs1" }))
+ * r({"id": "1"}))
  */
-public class JournalParser extends ContextAwareSupport {
+public class JournalParser
+  extends ContextAwareSupport {
 
-    protected JSONParser jsonParser;
+  protected JSONParser jsonParser;
 
-    public JournalParser() {
-        // do not fail if context is null
-        X ctx = (getX() == null) ? new ProxyX() : getX();
-        this.jsonParser = new JSONParser();
-        jsonParser.setX(ctx);
-    }
+  public JournalParser() {
+    // do not fail if context is null
+    X ctx = (getX() == null) ? new ProxyX() : getX();
+    this.jsonParser = new JSONParser();
+    jsonParser.setX(ctx);
+  }
 
 
-    // TODO(drish): do not generate a second copy of the journalLine
-    public FObject parseObject(String journalLine) {
+  // TODO(drish): do not generate a second copy of the journalLine
+  public FObject parseObject(String journalLine) {
 
-        // get the actual object
-        int objectIndex = journalLine.indexOf("{");
-        String object = journalLine.substring(objectIndex, journalLine.lastIndexOf("}") + 1);
+    // get the actual object
+    int objectIndex = journalLine.indexOf("{");
+    String object = journalLine.substring(objectIndex, journalLine.lastIndexOf("}") + 1);
 
-        return this.jsonParser.parseString(object);
-    }
+    return this.jsonParser.parseString(object);
+  }
 
-    public Object parseObjectId(String journalLine) {
+  public Object parseObjectId(String journalLine) {
 
-        // get the actual object
-        int idIndex = journalLine.lastIndexOf(":");
-        String id = journalLine.substring(idIndex + 1, journalLine.lastIndexOf("}"));
+    int idIndex = journalLine.lastIndexOf(":");
+    String id = journalLine.substring(idIndex + 2, journalLine.lastIndexOf("}") - 1);
 
-        return id;
-    }
+    return id;
+  }
 }
