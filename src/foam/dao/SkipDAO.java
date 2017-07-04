@@ -11,6 +11,11 @@ public class SkipDAO
 {
   protected long skip_;
 
+  public SkipDAO(long skip, DAO delegate) {
+    skip_ = skip;
+    setDelegate(delegate);
+  }
+
   public SkipDAO setSkip(long skip) {
     skip_ = skip;
     return this;
