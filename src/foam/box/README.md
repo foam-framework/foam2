@@ -118,7 +118,7 @@ interface StubFactory {
 
 The `get()` method returns a stub class for the input class. Stub class
 instances have a `delegate` property that should be set to a box that accepts
-RPC messages over the unerlying class's interface.
+RPC messages over the underlying class's interface.
 
 The dual to a stub class is a `SkeletonBox`. Such a box accepts RPC messages
 and replies with RPC return messages when the underlying method has a
