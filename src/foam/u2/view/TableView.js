@@ -62,6 +62,20 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Enum',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.label)
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
@@ -232,7 +246,7 @@ foam.CLASS({
       // Dynamic position calculation
       var origin = this.dropdownOrigin.el();
       var current = this.overlayOrigin.el();
-      
+
       var boundingBox = origin.getBoundingClientRect();
       var dropdownMenu = current.getBoundingClientRect();
 
@@ -306,7 +320,7 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    if ( view.editColumnsEnabled ) return this.tag('td'); 
+                    if ( view.editColumnsEnabled ) return this.tag('td');
                   })
               });
           }));

@@ -15,12 +15,22 @@
  * limitations under the License.
  */
 
+// TODO(markdittmer): Get rid of special-casing of 'js' and 'nanos' flags.
+
 var flags = {};
+var otherLanguages = [ 'java', 'swift' ];
 
 if ( process.argv.length > 2 ) {
   process.argv[2].split(',').forEach(function(f) {
     flags[f] = true;
   });
+
+  // Default to language = javascript.
+  if ( ! flags.js ) {
+    flags.js = ! otherLanguages.some(function(lang) {
+      return flags[lang];
+    });
+  }
 }
 
 var outfile = __dirname + '/../foam-bin.js';
