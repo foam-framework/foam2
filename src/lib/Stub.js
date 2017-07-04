@@ -314,3 +314,8 @@ foam.CLASS({
 
   axioms: [ foam.pattern.Singleton.create() ],
 });
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> Revert "Merge branch 'master' into master"
+>>>>>>> b775b81... Merge Conflicts
