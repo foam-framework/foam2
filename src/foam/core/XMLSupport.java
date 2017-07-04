@@ -1,9 +1,15 @@
 package foam.core;
 
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Document;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
+import java.io.StringReader;
+import java.io.File;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -93,45 +99,37 @@ public class XMLSupport {
     }
   }
 
-  public static void toXML(List<FObject> objList, XMLStreamWriter xmlStreamWriter) {
-    try {
-      xmlStreamWriter = new IndentingXMLStreamWriter(xmlStreamWriter);
-      Iterator i = objList.iterator();
-      xmlStreamWriter.writeStartDocument();
-      //Root tag
-      xmlStreamWriter.writeStartElement("objects");
+  public static void toXML(List<FObject> objList, Document doc) {
+    Iterator i = objList.iterator();
+    Element rootElement = doc.createElement("objects");
+    doc.appendChild(rootElement);
 
-      while ( i.hasNext() ) {
-        toXML((FObject) i.next(), xmlStreamWriter);
-      }
-
-      xmlStreamWriter.writeEndElement();
-      xmlStreamWriter.writeEndDocument();
-
-    } catch (XMLStreamException ex) {
+    while ( i.hasNext() ) {
+      toXML((FObject) i.next(), doc) ;
     }
   }
 
-  public static void toXML(FObject obj, XMLStreamWriter xmlStreamWriter) throws XMLStreamException {
-    try {
-      xmlStreamWriter.writeStartElement("object");
-      xmlStreamWriter.writeAttribute("class", obj.getClass().toString().replaceAll("class ", ""));
-      writeToXML(obj, xmlStreamWriter);
-      xmlStreamWriter.writeEndElement();
-    } catch (XMLStreamException ex) {
-      throw new XMLStreamException("Error while writing xml file");
+  public static void toXML(FObject obj, Document doc) {
+    Element objElement = doc.createElement("object");
+    objElement.setAttribute("class", obj.getClass().toString().replaceAll("class ", ""));
+    if ( doc.hasChildNodes() ) {
+      Element root = doc.getDocumentElement();
+      root.appendChild(objElement);
+    } else {
+      doc.appendChild(objElement);
     }
+    writeToXML(obj, doc, objElement);
   }
 
   // Write properties from given FObject
-  public static void writeToXML(FObject obj, XMLStreamWriter writer) {
+  public static void writeToXML(FObject obj, Document doc, Element objElement) {
     ClassInfo cInfo = obj.getClassInfo();
     List props = cInfo.getAxiomsByClass(PropertyInfo.class);
     Iterator propItr = props.iterator();
 
     while ( propItr.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) propItr.next();
-      prop.toXML(obj, writer);
+      prop.toXML(obj, doc, objElement);
     }
   }
 
@@ -141,7 +139,6 @@ public class XMLSupport {
     StringWriter sw = new StringWriter();
     try {
       XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
-      writer = new IndentingXMLStreamWriter(writer);
       toXML(obj, writer);
     } catch (XMLStreamException ex) {
     }
@@ -154,7 +151,6 @@ public class XMLSupport {
     StringWriter sw = new StringWriter();
     try {
       XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
-      writer = new IndentingXMLStreamWriter(writer);
       writer.writeStartDocument();
       Iterator i = objArray.iterator();
       writer.writeStartElement("objects");
