@@ -63,7 +63,13 @@ public class FileJournal
 
   public void remove(Object id, Detachable sub) {
     try {
-      bw.write("r({\"id\":\"" + id + "\"})");
+
+      if (id instanceof String) {
+        bw.write("r({\"id\":\"" + id + "\"})");
+      } else {
+        bw.write("r({\"id\":" + id + "})");
+      }
+
       bw.newLine();
       bw.flush();
     } catch (IOException e) {
