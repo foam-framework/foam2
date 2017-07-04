@@ -135,46 +135,66 @@ public class XMLSupport {
 
   public static void toXMLFile (Document doc, String fileName) {
     try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
       DOMSource source = new DOMSource(doc);
       StreamResult result = new StreamResult(new File(fileName));
+      Transformer transformer = createTransformer();
       transformer.transform(source, result);
     } catch (TransformerConfigurationException ex) {
-    } catch (TransformerException ex ) {
-    }
-  }
 
-  // Returns XML string as partial XML string with only object tags
-  public static String toXMLString(FObject obj) {
-    XMLOutputFactory factory = XMLOutputFactory.newInstance();
-    StringWriter sw = new StringWriter();
-    try {
-      XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
-      toXML(obj, writer);
-    } catch (XMLStreamException ex) {
+    } catch (TransformerException ex ) {
+
     }
-    return sw.toString();
   }
 
   // Returns XML string as full XML document string with document tags
   public static String toXMLString(List<FObject> objArray) {
-    XMLOutputFactory factory = XMLOutputFactory.newInstance();
-    StringWriter sw = new StringWriter();
+    Document doc = createDoc();
+    toXML(objArray, doc);
+    return toXMLString(doc);
+  }
+
+  // Returns XML string as partial XML string with only object tags
+  public static String toXMLString(FObject obj) {
+    Document doc = createDoc();
+    toXML(obj, doc);
+    return toXMLString(doc);
+  }
+
+  public static Document createDoc() {
+    Document doc = null;
     try {
-      XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
-      writer.writeStartDocument();
-      Iterator i = objArray.iterator();
-      writer.writeStartElement("objects");
-      while ( i.hasNext() ) {
-        toXML((FObject) i.next(), writer);
-      }
-      writer.writeEndElement();
-      writer.writeEndDocument();
-    } catch (XMLStreamException ex) {
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      doc = dBuilder.newDocument();
+    } catch (ParserConfigurationException ex) {
+
     }
-    return sw.toString();
+    return doc;
+  }
+
+  public static Transformer createTransformer() {
+    Transformer transformer = null;
+    try {
+      TransformerFactory tf = TransformerFactory.newInstance();
+      transformer = tf.newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+    } catch (TransformerConfigurationException ex) {
+    }
+    return transformer;
+  }
+
+  public static String toXMLString (Document doc) {
+    try {
+      DOMSource domSource = new DOMSource(doc);
+      StringWriter writer = new StringWriter();
+      StreamResult result = new StreamResult(writer);
+      Transformer transformer = createTransformer();
+      transformer.transform(domSource, result);
+      return writer.toString();
+    } catch (TransformerException ex) {
+    }
+    return "";
   }
 }
