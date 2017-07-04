@@ -63,23 +63,23 @@ public abstract  class AbstractArrayPropertyInfo
   }
 
   @Override
-  public void toXML (FObject obj, XMLStreamWriter writer) {
+  public void toXML (FObject obj, Document dom, Element objElement) {
     List nestedArr = (ArrayList) this.f(obj);
     Iterator i = nestedArr.iterator();
 
-    try {
-      while ( i.hasNext() ) {
-        // Array of FObjects
-        if ( i.next() instanceof FObject ) {
-          XMLSupport.toXML((FObject) i, writer);
-          continue;
-        }
-        writer.writeStartElement("value");
-        writer.writeCharacters(i.toString());
-        writer.writeEndElement();
-      }
-    } catch (XMLStreamException ex) {
-
-    }
+//    try {
+//      while ( i.hasNext() ) {
+//        // Array of FObjects
+//        if ( i.next() instanceof FObject ) {
+//          XMLSupport.toXML((FObject) i, writer);
+//          continue;
+//        }
+//        writer.writeStartElement("value");
+//        writer.writeCharacters(i.toString());
+//        writer.writeEndElement();
+//      }
+//    } catch (XMLStreamException ex) {
+//
+//    }
   }
 }
