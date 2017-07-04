@@ -103,10 +103,9 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: cls.name,
+          type: 'void',
           body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
+              + isSet + ' = true;'
         });
 
       if ( this.hasOwnProperty('javaFactory') ) {
