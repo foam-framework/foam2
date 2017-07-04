@@ -1,10 +1,10 @@
 # Boxes
 
-The `Box` interface is a message-passing interface. Its various
+The `foam.box.Box` interface is a message-passing interface. Its various
 implementations facilitate message passing over various boundaries such as
 FOAM contexts, operating system processes, and network layers.
 
-## Box and Message
+## Boxes and messages
 
 The box interface contains one method:
 
@@ -100,6 +100,10 @@ entities exported to the box context's FOAM context:
   connections to other box contexts;
 
 - `me`: A box that encapsulates a root service name for this box context.
+
+### Named boxes and name services
+
+TODO(adamvy): Write this section.
 
 ## Stubs and skeletons
 
