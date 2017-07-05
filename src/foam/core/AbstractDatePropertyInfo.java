@@ -10,7 +10,7 @@ import javax.xml.stream.XMLStreamReader;
 import java.util.Date;
 
 public abstract class AbstractDatePropertyInfo
-        extends AbstractPropertyInfo
+  extends AbstractPropertyInfo
 {
 
   public int compareValues(java.util.Date o1, java.util.Date o2) {
