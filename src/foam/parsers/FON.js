@@ -78,8 +78,10 @@ foam.CLASS({
           'undefined': literal('undefined', undefined),
           'number': substring(seq0(optional('-'),
                              repeat0(range('0', '9'), null, 1),
-                             optional(seq0('.',
-                                           repeat0(range('0', '9')))))),
+                             optional(
+                               seq0('.', repeat0(range('0', '9')))),
+                             optional(
+                               seq0('e', alt('-', '+'), repeat0(range('0', '9')))))),
           'bool': alt(literal('true', true),
                       literal('false', false)),
 
