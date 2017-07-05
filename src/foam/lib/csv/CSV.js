@@ -86,11 +86,10 @@ foam.CLASS({
     function outputPropertyName_(o, p, prefix, first) {
       if ( ! this.propertyPredicate(o, p) ) return;
 
-      // Checks if property is an inner object (and not an enum)
-      if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
+      if ( foam.core.FObjectProperty.isInstance(p) ) {
         // Gets new empty object if FObjectProperty is currently undefined
         // Done to permit appropriate headers for multi-line CSVs (multiple objects to convert)
-        if ( o[p.name] == undefined ) o[p.name] = foam.lookup(p.of.id);
+        if ( o[p.name] == undefined ) o[p.name] = p.of.id;
 
         // Appends object name to prefix for CSV Header
         prefix += p.name + this.nestedObjectSeperator;
