@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'RoundRobinBox',
   implements: [ 'foam.box.Box' ],
 
-  documentation: 'Delegates messages to box workers using round robin strategy',
+  documentation: 'Delegates messages to box workers using round robin strategy.',
 
   properties: [
     {
@@ -33,8 +33,8 @@ foam.CLASS({
       value: 0,
       preSet: function(_, val) {
         return val % this.delegates.length;
-      },
-    },
+      }
+    }
   ],
 
   methods: [

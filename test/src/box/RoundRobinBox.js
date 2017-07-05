@@ -42,10 +42,9 @@ describe('round robin box', function() {
   it('should send the outputs to the correct boxes', function() {
     console.log = jasmine.createSpy('log');
 
-    // Creating between 1 - 10 boxes for output.
-    var outputLen = Math.floor((Math.random() * 10) + 1);
+    // Creating 10 boxes for output.
     var boxes = [];
-    for (var i = 0; i < outputLen; i++) {
+    for (var i = 0; i < 10; i++) {
       boxes.push(OutputIDBox.create({ id: i }));
     }
 
