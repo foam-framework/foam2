@@ -34,7 +34,8 @@ public abstract class AbstractFObjectPropertyInfo
   @Override
   public void toXML(FObject obj, Document doc, Element objElement) {
     Object nestObj = this.f(obj);
-    Element objTag = doc.createElement(nestObj.getClass().getName());
+    String objName = nestObj.getClass().getName();
+    Element objTag = doc.createElement(objName.substring(objName.lastIndexOf(".")).replace(".",""));
     objElement.appendChild(objTag);
     if ( nestObj.getClass().isEnum() ) {
       XMLSupport.enumXML( (Enum) nestObj, doc, objTag);
