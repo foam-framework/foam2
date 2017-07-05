@@ -165,8 +165,8 @@ foam.CLASS({
       }, function(o, first) { this.outputPrimitive(o, first); })
     },
 
-    function fromCSV(className, s, sink) {
-      if ( ! s ) throw 'Invalid CSV input to convert. Arguments must be (className, csvString).'
+    function fromCSV(cls, s, sink) {
+      if ( ! s ) throw 'Invalid CSV input to convert. Arguments must be (class, csvString).'
       var lines = s.split('\n');
 
       if ( lines.length == 0 ) throw 'Insufficient CSV Input';
@@ -181,7 +181,7 @@ foam.CLASS({
         if ( values.length == 0 ) continue;
 
         // Calls for creation of new model, and `puts` into sink
-        sink.put(this.createModel(props, values, className));
+        sink.put(this.createModel(props, values, cls));
       }
 
       return sink;
@@ -194,11 +194,11 @@ foam.CLASS({
       return parser.parseString(csvString).map(field => field.value == undefined ? '' : field.value);
     },
 
-    function createModel(props, values, className) {
+    function createModel(props, values, cls) {
       foam.assert(props.length == values.length,
         'Invalid CSV Input, header and value rows must be the same number of cells');
 
-      var model = foam.lookup(className).create();
+      var model = cls.create();
 
       for ( var i = 0 ; i < props.length ; i++ ) {
         var p = props[i];
@@ -219,7 +219,7 @@ foam.CLASS({
               // Creates a new model for the inner object
               var prop = model.cls_.getAxiomByName(p[0]);
               prop.set(model, this.createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
-                                          values.slice(i, j), prop.of.id));
+                                          values.slice(i, j), prop.of));
               
               i = j - 1;
               break;
@@ -249,8 +249,8 @@ foam.LIB({
       return foam.lib.csv.Standard.toCSV(o);
     },
 
-    function fromCSV(className, csvString, sink) {
-      return foam.lib.csv.Standard.fromCSV(className, csvString, sink);
+    function fromCSV(cls, csvString, sink) {
+      return foam.lib.csv.Standard.fromCSV(cls, csvString, sink);
     }
   ]
 });
