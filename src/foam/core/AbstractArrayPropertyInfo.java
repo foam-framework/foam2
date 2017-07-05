@@ -7,7 +7,7 @@
 package foam.core;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.Element
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
@@ -16,7 +16,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-public abstract  class AbstractArrayPropertyInfo
+public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo
 {
 
@@ -74,15 +74,15 @@ public abstract  class AbstractArrayPropertyInfo
     objElement.appendChild(prop);
 
     // FObject Array check
-    if ( this.f(obj) instanceof FObject[]) {
+    if ( this.f(obj) instanceof FObject[] ) {
       FObject[] nestedArray = (FObject[]) this.f(obj);
-      for (int j = 0; j < nestedArray.length; j++ ) {
+      for ( int j = 0; j < nestedArray.length; j++ ) {
         XMLSupport.toXML(nestedArray[j], doc, prop);
       }
       return;
     } else {
       Object[] nestObj = (Object[]) this.f(obj);
-      for (int j = 0; j < nestObj.length; j++ ) {
+      for ( int j = 0; j < nestObj.length; j++ ) {
         Element nestedProp = doc.createElement("value");
         nestedProp.appendChild(doc.createTextNode(nestObj[j].toString()));
         prop.appendChild(nestedProp);
