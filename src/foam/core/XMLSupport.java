@@ -145,6 +145,13 @@ public class XMLSupport {
     }
   }
 
+  //Specific case for Enum
+  public static void enumXML (Enum o, Document doc, Element e) {
+    Element enumElement = doc.createElement("ordinal");
+    enumElement.appendChild(doc.createTextNode(Integer.toString(o.ordinal())));
+    e.appendChild(enumElement);
+  }
+
   public static void toXMLFile (Document doc, String fileName) {
     try {
       DOMSource source = new DOMSource(doc);
