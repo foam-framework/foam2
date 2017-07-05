@@ -280,6 +280,40 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Constant',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'Object',
+      name: 'value',
+    },
+    {
+      class: 'String',
+      name: 'documentation'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      cls.constant({
+        name:  this.name,
+        type:  this.type || undefined,
+        value: this.value,
+        documentation: this.documentation || undefined
+      });
+    }
+  ]
+});
+
 
 foam.CLASS({
   refines: 'foam.core.Method',
