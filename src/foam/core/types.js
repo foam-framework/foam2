@@ -402,6 +402,7 @@ foam.CLASS({
   name: 'Map',
   extends: 'Property',
 
+  // TODO: Remove need for sorting
   properties: [
     [ 'factory', function() { return {} } ],
     [
