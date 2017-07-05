@@ -57,6 +57,7 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
+  'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
