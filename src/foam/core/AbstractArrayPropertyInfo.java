@@ -20,10 +20,6 @@ public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo
 {
 
-  public int compareValues(boolean b1, boolean b2) {
-    return 0;
-  }
-
   @Override
   public void setFromString(Object obj, String value) {
     // TODO
