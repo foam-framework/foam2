@@ -8,5 +8,22 @@
    package: 'foam.mlang.order',
    name: 'Comparator',
 
-   javaImplements: [ 'java.lang.Comparator' ]
+   javaExtends: [ 'java.lang.Comparable' ],
+
+   methods: [
+     {
+       name: 'compare',
+       javaReturns: 'int',
+       args: [
+         {
+           name: 'o1',
+           javaType: 'Object'
+         },
+         {
+           name: 'o2',
+           javaType: 'Object'
+         }
+       ]
+     },
+   ]
  });
