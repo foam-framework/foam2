@@ -61,6 +61,7 @@ foam.CLASS({
         will store.
       */
       class: 'Class',
+      javaType: 'foam.core.ClassInfo',
       name: 'of'
     }
   ],

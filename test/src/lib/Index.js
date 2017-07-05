@@ -939,7 +939,7 @@ describe('AutoIndex', function() {
       pred,
       m.AND(
         m.CONTAINS_IC(test.Indexable.STRING, "we"),
-        m.EQ(test.Indexable.DATE, "today")
+        m.EQ(test.Indexable.DATE, new Date())
       )
     );
 

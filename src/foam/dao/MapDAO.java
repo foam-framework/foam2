@@ -72,7 +72,7 @@ public class MapDAO
     for ( FObject obj : getData().values() ) {
       if ( sub.getDetached() ) break;
 
-      decorated.put(obj, sub);
+      if ( predicate == null || predicate.f(obj) ) decorated.put(obj, sub);
     }
 
     decorated.eof();
@@ -81,6 +81,7 @@ public class MapDAO
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    // TODO: this deletes too much data if skip, limit or predicate are set
     setData(null);
   }
 
