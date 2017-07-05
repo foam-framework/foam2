@@ -207,17 +207,20 @@ foam.CLASS({
         var v = values[i];
 
         // Adds nested prop
-        if ( p.includes('__') ) {
-          p = p.split('__');
-          foam.assert(p.length >= 2, 'Invalid CSV object nesting, properties of inner objects are identified by `__`');
-          var prefix = p[0] + '__';
+        if ( p.includes(this.nestedObjectSeperator) ) {
+          p = p.split(this.nestedObjectSeperator);
+
+          foam.assert(p.length >= 2, 'Invalid CSV object nesting, properties of inner objects are identified by `' + 
+                                      this.nestedObjectSeperator + '`');
+
+          var prefix = p[0] + this.nestedObjectSeperator;
 
           for ( var j = i ; j <= props.length ; ++j ) {
             // If last element, or prefix no longer matches prop
             if ( ( j == props.length ) || ( ! props[j].startsWith(prefix) ) ) {
               // Creates a new model for the inner object
               var prop = model.cls_.getAxiomByName(p[0]);
-              prop.set(model, createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
+              prop.set(model, this.createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
                                           values.slice(i, j), prop.of.id));
               
               i = j - 1;
