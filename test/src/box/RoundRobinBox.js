@@ -43,8 +43,9 @@ describe('round robin box', function() {
     console.log = jasmine.createSpy('log');
 
     // Creating 10 boxes for output.
+    var outputLen = 10;
     var boxes = [];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < outputLen; i++) {
       boxes.push(OutputIDBox.create({ id: i }));
     }
 
