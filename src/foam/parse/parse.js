@@ -611,6 +611,14 @@ foam.CLASS({
       var delim = this.delimiter;
 
       while ( ps ) {
+        // Checks for end of string
+        if ( last && ( last.pos == ps.str[0].length ) ) {
+          // Checks if previous char was delimiter, if not removes trailing empty string
+          // TODO: Find a better way to handle reading past input
+          if ( delim && ( ps.str[0][last.pos - 1] != delim.s ) ) ret.pop();
+          return ps.setValue(ret);
+        }
+
         last = ps;
         ps = p.parse(ps, obj);
         if ( ps ) ret.push(ps.value);
@@ -620,6 +628,7 @@ foam.CLASS({
       }
 
       if ( this.minimum > 0 && ret.length < this.minimum ) return undefined;
+      
       return last.setValue(ret);
     },
 
