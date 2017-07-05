@@ -81,6 +81,7 @@ public class MapDAO
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    // TODO: this deletes too much data if skip, limit or predicate are set
     setData(null);
   }
 
