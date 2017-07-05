@@ -86,7 +86,7 @@ foam.CLASS({
     function outputPropertyName_(o, p, prefix, first) {
       if ( ! this.propertyPredicate(o, p) ) return;
 
-      // Checks if property is enum, or object with properties of its own
+      // Checks if property is an inner object (and not an enum)
       if ( p.of && ( ! foam.core.AbstractEnum.isInstance( o[p.name] ) ) ) {
         // Gets new empty object if FObjectProperty is currently undefined
         // Done to permit appropriate headers for multi-line CSVs (multiple objects to convert)
@@ -118,8 +118,7 @@ foam.CLASS({
     },
 
     function outputProperty(o, p, first) {
-      if ( ! this.propertyPredicate(o, p) ) return;
-      this.output(o[p.name], first);
+      if ( this.propertyPredicate(o, p) ) this.output(o[p.name], first);
     },
 
     function reset() {
@@ -146,7 +145,6 @@ foam.CLASS({
       name: 'output',
       code: foam.mmethod({
         Undefined:    function(o, first) { this.outputPrimitive(this.undefinedStr, first); },
-        Null:         function(o, first) { this.outputPrimitive(null, first); },
         String:       function(o, first) { this.outputPrimitive(this.escapeString(o), first); },
         AbstractEnum: function(o, first) { this.outputPrimitive(o.ordinal, first); },
         FObject:   function(o, first) {
@@ -176,7 +174,7 @@ foam.CLASS({
       // Trims quotes and splits CSV row into array
       var props = this.splitIntoValues(lines[0]);
 
-      for ( var i = 1 ; i < lines.length ; ++i ) {
+      for ( var i = 1 ; i < lines.length ; i++ ) {
         var values = this.splitIntoValues(lines[i]);
 
         // Skips blank lines
@@ -192,7 +190,7 @@ foam.CLASS({
     function splitIntoValues(csvString) {
       if ( ( csvString == undefined ) || ( csvString.length == 0) ) return [];
 
-      var parser = foam.lookup('foam.lib.csv.CSVParser').create();
+      var parser = foam.lib.csv.CSVParser.create();
       return parser.parseString(csvString).map(field => field.value == undefined ? '' : field.value);
     },
 
@@ -202,7 +200,7 @@ foam.CLASS({
 
       var model = foam.lookup(className).create();
 
-      for ( var i = 0 ; i < props.length ; ++i ) {
+      for ( var i = 0 ; i < props.length ; i++ ) {
         var p = props[i];
         var v = values[i];
 
