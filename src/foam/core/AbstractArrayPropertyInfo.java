@@ -46,9 +46,10 @@ public abstract  class AbstractArrayPropertyInfo
               }
             } else if ( reader.getLocalName().equals("value") ) {
               // Move to characters TODO
+              // Type of array required for casting
+              String type = this.of();
               reader.next();
               String value = reader.getText();
-//              String type = this.of();
               objList.add(value);
             }
             break;
@@ -64,19 +65,26 @@ public abstract  class AbstractArrayPropertyInfo
 
   @Override
   public void toXML (FObject obj, Document doc, Element objElement) {
-    List nestObjList = (ArrayList) this.f(obj);
-    Iterator i = nestObjList.iterator();
+    // Empty Array Properties
+    if ( this.f(obj) == null ) return;
+
     Element prop = doc.createElement(this.getName());
-    while ( i.hasNext() ) {
-      // Array of FObjects
-      if ( i.next() instanceof FObject ) {
-        XMLSupport.toXML(nestObjList, doc, objElement);
-        break;
-      }
-      Element nestedProp = doc.createElement("value");
-      nestedProp.appendChild(doc.createTextNode(i.toString()));
-      prop.appendChild(nestedProp);
-    }
     objElement.appendChild(prop);
+
+    // FObject Array check
+    if ( this.f(obj) instanceof FObject[]) {
+      FObject[] nestedArray = (FObject[]) this.f(obj);
+      for (int j = 0; j < nestedArray.length; j++ ) {
+        XMLSupport.toXML(nestedArray[j], doc, prop);
+      }
+      return;
+    } else {
+      Object[] nestObj = (Object[]) this.f(obj);
+      for (int j = 0; j < nestObj.length; j++ ) {
+        Element nestedProp = doc.createElement("value");
+        nestedProp.appendChild(doc.createTextNode(nestObj[j].toString()));
+        prop.appendChild(nestedProp);
+      }
+    }
   }
 }
