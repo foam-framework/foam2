@@ -40,6 +40,6 @@ foam.CLASS({
   methods: [
     function send(message) {
       this.delegates[this.currentBoxId_++].send(message);
-    },
-  ],
+    }
+  ]
 });
