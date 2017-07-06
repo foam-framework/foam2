@@ -190,7 +190,7 @@ foam.CLASS({
       if ( ( csvString == undefined ) || ( csvString.length == 0) ) return [];
 
       var parser = foam.lib.csv.CSVParser.create();
-      return parser.parseString(csvString).map(field => field.value == undefined ? '' : field.value);
+      return parser.parseString(csvString, this.delimiter).map(field => field.value == undefined ? '' : field.value);
     },
 
     function createModel(props, values, cls) {
