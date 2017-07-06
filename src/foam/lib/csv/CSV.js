@@ -177,7 +177,7 @@ foam.CLASS({
       if ( lines.length == 0 ) throw 'Insufficient CSV Input';
 
       // Trims quotes and splits CSV row into array
-      var props = this.splitIntoValues(lines[0]).map(this.splitProperty.bind(this));
+      var props = this.splitIntoValues(lines[0]).map(this.splitHeaderTitle.bind(this));
 
       for ( var i = 1 ; i < lines.length ; i++ ) {
         var values = this.splitIntoValues(lines[i]);
@@ -203,7 +203,7 @@ foam.CLASS({
       return parser.parseString(csvString, this.delimiter).map(field => field.value == undefined ? '' : field.value);
     },
 
-    function splitProperty(p) {
+    function splitHeaderTitle(p) {
       if ( ! this.validString(p) ) return [];
 
       var parser = foam.lib.csv.CSVParser.create();
