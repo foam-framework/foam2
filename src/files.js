@@ -170,6 +170,7 @@ FOAM_FILES([
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
   { name: "foam/box/BroadcastBox" },
+  { name: "foam/box/RoundRobinBox" },
   { name: "foam/box/pipeline/Pipeline" },
   { name: "foam/box/pipeline/PipelineBuilder" },
   { name: "foam/core/async" },
