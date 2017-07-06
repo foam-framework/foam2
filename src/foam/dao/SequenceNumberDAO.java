@@ -1,20 +1,25 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.ClassInfo;
 import foam.core.FObject;
-import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.core.X;
 import foam.mlang.MLang;
 import foam.mlang.sink.Max;
 
 public class SequenceNumberDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
-  protected long value_ = 1;
-  protected boolean isValueSet_ = false;
-
-  protected String property = "id";
-  private PropertyInfo property_ = null;
+  protected long         value_      = 1;
+  protected boolean      isValueSet_ = false;
+  protected String       property    = "id";
+  protected PropertyInfo property_   = null;
 
   public SequenceNumberDAO(DAO delegate) {
     setDelegate(delegate);
@@ -22,19 +27,22 @@ public class SequenceNumberDAO
 
   public SequenceNumberDAO(PropertyInfo property, DAO delegate) {
     setDelegate(delegate);
-    this.property_ = property;
+    property_ = property;
     this.property = property.getName();
   }
 
   public AbstractDAO setOf(ClassInfo of) {
     AbstractDAO ret = super.setOf(of);
-    this.property_ = null;
+
+    property_ = null;
+
     return ret;
   }
 
   public SequenceNumberDAO setProperty(String property) {
     this.property = property;
-    this.property_ = null;
+    property_ = null;
+
     return this;
   }
 
@@ -44,9 +52,8 @@ public class SequenceNumberDAO
   }
 
   private PropertyInfo getProperty_() {
-    if (property_ == null) {
+    if ( property_ == null )
       property_ = (PropertyInfo) this.of_.getAxiomByName(property);
-    }
 
     return property_;
   }
@@ -63,8 +70,7 @@ public class SequenceNumberDAO
 
   public FObject put_(X x, FObject obj) {
     synchronized (this) {
-      if ( ! isValueSet_ )
-        calcDelegateMax_();
+      if ( ! isValueSet_ ) calcDelegateMax_();
       Number val = (Number) obj.getProperty(property);
       if ( val.longValue() < 1 ) {
         getProperty_().set(obj, value_++);
@@ -72,6 +78,7 @@ public class SequenceNumberDAO
         setValue(val.longValue() + 1);
       }
     }
+
     return getDelegate().put(obj);
   }
 }
