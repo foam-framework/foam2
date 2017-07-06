@@ -136,9 +136,9 @@ foam.CLASS({
       return this;
     },
 
-    function escapeString(source, escapeStr = ',') {
-      if ( source.includes(escapeStr) ) {
-        // Surrounds fields with escapeStr in quotes
+    function escapeString(source) {
+      if ( source.includes(',') ) {
+        // Surrounds fields with ',' in quotes
         // Escapes inner quotes by adding another quote char (Google Sheets strategy)
         source = '"' + this.replaceAll(source, '"', '""') + '"';
       }
