@@ -23,12 +23,28 @@ public abstract class AbstractFObjectPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     FObject obj = null;
     try {
-      String objClass = reader.getAttributeValue(null, "class");
-      Class cls = Class.forName(objClass);
-      obj = (FObject) x.create(cls);
-      XMLSupport.copyFromXML(x, obj, reader);
-    } catch (ClassNotFoundException | XMLStreamException ex) {
 
+      while ( reader.hasNext() ) {
+        int eventType;
+        eventType = reader.next();
+        switch ( eventType ) {
+          case XMLStreamConstants.START_ELEMENT:
+            if (reader.getLocalName() == "object") {
+              XMLSupport.createObj(x, reader);
+            }
+            // Enum Specific Case
+            if (reader.getLocalName() == "ordinal" ) {
+              Class cls =  Class.forName(this.of);
+              reader.next();
+              Integer ordinalVal = Integer.parseInt(reader.getText());
+              return ((java.lang.Class<Enum>)cls).getEnumConstants()[ordinalVal];
+            }
+
+          case XMLStreamConstants.END_ELEMENT:
+            break;
+        }
+      }
+    } catch ( XMLStreamException ex) {
     }
     return obj;
   }
