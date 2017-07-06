@@ -215,12 +215,20 @@ foam.CLASS({
         {
           name: 'scriptDAO',
           factory: function() {
+            return this.ClientDAO.create({
+              of: this.Script,
+              delegate: this.HTTPBox.create({
+                method: 'POST',
+                url: 'http://localhost:8080/scriptDAO'
+              })});
+              /*
+
             return this.createDAO({
               of: this.Script,
               seqNo: true,
               testData: [
               ]
-            });
+            });*/
           }
         },
 
