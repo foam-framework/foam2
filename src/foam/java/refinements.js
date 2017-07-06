@@ -832,12 +832,6 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
-      info.method({
-        name: 'of',
-        visibility: 'public',
-        type: 'String',
-        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
-      });
       return info;
     }
   ],
