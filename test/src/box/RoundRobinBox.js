@@ -52,9 +52,8 @@ describe('round robin box', function() {
     // Create RoundRobinBox with outputLen number of OutputIDBoxes.
     var roundRobinBox = RoundRobinBox.create({ delegates: boxes });
 
-    // Sending between 10 - 100 outputs.
-    var rand = Math.floor((Math.random() * 90) + 10);
-    for (var i = 0; i < rand; i++) {
+    // Sending 25 outputs.
+    for (var i = 0; i < 25; i++) {
       roundRobinBox.send(i);
       expect(console.log).toHaveBeenCalledWith(
           `Box ID: ${i % outputLen}, Message: ${i}`);
