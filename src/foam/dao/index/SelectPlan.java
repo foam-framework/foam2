@@ -7,7 +7,7 @@ package foam.dao.index;
 
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
-import java.util.Comparator;
+import foam.mlang.order.Comparator;
 
 public interface SelectPlan extends Plan {
   public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate);
