@@ -13,7 +13,7 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends foam.mlang.Expr, Comparator
+  extends foam.mlang.Expr, Comparator
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
