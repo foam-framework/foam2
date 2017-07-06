@@ -8,7 +8,7 @@ package foam.dao.index;
 import foam.core.FObject;
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
-import java.util.Comparator;
+import foam.mlang.order.Comparator;
 
 /** Have-no-plan Plan. **/
 public class NoPlan implements FindPlan, SelectPlan
