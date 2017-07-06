@@ -44,7 +44,7 @@ public abstract class AbstractFObjectPropertyInfo
             break;
         }
       }
-    } catch ( XMLStreamException ex) {
+    } catch ( ClassNotFoundException | XMLStreamException ex) {
     }
     return obj;
   }
