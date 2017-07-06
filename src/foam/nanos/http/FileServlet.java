@@ -50,7 +50,7 @@ public class FileServlet
     String pathInfo;
     try {
       pathInfo = req.getRequestURI();
-    } catch (Exception e) {
+    } catch (UnsupportedOperationException e) {
       pathInfo = req.getPathInfo();
     }
     String filePath = pathInfo.substring(SERVLET_NAME.length() + 2);
