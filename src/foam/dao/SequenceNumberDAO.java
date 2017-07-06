@@ -71,6 +71,7 @@ public class SequenceNumberDAO
   public FObject put_(X x, FObject obj) {
     synchronized (this) {
       if ( ! isValueSet_ ) calcDelegateMax_();
+
       Number val = (Number) obj.getProperty(property);
       if ( val.longValue() < 1 ) {
         getProperty_().set(obj, value_++);
