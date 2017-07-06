@@ -80,7 +80,7 @@ foam.CLASS({
 
     function outputHeaderTitle(o, prefix, first) {
       this.out(first ? '' : this.delimiter)
-          .out(this.escapeString(prefix + o));
+          .out(this.escapeString(prefix + this.sanitizeHeaderTitle(o)));
     },
 
     function outputPropertyName_(o, p, prefix, first) {
@@ -92,11 +92,17 @@ foam.CLASS({
         if ( o[p.name] == undefined ) o[p.name] = p.of.id;
 
         // Appends object name to prefix for CSV Header
-        prefix += p.name + this.nestedObjectSeperator;
+        prefix += this.sanitizeHeaderTitle(p.name) + this.nestedObjectSeperator;
         this.outputPropertyName(o[p.name], prefix, first);
       } else {
         this.outputPropertyName(p.name, prefix, first);
       }
+    },
+
+    function sanitizeHeaderTitle(t) {
+      // Sanitizes header title by replacing the nested object seperator, by itself x 2
+      return this.replaceAll(t, this.nestedObjectSeperator, 
+                    this.nestedObjectSeperator + this.nestedObjectSeperator);
     },
 
     {
@@ -130,14 +136,14 @@ foam.CLASS({
       return this;
     },
 
-    function escapeString(s) {
-      if ( s.includes(',') ) {
-        // Surrounds fields with commas in quotes
+    function escapeString(source, escapeStr = ',') {
+      if ( source.includes(escapeStr) ) {
+        // Surrounds fields with escapeStr in quotes
         // Escapes inner quotes by adding another quote char (Google Sheets strategy)
-        s = '"' + s.replace('"', '""') + '"';
+        source = '"' + this.replaceAll(source, '"', '""') + '"';
       }
       
-      return s;
+      return source;
     },
 
     {
@@ -171,7 +177,7 @@ foam.CLASS({
       if ( lines.length == 0 ) throw 'Insufficient CSV Input';
 
       // Trims quotes and splits CSV row into array
-      var props = this.splitIntoValues(lines[0]);
+      var props = this.splitIntoValues(lines[0]).map(this.splitProperty.bind(this));
 
       for ( var i = 1 ; i < lines.length ; i++ ) {
         var values = this.splitIntoValues(lines[i]);
@@ -186,11 +192,27 @@ foam.CLASS({
       return sink;
     },
 
+    function validString(s) {
+      return ( s != undefined ) && ( s.length > 0);
+    },
+
     function splitIntoValues(csvString) {
-      if ( ( csvString == undefined ) || ( csvString.length == 0) ) return [];
+      if ( ! this.validString(csvString) ) return [];
 
       var parser = foam.lib.csv.CSVParser.create();
       return parser.parseString(csvString, this.delimiter).map(field => field.value == undefined ? '' : field.value);
+    },
+
+    function splitProperty(p) {
+      if ( ! this.validString(p) ) return [];
+
+      var parser = foam.lib.csv.CSVParser.create();
+      return parser.parseHeader(p, this.nestedObjectSeperator).map(field => field.value == undefined ? '' : field.value);
+    },
+
+    // Perhaps move this to foam.core.string
+    function replaceAll(text, search, replacement) {
+      return text.replace(new RegExp(search, 'g'), replacement);
     },
 
     function createModel(props, values, cls) {
@@ -204,20 +226,15 @@ foam.CLASS({
         var v = values[i];
 
         // Adds nested prop
-        if ( p.includes(this.nestedObjectSeperator) ) {
-          p = p.split(this.nestedObjectSeperator);
-
-          foam.assert(p.length >= 2, 'Invalid CSV object nesting, properties of inner objects are identified by `' + 
-                                      this.nestedObjectSeperator + '`');
-
-          var prefix = p[0] + this.nestedObjectSeperator;
+        if ( p.length > 1 ) {
+          var prefix = p[0];
 
           for ( var j = i ; j <= props.length ; ++j ) {
             // If last element, or prefix no longer matches prop
-            if ( ( j == props.length ) || ( ! props[j].startsWith(prefix) ) ) {
+            if ( ( j == props.length ) || ( props[j][0] != prefix ) ) {
               // Creates a new model for the inner object
               var prop = model.cls_.getAxiomByName(p[0]);
-              prop.set(model, this.createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(prefix.length)), 
+              prop.set(model, this.createModel(props.slice(i, j).map(nestedProp => nestedProp.slice(1)), 
                                           values.slice(i, j), prop.of));
               
               i = j - 1;
@@ -226,7 +243,7 @@ foam.CLASS({
           }
         // Adds regular prop
         } else {
-          var prop = model.cls_.getAxiomByName(p);
+          var prop = model.cls_.getAxiomByName(p[0]);
           prop.set(model, prop.of ? prop.of.create({ ordinal: v }) : v);
         }
       }
