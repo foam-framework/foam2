@@ -86,6 +86,11 @@ public class ServletHandler
     }
 
     @Override
+    public String getQueryString() {
+      return ex.getRequestURI().getQuery();
+    }
+
+    @Override
     public String getPathInfo() {
       return ex.getRequestURI().getPath();
     }
