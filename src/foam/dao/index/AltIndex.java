@@ -9,7 +9,7 @@ import foam.core.FObject;
 import foam.dao.Sink;
 import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
-import java.util.Comparator;
+import foam.mlang.order.Comparator;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
 public class AltIndex implements Index {
