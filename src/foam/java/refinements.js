@@ -55,7 +55,6 @@ foam.CLASS({
         propName: this.name,
         propType: this.javaType,
         propRequired: this.required,
-        of: this.of,
         jsonParser: this.javaJSONParser,
         extends: this.javaInfoType,
         transient: this.transient
@@ -517,6 +516,12 @@ foam.CLASS({
 
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
       return info;
     }
   ]
@@ -686,6 +691,12 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
       return info;
     }
   ],
@@ -738,7 +749,13 @@ foam.CLASS({
       cast.body = 'Object[] value = (Object[])o;\n'
                 + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
                 + 'System.arraycopy(value, 0, ret, 0, value.length);\n'
-                + 'return ret;'
+                + 'return ret;';
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
 
       return info;
     }
@@ -781,6 +798,12 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
       return info;
     }
   ],
