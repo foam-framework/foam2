@@ -386,6 +386,21 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.FObject',
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
+      return info;
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.AbstractInterface',
@@ -550,13 +565,6 @@ foam.CLASS({
 
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
-      info.method({
-        name: 'of',
-        visibility: 'public',
-        type: 'String',
-        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
-      });
-      return info;
     }
   ]
 });
