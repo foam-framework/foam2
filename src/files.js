@@ -228,6 +228,8 @@ FOAM_FILES([
   { name: "foam/box/LogBox" },
   { name: "foam/box/BroadcastBox" },
   { name: "foam/box/RoundRobinBox" },
+  { name: "foam/box/DedicatedWorkerRegistry", flags: ['node'] },
+  { name: "foam/box/SharedWorkerRegistry", flags: ['node'] },
   { name: "foam/box/pipeline/Pipeline" },
   { name: "foam/box/pipeline/PipelineBuilder" },
   { name: "foam/core/async" },
