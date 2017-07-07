@@ -266,6 +266,7 @@ FOAM_FILES([
   { name: "foam/u2/view/EditColumnsView", flags: ['web'] },
   { name: "foam/u2/md/OverlayDropdown", flags: ['web'] },
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
+  { name: "foam/u2/view/ScrollDAOView", flags: ['web'] },
   { name: "foam/u2/view/BlobView", flags: ['web'] },
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
   { name: "foam/u2/view/ImageView", flags: ['web'] },
