@@ -208,7 +208,6 @@ public class ServletHandler
     ex.getRequestBody().close();
     final ByteArrayInputStream newInput = new ByteArrayInputStream(inBytes);
     final ServletInputStream   is       = new ServletInputStream() {
-
       @Override
       public int read() throws IOException {
         return newInput.read();
