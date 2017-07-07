@@ -35,6 +35,12 @@ foam.CLASS({
       name: 'data',
     },
     {
+      name: 'title',
+      expression: function(data$of) {
+        return 'Browse ' + data$of.name;
+      }
+    },
+    {
       name: 'controller',
       expression: function(data) {
         return this.DAOController.create({ data: data });
@@ -49,7 +55,10 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.tag(this.DAOControllerView);
+      this
+        .addClass(this.myClass())
+        .addClass(this.myClass(this.data.of.id.replace(/\./g, '-')))
+        .tag(this.DAOControllerView);
     }
   ]
 });

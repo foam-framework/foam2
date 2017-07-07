@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /*
@@ -805,14 +794,16 @@ foam.CLASS({
       // TODO: This should be handled by an onsub event when someone subscribes to
       // scroll height changes.
       var self = this;
+      var observer = new MutationObserver(function(mutations) {
+        self.scrollHeight = self.el().scrollHeight;
+      });
+      var config = { attributes: true, childList: true, characterData: true };
+
       this.onload.sub(function(s) {
-        s.detach();
-        var observer = new MutationObserver(function(mutations) {
-          self.scrollHeight = self.el().scrollHeight;
-        });
-        var config = { attributes: true, childList: true, characterData: true };
         observer.observe(self.el(), config);
-        self.onDetach(function() { observer.disconnect() });
+      });
+      this.onunload.sub(function(s) {
+        observer.disconnect()
       });
       return this;
     },
@@ -1744,7 +1735,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.detach, s));
+      this.onDetach(s);
 
       return e;
     },
@@ -1953,6 +1944,8 @@ foam.CLASS({
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      e.addClass('property-' + this.name);
 
       return e;
     }
@@ -2217,6 +2210,19 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'SearchColumns',
+
+  documentation: 'Axiom for storing Table Search Columns information in Class. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
+  properties: [
+    [ 'name', 'searchColumns' ],
+    'columns'
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
@@ -2231,6 +2237,12 @@ foam.CLASS({
       name: 'tableColumns',
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
+      }
+    },
+    {
+      name: 'searchColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
     }
   ]

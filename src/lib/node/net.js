@@ -58,7 +58,7 @@ foam.CLASS({
           (this.buffer.length > 125 ? 4 : 2);
 
       var i = 0;
-      var buffer = new Buffer(this.buffer.length + headerSize);
+      var buffer = Buffer.alloc(this.buffer.length + headerSize);
       // FIN = 1, RSV1-3 = 0
       buffer.writeUInt8(
         0x80 +
@@ -167,7 +167,7 @@ foam.CLASS({
 
     function maskingKey0(byte) {
       this.length = this.length_
-      this.buffer = new Buffer(this.length);
+      this.buffer = Buffer.alloc(this.length);
       this.bufferPos = 0;
       this.needed = this.length;
 
@@ -300,7 +300,7 @@ foam.CLASS({
     function write(msg) {
       var serialized = foam.json.Network.stringify(msg);
       var size = Buffer.byteLength(serialized);
-      var packet = new Buffer(size + 4);
+      var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
       packet.write(serialized, 4);
       this.socket_.write(packet);
@@ -350,7 +350,7 @@ foam.CLASS({
         while ( start != data.length ) {
           if ( this.nextSize == 0 ) {
             this.nextSize = data.readInt32LE(start);
-            this.buffer = new Buffer(this.nextSize);
+            this.buffer = Buffer.alloc(this.nextSize);
             this.offset = 0;
             remaining = this.nextSize - this.offset;
             start += 4;
@@ -396,11 +396,21 @@ foam.CLASS({
     'foam.box.RegisterSelfMessage'
   ],
 
+  imports: [
+    'info',
+    'error',
+    'fonParser'
+  ],
+
   properties: [
     {
       class: 'Boolean',
       name: 'listen',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'listening'
     },
     {
       class: 'Int',
@@ -419,19 +429,33 @@ foam.CLASS({
     function init() {
       if ( ! this.listen ) return;
 
+      this.setupServer(this.port);
+    },
+
+    function setupServer(port) {
       var server = this.server = new require('net').Server();
       this.server.on('connection', this.onConnection);
-      this.server.on('error', function(e) {
-        console.log("Server error", e);
+      this.server.on('error', function(error) {
+        this.error('foam.net.node.SocketService: Server error', error);
         server.unref();
+        if ( error.code === 'EADDRINUSE' ) {
+          var port = Math.floor( 10000 + ( Math.random() * 10000 ) );
+          this.info('foam.net.node.SocketService: Retrying on port', port);
+          this.setupServer(port);
+        }
       }.bind(this));
 
-      if ( this.listen ) this.server.listen(this.port);
+      if ( this.listen ) {
+        this.server.on('listening', function() {
+          this.listening = true;
+        }.bind(this));
+        this.server.listen(this.port = port);
+      }
     },
 
     function addSocket(socket) {
       var s1 = socket.message.sub(function(s, _, m) {
-        var m = foam.json.parseString(m, this);
+        var m = this.fonParser.parseString(m);
 
         if ( this.RegisterSelfMessage.isInstance(m) ) {
           var named = foam.box.NamedBox.create({
@@ -506,7 +530,7 @@ foam.CLASS({
 
       if ( typeof data == "string" ) {
         var opcode = 1;
-        data = new Buffer(data);
+        data = Buffer.from(data);
       } else {
         opcode = 2;
       }
@@ -607,14 +631,26 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      class: 'String',
+      name: 'privateKey'
+    },
+    {
+      class: 'String',
+      name: 'cert'
     }
   ],
 
   methods: [
     function init() {
-      this.server = require('http').createServer(this.onRequest);
-      this.server.listen(this.port);
+      if ( this.cert && this.privateKey )
+        this.server = require('https').createServer({ key: this.privateKey, cert: this.cert });
+      else
+        this.server = require('http').createServer();
+
       this.server.on('upgrade', this.onUpgrade);
+      this.server.listen(this.port);
     }
   ],
 
@@ -705,7 +741,7 @@ foam.CLASS({
       if ( this.payload && this.Blob.isInstance(this.payload) ) {
         this.headers['Content-Length'] = this.payload.size;
       } else if ( this.payload ) {
-        buf = new Buffer(this.payload, 'utf8');
+        buf = Buffer.from(this.payload, 'utf8');
         if ( ! this.headers['Content-Length'] ) {
           this.headers['Content-Length'] = buf.length;
         }

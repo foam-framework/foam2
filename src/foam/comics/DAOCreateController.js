@@ -29,10 +29,17 @@ foam.CLASS({
       name: 'dao'
     },
     {
+      class: 'Boolean',
+      name: 'inProgress'
+    },
+    {
+      name: 'exception'
+    },
+    {
       name: 'data',
       view: { class: 'foam.u2.DetailView' },
       factory: function() {
-        return this.dao.of.create();
+        return this.dao ? this.dao.of.create() : null;
       }
     }
   ],
@@ -40,13 +47,17 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(dao, data$errors_, inProgress) { return !! dao && ! inProgress && ! data$errors_; },
       code: function() {
+        this.inProgress = true;
+        this.clearProperty('exception');
         var self = this;
         this.dao.put(this.data.clone()).then(function() {
+          self.inProgress = false;
           self.finished.pub();
         }, function(e) {
-          // TODO: Display error in view.
-          console.error(e);
+          self.inProgress = false;
+          self.exception = e;
         });
       }
     },

@@ -60,6 +60,10 @@
  *
  *   // Returns a hash of 'a' useful for hash tables
  *   hashCode(a) -> Int
+ *
+ *   // Returns true if the two values are the same instance
+ *   // or the same value for primitive types.
+ *   is(a, b) -> Boolean
  * }
  */
 
@@ -67,6 +71,7 @@ foam.LIB({
   name: 'foam.Undefined',
   methods: [
     function isInstance(o) { return o === undefined; },
+    function is(a, b) { return b === undefined; },
     function clone(o) { return o; },
     function equals(_, b) { return b === undefined; },
     function compare(_, b) { return b === undefined ? 0 : 1; },
@@ -79,6 +84,7 @@ foam.LIB({
   name: 'foam.Null',
   methods: [
     function isInstance(o) { return o === null; },
+    function is(a, b) { return b === null; },
     function clone(o) { return o; },
     function equals(_, b) { return b === null; },
     function compare(_, b) { return b === null ? 0 : 1; },
@@ -91,6 +97,7 @@ foam.LIB({
   name: 'foam.Boolean',
   methods: [
     function isInstance(o) { return typeof o === 'boolean'; },
+    function is(a, b) { return a === b; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -106,6 +113,7 @@ foam.LIB({
   name: 'foam.Function',
   methods: [
     function isInstance(o) { return typeof o === 'function'; },
+    function is(a, b) { return a === b },
     function clone(o) { return o; },
     function equals(a, b) { return b ? a.toString() === b.toString() : false; },
     function compare(a, b) {
@@ -360,12 +368,12 @@ foam.LIB({
   name: 'foam.Number',
   methods: [
     function isInstance(o) { return typeof o === 'number'; },
+    function is(a, b) { return foam.Number.compare(a, b) == 0; },
     function clone(o) { return o; },
-    function equals(a, b) { return a === b; },
+    function equals(a, b) { return foam.Number.compare(a, b) == 0; },
     function compare(a, b) {
-      if ( ! foam.Number.isInstance(b) && isNaN(parseFloat(b))
-          || ( isNaN(a) && ! isNaN(b)) ) return 1;
-      else if ( ! isNaN(a) && isNaN(b) ) return -1;
+      if ( ! foam.Number.isInstance(b) || ( isNaN(a) && ! isNaN(b)) ) return 1;
+      if ( ! isNaN(a) && isNaN(b) ) return -1;
       return a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
@@ -390,6 +398,7 @@ foam.LIB({
   name: 'foam.String',
   methods: [
     function isInstance(o) { return typeof o === 'string'; },
+    function is(a, b) { return a === b; },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
     function compare(a, b) {
@@ -505,6 +514,7 @@ foam.LIB({
   name: 'foam.Array',
   methods: [
     function isInstance(o) { return Array.isArray(o); },
+    function is(a, b) { return a === b; },
     function clone(o) {
       /** Returns a deep copy of this array and its contents. */
       var ret = new Array(o.length);
@@ -571,14 +581,13 @@ foam.LIB({
   name: 'foam.Date',
   methods: [
     function isInstance(o) { return o instanceof Date; },
+    function is(a, b) { return a === b; },
     function clone(o) { return new Date(o); },
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
-      if ( ! foam.Date.isInstance(b) && ! foam.Number.isInstance(b) ) return 1;
-      a = this.getTime(a);
-      b = foam.Number.isInstance(b) ? b : this.getTime(b);
-      return foam.Number.compare(a, b);
+      if ( ! foam.Date.isInstance(b) ) return 1;
+      return foam.Number.compare(this.getTime(a), this.getTime(b));
     },
     // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
@@ -632,9 +641,13 @@ foam.LIB({
     /* istanbul ignore next */
     function isInstance(o) { return false; },
     function clone(o)      { return o ? o.clone() : this; },
+    function is(a, b)      { return a === b; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
-    function compare(a, b) { return a.compareTo(b); },
+    function compare(a, b) {
+      if ( ! foam.core.FObject.isInstance(b) ) return 1;
+      return a.compareTo(b);
+    },
     function hashCode(o)   { return o.hashCode(); }
   ]
 });
@@ -649,6 +662,7 @@ foam.LIB({
         if ( obj.hasOwnProperty(key) ) f(obj[key], key);
       }
     },
+    function is(a, b) { return a === b; },
     function isInstance(o) {
       return typeof o === 'object' && ! Array.isArray(o) &&
           ! foam.core.FObject.isInstance(o);
@@ -710,16 +724,16 @@ foam.typeOf = (function() {
 /**
   Defining an ordinal property to establish a precedence
   in which items should be compared in. Items are arranged
-  by complexity of the type
+  by complexity of the type.
 */
 
 foam.core.FObject.ordinal = 0;
-foam.Object.ordinal = 1;
-foam.Function.ordinal = 2;
-foam.Array.ordinal = 3;
-foam.String.ordinal = 4;
-foam.Number.ordinal = 5;
-foam.Date.ordinal = 6; // Dates are compared as Number, thus more simple
+foam.Date.ordinal = 1;
+foam.Object.ordinal = 2;
+foam.Function.ordinal = 3;
+foam.Array.ordinal = 4;
+foam.String.ordinal = 5;
+foam.Number.ordinal = 6;
 foam.Boolean.ordinal = 7;
 foam.Null.ordinal = 8;
 foam.Undefined.ordinal = 9;
@@ -772,20 +786,18 @@ foam.LIB({
     methods: [
       function clone(o)      { return typeOf(o).clone(o); },
       function equals(a, b)  { return typeOf(a).equals(a, b); },
+      function is(a, b) {
+        var aType = typeOf(a);
+        var bType = typeOf(b);
+        return aType === bType && aType.is(a, b);
+      },
       function compare(a, b) {
         // To ensure that symmetry is present when comparing,
         // we will always use the comparator of higher precedence.
         var aType = typeOf(a);
         var bType = typeOf(b);
-        return (aType.ordinal >= bType.ordinal) ? aType.compare(a, b) :
-            this.comparatorNegate(bType.compare(b, a));
-      },
-      function comparatorNegate(num) {
-        // When negating comparisons, a -0 may be returned and
-        // this may cause unexpected behaviour. Since -0 === 0
-        // is true, we return 0 and avoid returning -0.
-        if (num === 0) return 0;
-        return -num;
+        return aType.ordinal > bType.ordinal ? 1 :
+            aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {

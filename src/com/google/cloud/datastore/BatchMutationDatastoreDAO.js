@@ -100,7 +100,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(o) {
+    function put_(x, o) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
@@ -117,7 +117,7 @@ foam.CLASS({
         self.onBatchedOperation();
       });
     },
-    function remove(o) {
+    function remove_(x, o) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
@@ -146,18 +146,18 @@ foam.CLASS({
           this.mutations_.length > 0,
           'BatchedMutationDatastoreDAO: Attempt to batch no operations');
 
+        var mutations = this.mutations_.slice(0, this.batchSize);
+        this.mutations_ = this.mutations_.slice(this.batchSize);
+
         return this.getRequest('beginTransaction').send()
-          .then(this.onResponse.bind(this, 'batch transaction'))
-          .then(this.onBatchTransactionResponse);
+            .then(this.onResponse.bind(this, 'batch transaction'))
+            .then(this.onBatchTransactionResponse.bind(this, mutations));
       }
     },
 
-    function onBatchTransactionResponse(json) {
-      var transaction = json.transaction;
-
-      var mutations = this.mutations_.slice(0, this.batchSize);
+    function onBatchTransactionResponse(mutations, json) {
       var mutationData = new Array(mutations.length);
-      this.mutations_ = this.mutations_.slice(this.batchSize);
+      var transaction = json.transaction;
 
       for ( var i = 0; i < mutations.length; i++ ) {
         mutationData[i] = {};
@@ -170,8 +170,8 @@ foam.CLASS({
         mutations: mutationData,
         transaction: transaction
       })).send().then(this.onResponse.bind(this, 'batch commit'))
-        .then(this.onBatchResponse.bind(this, mutations))
-        .catch(this.onBatchFailure.bind(this, mutations));
+          .then(this.onBatchResponse.bind(this, mutations))
+          .catch(this.onBatchFailure.bind(this, mutations));
     },
     function onBatchResponse(mutations, json) {
       var results = json.mutationResults;

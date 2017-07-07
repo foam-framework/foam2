@@ -87,7 +87,7 @@ foam.CLASS({
     'foam.core.Property',
     'foam.dao.ArraySink',
     'foam.mlang.sink.NullSink',
-    'foam.dao.index.AltPlan',
+    'foam.dao.index.MergePlan',
     'foam.dao.index.CountPlan',
     'foam.dao.index.CustomPlan',
     'foam.dao.index.NotFoundPlan',
@@ -421,8 +421,7 @@ foam.CLASS({
 
           if ( subPlans.length === 0 ) return m.NotFoundPlan.create();
 
-          // TODO: If ordering, AltPlan may need to sort like MergePlan.
-          return m.AltPlan.create({
+          return m.MergePlan.create({
             subPlans: subPlans,
             prop: prop
           });
@@ -439,11 +438,7 @@ foam.CLASS({
 
         subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
-        // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return m.AltPlan.create({
-          subPlans: [subPlan],
-          prop: prop
-        });
+        return subPlan;
       }
 
       var ic = false;
@@ -480,8 +475,7 @@ foam.CLASS({
           subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate, root));
         }
 
-        // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return m.AltPlan.create({
+        return m.MergePlan.create({
           subPlans: subPlans,
           prop: prop
         });
@@ -538,8 +532,13 @@ foam.CLASS({
             limit += skip;
             limit = Math.min(a.length, limit);
 
-            for ( var i = skip; i < limit; i++ )
-              sink.put(a[i]);
+            var sub = foam.core.FObject.create();
+            var detached = false;
+            sub.onDetach(function() { detached = true; });
+            for ( var i = skip; i < limit; i++ ) {
+              sink.put(a[i], sub);
+              if ( detached ) break;
+            }
           } else {
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place

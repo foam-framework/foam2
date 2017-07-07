@@ -23,11 +23,15 @@ var classes = [
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
+  'foam.mlang.sink.Count',
+  'foam.mlang.sink.GroupBy',
+  'foam.mlang.F',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
   'foam.box.Box',
+  'foam.box.Skeleton',
   'foam.box.ProxyBox',
   'foam.box.SubBox',
   'foam.box.Message',
@@ -46,13 +50,19 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.Sink',
   'foam.dao.AbstractSink',
+  'foam.mlang.sink.AbstractUnarySink',
   'foam.dao.PredicatedSink',
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
+  'foam.dao.ReadOnlyDAO',
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
+  'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
+  'foam.mlang.sink.Max',
+  'foam.mlang.sink.Min',
+  'foam.mlang.sink.Sum',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
@@ -62,25 +72,33 @@ var classes = [
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.script.Script',
-  'foam.nanos.test.Test'
+  'foam.nanos.test.Test',
+  'foam.nanos.cron.Cron',
+  'foam.dao.history.PropertyUpdate',
+  'foam.dao.history.HistoryRecord',
+  'foam.mop.MOP',
+  'foam.nanos.export.ExportDriverRegistry'
 ];
 
 var abstractClasses = [
-//  'foam.json.Outputer'
+//  'foam.json.Outputter'
 ];
 
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',
-  'foam.dao.DAO'
+  'foam.dao.DAO',
+  'foam.mop.MOP'
 ];
 
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'com.google.foam.demos.appengine.TestService'
+  'com.google.foam.demos.appengine.TestService',
+  'foam.mop.MOP'
 ];
 
 module.exports = {

@@ -183,9 +183,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Literal',
+
+  documentation: 'Matches a literal with the parse stream (case sensitive)',
 
   properties: [
     {
@@ -219,6 +222,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parse',
   name: 'LiteralIC',
+
+  documentation: 'Matches a literal with the parse stream (case insensitive)',
 
   properties: [
     {
@@ -260,6 +265,8 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Alternate',
 
+  documentation: 'Attempts to match one of the parser properties to the parse stream.',
+
   properties: [
     {
       name: 'args',
@@ -295,6 +302,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parse',
   name: 'Sequence',
+
+  documentation: 'Parses the parser properties sequentially.',
 
   properties: [
     {
@@ -343,6 +352,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Substring',
@@ -360,9 +370,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Sequence0',
+
+  documentation: `Parses the parser properties sequentially, 
+    without returning value`,
 
   properties: [
     {
@@ -395,6 +409,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.parse',
   name: 'Sequence1',
+
+  documentation: `Parses the parser properties sequentially, returning
+    the n(th) property value parsed.`,
 
   properties: [
     {
@@ -436,6 +453,8 @@ foam.CLASS({
   name: 'Optional',
   extends: 'foam.parse.ParserDecorator',
 
+  documentation: 'Refers to an optional parser property.',
+
   methods: [
     function parse(ps, obj) {
       return this.p.parse(ps, obj) || ps.setValue(null);
@@ -452,6 +471,10 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'AnyChar',
 
+  documentation: `Matches any char within the parse stream.
+    Often used under the else clause of the 'not' parser
+    property. Ex. \`not(',', anyChar())\``,
+
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
@@ -463,9 +486,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'NotChars',
+
+  documentation: `Matches against all but the chars specified
+    in the argument string.`,
 
   properties: [
     {
@@ -491,9 +518,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'Chars',
+
+  documentation: `Matches against any of the chars specified
+    in the argument string.`,
+
   properties: [
     {
       name: 'string',
@@ -519,10 +551,12 @@ foam.CLASS({
 });
 
 
-
 foam.CLASS({
   package: 'foam.parse',
   name: 'Range',
+
+  documentation: `Matches against a range of chars specified
+    with from/to. Ex. \`range('0', '9')\` for digits`,
 
   properties: [
     {
@@ -555,6 +589,9 @@ foam.CLASS({
   name: 'Repeat',
   extends: 'foam.parse.ParserDecorator',
 
+  documentation: `Repeats matching to the parser property specified
+    with an optional delimiter, and min number of matches.`,
+
   properties: [
     {
       class: 'foam.parse.ParserProperty',
@@ -574,6 +611,14 @@ foam.CLASS({
       var delim = this.delimiter;
 
       while ( ps ) {
+        // Checks for end of string
+        if ( last && ( last.pos == ps.str[0].length ) ) {
+          // Checks if previous char was delimiter, if not removes trailing empty string
+          // TODO: Find a better way to handle reading past input
+          if ( delim && ( ps.str[0][last.pos - 1] != delim.s ) ) ret.pop();
+          return ps.setValue(ret);
+        }
+
         last = ps;
         ps = p.parse(ps, obj);
         if ( ps ) ret.push(ps.value);
@@ -583,6 +628,7 @@ foam.CLASS({
       }
 
       if ( this.minimum > 0 && ret.length < this.minimum ) return undefined;
+      
       return last.setValue(ret);
     },
 
@@ -601,6 +647,9 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Plus',
   extends: 'foam.parse.Repeat',
+
+  documentation: `Repeats matching to a parser property at least one time
+    with an optional delimiter.`,
 
   properties: [
     ['minimum', 1]
@@ -621,6 +670,10 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Repeat0',
   extends: 'foam.parse.Repeat',
+
+  documentation: `Repeats matching to a parser property,
+    without returning a value. Useful for whitespace.
+    Ex. \`repeat0(sym('white'))\``,
 
   methods: [
     function parse(ps, obj) {
@@ -657,6 +710,11 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Not',
   extends: 'foam.parse.ParserDecorator',
+
+  documentation: `Ensures the leading char isn't the parser
+    property specified. If not, attempts to parse with the
+    else clause parser property. Useful for matching all but
+    a particular character. Ex. \`not('"', anyChar())\``,
 
   properties: [
     {
@@ -707,6 +765,8 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Symbol',
 
+  documentation: `Parses based on the parser property named.`,
+
   properties: [
     {
       name: 'name',
@@ -737,13 +797,13 @@ foam.CLASS({
 
   methods: [
     function seq() {
-      return foam.lookup('foam.parse.Sequence').create({
+      return this.lookup('foam.parse.Sequence').create({
         args: Array.from(arguments)
       });
     },
 
     function repeat0(p, delim, min) {
-      return foam.lookup('foam.parse.Repeat0').create({
+      return this.lookup('foam.parse.Repeat0').create({
         p: p,
         minimum: min || 0,
         delimiter: delim
@@ -751,38 +811,38 @@ foam.CLASS({
     },
 
     function simpleAlt() {
-      return foam.lookup('foam.parse.Alternate').create({
+      return this.lookup('foam.parse.Alternate').create({
         args: Array.from(arguments)
       });
     },
 
     function alt() {
-      return foam.lookup('foam.parse.Alternate').create({
+      return this.lookup('foam.parse.Alternate').create({
         args: Array.from(arguments)
       });
     },
 
     function sym(name) {
-      return foam.lookup('foam.parse.Symbol').create({
+      return this.lookup('foam.parse.Symbol').create({
         name: name
       });
     },
 
     function seq1(n) {
-      return foam.lookup('foam.parse.Sequence1').create({
+      return this.lookup('foam.parse.Sequence1').create({
         n: n,
         args: Array.from(arguments).slice(1)
       });
     },
 
     function seq0() {
-      return foam.lookup('foam.parse.Sequence0').create({
+      return this.lookup('foam.parse.Sequence0').create({
         args: Array.from(arguments)
       });
     },
 
     function repeat(p, delim, min) {
-      return foam.lookup('foam.parse.Repeat').create({
+      return this.lookup('foam.parse.Repeat').create({
         p: p,
         minimum: min || 0,
         delimiter: delim
@@ -790,65 +850,65 @@ foam.CLASS({
     },
 
     function plus(p, delim) {
-      return foam.lookup('foam.parse.Plus').create({
+      return this.lookup('foam.parse.Plus').create({
         p: p,
         delimiter: delim
       });
     },
 
     function str(p) {
-      return foam.lookup('foam.parse.String').create({
+      return this.lookup('foam.parse.String').create({
         p: p
       });
     },
 
     function substring(p) {
-      return foam.lookup('foam.parse.Substring').create({
+      return this.lookup('foam.parse.Substring').create({
         p: p
       });
     },
 
     function range(a, b) {
-      return foam.lookup('foam.parse.Range').create({
+      return this.lookup('foam.parse.Range').create({
         from: a,
         to: b
       });
     },
 
     function notChars(s) {
-      return foam.lookup('foam.parse.NotChars').create({
+      return this.lookup('foam.parse.NotChars').create({
         string: s
       });
     },
 
     function chars(s) {
-      return foam.lookup('foam.parse.Chars').create({
+      return this.lookup('foam.parse.Chars').create({
         string: s
       });
     },
 
     function not(p, opt_else) {
-      return foam.lookup('foam.parse.Not').create({
+      return this.lookup('foam.parse.Not').create({
         p: p,
         else: opt_else
       });
     },
 
     function optional(p) {
-      return foam.lookup('foam.parse.Optional').create({
+      return this.lookup('foam.parse.Optional').create({
         p: p
       });
     },
 
     function literal(s, value) {
-      return foam.lookup('foam.parse.Literal').create({
+      return this.lookup('foam.parse.Literal').create({
         s: s,
         value: value
       });
     },
 
     function literalIC(s, value) {
-      return foam.lookup('foam.parse.LiteralIC').create({
+      return this.lookup('foam.parse.LiteralIC').create({
         s: s,
         value: value
       });
@@ -972,6 +1032,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse',
   name: 'GrammarAxiom',
@@ -1034,6 +1095,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
@@ -1044,6 +1106,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.parse',
