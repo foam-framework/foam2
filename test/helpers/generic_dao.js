@@ -455,6 +455,39 @@ global.genericDAOTestBattery = function(daoFactory) {
             expect(a.array[1].firstName).toBe('Jon');
           }).then(done);
         });
+        it('should honour sub.detach() with orderBy()', function(done) {
+          foam.CLASS({
+            package: 'test.dao.generic',
+            name: 'DetachAfterFirstSink',
+            extends: 'foam.dao.ProxySink',
+
+            methods: [
+              function put(o, sub) {
+                this.delegate.put(o, sub);
+                sub.detach();
+              }
+            ]
+          });
+
+          dao.orderBy(test.dao.generic.Person.LAST_NAME)
+              .select(test.dao.generic.DetachAfterFirstSink.create({
+                delegate: foam.dao.ArraySink.create()
+              })).then(function(sink) {
+                var array = sink.delegate.array;
+                expect(array).toBeDefined();
+                expect(array.length).toBe(1);
+                expect(array[0].lastName).toBe('Bonham');
+                return dao.orderBy(test.dao.generic.Person.FIRST_NAME)
+                    .select(test.dao.generic.DetachAfterFirstSink.create({
+                      delegate: foam.dao.ArraySink.create()
+                    }));
+              }).then(function(sink) {
+                var array = sink.delegate.array;
+                expect(array).toBeDefined();
+                expect(array.length).toBe(1);
+                expect(array[0].firstName).toBe('Angus');
+              }).then(done, done.fail);
+        });
       });
     });
   });
