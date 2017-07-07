@@ -42,7 +42,7 @@ foam.CLASS({
   classes: [
     {
       name: 'JSONOutputter',
-      extends: 'foam.json.Outputer',
+      extends: 'foam.json.Outputter',
       requires: [
         'foam.box.HTTPReplyBox'
       ],
