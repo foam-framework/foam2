@@ -17,7 +17,8 @@ foam.CLASS({
     'data', // TODO: output as 'stack'
     'detailView',
     'factory',
-    'summaryView'
+    'summaryView',
+    'showActions'
   ],
 
   properties: [
@@ -104,9 +105,8 @@ foam.CLASS({
     {
       name: 'CreateController',
       extends: 'foam.u2.Element',
-
-      imports: [ 'detailView', 'stack', 'dao', 'factory' ],
-      exports: [ 'as data' ],
+      imports: [ 'detailView', 'stack', 'dao', 'factory', 'showActions' ],
+      exports: [ 'as data', 'save', 'cancel' ],
 
       properties: [
           {
@@ -117,7 +117,8 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.tag(this.detailView, {data: this.obj}).add(this.CANCEL, this.SAVE);
+          this.tag(this.detailView, {data: this.obj});
+          if ( this.showActions ) this.add(this.CANCEL, this.SAVE);
         }
       ],
 
