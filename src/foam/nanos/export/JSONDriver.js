@@ -14,8 +14,8 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.json.Outputer',
-      name: 'outputer',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
       factory: function() { return foam.json.PrettyStrict; }
     }
   ],
@@ -23,7 +23,7 @@ foam.CLASS({
   methods: [
     function exportDAO(X, dao) {
       return dao.select().then(function (sink) {
-        return outputer.stringify(sink.array);
+        return outputter.stringify(sink.array);
       });
     }
   ]
