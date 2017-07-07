@@ -35,9 +35,9 @@ public class ServletHandler
     RequestWrapper(HttpServletRequest request, HttpExchange ex, Map<String, String[]> postData, ServletInputStream is) {
       super(request);
 
-      this.ex = ex;
+      this.ex       = ex;
       this.postData = postData;
-      this.is = is;
+      this.is       = is;
     }
 
     @Override
@@ -86,7 +86,17 @@ public class ServletHandler
     }
 
     @Override
+    public String getQueryString() {
+      return ex.getRequestURI().getQuery();
+    }
+
+    @Override
     public String getPathInfo() {
+      return ex.getRequestURI().getPath();
+    }
+
+    @Override
+    public String getRequestURI() {
       return ex.getRequestURI().getPath();
     }
 
@@ -156,7 +166,7 @@ public class ServletHandler
     @Override
     public void sendError(int sc, String msg) throws IOException {
       this.status = sc;
-      if (msg != null) {
+      if ( msg != null ) {
         printWriter.write(msg);
       }
     }

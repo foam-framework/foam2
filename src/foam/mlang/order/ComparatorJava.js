@@ -8,7 +8,7 @@
    package: 'foam.mlang.order',
    name: 'Comparator',
 
-   javaExtends: [ 'java.lang.Comparable' ],
+   javaExtends: [ 'java.util.Comparator' ],
 
    methods: [
      {
