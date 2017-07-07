@@ -55,6 +55,7 @@ var classes = [
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
+  'foam.dao.ReadOnlyDAO',
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
@@ -84,7 +85,7 @@ var classes = [
 ];
 
 var abstractClasses = [
-//  'foam.json.Outputer'
+//  'foam.json.Outputter'
 ];
 
 var skeletons = [
