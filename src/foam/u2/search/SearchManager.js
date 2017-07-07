@@ -106,6 +106,7 @@ foam.CLASS({
       this.views = {};
       this.subs_ = {};
     },
+
     function clear() {
       foam.Object.forEach(this.views, function(view) { view.clear(); });
     }

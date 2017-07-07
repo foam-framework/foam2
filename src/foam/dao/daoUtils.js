@@ -31,7 +31,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return foam.dao.NullDAO.create() },
       postSet: function(old, nu) {
@@ -47,10 +47,16 @@ foam.CLASS({
   ],
 
   methods: [
-    function listen(sink, skip, limit, order, predicate) {
+    {
+      name: 'getOf',
+      javaReturns: 'foam.core.ClassInfo',
+      javaCode: 'if ( of_ == null && getDelegate() != null ) return getDelegate().getOf(); return of_;'
+    },
+
+    function listen_(x, sink, predicate) {
       var listener = this.ProxyListener.create({
         delegate: sink,
-        args: [skip, limit, order, predicate]
+        args: [ predicate ]
       });
 
       listener.onDetach(listener.dao$.follow(this.delegate$));
@@ -88,11 +94,11 @@ foam.CLASS({
 
   methods: [
     function put(obj, s) {
-      this.delegate.put(this, obj);
+      this.delegate.put(obj, this);
     },
 
     function remove(obj, s) {
-      this.delegate.remove(this, obj);
+      this.delegate.remove(obj, this);
     },
 
     function reset(s) {
@@ -138,7 +144,7 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll', 'listen' ],
+      methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_', 'cmd_' ],
       name: 'promise'
     }
   ]

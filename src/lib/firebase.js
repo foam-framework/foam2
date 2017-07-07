@@ -65,7 +65,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(x, obj) {
       var req = this.HTTPRequest.create();
 
       if ( obj.id ) {
@@ -98,7 +98,7 @@ foam.CLASS({
         payload = JSON.parse(payload);
 
         //        if ( obj.id ) {
-          var o2 = foam.json.parse(foam.json.parseString(payload.data));
+        var o2 = foam.json.parseString(payload.data, this);
           if ( this.timestampProperty ) {
             this.timestampProperty.set(o2, payload.lastUpdate);
           }
@@ -112,7 +112,7 @@ foam.CLASS({
       });
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       var req = this.HTTPRequest.create();
       req.method = 'DELETE',
       req.url = this.basepath + "/" + encodeURIComponent(obj.id) + ".json";
@@ -128,7 +128,7 @@ foam.CLASS({
       });
     },
 
-    function find(id) {
+    function find_(x, id) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
       req.url = this.basepath + "/" + encodeURIComponent(id) + ".json";
@@ -145,8 +145,7 @@ foam.CLASS({
         try {
           data = JSON.parse(data);
 
-          var obj = foam.json.parse(
-            foam.json.parseString(data.data));
+          var obj = foam.json.parseString(data.data, this);
 
           if ( this.timestampProperty ) {
             this.timestampProperty.set(obj, data.lastUpdate);
@@ -194,7 +193,7 @@ foam.CLASS({
       }
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       var req = this.HTTPRequest.create();
       req.method = "GET";
 
@@ -245,8 +244,7 @@ foam.CLASS({
         for ( var key in data ) {
           if ( detached ) break;
 
-          var obj = foam.json.parse(
-            foam.json.parseString(data[key].data));
+          var obj = foam.json.parseString(data[key].data, this);
           if ( this.timestampProperty ) {
             this.timestampProperty.set(obj, data[key].lastUpdate);
           }
@@ -279,7 +277,7 @@ foam.CLASS({
         }
 
         for ( var key in data.data ) {
-          var obj = foam.json.parse(foam.json.parseString(data.data[key].data));
+          var obj = foam.json.parseString(data.data[key].data, this);
           if ( this.timestampProperty ) {
             this.timestampProperty.set(obj, data.data[key].lastUpdate);
           }
@@ -293,7 +291,7 @@ foam.CLASS({
           this.on.remove.pub(obj);
           return;
         }
-        var obj = foam.json.parse(foam.json.parseString(data.data.data));
+        var obj = foam.json.parseString(data.data.data, this);
         if ( this.timestampProperty ) {
           this.timestampProperty.set(obj, data.data.lastUpdate);
         }
@@ -311,7 +309,7 @@ foam.CLASS({
           this.on.put.pub(obj);
         }.bind(this));
 
-        // var obj = foam.json.parse(foam.json.parseString(data.data));
+        // var obj = foam.json.parseString(data.data, this);
         // this.on.put.pub(obj);
       } else if ( path.indexOf('/lastUpdate') === path.length - 11 ) {
         // Timestamp of an existing row updated, do anything?

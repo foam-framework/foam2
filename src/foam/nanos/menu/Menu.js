@@ -27,7 +27,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView(X) { return this.view; }
+    function createView(X) { return this.view.clone(); }
   ]
 });
 
@@ -51,6 +51,36 @@ foam.CLASS({
 
       if ( this.summaryView ) view.summaryView = this.summaryView;
       return view;
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.nanos.menu',
+  name: 'ListMenu',
+  extends: 'foam.nanos.menu.AbstractMenu',
+
+  requires: [ 'foam.u2.Element' ],
+
+  methods: [
+    function createView(X, menu) {
+      var e = this.Element.create(undefined, X);
+
+      X.stack.push(e);
+
+      menu.children.select({
+        put: function(menu) {
+          if ( menu.handler ) {
+            e.tag(menu.handler.createView(X, menu));
+          } else {
+            e.add('Coming Soon!');
+          }
+        },
+        eof: function() {}
+      });
+
+      return e;
     }
   ]
 });
@@ -87,6 +117,32 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.nanos.menu',
+  name: 'SubMenuView',
+  extends: 'foam.nanos.menu.PopupMenu',
+
+  properties: [ 'X', 'menu' ],
+
+  methods: [
+    function initE() {
+      this.addClass(this.myClass());
+      var self = this;
+      var menu = this.menu;
+      var X = this.X;
+      menu.children.select({
+        put: function(menu) {
+          if ( ! menu.handler ) return;
+          self.start('div')
+            .on('click', function() { self.close(); menu.launch(X); })
+            .add(menu.label)
+          .end();
+        },
+        eof: function() {}
+      });
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.nanos.menu',
@@ -97,20 +153,7 @@ foam.CLASS({
 
   methods: [
     function createView(X, menu) {
-      var popup = this.PopupMenu.create(undefined, X);
-
-      menu.children.select({
-        put: function(menu) {
-          if ( ! menu.handler ) return;
-          popup.start('div')
-            .on('click', function() { popup.close(); menu.launch(X); })
-            .add(menu.label)
-          .end();
-        },
-        eof: function() {}
-      });
-
-      return popup;
+      return this.SubMenuView.create({menu: menu}, X);
     },
 
     function launch(X, menu) {
@@ -137,6 +180,11 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'handler'
+    },
+    {
+      class: 'Int',
+      name: 'order',
+      value: 1000
     }
   ],
 

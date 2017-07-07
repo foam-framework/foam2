@@ -75,7 +75,7 @@ foam.CLASS({
         field({
           name: privateName,
           type: this.javaType,
-          visibility: 'private'
+          visibility: 'protected'
         }).
         field({
           name: isSet,
@@ -88,7 +88,8 @@ foam.CLASS({
           type: this.javaType,
           visibility: 'public',
           body: 'if ( ! ' + isSet + ' ) {\n' +
-            ( this.hasOwnProperty('javaFactory') ? '  set' + capitalized + '(' + factoryName + '());\n' :
+            ( this.hasOwnProperty('javaFactory') ?
+                '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';'
@@ -102,10 +103,9 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: cls.name,
+          type: 'void',
           body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
+              + isSet + ' = true;'
         });
 
       if ( this.hasOwnProperty('javaFactory') ) {
@@ -119,6 +119,7 @@ foam.CLASS({
 
       cls.field({
         name: constantize,
+        visibility: 'public',
         static: true,
         type: 'foam.core.PropertyInfo',
         initializer: this.createJavaPropertyInfo_(cls)
@@ -162,7 +163,7 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name = this.model_.name;
+      cls.name    = this.model_.name;
       cls.package = this.model_.package;
       cls.extends = this.model_.extends === 'FObject' ?
         'foam.core.AbstractFObject' : this.model_.extends;
@@ -190,6 +191,14 @@ foam.LIB({
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
 
+      // TODO: instead of doing this here, we should walk all Axioms
+      // and introuce a new buildJavaAncestorClass() method
+      cls.allProperties = this.getAxiomsByClass(foam.core.Property)
+        .filter(function(p) { return !!p.javaType && p.javaInfoType; })
+        .map(function(p) {
+          return foam.java.Field.create({name: p.name, type: p.javaType});
+        });
+
       return cls;
     }
   ]
@@ -212,6 +221,11 @@ foam.CLASS({
       class: 'Boolean',
       name: 'abstract',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'synchronized',
+      value: false
     },
     {
       class: 'StringArray',
@@ -252,6 +266,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
           return {
@@ -260,6 +275,40 @@ foam.CLASS({
           };
         }),
         body: this.javaCode ? this.javaCode : ''
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Constant',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'Object',
+      name: 'value',
+    },
+    {
+      class: 'String',
+      name: 'documentation'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      cls.constant({
+        name:  this.name,
+        type:  this.type || undefined,
+        value: this.value,
+        documentation: this.documentation || undefined
       });
     }
   ]
@@ -346,9 +395,9 @@ foam.CLASS({
         cls.buildJavaClass =  function(cls) {
           cls = cls || foam.java.Interface.create();
 
-          cls.name = this.name;
-          cls.package = this.package;
-          cls.extends = this.extends;
+          cls.name = this.model_.name;
+          cls.package = this.model_.package;
+          cls.implements = (this.implements || []).concat(this.model_.javaExtends || []);
 
           var axioms = this.getAxioms();
 
@@ -626,7 +675,7 @@ foam.CLASS({
       template: function() {/*
   <%= this.javaType %> values1 = get_(o1);
   <%= this.javaType %> values2 = get_(o2);
-  
+
   if ( values1.length > values2.length ) return 1;
   if ( values1.length < values2.length ) return -1;
 

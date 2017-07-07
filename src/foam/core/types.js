@@ -85,7 +85,7 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
+          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
 
           return ret;
         }
@@ -462,7 +462,7 @@ foam.CLASS({
         return of.isInstance(v) ?
             v :
             ( v.class ?
-                foam.lookup(v.class) :
+                this.lookup(v.class) :
                 of ).create(v, this.__subContext__);
       }
     }
@@ -483,7 +483,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) { return of + 'DAO'; }
+      expression: function(of) { return foam.String.daoize(of.name); }
     },
     {
       name: 'adapt',

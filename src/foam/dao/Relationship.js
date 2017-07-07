@@ -87,27 +87,27 @@ foam.CLASS({
       class: 'String',
       name: 'junctionModel',
       expression: function(sourceModel, targetModel) {
-        return ( this.package ? this.package + '.' : '' ) + foam.lookup(sourceModel).name + foam.lookup(targetModel).name + 'Junction'; }
+        return ( this.package ? this.package + '.' : '' ) + this.lookup(sourceModel).name + this.lookup(targetModel).name + 'Junction'; }
     },
     {
       class: 'String',
       name: 'sourceDAOKey',
       expression: function(sourceModel) {
-        return foam.String.daoize(foam.lookup(sourceModel).name);
+        return foam.String.daoize(this.lookup(sourceModel).name);
       }
     },
     {
       class: 'String',
       name: 'targetDAOKey',
       expression: function(targetModel) {
-        return foam.String.daoize(foam.lookup(targetModel).name);
+        return foam.String.daoize(this.lookup(targetModel).name);
       }
     },
     {
       class: 'String',
       name: 'junctionDAOKey',
       expression: function(junctionModel) {
-        return foam.String.daoize(foam.lookup(junctionModel).name);
+        return foam.String.daoize(this.lookup(junctionModel).name);
       }
     },
     {
@@ -201,7 +201,7 @@ foam.CLASS({
             ]
           });
 
-          junction = foam.lookup(this.junctionModel);
+          junction = this.lookup(this.junctionModel);
         }
 
         var junctionDAOKey = this.junctionDAOKey;
