@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'SharedWorkerRegistry',
-  extends: [ 'foam.box.BoxRegistryBox' ],
+  extends: 'foam.box.BoxRegistryBox',
 
   requires: [
     'foam.core.Stub',
@@ -44,7 +44,7 @@ foam.CLASS({
       documentation: 'Array of shared service worker instances.',
       hidden: true,
       factory: function() {
-        for (var i = 0; i < this.numSharedWorkers; i++) {
+        for ( var i = 0; i < this.numSharedWorkers; i++ ) {
           var stub = this.Stub.create({ of: 'foam.box.node.ForkBox' });
           this.sharedWorkers_.push(stub);
         }

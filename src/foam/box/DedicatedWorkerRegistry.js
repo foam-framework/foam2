@@ -18,35 +18,60 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'DedicatedWorkerRegistry',
-  extends: [ 'foam.box.BoxRegistryBox' ],
+  extends: 'foam.box.BoxRegistryBox',
 
   requires: [
-    'foam.core.Stub',
+    'foam.core.StubFactorySingleton',
+    'foam.box.Box',
     'foam.box.node.ForkBox'
   ],
 
+  exports: [
+    'dedicatedWorkers_'
+  ],
+
   properties: [
+    {
+      name: "getDedicatedWorkerKey",
+      value: function(box) { return null; }
+    },
     {
       name: "dedicatedWorkers_",
       factory: function() { return {}; }
     },
     {
-      name: "getDedicatedWorkerKey",
-      value: function(box) { return null; }
+      name: 'stubFactory_',
+      factory: function() {
+        return this.StubFactorySingleton.create().get(this.ForkBox);
+      }
+    },
+    {
+      name: "context_",
+      factory: function() { return foam.box.Context.create(); }
     }
   ],
 
   methods: [
     function register(name, service, box) {
       var key = this.getDedicatedWorkerKey(box);
-      var stub = this.Stub.create({ of: 'foam.box.node.ForkBox' });
+      var fork = this.ForkBox.create(null, this.context_);
 
-      stub.register(name, service, box);
-      dedicatedWorkers[key] = stub;
+
+      var stub = this.stubFactory_.create({ delegate: fork });
+      this.dedicatedWorkers_[key] = stub;
       return stub;
     },
     function unregister(name) {
       // ???
+      if ( foam.box.Box.isInstance(name) ) {
+        for ( var key in this.dedicatedWorkers_ ) {
+          //
+          return;
+        }
+        return;
+      }
+
+      delete this.dedicatedWorkers_[name];
     }
   ]
 });

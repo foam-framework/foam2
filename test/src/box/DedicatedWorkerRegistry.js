@@ -18,25 +18,56 @@
 describe('dedicated worker registry', function() {
   var Registry;
   var OutputBox;
+  var Context;
 
   beforeEach(function() {
-    foam.CLASS({
-      package: ' foam.box.DedicatedWorkerRegistry.test',
-      name: 'OutputBox',
-      implements: [ 'foam.box.Box' ],
+    Registry = foam.lookup('foam.box.DedicatedWorkerRegistry');
 
-      methods: [
-        function send(message) {
-          console.log(message);
+    foam.CLASS({
+      package: 'foam.box.DedicatedWorkerRegistry.Test',
+      name: 'Context',
+      extends: 'foam.box.Context',
+      requires: [ 'foam.box.DedicatedWorkerRegistry' ],
+      properties: [
+        {
+          name: 'registry',
+          factory: function() {
+            return this.DedicatedWorkerRegistry.create({
+              getDedicatedWorkerKey: function(box) { return box.key; }
+            });
+          }
         }
       ]
     });
 
-    Registry = foam.lookup('foam.box.DedicatedWorkerRegistry');
+    foam.CLASS({
+      package: 'foam.box.DedicatedWorkerRegistry.test',
+      name: 'OutputBox',
+      implements: [ 'foam.box.Box' ],
+
+      properties: [ 'key' ],
+
+      methods: [
+        function send(message) {
+          var process = require('process');
+          console.log(`Key: ${this.key}, Worker PID: ${process.pid}, Message: ${message}`);
+        }
+      ]
+    });
+
+    Context = foam.lookup('foam.box.DedicatedWorkerRegistry.Test.Context');
     OutputBox = foam.lookup('foam.box.DedicatedWorkerRegistry.test.OutputBox');
   });
 
   it('should ...', function() {
-    var registry = Registry.create();
+    var firstBox = OutputBox.create({ key: 'Box1' });
+    var secondBox = OutputBox.create({ key: 'Box2' });
+    var ctx = Context.create();
+
+    var x = ctx.registry.register(null, null, firstBox);
+    var y = ctx.registry.register(null, null, secondBox);
+
+
+    throw "Potato"
   });
 });
