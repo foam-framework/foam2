@@ -532,8 +532,13 @@ foam.CLASS({
             limit += skip;
             limit = Math.min(a.length, limit);
 
-            for ( var i = skip; i < limit; i++ )
-              sink.put(a[i]);
+            var sub = foam.core.FObject.create();
+            var detached = false;
+            sub.onDetach(function() { detached = true; });
+            for ( var i = skip; i < limit; i++ ) {
+              sink.put(a[i], sub);
+              if ( detached ) break;
+            }
           } else {
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place
