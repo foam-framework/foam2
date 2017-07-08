@@ -65,6 +65,7 @@ foam.CLASS({
         foam.u2.CSS.create({
           code: function CSS() {/*
             ^ {
+              display: block;
               contain: layout;
               will-change: transform;
               padding: 5px;
@@ -205,6 +206,15 @@ foam.CLASS({
       }
     },
     {
+      class: 'Int',
+      name: 'batchSize',
+      documentation: `Size for batch of data to fetch from DAO. This view will
+          keep fetching batches until it fills out all rows, but requesting
+          batches limits the number of rows to be processed per animation
+          frame.`,
+      value: 25
+    },
+    {
       name: 'listenSub_',
       documentation: 'Subscription used to listen for DAO reset.',
       value: null,
@@ -306,6 +316,14 @@ foam.CLASS({
       documentation: `A synchronization variable to prevent unhandled scroll
           events from firing when "count_" (and therefore "sentinel_" location)
           changes.`,
+      transient: true
+    },
+    {
+      class: 'Int',
+      name: 'fetchId_',
+      documentation: `A synchronization variable to prevent halt batch fetching
+          of results if fetching from a new starting point has already
+          commenced.`,
       transient: true
     },
     {
@@ -489,13 +507,26 @@ foam.CLASS({
     },
     {
       name: 'fetchData_',
-      documentation: 'Fetch data aligned with current row window from "dao".',
+      documentation: `Fetch data aligned with current row window from "dao" in
+          batches of size "batchSize".`,
       code: function() {
-        return self.dao.skip(this.skip_).limit(this.limit_)
-          .select(this.FetchSink.create({
-            skip: this.skip_,
-            limit: this.limit_
-          }));
+        var batchSize = this.batchSize;
+        var skip = this.skip_;
+        var limit = Math.min(batchSize, this.limit_);
+        var fetchId = ++this.fetchId_;
+        var fetchBatch = function() {
+          if ( this.fetchId_ !== fetchId ) return;
+          this.dao.skip(skip).limit(limit)
+            .select(this.FetchSink.create({
+              skip: skip,
+              limit: limit
+            }));
+
+          skip += batchSize;
+          limit = Math.min(limit, this.skip_ + this.limit_ - skip);
+          if ( limit > 0 ) window.requestAnimationFrame(fetchBatch);
+        }.bind(this);
+        fetchBatch();
       }
     }
   ],
@@ -528,7 +559,7 @@ foam.CLASS({
           This should be the only caller of "fetchData_()" to ensure that
           rapid fetch requests are merged.`,
       isMerged: true,
-      mergeDelay: 200,
+      mergeDelay: 500,
       code: function() { this.fetchData_(); }
     }
   ]
