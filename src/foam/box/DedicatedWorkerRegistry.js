@@ -18,16 +18,13 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'DedicatedWorkerRegistry',
-  extends: 'foam.box.BoxRegistryBox',
+  extends: 'foam.box.ProxyBox',
+  implements: [ 'foam.box.BoxRegistryBox' ],
 
   requires: [
     'foam.core.StubFactorySingleton',
     'foam.box.Box',
     'foam.box.node.ForkBox'
-  ],
-
-  exports: [
-    'dedicatedWorkers_'
   ],
 
   properties: [
@@ -44,33 +41,34 @@ foam.CLASS({
       factory: function() {
         return this.StubFactorySingleton.create().get(this.ForkBox);
       }
-    },
-    {
-      name: "context_",
-      factory: function() { return foam.box.Context.create(); }
     }
   ],
 
   methods: [
     function register(name, service, box) {
       var key = this.getDedicatedWorkerKey(box);
-      var fork = this.ForkBox.create(null, this.context_);
 
+      // What context is this being spawned in?
+      var fork = this.ForkBox.create(null);
 
+      var reg = this.delegate.register(name, service, box);
       var stub = this.stubFactory_.create({ delegate: fork });
       this.dedicatedWorkers_[key] = stub;
+
       return stub;
     },
     function unregister(name) {
-      // ???
+      this.delegate.unregister(name);
+
       if ( foam.box.Box.isInstance(name) ) {
         for ( var key in this.dedicatedWorkers_ ) {
-          //
-          return;
+          if ( this.dedicatedWorkers_[key] === name ) {
+            delete this.dedicatedWorkers_[key];
+            return;
+          }
         }
         return;
       }
-
       delete this.dedicatedWorkers_[name];
     }
   ]

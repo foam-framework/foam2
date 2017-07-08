@@ -18,12 +18,13 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'SharedWorkerRegistry',
-  extends: 'foam.box.BoxRegistryBox',
+  extends: 'foam.box.ProxyBox',
+  implements: [ 'foam.box.BoxRegistryBox' ],
 
   requires: [
-    'foam.core.Stub',
+    'foam.core.StubFactorySingleton',
     'foam.box.RoundRobinBox',
-    //'foam.box.node.ForkBox'
+    'foam.box.node.ForkBox'
   ],
 
   properties: [
@@ -39,13 +40,19 @@ foam.CLASS({
       }
     },
     {
+      name: 'stubFactory_',
+      factory: function() {
+        return this.StubFactorySingleton.create().get(this.ForkBox);
+      }
+    },
+    {
       class: 'Array',
       name: 'sharedWorkers_',
       documentation: 'Array of shared service worker instances.',
       hidden: true,
       factory: function() {
         for ( var i = 0; i < this.numSharedWorkers; i++ ) {
-          var stub = this.Stub.create({ of: 'foam.box.node.ForkBox' });
+          var stub = this.stubFactory_.create(); // Delegate?
           this.sharedWorkers_.push(stub);
         }
       }
