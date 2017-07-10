@@ -76,6 +76,11 @@ public class ServletHandler
     }
 
     @Override
+    public String getProtocol() {
+      return ex.getProtocol();
+    }
+
+    @Override
     public ServletInputStream getInputStream() throws IOException {
       return is;
     }
