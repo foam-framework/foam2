@@ -186,37 +186,46 @@ foam.CLASS({
       return this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name)
     },
 
-    function outputProperty(o, p) {
+    function outputProperty_(o, p) {
       if ( ! this.propertyPredicate(o, p ) ) return;
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
 
       var v = o[p.name];
       this.nl().indent();
-      // Create attribute class='Array' in order for parsing later on and check for nested objects
-      if ( v instanceof Array || typeof v === 'object' ) {
-        this.nestedObject(v, p);
-        return;
-      }
+      this.outputProperty(v, p);
+    },
 
+    {
+      name: 'outputProperty',
+      code: foam.mmethod({
+        String: function(v, p) { this.outputPrimitive(v, p) },
+        Number: function(v, p) { this.outputPrimitive(v, p) },
+        Boolean: function(v, p) { this.outputPrimitive(v, p) },
+        Date: function(v, p) { this.outputPrimitive(v, p) },
+        Array: function(v, p) {
+          this.start("<" + this.propertyName(p) + " class='Array'>");
+          this.nl().indent();
+          this.output(p.toXML(v, this));
+          this.end('</' +  this.propertyName(p) + '>');
+        },
+        FObject: function(v, p) {
+          this.start("<" + this.propertyName(p) + ">");
+          this.nl().indent();
+          this.output(p.toXML(v, this));
+          this.end('</' +  this.propertyName(p) + '>');
+        },
+        AbstractEnum: function(v, p) {
+          this.start("<" + this.propertyName(p) + ">");
+          this.outputProperty_(v, v.cls_.getAxiomByName('ordinal'));
+          this.end('</' +  this.propertyName(p) + '>');
+        }
+      })
+    },
+
+    function outputPrimitive(v, p){
       this.out('<').outputPropertyName(p).out('>');
       this.output(p.toXML(v, this));
       this.out('</').outputPropertyName(p).out('>');
-    },
-
-    function nestedObject(v, p) {
-      if ( v instanceof Array ) {
-        this.start("<" + this.propertyName(p) + " class='Array'>");
-      } else {
-          this.start("<" + this.propertyName(p) + ">");
-      }
-      // Check if object is enum or object with regular properties
-      if ( foam.core.AbstractEnum.isInstance( v ) ) {
-        this.outputProperty(v, v.cls_.getAxiomByName('ordinal'));
-      } else {
-        this.nl().indent();
-        this.output(p.toXML(v, this));
-      }
-      this.end('</' +  this.propertyName(p) + '>');
     },
 
     function outputDate(o) {
@@ -272,6 +281,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
+        AbstractEnum: function(o) { },
         FObject:   function(o) {
           if ( o.outputXML ) {
             o.outputXML(this)
@@ -283,7 +293,7 @@ foam.CLASS({
           // Iterate through properties and output
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputProperty(o, ps[i]);
+            this.outputProperty_(o, ps[i]);
           }
           this.end('</object>');
         },
@@ -291,7 +301,7 @@ foam.CLASS({
           // Nested Objects and FObject Arrays Passed
           for ( var i = 0 ; i < o.length ; i++ ) {
             // Output 'value' tags for arrays containing non-FObject values
-            if ( !o[i].cls_ ) this.out("<value>");
+            if ( !o[i].cls_) this.out("<value>");
             this.output(o[i], this);
             if ( !o[i].cls_ ) this.out("</value>");
             if ( o.length - i != 1 ) this.nl().indent();
@@ -326,10 +336,6 @@ foam.CLASS({
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
-    },
-
-    function ma (objClass, propObj) {
-      return foam.lookup(objClass).create(propObj);
     },
 
     {
@@ -370,10 +376,10 @@ foam.CLASS({
 
             // Regular Prop
             if ( currentProp.firstChild.nodeValue ) {
-              var val = currentProp.firstChild.nodeValue;
+              var val = currentProp.firstChild.nodeValue.replace(/\"/g, "");
               prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: val }) : val );
             } else if ( currentProp.firstChild.innerHTML ) {
-              var v = currentProp.firstChild.innerHTML;
+              var v = currentProp.firstChild.innerHTML.replace(/\"/g, "");
               prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: v }) : v );
             }
           }
@@ -389,26 +395,28 @@ foam.CLASS({
       })
     },
 
-    function objectify(o) {
-      if ( !o ) throw 'Invalid XML Input'
-      // Checking for string and if string is not empty
-      if ( typeof o === 'string' && o ) {
-         // Convert xml string into an xml DOM object for node traversal
-         o = o.replace(/\t|\n|\r|↵/g, "");
-        var parser = new DOMParser();
-        var xmlDoc = parser.parseFromString(o, "text/xml");
-        var rootName = xmlDoc.firstChild.nodeName;
-        // Check if multiple objects
-        if ( rootName === 'objects' ) {
-          return this.createFObj(Array.from(xmlDoc.firstChild.childNodes));
-        } else if ( rootName === 'object' ) {
-          //Single Object
-          var obj = xmlDoc.firstChild;
-          return this.createFObj(obj);
+    {
+      name: 'objectify',
+      code: foam.mmethod({
+        String: function (o) {
+          if ( o ) {
+            // Convert xml string into an xml DOM object for node traversal
+            var parser = new DOMParser();
+            o = o.replace(/\t|\n|\r|↵/g, "");
+            var xmlDoc = parser.parseFromString(o, "text/xml");
+            var rootName = xmlDoc.firstChild.nodeName;
+            // Check if multiple objects
+            if ( rootName === 'objects' ) {
+              return this.createFObj(Array.from(xmlDoc.firstChild.childNodes));
+            } else if ( rootName === 'object' ) {
+              //Single Object
+              var obj = xmlDoc.firstChild;
+              return this.createFObj(obj);
+            }
+          }
         }
-      }
-      throw 'Invalid XML string'
-    },
+      })
+    }
   ]
 });
 
@@ -421,7 +429,6 @@ foam.LIB({
     // Pretty Print
     Pretty: foam.xml.Outputer.create({
       outputDefaultValues: false
-    }
     }),
 
     // Compact output (not pretty)
