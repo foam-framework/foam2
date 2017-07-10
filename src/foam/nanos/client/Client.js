@@ -27,7 +27,8 @@ foam.CLASS({
     'foam.nanos.export.ExportDriverRegistry',
     'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
-    'foam.nanos.test.Test'
+    'foam.nanos.test.Test',
+    'foam.nanos.auth.AuthService'
   ],
 
   exports: [
