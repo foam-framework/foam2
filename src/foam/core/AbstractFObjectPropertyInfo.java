@@ -30,16 +30,9 @@ public abstract class AbstractFObjectPropertyInfo
         switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             if (reader.getLocalName() == "object") {
-              XMLSupport.createObj(x, reader);
+              obj = XMLSupport.createObj(x, reader);
+              return obj;
             }
-            // Enum Specific Case
-            if (reader.getLocalName() == "ordinal" ) {
-              Class cls =  Class.forName(this.of);
-              reader.next();
-              Integer ordinalVal = Integer.parseInt(reader.getText());
-              return ((java.lang.Class<Enum>)cls).getEnumConstants()[ordinalVal];
-            }
-
           case XMLStreamConstants.END_ELEMENT:
             break;
         }
