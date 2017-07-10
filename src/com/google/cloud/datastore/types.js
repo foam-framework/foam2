@@ -107,7 +107,7 @@ foam.LIB({
   methods: [
     function toDatastoreValue(a) {
       var values = new Array(a.length);
-      for ( var i = 0; i < a.length; i++) {
+      for ( var i = 0; i < a.length; i++ ) {
         values[i] = com.google.cloud.datastore.toDatastoreValue(a[i]);
       }
       return { arrayValue: { values: values } };
@@ -163,19 +163,18 @@ foam.LIB({
         var key = keys[keys.length - 1];
         var cls = foam.lookup(key.kind);
         var id = key.name;
-        var idProp = cls.ids && cls.ids.length === 1 ?
-            cls.getAxiomByName(cls.ids[0]) :
-            cls.getAxiomByName('id');
+        var idProp = cls.getAxiomByName('id');
         var opts = {};
-
-        if ( idProp && ! MultiPartID.isInstance(idProp) )
-          opts[idProp.name] = idProp.fromDatastoreKeyName(id);
-
         var props = entity.properties;
+
+        // MultiPartIDs are derived. Do not set them.
+        if ( idProp && MultiPartID.isInstance(idProp) )
+          delete props.id;
+
         for ( var name in props ) {
           if ( props.hasOwnProperty(name) ) {
             opts[name] = com.google.cloud.datastore.fromDatastoreValue(
-                props[name], opt_ctx);
+              props[name], opt_ctx);
           }
         }
 
@@ -279,8 +278,9 @@ foam.LIB({
 });
 
 //
-// Refine properties and multi-part ids to support conversion:
+// Refine properties to support conversion:
 // property-on-object => datastore-key-name
+// Also provide <property-type>.toDatastoreValue(v).
 //
 
 foam.CLASS({
@@ -308,6 +308,27 @@ foam.CLASS({
         return this.f(o).toString();
         return this.toDatastoreKeyNamePart(o);
       }
+    },
+    function toDatastoreValue(v) {
+      return com.google.cloud.datastore.toDatastoreValue(v);
+    },
+    {
+      name: 'toDatastoreInnerValue',
+      documentation: `Get the inner value (not wrapped in in datastore protocol
+          object) associated with this property type value.`,
+      code: function(v) {
+        this.__context__.warn(this.cls_.id + '.toDatastoreInnerValue: Slow path');
+        var wrappedValue = this.toDatastoreValue(v);
+        for ( var key in wrappedValue ) {
+          if ( wrappedValue.hasOwnProperty(key) ) {
+            return key === 'arrayValue' ?
+              wrappedValue.arrayValue && wrappedValue.arrayValue.values || [] :
+              wrappedValue[key];
+          }
+        }
+
+        throw new Error(this.cls_.id + '.toDatastoreInnerValue: No value found');
+      }
     }
   ]
 });
@@ -318,6 +339,12 @@ foam.CLASS({
   methods: [
     function toDatastoreKeyNamePart(o) {
       return this.f(o).toISOString();
+    },
+    function toDatastoreValue(v) {
+      return { timestampValue: this.toDatastoreInnerValue(v) };
+    },
+    function toDatastoreInnerValue(v) {
+      return ( typeof v === 'number' ? new Date(v) : v ).toISOString();
     }
   ]
 });
@@ -345,7 +372,22 @@ foam.CLASS({
       return str;
     },
     function fromDatastoreKeyName(name) {
+      // TODO(markdittmer): Don't parts need to be adapted according to props?
       return name.split(this.stringSeparator);
+    },
+    function toDatastoreValue(v) {
+      var props = this.props;
+      if ( props.length === 1 ) props[0].toDatastoreValue(v);
+
+      // Queries cannot be issued against arrays. Store multi-part IDs as
+      // strings.
+      var sep = this.stringSeparator;
+      var str = '';
+      for ( var i = 0; i < props.length; i++ ) {
+        str += props[i].toDatastoreInnerValue(v[i]).toString();
+        if ( i !== props.length - 1 ) str += sep;
+      }
+      return { stringValue: str };
     }
   ]
 });
@@ -360,7 +402,7 @@ foam.CLASS({
   methods: [
     function toDatastoreValue() {
       return { integerValue: this.ordinal };
-    }
+    },
   ]
 });
 
@@ -372,65 +414,72 @@ foam.CLASS({
 // (4) "values" (i.e., primitives or entities).
 //
 
-foam.CLASS({
-  refines: 'foam.core.FObject',
+(function() {
+  var MultiPartID = foam.core.MultiPartID;
 
-  methods: [
-    function getOwnDatastoreKind() {
-      return this.cls_.getOwnClassDatastoreKind();
-    },
-    function getDatastoreKind() {
-      return this.cls_.getClassDatastoreKind();
-    },
-    function getOwnDatastoreKey() {
-      return {
-        kind: this.getOwnDatastoreKind(),
-        name: com.google.cloud.datastore.toDatastoreKeyName(this)
-      };
-    },
-    function getDatastoreKey(opt_propertyPath) {
-      if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
+  foam.CLASS({
+    refines: 'foam.core.FObject',
 
-      var o = this;
-      var path = new Array(opt_propertyPath.length + 1);
+    methods: [
+      function getOwnDatastoreKind() {
+        return this.cls_.getOwnClassDatastoreKind();
+      },
+      function getDatastoreKind() {
+        return this.cls_.getClassDatastoreKind();
+      },
+      function getOwnDatastoreKey() {
+        return {
+          kind: this.getOwnDatastoreKind(),
+          name: com.google.cloud.datastore.toDatastoreKeyName(this)
+        };
+      },
+      function getDatastoreKey(opt_propertyPath) {
+        if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
 
-      path[0] = this.getOwnDatastoreKey();
+        var o = this;
+        var path = new Array(opt_propertyPath.length + 1);
 
-      for ( var i = 0; i < opt_propertyPath.length; i++ ) {
-        var next = opt_propertyPath[i];
-        var o = ( typeof next === 'string' ) ? o[next] : next.f(o);
+        path[0] = this.getOwnDatastoreKey();
 
-        if ( ! foam.core.FObject.isInstance(o) ) {
-          throw new Error('Attempt to get datastore key from non-keyable ' +
-              'object');
+        for ( var i = 0; i < opt_propertyPath.length; i++ ) {
+          var next = opt_propertyPath[i];
+          var o = ( typeof next === 'string' ) ? o[next] : next.f(o);
+
+          if ( ! foam.core.FObject.isInstance(o) ) {
+            throw new Error('Attempt to get datastore key from non-keyable ' +
+                'object');
+          }
+
+          path[i + 1] = o.getOwnDatastoreKey();
         }
 
-        path[i + 1] = o.getOwnDatastoreKey();
-      }
+        return { path: path };
+      },
+        function toDatastoreEntity() {
+          var properties = {};
+          var ps = this.cls_.getAxiomsByClass(foam.core.Property);
 
-      return { path: path };
-    },
-    function toDatastoreEntity() {
-      var properties = {};
-      var ps = this.cls_.getAxiomsByClass(foam.core.Property);
+          for ( var i = 0; i < ps.length; i++ ) {
+            // TODO(markdittmer): MLangs that refer to storageTransient
+            // properties could cause the DatastoreDAO to misbehave. This could
+            // be fixed by auditing predicates and throwing an error when they
+            // contain properties that are dropped by the DAO processing the
+            // predicate.
+            //
+            // Store MultiPartIDs. Datastore does not support querying by key.
+            if ( ( ! MultiPartID.isInstance(ps[i]) ) && ps[i].storageTransient )
+              continue;
 
-      for ( var i = 0; i < ps.length; i++ ) {
-        // TODO(markdittmer): MLangs that refer to storageTransient
-        // properties could cause the DatastoreDAO to misbehave. This could be
-        // fixed by auditing predicates and throwing an error when they contain
-        // properties that are dropped by the DAO processing the predicate.
-        if ( ps[i].storageTransient ) continue;
+            var value = ps[i].f(this);
+            properties[ps[i].name] = ps[i].toDatastoreValue(value);
+          }
 
-        var value = ps[i].f(this);
-        properties[ps[i].name] = com.google.cloud.datastore.toDatastoreValue(
-            value);
-      }
-
-      return { key: this.getDatastoreKey(), properties: properties };
-    },
-    function toDatastoreValue() {
-      return { entityValue: this.toDatastoreEntity() };
-    },
-    function fromDatastoreKeyName(name) { return name; }
-  ]
-});
+          return { key: this.getDatastoreKey(), properties: properties };
+        },
+        function toDatastoreValue() {
+          return { entityValue: this.toDatastoreEntity() };
+        },
+        function fromDatastoreKeyName(name) { return name; }
+        ]
+  });
+})();

@@ -33,7 +33,7 @@ foam.CLASS({
 
           [1] https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Projection`,
       code: function(query) {
-        query.projection = [ { property: { name: "__key__" } } ];
+        query.projection = [ { property: { name: '__key__' } } ];
       }
     },
     {
@@ -183,10 +183,17 @@ foam.CLASS({
       foam.assert(this.datastoreOpName,
           'Predicate has no datastore op name:', this.cls_.id);
 
+      var value = ( this.arg1.toDatastoreValue &&
+                    foam.mlang.Constant.isInstance(this.arg2) ) ?
+          // Allow property to override value constant serialization. This
+          // mirrors foam.mlang.predicate.Binary.adapt() delegating to
+          // arg1.adapt() in a similar fashion.
+          this.arg1.toDatastoreValue(this.arg2.value) :
+          com.google.cloud.datastore.toDatastoreValue(this.arg2);
       return {
         property: this.arg1.toDatastorePropertyReference(),
         op: this.datastoreOpName,
-        value: com.google.cloud.datastore.toDatastoreValue(this.arg2)
+        value:
       };
     },
 
