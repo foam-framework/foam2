@@ -51,6 +51,7 @@ public abstract class AbstractArrayPropertyInfo
               reader.next();
               String value = reader.getText();
               String type = this.of();
+//              Class cls = Class.forName(this.of);
               objList.add(value);
             }
             break;
@@ -72,15 +73,15 @@ public abstract class AbstractArrayPropertyInfo
     objElement.appendChild(prop);
 
     // FObject Array check
-    if ( this.f(obj) instanceof FObject[]) {
+    if ( this.f(obj) instanceof FObject[] ) {
       FObject[] nestedArray = (FObject[]) this.f(obj);
-      for (int j = 0; j < nestedArray.length; j++ ) {
+      for ( int j = 0; j < nestedArray.length; j++ ) {
         XMLSupport.toXML(nestedArray[j], doc, prop);
       }
       return;
     } else {
       Object[] nestObj = (Object[]) this.f(obj);
-      for (int j = 0; j < nestObj.length; j++ ) {
+      for ( int j = 0; j < nestObj.length; j++ ) {
         Element nestedProp = doc.createElement("value");
         nestedProp.appendChild(doc.createTextNode(nestObj[j].toString()));
         prop.appendChild(nestedProp);
