@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'InlineBrowserView',
   extends: 'foam.comics.BrowserView',
+
   requires: [
     'foam.comics.InlineDAOControllerView as DAOControllerView'
   ]

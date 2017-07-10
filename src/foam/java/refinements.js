@@ -75,7 +75,7 @@ foam.CLASS({
         field({
           name: privateName,
           type: this.javaType,
-          visibility: 'private'
+          visibility: 'protected'
         }).
         field({
           name: isSet,
@@ -88,7 +88,7 @@ foam.CLASS({
           type: this.javaType,
           visibility: 'public',
           body: 'if ( ! ' + isSet + ' ) {\n' +
-            ( this.hasOwnProperty('javaFactory') ? 
+            ( this.hasOwnProperty('javaFactory') ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
@@ -103,10 +103,9 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: cls.name,
+          type: 'void',
           body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
+              + isSet + ' = true;'
         });
 
       if ( this.hasOwnProperty('javaFactory') ) {
@@ -164,7 +163,7 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name = this.model_.name;
+      cls.name    = this.model_.name;
       cls.package = this.model_.package;
       cls.extends = this.model_.extends === 'FObject' ?
         'foam.core.AbstractFObject' : this.model_.extends;
@@ -191,6 +190,14 @@ foam.LIB({
       for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
       }
+
+      // TODO: instead of doing this here, we should walk all Axioms
+      // and introuce a new buildJavaAncestorClass() method
+      cls.allProperties = this.getAxiomsByClass(foam.core.Property)
+        .filter(function(p) { return !!p.javaType && p.javaInfoType; })
+        .map(function(p) {
+          return foam.java.Field.create({name: p.name, type: p.javaType});
+        });
 
       return cls;
     }
@@ -268,6 +275,40 @@ foam.CLASS({
           };
         }),
         body: this.javaCode ? this.javaCode : ''
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Constant',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'Object',
+      name: 'value',
+    },
+    {
+      class: 'String',
+      name: 'documentation'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      cls.constant({
+        name:  this.name,
+        type:  this.type || undefined,
+        value: this.value,
+        documentation: this.documentation || undefined
       });
     }
   ]
@@ -356,7 +397,7 @@ foam.CLASS({
 
           cls.name = this.model_.name;
           cls.package = this.model_.package;
-          cls.extends = this.extends;
+          cls.implements = (this.implements || []).concat(this.model_.javaExtends || []);
 
           var axioms = this.getAxioms();
 

@@ -11,9 +11,8 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-
 public interface Index {
-  // Called when an Index is added 
+  // Called when an Index is added
   public void onAdd(Sink sink);
 
   public Object put(Object state, FObject value);

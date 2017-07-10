@@ -8,3 +8,4 @@ doc/gen/*
 test/third_party/google-cloud-sdk*
 build
 foam-bin.js
+target/

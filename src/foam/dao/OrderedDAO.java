@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.X;
@@ -10,6 +16,11 @@ public class OrderedDAO
   extends ProxyDAO
 {
   protected foam.mlang.order.Comparator order_;
+
+  public OrderedDAO(Comparator order, DAO delegate) {
+    order_ = order;
+    setDelegate(delegate);
+  }
 
   public OrderedDAO setOrder(foam.mlang.order.Comparator order) {
     order_ = order;
