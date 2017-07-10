@@ -27,20 +27,20 @@ public class AltIndex implements Index {
     delegates_.add(i);
   }
 
-  private Object[] toArrayObject(Object state) {
+  protected Object[] toObjectArray(Object state) {
     if ( state == null ) return new Object[delegates_.size()];
 
     return (Object[]) state;
   }
 
   public Object get(Object state, FObject obj) {
-    Object[] s = toArrayObject(state);
+    Object[] s = toObjectArray(state);
 
     return this.delegates_.get(0).get(s[0], obj);
   }
 
   public Object put(Object state, FObject value) {
-    Object[] s = toArrayObject(state);
+    Object[] s = toObjectArray(state);
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
       s[i] = delegates_.get(i).put(s[i], value);
@@ -50,7 +50,7 @@ public class AltIndex implements Index {
 
 
   public Object remove(Object state, FObject value) {
-    Object[] s = toArrayObject(state);
+    Object[] s = toObjectArray(state);
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
       s[i] = delegates_.get(i).remove(s[i], value);
@@ -59,7 +59,7 @@ public class AltIndex implements Index {
   }
 
   public Object removeAll() {
-    Object[] s = toArrayObject(null);
+    Object[] s = toObjectArray(null);
 
     for ( int i = 0 ; i < delegates_.size() ; i++ )
       s[i] = delegates_.get(i).removeAll();
@@ -68,7 +68,7 @@ public class AltIndex implements Index {
   }
 
   public FindPlan planFind(Object state, Object key) {
-    Object[] s = toArrayObject(state);
+    Object[] s = toObjectArray(state);
     Plan bestPlan = NoPlan.instance();
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
@@ -84,7 +84,7 @@ public class AltIndex implements Index {
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Object[] s = toArrayObject(state);
+    Object[] s = toObjectArray(state);
     Plan     bestPlan = NoPlan.instance();
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
@@ -100,7 +100,7 @@ public class AltIndex implements Index {
   }
 
   public long size(Object state) {
-    Object[] s = toArrayObject(state);
+    Object[] s = toObjectArray(state);
     return s.length > 0 ? delegates_.get(0).size(s[0]) : 0;
   }
 
