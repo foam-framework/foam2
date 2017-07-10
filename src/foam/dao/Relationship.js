@@ -50,7 +50,7 @@ foam.CLASS({
       hidden: true,
       getter: function() {
         return this.lookup(this.sourceModel).name +
-          foam.String.capitalize(this.forwardName) + 'Relationship';
+          this.lookup(this.targetModel).name + 'Relationship';
       }
     },
     'forwardName',
