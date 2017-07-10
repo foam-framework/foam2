@@ -18,7 +18,7 @@ public class TreeNode {
   protected TreeNode left;
   protected TreeNode right;
   
-  protected final static TreeNode nullNode = new TreeNode(null, null, 
+  protected final static TreeNode NULL_NODE = new TreeNode(null, null, 
                                                           0, 0, null, null);
   
   public TreeNode(Object key, Object value) {
@@ -48,7 +48,7 @@ public class TreeNode {
     return s;
   }
   public static TreeNode getNullNode() {
-    return nullNode;
+    return NULL_NODE;
   }
   
   public Object bulkLoad(Index tail, PropertyInfo prop, int start, int end, FObject[] a) {
