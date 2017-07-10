@@ -8,7 +8,9 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class DateParser extends ProxyParser {
+public class DateParser
+  extends ProxyParser
+{
   public DateParser() {
     super(new Seq(
                   new Literal("\""),
