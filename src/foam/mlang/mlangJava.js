@@ -399,24 +399,22 @@ foam.CLASS({
   methods: [
     {
       name: 'compare',
+      javaReturns: 'int',
+      args: [
+        {
+          name: 'o1',
+          javaType: 'Object'
+        },
+        {
+          name: 'o2',
+          javaType: 'Object'
+        }
+      ],
       javaCode: 'return -1 * getArg1().compare(o1, o2);'
     },
     {
       name: 'toString',
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return null;'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
-        'ret.setSrcOrder(this); return ret;'
     }
   ]
 });

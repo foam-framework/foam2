@@ -27,7 +27,8 @@ foam.CLASS({
     'foam.nanos.export.ExportDriverRegistry',
     'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
-    'foam.nanos.test.Test'
+    'foam.nanos.test.Test',
+    'foam.nanos.auth.AuthService'
   ],
 
   exports: [
@@ -215,12 +216,20 @@ foam.CLASS({
         {
           name: 'scriptDAO',
           factory: function() {
+            return this.ClientDAO.create({
+              of: this.Script,
+              delegate: this.HTTPBox.create({
+                method: 'POST',
+                url: 'http://localhost:8080/scriptDAO'
+              })});
+              /*
+
             return this.createDAO({
               of: this.Script,
               seqNo: true,
               testData: [
               ]
-            });
+            });*/
           }
         },
 
@@ -239,12 +248,21 @@ foam.CLASS({
         {
           name: 'testDAO',
           factory: function() {
+            return this.ClientDAO.create({
+                      of: this.NSpec,
+                      delegate: this.HTTPBox.create({
+                        method: 'POST',
+                        url: 'http://localhost:8080/nSpecDAO'
+                      })});
+
+            /*
             return this.createDAO({
               of: this.Test,
               seqNo: true,
               testData: [
               ]
             });
+            */
           }
         }
 

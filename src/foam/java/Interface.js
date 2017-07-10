@@ -39,6 +39,12 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
+      of: 'foam.java.Constant',
+      name: 'constants',
+      factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
       of: 'foam.java.InterfaceMethod',
       name: 'methods',
       factory: function() { return []; }
@@ -57,6 +63,15 @@ foam.CLASS({
 
     function getMethod(name) {
       return this.methods.find(function(m) { return m.name == name; });
+    },
+
+    function constant(c) {
+      this.constants.push(foam.java.Constant.create(c));
+      return this;
+    },
+
+    function getConstant(name) {
+      return this.constant.find(function(c) { return c.name == name; });
     },
 
     function field() {
@@ -94,7 +109,11 @@ foam.CLASS({
 
       o.increaseIndent();
 
-      // TODO: output constants
+      for ( var i = 0 ; i < this.constants.length ; i++ ) {
+        o.indent();
+        o.out(this.constants[i]);
+        o.out('\n');
+      }
 
       for ( var i = 0 ; i < this.methods.length ; i++ ) {
         o.indent();

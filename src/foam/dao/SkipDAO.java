@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.X;
@@ -10,6 +16,11 @@ public class SkipDAO
   extends ProxyDAO
 {
   protected long skip_;
+
+  public SkipDAO(long skip, DAO delegate) {
+    skip_ = skip;
+    setDelegate(delegate);
+  }
 
   public SkipDAO setSkip(long skip) {
     skip_ = skip;
