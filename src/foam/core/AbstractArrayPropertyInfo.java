@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public abstract  class AbstractArrayPropertyInfo extends AbstractPropertyInfo {
+public abstract class AbstractArrayPropertyInfo
+  extends AbstractPropertyInfo {
 
   public int compareValues(boolean b1, boolean b2) {
     return 0;
