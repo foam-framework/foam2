@@ -7,11 +7,12 @@
 package foam.dao;
 
 import foam.core.ClassInfo;
+import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
-import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import java.io.IOException;
+import foam.mlang.order.Comparator;
 
 public class JDAO
   extends ProxyDAO
@@ -50,10 +51,17 @@ public class JDAO
   }
 
   @Override
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(final X x, long skip, final long limit, Comparator order, Predicate predicate) {
     // TODO: this is wrong, should only call journal.removeAll() if neither limit nor predicate
     // are set.
-    journal.removeAll();
+
+    getDelegate().select_(x, new AbstractSink() {
+      @Override
+      public void put(FObject obj, Detachable sub) {
+        remove_(x, obj);
+      }
+    }, skip, limit, order, predicate);
+
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 }
