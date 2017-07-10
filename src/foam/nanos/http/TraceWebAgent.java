@@ -24,13 +24,13 @@ public class TraceWebAgent
     out.println("<HTML>\n" +
         "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
         "<BODY BGCOLOR=\"#FDF5E6\">\n" +
-//        "<H1 ALIGN=\"CENTER\">trace</H1>\n" +
-//        "<B>Request Method: </B>" +
-//        req.getMethod() + "<BR>\n" +
-//        "<B>Request URI: </B>" +
-//        req.getRequestURI() + "<BR>\n" +
-//        "<B>Request Protocol: </B>" +
-//        req.getProtocol() + "<BR><BR>\n" +
+        "<H1 ALIGN=\"CENTER\">trace</H1>\n" +
+        "<B>Request Method: </B>" +
+        req.getMethod() + "<BR>\n" +
+        "<B>Request URI: </B>" +
+        req.getRequestURI() + "<BR>\n" +
+        "<B>Request Protocol: </B>" +
+        req.getProtocol() + "<BR><BR>\n" +
         "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
         "<TR BGCOLOR=\"#FFAD00\">\n" +
         "<TH>Header Name<TH>Header Value");
