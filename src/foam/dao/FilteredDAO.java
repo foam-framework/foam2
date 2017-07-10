@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.X;
@@ -8,6 +14,11 @@ public class FilteredDAO
   extends ProxyDAO
 {
   protected Predicate predicate_;
+
+  public FilteredDAO(Predicate predicate, DAO delegate) {
+    predicate_ = predicate;
+    setDelegate(delegate);
+  }
 
   public FilteredDAO setPredicate(Predicate predicate) {
     predicate_ = predicate;

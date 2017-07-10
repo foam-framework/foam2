@@ -430,7 +430,7 @@ describe('MLang', function() {
     });
 
     it('toString()s nicely', function() {
-      expect(NOT(EQ(test.mlang.Person.ID, "123")).toString()).toBe('NOT(EQ(id, "123"))');
+      expect(NOT(EQ(test.mlang.Person.ID, "123")).toString()).toBe('NOT(EQ(id, 123))');
     });
   });
 
@@ -805,7 +805,7 @@ describe('MLang', function() {
       expect(MUL(3, 5).f()).toBe(15);
     });
 
-    // todo: mul should return false when one of the arguments is not a number 
+    // todo: mul should return false when one of the arguments is not a number
     xit('correctly handle', function() {
       expect(MUL('a', 'x').f()).toBe(false);
     });

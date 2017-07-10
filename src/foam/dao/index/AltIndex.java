@@ -26,15 +26,15 @@ public class AltIndex implements Index {
   public void addIndex(Index i) {
     delegates_.add(i);
   }
-  
+
   private Object[] toArrayObject(Object state) {
     if ( state == null ) return new Object[delegates_.size()];
 
     return (Object[]) state;
   }
-  
+
   public Object get(Object state, FObject obj) {
-    Object[] s = toArrayObject(state);  
+    Object[] s = toArrayObject(state);
 
     return this.delegates_.get(0).get(s[0], obj);
   }
@@ -47,11 +47,11 @@ public class AltIndex implements Index {
 
     return s;
   }
-  
-  
+
+
   public Object remove(Object state, FObject value) {
     Object[] s = toArrayObject(state);
-    
+
     for ( int i = 0 ; i < delegates_.size() ; i++ )
       s[i] = delegates_.get(i).remove(s[i], value);
 

@@ -139,7 +139,8 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("Invalid Password");
     }
 
-    userDAO_.put(user.setPassword(newPassword));
+    user.setPassword(newPassword);
+    userDAO_.put(user);
 
     return this.getX().put("user", user);
   }

@@ -3,6 +3,7 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *     http://www.apache.org/licenses/LICENSE-2.0
  */
+
 package foam.dao.index;
 
 import foam.core.FObject;
@@ -28,5 +29,5 @@ public class NotFoundPlan implements FindPlan, SelectPlan
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     throw new UnsupportedOperationException();
   }
-  
+
 }

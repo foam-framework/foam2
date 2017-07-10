@@ -410,7 +410,7 @@ describe('foam.Number', function() {
   });
   it('equals', function() {
     expect(foam.Number.equals(44, 44)).toBe(true);
-    expect(foam.Number.equals(Math.NaN, Math.NaN)).toBe(true);
+    expect(foam.Number.equals(NaN, NaN)).toBe(true);
     expect(foam.Number.equals(56, '56')).toBe(false);
     expect(foam.Number.equals(0, false)).toBe(false);
   });

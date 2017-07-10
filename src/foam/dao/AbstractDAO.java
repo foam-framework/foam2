@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.*;
@@ -16,19 +22,19 @@ public abstract class AbstractDAO
   protected PropertyInfo primaryKey_        = null;
 
   public DAO where(Predicate predicate) {
-    return new FilteredDAO().setPredicate(predicate).setDelegate(this);
+    return new FilteredDAO(predicate, this);
   }
 
   public DAO orderBy(Comparator comparator) {
-    return new OrderedDAO().setOrder(comparator).setDelegate(this);
+    return new OrderedDAO(comparator, this);
   }
 
   public DAO skip(long count) {
-    return new SkipDAO().setSkip(count).setDelegate(this);
+    return new SkipDAO(count, this);
   }
 
   public DAO limit(long count) {
-    return new LimitedDAO().setLimit(count).setDelegate(this);
+    return new LimitedDAO(count, this);
   }
 
   public void pipe_(X x, foam.dao.Sink sink) {
@@ -37,19 +43,19 @@ public abstract class AbstractDAO
 
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( limit < this.MAX_SAFE_INTEGER ) {
-      sink = new LimitedSink().setLimit(limit).setDelegate(sink);
+      sink = new LimitedSink(limit, 0, sink);
     }
 
     if ( skip > 0 ) {
-      sink = new SkipSink().setSkip(skip).setDelegate(sink);
+      sink = new SkipSink(skip, 0, sink);
     }
 
     if ( order != null ) {
-      sink = new OrderedSink().setComparator(order).setDelegate(sink);
+      sink = new OrderedSink(order, null, sink);
     }
 
     if ( predicate != null ) {
-      sink = new PredicatedSink().setPredicate(predicate).setDelegate(sink);
+      sink = new PredicatedSink(predicate, sink);
     }
 
     return sink;
@@ -106,8 +112,7 @@ public abstract class AbstractDAO
   }
 
   public DAO inX(X x) {
-    ProxyDAO dao = new ProxyDAO();
-    dao.setDelegate(this);
+    ProxyDAO dao = new ProxyDAO(this);
     dao.setX(x);
     return dao;
   }
