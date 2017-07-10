@@ -111,7 +111,7 @@ public class XMLSupport {
     Iterator i = objList.iterator();
     Element rootElement = doc.createElement("objects");
     // Case for nested object arrays
-    if (doc.hasChildNodes() ) {
+    if ( doc.hasChildNodes() ) {
       e.appendChild(rootElement);
     } else {
       doc.appendChild(rootElement);
