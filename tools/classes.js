@@ -91,7 +91,8 @@ var abstractClasses = [
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.nanos.auth.AuthService'
 ];
 
 var proxies = [
