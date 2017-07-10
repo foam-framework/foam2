@@ -11,5 +11,5 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 public interface SelectPlan extends Plan {
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate);
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate);
 }
