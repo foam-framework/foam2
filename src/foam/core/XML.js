@@ -394,6 +394,7 @@ foam.CLASS({
       // Checking for string and if string is not empty
       if ( typeof o === 'string' && o ) {
          // Convert xml string into an xml DOM object for node traversal
+         o = o.replace(/\t|\n|\r|↵/g, "");
         var parser = new DOMParser();
         var xmlDoc = parser.parseFromString(o, "text/xml");
         var rootName = xmlDoc.firstChild.nodeName;
@@ -419,6 +420,8 @@ foam.LIB({
 
     // Pretty Print
     Pretty: foam.xml.Outputer.create({
+      outputDefaultValues: false
+    }
     }),
 
     // Compact output (not pretty)
