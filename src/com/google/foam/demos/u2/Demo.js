@@ -273,7 +273,7 @@ foam.CLASS({
   properties: [
     { class: 'Int', name: 'i' },
     'field1',
-    'field2',
+    { name: 'field2', view: 'foam.u2.view.PasswordView' },
     {
       name: 'choices',
       view: {
