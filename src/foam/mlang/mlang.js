@@ -798,11 +798,11 @@ foam.CLASS({
   name: 'In',
   extends: 'foam.mlang.predicate.ArrayBinary',
   implements: [
-    'foam.core.Serializable',
-    'foam.mlang.Expressions'
+    'foam.core.Serializable'
+    //, 'foam.mlang.Expressions' Is this necessary? No other predicate has it.
   ],
 
-  documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2.',
+  documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, arg1 is an element of arg2.',
 
   requires: [ 'foam.mlang.Constant' ],
 
