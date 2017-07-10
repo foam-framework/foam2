@@ -1,15 +1,14 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
-import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
 
 /** Have-no-plan Plan. **/
 public class NoPlan implements FindPlan, SelectPlan
@@ -23,10 +22,11 @@ public class NoPlan implements FindPlan, SelectPlan
   public long cost() { return Long.MAX_VALUE; }
 
   public FObject find(Object state, Object key) {
-    throw new IllegalStateException("Attempt to use NoPlan.");
+    throw new UnsupportedOperationException();
   }
 
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
-    throw new IllegalStateException("Attempt to use NoPlan.");
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    throw new UnsupportedOperationException();
   }
+
 }
