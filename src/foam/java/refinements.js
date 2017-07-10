@@ -387,22 +387,6 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.core.FObject',
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-      info.method({
-        name: 'of',
-        visibility: 'public',
-        type: 'String',
-        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
-      });
-      return info;
-    }
-  ]
-});
-
-foam.CLASS({
   refines: 'foam.core.AbstractInterface',
   axioms: [
     {
@@ -575,8 +559,20 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.lang.Enum'],
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+  methods: [
+      function createJavaPropertyInfo_(cls) {
+        var info = this.SUPER(cls);
+        info.method({
+          name: 'of',
+          visibility: 'public',
+          type: 'String',
+          body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+        });
+        return info;
+      }
   ]
 });
 
