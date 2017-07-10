@@ -1,7 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.dao.index;
 
@@ -11,23 +11,23 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 public class ValueIndex implements Index {
-  
+
   protected static ValueIndex instance_ = new ValueIndex();
-  
+
   protected Plan plan = ValuePlan.instance();
-  
-  
+
+
   public static ValueIndex instance() {
     return instance_;
   }
-  
+
   public void onAdd(Sink sink) {
   }
-  
+
   public Object get(Object state, FObject obj) {
     return obj;
   }
-  
+
   public Object put(Object state, FObject value) {
     return value;
   }
@@ -51,13 +51,13 @@ public class ValueIndex implements Index {
   public long size(Object state) {
     return ( state != null ) ? 1 : 0;
   }
-  
-  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {    
+
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if( predicate != null && ! predicate.f((FObject) state) ) return;
     if( skip-- > 0 ) return;
     if( limit <= 0 ) return;
     //We need to check whether we'll do with this detachable parameter inside this index
     sink.put((FObject) state, null);
   }
-  
+
 }
