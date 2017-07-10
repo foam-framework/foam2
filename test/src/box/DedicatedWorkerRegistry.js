@@ -18,49 +18,73 @@
 describe('dedicated worker registry', function() {
   var Registry;
   var OutputBox;
+  var PIDBox;
   var Context;
 
   beforeEach(function() {
-    foam.CLASS({
-      package: 'foam.box.DedicatedWorkerRegistry.test',
-      name: 'OutputBox',
-      implements: [ 'foam.box.Box' ],
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 2147483647;
 
-      properties: [ 'key' ],
+    // Refining LogBox to our uses since the portable box
+    // needs to be defined for child as well...
+    foam.CLASS({
+      refines: 'foam.box.LogBox',
+
+      properties: [
+        {
+          name: 'results',
+          factory: function() { return {}; }
+        }
+      ],
 
       methods: [
-        function send(message) {
-          var process = require('process');
-          console.log(`Key: ${this.key}, Worker PID: ${process.pid}, Message: ${message}`);
+        function send(msg) {
+          var sender = msg.attributes.sender;
+          results[sender] = msg.object;
         }
       ]
     });
 
     Registry = foam.lookup('foam.box.DedicatedWorkerRegistry');
     Context = foam.lookup('foam.box.Context');
-    OutputBox = foam.lookup('foam.box.DedicatedWorkerRegistry.test.OutputBox');
+    LogBox = foam.lookup('foam.box.LogBox');
+    PIDBox = foam.lookup('foam.box.PIDBox'); // Only available during testing
   });
 
-  it('should ...', function() {
-    var firstBox = OutputBox.create({ key: 'Box1' });
-    var secondBox = OutputBox.create({ key: 'Box2' });
+  it('should ...', function(done) {
+    // Local context and registry
     var ctx = Context.create();
+    var recvBox = LogBox.create({ name: 'RecvBox' });
 
-    var registry = Registry.create({
-      delegate: ctx.registry,
+    var skBox = foam.box.SkeletonBox.create({ delegate: recvBox });
+    var portableBox = ctx.registry.register(null, null, skBox);
+
+    ctx.registry = Registry.create({
+      delegate: ctx.registry, // Default registry
       getDedicatedWorkerKey: function(box) {
-        return box.key;
+        return box.name;
       }
-    });
+    }, ctx);
 
-    // Test code
-    var ForkBox = foam.lookup('foam.box.node.ForkBox');
-    var fb = ForkBox.create({ detached: false }, ctx);
+    // Registering service in remote processes
+    var firstBox = PIDBox.create({ name: 'Box1' });
+    var secondBox = PIDBox.create({ name: 'Box2' });
 
-    var x = registry.register(null, null, firstBox);
-    var y = registry.register(null, null, secondBox);
+    var first = ctx.registry.register(null, null, firstBox);
+//    var second = ctx.registry.register(null, null, secondBox);
 
 
-    throw "Potato"
+    // Sending message to child processes
+    var firstMsg = 'This is the first test';
+    var secondMsg = 'This is the second test';
+    first.send(foam.box.Message.create({ object: { message: firstMsg, portableBox: portableBox } }));
+//    second.send(foam.box.Message.create({ object: { message: secondMsg, portableBox: skBox } }));
+
+    setTimeout(function() {
+      expect(Object.keys(recvBox).length).toBeGreaterThan(0);
+      //expect(recvBox.results['Box1']).toBeDefined();
+      //expect(recvBox.results['Box2']).toBeDefined();
+
+      //done();
+    }, 10000);
   });
 });

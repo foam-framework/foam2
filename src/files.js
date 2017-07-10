@@ -182,6 +182,7 @@ FOAM_FILES([
   { name: "foam/box/PromisedBoxRegistry" },
   { name: "foam/box/DedicatedWorkerRegistry" },
   { name: "foam/box/SharedWorkerRegistry" },
+  { name: "foam/box/PIDBox", flags: ['debug'] },
   { name: "foam/box/LookupBox" },
   { name: "foam/box/NamedBox" },
   { name: "foam/box/RetryBox" },

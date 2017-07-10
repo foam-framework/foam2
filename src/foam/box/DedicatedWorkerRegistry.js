@@ -23,7 +23,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.StubFactorySingleton',
-    'foam.box.Box',
+    'foam.box.BoxRegistry',
     'foam.box.node.ForkBox'
   ],
 
@@ -39,7 +39,13 @@ foam.CLASS({
     {
       name: 'stubFactory_',
       factory: function() {
-        return this.StubFactorySingleton.create().get(this.ForkBox);
+        return this.StubFactorySingleton.create().get(this.BoxRegistry);
+      }
+    },
+    {
+      name: 'registry',
+      expression: function(delegate) {
+        return this.delegate.registry;
       }
     }
   ],
@@ -47,29 +53,33 @@ foam.CLASS({
   methods: [
     function register(name, service, box) {
       var key = this.getDedicatedWorkerKey(box);
+      if ( ! key ) return this.delegate.register(name, service, box);
+      if ( ! this.dedicatedWorkers_[key] )
+        this.dedicatedWorkers_[key] = this.stubFactory_.create({
+          delegate: this.ForkBox.create(null, this)
+        }, this);
 
-      // What context is this being spawned in?
-      var fork = this.ForkBox.create(null);
-
-      var reg = this.delegate.register(name, service, box);
-      var stub = this.stubFactory_.create({ delegate: fork });
-      this.dedicatedWorkers_[key] = stub;
-
-      return stub;
+      return this.dedicatedWorkers_[key].register(name, service, box);
     },
     function unregister(name) {
-      this.delegate.unregister(name);
-
       if ( foam.box.Box.isInstance(name) ) {
+        var key = this.getDedicatedWorkerKey(name);
+        if ( ! key ) this.delegate.unregister(name);
+
         for ( var key in this.dedicatedWorkers_ ) {
-          if ( this.dedicatedWorkers_[key] === name ) {
+          if (  this.dedicatedWorkers_[key] === name ) {
             delete this.dedicatedWorkers_[key];
             return;
           }
         }
         return;
       }
-      delete this.dedicatedWorkers_[name];
-    }
+
+      if ( this.dedicatedWorkers_[name] ) {
+        delete this.dedicatedWorkers_[name];
+      } else {
+        this.delegate.unregister(name);
+      }
+    },
   ]
 });
