@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Iterator;
 
 public class XMLDAO
-        extends MapDAO
+  extends MapDAO
 {
 
   protected String fileName;
