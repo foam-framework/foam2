@@ -45,14 +45,26 @@ import com.google.foam.demos.appengine.TestServiceImpl;
 @SuppressWarnings("serial")
 public class HelloServlet extends HttpServlet {
   private X x = EmptyX.instance();
-
-  private FObject obj = ((TestModel)x.create(TestModel.class)).setName("Adam");
+  
+  private FObject obj;
+  {
+    obj = x.create(TestModel.class);
+    ((TestModel) obj).setName("Adam");
+  }
 
   private TestService myService = new TestServiceImpl();
-  private foam.box.Box dest = ((TestServiceSkeleton)x.create(TestServiceSkeleton.class)).setDelegate(myService);
+  private foam.box.Box dest;
+  {
+    dest = x.create(TestServiceSkeleton.class);
+    ((TestServiceSkeleton) dest).setDelegate(myService);
+  }
 
   private DAO dao = ((DatastoreDAO)x.create(DatastoreDAO.class)).setOf(TestModel.getOwnClassInfo());
-  private foam.box.Box daoSkeleton = ((DAOSkeleton)x.create(DAOSkeleton.class)).setDelegate(dao);
+  private foam.box.Box daoSkeleton;
+  {
+    daoSkeleton = x.create(DAOSkeleton.class);
+    ((DAOSkeleton) daoSkeleton).setDelegate(dao);
+  }
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

@@ -110,7 +110,9 @@ foam.CLASS({
       foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
       reply.setData(result);
 
-      replyBox.send(getX().create(foam.box.Message.class).setObject(reply));
+      foam.box.Message message1 = getX().create(foam.box.Message.class);
+      message1.setObject(reply);
+      replyBox.send(message1);
     }*/}
     }
   ]

@@ -75,7 +75,7 @@ foam.CLASS({
         field({
           name: privateName,
           type: this.javaType,
-          visibility: 'private'
+          visibility: 'protected'
         }).
         field({
           name: isSet,
@@ -103,10 +103,9 @@ foam.CLASS({
               name: 'val'
             }
           ],
-          type: cls.name,
+          type: 'void',
           body: privateName + ' = val;\n'
-              + isSet + ' = true;\n'
-              + 'return this;'
+              + isSet + ' = true;'
         });
 
       if ( this.hasOwnProperty('javaFactory') ) {
@@ -276,6 +275,40 @@ foam.CLASS({
           };
         }),
         body: this.javaCode ? this.javaCode : ''
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Constant',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'Object',
+      name: 'value',
+    },
+    {
+      class: 'String',
+      name: 'documentation'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      cls.constant({
+        name:  this.name,
+        type:  this.type || undefined,
+        value: this.value,
+        documentation: this.documentation || undefined
       });
     }
   ]

@@ -3,7 +3,7 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.*;
-import foam.nanos.util.LRULinkedHashMap;
+import foam.util.LRULinkedHashMap;
 
 import javax.security.auth.login.LoginException;
 import java.util.*;
@@ -139,7 +139,8 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("Invalid Password");
     }
 
-    userDAO_.put(user.setPassword(newPassword));
+    user.setPassword(newPassword);
+    userDAO_.put(user);
 
     return this.getX().put("user", user);
   }
