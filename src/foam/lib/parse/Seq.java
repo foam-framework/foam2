@@ -17,8 +17,10 @@
 
 package foam.lib.parse;
 
-public class Seq implements Parser {
-  private Parser[] parsers;
+public class Seq
+  implements Parser
+{
+  protected Parser[] parsers;
 
   public Seq(Parser... args) {
     parsers = args;

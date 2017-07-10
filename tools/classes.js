@@ -55,8 +55,10 @@ var classes = [
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
+  'foam.dao.ReadOnlyDAO',
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
+  'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
@@ -83,13 +85,14 @@ var classes = [
 ];
 
 var abstractClasses = [
-//  'foam.json.Outputer'
+//  'foam.json.Outputter'
 ];
 
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.nanos.auth.AuthService'
 ];
 
 var proxies = [
