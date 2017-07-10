@@ -76,6 +76,11 @@ public class ServletHandler
     }
 
     @Override
+    public String getProtocol() {
+      return ex.getProtocol();
+    }
+
+    @Override
     public ServletInputStream getInputStream() throws IOException {
       return is;
     }
@@ -161,6 +166,12 @@ public class ServletHandler
     @Override
     public void setStatus(int status) {
       this.status = status;
+    }
+
+    @Override
+    public void sendRedirect(String location) throws IOException {
+      setStatus(301);
+      setHeader("Location", location);
     }
 
     @Override
