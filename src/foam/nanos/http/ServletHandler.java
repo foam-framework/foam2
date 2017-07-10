@@ -164,6 +164,12 @@ public class ServletHandler
     }
 
     @Override
+    public void sendRedirect(String location) throws IOException {
+      setStatus(301);
+      setHeader("Location", location);
+    }
+
+    @Override
     public void sendError(int sc, String msg) throws IOException {
       this.status = sc;
       if ( msg != null ) {
