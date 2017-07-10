@@ -11,4 +11,5 @@ p({"class":"foam.nanos.boot.NSpec","name":"export",   "lazy":true,"serve":false,
 p({"class":"foam.nanos.boot.NSpec","name":"trace",    "lazy":true,"serve":false,"serviceClass":"foam.nanos.http.TraceWebAgent"})
 p({"class":"foam.nanos.boot.NSpec","name":"services", "lazy":true,"serve":false,"serviceClass":"foam.nanos.http.ServicesWebAgent"})
 p({"class":"foam.nanos.boot.NSpec","name":"threadPool", "lazy":true,"serve":false,"serviceClass":"foam.nanos.pool.FixedThreadPool"})
-p({"class":"foam.nanos.boot.NSpec","name":"testDAO",   "lazy":true,"serve":true, "serviceInterface": "foam.dao.DAO", "serviceClass":"foam.nanos.test.ScriptRunnerDAO"})
+p({"class":"foam.nanos.boot.NSpec","name":"scriptDAO",   "lazy":true,"serve":true, "serviceInterface": "foam.dao.DAO", "serviceScript":"return new foam.nanos.script.ScriptRunnerDAO();"})
+p({"class":"foam.nanos.boot.NSpec","name":"testDAO",   "lazy":true,"serve":true, "serviceInterface": "foam.dao.DAO", "serviceScript":"return new foam.nanos.test.ScriptRunnerDAO();"})
