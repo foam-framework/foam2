@@ -57,8 +57,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'title',
-      expression: function(data$of) {
-        return 'Browse ' + data$of.name;
+      expression: function(data$data$of) {
+        return 'Browse ' + data$data$of.name;
       }
     }
   ],
