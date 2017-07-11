@@ -7,7 +7,7 @@
 package foam.nanos.auth;
 
 import foam.core.X;
-import foam.nanos.util.LRULinkedHashMap;
+import foam.util.LRULinkedHashMap;
 import javax.security.auth.login.LoginException;
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class WebAuthService
         X x = super.login(userId, password);
         loginMap.put(userId, x);
       }
-    } catch (LoginException e) {
+    } catch (RuntimeException e) {
       e.printStackTrace();
     }
   }
