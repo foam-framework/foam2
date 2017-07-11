@@ -51,25 +51,25 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(String userId, String challenge) throws LoginException {
+  public X challengedLogin(String userId, String challenge) throws RuntimeException {
     if ( userId == null || challenge == null || userId == "" || challenge == "" ) {
-      throw new LoginException("Invalid Parameters");
+      throw new RuntimeException("Invalid Parameters");
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) throw new LoginException("Invalid userId");
+    if ( c == null ) throw new RuntimeException("Invalid userId");
 
     if ( ! c.getChallenge().equals(challenge) ) {
-      throw new LoginException("Invalid Challenge");
+      throw new RuntimeException("Invalid Challenge");
     }
 
     if ( new Date().after(c.getTtl()) ) {
       challengeMap.remove(userId);
-      throw new LoginException("Challenge expired");
+      throw new RuntimeException("Challenge expired");
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new LoginException("User not found");
+    if ( user == null ) throw new RuntimeException("User not found");
 
     challengeMap.remove(userId);
     return this.getX().put("user", user);
@@ -79,16 +79,16 @@ public class UserAndGroupAuthService
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(String userId, String password) throws LoginException {
+  public X login(String userId, String password) throws RuntimeException {
     if ( userId == null || password == null || userId == "" || password == "" ) {
-      throw new LoginException("Invalid Parameters");
+      throw new RuntimeException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new LoginException("User not found.");
+    if ( user == null ) throw new RuntimeException("User not found.");
 
     if ( ! user.getPassword().equals(password) ) {
-      throw new LoginException("Invalid Password");
+      throw new RuntimeException("Invalid Password");
     }
 
     return this.getX().put("user", user);
