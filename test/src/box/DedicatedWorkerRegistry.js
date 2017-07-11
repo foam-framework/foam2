@@ -24,67 +24,174 @@ describe('dedicated worker registry', function() {
   beforeEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 2147483647;
 
-    // Refining LogBox to our uses since the portable box
-    // needs to be defined for child as well...
     foam.CLASS({
-      refines: 'foam.box.LogBox',
+      package: 'foam.box.DedicatedWorkerRegistry.Test',
+      name: 'MockRegistry',
+      extends: 'foam.box.BoxRegistry',
 
       properties: [
         {
-          name: 'results',
-          factory: function() { return {}; }
+          class: 'Array',
+          of: 'FObject',
+          name: 'actions'
         }
       ],
 
       methods: [
+        function register(name, service, localBox) {
+          this.actions.push({
+            action: 'register',
+            name: name,
+            service: service,
+            box: localBox
+          });
+
+          // Copied code...
+          name = name || foam.next$UID();
+
+          var exportBox = this.SubBox.create({ name: name, delegate: this.me });
+          exportBox = service ? service.clientBox(exportBox) : exportBox;
+
+          this.registry[name] = {
+            exportBox: exportBox,
+            localBox: service ? service.serverBox(localBox) : localBox
+          };
+
+          return this.registry[name].exportBox;
+        },
+        function unregister(name) {
+          this.actions.push({
+            action: 'unregister',
+            name: name
+          });
+        },
         function send(msg) {
-          var sender = msg.attributes.sender;
-          results[sender] = msg.object;
+          return new Promise(function(resolve, reject) {
+            resolve("This was sent from mock registry!");
+          });
         }
       ]
     });
 
+    MockRegistry = foam.lookup('foam.box.DedicatedWorkerRegistry.Test.MockRegistry');
     Registry = foam.lookup('foam.box.DedicatedWorkerRegistry');
     Context = foam.lookup('foam.box.Context');
     LogBox = foam.lookup('foam.box.LogBox');
     PIDBox = foam.lookup('foam.box.PIDBox'); // Only available during testing
   });
 
-  it('should ...', function(done) {
-    // Local context and registry
+  it('should forward all registrations to delegate by default', function() {
     var ctx = Context.create();
-    var recvBox = LogBox.create({ name: 'RecvBox' });
+    var mockRegistry = MockRegistry.create(null, ctx);
 
-    var skBox = foam.box.SkeletonBox.create({ delegate: recvBox });
-    var portableBox = ctx.registry.register(null, null, skBox);
+    var registry = Registry.create({
+      delegate: mockRegistry
+    }, ctx);
 
-    ctx.registry = Registry.create({
-      delegate: ctx.registry, // Default registry
+    registry.register(null, null, foam.box.LogBox.create());
+    registry.register('LogBox2', null, foam.box.LogBox.create());
+
+    expect(mockRegistry.actions.length).toBe(2);
+    expect(mockRegistry.actions[0].action).toBe('register');
+    expect(foam.box.LogBox.isInstance(mockRegistry.actions[0].box)).toBe(true);
+    expect(mockRegistry.actions[1].action).toBe('register');
+    expect(foam.box.LogBox.isInstance(mockRegistry.actions[1].box)).toBe(true);
+  });
+
+  it('should forward register requests of unknown services to delegate', function() {
+    var ctx = Context.create();
+    var mockRegistry = MockRegistry.create(null, ctx);
+
+    var registry = Registry.create({
+      delegate: mockRegistry,
       getDedicatedWorkerKey: function(box) {
-        return box.name;
+        return box.serviceName;
       }
     }, ctx);
 
-    // Registering service in remote processes
-    var firstBox = PIDBox.create({ name: 'Box1' });
-    var secondBox = PIDBox.create({ name: 'Box2' });
+    var registryCount = function() {
+      return Object.keys(registry.registry.registry).length;
+    }
 
-    var first = ctx.registry.register(null, null, firstBox);
-//    var second = ctx.registry.register(null, null, secondBox);
+    var dedicated = foam.box.LogBox.create();
+    dedicated.serviceName = 'Box';
+    var nonDedicated = foam.box.LogBox.create();
 
+    registry.register(null, null, dedicated);
+    // One register for ForkFox, one for dedicatedWorkers_
+    expect(registryCount()).toBe(2);
+    expect(mockRegistry.actions.length).toBe(0); // Delegate should not be hit
 
-    // Sending message to child processes
-    var firstMsg = 'This is the first test';
-    var secondMsg = 'This is the second test';
-    first.send(foam.box.Message.create({ object: { message: firstMsg, portableBox: portableBox } }));
-//    second.send(foam.box.Message.create({ object: { message: secondMsg, portableBox: skBox } }));
+    registry.register('TestName', null, dedicated);
+    // No reregister for ForkBox, one for dedicatedWorkers_
+    expect(registryCount()).toBe(3);
+    expect(mockRegistry.actions.length).toBe(0);
 
-    setTimeout(function() {
-      expect(Object.keys(recvBox).length).toBeGreaterThan(0);
-      //expect(recvBox.results['Box1']).toBeDefined();
-      //expect(recvBox.results['Box2']).toBeDefined();
+    registry.register(null, null, nonDedicated);
+    // Verify dedicated registery was not hit
+    expect(registryCount()).toBe(3);
+    expect(mockRegistry.actions.length).toBe(1);
 
-      //done();
-    }, 10000);
+    registry.register('Test2', null, nonDedicated);
+    // Verify dedicated registry was not hit
+    expect(registryCount()).toBe(3);
+    expect(mockRegistry.actions.length).toBe(2);
+  });
+
+  it('should route messages to the dedicated service', function(done) {
+    var ctx = Context.create();
+    var mockRegistry = MockRegistry.create(null, ctx);
+
+    var registry = Registry.create({
+      delegate: mockRegistry, // Default registry
+      getDedicatedWorkerKey: function(box) {
+        return box.serviceName;
+      }
+    }, ctx);
+
+    var dao = foam.dao.ArrayDAO.create();
+    var box = foam.box.SkeletonBox.create({ data: dao });
+    // Setting box service name for dedicated worker registry.
+    box.serviceName = "ArrayDAO";
+
+    var register = registry.register(null, null, box);
+    var stub = foam.core.StubFactorySingleton.create().get(foam.dao.DAO)
+        .create({ delegate: register }, ctx);
+
+    var obj = { id: 3, value: "Test" };
+    stub.put(obj).then(function(ret) {
+      expect(ret).toEqual(obj);
+      done();
+    });
+  });
+
+  it('should route messages to delegate service', function(done) {
+    var ctx = Context.create();
+    var mockRegistry = MockRegistry.create(null, ctx);
+
+    var registry = Registry.create({
+      delegate: mockRegistry, // Default registry
+      getDedicatedWorkerKey: function(box) {
+        return box.serviceName;
+      }
+    }, ctx);
+
+    var dao = foam.dao.ArrayDAO.create();
+    var box = foam.box.SkeletonBox.create({ data: dao });
+
+    var register = registry.register(null, null, box);
+    var stub = foam.core.StubFactorySingleton.create().get(foam.dao.DAO)
+        .create({ delegate: register }, ctx);
+
+    var obj = { id: 3, value: "Test" };
+    stub.put(obj).then(function(ret) {
+      expect(ret).toBe("This was sent from mock registry!");
+    });
+  });
+
+  it('should unregister dedicated services', function() {
+  });
+
+  it('should forward unregister of unknown services to delegate', function() {
   });
 });

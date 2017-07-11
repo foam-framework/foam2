@@ -27,10 +27,20 @@ foam.CLASS({
     'foam.box.node.ForkBox'
   ],
 
+  imports: [ 'registry' ], // __context__.registry is the context it is declared in
+
+  exports: [ 'as registry' ], // __subContext__.registry === this
+
   properties: [
     {
       name: "getDedicatedWorkerKey",
       value: function(box) { return null; }
+    },
+    {
+      name: 'workerFactory',
+      value: function(ctx) {
+        return this.ForkBox.create(null, ctx);
+      }
     },
     {
       name: "dedicatedWorkers_",
@@ -41,12 +51,6 @@ foam.CLASS({
       factory: function() {
         return this.StubFactorySingleton.create().get(this.BoxRegistry);
       }
-    },
-    {
-      name: 'registry',
-      expression: function(delegate) {
-        return this.delegate.registry;
-      }
     }
   ],
 
@@ -54,12 +58,24 @@ foam.CLASS({
     function register(name, service, box) {
       var key = this.getDedicatedWorkerKey(box);
       if ( ! key ) return this.delegate.register(name, service, box);
-      if ( ! this.dedicatedWorkers_[key] )
-        this.dedicatedWorkers_[key] = this.stubFactory_.create({
-          delegate: this.ForkBox.create(null, this)
-        }, this);
 
-      return this.dedicatedWorkers_[key].register(name, service, box);
+      // Using imported registry as context and instead of ourself.
+      var self = this;
+      var ctx = this.__context__.createSubContext({
+        stubFactory: function() {
+          return self.stubFactory_.create({
+            delegate: self.workerFactory(this)
+          }, this);
+        },
+
+        registerWorker: function(name, service, box) {
+          return self.dedicatedWorkers_[key].register(name, service, box);
+        }
+      });
+
+      if ( ! this.dedicatedWorkers_[key] )
+        this.dedicatedWorkers_[key] = ctx.stubFactory();
+      return ctx.registerWorker(name, service, box);
     },
     function unregister(name) {
       if ( foam.box.Box.isInstance(name) ) {
@@ -81,5 +97,7 @@ foam.CLASS({
         this.delegate.unregister(name);
       }
     },
+    //function send(msg) {
+    //}
   ]
 });

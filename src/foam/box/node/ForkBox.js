@@ -86,7 +86,7 @@ foam.CLASS({
 
       this.child_ = require('child_process').spawn(
         this.nodePath,
-        [ '--inspect', '--debug-brk', this.childScriptPath ],
+        [ this.childScriptPath ],
         { detached: this.detached });
 
       var process = require('process');
