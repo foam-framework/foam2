@@ -1,7 +1,12 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package foam.nanos.auth;
 
 import foam.core.X;
-import foam.nanos.util.LRULinkedHashMap;
+import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import java.util.HashMap;
 
