@@ -17,7 +17,7 @@ foam.CLASS({
     },
     {
       name: 'toXML',
-      value: function toXML(value, outputer) { return value; }
+      value: function toXML(value, Outputter) { return value; }
     }
   ],
 
@@ -48,9 +48,9 @@ foam.CLASS({
 /** XML Outputter **/
 foam.CLASS({
   package: 'foam.xml',
-  name: "Outputer",
+  name: "Outputter",
 
-  documentation: 'XML Outputer.',
+  documentation: 'XML Outputter.',
 
   properties: [
     {
@@ -420,26 +420,26 @@ foam.CLASS({
   ]
 });
 
-/** Library of pre-configured XML Outputers. **/
+/** Library of pre-configured XML Outputters. **/
 foam.LIB({
   name: 'foam.xml',
 
   constants: {
 
     // Pretty Print
-    Pretty: foam.xml.Outputer.create({
+    Pretty: foam.xml.Outputter.create({
       outputDefaultValues: false
     }),
 
     // Compact output (not pretty)
-    Compact: foam.xml.Outputer.create({
+    Compact: foam.xml.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
     }),
 
     // Shorter than Compact (uses short-names if available)
-    Short: foam.json.Outputer.create({
+    Short: foam.xml.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
