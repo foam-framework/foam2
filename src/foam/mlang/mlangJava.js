@@ -222,12 +222,12 @@ foam.CLASS({
 
 
 foam.CLASS({
-    refines: 'foam.mlang.predicate.In',
+  refines: 'foam.mlang.predicate.In',
 
-    methods: [
-      {
-        name: 'f',
-        javaCode:
+  methods: [
+    {
+      name: 'f',
+      javaCode:
   `
   Object lhs = getArg1().f(obj);
   // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
@@ -250,8 +250,8 @@ foam.CLASS({
 
   return false;
   `
-      }
-    ]
+    }
+  ]
 });
 
 
