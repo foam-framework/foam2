@@ -103,7 +103,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0; i < numUsers; i++ ) {
       try {
         xArray.add(login("" + i, "marc" + i));
-      } catch ( RuntimeException e ) {
+      } catch (RuntimeException e) {
         e.printStackTrace();
       }
     }
