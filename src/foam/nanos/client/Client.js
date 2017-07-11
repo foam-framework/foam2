@@ -252,7 +252,7 @@ foam.CLASS({
                       of: this.NSpec,
                       delegate: this.HTTPBox.create({
                         method: 'POST',
-                        url: 'http://localhost:8080/nSpecDAO'
+                        url: 'http://localhost:8080/testDAO'
                       })});
 
             /*
