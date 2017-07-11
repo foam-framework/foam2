@@ -10,23 +10,21 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-/** Found that no data exists for the query. **/
-public class NotFoundPlan implements FindPlan, SelectPlan
-{
-  protected final static NotFoundPlan instance_ = new NotFoundPlan();
 
-  public static NotFoundPlan instance() { return instance_; }
+public class ValuePlan implements FindPlan, SelectPlan {
+  protected final static ValuePlan instance_ = new ValuePlan();
 
-  protected NotFoundPlan() {}
+  public static ValuePlan instance() { return instance_; }
 
-  public long cost() { return 0; }
+  protected ValuePlan() {}
+
+  public long cost() { return 1; }
 
   public FObject find(Object state, Object key) {
-    throw new UnsupportedOperationException();
+    return null;
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    throw new UnsupportedOperationException();
+    sink.put((FObject) state, null);
   }
-
 }

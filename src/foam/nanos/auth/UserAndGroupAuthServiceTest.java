@@ -103,7 +103,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0; i < numUsers; i++ ) {
       try {
         xArray.add(login("" + i, "marc" + i));
-      } catch ( LoginException e ) {
+      } catch (RuntimeException e) {
         e.printStackTrace();
       }
     }
@@ -159,7 +159,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0 ; i < numUsers ; i++ ) {
       try {
         challengedLogin("" + i, generateChallenge("" + i));
-      } catch (LoginException e) {
+      } catch (RuntimeException e) {
         e.printStackTrace();
       }
     }
@@ -174,7 +174,7 @@ public class UserAndGroupAuthServiceTest
       String challenge = generateChallenge("0");
       TimeUnit.SECONDS.sleep(6);
       challengedLogin("0", challenge);
-    } catch (LoginException e) {
+    } catch (RuntimeException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
       e.printStackTrace();
