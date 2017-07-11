@@ -9,10 +9,21 @@
    name: 'XMLDriver',
    implements: [ 'foam.nanos.export.ExportDriver' ],
    documentation: 'Class for exporting data from a DAO to XML',
+   
+   properties: [
+     {
+       class: 'FObjectProperty',
+       of: 'foam.xml.Outputter',
+       name: 'outputter',
+       factory: function() { return foam.xml.Compact; }
+     }
+   ],
+   
    methods: [
      function exportDAO(X, dao) {
-       // TODO: add XML exporting when ready
-       return Promise.resolve();
+       return dao.select().then(function (sink) {
+         return outputter.stringify(sink.array);
+       });
      }
    ]
  });
