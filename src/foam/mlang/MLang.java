@@ -42,6 +42,10 @@ public class MLang
     return new Gt(MLang.prepare(o1), MLang.prepare(o2));
   }
 
+  public static Predicate IN(Object o1, Object o2) {
+    return new In(MLang.prepare(o1), MLang.prepare(o2));
+  }
+
   public static Predicate AND(Predicate... args) {
     return new And(args);
   }
