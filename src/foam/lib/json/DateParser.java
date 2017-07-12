@@ -12,23 +12,24 @@ public class DateParser
   extends ProxyParser
 {
   public DateParser() {
-    super(new Seq(
-                  new Literal("\""),
-                  new IntParser(),
-                  new Literal("-"),
-                  new IntParser(),
-                  new Literal("-"),
-                  new IntParser(),
-                  new Literal("T"),
-                  new IntParser(),
-                  new Literal(":"),
-                  new IntParser(),
-                  new Literal(":"),
-                  new IntParser(),
-                  new Literal("."),
-                  new Repeat(new Chars("0123456789")),
-                  new Literal("Z"),
-                  new Literal("\"")));
+    super(new Alt(new LongParser(), 
+                  new Seq(
+                    new Literal("\""),
+                    new IntParser(),
+                    new Literal("-"),
+                    new IntParser(),
+                    new Literal("-"),
+                    new IntParser(),
+                    new Literal("T"),
+                    new IntParser(),
+                    new Literal(":"),
+                    new IntParser(),
+                    new Literal(":"),
+                    new IntParser(),
+                    new Literal("."),
+                    new Repeat(new Chars("0123456789")),
+                    new Literal("Z"),
+                    new Literal("\""))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -39,12 +40,18 @@ public class DateParser
 
     System.out.println("Succcess.");
 
+    // Checks if Long Date (Timestamp from epoch)
+    if (ps.value() instanceof java.lang.Long) {
+      return ps.setValue(new java.util.Date((java.lang.Long) ps.value()));
+    }
+
     Object[] result = (Object[]) ps.value();
 
     // TODO: Handle sub-millisecond accuracy, either with java 8 java.time package or some custom type
     // to support java 7
 
     java.util.Calendar c = new java.util.GregorianCalendar(java.util.TimeZone.getTimeZone("UTC"));
+    
     c.clear();
     c.set(
           (Integer) result[1],
