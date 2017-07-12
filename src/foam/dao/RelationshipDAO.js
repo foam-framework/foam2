@@ -24,10 +24,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'obj'
+      name: 'obj',
+      class: 'foam.core.FObjectProperty'
     },
     {
       name: 'relationship',
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.dao.Relationship',
       required: true
     },
     {

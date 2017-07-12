@@ -14,6 +14,8 @@ public class FilteredDAO
     setDelegate(delegate);
   }
 
+  public FilteredDAO() {}
+
   public FilteredDAO setPredicate(Predicate predicate) {
     predicate_ = predicate;
     return this;
