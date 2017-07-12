@@ -19,5 +19,17 @@ foam.INTERFACE({
   package: 'foam.box',
   name: 'Skeleton',
   extends: 'foam.box.Box',
-  documentation: 'Skeleton marker interface.'
+  documentation: 'Skeleton marker interface.',
+
+  methods: [
+    {
+      name: 'setDelegateObject',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'Object'
+        }
+      ]
+    }
+  ]
 });
