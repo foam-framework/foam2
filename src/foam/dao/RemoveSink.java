@@ -11,13 +11,13 @@ public class RemoveSink implements Sink {
   protected DAO dao;
 
   public RemoveSink(DAO dao) {
-    dao = dao;
+    this.dao = dao;
   }
 
   @Override
   public void put(FObject obj, Detachable sub) {
-    final X x = ((AbstractDAO) dao).getX();
-    dao.remove_(x, obj);
+    final X x = ((AbstractDAO) this.dao).getX();
+    this.dao.remove_(x, obj);
   }
 
   @Override
