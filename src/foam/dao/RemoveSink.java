@@ -17,12 +17,7 @@ public class RemoveSink implements Sink {
   @Override
   public void put(FObject obj, Detachable sub) {
     final X x = ((AbstractDAO) dao).getX();
-    dao.select_(x, new AbstractSink() {
-      @Override
-      public void put(FObject obj, Detachable sub) {
-        dao.remove_(x, obj);
-      }
-    }, 0, AbstractDAO.MAX_SAFE_INTEGER,null, null);
+    dao.remove_(x, obj);
   }
 
   @Override

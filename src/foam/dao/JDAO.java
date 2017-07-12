@@ -55,13 +55,7 @@ public class JDAO
     // TODO: this is wrong, should only call journal.removeAll() if neither limit nor predicate
     // are set.
 
-    getDelegate().select_(x, new AbstractSink() {
-      @Override
-      public void put(FObject obj, Detachable sub) {
-        remove_(x, obj);
-      }
-    }, skip, limit, order, predicate);
-
+    getDelegate().select_(x, new RemoveSink(this), skip, limit, order, predicate);
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 }
