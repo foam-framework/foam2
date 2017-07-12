@@ -93,7 +93,10 @@ foam.CLASS({
       code: function(name) {
         if ( foam.box.Box.isInstance(name) ) {
           for ( var key in this.registry ) {
-            if ( this.registry[key] === name ) {
+            // TODO(markdittmer): Should there be a specialized compare() should
+            // be implemented by NamedBox (to cut out delegate) and
+            // foam.util.compare()?
+            if ( this.registry[key].exportBox === name ) {
               delete this.registry[key];
               return;
             }
