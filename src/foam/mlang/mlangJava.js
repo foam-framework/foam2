@@ -256,6 +256,29 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.mlang.sink.Map',
+
+  methods: [
+    {
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaReturns: 'foam.core.FObject',
+      javaCode: `return (foam.core.FObject) getArg1().f(obj);`
+    },
+    {
+      name: 'put',
+      javaCode: 'getDelegate().put(f(obj), sub);'
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.predicate.Contains',
 
   methods: [
