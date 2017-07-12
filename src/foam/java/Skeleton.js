@@ -66,6 +66,14 @@ foam.CLASS({
         body: this.sendMethodCode()
       });
 
+      cls.method({
+        type: 'void',
+        visibility: 'public',
+        name: 'setDelegateObject',
+        args: [ { name: 'obj', type: 'Object' } ],
+        body: "setDelegate((" + this.of.id + ") obj);"
+      });
+
       return cls;
     }
   ],
