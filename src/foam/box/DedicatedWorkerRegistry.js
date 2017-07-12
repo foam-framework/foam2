@@ -77,25 +77,9 @@ foam.CLASS({
       return ret;
     },
     function unregister(name) {
-      // Attempt to unregister in ourselves first.
-      if ( foam.box.Box.isInstance(name) ) {
-        var key = this.getDedicatedWorkerKey(name);
-
-        for (var key in this.dedicatedWorkers_ ) {
-          if ( this.dedicatedWorkers_[key] === name ) {
-            delete this.dedicatedWorkers_[key];
-            break;
-          }
-        }
-        this.SUPER(name);
-        return;
-      } else if ( this.dedicatedWorkers_[name] || this.registry[name] ) {
-        delete this.dedicatedWorkers_[name];
-        this.SUPER(name);
-      } else {
-        // Forward unregister request to delegate
-        this.delegate.unregister(name);
-      }
+      // Attempt to unregister in our registry, then delegate registry
+      this.SUPER(name);
+      this.delegate.unregister(name);
     },
     function send(msg) {
       // Determine if we have a registration for box.
