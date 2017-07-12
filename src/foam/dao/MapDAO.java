@@ -16,7 +16,6 @@ public class MapDAO
   extends AbstractDAO
 {
   protected Map<Object, FObject> data_ = null;
-  protected ClassInfo            of_   = null;
 
   protected synchronized void data_factory() {
     if ( data_ == null ) {
@@ -35,16 +34,6 @@ public class MapDAO
     data_ = data;
   }
 
-  public ClassInfo getOf() {
-    return of_;
-  }
-
-  public MapDAO setOf(ClassInfo of) {
-    of_ = of;
-    primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
-    return this;
-  }
-
   public FObject put_(X x, FObject obj) {
     getData().put(getPrimaryKey().get(obj), obj);
     return obj;
@@ -57,9 +46,9 @@ public class MapDAO
 
   public FObject find_(X x, Object o) {
     return AbstractFObject.maybeClone(
-            getOf().isInstance(o)
-            ? getData().get(getPrimaryKey().get(o))
-            : getData().get(o)
+        getOf().isInstance(o)
+          ? getData().get(getPrimaryKey().get(o))
+          : getData().get(o)
     );
   }
 
