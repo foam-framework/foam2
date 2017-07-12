@@ -59,47 +59,41 @@ foam.CLASS({
       var key = this.getDedicatedWorkerKey(box);
       if ( ! key ) return this.delegate.register(name, service, box);
 
-      // Using imported registry as context and instead of ourself.
-      var self = this;
-      var ctx = this.__context__.createSubContext({
-        registry: {
-          register: function(name, service, box) {
-            self.SUPER(name, service, box);
-          }
-        },
-
-        stubFactory: function() {
-          return self.stubFactory_.create({
-            delegate: self.workerFactory(this)
-          }, this);
-        },
-
-        registerWorker: function(name, service, box) {
-          return self.dedicatedWorkers_[key].register(name, service, box);
-        }
-      });
+      // Redirecting all registers of following statements with our registry.
+      // If this is not done, this register method will be called recursively,
+      // and registrations will be forwarded to delegate.
+      var oldReg = this.register;
+      this.register = this.SUPER;
 
       if ( ! this.dedicatedWorkers_[key] )
-        this.dedicatedWorkers_[key] = ctx.stubFactory();
-      return ctx.registerWorker(name, service, box);
+        this.dedicatedWorkers_[key] = this.stubFactory_.create({
+          delegate: this.workerFactory(this)
+        }, this);
+
+      var ret = this.dedicatedWorkers_[key].register(name, service, box);
+
+      // Register is set back to this method for future calls.
+      this.register = oldReg;
+      return ret;
     },
     function unregister(name) {
+      // Attempt to unregister in ourselves first.
       if ( foam.box.Box.isInstance(name) ) {
         var key = this.getDedicatedWorkerKey(name);
-        if ( ! key ) this.delegate.unregister(name);
 
-        for ( var key in this.dedicatedWorkers_ ) {
-          if (  this.dedicatedWorkers_[key] === name ) {
+        for (var key in this.dedicatedWorkers_ ) {
+          if ( this.dedicatedWorkers_[key] === name ) {
             delete this.dedicatedWorkers_[key];
-            return;
+            break;
           }
         }
+        this.SUPER(name);
         return;
-      }
-
-      if ( this.dedicatedWorkers_[name] ) {
+      } else if ( this.dedicatedWorkers_[name] || this.registry[name] ) {
         delete this.dedicatedWorkers_[name];
+        this.SUPER(name);
       } else {
+        // Forward unregister request to delegate
         this.delegate.unregister(name);
       }
     },

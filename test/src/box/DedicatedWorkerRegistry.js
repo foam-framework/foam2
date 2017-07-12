@@ -52,12 +52,6 @@ describe('dedicated worker registry', function() {
             name: name
           });
           this.SUPER(name);
-        },
-        function send(msg) {
-          var x = this.SUPER(msg);
-          return new Promise(function(resolve, reject) {
-            resolve("This was sent from mock registry!");
-          });
         }
       ]
     });
@@ -126,7 +120,7 @@ describe('dedicated worker registry', function() {
     expect(mockRegistry.actions.length).toBe(2);
   });
 
-  it('should route messages to the dedicated service', function(done) {
+  it('should send messages with services registered with dedicated registry', function(done) {
     var ctx = Context.create();
     var mockRegistry = MockRegistry.create(null, ctx);
 
@@ -153,7 +147,7 @@ describe('dedicated worker registry', function() {
     });
   });
 
-  it('should route messages to delegate service', function(done) {
+  it('should send messages with services registered through delegate registry', function(done) {
     var ctx = Context.create();
     var mockRegistry = MockRegistry.create(null, ctx);
 
@@ -173,7 +167,8 @@ describe('dedicated worker registry', function() {
 
     var obj = { id: 3, value: "Test" };
     stub.put(obj).then(function(ret) {
-      expect(ret).toBe("This was sent from mock registry!");
+      expect(ret).toBe(obj);
+      done();
     });
   });
 
