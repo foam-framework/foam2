@@ -18,7 +18,6 @@
 describe('dedicated worker registry', function() {
   var Registry;
   var OutputBox;
-  var PIDBox;
   var Context;
 
   beforeEach(function() {
@@ -77,19 +76,18 @@ describe('dedicated worker registry', function() {
     Registry = foam.lookup('foam.box.DedicatedWorkerRegistry');
     Context = foam.lookup('foam.box.Context');
     LogBox = foam.lookup('foam.box.LogBox');
-    PIDBox = foam.lookup('foam.box.PIDBox'); // Only available during testing
   });
 
   it('should forward all registrations to delegate by default', function() {
     var ctx = Context.create();
     var mockRegistry = MockRegistry.create(null, ctx);
 
-    var registry = Registry.create({
+    ctx.registry = Registry.create({
       delegate: mockRegistry
     }, ctx);
 
-    registry.register(null, null, foam.box.LogBox.create());
-    registry.register('LogBox2', null, foam.box.LogBox.create());
+    ctx.registry.register(null, null, foam.box.LogBox.create());
+    ctx.registry.register('LogBox2', null, foam.box.LogBox.create());
 
     expect(mockRegistry.actions.length).toBe(2);
     expect(mockRegistry.actions[0].action).toBe('register');
@@ -102,7 +100,7 @@ describe('dedicated worker registry', function() {
     var ctx = Context.create();
     var mockRegistry = MockRegistry.create(null, ctx);
 
-    var registry = Registry.create({
+    ctx.registry = Registry.create({
       delegate: mockRegistry,
       getDedicatedWorkerKey: function(box) {
         return box.serviceName;
@@ -110,29 +108,29 @@ describe('dedicated worker registry', function() {
     }, ctx);
 
     var registryCount = function() {
-      return Object.keys(registry.registry.registry).length;
+      return Object.keys(ctx.registry.registry.registry).length;
     }
 
     var dedicated = foam.box.LogBox.create();
     dedicated.serviceName = 'Box';
     var nonDedicated = foam.box.LogBox.create();
 
-    registry.register(null, null, dedicated);
+    ctx.registry.register(null, null, dedicated);
     // One register for ForkFox, one for dedicatedWorkers_
     expect(registryCount()).toBe(2);
     expect(mockRegistry.actions.length).toBe(0); // Delegate should not be hit
 
-    registry.register('TestName', null, dedicated);
+    ctx.registry.register('TestName', null, dedicated);
     // No reregister for ForkBox, one for dedicatedWorkers_
     expect(registryCount()).toBe(3);
     expect(mockRegistry.actions.length).toBe(0);
 
-    registry.register(null, null, nonDedicated);
+    ctx.registry.register(null, null, nonDedicated);
     // Verify dedicated registery was not hit
     expect(registryCount()).toBe(3);
     expect(mockRegistry.actions.length).toBe(1);
 
-    registry.register('Test2', null, nonDedicated);
+    ctx.registry.register('Test2', null, nonDedicated);
     // Verify dedicated registry was not hit
     expect(registryCount()).toBe(3);
     expect(mockRegistry.actions.length).toBe(2);

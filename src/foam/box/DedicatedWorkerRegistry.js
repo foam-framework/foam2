@@ -97,7 +97,20 @@ foam.CLASS({
         this.delegate.unregister(name);
       }
     },
-    //function send(msg) {
-    //}
+    function send(msg) {
+      if ( this.SubBoxMessage.isInstance(msg.object) ) {
+        var name = msg.object.name;
+
+        if ( ! this.registry[name].localBox ) {
+          this.delegate.send(msg);
+        } else {
+          msg.object = msg.object.object;
+          this.registry[name].localBox.send(msg);
+        }
+      } else if ( this.HelloMessage.isInstance(msg.object) ) {
+      } else {
+        this.registrySkeleton.send(msg)
+      }
+    }
   ]
 });
