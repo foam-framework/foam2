@@ -70,6 +70,10 @@ describe('dedicated worker registry', function() {
       delegate: mockRegistry
     }, ctx);
 
+    /*
+    ctx = ctx.registry = MockRegistry.create(null, ctx);
+    ctx = Registry.create(null, ctx);
+    */
     ctx.registry.register(null, null, foam.box.LogBox.create());
     ctx.registry.register('LogBox2', null, foam.box.LogBox.create());
 

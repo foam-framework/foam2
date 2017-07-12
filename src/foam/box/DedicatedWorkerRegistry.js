@@ -18,8 +18,31 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'DedicatedWorkerRegistry',
-  extends: 'foam.box.BoxRegistryBox', //'foam.box.ProxyBox',
-  implements: [ 'foam.box.ProxyBox' ], //'foam.box.BoxRegistryBox' ],
+  extends: 'foam.box.BoxRegistryBox',
+  implements: [ 'foam.box.ProxyBox' ],
+
+  documentation: `A registry used to manage dedicated worker instances. The
+    registry will instantiate a worker for services that require dedicate
+    worker instances. A dedicated worker will be provided for the service if
+    'getDedicatedWorkerKey' returns a non-null value. Otherwise, the
+    registration request is passed to the delegate.
+
+    Example usage:
+    var ctx = foam.box.Context.create();
+    ctx.registry = Registry.create({
+      delegate: ctx.registry,
+      getDedicatedWorkerKey: function(box) {
+        return box.serviceName;
+      }
+    }, ctx.registry);
+
+    // A service that requires dedicated worker.
+    var service = Service.create();
+    var skBox = foam.box.SkeletonBox.create({ delegate: service });
+    skBox.serviceName = "HTTPFetcher";
+
+    // Spawns a dedicated worker, running Service.
+    var register = ctx.registry.register(null, null, skBox);`,
 
   requires: [
     'foam.core.StubFactorySingleton',
@@ -27,27 +50,49 @@ foam.CLASS({
     'foam.box.node.ForkBox'
   ],
 
-//  imports: [ 'registry' ], // __context__.registry is the context it is declared in
-
-  exports: [ 'as registry' ], // __subContext__.registry === this
+  exports: [ 'as registry' ],
 
   properties: [
     {
+      class: 'Function',
       name: "getDedicatedWorkerKey",
-      value: function(box) { return null; }
+      documentation: `Gets the service name from the provided box.
+        If the value is not null, a dedicated worker will be used for the box.
+        Otherwise, the registration request will be forwarded to the delegate.`,
+      value: function(box) { return null; },
     },
     {
+      class: 'Function',
       name: 'workerFactory',
-      value: function(ctx) {
-        return this.ForkBox.create(null, ctx);
+      documentation: 'Used to generate the dedicated workers.',
+      value: function(args, ctx) {
+        return this.ForkBox.create(args, ctx);
       }
     },
     {
-      name: "dedicatedWorkers_",
+      class: 'Proxy',
+      of: 'foam.box.Box',
+      name: 'delegate',
+      documentation: 'Handles all non-dedicated worker requests.',
+      required: true,
+      factory: function() { return this.registry; }
+    },
+    {
+      name: 'dedicatedWorkers_',
+      documentation: `Map of BoxRegistryStub used for registering box
+        on the dedicated service worker.`,
+      factory: function() { return {}; }
+    },
+    {
+      name: 'registeredNames_',
+      documentation: `Map of the names of registrations and whether the
+        box was registered under dedicated registry or delegate registry.`,
       factory: function() { return {}; }
     },
     {
       name: 'stubFactory_',
+      documentation: `A factory to generate BoxRegistryStubs when instantiating
+        a dedicated worker.`,
       factory: function() {
         return this.StubFactorySingleton.create().get(this.BoxRegistry);
       }
@@ -57,23 +102,28 @@ foam.CLASS({
   methods: [
     function register(name, service, box) {
       var key = this.getDedicatedWorkerKey(box);
-      if ( ! key ) return this.delegate.register(name, service, box);
+      if ( ! key ) {
+        return this.delegate.register(name, service, box);
+      }
 
       // Redirecting all registers of following statements with our registry.
       // If this is not done, this register method will be called recursively,
       // and registrations will be forwarded to delegate.
-      var oldReg = this.register;
-      this.register = this.SUPER;
+      var clone = this.clone();
+      clone.register = this.SUPER;
+      var ctx = this.__context__.createSubContext({
+        registry: clone,
+        registerWorker: this.dedicatedWorkers_[key].register
+      });
 
       if ( ! this.dedicatedWorkers_[key] )
         this.dedicatedWorkers_[key] = this.stubFactory_.create({
-          delegate: this.workerFactory(this)
-        }, this);
+          delegate: this.workerFactory(null, ctx)
+        }, ctx);
 
-      var ret = this.dedicatedWorkers_[key].register(name, service, box);
+      var ret = ctx.registerWorker(name, service, box);
 
       // Register is set back to this method for future calls.
-      this.register = oldReg;
       return ret;
     },
     function unregister(name) {
