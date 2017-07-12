@@ -67,7 +67,7 @@ public abstract class AbstractDAO
 
   public AbstractDAO setOf(ClassInfo of) {
     of_ = of;
-    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
+    primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
     return this;
   }
 
