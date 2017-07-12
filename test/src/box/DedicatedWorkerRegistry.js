@@ -16,17 +16,17 @@
  */
 
 describe('dedicated worker registry', function() {
+  var MockRegistry;
   var Registry;
-  var OutputBox;
   var Context;
+  var LogBox;
 
   beforeEach(function() {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 2147483647;
-
     foam.CLASS({
       package: 'foam.box.DedicatedWorkerRegistry.Test',
       name: 'MockRegistry',
-      extends: 'foam.box.BoxRegistry',
+      extends: 'foam.box.BoxRegistryBox',
 
       properties: [
         {
@@ -37,34 +37,24 @@ describe('dedicated worker registry', function() {
       ],
 
       methods: [
-        function register(name, service, localBox) {
+        function register(name, service, box) {
           this.actions.push({
             action: 'register',
             name: name,
             service: service,
-            box: localBox
+            box: box
           });
-
-          // Copied code...
-          name = name || foam.next$UID();
-
-          var exportBox = this.SubBox.create({ name: name, delegate: this.me });
-          exportBox = service ? service.clientBox(exportBox) : exportBox;
-
-          this.registry[name] = {
-            exportBox: exportBox,
-            localBox: service ? service.serverBox(localBox) : localBox
-          };
-
-          return this.registry[name].exportBox;
+          return this.SUPER(name, service, box);
         },
         function unregister(name) {
           this.actions.push({
             action: 'unregister',
             name: name
           });
+          this.SUPER(name);
         },
         function send(msg) {
+          var x = this.SUPER(msg);
           return new Promise(function(resolve, reject) {
             resolve("This was sent from mock registry!");
           });
@@ -108,7 +98,7 @@ describe('dedicated worker registry', function() {
     }, ctx);
 
     var registryCount = function() {
-      return Object.keys(ctx.registry.registry.registry).length;
+      return Object.keys(ctx.registry.registry).length;
     }
 
     var dedicated = foam.box.LogBox.create();
@@ -140,19 +130,19 @@ describe('dedicated worker registry', function() {
     var ctx = Context.create();
     var mockRegistry = MockRegistry.create(null, ctx);
 
-    var registry = Registry.create({
+    ctx.registry = Registry.create({
       delegate: mockRegistry, // Default registry
       getDedicatedWorkerKey: function(box) {
         return box.serviceName;
       }
     }, ctx);
 
-    var dao = foam.dao.ArrayDAO.create();
+    var dao = foam.dao.ArrayDAO.create({ of: 'Object' });
     var box = foam.box.SkeletonBox.create({ data: dao });
     // Setting box service name for dedicated worker registry.
     box.serviceName = "ArrayDAO";
 
-    var register = registry.register(null, null, box);
+    var register = ctx.registry.register(null, null, box);
     var stub = foam.core.StubFactorySingleton.create().get(foam.dao.DAO)
         .create({ delegate: register }, ctx);
 
@@ -167,7 +157,7 @@ describe('dedicated worker registry', function() {
     var ctx = Context.create();
     var mockRegistry = MockRegistry.create(null, ctx);
 
-    var registry = Registry.create({
+    ctx.registry = Registry.create({
       delegate: mockRegistry, // Default registry
       getDedicatedWorkerKey: function(box) {
         return box.serviceName;
@@ -177,7 +167,7 @@ describe('dedicated worker registry', function() {
     var dao = foam.dao.ArrayDAO.create();
     var box = foam.box.SkeletonBox.create({ data: dao });
 
-    var register = registry.register(null, null, box);
+    var register = ctx.registry.register(null, null, box);
     var stub = foam.core.StubFactorySingleton.create().get(foam.dao.DAO)
         .create({ delegate: register }, ctx);
 

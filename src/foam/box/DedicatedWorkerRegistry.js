@@ -18,8 +18,8 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'DedicatedWorkerRegistry',
-  extends: 'foam.box.ProxyBox',
-  implements: [ 'foam.box.BoxRegistryBox' ],
+  extends: 'foam.box.BoxRegistryBox', //'foam.box.ProxyBox',
+  implements: [ 'foam.box.ProxyBox' ], //'foam.box.BoxRegistryBox' ],
 
   requires: [
     'foam.core.StubFactorySingleton',
@@ -27,7 +27,7 @@ foam.CLASS({
     'foam.box.node.ForkBox'
   ],
 
-  imports: [ 'registry' ], // __context__.registry is the context it is declared in
+//  imports: [ 'registry' ], // __context__.registry is the context it is declared in
 
   exports: [ 'as registry' ], // __subContext__.registry === this
 
@@ -62,6 +62,12 @@ foam.CLASS({
       // Using imported registry as context and instead of ourself.
       var self = this;
       var ctx = this.__context__.createSubContext({
+        registry: {
+          register: function(name, service, box) {
+            self.SUPER(name, service, box);
+          }
+        },
+
         stubFactory: function() {
           return self.stubFactory_.create({
             delegate: self.workerFactory(this)
@@ -98,19 +104,16 @@ foam.CLASS({
       }
     },
     function send(msg) {
+      // Determine if we have a registration for box.
+      // If not, forward to delegate and let it handle.
       if ( this.SubBoxMessage.isInstance(msg.object) ) {
         var name = msg.object.name;
-
-        if ( ! this.registry[name].localBox ) {
-          this.delegate.send(msg);
-        } else {
-          msg.object = msg.object.object;
-          this.registry[name].localBox.send(msg);
+        if ( this.registry[name] && this.registry[name].localBox ) {
+          this.SUPER(msg);
+          return;
         }
-      } else if ( this.HelloMessage.isInstance(msg.object) ) {
-      } else {
-        this.registrySkeleton.send(msg)
       }
+      this.delegate.send(msg);
     }
   ]
 });
