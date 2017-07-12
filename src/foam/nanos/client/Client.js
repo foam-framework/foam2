@@ -165,7 +165,8 @@ foam.CLASS({
           of: this.User,
           seqNo: true,
           testData: [
-            { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' }
+            { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' },
+            { id: 2, firstName: 'Test', password: 'test123', lastName: 'User', phone: '19055552323', email: 'test@test.com', verified: true, business: 104 },
           ]
         });
       }
