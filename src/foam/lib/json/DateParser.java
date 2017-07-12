@@ -41,7 +41,7 @@ public class DateParser
     System.out.println("Succcess.");
 
     // Checks if Long Date (Timestamp from epoch)
-    if (ps.value() instanceof java.lang.Long) {
+    if ( ps.value() instanceof java.lang.Long ) {
       return ps.setValue(new java.util.Date((java.lang.Long) ps.value()));
     }
 
