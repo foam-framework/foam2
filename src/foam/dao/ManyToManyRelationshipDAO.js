@@ -20,18 +20,37 @@ foam.CLASS({
   name: 'ManyToManyRelationshipDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  implements: [ 'foam.mlang.Expressions' ],
+  implements: [ { path: 'foam.mlang.Expressions', java: false } ],
 
   documentation: 'Adapts a DAO based on a *:* Relationship.',
 
   properties: [
-    'junctionProperty',
-    'junctionDAOKey',
+    {
+      class: 'foam.core.String',
+      name: 'junctionProperty'
+    },
+    {
+      class: 'foam.core.String',
+      name: 'junctionDAOKey'
+    },
     'junctionCls',
-    'targetProperty',
-    'sourceKey',
-    'sourceProperty',
+    {
+      class: 'foam.core.String',
+      name: 'sourceKey'
+    },
+    {
+      class: 'foam.core.String',
+      name: 'targetProperty'
+    },
+    {
+      class: 'foam.core.String',
+      name: 'sourceProperty'
+    },
     'junctionKeyFactory',
+    {
+      class: 'foam.core.Boolean',
+      name: 'junctionFactoryPreOrder'
+    },
     {
       name: 'junctionDAO',
       getter: function() {
