@@ -76,6 +76,11 @@ public class ServletHandler
     }
 
     @Override
+    public String getProtocol() {
+      return ex.getProtocol();
+    }
+
+    @Override
     public ServletInputStream getInputStream() throws IOException {
       return is;
     }
@@ -164,6 +169,12 @@ public class ServletHandler
     }
 
     @Override
+    public void sendRedirect(String location) throws IOException {
+      setStatus(301);
+      setHeader("Location", location);
+    }
+
+    @Override
     public void sendError(int sc, String msg) throws IOException {
       this.status = sc;
       if ( msg != null ) {
@@ -208,7 +219,6 @@ public class ServletHandler
     ex.getRequestBody().close();
     final ByteArrayInputStream newInput = new ByteArrayInputStream(inBytes);
     final ServletInputStream   is       = new ServletInputStream() {
-
       @Override
       public int read() throws IOException {
         return newInput.read();
