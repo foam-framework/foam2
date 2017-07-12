@@ -47,11 +47,10 @@ public abstract class AbstractArrayPropertyInfo
                 objList.add(clsInstance);
               }
             } else if ( reader.getLocalName().equals("value") ) {
-              // TODO: TYPE CASTING FOR PROPER CONVERSION
+              // TODO: TYPE CASTING FOR PROPER CONVERSION. NEED FURTHER SUPPORT FOR PRIMITIVE TYPES
               reader.next();
               String value = reader.getText();
               String type = this.of();
-//              Class cls = Class.forName(this.of);
               objList.add(value);
             }
             break;
