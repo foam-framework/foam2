@@ -80,11 +80,6 @@ public class MapDAO
     return sink;
   }
 
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    // TODO: this deletes too much data if skip, limit or predicate are set
-    setData(null);
-  }
-
   public void pipe_(X x, Sink s) {
     // TODO
   }
