@@ -729,6 +729,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+      // TODO: Change to ClassInfo return type once primitive support is added
       info.method({
         name: 'of',
         visibility: 'public',
@@ -788,6 +789,7 @@ foam.CLASS({
                 + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
                 + 'System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
+      // TODO: Change to ClassInfo return type once primitive support is added
       info.method({
         name: 'of',
         visibility: 'public',
