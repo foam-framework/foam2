@@ -6,7 +6,7 @@ import foam.core.X;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-public class RemoveSink implements Sink {
+public class RemoveSink extends AbstractSink {
 
   protected DAO dao;
 
@@ -16,22 +16,6 @@ public class RemoveSink implements Sink {
 
   @Override
   public void put(FObject obj, Detachable sub) {
-    final X x = ((AbstractDAO) this.dao).getX();
-    this.dao.remove_(x, obj);
-  }
-
-  @Override
-  public void remove(FObject obj, Detachable sub) {
-
-  }
-
-  @Override
-  public void eof() {
-
-  }
-
-  @Override
-  public void reset(Detachable sub) {
-
+    this.dao.remove(obj);
   }
 }
