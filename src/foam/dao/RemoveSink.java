@@ -16,6 +16,6 @@ public class RemoveSink extends AbstractSink {
 
   @Override
   public void put(FObject obj, Detachable sub) {
-    this.dao.remove(obj);
+    dao.remove(obj);
   }
 }
