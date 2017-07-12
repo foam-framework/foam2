@@ -533,6 +533,17 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
 
+  properties: [
+    {
+      name: 'javaType',
+      expression: function(of) {
+        return of ? of.id : 'foam.core.FObject';
+      }
+    },
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
@@ -542,6 +553,13 @@ foam.CLASS({
 
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
+
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
       return info;
     }
   ]
@@ -555,6 +573,19 @@ foam.CLASS({
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
+      return info;
+    }
   ]
 });
 
@@ -642,22 +673,6 @@ foam.CLASS({
   ]
 });
 
-
-foam.CLASS({
-  refines: 'foam.core.FObjectProperty',
-  properties: [
-    {
-      name: 'javaType',
-      expression: function(of) {
-        return of ? of.id : 'foam.core.FObject';
-      }
-    },
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
-  ]
-});
-
-
 foam.CLASS({
   refines: 'foam.core.Array',
 
@@ -672,6 +687,13 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
       return info;
     }
   ],
@@ -821,6 +843,19 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
+      return info;
+    }
   ]
 });
 
