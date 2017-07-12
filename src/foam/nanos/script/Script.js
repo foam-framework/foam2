@@ -45,7 +45,9 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL
+      value: foam.nanos.script.Language.BEANSHELL,
+      transient: true
+      // TODO: fix JS support
     },
     {
       class: 'Boolean',
