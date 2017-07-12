@@ -16,7 +16,6 @@ import foam.lib.parse.*;
 import foam.lib.parse.StringPS;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.AuthServiceSkeleton;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -31,20 +30,13 @@ public class ServiceServlet
   extends    HttpServlet
   implements ContextAware
 {
-  protected Object  service_;
-  protected Box     skeleton_;
-  protected X       x_;
+  protected Object service_;
+  protected Box    skeleton_;
+  protected X      x_;
 
-  public ServiceServlet(Object service) {
-    service_ = service;
-    // TODO: Use FacetManager when ready
-    if ( service instanceof DAO ) {
-      skeleton_ = new DAOSkeleton();
-      ((DAOSkeleton) skeleton_).setDelegate((DAO) service);
-    } else if ( service instanceof AuthService) {
-      skeleton_ = new AuthServiceSkeleton();
-      ((AuthServiceSkeleton) skeleton_).setDelegate((AuthService) service);
-    }
+  public ServiceServlet(Object service, Box skeleton) {
+    service_  = service;
+    skeleton_ = skeleton;
   }
 
   public X    getX() { return x_; }
