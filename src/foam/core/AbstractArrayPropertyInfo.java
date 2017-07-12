@@ -27,7 +27,7 @@ public abstract class AbstractArrayPropertyInfo
     // TODO
   }
 
-  public String of() { return " "; }
+  public abstract String of();
 
   // NESTED ARRAY
   @Override
