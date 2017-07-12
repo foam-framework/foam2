@@ -23,6 +23,7 @@ foam.CLASS({
       /** The source path of this object, where changes should be commited. */
       name: 'src_',
       hidden: true,
+      
     }
   ]
   
@@ -43,7 +44,7 @@ foam.CLASS({
       name: 'preSet',
       value: function(old, nu, prop) {
         if (prop.owner) {
-          old && (old.src_ = '');
+          //old && (old.src_ = ''); // TODO: wipe old obj's src_ or not?
           nu && (nu.src_ = this.src_ + '/' + prop.name);
         }
       }
