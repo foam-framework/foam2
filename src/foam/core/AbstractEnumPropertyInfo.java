@@ -15,7 +15,7 @@ import javax.xml.stream.XMLStreamReader;
 public abstract class AbstractEnumPropertyInfo
   extends AbstractObjectPropertyInfo {
 
-  public String of() { return ""; }
+  public abstract String of();
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
