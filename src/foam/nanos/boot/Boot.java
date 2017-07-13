@@ -10,7 +10,7 @@ import foam.core.*;
 import foam.dao.*;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.User;
-
+import foam.nanos.pm.*;
 import java.io.IOException;
 
 public class Boot {
@@ -23,7 +23,7 @@ public class Boot {
   public Boot() {
     try {
       // Used for all the services that will be required when Booting
-      serviceDAO_ = new JDAO(NSpec.getOwnClassInfo(), "services");
+      serviceDAO_ = new foam.dao.PMDAO(root_, new JDAO(NSpec.getOwnClassInfo(), "services"));
     } catch (IOException e) {
       e.printStackTrace();
     }
