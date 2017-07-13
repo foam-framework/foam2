@@ -16,12 +16,14 @@ import foam.dao.MapDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Min;
 import foam.nanos.NanoService;
+import foam.nanos.logger.NanoLogger;
+import foam.nanos.pm.PM;
 
 import java.util.Date;
 
 public class CronScheduler
     extends    ContextAwareSupport
-    implements NanoService
+    implements NanoService, Runnable
 {
   protected DAO cronDAO_;
 
@@ -36,31 +38,38 @@ public class CronScheduler
     return ((Cron) min.getValue()).getScheduledTime();
   }
 
-  private final Thread cronJobs = new Thread() {
-    @Override
-    public void run() {
-      try {
-        while (true) {
-          Date dtnow = new Date();
-          cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, dtnow)).select(new AbstractSink() {
-            @Override
-            public void put(FObject obj, Detachable sub) {
-              ((Cron) obj).runScript();
-              cronDAO_.put(obj);
-            }
-          });
-
-          Date minScheduledTime = getMinScheduledTime();
-          Thread.sleep(minScheduledTime.getTime() - dtnow.getTime());
-        }
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-  };
-
   public void start() {
-    cronDAO_ = (DAO) getX().get("MapDAO");
-    cronJobs.start();
+    cronDAO_ = (DAO) getX().get("cronDAO");
+    new Thread(this).start();
+  }
+
+  @Override
+  public void run() {
+    final NanoLogger logger = (NanoLogger) getX().get("logger");
+
+    try {
+      while ( true ) {
+        Date now = new Date();
+        cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, now)).select(new AbstractSink() {
+          @Override
+          public void put(FObject obj, Detachable sub) {
+            PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
+            try {
+              ((Cron) obj).runScript(CronScheduler.this.getX());
+              cronDAO_.put(obj);
+            } catch (Throwable t) {
+              logger.error(this.getClass(), t.getMessage());
+            } finally {
+              pm.log(getX());
+            }
+          }
+        });
+
+        Date minScheduledTime = getMinScheduledTime();
+        Thread.sleep(minScheduledTime.getTime() - now.getTime());
+      }
+    } catch (Throwable t) {
+      logger.error(this.getClass(), t.getMessage());
+    }
   }
 }

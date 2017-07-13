@@ -13,6 +13,7 @@ import foam.dao.*;
 import foam.nanos.*;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.NanoLogger;
+import foam.nanos.pm.PM;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +28,7 @@ public class NanoHttpHandler
   protected Map<String, HttpHandler> handlerMap_ = new ConcurrentHashMap();
 
   public NanoHttpHandler(X x) {
-    x_ = x;
+    setX(x);
   }
 
   @Override
@@ -51,7 +52,13 @@ public class NanoHttpHandler
     // if ( auth.checkPermission(...) ) {}
 
     if ( handler != null ) {
-      handler.handle(exchange);
+      PM pm = new PM(this.getClass(), serviceKey);
+
+      try {
+        handler.handle(exchange);
+      } finally {
+        pm.log(getX());
+      }
     }
   }
 
@@ -72,6 +79,8 @@ public class NanoHttpHandler
           Class.forName(spec.getBoxClass()) :
           DAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
+
+        if ( skeleton instanceof ContextAware ) ((ContextAware) skeleton).setX(getX());
 
         skeleton.setDelegateObject(service);
 
