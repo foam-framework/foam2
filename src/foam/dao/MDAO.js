@@ -54,15 +54,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'autoIndex',
-      value: false
+      name: 'autoIndex'
     },
     {
-      name: 'idIndex'
+      name: 'idIndex',
+      transient: true
     },
     {
       /** The root IndexNode of our index. */
-      name: 'index'
+      name: 'index',
+      transient: true
     }
   ],
 
