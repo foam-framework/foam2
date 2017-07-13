@@ -15,6 +15,7 @@ foam.CLASS({
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date'
@@ -41,6 +42,7 @@ foam.CLASS({
       transient: true,
       visibility: foam.u2.Visibility.RO
     },
+    /*
     {
       class: 'Enum',
       of: 'foam.nanos.script.Language',
@@ -48,6 +50,12 @@ foam.CLASS({
       value: foam.nanos.script.Language.BEANSHELL,
       transient: true
       // TODO: fix JS support
+    },
+    */
+    {
+      class: 'Boolean',
+      name: 'server',
+      value: true
     },
     {
       class: 'Boolean',
@@ -75,11 +83,17 @@ foam.CLASS({
   methods: [
     {
       name: 'runScript',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'void',
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = new Interpreter();
+        PM                    pm    = new PM(this.getClass(), getId());
 
         try {
           shell.set("currentScript", this);
@@ -88,6 +102,8 @@ foam.CLASS({
           shell.eval(getCode());
         } catch (EvalError e) {
           e.printStackTrace();
+        } finally {
+          pm.log(x);
         }
 
         setLastRun(new Date());
@@ -104,7 +120,8 @@ foam.CLASS({
       code: function() {
         this.output = '';
 
-        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+//        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+        if ( this.server ) {
           this.scheduled = true;
           this.scriptDAO.put(this);
         } else {
