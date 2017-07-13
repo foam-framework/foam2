@@ -39,7 +39,7 @@ public class CronScheduler
   }
 
   public void start() {
-    cronDAO_ = (DAO) getX().get("MapDAO");
+    cronDAO_ = (DAO) getX().get("cronDAO");
     new Thread(this).start();
   }
 
@@ -54,7 +54,7 @@ public class CronScheduler
         cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, now)).select(new AbstractSink() {
           @Override
           public void put(FObject obj, Detachable sub) {
-            ((Cron) obj).runScript();
+            ((Cron) obj).runScript(CronScheduler.this.getX());
             cronDAO_.put(obj);
           }
         });
