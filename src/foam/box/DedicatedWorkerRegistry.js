@@ -50,6 +50,8 @@ foam.CLASS({
     'foam.box.node.ForkBox'
   ],
 
+  imports: [ 'registry? as ctxRegistry' ],
+
   exports: [ 'as registry' ],
 
   properties: [
@@ -75,7 +77,7 @@ foam.CLASS({
       name: 'delegate',
       documentation: 'Handles all non-dedicated worker requests.',
       required: true,
-      //factory: function() { return this.registry; }
+      factory: function() { return this.ctxRegistry; }
     },
     {
       name: 'dedicatedWorkers_',
@@ -101,26 +103,28 @@ foam.CLASS({
 
   methods: [
     function register(name, service, box) {
+      // Deter
+      
       var key = this.getDedicatedWorkerKey(box);
+
+
+
+
+      var ret;
       if ( ! key ) {
-        return this.delegate.register(name, service, box);
+        ret = this.delegate.register(name, service, box);
       }
 
       // Redirecting all registers of following statements with our registry.
       // If this is not done, this register method will be called recursively,
       // and registrations will be forwarded to delegate.
-      var oldReg = this.register;
-      this.register = this.SUPER;
-
       if ( ! this.dedicatedWorkers_[key] )
         this.dedicatedWorkers_[key] = this.stubFactory_.create({
-          delegate: this.workerFactory(null, this)
-        }, this);
+          delegate: this.workerFactory(null, ctx)
+        }, ctx);
 
       var ret = this.dedicatedWorkers_[key].register(name, service, box);
-
       // Register is set back to this method for future calls.
-      this.register = oldReg;
       return ret;
     },
     function unregister(name) {
