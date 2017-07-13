@@ -32,6 +32,7 @@ ctx.socketService.listening$.sub(function(sub, _, __, slot) {
     // TODO(markdittmer): Use secure parser.
     foam.json.parseString(buf, ctx).send(foam.box.Message.create({
       object: foam.box.SocketBox.create({
+        name: ctx.me.name,
         address: `0.0.0.0:${ctx.socketService.port}`
       })
     }));
