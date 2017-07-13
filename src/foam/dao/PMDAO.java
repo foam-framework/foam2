@@ -16,9 +16,8 @@ public class PMDAO
   extends ProxyDAO
 {
 
-  public PMDAO(X x, DAO delegate) {
+  public PMDAO(DAO delegate) {
     super(delegate);
-    setX(x);
   }
 
   @Override
@@ -28,7 +27,7 @@ public class PMDAO
     try {
       return super.put_(x, obj);
     } finally {
-      pm.log(getX());
+      pm.log(x);
     }
   }
 
@@ -39,7 +38,7 @@ public class PMDAO
     try {
       return super.find_(x, id);
     } finally {
-      pm.log(getX());
+      pm.log(x);
     }
   }
 
@@ -50,19 +49,18 @@ public class PMDAO
     try {
       return super.remove_(x, obj);
     } finally {
-      pm.log(getX());
+      pm.log(x);
     }
   }
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    // Is this the right key to use?
     PM pm = new PM(PMDAO.class, getOf().getId() + ":removeAll");
 
     try {
       super.removeAll_(x, skip, limit, order, predicate);
     } finally {
-      pm.log(getX());
+      pm.log(x);
     }
   }
 }

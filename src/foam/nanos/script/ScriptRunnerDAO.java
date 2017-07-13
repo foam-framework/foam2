@@ -17,7 +17,7 @@ public class ScriptRunnerDAO
   public ScriptRunnerDAO()
     throws IOException
   {
-    this(new JDAO(Script.getOwnClassInfo(), "scripts"));
+    this(new foam.dao.PMDAO(new JDAO(Script.getOwnClassInfo(), "scripts")));
   }
 
   public ScriptRunnerDAO(DAO delegate) {
