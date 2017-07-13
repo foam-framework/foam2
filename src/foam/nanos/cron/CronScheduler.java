@@ -56,6 +56,7 @@ public class CronScheduler
           public void put(FObject obj, Detachable sub) {
             ((Cron) obj).runScript(CronScheduler.this.getX());
             cronDAO_.put(obj);
+            pm.log(getX());
           }
         });
 
@@ -64,8 +65,6 @@ public class CronScheduler
       }
     } catch (InterruptedException e) {
       logger.error(this.getClass(), e.getMessage());
-    } finally {
-      pm.log(getX());
     }
   }
 }
