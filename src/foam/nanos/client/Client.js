@@ -26,6 +26,7 @@ foam.CLASS({
     'foam.nanos.cron.Cron',
     'foam.nanos.export.ExportDriverRegistry',
     'foam.nanos.menu.Menu',
+    'foam.nanos.pm.PMInfo',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test',
     'foam.nanos.auth.AuthService'
@@ -40,6 +41,7 @@ foam.CLASS({
     'menuDAO',
     'nSpecDAO',
     'permissionDAO',
+    'pmInfoDAO',
     'regionDAO',
     'scriptDAO',
     'testDAO',
@@ -143,10 +145,10 @@ foam.CLASS({
               { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
               { parent: 'admin', id: 'export',       label: 'Export Drivers', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
               { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', summaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
-              { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' }  },
-              { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' }  },
-              { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' }  },
-              { parent: 'admin', id: 'pm',           label: 'Performance' },
+              { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' } },
+              { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO' } },
+              { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' } },
+              { parent: 'admin', id: 'pm',           label: 'Performance',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'pmInfoDAO' } },
               { parent: 'admin', id: 'log',          label: 'View Logs' },
               /*
             { id: 'support',                         label: 'Support',         handler: { class: 'foam.nanos.menu.TabsMenu' } },
@@ -230,6 +232,18 @@ foam.CLASS({
               testData: [
               ]
             });*/
+          }
+        },
+
+        {
+          name: 'pmInfoDAO',
+          factory: function() {
+            return this.ClientDAO.create({
+              of: this.PMInfo,
+              delegate: this.HTTPBox.create({
+                method: 'POST',
+                url: 'http://localhost:8080/pmInfoDAO'
+              })});
           }
         },
 

@@ -13,6 +13,7 @@ import foam.dao.*;
 import foam.nanos.*;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.NanoLogger;
+import foam.nanos.pm.PM;
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,13 @@ public class NanoHttpHandler
     // if ( auth.checkPermission(...) ) {}
 
     if ( handler != null ) {
-      handler.handle(exchange);
+      PM pm = new PM(this.getClass(), serviceKey);
+
+      try {
+        handler.handle(exchange);
+      } finally {
+        pm.log(getX());
+      }
     }
   }
 
