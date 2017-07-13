@@ -256,7 +256,8 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = java.lang.Long.compare((Long)prop.get(s.value), (Long)key);
+    
     if ( r == 0 ) {
       return s.value;
     } 
