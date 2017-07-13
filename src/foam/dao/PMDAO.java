@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.FObject;
@@ -58,7 +64,7 @@ public class PMDAO extends ProxyDAO {
   }
 
   @Override
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     // Is this the right key to use?
     PM pm = new PM(PMDAO.class, getOwnClassInfo().getId() + ":removeAll");
     try {

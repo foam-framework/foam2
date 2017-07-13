@@ -20,24 +20,35 @@ foam.CLASS({
     'java.util.Date'
   ],
 
+  tableColumns: [
+    'id', 'enabled', 'language', 'description', 'run'
+  ],
+
+  searchColumns: [ ],
+
   properties: [
     {
       class: 'String',
       name: 'id'
     },
     {
+      class: 'String',
+      name: 'description'
+    },
+    {
       class: 'DateTime',
       name: 'lastRun',
+      transient: true,
       visibility: foam.u2.Visibility.RO
     },
-    /*
     {
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL
+      value: foam.nanos.script.Language.BEANSHELL,
+      transient: true
+      // TODO: fix JS support
     },
-    */
     {
       class: 'Boolean',
       name: 'scheduled',
@@ -65,22 +76,24 @@ foam.CLASS({
     {
       name: 'runScript',
       javaReturns: 'void',
-      javaCode:
-`ByteArrayOutputStream baos = new ByteArrayOutputStream();
-PrintStream ps = new PrintStream(baos);
-Interpreter shell = new Interpreter();
-try {
-  shell.set("currentScript", this);
-  setOutput("");
-  shell.setOut(ps);
-  shell.eval(getCode());
-} catch (EvalError e) {
-  e.printStackTrace();
-}
+      javaCode: `
+        ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+        PrintStream           ps    = new PrintStream(baos);
+        Interpreter           shell = new Interpreter();
 
-setLastRun(new Date());
-ps.flush();
-setOutput(baos.toString());
+        try {
+          shell.set("currentScript", this);
+          setOutput("");
+          shell.setOut(ps);
+          shell.eval(getCode());
+        } catch (EvalError e) {
+          e.printStackTrace();
+        }
+
+        setLastRun(new Date());
+        ps.flush();
+      System.err.println("******************** Output: " + baos.toString());
+        setOutput(baos.toString());
 `
     }
   ],
@@ -91,7 +104,7 @@ setOutput(baos.toString());
       code: function() {
         this.output = '';
 
-        if ( false /* this.language === foam.nanos.script.Language.BEANSHELL */ ) {
+        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
           this.scheduled = true;
           this.scriptDAO.put(this);
         } else {

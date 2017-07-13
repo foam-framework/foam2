@@ -20,12 +20,16 @@ foam.CLASS({
   name: 'ForkBox',
   extends: 'foam.box.PromisedBox',
 
+  documentation: `A PromisedBox that resolves to a RawSocketBox connected to
+      a newly forked child process.`,
+
   requires: [
     'foam.box.Message',
     'foam.box.ReplyBox',
     'foam.box.SocketBox',
     'foam.box.SubBox'
   ],
+
   imports: [
     'registry',
     'socketService'
@@ -33,10 +37,10 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.box.Box',
-      documentation: `Box used for child's SocketBox reply`,
-      name: 'replyBox'
+      class: 'Boolean',
+      documentation: `Whether child process should be detached from parent
+          (https://nodejs.org/api/child_process.html#child_process_options_detached).`,
+      name: 'detached'
     },
     {
       class: 'String',
@@ -51,6 +55,12 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
+      documentation: `Box used for child's SocketBox reply.`,
+      name: 'replyBox_'
+    },
+    {
       name: 'child_'
     }
   ],
@@ -61,7 +71,7 @@ foam.CLASS({
       this.SUPER();
 
       this.delegate = new Promise(function(resolve, reject) {
-        this.replyBox = this.ReplyBox.create({
+        this.replyBox_ = this.ReplyBox.create({
           delegate: {
             send: function(message) {
               if ( ! this.SocketBox.isInstance(message.object) ) {
@@ -72,12 +82,12 @@ foam.CLASS({
           }
         });
       }.bind(this));
-      this.registry.register(this.replyBox.id, null, this.replyBox);
+      this.registry.register(this.replyBox_.id, null, this.replyBox_);
 
       this.child_ = require('child_process').spawn(
         this.nodePath,
         [ this.childScriptPath ],
-        { detached: true });
+        { detached: this.detached });
 
       var process = require('process');
       this.child_.stdout.pipe(process.stdout);
@@ -94,7 +104,7 @@ foam.CLASS({
       sub.detach();
       this.child_.stdin.end(
           foam.json.Network.stringify(this.SubBox.create({
-            name: this.replyBox.id,
+            name: this.replyBox_.id,
             delegate: this.SocketBox.create({
               address: `0.0.0.0:${this.socketService.port}`
             })

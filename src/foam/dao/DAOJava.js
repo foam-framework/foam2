@@ -20,6 +20,17 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'getOf',
+      javaReturns: 'foam.core.ClassInfo'
+    },
+    {
+      name: 'setOf',
+      args: [
+        { name: 'of', javaType: 'foam.core.ClassInfo' }
+      ],
+      javaReturns: 'foam.dao.DAO'
+    },
+    {
       name: 'put',
       javaReturns: 'foam.core.FObject',
       args: [
@@ -115,11 +126,11 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'limit',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -146,11 +157,11 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'limit',
-          javaType: 'Long'
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -227,7 +238,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
@@ -237,7 +248,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
@@ -272,7 +283,7 @@ foam.INTERFACE({
         {
           name: 'obj',
           javaType:  'Object'
-        },
+        }
       ]
     }
   ]

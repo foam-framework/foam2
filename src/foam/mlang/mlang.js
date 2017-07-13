@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 // TODO(braden): Port the partialEval() code over here.
@@ -100,17 +89,21 @@ foam.CLASS({
   properties: [
     {
       name: 'adapt',
-      value: function(_, o) {
-        if ( o === null )                           return foam.mlang.Constant.create({ value: null });
-        if ( ! o.f && typeof o === 'function' )     return foam.mlang.predicate.Func.create({ fn: o });
-        if ( typeof o !== 'object' )                return foam.mlang.Constant.create({ value: o });
-        if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
-        if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
-        if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
-        if ( foam.core.FObject.isInstance(o) )      return o;
+      value: function(_, o, p) { return p.adaptValue(o); }
+    }
+  ],
 
-        console.error('Invalid expression value: ', o);
-      }
+  methods: [
+    function adaptValue(o) {
+      if ( o === null )                           return foam.mlang.Constant.create({ value: null });
+      if ( ! o.f && typeof o === 'function' )     return foam.mlang.predicate.Func.create({ fn: o });
+      if ( typeof o !== 'object' )                return foam.mlang.Constant.create({ value: o });
+      if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
+      if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
+      if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
+      if ( foam.core.FObject.isInstance(o) )      return o;
+
+      console.error('Invalid expression value: ', o);
     }
   ]
 });
@@ -321,7 +314,15 @@ foam.CLASS({
     },
     {
       class: 'foam.mlang.ExprProperty',
-      name: 'arg2'
+      name: 'arg2',
+      adapt: function(old, nu, prop) {
+        var value = prop.adaptValue(nu);
+        var arg1 = this.arg1;
+        if ( foam.mlang.Constant.isInstance(value) && arg1 && arg1.adapt )
+          value.value = this.arg1.adapt.call(null, old, value.value, arg1);
+
+        return value;
+      }
     }
   ],
 
@@ -760,8 +761,42 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
-  name: 'In',
+  name: 'ArrayBinary',
   extends: 'foam.mlang.predicate.Binary',
+
+  documentation: 'Binary predicate that accepts an array in "arg2".',
+
+  properties: [
+    {
+      name: 'arg2',
+      postSet: function() {
+        this.valueSet_ = null;
+      },
+      adapt: function(old, nu, prop) {
+        var value = prop.adaptValue(nu);
+        var arg1 = this.arg1;
+        if ( foam.mlang.Constant.isInstance(value) && arg1 && arg1.adapt ) {
+          var arrayValue = value.value;
+          for ( var i = 0; i < arrayValue.length; i++ ) {
+            arrayValue[i] = arg1.adapt.call(null, old && old[i], arrayValue[i], arg1);
+          }
+        }
+
+        return value;
+      }
+    },
+    {
+      // TODO: simpler to make an expression
+      name: 'valueSet_'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
+  name: 'In',
+  extends: 'foam.mlang.predicate.ArrayBinary',
   implements: [
     'foam.core.Serializable',
     'foam.mlang.Expressions'
@@ -778,16 +813,6 @@ foam.CLASS({
         // this is slightly slower when an expression on upperCase_
         this.upperCase_ = nu && foam.core.Enum.isInstance(nu);
       }
-    },
-    {
-      name: 'arg2',
-      postSet: function() {
-        this.valueSet_ = null;
-      }
-    },
-    {
-      // TODO: simpler to make an expression
-      name: 'valueSet_'
     },
     {
       name: 'upperCase_',
@@ -828,21 +853,10 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'InIC',
-  extends: 'foam.mlang.predicate.Binary',
+  extends: 'foam.mlang.predicate.ArrayBinary',
   implements: [ 'foam.core.Serializable' ],
 
   documentation: 'Predicate returns true iff arg1 is a substring of arg2, or if arg2 is an array, is an element of arg2, case insensitive.',
-
-  properties: [
-    {
-      name: 'arg2',
-      postSet: function() { this.valueSet_ = null; }
-    },
-    {
-      // TODO: simpler to make an expression
-      name: 'valueSet_'
-    }
-  ],
 
   methods: [
     function f(o) {
@@ -1398,43 +1412,6 @@ foam.CLASS({
 });
 
 
-foam.INTERFACE({
-  package: 'foam.mlang.order',
-  name: 'Comparator',
-
-  documentation: 'Interface for comparing two values: -1: o1 < o2, 0: o1 == o2, 1: o1 > o2.',
-
-  methods: [
-    {
-      name: 'compare',
-      args: [
-        'o1',
-        'o2'
-      ]
-    },
-    {
-      name: 'toIndex',
-      args: [
-        'tail'
-      ]
-    },
-    {
-      /** Returns remaning ordering without this first one, which may be the
-        only one. */
-      name: 'orderTail'
-    },
-    {
-      /** The property, if any, sorted by this ordering. */
-      name: 'orderPrimaryProperty'
-    },
-    {
-      /** Returns 1 or -1 for ascending/descending */
-      name: 'orderDirection'
-    }
-  ]
-});
-
-
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -1672,7 +1649,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Object',
+      class: 'Double',
       name: 'value'
     }
   ],
@@ -1724,6 +1701,7 @@ foam.CLASS({
       name: 'arg1'
     },
     {
+      class: 'Double',
       name: 'value',
       value: 0
     }

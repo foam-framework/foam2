@@ -63,7 +63,14 @@ public class FileJournal
 
   public void remove(Object id, Detachable sub) {
     try {
-      bw.write("r({\"id\":" + id + "})");
+      // TODO: User Property toJSON() support when ready, since
+      // this code doesn't support multi-part keys or escaping "'s in the id.
+      if ( id instanceof String ) {
+        bw.write("r({\"id\":\"" + id + "\"})");
+      } else {
+        bw.write("r({\"id\":" + id + "})");
+      }
+
       bw.newLine();
       bw.flush();
     } catch (IOException e) {
@@ -90,15 +97,28 @@ public class FileJournal
 
     String line;
     while ( ( line = br.readLine() ) != null ) {
-      String operation = line.substring(0, 1);
-      switch (operation) {
-        case "p":
-          FObject object = journalParser.parseObject(line);
-          delegate.put(object);
-          break;
-        case "r":
-          Object id = journalParser.parseObjectId(line);
-          delegate.remove(delegate.find(id));
+      try {
+        String operation = line.substring(0, 1);
+        switch ( operation ) {
+          case "p":
+            FObject object = journalParser.parseObject(line);
+            if ( object == null ) {
+              System.err.println("Journal Error, unable to parse: " + line);
+            } else {
+              delegate.put(object);
+            }
+            break;
+          case "r":
+            Object id = journalParser.parseObjectId(line);
+            if ( id == null ) {
+              System.err.println("Journal Error, unable to parse: " + line);
+            } else {
+              delegate.remove(delegate.find(id));
+            }
+        }
+      } catch (Throwable t) {
+        System.err.println("Error reading journal line: " + line);
+        t.printStackTrace();
       }
     }
   }

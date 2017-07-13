@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.X;
@@ -9,18 +15,23 @@ import foam.dao.Sink;
 public class LimitedDAO
   extends ProxyDAO
 {
-  protected int limit_;
+  protected long limit_;
 
-  public LimitedDAO setLimit(int limit) {
+  public LimitedDAO(long limit, DAO delegate) {
+    limit_ = limit;
+    setDelegate(delegate);
+  }
+
+  public LimitedDAO setLimit(long limit) {
     limit_ = limit;
     return this;
   }
 
-  public Sink select_(X x, Sink s, Long skip, Long limit, Comparator order, Predicate predicate) {
-    return super.select_(x, s, skip, Long.valueOf(limit_), order, predicate);
+  public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+    return super.select_(x, s, skip, limit_, order, predicate);
   }
 
-  public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
-    super.removeAll_(x, skip, Long.valueOf(limit_), order, predicate);
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    super.removeAll_(x, skip, limit_, order, predicate);
   }
 }

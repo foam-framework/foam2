@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import com.google.appengine.api.datastore.*;
@@ -133,8 +139,8 @@ public class DatastoreDAO
         return obj;
     }
 
-    public Sink select_(X x, Sink sink, Long skip, Long limit, Comparator order, Predicate predicate) {
-        if (sink == null) {
+    public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+        if ( sink == null ) {
             sink = new ListSink();
         }
 
@@ -161,7 +167,7 @@ public class DatastoreDAO
         return sink;
     }
 
-    public void removeAll_(X x, Long skip, Long limit, Comparator order, Predicate predicate) {
+    public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     }
 
     public void pipe_(X x, Sink s) {

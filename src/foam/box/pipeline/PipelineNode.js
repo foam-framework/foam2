@@ -26,7 +26,7 @@ foam.CLASS({
     'foam.box.LogBox',
     'foam.box.PromisedBox',
     'foam.box.SkeletonBox',
-    'foam.nanos.log.LogLevel'
+    'foam.log.LogLevel'
   ],
   imports: [ 'defaultErrorBox?' ],
 

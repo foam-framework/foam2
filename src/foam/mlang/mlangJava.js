@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.INTERFACE({
@@ -384,36 +373,6 @@ foam.CLASS({
 });
 
 
-foam.INTERFACE({
-  refines: 'foam.mlang.order.Comparator',
-
-  methods: [
-    {
-      name: 'compare',
-      args: [
-        {
-          name: 'o1',
-          javaType: 'Object'
-        },
-        {
-          name: 'o2',
-          javaType: 'Object'
-        }
-      ]
-    },
-    {
-      name: 'toIndex',
-      javaSupport: false,
-      args: [
-        {
-          name: 'tail'
-        }
-      ]
-    }
-  ]
-});
-
-
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -440,24 +399,22 @@ foam.CLASS({
   methods: [
     {
       name: 'compare',
+      javaReturns: 'int',
+      args: [
+        {
+          name: 'o1',
+          javaType: 'Object'
+        },
+        {
+          name: 'o2',
+          javaType: 'Object'
+        }
+      ],
       javaCode: 'return -1 * getArg1().compare(o1, o2);'
     },
     {
       name: 'toString',
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return null;'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
-        'ret.setSrcOrder(this); return ret;'
     }
   ]
 });
@@ -520,14 +477,11 @@ foam.CLASS({
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: function() {
-/*if (obj.compareTo(this.getValue()) < 0) {
-  this.setValue(obj);
-}*/
-      }
+      javaCode: 'setValue(Math.max(((Number) getArg1().f(obj)).doubleValue(), getValue()));'
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Min',
@@ -551,6 +505,28 @@ foam.CLASS({
   this.setValue(obj);
 }*/
       }
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Sum',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'setValue(getValue() + (double) this.arg1_.f(obj));'
     }
   ]
 });
