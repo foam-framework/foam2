@@ -46,7 +46,7 @@ public class CronScheduler
   @Override
   public void run() {
     NanoLogger logger = (NanoLogger) getX().get("logger");
-    PM pm = new PM(this.getClass(), "");
+    PM pm = new PM(this.getClass(), "cronScheduler");
 
     try {
       while ( true ) {
