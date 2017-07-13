@@ -565,12 +565,42 @@ foam.CLASS({
   methods: [
       function createJavaPropertyInfo_(cls) {
         var info = this.SUPER(cls);
+
+        const OF = (this.of ? this.of.id ? this.of.id : this.of : null);
+
         info.method({
           name: 'of',
           visibility: 'public',
           type: 'String',
-          body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+          body: `return "${OF}";`
         });
+
+        info.method({
+          name: 'getOrdinal',
+          visibility: 'public',
+          type: 'int',
+          args: [
+            {
+                name: 'o',
+                type: 'Object'
+            }
+          ],
+          body: `return ((${OF}) o).getOrdinal();`
+        });
+
+        info.method({
+          name: 'forOrdinal',
+          visibility: 'public',
+          type: OF,
+          args: [
+            {
+                name: 'ordinal',
+                type: 'int'
+            }
+          ],
+          body: `return ${OF}.forOrdinal(ordinal);`
+        });
+
         return info;
       }
   ]
