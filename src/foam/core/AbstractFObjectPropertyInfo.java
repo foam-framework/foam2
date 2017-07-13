@@ -9,5 +9,5 @@ package foam.core;
 public abstract class AbstractFObjectPropertyInfo
   extends AbstractObjectPropertyInfo
 {
-  public abstract String of();
+  public abstract String getOf();
 }

@@ -555,7 +555,7 @@ foam.CLASS({
       }
 
       info.method({
-        name: 'of',
+        name: 'getOf',
         visibility: 'public',
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
@@ -579,7 +579,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       info.method({
-        name: 'of',
+        name: 'getOf',
         visibility: 'public',
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
@@ -689,7 +689,7 @@ foam.CLASS({
       compare.body = this.compareTemplate();
 
       info.method({
-        name: 'of',
+        name: 'getOf',
         visibility: 'public',
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
@@ -849,7 +849,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       info.method({
-        name: 'of',
+        name: 'getOf',
         visibility: 'public',
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
