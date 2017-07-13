@@ -60,13 +60,12 @@ public class AltIndex implements Index {
 
     return s;
   }
-  
+
   public Object get(Object state, Object key) {
     Object[] s = toObjectArray(state);
     return this.delegates_.get(0).planFind(s[0], key).find(s[0], key);
-//    return planFind(state, key).find(state, key);
   }
-  
+
   public FindPlan planFind(Object state, Object key) {
     Object[] s = toObjectArray(state);
     Plan bestPlan = NoPlan.instance();
