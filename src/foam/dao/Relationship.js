@@ -377,5 +377,11 @@ foam.CLASS({
       name: 'view',
       value: { class: 'foam.comics.RelationshipView' },
     },
-  ],
+    {
+      name: 'comparePropertyValues',
+      documentation: `Relationships cannot be compared synchronously. Ignore
+          them during synchronous comparison.`,
+      value: function() { return 0; }
+    }
+  ]
 });
