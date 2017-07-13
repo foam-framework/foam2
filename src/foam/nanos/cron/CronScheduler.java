@@ -45,7 +45,7 @@ public class CronScheduler
           cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, dtnow)).select(new AbstractSink() {
             @Override
             public void put(FObject obj, Detachable sub) {
-              ((Cron) obj).runScript();
+              ((Cron) obj).runScript(getX());
               cronDAO_.put(obj);
             }
           });

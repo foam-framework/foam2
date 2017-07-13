@@ -186,8 +186,12 @@ foam.CLASS({
         throw new Error('Expected ArraySink from REST endpoint when proxying local sink');
 
       if ( localSink.put ) {
+        var sub = foam.core.FObject.create();
+        var detached = false;
+        sub.onDetach(function() { detached = true; });
         for ( var i = 0; i < array.length; i++ ) {
-          localSink.put(array[i]);
+          localSink.put(array[i], sub);
+          if ( detached ) break;
         }
       }
       if ( localSink.eof ) localSink.eof();
