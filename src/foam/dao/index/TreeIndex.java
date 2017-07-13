@@ -53,13 +53,6 @@ public class TreeIndex implements Index {
     return null;
   }
 
-  public Object get(Object state, FObject obj) {
-    if ( state != null ) {
-      return ((TreeNode) state).get(((TreeNode) state), obj, prop_);
-    }
-    return null;
-  }
-
   public Object put(Object state, FObject value) {
     if ( state == null ) {
       state = TreeNode.getNullNode();
@@ -71,14 +64,14 @@ public class TreeIndex implements Index {
   public Object remove(Object state, FObject value) {
     return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
   }
-
+ 
   public Object removeAll() {
     return TreeNode.getNullNode();
   }
-
+  
   //TODO
   public FindPlan planFind(Object state, Object key) {
-    return (FindPlan) ValuePlan.instance();
+    return new TreePlan(prop_);
   }
 
   //TODO
