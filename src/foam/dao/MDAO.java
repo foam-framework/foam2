@@ -50,12 +50,11 @@ public class MDAO extends AbstractDAO {
     }
     return obj;
   }
-  
+
   public FObject find_(X x, Object o) {
     if ( o == null ) {
       return null;
     }
-    PropertyInfo p = getPrimaryKey();
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
         ? (FObject)index_.get(state_,getPrimaryKey().get(o))
