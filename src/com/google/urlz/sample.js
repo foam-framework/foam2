@@ -52,7 +52,7 @@ b.do(
 
 
 // Potential Transaction building ---------------
-// A context or state that is passed down might make variable-scoping easier
+// With a context or state that is passed down might make variable-scoping easier
 
 // o.a = b.a
 // b.foo()
@@ -60,14 +60,88 @@ b.do(
 // o.commit()
 
 o.do(
-  Scope(Fetch(b.url_), o, // scope is passed down and serialized as needed
-    AllOf(// ordering? serial, parallel, any order...
+  Scope({ 'b': Fetch(b.url_), 'o': o }, // scope is passed down and serialized as needed
+    Do(
       Set(A_PROP_A, 
           With(Scoped(b.url_), B_PROP_A)
       ),
-      With(Scoped(b.url_), Commit()), // maybe shorter With(Scoped(...)) syntax
-      With(Scoped(o.url_), Commit()),
-      Return(Scoped(o.url_)) // a With() that takes no subsequent op, "returning" the given value into the next .f()
+      With(Scoped('b'), // maybe shorter With(Scoped(...)) syntax
+        Do(
+          Call('foo'),
+          Commit()
+        )
+      )
+      With(Scoped('o'), Commit()),
+      Return(Scoped('o')) // a With() that takes no subsequent op, "returning" the given value into the next .f()
     )
   )
 )
+
+// functors pass through a target object and a scope for sharing temporary objects
+Functor.f(object, scope)
+
+// things in scope are also Functors, such as Constant
+Scope(scope, delegate)
+Scope.f(obj, scope) {
+  let childScope = this.scope;
+  if (scope) {
+    childScope = Object.create(scope);
+    for (key in this.scope) {
+      childScope[key] = this.scope[key];
+    }
+  }
+  return delegate.f(obj, childScope);
+}
+
+// async so we can fetch. Avoid? Deps loaded at start instead? What about commit?
+// maybe just fast cheater thenables that don't wait for next frame
+With(withObj, delegate)
+With.f(obj, scope) {
+  return withObj.f(obj, scope).then(function(o) {
+    return delegate.f(o, scope);
+  });
+}
+
+Scoped(name, delegate)
+Scoped.f(obj, scope) {
+  return scope[name].f(obj, scope);
+}
+
+Commit()
+Commit.f(obj, scope) {
+  return obj.commit();
+  // or this.context.commit(obj)?
+}
+
+If(predicate, trufe, falsey)
+// Might be getting too crazy with loops
+While(predicate, delegate)
+
+Select(pred, order, delegate) // delegate runs on each query result
+Select(obj, scope) {
+  if (obj.select) {
+    return obj.select... // is this just a Call()?
+  }
+  // or fall back on manual eval of collection
+  // if array sort, then pred each item
+  scope = Object.create(scope);
+  scope.__select__ = {};
+  var promises = [];
+  for (key in obj) {
+    var o = obj[key];
+    // async predicates make a mess of ordering. Either make them sync, or convey ordering elsewhere.
+    promises.push(this.pred.f(o, scope).then(function(b) { return b ? this.delegate.f(o, scope) : undefined; })
+  }
+  return Promose.all(promises);
+}
+
+Skip(num)
+Skip.f(obj, scope) {
+  // init scope.__select__ if needed
+  function doSkip(count) {
+    this.num.f(obj, scope).then(function(num) { // async predicates being difficult again
+      return count > num;
+    })
+  }
+  doSkip(++(scope.__select__.skip)); // count recorded in the order called
+}
