@@ -16,6 +16,8 @@ public abstract class AbstractEnumPropertyInfo
   extends AbstractObjectPropertyInfo {
 
   public abstract String of();
+  public abstract int getOrdinal(Object o);
+  public abstract java.lang.Enum forOrdinal(int ordinal);
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
@@ -23,22 +25,21 @@ public abstract class AbstractEnumPropertyInfo
     try {
 
       while ( reader.hasNext() ) {
-        int eventType;
-        eventType = reader.next();
-        switch ( eventType ) {
+        switch ( reader.getEventType() ) {
           case XMLStreamConstants.START_ELEMENT:
             // Enum Specific Case
-            if ( reader.getLocalName() == "ordinal" ) {
-              Class cls =  Class.forName(this.of());
+            if ( reader.getLocalName() == this.getName() ) {
               reader.next();
               Integer ordinalVal = Integer.parseInt(reader.getText());
-              return ((java.lang.Class<Enum>)cls).getEnumConstants()[ordinalVal];
+              return this.forOrdinal(ordinalVal);
             }
           case XMLStreamConstants.END_ELEMENT:
             break;
         }
+        reader.next();
       }
-    } catch ( ClassNotFoundException | XMLStreamException ex) {
+    } catch (XMLStreamException ex) {
+
     }
     return obj;
   }
@@ -47,11 +48,9 @@ public abstract class AbstractEnumPropertyInfo
   public void toXML(FObject obj, Document doc, Element objElement) {
     Object nestObj = this.f(obj);
     Element objTag = doc.createElement(this.getName());
+    int ordVal = this.getOrdinal(nestObj);
+    objTag.appendChild(doc.createTextNode(Integer.toString(ordVal)));
     objElement.appendChild(objTag);
-    Element enumElement = doc.createElement("ordinal");
-    String ordVal = Integer.toString(((Enum) nestObj).ordinal());
-    enumElement.appendChild(doc.createTextNode(ordVal));
-    objTag.appendChild(enumElement);
   }
 }
 

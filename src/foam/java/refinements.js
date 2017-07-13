@@ -569,11 +569,12 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ],
+  
   methods: [
       function createJavaPropertyInfo_(cls) {
         var info = this.SUPER(cls);
 
-        const OF = (this.of ? this.of.id ? this.of.id : this.of : null);
+        const OF = ( this.of ? this.of.id ? this.of.id : this.of : null );
 
         info.method({
           name: 'of',
@@ -588,8 +589,8 @@ foam.CLASS({
           type: 'int',
           args: [
             {
-                name: 'o',
-                type: 'Object'
+              name: 'o',
+              type: 'Object'
             }
           ],
           body: `return ((${OF}) o).getOrdinal();`
@@ -601,8 +602,8 @@ foam.CLASS({
           type: OF,
           args: [
             {
-                name: 'ordinal',
-                type: 'int'
+              name: 'ordinal',
+              type: 'int'
             }
           ],
           body: `return ${OF}.forOrdinal(ordinal);`
