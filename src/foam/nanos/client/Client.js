@@ -28,7 +28,8 @@ foam.CLASS({
     'foam.nanos.menu.Menu',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test',
-    'foam.nanos.auth.AuthService'
+    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.ClientAuthService'
   ],
 
   exports: [
@@ -43,10 +44,24 @@ foam.CLASS({
     'regionDAO',
     'scriptDAO',
     'testDAO',
-    'userDAO'
+    'userDAO',
+    'auth'
   ],
 
   properties: [
+    {
+      name: 'auth',
+      factory: function() {
+        return this.ClientAuthService.create({
+          delegate: this.HTTPBox.create({
+            method: 'POST',
+            url: 'http://localhost:8080/auth'
+          })
+        });
+      }
+    },
+
+
     {
       name: 'nSpecDAO',
       factory: function() {
