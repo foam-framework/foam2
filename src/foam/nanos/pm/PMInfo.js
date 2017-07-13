@@ -15,27 +15,40 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'clsname'
+      name: 'clsname',
+      label: 'Class'
     },
     {
       class: 'String',
-      name: 'pmname'
+      name: 'pmname',
+      label: 'Name'
     },
     {
       class: 'Long',
-      name: 'mintime'
+      name: 'mintime',
+      label: 'Min'
     },
     {
       class: 'Long',
-      name: 'maxtime'
+      name: 'average',
+      label: 'Avg',
+      getter: function() { return (this.totaltime / this.numoccurrences).toFixed(2); },
+      transient: true
     },
     {
       class: 'Long',
-      name: 'totaltime'
+      name: 'maxtime',
+      label: 'Max'
+    },
+    {
+      class: 'Long',
+      name: 'totaltime',
+      label: 'Total'
     },
     {
       class: 'Int',
-      name: 'numoccurrences'
+      name: 'numoccurrences',
+      label: 'Count'
     }
   ]
 });

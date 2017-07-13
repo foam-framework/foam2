@@ -31,6 +31,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'me',
     'registry',
     'socketService'
   ],
@@ -77,7 +78,8 @@ foam.CLASS({
               if ( ! this.SocketBox.isInstance(message.object) ) {
                 reject(new Error('ForkBox failed to bind to child socket'));
               }
-              resolve(message.object);
+              resolve(this.registry.register(
+                  message.object.name, null, message.object));
             }.bind(this)
           }
         });
@@ -106,6 +108,7 @@ foam.CLASS({
           foam.json.Network.stringify(this.SubBox.create({
             name: this.replyBox_.id,
             delegate: this.SocketBox.create({
+              name: this.me.name,
               address: `0.0.0.0:${this.socketService.port}`
             })
           }),

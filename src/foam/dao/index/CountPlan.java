@@ -1,7 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.dao.index;
 
@@ -18,9 +18,10 @@ public class CountPlan implements SelectPlan
 
   public long cost() { return 0; }
 
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     ((Count) sink).setValue(count_);
   }
 
   public String toString() { return "short-circuit-count(" + count_ + ")"; }
+
 }

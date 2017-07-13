@@ -51,11 +51,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'serviceInterface'
+      name: 'serviceClass'
     },
     {
       class: 'String',
-      name: 'serviceClass'
+      name: 'boxClass'
     },
     {
       class: 'String',

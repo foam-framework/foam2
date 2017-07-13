@@ -7,11 +7,17 @@
 package foam.nanos.http;
 
 import com.sun.net.httpserver.*;
+import foam.box.*;
 import foam.core.*;
-import foam.dao.DAO;
+import foam.dao.*;
 import foam.nanos.*;
+import foam.nanos.boot.NSpec;
+import foam.nanos.logger.NanoLogger;
+import foam.nanos.pm.PM;
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServlet;
 
 public class NanoHttpHandler
@@ -19,57 +25,85 @@ public class NanoHttpHandler
   implements HttpHandler
 {
 
+  protected Map<String, HttpHandler> handlerMap_ = new ConcurrentHashMap();
+
   public NanoHttpHandler(X x) {
     x_ = x;
   }
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {
-    URI    requestURI = exchange.getRequestURI();
-    String path       = requestURI.getPath();
-    String query      = requestURI.getQuery();
+    URI         requestURI = exchange.getRequestURI();
+    String      path       = requestURI.getPath();
+    String      query      = requestURI.getQuery();
+  //AuthService auth       = this.X.get("authService");
+    String[]    urlParams  = path.split("/");
+    String      serviceKey = urlParams[1];
+    Object      service    = getX().get(serviceKey);
+    DAO         nSpecDAO   = (DAO) getX().get("nSpecDAO");
+    NSpec       spec       = (NSpec) nSpecDAO.find(serviceKey);
+    NanoLogger  logger     = (NanoLogger) getX().get("logger");
 
-    // AuthService auth = this.X.get(AuthService);
+    logger.info(this.getClass(), "HTTP Request", path, serviceKey);
+    // System.out.println("HTTP Request: " + path + ", " + serviceKey);
 
-    String[] urlParams = path.split("/");
+    HttpHandler handler = getHandler(spec, service);
 
-    /*
-     * Get the item right after the first slash
-     * E.g.: /foo/bar => ['', 'foo', 'bar']
-    */
-    String serviceKey = urlParams[1];
-    Object service    = x_.get(serviceKey);
+    // if ( auth.checkPermission(...) ) {}
 
-    System.out.println("HTTP Request: " + path + ", " + serviceKey);
+    if ( handler != null ) {
+      PM pm = new PM(this.getClass(), serviceKey);
 
-    if ( service instanceof HttpHandler ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      ((HttpHandler) service).handle(exchange);
-    } if ( service instanceof HttpServlet ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      this.handleServlet((HttpServlet) service, exchange);
-    } if ( service instanceof WebAgent ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      if ( service instanceof ContextAware ) ((ContextAware) service).setX(this.getX());
-
-      this.handleServlet(new WebAgentServlet((WebAgent) service), exchange);
-    } if ( service instanceof DAO ) {
-      // todo auth check, server==true check
-
-      this.handleServlet(new ServiceServlet(service), exchange);
-    } else {
-      String errorMsg = "Service " + serviceKey + " does not have a HttpHandler";
-
-      throw new RuntimeException(errorMsg);
+      try {
+        handler.handle(exchange);
+      } finally {
+        pm.log(getX());
+      }
     }
   }
 
-  public void handleServlet(HttpServlet s, HttpExchange exchange) throws IOException {
-    if ( s instanceof ContextAware ) ((ContextAware) s).setX(this.getX());
+  public HttpHandler getHandler(NSpec spec, Object service) {
+    if ( spec == null ) return null;
 
-    new ServletHandler(s).handle(exchange);
+    if ( ! handlerMap_.containsKey(spec.getName()) ) {
+      handlerMap_.put(spec.getName(), createHandler(spec, service));
+    }
+
+    return handlerMap_.get(spec.getName());
+  }
+
+  public HttpHandler createHandler(NSpec spec, Object service) {
+    if ( spec.getServe() ) {
+      try {
+        Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
+          Class.forName(spec.getBoxClass()) :
+          DAOSkeleton.class ;
+        Skeleton skeleton = (Skeleton) cls.newInstance();
+
+        skeleton.setDelegateObject(service);
+
+        service = new ServiceServlet(service, skeleton);
+      } catch (IllegalAccessException e) {
+      } catch (ClassNotFoundException e) {
+      } catch (InstantiationException e) {
+      }
+    }
+
+    if ( service instanceof ContextAware ) ((ContextAware ) service).setX(getX());
+
+    if ( service instanceof WebAgent ) service = new WebAgentServlet((WebAgent) service);
+
+    if ( service instanceof ContextAware ) ((ContextAware ) service).setX(getX());
+
+    if ( service instanceof HttpServlet  ) service = new ServletHandler((HttpServlet) service);
+
+    if ( service instanceof ContextAware ) ((ContextAware ) service).setX(getX());
+
+    if ( service instanceof HttpHandler ) return (HttpHandler) service;
+
+    NanoLogger logger = (NanoLogger) getX().get("logger");
+    logger.error(this.getClass(), spec.getName() + " does not have an HttpHandler.");
+
+    return null;
   }
 }
