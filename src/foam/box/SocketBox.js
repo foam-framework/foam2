@@ -32,6 +32,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'name'
+    },
+    {
       name: 'address'
     },
     {

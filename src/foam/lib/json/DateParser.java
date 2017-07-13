@@ -8,25 +8,28 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class DateParser extends ProxyParser {
+public class DateParser
+  extends ProxyParser
+{
   public DateParser() {
-    super(new Seq(
-                  new Literal("\""),
-                  new IntParser(),
-                  new Literal("-"),
-                  new IntParser(),
-                  new Literal("-"),
-                  new IntParser(),
-                  new Literal("T"),
-                  new IntParser(),
-                  new Literal(":"),
-                  new IntParser(),
-                  new Literal(":"),
-                  new IntParser(),
-                  new Literal("."),
-                  new Repeat(new Chars("0123456789")),
-                  new Literal("Z"),
-                  new Literal("\"")));
+    super(new Alt(new LongParser(), 
+                  new Seq(
+                    new Literal("\""),
+                    new IntParser(),
+                    new Literal("-"),
+                    new IntParser(),
+                    new Literal("-"),
+                    new IntParser(),
+                    new Literal("T"),
+                    new IntParser(),
+                    new Literal(":"),
+                    new IntParser(),
+                    new Literal(":"),
+                    new IntParser(),
+                    new Literal("."),
+                    new Repeat(new Chars("0123456789")),
+                    new Literal("Z"),
+                    new Literal("\""))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -37,20 +40,26 @@ public class DateParser extends ProxyParser {
 
     System.out.println("Succcess.");
 
-    Object[] result = (Object[])ps.value();
+    // Checks if Long Date (Timestamp from epoch)
+    if ( ps.value() instanceof java.lang.Long ) {
+      return ps.setValue(new java.util.Date((java.lang.Long) ps.value()));
+    }
 
-    // TODO: Handle sub-milisecond accuracy, either with java 8 java.time pacakge or some custom type
+    Object[] result = (Object[]) ps.value();
+
+    // TODO: Handle sub-millisecond accuracy, either with java 8 java.time package or some custom type
     // to support java 7
 
     java.util.Calendar c = new java.util.GregorianCalendar(java.util.TimeZone.getTimeZone("UTC"));
+    
     c.clear();
     c.set(
-          (Integer)result[1],
-          (Integer)result[3] - 1, // Java calendar uses zero-indexed months
-          (Integer)result[5],
-          (Integer)result[7],
-          (Integer)result[9],
-          (Integer)result[11]);
+          (Integer) result[1],
+          (Integer) result[3] - 1, // Java calendar uses zero-indexed months
+          (Integer) result[5],
+          (Integer) result[7],
+          (Integer) result[9],
+          (Integer) result[11]);
 
     // TODO: There has to be a better way to do this.
     StringBuilder nanoseconds = new StringBuilder();
