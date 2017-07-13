@@ -27,7 +27,10 @@ public class ScriptRunnerDAO
   public FObject put_(X x, FObject obj) {
     Script script = (Script) obj;
 
-    if ( script.getScheduled() ) script.runScript();
+    if ( script.getScheduled() ) {
+      script.runScript(getX());
+      script.setScheduled(false);
+    }
 
     return getDelegate().put_(x, obj);
   }
