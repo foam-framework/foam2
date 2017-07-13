@@ -47,6 +47,12 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'getOf',
+      javaReturns: 'foam.core.ClassInfo',
+      javaCode: 'if ( of_ == null && getDelegate() != null ) return getDelegate().getOf(); return of_;'
+    },
+
     function listen_(x, sink, predicate) {
       var listener = this.ProxyListener.create({
         delegate: sink,
@@ -114,6 +120,7 @@ foam.CLASS({
     },
     {
       name: 'a',
+      transient: true,
       getter: function() {
         this.warn('Use of deprecated ArraySink.a');
         return this.array;

@@ -38,6 +38,14 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaGetter'
+    },
+    {
+      class: 'String',
+      name: 'javaSetter'
+    },
+    {
+      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -51,13 +59,13 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls: cls,
-        propName: this.name,
-        propType: this.javaType,
+        sourceCls:    cls,
+        propName:     this.name,
+        propType:     this.javaType,
         propRequired: this.required,
-        jsonParser: this.javaJSONParser,
-        extends: this.javaInfoType,
-        transient: this.transient
+        jsonParser:   this.javaJSONParser,
+        extends:      this.javaInfoType,
+        transient:    this.transient
       })
     },
 
@@ -87,12 +95,12 @@ foam.CLASS({
           name: 'get' + capitalized,
           type: this.javaType,
           visibility: 'public',
-          body: 'if ( ! ' + isSet + ' ) {\n' +
+          body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
             ( this.hasOwnProperty('javaFactory') ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
-            'return ' + privateName + ';'
+            'return ' + privateName + ';')
         }).
         method({
           name: 'set' + capitalized,
@@ -104,8 +112,7 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: privateName + ' = val;\n'
-              + isSet + ' = true;'
+          body: this.javaSetter || (privateName + ' = val;\n' + isSet + ' = true;')
         });
 
       if ( this.hasOwnProperty('javaFactory') ) {
@@ -275,6 +282,40 @@ foam.CLASS({
           };
         }),
         body: this.javaCode ? this.javaCode : ''
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Constant',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'Object',
+      name: 'value',
+    },
+    {
+      class: 'String',
+      name: 'documentation'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      cls.constant({
+        name:  this.name,
+        type:  this.type || undefined,
+        value: this.value,
+        documentation: this.documentation || undefined
       });
     }
   ]
