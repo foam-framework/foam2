@@ -75,7 +75,7 @@ foam.CLASS({
       name: 'delegate',
       documentation: 'Handles all non-dedicated worker requests.',
       required: true,
-      factory: function() { return this.registry; }
+      //factory: function() { return this.registry; }
     },
     {
       name: 'dedicatedWorkers_',
@@ -109,21 +109,18 @@ foam.CLASS({
       // Redirecting all registers of following statements with our registry.
       // If this is not done, this register method will be called recursively,
       // and registrations will be forwarded to delegate.
-      var clone = this.clone();
-      clone.register = this.SUPER;
-      var ctx = this.__context__.createSubContext({
-        registry: clone,
-        registerWorker: this.dedicatedWorkers_[key].register
-      });
+      var oldReg = this.register;
+      this.register = this.SUPER;
 
       if ( ! this.dedicatedWorkers_[key] )
         this.dedicatedWorkers_[key] = this.stubFactory_.create({
-          delegate: this.workerFactory(null, ctx)
-        }, ctx);
+          delegate: this.workerFactory(null, this)
+        }, this);
 
-      var ret = ctx.registerWorker(name, service, box);
+      var ret = this.dedicatedWorkers_[key].register(name, service, box);
 
       // Register is set back to this method for future calls.
+      this.register = oldReg;
       return ret;
     },
     function unregister(name) {
