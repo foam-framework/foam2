@@ -28,7 +28,7 @@ public class NanoHttpHandler
   protected Map<String, HttpHandler> handlerMap_ = new ConcurrentHashMap();
 
   public NanoHttpHandler(X x) {
-    x_ = x;
+    setX(x);
   }
 
   @Override
@@ -79,6 +79,8 @@ public class NanoHttpHandler
           Class.forName(spec.getBoxClass()) :
           DAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
+
+        if ( skeleton instanceof ContextAware ) ((ContextAware) skeleton).setX(getX());
 
         skeleton.setDelegateObject(service);
 
