@@ -8,18 +8,19 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
-import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
 
 public interface Index {
   // Called when an Index is added
   public void onAdd(Sink sink);
 
   public Object put(Object state, FObject value);
+  public Object get(Object state, FObject obj);
   public Object remove(Object state, FObject value);
   public Object removeAll();
   public FindPlan planFind(Object state, Object key);
-  public SelectPlan planSelect(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate);
+  public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate);
   public long size(Object state);
 
   // Future:
