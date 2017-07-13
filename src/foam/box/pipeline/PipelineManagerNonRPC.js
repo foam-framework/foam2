@@ -18,7 +18,7 @@
 
 foam.CLASS({
   package: 'foam.box.pipeline',
-  name: 'PipelineBuilder',
+  name: 'PipelineManager',
 
   requires: [
     'foam.box.Box',
@@ -40,7 +40,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
-      of: 'foam.box.pipeline.PipelineBuilder',
+      of: 'foam.box.pipeline.PipelineManager',
       name: 'delegates',
       postSet: function(old, nu) {
         var pl = this.pipeline;
