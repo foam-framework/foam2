@@ -73,7 +73,6 @@ foam.CLASS({
       ctx = ctx || o;
 
       for ( var key in data ) {
-        if ( key === 'owner' ) debugger;
         if ( ! data.hasOwnProperty(key) ) continue;
         o[key] = this.liftData_(data[key], ctx);
       }
