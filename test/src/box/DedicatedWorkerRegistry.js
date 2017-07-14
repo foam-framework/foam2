@@ -22,7 +22,6 @@ describe('dedicated worker registry', function() {
   var LogBox;
 
   beforeEach(function() {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 2147483647;
     foam.CLASS({
       package: 'foam.box.DedicatedWorkerRegistry.Test',
       name: 'MockRegistry',

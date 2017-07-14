@@ -34,7 +34,7 @@ foam.CLASS({
       getDedicatedWorkerKey: function(box) {
         return box.serviceName;
       }
-    }, ctx.registry);
+    }, ctx);
 
     // A service that requires dedicated worker.
     var service = Service.create();
@@ -119,7 +119,8 @@ foam.CLASS({
     },
     function register(name, service, box) {
       // Determine if this name has been registered previously.
-      if ( this.getRegisteredNames().includes(name) )
+      // TODO: Replace with .includes() once NodeJS 6+ is required
+      if ( this.getRegisteredNames().indexOf(name) > -1 )
         throw this.NameAlreadyRegisteredException({ name: name });
 
       var key = this.getDedicatedWorkerKey(box);
