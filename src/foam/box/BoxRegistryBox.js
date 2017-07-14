@@ -45,7 +45,7 @@ foam.CLASS({
         if ( this.SubBoxMessage.isInstance(msg.object) ) {
           var name = msg.object.name;
 
-          if ( this.registry[name].localBox ) {
+          if ( this.registry[name] && this.registry[name].localBox ) {
             // Unpack sub box object... is this right?
             msg.object = msg.object.object;
             this.registry[name].localBox.send(msg);

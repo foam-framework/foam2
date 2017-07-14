@@ -18,8 +18,8 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'DedicatedWorkerRegistry',
-  extends: 'foam.box.BoxRegistryBox',
-  implements: [ 'foam.box.ProxyBox' ],
+  extends: 'foam.box.ProxyBox',
+  implements: [ 'foam.box.BoxRegistryBox' ],
 
   documentation: `A registry used to manage dedicated worker instances. The
     registry will instantiate a worker for services that require dedicate
@@ -47,12 +47,16 @@ foam.CLASS({
   requires: [
     'foam.core.StubFactorySingleton',
     'foam.box.BoxRegistry',
+    'foam.box.NameAlreadyRegisteredException',
     'foam.box.node.ForkBox'
   ],
 
-  imports: [ 'registry? as ctxRegistry' ],
-
   exports: [ 'as registry' ],
+
+  constants: {
+    DEDICATED: 0,
+    DELEGATED: 1
+  },
 
   properties: [
     {
@@ -77,18 +81,21 @@ foam.CLASS({
       name: 'delegate',
       documentation: 'Handles all non-dedicated worker requests.',
       required: true,
-      factory: function() { return this.ctxRegistry; }
+    },
+    {
+      name: 'localRegistry',
+      documentation: 'Handles registration of all dedicated worker requests.',
+      factory: function() {
+        // TODO: Creating a context just to get a BoxRegistryBox seems
+        // excessive. But, we cannot create a BoxRegistryBox without a context
+        // at the moment.
+        return foam.box.Context.create().registry;
+      }
     },
     {
       name: 'dedicatedWorkers_',
       documentation: `Map of BoxRegistryStub used for registering box
         on the dedicated service worker.`,
-      factory: function() { return {}; }
-    },
-    {
-      name: 'registeredNames_',
-      documentation: `Map of the names of registrations and whether the
-        box was registered under dedicated registry or delegate registry.`,
       factory: function() { return {}; }
     },
     {
@@ -103,46 +110,46 @@ foam.CLASS({
 
   methods: [
     function register(name, service, box) {
-      // Deter
-      
+      // Determine if this name has been registered previously.
+      //if ( this.registeredNames_[name] )
+      //  throw this.NameAlreadyRegisteredException({ name: name });
+
       var key = this.getDedicatedWorkerKey(box);
+      if ( ! key )
+        return this.delegate.register(name, service, box);
 
 
-
-
-      var ret;
-      if ( ! key ) {
-        ret = this.delegate.register(name, service, box);
-      }
-
-      // Redirecting all registers of following statements with our registry.
-      // If this is not done, this register method will be called recursively,
-      // and registrations will be forwarded to delegate.
+      // Reroute localRegistry's send method? ...
       if ( ! this.dedicatedWorkers_[key] )
         this.dedicatedWorkers_[key] = this.stubFactory_.create({
-          delegate: this.workerFactory(null, ctx)
-        }, ctx);
+          delegate: this.workerFactory(null, this.localRegistry)
+        }, this.localRegistry);
 
-      var ret = this.dedicatedWorkers_[key].register(name, service, box);
-      // Register is set back to this method for future calls.
-      return ret;
+      // Perform registration in remote box.
+      return this.dedicatedWorkers_[key].register(name, service, box);
     },
     function unregister(name) {
-      // Attempt to unregister in our registry, then delegate registry
-      this.SUPER(name);
+      // Determine name of the box and which registry to remove from.
+      // Attempt to unregister in our registry, then delegate registry.
+      this.localRegistry.unregister(name);
       this.delegate.unregister(name);
+      /*
+      if ( this.localRegistry.registry[name] ) {
+        this.localRegistry.unregister(name);
+      } else if ( this.delegate.registry[name] ) {
+        this.delegate.unregister(name);
+      }
+      */
     },
     function send(msg) {
       // Determine if we have a registration for box.
       // If not, forward to delegate and let it handle.
-      if ( this.SubBoxMessage.isInstance(msg.object) ) {
-        var name = msg.object.name;
-        if ( this.registry[name] && this.registry[name].localBox ) {
-          this.SUPER(msg);
-          return;
-        }
+      var name = msg.object.name;
+      if ( this.localRegistry.registry[name] ) {
+        this.localRegistry.send(msg);
+      } else if ( this.delegate.registry[name] ) {
+        this.delegate.send(msg);
       }
-      this.delegate.send(msg);
     }
   ]
 });
