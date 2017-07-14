@@ -21,18 +21,20 @@ foam.CLASS({
   name: 'JSONFetcher',
 
   requires: [
-    'com.google.urlz.DObjectLocal',
+    'com.google.urlz.DObjectRemote',
     'com.google.urlz.functors.Error',
     'foam.net.HTTPRequest'
   ],
 
   properties: [
     'url',
-    'dataPath'
+    'dataPath',
+    [ 'baseDObjectClsName', 'DObjectCached' ]
   ],
 
   methods: [
     function fetch() {
+      console.log('Fetch', this.url);
       return this.HTTPRequest.create({
         responseType: 'json',
         headers: {
@@ -42,11 +44,11 @@ foam.CLASS({
         url: this.url
       }).send().then(this.onResponse, this.onError);
     },
-    function getCls(o, remote) {
-      remote = remote ? 'Remote' : 'Local';
+    function getCls(o) {
+      var baseName = this.baseDObjectClsName;
       var pkg = 'com.google.urlz';
       var ps = Object.keys(o).sort();
-      var name = `DObject${remote}_${ps.join('_')}`;
+      var name = `${baseName}_${ps.join('_')}`;
       var id = `${pkg}.${name}`;
       var cls = this.lookup(id, true);
       if ( cls ) return cls;
@@ -54,8 +56,7 @@ foam.CLASS({
       foam.CLASS({
         package: pkg,
         name: name,
-        extends: `com.google.urlz.DObject${remote}`,
-        exports: remote ? [ 'as src__' ] : [],
+        extends: `com.google.urlz.${baseName}`,
 
         properties: ps
       });
@@ -65,10 +66,12 @@ foam.CLASS({
       var type = foam.typeOf(data);
       if ( type !== foam.Object ) return data;
 
-      var cls = this.getCls(data, !! ctx);
+      var cls = this.getCls(data);
       var o = cls.create(null, ctx || this.__subContext__.createSubContext({
-        Fetch: this.fetch.bind(this),
-        src__: this.url
+        src__: this.DObjectRemote.create(null, this.__subContext__.createSubContext({
+          Fetch: this.fetch.bind(this),
+          src__: this.url
+        }))
       }));
       ctx = ctx || o;
 
@@ -98,6 +101,7 @@ foam.CLASS({
       } else if ( path ) {
         data = data[path];
       }
+
       return this.liftData_(data);
     },
     function onHTTPError(response) {

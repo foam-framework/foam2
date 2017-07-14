@@ -35,8 +35,8 @@ foam.INTERFACE({
 })
 
 foam.INTERFACE({
-  package: 'com.google.urlz',
   name: 'FunctorSync',
+  package: 'com.google.urlz',
   methods: [
     {
       name: 'fsync'
@@ -76,7 +76,7 @@ foam.INTERFACE({
   methods: [
     { name: 'run' }
   ]
-})
+});
 
 foam.CLASS({
   name: 'DObjectLocal',
@@ -127,6 +127,47 @@ foam.CLASS({
     function toSync() {
       return com.google.urlz.functors.Error.create({ message: "Remote object cannot toSync()" });
     }
+  ]
+});
+
+foam.CLASS({
+  name: 'DObjectCached',
+  package: 'com.google.urlz',
+
+  extends: 'com.google.urlz.DObjectLocal',
+  implements: [
+    'com.google.urlz.Functor'
+  ],
+
+  requires: [
+    'com.google.urlz.DObjectLocal',
+    'com.google.urlz.DObjectRemote',
+    'com.google.urlz.Error',
+  ],
+
+  properties: [
+    {
+      class: 'Date',
+      name: 'expiry__',
+      factory: function() {
+        // Expire in a minute.
+        return new Date(Date.now() + ( 60 * 1000 ) );
+      }
+    }
+  ],
+
+  methods: [
+    function f(obj, scope) {
+      return this.expired_() ? this.src__.f(obj, scope) :
+          this.SUPER(obj, scope);
+    },
+    function run(functor) {
+      return this.expired_() ? this.src__.run(functor) : this.SUPER(functor);
+    },
+    function toSync() {
+      return this.expired_() ? this.src__.toSync() : this.SUPER();
+    },
+    function expired_() { return Date.now() > this.expiry__.getTime(); }
   ]
 });
 
