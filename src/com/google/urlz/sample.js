@@ -99,11 +99,52 @@ foam.CLASS({
         Promise.all(ps).then(results => 
           obj[method].apply(results)));
     },
+    function fsync(obj, scope) {
+      return obj[methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
+    }
   ],
 });
 
+foam.INTERFACE({
+  name: 'Collection',
+  package: 'com.google.urlz',
+  
+  methods: [
+    'create', 'read', 'update', 'delete',
+    'enumerator' // returns Functor
+  ]
+})
+foam.CLASS({
+  name: 'MapEnumerator', // for use with MapCollection
+  package: 'com.google.urlz',
+  
+  properties: [
+    'delegate'
+  ],
+  
+  methods: [
+    function f(obj, scope) {
+      for (key in obj.map) {
+        this.delegate.f(obj.map[key]);
+      }
+    }
+  ]
+})
 
-
+foam.CLASS({
+  name: 'Select',
+  package: 'com.google.urlz',
+  
+  properties: ['delegate'],
+  
+  methods: [
+    function f(obj, scope) {
+      // obj is a collection
+      var enumerator = obj.enumerator(this.delegate); // do not .f() the delegate, let enumerator() optimize it
+      return enumerator.f(obj, scope);
+    },
+  ],
+})
 
 
 /*
