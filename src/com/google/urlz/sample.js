@@ -24,7 +24,7 @@ foam.INTERFACE({
     { 
       name: 'f',
       args: [
-        'object', // the object to operate on
+        'object', // the local object to operate on (if remote, it will always be resolved prior to calling f())
         'scope'   // runtime context for temporary storage
       ],
       returns: 'Thenable'
@@ -134,6 +134,10 @@ foam.CLASS({
 foam.CLASS({
   name: 'Error',
   package: 'com.google.urlz.functors',
+  implements: [
+    'com.google.urlz.Functor',
+    'com.google.urlz.FunctorSync', 
+  ],
   
   properties: [
     'message';
@@ -141,6 +145,9 @@ foam.CLASS({
   
   methods: [
     function f(obj, scope) {
+      return Promise.reject(this.message);
+    },
+    function fsync(obj, scope) {
       throw this.message;
     }
   ]
@@ -156,10 +163,12 @@ foam.CLASS({
   methods: [
     function f(obj, scope) {
       var methodP = this.methodName.f(obj, scope);
-      ps = this.args.map(a => a.f(obj, scope));
+      var ps = this.args.map(a => a.f(obj, scope));
       return methodP.then(method =>
-        Promise.all(ps).then(results => 
-          obj[method].apply(results)));
+        Promise.all(ps).then(args => 
+          obj[method].apply(args))); // Note: this is always a local invocation of the method on a local object.
+          // In the case of a remote object, this Call functor would be sent to the remote site or a local
+          // copy Fetched.
     },
     function fsync(obj, scope) {
       return obj[methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
