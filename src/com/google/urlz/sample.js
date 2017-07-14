@@ -169,9 +169,6 @@ foam.CLASS({
           // In the case of a remote object, this Call functor would be sent to the remote site or a local
           // copy Fetched.
     },
-    function fsync(obj, scope) {
-      return obj[this.methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
-    },
     function toSync() {
       // convert method name arg
       var m = this.methodName.toSync();
