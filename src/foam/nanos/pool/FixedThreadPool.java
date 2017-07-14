@@ -73,7 +73,7 @@ public class FixedThreadPool
 
   public synchronized ExecutorService getPool() {
     if ( pool_ == null ) {
-      pool_ = Executors.newFixedThreadPool(numberOfThreads_);
+      pool_ = Executors.newFixedThreadPool(getNumberOfThreads());
     }
     return pool_;
   }
