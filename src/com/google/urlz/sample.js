@@ -140,8 +140,8 @@ foam.CLASS({
   ],
   
   properties: [
-    'message';
-  ]
+    'message'
+  ],
   
   methods: [
     function f(obj, scope) {
@@ -151,7 +151,7 @@ foam.CLASS({
       throw this.message;
     }
   ]
-})
+});
 
 foam.CLASS({
   name: 'Call',
@@ -287,7 +287,7 @@ foam.CLASS({
   name: 'Func',
   package: 'com.google.urlz.functors',
   document: "Warning! Func is not safely capable of serialization or remote execution. \
-     Do not use unless backed into a corner!";
+  Do not use unless backed into a corner!",
   
   properties: [
     'fn', // a function primitive to run on objects (may not serialize!)
