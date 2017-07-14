@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-// Most functors are async/blocking, but may offer a synchronous+fast 
+// Most functors are async/blocking, but may offer a synchronous+fast
 // version as well
 foam.INTERFACE({
   package: 'com.google.urlz',
   name: 'Functor',
   methods: [
-    { 
+    {
       name: 'f',
       args: [
         'object', // the local object to operate on (if remote, it will always be resolved prior to calling f())
@@ -35,6 +35,7 @@ foam.INTERFACE({
 })
 
 foam.INTERFACE({
+  package: 'com.google.urlz',
   name: 'FunctorSync',
   methods: [
     {
@@ -50,7 +51,7 @@ foam.CLASS({
   name: 'FunctorProperty',
   package: 'com.google.urlz',
   extends: 'foam.core.Property',
-  
+
   properties: [
     {
       name: 'adapt',
@@ -69,11 +70,9 @@ foam.CLASS({
 foam.INTERFACE({
   name: 'DObject',
   package: 'com.google.urlz',
-  
-  properties: [
-    '__src_url__'
-  ],
-  
+
+  imports: [ 'src__' ],
+
   methods: [
     { name: 'run' }
   ]
@@ -85,7 +84,7 @@ foam.CLASS({
   implements: [
     'com.google.urlz.DObject',
     'com.google.urlz.Functor',
-    'com.google.urlz.FunctorSync', 
+    'com.google.urlz.FunctorSync',
   ],
 
   methods: [
@@ -108,17 +107,17 @@ foam.CLASS({
 foam.CLASS({
   name: 'DObjectRemote',
   package: 'com.google.urlz',
-  implements: [ 
+  implements: [
     'com.google.urlz.DObject',
     'com.google.urlz.Functor'
   ],
-    
+
   imports: ['Fetch'],
-  
+
   methods: [
     function f(obj, scope) {
       // async object loads itself when run as a functor
-      return this.Fetch(this.__src_url__);
+      return this.Fetch(this.src__);
     },
     function run(functor) {
       // get actual copy of object and run the functor
@@ -136,13 +135,13 @@ foam.CLASS({
   package: 'com.google.urlz.functors',
   implements: [
     'com.google.urlz.Functor',
-    'com.google.urlz.FunctorSync', 
+    'com.google.urlz.FunctorSync',
   ],
-  
+
   properties: [
     'message'
   ],
-  
+
   methods: [
     function f(obj, scope) {
       return Promise.reject(this.message);
@@ -157,25 +156,25 @@ foam.CLASS({
   name: 'Call',
   package: 'com.google.urlz.functors',
   implements: ['com.google.urlz.Functor'],
-  
+
   properties: ['methodName', 'args'],
-  
+
   methods: [
     function f(obj, scope) {
       var methodP = this.methodName.f(obj, scope);
       var ps = this.args.map(a => a.f(obj, scope));
       return methodP.then(method =>
-        Promise.all(ps).then(args => 
+        Promise.all(ps).then(args =>
           obj[method].apply(args))); // Note: this is always a local invocation of the method on a local object.
           // In the case of a remote object, this Call functor would be sent to the remote site or a local
           // copy Fetched.
     },
     function fsync(obj, scope) {
-      return obj[methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
+      return obj[this.methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
     },
     function toSync() {
       // convert method name arg
-      var m = methodName.toSync();
+      var m = this.methodName.toSync();
       if ( ! com.google.urlz.functors.Error.isInstance(m) ) {
         // convert arguments
         var sArgs = this.args.map(a => a.toSync());
@@ -196,9 +195,9 @@ foam.CLASS({
     'com.google.urlz.FunctorSync',
     'com.google.urlz.Functor',
   ],
-  
+
   properties: ['methodName', 'args'],
-  
+
   methods: [
     function fsync(obj, scope) {
       return obj[methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
@@ -216,7 +215,7 @@ foam.CLASS({
 foam.INTERFACE({
   name: 'Collection',
   package: 'com.google.urlz',
-  
+
   methods: [
     'create', 'read', 'update', 'delete',
     'enumerator' // returns Functor
@@ -225,11 +224,11 @@ foam.INTERFACE({
 foam.CLASS({
   name: 'MapEnumerator', // for use with MapCollection
   package: 'com.google.urlz',
-  
+
   properties: [
     'delegate'
   ],
-  
+
   methods: [
     function f(obj, scope) {
       for (key in obj.map) {
@@ -242,9 +241,9 @@ foam.CLASS({
 foam.CLASS({
   name: 'Select',
   package: 'com.google.urlz.functors',
-  
+
   properties: ['delegate'],
-  
+
   methods: [
     function f(obj, scope) {
       // obj is a collection
@@ -257,9 +256,9 @@ foam.CLASS({
 foam.CLASS({
   name: 'Constant',
   package: 'com.google.urlz.functors',
-  
+
   properties: ['value'],
-  
+
   methods: [
     function f(obj, scope) {
       return Promise.resolve(this.value);
@@ -270,12 +269,12 @@ foam.CLASS({
 foam.CLASS({
   name: 'Run',
   package: 'com.google.urlz.functors',
-  
+
   properties: [
     'arg', // argument to resolve and pass into delegate
     'delegate' // functor to execute with a new arg
   ],
-  
+
   methods: [
     function f(obj, scope) {
       return arg.f(obj, scope).then(a => delegate.f(a, scope));
@@ -288,11 +287,11 @@ foam.CLASS({
   package: 'com.google.urlz.functors',
   document: "Warning! Func is not safely capable of serialization or remote execution. \
   Do not use unless backed into a corner!",
-  
+
   properties: [
     'fn', // a function primitive to run on objects (may not serialize!)
   ],
-  
+
   methods: [
     function f(obj, scope) {
       return this.fn(obj, scope);
@@ -348,7 +347,7 @@ b.run(
 o.run(
   Scope({ 'b': Fetch(b.url_), 'o': o }, // scope is passed down and serialized as needed
     Do(
-      Set(A_PROP_A, 
+      Set(A_PROP_A,
           With(Scoped(b.url_), B_PROP_A)
       ),
       With(Scoped('b'), // maybe shorter With(Scoped(...)) syntax
