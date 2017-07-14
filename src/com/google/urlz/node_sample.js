@@ -1,5 +1,5 @@
 require('../../../foam.js');
-require('./sample.js');
+require('./functors.js');
 require('./fetch.js');
 
 com.google.urlz.JSONFetcher.create({
