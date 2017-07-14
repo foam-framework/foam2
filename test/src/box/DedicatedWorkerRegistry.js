@@ -195,10 +195,9 @@ describe('dedicated worker registry', function() {
 
   it('should unregister dedicated services', function() {
     var ctx = ctxFactory();
-    var mockRegistry = ctx.registry.delegate;
     var boxes = [ null, null, null ].map(function(x) {
       var box = foam.box.LogBox.create();
-      box.serviceName = "Log";
+      box.serviceName = 'Log';
       return box;
     });
 
@@ -219,5 +218,40 @@ describe('dedicated worker registry', function() {
     // Unregistering first box (index 1, since 0 is ForkBox) using handle.
     ctx.registry.unregister(names()[1]);
     expect(names().length).toBe(3);
+  });
+
+  it('should throw an error if registering a service with name that exists in localRegistry', function() {
+    var ctx = ctxFactory();
+
+    // Make a registration with dedicated and get some sort of name.
+    var box = foam.box.LogBox.create();
+    box.serviceName = 'Log';
+    ctx.registry.register(null, null, box);
+    var names = Object.keys(ctx.registry.localRegistry.registry);
+
+    // Creating another service with an existing name, should throw.
+    expect(function() {
+      ctx.registry.register(names[0], null, box);
+    }).toThrow();
+  });
+
+  it('should throw an error if registering a service with a name that exists in delegate', function() {
+    var ctx = ctxFactory();
+    var mockRegistry = ctx.registry.delegate;
+
+    // Make a registration as non-dedicated.
+    var box = foam.box.LogBox.create();
+    ctx.registry.register('Test', null, box);
+
+    // Making another registration as non-dedicated with same name should error.
+    expect(function() {
+      ctx.registry.register('Test', null, box);
+    }).toThrow();
+
+    // Making a dedicated registration with the same name should error as well.
+    box.serviceName = 'Log';
+    expect(function() {
+      ctx.registry.register('Test', null, box);
+    }).toThrow();
   });
 });

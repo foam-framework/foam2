@@ -109,17 +109,23 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'getRegisteredNames',
+      returns: 'Array',
+      code: function() {
+        return this.localRegistry.getRegisteredNames()
+          .concat(this.delegate.getRegisteredNames());
+      }
+    },
     function register(name, service, box) {
       // Determine if this name has been registered previously.
-      //if ( this.registeredNames_[name] )
-      //  throw this.NameAlreadyRegisteredException({ name: name });
+      if ( this.getRegisteredNames().includes(name) )
+        throw this.NameAlreadyRegisteredException({ name: name });
 
       var key = this.getDedicatedWorkerKey(box);
       if ( ! key )
         return this.delegate.register(name, service, box);
 
-
-      // Reroute localRegistry's send method? ...
       if ( ! this.dedicatedWorkers_[key] )
         this.dedicatedWorkers_[key] = this.stubFactory_.create({
           delegate: this.workerFactory(null, this.localRegistry)
@@ -128,18 +134,11 @@ foam.CLASS({
       // Perform registration in remote box.
       return this.dedicatedWorkers_[key].register(name, service, box);
     },
-    function unregister(name) {
-      // Determine name of the box and which registry to remove from.
-      // Attempt to unregister in our registry, then delegate registry.
-      this.localRegistry.unregister(name);
-      this.delegate.unregister(name);
-      /*
-      if ( this.localRegistry.registry[name] ) {
-        this.localRegistry.unregister(name);
-      } else if ( this.delegate.registry[name] ) {
-        this.delegate.unregister(name);
-      }
-      */
+    function unregister(nameOrBox) {
+      // Forward the request to localRegistry and delegate.
+      // If it does not exist, unregister does nothing.
+      this.localRegistry.unregister(nameOrBox);
+      this.delegate.unregister(nameOrBox);
     },
     function send(msg) {
       // Determine if we have a registration for box.
@@ -147,7 +146,7 @@ foam.CLASS({
       var name = msg.object.name;
       if ( this.localRegistry.registry[name] ) {
         this.localRegistry.send(msg);
-      } else if ( this.delegate.registry[name] ) {
+      } else {
         this.delegate.send(msg);
       }
     }
