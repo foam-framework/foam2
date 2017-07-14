@@ -18,8 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'DedicatedWorkerRegistry',
-  extends: 'foam.box.ProxyBox',
-  implements: [ 'foam.box.BoxRegistryBox' ],
+  extends: 'foam.box.WorkerRegistry',
 
   documentation: `A registry used to manage dedicated worker instances. The
     registry will instantiate a worker for services that require dedicate
@@ -45,18 +44,11 @@ foam.CLASS({
     var register = ctx.registry.register(null, null, skBox);`,
 
   requires: [
-    'foam.core.StubFactorySingleton',
-    'foam.box.BoxRegistry',
     'foam.box.NameAlreadyRegisteredException',
     'foam.box.node.ForkBox'
   ],
 
   exports: [ 'as registry' ],
-
-  constants: {
-    DEDICATED: 0,
-    DELEGATED: 1
-  },
 
   properties: [
     {
@@ -68,88 +60,61 @@ foam.CLASS({
       value: function(box) { return null; },
     },
     {
-      class: 'Function',
-      name: 'workerFactory',
-      documentation: 'Used to generate the dedicated workers.',
-      value: function(args, ctx) {
-        return this.ForkBox.create(args, ctx);
-      }
-    },
-    {
-      class: 'Proxy',
-      of: 'foam.box.Box',
-      name: 'delegate',
-      documentation: 'Handles all non-dedicated worker requests.',
-      required: true,
-    },
-    {
-      name: 'localRegistry',
-      documentation: 'Handles registration of all dedicated worker requests.',
-      factory: function() {
-        // TODO: Creating a context just to get a BoxRegistryBox seems
-        // excessive. But, we cannot create a BoxRegistryBox without a context
-        // at the moment.
-        return foam.box.Context.create().registry;
-      }
-    },
-    {
       name: 'dedicatedWorkers_',
       documentation: `Map of BoxRegistryStub used for registering box
         on the dedicated service worker.`,
+      hidden: true,
       factory: function() { return {}; }
     },
-    {
-      name: 'stubFactory_',
-      documentation: `A factory to generate BoxRegistryStubs when instantiating
-        a dedicated worker.`,
-      factory: function() {
-        return this.StubFactorySingleton.create().get(this.BoxRegistry);
-      }
-    }
   ],
 
   methods: [
     {
-      name: 'getRegisteredNames',
-      returns: 'Array',
-      code: function() {
-        return this.localRegistry.getRegisteredNames()
-          .concat(this.delegate.getRegisteredNames());
-      }
-    },
-    function register(name, service, box) {
-      // Determine if this name has been registered previously.
-      // TODO: Replace with .includes() once NodeJS 6+ is required
-      if ( this.getRegisteredNames().indexOf(name) > -1 )
-        throw this.NameAlreadyRegisteredException({ name: name });
+      name: 'register',
+      returns: 'foam.box.Box',
+      code: function(name, service, box) {
+        // Perform check on name to see if it is already registered.
+        this.SUPER(name, service, box);
 
-      var key = this.getDedicatedWorkerKey(box);
-      if ( ! key )
-        return this.delegate.register(name, service, box);
+        var key = this.getDedicatedWorkerKey(box);
+        if ( ! key )
+          return this.delegate.register(name, service, box);
 
-      if ( ! this.dedicatedWorkers_[key] )
-        this.dedicatedWorkers_[key] = this.stubFactory_.create({
-          delegate: this.workerFactory(null, this.localRegistry)
-        }, this.localRegistry);
+        if ( ! this.dedicatedWorkers_[key] )
+          this.dedicatedWorkers_[key] = this.stubFactory_.create({
+            delegate: this.workerFactory(null, this.localRegistry)
+          }, this.localRegistry);
 
-      // Perform registration in remote box.
-      return this.dedicatedWorkers_[key].register(name, service, box);
+        // Perform registration in remote box.
+        return this.dedicatedWorkers_[key].register(name, service, box);
+      },
+      args: [ 'name', 'service', 'box' ],
     },
-    function unregister(nameOrBox) {
-      // Forward the request to localRegistry and delegate.
-      // If it does not exist, unregister does nothing.
-      this.localRegistry.unregister(nameOrBox);
-      this.delegate.unregister(nameOrBox);
+    {
+      name: 'unregister',
+      returns: '',
+      code: function(nameOrBox) {
+        // Forward the request to localRegistry and delegate.
+        // If it does not exist, unregister does nothing.
+        this.localRegistry.unregister(nameOrBox);
+        this.delegate.unregister(nameOrBox);
+      },
+      args: [ 'name' ]
     },
-    function send(msg) {
-      // Determine if we have a registration for box.
-      // If not, forward to delegate and let it handle.
-      var name = msg.object.name;
-      if ( this.localRegistry.registry[name] ) {
-        this.localRegistry.send(msg);
-      } else {
-        this.delegate.send(msg);
-      }
+    {
+      name: 'send',
+      returns: '',
+      code: function(msg) {
+        // Determine if we have a registration for box.
+        // If not, forward to delegate and let it handle.
+        var name = msg.object.name;
+        if ( this.localRegistry.registry[name] ) {
+          this.localRegistry.send(msg);
+        } else {
+          this.delegate.send(msg);
+        }
+      },
+      args: [ 'msg' ]
     }
   ]
 });

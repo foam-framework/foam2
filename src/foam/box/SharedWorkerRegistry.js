@@ -21,28 +21,35 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
   implements: [ 'foam.box.BoxRegistryBox' ],
 
+  documentation: `A registry used to manage shared worker instances. The
+    registry will instantiate a specified number of worker instances. Upon
+    registration, the service will be registered with all worker instances.
+
+    Example usage:
+    <To be included later>`,
+
   requires: [
-    'foam.core.StubFactorySingleton',
+    'foam.box.NameAlreadyRegisteredException',
     'foam.box.RoundRobinBox',
     'foam.box.node.ForkBox'
   ],
 
+  exports: [ 'as registry' ],
+
   properties: [
     {
+      class: 'Int',
       name: 'numSharedWorkers',
       documentation: 'The number of shared workers to be instantiated.',
       required: true,
     },
     {
+      class: 'Function',
       name: 'loadBalancerFactory',
-      factory: function() {
+      documentation: `Generates the load balancer which is used to forward
+        units of work to worker instances.`,
+      value: function() {
         return this.RoundRobinBox.create(this.sharedWorkers_);
-      }
-    },
-    {
-      name: 'stubFactory_',
-      factory: function() {
-        return this.StubFactorySingleton.create().get(this.ForkBox);
       }
     },
     {
@@ -52,7 +59,9 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         for ( var i = 0; i < this.numSharedWorkers; i++ ) {
-          var stub = this.stubFactory_.create(); // Delegate?
+          var stub = this.stubFactory_.create({
+            delegate: this.workerFactory(null, this.localRegistry)
+          }, this.localRegistry);
           this.sharedWorkers_.push(stub);
         }
       }
@@ -64,6 +73,9 @@ foam.CLASS({
       name: 'register',
       returns: 'foam.box.Box',
       code: function(name, service, box) {
+        // Perform check on name to see if it is already registered.
+        this.SUPER(name, service, box);
+
         var workers = this.sharedWorkers_.map(function(worker) {
           return worker.register(name, service, box);
         });
@@ -77,6 +89,13 @@ foam.CLASS({
         this.sharedWorkers_.forEach(function(worker) {
           worker.unregister(name);
         });
+      }
+    },
+    {
+      name: 'send',
+      code: function(msg) {
+        // If registry contains destination, we send it to one of our workers.
+        // Otherwise, forward request to delegate.
       }
     }
   ]
