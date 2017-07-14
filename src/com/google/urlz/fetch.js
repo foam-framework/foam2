@@ -46,7 +46,8 @@ foam.CLASS({
       remote = remote ? 'Remote' : 'Local';
       var pkg = 'com.google.urlz';
       var ps = Object.keys(o).sort();
-      var name = `DObject${remote}_${ps.join('_')}`;
+      //var name = `DObject${remote}_${ps.join('_')}`;
+      var name = `DObject${remote}_${this.url.replace(/\W/g, '_')}`;
       var id = `${pkg}.${name}`;
       var cls = this.lookup(id, true);
       if ( cls ) return cls;

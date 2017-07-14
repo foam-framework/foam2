@@ -125,6 +125,7 @@ foam.CLASS({
       // more advanced impl. may send the functor off to run remotely
     },
     function toSync() {
+      // TODO: Could convert to DObjectLocal IF usage of the object can be saved reliably (fetch -> run -> commit)
       return com.google.urlz.functors.Error.create({ message: "Remote object cannot toSync()" });
     }
   ]
@@ -167,7 +168,7 @@ foam.CLASS({
         Promise.all(ps).then(args =>
           obj[method].apply(args))); // Note: this is always a local invocation of the method on a local object.
           // In the case of a remote object, this Call functor would be sent to the remote site or a local
-          // copy Fetched.
+          // copy Fetched by the stub when you call stubObj.run(ThisFunctor(...))
     },
     function toSync() {
       // convert method name arg
