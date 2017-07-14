@@ -15,6 +15,98 @@
  * limitations under the License.
  */
 
+// Most functors are async/blocking, but may offer a synchronous+fast 
+// version as well
+foam.INTERFACE({
+  package: 'com.google.urlz'
+  name: 'Functor',
+  methods: [
+    { 
+      name: 'f',
+      args: [
+        'object', // the object to operate on
+        'scope'   // runtime context for temporary storage
+      ],
+      returns: 'Thenable'
+    },
+    { name: 'toSync' },
+    //{ name: 'runCost' }, // hmmmm??
+  ]
+})
+// foam.INTERFACE({
+//   name: 'FunctorSync',
+//   methods: [
+//     {
+//       name: 'fsync'
+//     }
+//   ]
+// })
+
+foam.CLASS({
+  name: 'DObject',
+  package: 'com.google.urlz',
+  implements: ['com.google.urlz.Functor'],
+  
+  properties: [
+    '__src_url__'
+  ],
+  
+  methods: [
+    function f(obj, scope) {
+      // By default, a local object returns itself
+      return Promise.resolve(this);
+    },
+    function do(functor) {
+      //return this.f().then(o => functor.f(o, {})); // async version for a stub object
+      return functor.f(this, this.__context__.createSubContext());
+    },
+  ],
+});
+
+foam.CLASS({
+  name: 'DObjectStub',
+  package: 'com.google.urlz',
+  extends: 'com.google.urlz.DObject',
+  imports: ['Fetch'],
+  
+  methods: [
+    function f(obj, scope) {
+      // async object loads itself when run as a functor
+      return this.Fetch(this.__src_url__);
+    },
+    function do(functor) {
+      // get actual copy of object and run the functor
+      return this.f().then(o => functor.f(o, o.__context__.createSubContext()));
+      // more advanced impl. may send the functor off to run remotely
+    }
+  ]
+})
+
+foam.CLASS({
+  name: 'Call',
+  package: 'com.google.urlz.functors',
+  implements: ['com.google.urlz.Functor'],
+  
+  properties: ['methodName', 'args'],
+  
+  methods: [
+    function f(obj, scope) {
+      var methodP = this.methodName.f(obj, scope);
+      ps = this.args.map(function(a) {
+        return a.f(obj, scope);
+      });
+      return methodP.then(method =>
+        Promise.all(ps).then(results => 
+          obj[method].apply(results)));
+    },
+  ],
+});
+
+
+
+
+
+/*
 // Something like U2 DSL, but for expressions
 
 // Simple change to a single object, executes anywhere -----------
@@ -145,3 +237,4 @@ Skip.f(obj, scope) {
   }
   doSkip(++(scope.__select__.skip)); // count recorded in the order called
 }
+*/
