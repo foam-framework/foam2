@@ -18,7 +18,7 @@
 // Most functors are async/blocking, but may offer a synchronous+fast 
 // version as well
 foam.INTERFACE({
-  package: 'com.google.urlz'
+  package: 'com.google.urlz',
   name: 'Functor',
   methods: [
     { 
@@ -29,44 +29,90 @@ foam.INTERFACE({
       ],
       returns: 'Thenable'
     },
-    { name: 'toSync' },
-    //{ name: 'runCost' }, // hmmmm??
+    { name: 'toSync' }, // returns FunctorSync or fails
+    //{ name: 'runCost' }, // maybe??
   ]
 })
-// foam.INTERFACE({
-//   name: 'FunctorSync',
-//   methods: [
-//     {
-//       name: 'fsync'
-//     }
-//   ]
-// })
+
+foam.INTERFACE({
+  name: 'FunctorSync',
+  methods: [
+    {
+      name: 'fsync'
+    },
+    {
+      name: 'toAsync'
+    }
+  ]
+});
 
 foam.CLASS({
+  name: 'FunctorProperty',
+  package: 'com.google.urlz',
+  extends: 'foam.core.Property',
+  
+  properties: [
+    {
+      name: 'adapt',
+      value: function(old, nu) {
+        if ( com.google.urlz.Functor.isInstance(nu) ) {
+          return nu;
+        } else if ( foam.Function.isInstance(nu) ) {
+          return com.google.urlz.functors.Func.create({ fn: nu });
+        }
+        return com.google.urlz.functors.Constant.create({ value: nu });
+      }
+    }
+  ]
+});
+
+foam.INTERFACE({
   name: 'DObject',
   package: 'com.google.urlz',
-  implements: ['com.google.urlz.Functor'],
   
   properties: [
     '__src_url__'
   ],
   
   methods: [
+    { name: 'run' }
+  ]
+})
+
+foam.CLASS({
+  name: 'DObjectLocal',
+  package: 'com.google.urlz',
+  implements: [
+    'com.google.urlz.DObject',
+    'com.google.urlz.Functor',
+    'com.google.urlz.FunctorSync', 
+  ],
+
+  methods: [
     function f(obj, scope) {
       // By default, a local object returns itself
       return Promise.resolve(this);
     },
-    function do(functor) {
-      //return this.f().then(o => functor.f(o, {})); // async version for a stub object
+    function fsync(obj, scope) {
+      return this;
+    },
+    function run(functor) {
       return functor.f(this, this.__context__.createSubContext());
     },
+    function toSync() {
+      return this;
+    }
   ],
 });
 
 foam.CLASS({
-  name: 'DObjectStub',
+  name: 'DObjectRemote',
   package: 'com.google.urlz',
-  extends: 'com.google.urlz.DObject',
+  implements: [ 
+    'com.google.urlz.DObject',
+    'com.google.urlz.Functor'
+  ],
+    
   imports: ['Fetch'],
   
   methods: [
@@ -74,10 +120,28 @@ foam.CLASS({
       // async object loads itself when run as a functor
       return this.Fetch(this.__src_url__);
     },
-    function do(functor) {
+    function run(functor) {
       // get actual copy of object and run the functor
       return this.f().then(o => functor.f(o, o.__context__.createSubContext()));
       // more advanced impl. may send the functor off to run remotely
+    },
+    function toSync() {
+      return com.google.urlz.functors.Error.create({ message: "Remote object cannot toSync()" });
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'Error',
+  package: 'com.google.urlz.functors',
+  
+  properties: [
+    'message';
+  ]
+  
+  methods: [
+    function f(obj, scope) {
+      throw this.message;
     }
   ]
 })
@@ -92,15 +156,50 @@ foam.CLASS({
   methods: [
     function f(obj, scope) {
       var methodP = this.methodName.f(obj, scope);
-      ps = this.args.map(function(a) {
-        return a.f(obj, scope);
-      });
+      ps = this.args.map(a => a.f(obj, scope));
       return methodP.then(method =>
         Promise.all(ps).then(results => 
           obj[method].apply(results)));
     },
     function fsync(obj, scope) {
       return obj[methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
+    },
+    function toSync() {
+      // convert method name arg
+      var m = methodName.toSync();
+      if ( ! com.google.urlz.functors.Error.isInstance(m) ) {
+        // convert arguments
+        var sArgs = this.args.map(a => a.toSync());
+        if ( sArgs.some(a => com.google.urlz.functors.Error.isInstance(a)) ) {
+          return com.google.urlz.functors.Error.create("Not all method args can be made synchronous." + sArgs.toString());
+        }
+        return com.google.urlz.functors.CallSync({ methodName: m, args: sArgs });
+      } else {
+        return m;
+      }
+    }
+  ],
+});
+foam.CLASS({
+  name: 'CallSync',
+  package: 'com.google.urlz.functors',
+  implements: [
+    'com.google.urlz.FunctorSync',
+    'com.google.urlz.Functor',
+  ],
+  
+  properties: ['methodName', 'args'],
+  
+  methods: [
+    function fsync(obj, scope) {
+      return obj[methodName.f(obj, scope)].apply(this.args.map(a => a.f(obj, scope)));
+    },
+    function f(obj, scope) {
+      // If we're synchronous, implementing async is easy.
+      return Promise.resolve(this.fsync(obj, scope));
+    },
+    function toASync() {
+      return this;
     }
   ],
 });
@@ -113,7 +212,7 @@ foam.INTERFACE({
     'create', 'read', 'update', 'delete',
     'enumerator' // returns Functor
   ]
-})
+});
 foam.CLASS({
   name: 'MapEnumerator', // for use with MapCollection
   package: 'com.google.urlz',
@@ -129,11 +228,11 @@ foam.CLASS({
       }
     }
   ]
-})
+});
 
 foam.CLASS({
   name: 'Select',
-  package: 'com.google.urlz',
+  package: 'com.google.urlz.functors',
   
   properties: ['delegate'],
   
@@ -141,11 +240,56 @@ foam.CLASS({
     function f(obj, scope) {
       // obj is a collection
       var enumerator = obj.enumerator(this.delegate); // do not .f() the delegate, let enumerator() optimize it
-      return enumerator.f(obj, scope);
+      return enumerator.f(obj, scope.createSubContext());
     },
   ],
-})
+});
 
+foam.CLASS({
+  name: 'Constant',
+  package: 'com.google.urlz.functors',
+  
+  properties: ['value'],
+  
+  methods: [
+    function f(obj, scope) {
+      return Promise.resolve(this.value);
+    },
+  ]
+});
+
+foam.CLASS({
+  name: 'Run',
+  package: 'com.google.urlz.functors',
+  
+  properties: [
+    'arg', // argument to resolve and pass into delegate
+    'delegate' // functor to execute with a new arg
+  ],
+  
+  methods: [
+    function f(obj, scope) {
+      return arg.f(obj, scope).then(a => delegate.f(a, scope));
+    },
+  ]
+});
+
+foam.CLASS({
+  name: 'Func',
+  package: 'com.google.urlz.functors',
+  document: "Warning! Func is not safely capable of serialization or remote execution. \
+     Do not use unless backed into a corner!";
+  
+  properties: [
+    'fn', // a function primitive to run on objects (may not serialize!)
+  ],
+  
+  methods: [
+    function f(obj, scope) {
+      return this.fn(obj, scope);
+    },
+  ]
+});
 
 /*
 // Something like U2 DSL, but for expressions
@@ -155,7 +299,7 @@ foam.CLASS({
 // o.a = o.b + o.c
 // o.commit()
 
-o.do(
+o.run(
   Commit(
     Set(PROP_A,
       Plus(PROP_B, PROP_C)
@@ -170,7 +314,7 @@ o.do(
 // b.a = o.b + o.c
 // b.commit()
 
-b.do(
+b.run(
   Commit(
     Set(B_PROP_A,
       With(
@@ -192,7 +336,7 @@ b.do(
 // b.commit()
 // o.commit()
 
-o.do(
+o.run(
   Scope({ 'b': Fetch(b.url_), 'o': o }, // scope is passed down and serialized as needed
     Do(
       Set(A_PROP_A, 
