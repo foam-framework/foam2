@@ -15,6 +15,46 @@
  * limitations under the License.
  */
 
+// route fetches based on remappings
+// check context, __url_map__ that is inherited down context layers
+// Fetch is a functor?
+// Each type should take a delegate to chain together, fall back to delegate on fail
+foam.INTERFACE({ 
+  package: 'com.google.urlz',
+  name: 'Fetcher',
+  
+  methods: [
+    { name: 'fetch', args: ['url'], returns: 'Promise(com.google.urlz.DObject)' }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'com.google.urlz',
+  name: 'LocalFetcher',
+  documentation: 'Traverses properties to find the local instance of an object',
+  
+  properties: [
+    {
+      name: 'rootObject',
+    }
+  ],
+  
+  methods: [
+    function fetch(url) {
+      // url must be relative or absolute with the prefix matching our root object
+      path = UrlUtils(url).relativeTo(this.rootObject.src__).split('/');
+      
+      var obj = this.rootObject;
+      path.forEach(pname => { obj = obj[pname]; }); // TODO: watch for failure to find
+      return obj;
+    });
+  ]
+});
+
+
+
+
 // TODO(markdittmer): Should this be an Outputer implementation?
 foam.CLASS({
   package: 'com.google.urlz',
