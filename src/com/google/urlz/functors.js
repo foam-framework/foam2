@@ -97,6 +97,7 @@ foam.CLASS({
       // TODO: subtract prefix, return relative
     },
     function addRelative(subpath) {
+      // convert subpath from string if given as string
       // TODO: clone and return this + subpath
     }
   ],
@@ -125,11 +126,13 @@ foam.INTERFACE({
   name: 'DObject',
   package: 'com.google.urlz',
 
-  imports: [ 'src__' ],
+  properties: ['id'],
+  //imports: [ 'src__' ],
 
   methods: [
     { name: 'run' }, // runs a functor on this
     { name: 'lookup', returns: 'Promise(DObject)' }, // traverses a path through sub-objects
+    { name: 'getPath' }, // sync
   ]
 });
 
@@ -142,7 +145,15 @@ foam.CLASS({
     'com.google.urlz.FunctorSync',
   ],
 
+  properties: [
+    'parent__'
+  ],
+
   methods: [
+    function getPath() {
+      var p = parent__.getPath();
+      return p.addRelative(this.id);
+    },
     function lookup(path) { // TODO: consider a linked list here, easier to decompose
       // TODO: This is just a fetch(relativePath). Make fetch relative recursive, absolute or ../ goes to context
       // traverse a path through sub-objects
@@ -179,12 +190,20 @@ foam.CLASS({
   ],
 
   imports: ['Fetch'],
+  
+  properties: [ 
+    {
+      /** Path to source of this stub object */
+      name: 'src__',
+      required: true
+    },
+  ],
 
   methods: [
     function lookup(path) {
       // For remote object, fetch remote property contents and lookup on it
       // TODO: cache the fetched contents, if policy allows
-      return this.Fetch(this.src__ + '/' + path.name).then(obj => obj.lookup(path.next);
+      return this.Fetch(this.src__.addRelative(path));
     },
     function f(obj, scope) {
       // async object loads itself when run as a functor
@@ -227,17 +246,18 @@ foam.CLASS({
       }
     }
   ],
-  // TODO(jacksonic): I'm thinking about src__ as a source path. Reconcile with the following:
+
   methods: [
     function f(obj, scope) {
-      return this.expired_() ? this.src__.f(obj, scope) :
+      return this.expired_() ? this.Fetch(this.getPath()).then(fd => fd.f(obj, scope)) :
           this.SUPER(obj, scope);
     },
     function run(functor) {
-      return this.expired_() ? this.src__.run(functor) : this.SUPER(functor);
+      return this.expired_() ? this.Fetch(this.getPath()).then(fd => fd.run(functor)) : this.SUPER(functor);
     },
     function toSync() {
-      return this.expired_() ? this.src__.toSync() : this.SUPER();
+      //return this.expired_() ? throw "Cached object expired, cannot toSync()." : this.SUPER();
+      throw "Cannot guarantee toSync() on a cached object, the object may expire. Fetch() a local copy.";
     },
     function expired_() { return Date.now() > this.expiry__.getTime(); }
   ]
