@@ -67,6 +67,60 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  name: 'Path',
+  package: 'com.google.urlz',
+  
+  methods: [
+    function fromStringUrl(url) { // actually a static method
+      // return path from string
+      var returnPath = ( url.startsWith('/') || url.contains('://') ) ? 
+        com.google.urlz.AbsolutePath.create() : com.google.urlz.RelativePath.create();
+      var curPath;
+      
+      var parts = url.split('/');
+      for ( var i = 1; i < parts.length; ++i ) {
+        var p = parts[i];
+        // skip empty or https: bits
+        if ( !p || p.isEmpty() || p.contains(':') ) continue; // TODO: regex instead
+        if ( !curPath ) {
+          returnPath.name = p; // grab first valid identifier for the base Absolute/Relative path object
+          curPath = returnPath;
+        } else {
+          curPath.next = com.google.urlz.RelativePath.create({ name: p });
+          curPath = curPath.next;         
+        }
+      }
+      return returnPath;
+    },
+    function relativeTo(prefix) {
+      // TODO: subtract prefix, return relative
+    },
+    function addRelative(subpath) {
+      // TODO: clone and return this + subpath
+    }
+  ],
+  
+  properties: [
+    'name', // string, one piece of path
+    'next' // next RelativePath instance 
+  ]
+});
+// TODO: remove this static method hack
+var __tempPath__ = com.google.urlz.Path.create();
+com.google.urlz.Path.fromStringUrl = __tempPath__.fromStringUrl;
+
+foam.CLASS({
+  name: 'AbsolutePath',
+  package: 'com.google.urlz',
+  extends: 'com.google.urlz.Path',
+});
+foam.CLASS({
+  name: 'RelativePath',
+  package: 'com.google.urlz',
+  extends: 'com.google.urlz.Path'
+});
+
 foam.INTERFACE({
   name: 'DObject',
   package: 'com.google.urlz',
@@ -89,14 +143,15 @@ foam.CLASS({
   ],
 
   methods: [
-    function lookup(pathNameArray) { // TODO: consider a linked list here, easier to decompose
+    function lookup(path) { // TODO: consider a linked list here, easier to decompose
+      // TODO: This is just a fetch(relativePath). Make fetch relative recursive, absolute or ../ goes to context
       // traverse a path through sub-objects
-      var pName = this[pathNameArray];
-      if ( pathNameArray.length > 1 ) {
-        return this[pName].lookup(pathNameArray.slice(1)); // no promise construction required...
+      var value = this[path.name];
+      if ( path.next ) {
+        return value.lookup(path.next); // no promise construction required...
       } else {
         // This is the last property lookup in the path, so return the contents
-        return Promise.resolve(this[pName]); // only leaves construct a promise
+        return Promise.resolve(value); // only leaves construct a promise
       }
     }
     function f(obj, scope) {
@@ -126,10 +181,10 @@ foam.CLASS({
   imports: ['Fetch'],
 
   methods: [
-    function lookup(pathNameArray) {
+    function lookup(path) {
       // For remote object, fetch remote property contents and lookup on it
-      // TODO: cache the fetched contents, if poolicy allows
-      return this.Fetch(this.src__ + '/' + pathNameArray[0]).then(obj => obj.lookup(pathNameArray.slice(1)));
+      // TODO: cache the fetched contents, if policy allows
+      return this.Fetch(this.src__ + '/' + path.name).then(obj => obj.lookup(path.next);
     },
     function f(obj, scope) {
       // async object loads itself when run as a functor
@@ -142,7 +197,7 @@ foam.CLASS({
     },
     function toSync() {
       // TODO: Could convert to DObjectLocal IF usage of the object can be saved reliably (fetch -> run -> commit)
-      return com.google.urlz.functors.Error.create({ message: "Remote object cannot toSync()" });
+      return com.google.urlz.functors.Error.create({ message: "Remote object cannot toSync(). Explicitly Fetch() a local copy." });
     }
   ]
 });
@@ -172,7 +227,7 @@ foam.CLASS({
       }
     }
   ],
-
+  // TODO(jacksonic): I'm thinking about src__ as a source path. Reconcile with the following:
   methods: [
     function f(obj, scope) {
       return this.expired_() ? this.src__.f(obj, scope) :
@@ -275,7 +330,7 @@ foam.INTERFACE({
     'create', 'read', 'update', 'delete',
     'enumerator', // returns Functor
     function lookup(pathNameArray) {
-      return this.read(pathNameArray[0]).then(obj => obj.lookup(pathNameArray.slice(1));
+      return this.read(path.name).then(obj => obj.lookup(path.next);
     }
   ]
 });
