@@ -23,8 +23,20 @@ foam.INTERFACE({
   package: 'com.google.urlz',
   name: 'Fetcher',
   
+  properties: [
+    'delegate'
+  ],
+  
   methods: [
-    { name: 'fetch', args: ['url'], returns: 'Promise(com.google.urlz.DObject)' }
+    { 
+      name: 'fetchImpl_', 
+      args: ['url'], 
+      returns: 'Promise(com.google.urlz.DObject)' 
+    },
+    function fetch(url) {
+      // if we failed to resolve obj due to missing properties, try our delegate
+      return this.fetchImpl_(url).catch(err => this.delegate ? this.delegate.fetch(url) : throw err)
+    }
   ]
 });
 
@@ -32,6 +44,7 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'com.google.urlz',
   name: 'LocalFetcher',
+  extends: 'com.google.urlz.Fetcher',
   documentation: 'Traverses properties to find the local instance of an object',
   
   properties: [
@@ -41,13 +54,14 @@ foam.CLASS({
   ],
   
   methods: [
-    function fetch(url) {
+    function fetchImpl_(url) {
       // url must be relative or absolute with the prefix matching our root object
-      path = UrlUtils(url).relativeTo(this.rootObject.src__).split('/');
-      
+      path = Url(url).relativeTo(this.rootObject.src__).split('/');
       var obj = this.rootObject;
-      path.forEach(pname => { obj = obj[pname]; }); // TODO: watch for failure to find
-      return obj;
+      path.forEach(pname => { obj = obj[pname]; });
+      if ( obj) return obj;
+      
+      throw "Not Found!" + url + this;
     });
   ]
 });
@@ -56,6 +70,7 @@ foam.CLASS({
 
 
 // TODO(markdittmer): Should this be an Outputer implementation?
+// TODO(jacksonic): take datapath as the fetch(datapath) arg, make HTTPFetcher and extend for JSON?
 foam.CLASS({
   package: 'com.google.urlz',
   name: 'JSONFetcher',
