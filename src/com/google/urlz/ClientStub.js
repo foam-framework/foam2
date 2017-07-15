@@ -23,22 +23,24 @@ foam.CLASS({
   
   requires: [
     'com.google.urlz.LocalFetcher',
-  ]
+  ],
   
   exports: [
-    'Fetch',
-    'Commit',
+    'fetcher',
     '__url_map__',
   ],
   
   properties: [
     {
-      class: 'FunctionProperty',
-      name: 'Fetch',
-      factory: function() {
-        var fetcher = this.LocalFetcher.create({ rootObject: this });
-        return fetcher.fetch.bind(fetcher);
+      /** The root object defining the client. Should be renderable with some kind of View. */
+      name: 'root'
+    },
+    {
+      name: 'fetcher',
+      expression: function(root) {
+        // Create with delegate: FilteredHTTPFetcher for web fetching
+        return this.LocalFetcher.create({ rootObject: this.root });
       }
     }
-  ]
+  ],
 })

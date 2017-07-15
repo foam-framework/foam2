@@ -17,9 +17,9 @@
 
 // route fetches based on remappings
 // check context, __url_map__ that is inherited down context layers
-// Fetch is a functor?
 // Each type should take a delegate to chain together, fall back to delegate on fail
-foam.INTERFACE({ 
+// CLientStub created by server to work with stubRoot: FilteredHTTPFetcher(CORSList) <- LocalFetcher(stubRoot)
+foam.CLASS({
   package: 'com.google.urlz',
   name: 'Fetcher',
   
@@ -28,14 +28,22 @@ foam.INTERFACE({
   ],
   
   methods: [
-    { 
+    {
       name: 'fetchImpl_', 
       args: ['url'], 
       returns: 'Promise(com.google.urlz.DObject)' 
     },
+    {
+      name: 'commitImpl_', 
+      args: ['url', 'obj'], 
+      returns: 'Promise(com.google.urlz.DObject)'
+    },
     function fetch(url) {
       // if we failed to resolve obj due to missing properties, try our delegate
-      return this.fetchImpl_(url).catch(err => this.delegate ? this.delegate.fetch(url) : throw err)
+      return this.fetchImpl_(url).catch(err => this.delegate ? this.delegate.fetch(url) : throw err);
+    },
+    function commit(url, obj) {
+      return this.commitImpl_(url, obj).catch(err => this.delegate ? this.delegate.commit(url, obj) : throw err)
     }
   ]
 });
@@ -61,8 +69,17 @@ foam.CLASS({
       path.forEach(pname => { obj = obj[pname]; });
       if ( obj) return obj;
       
-      throw "Not Found!" + url + this;
-    });
+      throw `LocalFetch: Not Found! ${url} ${path} in ${this}`;
+    },
+    function commitImpl_(url, nuObj) {
+      // url must be relative or absolute with the prefix matching our root object
+      path = Url(url).relativeTo(this.rootObject.src__).split('/');
+      var obj = this.rootObject;
+      path.forEach(pname => { obj = obj[pname]; });
+      if ( obj) obj.copyFrom(nuObj);
+      
+      throw `LocalCommit: Not Found! ${url} ${path} in ${this}`;
+    }
   ]
 });
 
