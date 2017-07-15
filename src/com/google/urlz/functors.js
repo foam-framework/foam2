@@ -74,7 +74,8 @@ foam.INTERFACE({
   imports: [ 'src__' ],
 
   methods: [
-    { name: 'run' }
+    { name: 'run' }, // runs a functor on this
+    { name: 'lookup', returns: 'Promise(DObject)' }, // traverses a path through sub-objects
   ]
 });
 
@@ -88,6 +89,16 @@ foam.CLASS({
   ],
 
   methods: [
+    function lookup(pathNameArray) { // TODO: consider a linked list here, easier to decompose
+      // traverse a path through sub-objects
+      var pName = this[pathNameArray];
+      if ( pathNameArray.length > 1 ) {
+        return this[pName].lookup(pathNameArray.slice(1)); // no promise construction required...
+      } else {
+        // This is the last property lookup in the path, so return the contents
+        return Promise.resolve(this[pName]); // only leaves construct a promise
+      }
+    }
     function f(obj, scope) {
       // By default, a local object returns itself
       return Promise.resolve(this);
@@ -115,6 +126,11 @@ foam.CLASS({
   imports: ['Fetch'],
 
   methods: [
+    function lookup(pathNameArray) {
+      // For remote object, fetch remote property contents and lookup on it
+      // TODO: cache the fetched contents, if poolicy allows
+      return this.Fetch(this.src__ + '/' + pathNameArray[0]).then(obj => obj.lookup(pathNameArray.slice(1)));
+    },
     function f(obj, scope) {
       // async object loads itself when run as a functor
       return this.Fetch(this.src__);
@@ -257,7 +273,10 @@ foam.INTERFACE({
 
   methods: [
     'create', 'read', 'update', 'delete',
-    'enumerator' // returns Functor
+    'enumerator', // returns Functor
+    function lookup(pathNameArray) {
+      return this.read(pathNameArray[0]).then(obj => obj.lookup(pathNameArray.slice(1));
+    }
   ]
 });
 foam.CLASS({

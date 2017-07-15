@@ -18,7 +18,13 @@
 // route fetches based on remappings
 // check context, __url_map__ that is inherited down context layers
 // Each type should take a delegate to chain together, fall back to delegate on fail
-// CLientStub created by server to work with stubRoot: FilteredHTTPFetcher(CORSList) <- LocalFetcher(stubRoot)
+// CLientStub created by server to work with stubRoot: 
+//   LocalFetcher(stubRoot) -> FilteredHTTPFetcher(CORSList) -> ForwardingHTTPFetcher
+//   (try local copies)        (restricted web fetch)           (finally send full URL to server to resolve)
+// Server side:
+//                                                              FetchServer(client) -> LocalFetcher(serverRoot) -> HTTPFetcher
+//                                                              (route or filter)      (server's local objects)    (hit the open web, if desired)
+
 foam.CLASS({
   package: 'com.google.urlz',
   name: 'Fetcher',
@@ -66,7 +72,9 @@ foam.CLASS({
       // url must be relative or absolute with the prefix matching our root object
       path = Url(url).relativeTo(this.rootObject.src__).split('/');
       var obj = this.rootObject;
-      path.forEach(pname => { obj = obj[pname]; });
+      path.forEach(pname => {
+        obj = obj[pname]; 
+      });  
       if ( obj) return obj;
       
       throw `LocalFetch: Not Found! ${url} ${path} in ${this}`;
@@ -83,7 +91,42 @@ foam.CLASS({
   ]
 });
 
-
+foam.CLASS({
+  package: 'com.google.urlz',
+  name: 'FirebaseRTDBFetcher',
+  extends: 'com.google.urlz.Fetcher',
+  documentation: 'Looks up a path from a Firebase Realtime Database',
+  
+  properties: [
+    {
+      /** The URL for our RTDB */
+      name: 'serverUrl',
+    },
+    // RTDB api instance?
+    // Also: return DObjects that wrap RTDB refs, resolve as needed?
+  ],
+  
+  methods: [
+    function fetchImpl_(url) {
+      // url must prefix match our serverUrl, or start with '/' to be relative to the server
+      pathStr = Url(url).relativeTo(this.rootObject.src__);
+      //RTDB_API.grabKey(pathStr);
+      //ObjectDeserialize
+      
+      throw `RTDBFetch: Not Found! ${url} ${path} in ${this}`;
+    },
+    function commitImpl_(url, nuObj) {
+      // url must prefix match our serverUrl, or start with '/' to be relative to the server
+      path = Url(url).relativeTo(this.rootObject.src__);
+      pathStr = Url(url).relativeTo(this.rootObject.src__);
+      //RTDB_API.grabKey(pathStr);
+      //ObjectSerialize
+      //Write
+      
+      throw `RTDBCommit: Not Found! ${url} ${path} in ${this}`;
+    }
+  ]
+});
 
 
 // TODO(markdittmer): Should this be an Outputer implementation?
