@@ -14,7 +14,7 @@ import foam.nanos.logger.NanoLogger;
 import foam.nanos.pm.PM;
 
 public class FixedThreadPool
-    extends AbstractFixedThreadPool
+  extends AbstractFixedThreadPool
 {
   protected ExecutorService pool_          = null;
   protected Object          queuedLock_    = new Object();
