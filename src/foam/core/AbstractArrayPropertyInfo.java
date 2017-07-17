@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.nanos.logger.NanoLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.lang.UnsupportedOperationException;
@@ -33,6 +34,7 @@ public abstract class AbstractArrayPropertyInfo
   // NESTED ARRAY
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
+    NanoLogger logger = (NanoLogger) x.get("logger");
     List objList = new ArrayList();
     String startTag = reader.getLocalName();
     try {
@@ -62,6 +64,7 @@ public abstract class AbstractArrayPropertyInfo
         }
       }
     } catch (XMLStreamException ex) {
+      logger.error("Premature end of XML file")
     }
     return objList.toArray();
   }
