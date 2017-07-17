@@ -17,7 +17,7 @@ public class ScriptRunnerDAO
   public ScriptRunnerDAO()
     throws IOException
   {
-    this(new JDAO(Script.getOwnClassInfo(), "scripts"));
+    this(new foam.dao.PMDAO(new JDAO(Script.getOwnClassInfo(), "scripts")));
   }
 
   public ScriptRunnerDAO(DAO delegate) {
@@ -27,7 +27,10 @@ public class ScriptRunnerDAO
   public FObject put_(X x, FObject obj) {
     Script script = (Script) obj;
 
-    if ( script.getScheduled() ) script.runScript();
+    if ( script.getScheduled() ) {
+      script.runScript(getX());
+      script.setScheduled(false);
+    }
 
     return getDelegate().put_(x, obj);
   }
