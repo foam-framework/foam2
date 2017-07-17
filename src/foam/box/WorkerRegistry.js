@@ -56,10 +56,16 @@ foam.CLASS({
     {
       name: 'stubFactory_',
       documentation: `A factory used to generate BoxRegistryStubs when
-        instantiating a dedicated worker`,
+        instantiating a dedicated worker.`,
       factory: function() {
         return this.StubFactorySingleton.create().get(this.BoxRegistry);
       }
+    },
+    {
+      name: 'registrationRecord_',
+      hidden: true,
+      documentation: `Map of the names of registrations.`,
+      factory: function() { return {}; }
     }
   ],
 
@@ -72,19 +78,10 @@ foam.CLASS({
       }
     },
     {
-      name: 'getRegisteredNames',
-      returns: 'Array',
-      code: function() {
-        return this.localRegistry.getRegisteredNames()
-          .concat(this.delegate.getRegisteredNames());
-      }
-    },
-    {
       name: 'register',
       code: function(name, service, box) {
         // Determine if this name has been registered previously.
-        // TODO: Replace with .includes() once NodeJS 6+ is required.
-        if ( this.getRegisteredNames().indexOf(name) > -1)
+        if ( this.registrationRecord_[name] )
           throw this.NameAlreadyRegisteredException({ name: name });
       }
     }

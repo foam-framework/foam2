@@ -29,7 +29,8 @@ describe('dedicated worker registry', function() {
 
       properties: [
         {
-          class: 'FObjectArray',
+          class: 'Array',
+          of: 'Object',
           name: 'actions'
         }
       ],
@@ -191,7 +192,7 @@ describe('dedicated worker registry', function() {
     expect(mockCount()).toBe(1);
   });
 
-  it('should unregister dedicated services', function() {
+  it('should unregister dedicated services', function(done) {
     var ctx = ctxFactory();
     var boxes = [ null, null, null ].map(function(x) {
       var box = foam.box.LogBox.create();
@@ -209,16 +210,19 @@ describe('dedicated worker registry', function() {
     }
     expect(names().length).toBe(4);
 
-    // Unregistering a box that isn't registered should not do anything.
-    ctx.registry.unregister('Tester');
-    expect(names().length).toBe(4);
+    setTimeout(function() {
+      // Unregistering a box that isn't registered should not do anything.
+      ctx.registry.unregister('Tester');
+      expect(names().length).toBe(4);
 
-    // Unregistering first box (index 1, since 0 is ForkBox) using handle.
-    ctx.registry.unregister(names()[1]);
-    expect(names().length).toBe(3);
+      // Unregistering first box using box.
+      ctx.registry.unregister(register[0]);
+      expect(names().length).toBe(3);
+      done()
+    }, 4500);
   });
 
-  it('should throw an error if registering a service with name that exists in localRegistry', function() {
+  it('should throw an error if registering a service with name that exists in localRegistry', function(done) {
     var ctx = ctxFactory();
 
     // Make a registration with dedicated and get some sort of name.
@@ -228,9 +232,12 @@ describe('dedicated worker registry', function() {
     var names = Object.keys(ctx.registry.localRegistry.registry);
 
     // Creating another service with an existing name, should throw.
-    expect(function() {
-      ctx.registry.register(names[0], null, box);
-    }).toThrow();
+    setTimeout(function() {
+      expect(function() {
+        ctx.registry.register(names[0], null, box);
+      }).toThrow();
+      done();
+    }, 2500);
   });
 
   it('should throw an error if registering a service with a name that exists in delegate', function() {
