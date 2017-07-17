@@ -56,9 +56,10 @@ public class XMLSupport {
   public static FObject createObj ( X x, XMLStreamReader xmlr ) {
     NanoLogger logger = (NanoLogger) x.get("logger");
     Object clsInstance = null;
+    String objClass = null;
     try {
       // Create new fObject
-      String objClass = xmlr.getAttributeValue(null, "class");
+      objClass = xmlr.getAttributeValue(null, "class");
       Class cls = Class.forName(objClass);
       clsInstance = x.create(cls);
       // Object properties
@@ -171,14 +172,14 @@ public class XMLSupport {
   // Returns XML string as full XML document string with document tags
   public static String toXMLString(List<FObject> objArray) {
     Document doc = createDoc();
-    toXML(objArray, doc);
+    toXML(objArray, doc, null);
     return toXMLString(doc);
   }
 
   // Returns XML string as partial XML string with only object tags
   public static String toXMLString(FObject obj) {
     Document doc = createDoc();
-    toXML(obj, doc);
+    toXML(obj, doc, null);
     return toXMLString(doc);
   }
 
