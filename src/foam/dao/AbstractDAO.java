@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao;
 
 import foam.core.*;
@@ -61,7 +67,7 @@ public abstract class AbstractDAO
 
   public AbstractDAO setOf(ClassInfo of) {
     of_ = of;
-    primaryKey_ = (PropertyInfo)of.getAxiomByName("id");
+    primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
     return this;
   }
 
@@ -91,6 +97,10 @@ public abstract class AbstractDAO
 
   public void removeAll() {
     this.removeAll_(this.getX(), 0, this.MAX_SAFE_INTEGER, null, null);
+  }
+
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    this.select_(x, new RemoveSink(this), skip, limit, order, predicate);
   }
 
   public Sink select(Sink sink) {

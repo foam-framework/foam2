@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -284,7 +273,7 @@ foam.CLASS({
   properties: [
     { class: 'Int', name: 'i' },
     'field1',
-    'field2',
+    { name: 'field2', view: 'foam.u2.view.PasswordView' },
     {
       name: 'choices',
       view: {
@@ -440,8 +429,33 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  name: 'ActionDemoSubView',
+  extends: 'foam.u2.Element',
+
+  imports: [ 'viewAction' ],
+
+  exports: [ 'as data' ],
+
+  methods: [
+    function initE() {
+      this
+        // Default Button
+        .add('subView: ', this.SUB_VIEW_ACTION);
+    }
+  ],
+  actions: [
+    function subViewAction(X, obj) {
+      this.viewAction();
+    }
+  ]
+});
+
+foam.CLASS({
   name: 'ActionDemoView',
   extends: 'foam.u2.View',
+
+  exports: [ 'viewAction' ],
+
   methods: [
     function initE() {
       this
@@ -461,9 +475,18 @@ foam.CLASS({
         .start(ActionDemo.ADD, {showLabel: false, icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).setNodeName('a').end()
 
         // Show an Action that already has an icon defined
-        .start(ActionDemo.ADD2).end();
+        .start(ActionDemo.ADD2).end()
+
+        .add(this.VIEW_ACTION)
+
+        .tag({class: 'ActionDemoSubView'});
+    }
+  ],
+  actions: [
+    function viewAction() {
+      console.log('view action');
     }
   ]
-})
+});
 
 ActionDemoView.create({data: ActionDemo.create()}).write();

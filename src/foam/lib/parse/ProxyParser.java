@@ -17,7 +17,9 @@
 
 package foam.lib.parse;
 
-public class ProxyParser implements Parser {
+public class ProxyParser
+  implements Parser
+{
   private Parser delegate;
 
   public ProxyParser(Parser d) {
