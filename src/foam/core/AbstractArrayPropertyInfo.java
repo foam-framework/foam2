@@ -64,7 +64,7 @@ public abstract class AbstractArrayPropertyInfo
         }
       }
     } catch (XMLStreamException ex) {
-      logger.error("Premature end of XML file")
+      logger.error("Premature end of XML file");
     }
     return objList.toArray();
   }
