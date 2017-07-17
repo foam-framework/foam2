@@ -29,8 +29,7 @@ describe('dedicated worker registry', function() {
 
       properties: [
         {
-          class: 'Array',
-          of: 'FObject',
+          class: 'FObjectArray',
           name: 'actions'
         }
       ],

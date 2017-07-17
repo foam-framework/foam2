@@ -48,8 +48,8 @@ foam.CLASS({
       name: 'loadBalancerFactory',
       documentation: `Generates the load balancer which is used to forward
         units of work to worker instances.`,
-      value: function() {
-        return this.RoundRobinBox.create(this.sharedWorkers_);
+      value: function(workers) {
+        return this.RoundRobinBox.create(workers);
       }
     },
     {
@@ -94,6 +94,7 @@ foam.CLASS({
     {
       name: 'send',
       code: function(msg) {
+        // I'm actually not too sure what this would do...
         // If registry contains destination, we send it to one of our workers.
         // Otherwise, forward request to delegate.
       }
