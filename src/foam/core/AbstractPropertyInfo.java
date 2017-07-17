@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.nanos.logger.NanoLogger;
 import foam.lib.parse.Parser;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
@@ -56,11 +57,12 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
-    // Moves reader to characters state in order for value reading
+    // Moves reader to characters state in order for value reading for various data types (date, boolean, short ...)
+    NanoLogger logger = (NanoLogger) x.get("logger");
     try {
       reader.next();
     } catch (XMLStreamException ex) {
-
+      logger.error("Premature end of XML file");
     }
     return "";
   }

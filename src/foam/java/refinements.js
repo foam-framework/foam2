@@ -569,7 +569,7 @@ foam.CLASS({
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FObjectParser']
   ],
-  
+
   methods: [
       function createJavaPropertyInfo_(cls) {
         var info = this.SUPER(cls);

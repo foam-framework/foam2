@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.nanos.logger.NanoLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import javax.xml.stream.XMLStreamException;
@@ -22,8 +23,8 @@ public abstract class AbstractFObjectPropertyInfo
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     FObject obj = null;
+    NanoLogger logger = (NanoLogger) x.get("logger");
     try {
-
       while ( reader.hasNext() ) {
         int eventType;
         eventType = reader.next();
@@ -37,7 +38,8 @@ public abstract class AbstractFObjectPropertyInfo
             break;
         }
       }
-    } catch ( ClassNotFoundException | XMLStreamException ex) {
+    } catch ( XMLStreamException ex) {
+      logger.error("Premature end of xml file while reading property", this.getName());
     }
     return obj;
   }

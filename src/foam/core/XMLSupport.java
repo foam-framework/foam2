@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.nanos.logger.NanoLogger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 import java.io.FileReader;
@@ -28,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 public class XMLSupport {
 
   public static List<FObject> fromXML(X x, XMLStreamReader xmlr) {
+    NanoLogger logger = (NanoLogger) x.get("logger");
     List<FObject> objList = new ArrayList<FObject>();
     try {
       int eventType;
@@ -46,11 +48,13 @@ public class XMLSupport {
       }
       xmlr.close();
     } catch (XMLStreamException ex) {
+      logger.error("Could not read from file with existing XMLStreamReader");
     }
     return objList;
   }
 
   public static FObject createObj ( X x, XMLStreamReader xmlr ) {
+    NanoLogger logger = (NanoLogger) x.get("logger");
     Object clsInstance = null;
     try {
       // Create new fObject
@@ -60,27 +64,29 @@ public class XMLSupport {
       // Object properties
       copyFromXML(x, (FObject) clsInstance, xmlr);
     } catch (ClassNotFoundException ex) {
-
+      logger.error("Could not find class: ", objClass);
     } catch (XMLStreamException ex ) {
-
+      logger.error("Error while reading file");
     }
     return (FObject) clsInstance;
   }
 
   public static List<FObject> fromXML(X x, String fileName) throws IOException {
+    NanoLogger logger = (NanoLogger) x.get("logger");
     XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     XMLStreamReader xmlr = null;
     try {
       xmlr = xmlInputFactory.createXMLStreamReader(new FileReader(fileName));
     } catch (IOException ex) {
-      throw new IOException("Could not create/file with given fileName");
+      logger.error("Could not create/file with given fileName");
     } catch (XMLStreamException ex) {
-
+      logger.error("Error reading file: ", fileName);
     }
     return fromXML(x, xmlr);
   }
 
   public static void copyFromXML(X x, FObject obj, XMLStreamReader reader) throws XMLStreamException {
+    NanoLogger logger = (NanoLogger) x.get("logger");
     try {
       PropertyInfo prop = null;
       while ( reader.hasNext() ) {
@@ -103,7 +109,7 @@ public class XMLSupport {
         }
       }
     } catch (XMLStreamException ex) {
-      throw new XMLStreamException("Premature end of xml file");
+      logger.error("Premature end of xml file");
     }
   }
 
