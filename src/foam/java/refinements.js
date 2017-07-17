@@ -595,6 +595,27 @@ foam.CLASS({
         body: `return ${OF}.forOrdinal(ordinal);`
       });
 
+      info.method({
+        name: 'toJSON',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.json.Outputter'
+          },
+          {
+            name: 'out',
+            type: 'StringBuilder'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `outputter.output(out, getOrdinal(value));`
+      });
+
       var cast = info.getMethod('cast');
       cast.body = 
 `if (o instanceof Integer) {
