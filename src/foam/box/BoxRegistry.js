@@ -30,7 +30,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'registry',
+      name: 'registry_',
       hidden: true,
       factory: function() { return {}; }
     }
@@ -59,9 +59,9 @@ foam.CLASS({
       name: 'doLookup',
       returns: 'foam.box.Box',
       code: function doLookup(name) {
-        if ( this.registry[name] &&
-             this.registry[name].exportBox )
-          return this.registry[name].exportBox;
+        if ( this.registry_[name] &&
+             this.registry_[name].exportBox )
+          return this.registry_[name].exportBox;
 
         throw this.NoSuchNameException.create({ name: name });
       },
@@ -78,12 +78,12 @@ foam.CLASS({
         var exportBox = this.SubBox.create({ name: name, delegate: this.me });
         exportBox = service ? service.clientBox(exportBox) : exportBox;
 
-        this.registry[name] = {
+        this.registry_[name] = {
           exportBox: exportBox,
           localBox: service ? service.serverBox(localBox) : localBox
         };
 
-        return this.registry[name].exportBox;
+        return this.registry_[name].exportBox;
       },
       args: [ 'name', 'service', 'box' ]
     },
@@ -92,19 +92,19 @@ foam.CLASS({
       returns: '',
       code: function(name) {
         if ( foam.box.Box.isInstance(name) ) {
-          for ( var key in this.registry ) {
+          for ( var key in this.registry_ ) {
             // TODO(markdittmer): Should there be a specialized compare() should
             // be implemented by NamedBox (to cut out delegate) and
             // foam.util.compare()?
-            if ( this.registry[key].exportBox === name ) {
-              delete this.registry[key];
+            if ( this.registry_[key].exportBox === name ) {
+              delete this.registry_[key];
               return;
             }
           }
           return;
         }
 
-        delete this.registry[name];
+        delete this.registry_[name];
       },
       args: [
         'name'
