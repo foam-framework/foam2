@@ -6,9 +6,10 @@
 
 package foam.core;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import foam.lib.parse.Parser;
 import foam.mlang.order.Comparator;
-
 import java.util.Map;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
