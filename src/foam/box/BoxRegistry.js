@@ -70,6 +70,13 @@ foam.CLASS({
       ]
     },
     {
+      name: 'getRegisteredNames',
+      returns: 'Array',
+      code: function() {
+        return Object.keys(this.registry);
+      }
+    },
+    {
       name: 'register',
       returns: 'foam.box.Box',
       code: function(name, service, localBox) {
