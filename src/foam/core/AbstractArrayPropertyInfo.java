@@ -8,6 +8,7 @@ package foam.core;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import java.lang.UnsupportedOperationException;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -48,10 +49,11 @@ public abstract class AbstractArrayPropertyInfo
               }
             } else if ( reader.getLocalName().equals("value") ) {
               // TODO: TYPE CASTING FOR PROPER CONVERSION. NEED FURTHER SUPPORT FOR PRIMITIVE TYPES
-              reader.next();
-              String value = reader.getText();
-              String type = this.of();
-              objList.add(value);
+//              reader.next();
+//              String value = reader.getText();
+//              String type = this.of();
+//              objList.add(value);
+              throw new UnsupportedOperationException("Primitive typed array XML reading is not supported yet");
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
