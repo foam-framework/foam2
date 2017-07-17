@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
