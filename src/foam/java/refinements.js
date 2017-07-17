@@ -618,7 +618,7 @@ foam.CLASS({
 
       var cast = info.getMethod('cast');
       cast.body = 
-`if (o instanceof Integer) {
+`if ( o instanceof Integer ) {
   return forOrdinal((int) o);
 }
 
