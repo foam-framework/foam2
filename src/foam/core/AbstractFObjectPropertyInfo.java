@@ -51,10 +51,6 @@ public abstract class AbstractFObjectPropertyInfo
     String objName = nestObj.getClass().getName();
     Element objTag = doc.createElement(objName.substring(objName.lastIndexOf(".")).replace(".",""));
     objElement.appendChild(objTag);
-    if ( nestObj.getClass().isEnum() ) {
-      XMLSupport.enumXML( (Enum) nestObj, doc, objTag);
-    } else {
-      XMLSupport.toXML((FObject) nestObj, doc, objTag);
-    }
+    XMLSupport.toXML((FObject) nestObj, doc, objTag);
   }
 }
