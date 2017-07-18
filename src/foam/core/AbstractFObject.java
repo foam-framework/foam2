@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.core;
 
 import java.util.HashMap;
@@ -6,7 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public abstract class AbstractFObject
-  extends ContextAwareSupport
+  extends    ContextAwareSupport
   implements FObject
 {
 

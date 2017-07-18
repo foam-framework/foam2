@@ -102,10 +102,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'HelloMessage'
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -452,6 +454,7 @@ foam.CLASS({
       value: 3
     }
   ],
+
   methods: [
     function send(msg) {
       if ( this.attempts == this.maxAttempts ) {
@@ -493,6 +496,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -593,10 +597,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'BaseClientDAO',
   extends: 'foam.dao.AbstractDAO',
+
   properties: [
     {
       class: 'Stub',
@@ -607,15 +613,18 @@ foam.CLASS({
         'remove_',
         'removeAll_',
         'select_',
+        'listen_',
         'find_'
       ]
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DAOEvent',
+
   properties: [
     {
       class: 'String',
@@ -632,12 +641,16 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'BoxDAOListener',
+
   implements: [
     'foam.dao.Sink'
   ],
+
   requires: [
-    'foam.dao.DAOEvent'
+    'foam.box.Message',
+    'foam.dao.DAOEvent',
   ],
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -645,15 +658,20 @@ foam.CLASS({
       name: 'box',
     }
   ],
+
   methods: [
     function put(obj) {
-      this.box.send(this.DAOEvent.create({
-        name: 'put', obj: obj
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'put', obj: obj
+        })
       }));
     },
     function remove(obj) {
-      this.box.send(this.DAOEvent.create({
-        name: 'remove', obj: obj
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'remove', obj: obj
+        })
       }));
     },
     function eof() {
@@ -664,12 +682,15 @@ foam.CLASS({
       }));
     },
     function reset() {
-      this.box.send(this.DAOEvent.create({
-        name: 'reset'
+      this.box.send(this.Message.create({
+        object: this.DAOEvent.create({
+          name: 'reset'
+        })
       }));
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -706,25 +727,35 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ClientDAO',
   extends: 'foam.dao.BaseClientDAO',
+
   requires: [
     'foam.core.Serializable',
     'foam.dao.BoxDAOListener'
   ],
+
   methods: [
     function put_(x, obj) {
       return this.SUPER(null, obj);
     },
+
     function remove_(x, obj) {
       return this.SUPER(null, obj);
     },
+
     function find_(x, key) {
       return this.SUPER(null, key);
     },
+
     function select_(x, sink, skip, limit, order, predicate) {
+      if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
+      if ( ! skip ) skip = 0;
+      if ( ! limit ) limit = Number.MAX_SAFE_INTEGER;
+
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
 
@@ -751,10 +782,12 @@ foam.CLASS({
 
       return this.SUPER(null, sink, skip, limit, order, predicate);
     },
+
     function removeAll_(x, skip, limit, order, predicate) {
         return this.SUPER(null, skip, limit, order, predicate);
     },
-    function listen(sink, predicate) {
+
+    function listen_(x, sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
       // TODO: Unsubscribe support.
       var id = foam.next$UID();
@@ -774,12 +807,13 @@ foam.CLASS({
           }
         });
 
-      this.SUPER(this.BoxDAOListener.create({
+      this.SUPER(null, this.BoxDAOListener.create({
         box: replyBox
       }), predicate);
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -1105,6 +1139,7 @@ foam.CLASS({
     },
     {
       name: 'delegate',
+      transient: true,
       factory: function() {
         return foam.box.SocketConnectBox.create({
           address: this.address
@@ -1252,6 +1287,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'RawMessagePortBox',
@@ -1377,18 +1413,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'LoggedLookupContext',
+
   exports: [
     'lookup',
   ],
+
   properties: [
     {
       class: 'Map',
       name: 'record'
     }
   ],
+
   methods: [
     {
       class: 'ContextMethod',
@@ -1400,6 +1440,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.box',
@@ -1443,6 +1484,7 @@ foam.CLASS({
         var model = this.lookup('foam.net.node.SocketService', true);
         if ( model ) {
           return model.create({
+            port: Math.floor( 10000 + ( Math.random() * 10000 ) ),
             delegate: this.registry
           }, this);
         }
@@ -1671,7 +1713,8 @@ foam.CLASS({
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          this.me.send(this.fonParser.parseString(p));
+          var msg = this.fonParser.parseString(p);
+          msg && this.me.send(msg);
         }.bind(this));
       }
     }
@@ -1683,12 +1726,15 @@ foam.CLASS({
   package: 'foam.box',
   name: 'MessagePortBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage',
     'foam.box.Message'
   ],
+
   imports: [ 'messagePortService', 'me' ],
+
   properties: [
     {
       name: 'target'
@@ -1696,8 +1742,8 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-	var channel = new MessageChannel();
-	this.messagePortService.addPort(channel.port1);
+	      var channel = new MessageChannel();
+	      this.messagePortService.addPort(channel.port1);
 
 	this.target.postMessage(channel.port2, [ channel.port2 ]);
 
@@ -1705,15 +1751,17 @@ foam.CLASS({
           object: this.RegisterSelfMessage.create({ name: this.me.name })
         })));
 
-	return this.RawMessagePortBox.create({ port: channel.port1 });
+	      return this.RawMessagePortBox.create({ port: channel.port1 });
       }
     }
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ForwardedMessage',
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -1727,18 +1775,22 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ForwardBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
     'foam.box.ForwardedMessage'
   ],
+
   properties: [
     {
       name: 'destination'
     }
   ],
+
   methods: [
     function send(m) {
       m.object = this.ForwardedMessage.create({
@@ -1750,23 +1802,25 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ForwardingBox',
   implements: [ 'foam.box.Box' ],
+
   requires: [
     'foam.box.ForwardedMessage'
   ],
+
   methods: [
     function send(m) {
-      if ( ! this.ForwardedMessage.isInstance(m.object) ) throw foam.box.InvalidMessageException.create();
+      if ( ! this.ForwardedMessage.isInstance(m.object) )
+        throw foam.box.InvalidMessageException.create();
 
       var wrapper = m.object;
       m.object = wrapper.payload;
 
       wrapper.destination.describe();
-
-
       wrapper.destination.send(m);
     }
   ]

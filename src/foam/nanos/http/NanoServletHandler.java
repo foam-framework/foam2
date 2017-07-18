@@ -16,13 +16,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-/** Adapt a Servlet into an HttpHandler. **/
-public class ServletHandler
+/** Adapt a NanoServlet into an HttpHandler. **/
+public class NanoServletHandler
   implements HttpHandler
 {
-  protected HttpServlet servlet_;
+  protected NanoServlet servlet_;
 
-  public ServletHandler(HttpServlet servlet) {
+  public NanoServletHandler(NanoServlet servlet) {
     servlet_ = servlet;
   }
 
@@ -35,9 +35,9 @@ public class ServletHandler
     RequestWrapper(HttpServletRequest request, HttpExchange ex, Map<String, String[]> postData, ServletInputStream is) {
       super(request);
 
-      this.ex       = ex;
+      this.ex = ex;
       this.postData = postData;
-      this.is       = is;
+      this.is = is;
     }
 
     @Override
@@ -76,11 +76,6 @@ public class ServletHandler
     }
 
     @Override
-    public String getProtocol() {
-      return ex.getProtocol();
-    }
-
-    @Override
     public ServletInputStream getInputStream() throws IOException {
       return is;
     }
@@ -91,17 +86,7 @@ public class ServletHandler
     }
 
     @Override
-    public String getQueryString() {
-      return ex.getRequestURI().getQuery();
-    }
-
-    @Override
     public String getPathInfo() {
-      return ex.getRequestURI().getPath();
-    }
-
-    @Override
-    public String getRequestURI() {
       return ex.getRequestURI().getPath();
     }
 
@@ -169,15 +154,9 @@ public class ServletHandler
     }
 
     @Override
-    public void sendRedirect(String location) throws IOException {
-      setStatus(301);
-      setHeader("Location", location);
-    }
-
-    @Override
     public void sendError(int sc, String msg) throws IOException {
       this.status = sc;
-      if ( msg != null ) {
+      if (msg != null) {
         printWriter.write(msg);
       }
     }
@@ -219,6 +198,7 @@ public class ServletHandler
     ex.getRequestBody().close();
     final ByteArrayInputStream newInput = new ByteArrayInputStream(inBytes);
     final ServletInputStream   is       = new ServletInputStream() {
+
       @Override
       public int read() throws IOException {
         return newInput.read();

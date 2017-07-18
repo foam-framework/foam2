@@ -42,7 +42,17 @@ foam.CLASS({
   ]
 });
 
-debugger;
+
+foam.CLASS({
+  refines: 'foam.mlang.SinkProperty',
+
+  properties: [
+    ['javaType', 'foam.dao.Sink'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 

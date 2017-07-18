@@ -4,8 +4,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.core;
+package foam.nanos.http;
 
-public interface Detachable {
-  public void detach();
+public interface WebAgent
+  extends foam.core.ContextAgent
+{
 }

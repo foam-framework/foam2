@@ -32,7 +32,7 @@ public class TestRunner
   public void runAllTests() {
     final DAO tests = (DAO) getX().get("TestDAO");
     try {
-      final JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
+      final JDAO jTests = new JDAO(tests,"TestFile.jrl");
       tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE)).select(new AbstractSink() {
         public void put(FObject obj, Detachable sub) {
           ((Test) obj).runScript(getX());
@@ -50,7 +50,7 @@ public class TestRunner
     tests.setX(x);
     tests.setOf(Test.getOwnClassInfo());
     try {
-      JournaledDAO jTests = new JournaledDAO(tests,"TestFile.jrl");
+      JDAO jTests = new JDAO(tests,"TestFile.jrl");
       Test test1 = new Test();
       test1.setId("Test 1");
       test1.setCode("test(2==2 ,\"TRUE\");");
