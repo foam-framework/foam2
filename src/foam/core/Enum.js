@@ -315,6 +315,12 @@ foam.CLASS({
         return of && of.VALUES[0];
       },
     },
+    {
+      name: 'javaValue',
+      expression: function(of, value) {
+        return of.id + '.' + value;
+      },
+    },
     [
       'adapt',
       function(o, n, prop) {
@@ -334,7 +340,11 @@ foam.CLASS({
 
         throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
-    ]
+    ],
+    {
+      name: 'toJSON',
+      value: function(value) { return value.ordinal; }
+    }
   ]
 });
 

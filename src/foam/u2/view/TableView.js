@@ -300,7 +300,7 @@ foam.CLASS({
             return this.
               E('tbody').
               select(this.orderedDAO$proxy, function(obj) {
-                this.start('tr').
+                return this.E('tr').
                   on('mouseover', function() { view.hoverSelection = obj; }).
                   on('click', function() {
                     view.selection = obj;

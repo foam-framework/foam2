@@ -23,6 +23,8 @@ var classes = [
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
+  'foam.mlang.sink.Count',
+  'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
   'foam.mlang.Expr',
   'foam.mlang.AbstractExpr',
@@ -78,7 +80,8 @@ var classes = [
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.nanos.export.ExportDriverRegistry'
 ];
 
 var abstractClasses = [

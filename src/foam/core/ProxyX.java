@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.core;
 
 /** Proxy for X interface. **/
@@ -14,21 +20,21 @@ public class ProxyX
     setX(x);
   }
 
-  public Object get(String name) {
+  public Object get(Object name) {
     return getX().get(this, name);
   }
 
-  public Object get(X x, String name) {
+  public Object get(X x, Object name) {
     return getX().get(x, name);
   }
 
-  public X put(String name, Object value) {
+  public X put(Object name, Object value) {
     setX(getX().put(name, value));
 
     return this;
   }
 
-  public X putFactory(String name, XFactory factory) {
+  public X putFactory(Object name, XFactory factory) {
     setX(getX().putFactory(name, factory));
 
     return this;

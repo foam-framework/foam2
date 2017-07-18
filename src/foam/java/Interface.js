@@ -91,7 +91,7 @@ foam.CLASS({
       this.imports.forEach(function(i) {
         o.out('import ' + i, ';\n');
       });
-      
+
       o.out('\n');
 
       o.out(this.visibility, this.visibility ? ' ' : '',
