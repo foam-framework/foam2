@@ -27,10 +27,6 @@ foam.CLASS({
       by "selector" to reside in a different foam.box.Context (with a different
       foam.box.Context.myname) than the SelectorRegistry.`,
 
-  requires: [
-    'foam.box.NameAlreadyRegisteredException',
-    'foam.box.node.ForkBox'
-  ],
   exports: [ 'as registry' ],
 
   classes: [
@@ -91,7 +87,7 @@ foam.CLASS({
       // unregistration in delegate.
       var delegateRegisteredBox;
       if ( foam.box.Box.isInstance(nameOrBox) ) {
-        for ( var key in this.registry ) {
+        for ( var key in this.registry_ ) {
           if ( this.registry_[key].exportBox === nameOrBox ) {
             delegateRegisteredBox = this.registry_[key].localBox;
             delete this.registry_[key];
