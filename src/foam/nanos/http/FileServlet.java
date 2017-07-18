@@ -29,6 +29,7 @@ public class FileServlet
 
     EXTS.put("gif",   "image/gif");
     EXTS.put("png",   "image/png");
+    EXTS.put("svg",   "image/svg+xml");
 
     EXTS.put("java",  "text/x-java-source");
     EXTS.put("csv",   "text/csv");
@@ -49,7 +50,6 @@ public class FileServlet
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
     String pathInfo = req.getPathInfo();
     String filePath = pathInfo.substring(SERVLET_NAME.length() + 2);
-
     try {
       File   srcFile = new File(filePath.isEmpty() ? "./" : filePath);
       String path    = srcFile.getAbsolutePath();
