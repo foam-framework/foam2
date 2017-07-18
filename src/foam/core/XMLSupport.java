@@ -7,8 +7,6 @@
 package foam.core;
 
 import foam.nanos.logger.NanoLogger;
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -25,6 +23,8 @@ import javax.xml.stream.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 
 public class XMLSupport {
 

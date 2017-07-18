@@ -152,7 +152,6 @@ FOAM_FILES([
   { name: "foam/dao/LastModifiedAwareDAO" },
   { name: "foam/dao/ValidationDAODecorator" },
   { name: "foam/dao/SQL", flags: ['sql'] },
-  { name: "foam/dao/NoDisjunctionDAO" },
   { name: "foam/parse/QueryParser" },
   { name: "foam/physics/Physical" },
   { name: "foam/physics/Collider" },
@@ -224,6 +223,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "lib/boxJava", flags: ['java'] },
+<<<<<<< HEAD
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
   { name: "foam/box/BroadcastBox" },
@@ -231,6 +231,8 @@ FOAM_FILES([
   { name: "foam/box/pipeline/PipelineNode" },
   { name: "foam/box/pipeline/PipelineManager" },
   { name: "foam/box/pipeline/PipelineBuilder" },
+=======
+>>>>>>> master
   { name: "foam/core/async" },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
   { name: "foam/u2/daos", flags: ['web'] },
@@ -303,7 +305,6 @@ FOAM_FILES([
   { name: "foam/comics/RelationshipView", flags: ['web'] },
   { name: "foam/u2/view/RecipricalSearch", flags: ['web'] },
   { name: "lib/node/box", flags: ['node'] },
-  { name: "foam/box/node/ForkBox", flags: ['node'] },
   { name: "foam/net/HTTPMethod" },
   { name: "lib/net" },
   { name: "foam/net/RetryHTTPRequest" },

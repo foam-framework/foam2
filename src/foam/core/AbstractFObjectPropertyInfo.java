@@ -7,15 +7,15 @@
 package foam.core;
 
 import foam.nanos.logger.NanoLogger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractFObjectPropertyInfo
-  extends AbstractObjectPropertyInfo
+        extends AbstractObjectPropertyInfo
 {
   //  public int compareValues(FObject o1, FObject o2) {
   //    return o1.compareTo(o2);

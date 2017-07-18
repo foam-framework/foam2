@@ -9,7 +9,7 @@ package foam.core;
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractBytePropertyInfo
-  extends AbstractPropertyInfo
+        extends AbstractPropertyInfo
 {
   public int compareValues(byte b1, byte b2) {
     return java.lang.Byte.compare(b1, b2);
