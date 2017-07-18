@@ -10,12 +10,13 @@ import foam.lib.parse.*;
 
 public class AnyKeyParser extends ProxyParser {
   public AnyKeyParser() {
-    super(new Alt(
-                  new Seq1(1,
-                           new Literal("\""),
-                           new Substring(new Repeat0(new NotChars("\""))),
-                           new Literal("\"")),
-                  new Seq1(0,
-                           new Substring(new Repeat0(new NotChars(" :{}"))))));
+    super(new Alt(new StringParser(), 
+                  new Substring(
+                    new Seq0(
+                      // TODO: Implement Java Grammar support (so separate files aren't needed)
+                      new IdentifierStartParser(),
+                      new Repeat0(new Alt(
+                          new Range('0', '9'),
+                          new IdentifierStartParser()))))));
   }
 }
