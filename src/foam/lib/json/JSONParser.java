@@ -1,10 +1,18 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.core.*;
 
-public class JSONParser extends foam.core.ContextAwareSupport {
-  private Parser parser = new FObjectParser();
+public class JSONParser
+  extends foam.core.ContextAwareSupport
+{
+  private Parser   parser   = new FObjectParser();
   private StringPS stringps = new StringPS();
 
   public FObject parseString(String data) {
@@ -18,7 +26,7 @@ public class JSONParser extends foam.core.ContextAwareSupport {
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
     x.set("defaultClass", defaultClass);
-    ps = (StringPS)parser.parse(ps, x);
+    ps = (StringPS) parser.parse(ps, x);
     if ( ps != null ) return (FObject)ps.value();
     return null;
   }

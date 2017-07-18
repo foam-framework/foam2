@@ -33,6 +33,14 @@ foam.CLASS({
     'foam.dao.DAOSink'
   ],
 
+  classes: [
+    {
+      name: 'AnySink',
+      properties: [ { class: 'Boolean', name: 'hasAny' } ],
+      methods: [ function put() { this.hasAny = true; }, function eof() {} ]
+    }
+  ],
+
   properties: [
     {
       /** Set to the desired cache, such as a foam.dao.MDAO. */
@@ -254,14 +262,15 @@ foam.CLASS({
       // If anything exists in the cache for this query, return it (updates
       // may arrive later and trigger a reset notification). If nothing,
       // wait on the pending cache update.
-      return self.cache.select_(x, this.COUNT(), skip, limit, order, predicate)
-        .then(function(c) {
-          if ( c.value > 0 ) {
-            return readFromCache();
-          } else {
-            return entry.promise.then(readFromCache);
-          }
-        });
+      return self.cache.select_(
+          x, this.AnySink.create(), skip, 1, order, predicate)
+              .then(function(hasAny) {
+                if ( hasAny.hasAny ) {
+                  return readFromCache();
+                } else {
+                  return entry.promise.then(readFromCache);
+                }
+              });
     }
   ],
 

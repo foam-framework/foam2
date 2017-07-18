@@ -41,7 +41,11 @@ public class HeroesServlet
   private X x = EmptyX.instance();
 
   private DAO dao = ((DatastoreDAO) x.create(DatastoreDAO.class)).setOf(Hero.getOwnClassInfo());
-  private foam.box.Box daoSkeleton = ((DAOSkeleton) x.create(DAOSkeleton.class)).setDelegate(dao);
+  private foam.box.Box daoSkeleton;
+  {
+    daoSkeleton = x.create(DAOSkeleton.class);
+    ((DAOSkeleton) daoSkeleton).setDelegate(dao);
+  }
 
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

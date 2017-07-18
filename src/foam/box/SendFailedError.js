@@ -15,45 +15,17 @@
  * limitations under the License.
  */
 
-foam.ENUM({
-  package: 'foam.nanos.log',
-  name: 'LogLevel',
+foam.CLASS({
+  package: 'foam.box',
+  name: 'SendFailedError',
+  extends: 'foam.box.Message',
 
   properties: [
     {
-      class: 'String',
-      name: 'shortName'
+      name: 'original'
     },
     {
-      class: 'String',
-      name: 'consoleMethodName'
-    }
-  ],
-
-  values: [
-    {
-      name: 'DEBUG',
-      shortName: 'DEBG',
-      label: 'Debug',
-      consoleMethodName: 'debug'
-    },
-    {
-      name: 'INFO',
-      shortName: 'INFO',
-      label: 'Info',
-      consoleMethodName: 'info'
-    },
-    {
-      name: 'WARN',
-      shortName: 'WARN',
-      label: 'Warn',
-      consoleMethodName: 'warn'
-    },
-    {
-      name: 'ERROR',
-      shortName: 'ERRR',
-      label: 'Error',
-      consoleMethodName: 'error'
+      name: 'error'
     }
   ]
 });

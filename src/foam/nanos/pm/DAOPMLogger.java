@@ -8,30 +8,29 @@ package foam.nanos.pm;
 
 import foam.core.ContextAwareSupport;
 import foam.dao.DAO;
-import foam.dao.MapDAO;
-import foam.dao.ProxyDAO;
-import java.lang.reflect.Proxy;
 
 public class DAOPMLogger
   extends    ContextAwareSupport
   implements PMLogger
 {
-  public static final String ServiceName = "pmLogger";
+  public final static String ServiceName = "pmLogger";
+  public final static String DAO_NAME    = "pmInfoDAO";
 
   @Override
   public void log(PM pm) {
-    PMInfo pmi = new PMInfo()
-        .setClsname(pm.getClassType().getName())
-        .setPmname(pm.getName());
+    PMInfo pmi = new PMInfo();
+    pmi.setClsname(pm.getClassType().getName());
+    pmi.setPmname(pm.getName());
 
-    DAO pmd = (DAO) getX().get(PMDAO.ServiceName);
+    DAO pmd = (DAO) getX().get(DAO_NAME);
 
     PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
-      pmi.setMintime(pm.getTime())
-          .setMaxtime(pm.getTime())
-          .setTotaltime(pm.getTime())
-          .setNumoccurrences(1);
+
+      pmi.setMintime(pm.getTime());
+      pmi.setMaxtime(pm.getTime());
+      pmi.setTotaltime(pm.getTime());
+      pmi.setNumoccurrences(1);
 
       pmd.put(pmi);
     } else {

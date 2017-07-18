@@ -7,7 +7,8 @@
 package foam.core;
 
 import foam.lib.parse.Parser;
-import java.util.Comparator;
+import foam.mlang.order.Comparator;
+
 import java.util.Map;
 
 // ???: Why is this interface mutable?

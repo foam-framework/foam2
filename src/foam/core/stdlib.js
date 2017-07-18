@@ -372,9 +372,8 @@ foam.LIB({
     function clone(o) { return o; },
     function equals(a, b) { return foam.Number.compare(a, b) == 0; },
     function compare(a, b) {
-      if ( ! foam.Number.isInstance(b) && isNaN(parseFloat(b))
-          || ( isNaN(a) && ! isNaN(b)) ) return 1;
-      else if ( ! isNaN(a) && isNaN(b) ) return -1;
+      if ( ! foam.Number.isInstance(b) || ( isNaN(a) && ! isNaN(b)) ) return 1;
+      if ( ! isNaN(a) && isNaN(b) ) return -1;
       return a < b ? -1 : a > b ? 1 : 0;
     },
     (function() {
@@ -587,10 +586,8 @@ foam.LIB({
     function getTime(d) { return ! d ? 0 : d.getTime ? d.getTime() : d ; },
     function equals(a, b) { return this.getTime(a) === this.getTime(b); },
     function compare(a, b) {
-      if ( ! foam.Date.isInstance(b) && ! foam.Number.isInstance(b) ) return 1;
-      a = this.getTime(a);
-      b = foam.Number.isInstance(b) ? b : this.getTime(b);
-      return foam.Number.compare(a, b);
+      if ( ! foam.Date.isInstance(b) ) return 1;
+      return foam.Number.compare(this.getTime(a), this.getTime(b));
     },
     // Hash n & n: Truncate to 32 bits.
     function hashCode(d) { var n = d.getTime(); return n & n; },
@@ -647,7 +644,10 @@ foam.LIB({
     function is(a, b)      { return a === b; },
     function diff(a, b)    { return a.diff(b); },
     function equals(a, b)  { return a.equals(b); },
-    function compare(a, b) { return a.compareTo(b); },
+    function compare(a, b) {
+      if ( ! foam.core.FObject.isInstance(b) ) return 1;
+      return a.compareTo(b);
+    },
     function hashCode(o)   { return o.hashCode(); }
   ]
 });
@@ -724,16 +724,16 @@ foam.typeOf = (function() {
 /**
   Defining an ordinal property to establish a precedence
   in which items should be compared in. Items are arranged
-  by complexity of the type
+  by complexity of the type.
 */
 
 foam.core.FObject.ordinal = 0;
-foam.Object.ordinal = 1;
-foam.Function.ordinal = 2;
-foam.Array.ordinal = 3;
-foam.String.ordinal = 4;
-foam.Number.ordinal = 5;
-foam.Date.ordinal = 6; // Dates are compared as Number, thus more simple
+foam.Date.ordinal = 1;
+foam.Object.ordinal = 2;
+foam.Function.ordinal = 3;
+foam.Array.ordinal = 4;
+foam.String.ordinal = 5;
+foam.Number.ordinal = 6;
 foam.Boolean.ordinal = 7;
 foam.Null.ordinal = 8;
 foam.Undefined.ordinal = 9;
@@ -796,8 +796,8 @@ foam.LIB({
         // we will always use the comparator of higher precedence.
         var aType = typeOf(a);
         var bType = typeOf(b);
-        return aType.ordinal >= bType.ordinal ? aType.compare(a, b) :
-            -bType.compare(b, a);
+        return aType.ordinal > bType.ordinal ? 1 :
+            aType.ordinal < bType.ordinal ? -1 : aType.compare(a, b);
       },
       function hashCode(o)   { return typeOf(o).hashCode(o); },
       function diff(a, b)    {

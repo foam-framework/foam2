@@ -20,6 +20,17 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'getOf',
+      javaReturns: 'foam.core.ClassInfo'
+    },
+    {
+      name: 'setOf',
+      args: [
+        { name: 'of', javaType: 'foam.core.ClassInfo' }
+      ],
+      javaReturns: 'foam.dao.DAO'
+    },
+    {
       name: 'put',
       javaReturns: 'foam.core.FObject',
       args: [
@@ -272,7 +283,7 @@ foam.INTERFACE({
         {
           name: 'obj',
           javaType:  'Object'
-        },
+        }
       ]
     }
   ]

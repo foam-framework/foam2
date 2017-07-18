@@ -1,11 +1,16 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.json;
 
-import foam.core.FObject;
 import foam.core.ClassInfo;
+import foam.core.FObject;
 import foam.core.PropertyInfo;
-
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public class Outputter {
   public String stringify(FObject obj) {
@@ -65,6 +70,7 @@ public class Outputter {
       output(out, value);
       if ( keys.hasNext() ) out.append(",");
     }
+    out.append("}");
   }
 
   protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p) {

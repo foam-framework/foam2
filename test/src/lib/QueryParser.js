@@ -102,6 +102,7 @@ describe('Query parser', function() {
   var testQuery = function(str, expected, opt_dao) {
     return function(done) {
       var q = parser.parseString(str);
+      console.log('Test query', q.toString());
       expect(q).toBeDefined();
       (opt_dao || dao)
           .where(q)
