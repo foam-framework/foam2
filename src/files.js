@@ -223,7 +223,6 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "lib/boxJava", flags: ['java'] },
-<<<<<<< HEAD
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
   { name: "foam/box/BroadcastBox" },
@@ -231,8 +230,6 @@ FOAM_FILES([
   { name: "foam/box/pipeline/PipelineNode" },
   { name: "foam/box/pipeline/PipelineManager" },
   { name: "foam/box/pipeline/PipelineBuilder" },
-=======
->>>>>>> master
   { name: "foam/core/async" },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
   { name: "foam/u2/daos", flags: ['web'] },
