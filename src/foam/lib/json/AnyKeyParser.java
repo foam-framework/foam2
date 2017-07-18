@@ -16,6 +16,6 @@ public class AnyKeyParser extends ProxyParser {
                            new Substring(new Repeat0(new NotChars("\""))),
                            new Literal("\"")),
                   new Seq1(0,
-                           new Substring(new Repeat0(new NotChars(" :"))))));
+                           new Substring(new Repeat0(new NotChars(" :{}"))))));
   }
 }
