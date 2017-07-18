@@ -13,6 +13,7 @@ public class AnyKeyParser extends ProxyParser {
     super(new Alt(new StringParser(), 
                   new Substring(
                     new Seq0(
+                      // TODO: Implement Java Grammar support (so separate files aren't needed)
                       new IdentifierStartParser(),
                       new Repeat0(new Alt(
                           new Range('0', '9'),
