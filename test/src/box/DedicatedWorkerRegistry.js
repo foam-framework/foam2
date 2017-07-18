@@ -192,7 +192,7 @@ describe('dedicated worker registry', function() {
     expect(mockCount()).toBe(1);
   });
 
-  it('should unregister dedicated services', function(done) {
+  it('should unregister dedicated services', function() {
     var ctx = ctxFactory();
     var boxes = [ null, null, null ].map(function(x) {
       var box = foam.box.LogBox.create();
@@ -204,40 +204,36 @@ describe('dedicated worker registry', function() {
       return ctx.registry.register(`Box${i}`, null, box);
     });
 
-    // There should be 4 registrations. 1 for ForkBox, 3 for boxes above.
-    var names = function() {
-      return Object.keys(ctx.registry.localRegistry.registry);
+    // There should be 3 registrations, 1 for each box above.
+    var nameCount = function() {
+      return ctx.registry.registrationRecord_.length;
     }
-    expect(names().length).toBe(4);
+    expect(nameCount()).toBe(3);
 
-    setTimeout(function() {
-      // Unregistering a box that isn't registered should not do anything.
-      ctx.registry.unregister('Tester');
-      expect(names().length).toBe(4);
+    // Unregistering a box that isn't registered should not do anything.
+    ctx.registry.unregister('Tester');
+    expect(nameCount()).toBe(3);
 
-      // Unregistering first box using box.
-      ctx.registry.unregister(register[0]);
-      expect(names().length).toBe(3);
-      done()
-    }, 4500);
+    // Unregistering first box using box.
+    ctx.registry.unregister(register[0]);
+    expect(nameCount()).toBe(2);
   });
 
-  it('should throw an error if registering a service with name that exists in localRegistry', function(done) {
+  it('should throw an error if registering a service with name that exists in localRegistry', function() {
     var ctx = ctxFactory();
 
     // Make a registration with dedicated and get some sort of name.
     var box = foam.box.LogBox.create();
     box.serviceName = 'Log';
     ctx.registry.register(null, null, box);
-    var names = Object.keys(ctx.registry.localRegistry.registry);
+    var names = ctx.registry.registrationRecord_.map(function(record) {
+      return record.name;
+    });
 
     // Creating another service with an existing name, should throw.
-    setTimeout(function() {
-      expect(function() {
-        ctx.registry.register(names[0], null, box);
-      }).toThrow();
-      done();
-    }, 2500);
+    expect(function() {
+      ctx.registry.register(names[0], null, box);
+    }).toThrow();
   });
 
   it('should throw an error if registering a service with a name that exists in delegate', function() {

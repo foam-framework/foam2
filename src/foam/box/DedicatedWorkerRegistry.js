@@ -65,6 +65,12 @@ foam.CLASS({
         on the dedicated service worker.`,
       hidden: true,
       factory: function() { return {}; }
+    },
+    {
+      class: 'Array',
+      name: 'registrationRecord_',
+      hidden: true,
+      documentation: `To be added later...`
     }
   ],
 
@@ -74,7 +80,10 @@ foam.CLASS({
       returns: 'foam.box.Box',
       code: function(name, service, box) {
         // Perform check on name to see if it is already registered.
-        this.SUPER(name, service, box);
+        this.registrationRecord_.forEach(function(record) {
+          if ( record.name === name )
+            throw this.NameAlreadyRegisteredException({ name: name });
+        });
 
         var ret;
         var key = this.getDedicatedWorkerKey(box);
@@ -82,12 +91,12 @@ foam.CLASS({
           ret = this.delegate.register(name, service, box);
           if ( ! ret.name ) ret.name = foam.next$UID;
 
-          this.registrationRecord_[ret.name] = {
+          this.registrationRecord_.push({
             key: null,
-            worker: this.delegate,
+            registry: this.delegate,
             box: ret,
             name: ret.name
-          };
+          });
         } else {
           if ( ! this.dedicatedWorkers_[key] ) {
             this.dedicatedWorkers_[key] = this.stubFactory_.create({
@@ -99,20 +108,19 @@ foam.CLASS({
           ret = this.dedicatedWorkers_[key].register(name, service, box);
 
           // Async resolve name and add record.
-          var self = this;
-          ret.delegate.then(function resolve(box) {
-            if ( foam.box.NamedBox.isInstance(box) ) {
-              self.registrationRecord_[box.name] = {
-                key: key,
-                worker: self.dedicatedWorkers_[key],
-                box: ret,
-                name: box.name
-              };
-            } else if ( ! box.delegate ) {
-              return '';
-            } else {
-              return resolve(box.delegate);
-            }
+          this.registrationRecord_.push({
+            key: key,
+            registry: this.dedicatedWorkers_[key],
+            box: ret,
+            name: ret.delegate.then(function(box) {
+              if ( foam.box.NamedBox.isInstance(box) ) {
+                Promise.resolve(box.name);
+              } else if ( ! box.delegate ) {
+                Promise.resolve('');
+              } else {
+                return box.delegate;
+              }
+            })
           });
         }
         return ret;
@@ -123,26 +131,19 @@ foam.CLASS({
       name: 'unregister',
       returns: '',
       code: function(name) {
-        if ( foam.box.Box.isInstance(name) ) {
-          // Check to see if box is a returned promised box.
-          for ( var prop in this.registrationRecord_ ) {
-            var record = this.registrationRecord_[prop];
-            if ( name === record.box ) {
-              record.worker.unregister(prop);
-              delete this.registrationRecord_[prop];
-              return;
-            }
-          }
-          // A record was not found. Let delegate handle it.
-          this.delegate.unregister(name);
-        } else {
-          var record = this.registrationRecord_[name];
-          if ( record ) {
-            record.worker.unregister(name);
-            delete this.registrationRecord_[name];
+        var self = this;
+        this.registrationRecord_.forEach(function(record, i) {
+          var ref = foam.box.Box.isInstance(name) ?
+            record.box : record.name;
+
+          if ( name === ref ) {
+            record.registry.unregister(record.name);
+            self.registrationRecord_.splice(i, 1);
             return;
           }
-        }
+        });
+        // A record was not found. Let delegate handle it.
+        this.delegate.unregister(name);
       }
     },
     {

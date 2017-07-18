@@ -23,6 +23,7 @@ foam.CLASS({
 
   requires: [
     'foam.core.StubFactorySingleton',
+    'foam.box.NameAlreadyRegisteredException',
     'foam.box.BoxRegistry',
     'foam.box.Context'
   ],
