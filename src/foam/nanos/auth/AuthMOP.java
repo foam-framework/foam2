@@ -9,6 +9,7 @@ package foam.nanos.auth;
 import foam.core.FObject;
 import foam.core.X;
 import foam.mop.ProxyMOP;
+
 import javax.security.auth.AuthPermission;
 import java.util.Map;
 
@@ -22,9 +23,7 @@ public class AuthMOP
   }
 
   protected String getRootPermission_(X x) {
-    return rootPermission_ == null ?
-      getDelegate().get(x).getClassInfo().getId() :
-      rootPermission_ ;
+    return rootPermission_ == null ? getDelegate().get(x).getClassInfo().getId() : rootPermission_;
   }
 
   /**
@@ -36,40 +35,40 @@ public class AuthMOP
    * @return true if has access, false otherwise
    */
   private Boolean checkPermission_(X x, AuthService authService, String name) {
-    String permissionString = name == null ?
-      getRootPermission_(x) :
-      getRootPermission_(x) + "." + name ;
-
+    String permissionString = (name == null ? getRootPermission_(x) : getRootPermission_(x) + "." + name);
     java.security.Permission permission = new AuthPermission(permissionString);
-
     return authService.check(x, permission);
   }
 
   @Override
   public FObject get(X x) {
     AuthService authService = (AuthService) x.get("authService");
-    return checkPermission_(x, authService, null ) ? super.get(x) : null;
+    if ( ! checkPermission_(x, authService, null) ) {
+      // TODO figure out what to do here
+      return null;
+    }
+    return super.get(x);
   }
 
   @Override
   public FObject setProperty(X x, String name, Object value) {
     AuthService authService = (AuthService) x.get("authService");
-    return checkPermission_(x, authService, name) ?
-      super.setProperty(x, name, value) :
-      null ;
+    if ( ! checkPermission_(x, authService, name) ) {
+      // TODO figure out what to do here
+      return null;
+    }
+    return super.setProperty(x, name, value);
   }
 
   @Override
   public FObject setProperties(X x, Map values) {
     AuthService authService = (AuthService) x.get("authService");
-
     for ( Object o : values.keySet() ) {
       if ( ! checkPermission_(x, authService, (String) o) ) {
         // TODO figure out what to do here
         return null;
       }
     }
-
     return super.setProperties(x, values);
   }
 }

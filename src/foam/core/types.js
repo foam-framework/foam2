@@ -85,7 +85,7 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
+          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
 
           return ret;
         }

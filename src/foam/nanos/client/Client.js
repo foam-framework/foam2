@@ -8,13 +8,9 @@ foam.CLASS({
   package: 'foam.nanos.client',
   name: 'Client',
 
-  implements: [ 'foam.box.Context' ],
-
   documentation: 'Client for connecting to NANOS server.',
 
   requires: [
-    'foam.box.HTTPBox',
-    'foam.dao.ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
@@ -24,7 +20,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.boot.NSpec',
     'foam.nanos.cron.Cron',
-    'foam.nanos.export.ExportDriverRegistry',
     'foam.nanos.menu.Menu',
     'foam.nanos.pm.PMInfo',
     'foam.nanos.script.Script',
@@ -35,7 +30,6 @@ foam.CLASS({
   exports: [
     'countryDAO',
     'cronDAO',
-    'exportDriverRegistryDAO',
     'groupDAO',
     'languageDAO',
     'menuDAO',
@@ -52,13 +46,6 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
-        return this.ClientDAO.create({
-          of: this.NSpec,
-          delegate: this.HTTPBox.create({
-            method: 'POST',
-            url: 'http://localhost:8080/nSpecDAO'
-          })});
-        /*
         return this.createDAO({
           of: this.NSpec,
           seqNo: true,
@@ -71,7 +58,6 @@ foam.CLASS({
             { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
-        */
       }
     },
 
@@ -94,21 +80,6 @@ foam.CLASS({
             { code: 'UK', name: 'United Kingdom' },
             { code: 'US', name: 'USA' },
             { code: 'ZA', name: 'South Africa' }
-          ]
-        });
-      }
-    },
-
-    // TODO: change to client DAO
-    {
-      name: 'exportDriverRegistryDAO',
-      factory: function() {
-        return this.createDAO({
-          of: this.ExportDriverRegistry,
-          testData: [
-            { id: 'CSV',  driverName: 'net.nanopay.export.CSVDriver' },
-            { id: 'JSON', driverName: 'net.nanopay.export.JSONDriver' },
-            { id: 'XML',  driverName: 'net.nanopay.export.XMLDriver' }
           ]
         });
       }

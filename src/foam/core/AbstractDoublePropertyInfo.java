@@ -9,7 +9,7 @@ package foam.core;
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractDoublePropertyInfo
-  extends AbstractPropertyInfo
+        extends AbstractPropertyInfo
 {
   public int compareValues(double d1, double d2) {
     return Double.compare(d1, d2);

@@ -125,9 +125,6 @@ foam.CLASS({
     function serialize(obj) {
       return foam.json.Storage.objectify(obj);
     },
-    function serializeId(id) {
-      return this.of.ID.toJSON(id);
-    },
 
     function withStore(mode, fn) {
       return this.withStore_(mode, fn);
@@ -169,8 +166,7 @@ foam.CLASS({
       var self = this;
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
-          var request = store.put(self.serialize(value),
-                                  self.serializeId(value.id));
+          var request = store.put(self.serialize(value), value.id);
           request.transaction.addEventListener(
             'complete',
             function(e) {
@@ -186,9 +182,8 @@ foam.CLASS({
       });
     },
 
-    function find_(x, obj) {
+    function find_(x, key) {
       var self = this;
-      var key = this.serializeId(obj.id != undefined ? obj.id : obj);
 
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
@@ -212,7 +207,7 @@ foam.CLASS({
 
     function remove_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id != undefined ? obj.id : obj);
+      var key = obj.id != undefined ? obj.id : obj;
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
           var getRequest = store.get(key);
