@@ -21,7 +21,11 @@ foam.CLASS({
   extends: 'foam.box.BoxRegistryBox',
 
   documentation: `A registry that routes registration requests to other
-      registries according to its "selector".`,
+      registries according to its "selector".
+
+      NOTE: SelectorRegistry's delegation strategy expects registries returned
+      by "selector" to reside in a different foam.box.Context (with a different
+      foam.box.Context.myname) than the SelectorRegistry.`,
 
   requires: [
     'foam.box.NameAlreadyRegisteredException',
@@ -33,12 +37,13 @@ foam.CLASS({
     {
       name: 'Registration',
 
-      documentation: `Mapping between string key and box registered on dedicated
-          worker associated with that key.`,
+      documentation: `Mapping between a delegate registry and a box returned
+          from registering with the delegate.`,
 
       properties: [
         {
-          class: 'foam.box.BoxRegistry',
+          class: 'FObjectProperty',
+          of: 'foam.box.BoxRegistry',
           name: 'registry',
           documentation: `The registry that returned "box".`
         },
@@ -64,7 +69,7 @@ foam.CLASS({
     },
     {
       class: 'Array',
-      // of: 'WorkerRegistration',
+      // of: 'Registration',
       name: 'selectorRegistrations_',
       documentation: `Array of bindings:
           <selector-chosen-delegate, box-returned-from-register-in-delegate>.`
@@ -72,56 +77,47 @@ foam.CLASS({
   ],
 
   methods: [
-    {
-      name: 'register',
-      returns: 'foam.box.Box',
-      args: [ 'name', 'service', 'box' ],
-      code: function(name, service, box) {
-        var delegate = this.selector.select(name, service, box);
-        var delegateRegisteredBox = delegate.register(null, null, box);
-        this.selectorRegistrations_.push(this.Registration.create({
-          registry: delegate,
-          box: delegateRegisteredBox
-        }));
-        return this.SUPER(name, service, delegateRegisteredBox);
-      }
+    function register(name, service, box) {
+      var delegate = this.selector.select(name, service, box);
+      var delegateRegisteredBox = delegate.register(null, null, box);
+      this.selectorRegistrations_.push(this.Registration.create({
+        registry: delegate,
+        box: delegateRegisteredBox
+      }));
+      return this.SUPER(name, service, delegateRegisteredBox);
     },
-    {
-      name: 'unregister',
-      returns: '',
-      code: function(name) {
-        // Similar to BoxRegistry implementation, but grab local box for
-        // unregistration in worker.
-        var delegateRegisteredBox;
-        if ( foam.box.Box.isInstance(name) ) {
-          for ( var key in this.registry ) {
-            if ( this.registry_[key].exportBox === name ) {
-              delegateRegisteredBox = this.registry_[key].localBox;
-              delete this.registry_[key];
-            }
+    function unregister(nameOrBox) {
+      // Similar to BoxRegistry implementation, but grab local box for
+      // unregistration in delegate.
+      var delegateRegisteredBox;
+      if ( foam.box.Box.isInstance(nameOrBox) ) {
+        for ( var key in this.registry ) {
+          if ( this.registry_[key].exportBox === nameOrBox ) {
+            delegateRegisteredBox = this.registry_[key].localBox;
+            delete this.registry_[key];
           }
-        } else {
-          delegateRegisteredBox = this.registry_[name].localBox;
-          delete this.registry_[name];
         }
-
-        if ( ! delegateRegisteredBox ) return;
-
-        var registrations = this.selectorRegistrations_;
-        var registry = null;
-        for ( var i = 0; i < registrations.length; i++ ) {
-          if ( registrations[i].box !== delegateRegisteredBox ) continue;
-          registry = registrations[i].registry;
-          break;
-        }
-
-        foam.assert(registry, 'SelectorRegistry: Expected to find registry');
-
-        // TODO(markdittmer): See TODO in BoxRegistry.unregister();
-        // unregistering remote boxes this way will not work unless something
-        // more nuanced than object identity is used.
-        registry.unregister(delegateRegisteredBox);
+      } else {
+        delegateRegisteredBox = this.registry_[nameOrBox].localBox;
+        delete this.registry_[nameOrBox];
       }
+
+      if ( ! delegateRegisteredBox ) return;
+
+      var registrations = this.selectorRegistrations_;
+      var registry = null;
+      for ( var i = 0; i < registrations.length; i++ ) {
+        if ( registrations[i].box !== delegateRegisteredBox ) continue;
+        registry = registrations[i].registry;
+        break;
+      }
+
+      foam.assert(registry, 'SelectorRegistry: Expected to find registry');
+
+      // TODO(markdittmer): See TODO in BoxRegistry.unregister();
+      // unregistering remote boxes this way will not work unless something
+      // more nuanced than object identity is used.
+      registry.unregister(delegateRegisteredBox);
     }
   ]
 });
