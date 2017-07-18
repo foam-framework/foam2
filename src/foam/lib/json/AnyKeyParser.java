@@ -13,9 +13,9 @@ public class AnyKeyParser extends ProxyParser {
     super(new Alt(new StringParser(), 
                   new Substring(
                     new Seq0(
-                      new Alt(new Range('A', 'z'), new Literal("_"), new Literal("$")), 
+                      new IdentifierStartParser(),
                       new Repeat0(new Alt(
                           new Range('0', '9'),
-                          new Alt(new Range('A', 'z'), new Literal("_"), new Literal("$"))))))));
+                          new IdentifierStartParser()))))));
   }
 }
