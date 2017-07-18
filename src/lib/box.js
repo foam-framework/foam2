@@ -30,9 +30,18 @@ foam.INTERFACE({
 });
 
 
+foam.INTERFACE({
+  package: 'foam.box',
+  name: 'Skeleton',
+  extends: 'foam.box.Box',
+  documentation: 'Skeleton marker interface.'
+});
+
+
 foam.CLASS({
   package: 'foam.box',
   name: 'PromisedBox',
+  implements: [ 'foam.box.Box' ],
 
   properties: [
     {
@@ -1671,7 +1680,7 @@ foam.CLASS({
   classes: [
     {
       name: 'JSONOutputter',
-      extends: 'foam.json.Outputer',
+      extends: 'foam.json.Outputter',
       requires: [
         'foam.box.HTTPReplyBox'
       ],

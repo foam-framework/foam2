@@ -53,6 +53,13 @@ foam.CLASS({
       factory: function() {
         return this.importedSummaryView$ ? this.importedSummaryView : { class: 'foam.u2.view.ScrollTableView' };
       }
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$data$of) {
+        return 'Browse ' + data$data$of.name;
+      }
     }
   ],
 
