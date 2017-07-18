@@ -180,6 +180,8 @@ FOAM_FILES([
   { name: "foam/box/BoxRegistryBox" },
   { name: "foam/box/ClientBoxRegistry" },
   { name: "foam/box/PromisedBoxRegistry" },
+  { name: "foam/box/RegistrySelector" },
+  { name: "foam/box/SelectorRegistry" },
   { name: "foam/box/LookupBox" },
   { name: "foam/box/NamedBox" },
   { name: "foam/box/RetryBox" },
