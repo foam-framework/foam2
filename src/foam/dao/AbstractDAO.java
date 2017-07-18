@@ -99,7 +99,7 @@ public abstract class AbstractDAO
     this.removeAll_(this.getX(), 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
-  public void removeAll_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     this.select_(x, new RemoveSink(this), skip, limit, order, predicate);
   }
 
