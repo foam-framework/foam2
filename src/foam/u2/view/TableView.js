@@ -76,6 +76,22 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Currency',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.start()
+          .style({'text-align': 'left', 'padding-right': '20px'})
+          .add('$' + value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+        .end();
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
