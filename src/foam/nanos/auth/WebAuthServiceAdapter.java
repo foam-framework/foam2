@@ -23,7 +23,11 @@ public class WebAuthServiceAdapter
    * marshall a context
    * */
   protected Map<String, X> loginMap = new LRULinkedHashMap<>(10000);
-  private CachedUserAndGroupAuthService service_ = new CachedUserAndGroupAuthService();
+  private AuthService service_ = new UserAndGroupAuthService();
+
+  public void start() {
+    service_.start();
+  }
 
   public String generateChallenge(String userId) {
     return service_.generateChallenge(userId);
