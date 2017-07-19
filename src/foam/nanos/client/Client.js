@@ -29,7 +29,7 @@ foam.CLASS({
     'foam.nanos.pm.PMInfo',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test',
-    'foam.nanos.auth.AuthService',
+    'foam.nanos.auth.WebAuthService',
     'foam.nanos.auth.ClientAuthService'
   ],
 
