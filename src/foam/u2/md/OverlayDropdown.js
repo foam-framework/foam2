@@ -83,6 +83,11 @@ foam.CLASS({
       value: 0
     },
     {
+      class: 'Int',
+      name: 'bottomOffset',
+      value: -13
+    },
+    {
       class: 'Boolean',
       name: 'opened',
       documentation: 'True when the overlay has been commanded to be open. ' +
@@ -150,8 +155,8 @@ foam.CLASS({
       
       if ( Number.isNaN(margin) ) margin = 0;
 
-      return (Math.min(border + last.offsetTop + last.offsetHeight + margin,
-          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top)) - 13;
+      return Math.min(border + last.offsetTop + last.offsetHeight + margin,
+          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top) + this.bottomOffset;
     },
 
     function initE() {

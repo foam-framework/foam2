@@ -66,7 +66,7 @@ foam.CLASS({
         margin: 8px;
         padding: 8px;
       }
-      
+
       ^label {
         color: #444;
         flex-grow: 1;
