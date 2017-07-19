@@ -27,7 +27,7 @@ public class StringParser implements Parser {
     char lastc = delim_;
 
     StringBuilder sb = new StringBuilder();
-
+    
     while ( ps.valid() ) {
       char c = ps.head();
       if ( c == delim_ && lastc != escape_ ) {
@@ -35,9 +35,24 @@ public class StringParser implements Parser {
       }
 
       if ( c != escape_ ) sb.append(c);
+      
+      if ( c == '\\' && ps.tail().head() == 'u' ) {
+        Parser unicodeParser = new UnicodeParser();
+        PStream unicodePS = unicodeParser.parse(ps, x);
+
+        if ( unicodePS != null ) {
+          sb.append(unicodePS.value());
+          ps = unicodePS;
+
+          c = ((Character) unicodePS.value()).charValue();
+        } else {
+          ps = ps.tail();
+        }
+      } else {
+        ps = ps.tail();
+      }
 
       lastc = c;
-      ps = ps.tail();
     }
 
     return ps.tail().setValue(sb.toString());
