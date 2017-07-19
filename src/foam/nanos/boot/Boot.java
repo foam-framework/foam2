@@ -73,6 +73,10 @@ public class Boot {
     });
   }
 
+  public X getX() {
+    return root_;
+  }
+
   public static void main (String[] args)
     throws Exception
   {
