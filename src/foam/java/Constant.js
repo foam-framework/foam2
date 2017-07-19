@@ -69,7 +69,7 @@ foam.CLASS({
       if ( ( ! this.type && ! foam.String.isInstance(this.value) ) || ( this.type && this.type != 'String' ) ) {
         o.out(this.value);
       } else {
-        let escapedValue = this.escapeString(this.value);
+        var escapedValue = this.escapeString(this.value);
         o.out('\"' + escapedValue + '\"');
       }
 
@@ -79,7 +79,7 @@ foam.CLASS({
     function escapeString(s) {
       var escapedValue = '';
       for ( var i = 0 ; i < this.value.length ; i++ ) {
-        let c = this.value.charAt(i);
+        var c = this.value.charAt(i);
         switch(c) {
           case '\\' :
             escapedValue += '\\\\';

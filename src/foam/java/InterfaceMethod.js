@@ -40,6 +40,12 @@ foam.CLASS({
       setter: function() {},
       getter: function() {}
     },
+    {
+      name: 'synchronized',
+      documentation: 'Dummy property to silence warnings',
+      setter: function() {},
+      getter: function() {}
+    },
     { class: 'StringArray', name: 'throws' }
   ],
 
