@@ -151,7 +151,7 @@ foam.CLASS({
       if ( Number.isNaN(margin) ) margin = 0;
 
       return (Math.min(border + last.offsetTop + last.offsetHeight + margin,
-          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top)) - 15;
+          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top)) - 13;
     },
 
     function initE() {
