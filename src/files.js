@@ -87,7 +87,6 @@ FOAM_FILES([
   { name: "foam/java/MultiPartSetter", flags: ['java'] },
   { name: "foam/java/Outputter", flags: ['java'] },
   { name: "foam/java/PropertyInfo", flags: ['java'] },
-  { name: "foam/java/PropertyRefinement", flags: ['java'] },
   { name: "foam/java/Skeleton", flags: ['java'] },
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
