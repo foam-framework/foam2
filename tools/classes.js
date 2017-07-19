@@ -72,6 +72,7 @@ var classes = [
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.WebAuthService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
@@ -92,7 +93,7 @@ var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
-  'foam.nanos.auth.AuthService'
+  'foam.nanos.auth.WebAuthService'
 ];
 
 var proxies = [

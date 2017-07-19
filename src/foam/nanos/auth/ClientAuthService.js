@@ -11,7 +11,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Stub',
-      of: 'foam.nanos.auth.AuthService',
+      of: 'foam.nanos.auth.WebAuthService',
       name: 'delegate'
     }
   ]
