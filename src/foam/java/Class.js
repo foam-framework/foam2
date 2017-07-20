@@ -92,6 +92,12 @@ foam.CLASS({
     {
       name: 'extras',
       factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Action',
+      name: 'actions',
+      factory: function() { return []; }
     }
   ],
 
@@ -207,6 +213,7 @@ foam.CLASS({
       }
 
       this.methods.forEach(function(f) { o.out(f, '\n'); });
+      this.actions.forEach(function(a) { o.out(a, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });
       this.extras.forEach(function(c) { o.out(c, '\n'); });
       o.decreaseIndent();

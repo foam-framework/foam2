@@ -109,7 +109,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaCode',
+      name: 'javaCode'
     }
   ],
 
@@ -159,6 +159,17 @@ foam.CLASS({
       proto[this.name] = function() {
         return action.maybeCall(this.__context__, this);
       };
+    },
+
+    function outputJava(o) {
+      var a = foam.java.Method.create({
+        visibility: 'public',
+        name: this.name,
+        type: '',
+        static: true,
+        body: this.javaCode
+      });
+      o.out(a);
     }
   ]
 });
