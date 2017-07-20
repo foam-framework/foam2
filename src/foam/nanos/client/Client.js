@@ -47,17 +47,17 @@ foam.CLASS({
     'scriptDAO',
     'testDAO',
     'userDAO',
-    'auth'
+    'webAuth'
   ],
 
   properties: [
     {
-      name: 'auth',
+      name: 'webAuth',
       factory: function() {
         return this.ClientAuthService.create({
           delegate: this.HTTPBox.create({
             method: 'POST',
-            url: 'http://localhost:8080/auth'
+            url: 'http://localhost:8080/webAuth'
           })
         });
       }
