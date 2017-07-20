@@ -10,15 +10,16 @@ import foam.lib.parse.*;
 
 public class ASCIIEscapeParser extends ProxyParser {
   public ASCIIEscapeParser() {
-    super(new Seq(new Whitespace(),
-                  new Literal("\\"),
-                  new Alt(
-                    new Literal("n"),
-                    new Literal("t"),
-                    new Literal("r"),
-                    new Literal("f"),
-                    new Literal("b")),
-                  new Whitespace()));
+    super(new Seq(
+      new Whitespace(),
+      new Literal("\\"),
+      new Alt(
+        new Literal("n"),
+        new Literal("t"),
+        new Literal("r"),
+        new Literal("f"),
+        new Literal("b")),
+      new Whitespace()));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
