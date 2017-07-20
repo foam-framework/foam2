@@ -9,11 +9,13 @@ package foam.nanos.auth;
 import foam.core.X;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
+import foam.core.ContextAwareSupport;
 
 /**
  * Created by marcroopchand on 2017-06-27.
  */
 public class WebAuthServiceAdapter
+  extends    ContextAwareSupport
   implements WebAuthService
 {
   /**
@@ -23,27 +25,20 @@ public class WebAuthServiceAdapter
    * marshall a context
    * */
   protected Map<String, X> loginMap = new LRULinkedHashMap<>(10000);
-  protected final AuthService service_;
-
-  public WebAuthServiceAdapter() {
-    this(new UserAndGroupAuthService());
-  }
-
-  public WebAuthServiceAdapter(AuthService service) {
-    service_ = service;
-  }
+  protected AuthService service;
 
   public void start() {
-    service_.start();
+    service = (AuthService) getX().get("auth");
+    service.start();
   }
 
   public String generateChallenge(String userId) {
-    return service_.generateChallenge(userId);
+    return service.generateChallenge(userId);
   }
 
   public void challengedLogin(String userId, String challenge) {
     try {
-      X x = service_.challengedLogin(userId, challenge);
+      X x = service.challengedLogin(userId, challenge);
       loginMap.put(userId, x);
     } catch (RuntimeException e) {
       e.printStackTrace();
@@ -53,7 +48,7 @@ public class WebAuthServiceAdapter
   public void login(String userId, String password) {
     try {
       if ( ! loginMap.containsKey(userId) ) {
-        X x = service_.login(userId, password);
+        X x = service.login(userId, password);
         loginMap.put(userId, x);
       }
     } catch (RuntimeException e) {
@@ -65,7 +60,7 @@ public class WebAuthServiceAdapter
     if ( userId == null || userId == "" ) return false;
 
     if ( loginMap.containsKey(userId) ) {
-      return service_.check(loginMap.get(userId), permission);
+      return service.check(loginMap.get(userId), permission);
     }
 
     return false;
@@ -75,19 +70,19 @@ public class WebAuthServiceAdapter
     if ( userId == null || userId == "" ) return;
 
     if ( loginMap.containsKey(userId) ) {
-      service_.updatePassword(loginMap.get(userId), oldPassword, newPassword);
+      service.updatePassword(loginMap.get(userId), oldPassword, newPassword);
     }
   }
 
   public Boolean validateUser(User user) {
-    return service_.validateUser(user);
+    return service.validateUser(user);
   }
 
   public void logout(String userId) {
     if ( userId == null || userId == "" ) return;
 
     if ( loginMap.containsKey(userId) ) {
-      service_.logout(loginMap.get(userId));
+      service.logout(loginMap.get(userId));
       loginMap.remove(userId);
     }
   }
