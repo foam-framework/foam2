@@ -227,7 +227,7 @@ foam.CLASS({
                       junctionProperty: junction.TARGET_ID,
                       junctionDAOKey: junctionDAOKey,
                       junctionKeyFactory: function(a) { return [id, a]; },
-                      junctionFactoryPreOrder: true, // TODO: Tmp implementation for ManyToManyRelationshipDAO, replace with java lambda function
+                      // junctionFactoryPreOrder: true, TODO: Tmp implementation for ManyToManyRelationshipDAO, replace with java lambda function
                       junctionCls: junction,
                       sourceKey: id,
                       sourceProperty: junction.SOURCE_ID,
@@ -257,7 +257,7 @@ foam.CLASS({
                       junctionProperty: junction.SOURCE_ID,
                       junctionDAOKey: junctionDAOKey,
                       junctionKeyFactory: function(a) { return [a, id]; },
-                      junctionFactoryPreOrder: false, // TODO: Tmp implementation for ManyToManyRelationshipDAO, replace with java lambda function
+                      // junctionFactoryPreOrder: false, TODO: Tmp implementation for ManyToManyRelationshipDAO, replace with java lambda function
                       junctionCls: junction,
                       sourceKey: id,
                       sourceProperty: junction.TARGET_ID,
