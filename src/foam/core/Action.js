@@ -106,6 +106,10 @@ foam.CLASS({
       name: 'code',
       required: true,
       value: null
+    },
+    {
+      class: 'String',
+      name: 'javaCode',
     }
   ],
 
