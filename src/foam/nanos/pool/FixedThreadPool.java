@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import foam.core.ContextAgent;
 import foam.core.X;
+import foam.nanos.logger.NanoLogger;
+import foam.nanos.pm.PM;
 
 public class FixedThreadPool
   extends AbstractFixedThreadPool
@@ -20,7 +22,7 @@ public class FixedThreadPool
   protected Object          executedLock_  = new Object();
 
   class ContextAgentRunnable
-    implements Runnable
+      implements Runnable
   {
     final X            x_;
     final ContextAgent agent_;
@@ -33,14 +35,17 @@ public class FixedThreadPool
     public void run() {
       incrExecuting(1);
 
-      // TODO: PM
+      NanoLogger logger = (NanoLogger) getX().get("logger");
+      PM pm = new PM(this.getClass(), agent_.getClass().getName());
+
       try {
         agent_.execute(x_);
       } catch (Throwable t) {
-        // TODO: log
+        logger.error(this.getClass(), t.getMessage());
       } finally {
         incrExecuting(-1);
         incrExecuted();
+        pm.log(getX());
       }
     }
   }
@@ -68,7 +73,7 @@ public class FixedThreadPool
 
   public synchronized ExecutorService getPool() {
     if ( pool_ == null ) {
-      pool_ = Executors.newFixedThreadPool(numberOfThreads_);
+      pool_ = Executors.newFixedThreadPool(getNumberOfThreads());
     }
     return pool_;
   }

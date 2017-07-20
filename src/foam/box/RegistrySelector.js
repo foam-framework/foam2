@@ -17,19 +17,18 @@
 
 foam.INTERFACE({
   package: 'foam.box',
-  name: 'Skeleton',
-  extends: 'foam.box.Box',
-  documentation: 'Skeleton marker interface.',
+  name: 'RegistrySelector',
+
+  documentation: `A function that selects a registry where a service should be
+      registered, based on the requested name, service policy, box, and any
+      state internal to the selector. RegistrySelectors are used by
+      SelectorRegistries to route registration requests.
+
+      NOTE: SelectorRegistry's delegation strategy expects registries returned
+      by from RegistrySelectors to reside in a different foam.box.Context (with
+      a different foam.box.Context.myname) than the SelectorRegistry.`,
 
   methods: [
-    {
-      name: 'setDelegateObject',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        }
-      ]
-    }
+    function select(name, service, box) {}
   ]
 });

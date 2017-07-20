@@ -16,6 +16,6 @@ public class ScriptRunnerDAO
   public ScriptRunnerDAO()
     throws IOException
   {
-    super(new JDAO(Test.getOwnClassInfo(), "tests"));
+    super(new foam.dao.PMDAO(new JDAO(Test.getOwnClassInfo(), "tests")));
   }
 }
