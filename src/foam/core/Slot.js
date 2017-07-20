@@ -320,14 +320,7 @@ foam.CLASS({
 
       // If the parent object changes class, then don't update
       // because a new class will have different sub-slots.
-      if ( this.of ) {
-        if ( this.of !== ( o && o.cls_ ) ) {
-          s.detach();
-          return;
-        }
-      } else {
-        if ( o ) this.of = o.cls_;
-      }
+      if ( ( ! this.of  ) && o ) this.of = o.cls_;
 
       this.prevSub = o && o.slot(this.name).sub(this.valueChange);
       this.valueChange();

@@ -23,6 +23,16 @@ foam.CLASS({
       class: 'String',
       name: 'escape',
       value: '\\'
+    },
+    {
+      name: 'escapeChars',
+      value: {
+        'n': '\u000a',
+        'f': '\u000c',
+        'b': '\u0008',
+        'r': '\u000d',
+        't': '\u0009'
+      }
     }
   ],
   methods: [
@@ -42,6 +52,13 @@ foam.CLASS({
         if ( c == delim && lastc != escape ) break;
 
         if ( c != escape ) str += c;
+
+
+        if ( c == '\\' && this.escapeChars[ps.tail.head] ) {
+          c = this.escapeChars[ps.tail.head];
+          str += c;
+          ps = ps.tail;
+        }
 
         lastc = c;
         ps = ps.tail;

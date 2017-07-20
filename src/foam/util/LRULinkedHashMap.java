@@ -1,4 +1,4 @@
-package foam.nanos.util;
+package foam.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
