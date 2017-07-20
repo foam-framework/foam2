@@ -17,6 +17,8 @@ import foam.mlang.sink.*;
  */
 public class MLang
 {
+  public static final Predicate TRUE = new True();
+  public static final Predicate FALSE = new False();
 
   public static Expr prepare(Object o) {
     return o instanceof Expr ? (Expr) o : new Constant(o);
@@ -42,6 +44,10 @@ public class MLang
     return new Gt(MLang.prepare(o1), MLang.prepare(o2));
   }
 
+  public static Predicate IN(Object o1, Object o2) {
+    return new In(MLang.prepare(o1), MLang.prepare(o2));
+  }
+
   public static Predicate AND(Predicate... args) {
     return new And(args);
   }
@@ -56,5 +62,9 @@ public class MLang
 
   public static Sink MIN(Object o1) {
     return new Min(0, MLang.prepare(o1));
+  }
+  
+  public static Sink MAP(Object o1, foam.dao.Sink delegate) {
+    return new Map(MLang.prepare(o1), delegate);
   }
 }
