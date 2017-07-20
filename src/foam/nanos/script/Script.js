@@ -15,6 +15,7 @@ foam.CLASS({
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date'
@@ -41,11 +42,20 @@ foam.CLASS({
       transient: true,
       visibility: foam.u2.Visibility.RO
     },
+    /*
     {
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL
+      value: foam.nanos.script.Language.BEANSHELL,
+      transient: true
+      // TODO: fix JS support
+    },
+    */
+    {
+      class: 'Boolean',
+      name: 'server',
+      value: true
     },
     {
       class: 'Boolean',
@@ -73,26 +83,36 @@ foam.CLASS({
   methods: [
     {
       name: 'runScript',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'void',
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = new Interpreter();
+        PM                    pm    = new PM(this.getClass(), getId());
 
+        // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
           shell.set("currentScript", this);
           setOutput("");
+          shell.set("x", getX());
           shell.setOut(ps);
           shell.eval(getCode());
         } catch (EvalError e) {
           e.printStackTrace();
+        } finally {
+          pm.log(x);
         }
 
         setLastRun(new Date());
         ps.flush();
       System.err.println("******************** Output: " + baos.toString());
         setOutput(baos.toString());
-`
+    `
     }
   ],
 
@@ -102,7 +122,8 @@ foam.CLASS({
       code: function() {
         this.output = '';
 
-        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+//        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+        if ( this.server ) {
           this.scheduled = true;
           this.scriptDAO.put(this);
         } else {

@@ -44,7 +44,15 @@ foam.CLASS({
   */},
 
   properties: [
-    { name: 'name', getter: function() { return 'implements_' + this.path; } },
+    { 
+      name: 'name', 
+      getter: function() { return 'implements_' + this.path; } 
+    },
+    {
+      name: 'java',
+      class: 'Boolean',
+      value: true
+    },
     'path'
   ],
 
