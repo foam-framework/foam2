@@ -29,7 +29,7 @@ public class ASCIIEscapeParser extends ProxyParser {
 
       char c = values[2].toString().charAt(0);
 
-      switch(c) {
+      switch ( c ) {
         case 'n': c = '\n';
           break;
         case 't': c = '\t';
