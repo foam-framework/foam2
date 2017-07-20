@@ -29,7 +29,6 @@ foam.CLASS({
       `
       String inverseName = getRelationship().getInverseName();
 
-      // TODO: Review if this accurately reflects the JS version in Relationships.js
       ((RelationshipDAO) target).getRelationship().setInverseName(source.getClassInfo().getId());
 
       return (foam.core.FObject) target;
