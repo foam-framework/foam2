@@ -7,7 +7,6 @@
 package foam.lib.json;
 
 import foam.lib.parse.*;
-import java.util.Arrays;
 
 public class UnicodeParser extends ProxyParser {
   public UnicodeParser() {
