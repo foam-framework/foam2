@@ -16,7 +16,7 @@ foam.CLASS({
     'data as stack',
     'data', // TODO: output as 'stack'
     'detailView',
-    'factory'
+    'factory',
   ],
 
   properties: [
@@ -103,6 +103,7 @@ foam.CLASS({
     {
       name: 'CreateController',
       extends: 'foam.u2.Element',
+      
       imports: [ 'detailView', 'stack', 'dao', 'factory' ],
       exports: [ 'as data' ],
 
