@@ -91,13 +91,14 @@ var classes = [
 ];
 
 var abstractClasses = [
-//  'foam.json.Outputer'
+//  'foam.json.Outputter'
 ];
 
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.nanos.auth.AuthService'
 ];
 
 var proxies = [

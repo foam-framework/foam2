@@ -7,11 +7,16 @@
 package foam.nanos.http;
 
 import com.sun.net.httpserver.*;
+import foam.box.*;
 import foam.core.*;
-import foam.dao.DAO;
-import foam.nanos.*;
+import foam.dao.*;
+import foam.nanos.boot.NSpec;
+import foam.nanos.logger.NanoLogger;
+import foam.nanos.pm.PM;
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import javax.servlet.http.HttpServlet;
 
 public class NanoHttpHandler
@@ -20,56 +25,12 @@ public class NanoHttpHandler
 {
 
   public NanoHttpHandler(X x) {
-    x_ = x;
+    setX(x);
   }
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {
-    URI    requestURI = exchange.getRequestURI();
-    String path       = requestURI.getPath();
-    String query      = requestURI.getQuery();
-
-    // AuthService auth = this.X.get(AuthService);
-
-    String[] urlParams = path.split("/");
-
-    /*
-     * Get the item right after the first slash
-     * E.g.: /foo/bar => ['', 'foo', 'bar']
-    */
-    String serviceKey = urlParams[1];
-    Object service    = x_.get(serviceKey);
-
-    System.out.println("HTTP Request: " + path + ", " + serviceKey);
-
-    if ( service instanceof HttpHandler ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      ((HttpHandler) service).handle(exchange);
-    } if ( service instanceof HttpServlet ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      this.handleServlet((HttpServlet) service, exchange);
-    } if ( service instanceof WebAgent ) {
-      // if ( auth.checkPermission(...) ) {}
-
-      if ( service instanceof ContextAware ) ((ContextAware) service).setX(this.getX());
-
-      this.handleServlet(new WebAgentServlet((WebAgent) service), exchange);
-    } if ( service instanceof DAO ) {
-      // todo auth check, server==true check
-
-      this.handleServlet(new ServiceServlet(service), exchange);
-    } else {
-      String errorMsg = "Service " + serviceKey + " does not have a HttpHandler";
-
-      throw new RuntimeException(errorMsg);
-    }
-  }
-
-  public void handleServlet(HttpServlet s, HttpExchange exchange) throws IOException {
-    if ( s instanceof ContextAware ) ((ContextAware) s).setX(this.getX());
-
-    new ServletHandler(s).handle(exchange);
+    ServletHandler sh = new ServletHandler((HttpServlet)getX().get("httprouter"));
+    sh.handle(exchange);
   }
 }

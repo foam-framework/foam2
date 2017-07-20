@@ -1,14 +1,14 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.dao.index;
 
 import foam.core.FObject;
 import foam.dao.Sink;
-import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
 
 /** Found that no data exists for the query. **/
 public class NotFoundPlan implements FindPlan, SelectPlan
@@ -22,9 +22,11 @@ public class NotFoundPlan implements FindPlan, SelectPlan
   public long cost() { return 0; }
 
   public FObject find(Object state, Object key) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
-  public void select(Object state, Sink sink, int skip, int limit, Comparator order, Predicate predicate) {
+  public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    throw new UnsupportedOperationException();
   }
+
 }

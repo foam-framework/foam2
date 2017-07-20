@@ -24,6 +24,10 @@ foam.CLASS({
       the correct payload to subsequent API calls, and return results in the
       Promise.`,
 
+  constants: {
+    INT32_MAX: Math.pow(2, 31) - 1
+  },
+
   properties: [
     {
       name: 'ctx'
@@ -144,8 +148,8 @@ foam.CLASS({
       var query = payload.query;
       if ( predicate ) query.filter = predicate.toDatastoreFilter();
       if ( order ) query.order = order.toDatastoreOrder();
-      if ( skip ) query.offset = skip;
-      if ( limit ) query.limit = limit;
+      if ( skip ) query.offset = Math.min(skip, this.INT32_MAX);
+      if ( limit ) query.limit = Math.min(limit, this.INT32_MAX);
       // Optional Sink interface extension:
       // Allow datastore-aware sinks to decorate query.
       if ( sink.decorateDatastoreQuery )

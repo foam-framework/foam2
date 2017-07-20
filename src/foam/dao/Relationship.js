@@ -51,7 +51,7 @@ foam.CLASS({
       hidden: true,
       getter: function() {
         return this.lookup(this.sourceModel).name +
-          foam.String.capitalize(this.forwardName) + 'Relationship';
+          this.lookup(this.targetModel).name + 'Relationship';
       }
     },
     'forwardName',
@@ -385,5 +385,11 @@ foam.CLASS({
       name: 'view',
       value: { class: 'foam.comics.RelationshipView' },
     },
-  ],
+    {
+      name: 'comparePropertyValues',
+      documentation: `Relationships cannot be compared synchronously. Ignore
+          them during synchronous comparison.`,
+      value: function() { return 0; }
+    }
+  ]
 });
