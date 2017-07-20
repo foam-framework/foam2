@@ -16,7 +16,6 @@ public class StringParser implements Parser {
     escape_ = '\\';
   }
 
-
   public PStream parse(PStream ps, ParserContext x) {
     delim_ = ps.head();
     if ( delim_ != '"' && delim_ != '\'' ) {
@@ -27,7 +26,7 @@ public class StringParser implements Parser {
     char lastc = delim_;
 
     StringBuilder sb = new StringBuilder();
-    
+
     while ( ps.valid() ) {
       char c = ps.head();
       if ( c == delim_ && lastc != escape_ ) {
