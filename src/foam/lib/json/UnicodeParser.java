@@ -26,11 +26,10 @@ public class UnicodeParser extends ProxyParser {
       // Gets the repeated hex char sequence
       values = (Object[]) values[3];
 
-      char hexChar =  ( (char)
-                           ( hexToInt(values[0], 3) + 
-                             hexToInt(values[1], 2) + 
-                             hexToInt(values[2], 1) + 
-                             hexToInt(values[3], 0) ) );
+      char hexChar = (char) ( hexToInt(values[0], 3) + 
+                              hexToInt(values[1], 2) + 
+                              hexToInt(values[2], 1) + 
+                              hexToInt(values[3], 0) );
 
       return ps.setValue(Character.valueOf(hexChar));
     }
@@ -43,7 +42,7 @@ public class UnicodeParser extends ProxyParser {
 
     // Converts to upper case if necessary
     if ( c >= 'a' && c <= 'z' ) {
-        c = Character.toUpperCase(c);
+      c = Character.toUpperCase(c);
     }
 
     return ( c <= '9' ? c - '0' : 10 + c - 'A' ) * (int) Math.pow(16, power);
