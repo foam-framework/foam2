@@ -35,23 +35,32 @@ public class StringParser implements Parser {
       }
 
       if ( c != escape_ ) sb.append(c);
-      
-      if ( c == '\\' && ps.tail().head() == 'u' ) {
-        Parser unicodeParser = new UnicodeParser();
-        PStream unicodePS = unicodeParser.parse(ps, x);
 
-        if ( unicodePS != null ) {
-          sb.append(unicodePS.value());
-          ps = unicodePS;
+      PStream tail = ps.tail();
 
-          c = ((Character) unicodePS.value()).charValue();
-        } else {
-          ps = ps.tail();
+      if ( c == '\\' ) {
+        char nextChar = ps.tail().head();
+        Parser escapeSeqParser = null;
+
+        if ( nextChar == 'u' ) {
+          escapeSeqParser = new UnicodeParser();
+        } else if ( nextChar == 'n' ) {
+          escapeSeqParser = new ASCIIEscapeParser();
         }
-      } else {
-        ps = ps.tail();
+
+        if ( escapeSeqParser != null ) {
+          PStream escapePS = escapeSeqParser.parse(ps, x);
+
+          if ( escapePS != null ) {
+            sb.append(escapePS.value());
+            tail = escapePS;
+
+            c = ((Character) escapePS.value()).charValue();
+          }
+        }
       }
 
+      ps = tail;
       lastc = c;
     }
 
