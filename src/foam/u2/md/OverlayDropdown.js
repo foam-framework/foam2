@@ -76,6 +76,10 @@ foam.CLASS({
     })
   ],
 
+  constants: {
+    BOTTOM_OFFSET: -13
+  },
+
   properties: [
     {
       class: 'Float',
@@ -151,7 +155,7 @@ foam.CLASS({
       if ( Number.isNaN(margin) ) margin = 0;
 
       return Math.min(border + last.offsetTop + last.offsetHeight + margin,
-          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top);
+          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top) + this.BOTTOM_OFFSET;
     },
 
     function initE() {
