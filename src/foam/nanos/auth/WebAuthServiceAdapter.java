@@ -23,7 +23,15 @@ public class WebAuthServiceAdapter
    * marshall a context
    * */
   protected Map<String, X> loginMap = new LRULinkedHashMap<>(10000);
-  private AuthService service_ = new UserAndGroupAuthService();
+  protected final AuthService service_;
+
+  public WebAuthServiceAdapter() {
+    this(new UserAndGroupAuthService());
+  }
+
+  public WebAuthServiceAdapter(AuthService service) {
+    service_ = service;
+  }
 
   public void start() {
     service_.start();
