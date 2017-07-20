@@ -500,6 +500,25 @@ foam.CLASS({
           newValue ;
       }
     }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var self = this;
+      var name = this.name;
+      var relationObj;
+
+      Object.defineProperty(proto, name + '$find', {
+        get: function classGetter() {
+          this.__context__[self.targetDAOKey].find(this.valueOf()[self.name]).then(function(a){
+              relationObj = a;
+          });
+          return relationObj;
+        },
+        configurable: true
+      });
+    }
   ]
 });
 
