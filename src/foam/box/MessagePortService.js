@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,21 @@
  */
 
 foam.CLASS({
-  package: 'foam.messageport',
+  package: 'foam.box',
   name: 'MessagePortService',
 
   requires: [
-    'foam.box.RegisterSelfMessage',
+    'foam.box.HUPMessage',
+    'foam.box.NamedBox',
     'foam.box.RawMessagePortBox',
-    'foam.box.NamedBox'
+    'foam.box.RegisterSelfMessage'
+  ],
+  imports: [
+    'fonParser',
+    'warn'
   ],
 
-  imports: [
-    'fonParser'
-  ],
+  topics: [ 'HUP' ],
 
   properties: [
     {
@@ -65,6 +68,18 @@ foam.CLASS({
           port: port
         });
         return;
+      }
+      if ( this.HUPMessage.isInstance(msg.object) ) {
+        this.pub('HUP', msg.object);
+
+        var service = this.NamedBox.create({ name: msg.object.name });
+        if ( ! this.RawMessagePortBox.isInstance(service.delegate) ) {
+          this.warn('Expected to find RawMessagePortBox delegate on NamedBox:',
+                    service);
+          return;
+        }
+
+        service.delegate.hangUp();
       }
 
       this.delegate && this.delegate.send(msg);

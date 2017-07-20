@@ -161,7 +161,6 @@ FOAM_FILES([
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
   { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
-  { name: "lib/messageport", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/firebase" },
   { name: "lib/fcm" },
@@ -223,6 +222,8 @@ FOAM_FILES([
   { name: "foam/box/ForwardedMessage" },
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
+  { name: "foam/box/HUPMessage", flags: ['web'] },
+  { name: "foam/box/MessagePortService", flags: ['web'] },
   { name: "lib/boxJava", flags: ['java'] },
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },

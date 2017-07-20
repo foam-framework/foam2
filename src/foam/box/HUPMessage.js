@@ -17,20 +17,17 @@
 
 foam.CLASS({
   package: 'foam.box',
-  name: 'RawMessagePortBox',
-  implements: [ 'foam.box.Box' ],
+  name: 'HUPMessage',
+  extends: 'foam.box.Message',
+
+  documentation: `Hang UP message for notifying that a connection is about to be
+      severed.`,
+
   properties: [
     {
-      name: 'port'
-    }
-  ],
-  methods: [
-    function send(m) {
-      this.port.postMessage(foam.json.Network.stringify(m));
-    },
-    function hangUp() {
-      this.port.onmessage = null;
-      this.port = null;
+      class: 'String',
+      name: 'name',
+      documentation: 'NamedBox name of service hanging up.'
     }
   ]
 });
