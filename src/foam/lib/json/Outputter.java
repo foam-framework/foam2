@@ -90,7 +90,9 @@ public class Outputter {
       outputFObject(out, (FObject)value);
     } else if ( value instanceof Number ) {
       outputNumber(out, (Number)value);
-    } else if ( value.getClass().isArray() ) {
+    } else if ( ( value != null ) &&
+                ( value.getClass() != null ) &&
+                value.getClass().isArray() ) {
       outputArray(out, (Object[])value);
     } else if ( value instanceof Boolean ) {
       outputBoolean(out, (Boolean)value);
