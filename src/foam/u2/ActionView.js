@@ -118,7 +118,7 @@ foam.CLASS({
       if ( this.icon ) {
         // this.nodeName = 'a';
         this.start('img').attr('src', this.icon).end();
-      } else if (this.iconFontName) {
+      } else if ( this.iconFontName ) {
         this.nodeName = 'i';
         this.cssClass(this.action.name);
         this.cssClass(this.iconFontClass); // required by font package
