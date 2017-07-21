@@ -48,9 +48,11 @@ foam.CLASS({
 
   methods: [
     function send(message) {
+      var output = message.object;
       this[this.logLevel.consoleMethodName].apply(this, [
         this.name,
-        foam.json.Pretty.stringify(message)
+        output instanceof Error ? output.toString() :
+          foam.json.Pretty.stringify(message)
       ]);
       this.delegate && this.delegate.send(message);
     }
