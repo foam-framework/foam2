@@ -15,26 +15,20 @@
  * limitations under the License.
  */
 
-require(require('path').resolve(`${__dirname}/../../../foam.js`));
+foam.INTERFACE({
+  package: 'foam.box',
+  name: 'RegistrySelector',
 
-var ctx = foam.box.Context.create();
+  documentation: `A function that selects a registry where a service should be
+      registered, based on the requested name, service policy, box, and any
+      state internal to the selector. RegistrySelectors are used by
+      SelectorRegistries to route registration requests.
 
-ctx.socketService.listening$.sub(function(sub, _, __, slot) {
-  if ( ! slot.get() ) return;
+      NOTE: SelectorRegistry's delegation strategy expects registries returned
+      by from RegistrySelectors to reside in a different foam.box.Context (with
+      a different foam.box.Context.myname) than the SelectorRegistry.`,
 
-  sub.detach();
-  var stdin = require('process').stdin;
-  var buf = '';
-  stdin.on('data', function(data) {
-    buf += data.toString();
-  });
-  stdin.on('end', function() {
-    // TODO(markdittmer): Use secure parser.
-    foam.json.parseString(buf, ctx).send(foam.box.Message.create({
-      object: foam.box.SocketBox.create({
-        name: ctx.me.name,
-        address: `0.0.0.0:${ctx.socketService.port}`
-      })
-    }));
-  });
+  methods: [
+    function select(name, service, box) {}
+  ]
 });

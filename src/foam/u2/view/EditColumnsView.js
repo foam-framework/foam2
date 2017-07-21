@@ -10,7 +10,7 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   requires: [
-    'foam.u2.CheckBox'
+    'foam.u2.md.CheckBox'
   ],
 
   properties: [

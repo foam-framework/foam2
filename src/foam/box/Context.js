@@ -95,14 +95,18 @@ foam.CLASS({
       class: 'String',
       name: 'myname',
       hidden: true,
+      factory: function() {
+        return foam.isServer ?
+          '/proc/' + require('process').pid :
+          '/com/foamdev/anonymous/' + foam.uuid.randomGUID();
+      }
     },
     {
       name: 'me',
       hidden: true,
+      transient: true,
       factory: function() {
-        var me = this.NamedBox.create({
-          name: this.myname || ( '/com/foamdev/anonymous/' + foam.uuid.randomGUID() )
-        });
+        var me = this.NamedBox.create({ name: this.myname });
         me.delegate = this.registry;
         return me;
       }
