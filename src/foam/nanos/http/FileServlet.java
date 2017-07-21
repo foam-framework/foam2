@@ -48,8 +48,15 @@ public class FileServlet
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-    String pathInfo = req.getPathInfo();
-    String filePath = pathInfo.substring(SERVLET_NAME.length() + 2);
+    String pathInfo;
+    try {
+      pathInfo = req.getRequestURI();
+    } catch(Exception e) {
+      e.printStackTrace();
+      pathInfo = req.getPathInfo();
+    }
+
+    String filePath = pathInfo.substring(SERVLET_NAME.length() + (pathInfo.startsWith("/static/") ? 2 : 1));
     try {
       File   srcFile = new File(filePath.isEmpty() ? "./" : filePath);
       String path    = srcFile.getAbsolutePath();
