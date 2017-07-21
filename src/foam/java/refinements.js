@@ -560,15 +560,6 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
 
-      const OF = (this.of ? this.of.id ? this.of.id : this.of : null);
-
-      info.method({
-        name: 'of',
-        visibility: 'public',
-        type: 'String',
-        body: `return "${OF}";`
-      });
-
       info.method({
         name: 'getOrdinal',
         visibility: 'public',
@@ -579,20 +570,20 @@ foam.CLASS({
             type: 'Object'
           }
         ],
-        body: `return ((${OF}) o).getOrdinal();`
+        body: `return ((${this.of.id}) o).getOrdinal();`
       });
 
       info.method({
         name: 'forOrdinal',
         visibility: 'public',
-        type: OF,
+        type: this.of.id,
         args: [
           {
             name: 'ordinal',
             type: 'int'
           }
         ],
-        body: `return ${OF}.forOrdinal(ordinal);`
+        body: `return ${this.of.id}.forOrdinal(ordinal);`
       });
 
       info.method({
