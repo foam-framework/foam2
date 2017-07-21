@@ -18,6 +18,16 @@
 foam.CLASS({
   package: 'foam.parse.json',
   name: 'String',
+
+  constants: {
+    CHAR_CODE_0:       '0'.charCodeAt(0),
+    CHAR_CODE_9:       '9'.charCodeAt(0),
+    CHAR_CODE_A_LOWER: 'a'.charCodeAt(0),
+    CHAR_CODE_F_LOWER: 'f'.charCodeAt(0),
+    CHAR_CODE_A_UPPER: 'A'.charCodeAt(0),
+    CHAR_CODE_F_UPPER: 'F'.charCodeAt(0)
+  },
+
   properties: [
     {
       class: 'String',
@@ -35,29 +45,54 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function parse(ps, obj) {
       var delim = ps.head;
       var escape = this.escape;
 
-      if ( delim != '"' && delim != "'" ) return undefined;
+      if ( delim !== '"' && delim !== "'" ) return undefined;
 
       ps = ps.tail;
 
       var lastc = delim;
-      var str = "";
+      var str = '';
 
       while ( ps.valid ) {
         var c = ps.head;
-        if ( c == delim && lastc != escape ) break;
+        if ( c === delim && lastc !== escape ) break;
 
-        if ( c != escape ) str += c;
-
-
-        if ( c == '\\' && this.escapeChars[ps.tail.head] ) {
-          c = this.escapeChars[ps.tail.head];
+        if ( c !== escape ) {
           str += c;
-          ps = ps.tail;
+        } else {
+          var next = ps.tail.head;
+          if ( next === escape ) {
+            // "\\" parses to "\".
+            str += escape;
+            ps = ps.tail;
+          } else if ( ps.tail.head === 'u' ) {
+            // Unicode escape sequence: "\u####".
+            // Extract "###".
+            var hexCharCode = ps.tail.str[0].substr(ps.pos + 2, 4);
+            // Verify that each character in sequence is a hex digit.
+            for ( var i = 0; i < hexCharCode.length; i++ ) {
+              var hexDigitCharCode = hexCharCode.charCodeAt(i);
+              if ( ! this.isHexDigitCharCode_(hexDigitCharCode) )
+                throw new Error('FON string parse error at ' + ps.pos + ': ' +
+                                'Invalid unicode escape sequence: \\u' +
+                                hexCharCode);
+            }
+            // Construct hex character and add it to str.
+            var charCode = parseInt(hexCharCode, 16);
+            c = String.fromCharCode(charCode);
+            str += c;
+            // Advance to last char in "\u####" escape sequence.
+            ps = ps.tail.tail.tail.tail.tail;
+          } else if ( this.escapeChars[ps.tail.head] ) {
+            c = this.escapeChars[ps.tail.head];
+            str += c;
+            ps = ps.tail;
+          }
         }
 
         lastc = c;
@@ -65,6 +100,14 @@ foam.CLASS({
       }
 
       return ps.tail.setValue(str);
+    },
+    function isHexDigitCharCode_(charCode) {
+      return ( ( charCode >= this.CHAR_CODE_0 &&
+                 charCode <= this.CHAR_CODE_9 ) ||
+               ( charCode >= this.CHAR_CODE_A_LOWER &&
+                 charCode <= this.CHAR_CODE_F_LOWER ) ||
+               ( charCode >= this.CHAR_CODE_A_UPPER &&
+                 charCode <= this.CHAR_CODE_F_UPPER ) );
     }
   ]
 });
