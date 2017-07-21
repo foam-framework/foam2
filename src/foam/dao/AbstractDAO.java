@@ -61,6 +61,13 @@ public abstract class AbstractDAO
     return sink;
   }
 
+  protected Sink decorateSink_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    Sink decoratedSink = decorateSink_(sink, skip, limit, order, predicate);
+    ((AbstractFObject) decoratedSink).setX(x);
+
+    return decoratedSink;
+  }
+
   public ClassInfo getOf() {
     return of_;
   }
