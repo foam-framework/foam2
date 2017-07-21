@@ -229,6 +229,7 @@ FOAM_FILES([
   { name: "foam/box/LogBox" },
   { name: "foam/box/BroadcastBox" },
   { name: "foam/box/RoundRobinBox" },
+  { name: "foam/box/pipeline/RunnableRPCBox" },
   { name: "foam/box/pipeline/PipelineNode" },
   { name: "foam/box/pipeline/PipelineManager" },
   { name: "foam/box/pipeline/PipelineBuilder" },

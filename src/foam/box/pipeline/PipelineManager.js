@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -57,46 +56,13 @@ foam.CLASS({
     'foam.box.Message',
     'foam.box.RPCMessage',
     'foam.box.RPCReturnBox',
-    'foam.box.pipeline.PipelineNode'
+    'foam.box.pipeline.PipelineNode',
+    'foam.box.pipeline.RunnableRPCBox'
   ],
 
   imports: [
     'registry',
     'defaultOutputBox? as ctxDefaultOutputBox'
-  ],
-
-  classes: [
-    {
-      name: 'RunnableRPCBox',
-      extends: 'foam.box.ProxyBox',
-
-      requires: [
-        'foam.box.Message',
-        'foam.box.RPCMessage'
-      ],
-
-      properties: [
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          documentation: `Error box for routing errors when sending to
-              runnable.`,
-          name: 'errorBox'
-        },
-      ],
-
-      methods: [
-        function send(inputMessage) {
-          return this.delegate && this.delegate.send(this.Message.create({
-            object: this.RPCMessage.create({
-              name: 'run',
-              args: [ inputMessage.object ],
-            }),
-            attributes: { errorBox: this.errorBox }
-          }));
-        }
-      ]
-    }
   ],
 
   properties: [
