@@ -29,6 +29,9 @@ foam.CLASS({
   classes: [
     {
       name: 'StreamingReplyBox',
+      implements: [ 'foam.box.Box' ],
+
+      imports: [ 'registry' ],
 
       properties: [
         {
@@ -40,18 +43,9 @@ foam.CLASS({
           of: 'foam.dao.Sink',
           name: 'sink'
         },
-        // TODO(markdittmer): Signal remote of detached and unregister
-        // reply box.
-        {
-          name: 'sinkSub_',
-          factory: function() {
-            var sub = foam.core.FObject.create();
-            sub.onDetach(function() { this.detached_ = true; }.bind(this));
-          }
-        },
         {
           class: 'Boolean',
-          name: 'detached_'
+          name: 'detachOnEOF'
         },
         {
           name: 'promise',
@@ -63,6 +57,15 @@ foam.CLASS({
             });
           }
         },
+        {
+          name: 'sinkSub',
+          factory: function() {
+            var sub = foam.core.FObject.create();
+            // TODO(markdittmer): Notify remote DAO of detachment.
+            sub.onDetach(this.unregisterSelf);
+            return sub;
+          }
+        },
         'resolve_',
         'reject_'
       ],
@@ -71,35 +74,46 @@ foam.CLASS({
         function send(msg) {
           // TODO(markdittmer): Error check message type.
 
-          if ( this.detached_ ) return;
           switch ( msg.object.name ) {
             case 'put':
-              this.sink.put(msg.object.obj, this.sinkSub_);
+              this.sink.put(msg.object.obj, this.sinkSub);
               break;
             case 'remove':
-              this.sink.remove(msg.object.obj, this.sinkSub_);
+              this.sink.remove(msg.object.obj, this.sinkSub);
               break;
             case 'eof':
               this.sink.eof();
               this.resolve_(this.sink);
+              if ( this.detachOnEOF ) this.sinkSub.detach();
               break;
             case 'reset':
               this.sink.reset();
               break;
           }
         }
+      ],
+
+      listeners: [
+        function registerSelf() {
+          return this.exportBox_ = this.registry.register(this.id, null, this);
+        },
+        function unregisterSelf() { this.registry.unregister(this.id); }
       ]
     }
   ],
 
   methods: [
+    function put_(x, obj) { return this.SUPER(null, obj); },
+    function remove_(x, obj) { return this.SUPER(null, obj); },
+    function find_(x, key) { return this.SUPER(null, key); },
     function select_(x, sink, skip, limit, order, predicate) {
       var replyBox = this.StreamingReplyBox.create({
-        sink: sink || this.ArraySink.create()
+        sink: sink || this.ArraySink.create(),
+        detachOnEOF: true
       });
       var promise = replyBox.promise;
 
-      replyBox = this.registry.register(replyBox.id, null, replyBox);
+      replyBox = replyBox.registerSelf();
 
       // TODO(markdittmer): Shouldn't there be an annotation for an errorBox
       // somewhere here?
@@ -113,12 +127,14 @@ foam.CLASS({
       var replyBox = this.StreamingReplyBox.create({
         sink: sink || this.ArraySink.create()
       });
-      replyBox = this.registry.register(replyBox.id, null, replyBox);
 
       // TODO(markdittmer): Shouldn't there be an annotation for an errorBox
       // somewhere here?
-      this.SUPER(null, this.BoxDAOListener.create({ box: replyBox }),
-                 predicate);
+      this.SUPER(null, this.BoxDAOListener.create({
+        box: replyBox.registerSelf()
+      }), predicate);
+
+      return replyBox.sinkSub;
     }
   ]
 });

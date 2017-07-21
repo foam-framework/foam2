@@ -17,6 +17,13 @@ public class MapDAO
 {
   protected Map<Object, FObject> data_ = null;
 
+  public MapDAO() {
+  }
+
+  public MapDAO(ClassInfo of) {
+    setOf(of);
+  }
+
   protected synchronized void data_factory() {
     if ( data_ == null ) {
       data_ = (Map<Object, FObject>) new ConcurrentHashMap();
@@ -67,11 +74,6 @@ public class MapDAO
     decorated.eof();
 
     return sink;
-  }
-
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    // TODO: this deletes too much data if skip, limit or predicate are set
-    setData(null);
   }
 
   public void pipe_(X x, Sink s) {

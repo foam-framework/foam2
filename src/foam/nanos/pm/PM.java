@@ -17,11 +17,11 @@ public class PM {
   public PM(Class cls, String name) {
     cls_       = cls;
     name_      = name;
-    startTime_ = System.nanoTime();
+    startTime_ = System.currentTimeMillis();
   }
 
   public void log(X x) {
-    endTime_ = System.nanoTime();
+    endTime_ = System.currentTimeMillis();
     PMLogger logger = (PMLogger) x.get(DAOPMLogger.ServiceName);
     logger.log(this);
   }
