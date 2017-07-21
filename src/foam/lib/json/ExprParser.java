@@ -42,11 +42,12 @@ public class ExprParser extends foam.lib.parse.ProxyParser {
                                                        new Literal("}"));
                     public PStream parse(PStream ps, ParserContext x) {
                       ps = delegate.parse(ps, x);
-                      String forClass = (String)x.get("forClass_");
-                      String classId = forClass.substring(0, forClass.lastIndexOf("."));
-                      String propName = forClass.substring(forClass.lastIndexOf(".") + 1);
 
                       if ( ps != null ) {
+                        String forClass = (String)x.get("forClass_");
+                        String classId = forClass.substring(0, forClass.lastIndexOf("."));
+                        String propName = forClass.substring(forClass.lastIndexOf(".") + 1);
+
                         Class cls;
                         try {
                           cls = Class.forName(classId);
