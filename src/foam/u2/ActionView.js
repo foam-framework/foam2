@@ -77,7 +77,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      value: true
+      expression: function(icon, iconFontName ) { return ! ( icon || iconFontName); }
     },
     {
       class: 'URL',
@@ -124,9 +124,12 @@ foam.CLASS({
         this.cssClass(this.iconFontClass); // required by font package
         this.style({'font-family': this.iconFontFamily});
         this.add(this.iconFontName);
-      } else if ( this.showLabel ) {
+      }
+
+      if ( this.showLabel ) {
         this.add(this.label$);
       }
+
       this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
