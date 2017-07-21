@@ -392,8 +392,9 @@ foam.CLASS({
   name: 'SocketService',
 
   requires: [
-    'foam.net.node.Socket',
-    'foam.box.RegisterSelfMessage'
+    'foam.box.Message',
+    'foam.box.RegisterSelfMessage',
+    'foam.net.node.Socket'
   ],
 
   imports: [
@@ -454,8 +455,12 @@ foam.CLASS({
     },
 
     function addSocket(socket) {
-      var s1 = socket.message.sub(function(s, _, m) {
-        var m = this.fonParser.parseString(m);
+      var s1 = socket.message.sub(function(s, _, mStr) {
+        var m = this.fonParser.parseString(mStr);
+
+        if ( ! this.Message.isInstance(m) ) {
+          console.warn('Got non-message:', m, mStr);
+        }
 
         if ( this.RegisterSelfMessage.isInstance(m) ) {
           var named = foam.box.NamedBox.create({
