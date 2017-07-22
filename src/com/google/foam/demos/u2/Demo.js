@@ -507,12 +507,14 @@ foam.CLASS({
 
 foam.CLASS({
   name: 'Child1View',
-  extends: 'ParentView'
+  extends: 'ParentView',
+  axioms: [ foam.u2.CSS.create({code: ParentView.getAxiomsByClass(foam.u2.CSS)[0].code}) ]
 });
 
 foam.CLASS({
   name: 'Child2View',
-  extends: 'ParentView'
+  extends: 'ParentView',
+  axioms: [ foam.u2.CSS.create({code: ParentView.getAxiomsByClass(foam.u2.CSS)[0].code}) ]
 })
 
 Child1View.create().write();
