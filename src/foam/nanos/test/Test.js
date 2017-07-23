@@ -18,7 +18,14 @@ foam.CLASS({
     'java.util.Date'
   ],
 
+  tableColumns: [
+    'id', 'enabled', 'description', 'passed', 'failed', 'run'
+  ],
+
+  searchColumns: [ ],
+
   properties: [
+    'id',
     {
       class: 'Int',
       name: 'passed'
