@@ -278,11 +278,11 @@ foam.CLASS({
           name: 'testDAO',
           factory: function() {
             return this.ClientDAO.create({
-                      of: this.NSpec,
-                      delegate: this.HTTPBox.create({
-                        method: 'POST',
-                        url: 'http://localhost:8080/testDAO'
-                      })});
+              of: this.Test,
+              delegate: this.HTTPBox.create({
+              method: 'POST',
+              url: 'http://localhost:8080/testDAO'
+            })});
 
             /*
             return this.createDAO({
