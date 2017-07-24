@@ -97,7 +97,7 @@ foam.CLASS({
       hidden: true,
       factory: function() {
         return foam.isServer ?
-          '/proc/' + require('process').pid :
+          '/proc/' + require('process').pid + '/' + foam.uuid.randomGUID() :
           '/com/foamdev/anonymous/' + foam.uuid.randomGUID();
       }
     },
