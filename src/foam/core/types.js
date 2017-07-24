@@ -399,6 +399,13 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Currency',
+  extends: 'Float'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Map',
   extends: 'Property',
 
