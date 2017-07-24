@@ -113,12 +113,12 @@ foam.CLASS({
       });
       var promise = replyBox.promise;
 
-      replyBox = replyBox.registerSelf();
+      var registeredReplyBox = replyBox.registerSelf();
 
       // TODO(markdittmer): Shouldn't there be an annotation for an errorBox
       // somewhere here?
       this.SUPER(
-          null, this.BoxDAOListener.create({ box: replyBox }),
+          null, this.BoxDAOListener.create({ box: registeredReplyBox }),
           skip, limit, order, predicate)
               .catch(function(error) { replyBox.reject_(error); });
       return promise;

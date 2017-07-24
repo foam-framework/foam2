@@ -554,7 +554,69 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'foam.lib.json.IntParser']
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+
+      info.method({
+        name: 'getOrdinal',
+        visibility: 'public',
+        type: 'int',
+        args: [
+          {
+            name: 'o',
+            type: 'Object'
+          }
+        ],
+        body: `return ((${this.of.id}) o).getOrdinal();`
+      });
+
+      info.method({
+        name: 'forOrdinal',
+        visibility: 'public',
+        type: this.of.id,
+        args: [
+          {
+            name: 'ordinal',
+            type: 'int'
+          }
+        ],
+        body: `return ${this.of.id}.forOrdinal(ordinal);`
+      });
+
+      info.method({
+        name: 'toJSON',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.json.Outputter'
+          },
+          {
+            name: 'out',
+            type: 'StringBuilder'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `outputter.output(out, getOrdinal(value));`
+      });
+
+      var cast = info.getMethod('cast');
+      cast.body = 
+`if ( o instanceof Integer ) {
+  return forOrdinal((int) o);
+}
+
+return (java.lang.Enum) o;`;
+
+      return info;
+    }
   ]
 });
 

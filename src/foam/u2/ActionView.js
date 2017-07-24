@@ -77,7 +77,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      value: true
+      expression: function(icon, iconFontName ) { return ! ( icon || iconFontName); }
     },
     {
       class: 'URL',
@@ -118,15 +118,18 @@ foam.CLASS({
       if ( this.icon ) {
         // this.nodeName = 'a';
         this.start('img').attr('src', this.icon).end();
-      } else if (this.iconFontName) {
+      } else if ( this.iconFontName ) {
         this.nodeName = 'i';
         this.cssClass(this.action.name);
         this.cssClass(this.iconFontClass); // required by font package
         this.style({'font-family': this.iconFontFamily});
         this.add(this.iconFontName);
-      } else if ( this.showLabel ) {
+      }
+
+      if ( this.showLabel ) {
         this.add(this.label$);
       }
+
       this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {

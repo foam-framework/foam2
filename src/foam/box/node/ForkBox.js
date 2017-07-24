@@ -78,8 +78,7 @@ foam.CLASS({
               if ( ! this.SocketBox.isInstance(message.object) ) {
                 reject(new Error('ForkBox failed to bind to child socket'));
               }
-              resolve(this.registry.register(
-                  message.object.name, null, message.object));
+              resolve(message.object);
             }.bind(this)
           }
         });
@@ -107,6 +106,8 @@ foam.CLASS({
       this.child_.stdin.end(
           foam.json.Network.stringify(this.SubBox.create({
             name: this.replyBox_.id,
+            // TODO(markdittmer): RegisterSelfMessage should handle naming. Is
+            // "name:" below necessary?
             delegate: this.SocketBox.create({
               name: this.me.name,
               address: `0.0.0.0:${this.socketService.port}`

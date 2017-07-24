@@ -27,6 +27,7 @@ foam.CLASS({
       by "selector" to reside in a different foam.box.Context (with a different
       foam.box.Context.myname) than the SelectorRegistry.`,
 
+  requires: [ 'foam.box.Box' ],
   exports: [ 'as registry' ],
 
   classes: [
@@ -38,17 +39,23 @@ foam.CLASS({
 
       properties: [
         {
+          class: 'String',
+          name: 'name',
+          documentation: `Name under which registration was stored in
+              SelectorRegistry.`
+        },
+        {
           class: 'FObjectProperty',
           of: 'foam.box.BoxRegistry',
-          name: 'registry',
-          documentation: `The registry that returned "box".`
+          name: 'delegateRegistry',
+          documentation: `The registry that SelectorRegistry delegated to for
+              managed registration.`
         },
         {
           class: 'FObjectProperty',
           of: 'foam.box.Box',
-          name: 'box',
-          documentation: `The box returned from registering a service with
-              "registry".`
+          name: 'delegateRegisteredBox',
+          documentation: `Box returned from register() on "delegateRegistry".`
         }
       ]
     }
@@ -74,46 +81,58 @@ foam.CLASS({
 
   methods: [
     function register(name, service, box) {
+      name = name || foam.next$UID();
+
       var delegate = this.selector.select(name, service, box);
+
       var delegateRegisteredBox = delegate.register(null, null, box);
+
+      // Create relay to desired service name, but return box from delegate.
+      // This creates a consistent namespace for clients of this registry while
+      // also returning NamedBoxes that resolve to delegate Context names.
+      this.SUPER(name, service, delegateRegisteredBox);
+
       this.selectorRegistrations_.push(this.Registration.create({
-        registry: delegate,
-        box: delegateRegisteredBox
+        name: name,
+        delegateRegistry: delegate,
+        delegateRegisteredBox: delegateRegisteredBox
       }));
-      return this.SUPER(name, service, delegateRegisteredBox);
+
+      return delegateRegisteredBox;
     },
     function unregister(nameOrBox) {
-      // Similar to BoxRegistry implementation, but grab local box for
-      // unregistration in delegate.
       var delegateRegisteredBox;
-      if ( foam.box.Box.isInstance(nameOrBox) ) {
-        for ( var key in this.registry_ ) {
-          if ( this.registry_[key].exportBox === nameOrBox ) {
-            delegateRegisteredBox = this.registry_[key].localBox;
-            delete this.registry_[key];
-          }
-        }
+      var inputIsBox = this.Box.isInstance(nameOrBox);
+      if ( inputIsBox ) {
+        delegateRegisteredBox = nameOrBox;
       } else {
         delegateRegisteredBox = this.registry_[nameOrBox].localBox;
-        delete this.registry_[nameOrBox];
+
+        // When name is known, delete from this registry immediately.
+        delete this.SUPER(nameOrBox);
       }
 
-      if ( ! delegateRegisteredBox ) return;
-
       var registrations = this.selectorRegistrations_;
-      var registry = null;
+      var delegateRegistry = null;
       for ( var i = 0; i < registrations.length; i++ ) {
-        if ( registrations[i].box !== delegateRegisteredBox ) continue;
-        registry = registrations[i].registry;
+        if ( registrations[i].delegateRegisteredBox !== delegateRegisteredBox )
+          continue;
+
+        delegateRegistry = registrations[i].delegateRegistry;
+
+        // When name was not previously known, delete from this registry after
+        // finding associated Registration.
+        if ( inputIsBox ) delete this.registry_[registrations[i].name];
         break;
       }
 
-      foam.assert(registry, 'SelectorRegistry: Expected to find registry');
+      foam.assert(delegateRegistry,
+                  'SelectorRegistry: Expected to find delegate registry');
 
       // TODO(markdittmer): See TODO in BoxRegistry.unregister();
       // unregistering remote boxes this way will not work unless something
       // more nuanced than object identity is used.
-      registry.unregister(delegateRegisteredBox);
+      delegateRegistry.unregister(delegateRegisteredBox);
     }
   ]
 });
