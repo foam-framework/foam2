@@ -51,6 +51,7 @@ foam.CLASS({
         Interpreter           shell = new Interpreter();
         PM                    pm    = new PM(this.getClass(), getId());
 
+System.err.println("************************** Test: " + getCode());
         try {
           shell.set("currentTest", this);
           setPassed(0);
@@ -70,7 +71,9 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
+        System.err.println("******************** Output: " + this.getPassed() + " " + this.getFailed() + " " + baos.toString());
         setOutput(baos.toString());
+    `
     }
   ]
 });
