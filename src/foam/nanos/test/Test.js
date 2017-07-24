@@ -56,6 +56,7 @@ foam.CLASS({
           setPassed(0);
           setFailed(0);
           setOutput("");
+          shell.set("x", getX());
           shell.setOut(ps);
 
           // creates the testing method
