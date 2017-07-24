@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class UserAndGroupAuthServiceTest
-  extends WebAuthService
+  extends CachedUserAndGroupAuthService
 {
   private int numUsers        = 10;
   private int numGroups       = 5;
