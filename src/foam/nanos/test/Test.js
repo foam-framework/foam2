@@ -70,7 +70,7 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
-        setOutput(baos.toString());
+        setOutput(baos.toString());`
     }
   ]
 });
