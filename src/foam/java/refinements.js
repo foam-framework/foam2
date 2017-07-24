@@ -682,6 +682,12 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Property',
+  javaType: 'foam.core.PropertyInfo'
+});
+
+
+foam.CLASS({
   refines: 'foam.core.String',
 
   properties: [
