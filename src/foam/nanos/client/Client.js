@@ -29,7 +29,8 @@ foam.CLASS({
     'foam.nanos.pm.PMInfo',
     'foam.nanos.script.Script',
     'foam.nanos.test.Test',
-    'foam.nanos.auth.AuthService'
+    'foam.nanos.auth.WebAuthService',
+    'foam.nanos.auth.ClientAuthService'
   ],
 
   exports: [
@@ -45,10 +46,24 @@ foam.CLASS({
     'regionDAO',
     'scriptDAO',
     'testDAO',
-    'userDAO'
+    'userDAO',
+    'webAuth'
   ],
 
   properties: [
+    {
+      name: 'webAuth',
+      factory: function() {
+        return this.ClientAuthService.create({
+          delegate: this.HTTPBox.create({
+            method: 'POST',
+            url: 'http://localhost:8080/webAuth'
+          })
+        });
+      }
+    },
+
+
     {
       name: 'nSpecDAO',
       factory: function() {
@@ -263,11 +278,11 @@ foam.CLASS({
           name: 'testDAO',
           factory: function() {
             return this.ClientDAO.create({
-                      of: this.NSpec,
-                      delegate: this.HTTPBox.create({
-                        method: 'POST',
-                        url: 'http://localhost:8080/testDAO'
-                      })});
+              of: this.Test,
+              delegate: this.HTTPBox.create({
+              method: 'POST',
+              url: 'http://localhost:8080/testDAO'
+            })});
 
             /*
             return this.createDAO({

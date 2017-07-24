@@ -16,7 +16,6 @@ public class StringParser implements Parser {
     escape_ = '\\';
   }
 
-
   public PStream parse(PStream ps, ParserContext x) {
     delim_ = ps.head();
     if ( delim_ != '"' && delim_ != '\'' ) {
@@ -36,8 +35,32 @@ public class StringParser implements Parser {
 
       if ( c != escape_ ) sb.append(c);
 
+      PStream tail = ps.tail();
+
+      if ( c == '\\' ) {
+        char nextChar = ps.tail().head();
+        Parser escapeSeqParser = null;
+
+        if ( nextChar == 'u' ) {
+          escapeSeqParser = new UnicodeParser();
+        } else if ( nextChar == 'n' ) {
+          escapeSeqParser = new ASCIIEscapeParser();
+        }
+
+        if ( escapeSeqParser != null ) {
+          PStream escapePS = escapeSeqParser.parse(ps, x);
+
+          if ( escapePS != null ) {
+            sb.append(escapePS.value());
+            tail = escapePS;
+
+            c = ((Character) escapePS.value()).charValue();
+          }
+        }
+      }
+
+      ps = tail;
       lastc = c;
-      ps = ps.tail();
     }
 
     return ps.tail().setValue(sb.toString());
