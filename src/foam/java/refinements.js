@@ -556,6 +556,7 @@ foam.CLASS({
 
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
+      return info;
     }
   ]
 });
@@ -567,50 +568,68 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'foam.lib.json.IntParser']
   ],
 
   methods: [
-      function createJavaPropertyInfo_(cls) {
-        var info = this.SUPER(cls);
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
 
-        const OF = ( this.of ? this.of.id ? this.of.id : this.of : null );
+      info.method({
+        name: 'getOrdinal',
+        visibility: 'public',
+        type: 'int',
+        args: [
+          {
+            name: 'o',
+            type: 'Object'
+          }
+        ],
+        body: `return ((${this.of.id}) o).getOrdinal();`
+      });
 
-        info.method({
-          name: 'of',
-          visibility: 'public',
-          type: 'String',
-          body: `return "${OF}";`
-        });
+      info.method({
+        name: 'forOrdinal',
+        visibility: 'public',
+        type: this.of.id,
+        args: [
+          {
+            name: 'ordinal',
+            type: 'int'
+          }
+        ],
+        body: `return ${this.of.id}.forOrdinal(ordinal);`
+      });
 
-        info.method({
-          name: 'getOrdinal',
-          visibility: 'public',
-          type: 'int',
-          args: [
-            {
-              name: 'o',
-              type: 'Object'
-            }
-          ],
-          body: `return ((${OF}) o).getOrdinal();`
-        });
+      info.method({
+        name: 'toJSON',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.json.Outputter'
+          },
+          {
+            name: 'out',
+            type: 'StringBuilder'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `outputter.output(out, getOrdinal(value));`
+      });
 
-        info.method({
-          name: 'forOrdinal',
-          visibility: 'public',
-          type: OF,
-          args: [
-            {
-              name: 'ordinal',
-              type: 'int'
-            }
-          ],
-          body: `return ${OF}.forOrdinal(ordinal);`
-        });
+      var cast = info.getMethod('cast');
+      cast.body = 'if ( o instanceof Integer ) {'
+      + 'return forOrdinal((int) o); '
+      + '}'
+      + ' return (java.lang.Enum) o;';
 
-        return info;
-      }
+      return info;
+    }
   ]
 });
 

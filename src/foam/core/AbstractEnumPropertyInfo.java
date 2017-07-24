@@ -16,9 +16,9 @@ import javax.xml.stream.XMLStreamReader;
 public abstract class AbstractEnumPropertyInfo
   extends AbstractObjectPropertyInfo {
 
-  public abstract String of();
   public abstract int getOrdinal(Object o);
   public abstract java.lang.Enum forOrdinal(int ordinal);
+  public abstract void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
