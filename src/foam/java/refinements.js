@@ -857,7 +857,7 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Boolean',
   properties: [
-    ['javaType', 'boolean'],
+    ['javaType', 'Boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
   ]
