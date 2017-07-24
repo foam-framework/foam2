@@ -22,7 +22,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'language', 'description', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
   ],
 
   searchColumns: [ ],
@@ -95,9 +95,11 @@ foam.CLASS({
         Interpreter           shell = new Interpreter();
         PM                    pm    = new PM(this.getClass(), getId());
 
+        // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
           shell.set("currentScript", this);
           setOutput("");
+          shell.set("x", getX());
           shell.setOut(ps);
           shell.eval(getCode());
         } catch (EvalError e) {
@@ -110,7 +112,7 @@ foam.CLASS({
         ps.flush();
       System.err.println("******************** Output: " + baos.toString());
         setOutput(baos.toString());
-`
+    `
     }
   ],
 
