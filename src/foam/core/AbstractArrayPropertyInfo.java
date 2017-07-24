@@ -60,7 +60,6 @@ public abstract class AbstractArrayPropertyInfo
             break;
           case XMLStreamConstants.END_ELEMENT:
             if ( reader.getLocalName() == startTag ) { return objList.toArray(); }
-            break;
         }
       }
     } catch (XMLStreamException ex) {
@@ -85,9 +84,9 @@ public abstract class AbstractArrayPropertyInfo
       return;
     } else {
       Object[] nestObj = (Object[]) this.f(obj);
-      for ( int j = 0; j < nestObj.length; j++ ) {
+      for ( int k = 0; k < nestObj.length; k++ ) {
         Element nestedProp = doc.createElement("value");
-        nestedProp.appendChild(doc.createTextNode(nestObj[j].toString()));
+        nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
         prop.appendChild(nestedProp);
       }
     }
