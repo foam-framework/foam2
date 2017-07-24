@@ -166,7 +166,7 @@ foam.CLASS({
     {
       name: 'eof',
       javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
-                + 'java.util.Collections.sort(getArray());\n'
+                + 'java.util.Collections.sort(getArray(), comparator_);\n'
                 + 'foam.dao.Subscription sub = getX().create(foam.dao.Subscription.class);\n'
                 + 'for ( Object o : getArray() ) {\n'
                 + '  if ( sub.getDetached() ) {\n'
