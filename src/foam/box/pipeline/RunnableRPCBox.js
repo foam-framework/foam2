@@ -16,45 +16,36 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'LogBox',
+  package: 'foam.box.pipeline',
+  name: 'RunnableRPCBox',
   extends: 'foam.box.ProxyBox',
 
-  documentation: 'Log input messages before passing to optional delegate.',
+  documentation: 'A box that wraps input messages in Runnable.run() RPC calls.',
 
-  requires: [ 'foam.log.LogLevel' ],
-
-  imports: [
-    'debug',
-    'log',
-    'info',
-    'warn',
-    'error'
+  requires: [
+    'foam.box.Message',
+    'foam.box.RPCMessage'
   ],
 
   properties: [
     {
-      class: 'String',
-      name: 'name',
-      factory: function() { return `LogBox${this.$UID}`; }
-    },
-    {
       class: 'FObjectProperty',
-      of: 'foam.log.LogLevel',
-      name: 'logLevel',
-      factory: function() { return this.LogLevel.INFO; }
-    }
+      of: 'foam.box.Box',
+      documentation: `Error box for routing errors when sending to
+              runnable.`,
+      name: 'errorBox'
+    },
   ],
 
   methods: [
-    function send(message) {
-      var output = message.object;
-      this[this.logLevel.consoleMethodName].apply(this, [
-        this.name,
-        output instanceof Error ? output.toString() :
-          foam.json.Pretty.stringify(message)
-      ]);
-      this.delegate && this.delegate.send(message);
+    function send(inputMessage) {
+      return this.delegate && this.delegate.send(this.Message.create({
+        object: this.RPCMessage.create({
+          name: 'run',
+          args: [ inputMessage.object ]
+        }),
+        attributes: { errorBox: this.errorBox }
+      }));
     }
   ]
 });

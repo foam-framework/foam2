@@ -490,3 +490,32 @@ foam.CLASS({
 });
 
 ActionDemoView.create({data: ActionDemo.create()}).write();
+
+
+foam.CLASS({
+  name: 'ParentView',
+  extends: 'foam.u2.Element',
+  axioms: [
+    foam.u2.CSS.create({code: `
+      ^ { background: pink }
+    `})
+  ],
+  methods: [ function initE() {
+    this.addClass(this.myClass()).add('text');
+  }]
+});
+
+foam.CLASS({
+  name: 'Child1View',
+  extends: 'ParentView',
+  axioms: [ foam.u2.CSS.create({code: ParentView.getAxiomsByClass(foam.u2.CSS)[0].code}) ]
+});
+
+foam.CLASS({
+  name: 'Child2View',
+  extends: 'ParentView',
+  axioms: [ foam.u2.CSS.create({code: ParentView.getAxiomsByClass(foam.u2.CSS)[0].code}) ]
+})
+
+Child1View.create().write();
+Child2View.create().write();

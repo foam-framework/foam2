@@ -16,11 +16,13 @@ var classes = [
   'foam.mlang.predicate.Nary',
   'foam.mlang.predicate.Unary',
   'foam.mlang.predicate.Binary',
+  'foam.mlang.predicate.ArrayBinary',
   'foam.mlang.predicate.Contains',
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Lt',
+  'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
   'foam.mlang.sink.Count',
@@ -63,6 +65,7 @@ var classes = [
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
+  'foam.mlang.sink.Map',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
@@ -72,6 +75,7 @@ var classes = [
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.WebAuthService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
@@ -92,7 +96,7 @@ var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
-  'foam.nanos.auth.AuthService'
+  'foam.nanos.auth.WebAuthService'
 ];
 
 var proxies = [
