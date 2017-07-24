@@ -26,7 +26,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.core.String',
+      class: 'foam.core.Property',
+      javaType: 'foam.core.PropertyInfo',
       name: 'junctionProperty'
     },
     {
@@ -35,15 +36,18 @@ foam.CLASS({
     },
     'junctionCls',
     {
-      class: 'foam.core.String',
+      class: 'foam.core.Property',
+      javaType: 'foam.core.PropertyInfo',
       name: 'sourceKey'
     },
     {
-      class: 'foam.core.String',
+      class: 'foam.core.Property',
+      javaType: 'foam.core.PropertyInfo',
       name: 'targetProperty'
     },
     {
-      class: 'foam.core.String',
+      class: 'foam.core.Property',
+      javaType: 'foam.core.PropertyInfo',
       name: 'sourceProperty'
     },
     'junctionKeyFactory',
