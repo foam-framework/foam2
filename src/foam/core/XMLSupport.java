@@ -116,14 +116,15 @@ public class XMLSupport {
 
   public static void toXML(List<FObject> objList, Document doc, Element e) {
     Iterator i = objList.iterator();
-    Element rootElement = doc.createElement("objects");
-    // Case for nested object arrays
-    if ( doc.hasChildNodes() ) {
-      e.appendChild(rootElement);
-    } else {
-      doc.appendChild(rootElement);
+    if ( objList.size() > 1 ) {
+      Element rootElement = doc.createElement("objects");
+      // Case for nested object arrays
+      if ( doc.hasChildNodes() ) {
+        e.appendChild(rootElement);
+      } else {
+        doc.appendChild(rootElement);
+      }
     }
-
     while ( i.hasNext() ) {
       toXML((FObject) i.next(), doc, e) ;
     }
