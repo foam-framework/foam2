@@ -111,21 +111,23 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  if ( sub != null ) sub.detach();\n'
-              + '} else {\n'
-              + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(obj, sub);\n'
-              + '}\n'
+      javaCode: 
+`if ( getCount() >= getLimit() ) {
+  if ( sub != null ) sub.detach();
+} else {
+  setCount(getCount() + 1);
+  getDelegate().put(obj, sub);
+}`
     },
     {
       name: 'remove',
-      javaCode: 'if ( getCount() >= getLimit() ) {\n'
-              + '  if ( sub != null ) sub.detach();\n'
-              + '} else {'
-              + '  setCount(getCount() + 1);\n'
-              + '  getDelegate().put(obj, sub);\n'
-              + '}\n'
+      javaCode: 
+`if ( getCount() >= getLimit() ) {
+  if ( sub != null ) sub.detach();
+} else {
+  setCount(getCount() + 1);
+  getDelegate().put(obj, sub);
+}`
     }
   ]
 });
@@ -136,19 +138,21 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'if ( getCount() < getSkip() ) {\n'
-              + '  setCount(getCount() + 1);\n'
-              + '  return;'
-              + '}\n'
-              + 'getDelegate().put(obj, sub);'
+      javaCode: 
+`if ( getCount() < getSkip() ) {
+  setCount(getCount() + 1);
+  return;
+}
+getDelegate().put(obj, sub);`
     },
     {
       name: 'remove',
-      javaCode: 'if ( getCount() < getSkip() ) {\n'
-              + '  setCount(getCount() + 1);\n'
-              + '  return;'
-              + '}\n'
-              + 'getDelegate().remove(obj, sub);'
+      javaCode: 
+`if ( getCount() < getSkip() ) {
+  setCount(getCount() + 1);
+  return;
+}
+getDelegate().remove(obj, sub);`
     }
   ]
 });
@@ -160,20 +164,24 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
-                + 'getArray().add(obj);'
+      javaCode: 
+`if ( getArray() == null ) setArray(new java.util.ArrayList());
+getArray().add(obj);`
     },
     {
       name: 'eof',
-      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
-                + 'java.util.Collections.sort(getArray(), comparator_);\n'
-                + 'foam.dao.Subscription sub = getX().create(foam.dao.Subscription.class);\n'
-                + 'for ( Object o : getArray() ) {\n'
-                + '  if ( sub.getDetached() ) {\n'
-                + '    break;\n'
-                + '  }\n'
-                + '  getDelegate().put((foam.core.FObject)o, sub);\n'
-                + '}'
+      javaCode: 
+`if ( getArray() == null ) setArray(new java.util.ArrayList());
+java.util.Collections.sort(getArray(), comparator_);
+foam.dao.Subscription sub = getX().create(foam.dao.Subscription.class);
+
+for ( Object o : getArray() ) {
+  if ( sub.getDetached() ) {
+    break;
+  }
+  
+  getDelegate().put((foam.core.FObject)o, sub);
+}`
     }
   ]
 });
