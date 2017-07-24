@@ -3,11 +3,11 @@ package foam.dao.index;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 
-public class TreePlan implements FindPlan {
+public class TreeLookupFindPlan implements FindPlan {
   
   protected PropertyInfo prop_;
   
-  public TreePlan(PropertyInfo prop) {
+  public TreeLookupFindPlan(PropertyInfo prop) {
     prop_ = prop;
   }
   //TODO
