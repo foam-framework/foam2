@@ -70,6 +70,7 @@ public class Outputter {
       output(out, value);
       if ( keys.hasNext() ) out.append(",");
     }
+    out.append("}");
   }
 
   protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p) {
