@@ -608,7 +608,7 @@ foam.CLASS({
       });
 
       var cast = info.getMethod('cast');
-      cast.body = 
+      cast.body =
 `if ( o instanceof Integer ) {
   return forOrdinal((int) o);
 }
@@ -860,6 +860,14 @@ foam.CLASS({
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ((Boolean) o).booleanValue();'
+      return info;
+    }
   ]
 });
 
