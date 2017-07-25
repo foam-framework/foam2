@@ -23,6 +23,8 @@ foam.CLASS({
   properties: [
     'units',
     [ 'value', 0 ],
+    'min',
+    'max',
     [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
