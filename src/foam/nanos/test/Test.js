@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'Test',
   extends: 'foam.nanos.script.Script',
 
+  imports: [ 'testDAO as scriptDAO' ],
+
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
