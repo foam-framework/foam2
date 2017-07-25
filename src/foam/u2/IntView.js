@@ -28,25 +28,12 @@ foam.CLASS({
 
   properties: [
     [ 'type', 'number' ],
-    { class: 'Int', name: 'data' },
-    'min',
-    'max'
+    { class: 'Int', name: 'data' }
   ],
 
   methods: [
-    function initE() {
-      this.SUPER();
-      if ( this.min != undefined ) this.setAttribute('min', this.min);
-      if ( this.max != undefined ) this.setAttribute('max', this.max);
-    },
-
     function link() {
       this.attrSlot(null, this.onKey ? 'input' : null).linkFrom(this.data$)
-    },
-
-    function fromProperty(p) {
-      this.min = p.min;
-      this.max = p.max;
     }
   ]
 });
