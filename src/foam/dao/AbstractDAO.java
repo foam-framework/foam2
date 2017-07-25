@@ -41,7 +41,7 @@ public abstract class AbstractDAO
     throw new UnsupportedOperationException();
   }
 
-  protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+  protected Sink decorateSink_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( limit < this.MAX_SAFE_INTEGER ) {
       sink = new LimitedSink(limit, 0, sink);
     }
@@ -58,14 +58,9 @@ public abstract class AbstractDAO
       sink = new PredicatedSink(predicate, sink);
     }
 
+    ((AbstractFObject) sink).setX(x);
+
     return sink;
-  }
-
-  protected Sink decorateSink_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink decoratedSink = decorateSink_(sink, skip, limit, order, predicate);
-    ((AbstractFObject) decoratedSink).setX(x);
-
-    return decoratedSink;
   }
 
   public ClassInfo getOf() {

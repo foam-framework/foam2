@@ -144,7 +144,7 @@ public class DatastoreDAO
             sink = new ListSink();
         }
 
-        Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
+        Sink decorated = decorateSink_(x, sink, skip, limit, order, predicate);
 
         Subscription sub = getX().create(foam.dao.Subscription.class);
 
