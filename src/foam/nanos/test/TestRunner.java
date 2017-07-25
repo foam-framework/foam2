@@ -23,10 +23,8 @@ public class TestRunner
 {
 
   public void start() {
-
     final DAO tests = (DAO) getX().get("TestDAO");
     /* TODO add listener for when test is scheduled
-
     */
     runAllTests();
   }
