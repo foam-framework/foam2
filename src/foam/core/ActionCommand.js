@@ -24,7 +24,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Object',
-      name: 'obj',
+      name: 'object',
       required: true
     },
     {
