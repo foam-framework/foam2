@@ -46,13 +46,19 @@ public abstract class AbstractDAO
       sink = new LimitedSink(limit, 0, sink);
     }
 
+    ((AbstractFObject) sink).setX(x);
+
     if ( skip > 0 ) {
       sink = new SkipSink(skip, 0, sink);
     }
 
+    ((AbstractFObject) sink).setX(x);
+
     if ( order != null ) {
       sink = new OrderedSink(order, null, sink);
     }
+
+    ((AbstractFObject) sink).setX(x);
 
     if ( predicate != null ) {
       sink = new PredicatedSink(predicate, sink);
