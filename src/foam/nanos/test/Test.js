@@ -9,8 +9,6 @@ foam.CLASS({
   name: 'Test',
   extends: 'foam.nanos.script.Script',
 
-  imports: [ 'testDAO as scriptDAO' ],
-
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
@@ -20,14 +18,7 @@ foam.CLASS({
     'java.util.Date'
   ],
 
-  tableColumns: [
-    'id', 'enabled', 'description', 'passed', 'failed', 'run'
-  ],
-
-  searchColumns: [ ],
-
   properties: [
-    'id',
     {
       class: 'Int',
       name: 'passed'
@@ -53,17 +44,15 @@ foam.CLASS({
         Interpreter           shell = new Interpreter();
         PM                    pm    = new PM(this.getClass(), getId());
 
-System.err.println("************************** Test: " + getCode());
         try {
           shell.set("currentTest", this);
           setPassed(0);
           setFailed(0);
           setOutput("");
-          shell.set("x", getX());
           shell.setOut(ps);
 
           // creates the testing method
-          shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else { currentTest.setFailed(currentTest.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
+          shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else currentTest.setFailed(currentTest.getFailed()+1); print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
         } catch (EvalError e) {
           e.printStackTrace();
@@ -73,9 +62,8 @@ System.err.println("************************** Test: " + getCode());
 
         setLastRun(new Date());
         ps.flush();
-        System.err.println("******************** Output: " + this.getPassed() + " " + this.getFailed() + " " + baos.toString());
         setOutput(baos.toString());
-    `
+        setScheduled(false);`
     }
   ]
 });
