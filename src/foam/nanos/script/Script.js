@@ -22,7 +22,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'language', 'description', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
   ],
 
   searchColumns: [ ],
