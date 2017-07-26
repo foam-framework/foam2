@@ -24,10 +24,6 @@ foam.CLASS({
       the correct payload to subsequent API calls, and return results in the
       Promise.`,
 
-  constants: {
-    INT32_MAX: Math.pow(2, 31) - 1
-  },
-
   properties: [
     {
       name: 'ctx'
@@ -41,6 +37,18 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'results'
+    },
+    {
+      class: 'Boolean',
+      name: 'halted'
+    },
+    {
+      name: 'sub',
+      factory: function() {
+        var sub = foam.core.FObject.create();
+        sub.onDetach(function() { this.halted = true; }.bind(this));
+        return sub;
+      }
     }
   ]
 });
@@ -62,6 +70,10 @@ foam.CLASS({
     'foam.net.HTTPRequest'
   ],
   imports: [ 'gcloudProjectId?' ],
+
+  constants: {
+    INT32_MAX: Math.pow(2, 31) - 1
+  },
 
   properties: [
     {
@@ -207,8 +219,9 @@ foam.CLASS({
       documentation: `Determine whether or not a batch contains the last results
         in a (potentially "limit"ed) query result. Abstracted out of
         onSelectResponse() to support faked batching in tests.`,
-      code: function(batch) {
-        return batch.entityResults && batch.entityResults.length > 0 &&
+      code: function(batch, data) {
+        return ( ! data.halted ) && batch.entityResults &&
+            batch.entityResults.length > 0 &&
             ( batch.moreResults === 'NOT_FINISHED' ||
               batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
       }
@@ -292,18 +305,19 @@ foam.CLASS({
       // Allow datastore-aware sinks to unpack query result batches manually
       // instead of DAO put()ing to them.
       if ( data.sink && data.sink.fromDatastoreEntityResults ) {
-        data.sink.fromDatastoreEntityResults(entities, data.x);
+        data.sink.fromDatastoreEntityResults(entities, data.ctx);
       } else {
         var fromDatastoreEntity =
             com.google.cloud.datastore.fromDatastoreEntity;
         for ( var i = 0; i < entities.length; i++ ) {
           var obj = fromDatastoreEntity(entities[i].entity, data.ctx);
           data.results.push(obj);
-          data.sink && data.sink.put && data.sink.put(obj);
+          data.sink && data.sink.put && data.sink.put(obj, data.sub);
+          if ( data.halted ) break;
         }
       }
 
-      if ( this.resultsAreIncomplete_(batch) ) {
+      if ( this.resultsAreIncomplete_(batch, data) ) {
         return this.selectNextBatch_(data, batch);
       } else {
         data.sink && data.sink.eof && data.sink.eof();
@@ -317,7 +331,7 @@ foam.CLASS({
         deletes[i] = { delete: arr[i].getDatastoreKey() };
       }
 
-      this.sendRequest('commit', {
+      return this.sendRequest('commit', {
         mode: 'TRANSACTIONAL',
         mutations: deletes,
         transaction: transaction
