@@ -6,13 +6,15 @@ import foam.core.PropertyInfo;
 public class TreeLookupFindPlan implements FindPlan {
   
   protected PropertyInfo prop_;
+  protected long size_;
   
-  public TreeLookupFindPlan(PropertyInfo prop) {
+  public TreeLookupFindPlan(PropertyInfo prop, long size) {
     prop_ = prop;
+    size_ = size;
   }
-  //TODO
+  
   public long cost() {
-    return 1;
+    return ((Double) Math.log(Long.valueOf(size_).doubleValue())).longValue();
   }
   
   public FObject find(Object state, Object key) {
