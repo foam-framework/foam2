@@ -23,12 +23,13 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObject',
+      class: 'FObjectProperty',
       name: 'object',
       required: true
     },
     {
-      class: 'Action',
+      class: 'FObjectProperty',
+      of: 'foam.core.Action',
       name: 'action',
       required: true
     }
