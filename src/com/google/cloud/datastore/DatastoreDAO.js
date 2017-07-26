@@ -220,10 +220,10 @@ foam.CLASS({
         in a (potentially "limit"ed) query result. Abstracted out of
         onSelectResponse() to support faked batching in tests.`,
       code: function(batch, data) {
-        return data.halted ||
-            ( batch.entityResults && batch.entityResults.length > 0 &&
-              ( batch.moreResults === 'NOT_FINISHED' ||
-                batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' ) );
+        return ( ! data.halted ) && batch.entityResults &&
+            batch.entityResults.length > 0 &&
+            ( batch.moreResults === 'NOT_FINISHED' ||
+              batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
       }
     }
   ],
