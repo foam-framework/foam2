@@ -45,7 +45,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(o) {
+    function put_(x, o) {
       /**
        * PUT baseURL
        * <network-foam-jsonified FOAM object>
@@ -58,7 +58,7 @@ foam.CLASS({
           .then(this.onPutResponse);
     },
 
-    function remove(o) {
+    function remove_(x, o) {
       /**
        * DELETE baseURL/<network-foam-jsonified FOAM object id>
        */
@@ -69,7 +69,7 @@ foam.CLASS({
           .then(this.onRemoveResponse);
     },
 
-    function find(key) {
+    function find_(x, key) {
       /**
        * GET baseURL/<network-foam-jsonified FOAM object id>
        */
@@ -81,7 +81,7 @@ foam.CLASS({
           .then(this.onFindResponse);
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       /**
        * GET baseURL
        * { skip, limit, order, predicate }
@@ -112,7 +112,7 @@ foam.CLASS({
               this, sink || this.ArraySink.create()));
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       /**
        * POST baseURL/removeAll
        * { skip, limit, order, predicate }
@@ -186,8 +186,12 @@ foam.CLASS({
         throw new Error('Expected ArraySink from REST endpoint when proxying local sink');
 
       if ( localSink.put ) {
+        var sub = foam.core.FObject.create();
+        var detached = false;
+        sub.onDetach(function() { detached = true; });
         for ( var i = 0; i < array.length; i++ ) {
-          localSink.put(array[i]);
+          localSink.put(array[i], sub);
+          if ( detached ) break;
         }
       }
       if ( localSink.eof ) localSink.eof();

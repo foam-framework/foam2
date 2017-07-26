@@ -28,7 +28,6 @@ if [ "$(which gcloud)" == "" ]; then
 fi
 
 CDS_EMULATOR_PID=""
-UNRELIABLE_CDS_EMULATOR_PID=""
 JASMINE_PID=""
 JASMINE_CODE=""
 
@@ -44,12 +43,6 @@ function stop() {
     kill $CDS_EMULATOR_PID
   fi
   win "CLOUD DATASTORE EMULATOR STOPPED"
-
-  if [ "$UNRELIABLE_CDS_EMULATOR_PID" != "" ]; then
-    warn "STOPPING UNRELIABLE CLOUD DATASTORE EMULATOR (PID=$UNRELIABLE_CDS_EMULATOR_PID)"
-    kill $UNRELIABLE_CDS_EMULATOR_PID
-  fi
-  win "UNRELIABLE CLOUD DATASTORE EMULATOR STOPPED"
 
   if [ "$JASMINE_CODE" != "" ]; then
     warn "EXIT CODE $JASMINE_CODE"
@@ -83,22 +76,11 @@ ${JAVA:="java"} -cp "$CDS_EMULATOR_JAR" \
                 --port=$CDS_EMULATOR_PORT --testing &
 export CDS_EMULATOR_PID=$!
 
-export UNRELIABLE_CDS_EMULATOR_PROTOCOL="http"
-export UNRELIABLE_CDS_EMULATOR_HOST="localhost"
-export UNRELIABLE_CDS_EMULATOR_PORT=$((($RANDOM % 1000) + 8000))
-
-${JAVA:="java"} -cp "$CDS_EMULATOR_JAR" \
-                com.google.cloud.datastore.emulator.CloudDatastore \
-                "$CDS_EMULATOR" start --host=$UNRELIABLE_CDS_EMULATOR_HOST \
-                --port=$UNRELIABLE_CDS_EMULATOR_PORT --store_on_disk=false \
-                --store_index_configuration_on_disk=false --consistency=0.0 &
-export UNRELIABLE_CDS_EMULATOR_PID=$!
-
-sleep 5
 
 export JASMINE_CONFIG_PATH="$BASE_DIR/../../jasmine_gcloud.json"
 
 # Run tests
+sleep 5
 node "$BASE_DIR/../../node_modules/.bin/jasmine" &
 JASMINE_PID=$!
 wait $JASMINE_PID
@@ -106,7 +88,7 @@ wait $JASMINE_PID
 # OR
 
 # Debug tests
-# node --inspect "$BASE_DIR/inspect.es6.js" "$BASE_DIR/../../node_modules/.bin/jasmine"
+# node --inspect --debug-brk "$BASE_DIR/../../node_modules/.bin/jasmine"
 
 JASMINE_CODE=$?
 

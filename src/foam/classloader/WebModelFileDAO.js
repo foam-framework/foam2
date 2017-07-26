@@ -38,7 +38,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function find(id) {
+    function find_(x, id) {
       var self = this;
       var url  = this.url + '/' + id.replace(/\./g, '/') + '.js';
       var req  = this.HTTPRequest.create({

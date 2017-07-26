@@ -19,15 +19,15 @@ foam.CLASS({
   package: 'com.google.cloud.datastore',
   name: 'SelectData',
 
-  documentation: function() {/*
-                               State passed around by intermediate callbacks
-                               during a select() in progress. These data must
-                               be retained to notify the sink, send the
-                               correct payload to subsequent API calls, and
-                               return results in the Promise.
-                              */},
+  documentation: `State passed around by intermediate callbacks during a
+      select() in progress. These data must be retained to notify the sink, send
+      the correct payload to subsequent API calls, and return results in the
+      Promise.`,
 
   properties: [
+    {
+      name: 'ctx'
+    },
     {
       name: 'sink'
     },
@@ -37,6 +37,18 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'results'
+    },
+    {
+      class: 'Boolean',
+      name: 'halted'
+    },
+    {
+      name: 'sub',
+      factory: function() {
+        var sub = foam.core.FObject.create();
+        sub.onDetach(function() { this.halted = true; }.bind(this));
+        return sub;
+      }
     }
   ]
 });
@@ -46,15 +58,11 @@ foam.CLASS({
   name: 'DatastoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
-  documentation: function() {/*
-                               DAO implementation for the Google Cloud
-                               Datastore v1 REST API.
+  documentation: `DAO implementation for the Google Cloud Datastore v1 REST API.
 
-                               https://cloud.google.com/datastore/docs/reference/rest/
+      https://cloud.google.com/datastore/docs/reference/rest/
 
-                               This implementation uses structured queries,
-                               not GQL queries.
-                              */},
+      This implementation uses structured queries, not GQL queries.`,
 
   requires: [
     'com.google.cloud.datastore.SelectData',
@@ -62,6 +70,10 @@ foam.CLASS({
     'foam.net.HTTPRequest'
   ],
   imports: [ 'gcloudProjectId?' ],
+
+  constants: {
+    INT32_MAX: Math.pow(2, 31) - 1
+  },
 
   properties: [
     {
@@ -103,6 +115,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function sendRequest(name, objPayload) {
+      return this.getRequest(name, objPayload && JSON.stringify(objPayload))
+          .send();
+    },
     function getRequest(name, payload) {
       var headers = { Accept: 'application/json' };
       if ( payload ) headers['Content-Type'] = 'application/json';
@@ -115,27 +131,28 @@ foam.CLASS({
       });
     },
 
-    function find(idOrObj) {
+    function find_(x, idOrObj) {
       var key = foam.core.FObject.isInstance(idOrObj) ?
           idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
-      return this.getRequest('lookup', JSON.stringify({ keys: [ key ] })).send()
-          .then(this.onResponse.bind(this, 'find')).then(this.onFindResponse);
+      return this.sendRequest('lookup', { keys: [ key ] })
+          .then(this.onResponse.bind(this, 'find'))
+          .then(this.onFindResponse.bind(this, x));
     },
-    function put(o) {
-      return this.getRequest('commit', JSON.stringify({
+    function put_(x, o) {
+      return this.sendRequest('commit', {
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { upsert: o.toDatastoreEntity() } ]
-      })).send().then(this.onResponse.bind(this, 'put'))
-          .then(this.onPutResponse.bind(this, o));
+      }).then(this.onResponse.bind(this, 'put'))
+          .then(this.onPutResponse.bind(this, x, o));
     },
-    function remove(o) {
-      return this.getRequest('commit', JSON.stringify({
+    function remove_(x, o) {
+      return this.sendRequest('commit', {
         mode: 'NON_TRANSACTIONAL',
         mutations: [ { delete: o.getDatastoreKey() } ]
-      })).send().then(this.onResponse.bind(this, 'remove'))
-          .then(this.onRemoveResponse.bind(this, o));
+      }).then(this.onResponse.bind(this, 'remove'))
+          .then(this.onRemoveResponse.bind(this, x, o));
     },
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var payload = { query: { kind: [
         this.of.getClassDatastoreKind()
@@ -143,23 +160,24 @@ foam.CLASS({
       var query = payload.query;
       if ( predicate ) query.filter = predicate.toDatastoreFilter();
       if ( order ) query.order = order.toDatastoreOrder();
-      if ( skip ) query.offset = skip;
-      if ( limit ) query.limit = limit;
+      if ( skip ) query.offset = Math.min(skip, this.INT32_MAX);
+      if ( limit ) query.limit = Math.min(limit, this.INT32_MAX);
       // Optional Sink interface extension:
       // Allow datastore-aware sinks to decorate query.
       if ( sink.decorateDatastoreQuery )
         sink.decorateDatastoreQuery(query);
 
-      return this.getRequest('runQuery', JSON.stringify(payload)).send()
+      return this.sendRequest('runQuery', payload)
           .then(this.onResponse.bind(this, 'select'))
           .then(this.onSelectResponse.bind(
               this, this.SelectData.create({
+                ctx: x,
                 sink: sink,
                 requestPayload: payload
               })));
     },
-    function removeAll(skip, limit, order, predicate) {
-      return this.select(undefined, skip, limit, order, predicate)
+    function removeAll_(x, skip, limit, order, predicate) {
+      return this.select_(x, undefined, skip, limit, order, predicate)
           .then(this.onRemoveAll);
     },
 
@@ -191,7 +209,7 @@ foam.CLASS({
         }
         query.startCursor = batch.endCursor;
 
-        return this.getRequest('runQuery', JSON.stringify(payload)).send()
+        return this.sendRequest('runQuery', payload)
             .then(this.onResponse.bind(this, 'select'))
             .then(this.onSelectResponse.bind(this, data));
       }
@@ -201,8 +219,9 @@ foam.CLASS({
       documentation: `Determine whether or not a batch contains the last results
         in a (potentially "limit"ed) query result. Abstracted out of
         onSelectResponse() to support faked batching in tests.`,
-      code: function(batch) {
-        return batch.entityResults && batch.entityResults.length > 0 &&
+      code: function(batch, data) {
+        return ( ! data.halted ) && batch.entityResults &&
+            batch.entityResults.length > 0 &&
             ( batch.moreResults === 'NOT_FINISHED' ||
               batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
       }
@@ -214,19 +233,27 @@ foam.CLASS({
       var arr = arraySink.array;
       if ( arr.length === 0 ) return undefined;
 
-      return this.getRequest('beginTransaction').send()
+      return this.sendRequest('beginTransaction')
           .then(this.onResponse.bind(this, 'removeAll transaction'))
           .then(this.onRemoveAllTransactionResponse.bind(this, arr));
     },
 
     function onResponse(name, response) {
       if ( response.status !== 200 ) {
-        throw new Error('Unexpected ' + name + ' response code from Cloud ' +
-            'Datastore endpoint: ' + response.status);
+        return response.payload.then(function(payload) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status + '\nPayload: ' +
+              JSON.stringify(payload, null, 2));
+        }, function(error) {
+          throw new Error('Unexpected ' + name + ' response code from Cloud ' +
+              'Datastore endpoint: ' + response.status +
+              '\nError retrieving payload: ' + error);
+        });
       }
+
       return response.payload;
     },
-    function onFindResponse(json) {
+    function onFindResponse(x, json) {
       if ( ! ( json.found && json.found[0] && json.found[0].entity ) )
         return null;
       if ( json.found.length > 1 ) {
@@ -235,32 +262,35 @@ foam.CLASS({
       }
 
       return com.google.cloud.datastore.fromDatastoreEntity(
-          json.found[0].entity);
+          json.found[0].entity, x);
     },
-    function onPutResponse(o, json) {
+    function onPutResponse(x, o, json) {
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
         if ( results[i].conflictDetected )
           throw new Error('Put to Cloud Datastore yielded conflict');
       }
 
-      this.pub('on', 'put', o);
-      return o;
+      var newO = o.cls_.create(o, x);
+      this.pub('on', 'put', newO);
+      return newO;
     },
-    function onRemoveResponse(o, json) {
+    function onRemoveResponse(x, o, json) {
       var results = json.mutationResults;
       for ( var i = 0; i < results.length; i++ ) {
         if ( results[i].conflictDetected )
           throw new Error('Remove from Cloud Datastore yielded conflict');
       }
 
+      var newO = o.cls_.create(o, x);
+
       // Cloud Datastore will provide results with version numbers even if
       // the entity did not exist. Use indexUpdates defined-and-non-0 as a
       // proxy found-and-deleted.
       if ( json.indexUpdates ) {
-        this.pub('on', 'remove', o);
+        this.pub('on', 'remove', newO);
       }
-      return o;
+      return newO;
     },
     function onSelectResponse(data, json) {
       var batch = json.batch;
@@ -275,18 +305,19 @@ foam.CLASS({
       // Allow datastore-aware sinks to unpack query result batches manually
       // instead of DAO put()ing to them.
       if ( data.sink && data.sink.fromDatastoreEntityResults ) {
-        data.sink.fromDatastoreEntityResults(entities);
+        data.sink.fromDatastoreEntityResults(entities, data.ctx);
       } else {
         var fromDatastoreEntity =
             com.google.cloud.datastore.fromDatastoreEntity;
         for ( var i = 0; i < entities.length; i++ ) {
-          var obj = fromDatastoreEntity(entities[i].entity);
+          var obj = fromDatastoreEntity(entities[i].entity, data.ctx);
           data.results.push(obj);
-          data.sink && data.sink.put && data.sink.put(obj);
+          data.sink && data.sink.put && data.sink.put(obj, data.sub);
+          if ( data.halted ) break;
         }
       }
 
-      if ( this.resultsAreIncomplete_(batch) ) {
+      if ( this.resultsAreIncomplete_(batch, data) ) {
         return this.selectNextBatch_(data, batch);
       } else {
         data.sink && data.sink.eof && data.sink.eof();
@@ -300,11 +331,11 @@ foam.CLASS({
         deletes[i] = { delete: arr[i].getDatastoreKey() };
       }
 
-      this.getRequest('commit', JSON.stringify({
+      return this.sendRequest('commit', {
         mode: 'TRANSACTIONAL',
         mutations: deletes,
         transaction: transaction
-      })).send().then(this.onResponse.bind(this, 'removeAll commit'))
+      }).then(this.onResponse.bind(this, 'removeAll commit'))
           .then(this.onRemoveAllResponse);
     },
     function onRemoveAllResponse(json) {

@@ -54,15 +54,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'autoIndex',
-      value: false
+      name: 'autoIndex'
     },
     {
-      name: 'idIndex'
+      name: 'idIndex',
+      transient: true
     },
     {
       /** The root IndexNode of our index. */
-      name: 'index'
+      name: 'index',
+      transient: true
     }
   ],
 
@@ -146,8 +147,8 @@ foam.CLASS({
       });
     },
 
-    function put(obj) {
-      var oldValue = this.find_(obj.id);
+    function put_(x, obj) {
+      var oldValue = this.findSync_(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
       }
@@ -156,19 +157,19 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function find(objOrKey) {
+    function find_(x, objOrKey) {
       if ( objOrKey === undefined ) {
         return Promise.reject(this.InvalidArgumentException.create({
           message: '"key" cannot be undefined/null'
         }));
       }
 
-      return Promise.resolve(this.find_(
+      return Promise.resolve(this.findSync_(
           this.of.isInstance(objOrKey) ? objOrKey.id : objOrKey));
     },
 
     /** internal, synchronous version of find, does not throw */
-    function find_(key) {
+    function findSync_(key) {
       var index = this.idIndex;
       index = index.get(key);
 
@@ -177,7 +178,7 @@ foam.CLASS({
       return null;
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       if ( ! obj || obj.id === undefined ) {
         return Promise.reject(this.ExternalException.create({ id: 'no_id' })); // TODO: err
       }
@@ -185,7 +186,7 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      var found = this.find_(id);
+      var found = this.findSync_(id);
       if ( found ) {
         self.index.remove(found);
         self.pub('on', 'remove', found);
@@ -194,7 +195,7 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       if ( ! predicate ) predicate = this.True.create();
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
@@ -209,7 +210,7 @@ foam.CLASS({
       );
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var plan;
 //console.log("----select");
@@ -257,7 +258,7 @@ foam.CLASS({
         );
       }
 
-      return this.MergePlan.create({ of: this.of, subPlans: plans });
+      return this.MergePlan.create({ of: this.of, subPlans: plans, predicates: args });
     },
 
     function toString() {

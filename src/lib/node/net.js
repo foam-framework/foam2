@@ -392,11 +392,14 @@ foam.CLASS({
   name: 'SocketService',
 
   requires: [
-    'foam.net.node.Socket',
-    'foam.box.RegisterSelfMessage'
+    'foam.box.Message',
+    'foam.box.RegisterSelfMessage',
+    'foam.net.node.Socket'
   ],
 
   imports: [
+    'info',
+    'error',
     'fonParser'
   ],
 
@@ -405,6 +408,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'listen',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'listening'
     },
     {
       class: 'Int',
@@ -423,19 +430,37 @@ foam.CLASS({
     function init() {
       if ( ! this.listen ) return;
 
+      this.setupServer(this.port);
+    },
+
+    function setupServer(port) {
       var server = this.server = new require('net').Server();
       this.server.on('connection', this.onConnection);
-      this.server.on('error', function(e) {
-        console.log("Server error", e);
+      this.server.on('error', function(error) {
+        this.error('foam.net.node.SocketService: Server error', error);
         server.unref();
+        if ( error.code === 'EADDRINUSE' ) {
+          var port = Math.floor( 10000 + ( Math.random() * 10000 ) );
+          this.info('foam.net.node.SocketService: Retrying on port', port);
+          this.setupServer(port);
+        }
       }.bind(this));
 
-      if ( this.listen ) this.server.listen(this.port);
+      if ( this.listen ) {
+        this.server.on('listening', function() {
+          this.listening = true;
+        }.bind(this));
+        this.server.listen(this.port = port);
+      }
     },
 
     function addSocket(socket) {
-      var s1 = socket.message.sub(function(s, _, m) {
-        var m = this.fonParser.parseString(m);
+      var s1 = socket.message.sub(function(s, _, mStr) {
+        var m = this.fonParser.parseString(mStr);
+
+        if ( ! this.Message.isInstance(m) ) {
+          console.warn('Got non-message:', m, mStr);
+        }
 
         if ( this.RegisterSelfMessage.isInstance(m) ) {
           var named = foam.box.NamedBox.create({
