@@ -234,7 +234,8 @@ foam.CLASS({
     },
     {
       name: 'selection',
-      expression: function(importSelection) { return importSelection },
+      // breaks everyone
+//      expression: function(importSelection) { return importSelection },
     },
     'hoverSelection',
     'dropdownOrigin',
