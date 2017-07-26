@@ -19,11 +19,11 @@ foam.CLASS({
   package: 'foam.core',
   name: 'ActionCommand',
 
-  documentation: 'Command object containing an object and the action to be done on it',
+  documentation: 'Command object containing an object and pending action to be done on it',
 
   properties: [
     {
-      class: 'Object',
+      class: 'FObject',
       name: 'object',
       required: true
     },
