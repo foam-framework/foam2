@@ -62,7 +62,7 @@ public class MapDAO
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( sink == null ) sink = new ListSink();
 
-    Sink         decorated = decorateSink_(x, sink, skip, limit, order, predicate);
+    Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
     Subscription sub       = new Subscription();
 
     for ( FObject obj : getData().values() ) {
