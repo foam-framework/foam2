@@ -64,11 +64,11 @@ public class TreeIndex implements Index {
   public Object remove(Object state, FObject value) {
     return ((TreeNode) state).removeKeyValue((TreeNode) state, prop_, prop_.f(value), value, tail_);
   }
- 
+
   public Object removeAll() {
     return TreeNode.getNullNode();
   }
-  
+
   //TODO
   public FindPlan planFind(Object state, Object key) {
     return new TreeLookupFindPlan(prop_, ((TreeNode) state).size);
