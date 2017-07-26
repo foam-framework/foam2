@@ -90,7 +90,7 @@ public class Outputter {
       outputFObject(out, (FObject)value);
     } else if ( value instanceof Number ) {
       outputNumber(out, (Number)value);
-    } else if ( value.getClass().isArray() ) {
+    } else if ( isArray(value) ) {
       outputArray(out, (Object[])value);
     } else if ( value instanceof Boolean ) {
       outputBoolean(out, (Boolean)value);
@@ -99,6 +99,12 @@ public class Outputter {
     } else if ( value instanceof java.util.Map ) {
       outputMap(out, (java.util.Map)value);
     }
+  }
+
+  protected boolean isArray(Object value) {
+    return ( value != null ) &&
+             ( value.getClass() != null ) &&
+             value.getClass().isArray();
   }
 
   protected void outputDate(StringBuilder out, java.util.Date date) {
