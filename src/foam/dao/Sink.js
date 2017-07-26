@@ -243,7 +243,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Long',
       name: 'limit'
     },
     {
@@ -285,7 +285,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Long',
       name: 'skip'
     },
     {
@@ -358,8 +358,12 @@ foam.CLASS({
           return comparator.compare(o1, o2);
         });
 
+        var sub = foam.core.FObject.create();
+        var detached = false;
+        sub.onDetach(function() { detached = true; });
         for ( var i = 0 ; i < this.array.length ; i++ ) {
-          this.delegate.put(this.array[i]);
+          this.delegate.put(this.array[i], sub);
+          if ( detached ) break;
         }
       }
     },

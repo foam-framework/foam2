@@ -42,41 +42,45 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
+    function put_(x, obj) {
       this.logger('put', obj);
-      return this.SUPER(obj);
+      return this.SUPER(x, obj);
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       this.logger('remove', obj);
-      return this.SUPER(obj);
+      return this.SUPER(x, obj);
     },
 
-    function select(sink, skip, limit, order, predicate) {
-      this.logger('select', skip, limit, order, predicate);
+    function select_(x, sink, skip, limit, order, predicate) {
+      this.logger('select',
+                  'skip', skip,
+                  'limit', limit,
+                  'order', order && order.toString(),
+                  'predicate', predicate && predicate.toString());
       sink = sink || this.ArraySink.create();
       if ( this.logReads ) {
         var put = sink.put.bind(sink);
         var newSink = { __proto__: sink };
         newSink.put = function(o) {
-          this.logger('read', o);
+          this.logger('read', foam.json.objectify(o));
           return put.apply(null, arguments);
         }.bind(this);
-        return this.SUPER(newSink, skip, limit, order, predicate).then(function() {
+        return this.SUPER(x, newSink, skip, limit, order, predicate).then(function() {
           return sink;
         });
       }
-      return this.SUPER(sink, skip, limit, order, predicate);
+      return this.SUPER(x, sink, skip, limit, order, predicate);
     },
 
-    function removeAll(sink, skip, limit, order, predicate) {
+    function removeAll_(x, sink, skip, limit, order, predicate) {
       this.logger('removeAll', skip, limit, order, predicate);
-      return this.SUPER(sink, skip, limit, order, predicate);
+      return this.SUPER(x, sink, skip, limit, order, predicate);
     },
 
-    function find(id) {
+    function find_(x, id) {
       this.logger('find', id);
-      return this.SUPER(id);
+      return this.SUPER(x, id);
     }
   ]
 });

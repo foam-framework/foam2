@@ -21,7 +21,7 @@ describe('HTMLLexer', function() {
   var parser;
 
   beforeAll(function() {
-    parser = foam.parsers.HTMLLexer.create();
+    parser = foam.parsers.html.HTMLLexer.create();
   });
 
   function gist(str) {
@@ -66,13 +66,14 @@ describe('HTMLLexer', function() {
       '<pre>if ( x < 3 ) return true</pre>',
       '<code>if ( x < 3 ) return true</code>',
     ].forEach(function(str) {
-      var value = testParse('maybeEmbed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(1);
-      expect(value.content[0]).toBe('if ( x < 3 ) return true');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(3);
+      expect(value[0].type.name).toBe(parser.TagType.OPEN.name);
+      expect(value[1]).toBe('if ( x < 3 ) return true');
+      expect(value[2].type.name).toBe(parser.TagType.CLOSE.name);
     });
   });
 
@@ -81,13 +82,37 @@ describe('HTMLLexer', function() {
       '<pre><div>text</div></pre>',
       '<code><div>text</div></code>',
     ].forEach(function(str) {
-      var value = testParse('maybeEmbed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(3);
-      expect(value.content[1]).toBe('text');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(5);
+      expect(value[1].type.name).toBe(parser.TagType.OPEN.name);
+      expect(value[1].nodeName).toBe('div');
+      expect(value[2]).toBe('text');
+      expect(value[3].type.name).toBe(parser.TagType.CLOSE.name);
+      expect(value[3].nodeName).toBe('div');
+    });
+  });
+
+  it('should parse nested markup inside escaped <pre>/<code>', function() {
+    [
+        '<pre><div>text</div><code>if (x < 3) return true;</code></pre>',
+        '<code><div>text</div><code>if (x < 3) return true;</code></code>'
+    ].forEach(function(str) {
+      var value = testParse('html', str);
+      if ( ! value ) return;
+
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(8);
+      expect(value[1].nodeName).toBe('div');
+      expect(value[2]).toBe('text');
+      expect(value[3].nodeName).toBe('div');
+      expect(value[4].nodeName).toBe('code');
+      expect(value[4].type.name).toBe(parser.TagType.OPEN.name);
+      expect(value[5]).toBe('if (x < 3) return true;');
+      expect(value[6].nodeName).toBe('code');
+      expect(value[6].type.name).toBe(parser.TagType.CLOSE.name);
     });
   });
 
@@ -96,29 +121,27 @@ describe('HTMLLexer', function() {
       '<pre>if ( x &lt; 3 ) return true</pre>',
       '<code>if ( x &lt; 3 ) return true</code>',
     ].forEach(function(str) {
-      var value = testParse('maybeEmbed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(1);
-      expect(value.content[0]).toBe('if ( x < 3 ) return true');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(3);
+      expect(value[1]).toBe('if ( x &lt; 3 ) return true');
     });
   });
 
-  it('should parse <script>/<style>/<xmp> as embedded content', function() {
+  it('should parse <script>/<style>/<xmp>', function() {
     [
       '<script type="text/javascript">sc < ri ? p &gt; t : en</script>',
       '<style type="text/css">sc < ri ? p &gt; t : en</style>',
       '<xmp class="noescape">sc < ri ? p &gt; t : en</xmp>',
     ].forEach(function(str) {
-      var value = testParse('embed', str);
+      var value = testParse('html', str);
       if ( ! value ) return;
 
-      expect(foam.parsers.Embed.isInstance(value)).toBe(true);
-      expect(Array.isArray(value.content)).toBe(true);
-      expect(value.content.length).toBe(1);
-      expect(value.content[0]).toBe('sc < ri ? p &gt; t : en');
+      expect(Array.isArray(value)).toBe(true);
+      expect(value.length).toBe(3);
+      expect(value[1]).toBe('sc < ri ? p &gt; t : en');
     });
   });
 
@@ -137,6 +160,115 @@ describe('HTMLLexer', function() {
       'baz_bar_foo',
       'some+thing'
     ].forEach(testParse.bind(this, 'label'));
+  });
+
+  it('should parse tags with one attribute', function() {
+    [
+        '<div name="TestDiv1" />',
+        '<label id=3 />',
+        '<pre class="idl" />Some stuff here</pre>'
+    ].forEach(function(str) {
+      var value = testParse('html', str);
+      if ( ! value ) return;
+
+      expect(Array.isArray(value)).toBe(true);
+      expect(Array.isArray(value[0].attributes)).toBe(true);
+      expect(value[0].attributes.length).toBe(1);
+      expect(value[0].attributes[0]).toBeDefined();
+    });
+  });
+
+  it('should parse tags with multiple attributes (Part 1)', function() {
+    [
+        '<div id=1 name="TestDiv2" visible=true />',
+        '<label name="TestLabel" id=2 visible />',
+        '<pre class="idl" visible=false id=3><div>Some more content</div></pre>'
+    ].forEach(function(str, index) {
+      var value = testParse('html', str);
+      if ( ! value ) return;
+
+      expect(Array.isArray(value)).toBe(true);
+      expect(Array.isArray(value[0].attributes)).toBe(true);
+      expect(value[0].attributes).toBeDefined();
+      expect(value[0].attributes.length).toBeGreaterThan(2);
+      expect(value[0].attributes[index].name).toBe('id');
+      expect(value[0].attributes[index].value).toBe((index + 1).toString());
+    });
+  });
+
+  it('should parse tags with multiple attributes (Part 2)', function() {
+    var value = testParse('htmlPart',
+        '<div id=3 name=multiAttributeTest visible disabled=false />');
+    var attributes = [
+      { name: 'id', value: '3' },
+      { name: 'name', value: 'multiAttributeTest' },
+      { name: 'visible', value: '' },
+      { name: 'disabled', value: 'false' }
+    ];
+    expect(value).toBeDefined();
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes.length).toBe(4);
+
+    for (var i = 0; i < attributes.length; i++) {
+      expect(value.attributes[i].name).toBe(attributes[i].name);
+      expect(value.attributes[i].value).toBe(attributes[i].value);
+    }
+  });
+
+  it('should parse attributes without value', function() {
+    var value = testParse('htmlPart', '<pre visible />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('visible');
+    expect(value.attributes[0].value).toBe('');
+  });
+
+  it('should parse attributes without quotes', function() {
+    var value = testParse('htmlPart', '<pre name=someUniqueName />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('name');
+    expect(value.attributes[0].value).toBe('someUniqueName');
+  });
+
+  it('should parse attributes in single quotes', function() {
+    var value = testParse('htmlPart', '<div type=\'Potato\' />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('type');
+    expect(value.attributes[0].value).toBe('Potato');
+  });
+
+  it('should parse attributes with escaped characters with quotes', function() {
+    var value = testParse('htmlPart', '<option value="&amp;Potato" />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&amp;Potato');
+  });
+
+  it('should parse attributes with escaped characters with no quotes', function() {
+    var value = testParse('htmlPart', '<option value=&amp;Potato />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&amp;Potato');
+  });
+
+  it('should parse attributes with illegitmate escape with quotes', function() {
+    var value = testParse('htmlPart', '<label value="&Potato;" />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&Potato;');
+  });
+
+  it('should parse attributes with illegimate escape with no quotes',  function() {
+    var value = testParse('htmlPart', '<label value=&Potato; />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('&Potato;');
+  });
+
+  it('should parse attributes containing whitespace', function() {
+    var value = testParse('htmlPart', '<label value="Fish\nPotato" />');
+    expect(value.attributes).toBeDefined();
+    expect(value.attributes[0].name).toBe('value');
+    expect(value.attributes[0].value).toBe('Fish\nPotato');
   });
 
   it('should parse comments', function() {

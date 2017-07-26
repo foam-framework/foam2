@@ -62,11 +62,47 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Enum',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.add(value.label)
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Currency',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.start()
+          .style({'text-align': 'left', 'padding-right': '20px'})
+          .add('$' + value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+        .end();
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
 
   implements: [ 'foam.mlang.Expressions' ],
+
+  requires: [
+    'foam.u2.view.EditColumnsView',
+    'foam.u2.md.OverlayDropdown'
+  ],
 
   exports: [
     'columns',
@@ -94,6 +130,21 @@ foam.CLASS({
         ^selected {
           background: #eee;
           outline: 1px solid #f00;
+        }
+
+        ^vertDots {
+          font-size: 20px;
+          font-weight: bold;
+          padding-right: 10px;
+        }
+
+        ^noselect {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
         }
     */}
     })
@@ -155,8 +206,39 @@ foam.CLASS({
             map(foam.core.Property.NAME.f);
       }
     },
-    'selection',
-    'hoverSelection'
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      documentation: 'Set this to true to let the user select columns.'
+    },
+    {
+      name: 'ascIcon',
+      documentation: 'HTML entity representing unicode Up-Pointing Triangle',
+      factory: function() {
+        return this.Entity.create({ name: '#9651' });
+      }
+    },
+    {
+      name: 'descIcon',
+      documentation: 'HTML entity representing unicode Down-Pointing Triangle',
+      factory: function() {
+        return this.Entity.create({ name: '#9661' });
+      }
+    },
+    {
+      name: 'vertMenuIcon',
+      documentation: 'HTML entity representing unicode Vertical Ellipsis',
+      factory: function() {
+        return this.Entity.create({ name: '#8942' });
+      }
+    },
+    {
+      name: 'selection',
+      expression: function(importSelection) { return importSelection },
+    },
+    'hoverSelection',
+    'dropdownOrigin',
+    'overlayOrigin'
   ],
 
   methods: [
@@ -166,8 +248,39 @@ foam.CLASS({
         column;
     },
 
+    function createColumnSelection() {
+      var editor = this.EditColumnsView.create({
+        columns: this.columns,
+        columns_$: this.columns_$,
+        table: this.of
+      });
+
+      return this.OverlayDropdown.create().add(editor);
+    },
+
+    /** Adds offset for edit columns overlay dropdown
+     * OverlayDropdown adds element to top right of parent container.
+     * We want the table dropdown to appear below the dropdown icon.
+     */
+    function positionOverlayDropdown(columnSelectionE) {
+      // Dynamic position calculation
+      var origin = this.dropdownOrigin.el();
+      var current = this.overlayOrigin.el();
+
+      var boundingBox = origin.getBoundingClientRect();
+      var dropdownMenu = current.getBoundingClientRect();
+
+      columnSelectionE.style({ top: boundingBox.top - dropdownMenu.top + 'px'});
+    },
+
     function initE() {
       var view = this;
+      var columnSelectionE;
+
+      if ( view.editColumnsEnabled ) {
+        columnSelectionE = view.createColumnSelection();
+        this.start('div', null, this.overlayOrigin$).add(columnSelectionE).end();
+      }
 
       this.
         addClass(this.myClass()).
@@ -182,39 +295,54 @@ foam.CLASS({
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   add(' ', this.slot(function(order) {
-                    return column === order ? this.Entity.create({ name: '#9651' }) :
-                        (view.Desc.isInstance(order) && order.arg1 === column) ? this.Entity.create({ name: '#9661' }) :
-                        ''
+                    return column === order ? view.ascIcon :
+                        (view.Desc.isInstance(order) && order.arg1 === column) ? view.descIcon : ''
                   }, view.order$)).
                 end();
-              });
+              }).
+              call(function() {
+                if ( view.editColumnsEnabled ) {
+                  this.start('th').
+                    addClass(view.myClass('th-editColumns')).
+                    on('click', function(e) {
+                      view.positionOverlayDropdown(columnSelectionE);
+                      columnSelectionE.open();
+                    }).
+                    add(' ', view.vertMenuIcon).
+                    addClass(view.myClass('vertDots')).
+                    addClass(view.myClass('noselect')).
+                    tag('div', null, view.dropdownOrigin$)
+                  .end();
+                }
+              })
           })).
           add(this.slot(function(columns_) {
             return this.
               E('tbody').
               select(this.orderedDAO$proxy, function(obj) {
-                return this.
-                  E('tr').
-                    start('tr').
-                      on('mouseover', function() { view.hoverSelection = obj; }).
-                      on('click', function() {
-                        view.selection = obj;
-                        if ( view.importSelection$ ) view.importSelection = obj;
-                        if ( view.editRecord$ ) view.editRecord(obj);
-                      }).
-                      addClass(this.slot(function(selection) {
-                        if ( obj === selection ) return view.myClass('selected');
-                        return '';
-                      }, view.selection$)).
-                      addClass(view.myClass('row')).
-                      forEach(columns_, function(column) {
-                        this.
-                          start('td').
-                          call(column.tableCellFormatter, [
-                            column.f ? column.f(obj) : null, obj, column
-                          ]).
-                          end();
-                      });
+                return this.E('tr').
+                  on('mouseover', function() { view.hoverSelection = obj; }).
+                  on('click', function() {
+                    view.selection = obj;
+                    if ( view.importSelection$ ) view.importSelection = obj;
+                    if ( view.editRecord$ ) view.editRecord(obj);
+                  }).
+                  addClass(view.slot(function(selection) {
+                    return selection && foam.util.equals(obj.id, selection.id) ?
+                        view.myClass('selected') : '';
+                  })).
+                  addClass(view.myClass('row')).
+                  forEach(columns_, function(column) {
+                    this.
+                      start('td').
+                        call(column.tableCellFormatter, [
+                          column.f ? column.f(obj) : null, obj, column
+                        ]).
+                      end();
+                  }).
+                  call(function() {
+                    if ( view.editColumnsEnabled ) return this.tag('td');
+                  })
               });
           }));
     }

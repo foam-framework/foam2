@@ -794,14 +794,16 @@ foam.CLASS({
       // TODO: This should be handled by an onsub event when someone subscribes to
       // scroll height changes.
       var self = this;
+      var observer = new MutationObserver(function(mutations) {
+        self.scrollHeight = self.el().scrollHeight;
+      });
+      var config = { attributes: true, childList: true, characterData: true };
+
       this.onload.sub(function(s) {
-        s.detach();
-        var observer = new MutationObserver(function(mutations) {
-          self.scrollHeight = self.el().scrollHeight;
-        });
-        var config = { attributes: true, childList: true, characterData: true };
         observer.observe(self.el(), config);
-        self.onDetach(function() { observer.disconnect() });
+      });
+      this.onunload.sub(function(s) {
+        observer.disconnect()
       });
       return this;
     },
@@ -1733,7 +1735,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.detach, s));
+      this.onDetach(s);
 
       return e;
     },
@@ -1942,6 +1944,9 @@ foam.CLASS({
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      // e could be a Slot, so check if addClass exists
+      e.addClass && e.addClass('property-' + this.name);
 
       return e;
     }

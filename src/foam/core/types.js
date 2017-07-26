@@ -23,6 +23,8 @@ foam.CLASS({
   properties: [
     'units',
     [ 'value', 0 ],
+    'min',
+    'max',
     [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
@@ -85,7 +87,7 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
+          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
 
           return ret;
         }
@@ -399,6 +401,13 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Currency',
+  extends: 'Float'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Map',
   extends: 'Property',
 
@@ -483,7 +492,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) { return of + 'DAO'; }
+      expression: function(of) { return foam.String.daoize(of.name); }
     },
     {
       name: 'adapt',
@@ -492,6 +501,21 @@ foam.CLASS({
           newValue.id :
           newValue ;
       }
+    }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var key  = this.targetDAOKey;
+      var name = this.name;
+
+      Object.defineProperty(proto, name + '$find', {
+        get: function classGetter() {
+          return this.__context__[key].find(this[name]);
+        },
+        configurable: true
+      });
     }
   ]
 });

@@ -11,7 +11,7 @@ foam.ENUM({
   documentation: 'Scripting language',
 
   values: [
-    { name: 'JS',        label: 'Javascript' },
-    { name: 'BEANSHELL', label: 'BeanShell'  }
+    { name: 'JS',        label: 'Javascript (Client)' },
+    { name: 'BEANSHELL', label: 'BeanShell (Server)'  }
   ]
 });

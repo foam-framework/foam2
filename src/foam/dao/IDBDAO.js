@@ -125,6 +125,9 @@ foam.CLASS({
     function serialize(obj) {
       return foam.json.Storage.objectify(obj);
     },
+    function serializeId(id) {
+      return this.of.ID.toJSON(id);
+    },
 
     function withStore(mode, fn) {
       return this.withStore_(mode, fn);
@@ -162,11 +165,12 @@ foam.CLASS({
       });
     },
 
-    function put(value) {
+    function put_(x, value) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
-          var request = store.put(self.serialize(value), value.id);
+          var request = store.put(self.serialize(value),
+                                  self.serializeId(value.id));
           request.transaction.addEventListener(
             'complete',
             function(e) {
@@ -182,8 +186,9 @@ foam.CLASS({
       });
     },
 
-    function find(key) {
+    function find_(x, obj) {
       var self = this;
+      var key = this.serializeId(obj.id != undefined ? obj.id : obj);
 
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
@@ -205,9 +210,9 @@ foam.CLASS({
       });
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       var self = this;
-      var key = obj.id != undefined ? obj.id : obj;
+      var key = this.serializeId(obj.id != undefined ? obj.id : obj);
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
           var getRequest = store.get(key);
@@ -235,7 +240,7 @@ foam.CLASS({
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       var query = predicate || this.True.create();
 
       var self = this;
@@ -287,7 +292,7 @@ foam.CLASS({
       }
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 

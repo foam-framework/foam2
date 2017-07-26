@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOUpdateControllerView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.comics.DAOUpdateController'
   ],
@@ -45,6 +46,13 @@ foam.CLASS({
           data: this.key,
           dao: this.dao
         });
+      }
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$dao$of) {
+        return 'Edit ' + data$dao$of.name;
       }
     }
   ],

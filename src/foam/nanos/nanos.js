@@ -21,14 +21,18 @@ FOAM_FILES([
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/client/Client" },
-  { name: "foam/nanos/log/LogLevel" },
-  { name: "foam/nanos/log/Logger" },
-  { name: "foam/nanos/log/ConsoleLogger" },
   { name: "foam/nanos/menu/Menu" },
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/cron/Cron" },
-
-  { name: "foam/nanos/auth/Relationships" }
+  { name: "foam/nanos/export/ExportDriverRegistry"},
+  { name: "foam/nanos/export/JSONDriver"},
+  { name: "foam/nanos/export/XMLDriver"},
+  { name: "foam/nanos/export/CSVDriver"},
+  { name: "foam/nanos/auth/Relationships" },
+  { name: "foam/nanos/NanoService" },
+  { name: "foam/nanos/auth/WebAuthService" },
+  { name: "foam/nanos/auth/ClientAuthService" },
+  { name: "foam/nanos/pm/PMInfo" }
 ]);
