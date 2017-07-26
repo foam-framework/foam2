@@ -71,7 +71,7 @@ public class TreeIndex implements Index {
   
   //TODO
   public FindPlan planFind(Object state, Object key) {
-    return new TreeLookupFindPlan(prop_);
+    return new TreeLookupFindPlan(prop_, ((TreeNode) state).size);
   }
 
   //TODO
