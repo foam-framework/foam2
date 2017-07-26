@@ -388,8 +388,13 @@ foam.CLASS({
         name: com.google.cloud.datastore.toDatastoreKeyName(this)
       };
     },
-    function getDatastoreKey(opt_propertyPath) {
-      if ( ! opt_propertyPath ) return { path: [ this.getOwnDatastoreKey() ] };
+    function getDatastoreKey(partitionId, opt_propertyPath) {
+      if ( ! opt_propertyPath ) {
+        return {
+          partitionId: partitionId,
+          path: [ this.getOwnDatastoreKey() ]
+        };
+      }
 
       var o = this;
       var path = new Array(opt_propertyPath.length + 1);
@@ -408,9 +413,9 @@ foam.CLASS({
         path[i + 1] = o.getOwnDatastoreKey();
       }
 
-      return { path: path };
+      return { partitionId: partitionId, path: path };
     },
-    function toDatastoreEntity() {
+    function toDatastoreEntity(partitionId) {
       var properties = {};
       var ps = this.cls_.getAxiomsByClass(foam.core.Property);
 
@@ -426,7 +431,7 @@ foam.CLASS({
             value);
       }
 
-      return { key: this.getDatastoreKey(), properties: properties };
+      return { key: this.getDatastoreKey(partitionId), properties: properties };
     },
     function toDatastoreValue() {
       return { entityValue: this.toDatastoreEntity() };
