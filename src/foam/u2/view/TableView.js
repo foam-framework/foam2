@@ -232,7 +232,10 @@ foam.CLASS({
         return this.Entity.create({ name: '#8942' });
       }
     },
-    'selection',
+    {
+      name: 'selection',
+      expression: function(importSelection) { return importSelection },
+    },
     'hoverSelection',
     'dropdownOrigin',
     'overlayOrigin'
@@ -324,9 +327,10 @@ foam.CLASS({
                     if ( view.importSelection$ ) view.importSelection = obj;
                     if ( view.editRecord$ ) view.editRecord(obj);
                   }).
-                  addClass(this.slot(function(selection) {
-                    return ( obj === selection ) ? view.myClass('selected') : '';
-                  }, view.selection$)).
+                  addClass(view.slot(function(selection) {
+                    return selection && foam.util.equals(obj.id, selection.id) ?
+                        view.myClass('selected') : '';
+                  })).
                   addClass(view.myClass('row')).
                   forEach(columns_, function(column) {
                     this.
