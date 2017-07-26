@@ -20,11 +20,21 @@
    name: 'ActionCommandDAO',
    extends: 'foam.dao.AbstractDAO',
 
-   documentation: 'A DAO implementation that listens on cmd',
+   documentation: 'A DAO implementation that listens on cmd for actionCommand',
 
    methods: [
 
+     function cmd(obj) {
+       if ( foam.core.ActionCommand.isInstance(obj) ) {
+         // Find action for specific actionCommand object
+         var objAction = obj.cls_.getAxiomByName(obj.action.name).instance_.code;
+         // Executing action
+         objAction.call(obj.object.__context__);
+       }
+     },
 
-
+     function cmd_(x, obj) {
+       this.cmd(obj);
+     }
    ]
  });
