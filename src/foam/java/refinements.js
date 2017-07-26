@@ -627,7 +627,7 @@ foam.CLASS({
       + 'return forOrdinal((int) o); '
       + '}'
       + ' return (java.lang.Enum) o;';
-
+      
       return info;
     }
   ]
@@ -767,7 +767,7 @@ foam.CLASS({
       }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'foam.lib.json.ExprParser']
   ]
 });
 
@@ -926,6 +926,14 @@ foam.CLASS({
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = 'return ((Boolean) o).booleanValue();'
+      return info;
+    }
   ]
 });
 
