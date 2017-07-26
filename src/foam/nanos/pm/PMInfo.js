@@ -33,6 +33,7 @@ foam.CLASS({
       name: 'average',
       label: 'Avg',
       getter: function() { return (this.totaltime / this.numoccurrences).toFixed(2); },
+      javaGetter: `return (long) Math.round( ( getTotaltime() / getNumoccurrences() ) * 100 ) / 100;`,
       transient: true
     },
     {

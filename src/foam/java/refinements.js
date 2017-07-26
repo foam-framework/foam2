@@ -739,7 +739,7 @@ foam.CLASS({
       }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'foam.lib.json.ExprParser']
   ]
 });
 
@@ -928,6 +928,9 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var c = info.getMethod('comparePropertyValue');
       c.body = 'return compareValues((boolean) key, (boolean) f(o));';
+
+      var m = info.getMethod('cast');
+      m.body = 'return ((Boolean) o).booleanValue();'
 
       return info;
     }
