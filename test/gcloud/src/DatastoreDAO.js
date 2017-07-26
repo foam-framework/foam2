@@ -42,7 +42,7 @@ describe('DatastoreDAO', function() {
             of: foam.core.FObject,
             protocol: env.CDS_EMULATOR_PROTOCOL,
             host: env.CDS_EMULATOR_HOST,
-            port: env.CDS_EMULATOR_PORT,
+            port: env.CDS_EMULATOR_PORT
           }, foam.__context__.createSubContext({
             gcloudProjectId: env.CDS_PROJECT_ID
           }));
@@ -56,9 +56,24 @@ describe('DatastoreDAO', function() {
               of: foam.core.FObject,
               protocol: env.CDS_EMULATOR_PROTOCOL,
               host: env.CDS_EMULATOR_HOST,
-              port: env.CDS_EMULATOR_PORT,
+              port: env.CDS_EMULATOR_PORT
             }).projectId;
       }).toThrow();
+    });
+    it('should support "datastoreNamespaceId" from context', function() {
+      var customNamespace = 'custom';
+      var dao = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
+          .create({
+            of: foam.core.FObject,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID
+          }, foam.__context__.createSubContext({
+            datastoreNamespaceId: customNamespace
+          }));
+      expect(dao.datastoreNamespaceId).toBe(customNamespace);
+      expect(dao.namespaceId).toBe(customNamespace);
     });
   });
 
@@ -331,6 +346,71 @@ describe('DatastoreDAO', function() {
               done();
             }).catch(done.fail);
       });
+    });
+  });
+
+  describe('partitions', function() {
+    it('should treat partitions as mutually exclusive', function(done) {
+      foam.CLASS({
+        package: 'test.dao.partitions',
+        name: 'Thing',
+        properties: [ 'id', 'name' ]
+      });
+      var Thing = foam.lookup('test.dao.partitions.Thing');
+      var dao1 = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
+          .create({
+            of: Thing,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID,
+            namespaceId: 'ns1'
+          });
+      var dao2 = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
+          .create({
+            of: Thing,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID,
+            namespaceId: 'ns2'
+          });
+
+      Promise.all([
+        dao1.put(Thing.create({ id: 1, name: 'dao1thing1' })),
+        dao2.put(Thing.create({ id: 2, name: 'dao2thing2' }))
+      ]).then(function() {
+        return Promise.all([
+          dao1.find(1),
+          dao1.find(2),
+          dao2.find(1),
+          dao2.find(2)
+        ]);
+      }).then(function(results) {
+        expect(results[0]).not.toBeNull();
+        expect(results[1]).toBeNull();
+        expect(results[2]).toBeNull();
+        expect(results[3]).not.toBeNull();
+
+        return Promise.all([
+          dao1.put(Thing.create({ id: 2, name: 'dao1thing2' })),
+          dao2.put(Thing.create({ id: 1, name: 'dao2thing1' }))
+        ]);
+      }).then(function() {
+        return Promise.all([
+          dao1.find(1),
+          dao1.find(2),
+          dao2.find(1),
+          dao2.find(2)
+        ]);
+      }).then(function(results) {
+        expect(results[0].name).toBe('dao1thing1');
+        expect(results[1].name).toBe('dao1thing2');
+        expect(results[2].name).toBe('dao2thing1');
+        expect(results[3].name).toBe('dao2thing2');
+
+        done();
+      }).catch(done.fail);
     });
   });
 });
