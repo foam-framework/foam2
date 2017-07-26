@@ -505,12 +505,12 @@ foam.CLASS({
   methods: [
     function installInProto(proto) {
       this.SUPER(proto);
-      var self = this;
+      var key  = this.targetDAOKey;
       var name = this.name;
 
       Object.defineProperty(proto, name + '$find', {
         get: function classGetter() {
-          return this.__context__[self.targetDAOKey].find(this.valueOf()[self.name])
+          return this.__context__[key].find(this[name]);
         },
         configurable: true
       });
