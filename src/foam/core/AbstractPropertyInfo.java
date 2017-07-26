@@ -46,4 +46,9 @@ public abstract class AbstractPropertyInfo
       diff.put(prop.getName(), prop.f(o2));
     }
   }
+
+  @Override
+  public int comparePropertyValue(Object key, FObject o) {
+    return compare(key, o);
+  }
 }
