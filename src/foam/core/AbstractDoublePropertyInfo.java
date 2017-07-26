@@ -12,4 +12,8 @@ public abstract class AbstractDoublePropertyInfo
   public int compareValues(double d1, double d2) {
     return Double.compare(d1, d2);
   }
+  
+  public int comparePropertyValue(Object key, FObject o) {
+    return compareValues((double) key, (double) f(o));
+  }
 }

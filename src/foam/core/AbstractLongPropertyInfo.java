@@ -12,6 +12,10 @@ public abstract class AbstractLongPropertyInfo
   public int compareValues(long o1, long o2) {
     return java.lang.Long.compare(o1, o2);
   }
+  
+  public int comparePropertyValue(Object key, FObject o) {
+    return compareValues((long) key, (long) f(o));
+  }
 
   public foam.lib.parse.Parser jsonParser() {
     return new foam.lib.json.LongParser();
