@@ -93,13 +93,13 @@ foam.CLASS({
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.tabRow$).
-            addClass(this.myClass('tabRow')).
-          end().
-          start('div', null, this.content$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.tabRow$).
+          addClass(this.myClass('tabRow')).
+        end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end();
     },
 
     function add(tab) {
@@ -108,10 +108,10 @@ foam.CLASS({
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            addClass(this.myClass('tab')).
-            enableClass('selected', tab.selected$).
-            on('click', function() { this.selected = tab; }.bind(this)).
-            add(tab.label).
+          addClass(this.myClass('tab')).
+          enableClass('selected', tab.selected$).
+          on('click', function() { this.selected = tab; }.bind(this)).
+          add(tab.label).
         end();
 
         tab.shown$ = tab.selected$;
