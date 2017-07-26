@@ -64,7 +64,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       if ( this.type ) this.attrs({ type: this.type });
-      if ( this.maxLength != undefined ) this.setAttribute('maxlength', this.maxLength);
+      if ( this.maxLength > 0 ) this.setAttribute('maxlength', this.maxLength);
       this.initCls();
       this.link();
     },
