@@ -90,7 +90,7 @@ foam.CLASS({
             body: 'return compareValues(get_(o1), get_(o2));'
           },
           {
-            name: 'comparePropertyValue',
+            name: 'comparePropertyToObject',
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
