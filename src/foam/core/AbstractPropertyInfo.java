@@ -6,14 +6,14 @@
 
 package foam.core;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import foam.nanos.logger.NanoLogger;
 import foam.lib.parse.Parser;
+import foam.nanos.logger.NanoLogger;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractPropertyInfo
   implements PropertyInfo
