@@ -438,6 +438,9 @@ foam.CLASS({
         + ' Integer.valueOf((String) o) :'
         + ' (int)o;';
 
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((int) key, get_(o));';
+
       return info;
     }
   ]
@@ -462,6 +465,9 @@ foam.CLASS({
         + ' ( o instanceof String ) ?'
         + ' Byte.valueOf((String) o) :'
         + ' (byte)o;';
+      
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((byte) key, get_(o));';
 
       return info;
     }
@@ -488,6 +494,9 @@ foam.CLASS({
         + ' Short.valueOf((String) o) :'
         + ' (short)o;';
 
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((short) key, get_(o));';
+
       return info;
     }
   ]
@@ -513,6 +522,9 @@ foam.CLASS({
         + ' Long.valueOf((String) o) :'
         + ' (long)o;';
 
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((long) key, get_(o));';
+
       return info;
     }
   ]
@@ -537,6 +549,9 @@ foam.CLASS({
         + ' ( o instanceof String ) ?'
         + ' Float.parseFloat((String) o) :'
         + ' (double)o;';
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((double) key, get_(o));';
 
       return info;
     }
@@ -751,6 +766,10 @@ foam.CLASS({
         type: 'int',
         body: 'return ' + this.width + ';'
       });
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((String) key, get_(o));';
+
       return info;
     }
   ]
@@ -786,6 +805,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
       // TODO: Change to ClassInfo return type once primitive support is added
       info.method({
         name: 'of',
@@ -793,6 +813,10 @@ foam.CLASS({
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
       });
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compare(key, get_(o));';
+
       return info;
     }
   ],
@@ -840,6 +864,9 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compare(key, get_(o));';
 
       var cast = info.getMethod('cast');
       cast.body = 'Object[] value = (Object[])o;\n'
@@ -895,6 +922,10 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compare(key, get_(o));';
+
       return info;
     }
   ],
@@ -919,6 +950,32 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.String',
+
+  properties: [
+    ['javaType', 'String'],
+    ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.StringParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'getWidth',
+        visibility: 'public',
+        type: 'int',
+        body: 'return ' + this.width + ';'
+      });
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((String) key, get_(o));';
+
+      return info;
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
@@ -930,8 +987,12 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((boolean) key, get_(o));';
+
       var m = info.getMethod('cast');
       m.body = 'return ((Boolean) o).booleanValue();'
+
       return info;
     }
   ]
@@ -944,6 +1005,16 @@ foam.CLASS({
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(key, get_(o));';
+
+      return info;
+    }
   ]
 });
 

@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 server.bat
 *~
+.DS_Store
 coverage
 doc/gen/*
 **/bower_components/*
