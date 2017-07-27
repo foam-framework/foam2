@@ -25,7 +25,7 @@ public class ActionCommandDAO
         // Calling method
         Method action = actionObj.getClass().getDeclaredMethod(((foam.core.ActionCommand)obj).getActionName());
         action.invoke(null);
-      } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
+      } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 
       }
     }
