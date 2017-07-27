@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'Test',
   extends: 'foam.nanos.script.Script',
 
+  imports: [ 'testDAO as scriptDAO' ],
+
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
@@ -19,7 +21,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'description', 'passed', 'failed', 'run'
+    'id', 'enabled', 'description', 'passed', 'failed', 'lastRun', 'run'
   ],
 
   searchColumns: [ ],
@@ -28,11 +30,13 @@ foam.CLASS({
     'id',
     {
       class: 'Int',
-      name: 'passed'
+      name: 'passed',
+      visibility: foam.u2.Visibility.RO
     },
     {
       class: 'Int',
-      name: 'failed'
+      name: 'failed',
+      visibility: foam.u2.Visibility.RO
     }
   ],
 
@@ -51,6 +55,7 @@ foam.CLASS({
         Interpreter           shell = new Interpreter();
         PM                    pm    = new PM(this.getClass(), getId());
 
+System.err.println("************************** Test: " + getCode());
         try {
           shell.set("currentTest", this);
           setPassed(0);
@@ -70,7 +75,9 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
+        System.err.println("******************** Output: " + this.getPassed() + " " + this.getFailed() + " " + baos.toString());
         setOutput(baos.toString());
+    `
     }
   ]
 });
