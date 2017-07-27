@@ -22,8 +22,9 @@ public class ActionCommandDAO
     if ( obj instanceof foam.core.ActionCommand ) {
       FObject actionObj = ((foam.core.ActionCommand)obj).getObject();
       try {
-        Method action = actionObj.getClass().getDeclaredMethod(((foam.core.ActionCommand)obj).getAction().getName());
-        action.invoke(((foam.core.ActionCommand)obj).getAction());
+        // Calling method
+        Method action = actionObj.getClass().getDeclaredMethod(((foam.core.ActionCommand)obj).getActionName());
+        action.invoke(null);
       } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
 
       }
