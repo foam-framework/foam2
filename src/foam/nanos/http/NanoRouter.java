@@ -5,23 +5,19 @@ import foam.core.ContextAware;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
-import foam.nanos.NanoService;
 import foam.nanos.boot.NSpec;
+import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.NanoLogger;
+import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
-
-import javax.servlet.ServletException;
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.ServletException;
 
-/**
- * Created by nick on 17/07/17.
- */
 public class NanoRouter
   extends HttpServlet
   implements NanoService, ContextAware
@@ -49,7 +45,7 @@ public class NanoRouter
     }
   }
 
-  private HttpServlet getServlet(NSpec spec, Object service) {
+  protected HttpServlet getServlet(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
     if ( ! handlerMap_.containsKey(spec.getName()) ) {
@@ -59,7 +55,9 @@ public class NanoRouter
     return handlerMap_.get(spec.getName());
   }
 
-  private HttpServlet createServlet(NSpec spec, Object service) {
+  protected HttpServlet createServlet(NSpec spec, Object service) {
+    informService(service, spec);
+
     if ( spec.getServe() ) {
       try {
         Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
@@ -67,25 +65,31 @@ public class NanoRouter
             DAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
 
-        if ( skeleton instanceof ContextAware) ((ContextAware) skeleton).setX(getX());
+        informService(skeleton, spec);
 
         skeleton.setDelegateObject(service);
 
         service = new ServiceServlet(service, skeleton);
+        informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ignored) {
       }
     }
 
-    if ( service instanceof WebAgent ) service = new WebAgentServlet((WebAgent) service);
-
-    if ( service instanceof ContextAware ) ((ContextAware ) service).setX(getX());
-
-    if( service instanceof HttpServlet ) return (HttpServlet) service;
-    else {
-      NanoLogger logger = (NanoLogger) getX().get("logger");
-      logger.error(this.getClass(), spec.getName() + " does not have a HttpServlet.");
-      return null;
+    if ( service instanceof WebAgent ) {
+      service = new WebAgentServlet((WebAgent) service);
+      informService(service, spec);
     }
+
+    if ( service instanceof HttpServlet ) return (HttpServlet) service;
+
+    NanoLogger logger = (NanoLogger) getX().get("logger");
+    logger.error(this.getClass(), spec.getName() + " does not have a HttpServlet.");
+    return null;
+  }
+
+  protected void informService(Object service, NSpec spec) {
+    if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
+    if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
   }
 
   @Override

@@ -93,6 +93,34 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Date',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toString().substring(4,15));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toString().substring(4,24));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
@@ -232,7 +260,10 @@ foam.CLASS({
         return this.Entity.create({ name: '#8942' });
       }
     },
-    'selection',
+    {
+      name: 'selection',
+      expression: function(importSelection) { return importSelection },
+    },
     'hoverSelection',
     'dropdownOrigin',
     'overlayOrigin'
@@ -324,9 +355,10 @@ foam.CLASS({
                     if ( view.importSelection$ ) view.importSelection = obj;
                     if ( view.editRecord$ ) view.editRecord(obj);
                   }).
-                  addClass(this.slot(function(selection) {
-                    return ( obj === selection ) ? view.myClass('selected') : '';
-                  }, view.selection$)).
+                  addClass(view.slot(function(selection) {
+                    return selection && foam.util.equals(obj.id, selection.id) ?
+                        view.myClass('selected') : '';
+                  })).
                   addClass(view.myClass('row')).
                   forEach(columns_, function(column) {
                     this.

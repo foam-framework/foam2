@@ -117,6 +117,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'SubMenuView',
@@ -143,6 +144,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.nanos.menu',
@@ -317,9 +319,6 @@ foam.CLASS({
         }
       */}
     })
-  ],
-
-  properties: [
   ],
 
   methods: [
