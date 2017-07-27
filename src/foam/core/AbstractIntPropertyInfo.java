@@ -13,7 +13,4 @@ public abstract class AbstractIntPropertyInfo
     return Integer.compare(o1, o2);
   }
   
-  public int comparePropertyValue(Object key, FObject o) {
-    return compareValues((int)key, (int) f(o));
-  }
 }

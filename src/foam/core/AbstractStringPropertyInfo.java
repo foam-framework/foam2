@@ -13,9 +13,5 @@ public abstract class AbstractStringPropertyInfo
     return o1.compareTo(o2);
   }
   
-  public int comparePropertyValue(Object key, FObject o) {
-    return compareValues((String) key, (String) f(o));
-  }
-  
   public abstract int getWidth();
 }
