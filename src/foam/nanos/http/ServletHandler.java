@@ -261,8 +261,8 @@ public class ServletHandler
       public int read() {
         int res = 0;
         try {
-          if(isReady()) {
-            if(availMsg) {
+          if ( isReady() ) {
+            if ( availMsg ) {
               readListener.onDataAvailable();
               availMsg = false;
             }

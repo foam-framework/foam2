@@ -96,7 +96,7 @@ public class FileServlet
 
         byte[] buffer = new byte[4096];
         int bytesread;
-        while((bytesread = fis.read(buffer)) != -1) {
+        while ( (bytesread = fis.read(buffer)) != -1 ) {
           resp.getOutputStream().write(buffer, 0, bytesread);
         }
 
