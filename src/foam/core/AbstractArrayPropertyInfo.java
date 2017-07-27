@@ -20,8 +20,8 @@ import java.util.List;
 public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo {
 
-  public int compareValues(boolean b1, boolean b2) {
-    return 0;
+  public int compareValues(Object[] b1, Object[] b2) {
+    return (b1 == b2) ? 1 : 0;
   }
 
   @Override
