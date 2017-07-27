@@ -6,6 +6,9 @@
 
 package foam.nanos.http;
 
+import foam.nanos.boot.NSpec;
+import foam.nanos.boot.NSpecAware;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,10 +20,12 @@ import java.util.HashMap;
 
 public class FileServlet
     extends HttpServlet
+    implements NSpecAware
 {
-  public    static final String                  SERVLET_NAME = "static";
   protected static final String                  DEFAULT_EXT  = "application/octet-stream";
   protected static final HashMap<String, String> EXTS         = new HashMap();
+
+  protected NSpec nspec_;
 
   static {
     EXTS.put("js",    "application/javascript");
@@ -56,7 +61,7 @@ public class FileServlet
       pathInfo = req.getPathInfo();
     }
 
-    String filePath = pathInfo.substring(SERVLET_NAME.length() + (pathInfo.startsWith("/static/") ? 2 : 1));
+    String filePath = pathInfo.substring(nspec_.getName().length() + (pathInfo.startsWith("/" + nspec_.getName() + "/") ? 2 : 1));
     try {
       File   srcFile = new File(filePath.isEmpty() ? "./" : filePath);
       String path    = srcFile.getAbsolutePath();
@@ -107,5 +112,10 @@ public class FileServlet
     } catch (StringIndexOutOfBoundsException | IOException e) {
       fileNotFoundError(resp, filePath);
     }
+  }
+
+  @Override
+  public void setNSpec(NSpec spec) {
+    nspec_ = spec;
   }
 }
