@@ -28,9 +28,8 @@ foam.CLASS({
       required: true
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.Action',
-      name: 'action',
+      class: 'String',
+      name: 'actionName',
       required: true
     }
   ]

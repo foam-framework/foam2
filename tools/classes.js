@@ -5,6 +5,8 @@
  */
 
 var classes = [
+  'foam.core.ActionCommand',
+  'foam.core.Action',
   'foam.core.Serializable',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
