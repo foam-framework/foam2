@@ -21,7 +21,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'description', 'passed', 'failed', 'run'
+    'id', 'enabled', 'description', 'passed', 'failed', 'lastRun', 'run'
   ],
 
   searchColumns: [ ],
@@ -30,11 +30,13 @@ foam.CLASS({
     'id',
     {
       class: 'Int',
-      name: 'passed'
+      name: 'passed',
+      visibility: foam.u2.Visibility.RO
     },
     {
       class: 'Int',
-      name: 'failed'
+      name: 'failed',
+      visibility: foam.u2.Visibility.RO
     }
   ],
 
