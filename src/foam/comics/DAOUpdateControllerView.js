@@ -66,6 +66,7 @@ foam.CLASS({
       this.
         add(this.DAOUpdateController.OBJ,
             this.DAOUpdateController.SAVE,
+            this.DAOUpdateController.CANCEL,
             this.DAOUpdateController.DELETE);
     }
   ],

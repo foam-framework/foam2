@@ -238,7 +238,7 @@ describe('Query parser', function() {
 
   // This one needs to go last because it mangles the DAO.
   // DISABLED: Pending fix for "today" not handling local time zone
-  xdescribe('relative dates', function() {
+  describe('relative dates', function() {
     var dao2 = foam.dao.ArrayDAO.create({
       of: Item
     }, foam.__context__);
@@ -261,15 +261,15 @@ describe('Query parser', function() {
     }, foam.__context__);
     dao2.put(yesterdayItem);
 
-    it('should recognize the keyword "today"',
+    xit('should recognize the keyword "today"',
         testQuery('timestamp>=today', [6], dao2));
-    it('should recognize the keyword "today"',
+    xit('should recognize the keyword "today"',
         testQuery('timestamp<today', [1, 2, 3, 4, 5, 7], dao2));
-    it('should handle relative day counts with "-N"',
+    xit('should handle relative day counts with "-N"',
         testQuery('timestamp>today-2', [6, 7], dao2));
-    it('should handle relative day counts with "-N"',
+    xit('should handle relative day counts with "-N"',
         testQuery('timestamp>today-1', [6], dao2));
-    it('should handle relative day counts with "-N"',
+    xit('should handle relative day counts with "-N"',
         testQuery('timestamp>=today-1', [6, 7], dao2));
   });
 
