@@ -22,7 +22,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'language', 'description', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
   ],
 
   searchColumns: [ ],
@@ -39,7 +39,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
-      transient: true,
       visibility: foam.u2.Visibility.RO
     },
     /*
