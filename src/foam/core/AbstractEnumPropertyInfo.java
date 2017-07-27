@@ -7,11 +7,11 @@
 package foam.core;
 
 import foam.nanos.logger.NanoLogger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractEnumPropertyInfo
   extends AbstractObjectPropertyInfo {
