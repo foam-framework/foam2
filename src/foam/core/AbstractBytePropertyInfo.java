@@ -13,7 +13,4 @@ public abstract class AbstractBytePropertyInfo
     return java.lang.Byte.compare(b1, b2);
   }
   
-  public int comparePropertyValue(Object key, FObject o) {
-    return compareValues((byte) key, (byte) f(o));
-  }
 }

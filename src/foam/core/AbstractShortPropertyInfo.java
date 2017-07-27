@@ -13,7 +13,4 @@ public abstract class AbstractShortPropertyInfo
     return Short.compare(o1, o2);
   }
   
-  public int comparePropertyValue(Object key, FObject o) {
-    return compareValues((short) key, (short) f(o));
-  }
 }

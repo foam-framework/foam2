@@ -47,8 +47,4 @@ public abstract class AbstractPropertyInfo
     }
   }
 
-  @Override
-  public int comparePropertyValue(Object key, FObject o) {
-    return compare(key, o);
-  }
 }

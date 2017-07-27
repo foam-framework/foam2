@@ -13,7 +13,4 @@ public abstract class AbstractBooleanPropertyInfo
     return Boolean.compare(b1, b2);
   }
   
-  public int comparePropertyValue(Object key, FObject o) {
-    return compareValues((boolean) key, (boolean) f(o));
-  }
 }

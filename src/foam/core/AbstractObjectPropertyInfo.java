@@ -13,7 +13,4 @@ public abstract class AbstractObjectPropertyInfo
     return ((Comparable)o1).compareTo(o2);
   }
   
-  public int comparePropertyValue(Object key, FObject o) {
-    return compareValues(key, f(o));
-  }
 }
