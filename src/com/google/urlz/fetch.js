@@ -45,8 +45,13 @@ foam.CLASS({
       returns: 'Promise(com.google.urlz.DObject)'
     },
     function fetch(url) {
+      // Returns a local copy of a DOjbect
       // if we failed to resolve obj due to missing properties, try our delegate
       return this.fetchImpl_(url).catch(err => this.delegate ? this.delegate.fetch(url) : throw err);
+    },
+    function reference(url) {
+      // returns a remote (stub) DObject
+      // TODO
     },
     function commit(url, obj) {
       return this.commitImpl_(url, obj).catch(err => this.delegate ? this.delegate.commit(url, obj) : throw err)

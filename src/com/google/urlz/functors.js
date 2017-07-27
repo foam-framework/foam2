@@ -122,6 +122,16 @@ foam.CLASS({
   extends: 'com.google.urlz.Path'
 });
 
+// TODO: This interface implies that any class generated will have multiple variations:
+//  1. The interface for the class, including only what was specified
+//     in the Model (excluding anything overridden from DObject)
+//  2. A DObjectLocal extending implementation of the interface
+//  3. A DObjectRemote extending implementation of the interface
+//  4. etc.
+// TODO: Should these be proxies instead? DObjectRemote and the stub class don't need to be
+//   the same type as the actual class, per se.
+// - Or: The DObject methods are considered "always safe", you choose which to implement. A
+//       DObjectRemoteProxy can be used on any existing type, but you don't get native properties.
 foam.INTERFACE({
   name: 'DObject',
   package: 'com.google.urlz',
@@ -154,7 +164,7 @@ foam.CLASS({
       var p = parent__.getPath();
       return p.addRelative(this.id);
     },
-    function lookup(path) { // TODO: consider a linked list here, easier to decompose
+    function lookup(path) {
       // TODO: This is just a fetch(relativePath). Make fetch relative recursive, absolute or ../ goes to context
       // traverse a path through sub-objects
       var value = this[path.name];
@@ -200,9 +210,16 @@ foam.CLASS({
   ],
 
   methods: [
+    function getPath() {
+      return this.src__;
+    },
     function lookup(path) {
-      // For remote object, fetch remote property contents and lookup on it
       // TODO: cache the fetched contents, if policy allows
+      // Since this object instance represents state living remotely,
+      // construct an absolute path so the remote server can find
+      // exactly the object we are looking for.
+      // Fetch may actually find a local copy, if we happen to have one
+      // cached in a parent context.
       return this.Fetch(this.src__.addRelative(path));
     },
     function f(obj, scope) {
@@ -221,6 +238,18 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  name: 'DObjectRemoteProxy',
+  package: 'com.google.urlz',
+  extends: 'com.google.urlz.DObjectRemote',
+  
+  // The idea here would be a proxy container that does remote access
+  // but doesn't implement the Type of its remote object. Use this instead
+  // of a generated stub type when the typing is not needed. Method calls
+  // be done with a .run(Call(...)) functor.
+});
+
+// 
 foam.CLASS({
   name: 'DObjectCached',
   package: 'com.google.urlz',
@@ -345,15 +374,29 @@ foam.CLASS({
 foam.INTERFACE({
   name: 'Collection',
   package: 'com.google.urlz',
+  implements: ['com.google.urlz.DObject'], // TODO: does this work?
 
   methods: [
     'create', 'read', 'update', 'delete',
     'enumerator', // returns Functor
-    function lookup(pathNameArray) {
+    // function lookup(path) {
+    //   return this.read(path.name).then(obj => obj.lookup(path.next);
+    // }
+  ]
+});
+foam.CLASS({
+  name: 'AbstractCollection',
+  package: 'com.google.urlz',
+  implements: [
+    'com.google.urlz.DObject',
+    'com.google.urlz.Collection'
+  ],
+  methods: [
+    function lookup(path) {
       return this.read(path.name).then(obj => obj.lookup(path.next);
     }
   ]
-});
+})
 foam.CLASS({
   name: 'MapEnumerator', // for use with MapCollection
   package: 'com.google.urlz',
@@ -379,8 +422,8 @@ foam.CLASS({
 
   methods: [
     function f(obj, scope) {
-      // obj is a collection
-      var enumerator = obj.enumerator(this.delegate); // do not .f() the delegate, let enumerator() optimize it
+      // obj must be a collection
+      var enumerator = obj.enumerator(this.delegate); // do not .f() the delegate functor, let enumerator() optimize it
       return enumerator.f(obj, scope.createSubContext());
     },
   ],
