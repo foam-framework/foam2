@@ -93,6 +93,34 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Date',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toString().substring(4,15));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toString().substring(4,24));
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
