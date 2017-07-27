@@ -432,11 +432,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-        + ' ((Number)o).intValue() :'
-        + ' ( o instanceof String ) ?'
-        + ' Integer.valueOf((String) o) :'
-        + ' (int)o;';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).intValue() :
+        ( o instanceof String ) ?
+        Integer.valueOf((String) o) :
+        (int)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((int) key, get_(o));';
@@ -460,11 +460,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-        + ' ((Number)o).byteValue() :'
-        + ' ( o instanceof String ) ?'
-        + ' Byte.valueOf((String) o) :'
-        + ' (byte)o;';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).byteValue() :
+        ( o instanceof String ) ?
+        Byte.valueOf((String) o) :
+        (byte)o;`;
       
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((byte) key, get_(o));';
@@ -488,11 +488,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-        + ' ((Number)o).shortValue() :'
-        + ' ( o instanceof String ) ?'
-        + ' Short.valueOf((String) o) :'
-        + ' (short)o;';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).shortValue() :
+        ( o instanceof String ) ?
+        Short.valueOf((String) o) :
+        (short)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((short) key, get_(o));';
@@ -516,11 +516,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-        + ' ((Number)o).longValue() :'
-        + ' ( o instanceof String ) ?'
-        + ' Long.valueOf((String) o) :'
-        + ' (long)o;';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).longValue() :
+        ( o instanceof String ) ?
+        Long.valueOf((String) o) :
+        (long)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((long) key, get_(o));';
@@ -544,11 +544,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-        + ' ((Number)o).doubleValue() :'
-        + ' ( o instanceof String ) ?'
-        + ' Float.parseFloat((String) o) :'
-        + ' (double)o;';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).doubleValue() :
+        ( o instanceof String ) ?
+        Float.parseFloat((String) o) :
+        (double)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((double) key, get_(o));';
@@ -690,11 +690,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'if ( o instanceof String ) {'
-        + 'java.util.Date date = new java.util.Date((String) o);'
-        + 'return date;'
-        + '}'
-        + 'return (java.util.Date)o;';
+      m.body = `if ( o instanceof String ) {
+        java.util.Date date = new java.util.Date((String) o);
+        return date;
+        }
+        return (java.util.Date)o;`;
 
       return info;
   }
@@ -715,11 +715,11 @@ foam.CLASS({
      function createJavaPropertyInfo_(cls) {
        var info = this.SUPER(cls);
        var m = info.getMethod('cast');
-       m.body = 'if ( o instanceof String ) {'
-         + 'java.util.Date date = new java.util.Date((String) o);'
-         + 'return date;'
-         + '}'
-         + 'return (java.util.Date)o;';
+       m.body = `if ( o instanceof String ) {
+         java.util.Date date = new java.util.Date((String) o);
+         return date;
+         }
+         return (java.util.Date)o;`;
 
        return info;
      }
