@@ -438,7 +438,7 @@ foam.CLASS({
             + '(int)o;';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((int) key, (int) get_(o));';
+      c.body = 'return compareValues((int) key, get_(o));';
 
       return info;
     }
@@ -464,7 +464,7 @@ foam.CLASS({
             + '(byte)o;';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((byte) key, (byte) get_(o));';
+      c.body = 'return compareValues((byte) key, get_(o));';
 
       return info;
     }
@@ -490,7 +490,7 @@ foam.CLASS({
             + '(short)o;';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((short) key, (short) get_(o));';
+      c.body = 'return compareValues((short) key, get_(o));';
 
       return info;
     }
@@ -516,7 +516,7 @@ foam.CLASS({
             + '(long)o;';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((long) key, (long) get_(o));';
+      c.body = 'return compareValues((long) key, get_(o));';
 
       return info;
     }
@@ -542,7 +542,7 @@ foam.CLASS({
             + '(double)o;';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((double) key, (double) get_(o));';
+      c.body = 'return compareValues((double) key, get_(o));';
 
       return info;
     }
@@ -721,7 +721,7 @@ foam.CLASS({
       });
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((String) key, (String) get_(o));';
+      c.body = 'return compareValues((String) key, get_(o));';
 
       return info;
     }
@@ -908,7 +908,7 @@ foam.CLASS({
       });
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((String) key, (String) get_(o));';
+      c.body = 'return compareValues((String) key, get_(o));';
 
       return info;
     }
@@ -926,7 +926,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((boolean) key, (boolean) get_(o));';
+      c.body = 'return compareValues((boolean) key, get_(o));';
 
       var m = info.getMethod('cast');
       m.body = 'return ((Boolean) o).booleanValue();'
