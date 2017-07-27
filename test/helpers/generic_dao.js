@@ -455,6 +455,7 @@ global.genericDAOTestBattery = function(daoFactory) {
             expect(a.array[1].firstName).toBe('Jon');
           }).then(done);
         });
+
         it('should honour sub.detach() with orderBy()', function(done) {
           foam.CLASS({
             package: 'test.dao.generic',

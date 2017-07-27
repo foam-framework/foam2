@@ -32,4 +32,5 @@ public interface PropertyInfo
   public void setFromString(Object obj, String value);
   public Object fromXML(X x, XMLStreamReader reader);
   public void toXML(FObject obj, Document doc, Element objElement);
+  public int comparePropertyToObject(Object key, FObject o);
 }
