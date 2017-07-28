@@ -12,7 +12,27 @@ public class DateParser
   extends ProxyParser
 {
   public DateParser() {
-    super(new Alt(new LongParser(), 
+    super(new Alt(new LongParser(),
+                  new Seq1(1,
+                    new Literal("ISODate("),
+                    new Seq(
+                      new Literal("\""),
+                      new IntParser(),
+                      new Literal("-"),
+                      new IntParser(),
+                      new Literal("-"),
+                      new IntParser(),
+                      new Literal("T"),
+                      new IntParser(),
+                      new Literal(":"),
+                      new IntParser(),
+                      new Literal(":"),
+                      new IntParser(),
+                      new Literal("."),
+                      new Repeat(new Chars("0123456789")),
+                      new Literal("Z"),
+                      new Literal("\"")),
+                    new Literal(")")),
                   new Seq(
                     new Literal("\""),
                     new IntParser(),
@@ -33,12 +53,9 @@ public class DateParser
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    System.out.println("Parsing date");
     ps = super.parse(ps, x);
 
     if ( ps == null ) return null;
-
-    System.out.println("Succcess.");
 
     // Checks if Long Date (Timestamp from epoch)
     if ( ps.value() instanceof java.lang.Long ) {
