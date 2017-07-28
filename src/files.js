@@ -139,6 +139,7 @@ FOAM_FILES([
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
   { name: "foam/dao/ContextualizingDAO" },
+  { name: "foam/dao/VersionNoDAO" },
   { name: "foam/dao/SyncDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
