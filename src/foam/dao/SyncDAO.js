@@ -314,7 +314,21 @@ foam.CLASS({
               if ( deleted ) {
                 var obj = self.of.create(undefined, self);
                 obj.id = id;
-                promises.push(self.remoteDAO.remove(obj));
+                var promise = self.remoteDAO.remove(obj);
+
+                // When not polling, server result will processed when
+                // onRemoteUpdate listener is fired.
+                if ( self.polling ) {
+                  promises.push(promise.then(function() {
+                    var propName = self.syncProperty.name;
+                    // Ensure that obj SyncRecord does not remain queued (i.e.,
+                    // does not have syncNo = -1).
+                    obj[propName] = Math.max(obj[propName], 0);
+                    self.removeFromRemote_(obj);
+                  }));
+                } else {
+                  promises.push(promise);
+                }
               } else {
                 // TODO: Stop sending updates if the first one fails.
                 promises.push(self.delegate.find(id).then(function(obj) {
@@ -324,8 +338,8 @@ foam.CLASS({
                   // When not polling, server result will processed when
                   // onRemoteUpdate listener is fired.
                   if ( self.polling ) {
-                    ret = ret.then(function(obj) {
-                      self.putFromRemote_(obj);
+                    ret = ret.then(function(o) {
+                      self.putFromRemote_(o);
                     });
                   }
 
