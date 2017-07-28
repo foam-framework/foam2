@@ -140,6 +140,7 @@ FOAM_FILES([
   { name: "foam/dao/SequenceNumberDAO" },
   { name: "foam/dao/ContextualizingDAO" },
   { name: "foam/dao/VersionNoDAO" },
+  { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },
