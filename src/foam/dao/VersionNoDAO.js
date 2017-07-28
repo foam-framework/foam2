@@ -21,33 +21,36 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   implements: [ 'foam.mlang.Expressions' ],
 
-  classes: [
-    {
-      name: 'PutData',
+  documentation: `DAO decorator that applies an incrementing version number
+      to all objects put() and remove()d. Instead of deleting objects that
+      are remove()d, a placeholder with a deleted flag is put() in its place.
+      This allows foam.dao.SyncDAO clients that are polling a VersionNoDAO to
+      recieve deletes from other clients.
 
-      properties: [
-        {
-          class: 'FObjectProperty',
-          of: 'FObject',
-          name: 'data'
-        },
-        {
-          class: 'Function',
-          name: 'resolve'
-        },
-        {
-          class: 'Function',
-          name: 'reject'
-        }
-      ]
-    }
-  ],
+      This DAO throws an InternalException when writes are issued before it has
+      synchronized its delegate. To get a DAO of this class that can accept
+      writes immediately, decorate it with a StoreAndForwardDAO.`,
+
+  requires: [ 'foam.dao.InternalException' ],
 
   properties: [
     {
+      name: 'delegate',
+      required: true,
+      final: true
+    },
+    {
       class: 'FObjectProperty',
       of: 'Property',
-      name: 'property',
+      name: 'versionProperty',
+      required: true,
+      hidden: true,
+      transient: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'Property',
+      name: 'deletedProperty',
       required: true,
       hidden: true,
       transient: true
@@ -58,15 +61,8 @@ foam.CLASS({
       value: 1
     },
     {
-      class: 'FObjectArray',
-      of: 'FObject',
-      // of: 'PutData',
-      name: 'putBacklog_'
-    },
-    {
-      class: 'Function',
-      name: 'putImpl_',
-      factory: function() { return this.putToBacklog_; }
+      class: 'Boolean',
+      name: 'ready_',
     }
   ],
 
@@ -78,9 +74,9 @@ foam.CLASS({
       // Get largest version number in delegate's records.
       this.delegate
           // Like MAX(), but faster on DAOs that can optimize order+limit.
-          .orderBy(this.DESC(this.property)).limit(1)
+          .orderBy(this.DESC(this.versionProperty)).limit(1)
           .select().then(function(sink) {
-            var propName = this.property.name;
+            var propName = this.versionProperty.name;
             if ( sink.array[0] && sink.array[0][propName] )
               this.version = sink.array[0][propName] + 1;
 
@@ -93,29 +89,30 @@ foam.CLASS({
               this.version++;
               delegate.put(obj).then(puts[i].resolve, puts[i].reject);
             }
-            this.putImpl_ = this.putToDelegate_;
+            this.ready_ = true;
           }.bind(this));
     },
     function put_(x, obj) {
-      // Either putToBacklog_() or putToDelegate_(), depending on whether
-      // version number has been initialized.
-      return this.putImpl_(x, obj);
-    },
-    function putToBacklog_(x, obj) {
-      // Store put()s before version number is initialized.
-      return new Promise(function(resolve, reject) {
-        this.putBacklog_.push(this.PutData.create({
-          data: obj,
-          resolve: resolve,
-          reject: reject
-        }));
-      }.bind(this));
-    },
-    function putToDelegate_(x, obj) {
+      if ( ! this.ready_ ) return Promise.reject(this.InternalException.create());
+
       // Increment version number and put to delegate.
-      obj[this.property.name] = this.version;
+      obj[this.versionProperty.name] = this.version;
       this.version++;
       return this.delegate.put_(x, obj);
+    },
+    function remove_(x, obj) {
+      if ( ! this.ready_ ) return Promise.reject(this.InternalException.create());
+
+      // Increment version number and put empty object (except for "id"
+      // and "deleted = true") to delegate.
+      var deleted = this.of.create({ id: obj.id }, x);
+      deleted[this.deletedProperty.name] = true;
+      deleted[this.versionProperty.name] = this.version;
+      this.version++;
+      return this.delegate.put_(x, deleted);
+    },
+    function removeAll_(x, skip, limit, order, predicate) {
+      // TODO(markdittmer): Implement this in terms of remove_() implementation.
     }
   ]
 });
