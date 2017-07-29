@@ -170,6 +170,8 @@ foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
 
+  tableColumns: [ 'id', 'parent', 'label', 'order' ],
+
   properties: [
     {
       class: 'String',
