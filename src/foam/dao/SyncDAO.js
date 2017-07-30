@@ -61,10 +61,20 @@ foam.CLASS({
     },
     {
       name: 'syncProperty',
+      of: 'Property',
       documentation: `The property to use to store the object version. This
           value on each object will be incremented each time it is put() into
           the SyncDAO.`,
       required: true,
+      hidden: true,
+      transient: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'Property',
+      name: 'deletedProperty',
+      required: true,
+      hidden: true,
       transient: true
     },
     {
@@ -285,7 +295,11 @@ foam.CLASS({
                     var promises = [];
 
                     for ( var i = 0 ; i < array.length ; i++ ) {
-                      promises.push(self.putFromRemote_(array[i]));
+                      if ( array[i][self.deletedProperty.name] ) {
+                        promises.push(self.removeFromRemote_(array[i]));
+                      } else {
+                        promises.push(self.putFromRemote_(array[i]));
+                      }
                     }
 
                     return Promise.all(promises);
