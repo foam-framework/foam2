@@ -25,9 +25,12 @@ foam.CLASS({
       version of each object, or if the object was deleted. The most recent
       version is retained.
 
-      Make sure to set the syncProperty to use to track each object's version.
-      It will automatically be incremented as changes are put() into the
-      SyncDAO.
+      Make sure to set the versionProperty to use to track each object's
+      version, and deletedProperty to use to track deleted objects. The version
+      property will be automatically be incremented as changes are put() into
+      the SyncDAO. The SyncDAO will expect to find objects in remoteDAO that
+      have been marked as deleted; this is interpreted as a signal to delete
+      records (during initial sync or polling).
 
       Remote DAOs that interact with SyncDAO clients should be decorated with
       foam.dao.VersionNoDAO, or similar, to provision new version numbers for
@@ -60,7 +63,7 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'syncProperty',
+      name: 'versionProperty',
       of: 'Property',
       documentation: `The property to use to store the object version. This
           value on each object will be incremented each time it is put() into
@@ -222,7 +225,7 @@ foam.CLASS({
             // console.log('putFromRemote_: store syncRecord for', foam.json.stringify(o));
             return self.syncRecordDAO.put(self.SyncRecord.create({
               id: o.id,
-              syncNo: o[self.syncProperty.name]
+              syncNo: o[self.versionProperty.name]
             }));
           });
         }).then(function() { return ret; });
@@ -241,7 +244,7 @@ foam.CLASS({
             // console.log('removeFromRemote_: store syncRecord for', foam.json.stringify(obj));
             return self.syncRecordDAO.put(self.SyncRecord.create({
               id: obj.id,
-              syncNo: obj[self.syncProperty.name],
+              syncNo: obj[self.versionProperty.name],
               deleted: true
             }));
           });
@@ -289,8 +292,8 @@ foam.CLASS({
               var value = sink.array[0] && SYNC_NO.f(sink.array[0]);
               // console.log('syncFromRemote_: version >', value || 0);
               return self.remoteDAO.
-                  where(self.GT(self.syncProperty, value || 0)).
-                  orderBy(self.syncProperty).
+                  where(self.GT(self.versionProperty, value || 0)).
+                  orderBy(self.versionProperty).
                   select().then(function(sink) {
                     var array = sink.array;
                     var promises = [];
@@ -335,7 +338,7 @@ foam.CLASS({
                 // onRemoteUpdate listener is fired.
                 if ( self.polling ) {
                   promises.push(promise.then(function() {
-                    var propName = self.syncProperty.name;
+                    var propName = self.versionProperty.name;
                     // Ensure that obj SyncRecord does not remain queued (i.e.,
                     // does not have syncNo = -1).
                     obj[propName] = Math.max(obj[propName], 0);
@@ -383,9 +386,11 @@ foam.CLASS({
       documentation: 'Respond to push event from remote.',
       code: function(s, on, event, obj) {
         if ( event == 'put' ) {
-          this.putFromRemote_(obj);
+          if ( obj[this.deletedProperty.name] ) this.removeFromRemote_(obj);
+          else                                  this.putFromRemote_(obj);
         } else if ( event === 'remove' ) {
-          this.removeFromRemote_(obj);
+          throw new Error(`SyncDAO recieved remove() event;
+                              expected put(deleted)-as-remove()`);
         } else if ( event === 'reset' ) {
           this.resetFromRemote_();
         }
