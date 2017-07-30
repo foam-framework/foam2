@@ -122,7 +122,7 @@ foam.CLASS({
         return Promise.reject(this.InternalException.create());
 
       // Select relevant records and mark each as deleted via remove_().
-      return this.select_(x, undefined, skip, limit, order, predicate).
+      return this.select_(x, null, skip, limit, order, predicate).
           then(function(sink) {
             var array = sink.array;
             var promises = [];
