@@ -27,6 +27,10 @@ foam.CLASS({
       This allows foam.dao.SyncDAO clients that are polling a VersionNoDAO to
       recieve deletes from other clients.
 
+      Note that marking records as deleted violates certain expectaions DAO
+      expectations. For example, removing an object and then finding it will not
+      yield null, it will yield a record marked as deleted.
+
       This DAO throws an InternalException when writes are issued before it has
       synchronized its delegate. To get a DAO of this class that can accept
       writes immediately, decorate it with a StoreAndForwardDAO.`,
@@ -93,7 +97,8 @@ foam.CLASS({
           }.bind(this));
     },
     function put_(x, obj) {
-      if ( ! this.ready_ ) return Promise.reject(this.InternalException.create());
+      if ( ! this.ready_ )
+        return Promise.reject(this.InternalException.create());
 
       // Increment version number and put to delegate.
       obj[this.versionProperty.name] = this.version;
@@ -101,7 +106,8 @@ foam.CLASS({
       return this.delegate.put_(x, obj);
     },
     function remove_(x, obj) {
-      if ( ! this.ready_ ) return Promise.reject(this.InternalException.create());
+      if ( ! this.ready_ )
+        return Promise.reject(this.InternalException.create());
 
       // Increment version number and put empty object (except for "id"
       // and "deleted = true") to delegate.
@@ -112,7 +118,19 @@ foam.CLASS({
       return this.delegate.put_(x, deleted);
     },
     function removeAll_(x, skip, limit, order, predicate) {
-      // TODO(markdittmer): Implement this in terms of remove_() implementation.
+      if ( ! this.ready_ )
+        return Promise.reject(this.InternalException.create());
+
+      // Select relevant records and mark each as deleted via remove_().
+      return this.select_(x, undefined, skip, limit, order, predicate).
+          then(function(sink) {
+            var array = sink.array;
+            var promises = [];
+            for ( var i = 0; i < array.length; i++ ) {
+              promises.push(this.remove_(x, array[i]));
+            }
+            return Promise.all(promises);
+          }.bind(this));
     }
   ]
 });
