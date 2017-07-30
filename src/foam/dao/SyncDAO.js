@@ -290,6 +290,7 @@ foam.CLASS({
               // console.log('syncFromRemote_: version >', value || 0);
               return self.remoteDAO.
                   where(self.GT(self.syncProperty, value || 0)).
+                  orderBy(self.syncProperty).
                   select().then(function(sink) {
                     var array = sink.array;
                     var promises = [];
