@@ -70,6 +70,14 @@ foam.CLASS({
   ],
 
   properties: [
+    /* TODO: uncomment this to fix ViewSpecs converting into Views when loading.
+    [
+      'fromJSON',
+      function fromJSON(value, ctx, prop, json) {
+        return value;
+      }
+    ],
+    */
     [ 'adapt', function(_, spec, prop) {
       return foam.String.isInstance(spec) ? { class: spec } : spec ;
     } ]
