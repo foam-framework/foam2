@@ -232,13 +232,11 @@ setTimeout(function() {
         if ( array.length !== reference.length ) {
           errorCount++;
           console.error('Agent', i, 'has too many/few records');
-          debugger;
         }
         for ( var j = 0; j < array.length; j++ ) {
           if ( ! foam.util.equals(array[j], reference[j]) ) {
             errorCount++;
             console.error('Agent', i, 'does not match reference at', j);
-            debugger;
           }
         }
       });
