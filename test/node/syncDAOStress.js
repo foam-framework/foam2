@@ -22,10 +22,11 @@
 
 require('../../src/foam.js');
 
-var Item;
 var BaseDAO;
+var Item;
 var ProxyDAO;
 var QuickSink;
+var StoreAndForwardDAO;
 var SyncDAO;
 var SyncRecord;
 var VersionNoDAO;
@@ -34,7 +35,7 @@ foam.CLASS({
   package: 'foam.dao.test',
   name: 'Item',
 
-  properties: [ 'id', [ 'version', -1 ], 'data' ]
+  properties: [ 'id', [ 'version', -1 ], [ 'deleted', false ], 'data' ]
 });
 
 foam.CLASS({
@@ -75,17 +76,13 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         // Log to ensure ordering (i.e., no logs such as these should appear
         // after verification step).
-        console.log('Base DAO', op);
         setTimeout(function() {
-          console.log('Base DAO', op, 'send to delegate');
           return self.delegate[op].apply(self.delegate, args).then(function(o) {
             setTimeout(function() {
-              console.log('Base DAO', op, 'resolve');
               resolve(o);
             }, Math.floor(Math.random() * self.maxDelay));
           }, function(e) {
             setTimeout(function() {
-              console.log('Base DAO', op, 'reject');
               reject(e);
             }, Math.floor(Math.random() * self.maxDelay));
           });
@@ -99,6 +96,7 @@ Item = foam.lookup('foam.dao.test.Item');
 BaseDAO = foam.lookup('foam.dao.test.BaseDAO');
 ProxyDAO = foam.lookup('foam.dao.ProxyDAO');
 QuickSink = foam.lookup('foam.dao.QuickSink');
+StoreAndForwardDAO = foam.lookup('foam.dao.StoreAndForwardDAO');
 SyncDAO = foam.lookup('foam.dao.SyncDAO');
 SyncRecord = foam.lookup('foam.dao.sync.SyncRecord');
 VersionNoDAO = foam.lookup('foam.dao.VersionNoDAO');
@@ -132,7 +130,10 @@ var numRounds = 50;
 // Number of put()/remove()s per synchronous "round".
 var opsPerRound = 20;
 // Wait time between rounds.
-var waitBetweenRounds = 1000;
+var waitBetweenRounds = 3000;
+// Polling frequency for polling SyncDAOs; should be appreciably less than
+// waitBetweenRounds.
+var pollingFrequency = 2000;
 // Wait time for sync DAOs to finish synchronizing before verifying results.
 // NOTE: If this value is too low, then spurious errors will be reported.
 var waitToSettle = 10000;
@@ -145,9 +146,12 @@ var waitToSettle = 10000;
 var remoteDelegate = BaseDAO.create({ of: Item });
 initialData.forEach(function(data) { remoteDelegate.put(data); });
 // DAO that agents hit when talking to remote.
-var remoteDAO = VersionNoDAO.create({
-  property: Item.VERSION,
-  delegate: remoteDelegate
+var remoteDAO = StoreAndForwardDAO.create({
+  delegate: VersionNoDAO.create({
+    versionProperty: Item.VERSION,
+    deletedProperty: Item.DELETED,
+    delegate: remoteDelegate
+  })
 });
 
 // Agents using SyncDAOs.
@@ -158,8 +162,11 @@ for ( var i = 0; i < numActiveAgents; i++ ) {
     of: Item,
     remoteDAO: remoteDAO,
     delegate: BaseDAO.create({ of: Item }),
-    syncProperty: Item.VERSION,
-    syncRecordDAO: BaseDAO.create({ of: SyncRecord })
+    versionProperty: Item.VERSION,
+    deletedProperty: Item.DELETED,
+    syncRecordDAO: BaseDAO.create({ of: SyncRecord }),
+    polling: Math.floor(Math.random() * 2) === 0,
+    pollingFrequency: pollingFrequency
   });
 }
 
@@ -197,29 +204,42 @@ for ( var i = 0; i < numRounds; i++ ) {
 
 // Setup timer for verification.
 setTimeout(function() {
+  var E = foam.lookup('foam.mlang.ExpressionsSingleton').create();
+  var errorCount = 0;
   var reference;
 
   // Add log marker after which no DAO activity should be logged.
   // If DAO activity is logged after this line, results should not be trusted;
   // increase timeouts to let SyncDAOs settle.
-  console.log('DONE! (There should be no BaseDAO logs below this line)');
+  console.log('DONE! (There should be no non-polling BaseDAO logs below)');
 
-  var p = remoteDAO.select().then(function(sink) {
-    reference = sink.array;
-  });
+  // Exclude deleted records from reference.
+  var p = remoteDAO.where(E.EQ(Item.DELETED, false)).select().
+      then(function(sink) { reference = sink.array; });
+
   for ( var i = 0; i < activeAgents.length; i++ ) {
     // Wait for previous round (or "reference" accumulation) before reporting on
     // next active agent.
     p = p.then(function(i) {
       return activeAgents[i].select().then(function(sink) {
         var array = sink.array;
-        if ( array.length !== reference.length )
+        if ( array.length !== reference.length ) {
+          errorCount++;
           console.error('Agent', i, 'has too many/few records');
+        }
         for ( var j = 0; j < array.length; j++ ) {
-          if ( ! foam.util.equals(array[j], reference[j]) )
+          if ( ! foam.util.equals(array[j], reference[j]) ) {
+            errorCount++;
             console.error('Agent', i, 'does not match reference at', j);
+          }
         }
       });
     }.bind(this, i));
   }
+  p.then(function() {
+    setTimeout(function() {
+      console.log('Exiting (found', errorCount, 'errors)');
+      require('process').exit(errorCount === 0 ? 0 : 1);
+    }, pollingFrequency + 100);
+  });
 }, numRounds * waitBetweenRounds + waitToSettle);

@@ -25,9 +25,12 @@ foam.CLASS({
       version of each object, or if the object was deleted. The most recent
       version is retained.
 
-      Make sure to set the syncProperty to use to track each object's version.
-      It will automatically be incremented as changes are put() into the
-      SyncDAO.
+      Make sure to set the versionProperty to use to track each object's
+      version, and deletedProperty to use to track deleted objects. The version
+      property will be automatically be incremented as changes are put() into
+      the SyncDAO. The SyncDAO will expect to find objects in remoteDAO that
+      have been marked as deleted; this is interpreted as a signal to delete
+      records (during initial sync or polling).
 
       Remote DAOs that interact with SyncDAO clients should be decorated with
       foam.dao.VersionNoDAO, or similar, to provision new version numbers for
@@ -60,11 +63,21 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'syncProperty',
+      name: 'versionProperty',
+      of: 'Property',
       documentation: `The property to use to store the object version. This
           value on each object will be incremented each time it is put() into
           the SyncDAO.`,
       required: true,
+      hidden: true,
+      transient: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'Property',
+      name: 'deletedProperty',
+      required: true,
+      hidden: true,
       transient: true
     },
     {
@@ -77,7 +90,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'polling',
       documentation: `If using a remote DAO without push capabilities, such as
-          an HTTP server, polling will periodically attempt to synchronize.`
+          an HTTP server, polling will periodically attempt to synchronize.`,
+      postSet: function(old, nu) {
+        this.sync_ = nu ? this.pollingSync_ : this.syncToRemote_;
+      }
     },
     {
       /**
@@ -98,6 +114,15 @@ foam.CLASS({
     {
       name: 'syncRecordWriteSync_',
       factory: function() { return Promise.resolve(); }
+    },
+    {
+      class: 'Function',
+      name: 'sync_',
+      documentation: `Selected sync strategy; either syncToRemote_() or
+          pollingSync_().`,
+      factory: function() {
+        return this.polling ? this.pollingSync_ : this.syncToRemote_;
+      }
     }
   ],
 
@@ -111,19 +136,18 @@ foam.CLASS({
 
       // Push initial data from delegate.
       var self = this;
-      self.synced = self.delegate.select().then(function(sink) {
-        var array = sink.array;
-        for ( var i = 0; i < array.length; i++ ) {
-          self.syncRecordDAO.put(self.SyncRecord.create({
-            id: array[i].id,
-            syncNo: -1
-          }));
-        }
-      }).
-          // Like sync(), but on initial sync, syncFromRemote_() regardless of
-          // whether "polling" is set.
-          then(self.syncToRemote_.bind(self)).
-          then(self.syncFromRemote_.bind(self));
+      self.synced = self.delegate.select().
+          then(function(sink) {
+            var array = sink.array;
+            for ( var i = 0; i < array.length; i++ ) {
+              self.syncRecordDAO.put(self.SyncRecord.create({
+                id: array[i].id,
+                syncNo: -1
+              }));
+            }
+          }).
+          // Sync as if polling on initial sync.
+          then(self.pollingSync_.bind(self));
 
       // Setup polling after initial sync.
       if ( ! self.polling ) return;
@@ -136,14 +160,7 @@ foam.CLASS({
     function sync() {
       // Sync after any sync(s) in progress complete.
       return this.synced = this.synced.then(function() {
-        console.log('sync');
-        var ret = this.syncToRemote_();
-
-        // Only syncFromRemote_ when polling (otherwise, updates will get pushed
-        // anyway).
-        if ( this.polling ) ret = ret.then(this.syncFromRemote_.bind(this));
-
-        return ret;
+        return this.sync_();
       }.bind(this));
     },
 
@@ -212,7 +229,7 @@ foam.CLASS({
             // console.log('putFromRemote_: store syncRecord for', foam.json.stringify(o));
             return self.syncRecordDAO.put(self.SyncRecord.create({
               id: o.id,
-              syncNo: o[self.syncProperty.name]
+              syncNo: o[self.versionProperty.name]
             }));
           });
         }).then(function() { return ret; });
@@ -231,7 +248,7 @@ foam.CLASS({
             // console.log('removeFromRemote_: store syncRecord for', foam.json.stringify(obj));
             return self.syncRecordDAO.put(self.SyncRecord.create({
               id: obj.id,
-              syncNo: obj[self.syncProperty.name],
+              syncNo: obj[self.versionProperty.name],
               deleted: true
             }));
           });
@@ -265,39 +282,44 @@ foam.CLASS({
       }
     },
     {
-      name: 'syncFromRemote_',
-      documentation: 'Pull data from remote and sync it to cache.',
+      name: 'pollingSync_',
+      documentation: `Polling synchronization strategy. Determine current
+          version, then push to remote, then pull update from remote.`,
       code: function() {
-        // console.log('syncFromRemote_');
         var self = this;
         var SYNC_NO = self.SyncRecord.SYNC_NO;
-
         return self.syncRecordDAO.
             // Like MAX(), but faster on DAOs that can optimize order+limit.
             orderBy(self.DESC(SYNC_NO)).limit(1).
             select().then(function(sink) {
-              var value = sink.array[0] && SYNC_NO.f(sink.array[0]);
-              // console.log('syncFromRemote_: version >', value || 0);
-              return self.remoteDAO.
-                  where(self.GT(self.syncProperty, value || 0)).
-                  select().then(function(sink) {
-                    var array = sink.array;
-                    var promises = [];
+              var minVersionNo = sink.array[0] && SYNC_NO.f(sink.array[0]) || 0;
+              return self.syncToRemote_().then(function() {
+                return self.remoteDAO.
+                  where(self.GT(self.versionProperty, minVersionNo)).
+                  orderBy(self.versionProperty).
+                  select();
+              }).then(function(sink) {
+                var array = sink.array;
+                var promises = [];
 
-                    for ( var i = 0 ; i < array.length ; i++ ) {
-                      promises.push(self.putFromRemote_(array[i]));
-                    }
+                for ( var i = 0 ; i < array.length ; i++ ) {
+                  if ( array[i][self.deletedProperty.name] ) {
+                    promises.push(self.removeFromRemote_(array[i]));
+                  } else {
+                    promises.push(self.putFromRemote_(array[i]));
+                  }
+                }
 
-                    return Promise.all(promises);
-                  });
+                return Promise.all(promises);
+              });
             });
       }
     },
     {
       name: 'syncToRemote_',
-      documentation: 'Push data from cach to remote.',
+      documentation: `Push synchronization strategy: Push data from cach to
+          remote; rely on pushed updates from server.`,
       code: function() {
-        // console.log('syncToRemote_');
         var self = this;
 
         return this.syncRecordDAO
@@ -320,17 +342,17 @@ foam.CLASS({
                 // onRemoteUpdate listener is fired.
                 if ( self.polling ) {
                   promises.push(promise.then(function() {
-                    var propName = self.syncProperty.name;
+                    var propName = self.versionProperty.name;
                     // Ensure that obj SyncRecord does not remain queued (i.e.,
                     // does not have syncNo = -1).
                     obj[propName] = Math.max(obj[propName], 0);
-                    self.removeFromRemote_(obj);
+                    return self.removeFromRemote_(obj);
                   }));
                 } else {
                   promises.push(promise);
                 }
               } else {
-                // TODO: Stop sending updates if the first one fails.
+                // TODO(markdittmer): Deal appropriately with failed updates.
                 promises.push(self.delegate.find(id).then(function(obj) {
                   if ( ! obj ) return null;
                   var ret = self.remoteDAO.put(obj);
@@ -339,7 +361,7 @@ foam.CLASS({
                   // onRemoteUpdate listener is fired.
                   if ( self.polling ) {
                     ret = ret.then(function(o) {
-                      self.putFromRemote_(o);
+                      return self.putFromRemote_(o);
                     });
                   }
 
@@ -368,9 +390,11 @@ foam.CLASS({
       documentation: 'Respond to push event from remote.',
       code: function(s, on, event, obj) {
         if ( event == 'put' ) {
-          this.putFromRemote_(obj);
+          if ( obj[this.deletedProperty.name] ) this.removeFromRemote_(obj);
+          else                                  this.putFromRemote_(obj);
         } else if ( event === 'remove' ) {
-          this.removeFromRemote_(obj);
+          throw new Error(`SyncDAO recieved remove() event;
+                              expected put(deleted)-as-remove()`);
         } else if ( event === 'reset' ) {
           this.resetFromRemote_();
         }

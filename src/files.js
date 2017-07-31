@@ -129,6 +129,7 @@ FOAM_FILES([
   { name: "foam/dao/GUIDDAO" },
   { name: "foam/dao/ReadOnlyDAO", flags: ['js'] },
   { name: "foam/dao/ReadOnlyDAOJava", flags: ['java'] },
+  { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/JDAO" },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
