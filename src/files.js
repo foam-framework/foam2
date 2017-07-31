@@ -188,6 +188,7 @@ FOAM_FILES([
   { name: "foam/box/ReplyBox" },
   { name: "foam/box/FunctionBox" },
   { name: "foam/box/RPCReturnMessage" },
+  { name: "foam/box/RPCErrorMessage" },
   { name: "foam/box/SubscribeMessage" },
   { name: "foam/box/RPCReturnBox" },
   { name: "foam/box/RPCMessage" },

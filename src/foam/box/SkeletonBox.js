@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.box.Message',
     'foam.box.RPCMessage',
     'foam.box.RPCReturnMessage',
+    'foam.box.RPCErrorMessage',
     'foam.box.InvalidMessageException'
   ],
 
@@ -40,7 +41,7 @@ foam.CLASS({
         p = this.data[message.object.name].apply(this.data, message.object.args);
       } catch(e) {
         message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
-          object: e
+          object: this.RPCErrorMessage.create({ data: e })
         }));
 
         return;
@@ -58,10 +59,9 @@ foam.CLASS({
             }));
           },
           function(error) {
-            message.attributes.errorBox && message.attributes.errorBox.send(
-              self.Message.create({
-                object: error
-              }));
+            message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
+              object: self.RPCErrorMessage.create({ data: error })
+            });
           });
       } else {
         replyBox && replyBox.send(this.Message.create({
