@@ -75,8 +75,8 @@ subViewSubscriptions = [:]
 var properties: [PropertyInfo] = []
 var actions: [Action] = []
 if let fobj = data as AnyObject as? FObject {
-  properties += type(of: fobj).classInfo().axioms(byType: PropertyInfo.self)
-  actions += type(of: fobj).classInfo().axioms(byType: Action.self)
+  properties += fobj.ownClassInfo().axioms(byType: PropertyInfo.self)
+  actions += fobj.ownClassInfo().axioms(byType: Action.self)
 }
 
 var vstack: [UIView] = []
@@ -131,7 +131,7 @@ subscript(key: String) -> FObject? {
   if let v = self.propertyViews[key] ?? self.actionViews[key] {
     return v
   }
-  let classInfo = type(of: data).classInfo()
+  let classInfo = data.ownClassInfo()
   if let a = classInfo.axiom(byName: key) {
     if let a = a as? PropertyInfo, a.view != nil {
       let prop = a.name

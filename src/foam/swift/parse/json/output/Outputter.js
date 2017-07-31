@@ -169,7 +169,7 @@ if let data = data as? FObject {
         },
       ],
       swiftCode: function() {/*
-let info = type(of:data).classInfo()
+let info = data.ownClassInfo()
 out.append("{")
 
 out.append(beforeKey)

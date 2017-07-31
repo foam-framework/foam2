@@ -43,30 +43,61 @@ foam.LIB({
         if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name));
       }.bind(this));
 
-      var createClassInfoBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties, id) {/*
-let classInfo = ClassInfoImpl()
-classInfo.id = "<%=id%>"
-classInfo.parent = (class_getSuperclass(self) as! FObject.Type).classInfo()
-classInfo.ownAxioms = [
-<% for (var i = 0, p; p = axioms[i]; i++) { if (!p.swiftAxiomName) continue; %>
-<%=p.swiftAxiomName%>,
-<% } %>
-]
-return classInfo
-          */}), '', ['axioms', 'id']).apply(this, [this.getOwnAxioms(), this.model_.id]).trim();
-
       var properties = this.getOwnAxiomsByClass(foam.core.Property)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
 
+      cls.classes.push(foam.swift.SwiftClass.create({
+        visibility: 'private',
+        name: 'ClassInfo_',
+        implements: ['ClassInfo'],
+        fields: [
+          foam.swift.Field.create({
+            lazy: true,
+            name: 'id',
+            type: 'String',
+            defaultValue: '"' + this.model_.id + '"',
+          }),
+          foam.swift.Field.create({
+            lazy: true,
+            name: 'parent',
+            type: 'ClassInfo',
+            defaultValue: this.model_.swiftExtends + '.classInfo()',
+          }),
+          foam.swift.Field.create({
+            lazy: true,
+            name: 'ownAxioms',
+            type: '[Axiom]',
+            defaultValue: '[' +
+              this.getOwnAxioms()
+                .filter(function(a) { return a.swiftAxiomName })
+                .map(function(a) { return a.swiftAxiomName }) +
+            ']',
+          }),
+        ],
+      }));
+      cls.fields.push(foam.swift.Field.create({
+        static: true,
+        visibility: 'private',
+        name: 'classInfo_',
+        type: 'ClassInfo',
+        defaultValue: 'ClassInfo_()',
+      }));
       cls.methods.push(foam.swift.Method.create({
         override: true,
-        name: 'createClassInfo_',
+        name: 'ownClassInfo',
+        visibility: 'public',
+        returnType: 'ClassInfo',
+        body: 'return ' + this.model_.swiftName + '.classInfo_',
+      }));
+      cls.methods.push(foam.swift.Method.create({
+        override: true,
+        name: 'classInfo',
+        visibility: 'public',
         class: true,
         returnType: 'ClassInfo',
-        body: createClassInfoBody,
+        body: 'return ' + this.model_.swiftName + '.classInfo_',
       }));
 
       var clearPropertyBody = foam.templates.TemplateUtil.create().compile(

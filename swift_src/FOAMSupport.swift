@@ -60,6 +60,15 @@ public class Action: Axiom {
 
 public class Context {
   public static let GLOBAL = Context()
+
+  private lazy var classMap: [String:ClassInfo] = [:]
+  public func registerClass(cls: ClassInfo) {
+    classMap[cls.id] = cls
+  }
+  public func lookup(_ id: String) -> ClassInfo? {
+    return classMap[id]
+  }
+
   public func create(type: Any, args: [String:Any?] = [:]) -> Any? {
     var o: Any? = nil
     if let t = type as? Initializable.Type {
@@ -93,6 +102,7 @@ public class Context {
 
     let subContext = Context()
     subContext.slotMap = slotMap
+    subContext.classMap = classMap
     return subContext
   }
 }
@@ -159,8 +169,8 @@ public class Subscription {
 }
 
 public protocol FObject: class {
+  func ownClassInfo() -> ClassInfo
   func sub(topics: [String], listener l: @escaping Listener) -> Subscription
-  static func classInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
   func getSlot(key: String) -> Slot?
@@ -181,6 +191,8 @@ extension FObject {
 */
 
 public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
+  public func ownClassInfo() -> ClassInfo { fatalError() }
+
   public var __context__: Context = Context.GLOBAL {
     didSet {
       self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())
@@ -196,18 +208,14 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
 
   lazy var listeners: ListenerList = ListenerList()
 
-  private static var classInfo_: ClassInfo! = nil
-  public class func classInfo() -> ClassInfo {
-    if classInfo_ == nil { classInfo_ = createClassInfo_() }
-    return classInfo_
-  }
-
-  class func createClassInfo_() -> ClassInfo {
+  private static var classInfo_: ClassInfo = {
     let classInfo = ClassInfoImpl()
     classInfo.parent = classInfo
     classInfo.id = "FObject"
     return classInfo
-  }
+  }()
+
+  public class func classInfo() -> ClassInfo { return AbstractFObject.classInfo_ }
 
   public func set(key: String, value: Any?) {}
   public func get(key: String) -> Any? { return nil }
@@ -275,10 +283,10 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     if self === data { return 0 }
     if data == nil { return 1 }
     let data = data!
-    if type(of: self).classInfo().id != type(of: data).classInfo().id {
-      return type(of: self).classInfo().id > type(of: data).classInfo().id ? 1 : -1
+    if ownClassInfo().id != data.ownClassInfo().id {
+      return ownClassInfo().id > data.ownClassInfo().id ? 1 : -1
     }
-    for props in type(of: data).classInfo().axioms(byType: PropertyInfo.self) {
+    for props in data.ownClassInfo().axioms(byType: PropertyInfo.self) {
       let diff = props.compare(self, data)
       if diff != 0 { return diff }
     }
@@ -351,7 +359,7 @@ extension Character {
 public class ModelParserFactory {
   private static var parsers: [String:Parser] = [:]
   public static func getInstance(_ c: FObject.Type) -> Parser {
-    let info = c.classInfo()
+    let info = (c as! AbstractFObject.Type).classInfo()
     if let p = parsers[info.id] { return p }
     let parser = buildInstance(info)
     parsers[info.id] = parser
