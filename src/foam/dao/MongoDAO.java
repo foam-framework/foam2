@@ -6,8 +6,14 @@
 
 package foam.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
+
 import foam.core.FObject;
 import foam.core.X;
+import foam.core.PropertyInfo;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
@@ -34,12 +40,6 @@ import static com.mongodb.client.model.Filters.*;
 import com.mongodb.client.result.DeleteResult;
 import static com.mongodb.client.model.Updates.*;
 import com.mongodb.client.result.UpdateResult;
-
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Map;
 
 
 public class MongoDAO
@@ -89,7 +89,7 @@ public class MongoDAO
 
     String collectionName = (String) x.get("collectionName");
     String collectionClass = (String) x.get("collectionClass");
-    Map<String, String> embeddedObjClasses = (Map<String, String>) x.get("embeddedObjClasses");
+    List props = getFObjectProperties(collectionClass, x);
 
     if ( collectionName == null || collectionName.isEmpty() ) {
       throw new IllegalArgumentException("Invalid collection name in context. Please provide a string name.");
@@ -102,7 +102,7 @@ public class MongoDAO
 
     try {
       while (cursor.hasNext()) {
-        sink.put(createFObject(collectionClass, embeddedObjClasses, cursor.next()), null);
+        sink.put(createFObject(collectionClass, props, cursor.next()), null);
       }
     } finally {
       cursor.close();
@@ -111,17 +111,37 @@ public class MongoDAO
     return sink;
   }
 
-  private FObject createFObject(String cls, Map<String, String> embeddedObjClasses, Document d) {
+  private List getFObjectProperties(String clsName, X x) {    
+    try {
+      Class cls = Class.forName(clsName);
+      FObject clsInstance = (FObject) x.create(cls);
+      List props = clsInstance.getClassInfo().getAxiomsByClass(foam.core.AbstractFObjectPropertyInfo.class);
+      
+      // Recursively handle nested FObjectProperties
+      for ( int i = 0 ; i < props.size() ; ++i ) {
+        props.addAll(getFObjectProperties(((PropertyInfo) props.get(i)).getPropertyType(), x));
+      }
+
+      return props;
+    } catch (Exception ex) {
+      throw new RuntimeException(clsName + " was not found.");
+    }
+  }
+
+  private FObject createFObject(String clsName, List props, Document d) {
     JsonWriterSettings writerSettings = new JsonWriterSettings(JsonMode.SHELL, true);
     String jsonStr = d.toJson(writerSettings);
 
     // Trims initial `"_id" : ObjectId("[24 HEX Chars]"),`
-    jsonStr = "{ class: \"" + cls + "\", " + jsonStr.substring(MONGO_OBJECT_PREFIX_LENGTH, jsonStr.length() - 1) + " }";
+    jsonStr = "{ class: \"" + clsName + "\", " + 
+                 jsonStr.substring(MONGO_OBJECT_PREFIX_LENGTH, jsonStr.length() - 1) + 
+              " }";
 
+    Iterator i = props.iterator();
 
-    // TODO: Find better technique to add embedded object classes
-    for (Map.Entry<String, String> entry : embeddedObjClasses.entrySet()) {
-      jsonStr = jsonStr.replace("\"" + entry.getKey() + "\" : {", "\"" + entry.getKey() + "\" : { class: \"" + entry.getValue() + "\",");
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      jsonStr = jsonStr.replace("\"" + prop.getName() + "\" : {", "\"" + prop.getName() + "\" : { class: \"" + prop.getPropertyType() + "\",");
     }
 
     JSONParser parser = new JSONParser();
