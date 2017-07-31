@@ -16,15 +16,18 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao.sync',
-  name: 'SyncRecord',
+  package: 'foam.version',
+  name: 'VersionTrait',
 
-  documentation: `Used by foam.dao.SyncDAO to track object updates and
-      deletions.`,
-
-  properties: [ 'id' ]
+  properties: [
+    {
+      class: 'Int',
+      name: 'version_',
+      value: -1
+    },
+    {
+      class: 'Boolean',
+      name: 'deleted_'
+    }
+  ]
 });
-
-// Define foam.dao.sync.VersionedSyncRecord.
-foam.lookup('foam.version.VersionedClassFactorySingleton').create().get(
-    foam.lookup('foam.dao.sync.SyncRecord'));
