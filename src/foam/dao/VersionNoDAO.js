@@ -83,16 +83,6 @@ foam.CLASS({
             var propName = this.versionProperty.name;
             if ( sink.array[0] && sink.array[0][propName] )
               this.version = sink.array[0][propName] + 1;
-
-            // Flush backlog, resolving put() promises.
-            var delegate = this.delegate;
-            var puts = this.putBacklog_;
-            for ( var i = 0; i < puts.length; i++ ) {
-              var obj = puts[i].data;
-              obj[propName] = this.version;
-              this.version++;
-              delegate.put(obj).then(puts[i].resolve, puts[i].reject);
-            }
             this.ready_ = true;
           }.bind(this));
     },
