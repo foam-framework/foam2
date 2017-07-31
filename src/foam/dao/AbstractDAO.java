@@ -42,11 +42,11 @@ public abstract class AbstractDAO
   }
 
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( limit < this.MAX_SAFE_INTEGER ) {
+    if ( ( limit > 0 ) && ( limit < this.MAX_SAFE_INTEGER ) ) {
       sink = new LimitedSink(limit, 0, sink);
     }
 
-    if ( skip > 0 ) {
+    if ( ( skip > 0 ) && ( skip < this.MAX_SAFE_INTEGER ) ) {
       sink = new SkipSink(skip, 0, sink);
     }
 
