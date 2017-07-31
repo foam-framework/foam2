@@ -34,9 +34,12 @@ import static com.mongodb.client.model.Filters.*;
 import com.mongodb.client.result.DeleteResult;
 import static com.mongodb.client.model.Updates.*;
 import com.mongodb.client.result.UpdateResult;
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Map;
 
 
 public class MongoDAO
@@ -86,6 +89,7 @@ public class MongoDAO
 
     String collectionName = (String) x.get("collectionName");
     String collectionClass = (String) x.get("collectionClass");
+    Map<String, String> embeddedObjClasses = (Map<String, String>) x.get("embeddedObjClasses");
 
     if ( collectionName == null || collectionName.isEmpty() ) {
       throw new IllegalArgumentException("Invalid collection name in context. Please provide a string name.");
@@ -98,7 +102,7 @@ public class MongoDAO
 
     try {
       while (cursor.hasNext()) {
-        sink.put(createFObject(collectionClass, cursor.next()), null);
+        sink.put(createFObject(collectionClass, embeddedObjClasses, cursor.next()), null);
       }
     } finally {
       cursor.close();
@@ -107,12 +111,18 @@ public class MongoDAO
     return sink;
   }
 
-  private FObject createFObject(String cls, Document d) {
+  private FObject createFObject(String cls, Map<String, String> embeddedObjClasses, Document d) {
     JsonWriterSettings writerSettings = new JsonWriterSettings(JsonMode.SHELL, true);
     String jsonStr = d.toJson(writerSettings);
 
     // Trims initial `"_id" : ObjectId("[24 HEX Chars]"),`
     jsonStr = "{ class: \"" + cls + "\", " + jsonStr.substring(MONGO_OBJECT_PREFIX_LENGTH, jsonStr.length() - 1) + " }";
+
+
+    // TODO: Find better technique to add embedded object classes
+    for (Map.Entry<String, String> entry : embeddedObjClasses.entrySet()) {
+      jsonStr = jsonStr.replace("\"" + entry.getKey() + "\" : {", "\"" + entry.getKey() + "\" : { class: \"" + entry.getValue() + "\",");
+    }
 
     JSONParser parser = new JSONParser();
     parser.setX(EmptyX.instance());
