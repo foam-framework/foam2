@@ -16,12 +16,12 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.Array',
+  refines: 'foam.core.FObjectArray',
   properties: [
     {
       name: 'swiftType',
       expression: function(of) {
-        return '[' + foam.lookup(of).model_.swiftName + ']';
+        return '[FObject]';
       },
     },
     {

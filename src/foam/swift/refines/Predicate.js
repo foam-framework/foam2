@@ -5,6 +5,9 @@ foam.INTERFACE({
       name: 'f',
       swiftReturnType: 'Bool',
       swiftEnabled: true,
+      args: [
+        'obj'
+      ]
     },
   ],
   axioms: [
