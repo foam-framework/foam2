@@ -106,6 +106,12 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             body: 'return ' + Boolean(this.propRequired) + ';'
+          },
+          {
+            name: 'getPropertyType',
+            visibility: 'public',
+            type: 'String',
+            body: `return "${this.propType}";`
           }
         ]
       }
