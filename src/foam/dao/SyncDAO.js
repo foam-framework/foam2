@@ -141,8 +141,7 @@ foam.CLASS({
             var array = sink.array;
             for ( var i = 0; i < array.length; i++ ) {
               self.syncRecordDAO.put(self.SyncRecord.create({
-                id: array[i].id,
-                syncNo: -1
+                id: array[i].id
               }));
             }
           }).
@@ -176,8 +175,7 @@ foam.CLASS({
           ret = o;
           // Updates the object's last seen info.
           return self.syncRecordDAO.put_(x, self.SyncRecord.create({
-            id: o.id,
-            syncNo: -1
+            id: o.id
           }));
         });
       }).then(self.onLocalUpdate).then(function() { return ret; });
@@ -191,8 +189,7 @@ foam.CLASS({
           // Marks the object as deleted.
           self.syncRecordDAO.put_(x, self.SyncRecord.create({
             id: obj.id,
-            deleted: true,
-            syncNo: -1
+            deleted: true
           }));
         });
       }).then(self.onLocalUpdate).then(function() { return ret; });
@@ -220,64 +217,33 @@ foam.CLASS({
       name: 'putFromRemote_',
       documentation: 'Process a put() to cache from remote.',
       code: function(obj) {
-        // console.log('putFromRemote_', foam.json.stringify(obj));
-        var self = this;
-        var ret;
-        return self.withSyncRecordTx_(function() {
-          return self.delegate.put(obj).then(function(o) {
-            ret = o;
-            // console.log('putFromRemote_: store syncRecord for', foam.json.stringify(o));
-            return self.syncRecordDAO.put(self.SyncRecord.create({
-              id: o.id,
-              syncNo: o[self.versionProperty.name]
-            }));
-          });
-        }).then(function() { return ret; });
+        return this.delegate.put(obj);
       }
     },
     {
       name: 'removeFromRemote_',
       documentation: 'Process a remove() on cache from remote.',
       code: function(obj) {
-        // console.log('removeFromRemote_', foam.json.stringify(obj));
-        var self = this;
-        var ret;
-        return self.withSyncRecordTx_(function() {
-          return self.delegate.remove(obj).then(function(o) {
-            ret = o;
-            // console.log('removeFromRemote_: store syncRecord for', foam.json.stringify(obj));
-            return self.syncRecordDAO.put(self.SyncRecord.create({
-              id: obj.id,
-              syncNo: obj[self.versionProperty.name],
-              deleted: true
-            }));
-          });
-        }).then(function() { return ret; });
+        return this.delegate.remove(obj);
       }
     },
     {
       name: 'resetFromRemote_',
       documentation: 'Process a reset signal on cache from remote.',
       code: function(obj) {
-        // console.log('resetFromRemote_', foam.json.stringify(obj));
         // Clear sync records and data not associated with unsynced data, then
         // sync.
         var self = this;
         var ret;
         return self.withSyncRecordTx_(function() {
-          return self.syncRecordDAO(self.GT(self.SyncRecord.SYNC_NO, -1))
-              .removeAll().
-              then(self.syncRecordDAO.select.bind(self.syncRecordDAO)).
-              then(function(sink) {
-                var idsToKeep = sink.array.map(function(syncRecord) {
-                  return syncRecord.id;
-                });
-                // console.log('resetFromRemote_: Keeping', idsToKeep,
-                //             'not yet pushed');
-                return self.delegate.where(
-                    self.NOT(self.IN(self.of.ID, idsToKeep))).
-                    removeAll();
-              });
+          return self.syncRecordDAO.select().then(function(sink) {
+            var idsToKeep = sink.array.map(function(syncRecord) {
+              return syncRecord.id;
+            });
+            return self.delegate.where(
+                self.NOT(self.IN(self.of.ID, idsToKeep))).
+                removeAll();
+          });
         }).then(self.sync.bind(self));
       }
     },
@@ -287,12 +253,12 @@ foam.CLASS({
           version, then push to remote, then pull update from remote.`,
       code: function() {
         var self = this;
-        var SYNC_NO = self.SyncRecord.SYNC_NO;
-        return self.syncRecordDAO.
+        return self.delegate.
             // Like MAX(), but faster on DAOs that can optimize order+limit.
-            orderBy(self.DESC(SYNC_NO)).limit(1).
+            orderBy(self.DESC(self.versionProperty)).limit(1).
             select().then(function(sink) {
-              var minVersionNo = sink.array[0] && SYNC_NO.f(sink.array[0]) || 0;
+              var minVersionNo = sink.array[0] &&
+                  sink.array[0][self.versionProperty.name] || 0;
               return self.syncToRemote_().then(function() {
                 return self.remoteDAO.
                   where(self.GT(self.versionProperty, minVersionNo)).
@@ -322,56 +288,39 @@ foam.CLASS({
       code: function() {
         var self = this;
 
-        return this.syncRecordDAO
-          .where(self.EQ(this.SyncRecord.SYNC_NO, -1))
-          .select().then(function(records) {
-            records = records.array;
-            var promises = [];
+        return self.syncRecordDAO.select().then(function(records) {
+          records = records.array;
+          var promises = [];
 
-            for ( var i = 0 ; i < records.length ; i++ ) {
-              var record = records[i];
-              var id = record.id;
-              var deleted = record.deleted;
+          for ( var i = 0 ; i < records.length ; i++ ) {
+            var record = records[i];
+            var id = record.id;
+            var deleted = record.deleted;
 
-              if ( deleted ) {
-                var obj = self.of.create(undefined, self);
-                obj.id = id;
-                var promise = self.remoteDAO.remove(obj);
+            if ( deleted ) {
+              var obj = self.of.create(undefined, self);
+              obj.id = id;
+              promises.push(self.withSyncRecordTx_(function() {
+                return self.remoteDAO.remove(obj).then(function() {
+                  return self.syncRecordDAO.remove(record);
+                });
+              }));
+            } else {
+              // TODO(markdittmer): Deal appropriately with failed updates.
+              promises.push(self.delegate.find(id).then(function(obj) {
+                if ( ! obj ) return null;
 
-                // When not polling, server result will processed when
-                // onRemoteUpdate listener is fired.
-                if ( self.polling ) {
-                  promises.push(promise.then(function() {
-                    var propName = self.versionProperty.name;
-                    // Ensure that obj SyncRecord does not remain queued (i.e.,
-                    // does not have syncNo = -1).
-                    obj[propName] = Math.max(obj[propName], 0);
-                    return self.removeFromRemote_(obj);
-                  }));
-                } else {
-                  promises.push(promise);
-                }
-              } else {
-                // TODO(markdittmer): Deal appropriately with failed updates.
-                promises.push(self.delegate.find(id).then(function(obj) {
-                  if ( ! obj ) return null;
-                  var ret = self.remoteDAO.put(obj);
-
-                  // When not polling, server result will processed when
-                  // onRemoteUpdate listener is fired.
-                  if ( self.polling ) {
-                    ret = ret.then(function(o) {
-                      return self.putFromRemote_(o);
-                    });
-                  }
-
-                  return ret;
-                }));
-              }
+                return self.withSyncRecordTx_(function() {
+                  return self.remoteDAO.put(obj).then(function() {
+                    return self.syncRecordDAO.remove(record);
+                  });
+                });
+              }));
             }
+          }
 
-            return Promise.all(promises);
-          });
+          return Promise.all(promises);
+        });
       }
     },
     {
