@@ -16,15 +16,22 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao.sync',
-  name: 'SyncRecord',
+  package: 'foam.version',
+  name: 'VersionedClassFactory',
 
-  documentation: `Used by foam.dao.SyncDAO to track object updates and
-      deletions.`,
+  requires: [ 'foam.version.VersionedClass' ],
 
-  properties: [ 'id' ]
+  methods: [
+    function get(cls) {
+      return this.VersionedClass.create({ of: cls }).versionedCls;
+    }
+  ]
 });
 
-// Define foam.dao.sync.VersionedSyncRecord.
-foam.lookup('foam.version.VersionedClassFactorySingleton').create().get(
-    foam.lookup('foam.dao.sync.SyncRecord'));
+foam.CLASS({
+  package: 'foam.version',
+  name: 'VersionedClassFactorySingleton',
+  extends: 'foam.version.VersionedClassFactory',
+
+  axioms: [ foam.pattern.Singleton.create() ],
+});
