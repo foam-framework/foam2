@@ -16,10 +16,22 @@ public class StringParser implements Parser {
     escape_ = '\\';
   }
 
+  public PStream isNull(PStream ps) {
+    // Is there a neater way to do this?
+    if ( ps.head() == 'n' &&
+          ( ps.tail().valid() && ps.tail().head() == 'u' ) && 
+          ( ps.tail().tail().valid() && ps.tail().tail().head() == 'l' ) && 
+          ( ps.tail().tail().tail().valid() && ps.tail().tail().tail().head() == 'l' ) ) {
+      return ps.tail().tail().tail().tail().setValue("");
+    }
+
+    return null;
+  }
+
   public PStream parse(PStream ps, ParserContext x) {
     delim_ = ps.head();
     if ( delim_ != '"' && delim_ != '\'' ) {
-      return null;
+      return isNull(ps);
     }
 
     ps = ps.tail();
