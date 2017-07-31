@@ -6,7 +6,6 @@
 
 package foam.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -30,16 +29,11 @@ import com.mongodb.MongoCredential;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 
 import org.bson.Document;
 import org.bson.json.JsonWriterSettings;
 import org.bson.json.JsonMode;
-
-import com.mongodb.client.MongoCursor;
-import static com.mongodb.client.model.Filters.*;
-import com.mongodb.client.result.DeleteResult;
-import static com.mongodb.client.model.Updates.*;
-import com.mongodb.client.result.UpdateResult;
 
 
 public class MongoDAO
