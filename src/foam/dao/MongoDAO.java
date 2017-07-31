@@ -54,7 +54,7 @@ public class MongoDAO
       throw new IllegalArgumentException("Illegal arguments");
     }
 
-    host = (host != null) ? host : "localhost";
+    host = ( host != null ) ? host : "localhost";
 
     MongoClient mongoClient;
 
@@ -104,12 +104,12 @@ public class MongoDAO
     MongoCursor<Document> cursor = collection.find().iterator();
 
     try {
-      while (cursor.hasNext()) {
+      while ( cursor.hasNext() ) {
         if ( sub.getDetached() ) break;
 
         FObject obj = createFObject(collectionClass, props, cursor.next());
-        
-        if ( predicate == null || predicate.f(obj) ) {
+
+        if ( ( predicate == null ) || predicate.f(obj) ) {
           decorated.put(obj, sub);
         }
       }
@@ -129,7 +129,7 @@ public class MongoDAO
       List props = clsInstance.getClassInfo().getAxiomsByClass(foam.core.AbstractFObjectPropertyInfo.class);
       
       // Recursively handle nested FObjectProperties
-      for ( int i = 0 ; i < props.size() ; ++i ) {
+      for ( int i = 0 ; i < props.size() ; i++ ) {
         props.addAll(getFObjectProperties(((PropertyInfo) props.get(i)).getPropertyType(), x));
       }
 
