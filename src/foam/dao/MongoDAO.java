@@ -82,10 +82,13 @@ public class MongoDAO
   }
 
   @Override
-  public foam.dao.Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( sink == null ) {
       sink = new ListSink();
     }
+
+    Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
+    Subscription sub       = new Subscription();
 
     String collectionName = (String) x.get("collectionName");
     String collectionClass = (String) x.get("collectionClass");
@@ -102,11 +105,19 @@ public class MongoDAO
 
     try {
       while (cursor.hasNext()) {
-        sink.put(createFObject(collectionClass, props, cursor.next()), null);
+        if ( sub.getDetached() ) break;
+
+        FObject obj = createFObject(collectionClass, props, cursor.next());
+        
+        if ( predicate == null || predicate.f(obj) ) {
+          decorated.put(obj, sub);
+        }
       }
     } finally {
       cursor.close();
     }
+
+    decorated.eof();
 
     return sink;
   }
