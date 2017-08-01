@@ -39,12 +39,13 @@ import org.bson.json.JsonMode;
 public class MongoDAO
         extends AbstractDAO
 {
-  MongoDatabase database;
+  private MongoDatabase database;
+  private String collectionName;
 
   private static final int MONGO_OBJECT_PREFIX_LENGTH = 49;
 
-  public MongoDAO(String host, int port, String dbName, String username, String password) {
-    if ( dbName == null || dbName.isEmpty() ) {
+  public MongoDAO(String host, int port, String dbName, String collectionName, String username, String password) {
+    if ( dbName == null || dbName.isEmpty() || collectionName == null || collectionName.isEmpty() ) {
       throw new IllegalArgumentException("Illegal arguments");
     }
 
@@ -60,14 +61,15 @@ public class MongoDAO
     }
 
     this.database = mongoClient.getDatabase(dbName);
+    this.collectionName = collectionName;
   }
 
-  public MongoDAO(String dbName, String username, String password) {
-    this("localhost", 27017, dbName, username, password);
+  public MongoDAO(String dbName, String collectionName, String username, String password) {
+    this("localhost", 27017, dbName, collectionName, username, password);
   }
 
-  public MongoDAO(String dbName) {
-    this(dbName, null, null);
+  public MongoDAO(String dbName, String collectionName) {
+    this(dbName, collectionName, null, null);
   }
 
   private boolean isUserPassProvided(String username, String password) {
@@ -84,15 +86,12 @@ public class MongoDAO
     Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
     Subscription sub       = new Subscription();
 
-    String collectionName = (String) x.get("collectionName");
-    String collectionClass = (String) x.get("collectionClass");
-    List props = getFObjectProperties(collectionClass, x);
-
-    if ( collectionName == null || collectionName.isEmpty() ) {
-      throw new IllegalArgumentException("Invalid collection name in context. Please provide a string name.");
-    } else if ( collectionClass == null || collectionClass.isEmpty() ) {
-      throw new IllegalArgumentException("Invalid collection class name in context. Please provide a string class name.");
+    if ( getOf() == null ) {
+      throw new IllegalArgumentException("`of` is not set");
     }
+
+    String collectionClass = getOf().getId();
+    List props = getFObjectProperties(collectionClass, x);
 
     MongoCollection<Document> collection = database.getCollection(collectionName);
     MongoCursor<Document> cursor = collection.find().iterator();
