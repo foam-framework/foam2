@@ -21,7 +21,8 @@ foam.CLASS({
 
   requires: [
     'foam.java.Argument',
-    'foam.java.Method'
+    'foam.java.Method',
+    'foam.java.Action'
   ],
 
   properties: [
@@ -50,6 +51,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.java.Method',
       name: 'methods',
+      factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.java.Action',
+      name: 'actions',
       factory: function() { return []; }
     },
     {
@@ -92,12 +99,6 @@ foam.CLASS({
     {
       name: 'extras',
       factory: function() { return []; }
-    },
-    {
-      class: 'FObjectArray',
-      of: 'foam.core.Action',
-      name: 'actions',
-      factory: function() { return []; }
     }
   ],
 
@@ -117,6 +118,12 @@ foam.CLASS({
     function getMethod(name) {
       for ( var i  = 0 ; this.methods && i < this.methods.length ; i++ ) {
         if ( this.methods[i].name === name ) return this.methods[i];
+      }
+    },
+
+    function getAction(name) {
+      for ( var i = 0 ; this.actions && i < this.actions.length ; i++ ) {
+        if ( this.actions[i].name === name ) return this.actions[i];
       }
     },
 
@@ -213,8 +220,8 @@ foam.CLASS({
       }
 
       this.methods.forEach(function(f) { o.out(f, '\n'); });
-      this.actions.forEach(function(a) { o.out(a, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });
+      this.actions.forEach(function(a) { o.out(a, '\n'); });
       this.extras.forEach(function(c) { o.out(c, '\n'); });
       o.decreaseIndent();
       o.indent();
