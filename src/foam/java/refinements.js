@@ -311,7 +311,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      cls.method({
+      cls.constant({
         name:  this.name,
         type:  this.type || undefined,
         value: this.value,
