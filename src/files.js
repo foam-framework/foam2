@@ -200,6 +200,7 @@ FOAM_FILES([
   { name: "foam/dao/EventlessClientDAO" },
   { name: "foam/dao/PollingClientDAO" },
   { name: "foam/dao/StreamingClientDAO" },
+  { name: "foam/dao/RequestResponseClientDAO" },
   { name: "foam/box/InvalidMessageException" },
   { name: "foam/box/EventMessage" },
   { name: "foam/box/EventDispatchBox" },
