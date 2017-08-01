@@ -311,7 +311,7 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      cls.constant({
+      cls.method({
         name:  this.name,
         type:  this.type || undefined,
         value: this.value,
@@ -321,6 +321,34 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Action',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'javaCode'
+    },
+    {
+      class: 'String',
+      name: 'javaReturns'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      if ( ! this.javaCode ) return;
+
+      cls.method({
+        visibility: 'public',
+        name: this.name,
+        type: 'void',
+        static: true,
+        body: this.javaCode
+      })
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Method',
