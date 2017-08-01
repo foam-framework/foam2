@@ -8,11 +8,13 @@ package foam.dao;
 
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import foam.core.FObject;
 import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.core.ClassInfo;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
@@ -31,9 +33,9 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 
-import org.bson.Document;
-import org.bson.json.JsonWriterSettings;
-import org.bson.json.JsonMode;
+import org.bson.BsonDocument;
+import org.bson.BsonDocumentReader;
+import org.bson.BsonType;
 
 
 public class MongoDAO
@@ -41,8 +43,6 @@ public class MongoDAO
 {
   private MongoDatabase database;
   private String collectionName;
-
-  private static final int MONGO_OBJECT_PREFIX_LENGTH = 49;
 
   public MongoDAO(String host, int port, String dbName, String collectionName, String username, String password) {
     if ( dbName == null || dbName.isEmpty() || collectionName == null || collectionName.isEmpty() ) {
@@ -90,17 +90,14 @@ public class MongoDAO
       throw new IllegalArgumentException("`of` is not set");
     }
 
-    String collectionClass = getOf().getId();
-    List props = getFObjectProperties(collectionClass, x);
-
-    MongoCollection<Document> collection = database.getCollection(collectionName);
-    MongoCursor<Document> cursor = collection.find().iterator();
+    MongoCollection<BsonDocument> collection = database.getCollection(collectionName, BsonDocument.class);
+    MongoCursor<BsonDocument> cursor = collection.find().iterator();
 
     try {
       while ( cursor.hasNext() ) {
         if ( sub.getDetached() ) break;
 
-        FObject obj = createFObject(collectionClass, props, cursor.next());
+        FObject obj = createFObject(x, new BsonDocumentReader(cursor.next()), getOf().getObjClass());
 
         if ( ( predicate == null ) || predicate.f(obj) ) {
           decorated.put(obj, sub);
@@ -115,42 +112,101 @@ public class MongoDAO
     return sink;
   }
 
-  private List getFObjectProperties(String clsName, X x) {    
-    try {
-      Class cls = Class.forName(clsName);
-      FObject clsInstance = (FObject) x.create(cls);
-      List props = clsInstance.getClassInfo().getAxiomsByClass(foam.core.AbstractFObjectPropertyInfo.class);
-      
-      // Recursively handle nested FObjectProperties
-      for ( int i = 0 ; i < props.size() ; i++ ) {
-        props.addAll(getFObjectProperties(((PropertyInfo) props.get(i)).getPropertyType(), x));
+  private FObject createFObject(X x, BsonDocumentReader reader, Class cls) {
+    FObject obj = (FObject) x.create(cls);
+
+    reader.readStartDocument();
+
+    while ( reader.readBsonType() != BsonType.END_OF_DOCUMENT ) {
+      String fieldName = reader.readName();
+
+      // Skips the initial MongoDB Document ID field
+      if ( fieldName.equals("_id") ) {
+        reader.readObjectId();
+        continue;
       }
 
-      return props;
-    } catch (Exception ex) {
-      throw new RuntimeException(clsName + " was not found.");
+      Class fieldType = ((PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName)).getPropertyClass();
+
+      obj.setProperty(fieldName, getValue(x, reader, fieldType));
     }
+
+    reader.readEndDocument();
+
+    return obj;
   }
 
-  private FObject createFObject(String clsName, List props, Document d) {
-    JsonWriterSettings writerSettings = new JsonWriterSettings(JsonMode.SHELL, true);
-    String jsonStr = d.toJson(writerSettings);
+  private Object getValue(X x, BsonDocumentReader reader, Class cls) {
+    Object value = null;
 
-    // Trims initial `"_id" : ObjectId("[24 HEX Chars]"),`
-    jsonStr = "{ class: \"" + clsName + "\", " + 
-                 jsonStr.substring(MONGO_OBJECT_PREFIX_LENGTH, jsonStr.length() - 1) + 
-              " }";
+    switch ( reader.getCurrentBsonType() ) {
+      case INT32:
+        value = reader.readInt32();
+        break;
+        
+      case INT64:
+        value = reader.readInt64();
+        break;
 
-    Iterator i = props.iterator();
+      case ARRAY:
+        value = readArray(x, reader, cls);
+        break;
 
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-      jsonStr = jsonStr.replace("\"" + prop.getName() + "\" : {", "\"" + prop.getName() + "\" : { class: \"" + prop.getPropertyType() + "\",");
+      case BOOLEAN:
+        value = reader.readBoolean();
+        break;
+
+      case DATE_TIME:
+        // Converts epoch timestamp to java date
+        value = new java.util.Date((java.lang.Long) reader.readDateTime());
+        break;
+
+      case STRING:
+        String str = reader.readString();
+
+        // Accounts for string "true" / "false"
+        if ( str.equals("true") ) {
+          value = true;
+        } else if ( str.equals("false") ) {
+          value = false;
+        } else {
+          value = str;
+        }
+
+        break;
+
+      case DOUBLE:
+        value = reader.readDouble();
+        break;
+
+      case NULL:
+        value = null;
+        reader.readNull();
+        break;
+
+      case DOCUMENT:
+        value = createFObject(x, reader, cls);
+        break;
+
+      default:
+        System.out.println(reader.getCurrentBsonType() + " parsing is not yet implemented.");
     }
 
-    JSONParser parser = new JSONParser();
-    parser.setX(EmptyX.instance());
-    return parser.parseString(jsonStr);
+    return value;
+  }
+
+  private Object readArray(X x, BsonDocumentReader reader, Class cls) {
+    reader.readStartArray();
+
+    ArrayList<Object> arr = new ArrayList();
+
+    while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+      arr.add(getValue(x, reader, cls));
+    }
+
+    reader.readEndArray();
+
+    return arr;
   }
 
   @Override
