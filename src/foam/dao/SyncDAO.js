@@ -112,6 +112,11 @@ foam.CLASS({
       factory: function() { return Promise.resolve(); }
     },
     {
+      class: 'Int',
+      name: 'latestVersion_'
+      // TODO(markdittmer): Persist this somehow.
+    },
+    {
       name: 'syncRecordWriteSync_',
       factory: function() { return Promise.resolve(); }
     },
@@ -217,14 +222,26 @@ foam.CLASS({
       name: 'putFromRemote_',
       documentation: 'Process a put() to cache from remote.',
       code: function(obj) {
-        return this.delegate.put(obj);
+        var self = this;
+        return self.withSyncRecordTx_(function() {
+          return self.delegate.put(obj).then(function(o) {
+            self.latestVersion_ = Math.max(self.latestVersion_,
+                                           self.versionProperty.f(o));
+          });
+        });
       }
     },
     {
       name: 'removeFromRemote_',
       documentation: 'Process a remove() on cache from remote.',
       code: function(obj) {
-        return this.delegate.remove(obj);
+        var self = this;
+        return self.withSyncRecordTx_(function() {
+          return self.delegate.remove(obj).then(function(o) {
+            self.latestVersion_ = Math.max(self.latestVersion_,
+                                           self.versionProperty.f(obj));
+          });
+        });
       }
     },
     {
@@ -243,6 +260,12 @@ foam.CLASS({
             return self.delegate.where(
                 self.NOT(self.IN(self.of.ID, idsToKeep))).
                 removeAll();
+          }).then(function() {
+            return self.delegate.orderBy(self.DESC(self.versionProperty)).
+                limit(1).select();
+          }).then(function(sink) {
+            return self.latestVersion_ = sink.array[0] ?
+                self.versionProperty.f(sink.array[0]) : 0;
           });
         }).then(self.sync.bind(self));
       }
@@ -253,32 +276,25 @@ foam.CLASS({
           version, then push to remote, then pull update from remote.`,
       code: function() {
         var self = this;
-        return self.delegate.
-            // Like MAX(), but faster on DAOs that can optimize order+limit.
-            orderBy(self.DESC(self.versionProperty)).limit(1).
-            select().then(function(sink) {
-              var minVersionNo = sink.array[0] &&
-                  sink.array[0][self.versionProperty.name] || 0;
-              return self.syncToRemote_().then(function() {
-                return self.remoteDAO.
-                  where(self.GT(self.versionProperty, minVersionNo)).
-                  orderBy(self.versionProperty).
-                  select();
-              }).then(function(sink) {
-                var array = sink.array;
-                var promises = [];
+        return self.syncToRemote_().then(function() {
+          return self.remoteDAO.
+              where(self.GT(self.versionProperty, self.latestVersion_)).
+              orderBy(self.versionProperty).
+              select();
+        }).then(function(sink) {
+          var array = sink.array;
+          var promises = [];
 
-                for ( var i = 0 ; i < array.length ; i++ ) {
-                  if ( array[i][self.deletedProperty.name] ) {
-                    promises.push(self.removeFromRemote_(array[i]));
-                  } else {
-                    promises.push(self.putFromRemote_(array[i]));
-                  }
-                }
+          for ( var i = 0 ; i < array.length ; i++ ) {
+            if ( array[i][self.deletedProperty.name] ) {
+              promises.push(self.removeFromRemote_(array[i]));
+            } else {
+              promises.push(self.putFromRemote_(array[i]));
+            }
+          }
 
-                return Promise.all(promises);
-              });
-            });
+          return Promise.all(promises);
+        });
       }
     },
     {
