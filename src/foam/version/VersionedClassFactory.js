@@ -19,11 +19,15 @@ foam.CLASS({
   package: 'foam.version',
   name: 'VersionedClassFactory',
 
-  requires: [ 'foam.version.VersionedClass' ],
+  requires: [
+    'foam.version.VersionTrait',
+    'foam.version.VersionedClass'
+  ],
 
   methods: [
     function get(cls) {
-      return this.VersionedClass.create({ of: cls }).versionedCls;
+      return this.VersionTrait.isSubClass(cls) ? cls :
+          this.VersionedClass.create({ of: cls }).versionedCls;
     }
   ]
 });
