@@ -93,8 +93,7 @@ public class ServiceServlet
       resp.setStatus(resp.SC_OK);
       resp.flushBuffer();
     } catch (Throwable t) {
-      System.err.println("Error: " + t);
-      t.printStackTrace();
+      throw new IOException(t);
     }
   }
 

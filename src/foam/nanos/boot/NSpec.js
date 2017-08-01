@@ -10,10 +10,14 @@ foam.CLASS({
 
   javaImports: [
     'bsh.EvalError',
-    'bsh.Interpreter'
+    'bsh.Interpreter',
+    'foam.dao.DAO',
+    'foam.core.FObject'
   ],
 
   ids: [ 'name' ],
+
+  tableColumns: [ 'name', 'lazy', 'serve', 'serviceClass' ],
 
   searchColumns: [ ],
 
@@ -60,15 +64,28 @@ foam.CLASS({
     {
       class: 'String',
       name: 'serviceScript'
-    }/*,
+    },
     {
       class: 'FObjectProperty',
-      name: 'service'
-    }*/
+      name: 'service',
+      view: 'foam.u2.DetailView'
+    }
     // TODO: permissions, keywords, lazy, parent
   ],
 
   methods: [
+    {
+      name: 'saveService',
+      args: [ { name: 'service', javaType: 'Object' } ],
+      javaCode: `
+      System.err.println("***** saveService: " + service.getClass() + " " + (service instanceof FObject));
+        if ( service instanceof FObject ) {
+          setService((FObject) service);
+          DAO dao = (DAO) getX().get("nSpecDAO");
+          dao.put(this);
+        }
+      `
+    },
     {
       name: 'createService',
       javaReturns: 'java.lang.Object',
@@ -77,14 +94,14 @@ foam.CLASS({
 
         if ( getServiceClass().length() > 0 ) {
           Object service = Class.forName(getServiceClass()).newInstance();
-          // if ( service instanceof FObject ) setService((FObject) service);
+          saveService(service);
           return service;
         }
 
         Interpreter shell = new Interpreter();
         try {
           Object service = shell.eval(getServiceScript());
-          // if ( service instanceof FObject ) setService((FObject) service);
+          saveService(service);
           return service;
         } catch (EvalError e) {
           e.printStackTrace();
