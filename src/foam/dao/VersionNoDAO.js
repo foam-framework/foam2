@@ -84,7 +84,7 @@ foam.CLASS({
       this.SUPER();
       if ( ! this.VersionTrait.isSubClass(this.of) ) {
         throw new Error(`VersionNoDAO.of must have trait
-                            foam.verison.VersionTrait`);
+                            foam.version.VersionTrait`);
       }
     },
     function put_(x, obj) {
