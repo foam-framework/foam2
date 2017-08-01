@@ -39,7 +39,6 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
-      transient: true,
       visibility: foam.u2.Visibility.RO
     },
     /*

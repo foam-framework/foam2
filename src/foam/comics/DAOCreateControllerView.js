@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.comics.DAOCreateController',
+    'foam.comics.DAOCreateController'
   ],
 
   imports: [

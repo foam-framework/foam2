@@ -93,6 +93,34 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Date',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toLocaleDateString());
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toLocaleString());
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
@@ -234,7 +262,7 @@ foam.CLASS({
     },
     {
       name: 'selection',
-      expression: function(importSelection) { return importSelection },
+      expression: function(importSelection) { return importSelection; },
     },
     'hoverSelection',
     'dropdownOrigin',

@@ -24,10 +24,6 @@ public class ValueIndex implements Index {
   public void onAdd(Sink sink) {
   }
 
-  public Object get(Object state, FObject obj) {
-    return obj;
-  }
-
   public Object put(Object state, FObject value) {
     return value;
   }
