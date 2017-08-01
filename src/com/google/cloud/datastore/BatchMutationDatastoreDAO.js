@@ -122,7 +122,7 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
           type: self.DatastoreMutationType.DELETE,
-          data: o.getDatastoreKey(),
+          data: o.getDatastoreKey(this.partitionId_),
           resolve: function(didRemove) {
             if ( didRemove ) self.pub('on', 'remove', o);
             resolve(o);
