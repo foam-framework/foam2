@@ -5,6 +5,7 @@
  */
 package foam.dao;
 
+import foam.core.AbstractFObject;
 import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
@@ -21,7 +22,7 @@ public class MDAO extends AbstractDAO {
   protected Object state_;
 
   public MDAO(ClassInfo of) {
-    of_ = of;
+    setOf(of);
     state_ = null;
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
   }
@@ -50,11 +51,15 @@ public class MDAO extends AbstractDAO {
     return obj;
   }
 
-  public FObject find_(X x, Object id) {
-    if ( id == null ) {
+  public FObject find_(X x, Object o) {
+    if ( o == null ) {
       return null;
     }
-    return (FObject)index_.get(state_, (FObject)id);
+    return AbstractFObject.maybeClone(
+        getOf().isInstance(o)
+        ? (FObject)index_.planFind(state_,getPrimaryKey().get(o)).find(state_,getPrimaryKey().get(o))
+        : (FObject)index_.planFind(state_,o).find(state_, o)
+    );
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {

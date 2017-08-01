@@ -25,6 +25,7 @@ FOAM_FILES([
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
+  { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
   { name: "foam/nanos/export/ExportDriverRegistry"},
   { name: "foam/nanos/export/JSONDriver"},
@@ -34,5 +35,6 @@ FOAM_FILES([
   { name: "foam/nanos/NanoService" },
   { name: "foam/nanos/auth/WebAuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
-  { name: "foam/nanos/pm/PMInfo" }
+  { name: "foam/nanos/pm/PMInfo" },
+  { name: "foam/nanos/pm/TemperatureCView" }
 ]);

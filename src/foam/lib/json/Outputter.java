@@ -63,7 +63,7 @@ public class Outputter {
     out.append("{");
     java.util.Iterator keys = map.keySet().iterator();
     while ( keys.hasNext() ) {
-      Object key = keys.next();
+      Object key   = keys.next();
       Object value = map.get(key);
       outputString(out, key.toString());
       out.append(":");
@@ -83,21 +83,23 @@ public class Outputter {
 
   public void output(StringBuilder out, Object value) {
     if ( value instanceof OutputJSON ) {
-      ((OutputJSON)value).outputJSON(out, this);
+      ((OutputJSON) value).outputJSON(out, this);
     } else if ( value instanceof String ) {
-      outputString(out, (String)value);
+      outputString(out, (String) value);
     } else if ( value instanceof FObject ) {
-      outputFObject(out, (FObject)value);
+      outputFObject(out, (FObject) value);
     } else if ( value instanceof Number ) {
-      outputNumber(out, (Number)value);
+      outputNumber(out, (Number) value);
     } else if ( isArray(value) ) {
-      outputArray(out, (Object[])value);
+      outputArray(out, (Object[]) value);
     } else if ( value instanceof Boolean ) {
-      outputBoolean(out, (Boolean)value);
+      outputBoolean(out, (Boolean) value);
     } else if ( value instanceof java.util.Date ) {
-      outputDate(out, (java.util.Date)value);
+      outputDate(out, (java.util.Date) value);
     } else if ( value instanceof java.util.Map ) {
-      outputMap(out, (java.util.Map)value);
+      outputMap(out, (java.util.Map) value);
+    } else /*if ( value == null )*/ {
+      out.append("null");
     }
   }
 
@@ -127,7 +129,7 @@ public class Outputter {
     Iterator i = axioms.iterator();
 
     while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo)i.next();
+      PropertyInfo prop = (PropertyInfo) i.next();
       if ( prop.getTransient() ) continue;
 
       Object value = prop.get(o);

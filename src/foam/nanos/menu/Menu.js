@@ -27,7 +27,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function createView(X) { return this.view.clone(); }
+    function createView(X) { return this.view.clone ? this.view.clone() : this.view; }
   ]
 });
 
@@ -42,7 +42,10 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey'
     },
-    'summaryView'
+    { class: 'foam.u2.ViewSpec', name: 'summaryView',
+    // TODO: remove next line when permanently fixed in ViewSpec
+    fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
+    }
   ],
 
   methods: [
@@ -169,6 +172,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
+
+  tableColumns: [ 'id', 'parent', 'label', 'order' ],
 
   properties: [
     {

@@ -97,7 +97,6 @@ describe('box pipeline', function() {
         }));
     return new Promise(function(resolve, reject) {
       setTimeout(function() {
-        debugger;
         expect(defaultOutputBox.outputs).toEqual(outputValues);
         expect(defaultErrorBox.outputs).toEqual([]);
         resolve();
