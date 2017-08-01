@@ -19,7 +19,7 @@ public class StringParser implements Parser {
   public PStream parse(PStream ps, ParserContext x) {
     delim_ = ps.head();
     if ( delim_ != '"' && delim_ != '\'' ) {
-      return (new Literal("null", "")).parse(ps, x);
+      return null;
     }
 
     ps = ps.tail();
