@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.swift.parse.parser',
   name: 'NotChars',
-  extends: 'foam.swift.parse.parser.Parser',
+  implements: ['foam.swift.parse.parser.Parser'],
   properties: [
     {
       swiftType: 'String',
