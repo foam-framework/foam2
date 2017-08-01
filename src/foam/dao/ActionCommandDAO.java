@@ -6,14 +6,14 @@
 
 package foam.dao;
 
-import foam.core.X;
 import foam.core.ClassInfo;
 import foam.core.FObject;
-import java.lang.reflect.Method;
-import java.lang.SecurityException;
-import java.lang.NoSuchMethodException;
+import foam.core.X;
 import java.lang.IllegalAccessException;
+import java.lang.NoSuchMethodException;
+import java.lang.SecurityException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ActionCommandDAO
   extends ProxyDAO
