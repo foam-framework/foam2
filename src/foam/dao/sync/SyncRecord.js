@@ -25,11 +25,6 @@ foam.CLASS({
   properties: [
     'id',
     {
-      class: 'Int',
-      name: 'syncNo',
-      value: -1
-    },
-    {
       class: 'Boolean',
       name: 'deleted',
       value: false
