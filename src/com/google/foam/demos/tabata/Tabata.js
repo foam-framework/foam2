@@ -19,7 +19,8 @@ foam.CLASS({
   name: 'Tabata',
 
   requires: [
-    'foam.util.Timer'
+    'TabataState',
+    'foam.util.Timer',
   ],
 
   properties: [

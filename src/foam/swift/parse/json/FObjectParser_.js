@@ -19,6 +19,14 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'FObjectParser_',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  requires: [
+    'foam.swift.parse.json.KeyParser',
+    'foam.swift.parse.json.StringParser',
+    'foam.swift.parse.json.Whitespace',
+    'foam.swift.parse.parser.Literal',
+    'foam.swift.parse.parser.Optional',
+    'foam.swift.parse.parser.Seq1',
+  ],
   properties: [
     {
       swiftType: 'Any!',
