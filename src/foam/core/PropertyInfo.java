@@ -20,7 +20,7 @@ public interface PropertyInfo
 
   public boolean getTransient();
   public boolean getRequired();
-  public String getPropertyType();
+  public Class getPropertyClass();
   public String getName();
   public Object get(Object obj);
   public void set(Object obj, Object value);
