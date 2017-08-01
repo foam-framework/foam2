@@ -61,7 +61,7 @@ foam.CLASS({
           function(error) {
             message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
               object: self.RPCErrorMessage.create({ data: error })
-            });
+            }));
           });
       } else {
         replyBox && replyBox.send(this.Message.create({
