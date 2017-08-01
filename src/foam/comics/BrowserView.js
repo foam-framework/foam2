@@ -49,7 +49,9 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'summaryView',
-      value: { class: 'foam.u2.view.ScrollTableView' }
+      value: { class: 'foam.u2.view.ScrollTableView' },
+      // TODO: remove next line when permanently fixed in ViewSpec
+      fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     }
   ],
 

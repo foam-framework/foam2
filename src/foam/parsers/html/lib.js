@@ -39,7 +39,7 @@
 
   // By decree of:
   // http://www.theukwebdesigncompany.com/articles/entity-escape-characters.php
-  var escapes = {
+  var unescapeMap = {
     '#100': 'd',
     '#101': 'e',
     '#102': 'f',
@@ -505,19 +505,32 @@
     'yacute': 'ý',
     'yen': '¥',
   };
+  var escapeMap = {};
+  for ( var key in unescapeMap ) {
+    if ( unescapeMap.hasOwnProperty(key) ) escapeMap[unescapeMap[key]] = key;
+  }
 
   // FUTURE: Lazily instantiate RegExp to save memory.
-  var escapeKeys = Object.keys(escapes).map(function(key) {
+  var unescapeKeys = Object.keys(unescapeMap).map(function(key) {
     return `&${key};`;
   });
-  var escapeSequenceRegExp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
+  var escapeSequenceRegExp = RegExp(`(?=(${unescapeKeys.join('|')}))\\1`, 'g');
+  var escapeKeys = Object.keys(escapeMap).map(function(escapeChar) {
+    return `[${escapeChar}]`;
+  });
+  var escapableCharRegExp = RegExp(`(?=(${escapeKeys.join('|')}))\\1`, 'g');
 
   foam.LIB({
     name: 'foam.parsers.html',
 
     methods: [
       function getHtmlEscapeChar(id) {
-        return escapes[id];
+        if ( ! unescapeMap.hasOwnProperty(id) ) return '';
+        return unescapeMap[id];
+      },
+      function getHtmlEscapeSequence(c) {
+        if ( ! escapeMap.hasOwnProperty(c) ) return '';
+        return escapeMap[c];
       },
       function isSelfClosing(nodeName) {
         return selfClosingNodeNames[nodeName];
@@ -528,7 +541,14 @@
         return str.replace(escapeSequenceRegExp, function(m) {
           // m is in the form of &id; We drop first and last character.
           var id = m.slice(1, -1);
-          return escapes[id];
+          return unescapeMap[id];
+        });
+      },
+      function escapeString(str) {
+        if ( ! foam.String.isInstance(str) ) return '';
+
+        return str.replace(escapableCharRegExp, function(id) {
+          return `&${escapeMap[id]};`;
         });
       }
     ]
