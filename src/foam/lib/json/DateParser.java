@@ -13,26 +13,6 @@ public class DateParser
 {
   public DateParser() {
     super(new Alt(new LongParser(),
-                  new Seq1(1,
-                    new Literal("ISODate("),
-                    new Seq(
-                      new Literal("\""),
-                      new IntParser(),
-                      new Literal("-"),
-                      new IntParser(),
-                      new Literal("-"),
-                      new IntParser(),
-                      new Literal("T"),
-                      new IntParser(),
-                      new Literal(":"),
-                      new IntParser(),
-                      new Literal(":"),
-                      new IntParser(),
-                      new Literal("."),
-                      new Repeat(new Chars("0123456789")),
-                      new Literal("Z"),
-                      new Literal("\"")),
-                    new Literal(")")),
                   new Seq(
                     new Literal("\""),
                     new IntParser(),
