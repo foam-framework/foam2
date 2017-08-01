@@ -155,8 +155,8 @@ foam.CLASS({
       proto[this.name] = function() {
         return action.maybeCall(this.__context__, this);
       };
-    },
-]
+    }
+  ]
 });
 
 
