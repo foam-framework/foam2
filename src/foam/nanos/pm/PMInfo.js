@@ -24,6 +24,11 @@ foam.CLASS({
       label: 'Name'
     },
     {
+      class: 'Int',
+      name: 'numoccurrences',
+      label: 'Count'
+    },
+    {
       class: 'Long',
       name: 'mintime',
       label: 'Min'
@@ -44,12 +49,10 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'totaltime',
-      label: 'Total'
-    },
-    {
-      class: 'Int',
-      name: 'numoccurrences',
-      label: 'Count'
+      label: 'Total',
+      tableCellFormatter: function(value) {
+        this.tag({class: 'foam.nanos.pm.TemperatureCView'}).add(' ', value);
+      }
     }
   ]
 });
