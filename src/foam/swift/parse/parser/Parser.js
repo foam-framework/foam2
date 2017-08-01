@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.swift.parse.parser',
   name: 'Parser',
-  requires: [
-    'foam.swift.parse.PStream',
-  ],
   methods: [
     {
       name: 'parse',
+      swiftEnabled: true,
       // TODO returnType: 'FObject', of: 'PStream',
       swiftReturnType: 'PStream?',
       args: [
@@ -37,9 +35,6 @@ foam.CLASS({
           name: 'x',
         },
       ],
-      swiftCode: function() {/*
-fatalError("Implement me")
-      */},
     },
   ]
 });

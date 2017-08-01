@@ -41,6 +41,7 @@ foam.CLASS({
         'foam.swift.core.PropertySlot',
         'foam.swift.core.Slot',
 
+        'foam.swift.parse.PStream',
         'foam.swift.parse.parser.Alt',
         'foam.swift.parse.parser.Not',
         'foam.swift.parse.parser.AnyChar',

@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'StringParser',
-  extends: 'foam.swift.parse.parser.Parser',
+  implements: ['foam.swift.parse.parser.Parser'],
   methods: [
     {
       name: 'parse',
