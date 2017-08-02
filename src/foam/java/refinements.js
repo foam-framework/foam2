@@ -926,7 +926,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((boolean) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       var m = info.getMethod('cast');
       m.body = 'return ((Boolean) o).booleanValue();'
