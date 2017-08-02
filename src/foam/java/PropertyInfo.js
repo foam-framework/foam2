@@ -113,6 +113,12 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             body: 'return ' + Boolean(this.propRequired) + ';'
+          },
+          {
+            name: 'getValueClass',
+            visibility: 'public',
+            type: 'Class',
+            body: `return ${this.propType}.class;`
           }
         ]
       }
