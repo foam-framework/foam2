@@ -25,7 +25,7 @@ public class ActionCommandDAO
       try {
         // Calling method
         Method action = actionObj.getClass().getDeclaredMethod(((ActionCommand)obj).getActionName());
-        action.invoke(null);
+        action.invoke(actionObj);
       } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 
       }
