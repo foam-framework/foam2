@@ -126,7 +126,7 @@ public class MongoDAO
         continue;
       }
 
-      Class fieldType = ((PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName)).getPropertyClass();
+      Class fieldType = ((PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName)).getValueClass();
 
       obj.setProperty(fieldName, getValue(x, reader, fieldType));
     }
