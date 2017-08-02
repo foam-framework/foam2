@@ -158,7 +158,7 @@ public class MongoDAO
 
       case DATE_TIME:
         // Converts epoch timestamp to java date
-        value = new java.util.Date((java.lang.Long) reader.readDateTime());
+        value = new java.util.Date(reader.readDateTime());
         break;
 
       case STRING:
