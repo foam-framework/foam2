@@ -343,7 +343,6 @@ foam.CLASS({
         visibility: 'public',
         name: this.name,
         type: 'void',
-        static: true,
         body: this.javaCode
       })
     }
