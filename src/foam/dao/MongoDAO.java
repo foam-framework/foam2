@@ -204,7 +204,7 @@ public class MongoDAO
         break;
 
       default:
-        System.out.println(reader.getCurrentBsonType() + " parsing is not yet implemented.");
+        logger.error(reader.getCurrentBsonType(), "parsing is not yet implemented.");
     }
 
     return value;
