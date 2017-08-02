@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.dao;
+package foam.nanos.actioncommand;
 
 import foam.core.ClassInfo;
 import foam.core.FObject;
@@ -17,7 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class ActionCommandDAO
-  extends ProxyDAO
+  extends foam.dao.ProxyDAO
 {
   public Object cmd(Object obj) {
     if ( obj instanceof ActionCommand ) {
