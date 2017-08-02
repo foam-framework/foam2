@@ -18,6 +18,8 @@ import foam.core.ClassInfo;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
+import foam.nanos.logger.NanoLogger;
+
 // FObject JSON Parsing
 import foam.core.EmptyX;
 import foam.lib.json.JSONParser;
@@ -85,6 +87,7 @@ public class MongoDAO
 
     Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
     Subscription sub       = new Subscription();
+    NanoLogger   logger    = (NanoLogger) x.get("logger");
 
     if ( getOf() == null ) {
       throw new IllegalArgumentException("`of` is not set");
@@ -97,7 +100,7 @@ public class MongoDAO
       while ( cursor.hasNext() ) {
         if ( sub.getDetached() ) break;
 
-        FObject obj = createFObject(x, new BsonDocumentReader(cursor.next()), getOf().getObjClass());
+        FObject obj = createFObject(x, new BsonDocumentReader(cursor.next()), getOf().getObjClass(), logger);
 
         if ( ( predicate == null ) || predicate.f(obj) ) {
           decorated.put(obj, sub);
@@ -112,8 +115,8 @@ public class MongoDAO
     return sink;
   }
 
-  private FObject createFObject(X x, BsonDocumentReader reader, Class cls) {
-    FObject obj = (FObject) x.create(cls);
+  private FObject createFObject(X x, BsonDocumentReader reader, Class cls, NanoLogger logger) {
+    FObject obj = ( cls == null ) ? null : (FObject) x.create(cls);
 
     reader.readStartDocument();
 
@@ -126,9 +129,17 @@ public class MongoDAO
         continue;
       }
 
-      Class fieldType = ((PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName)).getValueClass();
+      PropertyInfo prop = ( obj == null) ? null : 
+        (PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName);
 
-      obj.setProperty(fieldName, getValue(x, reader, fieldType));
+      if ( prop == null ) {
+        logger.warning("Unknown key in Mongo Document", fieldName);
+        getValue(x, reader, null, logger);
+        continue;
+      }
+
+      Class fieldType = prop.getValueClass();
+      obj.setProperty(fieldName, getValue(x, reader, fieldType, logger));
     }
 
     reader.readEndDocument();
@@ -136,7 +147,7 @@ public class MongoDAO
     return obj;
   }
 
-  private Object getValue(X x, BsonDocumentReader reader, Class cls) {
+  private Object getValue(X x, BsonDocumentReader reader, Class cls, NanoLogger logger) {
     Object value = null;
 
     switch ( reader.getCurrentBsonType() ) {
@@ -149,7 +160,7 @@ public class MongoDAO
         break;
 
       case ARRAY:
-        value = readArray(x, reader, cls);
+        value = readArray(x, reader, cls, logger);
         break;
 
       case BOOLEAN:
@@ -185,23 +196,27 @@ public class MongoDAO
         break;
 
       case DOCUMENT:
-        value = createFObject(x, reader, cls);
+        value = createFObject(x, reader, cls, logger);
+        break;
+
+      case OBJECT_ID:
+        value = reader.readObjectId();
         break;
 
       default:
-        System.out.println(reader.getCurrentBsonType() + " parsing is not yet implemented.");
+        logger.error(reader.getCurrentBsonType(), "parsing is not yet implemented.");
     }
 
     return value;
   }
 
-  private Object readArray(X x, BsonDocumentReader reader, Class cls) {
+  private Object readArray(X x, BsonDocumentReader reader, Class cls, NanoLogger logger) {
     reader.readStartArray();
 
     ArrayList<Object> arr = new ArrayList();
 
     while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-      arr.add(getValue(x, reader, cls));
+      arr.add(getValue(x, reader, cls, logger));
     }
 
     reader.readEndArray();
