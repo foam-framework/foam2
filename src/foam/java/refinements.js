@@ -433,10 +433,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).intValue() :'
-            + '((Integer) o).intValue();';
-
+      m.body = 'return ((Number) o).intValue();';
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -459,10 +456,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).byteValue() :'
-            + '((Byte) o).byteValue();';
-
+      m.body = 'return ((Number) o).byteValue();';
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -485,10 +479,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).shortValue() :'
-            + '((Short) o).shortValue();';
-
+      m.body = 'return ((Number) o).shortValue();';
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -511,10 +502,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).longValue() :'
-            + '((Long) o).longValue();';
-
+      m.body = 'return ((Number) o).longValue();';
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -537,10 +525,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).doubleValue() :'
-            + '((Double) o).doubleValue();';
-
+      m.body = 'return ((Number) o).doubleValue();';
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
