@@ -22,7 +22,12 @@ foam.CLASS({
   implements: ['foam.box.Box'],
 
   requires: [
-    'foam.box.RPCReturnMessage'
+    'foam.box.RPCReturnMessage',
+    'foam.box.RPCErrorMessage'
+  ],
+
+  imports: [
+    'warn'
   ],
 
   properties: [
@@ -48,8 +53,13 @@ foam.CLASS({
       if ( this.RPCReturnMessage.isInstance(msg.object) ) {
         this.resolve_(msg.object.data);
         return;
+      } else if ( this.RPCErrorMessage.isInstance(msg.object) ) {
+        this.reject_(msg.object.data);
+        return;
       }
-      this.reject_(msg.object);
+
+      this.warn('Invalid message to RPCReturnBox.');
+      return;
     }
   ]
 });
