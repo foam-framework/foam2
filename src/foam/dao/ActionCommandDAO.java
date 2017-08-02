@@ -9,6 +9,7 @@ package foam.dao;
 import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.X;
+import foam.nanos.actioncommand.ActionCommand;
 import java.lang.IllegalAccessException;
 import java.lang.NoSuchMethodException;
 import java.lang.SecurityException;
@@ -19,11 +20,11 @@ public class ActionCommandDAO
   extends ProxyDAO
 {
   public Object cmd(Object obj) {
-    if ( obj instanceof foam.core.ActionCommand ) {
-      FObject actionObj = ((foam.core.ActionCommand)obj).getObject();
+    if ( obj instanceof ActionCommand ) {
+      FObject actionObj = ((ActionCommand)obj).getObject();
       try {
         // Calling method
-        Method action = actionObj.getClass().getDeclaredMethod(((foam.core.ActionCommand)obj).getActionName());
+        Method action = actionObj.getClass().getDeclaredMethod(((ActionCommand)obj).getActionName());
         action.invoke(null);
       } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 

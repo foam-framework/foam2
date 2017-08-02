@@ -5,7 +5,6 @@
  */
 
 var classes = [
-  'foam.core.ActionCommand',
   'foam.core.Action',
   'foam.core.Serializable',
   'foam.mlang.predicate.Predicate',
@@ -68,6 +67,7 @@ var classes = [
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
   'foam.mlang.sink.Map',
+  'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
