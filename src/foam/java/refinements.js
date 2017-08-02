@@ -435,10 +435,10 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
             + '((Number)o).intValue() :'
-            + '(int)o;';
+            + '((Integer) o).intValue();';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((int) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -461,10 +461,10 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
             + '((Number)o).byteValue() :'
-            + '(byte)o;';
+            + '((Byte) o).byteValue();';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((byte) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -487,10 +487,10 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
             + '((Number)o).shortValue() :'
-            + '(short)o;';
+            + '((Short) o).shortValue();';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((short) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -513,10 +513,10 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
             + '((Number)o).longValue() :'
-            + '(long)o;';
+            + '((Long) o).longValue();';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((long) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -539,10 +539,10 @@ foam.CLASS({
       var m = info.getMethod('cast');
       m.body = 'return ( o instanceof Number ) ?'
             + '((Number)o).doubleValue() :'
-            + '(double)o;';
+            + '((Double) o).doubleValue();';
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((double) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -926,7 +926,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((boolean) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       var m = info.getMethod('cast');
       m.body = 'return ((Boolean) o).booleanValue();'
