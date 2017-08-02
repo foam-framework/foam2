@@ -14,7 +14,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.HTTPBox',
-    'foam.dao.ClientDAO',
+    'foam.dao.RequestResponseClientDAO as ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
