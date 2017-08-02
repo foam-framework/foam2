@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.core',
+  package: 'foam.nanos.actioncommand',
   name: 'ActionCommand',
 
   documentation: 'Command object containing an object and pending action to be done on it',
