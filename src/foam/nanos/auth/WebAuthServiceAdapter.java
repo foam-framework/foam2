@@ -10,7 +10,7 @@ import foam.core.X;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import foam.core.ContextAwareSupport;
-
+import foam.dao.*;
 /**
  * Created by marcroopchand on 2017-06-27.
  */
@@ -90,45 +90,36 @@ public class WebAuthServiceAdapter
     }
   }
   public void transferValueById(String userId, Integer amount, String message){
-    if ( userId == null || userId == "" ) return;
     try {
-        X x = transactionService.transferValueById(userId, amount, message);
-        loginMap.put(userId, x);
+      transactionService.transferValueById(userId, amount, message);  
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
   }
   public void transferValueByEmail(String email, Integer amount, String message){
-    if ( email == null || email == "" ) return;
     try {
-        X x = transactionService.transferValueById(email, amount, message);
-        loginMap.put(email, x);
+      transactionService.transferValueByEmail(email, amount, message);
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
   }
   public void requestValueById(String userId, Integer amount, String message){
-    if ( userId == null || userId == "" ) return;
     try {
-        X x = transactionService.transferValueById(userId, amount, message);
-        loginMap.put(userId, x);
+      transactionService.requestValueById(userId, amount, message);
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
   }
   public void requestValueByEmail(String email, Integer amount, String message){
-    if ( email == null || email == "" ) return;
     try {
-        X x = transactionService.transferValueById(email, amount, message);
-        loginMap.put(email, x);
+      transactionService.requestValueByEmail(email, amount, message);
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
   }
   public DAO getTransactions(){
     try {
-        X x = transactionService.getTransactions();
-        return x;
+      return transactionService.getTransactions();
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
