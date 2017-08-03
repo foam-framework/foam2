@@ -29,14 +29,20 @@ foam.CLASS({
   properties: [
     'id',
     {
-      class: 'Int',
+      class: 'Long',
       name: 'passed',
-      visibility: foam.u2.Visibility.RO
+      visibility: foam.u2.Visibility.RO,
+      tableCellFormatter: function(value) {
+        if ( value ) this.start().style({color: '#0f0'}).add(value).end();
+      }
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'failed',
-      visibility: foam.u2.Visibility.RO
+      visibility: foam.u2.Visibility.RO,
+      tableCellFormatter: function(value) {
+        if ( value ) this.start().style({color: '#f00'}).add(value).end();
+      }
     }
   ],
 

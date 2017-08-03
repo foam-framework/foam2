@@ -28,14 +28,15 @@ var ProxyDAO;
 var QuickSink;
 var StoreAndForwardDAO;
 var SyncDAO;
-var SyncRecord;
 var VersionNoDAO;
+var VersionTrait;
+var VersionedSyncRecord;
 
 foam.CLASS({
   package: 'foam.dao.test',
   name: 'Item',
 
-  properties: [ 'id', [ 'version', -1 ], [ 'deleted', false ], 'data' ]
+  properties: [ 'id', 'data' ]
 });
 
 foam.CLASS({
@@ -98,8 +99,11 @@ ProxyDAO = foam.lookup('foam.dao.ProxyDAO');
 QuickSink = foam.lookup('foam.dao.QuickSink');
 StoreAndForwardDAO = foam.lookup('foam.dao.StoreAndForwardDAO');
 SyncDAO = foam.lookup('foam.dao.SyncDAO');
-SyncRecord = foam.lookup('foam.dao.sync.SyncRecord');
 VersionNoDAO = foam.lookup('foam.dao.VersionNoDAO');
+VersionTrait = foam.lookup('foam.version.VersionTrait');
+VersionedSyncRecord = foam.lookup('foam.dao.sync.VersionedSyncRecord');
+var versionedClassFactory =
+    foam.lookup('foam.version.VersionedClassFactorySingleton').create();
 
 function getData(name) {
   return name + ':' + Math.ceil(Math.random() * 1000);
@@ -143,13 +147,13 @@ var waitToSettle = 10000;
  */
 
 // Underlying DAO on remote.
-var remoteDelegate = BaseDAO.create({ of: Item });
+var VersionedItem = versionedClassFactory.get(Item);
+var remoteDelegate = BaseDAO.create({ of: VersionedItem });
 initialData.forEach(function(data) { remoteDelegate.put(data); });
 // DAO that agents hit when talking to remote.
 var remoteDAO = StoreAndForwardDAO.create({
   delegate: VersionNoDAO.create({
-    versionProperty: Item.VERSION,
-    deletedProperty: Item.DELETED,
+    of: VersionedItem,
     delegate: remoteDelegate
   })
 });
@@ -161,10 +165,8 @@ for ( var i = 0; i < numActiveAgents; i++ ) {
   activeAgents[i] = SyncDAO.create({
     of: Item,
     remoteDAO: remoteDAO,
-    delegate: BaseDAO.create({ of: Item }),
-    versionProperty: Item.VERSION,
-    deletedProperty: Item.DELETED,
-    syncRecordDAO: BaseDAO.create({ of: SyncRecord }),
+    delegate: BaseDAO.create({ of: VersionedItem }),
+    syncRecordDAO: BaseDAO.create({ of: VersionedSyncRecord }),
     polling: Math.floor(Math.random() * 2) === 0,
     pollingFrequency: pollingFrequency
   });
@@ -214,8 +216,12 @@ setTimeout(function() {
   console.log('DONE! (There should be no non-polling BaseDAO logs below)');
 
   // Exclude deleted records from reference.
-  var p = remoteDAO.where(E.EQ(Item.DELETED, false)).select().
-      then(function(sink) { reference = sink.array; });
+  var p = remoteDAO.where(E.EQ(VersionTrait.DELETED_, false)).select().
+      then(function(sink) {
+        reference = sink.array.map(function(versionedItem) {
+          return Item.create(versionedItem);
+        });
+      });
 
   for ( var i = 0; i < activeAgents.length; i++ ) {
     // Wait for previous round (or "reference" accumulation) before reporting on

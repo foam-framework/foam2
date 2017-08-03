@@ -25,22 +25,48 @@ foam.CLASS({
       version of each object, or if the object was deleted. The most recent
       version is retained.
 
-      Make sure to set the versionProperty to use to track each object's
-      version, and deletedProperty to use to track deleted objects. The version
-      property will be automatically be incremented as changes are put() into
-      the SyncDAO. The SyncDAO will expect to find objects in remoteDAO that
-      have been marked as deleted; this is interpreted as a signal to delete
-      records (during initial sync or polling).
+      Objects put to this DAO are convered to a versioned sub-class of "of". The
+      "version_" property will be automatically be incremented as changes are
+      put() into the SyncDAO. The SyncDAO will expect to find objects in
+      remoteDAO that have been marked as deleted; this is interpreted as a
+      signal to delete records (during initial sync or polling). Details on
+      versioned class generation, and the "version_" and "deleted_" properties
+      are in the foam.version package.
 
       Remote DAOs that interact with SyncDAO clients should be decorated with
       foam.dao.VersionNoDAO, or similar, to provision new version numbers for
-      records being written to the server.`,
+      records being stored.`,
 
-  requires: [ 'foam.dao.sync.SyncRecord' ],
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.dao.sync.VersionedSyncRecord',
+    'foam.version.VersionTrait',
+    'foam.version.VersionedClassFactorySingleton'
+  ],
 
   implements: [ 'foam.mlang.Expressions' ],
 
   imports: [ 'setInterval' ],
+
+  classes: [
+    {
+      name: 'AdapterSink',
+      extends: 'foam.dao.ProxySink',
+
+      properties: [
+        {
+          class: 'Class',
+          name: 'of'
+        }
+      ],
+
+      methods: [
+        function put(o, sub) {
+          this.delegate.put(this.of.create(o, this.__subContext__), sub);
+        }
+      ]
+    }
+  ],
 
   properties: [
     {
@@ -57,28 +83,11 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'syncRecordDAO',
-      documentation: `The DAO in which to store SyncRecords for each object.
-          Each client tracks their own sync state in a separate syncRecordDAO.`,
+      documentation: `The DAO in which to store VersionedSyncRecords for each
+          object. Each client tracks their own sync state in a separate
+          syncRecordDAO.`,
       transient: true,
       required: true
-    },
-    {
-      name: 'versionProperty',
-      of: 'Property',
-      documentation: `The property to use to store the object version. This
-          value on each object will be incremented each time it is put() into
-          the SyncDAO.`,
-      required: true,
-      hidden: true,
-      transient: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'Property',
-      name: 'deletedProperty',
-      required: true,
-      hidden: true,
-      transient: true
     },
     {
       name: 'of',
@@ -96,9 +105,6 @@ foam.CLASS({
       }
     },
     {
-      /**
-
-      */
       class: 'Int',
       name: 'pollingFrequency',
       documentation: `If using polling, pollingFrequency will determine the
@@ -110,6 +116,21 @@ foam.CLASS({
       documentation: `A promise that resolves after any in-flight
           synchronization pass completes.`,
       factory: function() { return Promise.resolve(); }
+    },
+    // FUTURE: SyncDAO should not be responsible for adapting between
+    // versioned/unversioned classes; should decorate with some kind of
+    // TypeAdapterDAO and assert that SyncDAO is "of" a versioned class.
+    {
+      name: 'versionedOf_',
+      expression: function(of) {
+        return this.versionedClassFactory_.get(of);
+      }
+    },
+    {
+      name: 'versionedClassFactory_',
+      factory: function() {
+        return this.VersionedClassFactorySingleton.create();
+      }
     },
     {
       name: 'syncRecordWriteSync_',
@@ -140,9 +161,9 @@ foam.CLASS({
           then(function(sink) {
             var array = sink.array;
             for ( var i = 0; i < array.length; i++ ) {
-              self.syncRecordDAO.put(self.SyncRecord.create({
+              self.syncRecordDAO.put(self.VersionedSyncRecord.create({
                 id: array[i].id,
-                syncNo: -1
+                version_: -1
               }));
             }
           }).
@@ -168,34 +189,55 @@ foam.CLASS({
     // DAO overrides.
     //
 
-    function put_(x, obj) {
+    function put_(x, inputObj) {
+      var obj = this.versionedOf_.create(inputObj, x);
       var self = this;
       var ret;
       return self.withSyncRecordTx_(function() {
         return self.delegate.put_(x, obj).then(function(o) {
           ret = o;
           // Updates the object's last seen info.
-          return self.syncRecordDAO.put_(x, self.SyncRecord.create({
+          return self.syncRecordDAO.put_(x, self.VersionedSyncRecord.create({
             id: o.id,
-            syncNo: -1
+            version_: -1
           }));
         });
       }).then(self.onLocalUpdate).then(function() { return ret; });
     },
-    function remove_(x, obj) {
+    function remove_(x, inputObj) {
+      var obj = this.versionedOf_.create(inputObj, x);
       var self = this;
       var ret;
       return self.withSyncRecordTx_(function() {
         return self.delegate.remove_(x, obj).then(function(o) {
           ret = o;
           // Marks the object as deleted.
-          self.syncRecordDAO.put_(x, self.SyncRecord.create({
+          self.syncRecordDAO.put_(x, self.VersionedSyncRecord.create({
             id: obj.id,
-            deleted: true,
-            syncNo: -1
+            deleted_: true,
+            version_: -1
           }));
         });
       }).then(self.onLocalUpdate).then(function() { return ret; });
+    },
+    function find_(x, objOrId) {
+      if ( this.of.isInstance(objOrId) )
+        objOrId = this.versionedOf_.create(objOrId, x);
+      return this.delegate.find_(x, objOrId).then(function(o) {
+        if ( o === null ) return o;
+
+        return this.of.create(o, x);
+      }.bind(this));
+    },
+    function select_(x, sink, skip, limit, order, predicate) {
+      sink = sink || this.ArraySink.create();
+      var adapterSink = this.AdapterSink.create({
+        of: this.of,
+        delegate: sink
+      }, x);
+      return this.delegate.
+          select_(x, adapterSink, skip, limit, order, predicate).
+          then(function() { return sink; });
     },
     function removeAll_(x, skip, limit, order, predicate) {
       // Marks all the removed objects' sync records as deleted via remove_().
@@ -220,16 +262,14 @@ foam.CLASS({
       name: 'putFromRemote_',
       documentation: 'Process a put() to cache from remote.',
       code: function(obj) {
-        // console.log('putFromRemote_', foam.json.stringify(obj));
         var self = this;
         var ret;
         return self.withSyncRecordTx_(function() {
           return self.delegate.put(obj).then(function(o) {
             ret = o;
-            // console.log('putFromRemote_: store syncRecord for', foam.json.stringify(o));
-            return self.syncRecordDAO.put(self.SyncRecord.create({
+            return self.syncRecordDAO.put(self.VersionedSyncRecord.create({
               id: o.id,
-              syncNo: o[self.versionProperty.name]
+              version_: self.VersionTrait.VERSION_.f(o)
             }));
           });
         }).then(function() { return ret; });
@@ -239,17 +279,15 @@ foam.CLASS({
       name: 'removeFromRemote_',
       documentation: 'Process a remove() on cache from remote.',
       code: function(obj) {
-        // console.log('removeFromRemote_', foam.json.stringify(obj));
         var self = this;
         var ret;
         return self.withSyncRecordTx_(function() {
           return self.delegate.remove(obj).then(function(o) {
             ret = o;
-            // console.log('removeFromRemote_: store syncRecord for', foam.json.stringify(obj));
-            return self.syncRecordDAO.put(self.SyncRecord.create({
+            return self.syncRecordDAO.put(self.VersionedSyncRecord.create({
               id: obj.id,
-              syncNo: obj[self.versionProperty.name],
-              deleted: true
+              version_: self.VersionTrait.VERSION_.f(obj),
+              deleted_: true
             }));
           });
         }).then(function() { return ret; });
@@ -259,21 +297,19 @@ foam.CLASS({
       name: 'resetFromRemote_',
       documentation: 'Process a reset signal on cache from remote.',
       code: function(obj) {
-        // console.log('resetFromRemote_', foam.json.stringify(obj));
         // Clear sync records and data not associated with unsynced data, then
         // sync.
         var self = this;
         var ret;
         return self.withSyncRecordTx_(function() {
-          return self.syncRecordDAO(self.GT(self.SyncRecord.SYNC_NO, -1))
-              .removeAll().
+          return self.syncRecordDAO.
+              where(self.GT(self.VersionedSyncRecord.VERSION_, -1)).
+              removeAll().
               then(self.syncRecordDAO.select.bind(self.syncRecordDAO)).
               then(function(sink) {
                 var idsToKeep = sink.array.map(function(syncRecord) {
                   return syncRecord.id;
                 });
-                // console.log('resetFromRemote_: Keeping', idsToKeep,
-                //             'not yet pushed');
                 return self.delegate.where(
                     self.NOT(self.IN(self.of.ID, idsToKeep))).
                     removeAll();
@@ -287,23 +323,23 @@ foam.CLASS({
           version, then push to remote, then pull update from remote.`,
       code: function() {
         var self = this;
-        var SYNC_NO = self.SyncRecord.SYNC_NO;
+        var VERSION_ = self.VersionedSyncRecord.VERSION_;
         return self.syncRecordDAO.
             // Like MAX(), but faster on DAOs that can optimize order+limit.
-            orderBy(self.DESC(SYNC_NO)).limit(1).
+            orderBy(self.DESC(VERSION_)).limit(1).
             select().then(function(sink) {
-              var minVersionNo = sink.array[0] && SYNC_NO.f(sink.array[0]) || 0;
+              var minVersionNo = sink.array[0] && VERSION_.f(sink.array[0]) || 0;
               return self.syncToRemote_().then(function() {
                 return self.remoteDAO.
-                  where(self.GT(self.versionProperty, minVersionNo)).
-                  orderBy(self.versionProperty).
+                  where(self.GT(self.VersionTrait.VERSION_, minVersionNo)).
+                  orderBy(self.VersionTrait.VERSION_).
                   select();
               }).then(function(sink) {
                 var array = sink.array;
                 var promises = [];
 
                 for ( var i = 0 ; i < array.length ; i++ ) {
-                  if ( array[i][self.deletedProperty.name] ) {
+                  if ( self.VersionTrait.DELETED_.f(array[i]) ) {
                     promises.push(self.removeFromRemote_(array[i]));
                   } else {
                     promises.push(self.putFromRemote_(array[i]));
@@ -322,9 +358,9 @@ foam.CLASS({
       code: function() {
         var self = this;
 
-        return this.syncRecordDAO
-          .where(self.EQ(this.SyncRecord.SYNC_NO, -1))
-          .select().then(function(records) {
+        return this.syncRecordDAO.
+          where(self.EQ(this.VersionedSyncRecord.VERSION_, -1)).
+          select().then(function(records) {
             records = records.array;
             var promises = [];
 
@@ -334,7 +370,7 @@ foam.CLASS({
               var deleted = record.deleted;
 
               if ( deleted ) {
-                var obj = self.of.create(undefined, self);
+                var obj = self.versionedOf_.create(undefined, self);
                 obj.id = id;
                 var promise = self.remoteDAO.remove(obj);
 
@@ -342,9 +378,9 @@ foam.CLASS({
                 // onRemoteUpdate listener is fired.
                 if ( self.polling ) {
                   promises.push(promise.then(function() {
-                    var propName = self.versionProperty.name;
+                    var propName = self.VersionTrait.VERSION_.name;
                     // Ensure that obj SyncRecord does not remain queued (i.e.,
-                    // does not have syncNo = -1).
+                    // does not have version_ = -1).
                     obj[propName] = Math.max(obj[propName], 0);
                     return self.removeFromRemote_(obj);
                   }));
@@ -390,8 +426,8 @@ foam.CLASS({
       documentation: 'Respond to push event from remote.',
       code: function(s, on, event, obj) {
         if ( event == 'put' ) {
-          if ( obj[this.deletedProperty.name] ) this.removeFromRemote_(obj);
-          else                                  this.putFromRemote_(obj);
+          if ( this.VersionTrait.DELETED_.f(obj) ) this.removeFromRemote_(obj);
+          else                                     this.putFromRemote_(obj);
         } else if ( event === 'remove' ) {
           throw new Error(`SyncDAO recieved remove() event;
                               expected put(deleted)-as-remove()`);

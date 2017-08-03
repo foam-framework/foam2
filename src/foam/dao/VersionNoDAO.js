@@ -27,6 +27,9 @@ foam.CLASS({
       This allows foam.dao.SyncDAO clients that are polling a VersionNoDAO to
       recieve deletes from other clients.
 
+      This DAO expects to be "of" a class that has the trait
+      foam.version.VersionTrait.
+
       Note that marking records as deleted violates certain expectaions DAO
       expectations. For example, removing an object and then finding it will not
       yield null, it will yield a record marked as deleted.
@@ -35,29 +38,20 @@ foam.CLASS({
       synchronized its delegate. To get a DAO of this class that can accept
       writes immediately, decorate it with a StoreAndForwardDAO.`,
 
-  requires: [ 'foam.dao.InternalException' ],
+  requires: [
+    'foam.dao.InternalException',
+    'foam.version.VersionTrait'
+  ],
 
   properties: [
+    {
+      name: 'of',
+      required: true
+    },
     {
       name: 'delegate',
       required: true,
       final: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'Property',
-      name: 'versionProperty',
-      required: true,
-      hidden: true,
-      transient: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'Property',
-      name: 'deletedProperty',
-      required: true,
-      hidden: true,
-      transient: true
     },
     {
       class: 'Int',
@@ -66,7 +60,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'ready_',
+      name: 'ready_'
     }
   ],
 
@@ -78,20 +72,27 @@ foam.CLASS({
       // Get largest version number in delegate's records.
       this.delegate
           // Like MAX(), but faster on DAOs that can optimize order+limit.
-          .orderBy(this.DESC(this.versionProperty)).limit(1)
+          .orderBy(this.DESC(this.VersionTrait.VERSION_)).limit(1)
           .select().then(function(sink) {
-            var propName = this.versionProperty.name;
+            var propName = this.VersionTrait.VERSION_.name;
             if ( sink.array[0] && sink.array[0][propName] )
               this.version = sink.array[0][propName] + 1;
             this.ready_ = true;
           }.bind(this));
+    },
+    function validate() {
+      this.SUPER();
+      if ( ! this.VersionTrait.isSubClass(this.of) ) {
+        throw new Error(`VersionNoDAO.of must have trait
+                            foam.version.VersionTrait`);
+      }
     },
     function put_(x, obj) {
       if ( ! this.ready_ )
         return Promise.reject(this.InternalException.create());
 
       // Increment version number and put to delegate.
-      obj[this.versionProperty.name] = this.version;
+      obj[this.VersionTrait.VERSION_.name] = this.version;
       this.version++;
       return this.delegate.put_(x, obj);
     },
@@ -102,8 +103,8 @@ foam.CLASS({
       // Increment version number and put empty object (except for "id"
       // and "deleted = true") to delegate.
       var deleted = this.of.create({ id: obj.id }, x);
-      deleted[this.deletedProperty.name] = true;
-      deleted[this.versionProperty.name] = this.version;
+      deleted[this.VersionTrait.DELETED_.name] = true;
+      deleted[this.VersionTrait.VERSION_.name] = this.version;
       this.version++;
       return this.delegate.put_(x, deleted);
     },
