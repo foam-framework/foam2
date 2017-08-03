@@ -117,6 +117,9 @@ foam.CLASS({
           synchronization pass completes.`,
       factory: function() { return Promise.resolve(); }
     },
+    // FUTURE: SyncDAO should not be responsible for adapting between
+    // versioned/unversioned classes; should decorate with some kind of
+    // TypeAdapterDAO and assert that SyncDAO is "of" a versioned class.
     {
       name: 'versionedOf_',
       expression: function(of) {
