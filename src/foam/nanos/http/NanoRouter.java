@@ -35,11 +35,14 @@ public class NanoRouter
     Object      service    = getX().get(serviceKey);
     DAO         nSpecDAO   = (DAO) getX().get("nSpecDAO");
     NSpec       spec       = (NSpec) nSpecDAO.find(serviceKey);
+    HttpServlet serv       = getServlet(spec, service);
+    PM          pm         = new PM(this.getClass(), serviceKey);
 
-    HttpServlet serv = getServlet(spec, service);
-    PM pm = new PM(this.getClass(), serviceKey);
     try {
       serv.service(req, resp);
+    } catch (Throwable t) {
+      System.err.println("Error serving " + serviceKey + " " + path);
+      t.printStackTrace();
     } finally {
       pm.log(x_);
     }
