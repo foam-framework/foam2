@@ -108,8 +108,9 @@ foam.CLASS({
       name: 'listeners',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          foam.assert(o.name, 'Listener must be named');
-          return foam.core.Listener.create({name: o.name, code: o});
+          var name = foam.getMethodName(o);
+          foam.assert(name, 'Listener must be named');
+          return foam.core.Listener.create({name: name, code: o});
         }
 
         return foam.core.Listener.isInstance(o) ?
