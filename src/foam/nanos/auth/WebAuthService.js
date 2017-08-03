@@ -98,6 +98,92 @@ foam.INTERFACE({
           javaType: 'String'
         }
       ]
-    }
+    },
+    {
+      name: 'transferValueById',
+      javaReturns: 'void',
+      javaThrows: [ 'java.lang.RuntimeException' ],
+      returns: 'Promise',
+      args: [
+        {
+          name: 'userId',
+          javaType: 'String'
+        },
+        {
+          name: 'amount',
+          javaType: 'Integer'
+        },
+        {
+          name: 'message',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'transferValueByEmail',
+      javaReturns: 'void',
+      javaThrows: [ 'java.lang.RuntimeException' ],
+      returns: 'Promise',
+      args: [
+        {
+          name: 'email',
+          javaType: 'String'
+        },
+        {
+          name: 'amount',
+          javaType: 'Integer'
+        },
+        {
+          name: 'message',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'requestValueById',
+      javaReturns: 'void',
+      javaThrows: [ 'java.lang.RuntimeException' ],
+      returns: 'Promise',
+      args: [
+        {
+          name: 'userId',
+          javaType: 'String'
+        },
+        {
+          name: 'amount',
+          javaType: 'Integer'
+        },
+        {
+          name: 'message',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'requestValueByEmail',
+      javaReturns: 'void',
+      javaThrows: [ 'java.lang.RuntimeException' ],
+      returns: 'Promise',
+      args: [
+        {
+          name: 'email',
+          javaType: 'String'
+        },
+        {
+          name: 'amount',
+          javaType: 'Integer'
+        },
+        {
+          name: 'message',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'getTransactions',
+      javaReturns: 'foam.dao.DAO',
+      javaThrows: [ 'java.lang.RuntimeException' ],
+      returns: 'Promise',
+    },
   ]
 });
