@@ -96,9 +96,11 @@ foam.CLASS({
     {
       class: 'Int',
       documentation: `Maximum number of in-flight batches
-          (i.e., transactions).`,
+          (i.e., transactions). Default to 1 in case clients expect strict
+          ordering of operations. Increasing to ~25 seems to work well for bulk
+          updates where order-of-operations doesn't matter.`,
       name: 'numBatches',
-      value: 25
+      value: 1
     },
     {
       class: 'FObjectArray',
