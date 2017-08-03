@@ -334,7 +334,8 @@ foam.LIB({
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
           if ( foam.Function.isInstance(a) ) {
-            m.methods[i] = a = { name: a.name, code: a };
+            var name = foam.getMethodName(a);
+            m.methods[i] = a = { name: name, code: a };
           }
           if ( foam.core.Method ) {
             foam.assert(a.cls_ !== foam.core.Method,

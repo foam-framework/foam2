@@ -70,6 +70,19 @@ foam.assert = function assert(cond) {
 };
 
 
+foam.getMethodName = (function named() {}).name === 'named' ?
+    function(method) { return method.name;} :
+    function(method) {
+      if (typeof method !== 'function') return method.name;
+
+      // IE11 does not support named functions. Extract name from f.toString().
+      var match = method.toString()
+          .match(/^function\s+([A-Za-z_$][0-9A-Za-z_$]*)\s*\(/);
+      foam.assert(match, 'Unable to deduce method name from function');
+      return match[1];
+    };
+
+
 /**
  * Creates a small library in the foam package. A LIB is a collection of
  * constants and static methods.
@@ -124,11 +137,10 @@ foam.LIB = function LIB(model) {
          typeof m !== 'object' || typeof m.code === 'function',
         'Methods must have a code key which is a function');
 
-      foam.assert(
-        typeof m.name === 'string' && m.name !== '',
-        'Methods must be named with a non-empty string');
+      var name = foam.getMethodName(m);
+      foam.assert(name, 'Methods must be named with a non-empty string');
 
-      root[m.name] = m.code || m;
+      root[name] = m.code || m;
     }
   }
 };
