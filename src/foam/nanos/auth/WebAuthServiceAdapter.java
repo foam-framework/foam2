@@ -26,10 +26,13 @@ public class WebAuthServiceAdapter
    * */
   protected Map<String, X> loginMap = new LRULinkedHashMap<>(10000);
   protected AuthService service;
-
+  protected TransactionService transactionService;
+  
   public void start() {
     service = (AuthService) getX().get("auth");
     service.start();
+    transactionService = (TransactionService) getX.get("transaction");
+    transactionService.start();
   }
 
   public String generateChallenge(String userId) {
@@ -84,6 +87,50 @@ public class WebAuthServiceAdapter
     if ( loginMap.containsKey(userId) ) {
       service.logout(loginMap.get(userId));
       loginMap.remove(userId);
+    }
+  }
+  public void transferValueById(String userId, Integer amount, String message){
+    if ( userId == null || userId == "" ) return;
+    try {
+        X x = transactionService.transferValueById(userId, amount, message);
+        loginMap.put(userId, x);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+    }
+  }
+  public void transferValueByEmail(String email, Integer amount, String message){
+    if ( email == null || email == "" ) return;
+    try {
+        X x = transactionService.transferValueById(email, amount, message);
+        loginMap.put(email, x);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+    }
+  }
+  public void requestValueById(String userId, Integer amount, String message){
+    if ( userId == null || userId == "" ) return;
+    try {
+        X x = transactionService.transferValueById(userId, amount, message);
+        loginMap.put(userId, x);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+    }
+  }
+  public void requestValueByEmail(String email, Integer amount, String message){
+    if ( email == null || email == "" ) return;
+    try {
+        X x = transactionService.transferValueById(email, amount, message);
+        loginMap.put(email, x);
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+    }
+  }
+  public DAO getTransactions(){
+    try {
+        X x = transactionService.getTransactions();
+        return x;
+    } catch (RuntimeException e) {
+      e.printStackTrace();
     }
   }
 }
