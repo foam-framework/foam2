@@ -90,6 +90,13 @@ foam.CLASS({
             body: 'return compareValues(get_(o1), get_(o2));'
           },
           {
+            name: 'comparePropertyToObject',
+            type: 'int',
+            visibility: 'public',
+            args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
+            body: 'return compareValues(key, f(o));'
+          },
+          {
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
@@ -106,6 +113,12 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             body: 'return ' + Boolean(this.propRequired) + ';'
+          },
+          {
+            name: 'getValueClass',
+            visibility: 'public',
+            type: 'Class',
+            body: `return ${this.propType}.class;`
           }
         ]
       }

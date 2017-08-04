@@ -16,7 +16,6 @@ public interface Index {
   public void onAdd(Sink sink);
 
   public Object put(Object state, FObject value);
-  public Object get(Object state, FObject obj);
   public Object remove(Object state, FObject value);
   public Object removeAll();
   public FindPlan planFind(Object state, Object key);

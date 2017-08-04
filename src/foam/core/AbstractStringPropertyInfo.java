@@ -12,6 +12,6 @@ public abstract class AbstractStringPropertyInfo
   public int compareValues(String o1, String o2) {
     return o1.compareTo(o2);
   }
-
+  
   public abstract int getWidth();
 }

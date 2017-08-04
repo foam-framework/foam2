@@ -42,7 +42,7 @@ describe('DatastoreDAO', function() {
             of: foam.core.FObject,
             protocol: env.CDS_EMULATOR_PROTOCOL,
             host: env.CDS_EMULATOR_HOST,
-            port: env.CDS_EMULATOR_PORT,
+            port: env.CDS_EMULATOR_PORT
           }, foam.__context__.createSubContext({
             gcloudProjectId: env.CDS_PROJECT_ID
           }));
@@ -56,9 +56,24 @@ describe('DatastoreDAO', function() {
               of: foam.core.FObject,
               protocol: env.CDS_EMULATOR_PROTOCOL,
               host: env.CDS_EMULATOR_HOST,
-              port: env.CDS_EMULATOR_PORT,
+              port: env.CDS_EMULATOR_PORT
             }).projectId;
       }).toThrow();
+    });
+    it('should support "datastoreNamespaceId" from context', function() {
+      var customNamespace = 'custom';
+      var dao = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
+          .create({
+            of: foam.core.FObject,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID
+          }, foam.__context__.createSubContext({
+            datastoreNamespaceId: customNamespace
+          }));
+      expect(dao.datastoreNamespaceId).toBe(customNamespace);
+      expect(dao.namespaceId).toBe(customNamespace);
     });
   });
 
@@ -286,13 +301,16 @@ describe('DatastoreDAO', function() {
       E = foam.lookup('foam.mlang.ExpressionsSingleton').create();
     });
     it('should perform key-only queries over multiple batches', function(done) {
-      var expectedCount = 1000;
+      var expectedCount = 600;
       daoFactory(Sheep).then(function(dao) {
-        var promises = [];
+        var promise = Promise.resolve();
         for ( var i = 0; i < expectedCount; i++ ) {
-          promises.push(dao.put(Sheep.create()));
+          // Slow, but avoids opening too many connections at once.
+          promise = promise.then(function() {
+            return dao.put(Sheep.create());
+          });
         }
-        return Promise.all(promises).then(function() {
+        return promise.then(function() {
           return dao.select(E.COUNT());
         }).then(function() {
           expect(dao.handledMultipleBatches).toBe(true);
@@ -331,72 +349,68 @@ describe('DatastoreDAO', function() {
     });
   });
 
-  function unreliableDAOFactory(cls) {
-    return clearCDS().then(function() {
-      return foam.lookup('com.google.cloud.datastore.DatastoreDAO')
-          .create({
-            of: cls,
-            protocol: env.UNRELIABLE_CDS_EMULATOR_PROTOCOL,
-            host: env.UNRELIABLE_CDS_EMULATOR_HOST,
-            port: env.UNRELIABLE_CDS_EMULATOR_PORT,
-            projectId: env.CDS_PROJECT_ID
-          });
-    });
-  }
-  describe('unreliable server', function() {
-    beforeEach(function() {
+  describe('partitions', function() {
+    it('should treat partitions as mutually exclusive', function(done) {
       foam.CLASS({
-        package: 'test.dao.unreliable',
-        name: 'Place',
-
-        properties: [
-          {
-            class: 'String',
-            name: 'id'
-          },
-          {
-            class: 'Float',
-            name: 'long'
-          },
-          {
-            class: 'Float',
-            name: 'lat'
-          },
-        ]
+        package: 'test.dao.partitions',
+        name: 'Thing',
+        properties: [ 'id', 'name' ]
       });
-    });
-
-    var mkCentre = function() {
-      return test.dao.unreliable.Place.create({
-        id: 'centre:0:0',
-        name: 'Centre',
-        long: 0.0,
-        lat: 0.0
-      });
-    };
-
-    describe('put()', function() {
-      it('should reject promise', function() {
-        unreliableDAOFactory(test.dao.unreliable.Place).then(function(dao) {
-          dao.put(mkCentre()).then(function() {
-            fail('put() should fail on unreliable DAO');
-          }).catch(function() {
-            expect(1).toBe(1);
+      var Thing = foam.lookup('test.dao.partitions.Thing');
+      var dao1 = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
+          .create({
+            of: Thing,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID,
+            namespaceId: 'ns1'
           });
-        });
-      });
-    });
-
-    describe('find()', function() {
-      it('should reject promise',  function() {
-        unreliableDAOFactory(test.dao.unreliable.Place).then(function(dao) {
-          dao.find('centre:0:0').then(function() {
-            fail('find() should fail on unreliable DAO');
-          }).catch(function() {
-            expect(1).toBe(1);
+      var dao2 = foam.lookup('com.google.cloud.datastore.DatastoreDAO')
+          .create({
+            of: Thing,
+            protocol: env.CDS_EMULATOR_PROTOCOL,
+            host: env.CDS_EMULATOR_HOST,
+            port: env.CDS_EMULATOR_PORT,
+            projectId: env.CDS_PROJECT_ID,
+            namespaceId: 'ns2'
           });
-        });
-      });
+
+      Promise.all([
+        dao1.put(Thing.create({ id: 1, name: 'dao1thing1' })),
+        dao2.put(Thing.create({ id: 2, name: 'dao2thing2' }))
+      ]).then(function() {
+        return Promise.all([
+          dao1.find(1),
+          dao1.find(2),
+          dao2.find(1),
+          dao2.find(2)
+        ]);
+      }).then(function(results) {
+        expect(results[0]).not.toBeNull();
+        expect(results[1]).toBeNull();
+        expect(results[2]).toBeNull();
+        expect(results[3]).not.toBeNull();
+
+        return Promise.all([
+          dao1.put(Thing.create({ id: 2, name: 'dao1thing2' })),
+          dao2.put(Thing.create({ id: 1, name: 'dao2thing1' }))
+        ]);
+      }).then(function() {
+        return Promise.all([
+          dao1.find(1),
+          dao1.find(2),
+          dao2.find(1),
+          dao2.find(2)
+        ]);
+      }).then(function(results) {
+        expect(results[0].name).toBe('dao1thing1');
+        expect(results[1].name).toBe('dao1thing2');
+        expect(results[2].name).toBe('dao2thing1');
+        expect(results[3].name).toBe('dao2thing2');
+
+        done();
+      }).catch(done.fail);
     });
   });
 });

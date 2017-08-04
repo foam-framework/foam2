@@ -545,9 +545,13 @@ foam.CLASS({
         };
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var slot = this.slot(argNames[i]);
-          var s = slot.sub(l);
-          s && subs.push(s);
-          args[i] = slot.get();
+          // This check was introduced to handle optional imports not having a
+          // slot when the import isn't found in the context.
+          if (slot) {
+            var s = slot.sub(l);
+            s && subs.push(s);
+            args[i] = slot.get();
+          }
         }
         var ret = e.apply(this, args);
         if ( ret === undefined ) this.warn('Expression returned undefined');

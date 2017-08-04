@@ -23,6 +23,8 @@ foam.CLASS({
   properties: [
     'units',
     [ 'value', 0 ],
+    'min',
+    'max',
     [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
@@ -499,6 +501,21 @@ foam.CLASS({
           newValue.id :
           newValue ;
       }
+    }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var key  = this.targetDAOKey;
+      var name = this.name;
+
+      Object.defineProperty(proto, name + '$find', {
+        get: function classGetter() {
+          return this.__context__[key].find(this[name]);
+        },
+        configurable: true
+      });
     }
   ]
 });
