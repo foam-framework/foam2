@@ -334,7 +334,7 @@ foam.LIB({
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
           if ( foam.Function.isInstance(a) ) {
-            var name = foam.getMethodName(a);
+            var name = foam.Function.getName(a);
             m.methods[i] = a = { name: name, code: a };
           }
           if ( foam.core.Method ) {
