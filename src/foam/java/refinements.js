@@ -434,6 +434,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ((Number) o).intValue();';
+      
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -457,6 +458,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ((Number) o).byteValue();';
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -480,6 +482,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ((Number) o).shortValue();';
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -503,6 +506,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ((Number) o).longValue();';
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -526,6 +530,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ((Number) o).doubleValue();';
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
