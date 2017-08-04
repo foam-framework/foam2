@@ -9,13 +9,7 @@ package foam.nanos.http;
 import foam.box.*;
 import foam.core.*;
 import foam.core.FObject;
-import foam.dao.*;
 import foam.lib.json.JSONParser;
-import foam.lib.json.Outputter;
-import foam.lib.parse.*;
-import foam.lib.parse.StringPS;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.AuthServiceSkeleton;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -87,10 +81,7 @@ public class ServiceServlet
       }
 
       foam.box.Message msg = (foam.box.Message) result;
-
       skeleton_.send(msg);
-
-      System.err.println("Response: " + msg.getObject().toString());
 
       if ( ! ( msg.getAttributes().get("replyBox") instanceof foam.box.HTTPReplyBox ) ) {
         // resp.complete(); //flushBuffer();
@@ -99,8 +90,7 @@ public class ServiceServlet
       resp.setStatus(resp.SC_OK);
       resp.flushBuffer();
     } catch (Throwable t) {
-      System.err.println("Error: " + t);
-      t.printStackTrace();
+      throw new IOException(t);
     }
   }
 
