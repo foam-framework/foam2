@@ -434,7 +434,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
       m.body = 'return ((Number) o).intValue();';
-      
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
