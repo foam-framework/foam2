@@ -30,7 +30,7 @@ public class NanoHttpHandler
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {
-    ServletHandler sh = new ServletHandler((HttpServlet)getX().get("httprouter"));
+    ServletHandler sh = new ServletHandler((HttpServlet) getX().get("httprouter"));
     sh.handle(exchange);
   }
 }
