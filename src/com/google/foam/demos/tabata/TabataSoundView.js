@@ -47,7 +47,7 @@ foam.CLASS({
       factory: function() {
         return this.Beep.create({duration: 700, frequency: 500, type: 'square'});
       },
-      swiftFactory: 'return Beep_create(["note": 67, "duration": Float(0.7)])',
+      swiftFactory: 'return Beep_create(["note": 75, "duration": Float(0.7)])',
     }
   ],
 
@@ -56,11 +56,11 @@ foam.CLASS({
       name: 'init',
       code: function() {
         this.SUPER();
-        this.data.remaining$.sub(this.onTick);
+        this.onDetach(this.data.remaining$.sub(this.onTick));
       },
       swiftCode: function() {/*
 super.__foamInit__()
-_ = data.remaining$.swiftSub(onTick_listener)
+onDetach(data.remaining$.swiftSub(onTick_listener))
       */},
     },
   ],
@@ -76,7 +76,6 @@ _ = data.remaining$.swiftSub(onTick_listener)
         }
       },
       swiftCode: function() {/*
-        NSLog("%@", args)
         if data.remaining == 0 {
           longBeep.play()
         } else if data.remaining < 4 {
