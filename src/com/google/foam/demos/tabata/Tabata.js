@@ -69,6 +69,8 @@ foam.CLASS({
       name: 'remaining',
       units: 'seconds',
       value: 0,
+      preSet: function(_, n) { return Math.max(0, n) },
+      swiftPreSet: 'return max(0, newValue)',
       postSet: function(_, s) {
         if ( s == 0 ) {
           this.state.next(this);
