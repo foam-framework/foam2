@@ -295,7 +295,10 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
 
   public func callAction(key: String) { }
 
-  public override required init() {}
+  public override required init() {
+    super.init()
+    __foamInit__()
+  }
 
   public required init(_ args: [String:Any?]) {
     super.init()
