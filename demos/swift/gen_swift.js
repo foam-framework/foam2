@@ -32,6 +32,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
 
       'Tabata',
       'TestExtended',
+      'TabataSoundView',
       'foam.swift.dao.ArrayDAO',
       'foam.swift.dao.ArraySink',
       'foam.swift.parse.StringPStream',

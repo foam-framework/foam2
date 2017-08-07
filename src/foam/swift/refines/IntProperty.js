@@ -66,3 +66,24 @@ return 0
     },
   ],
 });
+
+foam.CLASS({
+  refines: 'foam.core.Float',
+  properties: [
+    {
+      name: 'swiftType',
+      value: 'Float',
+    },
+    {
+      name: 'swiftAdapt',
+      factory: function() {
+        return function() {/*
+var newValue = newValue
+if let str = newValue as? String { newValue = Float(str) }
+if let i = newValue as? Float { return i }
+return 0
+        */}
+      },
+    },
+  ],
+});

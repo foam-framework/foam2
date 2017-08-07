@@ -1,12 +1,20 @@
 import UIKit
 
 class ViewController: UIViewController {
+  lazy var data: Tabata = {
+    return Context.GLOBAL.create(type: Tabata.self) as! Tabata
+  }()
+  lazy var sound: TabataSoundView = {
+    return Context.GLOBAL.create(type: TabataSoundView.self, args: ["data": self.data]) as! TabataSoundView
+  }()
   lazy var detailView: DetailView = {
     let v = DetailView()
-    v.data = Context.GLOBAL.create(type: Tabata.self) as! Tabata
+    v.data = self.data
     return v
   }()
   override func viewDidLoad() {
+    _ = self.sound
+
     super.viewDidLoad()
     detailView.initAllViews()
     let views: [String:UIView] = ["v": detailView.view]

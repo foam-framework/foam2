@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1025B3351F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1025B3341F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift */; };
+		1025B3371F36AA8900D16F7E /* TabataSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1025B3361F36AA8900D16F7E /* TabataSoundView.swift */; };
 		1059840E1E5E859A0063941D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840D1E5E859A0063941D /* AppDelegate.swift */; };
 		105984101E5E859A0063941D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840F1E5E859A0063941D /* ViewController.swift */; };
 		105984131E5E859A0063941D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 105984111E5E859A0063941D /* Main.storyboard */; };
@@ -102,6 +104,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1025B3341F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_MidiNote.swift; sourceTree = "<group>"; };
+		1025B3361F36AA8900D16F7E /* TabataSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabataSoundView.swift; sourceTree = "<group>"; };
 		1059840A1E5E859A0063941D /* SwiftTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1059840D1E5E859A0063941D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1059840F1E5E859A0063941D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -275,8 +279,10 @@
 				10DA9F471E8468D800D9F779 /* foam_dao_Sink.swift */,
 				10DA9F481E8468D800D9F779 /* foam_dao_SkipSink.swift */,
 				10DA9F491E8468D800D9F779 /* foam_mlang_order_Comparator.swift */,
+				1025B3341F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift */,
 				10DEA2521E85C55D008C8F2F /* foam_swift_core_ExpressionSlot.swift */,
 				10DA9F4A1E8468D800D9F779 /* foam_mlang_predicate_Predicate.swift */,
+				1025B3361F36AA8900D16F7E /* TabataSoundView.swift */,
 				10DA9F4B1E8468D800D9F779 /* foam_swift_core_ConstantSlot.swift */,
 				10DA9F4C1E8468D800D9F779 /* foam_swift_core_PropertySlot.swift */,
 				10DA9F4D1E8468D800D9F779 /* foam_swift_core_Slot.swift */,
@@ -490,6 +496,7 @@
 				10DA9F811E8468D800D9F779 /* foam_dao_OrderedSink.swift in Sources */,
 				10DA9FBA1E8468D800D9F779 /* somepackage_RequiredClass.swift in Sources */,
 				10DA9F861E8468D800D9F779 /* foam_dao_SkipSink.swift in Sources */,
+				1025B3371F36AA8900D16F7E /* TabataSoundView.swift in Sources */,
 				10DA9FB31E8468D800D9F779 /* foam_swift_parse_parser_Substring.swift in Sources */,
 				10DA9FAF1E8468D800D9F779 /* foam_swift_parse_parser_Seq.swift in Sources */,
 				10DA9F9E1E8468D800D9F779 /* foam_swift_parse_json_output_Outputter.swift in Sources */,
@@ -515,6 +522,7 @@
 				10DA9F8E1E8468D800D9F779 /* foam_swift_dao_ArraySink.swift in Sources */,
 				10DA9FB61E8468D800D9F779 /* foam_swift_ui_DetailView.swift in Sources */,
 				10DA9F891E8468D800D9F779 /* foam_swift_core_ConstantSlot.swift in Sources */,
+				1025B3351F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift in Sources */,
 				10DA9FC11E84D36200D9F779 /* Tabata.swift in Sources */,
 				10DA9F9C1E8468D800D9F779 /* foam_swift_parse_json_MapParser.swift in Sources */,
 				10DA9FA31E8468D800D9F779 /* foam_swift_parse_parser_AnyChar.swift in Sources */,

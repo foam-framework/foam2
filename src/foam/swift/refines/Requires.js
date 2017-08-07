@@ -23,9 +23,15 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'swiftReturnType',
+      name: 'swiftPath',
       expression: function(path) {
-        return this.lookup(this.path).model_.swiftName;
+        return path;
+      },
+    },
+    {
+      name: 'swiftReturnType',
+      expression: function(swiftPath) {
+        return this.lookup(swiftPath).model_.swiftName;
       },
     },
   ],
@@ -56,4 +62,16 @@ return __subContext__.create(
       */},
     },
   ],
+});
+
+foam.CLASS({
+  package: 'foam.classloader',
+  name: 'RequiresARequireExtension',
+  refines: 'foam.core.Requires',
+
+  methods: [
+    function arequire(opt_deps) {
+      return this.__context__.arequire(this.swiftPath, opt_deps);
+    }
+  ]
 });
