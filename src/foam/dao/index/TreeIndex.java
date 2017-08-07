@@ -53,13 +53,6 @@ public class TreeIndex implements Index {
     return null;
   }
 
-  public Object get(Object state, FObject obj) {
-    if ( state != null ) {
-      return ((TreeNode) state).get(((TreeNode) state), obj, prop_);
-    }
-    return null;
-  }
-
   public Object put(Object state, FObject value) {
     if ( state == null ) {
       state = TreeNode.getNullNode();
@@ -78,7 +71,7 @@ public class TreeIndex implements Index {
 
   //TODO
   public FindPlan planFind(Object state, Object key) {
-    return (FindPlan) ValuePlan.instance();
+    return new TreeLookupFindPlan(prop_, (state != null ? ((TreeNode) state).size : 0) );
   }
 
   //TODO
