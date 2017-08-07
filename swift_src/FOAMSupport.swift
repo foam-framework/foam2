@@ -178,6 +178,7 @@ public protocol FObject: class {
   func clearProperty(_ key: String)
   func callAction(key: String)
   func compareTo(_ data: FObject?) -> Int
+  func onDetach(_ sub: Subscription)
   init(_ args: [String:Any?])
 }
 
@@ -222,6 +223,12 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   public func getSlot(key: String) -> Slot? { return nil }
   public func hasOwnProperty(_ key: String) -> Bool { return false }
   public func clearProperty(_ key: String) {}
+
+  public func onDetach(_ sub: Subscription) {
+    _ = self.sub(topics: ["detach"]) { (_, _) in
+      sub.detach()
+    }
+  }
 
   public func sub(
     topics: [String] = [],
@@ -338,6 +345,7 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   }
 
   deinit {
+    _ = pub(["detach"])
     detachListeners(listeners: listeners)
   }
 }
