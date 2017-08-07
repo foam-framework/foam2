@@ -375,4 +375,27 @@ class SwiftTestsTests: XCTestCase {
     }
   }
 
+  func testHasOwnProperty() {
+    let o = Test()
+    o.firstName = "Mike"
+    o.lastName = "C"
+    XCTAssertEqual(o.exprProp, "Mike C")
+    XCTAssertFalse(o.hasOwnProperty("exprProp"))
+  }
+
+  func testSwiftSubFire() {
+    let o = Tabata()
+
+    var calls = 0
+    let sub = o.remaining$.swiftSub { (_, _) in
+      calls += 1
+    }
+
+    XCTAssertEqual(calls, 0)
+    o.seconds += 1
+    XCTAssertEqual(calls, 1)
+
+    sub.detach()
+  }
+
 }
