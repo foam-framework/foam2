@@ -105,11 +105,14 @@ foam.LIB({
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
   case "<%=p.swiftName%>":
-    let oldValue: Any? = <%=p.swiftInitedName%> ? `<%=p.swiftName%>` : nil
-    <%= p.swiftInitedName %> = false
-    <%= p.swiftValueName %> = nil
-    if !FOAM_utils.equals(oldValue, <%=p.swiftName%>) {
-      _ = pub(["propertyChange", "<%=p.swiftName%>"])
+    if hasOwnProperty("<%=p.swiftName%>") {
+      <%= p.swiftInitedName %> = false
+      <%= p.swiftValueName %> = nil
+
+      // Only pub if there are listeners.
+      if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
+        _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
+      }
     }
     break
 <% } %>
@@ -221,8 +224,8 @@ switch key {
     <%=p.swiftValueName%> = <%=p.swiftPreSetFuncName%>(oldValue, <%=p.swiftAdaptFuncName%>(oldValue, value))
     <%=p.swiftInitedName%> = true
     <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%>)
-    if !FOAM_utils.equals(oldValue, <%=p.swiftName%>) {
-      _ = pub(["propertyChange", "<%=p.swiftName%>"])
+    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) && !FOAM_utils.equals(oldValue, <%=p.swiftValueName%>) {
+      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
     }
     return
 <% } %>
