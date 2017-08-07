@@ -254,6 +254,22 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     return node.sub!
   }
 
+  func hasListeners(_ args: [Any]) -> Bool {
+    var listeners: ListenerList? = self.listeners
+    var i = 0
+    while listeners != nil {
+      if listeners?.next != nil { return true }
+      if i == args.count { return false }
+      if let p = args[i] as? String {
+        listeners = listeners?.children[p]
+        i += 1
+      } else {
+        break
+      }
+    }
+    return false
+  }
+
   private func notify(listeners: ListenerList?, args: [Any]) -> Int {
     var count = 0
     var l = listeners
