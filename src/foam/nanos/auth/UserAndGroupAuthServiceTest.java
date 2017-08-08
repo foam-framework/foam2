@@ -4,6 +4,7 @@ import foam.core.X;
 import foam.dao.ListSink;
 import javax.security.auth.AuthPermission;
 import javax.security.auth.login.LoginException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +16,7 @@ public class UserAndGroupAuthServiceTest
   extends CachedUserAndGroupAuthService
 {
   private int numUsers        = 10;
-  private int numGroups       = 5;
+  private int numGroups       = 1;
   private int numPermissions  = 10;
 
   private ArrayList<X> xArray               = new ArrayList<>();
@@ -23,6 +24,7 @@ public class UserAndGroupAuthServiceTest
 
   @Override
   public void start() {
+    System.out.println("Starting");
     super.start();
     createGroupsAndPermissions();
     addTestUsers();
@@ -78,7 +80,13 @@ public class UserAndGroupAuthServiceTest
       user.setEmail("marc" + i + "@nanopay.net");
       user.setFirstName("Marc" + i);
       user.setLastName("R" + i);
-      user.setPassword("marc" + i);
+      try {
+        String salt = UserAndGroupAuthService.generateRandomSalt();
+        user.setPasswordSalt(salt);
+        user.setPassword(UserAndGroupAuthService.hashPassword("marc" + i, salt));
+      } catch (NoSuchAlgorithmException e) {
+        System.out.println("Couldn't hash password with " + UserAndGroupAuthService.HASH_METHOD + "\nTest Failed");
+      }
 
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
       Group group = (Group) sink.getData().get(randomGroup);
