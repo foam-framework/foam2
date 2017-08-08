@@ -26,8 +26,9 @@ foam.CLASS({
   ],
 
   imports: [
+    'generator? as ctxGenerator',
     'me',
-    'fonParser'
+    'parser'
   ],
 
   properties: [
@@ -36,6 +37,16 @@ foam.CLASS({
     },
     {
       name: 'method'
+    },
+    {
+      class: 'Function',
+      name: 'generator',
+      factory: function() {
+        var generator = this.JSONOutputter.create();
+        if ( this.ctxGenerator ) generator.copyFrom(this.ctxGenerator);
+        else                     generator.copyFrom(foam.json.Network);
+        return generator;
+      }
     }
   ],
 
@@ -64,18 +75,16 @@ foam.CLASS({
     {
       name: 'send',
       code: function(msg) {
-        var outputter = this.JSONOutputter.create().copyFrom(foam.json.Network);
-
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: outputter.stringify(msg)
+          payload: this.generator.stringify(msg)
         }).send();
 
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var msg = this.fonParser.parseString(p);
+          var msg = this.parser.parseString(p);
           msg && this.me.send(msg);
         }.bind(this));
       }

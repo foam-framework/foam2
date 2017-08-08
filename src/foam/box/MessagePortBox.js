@@ -27,11 +27,19 @@ foam.CLASS({
     'foam.box.Message'
   ],
 
-  imports: [ 'messagePortService', 'me' ],
+  imports: [
+    'generator? as ctxGenerator',
+    'me',
+    'messagePortService'
+  ],
 
   properties: [
     {
       name: 'target'
+    },
+    {
+      name: 'generator',
+      factory: function() { return this.ctxGenerator || foam.json.Network; }
     },
     {
       name: 'delegate',
@@ -41,11 +49,11 @@ foam.CLASS({
 
 	this.target.postMessage(channel.port2, [ channel.port2 ]);
 
-        channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
+        channel.port1.postMessage(this.generator.stringify(this.Message.create({
           object: this.RegisterSelfMessage.create({ name: this.me.name })
         })));
 
-	      return this.RawMessagePortBox.create({ port: channel.port1 });
+	return this.RawMessagePortBox.create({ port: channel.port1 });
       }
     }
   ]

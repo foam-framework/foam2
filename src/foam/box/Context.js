@@ -34,7 +34,8 @@ foam.CLASS({
     'registry',
     'root',
     'me',
-    'fonParser'
+    'parser',
+    'generator'
   ],
 
   properties: [
@@ -121,7 +122,7 @@ foam.CLASS({
       name: 'classWhitelist'
     },
     {
-      name: 'fonParser',
+      name: 'parser',
       hidden: true,
       factory: function() {
         // TODO: Better way to inject the class whitelist.
@@ -135,6 +136,13 @@ foam.CLASS({
         }
 
         return this.FON.create({ creationContext: context.__subContext__ });
+      }
+    },
+    {
+      name: 'generator',
+      hidden: true,
+      factory: function() {
+        return foam.json.Network;
       }
     }
   ]

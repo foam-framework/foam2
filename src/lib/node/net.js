@@ -243,8 +243,9 @@ foam.CLASS({
   name: 'Socket',
 
   imports: [
-    'socketService',
-    'me'
+    'generator? as ctxGenerator',
+    'me',
+    'socketService'
   ],
 
   requires: [
@@ -293,12 +294,17 @@ foam.CLASS({
       class: 'Int',
       name: 'nextSize',
       value: 0
+    },
+    {
+      class: 'Function',
+      name: 'generator',
+      factory: function() { return this.ctxGenerator || foam.json.Network; }
     }
   ],
 
   methods: [
     function write(msg) {
-      var serialized = foam.json.Network.stringify(msg);
+      var serialized = this.generator.stringify(msg);
       var size = Buffer.byteLength(serialized);
       var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
@@ -400,7 +406,7 @@ foam.CLASS({
   imports: [
     'info',
     'error',
-    'fonParser'
+    'parser'
   ],
 
   properties: [
@@ -456,7 +462,7 @@ foam.CLASS({
 
     function addSocket(socket) {
       var s1 = socket.message.sub(function(s, _, mStr) {
-        var m = this.fonParser.parseString(mStr);
+        var m = this.parser.parseString(mStr);
 
         if ( ! this.Message.isInstance(m) ) {
           console.warn('Got non-message:', m, mStr);
@@ -501,6 +507,7 @@ foam.CLASS({
   requires: [
     'foam.net.node.Frame'
   ],
+  imports: [ 'generator as ctxGenerator' ],
 
   topics: [
     'message',
@@ -524,13 +531,18 @@ foam.CLASS({
     },
     'opcode',
     'parts',
-    'currentFrame'
+    'currentFrame',
+    {
+      class: 'Function',
+      name: 'generator',
+      factory: function() { return this.ctxGenerator || foam.json.Network; }
+    }
   ],
 
   methods: [
     function send(data) {
       if ( foam.box.Message.isInstance(data) ) {
-        data = foam.json.Network.stringify(data);
+        data = this.generator.stringify(data);
       }
 
       if ( typeof data == "string" ) {

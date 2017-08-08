@@ -19,14 +19,21 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
+
+  imports: [ 'generator? as ctxGenerator' ],
+
   properties: [
     {
       name: 'port'
+    },
+    {
+      name: 'generator',
+      factory: function() { return this.ctxGenerator || foam.json.Network; }
     }
   ],
   methods: [
     function send(m) {
-      this.port.postMessage(foam.json.Network.stringify(m));
+      this.port.postMessage(this.generator.stringify((m)));
     }
   ]
 });

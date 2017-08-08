@@ -459,6 +459,53 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.json',
+  name: 'JSONParserGenerator',
+  extends: 'foam.json.Outputter',
+
+  documentation: `An outputter for "proper" JSON (with quoted keys, etc.). Not
+      to be confused with foam.json's standard outputters, which operate over
+      FON.`,
+
+  properties: [
+    {
+      documentation: `Map of {<class id>: true} for allowed classes`,
+      name: 'allowClassMap',
+      value: null
+    },
+    {
+      name: 'creationContext',
+      expression: function(allowClassMap) {
+        var baseCtx = this.__subContext__;
+        if ( ! allowClassMap ) return baseCtx;
+
+        return baseCtx.createSubContext({
+          lookup: function(id, opt_allowFail) {
+            if ( this.hasOwnProperty(id) )
+              return baseCtx.lookup(id, opt_allowFail);
+            if ( opt_allowFail ) return null;
+            throw new Error(
+              `JSONParserGenerator: Attempt to instantiate disallowed class: ${id}`);
+          }.bind(allowClassMap)
+        });
+      }
+    }
+  ],
+
+  methods: [
+    function parseString(str, opt_ctx) {
+      // foam.json.parse() defined in LIB() below.
+      return foam.json.parse(JSON.parse(str), null,
+                             opt_ctx || this.creationContext);
+    },
+    function stringify(o) {
+      return JSON.stringify(this.objectify(o));
+    }
+  ]
+});
+
+
 /** Library of pre-configured JSON Outputters. **/
 foam.LIB({
   name: 'foam.json',
@@ -515,6 +562,30 @@ foam.LIB({
 
     // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputter.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      strict: false,
+      propertyPredicate: function(o, p) { return ! p.storageTransient; }
+    }),
+
+    // JSON (not FON): Short, but exclude network-transient properties.
+    NetworkJSON: foam.json.JSONParserGenerator.create({
+      pretty: false,
+      formatDatesAsNumbers: true,
+      outputDefaultValues: false,
+      // TODO: No deserialization support for shortnames yet.
+      //      useShortNames: true,
+      useShortNames: false,
+      strict: false,
+      propertyPredicate: function(o, p) { return ! p.networkTransient; }
+    }),
+
+    // JSON (not FON): Short, but exclude storage-transient properties.
+    Storage: foam.json.JSONParserGenerator.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
