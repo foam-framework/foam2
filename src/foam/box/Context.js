@@ -35,7 +35,7 @@ foam.CLASS({
     'root',
     'me',
     'parser',
-    'generator'
+    'stringifier'
   ],
 
   properties: [
@@ -122,6 +122,8 @@ foam.CLASS({
       name: 'classWhitelist'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
       name: 'parser',
       hidden: true,
       factory: function() {
@@ -139,11 +141,11 @@ foam.CLASS({
       }
     },
     {
-      name: 'generator',
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
       hidden: true,
-      factory: function() {
-        return foam.json.Network;
-      }
+      factory: function() { return foam.json.Network; }
     }
   ]
 });

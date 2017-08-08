@@ -20,20 +20,22 @@ foam.CLASS({
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
 
-  imports: [ 'generator? as ctxGenerator' ],
+  imports: [ 'stringifier? as ctxStringifier' ],
 
   properties: [
     {
       name: 'port'
     },
     {
-      name: 'generator',
-      factory: function() { return this.ctxGenerator || foam.json.Network; }
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      factory: function() { return this.ctxStringifier || foam.json.Network; }
     }
   ],
   methods: [
     function send(m) {
-      this.port.postMessage(this.generator.stringify((m)));
+      this.port.postMessage(this.stringifier.stringify((m)));
     }
   ]
 });

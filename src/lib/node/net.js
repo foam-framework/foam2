@@ -243,7 +243,7 @@ foam.CLASS({
   name: 'Socket',
 
   imports: [
-    'generator? as ctxGenerator',
+    'stringifier? as ctxStringifier',
     'me',
     'socketService'
   ],
@@ -296,15 +296,16 @@ foam.CLASS({
       value: 0
     },
     {
-      class: 'Function',
-      name: 'generator',
-      factory: function() { return this.ctxGenerator || foam.json.Network; }
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      factory: function() { return this.ctxStringifier || foam.json.Network; }
     }
   ],
 
   methods: [
     function write(msg) {
-      var serialized = this.generator.stringify(msg);
+      var serialized = this.stringifier.stringify(msg);
       var size = Buffer.byteLength(serialized);
       var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
@@ -507,7 +508,7 @@ foam.CLASS({
   requires: [
     'foam.net.node.Frame'
   ],
-  imports: [ 'generator as ctxGenerator' ],
+  imports: [ 'stringifier as ctxStringifier' ],
 
   topics: [
     'message',
@@ -533,16 +534,15 @@ foam.CLASS({
     'parts',
     'currentFrame',
     {
-      class: 'Function',
-      name: 'generator',
-      factory: function() { return this.ctxGenerator || foam.json.Network; }
+      name: 'stringifier',
+      factory: function() { return this.ctxStringifier || foam.json.Network; }
     }
   ],
 
   methods: [
     function send(data) {
       if ( foam.box.Message.isInstance(data) ) {
-        data = this.generator.stringify(data);
+        data = this.stringifier.stringify(data);
       }
 
       if ( typeof data == "string" ) {

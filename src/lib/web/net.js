@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.web',
   name: 'WebSocket',
 
-  imports: [ 'generator? as ctxGenerator' ],
+  imports: [ 'stringifier? as ctxStringifier' ],
 
   topics: [
     'message',
@@ -36,9 +36,10 @@ foam.CLASS({
       transient: true
     },
     {
-      class: 'Function',
-      name: 'generator',
-      factory: function() { return this.ctxGenerator || foam.json.Network; }
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      factory: function() { return this.ctxStringifier || foam.json.Network; }
     }
   ],
 
@@ -53,7 +54,7 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      this.socket.send(this.generator.stringify(msg));
+      this.socket.send(this.stringifier.stringify(msg));
     },
 
     function connect() {

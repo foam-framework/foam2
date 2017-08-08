@@ -26,7 +26,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'generator? as ctxGenerator',
+    'stringifier? as ctxStringifier',
     'me',
     'parser'
   ],
@@ -39,13 +39,14 @@ foam.CLASS({
       name: 'method'
     },
     {
-      class: 'Function',
-      name: 'generator',
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
       factory: function() {
-        var generator = this.JSONOutputter.create();
-        if ( this.ctxGenerator ) generator.copyFrom(this.ctxGenerator);
-        else                     generator.copyFrom(foam.json.Network);
-        return generator;
+        var stringifier = this.JSONOutputter.create();
+        if ( this.ctxStringifier ) stringifier.copyFrom(this.ctxStringifier);
+        else                       stringifier.copyFrom(foam.json.Network);
+        return stringifier;
       }
     }
   ],
@@ -78,7 +79,7 @@ foam.CLASS({
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: this.generator.stringify(msg)
+          payload: this.stringifier.stringify(msg)
         }).send();
 
         req.then(function(resp) {
