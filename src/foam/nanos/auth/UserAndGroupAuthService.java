@@ -145,17 +145,19 @@ public class UserAndGroupAuthService
     }
 
     String hashedOldPassword = "";
+    String hashedNewPasswordOldSalt = "";
     String hashedNewPassword = "";
     String newSalt = generateRandomSalt();
 
     try {
       hashedOldPassword = hashPassword(oldPassword, user.getPasswordSalt());
+      hashedNewPasswordOldSalt = hashPassword(newPassword, user.getPasswordSalt());
       hashedNewPassword = hashPassword(newPassword, newSalt);
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException("Failed to hash passwords using " + HASH_METHOD);
     }
 
-    if ( hashedOldPassword.equals(hashedNewPassword) ) {
+    if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
       throw new IllegalStateException("New Password must be different");
     }
 
