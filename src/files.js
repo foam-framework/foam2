@@ -22,6 +22,7 @@
  */
 
 FOAM_FILES([
+  { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
