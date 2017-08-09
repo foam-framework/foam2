@@ -70,9 +70,10 @@ foam.CLASS({
       name: 'methods',
       adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
-          foam.assert(o.name, 'Method must be named');
+          var name = foam.Function.getName(o);
+          foam.assert(name, 'Method must be named');
           var m = this.lookup(prop.of).create();
-          m.name = o.name;
+          m.name = name;
           m.code = o;
           return m;
         }

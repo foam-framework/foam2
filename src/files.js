@@ -22,6 +22,7 @@
  */
 
 FOAM_FILES([
+  { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
@@ -102,6 +103,9 @@ FOAM_FILES([
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
 //  { name: "foam/u2/Element", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/version/VersionTrait" },
+  { name: "foam/version/VersionedClass" },
+  { name: "foam/version/VersionedClassFactory" },
   { name: "foam/dao/Sink" },
   { name: "foam/dao/SinkJava", flags: ['java'] },
   { name: "foam/dao/DAO" },
@@ -129,6 +133,7 @@ FOAM_FILES([
   { name: "foam/dao/GUIDDAO" },
   { name: "foam/dao/ReadOnlyDAO", flags: ['js'] },
   { name: "foam/dao/ReadOnlyDAOJava", flags: ['java'] },
+  { name: "foam/dao/StoreAndForwardDAO" },
   { name: "foam/dao/JDAO" },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
@@ -139,6 +144,8 @@ FOAM_FILES([
   { name: "foam/dao/LRUDAOManager" },
   { name: "foam/dao/SequenceNumberDAO" },
   { name: "foam/dao/ContextualizingDAO" },
+  { name: "foam/dao/VersionNoDAO" },
+  { name: "foam/dao/sync/SyncRecord" },
   { name: "foam/dao/SyncDAO" },
   { name: "foam/dao/EasyDAO" },
   { name: "foam/dao/NoSelectAllDAO" },

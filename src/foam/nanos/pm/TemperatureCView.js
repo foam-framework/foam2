@@ -11,19 +11,27 @@
 
    documentation: 'Display PM totalTime as a simple colour bar.',
 
+   imports: [ 'maxTotalTime' ],
+
    properties: [
-     [ 'temperature', 100 ],
+     [ 'totalTime', 100 ],
      [ 'width', 120 ],
-     [ 'height', 18 ]
+     [ 'height', 18 ],
+     [ 'autoRepaint', true ],
+     {
+       name: 'temperature',
+       expression: function(totalTime, maxTotalTime) {
+         return totalTime >= maxTotalTime ? 1 : totalTime/maxTotalTime;
+       }
+     }
    ],
 
    methods: [
      function paintSelf(x) {
-
        var g = x.fillStyle = x.createLinearGradient(0, 0, this.width, this.height);
        g.addColorStop(0, 'hsl(64, 100%, 50%)');
        g.addColorStop(1, 'hsl(0, 100%, 50%)');
-       x.fillRect(0, 0, this.width*100/this.temperature, this.height);
+       x.fillRect(0, 0, this.width*this.temperature, this.height);
      }
    ]
  });
