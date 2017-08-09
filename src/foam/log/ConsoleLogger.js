@@ -44,33 +44,35 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'debug',
-      factory() { return this.put.bind(this, this.LogLevel.DEBUG); }
+      factory: function() { return this.put.bind(this, this.LogLevel.DEBUG); }
     },
     {
       class: 'Function',
       documentation: 'Synonym for "info".',
       name: 'log',
-      factory() { return this.put.bind(this, this.LogLevel.INFO); }
+      factory: function() { return this.put.bind(this, this.LogLevel.INFO); }
     },
     {
       class: 'Function',
       name: 'info',
-      factory() { return this.put.bind(this, this.LogLevel.INFO); }
+      factory: function() { return this.put.bind(this, this.LogLevel.INFO); }
     },
     {
       class: 'Function',
       name: 'warn',
-      factory() { return this.put.bind(this, this.LogLevel.WARN); }
+      factory: function() { return this.put.bind(this, this.LogLevel.WARN); }
     },
     {
       class: 'Function',
       name: 'error',
-      factory() { return this.put.bind(this, this.LogLevel.ERROR); }
+      factory: function() { return this.put.bind(this, this.LogLevel.ERROR); }
     },
     {
       class: 'Function',
       name: 'getDateString',
-      factory() { return function() { return (new Date()).toString(); }; }
+      factory: function() {
+        return function() { return (new Date()).toString(); };
+      }
     }
   ],
 
