@@ -36,5 +36,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/WebAuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
+  { name: "foam/nanos/pm/PMTableView" },
   { name: "foam/nanos/pm/TemperatureCView" }
 ]);

@@ -16,6 +16,7 @@ foam.CLASS({
     'data as stack',
     'data', // TODO: output as 'stack'
     'detailView',
+    'createDetailView',
     'factory',
     'summaryView'
   ],
@@ -28,6 +29,10 @@ foam.CLASS({
     },
     {
       name: 'detailView',
+      value: { class: 'foam.u2.DetailView' }
+    },
+    {
+      name: 'createDetailView',
       value: { class: 'foam.u2.DetailView' }
     },
     {
@@ -105,7 +110,7 @@ foam.CLASS({
       name: 'CreateController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'detailView', 'stack', 'dao', 'factory' ],
+      imports: [ 'createDetailView', 'detailView', 'stack', 'dao', 'factory' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -117,7 +122,8 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.tag(this.detailView, {data: this.obj}).add(this.CANCEL, this.SAVE);
+          var view = this.createDetailView ? this.createDetailView : this.detailView
+          this.tag(view, {data: this.obj}).add(this.CANCEL, this.SAVE);
         }
       ],
 

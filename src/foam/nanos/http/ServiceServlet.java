@@ -81,10 +81,7 @@ public class ServiceServlet
       }
 
       foam.box.Message msg = (foam.box.Message) result;
-
       skeleton_.send(msg);
-
-      System.err.println("Response: " + msg.getObject().toString());
 
       if ( ! ( msg.getAttributes().get("replyBox") instanceof foam.box.HTTPReplyBox ) ) {
         // resp.complete(); //flushBuffer();
