@@ -31,8 +31,8 @@ foam.LIB({
 
             // IE11 does not support named functions. Extract name with
             // f.toString().
-            var match = method.toString()
-                  .match(/^function\s+([A-Za-z_$][0-9A-Za-z_$]*)\s*\(/);
+            var match = method.toString().
+                match(/^function\s+([A-Za-z_$][0-9A-Za-z_$]*)\s*\(/);
             foam.assert(match, 'Unable to deduce method name from function');
             return match[1];
           }
