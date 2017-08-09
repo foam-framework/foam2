@@ -51,7 +51,7 @@ foam.CLASS({
       name: 'totaltime',
       label: 'Total',
       tableCellFormatter: function(value) {
-        this.tag({class: 'foam.nanos.pm.TemperatureCView'}).add(' ', value);
+        this.tag({class: 'foam.nanos.pm.TemperatureCView', totalTime: value}).add(' ', value);
       }
     }
   ]
