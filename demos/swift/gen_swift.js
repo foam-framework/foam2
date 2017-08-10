@@ -21,7 +21,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
     dir + '/js',
     dir + '/../../src/com/google/foam/demos/tabata',
   ],
-  modelId: 'GenSwift',
+  modelId: 'foam.swift.GenSwift',
   modelArgs: {
     models: [
       // UI
