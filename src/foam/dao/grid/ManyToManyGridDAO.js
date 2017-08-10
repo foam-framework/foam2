@@ -16,7 +16,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.dao.grid',
   name: 'ManyToManyGridDAO',
   extends: 'foam.dao.ReadOnlyDAO',
   implements: [ 'foam.mlang.Expressions' ],
