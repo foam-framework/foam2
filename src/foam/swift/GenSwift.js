@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'GenSwift',
   requires: [
     'foam.core.Model',
+    'foam.swift.Enum',
+    'foam.swift.EnumValue',
     'foam.swift.SwiftClass',
     'foam.swift.Field',
     'foam.swift.Method',
@@ -76,6 +78,14 @@ foam.CLASS({
       ],
     },
     {
+      name: 'blacklist',
+      value: [
+        'FObject',
+        'foam.core.AbstractInterface',
+        'foam.core.AbstractEnum',
+      ],
+    },
+    {
       class: 'String',
       name: 'outdir',
     },
@@ -116,7 +126,7 @@ foam.CLASS({
         }
         models = Object.keys(models)
             .filter(function(m) {
-              return m != 'FObject';
+              return self.blacklist.indexOf(m) == -1;
             });
 
         for (var i = 0; i < models.length; i++) {
