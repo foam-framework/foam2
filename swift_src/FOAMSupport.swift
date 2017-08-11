@@ -29,6 +29,7 @@ public protocol PropertyInfo: Axiom {
   var transient: Bool { get }
   var view: FObject.Type? { get }
   var label: String { get }
+  var visibility: Visibility { get }
   var jsonParser: Parser? { get }
   func set(_ obj: FObject, value: Any?)
   func get(_ obj: FObject) -> Any? // TODO rename to f?

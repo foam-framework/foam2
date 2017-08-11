@@ -136,6 +136,9 @@ subscript(key: String) -> FObject? {
     if let a = a as? PropertyInfo, a.view != nil {
       let prop = a.name
       let viewFobj = self.__subContext__.create(type: a.view!) as! FObject
+      if let viewFobj = viewFobj as? PropertyView {
+        viewFobj.fromProperty(a)
+      }
       propertyViews[prop] = viewFobj
 
       let label = UILabel()

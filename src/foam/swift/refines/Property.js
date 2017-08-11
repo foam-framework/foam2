@@ -405,6 +405,7 @@ class PInfo: PropertyInfo {
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
+  let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
 <% if (this.swiftView && !this.hidden) { %>
   let view: FObject.Type? = <%=this.swiftView.split('.').pop()%>.self
