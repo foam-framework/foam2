@@ -61,8 +61,14 @@ foam.LIB({
           }),
           foam.swift.Field.create({
             lazy: true,
+            name: 'label',
+            type: 'String',
+            defaultValue: '"' + this.model_.label + '"',
+          }),
+          foam.swift.Field.create({
+            lazy: true,
             name: 'parent',
-            type: 'ClassInfo',
+            type: 'ClassInfo?',
             defaultValue: this.model_.swiftExtends + '.classInfo()',
           }),
           foam.swift.Field.create({
@@ -105,14 +111,12 @@ foam.LIB({
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
   case "<%=p.swiftName%>":
-    if hasOwnProperty("<%=p.swiftName%>") {
-      <%= p.swiftInitedName %> = false
-      <%= p.swiftValueName %> = nil
+    <%= p.swiftInitedName %> = false
+    <%= p.swiftValueName %> = nil
 
-      // Only pub if there are listeners.
-      if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
-        _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
-      }
+    // Only pub if there are listeners.
+    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
+      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
     }
     break
 <% } %>
@@ -220,7 +224,7 @@ switch key {
       for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
     }
   <% } %>
-    let oldValue: Any? = <%=p.swiftInitedName%> ? `<%=p.swiftName%>` : nil
+    let oldValue: Any? = <%=p.swiftInitedName%> ? self.`<%=p.swiftName%>` : nil
     <%=p.swiftValueName%> = <%=p.swiftPreSetFuncName%>(oldValue, <%=p.swiftAdaptFuncName%>(oldValue, value))
     <%=p.swiftInitedName%> = true
     <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%>)

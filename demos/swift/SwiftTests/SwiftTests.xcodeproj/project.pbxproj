@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1025B3351F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1025B3341F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift */; };
 		1025B3371F36AA8900D16F7E /* TabataSoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1025B3361F36AA8900D16F7E /* TabataSoundView.swift */; };
+		103225D11F3D151300E000B2 /* foam_swift_core_SubSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103225D01F3D151300E000B2 /* foam_swift_core_SubSlot.swift */; };
 		1059840E1E5E859A0063941D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840D1E5E859A0063941D /* AppDelegate.swift */; };
 		105984101E5E859A0063941D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059840F1E5E859A0063941D /* ViewController.swift */; };
 		105984131E5E859A0063941D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 105984111E5E859A0063941D /* Main.storyboard */; };
@@ -106,6 +107,7 @@
 /* Begin PBXFileReference section */
 		1025B3341F34D6B000D16F7E /* foam_swift_ui_MidiNote.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_MidiNote.swift; sourceTree = "<group>"; };
 		1025B3361F36AA8900D16F7E /* TabataSoundView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabataSoundView.swift; sourceTree = "<group>"; };
+		103225D01F3D151300E000B2 /* foam_swift_core_SubSlot.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_swift_core_SubSlot.swift; sourceTree = "<group>"; };
 		1059840A1E5E859A0063941D /* SwiftTests.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftTests.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1059840D1E5E859A0063941D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1059840F1E5E859A0063941D /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 				10DA9F441E8468D800D9F779 /* foam_dao_PredicatedSink.swift */,
 				10DA9F451E8468D800D9F779 /* foam_dao_ProxySink.swift */,
 				10DA9F461E8468D800D9F779 /* foam_dao_ResetListener.swift */,
+				103225D01F3D151300E000B2 /* foam_swift_core_SubSlot.swift */,
 				10DA9F471E8468D800D9F779 /* foam_dao_Sink.swift */,
 				10DA9F481E8468D800D9F779 /* foam_dao_SkipSink.swift */,
 				10DA9F491E8468D800D9F779 /* foam_mlang_order_Comparator.swift */,
@@ -536,6 +539,7 @@
 				10DA9F821E8468D800D9F779 /* foam_dao_PredicatedSink.swift in Sources */,
 				105984101E5E859A0063941D /* ViewController.swift in Sources */,
 				10DA9FA91E8468D800D9F779 /* foam_swift_parse_parser_NotChars.swift in Sources */,
+				103225D11F3D151300E000B2 /* foam_swift_core_SubSlot.swift in Sources */,
 				10DA9F931E8468D800D9F779 /* foam_swift_parse_json_DateParser.swift in Sources */,
 				10DA9F851E8468D800D9F779 /* foam_dao_Sink.swift in Sources */,
 				10DA9FA21E8468D800D9F779 /* foam_swift_parse_parser_Alt.swift in Sources */,
