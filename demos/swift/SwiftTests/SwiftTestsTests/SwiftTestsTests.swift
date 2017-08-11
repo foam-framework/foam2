@@ -387,7 +387,7 @@ class SwiftTestsTests: XCTestCase {
     let o = Tabata()
 
     var calls = 0
-    let sub = o.remaining$.swiftSub { (_, _) in
+    let sub = o.seconds$.swiftSub { (_, _) in
       calls += 1
     }
 
@@ -398,4 +398,23 @@ class SwiftTestsTests: XCTestCase {
     sub.detach()
   }
 
+  func testSubSlot() {
+    let t = Test()
+    let t2 = Test()
+    t2.firstName = "YO"
+    t.anyProp = t2
+
+    let s = t.anyProp$.dot("firstName")
+    XCTAssertEqual(s.swiftGet() as? String, "YO")
+
+    var i = 0
+    let sub = s.swiftSub { (_, _) in
+      i += 1
+      XCTAssertEqual(s.swiftGet() as? String, "YO2")
+    }
+    t2.firstName = "YO2"
+    XCTAssertEqual(s.swiftGet() as? String, "YO2")
+    XCTAssertEqual(i, 1)
+    sub.detach()
+  }
 }

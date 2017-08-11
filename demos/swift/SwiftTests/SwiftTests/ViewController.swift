@@ -1,6 +1,7 @@
 import UIKit
 
 class ViewController: UIViewController {
+  /*
   lazy var data: Tabata = {
     return Context.GLOBAL.create(type: Tabata.self) as! Tabata
   }()
@@ -33,4 +34,5 @@ class ViewController: UIViewController {
       metrics: nil,
       views: views))
   }
+ */
 }

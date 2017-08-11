@@ -351,7 +351,7 @@ self.set(key: "<%=this.swiftName%>", value: value)
       args: [],
       template: function() {/*
 if <%=this.swiftInitedName%> {
-  return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
+  return <%=this.swiftValueName%><% if ( this.swiftType != this.swiftValueType ) { %>!<% } %>
 }
 <% if ( this.swiftFactory ) { %>
 self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())

@@ -109,18 +109,19 @@ public class Context {
 
 public protocol ClassInfo {
   var id: String { get }
-  var parent: ClassInfo { get }
+  var label: String { get }
+  var parent: ClassInfo? { get }
   var ownAxioms: [Axiom] { get }
 }
 
 extension ClassInfo {
   var axioms: [Axiom] {
     get {
-      var curCls: ClassInfo = self
+      var curCls: ClassInfo? = self
       var axioms: [Axiom] = []
-      while curCls.parent.id != curCls.id {
-        axioms += curCls.ownAxioms
-        curCls = curCls.parent
+      while curCls != nil {
+        axioms += curCls!.ownAxioms
+        curCls = curCls!.parent
       }
       return axioms
     }
@@ -149,12 +150,6 @@ extension ClassInfo {
     }
     return nil
   }
-}
-
-public class ClassInfoImpl: ClassInfo {
-  public lazy var id: String = "FObject"
-  public lazy var parent: ClassInfo = self
-  public lazy var ownAxioms: [Axiom] = []
 }
 
 public class Subscription {
@@ -210,10 +205,13 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   lazy var listeners: ListenerList = ListenerList()
 
   private static var classInfo_: ClassInfo = {
-    let classInfo = ClassInfoImpl()
-    classInfo.parent = classInfo
-    classInfo.id = "FObject"
-    return classInfo
+    class ClassInfo_: ClassInfo {
+      lazy var id: String = "FObject"
+      lazy var label: String = "FObject"
+      lazy var parent: ClassInfo? = nil
+      lazy var ownAxioms: [Axiom] = []
+    }
+    return ClassInfo_()
   }()
 
   public class func classInfo() -> ClassInfo { return AbstractFObject.classInfo_ }

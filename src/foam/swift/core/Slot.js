@@ -163,5 +163,21 @@ return ExpressionSlot([
 ])
       */},
     },
+    {
+      name: 'dot',
+      args: [
+        {
+          swiftType: 'String',
+          name: 'name',
+        },
+      ],
+      swiftReturnType: 'SubSlot',
+      swiftCode: function() {/*
+return SubSlot([
+  "parentSlot": self,
+  "name": name,
+])
+      */},
+    },
   ]
 });
