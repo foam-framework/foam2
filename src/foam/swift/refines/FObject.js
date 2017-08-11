@@ -114,6 +114,13 @@ switch key {
     <%= p.swiftInitedName %> = false
     <%= p.swiftValueName %> = nil
 
+  <% if ( p.swiftExpression ) { %>
+    if <%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+    <%= p.swiftExpressionSubscriptionName %> = nil
+  <% } %>
+
     // Only pub if there are listeners.
     if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
       _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
