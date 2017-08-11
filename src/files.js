@@ -80,6 +80,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Action", flags: ['swift'] },
   { name: "foam/swift/refines/InnerClass", flags: ['swift'] },
   { name: "foam/swift/refines/AbstractInterface", flags: ['swift'] },
+  { name: "foam/swift/refines/AbstractEnum", flags: ['swift'] },
   { name: "foam/swift/refines/Argument", flags: ['swift'] },
   { name: "foam/swift/refines/Property", flags: ['swift'] },
   { name: "foam/swift/refines/FObject", flags: ['swift'] },
