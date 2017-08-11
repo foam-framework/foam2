@@ -22,6 +22,7 @@ foam.CLASS({
     'UIKit',
   ],
   swiftImplements: ['UITextFieldDelegate'],
+  implements: ['foam.swift.ui.PropertyView'],
   properties: [
     {
       name: 'view',
@@ -52,6 +53,12 @@ newValue.delegate = self
     },
   ],
   methods: [
+    {
+      name: 'fromProperty',
+      swiftCode: function() {/*
+view.isEnabled = prop.visibility == .RW
+      */},
+    },
     {
       name: 'textFieldDidEndEditing',
       args: [
