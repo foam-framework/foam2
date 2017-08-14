@@ -20,10 +20,27 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^{ }
+
+        ^ label {
+          position: relative;
+        }
+
+        .foam-u2-RadioContainer { }
+
+        .foam-u2-Label { }
+      */}
+    })
+  ],
+
   methods: [
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
+      this.addClass(this.myClass());
       if ( ! this.data && ! this.index ) {
         this.index = 0;
       }
@@ -37,11 +54,13 @@ foam.CLASS({
   listeners: [
     function onChoicesUpdate() {
       var self = this;
+      var id;
 
       this.removeAllChildren();
 
       this.add(this.choices.map(function(c) {
         return this.E('div').
+          addClass('foam-u2-RadioContainer').
           start('input').
             attrs({
               type: 'radio',
@@ -49,11 +68,20 @@ foam.CLASS({
               value: c[0],
               checked: self.slot(function (data) { return data === c[0]; })
             }).
+            setID(id = self.NEXT_ID()).
             on('change', function(evt) {
               self.data = evt.srcElement.value;
             }).
           end().
-          add(c[1]);
+          start('label').
+            attrs({
+              for: id
+            }).
+            start('span').
+            addClass('foam-u2-Label').
+            add(c[1]).
+            end()
+          .end();
       }.bind(this)));
     }
   ]
