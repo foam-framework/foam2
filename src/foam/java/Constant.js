@@ -10,7 +10,7 @@ foam.CLASS({
 
   properties: [
     'name',
-    'type',
+    'javaType',
     'value',
     'documentation'
   ],
@@ -38,7 +38,7 @@ foam.CLASS({
 
       o.out('public static final ');
 
-      if ( ! this.type ) {
+      if ( ! this.javaType ) {
         if ( foam.Boolean.isInstance(this.value) ) {
           o.out('Boolean');
         }
@@ -55,10 +55,10 @@ foam.CLASS({
         } else if ( foam.String.isInstance(this.value) ) {
           o.out('String');
         } else {
-          throw 'Constant type needs to be defined';
+          throw 'Constant javaType needs to be defined';
         }
       } else {
-        o.out(this.type);
+        o.out(this.javaType);
       }
 
       o.out(' ' + this.name);
@@ -66,7 +66,7 @@ foam.CLASS({
 
       // if the user has declared a type that requires a custom instantiation,
       // but not declare a javaType for it, the Java code should break on compile
-      if ( ( ! this.type && ! foam.String.isInstance(this.value) ) || ( this.type && this.type != 'String' ) ) {
+      if ( ( ! this.javaType && ! foam.String.isInstance(this.value) ) || ( this.javaType && this.javaType != 'String' ) ) {
         o.out(this.value);
       } else {
         var escapedValue = this.escapeString(this.value);
