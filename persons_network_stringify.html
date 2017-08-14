@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <script src="src/foam.js"></script>
+  </head>
+  <body>
+    <script src="persons.js"></script>
+    <script src="persons_data.js"></script>
+    <script>
+      var start = performance.now();
+      foam.json.Network.stringify(data);
+      var end = performance.now();
+      console.log('foam.json.Network.stringify', end - start);
+    </script>
+  </body>
+</html>

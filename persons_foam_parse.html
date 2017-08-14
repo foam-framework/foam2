@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <script src="src/foam.js"></script>
+  </head>
+  <body>
+    <script src="persons.js"></script>
+    <script src="persons_dataStr.js"></script>
+    <script>
+      var start = performance.now();
+      foam.json.parseString(dataStr);
+      var end = performance.now();
+      console.log('foam.json.parseString', end - start);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <script src="src/foam.js"></script>
+  </head>
+  <body>
+    <script src="persons.js"></script>
+    <script src="persons_fonStr.js"></script>
+    <script>
+      var fon = foam.parsers.FON.create({ creationContext: foam.__context__ });
+      var start = performance.now();
+      var res = fon.grammar.parseString(dataStr, 'array');
+      if ( ! res ) throw new Error('Parse failed');
+      foam.json.parse(res, null, fon.creationContext);
+      var end = performance.now();
+      console.log('FON parse', end - start);
+    </script>
+  </body>
+</html>
