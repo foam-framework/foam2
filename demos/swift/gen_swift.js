@@ -26,9 +26,11 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
     models: [
       // UI
       'foam.swift.ui.DetailView',
-      'foam.swift.ui.FOAMUITextFieldInt',
       'foam.swift.ui.FOAMUILabel',
       'foam.swift.ui.FOAMUITextField',
+      'foam.swift.ui.FOAMUITextFieldInt',
+      'foam.swift.ui.PropertyView',
+      'foam.u2.Visibility',
 
       'Tabata',
       'TestExtended',
