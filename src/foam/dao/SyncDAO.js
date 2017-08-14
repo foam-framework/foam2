@@ -145,16 +145,18 @@ foam.CLASS({
       var self = this;
       self.synced = self.delegate.select().
           then(function(sink) {
+            var minVersionNo = 0;
             var array = sink.array;
             for ( var i = 0; i < array.length; i++ ) {
+              var version = self.VersionTrait.VERSION_.f(array[i]);
               self.syncRecordDAO.put(self.VersionedSyncRecord.create({
                 id: array[i].id,
-                version_: -1
+                version_: version
               }));
+              minVersionNo = Math.max(minVersionNo, version);
             }
-          }).
-          // Sync as if polling on initial sync.
-          then(self.pollingSync_.bind(self));
+            return self.syncFromRemote_(minVersionNo);
+          });
 
       // Setup polling after initial sync.
       if ( ! self.polling ) return;
@@ -299,26 +301,10 @@ foam.CLASS({
             // Like MAX(), but faster on DAOs that can optimize order+limit.
             orderBy(self.DESC(VERSION_)).limit(1).
             select().then(function(sink) {
-              var minVersionNo = sink.array[0] && VERSION_.f(sink.array[0]) || 0;
-              return self.syncToRemote_().then(function() {
-                return self.remoteDAO.
-                  where(self.GT(self.VersionTrait.VERSION_, minVersionNo)).
-                  orderBy(self.VersionTrait.VERSION_).
-                  select();
-              }).then(function(sink) {
-                var array = sink.array;
-                var promises = [];
-
-                for ( var i = 0 ; i < array.length ; i++ ) {
-                  if ( self.VersionTrait.DELETED_.f(array[i]) ) {
-                    promises.push(self.removeFromRemote_(array[i]));
-                  } else {
-                    promises.push(self.putFromRemote_(array[i]));
-                  }
-                }
-
-                return Promise.all(promises);
-              });
+              var minVersionNo = sink.array[0] && VERSION_.f(sink.array[0]) ||
+                  0;
+              return self.syncToRemote_().
+                  then(self.syncFromRemote_.bind(self, minVersionNo));
             });
       }
     },
@@ -379,6 +365,31 @@ foam.CLASS({
 
             return Promise.all(promises);
           });
+      }
+    },
+    {
+      name: 'syncFromRemote_',
+      documentation: `Pull updates from remote; used for initial sync and
+          polling sync strategy.`,
+      code: function(minVersionNo) {
+        var self = this;
+        return self.remoteDAO.
+            where(self.GT(self.VersionTrait.VERSION_, minVersionNo)).
+            orderBy(self.VersionTrait.VERSION_).
+            select().then(function(sink) {
+              var array = sink.array;
+              var promises = [];
+
+              for ( var i = 0 ; i < array.length ; i++ ) {
+                if ( self.VersionTrait.DELETED_.f(array[i]) ) {
+                  promises.push(self.removeFromRemote_(array[i]));
+                } else {
+                  promises.push(self.putFromRemote_(array[i]));
+                }
+              }
+
+              return Promise.all(promises);
+            });
       }
     },
     {
