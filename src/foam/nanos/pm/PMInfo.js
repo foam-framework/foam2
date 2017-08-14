@@ -4,6 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// TODO: rename properties to use camelCase
 foam.CLASS({
   package: 'foam.nanos.pm',
   name: 'PMInfo',
