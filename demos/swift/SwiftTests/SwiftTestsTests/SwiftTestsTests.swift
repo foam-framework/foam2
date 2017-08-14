@@ -372,6 +372,8 @@ class SwiftTestsTests: XCTestCase {
       testListen()
       testExpression()
       testExpressionSlot()
+      testSubSlot()
+      testSubSlot2()
     }
   }
 
@@ -417,4 +419,36 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(i, 1)
     sub.detach()
   }
+
+  func testSubSlot2() {
+    let t = Test(["firstName": "a"])
+
+    var slot = 0
+    let s1 = t.firstName$.swiftSub { (_, _) in
+      slot += 1
+    }
+
+    var subSlot = 0
+    let t2 = Test(["anyProp": t])
+    // TODO without holding on to this here, the test fails because the subslot created when this
+    // happens gets destroyed. Need to find a way to prevent this.
+    let dot = t2.anyProp$.dot("firstName")
+    let s2 = dot.swiftSub { (_, _) in
+      subSlot += 1
+    }
+
+    XCTAssertEqual(dot.swiftGet() as! String, "a")
+    XCTAssertEqual(slot, 0)
+    XCTAssertEqual(subSlot, 0)
+
+    t.firstName = "B"
+
+    XCTAssertEqual(dot.swiftGet() as! String, "B")
+    XCTAssertEqual(slot, 1)
+    XCTAssertEqual(subSlot, 1)
+
+    s1.detach()
+    s2.detach()
+  }
+
 }
