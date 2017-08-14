@@ -8,10 +8,10 @@ package foam.nanos.logger;
 
 import foam.core.*;
 import foam.nanos.NanoService;
-import java.util.logging.*;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.io.IOException;
+import java.util.logging.*;
 
 public class NanoLogger
   extends    ContextAwareSupport
@@ -19,14 +19,14 @@ public class NanoLogger
 {
   protected Logger logger;
 
-  private static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+  protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
       return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
     }
   };
 
-  private ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
       return new StringBuilder();
@@ -54,7 +54,7 @@ public class NanoLogger
     }
   }
 
-  private class CustomFormatter extends Formatter {
+  protected class CustomFormatter extends Formatter {
     long   prevTime;
     String prevTimestamp;
 

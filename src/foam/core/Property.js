@@ -554,7 +554,7 @@ foam.CLASS({
           }
         }
         var ret = e.apply(this, args);
-        if ( ret === undefined ) this.warn('Expression returned undefined');
+        if ( ret === undefined ) this.warn('Expression returned undefined: ', e);
         return ret;
       };
     },
