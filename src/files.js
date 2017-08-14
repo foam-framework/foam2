@@ -22,6 +22,7 @@
  */
 
 FOAM_FILES([
+  { name: "foam/core/poly" },
   { name: "foam/core/lib" },
   { name: "foam/core/stdlib" },
   { name: "foam/core/events" },
@@ -125,8 +126,10 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Element" },
+  { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
 //  { name: "foam/u2/Element", flags: ['web'] },
+  { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
@@ -167,6 +170,8 @@ FOAM_FILES([
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/ManyToManyRelationshipDAO" },
+  { name: "foam/dao/grid/ManyToManyGridRecord" },
+  { name: "foam/dao/grid/ManyToManyGridDAO" },
   { name: "foam/dao/LazyCacheDAO" },
   { name: "foam/dao/CachingDAO" },
   { name: "foam/dao/DeDupDAO" },
@@ -203,6 +208,7 @@ FOAM_FILES([
   { name: "lib/fcm" },
   { name: "lib/Stub" },
   { name: "foam/box/Box" },
+  { name: "foam/box/RemoteException" },
   { name: "foam/box/Skeleton" },
   { name: "foam/box/PromisedBox" },
   { name: "foam/box/ProxyBox" },
