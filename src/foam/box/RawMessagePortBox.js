@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
 
-  imports: [ 'stringifier? as ctxStringifier' ],
+  requires: [ 'foam.json.Outputter' ],
 
   properties: [
     {
@@ -28,14 +28,24 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.json.Stringifier',
-      name: 'stringifier',
-      factory: function() { return this.ctxStringifier || foam.json.Network; }
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // NOTE: Configuration must be consistent with parser in
+        // foam.messageport.MessagePortService.
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
   methods: [
     function send(m) {
-      this.port.postMessage(this.stringifier.stringify((m)));
+      this.port.postMessage(this.outputter.stringify((m)));
     }
   ]
 });

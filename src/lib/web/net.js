@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.net.web',
   name: 'WebSocket',
 
-  imports: [ 'stringifier? as ctxStringifier' ],
+  requires: [ 'foam.json.Outputter' ],
 
   topics: [
     'message',
@@ -37,9 +37,17 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.json.Stringifier',
-      name: 'stringifier',
-      factory: function() { return this.ctxStringifier || foam.json.Network; }
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
 
@@ -54,7 +62,7 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      this.socket.send(this.stringifier.stringify(msg));
+      this.socket.send(this.outputter.stringify(msg));
     },
 
     function connect() {
@@ -100,18 +108,27 @@ foam.CLASS({
   name: 'WebSocketService',
 
   requires: [
-    'foam.net.web.WebSocket',
+    'foam.box.Message',
     'foam.box.RegisterSelfMessage',
-    'foam.box.Message'
+    'foam.json.Parser',
+    'foam.net.web.WebSocket'
   ],
-
-  imports: [
-    'parser'
-  ],
+  imports: [ 'creationContext' ],
 
   properties: [
     {
       name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 

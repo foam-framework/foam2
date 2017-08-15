@@ -23,43 +23,6 @@
 */
 
 /**
-  Interfaces for symmetric parser/stringifier pairs such as the foam.json and
-  foam.json.Outputter (for FON), or foam.json.JSONParserStringifier (for JSON).
-*/
-foam.INTERFACE({
-  package: 'foam.json',
-  name: 'Parser',
-
-  methods: [
-    {
-      name: 'parseString',
-      // returns: 'FObjectified result',
-      args: [
-        { name: 'str', documentation: 'String to FObjectify' },
-        { name: 'opt_ctx', documentation: 'Optional context for FObjects' }
-      ],
-      code: function(str, opt_ctx) {}
-    }
-  ]
-});
-
-
-foam.INTERFACE({
-  package: 'foam.json',
-  name: 'Stringifier',
-
-  methods: [
-    {
-      name: 'stringify',
-      returns: 'String',
-      args: [ { name: 'o', documentation: 'Object to serialize to string' } ],
-      code: function(o) {}
-    }
-  ]
-});
-
-
-/**
   A short-name is an optional shorter name for a property.
   It is used by foam.json.Outputter when 'useShortNames'
   is enabled. Short-names enable JSON output to be smaller,
@@ -499,50 +462,26 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.json',
-  name: 'JSONParserStringifier',
-  extends: 'foam.json.Outputter',
-  implements: [
-    'foam.json.Parser',
-    'foam.json.Stringifier'
-  ],
-
-  documentation: `An outputter for "proper" JSON (with quoted keys, etc.). Not
-      to be confused with foam.json's standard outputters, which operate over
-      FON.`,
+  name: 'Parser',
 
   properties: [
     {
-      documentation: `Map of {<class id>: true} for allowed classes`,
-      name: 'allowClassMap',
-      value: null
+      class: 'Boolean',
+      name: 'strict',
+      value: true
     },
     {
-      name: 'creationContext',
-      expression: function(allowClassMap) {
-        var baseCtx = this.__subContext__;
-        if ( ! allowClassMap ) return baseCtx;
-
-        return baseCtx.createSubContext({
-          lookup: function(id, opt_allowFail) {
-            if ( this.hasOwnProperty(id) )
-              return baseCtx.lookup(id, opt_allowFail);
-            if ( opt_allowFail ) return null;
-            throw new Error(
-              `JSONParserStringifier: Attempt to instantiate disallowed class: ${id}`);
-          }.bind(allowClassMap)
-        });
-      }
+      name: 'creationContext'
     }
   ],
 
   methods: [
     function parseString(str, opt_ctx) {
-      // foam.json.parse() defined in LIB() below.
-      return foam.json.parse(JSON.parse(str), null,
-                             opt_ctx || this.creationContext);
-    },
-    function stringify(o) {
-      return JSON.stringify(this.objectify(o));
+      return this.strict ?
+          // JSON.parse() is faster; use it when data format allows.
+          foam.json.parse(JSON.parse(str), null,
+                          opt_ctx || this.creationContext) :
+          foam.json.parseString(str, null, opt_ctx || this.creationContext);
     }
   ]
 });

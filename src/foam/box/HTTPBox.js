@@ -22,33 +22,14 @@ foam.CLASS({
   implements: ['foam.box.Box'],
 
   requires: [
+    'foam.json.Outputter',
+    'foam.json.Parser',
     'foam.net.web.HTTPRequest'
   ],
 
   imports: [
-    'stringifier? as ctxStringifier',
-    'me',
-    'parser'
-  ],
-
-  properties: [
-    {
-      name: 'url'
-    },
-    {
-      name: 'method'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Stringifier',
-      name: 'stringifier',
-      factory: function() {
-        var stringifier = this.JSONOutputter.create();
-        if ( this.ctxStringifier ) stringifier.copyFrom(this.ctxStringifier);
-        else                       stringifier.copyFrom(foam.json.Network);
-        return stringifier;
-      }
-    }
+    'creationContext',
+    'me'
   ],
 
   classes: [
@@ -72,6 +53,40 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    {
+      name: 'url'
+    },
+    {
+      name: 'method'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.JSONOutputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'send',
@@ -79,7 +94,7 @@ foam.CLASS({
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: this.stringifier.stringify(msg)
+          payload: this.outputter.stringify(msg)
         }).send();
 
         req.then(function(resp) {
