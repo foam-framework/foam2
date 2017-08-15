@@ -10,7 +10,7 @@ importScripts('src/foam.js', 'shared.js');
 var ctx = foam.box.Context.create({
   myname: '/worker'
 });
-ctx.parser = ctx.generator = foam.json.NetworkJSON;
+ctx.parser = ctx.stringifier = foam.json.NetworkJSON;
 
 self.onmessage = function(event) {
   if ( ! event.data instanceof MessagePort ) {
@@ -23,7 +23,7 @@ self.onmessage = function(event) {
 var sourceDAO = foam.dao.MDAO.create({ of: test.Source }, ctx);
 var targetDAO = foam.dao.MDAO.create({ of: test.Target }, ctx);
 var junctionDAO = foam.dao.MDAO.create({ of: test.SourceTargetJunction }, ctx);
-var grid = foam.dao.ManyToManyGridDAO.create(
+var grid = foam.dao.grid.ManyToManyGridDAO.create(
     null, ctx.__subContext__.createSubContext({
       sourceDAO: sourceDAO,
       targetDAO: targetDAO,

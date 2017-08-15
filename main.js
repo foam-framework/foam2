@@ -13,7 +13,7 @@ if ( ! window.Worker ) throw new Error('No Worker');
 // ).__subContext__;
 
 var ctx = foam.box.Context.create({ myname: '/main' });
-ctx.parser = ctx.generator = foam.json.NetworkJSON;
+ctx.parser = ctx.stringifier = foam.json.NetworkJSON;
 
 ctx.registry.register('ready', null, foam.box.SkeletonBox.create({
   data: test.Ready.create({
@@ -22,7 +22,7 @@ ctx.registry.register('ready', null, foam.box.SkeletonBox.create({
         numRows: 40,
         negativeRunway: 200,
         positiveRunway: 200,
-        dao: foam.dao.ClientDAO.create({
+        data: foam.dao.ClientDAO.create({
           delegate: foam.box.NamedBox.create({
             name: '/worker/grid'
           }, ctx)
