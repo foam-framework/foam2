@@ -18,12 +18,11 @@ import foam.mlang.sink.Min;
 import foam.nanos.NanoService;
 import foam.nanos.logger.NanoLogger;
 import foam.nanos.pm.PM;
-
 import java.util.Date;
 
 public class CronScheduler
-    extends    ContextAwareSupport
-    implements NanoService, Runnable
+  extends    ContextAwareSupport
+  implements NanoService, Runnable
 {
   protected DAO cronDAO_;
 
