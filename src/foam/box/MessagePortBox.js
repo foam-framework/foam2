@@ -27,11 +27,21 @@ foam.CLASS({
     'foam.box.Message'
   ],
 
-  imports: [ 'messagePortService', 'me' ],
+  imports: [
+    'stringifier? as ctxStringifier',
+    'me',
+    'messagePortService'
+  ],
 
   properties: [
     {
       name: 'target'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      factory: function() { return this.ctxStringifier || foam.json.Network; }
     },
     {
       name: 'delegate',
@@ -41,11 +51,12 @@ foam.CLASS({
 
 	this.target.postMessage(channel.port2, [ channel.port2 ]);
 
-        channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
-          object: this.RegisterSelfMessage.create({ name: this.me.name })
-        })));
+        channel.port1.postMessage(this.stringifier.stringify(
+            this.Message.create({
+              object: this.RegisterSelfMessage.create({ name: this.me.name })
+            })));
 
-	      return this.RawMessagePortBox.create({ port: channel.port1 });
+	return this.RawMessagePortBox.create({ port: channel.port1 });
       }
     }
   ]

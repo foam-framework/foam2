@@ -26,8 +26,9 @@ foam.CLASS({
   ],
 
   imports: [
+    'stringifier? as ctxStringifier',
     'me',
-    'fonParser'
+    'parser'
   ],
 
   properties: [
@@ -36,6 +37,17 @@ foam.CLASS({
     },
     {
       name: 'method'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      factory: function() {
+        var stringifier = this.JSONOutputter.create();
+        if ( this.ctxStringifier ) stringifier.copyFrom(this.ctxStringifier);
+        else                       stringifier.copyFrom(foam.json.Network);
+        return stringifier;
+      }
     }
   ],
 
@@ -64,18 +76,16 @@ foam.CLASS({
     {
       name: 'send',
       code: function(msg) {
-        var outputter = this.JSONOutputter.create().copyFrom(foam.json.Network);
-
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: outputter.stringify(msg)
+          payload: this.stringifier.stringify(msg)
         }).send();
 
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var msg = this.fonParser.parseString(p);
+          var msg = this.parser.parseString(p);
           msg && this.me.send(msg);
         }.bind(this));
       }

@@ -26,7 +26,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'fonParser'
+    'parser'
   ],
 
   properties: [
@@ -57,7 +57,7 @@ foam.CLASS({
     },
 
     function onMessage(port, e) {
-      var msg = this.fonParser.parseString(e.data);
+      var msg = this.parser.parseString(e.data);
 
       if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
         var named = this.NamedBox.create({ name: msg.object.name });

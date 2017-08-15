@@ -34,7 +34,8 @@ foam.CLASS({
     'registry',
     'root',
     'me',
-    'fonParser'
+    'parser',
+    'stringifier'
   ],
 
   properties: [
@@ -121,7 +122,9 @@ foam.CLASS({
       name: 'classWhitelist'
     },
     {
-      name: 'fonParser',
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
       hidden: true,
       factory: function() {
         // TODO: Better way to inject the class whitelist.
@@ -136,6 +139,13 @@ foam.CLASS({
 
         return this.FON.create({ creationContext: context.__subContext__ });
       }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      hidden: true,
+      factory: function() { return foam.json.Network; }
     }
   ]
 });

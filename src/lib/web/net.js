@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.net.web',
   name: 'WebSocket',
 
+  imports: [ 'stringifier? as ctxStringifier' ],
+
   topics: [
     'message',
     'connected',
@@ -32,6 +34,12 @@ foam.CLASS({
     {
       name: 'socket',
       transient: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Stringifer',
+      name: 'stringifier',
+      factory: function() { return this.ctxStringifier || foam.json.Network; }
     }
   ],
 
@@ -46,7 +54,7 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      this.socket.send(foam.json.Network.stringify(msg));
+      this.socket.send(this.stringifier.stringify(msg));
     },
 
     function connect() {
@@ -98,7 +106,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'fonParser'
+    'parser'
   ],
 
   properties: [
@@ -110,7 +118,7 @@ foam.CLASS({
   methods: [
     function addSocket(socket) {
       var sub1 = socket.message.sub(function onMessage(s, _, msgStr) {
-        var msg = this.fonParser.parseString(msgStr);
+        var msg = this.parser.parseString(msgStr);
 
         if ( ! this.Message.isInstance(msg) ) {
           console.warn('Got non-message:', msg, msgStr);
