@@ -29,7 +29,9 @@ public class ActionCommandDAO
       } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 
       }
+      return true;
     }
+    super.setDelegate(this);
     return null;
   }
 
