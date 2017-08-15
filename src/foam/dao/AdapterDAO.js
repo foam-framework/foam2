@@ -57,8 +57,9 @@ foam.CLASS({
       name: 'delegate',
       postSet: function(old, nu) {
         if ( ! nu ) return;
-        foam.assert(nu.of === this.to,
-                    'Expect AdapterDAO.delegate.of === AdapterDAO.to');
+        foam.assert(
+            nu.of === this.to,
+            'Expect AdapterDAO.delegate.of === AdapterDAO.to');
       }
     },
     {
@@ -108,14 +109,17 @@ foam.CLASS({
       return this.delegate.put_(ctx, this.adaptToDelegate(ctx, obj)).
         then(this.adaptFromDelegate.bind(this, ctx));
     },
+
     function remove_(ctx, obj) {
       return this.delegate.remove_(ctx, this.adaptToDelegate(ctx, obj)).
         then(this.adaptFromDelegate.bind(this, ctx));
     },
+
     function find_(ctx, objOrId) {
       return this.delegate.find_(ctx, this.adaptToDelegate(ctx, objOrId)).
         then(this.adaptFromDelegate.bind(this, ctx));
     },
+
     function select_(ctx, sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var adapterSink = this.AdapterSink.create({
@@ -127,6 +131,7 @@ foam.CLASS({
               this.adaptOrder(order), this.adaptPredicate(predicate)).
           then(function() { return sink; });
     },
+
     function removeAll_(ctx, skip, limit, order, predicate) {
       return this.delegate.removeAll_(
           ctx, skip, limit,
