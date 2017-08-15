@@ -10,9 +10,6 @@ import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * Created by marcroopchand on 2017-05-30.
- */
 public class CachedUserAndGroupAuthService
   extends UserAndGroupAuthService
 {

@@ -10,10 +10,7 @@ import foam.core.X;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import foam.core.ContextAwareSupport;
-import foam.dao.*;
-/**
- * Created by marcroopchand on 2017-06-27.
- */
+
 public class WebAuthServiceAdapter
   extends    ContextAwareSupport
   implements WebAuthService
