@@ -8,11 +8,14 @@ foam.CLASS({
   package: 'foam.nanos.cron',
   name: 'Cron',
   extends: 'foam.nanos.script.Script',
+
   javaImports: [
     'java.util.Date',
     'java.util.Calendar'
   ],
+
   documentation: 'FOAM class that models a Cron script',
+
   properties: [
     {
       class: 'Int',

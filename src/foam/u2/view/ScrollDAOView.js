@@ -47,104 +47,25 @@ foam.CLASS({
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
+  // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',
     'anchorRowIdx_',
+    'batchSize',
+    'count_',
+    'data',
     'modNumRows_',
     'negativeRunway',
     'numRows',
-    'rows_'
-  ],
-
-  classes: [
-    {
-      name: 'Row',
-      extends: 'foam.u2.Element',
-
-      axioms: [
-        foam.u2.CSS.create({
-          code: function CSS() {/*
-            ^ {
-              display: block;
-              contain: layout;
-              will-change: transform;
-              padding: 5px;
-              box-sizing: border-box;
-            }
-            ^ * {
-              background-color: #dddddd;
-            }
-        */}
-        })
-      ],
-
-      properties: [
-        [ 'nodeName', 'li' ],
-        {
-          class: 'FObjectProperty',
-          of: 'foam.u2.Element',
-          name: 'view'
-        }
-      ],
-
-      methods: [
-        function initE() { this.addClass(this.myClass()).add(this.view$); }
-      ]
-    },
-    {
-      name: 'FetchSink',
-      extends: 'foam.dao.AbstractSink',
-
-      imports: [
-        'anchorDAOIdx_',
-        'anchorRowIdx_',
-        'modNumRows_',
-        'negativeRunway',
-        'numRows',
-        'rows_'
-      ],
-
-      properties: [
-        {
-          class: 'Int',
-          name: 'skip'
-        },
-        {
-          class: 'Int',
-          name: 'limit'
-        },
-        {
-          class: 'Int',
-          name: 'i'
-        }
-      ],
-
-      methods: [
-        function put(obj, sub) {
-          var idx = this.skip + this.i;
-          // Record index relative to current anchor record index.
-          var recordDelta = idx - this.anchorDAOIdx_;
-
-          // Early return: idx is no longer in rows window.
-          if ( this.anchorDAOIdx_ - this.negativeRunway > idx ||
-               this.anchorDAOIdx_ + this.positiveRunway <= idx ) {
-            this.i++;
-            return;
-          }
-
-          // Compute row idx for record, and fill it.
-          var rowIdx = this.modNumRows_(this.anchorRowIdx_ + recordDelta);
-          this.rows_[rowIdx].view.data = obj;
-          this.i++;
-        }
-      ]
-    }
+    'positiveRunway',
+    'rows_',
+    'rowFormatter'
   ],
 
   properties: [
     {
       class: 'foam.dao.DAOProperty',
-      name: 'dao',
+      name: 'data',
       documentation: 'The DAO to the full set of data visible to this view.',
       postSet: function(old, nu) {
         if ( old === nu ) return;
@@ -156,20 +77,18 @@ foam.CLASS({
           // TODO(markdittmer): Model this?
           resetFn: function() { self.countRecords_(); }
         }));
+        self.countRecords_();
       },
       required: true
     },
     {
-      class: 'foam.u2.ViewSpec',
-      name: 'rowView',
-      documentation: `Spec for creating rows within this view. This view will
-          construct "numRows" rows and set their "data" to items from "dao"
-          or undefined (when row is not populated).`,
-      // TODO(markdittmer): ViewSpec should adapt default value here, instead of
-      // needing factory.
-      factory: function() {
-        return 'foam.u2.CitationView';
-      }
+      class: 'FObjectProperty',
+      of: 'foam.u2.RowFormatter',
+      name: 'rowFormatter',
+      documentation: `data => HTML-markup-string formatter for individual rows.
+          This strategy is used instead of Elements to maximize scroll
+          performance.`,
+      required: true
     },
     {
       class: 'Int',
@@ -183,27 +102,26 @@ foam.CLASS({
       class: 'Int',
       name: 'numRows',
       documentation: 'Fixed number of rows to recycle within this view.',
-      value: 200,
+      value: 20,
       required: true,
       final: true
     },
     {
       class: 'Int',
       name: 'negativeRunway',
-      documentation: 'Number of rows before anchor row.',
-      expression: function(numRows) {
-        return Math.floor(numRows / 3);
-      },
-      transient: true
+      documentation: 'Number of records to load before anchor row.',
+      value: 500
     },
     {
       class: 'Int',
       name: 'positiveRunway',
-      documentation: 'Number of rows after and including anchor row.',
-      transient: true,
-      expression: function(numRows, negativeRunway) {
-        return numRows - negativeRunway;
-      }
+      documentation: 'Number of records to load after+including anchor row.',
+      value: 500
+    },
+    {
+      class: 'Int',
+      name: 'rowOffset',
+      expression: function(numRows) { return Math.floor(numRows * 0.4); }
     },
     {
       class: 'Int',
@@ -213,6 +131,14 @@ foam.CLASS({
           batches limits the number of rows to be processed per animation
           frame.`,
       value: 25
+    },
+    {
+      class: 'FObjectProperty',
+      // of: 'DAOController',
+      name: 'daoController_',
+      documentation: `Private component responsible for fetching batches of data
+          and efficiently rendering in-view data as it arrives.`,
+      factory: function() { return this.DAOController.create(); }
     },
     {
       name: 'listenSub_',
@@ -240,26 +166,6 @@ foam.CLASS({
       documentation: 'Count of records to display in this view.'
     },
     {
-      class: 'Int',
-      name: 'skip_',
-      documentation: 'Number of records to skip when fetching data from "dao".',
-      expression: function(negativeRunway, rowHeight, anchorDAOIdx_) {
-        return Math.max(
-          0,
-          anchorDAOIdx_ - negativeRunway);
-      },
-      transient: true
-    },
-    {
-      class: 'Int',
-      name: 'limit_',
-      documentation: 'Limit on number of records to fetch from "dao".',
-      expression: function(count_, skip_, numRows) {
-        return Math.min(count_ - skip_, numRows);
-      },
-      transient: true
-    },
-    {
       class: 'FObjectArray',
       of: 'foam.u2.Element',
       name: 'rows_',
@@ -267,9 +173,7 @@ foam.CLASS({
       factory: function() {
         var rows = new Array(this.numRows);
         for ( var i = 0; i < rows.length; i++ ) {
-          rows[i] = this.Row.create({
-            view: this.rowView
-          });
+          rows[i] = this.Row.create();
         }
         return rows;
       },
@@ -341,9 +245,273 @@ foam.CLASS({
     }
   ],
 
+  classes: [
+    {
+      name: 'Row',
+      extends: 'foam.u2.Element',
+
+      documentation: `Recycled DOM rows. The "view" ViewSpec is used to manually
+          tear down and rebuild row contents whenever "data" changes. Scroll
+          performance is optimized by using an inner view with no dynamic
+          bindings so that the only DOM operation is the row completely
+          replacing its contents.`,
+
+      imports: [ 'rowFormatter' ],
+
+      axioms: [
+        foam.u2.CSS.create({
+          code: function CSS() {/*
+            ^ {
+              display: block;
+              contain: layout;
+              will-change: transform;
+              padding: 5px;
+              box-sizing: border-box;
+            }
+            ^ * {
+              background-color: #dddddd;
+            }
+        */}
+        })
+      ],
+
+      properties: [
+        [ 'nodeName', 'li' ],
+        {
+          name: 'data',
+          postSet: function(old, nu) {
+            if ( this.state !== this.LOADED ) return;
+            this.el().innerHTML = this.rowFormatter.format(nu);
+          }
+        }
+      ],
+
+      methods: [
+        function init() {
+          this.onload.sub(this.renderOnLoad);
+        },
+        function initE() {
+          this.addClass(this.myClass());
+        }
+      ],
+
+      listeners: [
+        function renderOnLoad() {
+          this.el().innerHTML = this.rowFormatter.format(this.data);
+        }
+      ]
+    },
+    {
+      name: 'DAOController',
+
+      documentation: `Controller responsible for fetching batches of data for
+          ScrollDAOView. Data are fetched in multiple small batch to avoid
+          blocking the main thread to parse large amounts of data.
+
+          Data are fetched in a window around the current scroll position and
+          inserted into row views as soon as they are available. Since the user
+          may "jump" to a far away scroll position, this controller keeps track
+          of a list of ranges, and only fetches missing data in the current
+          scroll window. The onReset() listener throws away data and ranges.
+
+          A smaller window (the "buffer") must contain gaps to trigger a data
+          fetch. When a fetch is triggered a larger window (the "runway")
+          defines which records to fetch:
+
+                    anchorDAOIdx_ ----v
+                                      <-- numRows -->
+                  <- negativeBuffer ->               <- positiveBuffer ->
+            <------- negativeRunway ->               <-- positiveRunway ------->
+            |||||||||||||||| records filled after batched fetch ||||||||||||||||
+          `,
+
+      // ScrollDAOView state needed for data fetching and immediate row
+      // insertion.
+      imports: [
+        'anchorDAOIdx_',
+        'anchorRowIdx_',
+        'batchSize',
+        'count_',
+        'data as dao',
+        'modNumRows_',
+        'negativeRunway',
+        'numRows',
+        'positiveRunway',
+        'rows_'
+      ],
+
+      properties: [
+        {
+          class: 'Int',
+          name: 'negativeBuffer',
+          documentation: `The area behind the current anchor where a gap may
+              trigger a data fetch`,
+          expression: function(negativeRunway, numRows) {
+            return Math.max(Math.ceil(negativeRunway / 5, numRows));
+          }
+        },
+        {
+          class: 'Int',
+          name: 'positiveBuffer',
+          documentation: `The area in front of the current anchor where a gap
+              may trigger a data fetch`,
+          expression: function(positiveRunway, numRows) {
+            return Math.max(Math.ceil(positiveRunway / 5, numRows));
+          }
+        },
+        {
+          name: 'data',
+          factory: function() { return {}; }
+        },
+        {
+          class: 'Array',
+          name: 'ranges'
+        }
+      ],
+
+      methods: [
+        function init() {
+          this.anchorDAOIdx_$.sub(this.onMove);
+          this.negativeRunway$.sub(this.onMove);
+          this.numRows$.sub(this.onMove);
+          this.positiveRunway$.sub(this.onMove);
+          this.onMove();
+          this.SUPER();
+        },
+        function missingData_(start, end) {
+          var ranges = this.ranges;
+          var iterAfterRange = true;
+          var i;
+          for ( i = this.ranges.length - 1; i >= 0; i-- ) {
+            if ( ranges[i][0] <= end ) break;
+          }
+          if ( i < 0 ) return [ [ start, end ] ];
+          if ( ranges[i][0] <= start && ranges[i][1] >= end ) return null;
+          var foundGaps = ranges[i][1] < end ? [ [ ranges[i][1], end ] ] : [];
+          var gapEnd = ranges[i][0];
+          for ( i--; i >= 0; i-- ) {
+            var range = ranges[i];
+            if ( range[1] < start ) {
+              foundGaps.push([ start, gapEnd ]);
+              break;
+            }
+            foundGaps.push([ range[1], gapEnd ]);
+            gapEnd = range[0];
+          }
+          return foundGaps;
+        },
+        function fetchData_(start, end, gaps) {
+          var viewStart = this.anchorDAOIdx_;
+          var viewEnd = viewStart + this.numRows;
+          var runwayStart = Math.max(0, viewStart - this.negativeRunway);
+          var runwayEnd = Math.min(this.count_, viewEnd + this.positiveRunway);
+
+          if ( runwayStart < start ) {
+            var before = this.missingData_(runwayStart, gaps[0][1]);
+            gaps = before ? before.concat(gaps.slice(1)) : gaps;
+          }
+          if ( runwayEnd > end ) {
+            var after = this.missingData_(gaps[gaps.length - 1][0], runwayEnd);
+            gaps = after ? gaps.slice(0, -1).concat(after) : gaps;
+          }
+
+          this.fetchChunks_(gaps);
+
+          var a = this.ranges;
+          var b = gaps;
+          var i = 0;
+          var j = 0;
+          while ( i < a.length || j < b.length ) {
+            if ( j >= b.length ) break;
+            if ( i >= a.length ) {
+              a = a.concat(b.slice(j));
+              break;
+            }
+            if ( a[i][0] <= b[j][0] ) {
+              if ( b[j][0] <= a[i][1] ) {
+                a[i][1] = Math.max(a[i][1], b[j][1]);
+                j++;
+              }
+            } else {
+              if ( a[i][0] <= b[j][1] ) {
+                a[i][0] = b[j][0];
+                a[i][1] = Math.max(a[i][1], b[j][1]);
+              }
+              j++;
+            }
+            for ( var k = i + 1; k < a.length; k++ ) {
+              if ( a[i][1] < a[k][0] ) break;
+              a[i][1] = a[k][1];
+            }
+            i = k;
+          }
+
+          this.ranges = a;
+        },
+        function fetchChunks_(chunks) {
+          for ( var i = 0; i < chunks.length; i++ ) {
+            this.fetchBatches_(chunks[i][0], chunks[i][1]);
+          }
+        },
+        function fetchBatches_(start, end) {
+          var self = this;
+          var batchSize = self.batchSize;
+          var skip = start;
+          var limit = Math.min(start + self.batchSize, end);
+          var fetchBatch = function() {
+            self.dao.skip(skip).limit(limit).
+              select().then(function(sink) {
+                var array = sink.array;
+                var daoStart = self.anchorDAOIdx_;
+                var daoEnd = Math.min(self.count_,
+                                      self.anchorDAOIdx_ + self.numRows);
+                for ( var i = 0; i < array.length; i++ ) {
+                  var daoIdx = skip + i;
+                  self.data[daoIdx] = array[i];
+                  if ( daoIdx >= daoStart && daoIdx < daoEnd ) {
+                    var anchorRelativeIdx = daoIdx - daoStart;
+                    var rowIdx = self.modNumRows_(self.anchorRowIdx_ +
+                                                  anchorRelativeIdx);
+                    var row = self.rows_[rowIdx];
+                    row.data = array[i];
+                  }
+                }
+
+                skip += batchSize;
+                limit = Math.min(batchSize, end - skip);
+                // TODO(markdittmer): Import rAF.
+                if ( limit > 0 ) window.requestAnimationFrame(fetchBatch);
+              });
+          };
+          fetchBatch();
+        }
+      ],
+
+      listeners: [
+        function onMove() {
+          var viewStart = this.anchorDAOIdx_;
+          var viewEnd = viewStart + this.numRows;
+          var bufferStart = Math.max(0, viewStart -
+                                     ( this.negativeRunway / 4 ));
+          var bufferEnd = Math.min(this.count_,
+                                   viewEnd + ( this.positiveRunway / 4 ));
+
+          var gaps = this.missingData_(bufferStart, bufferEnd);
+          if ( ! gaps ) return;
+          this.fetchData_(bufferStart, bufferEnd, gaps);
+        },
+        function onReset() {
+          this.data = {};
+          this.ranges = [];
+          this.onMove();
+        }
+      ]
+    }
+  ],
+
   methods: [
     function init() {
-      this.countRecords_();
+      if ( this.data ) this.countRecords_();
       this.SUPER();
     },
     function initE() {
@@ -387,18 +555,16 @@ foam.CLASS({
       documentation: `Layout all rows according to new anchor DAO idx. Generally
           used when scroll jump exceeds row window size or on data reset.`,
       code: function(anchorDAOIdx) {
-        var baseDAOIdx = anchorDAOIdx - this.negativeRunway;
+        var baseDAOIdx = anchorDAOIdx;
         for ( var i = 0; i < this.numRows; i++ ) {
           var row = this.rows_[i];
           var idx = baseDAOIdx + i;
-          row.view.data = undefined;
-          if ( idx >= this.count_ ) break;
-          if ( idx >= 0 )
-            this.translateRowTo_(idx, row);
+          row.data = this.daoController_.data[idx] || null;
+          this.translateRowTo_(idx < this.count_ ? idx : -1, row);
         }
 
         this.anchorDAOIdx_ = anchorDAOIdx;
-        this.anchorRowIdx_ = this.negativeRunway;
+        this.anchorRowIdx_ = 0;
       }
     },
     {
@@ -406,25 +572,17 @@ foam.CLASS({
       documentation: `Layout necessary rows for anchor moving forward within row
           window.`,
       code: function(anchorDAOIdx) {
-        var anchorDAOIdxDelta = anchorDAOIdx - this.anchorDAOIdx_;
-        var windowEndDAOIdx = this.anchorDAOIdx_ + this.positiveRunway;
-        var rowIdxStart = this.modNumRows_(this.anchorRowIdx_ -
-                                           this.negativeRunway);
-        var rowIdxEnd = this.modNumRows_(this.anchorRowIdx_ +
-                                         anchorDAOIdxDelta);
-        var numRows = anchorDAOIdxDelta;
-
-        for ( var i = 0; i < numRows; i++ ) {
-          var row = this.rows_[this.modNumRows_(rowIdxStart + i)];
-          var idx = windowEndDAOIdx + i;
-          row.view.data = undefined;
-          if ( idx >= this.count_ ) break;
-          if ( idx >= 0 )
-            this.translateRowTo_(idx, row);
+        var delta = anchorDAOIdx - this.anchorDAOIdx_;
+        var daoStart = this.anchorDAOIdx_ + this.numRows;
+        for ( var i = 0; i < delta; i++ ) {
+          var rowIdx = this.modNumRows_(this.anchorRowIdx_ + i);
+          var row = this.rows_[rowIdx];
+          var idx = daoStart + i < this.count_ ? daoStart + i : -1;
+          row.data = this.daoController_.data[idx] || null;
+          this.translateRowTo_(idx, row);
         }
-
         this.anchorDAOIdx_ = anchorDAOIdx;
-        this.anchorRowIdx_ = rowIdxEnd;
+        this.anchorRowIdx_ = this.modNumRows_(this.anchorRowIdx_ + delta);
       }
     },
     {
@@ -432,24 +590,18 @@ foam.CLASS({
       documentation: `Layout necessary rows for anchor moving backward within
           row window.`,
       code: function(anchorDAOIdx) {
-        var afterWindowRowIdx = this.anchorRowIdx_ + this.positiveRunway;
-        var anchorDAOIdxDelta = this.anchorDAOIdx_ - anchorDAOIdx;
-        var rowIdxStart = this.modNumRows_(afterWindowRowIdx);
-        var rowIdxEnd = this.modNumRows_(afterWindowRowIdx - anchorDAOIdxDelta);
-        var windowStartDAOIdx = this.anchorDAOIdx_ - this.negativeRunway;
-        var numRows = anchorDAOIdxDelta;
-
-        for ( var i = 0; i < numRows; i++ ) {
-          var row = this.rows_[this.modNumRows_(rowIdxStart - i)];
-          var idx = windowStartDAOIdx - i;
-          row.view.data = undefined;
-          if ( idx < 0 ) break;
-          if ( idx < this.count_ )
-            this.translateRowTo_(idx, row);
+        var delta = this.anchorDAOIdx_ - anchorDAOIdx;
+        var rowStart = this.anchorRowIdx_ + this.numRows;
+        for ( var i = 1; i <= delta; i++ ) {
+          var rowIdx = this.modNumRows_(rowStart - i);
+          var row = this.rows_[rowIdx];
+          var idx = this.anchorDAOIdx_ - i >= 0 ?
+              this.anchorDAOIdx_ - i : -1;
+          row.data = this.daoController_.data[idx] || null;
+          this.translateRowTo_(idx, row);
         }
-
         this.anchorDAOIdx_ = anchorDAOIdx;
-        this.anchorRowIdx_ = this.modNumRows_(this.anchorRowIdx_ - numRows);
+        this.anchorRowIdx_ = this.modNumRows_(this.anchorRowIdx_ - delta);
       }
     },
     {
@@ -469,16 +621,14 @@ foam.CLASS({
           within the row window triggers layout of all rows.`,
       code: function() {
         var self = this;
-        return self.dao.select(self.COUNT()).then(function(count) {
-          self.fetchData();
-
+        return self.data.select(self.COUNT()).then(function(count) {
           // Prevent unhandled scroll events from firing and potentially laying
           // out rows past the new "sentinel_" location.
           self.anchorLock_ = true;
 
           var oldCount = self.count_;
           var newCount = self.count_ = count.value;
-          var endIdx = self.anchorDAOIdx_ + self.positiveRunway;
+          var endIdx = self.anchorDAOIdx_ + self.numRows;
 
           // If the current window isn't affected by count change, nothing else
           // to be done.
@@ -487,46 +637,22 @@ foam.CLASS({
           // Choose a reasonable anchor for new count.
           var anchorDAOIdx = Math.min(
             self.anchorDAOIdx_,
-            Math.max(0, self.count_ - self.positiveRunway));
+            Math.max(0, self.count_ - self.numRows));
+
+          // Update scroll-indicating state first, then reset DAOController.
+          self.anchorDAOIdx_ = anchorDAOIdx;
+          self.anchorRowIdx_ = 0;
+          self.daoController_.onReset();
+
           // Like resetAnchor_, but lay out all rows.
-          var baseDAOIdx = anchorDAOIdx - self.negativeRunway;
+          var baseDAOIdx = anchorDAOIdx;
           for ( var i = 0; i < self.numRows; i++ ) {
             var row = self.rows_[i];
             var idx = baseDAOIdx + i;
-            row.view.data = undefined;
-            if ( idx < 0 || idx >= self.count_ )
-              self.translateRowTo_(-1, row);
-            else
-              self.translateRowTo_(idx, row);
+            row.data = self.daoController_.data[idx] || null;
+            self.translateRowTo_(idx < self.count_ ? idx : -1, row);
           }
-
-          self.anchorDAOIdx_ = anchorDAOIdx;
-          self.anchorRowIdx_ = self.negativeRunway;
         });
-      }
-    },
-    {
-      name: 'fetchData_',
-      documentation: `Fetch data aligned with current row window from "dao" in
-          batches of size "batchSize".`,
-      code: function() {
-        var batchSize = this.batchSize;
-        var skip = this.skip_;
-        var limit = Math.min(batchSize, this.limit_);
-        var fetchId = ++this.fetchId_;
-        var fetchBatch = function() {
-          if ( this.fetchId_ !== fetchId ) return;
-          this.dao.skip(skip).limit(limit)
-            .select(this.FetchSink.create({
-              skip: skip,
-              limit: limit
-            }));
-
-          skip += batchSize;
-          limit = Math.min(limit, this.skip_ + this.limit_ - skip);
-          if ( limit > 0 ) window.requestAnimationFrame(fetchBatch);
-        }.bind(this);
-        fetchBatch();
       }
     }
   ],
@@ -534,7 +660,7 @@ foam.CLASS({
   listeners: [
     {
       name: 'onScroll',
-      documentation: 'Respond to scroll: Move the anchor and fetch new data.',
+      documentation: 'Respond to scroll: Move the anchor.',
       isFramed: true,
       code: function(domEvt) {
         if ( this.anchorLock_ ) {
@@ -543,24 +669,21 @@ foam.CLASS({
         }
 
         var top = domEvt.srcElement.scrollTop;
-        var anchorTop = this.anchorDAOIdx_ * this.rowHeight;
-        var scrollDelta = top - anchorTop;
-        var recordDelta = Math.floor(scrollDelta / this.rowHeight);
+        var recordTop = Math.floor(top / this.rowHeight);
 
-        if ( Math.abs(recordDelta) < ( this.negativeRunway / 2 ) ) return;
+        // Situate anchor with 40% of rows scrolled above. This makes any lag
+        // from fast scrolling roughly symmetrical on scroll-up/scroll-down.
+        var rowsAbove = 0.4 * this.numRows;
+        var anchorDAOIdx;
+        if ( recordTop < rowsAbove ) {
+          anchorDAOIdx = 0;
+        } else {
+          anchorDAOIdx = recordTop - rowsAbove;
+        }
+        if ( anchorDAOIdx === this.anchorDAOIdx_ ) return;
 
-        this.moveAnchor_(this.anchorDAOIdx_ + recordDelta);
-        this.fetchData();
+        this.moveAnchor_(anchorDAOIdx);
       }
-    },
-    {
-      name: 'fetchData',
-      documentation: `Fetch data aligned with current row window from "dao".
-          This should be the only caller of "fetchData_()" to ensure that
-          rapid fetch requests are merged.`,
-      isMerged: true,
-      mergeDelay: 500,
-      code: function() { this.fetchData_(); }
     }
   ]
 });
