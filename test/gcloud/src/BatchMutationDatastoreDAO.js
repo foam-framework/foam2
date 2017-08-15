@@ -63,15 +63,10 @@ describe('BatchMutationDatastoreDAO', function() {
         }
       ],
 
-      listeners: [
-        {
-          name: 'onBatchedOperation',
-          isMerged: true,
-          mergeDelay: 150,
-          code: function() {
-            this.batches++;
-            this.SUPER();
-          }
+      methods: [
+        function beginBatchTransaction() {
+          if ( this.mutations_.length > 0 ) this.batches++;
+          return this.SUPER();
         }
       ]
     });

@@ -80,6 +80,7 @@ foam.CLASS({
     'com.google.cloud.datastore.DatastoreMutation',
     'com.google.cloud.datastore.DatastoreMutationType'
   ],
+  imports: [ 'info' ],
 
   properties: [
     {
@@ -93,10 +94,24 @@ foam.CLASS({
       value: 25
     },
     {
+      class: 'Int',
+      documentation: `Maximum number of in-flight batches
+          (i.e., transactions). Default to 1 in case clients expect strict
+          ordering of operations. Increasing to ~25 seems to work well for bulk
+          updates where order-of-operations doesn't matter.`,
+      name: 'numBatches',
+      value: 1
+    },
+    {
       class: 'FObjectArray',
       of: 'com.google.cloud.datastore.DatastoreMutation',
       name: 'mutations_'
     },
+    {
+      class: 'Int',
+      documentation: 'Number of in-flight transactions.',
+      name: 'numActiveTransactions_'
+    }
   ],
 
   methods: [
@@ -105,7 +120,7 @@ foam.CLASS({
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
           type: self.DatastoreMutationType.UPSERT,
-          data: o.toDatastoreEntity(),
+          data: o.toDatastoreEntity(this.partitionId_),
           resolve: function() {
             self.pub('on', 'put', o);
             resolve(o);
@@ -134,6 +149,20 @@ foam.CLASS({
         self.onBatchedOperation();
       });
     },
+    function beginBatchTransaction() {
+      if ( this.mutations_.length === 0 ) return Promise.resolve();
+
+      this.info(`BatchedMutationDatastoreDAO: Sending batch from ${this.mutations_.length} backlog`);
+
+      var mutations = this.mutations_.slice(0, this.batchSize);
+      this.mutations_ = this.mutations_.slice(this.batchSize);
+
+      this.numActiveTransactions_++;
+
+      return this.getRequest('beginTransaction').send()
+          .then(this.onResponse.bind(this, 'batch transaction'))
+          .then(this.onBatchTransactionResponse.bind(this, mutations));
+    }
   ],
 
   listeners: [
@@ -146,12 +175,12 @@ foam.CLASS({
           this.mutations_.length > 0,
           'BatchedMutationDatastoreDAO: Attempt to batch no operations');
 
-        var mutations = this.mutations_.slice(0, this.batchSize);
-        this.mutations_ = this.mutations_.slice(this.batchSize);
+        var promises = [];
+        for ( var i = this.numActiveTransactions_; i < this.numBatches; i++ ) {
+          this.beginBatchTransaction();
+        }
 
-        return this.getRequest('beginTransaction').send()
-            .then(this.onResponse.bind(this, 'batch transaction'))
-            .then(this.onBatchTransactionResponse.bind(this, mutations));
+        return Promise.all(promises);
       }
     },
 
@@ -190,12 +219,20 @@ foam.CLASS({
         mutations[i].resolve(operationComplete);
       }
 
-      if ( this.mutations_.length > 0 ) this.onBatchedOperation();
+      this.numActiveTransactions_--;
+
+      // Replace this transaction with a new one.
+      this.beginBatchTransaction();
     },
     function onBatchFailure(mutations) {
       for ( var i = 0; i < mutations.length; i++ ) {
         mutations[i].reject();
       }
+
+      this.numActiveTransactions_--;
+
+      // Replace this transaction with a new one.
+      this.beginBatchTransaction();
     }
   ]
 });
