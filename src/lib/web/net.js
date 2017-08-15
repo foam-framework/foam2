@@ -37,7 +37,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.json.Stringifer',
+      of: 'foam.json.Stringifier',
       name: 'stringifier',
       factory: function() { return this.ctxStringifier || foam.json.Network; }
     }
