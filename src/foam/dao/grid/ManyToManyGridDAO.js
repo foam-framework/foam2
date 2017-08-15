@@ -72,7 +72,7 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of',
-      value: 'foam.dao.ManyToManyGridRecord'
+      value: 'foam.dao.grid.ManyToManyGridRecord'
     }
   ],
 
