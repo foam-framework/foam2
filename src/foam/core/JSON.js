@@ -103,7 +103,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.json',
   name: 'Outputter',
-  implements: [ 'foam.json.Stringifier' ],
 
   documentation: 'JSON Outputter.',
 
@@ -543,30 +542,6 @@ foam.LIB({
 
     // Short, but exclude storage-transient properties.
     Storage: foam.json.Outputter.create({
-      pretty: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      // TODO: No deserialization support for shortnames yet.
-      //      useShortNames: true,
-      useShortNames: false,
-      strict: false,
-      propertyPredicate: function(o, p) { return ! p.storageTransient; }
-    }),
-
-    // JSON (not FON): Short, but exclude network-transient properties.
-    NetworkJSON: foam.json.JSONParserStringifier.create({
-      pretty: false,
-      formatDatesAsNumbers: true,
-      outputDefaultValues: false,
-      // TODO: No deserialization support for shortnames yet.
-      //      useShortNames: true,
-      useShortNames: false,
-      strict: false,
-      propertyPredicate: function(o, p) { return ! p.networkTransient; }
-    }),
-
-    // JSON (not FON): Short, but exclude storage-transient properties.
-    StorageJSON: foam.json.JSONParserStringifier.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,

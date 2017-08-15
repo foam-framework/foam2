@@ -20,9 +20,10 @@ foam.CLASS({
   name: 'MessagePortService',
 
   requires: [
-    'foam.box.RegisterSelfMessage',
+    'foam.box.NamedBox',
     'foam.box.RawMessagePortBox',
-    'foam.box.NamedBox'
+    'foam.box.RegisterSelfMessage',
+    'foam.json.Parser'
   ],
 
   imports: [
