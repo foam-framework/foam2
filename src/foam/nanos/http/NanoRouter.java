@@ -7,7 +7,7 @@ import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
 import java.io.IOException;
@@ -85,7 +85,7 @@ public class NanoRouter
 
     if ( service instanceof HttpServlet ) return (HttpServlet) service;
 
-    NanoLogger logger = (NanoLogger) getX().get("logger");
+    Logger logger = (Logger) getX().get("logger");
     logger.error(this.getClass(), spec.getName() + " does not have a HttpServlet.");
     return null;
   }

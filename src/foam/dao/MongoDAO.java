@@ -18,7 +18,7 @@ import foam.core.ClassInfo;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 
 // FObject JSON Parsing
 import foam.core.EmptyX;
@@ -87,7 +87,7 @@ public class MongoDAO
 
     Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
     Subscription sub       = new Subscription();
-    NanoLogger   logger    = (NanoLogger) x.get("logger");
+    Logger       logger    = (Logger) x.get("logger");
 
     if ( getOf() == null ) {
       throw new IllegalArgumentException("`of` is not set");
@@ -115,7 +115,7 @@ public class MongoDAO
     return sink;
   }
 
-  private FObject createFObject(X x, BsonDocumentReader reader, Class cls, NanoLogger logger) {
+  private FObject createFObject(X x, BsonDocumentReader reader, Class cls, Logger logger) {
     FObject obj = ( cls == null ) ? null : (FObject) x.create(cls);
 
     reader.readStartDocument();
@@ -147,7 +147,7 @@ public class MongoDAO
     return obj;
   }
 
-  private Object getValue(X x, BsonDocumentReader reader, Class cls, NanoLogger logger) {
+  private Object getValue(X x, BsonDocumentReader reader, Class cls, Logger logger) {
     Object value = null;
 
     switch ( reader.getCurrentBsonType() ) {
@@ -210,7 +210,7 @@ public class MongoDAO
     return value;
   }
 
-  private Object readArray(X x, BsonDocumentReader reader, Class cls, NanoLogger logger) {
+  private Object readArray(X x, BsonDocumentReader reader, Class cls, Logger logger) {
     reader.readStartArray();
 
     ArrayList<Object> arr = new ArrayList();
