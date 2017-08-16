@@ -328,10 +328,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaCode'
-    },
-    {
-      class: 'String',
-      name: 'javaReturns'
     }
   ],
 
