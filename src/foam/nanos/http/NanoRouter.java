@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.http;
 
 import foam.box.Skeleton;
@@ -39,7 +45,11 @@ public class NanoRouter
     PM          pm         = new PM(this.getClass(), serviceKey);
 
     try {
-      serv.service(req, resp);
+      if ( serv == null ) {
+        System.err.println("No service found for: " + serviceKey);
+      } else {
+        serv.service(req, resp);
+      }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
       t.printStackTrace();
