@@ -23,15 +23,9 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
-        ^{ }
-
         ^ label {
           position: relative;
         }
-
-        .foam-u2-RadioContainer { }
-
-        .foam-u2-Label { }
       */}
     })
   ],
@@ -60,7 +54,7 @@ foam.CLASS({
 
       this.add(this.choices.map(function(c) {
         return this.E('div').
-          addClass('foam-u2-RadioContainer').
+          addClass(this.myClass()).
           start('input').
             attrs({
               type: 'radio',
@@ -78,8 +72,7 @@ foam.CLASS({
               for: id
             }).
             start('span').
-            addClass('foam-u2-Label').
-            add(c[1]).
+              add(c[1]).
             end()
           .end();
       }.bind(this)));
