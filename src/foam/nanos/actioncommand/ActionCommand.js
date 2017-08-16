@@ -23,8 +23,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
-      name: 'object',
+      class: 'String',
+      name: 'objectID',
       required: true
     },
     {

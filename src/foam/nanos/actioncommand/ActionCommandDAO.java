@@ -19,9 +19,10 @@ import java.lang.reflect.Method;
 public class ActionCommandDAO
   extends foam.dao.ProxyDAO
 {
-  public Object cmd(Object obj) {
+  public Object cmd_(X x, Object obj) {
     if ( obj instanceof ActionCommand ) {
-      FObject actionObj = ((ActionCommand)obj).getObject();
+      String objID = ((ActionCommand)obj).getObjectID();
+      FObject actionObj = super.find_(x, objID);
       try {
         // Calling method
         Method action = actionObj.getClass().getDeclaredMethod(((ActionCommand)obj).getActionName());
@@ -32,10 +33,5 @@ public class ActionCommandDAO
       return true;
     }
     return super.cmd(obj);
-  }
-
-  public Object cmd_(X x, Object obj) {
-    this.cmd(obj);
-    return null;
   }
 }
