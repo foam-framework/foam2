@@ -20,7 +20,12 @@ public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo {
 
   public int compareValues(Object[] b1, Object[] b2) {
-    return (b1 == b2) ? 1 : 0;
+    if ( b1 == b2 ) return 0;
+    if ( b2 == null ) return 1;
+    if ( b1 == null ) return -1;
+    int h1 = b1.hashCode();
+    int h2 = b2.hashCode();
+    return h1 == h2 ? 0 : h1 > h2 ? 1 : -1;
   }
 
   @Override
@@ -44,9 +49,9 @@ public abstract class AbstractArrayPropertyInfo
           case XMLStreamConstants.START_ELEMENT:
             // Nested object in array
             if ( reader.getLocalName().equals("object") ) {
-              FObject clsInstance = XMLSupport.createObj(x, reader);
-              if ( clsInstance != null ) {
-                objList.add(clsInstance);
+              FObject o = XMLSupport.createObj(x, reader);
+              if ( o != null ) {
+                objList.add(o);
               }
             } else if ( reader.getLocalName().equals("value") ) {
               // TODO: TYPE CASTING FOR PROPER CONVERSION. NEED FURTHER SUPPORT FOR PRIMITIVE TYPES
@@ -81,13 +86,13 @@ public abstract class AbstractArrayPropertyInfo
         XMLSupport.toXML(nestedArray[j], doc, prop);
       }
       return;
-    } else {
-      Object[] nestObj = (Object[]) this.f(obj);
-      for ( int k = 0; k < nestObj.length; k++ ) {
-        Element nestedProp = doc.createElement("value");
-        nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
-        prop.appendChild(nestedProp);
-      }
+    }
+
+    Object[] nestObj = (Object[]) this.f(obj);
+    for ( int k = 0; k < nestObj.length; k++ ) {
+      Element nestedProp = doc.createElement("value");
+      nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
+      prop.appendChild(nestedProp);
     }
   }
 }
