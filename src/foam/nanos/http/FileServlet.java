@@ -8,19 +8,18 @@ package foam.nanos.http;
 
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class FileServlet
-    extends HttpServlet
-    implements NSpecAware
+  extends HttpServlet
+  implements NSpecAware
 {
   protected static final String                  DEFAULT_EXT  = "application/octet-stream";
   protected static final HashMap<String, String> EXTS         = new HashMap();
@@ -42,7 +41,7 @@ public class FileServlet
     EXTS.put("html",  "text/html");
   }
 
-  private void fileNotFoundError(HttpServletResponse resp, String file) {
+  protected void fileNotFoundError(HttpServletResponse resp, String file) {
     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
     resp.setContentType("application/json");
 

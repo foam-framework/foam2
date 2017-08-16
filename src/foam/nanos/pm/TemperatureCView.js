@@ -17,6 +17,7 @@
      [ 'totalTime', 100 ],
      [ 'width', 120 ],
      [ 'height', 18 ],
+     [ 'autoRepaint', true ],
      {
        name: 'temperature',
        expression: function(totalTime, maxTotalTime) {
