@@ -63,11 +63,16 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.
-        add(this.DAOUpdateController.OBJ,
-            this.DAOUpdateController.SAVE,
-            this.DAOUpdateController.CANCEL,
-            this.DAOUpdateController.DELETE);
+      /* Doesn't work because obj isn't known yet.
+      this.startContext({data: this.data.obj})
+        .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))
+      .endContext()
+      */
+      this.add(
+        this.DAOUpdateController.SAVE,
+        this.DAOUpdateController.CANCEL,
+        this.DAOUpdateController.DELETE,
+        this.DAOUpdateController.OBJ);
     }
   ],
 

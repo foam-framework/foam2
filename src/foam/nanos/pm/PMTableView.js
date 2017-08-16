@@ -20,8 +20,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Long',
-      name: 'maxTotalTime',
-      value: 10000
+      name: 'maxTotalTime'
     }
   ],
 

@@ -26,7 +26,7 @@ public class NanoHttpServer
     try {
       server_ = HttpServer.create(new InetSocketAddress(port_), 0);
     } catch(IOException e) {
-       e.printStackTrace();
+      e.printStackTrace();
     }
 
     server_.createContext("/", new NanoHttpHandler(getX()));
