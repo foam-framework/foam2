@@ -31,8 +31,7 @@ public class ActionCommandDAO
       }
       return true;
     }
-    super.setDelegate(this);
-    return null;
+    return super.cmd(obj);
   }
 
   public Object cmd_(X x, Object obj) {
