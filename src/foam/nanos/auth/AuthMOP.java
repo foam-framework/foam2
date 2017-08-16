@@ -12,6 +12,7 @@ import foam.mop.ProxyMOP;
 import javax.security.auth.AuthPermission;
 import java.util.Map;
 
+// TODO: Add docs. Is AuthenticatedMOP a better name?
 public class AuthMOP
   extends ProxyMOP
 {
