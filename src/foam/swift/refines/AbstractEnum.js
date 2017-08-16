@@ -49,7 +49,6 @@ switch self {
             })
           );
 
-          console.log(this.model_.id);
           this.VALUES.forEach(function(v) {
             cls.values.push(foam.swift.EnumValue.create({
               name: v.name,
