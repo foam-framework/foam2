@@ -84,7 +84,9 @@ public class NanoRouter
 
         service = new ServiceServlet(service, skeleton);
         informService(service, spec);
-      } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ignored) {
+      } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
+        ex.printStackTrace();
+        ((NanoLogger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
       }
     }
 
