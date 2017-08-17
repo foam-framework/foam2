@@ -66,7 +66,7 @@ foam.INTERFACE({
     {
       name: 'updatePassword',
       javaReturns: 'foam.core.X',
-      javaThrows: [ 'IllegalStateException' ],
+      javaThrows: [ 'java.lang.RuntimeException' ],
       args: [
         {
           name: 'x',
@@ -84,8 +84,8 @@ foam.INTERFACE({
     },
     {
       name: 'validateUser',
-      javaReturns: 'Boolean',
-      javaThrows: [ 'IllegalStateException' ],
+      javaReturns: 'void',
+      javaThrows: [ 'java.lang.RuntimeException' ],
       args: [
         {
           name: 'user',
