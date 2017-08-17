@@ -119,24 +119,24 @@ public class UserAndGroupAuthService
    * and return a context with the updated user information
    */
   public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
-    throws IllegalStateException {
+    throws RuntimeException {
 
     if ( x == null || oldPassword == null || newPassword == null
       || oldPassword == "" || newPassword == "" ) {
-      throw new IllegalStateException("Invalid Parameters");
+      throw new RuntimeException("Invalid Parameters");
     }
 
     if ( oldPassword.equals(newPassword) ) {
-      throw new IllegalStateException("New Password must be different");
+      throw new RuntimeException("New Password must be different");
     }
 
     User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
     if ( user == null ) {
-      throw new IllegalStateException("User not found");
+      throw new RuntimeException("User not found");
     }
 
     if ( ! oldPassword.equals(user.getPassword()) ) {
-      throw new IllegalStateException("Invalid Password");
+      throw new RuntimeException("Invalid Password");
     }
 
     user.setPassword(newPassword);
@@ -150,30 +150,30 @@ public class UserAndGroupAuthService
    * Will mainly be used as a veto method.
    * Users should have id, email, first name, last name, password for registration
    */
-  public Boolean validateUser(User user) throws IllegalStateException {
-    if ( user == null ) throw new IllegalStateException("Invalid User");
+  public void validateUser(User user) throws RuntimeException {
+    if ( user == null ) {
+      throw new RuntimeException("Invalid User");
+    }
 
     if ( user.getId() == "" ) {
-      throw new IllegalStateException("ID is required for creating a user");
+      throw new RuntimeException("ID is required for creating a user");
     }
 
     if ( user.getEmail() == "" ) {
-      throw new IllegalStateException("Email is required for creating a user");
+      throw new RuntimeException("Email is required for creating a user");
     }
 
     if ( user.getFirstName() == "" ) {
-      throw new IllegalStateException("First Name is required for creating a user");
+      throw new RuntimeException("First Name is required for creating a user");
     }
 
     if ( user.getLastName() == "" ) {
-      throw new IllegalStateException("Last Name is required for creating a user");
+      throw new RuntimeException("Last Name is required for creating a user");
     }
 
     if ( user.getPassword() == "" ) {
-      throw new IllegalStateException("Password is required for creating a user");
+      throw new RuntimeException("Password is required for creating a user");
     }
-
-    return true;
   }
 
   /**
