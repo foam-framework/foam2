@@ -6,18 +6,17 @@
 
 package foam.nanos.logger;
 
-import foam.core.*;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
-import java.io.IOException;
+import java.util.logging.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.logging.*;
+import java.io.IOException;
 
-public class NanoLogger
-  extends    ContextAwareSupport
-  implements NanoService
+public class StdoutLogger
+  implements Logger, NanoService
 {
-  protected Logger logger;
+  protected java.util.logging.Logger logger;
 
   protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -41,17 +40,13 @@ public class NanoLogger
   };
 
   public void start() {
-    logger = Logger.getAnonymousLogger();
+    logger = java.util.logging.Logger.getAnonymousLogger();
     logger.setUseParentHandlers(false);
     logger.setLevel(Level.ALL);
-
-    try {
-      Handler handler = new FileHandler("nano.log");
-      handler.setFormatter(new CustomFormatter());
-      logger.addHandler(handler);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    Handler handler = new ConsoleHandler();
+    handler.setLevel(Level.ALL);
+    handler.setFormatter(new CustomFormatter());
+    logger.addHandler(handler);
   }
 
   protected class CustomFormatter extends Formatter {
@@ -73,7 +68,7 @@ public class NanoLogger
       str.append(',');
 
       // debug special case, fine level == 500
-      if (lev == 500) {
+      if ( lev == 500 ) {
         str.append("DEBUG");
       } else {
         str.append(record.getLevel());
@@ -87,7 +82,7 @@ public class NanoLogger
 
   public String combine(Object[] args) {
     StringBuilder str = sb.get();
-    for (Object n : args) {
+    for ( Object n : args ) {
       str.append(',');
       str.append(n.toString());
     }
