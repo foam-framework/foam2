@@ -8,6 +8,7 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
+import foam.nanos.auth.AuthenticatedUserDAO;
 import foam.nanos.auth.Group;
 import foam.nanos.auth.User;
 import java.io.IOException;
@@ -16,7 +17,6 @@ public class Boot {
   protected DAO serviceDAO_;
   protected DAO userDAO_;
   protected DAO groupDAO_;
-  protected DAO pmDAO_;
   protected X   root_ = new ProxyX();
 
   public Boot() {
@@ -29,7 +29,6 @@ public class Boot {
       userDAO.setOf(User.getOwnClassInfo());
       userDAO.setX(root_);
       userDAO_ = new JDAO(userDAO, "users");
-      root_.put("userDAO", userDAO_);
 
       // Used for groups. We have multiple groups that contain different users
       MapDAO groupDAO = new MapDAO();
@@ -57,6 +56,7 @@ public class Boot {
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+    ((AuthenticatedUserDAO) root_.get("userDAO")).setDelegate(userDAO_);
 
     serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -68,9 +68,7 @@ public class Boot {
     });
   }
 
-  public X getX() {
-    return root_;
-  }
+  public X getX() { return root_; }
 
   public static void main (String[] args)
     throws Exception
