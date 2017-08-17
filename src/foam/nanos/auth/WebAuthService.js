@@ -12,6 +12,7 @@ foam.INTERFACE({
     {
       name: 'generateChallenge',
       javaReturns: 'String',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
@@ -22,6 +23,7 @@ foam.INTERFACE({
     {
       name: 'challengedLogin',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
@@ -36,6 +38,7 @@ foam.INTERFACE({
     {
       name: 'login',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
@@ -50,6 +53,7 @@ foam.INTERFACE({
     {
       name: 'check',
       javaReturns: 'Boolean',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
@@ -64,6 +68,7 @@ foam.INTERFACE({
     {
       name: 'updatePassword',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
@@ -82,6 +87,7 @@ foam.INTERFACE({
     {
       name: 'validateUser',
       javaReturns: 'Boolean',
+      returns: 'Promise',
       args: [
         {
           name: 'user',
@@ -92,6 +98,7 @@ foam.INTERFACE({
     {
       name: 'logout',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
