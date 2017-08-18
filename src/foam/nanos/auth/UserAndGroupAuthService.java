@@ -97,9 +97,9 @@ public class UserAndGroupAuthService
     String salt;
 
     try {
-      salt = user.getPassword().substring(user.getPassword().length() - 40);
+      salt = user.getPassword().split(":")[1];
       hashedPassword = hashPassword(password, salt);
-      storedPassword = user.getPassword().substring(0, user.getPassword().length() - 40);
+      storedPassword = user.getPassword().split(":")[0];
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Couldn't hash passwords with " + HASH_METHOD);
     }
@@ -149,8 +149,8 @@ public class UserAndGroupAuthService
     }
 
     String password = user.getPassword();
-    String storedPassword = password.substring(0, password.length() - 40);
-    String oldSalt = password.substring(password.length() - 40);
+    String storedPassword = password.split(":")[0];
+    String oldSalt = password.split(":")[1];
     String hashedOldPassword;
     String hashedNewPasswordOldSalt;
     String hashedNewPassword;
@@ -172,7 +172,7 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("New Password must be different");
     }
 
-    user.setPassword(hashedNewPassword + newSalt);
+    user.setPassword(hashedNewPassword + ":" + newSalt);
     userDAO_.put(user);
 
     return this.getX().put("user", user);

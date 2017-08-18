@@ -82,7 +82,7 @@ public class UserAndGroupAuthServiceTest
       user.setLastName("R" + i);
       try {
         String salt = UserAndGroupAuthService.generateRandomSalt();
-        user.setPassword(UserAndGroupAuthService.hashPassword("marc" + i, salt) + salt);
+        user.setPassword(UserAndGroupAuthService.hashPassword("marc" + i, salt) + ":" + salt);
       } catch (NoSuchAlgorithmException e) {
         System.out.println("Couldn't hash password with " + UserAndGroupAuthService.HASH_METHOD + "\nTest Failed");
       }
