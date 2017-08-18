@@ -4,6 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+// TODO: rename properties to use camelCase
 foam.CLASS({
   package: 'foam.nanos.pm',
   name: 'PMInfo',
@@ -51,7 +52,7 @@ foam.CLASS({
       name: 'totaltime',
       label: 'Total',
       tableCellFormatter: function(value) {
-        this.tag({class: 'foam.nanos.pm.TemperatureCView'}).add(' ', value);
+        this.tag({class: 'foam.nanos.pm.TemperatureCView', totalTime: value}).add(' ', value);
       }
     }
   ]

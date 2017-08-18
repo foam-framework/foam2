@@ -7,7 +7,9 @@
 foam.CLASS({
   package: 'foam.nanos.export',
   name: 'ExportDriverRegistry',
+
   documentation: 'Export driver registry model',
+
   properties: [
     { class: 'String', name: 'id' },
     { class: 'String', name: 'driverName' },

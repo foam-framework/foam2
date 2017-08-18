@@ -8,19 +8,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-/**
- * Created by marcroopchand on 2017-05-24.
- */
 
 public class UserAndGroupAuthServiceTest
   extends CachedUserAndGroupAuthService
 {
-  private int numUsers        = 10;
-  private int numGroups       = 1;
-  private int numPermissions  = 10;
 
-  private ArrayList<X> xArray               = new ArrayList<>();
-  private ArrayList<Permission> permissions = new ArrayList<>();
+  protected int numUsers        = 10;
+  protected int numGroups       = 5;
+  protected int numPermissions  = 10;
+
+  protected ArrayList<X> xArray               = new ArrayList<>();
+  protected ArrayList<Permission> permissions = new ArrayList<>();
 
   @Override
   public void start() {
