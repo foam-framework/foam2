@@ -11,7 +11,7 @@ import foam.box.*;
 import foam.core.*;
 import foam.dao.*;
 import foam.nanos.boot.NSpec;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 import java.io.IOException;
 import java.net.URI;
@@ -30,7 +30,7 @@ public class NanoHttpHandler
 
   @Override
   public void handle(HttpExchange exchange) throws IOException {
-    ServletHandler sh = new ServletHandler((HttpServlet)getX().get("httprouter"));
+    ServletHandler sh = new ServletHandler((HttpServlet) getX().get("httprouter"));
     sh.handle(exchange);
   }
 }
