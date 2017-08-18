@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import foam.core.ContextAgent;
 import foam.core.X;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
 
 public class FixedThreadPool
@@ -35,7 +35,7 @@ public class FixedThreadPool
     public void run() {
       incrExecuting(1);
 
-      NanoLogger logger = (NanoLogger) getX().get("logger");
+      Logger logger = (Logger) getX().get("logger");
       PM pm = new PM(this.getClass(), agent_.getClass().getName());
 
       try {

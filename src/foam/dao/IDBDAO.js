@@ -188,7 +188,7 @@ foam.CLASS({
 
     function find_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id != undefined ? obj.id : obj);
+      var key = this.serializeId(obj.id !== undefined ? obj.id : obj);
 
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
@@ -212,7 +212,7 @@ foam.CLASS({
 
     function remove_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id != undefined ? obj.id : obj);
+      var key = this.serializeId(obj.id !== undefined ? obj.id : obj);
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
           var getRequest = store.get(key);

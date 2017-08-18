@@ -46,28 +46,41 @@ if ( foam.isServer ) {
       {
         name: 'fs',
         factory: function() { return require('fs'); }
+      },
+      {
+        name: 'writePromise',
+        value: Promise.resolve()
       }
     ],
 
     methods: [
       function put(obj) {
-        this.write_(
-          Buffer.from("put(foam.json.parse(" +
-              foam.json.Storage.stringify(obj) + "));\n"));
+        return this.write_(Buffer.from(
+            "put(foam.json.parse(" + foam.json.Storage.stringify(obj) +
+              "));\n"));
       },
 
       function remove(obj) {
-        this.write_(
-          Buffer.from("remove(foam.json.parse(" +
-              foam.json.Storage.stringify(obj) + "));\n"));
+        return this.write_(Buffer.from(
+            "remove(foam.json.parse(" + foam.json.Storage.stringify(obj) +
+              "));\n"));
       },
 
       function write_(data) {
-        var offset = this.offset;
-        this.offset += data.length;
-        this.fs.write(this.fd, data, 0, data.length, offset, function(err, written, buffer){
-          if ( written != data.length ) throw "What";
-          if ( err ) throw err;
+        var self = this;
+        var offset = self.offset;
+        self.offset += data.length;
+        return self.writePromise = self.writePromise.then(function() {
+          return new Promise(function(resolve, reject) {
+            self.fs.write(
+                self.fd, data, 0, data.length, offset,
+                function(err, written, buffer) {
+                  if ( err ) reject(err);
+                  if ( written != data.length )
+                    reject(new Error('foam.dao.NodeFileJournal: Incomplete write'));
+                  resolve();
+                });
+          });
         });
       },
 
@@ -120,6 +133,12 @@ foam.CLASS({
           dao.listen(self.journal);
           return dao;
         });
+      }
+    },
+    {
+      name: 'synced',
+      getter: function() {
+        return Promise.all([ this.promise, this.journal.writePromise ]);
       }
     }
   ]

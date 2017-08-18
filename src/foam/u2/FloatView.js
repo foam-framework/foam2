@@ -31,13 +31,17 @@ foam.CLASS({
   properties: [
     [ 'type', 'number' ],
     { class: 'Float', name: 'data' },
-    'precision'
+    'precision',
+    'min',
+    'max'
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
+      if ( this.min != undefined ) this.setAttribute('min', this.min);
+      if ( this.max != undefined ) this.setAttribute('max', this.max);
     },
 
     function link() {
@@ -49,6 +53,8 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.precision = p.precision;
+      this.min = p.min;
+      this.max = p.max;
     },
 
     function formatNumber(val) {

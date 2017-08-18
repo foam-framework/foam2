@@ -20,10 +20,12 @@ public interface PropertyInfo
 
   public boolean getTransient();
   public boolean getRequired();
+  public Class getValueClass();
   public String getName();
   public Object get(Object obj);
   public void set(Object obj, Object value);
   public Parser jsonParser();
   public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
+  public int comparePropertyToObject(Object key, FObject o);
 }

@@ -433,9 +433,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).intValue() :'
-            + '(int)o;';
+      m.body = 'return ((Number) o).intValue();';
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(cast(key), get_(o));';
+
       return info;
     }
   ]
@@ -455,9 +457,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).byteValue() :'
-            + '(byte)o;';
+      m.body = 'return ((Number) o).byteValue();';
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(cast(key), get_(o));';
+
       return info;
     }
   ]
@@ -477,9 +481,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).shortValue() :'
-            + '(short)o;';
+      m.body = 'return ((Number) o).shortValue();';
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(cast(key), get_(o));';
+
       return info;
     }
   ]
@@ -499,9 +505,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).longValue() :'
-            + '(long)o;';
+      m.body = 'return ((Number) o).longValue();';
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(cast(key), get_(o));';
+
       return info;
     }
   ]
@@ -521,9 +529,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ( o instanceof Number ) ?'
-            + '((Number)o).doubleValue() :'
-            + '(double)o;';
+      m.body = 'return ((Number) o).doubleValue();';
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(cast(key), get_(o));';
+
       return info;
     }
   ]
@@ -608,7 +618,7 @@ foam.CLASS({
       });
 
       var cast = info.getMethod('cast');
-      cast.body = 
+      cast.body =
 `if ( o instanceof Integer ) {
   return forOrdinal((int) o);
 }
@@ -705,6 +715,10 @@ foam.CLASS({
         type: 'int',
         body: 'return ' + this.width + ';'
       });
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((String) key, get_(o));';
+
       return info;
     }
   ]
@@ -721,7 +735,7 @@ foam.CLASS({
       }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'foam.lib.json.ExprParser']
   ]
 });
 
@@ -740,6 +754,10 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compare(key, get_(o));';
+
       return info;
     }
   ],
@@ -788,6 +806,9 @@ foam.CLASS({
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
 
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compare(key, get_(o));';
+
       var cast = info.getMethod('cast');
       cast.body = 'Object[] value = (Object[])o;\n'
                 + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
@@ -835,6 +856,10 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compare(key, get_(o));';
+
       return info;
     }
   ],
@@ -859,6 +884,32 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.String',
+
+  properties: [
+    ['javaType', 'String'],
+    ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.StringParser']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'getWidth',
+        visibility: 'public',
+        type: 'int',
+        body: 'return ' + this.width + ';'
+      });
+
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues((String) key, get_(o));';
+
+      return info;
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
@@ -866,6 +917,18 @@ foam.CLASS({
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
+  ],
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(cast(key), get_(o));';
+
+      var m = info.getMethod('cast');
+      m.body = 'return ((Boolean) o).booleanValue();'
+
+      return info;
+    }
   ]
 });
 
@@ -876,6 +939,16 @@ foam.CLASS({
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var c = info.getMethod('comparePropertyToObject');
+      c.body = 'return compareValues(key, get_(o));';
+
+      return info;
+    }
   ]
 });
 

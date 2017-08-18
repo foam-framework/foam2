@@ -24,10 +24,6 @@ foam.CLASS({
       the correct payload to subsequent API calls, and return results in the
       Promise.`,
 
-  constants: {
-    INT32_MAX: Math.pow(2, 31) - 1
-  },
-
   properties: [
     {
       name: 'ctx'
@@ -41,6 +37,18 @@ foam.CLASS({
     {
       class: 'Array',
       name: 'results'
+    },
+    {
+      class: 'Boolean',
+      name: 'halted'
+    },
+    {
+      name: 'sub',
+      factory: function() {
+        var sub = foam.core.FObject.create();
+        sub.onDetach(function() { this.halted = true; }.bind(this));
+        return sub;
+      }
     }
   ]
 });
@@ -61,7 +69,14 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.net.HTTPRequest'
   ],
-  imports: [ 'gcloudProjectId?' ],
+  imports: [
+    'gcloudProjectId?',
+    'datastoreNamespaceId?'
+  ],
+
+  constants: {
+    INT32_MAX: Math.pow(2, 31) - 1
+  },
 
   properties: [
     {
@@ -71,6 +86,14 @@ foam.CLASS({
         foam.assert(this.gcloudProjectId, 'DatastoreDAO missing ' +
             '"gcloudProjectId" from context or "projectId" on construction');
         return this.gcloudProjectId;
+      },
+      final: true
+    },
+    {
+      class: 'String',
+      name: 'namespaceId',
+      factory: function() {
+        return this.datastoreNamespaceId || '';
       },
       final: true
     },
@@ -99,6 +122,14 @@ foam.CLASS({
         return this.protocol + '://' + this.host + ':' + this.port +
             '/v1/projects/' + this.projectId;
       }
+    },
+    {
+      name: 'partitionId_',
+      factory: function() {
+        return this.namespaceId ?
+            { projectId: this.projectId, namespaceId: this.namespaceId } :
+            { projectId: this.projectId };
+      }
     }
   ],
 
@@ -121,7 +152,8 @@ foam.CLASS({
 
     function find_(x, idOrObj) {
       var key = foam.core.FObject.isInstance(idOrObj) ?
-          idOrObj.getDatastoreKey() : this.getDatastoreKeyFromId_(idOrObj);
+          idOrObj.getDatastoreKey(this.partitionId_) :
+          this.getDatastoreKeyFromId_(idOrObj, this.partitionId_);
       return this.sendRequest('lookup', { keys: [ key ] })
           .then(this.onResponse.bind(this, 'find'))
           .then(this.onFindResponse.bind(this, x));
@@ -129,14 +161,14 @@ foam.CLASS({
     function put_(x, o) {
       return this.sendRequest('commit', {
         mode: 'NON_TRANSACTIONAL',
-        mutations: [ { upsert: o.toDatastoreEntity() } ]
+        mutations: [ { upsert: o.toDatastoreEntity(this.partitionId_) } ]
       }).then(this.onResponse.bind(this, 'put'))
           .then(this.onPutResponse.bind(this, x, o));
     },
     function remove_(x, o) {
       return this.sendRequest('commit', {
         mode: 'NON_TRANSACTIONAL',
-        mutations: [ { delete: o.getDatastoreKey() } ]
+        mutations: [ { delete: o.getDatastoreKey(this.partitionId_) } ]
       }).then(this.onResponse.bind(this, 'remove'))
           .then(this.onRemoveResponse.bind(this, x, o));
     },
@@ -146,6 +178,7 @@ foam.CLASS({
         this.of.getClassDatastoreKind()
       ] } };
       var query = payload.query;
+      payload.partitionId = this.partitionId_;
       if ( predicate ) query.filter = predicate.toDatastoreFilter();
       if ( order ) query.order = order.toDatastoreOrder();
       if ( skip ) query.offset = Math.min(skip, this.INT32_MAX);
@@ -173,11 +206,14 @@ foam.CLASS({
       name: 'getDatastoreKeyFromId_',
       documentation: `Helper for find() to construct the appropriate :lookup
         Datastore query.`,
-      code: function(id) {
-        return { path: [ {
-          kind: this.of.getOwnClassDatastoreKind(),
-          name: com.google.cloud.datastore.toDatastoreKeyName(id)
-        } ] };
+      code: function(id, partitionId) {
+        return {
+          partitionId: partitionId,
+          path: [ {
+            kind: this.of.getOwnClassDatastoreKind(),
+            name: com.google.cloud.datastore.toDatastoreKeyName(id)
+          } ]
+        };
       }
     },
     {
@@ -187,6 +223,8 @@ foam.CLASS({
       code: function(data, batch) {
         var payload = data.requestPayload;
         var query = payload.query;
+
+        payload.partitionId = this.partitionId_;
 
         // Update query to get next batch of results.
         if ( query.offset )
@@ -207,8 +245,9 @@ foam.CLASS({
       documentation: `Determine whether or not a batch contains the last results
         in a (potentially "limit"ed) query result. Abstracted out of
         onSelectResponse() to support faked batching in tests.`,
-      code: function(batch) {
-        return batch.entityResults && batch.entityResults.length > 0 &&
+      code: function(batch, data) {
+        return ( ! data.halted ) && batch.entityResults &&
+            batch.entityResults.length > 0 &&
             ( batch.moreResults === 'NOT_FINISHED' ||
               batch.moreResults === 'MORE_RESULTS_AFTER_CURSOR' );
       }
@@ -292,18 +331,19 @@ foam.CLASS({
       // Allow datastore-aware sinks to unpack query result batches manually
       // instead of DAO put()ing to them.
       if ( data.sink && data.sink.fromDatastoreEntityResults ) {
-        data.sink.fromDatastoreEntityResults(entities, data.x);
+        data.sink.fromDatastoreEntityResults(entities, data.ctx);
       } else {
         var fromDatastoreEntity =
             com.google.cloud.datastore.fromDatastoreEntity;
         for ( var i = 0; i < entities.length; i++ ) {
           var obj = fromDatastoreEntity(entities[i].entity, data.ctx);
           data.results.push(obj);
-          data.sink && data.sink.put && data.sink.put(obj);
+          data.sink && data.sink.put && data.sink.put(obj, data.sub);
+          if ( data.halted ) break;
         }
       }
 
-      if ( this.resultsAreIncomplete_(batch) ) {
+      if ( this.resultsAreIncomplete_(batch, data) ) {
         return this.selectNextBatch_(data, batch);
       } else {
         data.sink && data.sink.eof && data.sink.eof();
@@ -314,10 +354,10 @@ foam.CLASS({
       var transaction = json.transaction;
       var deletes = new Array(arr.length);
       for ( var i = 0; i < deletes.length; i++ ) {
-        deletes[i] = { delete: arr[i].getDatastoreKey() };
+        deletes[i] = { delete: arr[i].getDatastoreKey(this.partitionId_) };
       }
 
-      this.sendRequest('commit', {
+      return this.sendRequest('commit', {
         mode: 'TRANSACTIONAL',
         mutations: deletes,
         transaction: transaction

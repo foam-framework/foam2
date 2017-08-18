@@ -94,3 +94,22 @@ if ( ! Object.values ) {
     return Object.keys(obj).map(function(k) { return obj[k]; });
   };
 }
+
+// Required for IE 11.
+if( ! Object.is ) {
+  // From ES6 specs, and also:
+  // https://gist.github.com/matthewp/2036428
+  Object.is = function(x, y) {
+    if (x === y) {
+      // 0 === -0, but they are not identical
+      return x !== 0 || 1 / x === 1 / y;
+    }
+
+    // NaN !== NaN, but they are identical.
+    // NaNs are the only non-reflexive value, i.e., if x !== x,
+    // then x is a NaN.
+    // isNaN is broken: it converts its argument to number, so
+    // isNaN("foo") => true
+    return x !== x && y !== y;
+  };
+}

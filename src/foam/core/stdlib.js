@@ -15,6 +15,31 @@
  * limitations under the License.
  */
 
+// This must be declared as the first foam.LIB() using { name: ..., code: ... }
+// method syntax because foam.LIB() may invoke foam.Function.getName() on
+// methods declared using function methodName(...) { ... }.
+foam.LIB({
+  name: 'foam.Function',
+
+  methods: [
+    {
+      name: 'getName',
+      code: (function named() {}).name === 'named' ?
+          function(method) { return method.name; } :
+          function(method) {
+            if (typeof method !== 'function') return method.name;
+
+            // IE11 does not support named functions. Extract name with
+            // f.toString().
+            var match = method.toString().
+                match(/^function\s+([A-Za-z_$][0-9A-Za-z_$]*)\s*\(/);
+            foam.assert(match, 'Unable to deduce method name from function');
+            return match[1];
+          }
+    }
+  ]
+});
+
 /**
   Rather than extending built-in prototypes, we create flyweight versions.
 

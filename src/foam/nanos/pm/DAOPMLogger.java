@@ -26,7 +26,6 @@ public class DAOPMLogger
 
     PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
-
       pmi.setMintime(pm.getTime());
       pmi.setMaxtime(pm.getTime());
       pmi.setTotaltime(pm.getTime());
