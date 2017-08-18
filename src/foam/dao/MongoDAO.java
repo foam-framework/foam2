@@ -123,12 +123,6 @@ public class MongoDAO
     while ( reader.readBsonType() != BsonType.END_OF_DOCUMENT ) {
       String fieldName = reader.readName();
 
-      // Skips the initial MongoDB Document ID field
-      if ( fieldName.equals("_id") ) {
-        reader.readObjectId();
-        continue;
-      }
-
       PropertyInfo prop = ( obj == null) ? null : 
         (PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName);
 
@@ -200,7 +194,7 @@ public class MongoDAO
         break;
 
       case OBJECT_ID:
-        value = reader.readObjectId();
+        value = reader.readObjectId().toString();
         break;
 
       default:
