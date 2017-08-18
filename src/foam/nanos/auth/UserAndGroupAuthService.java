@@ -93,14 +93,18 @@ public class UserAndGroupAuthService
     if ( user == null ) throw new RuntimeException("User not found.");
 
     String hashedPassword;
+    String storedPassword;
+    String salt;
 
     try {
-      hashedPassword = hashPassword(password, user.getPasswordSalt());
+      salt = user.getPassword().substring(user.getPassword().length() - 40);
+      hashedPassword = hashPassword(password, salt);
+      storedPassword = user.getPassword().substring(0, user.getPassword().length() - 40);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Couldn't hash passwords with " + HASH_METHOD);
     }
 
-    if ( ! user.getPassword().equals(hashedPassword) ) {
+    if ( ! storedPassword.equals(hashedPassword) ) {
       throw new RuntimeException("Invalid Password");
     }
 
@@ -144,29 +148,31 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("User not found");
     }
 
-    String hashedOldPassword = "";
-    String hashedNewPasswordOldSalt = "";
-    String hashedNewPassword = "";
+    String password = user.getPassword();
+    String storedPassword = password.substring(0, password.length() - 40);
+    String oldSalt = password.substring(password.length() - 40);
+    String hashedOldPassword;
+    String hashedNewPasswordOldSalt;
+    String hashedNewPassword;
     String newSalt = generateRandomSalt();
 
     try {
-      hashedOldPassword = hashPassword(oldPassword, user.getPasswordSalt());
-      hashedNewPasswordOldSalt = hashPassword(newPassword, user.getPasswordSalt());
+      hashedOldPassword = hashPassword(oldPassword, oldSalt);
+      hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
       hashedNewPassword = hashPassword(newPassword, newSalt);
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException("Failed to hash passwords using " + HASH_METHOD);
+    }
+
+    if ( ! hashedOldPassword.equals(storedPassword) ) {
+      throw new IllegalStateException("Invalid Password");
     }
 
     if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
       throw new IllegalStateException("New Password must be different");
     }
 
-    if ( ! hashedOldPassword.equals(user.getPassword()) ) {
-      throw new IllegalStateException("Invalid Password");
-    }
-
-    user.setPassword(hashedNewPassword);
-    user.setPasswordSalt(newSalt);
+    user.setPassword(hashedNewPassword + newSalt);
     userDAO_.put(user);
 
     return this.getX().put("user", user);

@@ -85,10 +85,6 @@
        // TODO: create custom view or DAO
      },
      {
-       class: 'String',
-       name: 'passwordSalt'
-     },
-     {
        class: 'Password',
        name: 'password',
        displayWidth: 30,
