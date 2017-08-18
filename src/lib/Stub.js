@@ -19,22 +19,25 @@ foam.CLASS({
   package: 'foam.core',
   name: 'StubMethod',
   extends: 'Method',
+
   properties: [
     'replyPolicyName',
     'boxPropName',
     {
       name: 'code',
       factory: function() {
-        var returns = this.returns;
+        var returns         = this.returns;
         var replyPolicyName = this.replyPolicyName;
-        var boxPropName = this.boxPropName;
-        var name = this.name;
+        var boxPropName     = this.boxPropName;
+        var name            = this.name;
 
         return function() {
           if ( returns ) {
             var replyBox = this.ReplyBox.create({
               delegate: this.RPCReturnBox.create()
             });
+
+            var errorBox = replyBox;
 
             var ret = replyBox.delegate.promise;
 
@@ -70,10 +73,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'StubAction',
   extends: 'Action',
+
   properties: [
     'replyPolicyName',
     'boxPropName',
@@ -102,6 +107,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -217,6 +223,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'StubClass',
@@ -294,6 +301,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.core',
   name: 'StubFactory',
@@ -306,6 +314,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',

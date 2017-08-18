@@ -42,8 +42,11 @@ foam.CLASS({
 
     function out() {
       for ( var i = 0 ; i < arguments.length ; i++ ) {
-        if ( arguments[i] != null && arguments[i].outputJava ) { arguments[i].outputJava(this); }
-        else this.buf_ += arguments[i];
+        if ( arguments[i] != null && arguments[i].outputJava ) {
+          arguments[i].outputJava(this);
+        } else {
+          this.buf_ += arguments[i];
+        }
       }
       return this;
     },
