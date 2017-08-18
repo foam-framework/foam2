@@ -16,14 +16,13 @@ import foam.dao.MapDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Min;
 import foam.nanos.NanoService;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import foam.nanos.pm.PM;
-
 import java.util.Date;
 
 public class CronScheduler
-    extends    ContextAwareSupport
-    implements NanoService, Runnable
+  extends    ContextAwareSupport
+  implements NanoService, Runnable
 {
   protected DAO cronDAO_;
 
@@ -45,7 +44,7 @@ public class CronScheduler
 
   @Override
   public void run() {
-    final NanoLogger logger = (NanoLogger) getX().get("logger");
+    final Logger logger = (Logger) getX().get("logger");
 
     try {
       while ( true ) {
