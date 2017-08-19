@@ -175,6 +175,7 @@ public protocol FObject: class {
   func callAction(key: String)
   func compareTo(_ data: FObject?) -> Int
   func onDetach(_ sub: Subscription)
+  func detach()
   init(_ args: [String:Any?])
 }
 
@@ -224,9 +225,15 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   public func clearProperty(_ key: String) {}
 
   public func onDetach(_ sub: Subscription) {
-    _ = self.sub(topics: ["detach"]) { (_, _) in
+    _ = self.sub(topics: ["detach"]) { (s, _) in
+      s.detach()
       sub.detach()
     }
+  }
+
+  public func detach() {
+    _ = pub(["detach"])
+    detachListeners(listeners: listeners)
   }
 
   public func sub(
@@ -246,6 +253,7 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     node.prev = listeners
     node.listener = l
     node.sub = Subscription(detach: {
+      _ = self
       node.next?.prev = node.prev
       node.prev?.next = node.next
       node.listener = nil
@@ -344,8 +352,7 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   }
 
   deinit {
-    _ = pub(["detach"])
-    detachListeners(listeners: listeners)
+    detach()
   }
 }
 

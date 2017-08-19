@@ -271,6 +271,9 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "lib/boxJava", flags: ['java'] },
+
+  { name: "foam/swift/refines/Box", flags: ['swift'] },
+
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
   { name: "foam/box/BroadcastBox" },

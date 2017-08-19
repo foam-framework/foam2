@@ -8,6 +8,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.swift.core.Slot',
       required: true,
+      swiftWeak: true,
       name: 'parentSlot',
     },
     {
@@ -28,6 +29,7 @@ foam.CLASS({
       name: 'init',
       swiftCode: function() {/*
 onDetach(parentSlot.swiftSub(parentChange_listener))
+onDetach(Subscription(detach: { self.value = nil }))
 parentChange()
       */},
     },
@@ -64,6 +66,7 @@ prevSub?.detach()
 prevSub = nil
 if let o = parentSlot.swiftGet() as? FObject {
   prevSub = o.getSlot(key: name)?.swiftSub(valueChange_listener)
+  onDetach(prevSub!)
 }
 valueChange()
       */},
@@ -77,7 +80,7 @@ if let parentValue = parentSlot.swiftGet() as? FObject {
 } else {
   value = nil
 }
-    */},
+      */},
     },
   ]
 });

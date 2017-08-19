@@ -16,18 +16,18 @@ class SwiftTestsTests: XCTestCase {
   func testListen() {
     let test = Test()
     var numPubs = 0
-    let sub = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+    _ = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
       numPubs += 1
       sub.detach()
     })
 
     var numPubs2 = 0
-    let sub2 = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+    _ = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
       numPubs2 += 1
     })
 
     var numPubs3 = 0
-    let sub3 = test.lastName$.swiftSub({ (sub: Subscription, args: [Any?]) -> Void in
+    _ = test.lastName$.swiftSub({ (sub: Subscription, args: [Any?]) -> Void in
       numPubs3 += 1
     })
 
@@ -39,9 +39,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(numPubs2, 4) // Each set to first or last name triggers another set.
     XCTAssertEqual(numPubs3, 1)
 
-    sub.detach() // Should do nothing.
-    sub2.detach()
-    sub3.detach()
+    test.detach()
   }
 
   func testFollow() {
@@ -50,7 +48,8 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(o2.firstName, "A")
     o2.firstName = "B"
     XCTAssertEqual(o1.firstName, "B")
-    o2.firstName_Value_Sub_?.detach()
+    o1.detach()
+    o2.detach()
   }
 
   func testObjectCreationPerformance() {
@@ -262,6 +261,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(t.exprProp, "OVERRIDE")
     t.firstName = "Nope"
     XCTAssertEqual(t.exprProp, "OVERRIDE")
+    t.detach()
   }
 
   func testCompare() {
@@ -363,7 +363,8 @@ class SwiftTestsTests: XCTestCase {
     o.lastName = "D"
     XCTAssertEqual(slot.swiftGet() as! String, "Mike D")
 
-    slot.cleanup()
+    o.detach()
+    slot.detach()
   }
 
   func testMemLeaks() {
@@ -410,14 +411,17 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(s.swiftGet() as? String, "YO")
 
     var i = 0
-    let sub = s.swiftSub { (_, _) in
+    _ = s.swiftSub { (_, _) in
       i += 1
       XCTAssertEqual(s.swiftGet() as? String, "YO2")
     }
     t2.firstName = "YO2"
     XCTAssertEqual(s.swiftGet() as? String, "YO2")
     XCTAssertEqual(i, 1)
-    sub.detach()
+
+    s.detach()
+    t.detach()
+    t2.detach()
   }
 
   func testSubSlot2() {
@@ -430,25 +434,24 @@ class SwiftTestsTests: XCTestCase {
 
     var subSlot = 0
     let t2 = Test(["anyProp": t])
-    // TODO without holding on to this here, the test fails because the subslot created when this
-    // happens gets destroyed. Need to find a way to prevent this.
-    let dot = t2.anyProp$.dot("firstName")
-    let s2 = dot.swiftSub { (_, _) in
+    let s2 = t2.anyProp$.dot("firstName").swiftSub { (_, _) in
       subSlot += 1
     }
 
-    XCTAssertEqual(dot.swiftGet() as! String, "a")
+    XCTAssertEqual(t2.anyProp$.dot("firstName").swiftGet() as! String, "a")
     XCTAssertEqual(slot, 0)
     XCTAssertEqual(subSlot, 0)
 
     t.firstName = "B"
 
-    XCTAssertEqual(dot.swiftGet() as! String, "B")
+    XCTAssertEqual(t2.anyProp$.dot("firstName").swiftGet() as! String, "B")
     XCTAssertEqual(slot, 1)
     XCTAssertEqual(subSlot, 1)
 
     s1.detach()
     s2.detach()
+    t.detach()
+    t2.detach()
   }
 
 }
