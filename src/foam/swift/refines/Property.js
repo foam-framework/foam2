@@ -333,10 +333,14 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
       name: 'swiftSlotInitializer',
       args: [],
       template: function() {/*
-return PropertySlot([
+let s = PropertySlot([
   "object": self,
   "propertyName": "<%=this.swiftName%>",
 ])
+self.onDetach(Subscription(detach: {
+  s.detach()
+}))
+return s
       */},
     },
     {
@@ -359,8 +363,8 @@ return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftExpression ) { %>
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
 let valFunc = { () -> <%= this.swiftValueType %> in
-  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { %>
-  let <%=arg%> = self.<%=arg%>
+  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
+  let <%=arg.join('$')%> = self.<%=arg[0]%><% if (arg.length > 1) {%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftGet()<% } %>
   <% } %>
   <%= this.swiftExpression %>
 }
@@ -373,8 +377,8 @@ let detach: Listener = { _,_ in
   self.clearProperty("<%=this.swiftName%>")
 }
 <%=this.swiftExpressionSubscriptionName%> = [
-  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { %>
-  <%=arg%>$.swiftSub(detach),
+  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
+  <%=arg[0]%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftSub(detach),
   <% } %>
 ]
 <%=this.swiftValueName%> = valFunc()
@@ -394,6 +398,7 @@ fatalError("No default value for <%=this.swiftName%>")
       template: function() {/*
 self.<%=this.swiftSlotLinkSubName%>?.detach()
 self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(value)
+self.onDetach(self.<%=this.swiftSlotLinkSubName%>!)
       */},
     },
     {
@@ -468,6 +473,20 @@ foam.CLASS({
       expression: function(value) {
         return '' + value;
       },
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.Map',
+  properties: [
+    {
+      name: 'swiftType',
+      value: '[String:Any?]',
+    },
+    {
+      name: 'swiftValue',
+      value: '[:]',
     },
   ],
 });

@@ -39,6 +39,12 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.dao.ArrayDAO',
       'foam.swift.dao.ArraySink',
       'foam.swift.parse.StringPStream',
+
+      'foam.box.Box',
+      'foam.box.ReplyBox',
+      'foam.box.RPCReturnBox',
+      'foam.box.RPCMessage',
+      'foam.box.Message',
     ],
     outdir: genDir,
   },

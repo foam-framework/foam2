@@ -173,10 +173,14 @@ return ExpressionSlot([
       ],
       swiftReturnType: 'SubSlot',
       swiftCode: function() {/*
-return SubSlot([
+let s = SubSlot([
   "parentSlot": self,
   "name": name,
 ])
+onDetach(Subscription(detach: {
+  s.detach()
+}))
+return s
       */},
     },
   ]
