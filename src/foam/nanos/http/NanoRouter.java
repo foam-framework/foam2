@@ -78,11 +78,14 @@ public class NanoRouter
             DAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
 
+        // TODO: create using Context, which should do this automatically
+        if ( skeleton instanceof ContextAware ) ((ContextAware) skeleton).setX(getX());
+
         informService(skeleton, spec);
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceServlet(service, skeleton);
+        service = new ServiceWebAgent(service, skeleton);
         informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
