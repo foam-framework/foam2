@@ -23,7 +23,11 @@ foam.CLASS({
   documentation: "A Property which contains an array of 'of' FObjects.",
 
   properties: [
-    { name: 'of', required: true },
+    {
+      class: 'Class',
+      name: 'of',
+      required: true
+    },
     [
       'factory',
       function() { return []; }
@@ -49,7 +53,7 @@ foam.CLASS({
       // FUTURE: replace 'foam.' with '(this.__subContext__ || foam).' ?
       var ctx = obj.__subContext__ || foam;
       var of = o.class || this.of;
-      var cls = ctx.lookup(of);
+      var cls = foam.typeOf(of) === foam.String ? ctx.lookup(of) : of;
       return cls.isInstance(o) ? o : cls.create(o, obj);
     }],
     {
