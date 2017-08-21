@@ -23,7 +23,6 @@ public abstract class AbstractEnumPropertyInfo
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     FObject obj = null;
-    NanoLogger logger = (NanoLogger) x.get("logger");
     try {
 
       while ( reader.hasNext() ) {
@@ -31,8 +30,10 @@ public abstract class AbstractEnumPropertyInfo
           case XMLStreamConstants.START_ELEMENT:
             // Enum Specific Case
             if ( reader.getLocalName() == this.getName() ) {
+              // Move to characters within tags to extract ordinal value
               reader.next();
               Integer ordinalVal = Integer.parseInt(reader.getText());
+              // Searches forOrdinal in relation to the specific ENUM that's created
               return this.forOrdinal(ordinalVal);
             }
           case XMLStreamConstants.END_ELEMENT:
@@ -41,6 +42,7 @@ public abstract class AbstractEnumPropertyInfo
         reader.next();
       }
     } catch (XMLStreamException ex) {
+      NanoLogger logger = (NanoLogger) x.get("logger");
       logger.error("Premature end of xml file while reading property", this.getName());
     }
     return obj;

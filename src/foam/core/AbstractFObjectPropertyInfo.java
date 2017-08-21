@@ -24,7 +24,6 @@ public abstract class AbstractFObjectPropertyInfo
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     FObject obj = null;
-    NanoLogger logger = (NanoLogger) x.get("logger");
     try {
       while ( reader.hasNext() ) {
         int eventType;
@@ -40,6 +39,7 @@ public abstract class AbstractFObjectPropertyInfo
         }
       }
     } catch ( XMLStreamException ex) {
+      NanoLogger logger = (NanoLogger) x.get("logger");
       logger.error("Premature end of xml file while reading property", this.getName());
     }
     return obj;

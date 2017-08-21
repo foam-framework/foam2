@@ -16,13 +16,13 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class AbstractArrayPropertyInfo
-  extends AbstractPropertyInfo {
+public abstract class AbstractFObjectArrayPropertyInfo
+        extends AbstractPropertyInfo {
 
   public int compareValues(Object[] b1, Object[] b2) {
-    if ( b1 == b2 ) return 0;
-    if ( b2 == null ) return 1;
-    if ( b1 == null ) return -1;
+    if (b1 == b2) return 0;
+    if (b2 == null) return 1;
+    if (b1 == null) return -1;
     int h1 = b1.hashCode();
     int h2 = b2.hashCode();
     return h1 == h2 ? 0 : h1 > h2 ? 1 : -1;
@@ -42,20 +42,25 @@ public abstract class AbstractArrayPropertyInfo
     String startTag = reader.getLocalName();
     try {
       int eventType;
-      while ( reader.hasNext() ) {
+      while (reader.hasNext()) {
         eventType = reader.next();
-        switch ( eventType ) {
+        switch (eventType) {
           case XMLStreamConstants.START_ELEMENT:
-            if ( reader.getLocalName().equals("value") ) {
-              // TODO: TYPE CASTING FOR PROPER CONVERSION. NEED FURTHER SUPPORT FOR PRIMITIVE TYPES
-              throw new UnsupportedOperationException("Primitive typed array XML reading is not supported yet");
+            // Nested object in array
+            if (reader.getLocalName().equals("object")) {
+              FObject o = XMLSupport.createObj(x, reader);
+              if (o != null) {
+                objList.add(o);
+              }
             }
             break;
           case XMLStreamConstants.END_ELEMENT:
-            if ( reader.getLocalName() == startTag ) { return objList.toArray(); }
+            if (reader.getLocalName() == startTag) {
+              return objList.toArray();
+            }
         }
       }
-    } catch (XMLStreamException ex) {
+    } catch(XMLStreamException ex){
       NanoLogger logger = (NanoLogger) x.get("logger");
       logger.error("Premature end of XML file");
     }
@@ -69,11 +74,11 @@ public abstract class AbstractArrayPropertyInfo
     Element prop = doc.createElement(this.getName());
     objElement.appendChild(prop);
 
-    Object[] nestObj = (Object[]) this.f(obj);
-    for ( int k = 0; k < nestObj.length; k++ ) {
-      Element nestedProp = doc.createElement("value");
-      nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
-      prop.appendChild(nestedProp);
+    // FObject Array check
+    FObject[] nestedArray = (FObject[]) this.f(obj);
+    for ( int j = 0; j < nestedArray.length; j++ ) {
+      XMLSupport.toXML(nestedArray[j], doc, prop);
     }
+    return;
   }
 }
