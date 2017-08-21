@@ -10,35 +10,38 @@ import foam.nanos.logger.NanoLogger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class AbstractFObjectPropertyInfo
-  extends AbstractObjectPropertyInfo
-{
-  //  public int compareValues(FObject o1, FObject o2) {
-  //    return o1.compareTo(o2);
-  //  }
+public abstract class AbstractEnumPropertyInfo
+  extends AbstractObjectPropertyInfo {
+
+  public abstract int getOrdinal(Object o);
+  public abstract java.lang.Enum forOrdinal(int ordinal);
+  public abstract void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     FObject obj = null;
     try {
+
       while ( reader.hasNext() ) {
-        int eventType;
-        eventType = reader.next();
-        switch ( eventType ) {
+        switch ( reader.getEventType() ) {
           case XMLStreamConstants.START_ELEMENT:
-            if (reader.getLocalName() == "object") {
-              obj = XMLSupport.createObj(x, reader);
-              return obj;
+            // Enum Specific Case
+            if ( reader.getLocalName() == this.getName() ) {
+              // Move to characters within tags to extract ordinal value
+              reader.next();
+              Integer ordinalVal = Integer.parseInt(reader.getText());
+              // Searches forOrdinal in relation to the specific ENUM that's created
+              return this.forOrdinal(ordinalVal);
             }
           case XMLStreamConstants.END_ELEMENT:
             break;
         }
+        reader.next();
       }
-    } catch ( XMLStreamException ex) {
+    } catch (XMLStreamException ex) {
       NanoLogger logger = (NanoLogger) x.get("logger");
       logger.error("Premature end of xml file while reading property", this.getName());
     }
@@ -49,7 +52,9 @@ public abstract class AbstractFObjectPropertyInfo
   public void toXML(FObject obj, Document doc, Element objElement) {
     Object nestObj = this.f(obj);
     Element objTag = doc.createElement(this.getName());
+    int ordVal = this.getOrdinal(nestObj);
+    objTag.appendChild(doc.createTextNode(Integer.toString(ordVal)));
     objElement.appendChild(objTag);
-    XMLSupport.toXML((FObject) nestObj, doc, objTag);
   }
 }
+
