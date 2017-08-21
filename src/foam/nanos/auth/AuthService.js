@@ -15,7 +15,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         }
       ]
     },
@@ -26,7 +26,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'challenge',
@@ -41,7 +41,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'password',

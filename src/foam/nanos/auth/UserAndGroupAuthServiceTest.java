@@ -3,7 +3,6 @@ package foam.nanos.auth;
 import foam.core.X;
 import foam.dao.ListSink;
 import javax.security.auth.AuthPermission;
-import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -71,7 +70,7 @@ public class UserAndGroupAuthServiceTest
      * */
     for ( int i = 0 ; i < numUsers ; i++ ) {
       User user = new User();
-      user.setId("" + i);
+      user.setId(i);
       user.setEmail("marc" + i + "@nanopay.net");
       user.setFirstName("Marc" + i);
       user.setLastName("R" + i);
@@ -99,7 +98,7 @@ public class UserAndGroupAuthServiceTest
      * */
     for ( int i = 0; i < numUsers; i++ ) {
       try {
-        xArray.add(login("" + i, "marc" + i));
+        xArray.add(login(i, "marc" + i));
       } catch (RuntimeException e) {
         e.printStackTrace();
       }
@@ -155,7 +154,7 @@ public class UserAndGroupAuthServiceTest
 
     for ( int i = 0 ; i < numUsers ; i++ ) {
       try {
-        challengedLogin("" + i, generateChallenge("" + i));
+        challengedLogin(i, generateChallenge(i));
       } catch (RuntimeException e) {
         e.printStackTrace();
       }
@@ -168,9 +167,9 @@ public class UserAndGroupAuthServiceTest
 
   public void testChallengedLoginWithExpiredChallenge() {
     try {
-      String challenge = generateChallenge("0");
+      String challenge = generateChallenge(0);
       TimeUnit.SECONDS.sleep(6);
-      challengedLogin("0", challenge);
+      challengedLogin(0, challenge);
     } catch (RuntimeException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
