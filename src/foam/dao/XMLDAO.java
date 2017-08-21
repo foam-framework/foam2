@@ -72,7 +72,7 @@ public class XMLDAO
     saveToXML();
   }
 
-  public void saveToXML () {
+  public synchronized void saveToXML () {
     ListSink ls = new ListSink();
     this.select(ls);
 

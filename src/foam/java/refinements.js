@@ -856,7 +856,7 @@ foam.CLASS({
       name: 'javaJSONParser',
       value: 'foam.lib.json.FObjectArrayParser'
     },
-    ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractFObjectArrayPropertyInfo']
   ],
 
   methods: [
