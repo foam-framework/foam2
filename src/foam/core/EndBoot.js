@@ -70,9 +70,10 @@ foam.CLASS({
       name: 'methods',
       adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
-          foam.assert(o.name, 'Method must be named');
+          var name = foam.Function.getName(o);
+          foam.assert(name, 'Method must be named');
           var m = this.lookup(prop.of).create();
-          m.name = o.name;
+          m.name = name;
           m.code = o;
           return m;
         }
@@ -206,7 +207,21 @@ foam.CLASS({
       expression: function(transient) {
         return transient;
       }
-    }
+    },
+    /**
+      A short-name is an optional shorter name for a property.
+      It is used by foam.json.Outputter when 'useShortNames'
+      is enabled. Short-names enable JSON output to be smaller,
+      which can save disk space and/or network bandwidth.
+      Ex.
+    <pre>
+      properties: [
+        { name: 'firstName', shortName: 'fn' },
+        { name: 'lastName',  shortName: 'ln' }
+      ]
+    </pre>
+    */
+    { class: 'String', name: 'shortName' }
   ]
 });
 

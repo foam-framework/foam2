@@ -535,3 +535,30 @@ var p2 = PredicateTest.create({id: 2, pred: M.EQ(PredicateTest.ID, 2)});
 var p3 = PredicateTest.create({id: 3, pred: M.EQ(PredicateTest.ID, 3)});
 dao.put(p2);
 dao.put(p3);
+
+
+foam.CLASS({
+  name: 'DAOSlotTest',
+  extends: 'foam.u2.Element',
+  implements: ['foam.mlang.Expressions'],
+  properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
+    }
+  ],
+  methods: [
+    function initE() {
+      this.add(this.slot(function(count) {
+        return count.value == 0 ? 'No records' : ( count.value + ' records.');
+      }, this.daoSlot(this.dao$proxy, this.COUNT())));
+    }
+  ]
+});
+
+var daoslottest = DAOSlotTest.create();
+daoslottest.write();
+daoslottest.dao = dao;
+setInterval(function() { dao.removeAll(); }, 5500 );
+var nextId = 4;
+setInterval(function() { dao.put(PredicateTest.create({ id: nextId++ })); }, 1000);

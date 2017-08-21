@@ -99,7 +99,7 @@ foam.CLASS({
     {
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toString().substring(4,15));
+        if ( date ) this.add(date.toLocaleDateString());
       }
     }
   ]
@@ -113,7 +113,7 @@ foam.CLASS({
     {
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) this.add(date.toString().substring(4,24));
+        if ( date ) this.add(date.toLocaleString());
       }
     }
   ]
@@ -262,7 +262,7 @@ foam.CLASS({
     },
     {
       name: 'selection',
-      expression: function(importSelection) { return importSelection },
+      expression: function(importSelection) { return importSelection; },
     },
     'hoverSelection',
     'dropdownOrigin',

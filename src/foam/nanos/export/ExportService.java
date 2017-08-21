@@ -11,14 +11,12 @@ import foam.dao.JDAO;
 import foam.dao.MapDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.NanoService;
-
 import java.io.IOException;
 
 public class ExportService
   extends    ProxyDAO
   implements NanoService
 {
-
   public void start() {
     try {
       DAO dao = new JDAO(new MapDAO(), "ExportDriverRegistry");

@@ -220,7 +220,7 @@ public class ServletHandler
         }
         ex.getResponseBody().flush();
       } catch (Exception e) {
-        e.printStackTrace();
+        throw new IOException(e);
       } finally {
         ex.close();
       }
@@ -263,12 +263,12 @@ public class ServletHandler
         try {
           if ( isReady() ) {
             if ( availMsg ) {
-              readListener.onDataAvailable();
+              if ( readListener != null ) readListener.onDataAvailable();
               availMsg = false;
             }
             res = newInput.read();
           }
-          readListener.onAllDataRead();
+          if ( readListener != null ) readListener.onAllDataRead();
         } catch (IOException e) {
           readListener.onError(e);
         }

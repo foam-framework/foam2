@@ -16,7 +16,7 @@
  */
 
 describe('RestDAOHandler', function() {
-  var port = 8080;
+  var port = 8888;
   var urlPath = '/dao';
   var baseURL = 'http://0.0.0.0:' + port + urlPath;
   var server;

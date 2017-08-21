@@ -244,7 +244,7 @@ foam.CLASS({
     }
   } else if ( rhs instanceof String ) {
     // Checks if lhs is substring of rhs
-    return ( lhs instanceof String ) && 
+    return ( lhs instanceof String ) &&
       ( ( (String) rhs ).contains( (String) lhs ) );
   }
 

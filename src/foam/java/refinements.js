@@ -321,6 +321,29 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.Action',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'javaCode'
+    }
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      if ( ! this.javaCode ) return;
+
+      cls.method({
+        visibility: 'public',
+        name: this.name,
+        type: 'void',
+        body: this.javaCode
+      })
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Method',
@@ -439,7 +462,7 @@ foam.CLASS({
         (int)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((int) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -467,7 +490,7 @@ foam.CLASS({
         (byte)o;`;
       
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((byte) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -495,7 +518,7 @@ foam.CLASS({
         (short)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((short) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -523,7 +546,7 @@ foam.CLASS({
         (long)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((long) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -551,7 +574,7 @@ foam.CLASS({
         (double)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((double) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       return info;
     }
@@ -988,7 +1011,7 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((boolean) key, get_(o));';
+      c.body = 'return compareValues(cast(key), get_(o));';
 
       var m = info.getMethod('cast');
       m.body = 'return ((Boolean) o).booleanValue();'

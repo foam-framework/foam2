@@ -6,6 +6,9 @@ import foam.dao.*;
 import foam.util.LRULinkedHashMap;
 
 import javax.security.auth.login.LoginException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -18,6 +21,8 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected Map challengeMap;
+
+  public static final String HASH_METHOD = "SHA-512";
 
   @Override
   public void start() {
@@ -87,7 +92,19 @@ public class UserAndGroupAuthService
     User user = (User) userDAO_.find(userId);
     if ( user == null ) throw new RuntimeException("User not found.");
 
-    if ( ! user.getPassword().equals(password) ) {
+    String hashedPassword;
+    String storedPassword;
+    String salt;
+
+    try {
+      salt = user.getPassword().split(":")[1];
+      hashedPassword = hashPassword(password, salt);
+      storedPassword = user.getPassword().split(":")[0];
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException("Couldn't hash passwords with " + HASH_METHOD);
+    }
+
+    if ( ! storedPassword.equals(hashedPassword) ) {
       throw new RuntimeException("Invalid Password");
     }
 
@@ -126,20 +143,36 @@ public class UserAndGroupAuthService
       throw new IllegalStateException("Invalid Parameters");
     }
 
-    if ( oldPassword.equals(newPassword) ) {
-      throw new IllegalStateException("New Password must be different");
-    }
-
     User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
     if ( user == null ) {
       throw new IllegalStateException("User not found");
     }
 
-    if ( ! oldPassword.equals(user.getPassword()) ) {
+    String password = user.getPassword();
+    String storedPassword = password.split(":")[0];
+    String oldSalt = password.split(":")[1];
+    String hashedOldPassword;
+    String hashedNewPasswordOldSalt;
+    String hashedNewPassword;
+    String newSalt = generateRandomSalt();
+
+    try {
+      hashedOldPassword = hashPassword(oldPassword, oldSalt);
+      hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
+      hashedNewPassword = hashPassword(newPassword, newSalt);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("Failed to hash passwords using " + HASH_METHOD);
+    }
+
+    if ( ! hashedOldPassword.equals(storedPassword) ) {
       throw new IllegalStateException("Invalid Password");
     }
 
-    user.setPassword(newPassword);
+    if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
+      throw new IllegalStateException("New Password must be different");
+    }
+
+    user.setPassword(hashedNewPassword + ":" + newSalt);
     userDAO_.put(user);
 
     return this.getX().put("user", user);
@@ -174,6 +207,28 @@ public class UserAndGroupAuthService
     }
 
     return true;
+  }
+
+  public static String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
+    MessageDigest messageDigest = MessageDigest.getInstance(HASH_METHOD);
+    messageDigest.update(salt.getBytes());
+    byte[] hashedBytes = messageDigest.digest(password.getBytes());
+    StringBuilder hashedPasswordBuilder = new StringBuilder();
+    for(byte b : hashedBytes) {
+      hashedPasswordBuilder.append(String.format("%02x", b & 0xFF));
+    }
+    return hashedPasswordBuilder.toString();
+  }
+
+  public static String generateRandomSalt() {
+    SecureRandom secureRandom = new SecureRandom();
+    byte bytes[] = new byte[20];
+    secureRandom.nextBytes(bytes);
+    StringBuilder saltBuilder = new StringBuilder();
+    for(byte b : bytes) {
+      saltBuilder.append(String.format("%02x", b & 0xFF));
+    }
+    return saltBuilder.toString();
   }
 
   /**
