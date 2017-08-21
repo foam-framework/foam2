@@ -6,7 +6,7 @@
 
 package foam.core;
 
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class XMLSupport {
       }
       xmlr.close();
     } catch (XMLStreamException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Could not read from file with existing XMLStreamReader");
     }
     return objList;
@@ -64,10 +64,10 @@ public class XMLSupport {
       // Object properties
       copyFromXML(x, (FObject) clsInstance, xmlr);
     } catch (ClassNotFoundException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Could not find class: ", objClass);
     } catch (XMLStreamException ex ) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Error while reading file");
     }
     return (FObject) clsInstance;
@@ -79,10 +79,10 @@ public class XMLSupport {
     try {
       xmlr = xmlInputFactory.createXMLStreamReader(new FileReader(fileName));
     } catch (IOException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Could not create/file with given fileName");
     } catch (XMLStreamException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Error reading file: ", fileName);
     }
     return fromXML(x, xmlr);
@@ -111,7 +111,7 @@ public class XMLSupport {
         }
       }
     } catch (XMLStreamException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of xml file");
     }
   }

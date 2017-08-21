@@ -7,7 +7,7 @@
 package foam.core;
 
 import foam.lib.parse.Parser;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -63,7 +63,7 @@ public abstract class AbstractPropertyInfo
     try {
       reader.next();
     } catch (XMLStreamException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of XML file");
     }
     return "";
