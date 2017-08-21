@@ -207,21 +207,7 @@ foam.CLASS({
       expression: function(transient) {
         return transient;
       }
-    },
-    /**
-      A short-name is an optional shorter name for a property.
-      It is used by foam.json.Outputter when 'useShortNames'
-      is enabled. Short-names enable JSON output to be smaller,
-      which can save disk space and/or network bandwidth.
-      Ex.
-    <pre>
-      properties: [
-        { name: 'firstName', shortName: 'fn' },
-        { name: 'lastName',  shortName: 'ln' }
-      ]
-    </pre>
-    */
-    { class: 'String', name: 'shortName' }
+    }
   ]
 });
 
