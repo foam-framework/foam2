@@ -6,7 +6,7 @@
 
 package foam.core;
 
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public abstract class AbstractArrayPropertyInfo
         }
       }
     } catch (XMLStreamException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of XML file");
     }
     return objList.toArray();
