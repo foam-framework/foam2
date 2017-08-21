@@ -6,7 +6,7 @@
 
 package foam.core;
 
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -42,7 +42,7 @@ public abstract class AbstractEnumPropertyInfo
         reader.next();
       }
     } catch (XMLStreamException ex) {
-      NanoLogger logger = (NanoLogger) x.get("logger");
+      Logger logger = (Logger) x.get("logger");
       logger.error("Premature end of xml file while reading property", this.getName());
     }
     return obj;
