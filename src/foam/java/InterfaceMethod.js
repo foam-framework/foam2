@@ -35,6 +35,11 @@ foam.CLASS({
       name: 'args'
     },
     {
+      class: 'Boolean',
+      name: 'override',
+      value: false
+    },
+    {
       name: 'body',
       documentation: 'Dummy property to silence warnings',
       setter: function() {},
@@ -51,6 +56,12 @@ foam.CLASS({
 
   methods: [
     function outputJava(o) {
+      if (this.override) {
+        o.indent();
+        o.out("@Override\n");
+        o.indent();
+      }
+
       o.indent();
       o.out(this.visibility, this.visibility ? ' ' : '',
         this.type, ' ', this.name, '(');
