@@ -8,7 +8,6 @@ foam.CLASS({
   refines: 'foam.core.Property',
 
   properties: [
-    { class: 'String', name: 'shortName' },
     {
       name: 'fromXML',
       value: function fromXML(value, ctx, prop, xml) {
@@ -339,9 +338,9 @@ foam.CLASS({
     },
 
     {
-      name: 'createFObj',
+      name: 'parse',
       code: foam.mmethod({
-        Object: function (o) {
+        Object: function (o, opt_class, opt_ctx) {
           // Create FObject
           var className = o.className;
           var obj = foam.lookup(className).create();
@@ -350,18 +349,18 @@ foam.CLASS({
           // Populate FObject with properties
           for ( var propIndex = 0; propIndex < props.length; propIndex++ ) {
 
-            var currentProp = props[propIndex];
-            var prop = obj.cls_.getAxiomByName(currentProp.tagName);
-            var childName = currentProp.firstChild.localName;
+            var currentNode = props[propIndex];
+            var prop = obj.cls_.getAxiomByName(currentNode.tagName);
+            var childName = currentNode.firstChild.localName;
             // Specific case for array
-            if ( currentProp.className === 'Array' ) {
+            if ( currentNode.className === 'Array' ) {
               // Array of FObjects
               if ( childName === 'object' ) {
-                var nestObjArray = Array.from(currentProp.childNodes);
-                prop.set(obj, this.createFObj(nestObjArray));
+                var nestObjArray = Array.from(currentNode.childNodes);
+                prop.set(obj, this.parse(nestObjArray));
               } else {
                 // Array of other objects with 'value' tag names
-                var arrayValue = (Array.from(currentProp.children)).map( function (x) { return x.innerHTML; });
+                var arrayValue = (Array.from(currentNode.children)).map( function (x) { return x.innerHTML; });
                 prop.set(obj, arrayValue);
               }
               continue;
@@ -369,26 +368,27 @@ foam.CLASS({
 
             // Nested Object
             if ( childName === 'object' ) {
-              var nestObj = this.createFObj(currentProp.firstChild);
+              var nestObj = this.parse(currentNode.firstChild);
               prop.set(obj, nestObj);
               continue;
             }
 
-            // Regular Prop
-            if ( currentProp.firstChild.nodeValue ) {
-              var val = currentProp.firstChild.nodeValue.replace(/\"/g, "");
+            // Sets property with value found within node. Additionally checks whether property is Enum type in order
+            // to set ordinal value.
+            if ( currentNode.firstChild.nodeValue ) {
+              var val = currentNode.firstChild.nodeValue.replace(/\"/g, "");
               prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: val }) : val );
-            } else if ( currentProp.firstChild.innerHTML ) {
-              var v = currentProp.firstChild.innerHTML.replace(/\"/g, "");
+            } else if ( currentNode.firstChild.innerHTML ) {
+              var v = currentNode.firstChild.innerHTML.replace(/\"/g, "");
               prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: v }) : v );
             }
           }
           return obj;
         },
-        Array: function (o) {
+        Array: function (o, opt_class, opt_ctx) {
           var fObjects = []
           for ( index = 0; index < o.length; index++ ) {
-              fObjects.push(this.createFObj(o[index]));
+              fObjects.push(this.parse(o[index], opt_class, opt_ctx));
           }
           return fObjects;
         }
@@ -407,11 +407,11 @@ foam.CLASS({
             var rootName = xmlDoc.firstChild.nodeName;
             // Check if multiple objects
             if ( rootName === 'objects' ) {
-              return this.createFObj(Array.from(xmlDoc.firstChild.childNodes));
+              return this.parse(Array.from(xmlDoc.firstChild.childNodes));
             } else if ( rootName === 'object' ) {
               //Single Object
               var obj = xmlDoc.firstChild;
-              return this.createFObj(obj);
+              return this.parse(obj);
             }
           }
         }
