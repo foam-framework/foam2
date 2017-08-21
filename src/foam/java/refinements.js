@@ -416,7 +416,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   refines: 'foam.core.AbstractInterface',
   axioms: [
@@ -456,7 +455,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ((Number) o).intValue();';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).intValue() :
+        ( o instanceof String ) ?
+        Integer.valueOf((String) o) :
+        (int)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
@@ -480,8 +483,12 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ((Number) o).byteValue();';
-
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).byteValue() :
+        ( o instanceof String ) ?
+        Byte.valueOf((String) o) :
+        (byte)o;`;
+      
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -504,7 +511,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ((Number) o).shortValue();';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).shortValue() :
+        ( o instanceof String ) ?
+        Short.valueOf((String) o) :
+        (short)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
@@ -528,7 +539,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ((Number) o).longValue();';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).longValue() :
+        ( o instanceof String ) ?
+        Long.valueOf((String) o) :
+        (long)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
@@ -552,7 +567,11 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
       var m = info.getMethod('cast');
-      m.body = 'return ((Number) o).doubleValue();';
+      m.body = `return ( o instanceof Number ) ?
+        ((Number)o).doubleValue() :
+        ( o instanceof String ) ?
+        Float.parseFloat((String) o) :
+        (double)o;`;
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
@@ -586,9 +605,10 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.lang.Enum'],
-    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser']
   ],
+
   methods: [
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
@@ -641,13 +661,11 @@ foam.CLASS({
       });
 
       var cast = info.getMethod('cast');
-      cast.body =
-`if ( o instanceof Integer ) {
-  return forOrdinal((int) o);
-}
-
-return (java.lang.Enum) o;`;
-
+      cast.body = 'if ( o instanceof Integer ) {'
+      + 'return forOrdinal((int) o); '
+      + '}'
+      + ' return (java.lang.Enum) o;';
+      
       return info;
     }
   ]
@@ -687,9 +705,48 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.Date'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.DateParser']
+    ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.DateParser'],
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var m = info.getMethod('cast');
+      m.body = `if ( o instanceof String ) {
+        java.util.Date date = new java.util.Date((String) o);
+        return date;
+        }
+        return (java.util.Date)o;`;
+
+      return info;
+  }
   ]
+});
+
+
+foam.CLASS({
+   refines: 'foam.core.Date',
+
+   properties: [
+       ['javaType', 'java.util.Date'],
+       ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
+       ['javaJSONParser', 'foam.lib.json.DateParser']
+   ],
+
+   methods: [
+     function createJavaPropertyInfo_(cls) {
+       var info = this.SUPER(cls);
+       var m = info.getMethod('cast');
+       m.body = `if ( o instanceof String ) {
+         java.util.Date date = new java.util.Date((String) o);
+         return date;
+         }
+         return (java.util.Date)o;`;
+
+       return info;
+     }
+   ]
 });
 
 
@@ -762,7 +819,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'Object[]'],
-    ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ArrayParser']
   ],
 
@@ -771,6 +828,14 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      // TODO: Change to ClassInfo return type once primitive support is added
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compare(key, get_(o));';
@@ -814,7 +879,7 @@ foam.CLASS({
       name: 'javaJSONParser',
       value: 'foam.lib.json.FObjectArrayParser'
     },
-    ['javaInfoType', 'foam.core.AbstractPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractFObjectArrayPropertyInfo']
   ],
 
   methods: [
@@ -830,7 +895,14 @@ foam.CLASS({
       cast.body = 'Object[] value = (Object[])o;\n'
                 + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
                 + 'System.arraycopy(value, 0, ret, 0, value.length);\n'
-                + 'return ret;'
+                + 'return ret;';
+      // TODO: Change to ClassInfo return type once primitive support is added
+      info.method({
+        name: 'of',
+        visibility: 'public',
+        type: 'String',
+        body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
+      });
 
       return info;
     }

@@ -8,8 +8,11 @@ package foam.core;
 
 import foam.lib.parse.Parser;
 import foam.mlang.order.Comparator;
-
 import java.util.Map;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
@@ -27,5 +30,8 @@ public interface PropertyInfo
   public Parser jsonParser();
   public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
+  public void setFromString(Object obj, String value);
+  public Object fromXML(X x, XMLStreamReader reader);
+  public void toXML(FObject obj, Document doc, Element objElement);
   public int comparePropertyToObject(Object key, FObject o);
 }
