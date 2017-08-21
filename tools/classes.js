@@ -76,6 +76,7 @@ var classes = [
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
+  'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.WebAuthService',
   'foam.nanos.pool.AbstractFixedThreadPool',
