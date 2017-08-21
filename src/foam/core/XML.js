@@ -374,7 +374,7 @@ foam.CLASS({
             }
 
             // Sets property with value found within node. Additionally checks whether property is Enum type in order
-            // to set ordinal value.
+            // to set ordinal value. Sometimes nodeValue is not able to parse inner tag values correctly thus innerHTML
             if ( currentNode.firstChild.nodeValue ) {
               var val = currentNode.firstChild.nodeValue.replace(/\"/g, "");
               prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: val }) : val );
@@ -402,6 +402,8 @@ foam.CLASS({
           if ( o ) {
             // Convert xml string into an xml DOM object for node traversal
             var parser = new DOMParser();
+            // TODO: Remove this escape sequence. Future implementation should include looking through parsed
+            // xml doc and passing on childNodes which are texts and do not contain any info. 
             o = o.replace(/\t|\n|\r|↵/g, "");
             var xmlDoc = parser.parseFromString(o, "text/xml");
             var rootName = xmlDoc.firstChild.nodeName;
@@ -412,6 +414,8 @@ foam.CLASS({
               //Single Object
               var obj = xmlDoc.firstChild;
               return this.parse(obj);
+            } else {
+              throw new Error('Could not read object(s) in XML');
             }
           }
         }
