@@ -23,7 +23,7 @@ public class UserAndGroupAuthService
   public void start() {
     userDAO_      = (DAO) getX().get("userDAO");
     groupDAO_     = (DAO) getX().get("groupDAO");
-    challengeMap  = new LRULinkedHashMap<String, Challenge>(20000);
+    challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
   /**
@@ -32,11 +32,11 @@ public class UserAndGroupAuthService
    *
    * Should this throw an exception?
    */
-  public String generateChallenge(String userId) {
-    if ( userId == null || userId == "" ) return null;
+  public String generateChallenge(long userId) {
+    if ( userId < 1 ) return null;
     if ( userDAO_.find(userId) == null )  return null;
 
-    String   generatedChallenge = UUID.randomUUID() + userId;
+    String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
     Calendar calendar           = Calendar.getInstance();
     calendar.add(Calendar.SECOND, 5);
 
@@ -51,8 +51,8 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(String userId, String challenge) throws RuntimeException {
-    if ( userId == null || challenge == null || userId == "" || challenge == "" ) {
+  public X challengedLogin(long userId, String challenge) throws RuntimeException {
+    if ( userId < 1 || challenge == null  || challenge == "" ) {
       throw new RuntimeException("Invalid Parameters");
     }
 
@@ -79,8 +79,8 @@ public class UserAndGroupAuthService
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(String userId, String password) throws RuntimeException {
-    if ( userId == null || password == null || userId == "" || password == "" ) {
+  public X login(long userId, String password) throws RuntimeException {
+    if ( userId < 1 || password == null || password == "" ) {
       throw new RuntimeException("Invalid Parameters");
     }
 
@@ -153,10 +153,6 @@ public class UserAndGroupAuthService
   public void validateUser(User user) throws RuntimeException {
     if ( user == null ) {
       throw new RuntimeException("Invalid User");
-    }
-
-    if ( user.getId() == "" ) {
-      throw new RuntimeException("ID is required for creating a user");
     }
 
     if ( user.getEmail() == "" ) {

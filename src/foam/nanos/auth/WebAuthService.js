@@ -16,7 +16,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         }
       ]
     },
@@ -27,7 +27,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'challenge',
@@ -41,7 +41,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          name: 'userId',
+          name: 'email',
           javaType: 'String'
         },
         {
@@ -57,11 +57,11 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'permission',
-          javaType: 'java.security.Permission'
+          javaType: 'foam.nanos.auth.Permission'
         }
       ]
     },
@@ -72,7 +72,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'oldPassword',
@@ -85,24 +85,13 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'validateUser',
-      javaReturns: 'Boolean',
-      returns: 'Promise',
-      args: [
-        {
-          name: 'user',
-          javaType: 'User'
-        }
-      ]
-    },
-    {
       name: 'logout',
       javaReturns: 'void',
       returns: 'Promise',
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         }
       ]
     }
