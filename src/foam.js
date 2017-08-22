@@ -61,11 +61,15 @@
     };
   }
 
-  var load = isServer ? loadServer :
-    isWorker ? createLoadWorker() :
-    createLoadBrowser();
+  function getLoader() {
+    return isServer ? loadServer :
+      isWorker ? createLoadWorker() :
+      createLoadBrowser();
+  }
 
   this.FOAM_FILES = function(files) {
+    var load = getLoader();
+
     files.
       filter(function(f) {
         if ( ! f.flags ) return true;
@@ -80,5 +84,5 @@
   //  delete this.FOAM_FILES;
   };
 
-  load('files');
+  getLoader()('files');
 })();
