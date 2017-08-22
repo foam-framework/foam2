@@ -51,7 +51,8 @@
   }
 
   function loadServer(filename) {
-    require('./' + filename + '.js');
+    var path = __filename.substring(0, __filename.lastIndexOf('/')+1);
+    require(path + filename + '.js');
   }
 
   function createLoadWorker(filename) {
