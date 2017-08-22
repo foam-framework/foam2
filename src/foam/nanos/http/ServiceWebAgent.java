@@ -20,39 +20,45 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 @SuppressWarnings("serial")
-public class ServiceServlet
-  extends    HttpServlet
-  implements ContextAware
+public class ServiceWebAgent
+  implements WebAgent
 {
   protected Object service_;
   protected Box    skeleton_;
-  protected X      x_;
+//  protected X      x_;
 
-  public ServiceServlet(Object service, Box skeleton) {
+  public ServiceWebAgent(Object service, Box skeleton) {
     service_  = service;
     skeleton_ = skeleton;
   }
 
+/*
   public X    getX() { return x_; }
   public void setX(X x) {
     x_ = x;
     if ( skeleton_ instanceof ContextAware )
       ((ContextAware) skeleton_).setX(x);
   }
+*/
 
+/*
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setHeader("Access-Control-Allow-Origin", "*");
     resp.setStatus(resp.SC_OK);
     resp.flushBuffer();
   }
+*/
 
-  public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  public void execute(X x) {
     try {
-      CharBuffer buffer_        = CharBuffer.allocate(65535);
-      Reader     reader         = req.getReader();
-      int        count          = reader.read(buffer_);
-      X          requestContext = getX().put("httpRequest", req).put("httpResponse", resp);
+      HttpServletRequest  req            = (HttpServletRequest)  x.get(HttpServletRequest.class);
+      HttpServletResponse resp           = (HttpServletResponse) x.get(HttpServletResponse.class);
+      PrintWriter         out            = (PrintWriter) x.get(PrintWriter.class);
+      CharBuffer          buffer_        = CharBuffer.allocate(65535);
+      Reader              reader         = req.getReader();
+      int                 count          = reader.read(buffer_);
+      X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
 
       System.out.println("Service Request");
       resp.setHeader("Access-Control-Allow-Origin", "*");
@@ -64,7 +70,6 @@ public class ServiceServlet
 
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        PrintWriter out = resp.getWriter();
         System.err.println("Failed to parse request");
         out.print("Failed to parse request");
         out.flush();
@@ -73,7 +78,6 @@ public class ServiceServlet
 
       if ( ! ( result instanceof foam.box.Message ) ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        PrintWriter out = resp.getWriter();
         System.err.println("Expected instance of foam.box.Message");
         out.print("Expected instance of foam.box.Message");
         out.flush();
@@ -90,10 +94,11 @@ public class ServiceServlet
       resp.setStatus(resp.SC_OK);
       resp.flushBuffer();
     } catch (Throwable t) {
-      throw new IOException(t);
+      throw new RuntimeException(t);
     }
   }
 
+/*
   public void doOptions(HttpServletRequest req, HttpServletResponse resp)
     throws IOException, ServletException
   {
@@ -102,4 +107,5 @@ public class ServiceServlet
     resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
     super.doOptions(req, resp);
   }
+  */
 }
