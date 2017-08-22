@@ -55,7 +55,7 @@ var env = {
 var data = [ require('fs').readFileSync(__dirname + '/../src/files.js') ];
 if ( flags.nanos ) {
   data.push(
-      require('fs').readFileSync(__dirname + '/../src/nanos.js'));
+      require('fs').readFileSync(__dirname + '/../src/foam/nanos/nanos.js'));
 }
 
 for ( var i = 0; i < data.length; i++ ) {
