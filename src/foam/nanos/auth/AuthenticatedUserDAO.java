@@ -22,7 +22,7 @@ public class AuthenticatedUserDAO
     if ( fObject instanceof User ) {
       User user = (User) fObject;
 
-      if ( find(user.getId()) != null ) {
+      if ( super.find(user.getId()) != null ) {
         System.out.println("A user has already been registered with this account");
         return null;
       }
@@ -57,26 +57,4 @@ public class AuthenticatedUserDAO
     }
     return null;
   }
-
-//  @Override
-//  public FObject find_(X x, Object o) {
-//    if ( o instanceof User ) {
-//      User user               = (User) o;
-//      User authenticatedUser  = (User) this.getX().get("user");
-//
-//      if ( authenticatedUser == null ) {
-//        System.out.println("Please login");
-//        return null;
-//      }
-//
-//      if ( user.getId() != authenticatedUser.getId() ) {
-//        System.out.println("You do not have access to this User");
-//        return null;
-//      }
-//
-//      return super.find_(x, o);
-//    }
-//
-//    return null;
-//  }
 }
