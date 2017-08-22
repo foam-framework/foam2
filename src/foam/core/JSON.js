@@ -471,6 +471,14 @@ foam.CLASS({
     },
     {
       name: 'creationContext'
+    },
+    {
+      name: 'fonParser_',
+      expression: function(creationContext) {
+        return foam.parsers.FON.create({
+          creationContext: creationContext
+        });
+      }
     }
   ],
 
@@ -480,7 +488,11 @@ foam.CLASS({
           // JSON.parse() is faster; use it when data format allows.
           foam.json.parse(JSON.parse(str), null,
                           opt_ctx || this.creationContext) :
-          foam.json.parseString(str, null, opt_ctx || this.creationContext);
+          // Create new parser iff different context was injected; otherwise
+          // use same parser bound to "creationContext" each time.
+          opt_ctx ? foam.parsers.FON.create({
+            creationContext: opt_ctx
+          }).parseString(str) : this.fonParser_.parseString(str);
     }
   ]
 });
