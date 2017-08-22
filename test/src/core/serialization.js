@@ -73,6 +73,9 @@ describe('Serialization', function() {
              alice: test.Alice.create()
            }), test.Bob)).
       toEqual({ alice: {} });
+    expect(foam.json.Strict.stringify(test.Bob.create({
+      alice: test.Alice.create()
+    }), test.Bob)).toBe('{"alice":{}}');
   });
 
   it('should store non-default property class', function() {
@@ -103,6 +106,9 @@ describe('Serialization', function() {
              andy: test.Andy2.create()
            }), test.Beth)).
       toEqual({ andy: { class: 'test.Andy2' } });
+    expect(foam.json.Strict.stringify(test.Beth.create({
+      andy: test.Andy2.create()
+    }), test.Beth)).toBe('{"andy":{"class":"test.Andy2"}}');
   });
 
   it('should store only non-default classes on array elements', function() {
@@ -119,6 +125,10 @@ describe('Serialization', function() {
     expect(foam.json.Outputter.create().objectify(
             [ test.Animal.create(), test.Mammal.create() ], test.Animal)).
         toEqual([ {}, { class: 'test.Mammal' } ]);
+    expect(foam.json.Strict.stringify([
+      test.Animal.create(),
+      test.Mammal.create()
+    ], test.Animal)).toBe('[{},{"class":"test.Mammal"}]');
   });
 
   it('should store only non-default classes on array property elements', function() {
@@ -149,5 +159,111 @@ describe('Serialization', function() {
 
     expect(foam.json.Outputter.create().objectify(test.Js.create(), test.Js)).
         toEqual({ js: [ {}, { class: 'test.James' } ] });
+    expect(foam.json.Strict.stringify(test.Js.create(), test.Js)).
+        toBe('{"js":[{},{"class":"test.James"}]}');
+  });
+
+  it('should handle complex nesting of properties', function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'Alpha',
+
+      properties: [
+        {
+          class: 'String',
+          name: 'str',
+          value: 'Hello, world'
+        },
+        {
+          class: 'Boolean',
+          name: 'truthiness',
+          value: true
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'test.Beta',
+          name: 'beta',
+          value: null
+        }
+      ]
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'Beta',
+
+      properties: [
+        {
+          class: 'FObjectProperty',
+          of: 'test.Charlie',
+          name: 'charlie',
+          value: null
+        },
+        {
+          class: 'FObjectArray',
+          of: 'test.Delta',
+          name: 'deltas'
+        }
+      ]
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'Beta2',
+      extends: 'test.Beta'
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'Charlie'
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'Delta',
+
+      properties: [
+        {
+          class: 'Int',
+          name: 'value',
+          value: 1
+        }
+      ]
+    });
+    foam.CLASS({
+      package: 'test',
+      name: 'Delta2',
+      extends: 'test.Delta'
+    });
+
+    var objectifier = foam.json.Outputter.create({
+      outputDefaultValues: false
+    });
+    var stringifier = foam.json.Outputter.create({
+      strict: true,
+      outputDefaultValues: false
+    });
+    expect(objectifier.objectify(test.Alpha.create(), test.Alpha)).toEqual({});
+    expect(objectifier.objectify(test.Alpha.create({
+      beta: test.Beta.create()
+    }), test.Alpha)).toEqual({ beta: { deltas: [] } });
+    expect(objectifier.objectify(test.Alpha.create({
+      beta: test.Beta2.create({
+        charlie: test.Charlie.create(),
+        deltas: [ test.Delta2.create(), test.Delta.create({ value: 0 }) ]
+      })
+    }), test.Alpha)).toEqual({
+      beta: {
+        class: 'test.Beta2',
+        charlie: {},
+        deltas: [ { class: 'test.Delta2' }, { value: 0 } ]
+      }
+    });
+    expect(stringifier.stringify(test.Alpha.create(), test.Alpha)).toBe('{}');
+    expect(stringifier.stringify(test.Alpha.create({
+      beta: test.Beta.create()
+    }), test.Alpha)).toBe('{"beta":{"deltas":[]}}');
+    expect(stringifier.stringify(test.Alpha.create({
+      beta: test.Beta2.create({
+        charlie: test.Charlie.create(),
+        deltas: [ test.Delta2.create(), test.Delta.create({ value: 0 }) ]
+      })
+    }), test.Alpha)).toBe('{"beta":{"class":"test.Beta2","charlie":{},"deltas":[{"class":"test.Delta2"},{"value":0}]}}');
   });
 });
