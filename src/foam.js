@@ -42,7 +42,7 @@
       }
     }
 
-    path = path.substring(0, path.lastIndexOf('/')+1);
+    path = path.substring(0, path.lastIndexOf('src/')+4);
 
     return function(filename) {
       document.writeln(
@@ -50,8 +50,12 @@
     };
   }
 
-  function loadServer(filename) {
-    require('./' + filename + '.js');
+  function loadServer() {
+    var path = __filename.substring(0, __filename.lastIndexOf('src/')+4);
+
+    return function (filename) {
+      require(path + filename + '.js');
+    }
   }
 
   function createLoadWorker(filename) {
@@ -62,7 +66,7 @@
   }
 
   function getLoader() {
-    return isServer ? loadServer :
+    return isServer ? loadServer() :
       isWorker ? createLoadWorker() :
       createLoadBrowser();
   }
