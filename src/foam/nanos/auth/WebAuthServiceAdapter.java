@@ -7,6 +7,9 @@
 package foam.nanos.auth;
 
 import foam.core.X;
+import foam.dao.DAO;
+import foam.dao.ListSink;
+import foam.mlang.MLang;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import foam.core.ContextAwareSupport;
@@ -43,16 +46,30 @@ public class WebAuthServiceAdapter
     }
   }
 
-  public void login(String email, String password) {
-    long userId = 0;
+  public foam.nanos.auth.User login(String email, String password) {
+    DAO userDAO = (DAO) getX().get("userDAO");
+    ListSink sink = (ListSink) userDAO.where(MLang.EQ(email, User.EMAIL)).select(new ListSink());
+
+    //There should only be one object returned for the User
+    if ( sink.getData().size() != 1 ) {
+      return null;
+    }
+
+    User user = (User) sink.getData().get(0);
+
     try {
-      if ( ! loginMap.containsKey(userId) ) {
-        X x = service.login(userId, password);
-        loginMap.put(userId, x);
+      if ( ! loginMap.containsKey(user.getId()) ) {
+        X x = service.login(user.getId(), password);
+        loginMap.put(user.getId(), x);
+        return (User) x.get("user");
       }
+
+      return (User) loginMap.get(user.getId()).get("user");
+
     } catch (RuntimeException e) {
       e.printStackTrace();
     }
+    return null;
   }
 
   public Boolean check(long userId, foam.nanos.auth.Permission permission) {

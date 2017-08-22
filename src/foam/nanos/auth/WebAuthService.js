@@ -37,7 +37,7 @@ foam.INTERFACE({
     },
     {
       name: 'login',
-      javaReturns: 'void',
+      javaReturns: 'foam.nanos.auth.User',
       returns: 'Promise',
       args: [
         {
