@@ -42,7 +42,7 @@
       }
     }
 
-    path = path.substring(0, path.lastIndexOf('/')+1);
+    path = path.substring(0, path.lastIndexOf('src/')+4);
 
     return function(filename) {
       document.writeln(
@@ -50,8 +50,12 @@
     };
   }
 
-  function loadServer(filename) {
-    require('./' + filename + '.js');
+  function loadServer() {
+    var path = __filename.substring(0, __filename.lastIndexOf('src/')+4);
+
+    return function (filename) {
+      require(path + filename + '.js');
+    }
   }
 
   function createLoadWorker(filename) {
@@ -61,11 +65,15 @@
     };
   }
 
-  var load = isServer ? loadServer :
-    isWorker ? createLoadWorker() :
-    createLoadBrowser();
+  function getLoader() {
+    return isServer ? loadServer() :
+      isWorker ? createLoadWorker() :
+      createLoadBrowser();
+  }
 
   this.FOAM_FILES = function(files) {
+    var load = getLoader();
+
     files.
       filter(function(f) {
         if ( ! f.flags ) return true;
@@ -80,5 +88,5 @@
   //  delete this.FOAM_FILES;
   };
 
-  load('files');
+  getLoader()('files');
 })();

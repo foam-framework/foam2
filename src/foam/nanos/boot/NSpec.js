@@ -94,7 +94,8 @@ foam.CLASS({
 
         if ( getServiceClass().length() > 0 ) {
           Object service = Class.forName(getServiceClass()).newInstance();
-          saveService(service);
+          // TODO: doesn't work with DAO's, fix
+          // saveService(service);
           return service;
         }
 
