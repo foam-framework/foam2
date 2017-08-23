@@ -42,7 +42,7 @@
       }
     }
 
-    path = path.substring(0, path.lastIndexOf('/')+1);
+    path = path.substring(0, path.lastIndexOf('src/')+4);
 
     return function(filename) {
       document.writeln(
@@ -50,8 +50,34 @@
     };
   }
 
-  function loadServer(filename) {
-    require('./' + filename + '.js');
+  function getCaller () {
+    try {
+      var err = new Error();
+      var caller;
+      var current;
+
+      Error.prepareStackTrace = function (err, stack) { return stack; };
+
+      current = err.stack.shift().getFileName();
+
+      while ( err.stack.length ) {
+        caller = err.stack.shift().getFileName();
+        if ( current !== caller && caller !== 'module.js' ) {
+          return caller;
+        }
+      }
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function loadServer() {
+    var caller = getCaller() || __filename;
+    var path = caller.substring(0, caller.lastIndexOf('src/')+4);
+    
+    return function (filename) {
+      require(path + filename + '.js');
+    }
   }
 
   function createLoadWorker(filename) {
@@ -61,11 +87,15 @@
     };
   }
 
-  var load = isServer ? loadServer :
-    isWorker ? createLoadWorker() :
-    createLoadBrowser();
+  function getLoader() {
+    return isServer ? loadServer() :
+      isWorker ? createLoadWorker() :
+      createLoadBrowser();
+  }
 
   this.FOAM_FILES = function(files) {
+    var load = getLoader();
+
     files.
       filter(function(f) {
         if ( ! f.flags ) return true;
@@ -80,5 +110,5 @@
   //  delete this.FOAM_FILES;
   };
 
-  load('files');
+  getLoader()('files');
 })();
