@@ -24,7 +24,6 @@ public class WebAuthServiceAdapter
   protected Map<String, X> loginMap = new LRULinkedHashMap<>(10000);
   protected AuthService service;
 
-  
   public void start() {
     service = (AuthService) getX().get("auth");
     service.start();

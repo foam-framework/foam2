@@ -98,6 +98,6 @@ foam.INTERFACE({
           javaType: 'String'
         }
       ]
-    },
+    }
   ]
 });
