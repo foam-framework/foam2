@@ -66,7 +66,7 @@
      {
        class: 'String',
        // class: 'Phone',
-       name: 'phones'
+       name: 'phone'
      },
      {
        class: 'String',
