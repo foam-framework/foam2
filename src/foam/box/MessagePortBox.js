@@ -24,10 +24,14 @@ foam.CLASS({
   requires: [
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage',
-    'foam.box.Message'
+    'foam.box.Message',
+    'foam.json.Outputter'
   ],
 
-  imports: [ 'messagePortService', 'me' ],
+  imports: [
+    'me',
+    'messagePortService'
+  ],
 
   properties: [
     {
@@ -41,11 +45,28 @@ foam.CLASS({
 
 	this.target.postMessage(channel.port2, [ channel.port2 ]);
 
-        channel.port1.postMessage(foam.json.Network.stringify(this.Message.create({
-          object: this.RegisterSelfMessage.create({ name: this.me.name })
-        })));
+        channel.port1.postMessage(this.outputter.stringify(
+            this.Message.create({
+              object: this.RegisterSelfMessage.create({ name: this.me.name })
+            })));
 
-	      return this.RawMessagePortBox.create({ port: channel.port1 });
+	return this.RawMessagePortBox.create({ port: channel.port1 });
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // NOTE: Configuration must be consistent with parser in
+        // foam.messageport.MessagePortService.
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
       }
     }
   ]
