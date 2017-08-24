@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCReturnMessage',
+  extends: 'foam.box.Message',
   properties: [
     {
       class: 'Object',

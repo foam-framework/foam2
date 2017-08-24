@@ -42,7 +42,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
 
       'foam.box.Box',
       'foam.box.ReplyBox',
-      'foam.box.RPCReturnBox',
+      'foam.swift.box.RPCReturnBox',
       'foam.box.RPCMessage',
       'foam.box.Message',
     ],

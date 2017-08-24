@@ -454,4 +454,47 @@ class SwiftTestsTests: XCTestCase {
     t2.detach()
   }
 
+  func testRPCBoxSuccess() {
+    let rpcBox = RPCReturnBox()
+
+    let sem = DispatchSemaphore(value: 0)
+
+    var dispatched = false
+    DispatchQueue(label: "TestDispatch").async {
+      let msg = try? rpcBox.future.get() as! String
+      dispatched = true
+      XCTAssertEqual(msg, "Hello there")
+      sem.signal()
+    }
+
+    let msg = Message(["object": RPCReturnMessage(["data": "Hello there"])])
+    XCTAssertFalse(dispatched)
+    rpcBox.send(msg)
+    sem.wait()
+    XCTAssertTrue(dispatched)
+  }
+
+  func testRPCBoxError() {
+    let rpcBox = RPCReturnBox()
+
+    let sem = DispatchSemaphore(value: 0)
+
+    var dispatched = false
+    DispatchQueue(label: "TestDispatch").async {
+      do {
+        _ = try rpcBox.future.get() as! String
+      } catch let e {
+        let e = e as! FoamError
+        dispatched = true
+        XCTAssertEqual(e.obj as? String, "Hello there")
+        sem.signal()
+      }
+    }
+
+    let msg = Message(["object": "Hello there"])
+    XCTAssertFalse(dispatched)
+    rpcBox.send(msg)
+    sem.wait()
+    XCTAssertTrue(dispatched)
+  }
 }
