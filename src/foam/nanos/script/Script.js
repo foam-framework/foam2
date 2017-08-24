@@ -119,16 +119,19 @@ foam.CLASS({
     {
       name: 'run',
       code: function() {
+        var self = this;
         this.output = '';
 
 //        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
         if ( this.server ) {
           this.scheduled = true;
-          this.scriptDAO.put(this);
+          this.scriptDAO.put(this).then(function(script) {
+            self.copyFrom(script);
+          });
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
 
-          with ( { log: log } ) {
+          with ( { log: log, print: log } ) {
             var ret = eval(this.code);
             console.log('ret: ', ret);
             // TODO: if Promise returned, then wait
