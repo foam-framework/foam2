@@ -30,7 +30,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      value: true
+      expression: function(label) { return !!label },
     },
     { 
       class: 'String', 
@@ -53,6 +53,11 @@ foam.CLASS({
           }.bind(this))
         .end();
       }
+    },
+    function updateMode_(mode) {
+      var disabled = mode === foam.u2.DisplayMode.RO ||
+                     mode === foam.u2.DisplayMode.DISABLED;
+      this.setAttribute('disabled', disabled);
     },
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
