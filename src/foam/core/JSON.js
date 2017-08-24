@@ -355,7 +355,8 @@ foam.CLASS({
           }
 
           this.start('{');
-          var outputClassName = this.outputClassNames && o.cls_ !== opt_cls;
+          var cls = this.getCls(opt_cls);
+          var outputClassName = this.outputClassNames && o.cls_ !== cls;
           if ( outputClassName ) {
             this.out(
                 this.maybeEscapeKey('class'),
@@ -375,8 +376,9 @@ foam.CLASS({
         },
         Array: function(o, opt_cls) {
           this.start('[');
+          var cls = this.getCls(opt_cls);
           for ( var i = 0 ; i < o.length ; i++ ) {
-            this.output(o[i], opt_cls);
+            this.output(o[i], cls);
             if ( i < o.length-1 ) this.out(',').nl().indent();
           }
           //this.nl();
@@ -416,7 +418,8 @@ foam.CLASS({
         },
         FObject: function(o, opt_cls) {
           var m = {};
-          if ( this.outputClassNames && o.cls_ !== opt_cls ) {
+          var cls = this.getCls(opt_cls);
+          if ( this.outputClassNames && o.cls_ !== cls ) {
             m.class = o.cls_.id;
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
@@ -432,8 +435,9 @@ foam.CLASS({
         },
         Array: function(o, opt_cls) {
           var a = [];
+          var cls = this.getCls(opt_cls);
           for ( var i = 0 ; i < o.length ; i++ ) {
-            a[i] = this.objectify(o[i], opt_cls);
+            a[i] = this.objectify(o[i], cls);
           }
           return a;
         },
@@ -448,6 +452,11 @@ foam.CLASS({
         }
       },
       function(o) { return o; })
+    },
+
+    function getCls(opt_cls) {
+      return foam.typeOf(opt_cls) === foam.String ? this.lookup(opt_cls, true) :
+          opt_cls;
     }
   ]
 });
