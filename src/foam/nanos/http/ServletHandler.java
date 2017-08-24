@@ -76,6 +76,11 @@ public class ServletHandler
     }
 
     @Override
+    public String getProtocol() {
+      return ex.getProtocol();
+    }
+
+    @Override
     public ServletInputStream getInputStream() throws IOException {
       return is;
     }
@@ -83,6 +88,11 @@ public class ServletHandler
     @Override
     public BufferedReader getReader() throws IOException {
       return new BufferedReader(new InputStreamReader(getInputStream()));
+    }
+
+    @Override
+    public String getQueryString() {
+      return ex.getRequestURI().getQuery();
     }
 
     @Override
@@ -116,9 +126,24 @@ public class ServletHandler
     final ByteArrayOutputStream outputStream        = new ByteArrayOutputStream();
     final ServletOutputStream   servletOutputStream = new ServletOutputStream() {
 
+      boolean ready = true;
+      WriteListener writeListener;
+
       @Override
-      public void write(int b) throws IOException {
+      public boolean isReady() {
+        return ready;
+      }
+
+      @Override
+      public void setWriteListener(WriteListener writeListener) {
+        this.writeListener = writeListener;
+      }
+
+      @Override
+      public void write(int b) {
+        ready = false;
         outputStream.write(b);
+        ready = true;
       }
     };
 
@@ -159,6 +184,12 @@ public class ServletHandler
     }
 
     @Override
+    public void sendRedirect(String location) throws IOException {
+      setStatus(301);
+      setHeader("Location", location);
+    }
+
+    @Override
     public void sendError(int sc, String msg) throws IOException {
       this.status = sc;
       if ( msg != null ) {
@@ -189,7 +220,7 @@ public class ServletHandler
         }
         ex.getResponseBody().flush();
       } catch (Exception e) {
-        e.printStackTrace();
+        throw new IOException(e);
       } finally {
         ex.close();
       }
@@ -204,9 +235,44 @@ public class ServletHandler
     final ByteArrayInputStream newInput = new ByteArrayInputStream(inBytes);
     final ServletInputStream   is       = new ServletInputStream() {
 
+      ReadListener readListener;
+      boolean availMsg = true;
+
       @Override
-      public int read() throws IOException {
-        return newInput.read();
+      public boolean isFinished() {
+        return newInput.available() == 0;
+      }
+
+      @Override
+      public boolean isReady() {
+        int ret = newInput.available();
+        if ( ret == 0 ) {
+          availMsg = true;
+        }
+        return ret > 0;
+      }
+
+      @Override
+      public void setReadListener(ReadListener readListener) {
+        this.readListener = readListener;
+      }
+
+      @Override
+      public int read() {
+        int res = 0;
+        try {
+          if ( isReady() ) {
+            if ( availMsg ) {
+              if ( readListener != null ) readListener.onDataAvailable();
+              availMsg = false;
+            }
+            res = newInput.read();
+          }
+          if ( readListener != null ) readListener.onAllDataRead();
+        } catch (IOException e) {
+          readListener.onError(e);
+        }
+        return res;
       }
     };
 

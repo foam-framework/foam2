@@ -109,11 +109,11 @@ foam.CLASS({
 
   methods: [
     function addSocket(socket) {
-      var sub1 = socket.message.sub(function onMessage(s, _, msg) {
-        msg = this.fonParser.parseString(msg);
+      var sub1 = socket.message.sub(function onMessage(s, _, msgStr) {
+        var msg = this.fonParser.parseString(msgStr);
 
         if ( ! this.Message.isInstance(msg) ) {
-          console.warn("Got non-message object.", msg);
+          console.warn('Got non-message:', msg, msgStr);
         }
 
         if ( this.RegisterSelfMessage.isInstance(msg.object) ) {

@@ -15,15 +15,26 @@ foam.CLASS({
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.nanos.pm.PM',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
     'java.util.Date'
   ],
 
+  tableColumns: [
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
+  ],
+
+  searchColumns: [ ],
+
   properties: [
     {
       class: 'String',
       name: 'id'
+    },
+    {
+      class: 'String',
+      name: 'description'
     },
     {
       class: 'DateTime',
@@ -35,9 +46,16 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.script.Language',
       name: 'language',
-      value: foam.nanos.script.Language.BEANSHELL
+      value: foam.nanos.script.Language.BEANSHELL,
+      transient: true
+      // TODO: fix JS support
     },
     */
+    {
+      class: 'Boolean',
+      name: 'server',
+      value: true
+    },
     {
       class: 'Boolean',
       name: 'scheduled',
@@ -64,24 +82,36 @@ foam.CLASS({
   methods: [
     {
       name: 'runScript',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'void',
-      javaCode:
-`ByteArrayOutputStream baos = new ByteArrayOutputStream();
-PrintStream ps = new PrintStream(baos);
-Interpreter shell = new Interpreter();
-try {
-  shell.set("currentScript", this);
-  setOutput("");
-  shell.setOut(ps);
-  shell.eval(getCode());
-} catch (EvalError e) {
-  e.printStackTrace();
-}
+      javaCode: `
+        ByteArrayOutputStream baos  = new ByteArrayOutputStream();
+        PrintStream           ps    = new PrintStream(baos);
+        Interpreter           shell = new Interpreter();
+        PM                    pm    = new PM(this.getClass(), getId());
 
-setLastRun(new Date());
-ps.flush();
-setOutput(baos.toString());
-`
+        // TODO: import common packages like foam.core.*, foam.dao.*, etc.
+        try {
+          shell.set("currentScript", this);
+          setOutput("");
+          shell.set("x", getX());
+          shell.setOut(ps);
+          shell.eval(getCode());
+        } catch (EvalError e) {
+          e.printStackTrace();
+        } finally {
+          pm.log(x);
+        }
+
+        setLastRun(new Date());
+        ps.flush();
+      System.err.println("******************** Output: " + baos.toString());
+        setOutput(baos.toString());
+    `
     }
   ],
 
@@ -89,15 +119,19 @@ setOutput(baos.toString());
     {
       name: 'run',
       code: function() {
+        var self = this;
         this.output = '';
 
-        if ( false /* this.language === foam.nanos.script.Language.BEANSHELL */ ) {
+//        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+        if ( this.server ) {
           this.scheduled = true;
-          this.scriptDAO.put(this);
+          this.scriptDAO.put(this).then(function(script) {
+            self.copyFrom(script);
+          });
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
 
-          with ( { log: log } ) {
+          with ( { log: log, print: log } ) {
             var ret = eval(this.code);
             console.log('ret: ', ret);
             // TODO: if Promise returned, then wait

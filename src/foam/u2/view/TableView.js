@@ -76,6 +76,51 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Currency',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(value) {
+        this.start()
+          .style({'text-align': 'left', 'padding-right': '20px'})
+          .add('$' + value.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+        .end();
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Date',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toLocaleDateString());
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+
+  properties: [
+    {
+      name: 'tableCellFormatter',
+      value: function(date) {
+        if ( date ) this.add(date.toLocaleString());
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableView',
   extends: 'foam.u2.Element',
@@ -215,7 +260,10 @@ foam.CLASS({
         return this.Entity.create({ name: '#8942' });
       }
     },
-    'selection',
+    {
+      name: 'selection',
+      expression: function(importSelection) { return importSelection; },
+    },
     'hoverSelection',
     'dropdownOrigin',
     'overlayOrigin'
@@ -307,9 +355,10 @@ foam.CLASS({
                     if ( view.importSelection$ ) view.importSelection = obj;
                     if ( view.editRecord$ ) view.editRecord(obj);
                   }).
-                  addClass(this.slot(function(selection) {
-                    return ( obj === selection ) ? view.myClass('selected') : '';
-                  }, view.selection$)).
+                  addClass(view.slot(function(selection) {
+                    return selection && foam.util.equals(obj.id, selection.id) ?
+                        view.myClass('selected') : '';
+                  })).
                   addClass(view.myClass('row')).
                   forEach(columns_, function(column) {
                     this.

@@ -8,6 +8,7 @@
    package: 'foam.nanos.export',
    name: 'XMLDriver',
    implements: [ 'foam.nanos.export.ExportDriver' ],
+
    documentation: 'Class for exporting data from a DAO to XML',
    
    properties: [

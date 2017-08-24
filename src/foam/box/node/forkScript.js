@@ -31,7 +31,10 @@ ctx.socketService.listening$.sub(function(sub, _, __, slot) {
   stdin.on('end', function() {
     // TODO(markdittmer): Use secure parser.
     foam.json.parseString(buf, ctx).send(foam.box.Message.create({
+      // TODO(markdittmer): RegisterSelfMessage should handle naming. Is "name:"
+      // below necessary?
       object: foam.box.SocketBox.create({
+        name: ctx.me.name,
         address: `0.0.0.0:${ctx.socketService.port}`
       })
     }));

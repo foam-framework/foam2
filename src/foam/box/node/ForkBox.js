@@ -31,6 +31,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'me',
     'registry',
     'socketService'
   ],
@@ -105,7 +106,10 @@ foam.CLASS({
       this.child_.stdin.end(
           foam.json.Network.stringify(this.SubBox.create({
             name: this.replyBox_.id,
+            // TODO(markdittmer): RegisterSelfMessage should handle naming. Is
+            // "name:" below necessary?
             delegate: this.SocketBox.create({
+              name: this.me.name,
               address: `0.0.0.0:${this.socketService.port}`
             })
           }),

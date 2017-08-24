@@ -14,12 +14,6 @@ public class ScriptRunnerDAO
   extends ProxyDAO
 {
 
-  public ScriptRunnerDAO()
-    throws IOException
-  {
-    this(new JDAO(Script.getOwnClassInfo(), "scripts"));
-  }
-
   public ScriptRunnerDAO(DAO delegate) {
     super(delegate);
   }
@@ -27,7 +21,14 @@ public class ScriptRunnerDAO
   public FObject put_(X x, FObject obj) {
     Script script = (Script) obj;
 
-    if ( script.getScheduled() ) script.runScript();
+    try {
+      if ( script.getScheduled() ) {
+        script.runScript(getX());
+        script.setScheduled(false);
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
 
     return getDelegate().put_(x, obj);
   }

@@ -66,6 +66,14 @@ foam.CLASS({
         body: this.sendMethodCode()
       });
 
+      cls.method({
+        type: 'void',
+        visibility: 'public',
+        name: 'setDelegateObject',
+        args: [ { name: 'obj', type: 'Object' } ],
+        body: "setDelegate((" + this.of.id + ") obj);"
+      });
+
       return cls;
     }
   ],
@@ -80,30 +88,54 @@ foam.CLASS({
 
     foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
     foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
+    foam.box.Box        errorBox = (foam.box.Box) message.getAttributes().get("errorBox");
     Object result = null;
 
-    switch ( rpc.getName() ) {<%
+    try {
+      switch ( rpc.getName() ) {<%
   var methods = this.of.getOwnAxiomsByClass(foam.core.Method);
   for ( var i = 0 ; i < methods.length ; i++ ) {
     var m = methods[i]; %>
-      case "<%= m.name %>":
-        <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(
+        case "<%= m.name %>":
+          <% if ( m.javaReturns && m.javaReturns !== 'void' ) { %>result = <% } %>getDelegate().<%= m.name %>(
           <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
-      if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {
-        %>to<%= m.args[j].javaType %><%
+      if ( m.args[j].javaType == 'foam.core.X' ) {
+        %>getX()<%
       } else {
-        %>(<%= m.args[j].javaType %>)<%
+        if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {
+          %>to<%= m.args[j].javaType %><%
+        } else {
+          %>(<%= m.args[j].javaType %>)<%
+        }
+        %>(rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? rpc.getArgs()[<%= j %>] : null)<%
       }
-      %>(rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? rpc.getArgs()[<%= j %>] : null)<%
       if ( j != m.args.length - 1 ) { %>,
-          <% }
-    }
+            <% }
+      }
     %>);
         break;
     <%
   }%>
-      default: throw new RuntimeException("No such method found \\"" + rpc.getName() + "\\"");
+        default: throw new RuntimeException("No such method found \\"" + rpc.getName() + "\\"");
+      }
+    } catch (Exception e) {
+      if ( errorBox == null ) {
+        // TODO(adamvy): Do we care?
+        return;
+      }
+
+      foam.box.RemoteException wrapper = getX().create(foam.box.RemoteException.class);
+      wrapper.setId(e.getClass().getName());
+      wrapper.setMessage(e.getMessage());
+
+      foam.box.RPCErrorMessage reply = getX().create(foam.box.RPCErrorMessage.class);
+      reply.setData(wrapper);
+
+      foam.box.Message replyMessage = getX().create(foam.box.Message.class);
+      replyMessage.setObject(reply);
+
+      errorBox.send(replyMessage);
     }
 
     if ( replyBox != null ) {

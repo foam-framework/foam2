@@ -70,7 +70,7 @@ foam.CLASS({
       ^label {
         color: #444;
         flex-grow: 1;
-        margin-right: 12px;
+        margin-left: 12px;
         overflow: hidden;
         white-space: nowrap;
         display: inline;

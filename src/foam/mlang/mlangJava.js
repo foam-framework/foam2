@@ -222,6 +222,63 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.mlang.predicate.In',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode:
+  `
+  Object lhs = getArg1().f(obj);
+  // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
+  Object rhs = getArg2().f(obj);
+
+  if ( rhs instanceof Object[] ) {
+    // Checks if rhs array contains the lhs object
+    Object[] values = (Object[])rhs;
+
+    for ( int i = 0 ; i < values.length ; i++ ) {
+      if ( ( ( (Comparable) lhs ).compareTo( (Comparable) values[i] ) ) == 0 ) {
+        return true;
+      }
+    }
+  } else if ( rhs instanceof String ) {
+    // Checks if lhs is substring of rhs
+    return ( lhs instanceof String ) &&
+      ( ( (String) rhs ).contains( (String) lhs ) );
+  }
+
+  return false;
+  `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Map',
+
+  methods: [
+    {
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaReturns: 'foam.core.FObject',
+      javaCode: `return (foam.core.FObject) getArg1().f(obj);`
+    },
+    {
+      name: 'put',
+      javaCode: 'getDelegate().put(f(obj), sub);'
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.predicate.Contains',
 
   methods: [
