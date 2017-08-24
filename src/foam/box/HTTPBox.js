@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'HTTPBox',
 
-  implements: ['foam.box.Box'],
+  implements: [ 'foam.box.Box' ],
 
   requires: [
     'foam.json.Outputter',
