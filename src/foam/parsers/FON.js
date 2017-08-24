@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.parsers',
   name: 'FON',
+  implements: [ 'foam.json.Parser' ],
   properties: [
     {
       name: 'creationContext'
