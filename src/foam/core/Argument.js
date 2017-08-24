@@ -309,7 +309,7 @@ foam.CLASS({
       adaptArrayElement: function(e, obj) {
         var ctx = obj.__subContext__ || foam;
         var of = e.class || this.of;
-        var cls = foam.typeOf(of) === foam.String ? ctx.lookup(of) : of;
+        var cls = ctx.lookup(of);
 
         return cls.isInstance(e) ? e :
           foam.String.isInstance(e) ? cls.create({ name: e }) :
