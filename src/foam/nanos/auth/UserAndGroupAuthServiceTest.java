@@ -4,25 +4,25 @@ import foam.core.X;
 import foam.dao.ListSink;
 import javax.security.auth.AuthPermission;
 import javax.security.auth.login.LoginException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-/**
- * Created by marcroopchand on 2017-05-24.
- */
 
 public class UserAndGroupAuthServiceTest
   extends CachedUserAndGroupAuthService
 {
-  private int numUsers        = 100;
-  private int numGroups       = 5;
-  private int numPermissions  = 10;
 
-  private ArrayList<X> xArray               = new ArrayList<>();
-  private ArrayList<Permission> permissions = new ArrayList<>();
+  protected int numUsers        = 10;
+  protected int numGroups       = 5;
+  protected int numPermissions  = 10;
+
+  protected ArrayList<X> xArray               = new ArrayList<>();
+  protected ArrayList<Permission> permissions = new ArrayList<>();
 
   @Override
   public void start() {
+    System.out.println("Starting");
     super.start();
     createGroupsAndPermissions();
     addTestUsers();
@@ -78,7 +78,12 @@ public class UserAndGroupAuthServiceTest
       user.setEmail("marc" + i + "@nanopay.net");
       user.setFirstName("Marc" + i);
       user.setLastName("R" + i);
-      user.setPassword("marc" + i);
+      try {
+        String salt = UserAndGroupAuthService.generateRandomSalt();
+        user.setPassword(UserAndGroupAuthService.hashPassword("marc" + i, salt) + ":" + salt);
+      } catch (NoSuchAlgorithmException e) {
+        System.out.println("Couldn't hash password with " + UserAndGroupAuthService.HASH_METHOD + "\nTest Failed");
+      }
 
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
       Group group = (Group) sink.getData().get(randomGroup);
@@ -103,7 +108,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0; i < numUsers; i++ ) {
       try {
         xArray.add(login("" + i, "marc" + i));
-      } catch ( LoginException e ) {
+      } catch (RuntimeException e) {
         e.printStackTrace();
       }
     }
@@ -159,7 +164,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0 ; i < numUsers ; i++ ) {
       try {
         challengedLogin("" + i, generateChallenge("" + i));
-      } catch (LoginException e) {
+      } catch (RuntimeException e) {
         e.printStackTrace();
       }
     }
@@ -174,7 +179,7 @@ public class UserAndGroupAuthServiceTest
       String challenge = generateChallenge("0");
       TimeUnit.SECONDS.sleep(6);
       challengedLogin("0", challenge);
-    } catch (LoginException e) {
+    } catch (RuntimeException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
       e.printStackTrace();

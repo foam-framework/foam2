@@ -6,10 +6,7 @@
 
 package foam.lib.json;
 
-import foam.core.ContextAwareSupport;
-import foam.core.FObject;
-import foam.core.ProxyX;
-import foam.core.X;
+import foam.core.*;
 
 /**
  * Class responsible for parsing journal files.
@@ -43,8 +40,14 @@ public class JournalParser
 
   public Object parseObjectId(String journalLine) {
 
+    String id;
     int idIndex = journalLine.lastIndexOf(":");
-    String id = journalLine.substring(idIndex + 2, journalLine.lastIndexOf("}") - 1);
+
+    if ( String.valueOf(journalLine.charAt(idIndex + 1)).equals("\"") ) {
+      id = journalLine.substring(idIndex + 2, journalLine.lastIndexOf("}") - 1);
+    } else {
+      id = journalLine.substring(idIndex + 1, journalLine.lastIndexOf("}"));
+    }
 
     return id;
   }

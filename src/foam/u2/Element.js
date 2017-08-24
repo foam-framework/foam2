@@ -1484,6 +1484,17 @@ foam.CLASS({
       return this;
     },
 
+    function daoSlot(dao, sink) {
+      var slot = foam.dao.DAOSlot.create({
+        dao: dao,
+        sink: sink
+      });
+
+      this.onDetach(slot);
+
+      return slot;
+    },
+
     function select(dao, f, update) {
       var es   = {};
       var self = this;
@@ -1945,7 +1956,8 @@ foam.CLASS({
         e.data$ = X.data$.dot(this.name);
       }
 
-      e.addClass('property-' + this.name);
+      // e could be a Slot, so check if addClass exists
+      e.addClass && e.addClass('property-' + this.name);
 
       return e;
     }

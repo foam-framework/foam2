@@ -16,11 +16,13 @@ var classes = [
   'foam.mlang.predicate.Nary',
   'foam.mlang.predicate.Unary',
   'foam.mlang.predicate.Binary',
+  'foam.mlang.predicate.ArrayBinary',
   'foam.mlang.predicate.Contains',
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Lt',
+  'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
   'foam.mlang.sink.Count',
@@ -42,8 +44,10 @@ var classes = [
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
+  'foam.box.RemoteException',
   'foam.box.RPCMessage',
   'foam.box.RPCReturnMessage',
+  'foam.box.RPCErrorMessage',
   'foam.box.BoxRegistry',
   'foam.box.BoxRegistryBox',
   'foam.box.CheckAuthenticationBox',
@@ -55,6 +59,7 @@ var classes = [
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
+  'foam.dao.ReadOnlyDAO',
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
@@ -62,6 +67,8 @@ var classes = [
   'foam.mlang.sink.Max',
   'foam.mlang.sink.Min',
   'foam.mlang.sink.Sum',
+  'foam.mlang.sink.Map',
+  'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
   'foam.nanos.auth.EnabledAware',
@@ -70,7 +77,9 @@ var classes = [
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.User',
+  'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.WebAuthService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
@@ -84,13 +93,14 @@ var classes = [
 ];
 
 var abstractClasses = [
-//  'foam.json.Outputer'
+//  'foam.json.Outputter'
 ];
 
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.nanos.auth.WebAuthService'
 ];
 
 var proxies = [

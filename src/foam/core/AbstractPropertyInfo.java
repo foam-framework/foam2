@@ -7,7 +7,13 @@
 package foam.core;
 
 import foam.lib.parse.Parser;
+import foam.nanos.logger.Logger;
 import java.util.Map;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractPropertyInfo
   implements PropertyInfo
@@ -44,6 +50,33 @@ public abstract class AbstractPropertyInfo
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop) {
     if ( ! prop.f(o1).equals(prop.f(o2)) ) {
       diff.put(prop.getName(), prop.f(o2));
+    }
+  }
+
+  public void setFromString(Object obj, String value) {
+    // TODO: Need to write
+  }
+
+  @Override
+  public Object fromXML(X x, XMLStreamReader reader) {
+    // Moves reader to characters state in order for value reading for various data types (date, boolean, short ...)
+    try {
+      reader.next();
+    } catch (XMLStreamException ex) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("Premature end of XML file");
+    }
+    return "";
+  }
+
+  @Override
+  public void toXML(FObject obj, Document doc, Element objElement) {
+    Object value = this.f(obj);
+    if ( this.getTransient() ) return;
+    if ( value != null && value != "" ) {
+      Element prop = doc.createElement(this.getName());
+      prop.appendChild(doc.createTextNode(value.toString()));
+      objElement.appendChild(prop);
     }
   }
 }

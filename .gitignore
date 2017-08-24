@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 server.bat
 *~
+.DS_Store
 coverage
 doc/gen/*
 **/bower_components/*
@@ -9,3 +10,4 @@ test/third_party/google-cloud-sdk*
 build
 foam-bin.js
 target/
+.idea/

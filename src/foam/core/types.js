@@ -23,6 +23,8 @@ foam.CLASS({
   properties: [
     'units',
     [ 'value', 0 ],
+    'min',
+    'max',
     [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
@@ -399,9 +401,17 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Currency',
+  extends: 'Float'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Map',
   extends: 'Property',
 
+  // TODO: Remove need for sorting
   properties: [
     [ 'factory', function() { return {} } ],
     [
@@ -493,6 +503,21 @@ foam.CLASS({
           newValue ;
       }
     }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var key  = this.targetDAOKey;
+      var name = this.name;
+
+      Object.defineProperty(proto, name + '$find', {
+        get: function classGetter() {
+          return this.__context__[key].find(this[name]);
+        },
+        configurable: true
+      });
+    }
   ]
 });
 
@@ -520,5 +545,27 @@ foam.CLASS({
     {
       name: 'of'
     }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'Property',
+
+  properties: [
+    /**
+      A short-name is an optional shorter name for a property.
+      It is used by JSON and XML support when 'useShortNames'
+      is enabled. Short-names enable output to be smaller,
+      which can save disk space and/or network bandwidth.
+      Ex.
+    <pre>
+      properties: [
+        { name: 'firstName', shortName: 'fn' },
+        { name: 'lastName',  shortName: 'ln' }
+      ]
+    </pre>
+    */
+    { class: 'String', name: 'shortName' }
   ]
 });

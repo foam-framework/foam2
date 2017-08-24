@@ -22,24 +22,10 @@
 //   - don't output default classes
 */
 
-/**
-  A short-name is an optional shorter name for a property.
-  It is used by foam.json.Outputer when 'useShortNames'
-  is enabled. Short-names enable JSON output to be smaller,
-  which can save disk space and/or network bandwidth.
-  Ex.
-<pre>
-  properties: [
-    { name: 'firstName', shortName: 'fn' },
-    { name: 'lastName',  shortName: 'ln' }
-  ]
-</pre>
-*/
 foam.CLASS({
   refines: 'foam.core.Property',
 
   properties: [
-    { class: 'String', name: 'shortName' },
     {
       name: 'fromJSON',
       value: function fromJSON(value, ctx, prop, json) {
@@ -99,12 +85,12 @@ foam.CLASS({
 });
 
 
-/** JSON Outputer. **/
+/** JSON Outputter. **/
 foam.CLASS({
   package: 'foam.json',
-  name: 'Outputer',
+  name: 'Outputter',
 
-  documentation: 'JSON Outputer.',
+  documentation: 'JSON Outputter.',
 
   properties: [
     {
@@ -459,31 +445,31 @@ foam.CLASS({
 });
 
 
-/** Library of pre-configured JSON Outputers. **/
+/** Library of pre-configured JSON Outputters. **/
 foam.LIB({
   name: 'foam.json',
 
   constants: {
 
     // Pretty Print
-    Pretty: foam.json.Outputer.create({
+    Pretty: foam.json.Outputter.create({
       strict: false
     }),
 
     // Strict means output as proper JSON.
-    Strict: foam.json.Outputer.create({
+    Strict: foam.json.Outputter.create({
       pretty: false,
       strict: true
     }),
 
     // Pretty and proper JSON.
-    PrettyStrict: foam.json.Outputer.create({
+    PrettyStrict: foam.json.Outputter.create({
       pretty: true,
       strict: true
     }),
 
     // Compact output (not pretty)
-    Compact: foam.json.Outputer.create({
+    Compact: foam.json.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
@@ -491,7 +477,7 @@ foam.LIB({
     }),
 
     // Shorter than Compact (uses short-names if available)
-    Short: foam.json.Outputer.create({
+    Short: foam.json.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
@@ -502,7 +488,7 @@ foam.LIB({
     }),
 
     // Short, but exclude network-transient properties.
-    Network: foam.json.Outputer.create({
+    Network: foam.json.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
@@ -514,7 +500,7 @@ foam.LIB({
     }),
 
     // Short, but exclude storage-transient properties.
-    Storage: foam.json.Outputer.create({
+    Storage: foam.json.Outputter.create({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
