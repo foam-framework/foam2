@@ -63,6 +63,7 @@ FOAM_FILES([
   { name: "foam/pattern/Multiton" },
   { name: "foam/core/Enum" },
   { name: "foam/core/JSON" },
+  { name: "foam/core/XML" },
   { name: "foam/lib/csv/CSV" },
   { name: "foam/lib/csv/CSVParser" },
   { name: "foam/parse/parse" },
