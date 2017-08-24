@@ -197,11 +197,11 @@ foam.CLASS({
     {
       name: 'outputProperty',
       code: foam.mmethod({
-        String: function(v, p) { this.outputPrimitive(v, p) },
-        Number: function(v, p) { this.outputPrimitive(v, p) },
+        String:  function(v, p) { this.outputPrimitive(v, p) },
+        Number:  function(v, p) { this.outputPrimitive(v, p) },
         Boolean: function(v, p) { this.outputPrimitive(v, p) },
-        Date: function(v, p) { this.outputPrimitive(v, p) },
-        Array: function(v, p) {
+        Date:    function(v, p) { this.outputPrimitive(v, p) },
+        Array:   function(v, p) {
           this.start("<" + this.propertyName(p) + " class='Array'>");
           this.nl().indent();
           this.output(p.toXML(v, this));
@@ -273,15 +273,15 @@ foam.CLASS({
     {
       name: 'output',
       code: foam.mmethod({
-        Undefined: function(o) { this.out('null'); },
-        Null:      function(o) { this.out('null'); },
-        String:    function(o) { this.out(this.escape(o)); },
-        Number:    function(o) { this.out(o); },
-        Boolean:   function(o) { this.out(o); },
-        Date:      function(o) { this.outputDate(o); },
-        Function:  function(o) { this.outputFunction(o); },
+        Undefined:    function(o) { this.out('null'); },
+        Null:         function(o) { this.out('null'); },
+        String:       function(o) { this.out(this.escape(o)); },
+        Number:       function(o) { this.out(o); },
+        Boolean:      function(o) { this.out(o); },
+        Date:         function(o) { this.outputDate(o); },
+        Function:     function(o) { this.outputFunction(o); },
         AbstractEnum: function(o) { },
-        FObject:   function(o) {
+        FObject:      function(o) {
           if ( o.outputXML ) {
             o.outputXML(this)
             return;
@@ -403,7 +403,7 @@ foam.CLASS({
             // Convert xml string into an xml DOM object for node traversal
             var parser = new DOMParser();
             // TODO: Remove this escape sequence. Future implementation should include looking through parsed
-            // xml doc and passing on childNodes which are texts and do not contain any info. 
+            // xml doc and passing on childNodes which are texts and do not contain any info.
             o = o.replace(/\t|\n|\r|↵/g, "");
             var xmlDoc = parser.parseFromString(o, "text/xml");
             var rootName = xmlDoc.firstChild.nodeName;
@@ -424,12 +424,12 @@ foam.CLASS({
   ]
 });
 
+
 /** Library of pre-configured XML Outputters. **/
 foam.LIB({
   name: 'foam.xml',
 
   constants: {
-
     // Pretty Print
     Pretty: foam.xml.Outputter.create({
       outputDefaultValues: false
@@ -450,11 +450,10 @@ foam.LIB({
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
-    }),
+    })
   },
 
   methods: [
-
     function parseString(xmlStr, opt_ctx) {
       return this.parse(xmlStr, undefined, opt_ctx)
     },
@@ -465,6 +464,6 @@ foam.LIB({
 
     function objectify(o) {
       return foam.xml.Compact.objectify(o);
-    },
+    }
   ]
 });
