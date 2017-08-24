@@ -586,6 +586,7 @@ foam.LIB({
 
           if ( cls ) {
             var c = typeof cls === 'string' ? ( opt_ctx || foam ).lookup(cls) : cls;
+            if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
 
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);
