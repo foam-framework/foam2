@@ -243,12 +243,13 @@ foam.CLASS({
   name: 'Socket',
 
   imports: [
-    'socketService',
-    'me'
+    'me',
+    'socketService'
   ],
 
   requires: [
-    'foam.box.RegisterSelfMessage'
+    'foam.box.RegisterSelfMessage',
+    'foam.json.Outputter'
   ],
 
   topics: [
@@ -293,12 +294,26 @@ foam.CLASS({
       class: 'Int',
       name: 'nextSize',
       value: 0
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
 
   methods: [
     function write(msg) {
-      var serialized = foam.json.Network.stringify(msg);
+      var serialized = this.outputter.stringify(msg);
       var size = Buffer.byteLength(serialized);
       var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
@@ -394,13 +409,14 @@ foam.CLASS({
   requires: [
     'foam.box.Message',
     'foam.box.RegisterSelfMessage',
+    'foam.json.Parser',
     'foam.net.node.Socket'
   ],
 
   imports: [
-    'info',
+    'creationContext',
     'error',
-    'fonParser'
+    'info'
   ],
 
   properties: [
@@ -423,6 +439,17 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
@@ -456,7 +483,7 @@ foam.CLASS({
 
     function addSocket(socket) {
       var s1 = socket.message.sub(function(s, _, mStr) {
-        var m = this.fonParser.parseString(mStr);
+        var m = this.parser.parseString(mStr);
 
         if ( ! this.Message.isInstance(m) ) {
           console.warn('Got non-message:', m, mStr);
@@ -499,6 +526,7 @@ foam.CLASS({
   name: 'WebSocket',
 
   requires: [
+    'foam.json.Outputter',
     'foam.net.node.Frame'
   ],
 
@@ -524,13 +552,27 @@ foam.CLASS({
     },
     'opcode',
     'parts',
-    'currentFrame'
+    'currentFrame',
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
+    }
   ],
 
   methods: [
     function send(data) {
       if ( foam.box.Message.isInstance(data) ) {
-        data = foam.json.Network.stringify(data);
+        data = this.outputter.stringify(data);
       }
 
       if ( typeof data == "string" ) {
