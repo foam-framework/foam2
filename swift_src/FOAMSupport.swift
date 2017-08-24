@@ -420,3 +420,40 @@ public protocol FOAM_enum {
   var name: String { get }
   var label: String { get }
 }
+
+public class FoamError: Error {
+  var obj: Any?
+  init(_ obj: Any?) { self.obj = obj }
+}
+
+public class Future<T> {
+  var set: Bool = false
+  var value: T?
+  var error: Error?
+  var semaphore = DispatchSemaphore(value: 0)
+  var numWaiting = 0
+  public func get() throws -> T? {
+    if !set {
+      numWaiting += 1
+      semaphore.wait()
+    }
+    if error != nil {
+      throw error!
+    }
+    return value
+  }
+  public func set(_ value: T?) {
+    self.value = value
+    set = true
+    for _ in 0...numWaiting {
+      semaphore.signal()
+    }
+  }
+  public func error(_ value: Error?) {
+    self.error = value
+    set = true
+    for _ in 0...numWaiting {
+      semaphore.signal()
+    }
+  }
+}
