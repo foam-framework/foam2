@@ -149,17 +149,17 @@ describe('Serialization', function() {
         {
           class: 'FObjectArray',
           of: 'test.Jane',
-          name: 'js',
-          factory: function() {
-            return [ test.Jane.create(), test.James.create() ];
-          }
+          name: 'js'
         }
       ]
     });
 
-    expect(foam.json.Outputter.create().objectify(test.Js.create(), test.Js)).
+    var js = test.Js.create({
+      js: [ test.Jane.create(), test.James.create() ]
+    });
+    expect(foam.json.Outputter.create().objectify(js, test.Js)).
         toEqual({ js: [ {}, { class: 'test.James' } ] });
-    expect(foam.json.Strict.stringify(test.Js.create(), test.Js)).
+    expect(foam.json.Strict.stringify(js, test.Js)).
         toBe('{"js":[{},{"class":"test.James"}]}');
   });
 
@@ -235,10 +235,6 @@ describe('Serialization', function() {
     var objectifier = foam.json.Outputter.create({
       outputDefaultValues: false
     });
-    var stringifier = foam.json.Outputter.create({
-      strict: true,
-      outputDefaultValues: false
-    });
     expect(objectifier.objectify(test.Alpha.create(), test.Alpha)).toEqual({});
     expect(objectifier.objectify(test.Alpha.create({
       beta: test.Beta.create()
@@ -255,6 +251,8 @@ describe('Serialization', function() {
         deltas: [ { class: 'test.Delta2' }, { value: 0 } ]
       }
     });
+
+    var stringifier = foam.json.Strict;
     expect(stringifier.stringify(test.Alpha.create(), test.Alpha)).toBe('{}');
     expect(stringifier.stringify(test.Alpha.create({
       beta: test.Beta.create()

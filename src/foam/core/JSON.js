@@ -278,16 +278,20 @@ foam.CLASS({
     },
 
     function outputProperty(o, p, includeComma) {
-      if ( ! this.propertyPredicate(o, p ) ) return;
-      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
-      if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) ) return;
+      if ( ! this.propertyPredicate(o, p ) ) return false;
+      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) )
+        return false;
 
+      // Access property before checking o.hasOwnProperty.
       var v = o[p.name];
+      if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
+        return false;
 
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
       this.output(p.toJSON(v, this), p.of);
+      return true;
     },
 
     function outputDate(o) {
@@ -351,7 +355,8 @@ foam.CLASS({
           }
 
           this.start('{');
-          if ( this.outputClassNames && o.cls_ !== opt_cls ) {
+          var outputClassName = this.outputClassNames && o.cls_ !== opt_cls;
+          if ( outputClassName ) {
             this.out(
                 this.maybeEscapeKey('class'),
                 ':',
@@ -361,8 +366,10 @@ foam.CLASS({
                 '"');
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          var outputComma = outputClassName;
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputProperty(o, ps[i], this.outputClassNames || i );
+            outputComma = this.outputProperty(o, ps[i], outputComma) ||
+                outputComma;
           }
           this.nl().end('}');
         },
