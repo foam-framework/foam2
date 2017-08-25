@@ -19,6 +19,8 @@ foam.CLASS({
   package: 'foam.net.web',
   name: 'WebSocket',
 
+  requires: [ 'foam.json.Outputter' ],
+
   topics: [
     'message',
     'connected',
@@ -32,6 +34,20 @@ foam.CLASS({
     {
       name: 'socket',
       transient: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
 
@@ -46,7 +62,7 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      this.socket.send(foam.json.Network.stringify(msg));
+      this.socket.send(this.outputter.stringify(msg));
     },
 
     function connect() {
@@ -92,25 +108,34 @@ foam.CLASS({
   name: 'WebSocketService',
 
   requires: [
-    'foam.net.web.WebSocket',
+    'foam.box.Message',
     'foam.box.RegisterSelfMessage',
-    'foam.box.Message'
+    'foam.json.Parser',
+    'foam.net.web.WebSocket'
   ],
-
-  imports: [
-    'fonParser'
-  ],
+  imports: [ 'creationContext' ],
 
   properties: [
     {
       name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
   methods: [
     function addSocket(socket) {
       var sub1 = socket.message.sub(function onMessage(s, _, msgStr) {
-        var msg = this.fonParser.parseString(msgStr);
+        var msg = this.parser.parseString(msgStr);
 
         if ( ! this.Message.isInstance(msg) ) {
           console.warn('Got non-message:', msg, msgStr);
