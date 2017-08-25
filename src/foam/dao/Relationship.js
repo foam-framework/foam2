@@ -78,14 +78,14 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       name: 'sourceProperties',
-      of: 'foam.core.PropertyInfo', // TODO: Property changed to Property info for Java generation, could this cause issues on the JS side?
+      of: 'foam.core.PropertyInfo',
       javaType: 'foam.core.PropertyInfo[]',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
     {
       class: 'FObjectArray',
       name: 'targetProperties',
-      of: 'foam.core.PropertyInfo', // TODO: Property changed to Property info for Java generation, could this cause issues on the JS side?
+      of: 'foam.core.PropertyInfo',
       javaType: 'foam.core.PropertyInfo[]',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
