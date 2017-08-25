@@ -445,6 +445,45 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  package: 'foam.json',
+  name: 'Parser',
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'strict',
+      value: true
+    },
+    {
+      name: 'creationContext'
+    },
+    {
+      name: 'fonParser_',
+      expression: function(creationContext) {
+        return foam.parsers.FON.create({
+          creationContext: creationContext
+        });
+      }
+    }
+  ],
+
+  methods: [
+    function parseString(str, opt_ctx) {
+      return this.strict ?
+          // JSON.parse() is faster; use it when data format allows.
+          foam.json.parse(JSON.parse(str), null,
+                          opt_ctx || this.creationContext) :
+          // Create new parser iff different context was injected; otherwise
+          // use same parser bound to "creationContext" each time.
+          opt_ctx ? foam.parsers.FON.create({
+            creationContext: opt_ctx
+          }).parseString(str) : this.fonParser_.parseString(str);
+    }
+  ]
+});
+
+
 /** Library of pre-configured JSON Outputters. **/
 foam.LIB({
   name: 'foam.json',
