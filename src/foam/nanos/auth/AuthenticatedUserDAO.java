@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.auth;
 
 import foam.core.FObject;
@@ -6,7 +12,6 @@ import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
-
 import java.security.NoSuchAlgorithmException;
 
 //TODO: Throw exception for print statements when they are ready
@@ -43,6 +48,7 @@ public class AuthenticatedUserDAO
 
       String salt = UserAndGroupAuthService.generateRandomSalt();
       user.setPassword(UserAndGroupAuthService.hashPassword(user.getPassword(), salt) + ":" + salt);
+
       return getDelegate().put_(x, user);
     }
     catch (RuntimeException e) {
