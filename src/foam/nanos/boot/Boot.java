@@ -8,36 +8,16 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
-import foam.nanos.auth.Group;
-import foam.nanos.auth.User;
 import java.io.IOException;
 
 public class Boot {
   protected DAO serviceDAO_;
-  protected DAO userDAO_;
-  protected DAO groupDAO_;
-  protected DAO pmDAO_;
   protected X   root_ = new ProxyX();
 
   public Boot() {
     try {
       // Used for all the services that will be required when Booting
       serviceDAO_ = new foam.dao.PMDAO(new JDAO(NSpec.getOwnClassInfo(), "services"));
-
-      // Used to hold all of the users in our system
-      MapDAO userDAO = new MapDAO();
-      userDAO.setOf(User.getOwnClassInfo());
-      userDAO.setX(root_);
-      userDAO_ = new JDAO(userDAO, "users");
-      root_.put("userDAO", userDAO_);
-
-      // Used for groups. We have multiple groups that contain different users
-      MapDAO groupDAO = new MapDAO();
-      groupDAO.setOf(Group.getOwnClassInfo());
-      groupDAO.setX(root_);
-      groupDAO_ = new JDAO(groupDAO, "groups");
-      root_.put("groupDAO", groupDAO_);
-
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -68,9 +48,7 @@ public class Boot {
     });
   }
 
-  public X getX() {
-    return root_;
-  }
+  public X getX() { return root_; }
 
   public static void main (String[] args)
     throws Exception
