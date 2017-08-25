@@ -31,8 +31,7 @@ foam.CLASS({
 
       ((RelationshipDAO) target).getRelationship().setInverseName(source.getClassInfo().getId());
 
-      return (foam.core.FObject) target;
-      `
+      return (foam.core.FObject) target;`
     }
   ]
 });
