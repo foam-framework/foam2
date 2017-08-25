@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'RecipricalSearch', // Correct spelling: "reciprocal"
+  name: 'ReciprocalSearch',
   extends: 'foam.u2.Element', // TODO: make be a View
 
   requires: [
