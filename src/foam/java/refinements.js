@@ -772,6 +772,13 @@ foam.CLASS({
 
 
 foam.CLASS({
+  // Maps JS Property to Java Equivalent PropertyInfo for Java Relationships
+  refines: 'foam.core.Property',
+  javaType: 'foam.core.PropertyInfo'
+});
+
+
+foam.CLASS({
   refines: 'foam.core.String',
 
   properties: [

@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'Relationship',
-  implements: [ 'foam.mlang.Expressions' ],
+  implements: [ { path: 'foam.mlang.Expressions', java: false } ],
 
   documentation: 'An Axiom for defining Relationships between models.',
 
@@ -46,6 +46,7 @@ foam.CLASS({
     },
     {
       name: 'name',
+      class: 'String',
       transient: true,
       hidden: true,
       getter: function() {
@@ -54,7 +55,10 @@ foam.CLASS({
       }
     },
     'forwardName',
-    'inverseName',
+    {
+      name: 'inverseName',
+      class: 'String'
+    },
     {
       name: 'cardinality',
       assertValue: function(value) {
@@ -74,13 +78,15 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       name: 'sourceProperties',
-      of: 'Property',
+      of: 'PropertyInfo', // TODO: Property changed to Property info for Java generation, could this cause issues on the JS side?
+      javaType: 'foam.core.PropertyInfo[]',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
     {
       class: 'FObjectArray',
       name: 'targetProperties',
-      of: 'Property',
+      of: 'PropertyInfo', // TODO: Property changed to Property info for Java generation, could this cause issues on the JS side?
+      javaType: 'foam.core.PropertyInfo[]',
       adaptArrayElement: foam.core.Model.PROPERTIES.adaptArrayElement
     },
     {
@@ -221,6 +227,7 @@ foam.CLASS({
                       junctionProperty: junction.TARGET_ID,
                       junctionDAOKey: junctionDAOKey,
                       junctionKeyFactory: function(a) { return [id, a]; },
+                      // junctionFactoryPreOrder: true, TODO: Tmp implementation for ManyToManyRelationshipDAO, replace with java lambda function
                       junctionCls: junction,
                       sourceKey: id,
                       sourceProperty: junction.SOURCE_ID,
@@ -250,6 +257,7 @@ foam.CLASS({
                       junctionProperty: junction.SOURCE_ID,
                       junctionDAOKey: junctionDAOKey,
                       junctionKeyFactory: function(a) { return [a, id]; },
+                      // junctionFactoryPreOrder: false, TODO: Tmp implementation for ManyToManyRelationshipDAO, replace with java lambda function
                       junctionCls: junction,
                       sourceKey: id,
                       sourceProperty: junction.TARGET_ID,
