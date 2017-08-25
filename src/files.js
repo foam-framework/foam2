@@ -280,6 +280,7 @@ FOAM_FILES([
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
+  { name: "foam/u2/view/PopUpTitledView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
   { name: "foam/u2/view/DualView", flags: ['web'] },
