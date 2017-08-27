@@ -45,6 +45,7 @@ foam.CLASS({
     }
     */
   ],
+  
   methods: [
     {
       name: 'implies',

@@ -8,9 +8,6 @@ package foam.nanos.auth;
 
 import java.util.Date;
 
-/**
- * Created by marcroopchand on 2017-05-23.
- */
 public class Challenge {
   protected String challenge_;
   protected Date   ttl_;
