@@ -448,6 +448,16 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  refines: 'foam.core.Class',
+  properties: [
+    {
+      name: 'swiftType',
+      value: 'ClassInfo',
+    },
+  ],
+});
+
+foam.CLASS({
   refines: 'foam.core.List',
   properties: [
     {

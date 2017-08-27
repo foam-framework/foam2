@@ -41,6 +41,8 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.parse.StringPStream',
 
       'foam.box.Box',
+      'foam.box.BoxService',
+      'foam.box.BoxRegistry',
       'foam.box.ReplyBox',
       'foam.swift.box.RPCReturnBox',
       'foam.box.RPCMessage',

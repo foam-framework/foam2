@@ -30,9 +30,9 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Map',
       name: 'registry_',
       hidden: true,
-      factory: function() { return {}; }
     }
   ],
 
@@ -65,8 +65,18 @@ foam.CLASS({
 
         throw this.NoSuchNameException.create({ name: name });
       },
+      swiftCode: function() {/*
+if let exportBox = (registry_[name] as? Registration)?.exportBox {
+  return exportBox
+}
+throw NoSuchNameException_create(["name": name])
+      */},
+      throws: true,
       args: [
-        'name'
+        {
+          class: 'String',
+          name: 'name',
+        },
       ]
     },
     {
@@ -85,7 +95,39 @@ foam.CLASS({
 
         return this.registry_[name].exportBox;
       },
-      args: [ 'name', 'service', 'box' ]
+      swiftCode: function() {/*
+//name = name || foam.next$UID() TODO
+
+var exportBox: Box = SubBox_create([
+  "name": name,
+  "delegate": me
+])
+exportBox = service?.clientBox(exportBox) ?? exportBox
+
+let registration = Registration_create([
+  "exportBox": exportBox,
+  "localBox": service?.serverBox(localBox) ?? localBox
+])
+registry_[name] = registration
+return registration.exportBox!
+      */},
+      args: [
+        {
+          class: 'String',
+          name: 'name',
+          optional: true,
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.BoxService',
+          name: 'service',
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.Box',
+          name: 'localBox',
+        },
+      ],
     },
     {
       name: 'unregister',

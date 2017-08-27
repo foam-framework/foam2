@@ -62,6 +62,7 @@ foam.CLASS({
     { name: 'code', required: false },
     'documentation',
     'returns',
+    { class: 'Boolean', name: 'throws' },
     {
       name: 'args',
       factory: function() { return this.code ? foam.Function.args(this.code) : []; }
