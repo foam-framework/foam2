@@ -81,6 +81,12 @@ foam.LIB({
                 .map(function(a) { return a.swiftAxiomName }) +
             ']',
           }),
+          foam.swift.Field.create({
+            lazy: true,
+            name: 'cls',
+            type: 'Any',
+            defaultValue: this.model_.swiftName + '.self',
+          }),
         ],
       }));
       cls.fields.push(foam.swift.Field.create({

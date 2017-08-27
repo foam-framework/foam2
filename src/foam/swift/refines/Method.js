@@ -29,6 +29,11 @@ foam.CLASS({
       expression: function(name) { return name == 'init' ? '__foamInit__' : name; },
     },
     {
+      class: 'Boolean',
+      name: 'swiftThrows',
+      factory: function() { return this.throws }, // TODO make expression.
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.core.Argument',
       name: 'args',
@@ -72,6 +77,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftReturnType',
+      expression: function(returns) {
+        if (!returns) return '';
+        var cls = foam.lookup(returns, true)
+        if (cls) {
+          return cls.model_.swiftName
+        }
+        return 'Any?';
+      },
     },
     {
       class: 'StringArray',
@@ -95,6 +108,7 @@ foam.CLASS({
       cls.method(this.Method.create({
         name: this.swiftName,
         body: this.swiftCode,
+        throws: this.swiftThrows,
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
         visibility: this.swiftVisibility,

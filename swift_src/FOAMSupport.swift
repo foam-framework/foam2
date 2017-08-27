@@ -113,9 +113,13 @@ public protocol ClassInfo {
   var label: String { get }
   var parent: ClassInfo? { get }
   var ownAxioms: [Axiom] { get }
+  var cls: Any { get }
 }
 
 extension ClassInfo {
+  func create(_ args: [String:Any?] = [:], x: Context = Context.GLOBAL) -> FObject {
+    return x.create(type: cls, args: args) as! FObject
+  }
   var axioms: [Axiom] {
     get {
       var curCls: ClassInfo? = self
@@ -208,6 +212,7 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
 
   private static var classInfo_: ClassInfo = {
     class ClassInfo_: ClassInfo {
+      lazy var cls: Any = AbstractFObject.self
       lazy var id: String = "FObject"
       lazy var label: String = "FObject"
       lazy var parent: ClassInfo? = nil
