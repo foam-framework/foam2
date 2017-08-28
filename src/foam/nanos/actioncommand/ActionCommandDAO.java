@@ -21,17 +21,19 @@ public class ActionCommandDAO
 {
   public Object cmd_(X x, Object obj) {
     if ( obj instanceof ActionCommand ) {
-      String objID = ((ActionCommand)obj).getObjectID();
+      String objID      = ((ActionCommand)obj).getObjectID();
       FObject actionObj = super.find_(x, objID);
+
       try {
         // Calling method
         Method action = actionObj.getClass().getDeclaredMethod(((ActionCommand)obj).getActionName());
         action.invoke(actionObj);
       } catch ( SecurityException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-
       }
+
       return true;
     }
+
     return super.cmd(obj);
   }
 }

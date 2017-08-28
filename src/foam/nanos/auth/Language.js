@@ -8,7 +8,7 @@
    package: 'foam.nanos.auth',
    name: 'Language',
 
-   documentation: '',
+   documentation: 'Language codes.',
 
    ids: [ 'code' ],
 
