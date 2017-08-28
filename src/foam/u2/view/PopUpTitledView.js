@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.u2.view',
-  name: 'PopUpTitledView',
+  name: 'PopupTitledView',
   extends: 'foam.u2.View',
 
   imports: [
