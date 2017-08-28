@@ -4,8 +4,6 @@ import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.*;
 import foam.util.LRULinkedHashMap;
-
-import javax.security.auth.login.LoginException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -28,7 +26,7 @@ public class UserAndGroupAuthService
   public void start() {
     userDAO_      = (DAO) getX().get("userDAO");
     groupDAO_     = (DAO) getX().get("groupDAO");
-    challengeMap  = new LRULinkedHashMap<String, Challenge>(20000);
+    challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
   /**
@@ -37,11 +35,11 @@ public class UserAndGroupAuthService
    *
    * Should this throw an exception?
    */
-  public String generateChallenge(String userId) {
-    if ( userId == null || userId == "" ) return null;
+  public String generateChallenge(long userId) {
+    if ( userId < 1 ) return null;
     if ( userDAO_.find(userId) == null )  return null;
 
-    String   generatedChallenge = UUID.randomUUID() + userId;
+    String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
     Calendar calendar           = Calendar.getInstance();
     calendar.add(Calendar.SECOND, 5);
 
@@ -56,8 +54,8 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(String userId, String challenge) throws RuntimeException {
-    if ( userId == null || challenge == null || userId == "" || challenge == "" ) {
+  public X challengedLogin(long userId, String challenge) throws RuntimeException {
+    if ( userId < 1 || challenge == null  || challenge == "" ) {
       throw new RuntimeException("Invalid Parameters");
     }
 
@@ -84,8 +82,8 @@ public class UserAndGroupAuthService
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(String userId, String password) throws RuntimeException {
-    if ( userId == null || password == null || userId == "" || password == "" ) {
+  public X login(long userId, String password) throws RuntimeException {
+    if ( userId < 1 || password == null || password == "" ) {
       throw new RuntimeException("Invalid Parameters");
     }
 
@@ -136,16 +134,16 @@ public class UserAndGroupAuthService
    * and return a context with the updated user information
    */
   public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
-    throws IllegalStateException {
+    throws RuntimeException {
 
     if ( x == null || oldPassword == null || newPassword == null
       || oldPassword == "" || newPassword == "" ) {
-      throw new IllegalStateException("Invalid Parameters");
+      throw new RuntimeException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
     if ( user == null ) {
-      throw new IllegalStateException("User not found");
+      throw new RuntimeException("User not found");
     }
 
     String password = user.getPassword();
@@ -183,30 +181,26 @@ public class UserAndGroupAuthService
    * Will mainly be used as a veto method.
    * Users should have id, email, first name, last name, password for registration
    */
-  public Boolean validateUser(User user) throws IllegalStateException {
-    if ( user == null ) throw new IllegalStateException("Invalid User");
-
-    if ( user.getId() == "" ) {
-      throw new IllegalStateException("ID is required for creating a user");
+  public void validateUser(User user) throws RuntimeException {
+    if ( user == null ) {
+      throw new RuntimeException("Invalid User");
     }
 
     if ( user.getEmail() == "" ) {
-      throw new IllegalStateException("Email is required for creating a user");
+      throw new RuntimeException("Email is required for creating a user");
     }
 
     if ( user.getFirstName() == "" ) {
-      throw new IllegalStateException("First Name is required for creating a user");
+      throw new RuntimeException("First Name is required for creating a user");
     }
 
     if ( user.getLastName() == "" ) {
-      throw new IllegalStateException("Last Name is required for creating a user");
+      throw new RuntimeException("Last Name is required for creating a user");
     }
 
     if ( user.getPassword() == "" ) {
-      throw new IllegalStateException("Password is required for creating a user");
+      throw new RuntimeException("Password is required for creating a user");
     }
-
-    return true;
   }
 
   public static String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
