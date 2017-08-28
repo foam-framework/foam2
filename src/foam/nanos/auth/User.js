@@ -22,7 +22,7 @@
 
    properties: [
      {
-       class: 'String',
+       class: 'Long',
        name: 'id',
        displayWidth: 30,
        width: 100
