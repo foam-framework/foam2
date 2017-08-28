@@ -26,10 +26,12 @@ public class AuditMOP
    */
   private String formatMessage(FObject obj, Map values) {
     List<String> result = new ArrayList<>();
+
     for ( Object o : values.keySet() ) {
       String key = (String) o;
       result.add(key + ": [" + obj.getProperty(key) + "," + values.get(key) + "]");
     }
+
     return result.toString();
   }
 

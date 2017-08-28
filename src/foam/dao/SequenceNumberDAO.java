@@ -53,7 +53,7 @@ public class SequenceNumberDAO
 
   private PropertyInfo getProperty_() {
     if ( property_ == null )
-      property_ = (PropertyInfo) this.of_.getAxiomByName(property);
+      property_ = (PropertyInfo) getDelegate().getOf().getAxiomByName(property);
 
     return property_;
   }
@@ -80,6 +80,6 @@ public class SequenceNumberDAO
       }
     }
 
-    return getDelegate().put(obj);
+    return getDelegate().put_(x, obj);
   }
 }
