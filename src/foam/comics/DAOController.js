@@ -31,7 +31,7 @@ foam.CLASS({
     },
     {
       name: 'predicate',
-      view: { class: 'foam.u2.view.RecipricalSearch' }
+      view: { class: 'foam.u2.view.ReciprocalSearch' }
     },
     {
       name: 'filteredDAO',
