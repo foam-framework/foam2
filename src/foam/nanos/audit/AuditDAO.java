@@ -32,14 +32,15 @@ public class AuditDAO
    * @return String array of changes
    */
   String formatMessage(FObject currentValue, FObject newValue) {
-    Map diff = currentValue.diff(newValue);
-    Iterator i = diff.keySet().iterator();
-
+    Map          diff   = currentValue.diff(newValue);
+    Iterator     i      = diff.keySet().iterator();
     List<String> result = new ArrayList<>();
+
     while ( i.hasNext() ) {
       String key = (String) i.next();
       result.add(key + ": [" + currentValue.getProperty(key) + "," + diff.get(key) + "]");
     }
+
     return result.toString();
   }
 
