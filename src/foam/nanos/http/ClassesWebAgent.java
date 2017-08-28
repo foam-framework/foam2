@@ -24,10 +24,10 @@ public class ClassesWebAgent
 
     URL[] urls = ((URLClassLoader) cl).getURLs();
 
-    for(URL url : urls){
+    for ( URL url : urls ) {
       out.println(url.getFile());
     }
-    
+
     out.println("</pre>");
   }
 }
