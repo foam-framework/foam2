@@ -7,10 +7,8 @@
 package foam.nanos.http;
 
 import foam.core.*;
-import foam.dao.DAO;
 import java.net.URL;
 import java.net.URLClassLoader;
-import foam.nanos.boot.NSpec;
 import java.io.PrintWriter;
 
 public class ClassesWebAgent
@@ -24,9 +22,9 @@ public class ClassesWebAgent
     out.println("<pre>");
     ClassLoader cl = ClassLoader.getSystemClassLoader();
 
-    URL[] urls = ((URLClassLoader)cl).getURLs();
+    URL[] urls = ((URLClassLoader) cl).getURLs();
 
-    for(URL url: urls){
+    for(URL url : urls){
       out.println(url.getFile());
     }
     out.println("</pre>");
