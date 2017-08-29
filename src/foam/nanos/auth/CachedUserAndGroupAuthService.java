@@ -29,7 +29,7 @@ public class CachedUserAndGroupAuthService
    *  ...
    *}
    */
-  protected Map<String, Map<String, Boolean>> userMap = new LRULinkedHashMap<>(1000000);
+  protected Map<Long, Map<String, Boolean>> userMap = new LRULinkedHashMap<>(1000000);
   protected Map<String, Boolean> permissionMap;
 
   @Override

@@ -9,6 +9,7 @@ package foam.nanos.http;
 import foam.core.*;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 public class TraceWebAgent
@@ -18,8 +19,9 @@ public class TraceWebAgent
 
   public void execute(X x) {
     try {
-    PrintWriter        out = (PrintWriter)        x.get(PrintWriter.class);
-    HttpServletRequest req = (HttpServletRequest) x.get(HttpServletRequest.class);
+    PrintWriter        out     = (PrintWriter)        x.get(PrintWriter.class);
+    HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
+    Cookie[]           cookies = req.getCookies();
 
     out.println("<HTML>\n" +
         "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
@@ -41,7 +43,13 @@ public class TraceWebAgent
           out.println("<TR><TD>" + headerName);
           out.println("    <TD>" + req.getHeader(headerName));
         }
-        out.println("</TABLE>\n</BODY></HTML>");
+        out.println("</TABLE>");
+
+        for ( Cookie cookie : cookies ) {
+          out.println(cookie.toString());
+        }
+
+        out.println("</BODY></HTML>");
       } catch (Throwable t) {
           t.printStackTrace();
         }

@@ -12,20 +12,22 @@ foam.INTERFACE({
     {
       name: 'generateChallenge',
       javaReturns: 'String',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         }
       ]
     },
     {
       name: 'challengedLogin',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'challenge',
@@ -35,10 +37,11 @@ foam.INTERFACE({
     },
     {
       name: 'login',
-      javaReturns: 'void',
+      javaReturns: 'foam.nanos.auth.User',
+      returns: 'Promise',
       args: [
         {
-          name: 'userId',
+          name: 'email',
           javaType: 'String'
         },
         {
@@ -50,24 +53,26 @@ foam.INTERFACE({
     {
       name: 'check',
       javaReturns: 'Boolean',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'permission',
-          javaType: 'java.security.Permission'
+          javaType: 'foam.nanos.auth.Permission'
         }
       ]
     },
     {
       name: 'updatePassword',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         },
         {
           name: 'oldPassword',
@@ -80,22 +85,13 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'validateUser',
-      javaReturns: 'Boolean',
-      args: [
-        {
-          name: 'user',
-          javaType: 'User'
-        }
-      ]
-    },
-    {
       name: 'logout',
       javaReturns: 'void',
+      returns: 'Promise',
       args: [
         {
           name: 'userId',
-          javaType: 'String'
+          javaType: 'long'
         }
       ]
     }
