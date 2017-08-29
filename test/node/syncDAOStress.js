@@ -22,6 +22,7 @@
 
 require('../../src/foam.js');
 
+var AdapterDAO;
 var BaseDAO;
 var Item;
 var ProxyDAO;
@@ -30,6 +31,7 @@ var StoreAndForwardDAO;
 var SyncDAO;
 var VersionNoDAO;
 var VersionTrait;
+var VersionedItem;
 var VersionedSyncRecord;
 
 foam.CLASS({
@@ -94,6 +96,7 @@ foam.CLASS({
 });
 
 Item = foam.lookup('foam.dao.test.Item');
+AdapterDAO = foam.lookup('foam.dao.AdapterDAO');
 BaseDAO = foam.lookup('foam.dao.test.BaseDAO');
 ProxyDAO = foam.lookup('foam.dao.ProxyDAO');
 QuickSink = foam.lookup('foam.dao.QuickSink');
@@ -104,6 +107,7 @@ VersionTrait = foam.lookup('foam.version.VersionTrait');
 VersionedSyncRecord = foam.lookup('foam.dao.sync.VersionedSyncRecord');
 var versionedClassFactory =
     foam.lookup('foam.version.VersionedClassFactorySingleton').create();
+VersionedItem = versionedClassFactory.get(Item);
 
 function getData(name) {
   return name + ':' + Math.ceil(Math.random() * 1000);
@@ -114,12 +118,21 @@ function getData(name) {
  */
 
 // Data in remote before VersionNoDAO is added.
+var getInitialDatum = (function() {
+  var version = 1;
+  return function getInitialDatum(o) {
+    o.version_ = version;
+    version++;
+    o.deleted_ = Math.random() > 0.5;
+    return VersionedItem.create(o);
+  }
+})();
 var initialData = [
-  Item.create({ id: 0, data: getData('initial') }),
-  Item.create({ id: 10, data: getData('initial') }),
-  Item.create({ id: 20, data: getData('initial') }),
-  Item.create({ id: 30, data: getData('initial') }),
-  Item.create({ id: 40, data: getData('initial') })
+  getInitialDatum({ id: 0, data: getData('initial') }),
+  getInitialDatum({ id: 10, data: getData('initial') }),
+  getInitialDatum({ id: 20, data: getData('initial') }),
+  getInitialDatum({ id: 30, data: getData('initial') }),
+  getInitialDatum({ id: 40, data: getData('initial') })
 ];
 
 // Number of independent SyncDAOs communicating with remote.
@@ -147,7 +160,6 @@ var waitToSettle = 10000;
  */
 
 // Underlying DAO on remote.
-var VersionedItem = versionedClassFactory.get(Item);
 var remoteDelegate = BaseDAO.create({ of: VersionedItem });
 initialData.forEach(function(data) { remoteDelegate.put(data); });
 // DAO that agents hit when talking to remote.
@@ -162,20 +174,28 @@ var remoteDAO = StoreAndForwardDAO.create({
 var activeAgents = new Array(numActiveAgents);
 for ( var i = 0; i < numActiveAgents; i++ ) {
   // TODO(markdittmer): Add initial unsynced data to agents.
-  activeAgents[i] = SyncDAO.create({
+  activeAgents[i] = AdapterDAO.create({
     of: Item,
-    remoteDAO: remoteDAO,
-    delegate: BaseDAO.create({ of: VersionedItem }),
-    syncRecordDAO: BaseDAO.create({ of: VersionedSyncRecord }),
-    polling: Math.floor(Math.random() * 2) === 0,
-    pollingFrequency: pollingFrequency
+    to: VersionedItem,
+    delegate: SyncDAO.create({
+      of: VersionedItem,
+      remoteDAO: remoteDAO,
+      delegate: BaseDAO.create({ of: VersionedItem }),
+      syncRecordDAO: BaseDAO.create({ of: VersionedSyncRecord }),
+      polling: Math.floor(Math.random() * 2) === 0,
+      pollingFrequency: pollingFrequency
+    })
   });
 }
 
 // Agents talking directly to remote.
 var passiveAgents = new Array(numPassiveAgents);
 for ( var i = 0; i < numPassiveAgents; i++ ) {
-  passiveAgents[i] = ProxyDAO.create({ delegate: remoteDAO });
+  passiveAgents[i] = AdapterDAO.create({
+    of: Item,
+    to: VersionedItem,
+    delegate: ProxyDAO.create({ delegate: remoteDAO })
+  });
 }
 
 // All the agents.

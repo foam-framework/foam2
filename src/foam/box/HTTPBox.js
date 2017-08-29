@@ -19,24 +19,17 @@ foam.CLASS({
   package: 'foam.box',
   name: 'HTTPBox',
 
-  implements: ['foam.box.Box'],
+  implements: [ 'foam.box.Box' ],
 
   requires: [
+    'foam.json.Outputter',
+    'foam.json.Parser',
     'foam.net.web.HTTPRequest'
   ],
 
   imports: [
-    'me',
-    'fonParser'
-  ],
-
-  properties: [
-    {
-      name: 'url'
-    },
-    {
-      name: 'method'
-    }
+    'creationContext',
+    'me'
   ],
 
   classes: [
@@ -60,22 +53,54 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    {
+      name: 'url'
+    },
+    {
+      name: 'method'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.JSONOutputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
+    }
+  ],
+
   methods: [
     {
       name: 'send',
       code: function(msg) {
-        var outputter = this.JSONOutputter.create().copyFrom(foam.json.Network);
-
         var req = this.HTTPRequest.create({
           url: this.url,
           method: this.method,
-          payload: outputter.stringify(msg)
+          payload: this.outputter.stringify(msg)
         }).send();
 
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var msg = this.fonParser.parseString(p);
+          var msg = this.parser.parseString(p);
           msg && this.me.send(msg);
         }.bind(this));
       }

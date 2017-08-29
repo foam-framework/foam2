@@ -19,14 +19,33 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
+
+  requires: [ 'foam.json.Outputter' ],
+
   properties: [
     {
       name: 'port'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // NOTE: Configuration must be consistent with parser in
+        // foam.messageport.MessagePortService.
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
   methods: [
     function send(m) {
-      this.port.postMessage(foam.json.Network.stringify(m));
+      this.port.postMessage(this.outputter.stringify((m)));
     }
   ]
 });

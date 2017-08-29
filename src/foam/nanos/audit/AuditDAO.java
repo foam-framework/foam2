@@ -12,7 +12,7 @@ import foam.core.PropertyInfo;
 import foam.dao.ProxyDAO;
 import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,21 +32,22 @@ public class AuditDAO
    * @return String array of changes
    */
   String formatMessage(FObject currentValue, FObject newValue) {
-    Map diff = currentValue.diff(newValue);
-    Iterator i = diff.keySet().iterator();
-
+    Map          diff   = currentValue.diff(newValue);
+    Iterator     i      = diff.keySet().iterator();
     List<String> result = new ArrayList<>();
+
     while ( i.hasNext() ) {
       String key = (String) i.next();
       result.add(key + ": [" + currentValue.getProperty(key) + "," + diff.get(key) + "]");
     }
+
     return result.toString();
   }
 
   @Override
   public FObject put_(X x, FObject obj) {
     User       user     = (User) x.get("user");
-    NanoLogger logger   = (NanoLogger) x.get("logger");
+    Logger     logger   = (Logger) x.get("logger");
     FObject    current  = this.find_(x, obj);
     Object     objectId = obj.getProperty("id");
 
@@ -58,7 +59,7 @@ public class AuditDAO
   @Override
   public FObject remove_(X x, FObject obj) {
     User          user     = (User) x.get("user");
-    NanoLogger    logger   = (NanoLogger) x.get("logger");
+    Logger        logger   = (Logger) x.get("logger");
     StringBuilder sb       = new StringBuilder();
     Object        objectId = obj.getProperty("id");
 
