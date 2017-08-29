@@ -31,24 +31,24 @@ Eg https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/Clien
 5. Add Service to foam.nano.client.Client.js
 Eg
 {
-	name: 'webAuth',
-	factory: function() {
-		return this.ClientAuthService.create({
-			delegate: this.HTTPBox.create({
-            method: 'POST',
-            url: 'http://localhost:8080/webAuth'
-          })
-        });
-      }
-	},
+  name: 'webAuth',
+  factory: function() {
+    return this.ClientAuthService.create({
+      delegate: this.HTTPBox.create({
+        method: 'POST',
+        url: 'http://localhost:8080/webAuth'
+      })
+    });
+  }
+}
 
 6. In controller, import the service
 Eg
 imports: [
-    'stack', 'userDAO', 'user', 'webAuth'
+  'stack', 'userDAO', 'user', 'webAuth'
 ],
 
 Now, you can call the service in the controller:
 self.webAuth.login("marc4@marc.com", "marc123").then(function(response) {
-	console.log(response);
+  console.log(response);
 }
