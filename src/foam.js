@@ -50,31 +50,10 @@
     };
   }
 
-  function getCaller () {
-    try {
-      var err = new Error();
-      var caller;
-      var current;
-
-      Error.prepareStackTrace = function (err, stack) { return stack; };
-
-      current = err.stack.shift().getFileName();
-
-      while ( err.stack.length ) {
-        caller = err.stack.shift().getFileName();
-        if ( current !== caller && caller !== 'module.js' ) {
-          return caller;
-        }
-      }
-    } catch (err) {
-      return null;
-    }
-  }
-
   function loadServer() {
-    var caller = getCaller() || __filename;
+    var caller = FOAM_FLAGS.src || __filename;
     var path = caller.substring(0, caller.lastIndexOf('src/')+4);
-    
+
     return function (filename) {
       require(path + filename + '.js');
     }
