@@ -202,7 +202,7 @@ foam.CLASS({
         Boolean: function(v, p) { this.outputPrimitive(v, p) },
         Date:    function(v, p) { this.outputPrimitive(v, p) },
         Array:   function(v, p) {
-          this.start("<" + this.propertyName(p) + " class='Array'>");
+          this.start("<" + this.propertyName(p) + '>');
           this.nl().indent();
           this.output(p.toXML(v, this));
           this.end('</' +  this.propertyName(p) + '>');
