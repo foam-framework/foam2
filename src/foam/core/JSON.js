@@ -586,6 +586,9 @@ foam.LIB({
 
           if ( cls ) {
             var c = typeof cls === 'string' ? ( opt_ctx || foam ).lookup(cls) : cls;
+            // TODO(markdittmer): Turn into static method: "parseJSON" once
+            // https://github.com/foam-framework/foam2/issues/613 is fixed.
+            if ( c.PARSE_JSON ) return c.PARSE_JSON(json, opt_class, opt_ctx);
 
             for ( var key in json ) {
               var prop = c.getAxiomByName(key);

@@ -306,8 +306,8 @@ foam.CLASS({
         var c = this.instance_[prop.name];
 
         // Implement value and factory support.
-        if ( ! c ) {
-          if ( prop.value ) {
+        if ( foam.Undefined.isInstance(c) ) {
+          if ( ! foam.Undefined.isInstance(prop.value) ) {
             c = prop.value;
           } else if ( prop.factory ) {
             c = this.instance_[prop.name] = prop.factory.call(this, prop);
@@ -325,7 +325,7 @@ foam.CLASS({
     },
     {
       name: 'toJSON',
-      value: function(value) { return value.id; }
+      value: function(value) { return value ? value.id : value; }
     }
   ],
 
