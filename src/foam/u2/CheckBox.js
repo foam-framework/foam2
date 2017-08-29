@@ -30,7 +30,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'showLabel',
-      expression: function(label) { return !!label },
+      factory: function() { return !!this.label },
     },
     { 
       class: 'String', 
