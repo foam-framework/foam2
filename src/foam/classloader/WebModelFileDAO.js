@@ -61,7 +61,8 @@ foam.CLASS({
         try {
           eval('//# sourceURL=' + url + '\n' + js);
         } catch(e) {
-          console.warn('Unable to load at ' + url + '. Error: ' + e.stack);
+          console.warn('At ', url, 'line:' + (e.lineNumber - 1));
+          console.warn(e.message);
           return Promise.resolve(null);
         } finally {
           foam.CLASS = foamCLASS;
