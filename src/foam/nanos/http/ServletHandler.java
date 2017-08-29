@@ -50,6 +50,15 @@ public class ServletHandler
       return new Vector<String>(ex.getRequestHeaders().get(name)).elements();
     }
 
+    public Cookie[] getCookies() {
+      for ( Enumeration e = getHeaders("Set-Cookie") ; e.hasMoreElements() ; ) {
+        String header = (String) e.nextElement();
+        System.err.println("***** COOKIE: " + header);
+      }
+
+      return new Cookie[0];
+    }
+
     @Override
     public Enumeration<String> getHeaderNames() {
       return new Vector<String>(ex.getRequestHeaders().keySet()).elements();

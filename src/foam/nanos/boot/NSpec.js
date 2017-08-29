@@ -63,7 +63,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'serviceScript'
+      name: 'serviceScript',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
     },
     {
       class: 'FObjectProperty',
@@ -94,7 +95,8 @@ foam.CLASS({
 
         if ( getServiceClass().length() > 0 ) {
           Object service = Class.forName(getServiceClass()).newInstance();
-          saveService(service);
+          // TODO: doesn't work with DAO's, fix
+          // saveService(service);
           return service;
         }
 

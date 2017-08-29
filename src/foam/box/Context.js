@@ -22,19 +22,18 @@ foam.CLASS({
   requires: [
     'foam.box.BoxRegistryBox',
     'foam.box.NamedBox',
-    'foam.parsers.FON',
     'foam.box.ClassWhitelistContext',
     'foam.box.LoggedLookupContext',
   ],
 
   exports: [
+    'creationContext',
+    'me',
     'messagePortService',
-    'socketService',
-    'webSocketService',
     'registry',
     'root',
-    'me',
-    'fonParser'
+    'socketService',
+    'webSocketService'
   ],
 
   properties: [
@@ -121,20 +120,20 @@ foam.CLASS({
       name: 'classWhitelist'
     },
     {
-      name: 'fonParser',
+      name: 'creationContext',
+      documentation: `Provides required import for boxes that parse strings into
+          FObjects.`,
       hidden: true,
       factory: function() {
         // TODO: Better way to inject the class whitelist.
         if ( this.unsafe ) {
-          var context = this.LoggedLookupContext.create();
           console.warn('**** Boxes are running in UNSAFE mode.  Turn this off before you go to production!');
-        } else {
-          var context = this.ClassWhitelistContext.create({
-            whitelist: this.classWhitelist
-          });
+          return this.LoggedLookupContext.create(null, this).__subContext__;
         }
 
-        return this.FON.create({ creationContext: context.__subContext__ });
+        return this.ClassWhitelistContext.create({
+          whitelist: this.classWhitelist
+        }, this).__subContext__;
       }
     }
   ]

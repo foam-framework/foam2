@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.http;
 
 import foam.box.Skeleton;
@@ -7,7 +13,7 @@ import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
-import foam.nanos.logger.NanoLogger;
+import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
 import java.io.IOException;
@@ -39,7 +45,11 @@ public class NanoRouter
     PM          pm         = new PM(this.getClass(), serviceKey);
 
     try {
-      serv.service(req, resp);
+      if ( serv == null ) {
+        System.err.println("No service found for: " + serviceKey);
+      } else {
+        serv.service(req, resp);
+      }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
       t.printStackTrace();
@@ -68,13 +78,18 @@ public class NanoRouter
             DAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
 
+        // TODO: create using Context, which should do this automatically
+        if ( skeleton instanceof ContextAware ) ((ContextAware) skeleton).setX(getX());
+
         informService(skeleton, spec);
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceServlet(service, skeleton);
+        service = new ServiceWebAgent(service, skeleton);
         informService(service, spec);
-      } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ignored) {
+      } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
+        ex.printStackTrace();
+        ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
       }
     }
 
@@ -85,7 +100,7 @@ public class NanoRouter
 
     if ( service instanceof HttpServlet ) return (HttpServlet) service;
 
-    NanoLogger logger = (NanoLogger) getX().get("logger");
+    Logger logger = (Logger) getX().get("logger");
     logger.error(this.getClass(), spec.getName() + " does not have a HttpServlet.");
     return null;
   }
