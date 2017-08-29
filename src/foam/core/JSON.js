@@ -278,16 +278,20 @@ foam.CLASS({
     },
 
     function outputProperty(o, p, includeComma) {
-      if ( ! this.propertyPredicate(o, p ) ) return;
-      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
-      if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) ) return;
+      if ( ! this.propertyPredicate(o, p ) ) return false;
+      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) )
+        return false;
 
+      // Access property before checking o.hasOwnProperty.
       var v = o[p.name];
+      if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
+        return false;
 
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
-      this.output(p.toJSON(v, this));
+      this.output(p.toJSON(v, this), p.of);
+      return true;
     },
 
     function outputDate(o) {
@@ -344,14 +348,16 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
-        FObject:   function(o) {
+        FObject: function(o, opt_cls) {
           if ( o.outputJSON ) {
-            o.outputJSON(this)
+            o.outputJSON(this);
             return;
           }
 
           this.start('{');
-          if ( this.outputClassNames ) {
+          var cls = this.getCls(opt_cls);
+          var outputClassName = this.outputClassNames && o.cls_ !== cls;
+          if ( outputClassName ) {
             this.out(
                 this.maybeEscapeKey('class'),
                 ':',
@@ -361,15 +367,18 @@ foam.CLASS({
                 '"');
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+          var outputComma = outputClassName;
           for ( var i = 0 ; i < ps.length ; i++ ) {
-            this.outputProperty(o, ps[i], this.outputClassNames || i );
+            outputComma = this.outputProperty(o, ps[i], outputComma) ||
+                outputComma;
           }
           this.nl().end('}');
         },
-        Array: function(o) {
+        Array: function(o, opt_cls) {
           this.start('[');
+          var cls = this.getCls(opt_cls);
           for ( var i = 0 ; i < o.length ; i++ ) {
-            this.output(o[i], this);
+            this.output(o[i], cls);
             if ( i < o.length-1 ) this.out(',').nl().indent();
           }
           //this.nl();
@@ -391,8 +400,8 @@ foam.CLASS({
       })
     },
 
-    function stringify(o) {
-      this.output(o);
+    function stringify(o, opt_cls) {
+      this.output(o, opt_cls);
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
       return ret;
@@ -407,25 +416,28 @@ foam.CLASS({
         Function: function(o) {
           return this.formatFunctionsAsStrings ? o.toString() : o;
         },
-        FObject: function(o) {
+        FObject: function(o, opt_cls) {
           var m = {};
-          if ( this.outputClassNames ) {
+          var cls = this.getCls(opt_cls);
+          if ( this.outputClassNames && o.cls_ !== cls ) {
             m.class = o.cls_.id;
           }
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
             var p = ps[i];
             if ( ! this.propertyPredicate(o, p) ) continue;
-            if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) continue;
+            if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) )
+              continue;
 
-            m[p.name] = this.objectify(p.toJSON(o[p.name], this));
+            m[p.name] = this.objectify(p.toJSON(o[p.name], this), p.of);
           }
           return m;
         },
-        Array: function(o) {
+        Array: function(o, opt_cls) {
           var a = [];
+          var cls = this.getCls(opt_cls);
           for ( var i = 0 ; i < o.length ; i++ ) {
-            a[i] = this.objectify(o[i]);
+            a[i] = this.objectify(o[i], cls);
           }
           return a;
         },
@@ -440,6 +452,11 @@ foam.CLASS({
         }
       },
       function(o) { return o; })
+    },
+
+    function getCls(opt_cls) {
+      return foam.typeOf(opt_cls) === foam.String ? this.lookup(opt_cls, true) :
+          opt_cls;
     }
   ]
 });
