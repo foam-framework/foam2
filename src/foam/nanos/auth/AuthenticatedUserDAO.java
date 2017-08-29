@@ -8,7 +8,6 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
-import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
@@ -18,10 +17,6 @@ import java.security.NoSuchAlgorithmException;
 public class AuthenticatedUserDAO
   extends ProxyDAO
 {
-  public AuthenticatedUserDAO(DAO delegate) {
-    setDelegate(delegate);
-  }
-
   @Override
   public FObject put_(X x, FObject fObject) {
     User user = (User) fObject;
