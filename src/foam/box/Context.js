@@ -125,7 +125,6 @@ foam.CLASS({
           FObjects.`,
       hidden: true,
       factory: function() {
-        debugger;
         // TODO: Better way to inject the class whitelist.
         if ( this.unsafe ) {
           console.warn('**** Boxes are running in UNSAFE mode.  Turn this off before you go to production!');
