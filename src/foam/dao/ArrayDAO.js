@@ -33,8 +33,8 @@ foam.CLASS({
       name: 'of',
       factory: function() {
         if ( this.array.length === 0 ) return this.lookup('foam.core.FObject');
-        return undefined;
-      },
+        return null;
+      }
     },
     {
       name: 'array',

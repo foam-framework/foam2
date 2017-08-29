@@ -306,8 +306,8 @@ foam.CLASS({
         var c = this.instance_[prop.name];
 
         // Implement value and factory support.
-        if ( foam.typeOf(c) === foam.Undefined ) {
-          if ( foam.typeOf(prop.value) !== foam.Undefined ) {
+        if ( foam.Undefined.isInstance(c) ) {
+          if ( ! foam.Undefined.isInstance(prop.value) ) {
             c = prop.value;
           } else if ( prop.factory ) {
             c = this.instance_[prop.name] = prop.factory.call(this, prop);

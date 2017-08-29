@@ -115,6 +115,9 @@ foam.CLASS({
 
   constants: {
     // Dual to outputJSON method.
+    //
+    // TODO(markdittmer): Turn into static method: "parseJSON" once
+    // https://github.com/foam-framework/foam2/issues/613 is fixed.
     PARSE_JSON: function(json, opt_cls, opt_ctx) {
       var cls = json.of || opt_cls;
       var array = json.array;
