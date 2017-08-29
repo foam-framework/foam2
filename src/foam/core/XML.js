@@ -288,13 +288,11 @@ foam.CLASS({
           }
 
           var clsName = o.cls_.id;
-          this.start("<object class='" + clsName + "'>")
           // Iterate through properties and output
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
             this.outputProperty_(o, ps[i]);
           }
-          this.end('</object>');
         },
         Array: function(o) {
           // Nested Objects and FObject Arrays Passed
