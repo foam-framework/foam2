@@ -27,6 +27,11 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'object'
+    },
+    {
+      class: 'Map',
+      transient: true,
+      name: 'localAttributes'
     }
   ]
 });
