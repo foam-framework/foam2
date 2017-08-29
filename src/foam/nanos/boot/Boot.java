@@ -38,6 +38,9 @@ public class Boot {
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
 
+    DAO localUserDAO = (DAO) root_.get("localUserDAO");
+    ((ProxyDAO) root_.get("userDAO")).setDelegate(localUserDAO);
+
     serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
