@@ -51,6 +51,7 @@
   }
 
   function getCaller () {
+    var st = Error.prepareStackTrace;
     try {
       var err = new Error();
       var caller;
@@ -68,6 +69,8 @@
       }
     } catch (err) {
       return null;
+    } finally {
+      Error.prepareStackTrace = st;
     }
   }
 
