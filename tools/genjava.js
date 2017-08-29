@@ -57,11 +57,20 @@ function ensurePath(p) {
 }
 
 function loadClass(c) {
-  if ( ! foam.lookup(c, true) ) require(srcPath + c.replace(/\./g, '/') + '.js');
+  var path = srcPath;
+  
+  if ( foam.Array.isInstance(c) ) {
+    path = path + c[0];
+    c = c[1];  
+  }
+  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');  
   return foam.lookup(c);
 }
 
 function generateClass(cls) {
+  if ( foam.Array.isInstance(cls) ) {
+    cls = cls[1];  
+  }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
 
@@ -74,6 +83,9 @@ function generateClass(cls) {
 }
 
 function generateAbstractClass(cls) {
+  if ( foam.Array.isInstance(cls) ) {
+    cls = cls[1];  
+  }
   cls = foam.lookup(cls);
 
   var outfile = outdir + path_.sep +
@@ -88,6 +100,9 @@ function generateAbstractClass(cls) {
 }
 
 function generateSkeleton(cls) {
+  if ( foam.Array.isInstance(cls) ) {
+    cls = cls[1];  
+  }
   cls = foam.lookup(cls);
 
   var outfile = outdir + path_.sep +
@@ -102,6 +117,9 @@ function generateSkeleton(cls) {
 }
 
 function generateProxy(intf) {
+  if ( foam.Array.isInstance(intf) ) {
+    intf = intf[1];  
+  }
   intf = foam.lookup(intf);
 
   var existing = foam.lookup(intf.package + '.Proxy' + intf.name, true);
