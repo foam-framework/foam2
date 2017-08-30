@@ -47,7 +47,10 @@ foam.CLASS({
       try {
         require(path);
       } catch(e) {
-        !self.surpressWarning && console.warn('Unable to load at ' + path + '. Error: ' + e.stack);
+        if ( ! self.suppressWarning ) {
+          console.warn('Unable to load ', path);
+          console.warn(e);
+        }
         return Promise.resolve(null);
       } finally {
         foam.CLASS = foamCLASS;

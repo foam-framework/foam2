@@ -45,6 +45,7 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
+      this.SUPER(p);
       this.min = p.min;
       this.max = p.max;
     }
