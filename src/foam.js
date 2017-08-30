@@ -51,7 +51,7 @@
   }
 
   function loadServer() {
-    var caller = FOAM_FLAGS.src || __filename;
+    var caller = flags.src || __filename;
     var path = caller.substring(0, caller.lastIndexOf('src/')+4);
 
     return function (filename) {
