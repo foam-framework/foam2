@@ -20,7 +20,12 @@ foam.CLASS({
   name: 'RestDAOHandler',
   extends: 'foam.net.node.Handler',
 
-  imports: [ 'info' ],
+  requires: [ 'foam.json.Parser' ],
+
+  imports: [
+    'creationContext',
+    'info'
+  ],
 
   properties: [
     {
@@ -38,6 +43,19 @@ foam.CLASS({
     {
       name: 'url',
       factory: function() {  return require('url'); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        // NOTE: Configuration must be consistent with outputters in
+        // corresponding foam.dao.RestDAO.
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
@@ -188,19 +206,6 @@ foam.CLASS({
         return foam.json.Network.objectify(o);
       }
     },
-    {
-      name: 'jsonStr2fo_',
-      documentation: "Transform JSON string to FOAM object.",
-      code: function(str) {
-        // select() calls optionally contain a payload. To accept this case,
-        // return null on empty payload.
-        if ( ! str ) return null;
-
-        // TODO(markdittmer): Use a safe JSON deserializer that honours only
-        // an allowed list of classes.
-        return foam.json.parse(JSON.parse(str));
-      }
-    },
     function getPayload_(req) {
       var self = this;
       return new Promise(function(resolve, reject) {
@@ -210,7 +215,7 @@ foam.CLASS({
         });
         req.on('end', function () {
           try {
-            resolve(self.jsonStr2fo_(payload));
+            resolve(self.parser.parseString(payload));
           } catch (error) {
             reject(error);
           }

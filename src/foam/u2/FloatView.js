@@ -53,7 +53,10 @@ foam.CLASS({
 
     function fromProperty(p) {
       this.SUPER(p);
+
       this.precision = p.precision;
+      this.min       = p.min;
+      this.max       = p.max;
     },
 
     function formatNumber(val) {
