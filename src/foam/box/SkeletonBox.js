@@ -52,7 +52,7 @@ foam.CLASS({
         p = this.data[message.object.name].apply(this.data, args);
       } catch(e) {
         message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
-          object: this.RPCErrorMessage.create({ message: e.message })
+          object: this.RPCErrorMessage.create({ data: e.message })
         }));
 
         return;
@@ -71,7 +71,7 @@ foam.CLASS({
           },
           function(error) {
             message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
-              object: self.RPCErrorMessage.create({ message: error && error.toString() })
+              object: self.RPCErrorMessage.create({ data: error && error.toString() })
             }));
           });
       } else {
