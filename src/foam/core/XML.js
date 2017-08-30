@@ -190,6 +190,10 @@ foam.CLASS({
       if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
 
       var v = o[p.name];
+      if ( ! v || ( v instanceof Array && v.length === 0 ) ) {
+        return;
+      }
+
       this.nl().indent();
       this.outputProperty(v, p);
     },
@@ -197,24 +201,29 @@ foam.CLASS({
     {
       name: 'outputProperty',
       code: foam.mmethod({
-        String:  function(v, p) { this.outputPrimitive(v, p) },
-        Number:  function(v, p) { this.outputPrimitive(v, p) },
-        Boolean: function(v, p) { this.outputPrimitive(v, p) },
-        Date:    function(v, p) { this.outputPrimitive(v, p) },
-        Array:   function(v, p) {
+        Undefined:    function(v, p) {},
+        String:       function(v, p) { this.outputPrimitive(v, p); },
+        Number:       function(v, p) { this.outputPrimitive(v, p); },
+        Boolean:      function(v, p) { this.outputPrimitive(v, p); },
+        Date:         function(v, p) { this.outputPrimitive(v, p); },
+        AbstractEnum: function(v, p) { this.outputPrimitive(v.name, p); },
+        Array:     function(v, p) {
           for ( var i = 0; i < v.length; i++ ) {
-            this.outputPrimitive(v[i], p);
-            this.nl().indent();
+            if ( foam.core.FObjectArray.isInstance(p) ) {
+              this.start('<' + this.propertyName(p) + '>');
+              this.output(p.toXML(v[i], this));
+              this.end('</' + this.propertyName(p) + '>');
+            } else {
+              this.outputPrimitive(v[i], p);
+            }
+
+            // new line and indent except on last element
+            if ( i != v.length - 1 ) this.nl().indent();
           }
         },
         FObject: function(v, p) {
           this.start('<' + this.propertyName(p) + '>');
           this.output(p.toXML(v, this));
-          this.end('</' +  this.propertyName(p) + '>');
-        },
-        AbstractEnum: function(v, p) {
-          this.start('<' + this.propertyName(p) + '>');
-          this.outputProperty_(v, v.cls_.getAxiomByName('ordinal'));
           this.end('</' +  this.propertyName(p) + '>');
         }
       })
@@ -440,7 +449,7 @@ foam.LIB({
   constants: {
     // Pretty Print
     Pretty: foam.xml.Outputter.create({
-      outputDefaultValues: false
+      outputDefaultValues: true
     }),
 
     // Compact output (not pretty)
