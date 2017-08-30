@@ -404,8 +404,9 @@ foam.CLASS({
           // parse FObjectProperty
           prop.set(obj, this.objectify(node, prop.of));
         } else if ( foam.core.FObjectArray.isInstance(prop) ) {
-          // TODO: add logic for FObjectArray
-        }else {
+          // parse array property
+          prop.get(obj).push(this.objectify(node, foam.lookup(prop.of)));
+        } else {
           // parse property
           prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
         }
