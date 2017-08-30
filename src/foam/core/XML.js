@@ -413,10 +413,6 @@ foam.LIB({
   },
 
   methods: [
-    function parseString(xmlStr, opt_ctx) {
-      return this.parse(xmlStr, undefined, opt_ctx)
-    },
-
     function stringify(o) {
       return foam.xml.Compact.stringify(o);
     },
