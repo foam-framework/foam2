@@ -109,7 +109,7 @@ foam.CLASS({
         delegateRegisteredBox = this.registry_[nameOrBox].localBox;
 
         // When name is known, delete from this registry immediately.
-        delete this.SUPER(nameOrBox);
+        this.SUPER(nameOrBox);
       }
 
       var registrations = this.selectorRegistrations_;
