@@ -210,10 +210,12 @@ foam.CLASS({
         Array:     function(v, p) {
           for ( var i = 0; i < v.length; i++ ) {
             if ( foam.core.FObjectArray.isInstance(p) ) {
+              // output FObject array
               this.start('<' + this.propertyName(p) + '>');
               this.output(p.toXML(v[i], this));
               this.end('</' + this.propertyName(p) + '>');
             } else {
+              // output primitive array
               this.outputPrimitive(v[i], p);
             }
 
