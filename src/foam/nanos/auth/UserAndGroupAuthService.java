@@ -25,7 +25,7 @@ public class UserAndGroupAuthService
 
   @Override
   public void start() {
-    userDAO_      = (DAO) getX().get("userDAO");
+    userDAO_      = (DAO) getX().get("localUserDAO");
     groupDAO_     = (DAO) getX().get("groupDAO");
     challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
