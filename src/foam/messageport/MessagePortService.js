@@ -25,10 +25,11 @@ foam.CLASS({
     'foam.box.RegisterSelfMessage',
     'foam.json.Parser'
   ],
-
   imports: [
     'creationContext'
   ],
+
+  topics: [ 'connect' ],
 
   properties: [
     {
@@ -78,6 +79,7 @@ foam.CLASS({
         named.delegate = this.RawMessagePortBox.create({
           port: port
         });
+        this.connect.pub(named);
         return;
       }
 
