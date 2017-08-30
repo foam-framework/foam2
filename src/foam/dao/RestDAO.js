@@ -31,6 +31,7 @@ foam.CLASS({
   requires: [
     'foam.core.Serializable',
     'foam.dao.ArraySink',
+    'foam.json.Outputter',
     'foam.net.HTTPRequest'
   ],
 
@@ -41,6 +42,22 @@ foam.CLASS({
       documentation: 'URL for most rest calls. Some calls add "/<some-info>".',
       final: true,
       required: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // NOTE: Configuration must be consistent with parser in
+        // corresponding foam.net.node.RestDAOHandler.
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
 
@@ -53,7 +70,7 @@ foam.CLASS({
       return this.createRequest_({
         method: 'PUT',
         url: this.baseURL,
-        payload: this.jsonify_(o)
+        payload: this.outputter.stringify(o)
       }).send().then(this.onResponse.bind(this, 'put'))
           .then(this.onPutResponse);
     },
@@ -64,7 +81,8 @@ foam.CLASS({
        */
       return this.createRequest_({
         method: 'DELETE',
-        url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(o.id))
+        url: this.baseURL + '/' +
+            encodeURIComponent(this.outputter.stringify(o.id))
       }).send().then(this.onResponse.bind(this, 'remove'))
           .then(this.onRemoveResponse);
     },
@@ -76,7 +94,8 @@ foam.CLASS({
       var id = this.of.isInstance(key) ? key.id : key;
       return this.createRequest_({
         method: 'GET',
-        url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(id))
+        url: this.baseURL + '/' +
+            encodeURIComponent(this.outputter.stringify(id))
       }).send().then(this.onResponse.bind(this, 'find'))
           .then(this.onFindResponse);
     },
@@ -106,7 +125,7 @@ foam.CLASS({
       return this.createRequest_({
         method: 'POST',
         url: this.baseURL + ':select',
-        payload: this.jsonify_(payload)
+        payload: this.outputter.stringify(payload)
       }).send().then(this.onResponse.bind(this, 'select'))
           .then(this.onSelectResponse.bind(
               this, sink || this.ArraySink.create()));
@@ -128,7 +147,7 @@ foam.CLASS({
       return this.createRequest_({
         method: 'POST',
         url: this.baseURL + ':removeAll',
-        payload: this.jsonify_(payload)
+        payload: this.outputter.stringify(payload)
       }).send().then(this.onResponse.bind(this, 'removeAll'))
           .then(this.onRemoveAllResponse);
     },
@@ -138,13 +157,6 @@ foam.CLASS({
       this.validate();
       // Each request should default to a json responseType.
       return this.HTTPRequest.create(Object.assign({responseType: 'json'}, o));
-    },
-
-    function jsonify_(o) {
-      // What's meant by network-foam-jsonified for HTTP/JSON/REST APIs:
-      // Construct JSON-like object using foam's network strategy, then
-      // construct well-formed JSON from the object.
-      return JSON.stringify(foam.json.Network.objectify(o));
     }
   ],
 
