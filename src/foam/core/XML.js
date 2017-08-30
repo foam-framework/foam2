@@ -333,64 +333,6 @@ foam.CLASS({
       return ret;
     },
 
-    {
-      name: 'parse',
-      code: foam.mmethod({
-        Object: function (o, opt_class, opt_ctx) {
-          // Create FObject
-          var className = o.className;
-          var obj = foam.lookup(className).create();
-          var props = o.children;
-
-          // Populate FObject with properties
-          for ( var propIndex = 0; propIndex < props.length; propIndex++ ) {
-
-            var currentNode = props[propIndex];
-            var prop = obj.cls_.getAxiomByName(currentNode.tagName);
-            var childName = currentNode.firstChild.localName;
-            // Specific case for array
-            if ( currentNode.className === 'Array' ) {
-              // Array of FObjects
-              if ( childName === 'object' ) {
-                var nestObjArray = Array.from(currentNode.childNodes);
-                prop.set(obj, this.parse(nestObjArray));
-              } else {
-                // Array of other objects with 'value' tag names
-                var arrayValue = (Array.from(currentNode.children)).map( function (x) { return x.innerHTML; });
-                prop.set(obj, arrayValue);
-              }
-              continue;
-            }
-
-            // Nested Object
-            if ( childName === 'object' ) {
-              var nestObj = this.parse(currentNode.firstChild);
-              prop.set(obj, nestObj);
-              continue;
-            }
-
-            // Sets property with value found within node. Additionally checks whether property is Enum type in order
-            // to set ordinal value. Sometimes nodeValue is not able to parse inner tag values correctly thus innerHTML
-            if ( currentNode.firstChild.nodeValue ) {
-              var val = currentNode.firstChild.nodeValue.replace(/\"/g, "");
-              prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: val }) : val );
-            } else if ( currentNode.firstChild.innerHTML ) {
-              var v = currentNode.firstChild.innerHTML.replace(/\"/g, "");
-              prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: v }) : v );
-            }
-          }
-          return obj;
-        },
-        Array: function (o, opt_class, opt_ctx) {
-          var fObjects = []
-          for ( index = 0; index < o.length; index++ ) {
-              fObjects.push(this.parse(o[index], opt_class, opt_ctx));
-          }
-          return fObjects;
-        }
-      })
-    },
-
     function objectify(doc, cls) {
       var obj = cls.create();
       var children = doc.children;
