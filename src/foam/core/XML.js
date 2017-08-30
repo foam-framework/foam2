@@ -391,31 +391,46 @@ foam.CLASS({
       })
     },
 
-    {
-      name: 'objectify',
-      code: foam.mmethod({
-        String: function (o) {
-          if ( o ) {
-            // Convert xml string into an xml DOM object for node traversal
-            var parser = new DOMParser();
-            // TODO: Remove this escape sequence. Future implementation should include looking through parsed
-            // xml doc and passing on childNodes which are texts and do not contain any info.
-            o = o.replace(/\t|\n|\r|↵/g, "");
-            var xmlDoc = parser.parseFromString(o, "text/xml");
-            var rootName = xmlDoc.firstChild.nodeName;
-            // Check if multiple objects
-            if ( rootName === 'objects' ) {
-              return this.parse(Array.from(xmlDoc.firstChild.childNodes));
-            } else if ( rootName === 'object' ) {
-              //Single Object
-              var obj = xmlDoc.firstChild;
-              return this.parse(obj);
-            } else {
-              throw new Error('Could not read object(s) in XML');
-            }
-          }
+    function objectify(doc, cls) {
+      var obj = cls.create();
+      var children = doc.children;
+
+      for ( var i = 0; i < children.length; i++ ) {
+        var node = children[i];
+        var prop = obj.cls_.getAxiomByName(node.tagName);
+
+        if ( foam.core.FObjectProperty.isInstance(prop) ) {
+          // parse FObjectProperty
+          prop.set(obj, this.objectify(node, prop.of));
+        } else if ( foam.core.FObjectArray.isInstance(prop) ) {
+          // TODO: add logic for FObjectArray
+          // parse FObjectArray
+        }else {
+          // parse property
+          prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
         }
-      })
+      }
+
+      return obj;
+    },
+
+    function parseString(str, opt_class) {
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(str, 'text/xml');
+      var root = doc.firstChild;
+
+      var rootClass = root.getAttribute('class');
+      if ( rootClass ) {
+        // look up root class from XML tags
+        return this.objectify(root, foam.lookup(rootClass));
+      } else if ( opt_class ) {
+        // lookup class if given a string
+        if ( typeof(opt_class) === 'string' )
+          opt_class = foam.lookup(opt_class);
+        return this.objectify(root, opt_class);
+      } else {
+        throw new Error('Class not provided');
+      }
     }
   ]
 });
