@@ -229,7 +229,7 @@ foam.CLASS({
       if ( this.formatDatesAsNumbers ) {
         this.out(o.valueOf());
       } else {
-        this.out(JSON.stringify(o));
+        this.out(o.toISOString());
       }
     },
 
