@@ -49,6 +49,11 @@ foam.CLASS({
       value: 'node'
     },
     {
+      class: 'Array',
+      of: 'String',
+      name: 'nodeParams'
+    },
+    {
       class: 'String',
       name: 'childScriptPath',
       factory: function() {
@@ -86,9 +91,9 @@ foam.CLASS({
       this.registry.register(this.replyBox_.id, null, this.replyBox_);
 
       this.child_ = require('child_process').spawn(
-        this.nodePath,
-        [ this.childScriptPath ],
-        { detached: this.detached });
+          this.nodePath,
+          this.nodeParams.concat([ this.childScriptPath ]),
+          { detached: this.detached });
 
       var process = require('process');
       this.child_.stdout.pipe(process.stdout);

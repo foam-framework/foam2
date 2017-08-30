@@ -22,7 +22,7 @@ public class NSpecFactory
     Object ns = null;
 
     try {
-      ns = spec_.createService();
+      ns = spec_.createService(x);
 
       if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x);
       if ( ns instanceof NanoService  ) ((NanoService)  ns).start();

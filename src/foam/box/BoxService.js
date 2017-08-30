@@ -27,6 +27,9 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'client'
+    },
+    {
+      name: 'next'
     }
   ],
 
