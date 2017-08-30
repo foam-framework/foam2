@@ -202,9 +202,10 @@ foam.CLASS({
         Boolean: function(v, p) { this.outputPrimitive(v, p) },
         Date:    function(v, p) { this.outputPrimitive(v, p) },
         Array:   function(v, p) {
-          this.start('<' + this.propertyName(p) + '>');
-          this.output(p.toXML(v, this));
-          this.end('</' +  this.propertyName(p) + '>');
+          for ( var i = 0; i < v.length; i++ ) {
+            this.outputPrimitive(v[i], p);
+            this.nl().indent();
+          }
         },
         FObject: function(v, p) {
           this.start('<' + this.propertyName(p) + '>');
@@ -290,16 +291,6 @@ foam.CLASS({
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
             this.outputProperty_(o, ps[i]);
-          }
-        },
-        Array: function(o) {
-          // Nested Objects and FObject Arrays Passed
-          for ( var i = 0 ; i < o.length ; i++ ) {
-            // Output 'value' tags for arrays containing non-FObject values
-            if ( !o[i].cls_) this.out("<value>");
-            this.output(o[i], this);
-            if ( !o[i].cls_ ) this.out("</value>");
-            if ( o.length - i != 1 ) this.nl().indent();
           }
         },
         Object: function(o) {
@@ -406,6 +397,10 @@ foam.CLASS({
         } else if ( foam.core.FObjectArray.isInstance(prop) ) {
           // parse array property
           prop.get(obj).push(this.objectify(node, foam.lookup(prop.of)));
+
+        } else if ( foam.core.StringArray.isInstance(prop) ) {
+          // parse string array
+          prop.get(obj).push(node.firstChild ? node.firstChild.nodeValue : null);
         } else {
           // parse property
           prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
