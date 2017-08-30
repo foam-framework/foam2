@@ -89,6 +89,11 @@ foam.CLASS({
     },
     {
       name: 'createService',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'java.lang.Object',
       javaCode: `
         // if ( getService() != null ) return getService();
@@ -102,6 +107,7 @@ foam.CLASS({
 
         Interpreter shell = new Interpreter();
         try {
+          shell.set("x", x);
           Object service = shell.eval(getServiceScript());
           saveService(service);
           return service;
