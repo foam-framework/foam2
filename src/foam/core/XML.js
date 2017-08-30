@@ -393,7 +393,7 @@ foam.LIB({
   constants: {
     // Pretty Print
     Pretty: foam.xml.Outputter.create({
-      outputDefaultValues: true
+      outputDefaultValues: false
     }),
 
     // Compact output (not pretty)
