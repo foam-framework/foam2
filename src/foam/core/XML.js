@@ -370,17 +370,17 @@ foam.CLASS({
       var root = doc.firstChild;
 
       var rootClass = root.getAttribute('class');
-      if ( rootClass ) {
-        // look up root class from XML tags
+      if ( rootClass )
         return this.objectify(root, foam.lookup(rootClass));
-      } else if ( opt_class ) {
+
+      if ( opt_class ) {
         // lookup class if given a string
         if ( typeof(opt_class) === 'string' )
           opt_class = foam.lookup(opt_class);
         return this.objectify(root, opt_class);
-      } else {
-        throw new Error('Class not provided');
       }
+      
+      throw new Error('Class not provided');
     }
   ]
 });
