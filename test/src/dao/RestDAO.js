@@ -28,6 +28,8 @@ describe('RestDAO', function() {
 
       requires: [
         'foam.dao.ArraySink',
+        'foam.json.Outputter',
+        'foam.json.Parser',
         'foam.net.HTTPResponse'
       ],
 
@@ -36,6 +38,31 @@ describe('RestDAO', function() {
           class: 'String',
           name: 'baseURL',
           value: baseURL
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.json.Outputter',
+          name: 'outputter',
+          factory: function() {
+            return this.Outputter.create({
+              pretty: false,
+              formatDatesAsNumbers: true,
+              outputDefaultValues: false,
+              strict: true,
+              propertyPredicate: function(o, p) { return ! p.networkTransient; }
+            });
+          }
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.json.Parser',
+          name: 'parser',
+          factory: function() {
+            return this.Parser.create({
+              strict: true,
+              creationContext: this.__subContext__
+            });
+          }
         }
       ],
 
@@ -54,7 +81,7 @@ describe('RestDAO', function() {
             var order;
             var predicate;
             try {
-              obj = foam.json.parseString(this.payload);
+              obj = this.parser.parseString(this.payload);
               payload = jsonify(obj);
             } catch (err) {
               return Promise.resolve(this.createResponse({ status: 500 }));
@@ -90,7 +117,7 @@ describe('RestDAO', function() {
             // select()
             var data;
             try {
-              data = foam.json.parseString(this.payload);
+              data = this.parser.parseString(this.payload);
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
@@ -110,7 +137,7 @@ describe('RestDAO', function() {
             // removeAll()
             var data;
             try {
-              data = foam.json.parseString(this.payload);
+              data = this.parser.parseString(this.payload);
             } catch (err) {
               return Promise.resolve(createResponse({ status: 500 }));
             }
@@ -124,8 +151,6 @@ describe('RestDAO', function() {
               });
           }
 
-          debugger;
-
           // Request doesn't match DAO REST API. Return "Not Found".
           return Promise.resolve(createResponse({ status: 404 }));
         }
@@ -133,7 +158,7 @@ describe('RestDAO', function() {
 
       listeners: [
         function jsonify(o) {
-          return JSON.stringify(foam.json.Network.objectify(o));
+          return this.outputter.stringify(o);
         },
         function createResponse(o) {
           return this.HTTPResponse.create(Object.assign(

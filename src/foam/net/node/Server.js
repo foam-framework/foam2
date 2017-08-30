@@ -34,9 +34,11 @@ foam.CLASS({
   ],
 
   imports: [
+    'creationContext? as creationContextFromCtx',
     'info',
     'log'
   ],
+  exports: [ 'creationContext' ],
 
   properties: [
     {
@@ -48,6 +50,12 @@ foam.CLASS({
       type: 'Int',
       name: 'port',
       value: 8000
+    },
+    {
+      name: 'creationContext',
+      factory: function() {
+        return this.creationContextFromCtx || this.__subContext__;
+      }
     },
     {
       name: 'server',
