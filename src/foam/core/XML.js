@@ -396,6 +396,7 @@ foam.CLASS({
       var children = doc.children;
 
       for ( var i = 0; i < children.length; i++ ) {
+        // fetch property based on xml tag name since they may not be in order
         var node = children[i];
         var prop = obj.cls_.getAxiomByName(node.tagName);
 
@@ -404,7 +405,6 @@ foam.CLASS({
           prop.set(obj, this.objectify(node, prop.of));
         } else if ( foam.core.FObjectArray.isInstance(prop) ) {
           // TODO: add logic for FObjectArray
-          // parse FObjectArray
         }else {
           // parse property
           prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
@@ -415,6 +415,7 @@ foam.CLASS({
     },
 
     function parseString(str, opt_class) {
+      // create DOM
       var parser = new DOMParser();
       var doc = parser.parseFromString(str, 'text/xml');
       var root = doc.firstChild;
