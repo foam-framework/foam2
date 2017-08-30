@@ -20,8 +20,8 @@ foam.CLASS({
   name: 'RPCErrorMessage',
   properties: [
     {
-      class: 'String',
-      name: 'message'
+      class: 'Object',
+      name: 'data'
     }
   ]
 });
