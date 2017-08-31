@@ -209,8 +209,8 @@ foam.CLASS({
       if ( ! this.propertyPredicate(o, p ) ) return;
       // don't output default values unless value is defined and outputDefinedValues set to true
       if ( ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) &&
-        ( ! this.outputDefinedValues && o.hasOwnProperty(p.name) ) ) {
-         return;
+        ( this.outputDefinedValues && ! o.hasOwnProperty(p.name) ) ) {
+        return;
       }
 
       var v = o[p.name];
