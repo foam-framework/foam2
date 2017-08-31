@@ -190,7 +190,7 @@ foam.CLASS({
       var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.xmlAttribute });
       if ( attributes.length === 0 ) return this;
 
-      for ( var i = 0; i < attributes.length; i++ ) {
+      for ( var i = 0 ; i < attributes.length ; i++ ) {
         this.out(' ' + attributes[i].name + '="' + this.escapeAttr(attributes[i].get(v)) + '"');
       }
       return this;
@@ -223,7 +223,7 @@ foam.CLASS({
         Date:         function(v, p) { this.outputPrimitive(v, p); },
         AbstractEnum: function(v, p) { this.outputPrimitive(v.name, p); },
         Array:     function(v, p) {
-          for ( var i = 0; i < v.length; i++ ) {
+          for ( var i = 0 ; i < v.length ; i++ ) {
             if ( foam.core.FObjectArray.isInstance(p) ) {
               // output FObject array
               this.start('<' + this.propertyName(p) + '>');
@@ -371,7 +371,7 @@ foam.CLASS({
       var obj = cls.create();
       var children = doc.children;
 
-      for ( var i = 0; i < children.length; i++ ) {
+      for ( var i = 0 ; i < children.length ; i++ ) {
         // fetch property based on xml tag name since they may not be in order
         var node = children[i];
         var prop = obj.cls_.getAxiomByName(node.tagName);
@@ -397,7 +397,7 @@ foam.CLASS({
       if ( xmlValueProp ) {
         // parse attributes if they exist
         var attributes = doc.attributes;
-        for ( var i = 0; i < attributes.length; i++ ) {
+        for ( var i = 0 ; i < attributes.length ; i++ ) {
           var attribute = attributes[i];
           var prop = obj.cls_.getAxiomByName(attribute.name);
           // don't need to check for types as attributes are always simple types
