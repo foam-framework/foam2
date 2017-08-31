@@ -32,12 +32,12 @@ foam.CLASS({
   imports: [
     'me',
     'registry',
-    'socketService',
-    'warn'
+    'socketService'
   ],
 
   // TODO(markdittmer): Turn these into static methods.
   constants: {
+    // Outputter compatible with ForkBox.PARSER_FACTORY().
     OUTPUTTER_FACTORY: function() {
       return foam.json.Outputter.create({
         pretty: false,
@@ -48,10 +48,38 @@ foam.CLASS({
         propertyPredicate: function(o, p) { return ! p.networkTransient; }
       });
     },
+    // Parser compatible with ForkBox.OUTPUTTER_FACTORY().
     PARSER_FACTORY: function(creationContext) {
       return foam.json.Parser.create({
         strict: true,
         creationContext: creationContext
+      });
+    },
+    // Static method for use by forked script to connect to parent process.
+    CONNECT_TO_PARENT: function(ctx) {
+      foam.assert(foam.box.Context.isInstance(ctx),
+                  'ForkBox.CONNECT_TO_PARENT expects foam.box.Context');
+      ctx.socketService.listening$.sub(function(sub, _, __, slot) {
+        if ( ! slot.get() ) return;
+
+        sub.detach();
+        var stdin = require('process').stdin;
+        var buf = '';
+        stdin.on('data', function(data) {
+          buf += data.toString();
+        });
+        stdin.on('end', function() {
+          var parser = foam.box.node.ForkBox.PARSER_FACTORY(
+              ctx.creationContext);
+          parser.parseString(buf, ctx).send(foam.box.Message.create({
+            // TODO(markdittmer): RegisterSelfMessage should handle naming. Is
+            // "name:" below necessary?
+            object: foam.box.SocketBox.create({
+              name: ctx.me.name,
+              address: `0.0.0.0:${ctx.socketService.port}`
+            })
+          }));
+        });
       });
     }
   },
@@ -79,36 +107,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'childScriptPath',
-      documentation: `DEPRECATED. Previously used to name the top-level script
-          of the forked process.`,
-      postSet: function() {
-        this.warn(`foam.box.node.ForkBox.childScript is deprecated.
-                       Use "appModule" instead.`);
-      }
-    },
-    {
-      class: 'String',
-      name: 'appModule',
-      documentation: `A Node JS module to run for loading application classes,
-          data, and context. This module must return a foam.box.Context to be
-          used for IPC with the parent process.`
-    },
-    {
-      class: 'Array',
-      of: 'String',
-      name: 'appArgs',
-      documentation: `Additional arguments listed after "appModule" in script
-          invocation. The invocation will be:
-              /path/to/node /path/to/foam/box/node/forkScript.js \
-                  /path/to/appModule <appArgs>`
-    },
-    {
-      class: 'String',
-      name: 'childScriptPath_',
-      documentation: `The top-level script used to load "appModule" and
-          establish a connection with the parent process.`,
-      value: `${__dirname}${require('path').sep}forkScript.js`,
-      final: true
+      documentation: `The top-level script of the forked process.`
     },
     {
       class: 'FObjectProperty',
@@ -141,31 +140,16 @@ foam.CLASS({
       }.bind(this));
       this.registry.register(this.replyBox_.id, null, this.replyBox_);
 
-      var childScriptPath = this.childScriptPath || this.childScriptPath_;
-      var args = this.nodeParams.concat(childScriptPath);
-      if ( this.appModule ) args.push(this.appModule);
-      if ( this.appArgs ) args = args.concat(this.appArgs);
-
-      this.child_ = require('child_process').spawn(this.nodePath, args,
-                                                   { detached: this.detached });
+      this.child_ = require('child_process').spawn(
+          this.nodePath,
+          this.nodeParams.concat([ this.childScriptPath ]),
+          { detached: this.detached });
 
       var process = require('process');
       this.child_.stdout.pipe(process.stdout);
       this.child_.stderr.pipe(process.stderr);
 
       this.socketService.listening$.sub(this.onSocketListening);
-    },
-    function validate() {
-      this.SUPER();
-
-      if ( this.childScriptPath && this.appModule ) {
-        throw new Error(`foam.box.node.ForkBox: Cannot set both
-                             "childScriptPath" and "appModule"`);
-      }
-      if ( this.appArgs.length > 0 && ! this.appModule ) {
-        throw new Error(`foam.box.node.ForkBox: Cannot set "appArgs" without
-                             setting "appModule"`);
-      }
     }
   ],
 
