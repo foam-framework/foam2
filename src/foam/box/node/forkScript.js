@@ -15,10 +15,36 @@
  * limitations under the License.
  */
 
-require(require('path').resolve(`${__dirname}/../../../foam.js`));
+var path = require('path');
+var process = require('process');
 
-var ctx = foam.box.Context.create();
+require(path.resolve(`${__dirname}/../../../foam.js`));
 
+// Attempt to load foam.box.Context from an application module.
+var appModule = process.argv.slice(2)[0];
+var ctx = null;
+if ( appModule ) {
+  try {
+    var appPath = path.resolve(appModule);
+    ctx = require(appPath);
+  } catch ( error ) {
+    console.warn(`foam.box.node.forkScript: Error resolving and requiring
+                      "${appModule}". Exiting.`);
+    process.exit(1);
+  }
+} else {
+  console.warn('foam.box.node.forkScript: No application module provided');
+}
+ctx = ctx || foam.box.Context.create();
+
+// Expected API on "ctx": foam.box.Context.
+if ( ! foam.box.Context.isInstance(ctx) ) {
+  console.error(`foam.box.node.forkScript: Application module "${appModule}"
+                     failed to export a foam.box.Context for IPC. Exiting.`);
+  process.exit(1);
+}
+
+// Establish socket connection with parent process.
 ctx.socketService.listening$.sub(function(sub, _, __, slot) {
   if ( ! slot.get() ) return;
 
@@ -29,7 +55,7 @@ ctx.socketService.listening$.sub(function(sub, _, __, slot) {
     buf += data.toString();
   });
   stdin.on('end', function() {
-    // TODO(markdittmer): Use secure parser.
+    var parser = foam.box.node.ForkBox.PARSER_FACTORY(ctx.creationContext);
     foam.json.parseString(buf, ctx).send(foam.box.Message.create({
       // TODO(markdittmer): RegisterSelfMessage should handle naming. Is "name:"
       // below necessary?
