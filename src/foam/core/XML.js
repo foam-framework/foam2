@@ -301,6 +301,8 @@ foam.CLASS({
           // Iterate through properties and output
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
+            // skip outputting of attributes
+            if ( ps[i].attribute ) continue;
             this.outputProperty_(o, ps[i]);
           }
         },
