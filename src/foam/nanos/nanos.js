@@ -28,6 +28,7 @@ FOAM_FILES([
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
   { name: "foam/nanos/export/ExportDriverRegistry"},
+  { name: "foam/nanos/export/ExportDriver" },
   { name: "foam/nanos/export/JSONDriver"},
   { name: "foam/nanos/export/XMLDriver"},
   { name: "foam/nanos/export/CSVDriver"},
