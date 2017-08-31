@@ -12,7 +12,7 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'export',
+      name: 'exportFObject',
       returns: 'String',
       args: ['X', 'obj'],
       documentation: 'Exports an FObject'

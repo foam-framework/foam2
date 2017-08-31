@@ -21,7 +21,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function export(X, obj) {
+    function exportFObject(X, obj) {
       return outputter.stringify(obj);
     },
     function exportDAO(X, dao) {
