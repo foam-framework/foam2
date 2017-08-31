@@ -84,6 +84,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'outputDefinedValues',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'formatDatesAsNumbers',
       value: false
     },
@@ -202,7 +207,12 @@ foam.CLASS({
 
     function outputProperty_(o, p) {
       if ( ! this.propertyPredicate(o, p ) ) return;
-      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
+      // don't output default values unless value is defined and outputDefinedValues set to true
+      if ( this.outputDefinedValues ) {
+        if ( ! o.hasOwnProperty(p.name) ) return;
+      } else if ( this.outputDefaultValues ) {
+        if ( p.isDefaultValue(o[p.name]) ) return;
+      }
 
       var v = o[p.name];
       if ( ! v || ( v instanceof Array && v.length === 0 ) ) {
@@ -444,7 +454,8 @@ foam.LIB({
   constants: {
     // Pretty Print
     Pretty: foam.xml.Outputter.create({
-      outputDefaultValues: false
+      outputDefaultValues: false,
+      outputDefinedValues: true
     }),
 
     // Compact output (not pretty)
@@ -452,6 +463,7 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
+      outputDefinedValues: false
     }),
 
     // Shorter than Compact (uses short-names if available)
@@ -459,6 +471,7 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
+      outputDefinedValues: false,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
