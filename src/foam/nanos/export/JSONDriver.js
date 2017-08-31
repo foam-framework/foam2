@@ -22,11 +22,12 @@ foam.CLASS({
 
   methods: [
     function exportFObject(X, obj) {
-      return outputter.stringify(obj);
+      return this.outputter.stringify(obj);
     },
     function exportDAO(X, dao) {
+      var self = this;
       return dao.select().then(function (sink) {
-        return outputter.stringify(sink.array);
+        return self.outputter.stringify(sink.array);
       });
     }
   ]
