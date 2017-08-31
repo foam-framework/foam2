@@ -234,16 +234,16 @@ foam.CLASS({
           }
         },
         FObject: function(v, p) {
-          if ( v.value ) {
-            // if v.value exists then we have attributes
+          if ( v.xmlValue ) {
+            // if v.xmlValue exists then we have attributes
             // check if the value is an FObject and structure XML accordingly
-            if ( foam.core.FObject.isInstance(v.value) ) {
+            if ( foam.core.FObject.isInstance(v.xmlValue) ) {
               this.start('<' + this.propertyName(p) + this.outputAttributes(v) + '>');
               this.output(p.toXML(v, this));
               this.end('</' +  this.propertyName(p) + '>');
             } else {
               this.out('<').outputPropertyName(p).outputAttributes(v).out('>');
-              this.out(p.toXML(v.value, this));
+              this.out(p.toXML(v.xmlValue, this));
               this.out('</').outputPropertyName(p).out('>');
             }
           } else {
@@ -384,6 +384,25 @@ foam.CLASS({
         } else {
           // parse property
           prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
+        }
+      }
+
+      // check to see if xmlValue property exists
+      var xmlValueProp = obj.cls_.getAxiomByName('xmlValue');
+      if ( xmlValueProp ) {
+        // parse attributes if they exist
+        var attributes = doc.attributes;
+        for ( var i = 0; i < attributes.length; i++ ) {
+          var attribute = attributes[i];
+          var prop = obj.cls_.getAxiomByName(attribute.name);
+          // don't need to check for types as attributes are always simple types
+          prop.set(obj, attribute.value);
+        }
+
+        if ( foam.core.FObjectProperty.isInstance(xmlValueProp) ) {
+          xmlValueProp.set(obj, this.objectify(doc, xmlValueProp.of));
+        } else {
+          xmlValueProp.set(obj, doc.firstChild ? doc.firstChild.nodeValue : null);
         }
       }
 
