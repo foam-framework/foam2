@@ -181,6 +181,16 @@ foam.CLASS({
       return this;
     },
 
+    function outputAttributes(v) {
+      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.attribute });
+      if ( attributes.length === 0 ) return this;
+
+      for ( var i = 0; i < attributes.length; i++ ) {
+        this.out(' ' + attributes[i].name + '="' + this.escapeAttr(attributes[i].get(v)) + '"');
+      }
+      return this;
+    },
+
     function propertyName(p) {
       return this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name)
     },
@@ -224,22 +234,26 @@ foam.CLASS({
           }
         },
         FObject: function(v, p) {
-          this.start('<' + this.propertyName(p) + this.outputAttributes(v) + '>');
-          this.output(p.toXML(v, this));
-          this.end('</' +  this.propertyName(p) + '>');
+          if ( v.value ) {
+            // if v.value exists then we have attributes
+            // check if the value is an FObject and structure XML accordingly
+            if ( foam.core.FObject.isInstance(v.value) ) {
+              this.start('<' + this.propertyName(p) + this.outputAttributes(v) + '>');
+              this.output(p.toXML(v, this));
+              this.end('</' +  this.propertyName(p) + '>');
+            } else {
+              this.out('<').outputPropertyName(p).outputAttributes(v).out('>');
+              this.out(p.toXML(v.value, this));
+              this.out('</').outputPropertyName(p).out('>');
+            }
+          } else {
+            // assume no attributes
+            this.start('<' + this.propertyName(p) + '>');
+            this.output(p.toXML(v, this));
+            this.end('</' +  this.propertyName(p) + '>');
+          }
         }
       })
-    },
-
-    function outputAttributes(v) {
-      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.attribute });
-      if ( attributes.length === 0 ) return '';
-
-      var res = '';
-      for ( var i = 0; i < attributes.length; i++ ) {
-        res += ' ' + attributes[i].name + '="' + this.escapeAttr(attributes[i].get(v)) + '"';
-      }
-      return res;
     },
 
     function outputPrimitive(v, p){
