@@ -462,7 +462,7 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
-      outputDefinedValues: true
+      outputDefinedValues: false
     }),
 
     // Shorter than Compact (uses short-names if available)
