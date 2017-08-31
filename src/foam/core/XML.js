@@ -9,6 +9,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'xmlAttribute',
+      default: false
+    },
+    {
       name: 'fromXML',
       value: function fromXML(value, ctx, prop, xml) {
         return foam.xml.parse(value, null, ctx);
@@ -182,7 +187,7 @@ foam.CLASS({
     },
 
     function outputAttributes(v) {
-      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.attribute });
+      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.xmlAttribute });
       if ( attributes.length === 0 ) return this;
 
       for ( var i = 0; i < attributes.length; i++ ) {
@@ -327,7 +332,7 @@ foam.CLASS({
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
             // skip outputting of attributes
-            if ( ps[i].attribute ) continue;
+            if ( ps[i].xmlAttribute ) continue;
             this.outputProperty_(o, ps[i]);
           }
         },
