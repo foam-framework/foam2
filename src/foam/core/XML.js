@@ -224,11 +224,22 @@ foam.CLASS({
           }
         },
         FObject: function(v, p) {
-          this.start('<' + this.propertyName(p) + '>');
+          this.start('<' + this.propertyName(p) + this.outputAttributes(v) + '>');
           this.output(p.toXML(v, this));
           this.end('</' +  this.propertyName(p) + '>');
         }
       })
+    },
+
+    function outputAttributes(v) {
+      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.attribute });
+      if ( attributes.length === 0 ) return '';
+
+      var res = '';
+      for ( var i = 0; i < attributes.length; i++ ) {
+        res += ' ' + attributes[i].name + '="' + this.escapeAttr(attributes[i].get(v)) + '"';
+      }
+      return res;
     },
 
     function outputPrimitive(v, p){
