@@ -9,6 +9,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'xmlAttribute',
+      default: false
+    },
+    {
       name: 'fromXML',
       value: function fromXML(value, ctx, prop, xml) {
         return foam.xml.parse(value, null, ctx);
@@ -181,6 +186,16 @@ foam.CLASS({
       return this;
     },
 
+    function outputAttributes(v) {
+      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.xmlAttribute });
+      if ( attributes.length === 0 ) return this;
+
+      for ( var i = 0 ; i < attributes.length ; i++ ) {
+        this.out(' ' + attributes[i].name + '="' + this.escapeAttr(attributes[i].get(v)) + '"');
+      }
+      return this;
+    },
+
     function propertyName(p) {
       return this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name)
     },
@@ -208,7 +223,7 @@ foam.CLASS({
         Date:         function(v, p) { this.outputPrimitive(v, p); },
         AbstractEnum: function(v, p) { this.outputPrimitive(v.name, p); },
         Array:     function(v, p) {
-          for ( var i = 0; i < v.length; i++ ) {
+          for ( var i = 0 ; i < v.length ; i++ ) {
             if ( foam.core.FObjectArray.isInstance(p) ) {
               // output FObject array
               this.start('<' + this.propertyName(p) + '>');
@@ -224,9 +239,24 @@ foam.CLASS({
           }
         },
         FObject: function(v, p) {
-          this.start('<' + this.propertyName(p) + '>');
-          this.output(p.toXML(v, this));
-          this.end('</' +  this.propertyName(p) + '>');
+          if ( v.xmlValue ) {
+            // if v.xmlValue exists then we have attributes
+            // check if the value is an FObject and structure XML accordingly
+            if ( foam.core.FObject.isInstance(v.xmlValue) ) {
+              this.start('<' + this.propertyName(p) + this.outputAttributes(v) + '>');
+              this.output(p.toXML(v, this));
+              this.end('</' +  this.propertyName(p) + '>');
+            } else {
+              this.out('<').outputPropertyName(p).outputAttributes(v).out('>');
+              this.out(p.toXML(v.xmlValue, this));
+              this.out('</').outputPropertyName(p).out('>');
+            }
+          } else {
+            // assume no attributes
+            this.start('<' + this.propertyName(p) + '>');
+            this.output(p.toXML(v, this));
+            this.end('</' +  this.propertyName(p) + '>');
+          }
         }
       })
     },
@@ -301,6 +331,8 @@ foam.CLASS({
           // Iterate through properties and output
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
+            // skip outputting of attributes
+            if ( ps[i].xmlAttribute ) continue;
             this.outputProperty_(o, ps[i]);
           }
         },
@@ -339,7 +371,7 @@ foam.CLASS({
       var obj = cls.create();
       var children = doc.children;
 
-      for ( var i = 0; i < children.length; i++ ) {
+      for ( var i = 0 ; i < children.length ; i++ ) {
         // fetch property based on xml tag name since they may not be in order
         var node = children[i];
         var prop = obj.cls_.getAxiomByName(node.tagName);
@@ -357,6 +389,25 @@ foam.CLASS({
         } else {
           // parse property
           prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
+        }
+      }
+
+      // check to see if xmlValue property exists
+      var xmlValueProp = obj.cls_.getAxiomByName('xmlValue');
+      if ( xmlValueProp ) {
+        // parse attributes if they exist
+        var attributes = doc.attributes;
+        for ( var i = 0 ; i < attributes.length ; i++ ) {
+          var attribute = attributes[i];
+          var prop = obj.cls_.getAxiomByName(attribute.name);
+          // don't need to check for types as attributes are always simple types
+          prop.set(obj, attribute.value);
+        }
+
+        if ( foam.core.FObjectProperty.isInstance(xmlValueProp) ) {
+          xmlValueProp.set(obj, this.objectify(doc, xmlValueProp.of));
+        } else {
+          xmlValueProp.set(obj, doc.firstChild ? doc.firstChild.nodeValue : null);
         }
       }
 
