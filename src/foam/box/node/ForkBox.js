@@ -56,9 +56,8 @@ foam.CLASS({
       });
     },
     // Static method for use by forked script to connect to parent process.
+    // NOTE: context "ctx" should be a sub-context of a foam.box.Context.
     CONNECT_TO_PARENT: function(ctx) {
-      foam.assert(foam.box.Context.isInstance(ctx),
-                  'ForkBox.CONNECT_TO_PARENT expects foam.box.Context');
       ctx.socketService.listening$.sub(function(sub, _, __, slot) {
         if ( ! slot.get() ) return;
 
