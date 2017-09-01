@@ -9,15 +9,16 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class StringParser implements Parser {
-  private char delim_;
-  private char escape_;
+  public final static char ESCAPE = '\\';
+
+  protected char delim_;
 
   public StringParser() {
-    escape_ = '\\';
   }
 
   public PStream parse(PStream ps, ParserContext x) {
     delim_ = ps.head();
+
     if ( delim_ != '"' && delim_ != '\'' ) {
       return null;
     }
@@ -29,11 +30,11 @@ public class StringParser implements Parser {
 
     while ( ps.valid() ) {
       char c = ps.head();
-      if ( c == delim_ && lastc != escape_ ) {
+      if ( c == delim_ && lastc != ESCAPE ) {
         break;
       }
 
-      if ( c != escape_ ) sb.append(c);
+      if ( c != ESCAPE ) sb.append(c);
 
       PStream tail = ps.tail();
 
