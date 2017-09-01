@@ -57,7 +57,19 @@ foam.CLASS({
       cls.create = function(args) {
         var instances = this.private_.instances ||
             ( this.private_.instances = {} );
+
         var key = args[property];
+        if ( foam.Undefined.isInstance(key) ) {
+          var prop = cls[foam.String.constantize(property)];
+          key = prop && prop.value;
+          if ( foam.Undefined.isInstance(key) ) {
+            var tmp = oldCreate.call(cls, args);
+            key = tmp[property];
+            foam.assert( ! foam.Undefined.isInstance(key),
+                         'Unable to determine multiton key for class ' +
+                         cls.id + ' on property ' + property);
+          }
+        }
 
         return instances[key] ||
             ( instances[key] = oldCreate.apply(this, arguments) );
