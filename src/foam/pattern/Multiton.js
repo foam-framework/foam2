@@ -60,7 +60,7 @@ foam.CLASS({
 
         var key = args[property];
         if ( foam.Undefined.isInstance(key) ) {
-          var prop = cls[foam.String.constantize(property)];
+          var prop = cls.getAxiomByName(property);
           key = prop && prop.value;
           if ( foam.Undefined.isInstance(key) ) {
             var tmp = oldCreate.call(cls, args);
