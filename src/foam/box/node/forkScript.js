@@ -15,28 +15,9 @@
  * limitations under the License.
  */
 
-require(require('path').resolve(`${__dirname}/../../../foam.js`));
+var path = require('path');
+var process = require('process');
 
-var ctx = foam.box.Context.create();
+require(path.resolve(`${__dirname}/../../../foam.js`));
 
-ctx.socketService.listening$.sub(function(sub, _, __, slot) {
-  if ( ! slot.get() ) return;
-
-  sub.detach();
-  var stdin = require('process').stdin;
-  var buf = '';
-  stdin.on('data', function(data) {
-    buf += data.toString();
-  });
-  stdin.on('end', function() {
-    // TODO(markdittmer): Use secure parser.
-    foam.json.parseString(buf, ctx).send(foam.box.Message.create({
-      // TODO(markdittmer): RegisterSelfMessage should handle naming. Is "name:"
-      // below necessary?
-      object: foam.box.SocketBox.create({
-        name: ctx.me.name,
-        address: `0.0.0.0:${ctx.socketService.port}`
-      })
-    }));
-  });
-});
+foam.box.node.ForkBox.CONNECT_TO_PARENT(foam.box.Context.create());

@@ -29,12 +29,60 @@ foam.CLASS({
     'foam.box.SocketBox',
     'foam.box.SubBox'
   ],
-
   imports: [
     'me',
     'registry',
     'socketService'
   ],
+
+  // TODO(markdittmer): Turn these into static methods.
+  constants: {
+    // Outputter compatible with ForkBox.PARSER_FACTORY().
+    OUTPUTTER_FACTORY: function() {
+      return foam.json.Outputter.create({
+        pretty: false,
+        formatDatesAsNumbers: true,
+        outputDefaultValues: false,
+        useShortNames: false,
+        strict: true,
+        propertyPredicate: function(o, p) { return ! p.networkTransient; }
+      });
+    },
+    // Parser compatible with ForkBox.OUTPUTTER_FACTORY().
+    PARSER_FACTORY: function(creationContext) {
+      return foam.json.Parser.create({
+        strict: true,
+        creationContext: creationContext
+      });
+    },
+    // Static method for use by forked script to connect to parent process.
+    CONNECT_TO_PARENT: function(ctx) {
+      foam.assert(foam.box.Context.isInstance(ctx),
+                  'ForkBox.CONNECT_TO_PARENT expects foam.box.Context');
+      ctx.socketService.listening$.sub(function(sub, _, __, slot) {
+        if ( ! slot.get() ) return;
+
+        sub.detach();
+        var stdin = require('process').stdin;
+        var buf = '';
+        stdin.on('data', function(data) {
+          buf += data.toString();
+        });
+        stdin.on('end', function() {
+          var parser = foam.box.node.ForkBox.PARSER_FACTORY(
+              ctx.creationContext);
+          parser.parseString(buf, ctx).send(foam.box.Message.create({
+            // TODO(markdittmer): RegisterSelfMessage should handle naming. Is
+            // "name:" below necessary?
+            object: foam.box.SocketBox.create({
+              name: ctx.me.name,
+              address: `0.0.0.0:${ctx.socketService.port}`
+            })
+          }));
+        });
+      });
+    }
+  },
 
   properties: [
     {
@@ -46,19 +94,20 @@ foam.CLASS({
     {
       class: 'String',
       name: 'nodePath',
+      documentation: 'The path to the Node JS binary.',
       value: 'node'
     },
     {
       class: 'Array',
       of: 'String',
-      name: 'nodeParams'
+      name: 'nodeParams',
+      documentation: `Parameters passed to Node JS before naming the top-level
+          script to run.`
     },
     {
       class: 'String',
       name: 'childScriptPath',
-      factory: function() {
-        return `${__dirname}${require('path').sep}forkScript.js`;
-      }
+      documentation: `The top-level script of the forked process.`
     },
     {
       class: 'FObjectProperty',
@@ -67,7 +116,8 @@ foam.CLASS({
       name: 'replyBox_'
     },
     {
-      name: 'child_'
+      name: 'child_',
+      documentation: 'The Node ChildProcess object of the forked child process.'
     }
   ],
 
@@ -108,8 +158,9 @@ foam.CLASS({
       if ( ! slot.get() ) return;
 
       sub.detach();
+      var outputter = this.OUTPUTTER_FACTORY();
       this.child_.stdin.end(
-          foam.json.Network.stringify(this.SubBox.create({
+          outputter.stringify(this.SubBox.create({
             name: this.replyBox_.id,
             // TODO(markdittmer): RegisterSelfMessage should handle naming. Is
             // "name:" below necessary?
