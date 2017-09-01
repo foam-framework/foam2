@@ -20,6 +20,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Region" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/client/ClientBuilder" },
   { name: "foam/nanos/client/Client" },
   { name: "foam/nanos/menu/Menu" },
   { name: "foam/nanos/script/Language" },
