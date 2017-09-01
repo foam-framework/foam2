@@ -40,8 +40,8 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-	      var channel = new MessageChannel();
-	      this.messagePortService.addPort(channel.port1);
+	var channel = new MessageChannel();
+	this.messagePortService.addPort(channel.port1);
 
 	this.target.postMessage(channel.port2, [ channel.port2 ]);
 
