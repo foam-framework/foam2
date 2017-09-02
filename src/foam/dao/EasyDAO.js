@@ -238,7 +238,7 @@ foam.CLASS({
         params.delegate = this.serverBox || this.HTTPBox.create({
           of: this.model,
           method: 'POST',
-          url: '/' + this.serviceName
+          url: window.location.origin + '/' + this.serviceName
         });
       }
 
