@@ -11,40 +11,36 @@ import foam.lib.parse.*;
 public class StringParser implements Parser {
   public final static char ESCAPE = '\\';
 
-  protected char delim_;
-
   public StringParser() {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    delim_ = ps.head();
+    char delim = ps.head();
 
-    if ( delim_ != '"' && delim_ != '\'' ) {
-      return null;
-    }
+    if ( delim != '"' && delim != '\'' ) return null;
 
     ps = ps.tail();
-    char lastc = delim_;
+    char lastc = delim;
 
+    // TODO: use thread-local SB instead to avoid generating garbage
     StringBuilder sb = new StringBuilder();
 
     while ( ps.valid() ) {
       char c = ps.head();
-      if ( c == delim_ && lastc != ESCAPE ) {
-        break;
-      }
 
-      if ( c != ESCAPE ) sb.append(c);
+      if ( c == delim && lastc != ESCAPE ) break;
 
       PStream tail = ps.tail();
 
-      if ( c == '\\' ) {
-        char nextChar = ps.tail().head();
+      if ( c == ESCAPE ) {
+        char   nextChar        = ps.tail().head();
         Parser escapeSeqParser = null;
 
         if ( nextChar == 'u' ) {
+          // TODO: make a constant
           escapeSeqParser = new UnicodeParser();
         } else if ( nextChar == 'n' ) {
+          // TODO: make a constant
           escapeSeqParser = new ASCIIEscapeParser();
         }
 
@@ -58,6 +54,8 @@ public class StringParser implements Parser {
             c = ((Character) escapePS.value()).charValue();
           }
         }
+      } else {
+        sb.append(c);
       }
 
       ps = tail;
