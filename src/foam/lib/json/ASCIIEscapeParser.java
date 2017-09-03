@@ -8,7 +8,10 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class ASCIIEscapeParser extends ProxyParser {
+public class ASCIIEscapeParser
+  extends ProxyParser
+{
+
   public ASCIIEscapeParser() {
     super(new Seq(
       new Whitespace(),
