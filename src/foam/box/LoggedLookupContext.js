@@ -34,6 +34,7 @@ foam.CLASS({
     {
       class: 'ContextMethod',
       name: 'lookup',
+      swiftCode: 'fatalError()',
       code: function(X, id) {
         this.record[id] = id;
         return this.__context__.lookup.call(X, id);

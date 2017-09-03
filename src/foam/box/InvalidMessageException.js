@@ -18,6 +18,7 @@
 foam.CLASS({
   package :'foam.box',
   name: 'InvalidMessageException',
+  swiftImplements: ['Error'],
 
   properties: [
     'messageType'

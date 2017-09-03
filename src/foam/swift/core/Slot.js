@@ -21,7 +21,8 @@ foam.CLASS({
       name: 'swiftSub',
       args: [
         {
-          swiftType: '@escaping Listener',
+          swiftAnnotations: ['@escaping'],
+          swiftType: 'Listener',
           name: 'listener',
         },
       ],
@@ -117,7 +118,8 @@ return other.swiftSub { (_, _) in l() }
           name: 'other',
         },
         {
-          swiftType: '@escaping (Any?) -> Any?',
+          swiftAnnotations: ['@escaping'],
+          swiftType: '(Any?) -> Any?',
           name: 'f',
         },
       ],
@@ -138,7 +140,8 @@ return other.swiftSub { (_, _) in l() }
           name: 'other',
         },
         {
-          swiftType: '@escaping (Any?) -> Any?',
+          swiftAnnotations: ['@escaping'],
+          swiftType: '(Any?) -> Any?',
           name: 'f',
         },
       ],
@@ -151,7 +154,8 @@ return other.mapFrom(self, f)
       name: 'map',
       args: [
         {
-          swiftType: '@escaping (Any?) -> Any?',
+          swiftAnnotations: ['@escaping'],
+          swiftType: '(Any?) -> Any?',
           name: 'f',
         },
       ],

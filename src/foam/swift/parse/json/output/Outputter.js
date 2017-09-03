@@ -35,7 +35,8 @@ foam.CLASS({
       name: 'outputProperty',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -72,7 +73,8 @@ return data.replacingOccurrences(of: "\"", with: "\\\"")
       name: 'outputNil',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
       ],
@@ -84,7 +86,8 @@ out.append("null")
       name: 'outputString',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -102,7 +105,8 @@ out.append("\"")
       name: 'outputBoolean',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -118,7 +122,8 @@ out.append(data ? "true" : "false")
       name: 'outputNumber',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -134,7 +139,8 @@ out.append(data.stringValue)
       name: 'output',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -160,7 +166,8 @@ if let data = data as? FObject {
       name: 'outputFObject',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {

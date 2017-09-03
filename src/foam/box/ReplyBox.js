@@ -26,6 +26,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'id',
       factory: function() {
         // TODO: Do these need to be long lived?

@@ -41,6 +41,7 @@ foam.CLASS({
     {
       class: 'ContextMethod',
       name: 'lookup',
+      swiftCode: 'fatalError()',
       code: function(X, id) {
         if ( ! this.whitelist_[id] ) {
           throw new Error('Class "' + id + '" is not whitelisted.');

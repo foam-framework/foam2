@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
+  swiftName: 'BoxContext',
 
   requires: [
     'foam.box.BoxRegistryBox',
@@ -78,11 +79,14 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'registry',
       hidden: true,
       factory: function() {
         return this.BoxRegistryBox.create();
-      }
+      },
+      swiftFactory: 'return BoxRegistryBox_create()',
     },
     {
       name: 'root',
@@ -109,7 +113,12 @@ foam.CLASS({
         var me = this.NamedBox.create({ name: this.myname });
         me.delegate = this.registry;
         return me;
-      }
+      },
+      swiftFactory: function() {/*
+        let me = NamedBox_create(["name": self.myname])
+        me.delegate = self.registry;
+        return me
+      */},
     },
     {
       class: 'Boolean',

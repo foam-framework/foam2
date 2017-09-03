@@ -83,6 +83,7 @@ foam.CLASS({
         'FObject',
         'foam.core.AbstractInterface',
         'foam.core.AbstractEnum',
+        'foam.box.RPCReturnBox',
       ],
     },
     {
