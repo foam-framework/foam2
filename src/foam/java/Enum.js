@@ -25,7 +25,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'isEnum',
       value: true
-    },    
+    },
     {
       name: 'labelsOutput',
       expression: function() {
@@ -40,7 +40,7 @@ foam.CLASS({
 
         return out;
       }
-    },    
+    },
     {
       name: 'forOrdinal',
       expression: function() {
@@ -54,14 +54,14 @@ foam.CLASS({
 
         return out;
       }
-    },    
+    },
     {
       name: 'forLabel',
       expression: function() {
         var out = 'switch (label) {\n';
 
         for ( var i = 0, value ; value = this.values[i] ; i++ ) {
-          out += '  case ' + '"' + value.label + '"' + 
+          out += '  case ' + '"' + value.label + '"' +
                   ': return ' + this.name + '.' + value.name + ';\n';
         }
 
@@ -76,16 +76,16 @@ foam.CLASS({
         return [
           {
             name: this.name,
-            args: [ 
-                    { 
-                      name: 'ordinal', 
-                      type: 'int' 
-                    },
-                    { 
-                      name: 'label', 
-                      type: 'String' 
-                    },
-                  ],
+            args: [
+              {
+                name: 'ordinal',
+                type: 'int'
+              },
+              {
+                name: 'label',
+                type: 'String'
+              },
+            ],
             body: 'setOrdinal(ordinal);\nsetLabel(label);\nsetName(name());'
           },
           {
