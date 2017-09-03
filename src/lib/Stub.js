@@ -27,8 +27,8 @@ foam.CLASS({
       name: 'code',
       factory: function() {
         var returns         = foam.String.isInstance(this.returns) ?
-                                  this.returns :
-                                  this.returns && this.returns.typeName;
+            this.returns :
+            this.returns && this.returns.typeName;
         var replyPolicyName = this.replyPolicyName;
         var boxPropName     = this.boxPropName;
         var name            = this.name;
