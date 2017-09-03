@@ -34,61 +34,63 @@ foam.CLASS({
   ],
 
   methods: [
-    function then() {
+    function then(resolve) {
       var self = this;
 
-      return new Promise(function(resolve) {
-        var client = {
-          package: 'foam.nanos.client',
-          name: 'Client2',
+      var client = {
+        package: 'foam.nanos.client',
+        name: 'Client2',
 
-          implements: [ 'foam.box.Context' ],
+        implements: [ 'foam.box.Context' ],
 
-          requires: [
-            'foam.box.HTTPBox',
-            'foam.dao.RequestResponseClientDAO as ClientDAO',
-            'foam.dao.EasyDAO'
-          ],
+        requires: [
+          'foam.box.HTTPBox',
+          'foam.dao.RequestResponseClientDAO as ClientDAO',
+          'foam.dao.EasyDAO'
+        ],
 
-          exports: [
-          ],
+        exports: [
+        ],
 
-          properties: [
-          ],
+        properties: [
+        ],
 
-          methods: [
-            function createDAO(config) {
-              config.daoType = 'MDAO'; // 'IDB';
-              config.cache   = true;
+        methods: [
+          function createDAO(config) {
+            config.daoType = 'MDAO'; // 'IDB';
+            config.cache   = true;
 
-              return this.EasyDAO.create(config);
-            }
-          ]
-        };
-
-        self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
-          put: function(spec) {
-            if ( spec.client ) {
-              var stub =
-              console.log('*************', spec.stringify());
-
-              client.exports.push(spec.name);
-
-              client.properties.push({
-                name: spec.name,
-                factory: function() {
-                  console.log('********************* creating stub', spec.client);
-                  return foam.json.parseString(spec.client, this.__context__);
-                }
-              });
-            }
-          },
-          eof: function() {
+            return this.EasyDAO.create(config);
           }
-        }).then(function() {
+        ]
+      };
+
+      self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
+        put: function(spec) {
+          if ( spec.client ) {
+            var stub =
+            console.log('*************', spec.stringify());
+
+            client.exports.push(spec.name);
+
+            client.properties.push({
+              name: spec.name,
+              factory: function() {
+                console.log('********************* creating stub', spec.client);
+                var json = JSON.parse(spec.client);
+                if ( ! json.serviceName ) json.serviceName = spec.name;
+                if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
+                if ( ! json.daoType     ) json.daoType     = 'CLIENT';
+                return foam.json.parse(json, null, this);
+                //return foam.json.parseString(spec.client, this.__context__);
+              }
+            });
+          }
+        },
+        eof: function() {
           foam.CLASS(client);
-          resolve();
-        });
+          resolve(foam.nanos.client.Client2);
+        }
       });
     }
   ]
