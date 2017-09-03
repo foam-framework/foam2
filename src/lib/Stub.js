@@ -37,8 +37,6 @@ foam.CLASS({
               delegate: this.RPCReturnBox.create()
             });
 
-            var errorBox = replyBox;
-
             var ret = replyBox.delegate.promise;
 
             replyBox = this.registry.register(
@@ -148,6 +146,8 @@ foam.CLASS({
               name: m.name,
               replyPolicyName: replyPolicyName,
               boxPropName: name,
+              swiftReturnType: m.swiftReturnType,
+              args: m.args,
               returns: returns
             });
           });

@@ -35,6 +35,8 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'delegate',
       transient: true,
       factory: function() {
@@ -49,8 +51,12 @@ foam.CLASS({
   ],
 
   methods: [
-    function send(msg) {
-      this.delegate.send(msg);
+    {
+      name: 'send',
+      code: function(msg) {
+        this.delegate.send(msg);
+      },
+      swiftCode: 'try delegate!.send(msg)',
     },
 
     function getParentBox() {

@@ -469,7 +469,7 @@ class SwiftTestsTests: XCTestCase {
 
     let msg = Message(["object": RPCReturnMessage(["data": "Hello there"])])
     XCTAssertFalse(dispatched)
-    rpcBox.send(msg)
+    try! rpcBox.send(msg)
     sem.wait()
     XCTAssertTrue(dispatched)
   }
@@ -493,8 +493,40 @@ class SwiftTestsTests: XCTestCase {
 
     let msg = Message(["object": "Hello there"])
     XCTAssertFalse(dispatched)
-    rpcBox.send(msg)
+    try! rpcBox.send(msg)
     sem.wait()
     XCTAssertTrue(dispatched)
+  }
+
+  func testClientBoxRegistry() {
+    class TestBox: Box {
+      var complete: (Message) -> Void
+      init(complete: @escaping (Message) -> Void) { self.complete = complete }
+      func send(_ msg: Message) { complete(msg) }
+    }
+
+    var received = false
+    let boxContext = BoxContext()
+    let clientBoxRegistry = ClientBoxRegistry(X: boxContext.__subContext__)
+    clientBoxRegistry.delegate = TestBox(complete: { msg in
+      let obj = msg.object as! RPCMessage
+      XCTAssertEqual(obj.name, "doLookup")
+      XCTAssertEqual(obj.args.count, 1)
+      XCTAssertEqual(obj.args[0] as! String, "TestBox")
+
+      let replyBox = msg.attributes["replyBox"] as! Box
+      do {
+        try replyBox.send(msg)
+      } catch let e {
+        fatalError(e.localizedDescription)
+      }
+
+      XCTAssertNil(msg.object)
+      received = true
+    })
+
+    let box = clientBoxRegistry.doLookup("TestBox")
+    XCTAssertNotNil(box)
+    XCTAssertTrue(received)
   }
 }

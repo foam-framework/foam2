@@ -22,7 +22,6 @@ foam.CLASS({
 
   requires: [
     'foam.box.ClientBoxRegistry',
-    'foam.box.LookupRetryBox'
   ],
 
   properties: [

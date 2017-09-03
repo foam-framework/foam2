@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'SkeletonBox',
+  implements: ['foam.box.Box'],
 
   requires: [
     'foam.box.Message',
@@ -34,51 +35,75 @@ foam.CLASS({
   ],
 
   methods: [
-    function call(message) {
-      var p;
+    {
+      name: 'call',
+      args: [
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.Message',
+          name: 'message',
+        },
+      ],
+      code: function(message) {
+        var p;
 
-      try {
-        p = this.data[message.object.name].apply(this.data, message.object.args);
-      } catch(e) {
-        message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
-          object: this.RPCErrorMessage.create({ data: e })
-        }));
+        try {
+          p = this.data[message.object.name].apply(this.data, message.object.args);
+        } catch(e) {
+          message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
+            object: this.RPCErrorMessage.create({ data: e })
+          }));
 
-        return;
-      }
+          return;
+        }
 
-      var replyBox = message.attributes.replyBox;
+        var replyBox = message.attributes.replyBox;
 
-      var self = this;
+        var self = this;
 
-      if ( p instanceof Promise ) {
-        p.then(
-          function(data) {
-            replyBox.send(self.Message.create({
-              object: self.RPCReturnMessage.create({ data: data })
-            }));
-          },
-          function(error) {
-            message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
-              object: self.RPCErrorMessage.create({ data: error })
-            }));
-          });
-      } else {
-        replyBox && replyBox.send(this.Message.create({
-          object: this.RPCReturnMessage.create({ data: p })
-        }));
-      }
+        if ( p instanceof Promise ) {
+          p.then(
+            function(data) {
+              replyBox.send(self.Message.create({
+                object: self.RPCReturnMessage.create({ data: data })
+              }));
+            },
+            function(error) {
+              message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
+                object: self.RPCErrorMessage.create({ data: error })
+              }));
+            });
+        } else {
+          replyBox && replyBox.send(this.Message.create({
+            object: this.RPCReturnMessage.create({ data: p })
+          }));
+        }
+      },
+      swiftCode: 'fatalError()',
     },
 
-    function send(message) {
-      if ( this.RPCMessage.isInstance(message.object) ) {
-        this.call(message);
-        return;
-      }
+    {
+      name: 'send',
+      code: function(message) {
+        if ( this.RPCMessage.isInstance(message.object) ) {
+          this.call(message);
+          return;
+        }
 
-      throw this.InvalidMessageException.create({
-        messageType: message.cls_ && message.cls_.id
-      });
-    }
+        throw this.InvalidMessageException.create({
+          messageType: message.cls_ && message.cls_.id
+        });
+      },
+      swiftCode: function() {/*
+if let _ = msg.object as? RPCMessage {
+  call(msg)
+  return
+}
+
+throw InvalidMessageException_create([
+  "messageType": msg.ownClassInfo().id,
+])
+      */},
+    },
   ]
 });

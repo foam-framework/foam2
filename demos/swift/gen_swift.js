@@ -40,10 +40,12 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.dao.ArraySink',
       'foam.swift.parse.StringPStream',
 
+      'foam.box.Context',
       'foam.box.Box',
       'foam.box.BoxService',
       'foam.box.BoxRegistry',
       'foam.box.ReplyBox',
+      'foam.box.ClientBoxRegistry',
       'foam.swift.box.RPCReturnBox',
       'foam.box.RPCMessage',
       'foam.box.Message',

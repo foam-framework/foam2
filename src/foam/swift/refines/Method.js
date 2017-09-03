@@ -18,8 +18,9 @@
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
   requires: [
-    'foam.swift.Argument as SwiftArgument',
     'foam.core.Argument',
+    'foam.swift.Argument as SwiftArgument',
+    'foam.swift.Field',
     'foam.swift.Method',
   ],
   properties: [
@@ -27,6 +28,11 @@ foam.CLASS({
       class: 'String',
       name: 'swiftName',
       expression: function(name) { return name == 'init' ? '__foamInit__' : name; },
+    },
+    {
+      class: 'String',
+      name: 'swiftSlotName',
+      expression: function(swiftName) { return swiftName + '$'; },
     },
     {
       class: 'Boolean',
@@ -105,6 +111,15 @@ foam.CLASS({
     },
     function writeToSwiftClass(cls, superAxiom) {
       if ( !this.swiftCode ) return;
+      var override = !!(superAxiom && superAxiom.swiftCode);
+      if ( !override ) {
+        cls.fields.push(this.Field.create({
+          lazy: true,
+          name: this.swiftSlotName,
+          initializer: this.slotInit(),
+          type: 'Slot',
+        }));
+      }
       cls.method(this.Method.create({
         name: this.swiftName,
         body: this.swiftCode,
@@ -112,9 +127,35 @@ foam.CLASS({
         returnType: this.swiftReturnType,
         args: this.swiftArgs,
         visibility: this.swiftVisibility,
-        override: !!(superAxiom && superAxiom.swiftCode) || this.name == 'init',
+        override: override || this.name == 'init',
         annotations: this.swiftAnnotations,
       }));
     },
-  ]
+  ],
+  templates: [
+    {
+      name: 'slotInit',
+      args: [],
+      template: function() {/*
+<%
+var isMutable = function(a) { return a.annotations.indexOf('inout') != -1 };
+%>
+return ConstantSlot([
+  "value": { [weak self] (args: [Any?]) -> <%=this.swiftReturnType||'Void'%> in
+    if self == nil { fatalError() }
+<% this.swiftArgs.forEach(function(a, i) { %>
+    <%=isMutable(a) ? 'var' : 'let' %> <%
+  %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
+<% }) %>
+    <%=this.swiftReturnType ? 'return ' : ''%><%=this.swiftThrows ? 'try! ' : ''%>self!.`<%=this.swiftName%>`(
+        <%=this.swiftArgs.map(function(a){
+          return (a.externalName ? a.externalName + ': ' : '') +
+                 (isMutable(a) ? '&' : '') +
+                 a.localName
+        }).join(', ')%>)
+  }
+])
+      */},
+    },
+  ],
 });

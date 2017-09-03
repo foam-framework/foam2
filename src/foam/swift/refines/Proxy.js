@@ -8,6 +8,7 @@ foam.CLASS({
           return arg.localName;
         });
         return (swiftReturnType ? 'return ' : '') +
+          (this.throws ? 'try ' : '') + 
           property + '.' + swiftName + '(' + args.join(', ') + ')';
       }
     }

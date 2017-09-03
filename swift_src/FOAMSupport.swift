@@ -343,6 +343,21 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     __foamInit__()
   }
 
+  public required init(X x: Context) {
+    super.init()
+    __foamInit__()
+    __context__ = x
+  }
+
+  public required init(_ args: [String:Any?], _ x: Context) {
+    super.init()
+    for (key, value) in args {
+      self.set(key: key, value: value)
+    }
+    __foamInit__()
+    __context__ = x
+  }
+
   func __foamInit__() {}
 
   private func detachListeners(listeners: ListenerList?) {

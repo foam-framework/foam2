@@ -48,6 +48,7 @@ foam.CLASS({
         {
           class: 'FObjectProperty',
           of: 'foam.box.Box',
+          required: true,
           name: 'localBox'
         }
       ]
@@ -125,6 +126,7 @@ return registration.exportBox!
         {
           class: 'FObjectProperty',
           of: 'foam.box.Box',
+          required: true,
           name: 'localBox',
         },
       ],
