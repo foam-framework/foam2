@@ -9,6 +9,11 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Boolean',
+      name: 'xmlAttribute',
+      default: false
+    },
+    {
       name: 'fromXML',
       value: function fromXML(value, ctx, prop, xml) {
         return foam.xml.parse(value, null, ctx);
@@ -75,6 +80,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'outputDefaultValues',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'outputDefinedValues',
       value: true
     },
     {
@@ -181,15 +191,34 @@ foam.CLASS({
       return this;
     },
 
+    function outputAttributes(v) {
+      var attributes = v.cls_.getAxiomsByClass(foam.core.Property).filter(function (p) { return p.xmlAttribute });
+      if ( attributes.length === 0 ) return this;
+
+      for ( var i = 0 ; i < attributes.length ; i++ ) {
+        this.out(' ' + attributes[i].name + '="' + this.escapeAttr(attributes[i].get(v)) + '"');
+      }
+      return this;
+    },
+
     function propertyName(p) {
       return this.maybeEscapeKey(this.useShortNames && p.shortName ? p.shortName : p.name)
     },
 
     function outputProperty_(o, p) {
       if ( ! this.propertyPredicate(o, p ) ) return;
-      if ( ! this.outputDefaultValues && p.isDefaultValue(o[p.name]) ) return;
+      // don't output default values unless value is defined and outputDefinedValues set to true
+      if ( this.outputDefinedValues ) {
+        if ( ! o.hasOwnProperty(p.name) ) return;
+      } else if ( this.outputDefaultValues ) {
+        if ( p.isDefaultValue(o[p.name]) ) return;
+      }
 
       var v = o[p.name];
+      if ( ! v || ( v instanceof Array && v.length === 0 ) ) {
+        return;
+      }
+
       this.nl().indent();
       this.outputProperty(v, p);
     },
@@ -197,26 +226,47 @@ foam.CLASS({
     {
       name: 'outputProperty',
       code: foam.mmethod({
-        String:  function(v, p) { this.outputPrimitive(v, p) },
-        Number:  function(v, p) { this.outputPrimitive(v, p) },
-        Boolean: function(v, p) { this.outputPrimitive(v, p) },
-        Date:    function(v, p) { this.outputPrimitive(v, p) },
-        Array:   function(v, p) {
-          this.start("<" + this.propertyName(p) + " class='Array'>");
-          this.nl().indent();
-          this.output(p.toXML(v, this));
-          this.end('</' +  this.propertyName(p) + '>');
+        Undefined:    function(v, p) {},
+        String:       function(v, p) { this.outputPrimitive(v, p); },
+        Number:       function(v, p) { this.outputPrimitive(v, p); },
+        Boolean:      function(v, p) { this.outputPrimitive(v, p); },
+        Date:         function(v, p) { this.outputPrimitive(v, p); },
+        AbstractEnum: function(v, p) { this.outputPrimitive(v.name, p); },
+        Array:     function(v, p) {
+          for ( var i = 0 ; i < v.length ; i++ ) {
+            if ( foam.core.FObjectArray.isInstance(p) ) {
+              // output FObject array
+              this.start('<' + this.propertyName(p) + '>');
+              this.output(p.toXML(v[i], this));
+              this.end('</' + this.propertyName(p) + '>');
+            } else {
+              // output primitive array
+              this.outputPrimitive(v[i], p);
+            }
+
+            // new line and indent except on last element
+            if ( i != v.length - 1 ) this.nl().indent();
+          }
         },
         FObject: function(v, p) {
-          this.start("<" + this.propertyName(p) + ">");
-          this.nl().indent();
-          this.output(p.toXML(v, this));
-          this.end('</' +  this.propertyName(p) + '>');
-        },
-        AbstractEnum: function(v, p) {
-          this.start("<" + this.propertyName(p) + ">");
-          this.outputProperty_(v, v.cls_.getAxiomByName('ordinal'));
-          this.end('</' +  this.propertyName(p) + '>');
+          if ( v.xmlValue ) {
+            // if v.xmlValue exists then we have attributes
+            // check if the value is an FObject and structure XML accordingly
+            if ( foam.core.FObject.isInstance(v.xmlValue) ) {
+              this.start('<' + this.propertyName(p) + this.outputAttributes(v) + '>');
+              this.output(p.toXML(v, this));
+              this.end('</' +  this.propertyName(p) + '>');
+            } else {
+              this.out('<').outputPropertyName(p).outputAttributes(v).out('>');
+              this.out(p.toXML(v.xmlValue, this));
+              this.out('</').outputPropertyName(p).out('>');
+            }
+          } else {
+            // assume no attributes
+            this.start('<' + this.propertyName(p) + '>');
+            this.output(p.toXML(v, this));
+            this.end('</' +  this.propertyName(p) + '>');
+          }
         }
       })
     },
@@ -231,7 +281,7 @@ foam.CLASS({
       if ( this.formatDatesAsNumbers ) {
         this.out(o.valueOf());
       } else {
-        this.out(JSON.stringify(o));
+        this.out(o.toISOString());
       }
     },
 
@@ -288,22 +338,12 @@ foam.CLASS({
           }
 
           var clsName = o.cls_.id;
-          this.start("<object class='" + clsName + "'>")
           // Iterate through properties and output
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
           for ( var i = 0 ; i < ps.length ; i++ ) {
+            // skip outputting of attributes
+            if ( ps[i].xmlAttribute ) continue;
             this.outputProperty_(o, ps[i]);
-          }
-          this.end('</object>');
-        },
-        Array: function(o) {
-          // Nested Objects and FObject Arrays Passed
-          for ( var i = 0 ; i < o.length ; i++ ) {
-            // Output 'value' tags for arrays containing non-FObject values
-            if ( !o[i].cls_) this.out("<value>");
-            this.output(o[i], this);
-            if ( !o[i].cls_ ) this.out("</value>");
-            if ( o.length - i != 1 ) this.nl().indent();
           }
         },
         Object: function(o) {
@@ -337,89 +377,71 @@ foam.CLASS({
       return ret;
     },
 
-    {
-      name: 'parse',
-      code: foam.mmethod({
-        Object: function (o, opt_class, opt_ctx) {
-          // Create FObject
-          var className = o.className;
-          var obj = foam.lookup(className).create();
-          var props = o.children;
+    function objectify(doc, cls) {
+      var obj = cls.create();
+      var children = doc.children;
 
-          // Populate FObject with properties
-          for ( var propIndex = 0; propIndex < props.length; propIndex++ ) {
+      for ( var i = 0 ; i < children.length ; i++ ) {
+        // fetch property based on xml tag name since they may not be in order
+        var node = children[i];
+        var prop = obj.cls_.getAxiomByName(node.tagName);
 
-            var currentNode = props[propIndex];
-            var prop = obj.cls_.getAxiomByName(currentNode.tagName);
-            var childName = currentNode.firstChild.localName;
-            // Specific case for array
-            if ( currentNode.className === 'Array' ) {
-              // Array of FObjects
-              if ( childName === 'object' ) {
-                var nestObjArray = Array.from(currentNode.childNodes);
-                prop.set(obj, this.parse(nestObjArray));
-              } else {
-                // Array of other objects with 'value' tag names
-                var arrayValue = (Array.from(currentNode.children)).map( function (x) { return x.innerHTML; });
-                prop.set(obj, arrayValue);
-              }
-              continue;
-            }
+        if ( foam.core.FObjectProperty.isInstance(prop) ) {
+          // parse FObjectProperty
+          prop.set(obj, this.objectify(node, prop.of));
+        } else if ( foam.core.FObjectArray.isInstance(prop) ) {
+          // parse array property
+          prop.get(obj).push(this.objectify(node, foam.lookup(prop.of)));
 
-            // Nested Object
-            if ( childName === 'object' ) {
-              var nestObj = this.parse(currentNode.firstChild);
-              prop.set(obj, nestObj);
-              continue;
-            }
-
-            // Sets property with value found within node. Additionally checks whether property is Enum type in order
-            // to set ordinal value. Sometimes nodeValue is not able to parse inner tag values correctly thus innerHTML
-            if ( currentNode.firstChild.nodeValue ) {
-              var val = currentNode.firstChild.nodeValue.replace(/\"/g, "");
-              prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: val }) : val );
-            } else if ( currentNode.firstChild.innerHTML ) {
-              var v = currentNode.firstChild.innerHTML.replace(/\"/g, "");
-              prop.set(obj, prop.of ? foam.lookup(prop.of.id).create({ ordinal: v }) : v );
-            }
-          }
-          return obj;
-        },
-        Array: function (o, opt_class, opt_ctx) {
-          var fObjects = []
-          for ( index = 0; index < o.length; index++ ) {
-              fObjects.push(this.parse(o[index], opt_class, opt_ctx));
-          }
-          return fObjects;
+        } else if ( foam.core.StringArray.isInstance(prop) ) {
+          // parse string array
+          prop.get(obj).push(node.firstChild ? node.firstChild.nodeValue : null);
+        } else {
+          // parse property
+          prop.set(obj, node.firstChild ? node.firstChild.nodeValue : null);
         }
-      })
+      }
+
+      // check to see if xmlValue property exists
+      var xmlValueProp = obj.cls_.getAxiomByName('xmlValue');
+      if ( xmlValueProp ) {
+        // parse attributes if they exist
+        var attributes = doc.attributes;
+        for ( var i = 0 ; i < attributes.length ; i++ ) {
+          var attribute = attributes[i];
+          var prop = obj.cls_.getAxiomByName(attribute.name);
+          // don't need to check for types as attributes are always simple types
+          prop.set(obj, attribute.value);
+        }
+
+        if ( foam.core.FObjectProperty.isInstance(xmlValueProp) ) {
+          xmlValueProp.set(obj, this.objectify(doc, xmlValueProp.of));
+        } else {
+          xmlValueProp.set(obj, doc.firstChild ? doc.firstChild.nodeValue : null);
+        }
+      }
+
+      return obj;
     },
 
-    {
-      name: 'objectify',
-      code: foam.mmethod({
-        String: function (o) {
-          if ( o ) {
-            // Convert xml string into an xml DOM object for node traversal
-            var parser = new DOMParser();
-            // TODO: Remove this escape sequence. Future implementation should include looking through parsed
-            // xml doc and passing on childNodes which are texts and do not contain any info.
-            o = o.replace(/\t|\n|\r|↵/g, "");
-            var xmlDoc = parser.parseFromString(o, "text/xml");
-            var rootName = xmlDoc.firstChild.nodeName;
-            // Check if multiple objects
-            if ( rootName === 'objects' ) {
-              return this.parse(Array.from(xmlDoc.firstChild.childNodes));
-            } else if ( rootName === 'object' ) {
-              //Single Object
-              var obj = xmlDoc.firstChild;
-              return this.parse(obj);
-            } else {
-              throw new Error('Could not read object(s) in XML');
-            }
-          }
-        }
-      })
+    function parseString(str, opt_class) {
+      // create DOM
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(str, 'text/xml');
+      var root = doc.firstChild;
+
+      var rootClass = root.getAttribute('class');
+      if ( rootClass )
+        return this.objectify(root, foam.lookup(rootClass));
+
+      if ( opt_class ) {
+        // lookup class if given a string
+        if ( typeof(opt_class) === 'string' )
+          opt_class = foam.lookup(opt_class);
+        return this.objectify(root, opt_class);
+      }
+      
+      throw new Error('Class not provided');
     }
   ]
 });
@@ -432,7 +454,8 @@ foam.LIB({
   constants: {
     // Pretty Print
     Pretty: foam.xml.Outputter.create({
-      outputDefaultValues: false
+      outputDefaultValues: false,
+      outputDefinedValues: true
     }),
 
     // Compact output (not pretty)
@@ -440,6 +463,7 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
+      outputDefinedValues: false
     }),
 
     // Shorter than Compact (uses short-names if available)
@@ -447,6 +471,7 @@ foam.LIB({
       pretty: false,
       formatDatesAsNumbers: true,
       outputDefaultValues: false,
+      outputDefinedValues: false,
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
@@ -454,10 +479,6 @@ foam.LIB({
   },
 
   methods: [
-    function parseString(xmlStr, opt_ctx) {
-      return this.parse(xmlStr, undefined, opt_ctx)
-    },
-
     function stringify(o) {
       return foam.xml.Compact.stringify(o);
     },
