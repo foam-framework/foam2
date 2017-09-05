@@ -86,7 +86,7 @@
        name: 'profilePicture'
      },
      {
-      class: 'FObjectArray',
+      class: 'FObjectProperty',
       name: 'accounts'
      },
      {
