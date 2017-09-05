@@ -86,6 +86,11 @@
        name: 'profilePicture'
      },
      {
+      class: 'FObjectArray',
+      // of: 'net.nanopay.common.model.Account',
+      name: 'accounts'
+    },
+     {
        class: 'Reference',
        name: 'language',
        of: 'foam.nanos.auth.Language',
