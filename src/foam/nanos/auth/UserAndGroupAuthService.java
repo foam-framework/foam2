@@ -234,7 +234,11 @@ public class UserAndGroupAuthService
     return saltBuilder.toString();
   }
 
-  //Used regex recommended here http://www.ex-parrot.com/pdw/Mail-RFC822-Address.html
+  /**
+   * TODO: Benchmark compile time to check feasibility.
+   * Look into Context Free Grammar alternative
+   * Used regex recommended here http://www.ex-parrot.com/pdw/Mail-RFC822-Address.html
+   * */
   public static boolean validateEmail(String email) {
     Pattern pattern = Pattern.compile("(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\" +
       "\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\" +
