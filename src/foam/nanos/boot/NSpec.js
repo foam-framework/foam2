@@ -63,7 +63,14 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'serviceScript'
+      name: 'serviceScript',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
+    },
+    {
+      class: 'String',
+      name: 'client',
+      value: '{}',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
     },
     {
       class: 'FObjectProperty',
@@ -88,6 +95,11 @@ foam.CLASS({
     },
     {
       name: 'createService',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'java.lang.Object',
       javaCode: `
         // if ( getService() != null ) return getService();
@@ -101,6 +113,7 @@ foam.CLASS({
 
         Interpreter shell = new Interpreter();
         try {
+          shell.set("x", x);
           Object service = shell.eval(getServiceScript());
           saveService(service);
           return service;

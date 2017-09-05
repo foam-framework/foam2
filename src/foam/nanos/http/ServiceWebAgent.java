@@ -84,6 +84,10 @@ public class ServiceWebAgent
         return;
       }
 
+      // TODO: make skeleton_.send() take x instead
+      if ( service_ instanceof ContextAware )
+        ((ContextAware) service_).setX(x);
+
       foam.box.Message msg = (foam.box.Message) result;
       skeleton_.send(msg);
 

@@ -20,14 +20,16 @@ foam.CLASS({
   name: 'MessagePortService',
 
   requires: [
-    'foam.box.RegisterSelfMessage',
+    'foam.box.NamedBox',
     'foam.box.RawMessagePortBox',
-    'foam.box.NamedBox'
+    'foam.box.RegisterSelfMessage',
+    'foam.json.Parser'
+  ],
+  imports: [
+    'creationContext'
   ],
 
-  imports: [
-    'fonParser'
-  ],
+  topics: [ 'connect' ],
 
   properties: [
     {
@@ -40,6 +42,19 @@ foam.CLASS({
     {
       name: 'delegate',
       required: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        // NOTE: Configuration must be consistent with outputters in
+        // foam.box.MessagePortBox and foam.box.RawMesagePortBox.
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
@@ -57,13 +72,14 @@ foam.CLASS({
     },
 
     function onMessage(port, e) {
-      var msg = this.fonParser.parseString(e.data);
+      var msg = this.parser.parseString(e.data);
 
       if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
         var named = this.NamedBox.create({ name: msg.object.name });
         named.delegate = this.RawMessagePortBox.create({
           port: port
         });
+        this.connect.pub(named);
         return;
       }
 

@@ -48,10 +48,21 @@ foam.CLASS({
         var p;
 
         try {
-          p = this.data[message.object.name].apply(this.data, message.object.args);
+          var method = this.data.cls_.getAxiomByName(message.object.name);
+          var args = message.object.args.slice();
+
+          // TODO: This is pretty hackish.  Context-Oriented methods should just be modeled.
+          if ( method && method.args && method.args[0] && method.args[0].name == 'x' ) {
+            var x = this.__context__.createSubContext({
+              message: message
+            });
+            args[0] = x;
+          }
+
+          p = this.data[message.object.name].apply(this.data, args);
         } catch(e) {
           message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
-            object: this.RPCErrorMessage.create({ data: e })
+            object: this.RPCErrorMessage.create({ data: e.message })
           }));
 
           return;
@@ -70,7 +81,7 @@ foam.CLASS({
             },
             function(error) {
               message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
-                object: self.RPCErrorMessage.create({ data: error })
+                object: self.RPCErrorMessage.create({ data: error && error.toString() })
               }));
             });
         } else {
