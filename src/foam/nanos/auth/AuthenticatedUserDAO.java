@@ -10,6 +10,7 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 public class AuthenticatedUserDAO
   extends ProxyDAO
 {
+
   public AuthenticatedUserDAO(DAO delegate) {
     setDelegate(delegate);
   }
@@ -26,7 +28,7 @@ public class AuthenticatedUserDAO
   public FObject put_(X x, FObject fObject) {
     User user = (User) fObject;
 
-    if ( super.find_(x, user.getId()) != null ) {
+    if ( getDelegate().find_(x, user.getId()) != null ) {
       System.out.println("A user has already been registered with this account");
       return null;
     }
@@ -59,5 +61,35 @@ public class AuthenticatedUserDAO
       e.printStackTrace();
       return null;
     }
+  }
+
+  @Override
+  /**
+   * Restrict find method to only return the logged in user object
+   * */
+  public FObject find_(X x, Object id) {
+    User user = (User) x.get("user");
+
+    if ( user == null || user.getId() != (long) id ) {
+      System.out.println("User is not logged in");
+      return null;
+    }
+
+    return super.find_(x, user.getId());
+  }
+
+  @Override
+  public Sink select(Sink sink) {
+    return null;
+  }
+
+  @Override
+  public FObject remove(FObject obj) {
+    return null;
+  }
+
+  @Override
+  public void removeAll() {
+    return;
   }
 }
