@@ -590,7 +590,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
       if ( this.hasDefaultValue('javaJSONParser') && this.javaJSONParser == 'foam.lib.json.FObjectParser' ) {
         var m = info.getMethod('jsonParser');
-        var of = this.of.id;
+        var of = info.of ? info.of.id : 'foam.core.FObject';
 
         m.body = 'return new foam.lib.json.FObjectParser(' + of + '.class);';
       }
@@ -768,6 +768,13 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.util.List']
   ]
+});
+
+
+foam.CLASS({
+  // Maps JS Property to Java Equivalent PropertyInfo for Java Relationships
+  refines: 'foam.core.Property',
+  javaType: 'foam.core.PropertyInfo'
 });
 
 

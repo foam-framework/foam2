@@ -33,6 +33,11 @@ if ( foam.isServer ) {
     implements: ['foam.dao.Journal'],
     properties: [
       {
+        class: 'Class',
+        name: 'of',
+        value: 'foam.core.FObject'
+      },
+      {
         name: 'fd',
         required: true
       },
@@ -56,13 +61,14 @@ if ( foam.isServer ) {
     methods: [
       function put(obj) {
         return this.write_(Buffer.from(
-            "put(foam.json.parse(" + foam.json.Storage.stringify(obj) +
+            "put(foam.json.parse(" + foam.json.Storage.stringify(obj, this.of) +
               "));\n"));
       },
 
       function remove(obj) {
         return this.write_(Buffer.from(
-            "remove(foam.json.parse(" + foam.json.Storage.stringify(obj) +
+            "remove(foam.json.parse(" +
+              foam.json.Storage.stringify(obj, this.of) +
               "));\n"));
       },
 
@@ -99,7 +105,7 @@ if ( foam.isServer ) {
               foam: {
                 json: {
                   parse: function(obj) {
-                    return foam.json.parse(obj, null, dao.__context__);
+                    return foam.json.parse(obj, self.of, dao.__context__);
                   }
                 }
               }

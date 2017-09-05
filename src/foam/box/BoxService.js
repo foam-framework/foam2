@@ -32,7 +32,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       of: 'foam.box.BoxService',
       name: 'next'
-    },
+    }
   ],
 
   methods: [

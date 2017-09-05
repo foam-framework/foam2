@@ -60,6 +60,9 @@ var classes = [
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
   'foam.dao.ReadOnlyDAO',
+  'foam.dao.Relationship',
+  'foam.dao.RelationshipDAO',
+  'foam.dao.ManyToManyRelationshipDAO',
   'foam.dao.RelationshipPropertyValue',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
@@ -95,6 +98,7 @@ var classes = [
 var abstractClasses = [
 //  'foam.json.Outputter'
 ];
+
 
 var skeletons = [
   'com.google.foam.demos.appengine.TestService',

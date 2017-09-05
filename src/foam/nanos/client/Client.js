@@ -63,6 +63,17 @@ foam.CLASS({
       }
     },
 
+    {
+      name: 'userDAO',
+      factory: function() {
+        return this.ClientDAO.create({
+          of: this.User,
+          delegate: this.HTTPBox.create({
+            method: 'POST',
+            url: 'http://localhost:8080/userDAO'
+          })});
+      }
+    },
 
     {
       name: 'nSpecDAO',
@@ -172,19 +183,6 @@ foam.CLASS({
               */
           ]
         }).orderBy(this.Menu.ORDER, this.Menu.ID);
-      }
-    },
-
-    {
-      name: 'userDAO',
-      factory: function() {
-        return this.createDAO({
-          of: this.User,
-          seqNo: true,
-          testData: [
-            { id: 1, firstName: 'Simon', lastName: 'Alexander', phone: '16133195312' }
-          ]
-        });
       }
     },
 
