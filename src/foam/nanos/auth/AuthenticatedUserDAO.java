@@ -8,6 +8,7 @@ package foam.nanos.auth;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
@@ -18,6 +19,11 @@ import java.security.NoSuchAlgorithmException;
 public class AuthenticatedUserDAO
   extends ProxyDAO
 {
+
+  public AuthenticatedUserDAO(DAO delegate) {
+    setDelegate(delegate);
+  }
+
   @Override
   public FObject put_(X x, FObject fObject) {
     User user = (User) fObject;
@@ -64,7 +70,7 @@ public class AuthenticatedUserDAO
   public FObject find_(X x, Object id) {
     User user = (User) x.get("user");
 
-    if ( user == null ) {
+    if ( user == null || user.getId() != (long) id ) {
       System.out.println("User is not logged in");
       return null;
     }
