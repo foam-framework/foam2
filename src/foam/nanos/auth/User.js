@@ -79,11 +79,11 @@
      },
      {
        class: 'Date',
-       name:  'birthday'
+       name: 'birthday'
      },
      {
        class: 'String',
-       name:  'profilePicture'
+       name: 'profilePicture'
      },
      {
        class: 'Reference',
