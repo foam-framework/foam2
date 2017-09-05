@@ -570,6 +570,7 @@ foam.LIB({
 
   methods: [
     {
+      // TODO: why is this called parse when it's really objectify?
       name: 'parse',
       code: foam.mmethod({
         Array: function(o, opt_class, opt_ctx) {

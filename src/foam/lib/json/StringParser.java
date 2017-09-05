@@ -9,41 +9,38 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class StringParser implements Parser {
-  private char delim_;
-  private char escape_;
+  public final static char ESCAPE = '\\';
 
   public StringParser() {
-    escape_ = '\\';
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    delim_ = ps.head();
-    if ( delim_ != '"' && delim_ != '\'' ) {
-      return null;
-    }
+    char delim = ps.head();
+
+    if ( delim != '"' && delim != '\'' ) return null;
 
     ps = ps.tail();
-    char lastc = delim_;
+    char lastc = delim;
 
+    // TODO: use thread-local SB instead to avoid generating garbage
     StringBuilder sb = new StringBuilder();
 
     while ( ps.valid() ) {
       char c = ps.head();
-      if ( c == delim_ && lastc != escape_ ) {
-        break;
-      }
 
-      if ( c != escape_ ) sb.append(c);
+      if ( c == delim && lastc != ESCAPE ) break;
 
       PStream tail = ps.tail();
 
-      if ( c == '\\' ) {
-        char nextChar = ps.tail().head();
+      if ( c == ESCAPE ) {
+        char   nextChar        = ps.tail().head();
         Parser escapeSeqParser = null;
 
         if ( nextChar == 'u' ) {
+          // TODO: make a constant
           escapeSeqParser = new UnicodeParser();
         } else if ( nextChar == 'n' ) {
+          // TODO: make a constant
           escapeSeqParser = new ASCIIEscapeParser();
         }
 
@@ -57,6 +54,8 @@ public class StringParser implements Parser {
             c = ((Character) escapePS.value()).charValue();
           }
         }
+      } else {
+        sb.append(c);
       }
 
       ps = tail;
