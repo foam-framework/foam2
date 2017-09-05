@@ -272,7 +272,7 @@ foam.CLASS({
       // NOTE: Default value of -1 forces legitimate values (starting at 0) to
       // all be non-default. This is important for, e.g., serialization of enum
       // values:
-      // https://github.com/foam-framework/foam2/pull/635
+      // https://github.com/foam-framework/foam2/issues/637
       value: -1,
       final: true
     },
