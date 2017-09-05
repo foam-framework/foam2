@@ -47,7 +47,7 @@ public class WebAuthServiceAdapter
   }
 
   public foam.nanos.auth.User login(String email, String password) {
-    DAO userDAO = (DAO) getX().get("userDAO");
+    DAO userDAO = (DAO) getX().get("localUserDAO");
     ListSink sink = (ListSink) userDAO.where(MLang.EQ(email, User.EMAIL)).select(new ListSink());
 
     //There should only be one object returned for the User
