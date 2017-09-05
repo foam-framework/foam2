@@ -177,7 +177,7 @@ FOAM_FILES([
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
   { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
-  { name: "lib/messageport", flags: ['web'] },
+  { name: "foam/messageport/MessagePortService", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/firebase" },
   { name: "lib/fcm" },
