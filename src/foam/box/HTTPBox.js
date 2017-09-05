@@ -18,7 +18,8 @@ foam.CLASS({
 
   imports: [
     'creationContext',
-    'me'
+    'me',
+    'window'
   ],
 
   classes: [
@@ -74,9 +75,18 @@ foam.CLASS({
   ],
 
   methods: [
+    function prepareURL(url) {
+      /* Add window's origin if url is not complete. */
+      if ( this.window && url.indexOf(':') == -1 ) {
+        return this.window.location.origin + '/' + url;
+      }
+
+      return url;
+    },
+
     function send(msg) {
       var req = this.HTTPRequest.create({
-        url:     this.url,
+        url:     this.prepareURL(this.url),
         method:  this.method,
         payload: this.outputter.stringify(msg)
       }).send();
