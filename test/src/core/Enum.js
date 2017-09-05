@@ -146,7 +146,7 @@ describe('Enum tests', function() {
       package: 'foam.core.test',
       name: 'PingPong',
 
-      values: [ 'PING', 'PONG' ],
+      values: [ 'PING', 'PONG' ]
     });
 
     var outputter = foam.json.Outputter.create({ outputDefaultValues: false });
