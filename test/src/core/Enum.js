@@ -140,4 +140,32 @@ describe('Enum tests', function() {
       BadTodo;
     }).toThrow();
   });
+
+  it('should preserve equality for all values (particularly ordinal=0)', function() {
+    foam.ENUM({
+      package: 'foam.core.test',
+      name: 'PingPong',
+
+      values: [ 'PING', 'PONG' ]
+    });
+
+    var outputter = foam.json.Outputter.create({ outputDefaultValues: false });
+    var parser = foam.json.Parser.create({ creationContext: foam.__context__ });
+    function runSerialization(value) {
+      return parser.parseString(outputter.stringify(value));
+    }
+
+    expect(foam.util.equals(
+        foam.core.test.PingPong.PING,
+        runSerialization(foam.core.test.PingPong.PING))).toBe(true);
+    expect(foam.util.equals(
+        foam.core.test.PingPong.PONG,
+        runSerialization(foam.core.test.PingPong.PONG))).toBe(true);
+    expect(foam.util.equals(
+        foam.core.test.PingPong.PING,
+        runSerialization(foam.core.test.PingPong.PONG))).toBe(false);
+    expect(foam.util.equals(
+        foam.core.test.PingPong.PONG,
+        runSerialization(foam.core.test.PingPong.PING))).toBe(false);
+  });
 });
