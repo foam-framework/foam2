@@ -71,25 +71,28 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
-      class: 'Boolean',
-      documentation: 'Boolean indicator: Has state been loaded from hash yet?',
-      name: 'loadedFromHash_'
-    },
-    {
       class: 'String',
       documentation: `"path" part of hash; hash is:
           "#<path>?<key1>=<value1>&<key2>=<value2>..."`,
-      name: 'path_'
+      name: 'path_',
+      postSet: function(old, nu) {
+        if ( old !== nu ) this.onStateChange();
+      }
     }
   ],
 
   methods: [
+    function init() {
+      this.SUPER();
+      this.hashToState_();
+      this.window.addEventListener('hashchange', this.onHashChange);
+    },
     function getPath() { return this.path_; },
-    function setPath(path) { this.path_ = path; this.onStateChange(); },
+    function setPath(path) { return this.path_ = path; },
     function getSlot(name) {
       return this.bindingsMap_[name] || null;
     },
-    function addSlot(name, slot) {
+    function add(name, slot) {
       if ( this.bindingsMap_.hasOwnProperty(name) ) {
         this.warn('Overwriting URLState:', name, this.bindingsMap_[name],
                   'with', slot);
@@ -104,11 +107,6 @@ foam.CLASS({
       this.onStateChange();
     },
     function stateToHash_() {
-      if ( ! this.loadedFromHash_ ) {
-        this.hashToState_();
-        this.loadedFromHash_ = true;
-      }
-
       var hash = '#' + this.path_ + '?';
       var bindingsMap = this.bindingsMap_;
       var first = true;
@@ -146,24 +144,22 @@ foam.CLASS({
         var value = this.deserializer.parseString(
             this.window.decodeURIComponent(binding.value));
         if ( bindingsMap.hasOwnProperty(key) ) {
-          bindingsMap[key].set(value);
+          if ( ! foam.util.equals(bindingsMap[key].get(), value) )
+            bindingsMap[key].set(value);
         } else {
-          this.warn('Unbound URLState key', key);
           this.unboundMap_[key] = value;
         }
       }
-      this.loadedFromHash_ = true;
     }
   ],
 
   listeners: [
+    function onHashChange() { this.hashToState_(); },
     {
       name: 'onStateChange',
       isMerged: true,
       mergeDelay: 150,
-      code: function() {
-        this.stateToHash_();
-      }
+      code: function() { this.stateToHash_(); }
     }
   ],
 
@@ -173,9 +169,10 @@ foam.CLASS({
       language: 'foam.parse.json.Parsers',
       symbols: function() {
         return {
-          hash: seq(optional(seq1(1, '#', sym('path'))),
-                    repeat(sym('binding'), '&')),
-          path: seq1(0, str(repeat(notChars('?'))), '?'),
+          hash: optional(
+              seq('#', optional(sym('path')),
+                  optional(seq1(1, '?', repeat(sym('binding'), '&'))))),
+          path: str(repeat(notChars('?'))),
           binding: seq(sym('key'), optional(seq1(1, '=', sym('value')))),
           key: str(plus(notChars('=&'))),
           value: str(plus(notChars('=&')))
@@ -184,7 +181,7 @@ foam.CLASS({
       actions: [
         function binding(v) { return { key: v[0], value: v[1] }; },
         function hash(v) {
-          return { path: v[0] || '' , bindings: v[1] };
+          return { path: v && v[1] || '' , bindings: v && v[2] || [] };
         }
       ]
     }
