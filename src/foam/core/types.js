@@ -402,7 +402,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Currency',
-  extends: 'Float'
+  extends: 'Long'
 });
 
 
