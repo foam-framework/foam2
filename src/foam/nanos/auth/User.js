@@ -86,7 +86,8 @@
        name: 'profilePicture'
      },
      {
-      class: 'FObjectProperty',
+      class: 'FObjectArray',
+      of: 'foam.core.FObject',
       name: 'accounts'
      },
      {
