@@ -43,9 +43,10 @@ foam.CLASS({
 
       // Install last to first to avoid messing up the 'els' list.
       for ( var i = els.length-1 ; i >= 0 ; i-- ) {
-        var el = els[i];
+        var el        = els[i];
         var modelName = el.getAttribute('class');
-        var cls = this.lookup(modelName, true);
+        var cls       = this.lookup(modelName, true);
+        var id        = el.id;
 
         if ( cls ) {
           var view = cls.create(null, foam.__context__);
@@ -58,12 +59,15 @@ foam.CLASS({
 
           for ( var j = 0 ; j < el.attributes.length ; j++ ) {
             var attr = el.attributes[j];
-            var p = this.findPropertyIC(view.cls_, attr.name);
+            var p    = this.findPropertyIC(view.cls_, attr.name);
             if ( p ) p.set(view, attr.value);
           }
 
           el.outerHTML = view.outerHTML;
           view.load();
+
+          // Store view in global variable if named. Useful for testing.
+          if ( id ) global[id] = view;
         } else {
           console.error('Unknow class: ', modelName);
         }
