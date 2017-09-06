@@ -74,6 +74,23 @@
        name: 'mobile'
      },
      {
+       class: 'String',
+       name: 'type'
+     },
+     {
+       class: 'Date',
+       name: 'birthday'
+     },
+     {
+       class: 'String',
+       name: 'profilePicture'
+     },
+     {
+      class: 'FObjectArray',
+      of: 'foam.core.FObject',
+      name: 'accounts'
+     },
+     {
        class: 'Reference',
        name: 'language',
        of: 'foam.nanos.auth.Language',
