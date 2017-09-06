@@ -67,6 +67,12 @@ foam.CLASS({
       view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
     },
     {
+      class: 'String',
+      name: 'client',
+      value: '{}',
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80 }
+    },
+    {
       class: 'FObjectProperty',
       name: 'service',
       view: 'foam.u2.DetailView'

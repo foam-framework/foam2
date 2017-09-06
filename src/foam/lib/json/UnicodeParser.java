@@ -26,9 +26,9 @@ public class UnicodeParser extends ProxyParser {
       // Gets the repeated hex char sequence
       values = (Object[]) values[3];
 
-      char hexChar = (char) ( hexToInt(values[0], 3) + 
-                              hexToInt(values[1], 2) + 
-                              hexToInt(values[2], 1) + 
+      char hexChar = (char) ( hexToInt(values[0], 3) +
+                              hexToInt(values[1], 2) +
+                              hexToInt(values[2], 1) +
                               hexToInt(values[3], 0) );
 
       return ps.setValue(Character.valueOf(hexChar));
