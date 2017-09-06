@@ -69,10 +69,8 @@ foam.CLASS({
       .endContext()
       */
       this.add(
-        this.DAOUpdateController.SAVE,
-        this.DAOUpdateController.CANCEL,
-        this.DAOUpdateController.DELETE,
-        this.DAOUpdateController.OBJ);
+        this.DAOUpdateController.OBJ,
+        this.data.cls_.getAxiomsByClass(foam.core.Action));
     }
   ],
 
