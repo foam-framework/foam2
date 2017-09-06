@@ -50,6 +50,8 @@ var classes = [
   'foam.box.RPCErrorMessage',
   'foam.box.BoxRegistry',
   'foam.box.BoxRegistryBox',
+  'foam.box.RawWebSocketBox',
+  'foam.box.ReturnBox',
   'foam.box.CheckAuthenticationBox',
   'foam.dao.DAO',
   'foam.dao.Sink',
