@@ -133,31 +133,23 @@ foam.CLASS({
       this.onStateChange();
     },
     function stateToHash_() {
-      var hash = '#' + this.path_ + '?';
-      var bindingsMap = this.bindingsMap_;
-      var first = true;
-      function out(str) { hash += str; }
+      var stateStr = '';
+      stateStr = this.appendMapToStateStr_(stateStr, this.bindingsMap_);
+      stateStr = this.appendMapToStateStr_(stateStr, this.unboundMap_);
 
-      // Output bindings, then unbound values.
-      this.outputMapToHashStr_(
-          out,
-          this.unboundMap_,
-          this.outputMapToHashStr_(out, this.bindingsMap_, true));
-
-      this.hash_ = hash;
+      this.hash_ = '#' + this.path_ + '?' + stateStr;
     },
-    function outputMapToHashStr_(out, map, first) {
+    function appendMapToStateStr_(str, map) {
       for ( var key in map ) {
         if ( ! map.hasOwnProperty(key) ) continue;
 
-        if ( ! first ) out('&');
-        first = false;
+        if ( str !== '' ) str += '&';
 
         var value = this.serializer.stringify(map[key].get());
-        out(this.window.encodeURIComponent(key) + '=' +
-            this.window.encodeURIComponent(value));
+        str += this.window.encodeURIComponent(key) + '=' +
+            this.window.encodeURIComponent(value);
       }
-      return first;
+      return str;
     },
     function hashToState_() {
       var hash = this.hash_;
