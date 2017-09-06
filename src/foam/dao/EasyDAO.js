@@ -64,7 +64,7 @@ foam.CLASS({
       MDAO:   'foam.dao.MDAO',
       IDB:    'foam.dao.IDBDAO',
       LOCAL:  'foam.dao.LocalStorageDAO',
-      CLIENT: 'foam.dao.ClientDAO'
+      CLIENT: 'foam.dao.RequestResponseClientDAO'
     }
   },
 
@@ -233,7 +233,7 @@ foam.CLASS({
 
       var params = { of: this.of };
 
-      if ( daoType == 'foam.dao.ClientDAO' ) {
+      if ( daoType == 'foam.dao.RequestResponseClientDAO' ) {
         foam.assert(this.serverBox || this.serviceName, 'EasyDAO "client" type requires a serveBox or serviceName');
         params.delegate = this.serverBox || this.HTTPBox.create({
           of: this.model,

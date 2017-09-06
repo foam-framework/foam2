@@ -218,8 +218,13 @@ foam.CLASS({
  */
 (function() {
   // List of unused Models in the system.
-  foam.USED   = {};
-  foam.UNUSED = {};
+  foam.USED      = {};
+  foam.UNUSED    = {};
+
+  // Used to store an async. arequire() function which must be called
+  // before the class can be created. Used by FoamTagLoader, but should
+  // be extended into a more general classloader.
+  foam.AREQUIRES = {};
 
   var CLASS = foam.CLASS;
 
@@ -228,6 +233,9 @@ foam.CLASS({
 
     m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = true;
+
+    if ( m.arequire ) foam.AREQUIRES[m.id] = m.arequire;
+
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
       var c = CLASS(m);
