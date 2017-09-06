@@ -5,6 +5,7 @@
  */
 
 FOAM_FILES([
+  { name: "foam/nanos/auth/Address" },
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/EnabledAware", flags: ['js'] },
   { name: "foam/nanos/auth/EnabledAwareInterface", flags: ['java'] },
