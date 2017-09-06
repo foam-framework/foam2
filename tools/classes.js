@@ -86,6 +86,8 @@ var classes = [
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
+  'foam.nanos.auth.Language',
+  'foam.nanos.menu.Menu',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
