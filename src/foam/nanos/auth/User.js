@@ -87,7 +87,7 @@
      },
      {
       class: 'FObjectArray',
-      of: 'FObject',
+      of: 'foam.core.FObject',
       name: 'accounts'
      },
      {
