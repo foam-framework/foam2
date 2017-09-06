@@ -136,6 +136,8 @@ foam.CLASS({
       replyMessage.setObject(reply);
 
       errorBox.send(replyMessage);
+      // Don't send to replyBox if we've sent to the errorBox
+      return;
     }
 
     if ( replyBox != null ) {
