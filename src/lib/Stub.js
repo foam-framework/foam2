@@ -26,7 +26,9 @@ foam.CLASS({
     {
       name: 'code',
       factory: function() {
-        var returns         = this.returns;
+        var returns         = foam.String.isInstance(this.returns) ?
+            this.returns :
+            this.returns && this.returns.typeName;
         var replyPolicyName = this.replyPolicyName;
         var boxPropName     = this.boxPropName;
         var name            = this.name;
@@ -137,9 +139,10 @@ foam.CLASS({
             methods.map(function(m) { return cls.getAxiomByName(m); }) :
           cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
           map(function(m) {
-            var returns = m.returns;
-            if ( m.returns && m.returns !== 'Promise' ) {
-              var id = m.returns.split('.');
+            var returns = foam.String.isInstance(m.returns) ? m.returns :
+                m.returns && m.returns.typeName;
+            if ( returns && returns !== 'Promise' ) {
+              var id = returns.split('.');
               id[id.length - 1] = 'Promised' + id[id.length - 1];
               returns = id.join('.');
             }

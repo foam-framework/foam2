@@ -64,7 +64,7 @@ foam.CLASS({
       MDAO:   'foam.dao.MDAO',
       IDB:    'foam.dao.IDBDAO',
       LOCAL:  'foam.dao.LocalStorageDAO',
-      CLIENT: 'foam.dao.ClientDAO'
+      CLIENT: 'foam.dao.RequestResponseClientDAO'
     }
   },
 
@@ -201,6 +201,10 @@ foam.CLASS({
       name: 'serverBox'
     },
     {
+      /** Simpler alternative than providing serverBox. */
+      name: 'serviceName'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.dao.DAODecorator',
       name: 'decorators'
@@ -229,9 +233,13 @@ foam.CLASS({
 
       var params = { of: this.of };
 
-      if ( daoType == 'foam.dao.ClientDAO' ) {
-        foam.assert(this.serverBox, 'EasyDAO client type requires a server box');
-        params.delegate = this.serverBox;
+      if ( daoType == 'foam.dao.RequestResponseClientDAO' ) {
+        foam.assert(this.serverBox || this.serviceName, 'EasyDAO "client" type requires a serveBox or serviceName');
+        params.delegate = this.serverBox || this.HTTPBox.create({
+          of: this.model,
+          method: 'POST',
+          url: this.serviceName
+        });
       }
 
       if ( ! daoModel ) {
