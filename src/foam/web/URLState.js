@@ -34,6 +34,35 @@ foam.CLASS({
   ],
   imports: [ 'warn', 'window' ],
 
+  classes: [
+    {
+      name: 'URICoderWindow',
+
+      documentation: `Provide a window that fakes exactly the parts of the
+          massive window interface that are used by foam.web.URLState except
+          URI encode/decode. This is used to generate stateful URLs without
+          affecting the current page. E.g.:
+
+           foam.web.URLState.create(null, someContext.createSubContext({
+             window: foam.web.URLState.URICoderWindow.create(
+                 null, contextContainingRealWindow)
+           }));`,
+
+      imports: [ 'window' ],
+
+      properties: [ [ 'location', { hash: '' } ] ],
+      methods: [
+        function addEventListener() {},
+        function encodeURIComponent(component) {
+          return this.window.encodeURIComponent(component);
+        },
+        function decodeURIComponent(component) {
+          return this.window.decodeURIComponent(component);
+        }
+      ]
+    }
+  ],
+
   properties: [
     {
       name: 'serializer',
@@ -92,7 +121,7 @@ foam.CLASS({
     function getSlot(name) {
       return this.bindingsMap_[name] || null;
     },
-    function add(name, slot) {
+    function addBinding(name, slot) {
       if ( this.bindingsMap_.hasOwnProperty(name) ) {
         this.warn('Overwriting URLState:', name, this.bindingsMap_[name],
                   'with', slot);
@@ -104,6 +133,24 @@ foam.CLASS({
       }
       this.bindingsMap_[name] = slot;
       this.subMap_[name] = slot.sub(this.onStateChange);
+      this.onStateChange();
+    },
+    function removeBinding(name) {
+      if ( ! this.bindingsMap_.hasOwnProperty(name) ) return;
+      this.subMap_[name].detach();
+      delete this.subMap_[name];
+      delete this.bindingsMap_[name];
+      this.onStateChange();
+    },
+    function clearBindings() {
+      var subMap = this.subMap_;
+      for ( var key in subMap ) {
+        if ( ! subMap.hasOwnProperty(key) ) continue;
+        subMap[key].detach();
+      }
+      this.subMap_ = {};
+      this.bindingsMap_ = {};
+      this.unboundMap_ = {};
       this.onStateChange();
     },
     function stateToHash_() {
