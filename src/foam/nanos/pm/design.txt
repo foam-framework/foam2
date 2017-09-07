@@ -1,3 +1,12 @@
+Usage:
+PM pm = new PM(this.getClass(), some meaningful name, like name of method here);
+
+try {
+  /* do you work here */
+} finally {
+  pm.log(getX());
+}
+
 PM:
 Records information and is sent to PMLogger
 class PM {

@@ -18,18 +18,29 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
+  implements: ['foam.box.Box'],
 
   properties: [
-    'socket'
+    {
+      class: 'Object',
+      name: 'socket',
+      javaType: 'org.java_websocket.WebSocket'
+    }
   ],
 
   methods: [
-    function send(msg) {
-      try {
-        this.socket.send(msg);
-      } catch(e) {
-        if ( msg.errorBox ) msg.errorBox.send(foam.box.SendFailedError.create());
-      }
+    {
+      name: 'send',
+      code: function send(msg) {
+        try {
+          this.socket.send(msg);
+        } catch(e) {
+          if ( msg.errorBox ) msg.errorBox.send(foam.box.SendFailedError.create());
+        }
+      },
+      javaCode: `
+getSocket().send(getX().create(foam.lib.json.Outputter.class).stringify(message));
+`
     }
   ]
 });
