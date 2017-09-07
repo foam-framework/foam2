@@ -488,7 +488,7 @@ foam.CLASS({
         ( o instanceof String ) ?
         Byte.valueOf((String) o) :
         (byte)o;`;
-      
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -665,7 +665,7 @@ foam.CLASS({
       + 'return forOrdinal((int) o); '
       + '}'
       + ' return (java.lang.Enum) o;';
-      
+
       return info;
     }
   ]

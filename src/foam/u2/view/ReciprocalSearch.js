@@ -111,11 +111,13 @@ foam.CLASS({
         .start()
           .addClass(self.myClass('count'))
           // TODO: move formatting function to stdlib
-          .add(
-            self.selectedCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }),
-            ' of ',
-            self.totalCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }),
-            ' selected')
+          .add(self.selectedCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }))
+          .entity('nbsp')
+          .add('of')
+          .entity('nbsp')
+          .add(self.totalCount$.map(function(a) { return a.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }))
+          .entity('nbsp')
+          .add('selected')
         .end()
         .start(this.CLEAR).style({float: 'right'}).end();
     },

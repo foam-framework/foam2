@@ -40,4 +40,9 @@ public class FilteredDAO
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     super.removeAll_(x, skip, limit, order, getPredicate(predicate));
   }
+
+  @Override
+  public void listen_(X x, Sink sink, Predicate predicate) {
+    super.listen_(x, sink, getPredicate(predicate));
+  }
 }

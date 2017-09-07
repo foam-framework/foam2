@@ -23,7 +23,7 @@ foam.CLASS({
   requires: [
     'foam.core.Serializable',
     'foam.dao.ClientSink',
-    'foam.box.Skeleton'
+    'foam.box.SkeletonBox'
   ],
 
   methods: [

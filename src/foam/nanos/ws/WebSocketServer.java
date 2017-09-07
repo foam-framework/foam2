@@ -70,8 +70,13 @@ public class WebSocketServer
 
             FObject request = requestContext.create(foam.lib.json.JSONParser.class).parseString(message);
 
-            if ( request == null || ! ( request instanceof foam.box.Message ) ) {
-                log.warning("Invalid request");
+            if ( request == null ) {
+                log.warning("Failed to parse request.");
+                return;
+            }
+
+            if ( ! ( request instanceof foam.box.Message ) ) {
+                log.warning("Request was not a box message.");
                 return;
             }
 

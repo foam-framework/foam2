@@ -78,7 +78,7 @@
        name: 'type'
      },
      {
-       class: 'Date',
+       class: 'DateTime',
        name: 'birthday'
      },
      {
