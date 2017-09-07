@@ -75,7 +75,7 @@ foam.INTERFACE({
     {
       name: 'listen',
       returns: '',
-      args: [ 'sink' ]
+      args: [ 'sink', 'predicate' ]
     },
     {
       name: 'listen_',

@@ -37,6 +37,7 @@ var classes = [
   'foam.box.ProxyBox',
   'foam.box.SubBox',
   'foam.box.Message',
+  'foam.box.RegisterSelfMessage',
   'foam.box.SubBoxMessage',
   'foam.box.SubscribeMessage',
   'com.google.foam.demos.appengine.TestModel',
