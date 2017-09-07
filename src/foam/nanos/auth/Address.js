@@ -43,6 +43,8 @@ foam.CLASS({
       of: 'foam.nanos.auth.Country'
     },
     {
+      class: 'Reference',
+      targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region'
     },
