@@ -22,7 +22,8 @@ foam.CLASS({
 
   requires: [
     'foam.core.Serializable',
-    'foam.dao.BoxDAOListener'
+    'foam.dao.ClientSink',
+    'foam.box.SkeletonBox'
   ],
 
   methods: [
@@ -77,26 +78,21 @@ foam.CLASS({
     function listen_(x, sink, predicate) {
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
       // TODO: Unsubscribe support.
-      var id = foam.next$UID();
-      var replyBox = this.__context__.registry.register(
-        id,
-        this.delegateReplyPolicy,
-        {
-          send: function(m) {
-            switch(m.object.name) {
-              case 'put':
-              case 'remove':
-                sink[m.object.name](null, m.object.obj);
-              break;
-              case 'reset':
-                sink.reset(null);
-            }
-          }
-        });
 
-      this.SUPER(null, this.BoxDAOListener.create({
-        box: replyBox
-      }), predicate);
+
+      var skeleton = this.SkeletonBox.create({
+        data: sink
+      });
+
+      var clientSink = this.ClientSink.create({
+        delegate: this.__context__.registry.register(
+          null,
+          this.delegateReplyPolicy,
+          skeleton
+        )
+      });
+
+      this.SUPER(null, clientSink);
     }
   ]
 });
