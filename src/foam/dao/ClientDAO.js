@@ -17,6 +17,50 @@
 
 foam.CLASS({
   package: 'foam.dao',
+  name: 'ResetSink',
+  extends: 'foam.dao.ProxySink',
+  implements: [ 'foam.core.Serializable' ],
+  methods: [
+    {
+      name: 'put',
+      code: function(obj, sub) { this.reset(s); },
+      javaCode: 'reset(sub);'
+    },
+    {
+      name: 'remove',
+      code: function(obj, sub) { this.reset(s); },
+      javaCode: 'reset(sub);'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'MergedResetSink',
+  extends: 'foam.dao.ResetSink',
+  implements: [ 'foam.core.Serializable' ],
+  methods: [
+    {
+      name: 'reset',
+      code: function(sub) { this.doReset(sub); },
+      javaCode: `doReset(sub);`
+    }
+  ],
+  listeners: [
+    {
+      name: 'doReset',
+      isMerged: true,
+      mergeDelay: 200,
+      code: function(sub) {
+        this.delegate.reset(sub);
+      },
+      javaCode: `getDelegate().reset(null);`
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.dao',
   name: 'ClientDAO',
   extends: 'foam.dao.BaseClientDAO',
 
@@ -79,7 +123,6 @@ foam.CLASS({
       // TODO: This should probably just be handled automatically via a RemoteSink/Listener
       // TODO: Unsubscribe support.
 
-
       var skeleton = this.SkeletonBox.create({
         data: sink
       });
@@ -92,7 +135,11 @@ foam.CLASS({
         )
       });
 
-      this.SUPER(null, clientSink);
+      clientSink = foam.dao.MergedResetSink.create({
+        delegate: clientSink
+      });
+
+      this.SUPER(null, clientSink, predicate);
     }
   ]
 });
