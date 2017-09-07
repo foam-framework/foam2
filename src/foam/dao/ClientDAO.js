@@ -54,7 +54,13 @@ foam.CLASS({
       code: function(sub) {
         this.delegate.reset(sub);
       },
-      javaCode: `getDelegate().reset(null);`
+      javaCode: `
+try {
+  getDelegate().reset((foam.core.Detachable)event);
+} catch(Exception e) {
+  ((foam.core.Detachable)event).detach();
+}
+`
     }
   ]
 });
