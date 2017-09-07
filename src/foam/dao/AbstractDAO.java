@@ -94,32 +94,26 @@ public abstract class AbstractDAO
   }
 
   public void listen_(X x, Sink sink, Predicate predicate) {
-    System.out.println("listen_" + sink.getClass().getName());
-
     sink = decorateListener_(sink, predicate);
 
     listeners_.add(sink);
   }
 
   protected void onPut(FObject obj) {
-    System.out.println("onPut" + obj.getClass().getName() + " - " + getPK(obj));
     java.util.Iterator<Sink> iter = listeners_.iterator();
 
     while ( iter.hasNext() ) {
       Sink s = iter.next();
-      System.out.println(s.getClass().getName()  + " put " + obj.getClass().getName() + " - " + getPK(obj));
-
       s.put(obj, null);
     }
   }
 
   protected void onRemove(FObject obj) {
-    System.out.println("onRemove" + obj.getClass().getName() + " - " + getPK(obj));
     java.util.Iterator<Sink> iter = listeners_.iterator();
 
     while ( iter.hasNext() ) {
       Sink s = iter.next();
-      System.out.println(s.getClass().getName()  + " remove " + obj.getClass().getName() + " - " + getPK(obj));      s.remove(obj, null);
+      s.remove(obj, null);
     }
   }
 
