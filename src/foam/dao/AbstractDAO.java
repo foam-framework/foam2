@@ -89,9 +89,9 @@ public abstract class AbstractDAO
 
   protected class DAOListener implements foam.core.Detachable {
     protected Sink sink;
-    protected java.util.Set listeners;
+    protected java.util.Collection listeners;
 
-    public DAOListener(Sink sink, java.util.Set listeners) {
+    public DAOListener(Sink sink, java.util.Collection listeners) {
       this.sink = sink;
       this.listeners = listeners;
     }
@@ -125,7 +125,7 @@ public abstract class AbstractDAO
     }
   }
 
-  protected java.util.Set<DAOListener> listeners_ = new java.util.concurrent.ConcurrentSkipListSet<DAOListener>();
+  protected java.util.List<DAOListener> listeners_ = new java.util.concurrent.CopyOnWriteArrayList<DAOListener>();
 
   public void listen(Sink sink, Predicate predicate) {
     this.listen_(this.getX(), sink, predicate);
@@ -133,7 +133,6 @@ public abstract class AbstractDAO
 
   public void listen_(X x, Sink sink, Predicate predicate) {
     sink = decorateListener_(sink, predicate);
-
     listeners_.add(new DAOListener(sink, listeners_));
   }
 
