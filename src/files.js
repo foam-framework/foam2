@@ -255,6 +255,7 @@ FOAM_FILES([
   { name: "foam/box/pipeline/PipelineManager" },
   { name: "foam/box/pipeline/PipelineBuilder" },
   { name: "foam/core/async" },
+  { name: "foam/dao/ClientSink" },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
   { name: "foam/u2/daos", flags: ['web'] },
   { name: "foam/u2/TableView", flags: ['web'] },
