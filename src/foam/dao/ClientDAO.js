@@ -92,7 +92,7 @@ foam.CLASS({
     function select_(x, sink, skip, limit, order, predicate) {
       if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
       if ( ! skip ) skip = 0;
-      if ( ! limit ) limit = Number.MAX_SAFE_INTEGER;
+      if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
 
       if ( ! this.Serializable.isInstance(sink) ) {
         var self = this;
@@ -124,7 +124,7 @@ foam.CLASS({
     function removeAll_(x, skip, limit, order, predicate) {
       if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
       if ( ! skip ) skip = 0;
-      if ( ! limit ) limit = Number.MAX_SAFE_INTEGER;
+      if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
 
       return this.SUPER(null, skip, limit, order, predicate);
     },
