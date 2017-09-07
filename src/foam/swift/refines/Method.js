@@ -31,6 +31,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftAxiomName',
+      expression: function(swiftName, swiftCode) { return swiftCode && foam.String.constantize(swiftName); },
+    },
+    {
+      class: 'String',
       name: 'swiftSlotName',
       expression: function(swiftName) { return swiftName + '$'; },
     },
@@ -119,6 +124,14 @@ foam.CLASS({
           initializer: this.slotInit(),
           type: 'Slot',
         }));
+        cls.fields.push(this.Field.create({
+          visibility: 'public',
+          static: true,
+          final: true,
+          name: this.swiftAxiomName,
+          type: 'MethodInfo',
+          initializer: this.swiftMethodInfoInit(),
+        }));
       }
       cls.method(this.Method.create({
         name: this.swiftName,
@@ -141,13 +154,14 @@ foam.CLASS({
 var isMutable = function(a) { return a.annotations.indexOf('inout') != -1 };
 %>
 return ConstantSlot([
-  "value": { [weak self] (args: [Any?]) -> <%=this.swiftReturnType||'Void'%> in
+  "value": { [weak self] (args: [Any?]) throws -> Any? in
     if self == nil { fatalError() }
 <% this.swiftArgs.forEach(function(a, i) { %>
     <%=isMutable(a) ? 'var' : 'let' %> <%
   %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
 <% }) %>
-    <%=this.swiftReturnType ? 'return ' : ''%><%=this.swiftThrows ? 'try! ' : ''%>self!.`<%=this.swiftName%>`(
+    
+    return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
         <%=this.swiftArgs.map(function(a){
           return (a.externalName ? a.externalName + ': ' : '') +
                  (isMutable(a) ? '&' : '') +
@@ -157,5 +171,18 @@ return ConstantSlot([
 ])
       */},
     },
+    {
+      name: 'swiftMethodInfoInit',
+      args: [],
+      template: function() {/*
+class MInfo: MethodInfo {
+  let name = "<%=this.swiftName%>"
+  let args: [MethodArg] = [] //TODO
+  let classInfo: ClassInfo
+  init(_ ci: ClassInfo) { classInfo = ci }
+}
+return MInfo(classInfo())
+      */},
+    }
   ],
 });
