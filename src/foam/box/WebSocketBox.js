@@ -30,6 +30,27 @@ foam.CLASS({
     'me'
   ],
 
+  classes: [
+    {
+      name: 'JSONOutputter',
+      extends: 'foam.json.Outputter',
+      requires: [
+        'foam.box.ReturnBox'
+      ],
+      imports: [
+        'me'
+      ],
+      methods: [
+        function output(o) {
+          if ( o === this.me ) {
+            return this.SUPER(this.ReturnBox.create());
+          }
+          return this.SUPER(o);
+        }
+      ]
+    }
+  ],
+
   axioms: [
     foam.pattern.Multiton.create({
       property: 'uri'
@@ -43,7 +64,16 @@ foam.CLASS({
     {
       name: 'socket',
       factory: function() {
-        var ws = this.WebSocket.create({ uri: this.uri });
+        var ws = this.WebSocket.create({
+          uri: this.uri,
+          outputter: this.JSONOutputter.create({
+            pretty: false,
+            formatDatesAsNumbers: true,
+            outputDefaultValues: false,
+            strict: true,
+            propertyPredicate: function(o, p) { return ! p.networkTransient; }
+          })
+        });
 
         return ws.connect().then(function(ws) {
 

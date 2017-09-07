@@ -148,13 +148,17 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      javaCode: 'try {\n'
-              + '  java.io.PrintWriter writer = ((javax.servlet.ServletResponse)getX().get("httpResponse")).getWriter();\n'
-              + '  writer.print(new foam.lib.json.Outputter().stringify(message));\n'
-              + '  writer.flush();\n'
-              + '} catch(java.io.IOException e) {\n'
-              + '  throw new RuntimeException(e);\n'
-              + '}'
+      javaCode: `
+try {
+  javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
+  response.setContentType("application/json");
+  java.io.PrintWriter writer = response.getWriter();
+  writer.print(new foam.lib.json.Outputter().stringify(message));
+  writer.flush();
+} catch(java.io.IOException e) {
+  throw new RuntimeException(e);
+}
+`
     }
   ]
 });
