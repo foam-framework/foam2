@@ -122,7 +122,11 @@ foam.CLASS({
     },
 
     function removeAll_(x, skip, limit, order, predicate) {
-        return this.SUPER(null, skip, limit, order, predicate);
+      if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
+      if ( ! skip ) skip = 0;
+      if ( ! limit ) limit = Number.MAX_SAFE_INTEGER;
+
+      return this.SUPER(null, skip, limit, order, predicate);
     },
 
     function listen_(x, sink, predicate) {
