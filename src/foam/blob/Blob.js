@@ -557,7 +557,8 @@ foam.CLASS({
   package: 'foam.blob',
   name: 'TestBlobService',
   requires: [
-    'foam.blob.IdentifiedBlob'
+    'foam.blob.IdentifiedBlob',
+    'foam.blob.BlobBlob'
   ],
   properties: [
     {
@@ -577,10 +578,14 @@ foam.CLASS({
       return Promise.resolve(this.IdentifiedBlob.create({ id: id }));
     },
     function find(id) {
-      return Promise.resolve(this.blobs[id] || null);
+      return Promise.resolve(this.blobs[id] ?
+                             this.BlobBlob.create({ blob: this.blobs[id] }) :
+                             null);
     },
     function urlFor(id) {
-      return URL.createObjectURL(this.blobs[id]);
+      return this.blobs[id] ?
+        URL.createObjectURL(this.blobs[id]) :
+        null;
     }
   ]
 });
