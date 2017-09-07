@@ -13,7 +13,13 @@
    ids: [ 'code' ],
 
    properties: [
-     'code',
-     'name'
+     {
+       class: "String",
+       name: "code"
+     },
+     {
+       class: "String",
+       name: "name"
+     },
    ]
  });

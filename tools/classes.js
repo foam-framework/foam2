@@ -87,6 +87,7 @@ var classes = [
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
+  'foam.nanos.auth.Region',
   'foam.nanos.menu.Menu',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
@@ -98,6 +99,7 @@ var classes = [
 ];
 
 var abstractClasses = [
+  'foam.nanos.menu.AbstractMenu',
 //  'foam.json.Outputter'
 ];
 
