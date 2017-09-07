@@ -111,7 +111,7 @@ foam.CLASS({
             { code: 'CA', name: 'Canada' },
             { code: 'CN', name: 'China' },
             { code: 'IN', name: 'India' },
-            { code: 'JM', name: 'Jamacia' },
+            { code: 'JM', name: 'Jamaica' },
             { code: 'LB', name: 'Lebanon' },
             { code: 'MX', name: 'Mexico' },
             { code: 'MY', name: 'Malaysia' },
@@ -147,7 +147,8 @@ foam.CLASS({
           of: this.Region,
           testData: [
             { countryId: 'CA', code: 'ON', name: 'Ontario' },
-            { countryId: 'CA', code: 'PQ', name: 'Quebec' }
+            { countryId: 'CA', code: 'PQ', name: 'Quebec' },
+            { countryId: 'IN', code: 'MH', name: 'Maharashtra'}
           ]
         });
       }
