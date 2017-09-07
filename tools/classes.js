@@ -54,6 +54,7 @@ var classes = [
   'foam.box.ReturnBox',
   'foam.box.CheckAuthenticationBox',
   'foam.dao.DAO',
+  'foam.dao.ClientSink',
   'foam.dao.Sink',
   'foam.dao.AbstractSink',
   'foam.mlang.sink.AbstractUnarySink',
