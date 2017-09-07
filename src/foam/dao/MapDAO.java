@@ -43,11 +43,17 @@ public class MapDAO
 
   public FObject put_(X x, FObject obj) {
     getData().put(getPrimaryKey().get(obj), obj);
+    onPut(obj.fclone());
     return obj;
   }
 
   public FObject remove_(X x, FObject obj) {
-    getData().remove(getPrimaryKey().get(obj));
+    FObject existing = find_(x, obj);
+    if ( existing != null ) {
+      getData().remove(getPrimaryKey().get(obj));
+      onRemove(existing);
+    }
+
     return obj;
   }
 

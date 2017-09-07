@@ -41,6 +41,14 @@ public abstract class AbstractDAO
     throw new UnsupportedOperationException();
   }
 
+  protected Sink decorateListener_(Sink sink, Predicate predicate) {
+    if ( predicate != null ) {
+      sink = new PredicatedSink(predicate, sink);
+    }
+
+    return sink;
+  }
+
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( ( limit > 0 ) && ( limit < this.MAX_SAFE_INTEGER ) ) {
       sink = new LimitedSink(limit, 0, sink);
@@ -79,12 +87,43 @@ public abstract class AbstractDAO
     return getPrimaryKey().get(obj);
   }
 
-  public void listen() {
-    this.listen_(this.getX());
+  protected java.util.Set<Sink> listeners_ = new java.util.concurrent.ConcurrentSkipListSet<Sink>();
+
+  public void listen(Sink sink, Predicate predicate) {
+    this.listen_(this.getX(), sink, predicate);
   }
 
-  public void listen_(X x) {
-    // TODO
+  public void listen_(X x, Sink sink, Predicate predicate) {
+    sink = decorateListener_(sink, predicate);
+
+    listeners_.add(sink);
+  }
+
+  protected void onPut(FObject obj) {
+    java.util.Iterator<Sink> iter = listeners_.iterator();
+
+    while ( iter.hasNext() ) {
+      Sink s = iter.next();
+      s.put(obj, null);
+    }
+  }
+
+  protected void onRemove(FObject obj) {
+    java.util.Iterator<Sink> iter = listeners_.iterator();
+
+    while ( iter.hasNext() ) {
+      Sink s = iter.next();
+      s.remove(obj, null);
+    }
+  }
+
+  protected void onReset() {
+    java.util.Iterator<Sink> iter = listeners_.iterator();
+
+    while ( iter.hasNext() ) {
+      Sink s = iter.next();
+      s.reset(null);
+    }
   }
 
   public FObject put(FObject obj) {

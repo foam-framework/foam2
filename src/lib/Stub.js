@@ -72,6 +72,34 @@ foam.CLASS({
         };
       }
     }
+  ],
+  methods: [
+    function buildJavaClass(cls) {
+      if ( ! this.javaSupport ) return;
+
+      var name = this.name;
+      var args = this.args;
+      var boxPropName = this.boxPropName;
+
+      if ( this.javaReturns && this.javaReturns !== "void" ) {
+        throw new Error("Java stubs which return values are not supported yet.  Method: " + this.name + ", returns: " + this.javaReturns);
+      }
+
+      // TODO: The "createChildMethod_" in foam/java/refinements.
+      this.javaCode = `
+foam.box.Message message = getX().create(foam.box.Message.class);
+foam.box.RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
+rpc.setName("${name}");
+Object[] args = { ${ args.map( a => a.name ).join(',') } };
+rpc.setArgs(args);
+
+message.setObject(rpc);
+
+get${foam.String.capitalize(boxPropName)}().send(message);
+`;
+
+      this.SUPER(cls);
+    }
   ]
 });
 
@@ -178,7 +206,9 @@ foam.CLASS({
             });
           });
       }
-    }
+    },
+    ['javaType', 'foam.box.Box'],
+    ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo']
   ],
 
   methods: [
