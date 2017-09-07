@@ -14,6 +14,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.HTTPBox',
+    'foam.box.WebSocketBox',
     'foam.dao.RequestResponseClientDAO as ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
@@ -254,9 +255,8 @@ foam.CLASS({
           factory: function() {
             return this.ClientDAO.create({
               of: this.PMInfo,
-              delegate: this.HTTPBox.create({
-                method: 'POST',
-                url: 'http://localhost:8080/pmInfoDAO'
+              delegate: this.WebSocketBox.create({
+                uri: 'ws://localhost:8081/pmInfoDAO'
               })});
           }
         },
