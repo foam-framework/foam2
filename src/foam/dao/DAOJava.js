@@ -176,7 +176,16 @@ foam.INTERFACE({
     {
       name: 'listen',
       javaReturns: 'void',
-      args: []
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ]
     },
     {
       name: 'listen_',
@@ -185,6 +194,14 @@ foam.INTERFACE({
         {
           name: 'x',
           javaType: 'foam.core.X'
+        },
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
         }
       ]
     },
