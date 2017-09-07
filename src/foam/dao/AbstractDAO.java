@@ -87,7 +87,45 @@ public abstract class AbstractDAO
     return getPrimaryKey().get(obj);
   }
 
-  protected java.util.Set<Sink> listeners_ = new java.util.concurrent.ConcurrentSkipListSet<Sink>();
+  protected class DAOListener implements foam.core.Detachable {
+    protected Sink sink;
+    protected java.util.Set listeners;
+
+    public DAOListener(Sink sink, java.util.Set listeners) {
+      this.sink = sink;
+      this.listeners = listeners;
+    }
+
+    public void detach() {
+      listeners.remove(this);
+    }
+
+    public void put(FObject obj) {
+      try {
+        sink.put(obj, this);
+      } catch (Exception e) {
+        detach();
+      }
+    }
+
+    public void remove(FObject obj) {
+      try {
+        sink.remove(obj, this);
+      } catch (Exception e) {
+        detach();
+      }
+    }
+
+    public void reset() {
+      try {
+        sink.reset(this);
+      } catch (Exception e) {
+        detach();
+      }
+    }
+  }
+
+  protected java.util.Set<DAOListener> listeners_ = new java.util.concurrent.ConcurrentSkipListSet<DAOListener>();
 
   public void listen(Sink sink, Predicate predicate) {
     this.listen_(this.getX(), sink, predicate);
@@ -96,33 +134,33 @@ public abstract class AbstractDAO
   public void listen_(X x, Sink sink, Predicate predicate) {
     sink = decorateListener_(sink, predicate);
 
-    listeners_.add(sink);
+    listeners_.add(new DAOListener(sink, listeners_));
   }
 
   protected void onPut(FObject obj) {
-    java.util.Iterator<Sink> iter = listeners_.iterator();
+    java.util.Iterator<DAOListener> iter = listeners_.iterator();
 
     while ( iter.hasNext() ) {
-      Sink s = iter.next();
-      s.put(obj, null);
+      DAOListener s = iter.next();
+      s.put(obj);
     }
   }
 
   protected void onRemove(FObject obj) {
-    java.util.Iterator<Sink> iter = listeners_.iterator();
+    java.util.Iterator<DAOListener> iter = listeners_.iterator();
 
     while ( iter.hasNext() ) {
-      Sink s = iter.next();
-      s.remove(obj, null);
+      DAOListener s = iter.next();
+      s.remove(obj);
     }
   }
 
   protected void onReset() {
-    java.util.Iterator<Sink> iter = listeners_.iterator();
+    java.util.Iterator<DAOListener> iter = listeners_.iterator();
 
     while ( iter.hasNext() ) {
-      Sink s = iter.next();
-      s.reset(null);
+      DAOListener s = iter.next();
+      s.reset();
     }
   }
 
