@@ -15,6 +15,7 @@ foam.CLASS({
   requires: [
     'foam.box.HTTPBox',
     'foam.box.WebSocketBox',
+    'foam.dao.RequestResponseClientDAO',
     'foam.dao.ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
@@ -67,7 +68,7 @@ foam.CLASS({
     {
       name: 'userDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.User,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -79,7 +80,7 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -233,7 +234,7 @@ foam.CLASS({
         {
           name: 'scriptDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.RequestResponseClientDAO.create({
               of: this.Script,
               delegate: this.HTTPBox.create({
                 method: 'POST',
@@ -276,7 +277,7 @@ foam.CLASS({
         {
           name: 'testDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.RequestResponseClientDAO.create({
               of: this.Test,
               delegate: this.HTTPBox.create({
               method: 'POST',
