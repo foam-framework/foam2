@@ -230,6 +230,7 @@ FOAM_FILES([
   { name: "foam/box/SendFailedError" },
   { name: "foam/box/RegisterSelfMessage" },
   { name: "foam/box/RawWebSocketBox" },
+  { name: "foam/box/ReturnBox" },
   { name: "foam/box/RawMessagePortBox" },
   { name: "foam/box/WebSocketBox" },
   { name: "foam/box/ClassWhitelistContext" },

@@ -86,6 +86,11 @@
        name: 'profilePicture'
      },
      {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Address',
+      name: 'address'
+     },
+     {
       class: 'FObjectArray',
       of: 'foam.core.FObject',
       name: 'accounts'
