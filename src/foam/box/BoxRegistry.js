@@ -97,7 +97,7 @@ throw NoSuchNameException_create(["name": name])
         return this.registry_[name].exportBox;
       },
       swiftCode: function() {/*
-//name = name || foam.next$UID() TODO
+let name: String = name as? String ?? String(FOAM_utils.next$UID())
 
 var exportBox: Box = SubBox_create([
   "name": name,
@@ -114,9 +114,8 @@ return registration.exportBox!
       */},
       args: [
         {
-          class: 'String',
+          swiftClass: 'String?', // TODO better class+required:false
           name: 'name',
-          optional: true,
         },
         {
           class: 'FObjectProperty',

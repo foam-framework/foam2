@@ -47,6 +47,14 @@ foam.LIB({
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
+      var methods = this.getOwnAxiomsByClass(foam.core.Method)
+          .filter(function(p) {
+            var a = this.getSuperAxiomByName(p.name);
+            return !a || foam.core.internal.InterfaceMethod.isInstance(a);
+          }.bind(this))
+          .filter(function(p) {
+            return !!p.swiftCode;
+          }.bind(this));
 
       cls.classes.push(foam.swift.SwiftClass.create({
         visibility: 'private',
@@ -200,15 +208,18 @@ switch key {
       }));
 
       var slotGetterBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties) {/*
+          foam.String.multiline(function(properties, methods) {/*
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
+<% } %>
+<% for (var i = 0, p; p = methods[i]; i++) { %>
   case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
 <% } %>
   default:
     return super.getSlot(key: key)
 }
-          */}), '', ['properties']).apply(this, [properties]).trim();
+          */}), '', ['properties', 'methods']).apply(this, [properties, methods]).trim();
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'getSlot',

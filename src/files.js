@@ -276,7 +276,6 @@ FOAM_FILES([
   { name: "foam/box/ForwardingBox" },
   { name: "lib/boxJava", flags: ['java'] },
 
-  { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Box", flags: ['swift'] },
 

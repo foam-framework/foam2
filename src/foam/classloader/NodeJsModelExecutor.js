@@ -53,7 +53,7 @@ foam.CLASS({
           modelDao = this.OrDAO.create({
             delegate: modelDao,
             primary: this.NodeModelFileDAO.create({
-              surpressWarning: true,
+              suppressWarning: true,
               classpath: classpath,
             })
           });

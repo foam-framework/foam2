@@ -90,7 +90,34 @@ foam.CLASS({
           }));
         }
       },
-      swiftCode: 'fatalError()',
+      swiftCode: function() {/*
+do {
+  guard let object = message?.object as? RPCMessage,
+        let data = self.data as? FObject,
+        let method = data.ownClassInfo().axiom(byName: object.name) as? MethodInfo
+  else {
+    throw InvalidMessageException_create()
+  }
+
+  // TODO handle context oriented methods.
+
+  var p = try method.call(data, args: object.args)
+
+  guard let replyBox = message?.attributes["replyBox"] as? Box else { return }
+  if let pFut = p as? Future<Any> { p = try pFut.get() }
+  try replyBox.send(Message_create([
+    "object": RPCReturnMessage_create(["data": p])
+  ]))
+} catch let e {
+  if let errorBox = message?.attributes["errorBox"] as? Box {
+    try? errorBox.send(Message_create([
+      "object": RPCErrorMessage_create([
+        "data": e.localizedDescription
+      ])
+    ]))
+  }
+}
+      */},
     },
 
     {

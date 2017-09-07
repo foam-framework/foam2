@@ -59,6 +59,20 @@ public class Action: Axiom {
   }
 }
 
+public class MethodArg {
+  public var name: String = ""
+}
+
+public protocol MethodInfo: Axiom {
+  var args: [MethodArg] { get }
+}
+extension MethodInfo {
+  public func call(_ obj: FObject, args: [Any?]) throws -> Any? {
+    let callback = obj.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
+    return try callback(args)
+  }
+}
+
 public class Context {
   public static let GLOBAL = Context()
 
@@ -383,6 +397,15 @@ struct FOAM_utils {
     if a === b { return true }
     if a != nil { return a!.isEqual(b) }
     return false
+  }
+  static var nextId = 1
+  static func next$UID() -> Int {
+    var id: Int?
+    DispatchQueue(label: "FObjectUIDLock", attributes: []).sync {
+      id = nextId
+      nextId += 1
+    }
+    return id!
   }
 }
 

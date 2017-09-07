@@ -499,34 +499,24 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testClientBoxRegistry() {
+    let serverContext = BoxContext()
     class TestBox: Box {
-      var complete: (Message) -> Void
-      init(complete: @escaping (Message) -> Void) { self.complete = complete }
-      func send(_ msg: Message) { complete(msg) }
+      var o: Any?
+      func send(_ msg: Message) throws { o = msg.object }
     }
+    let testBox = TestBox()
+    let registeredBox =
+        (serverContext.registry as! BoxRegistryBox).register("TestBox", nil, testBox) as? SubBox
 
-    var received = false
-    let boxContext = BoxContext()
-    let clientBoxRegistry = ClientBoxRegistry(X: boxContext.__subContext__)
-    clientBoxRegistry.delegate = TestBox(complete: { msg in
-      let obj = msg.object as! RPCMessage
-      XCTAssertEqual(obj.name, "doLookup")
-      XCTAssertEqual(obj.args.count, 1)
-      XCTAssertEqual(obj.args[0] as! String, "TestBox")
+    let clientContext = BoxContext()
+    let clientBoxRegistry = ClientBoxRegistry(X: clientContext.__subContext__)
+    clientBoxRegistry.delegate = serverContext.registry!
 
-      let replyBox = msg.attributes["replyBox"] as! Box
-      do {
-        try replyBox.send(msg)
-      } catch let e {
-        fatalError(e.localizedDescription)
-      }
-
-      XCTAssertNil(msg.object)
-      received = true
-    })
-
-    let box = clientBoxRegistry.doLookup("TestBox")
+    let box = clientBoxRegistry.doLookup("TestBox") as? SubBox
     XCTAssertNotNil(box)
-    XCTAssertTrue(received)
+    XCTAssertTrue(registeredBox === box)
+
+    try? box?.send(Message(["object": "HELLO"]))
+    XCTAssertEqual(testBox.o as? String, "HELLO")
   }
 }

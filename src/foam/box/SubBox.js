@@ -40,7 +40,14 @@ foam.CLASS({
           object: msg.object
         });
         this.delegate.send(msg);
-      }
+      },
+      swiftCode: function() {/*
+msg.object = SubBoxMessage_create([
+  "name": name,
+  "object": msg.object
+])
+try delegate.send(msg);
+      */}
     }
   ]
 });

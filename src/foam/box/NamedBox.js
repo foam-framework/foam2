@@ -46,7 +46,13 @@ foam.CLASS({
           name: this.getBaseName(),
           parentBox: this.getParentBox()
         });
-      }
+      },
+      swiftFactory: function() {/*
+return self.LookupBox_create([
+  "name": self.getBaseName(),
+  "parentBox": self.getParentBox()
+])
+      */}
     }
   ],
 
@@ -59,14 +65,32 @@ foam.CLASS({
       swiftCode: 'try delegate!.send(msg)',
     },
 
-    function getParentBox() {
-      return this.cls_.create({
-        name: this.name.substring(0, this.name.lastIndexOf('/'))
-      }, this);
+    {
+      name: 'getParentBox',
+      returns: 'foam.box.Box',
+      code: function() {
+        return this.cls_.create({
+          name: this.name.substring(0, this.name.lastIndexOf('/'))
+        }, this);
+      },
+      swiftCode: function() {/*
+let index = name.range(of: ".", options: .backwards)!.lowerBound
+return ownClassInfo().create([
+  "name": name.substring(to: index)
+], x: self.__subContext__) as! Box
+      */},
     },
 
-    function getBaseName() {
-      return this.name.substring(this.name.lastIndexOf('/') + 1);
-    }
+    {
+      name: 'getBaseName',
+      returns: 'String',
+      code: function getBaseName() {
+        return this.name.substring(this.name.lastIndexOf('/') + 1);
+      },
+      swiftCode: function getBaseName() {/*
+let index = name.range(of: ".", options: .backwards)!.lowerBound
+return name.substring(to: name.index(index, offsetBy: 1))
+      */},
+    },
   ]
 });
