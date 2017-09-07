@@ -210,8 +210,6 @@ FOAM_FILES([
   { name: "foam/box/RPCReturnBox" },
   { name: "foam/box/RPCMessage" },
   { name: "foam/dao/BaseClientDAO" },
-  { name: "foam/dao/DAOEvent" },
-  { name: "foam/dao/BoxDAOListener" },
   { name: "foam/dao/MergeBox" },
   { name: "foam/dao/ClientDAO" },
   { name: "foam/dao/EventlessClientDAO" },
