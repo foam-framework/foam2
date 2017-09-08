@@ -45,7 +45,8 @@ foam.CLASS({
       name: 'url'
     },
     {
-      name: 'method'
+      name: 'method',
+      value: 'POST'
     },
     {
       class: 'FObjectProperty',
