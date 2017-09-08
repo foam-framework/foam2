@@ -17,9 +17,12 @@
 
 package foam.lib.parse;
 
-public class StringPS implements PStream {
-  private Reference<String> str;
-  private int pos;
+public class StringPS
+  implements PStream
+{
+  protected Reference<String> str;
+  protected int               pos;
+  protected StringPS          tail_ = null;
 
   public StringPS() {
     this(new Reference<String>());
@@ -34,8 +37,8 @@ public class StringPS implements PStream {
   }
 
   public StringPS(Reference<String> s, int p, Object value) {
-    str = s;
-    pos = p;
+    str    = s;
+    pos    = p;
     value_ = value;
   }
 
@@ -51,7 +54,6 @@ public class StringPS implements PStream {
     return pos < str.get().length();
   }
 
-  private StringPS tail_ = null;
   public PStream tail() {
     if ( tail_ == null ) tail_ = new StringPS(str, pos + 1);
     return tail_;

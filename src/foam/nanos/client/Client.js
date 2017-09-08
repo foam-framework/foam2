@@ -254,11 +254,11 @@ foam.CLASS({
         {
           name: 'pmInfoDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.EasyDAO.create({
+              daoType: 'CLIENT',
+              remoteListenerSupport: true,
               of: this.PMInfo,
-              delegate: this.WebSocketBox.create({
-                uri: 'ws://localhost:8081/pmInfoDAO'
-              })});
+              serviceName: 'pmInfoDAO'});
           }
         },
 
