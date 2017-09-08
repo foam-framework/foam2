@@ -27,7 +27,8 @@ foam.CLASS({
 
   imports: [
     'webSocketService',
-    'me'
+    'me',
+    'window'
   ],
 
   classes: [
@@ -65,12 +66,12 @@ foam.CLASS({
       name: 'socket',
       factory: function() {
         var ws = this.WebSocket.create({
-          uri: this.uri,
+          uri: this.prepareURL(this.uri),
           outputter: this.JSONOutputter.create({
-            pretty: false,
+            pretty:               false,
             formatDatesAsNumbers: true,
-            outputDefaultValues: false,
-            strict: true,
+            outputDefaultValues:  false,
+            strict:               true,
             propertyPredicate: function(o, p) { return ! p.networkTransient; }
           })
         });
@@ -95,6 +96,15 @@ foam.CLASS({
   ],
 
   methods: [
+    function prepareURL(url) {
+      /* Add window's origin if url is not complete. */
+      if ( this.window && url.indexOf(':') == -1 ) {
+        return 'ws://' + this.window.location.hostname + ':' + ( Number.parseInt(this.window.location.port) + 1 ) + '/' + url;
+      }
+
+      return url;
+    },
+
     function send(msg) {
       this.socket.then(function(s) {
         try {
