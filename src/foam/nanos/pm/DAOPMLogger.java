@@ -18,6 +18,9 @@ public class DAOPMLogger
 
   @Override
   public void log(PM pm) {
+    if ( pm.getClassType().getName().toLowerCase().indexOf("pm") != -1 ) return;
+    if ( pm.getName().toLowerCase().indexOf("pm") != -1 )                return;
+
     PMInfo pmi = new PMInfo();
     pmi.setClsname(pm.getClassType().getName());
     pmi.setPmname(pm.getName());

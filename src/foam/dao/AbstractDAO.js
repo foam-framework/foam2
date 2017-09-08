@@ -163,6 +163,10 @@ foam.CLASS({
     },
 
     function listen(sink) {
+      if ( ! foam.core.FObject.isInstance(sink) ) {
+        sink = foam.dao.AnonymousSink.create({ sink: sink });
+      }
+
       return this.listen_(this.__context__, sink, undefined);
     },
 
