@@ -118,6 +118,7 @@ foam.CLASS({
           saveService(service);
           return service;
         } catch (EvalError e) {
+          System.err.println("NSpec serviceScript error: " + getServiceScript());
           e.printStackTrace();
         }
 
