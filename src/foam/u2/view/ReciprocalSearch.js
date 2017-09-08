@@ -103,7 +103,7 @@ foam.CLASS({
               .end()
               .start(view)
                 .addClass(self.myClass('filter'))
-            .end()
+              .end();
           });
 
           return e;
