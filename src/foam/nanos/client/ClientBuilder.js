@@ -15,7 +15,8 @@ foam.CLASS({
 
   requires: [
     'foam.box.HTTPBox',
-    'foam.dao.RequestResponseClientDAO as ClientDAO',
+    'foam.dao.RequestResponseClientDAO',
+    'foam.dao.ClientDAO',
     'foam.nanos.boot.NSpec'
   ],
 
@@ -23,7 +24,7 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -45,7 +46,8 @@ foam.CLASS({
 
         requires: [
           'foam.box.HTTPBox',
-          'foam.dao.RequestResponseClientDAO as ClientDAO',
+          'foam.dao.RequestResponseClientDAO',
+          'foam.dao.ClientDAO',
           'foam.dao.EasyDAO'
         ],
 

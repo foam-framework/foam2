@@ -31,7 +31,7 @@ foam.CLASS({
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
-      ^ button {
+      button^ {
         -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
         box-shadow: inset 0 1px 0 0 #ffffff;
         background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );

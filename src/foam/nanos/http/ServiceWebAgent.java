@@ -60,7 +60,6 @@ public class ServiceWebAgent
       int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
 
-      System.out.println("Service Request");
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
