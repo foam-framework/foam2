@@ -18,7 +18,11 @@ foam.CLASS({
   exports: [ 'maxTotalTime' ],
 
   axioms: [
-    foam.u2.CSS.create({code: foam.u2.view.TableView.getAxiomsByClass(foam.u2.CSS)[0].code})
+    foam.u2.CSS.create({code: foam.u2.view.TableView.getAxiomsByClass(foam.u2.CSS)[0].code}),
+    foam.u2.CSS.create({code: `
+      .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-create { display: none; }
+      .foam-comics-BrowserView-foam-nanos-pm-PMInfo .foam-u2-ActionView-edit   { display: none; }
+    `})
   ],
 
   properties: [
@@ -31,6 +35,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.add(this.CLEAR_ALL);
+      this.columns_.push(this.CLEAR);
 
       this.SUPER();
 
@@ -40,6 +45,12 @@ foam.CLASS({
   ],
 
   actions: [
+    {
+      name: 'clear',
+      code: function(X) {
+        X.pmInfoDAO.remove(this);
+      }
+    },
     {
       name: 'clearAll',
       code: function() {
