@@ -822,6 +822,16 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.StringArray',
+
+  properties: [
+    ['javaType',       'String[]'],
+    ['javaJSONParser', 'foam.lib.json.StringArrayParser']
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Array',
 
   properties: [
