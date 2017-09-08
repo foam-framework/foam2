@@ -68,7 +68,7 @@ public class ServiceWebAgent
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
         System.err.println("Failed to parse request");
-        out.print("Failed to parse request");
+        out.print("Failed to parse request: " + buffer_.toString());
         out.flush();
         return;
       }
