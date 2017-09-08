@@ -84,7 +84,7 @@ foam.CLASS({
             style({background: 'rgba(0,0,0,0)'}).
             show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
             tag('td').
-            start('td').style({'padding-left':'26px'}).add(this.cls.getAxiomsByClass(foam.core.Action)).end().
+            start('td')/*.style({'padding-left':'26px'})*/.add(this.cls.getAxiomsByClass(foam.core.Action)).end().
           end().
         end();
     }

@@ -36,8 +36,6 @@ public class NanoServiceRouter
     PM          pm       = new PM(this.getClass(), serviceKey);
     Logger      logger   = (Logger)getX().get("logger");
 
-    logger.log("Servicing request", serviceKey);
-
     try {
       Object      service  = getX().get(serviceKey);
       DAO         nSpecDAO = (DAO) getX().get("nSpecDAO");
