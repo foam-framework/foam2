@@ -262,7 +262,7 @@ foam.CLASS({
     },
     {
       name: 'selection',
-      expression: function(importSelection) { return importSelection; },
+      expression: function(importSelection) { return importSelection || null; },
     },
     'hoverSelection',
     'dropdownOrigin',
