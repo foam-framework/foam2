@@ -26,10 +26,21 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      this.add(this.CLEAR_ALL);
+
       this.SUPER();
 
       this.updateMax();
-      this.data$.sub(this.updateMax);
+      this.data.listen({reset: this.updateMax, put: this.updateMax});
+    }
+  ],
+
+  actions: [
+    {
+      name: 'clearAll',
+      code: function() {
+        this.data.removeAll();
+      }
     }
   ],
 
