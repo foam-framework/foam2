@@ -17,6 +17,10 @@ foam.CLASS({
 
   exports: [ 'maxTotalTime' ],
 
+  axioms: [
+    foam.u2.CSS.create({code: foam.u2.view.TableView.getAxiomsByClass(foam.u2.CSS)[0].code})
+  ],
+
   properties: [
     {
       class: 'Long',
