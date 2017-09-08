@@ -22,7 +22,7 @@ public class ServicesWebAgent
           DAO         dao  = (DAO)         x.get("nSpecDAO");
 
     out.println("<pre>");
-    dao.select(new AbstractSink() {
+    dao.orderBy(NSpec.NAME).select(new AbstractSink() {
       public void put(FObject o, Detachable d) {
         NSpec s = (NSpec) o;
         out.println(s.getName() + (s.getServe() ? " (S)" : ""));
