@@ -75,6 +75,8 @@ foam.CLASS({
 
       this.
         add(this.slot(function(filters) {
+          self.show(filters.length);
+
           var searchManager = self.SearchManager.create({
             dao$: self.dao$,
             predicate$: self.data$
