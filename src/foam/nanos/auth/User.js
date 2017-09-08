@@ -139,7 +139,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'businessIdentificationNumber',
-      name: 'Business Identification Number (BIN)'
+      documentation: 'Business Identification Number (BIN)'
     },
     {
       class: 'String',
