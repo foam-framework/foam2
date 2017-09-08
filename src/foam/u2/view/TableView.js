@@ -146,6 +146,10 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
+        ^ {
+          border-spacing: 14px 8px;
+        }
+
         ^ th {
           text-align: left;
           white-space: nowrap;
