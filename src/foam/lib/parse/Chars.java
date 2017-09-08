@@ -7,7 +7,8 @@
 package foam.lib.parse;
 
 public class Chars implements Parser {
-  private String chars;
+  protected String chars;
+
   public Chars(String s) {
     chars = s;
   }

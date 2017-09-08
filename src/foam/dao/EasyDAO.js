@@ -47,6 +47,7 @@ foam.CLASS({
     'foam.box.Context',
     'foam.box.HTTPBox',
     'foam.box.SocketBox',
+    'foam.box.WebSocketBox',
     //'foam.core.dao.MergeDAO',
     //'foam.core.dao.MigrationDAO',
     //'foam.core.dao.VersionNoDAO',
@@ -177,6 +178,12 @@ foam.CLASS({
       value: false
     },
     {
+      /** Turn on to enable remote listener support. Only useful with daoType = CLIENT. */
+      class: 'Boolean',
+      name: 'remoteListenerSupport',
+      value: false
+    },
+    {
       /** Setting to true activates polling, periodically checking in with
         the server. If sockets are used, polling is optional as the server
         can push changes to this client. */
@@ -198,7 +205,12 @@ foam.CLASS({
     },
     {
       /** Destination address for server. */
-      name: 'serverBox'
+      name: 'serverBox',
+      factory: function() {
+        return this.remoteListenerSupport ?
+            this.WebSocketBox.create({of: this.model, uri: this.serviceName}) :
+            this.HTTPBox.create({of: this.model, url: this.serviceName}) ;
+      }
     },
     {
       /** Simpler alternative than providing serverBox. */
@@ -227,20 +239,21 @@ foam.CLASS({
         this.ALIASES[this.daoType] || this.daoType :
         this.daoType;
 
-      var daoModel = typeof daoType === 'string' ?
-        this.lookup(daoType) || global[daoType] :
-        daoType;
-
       var params = { of: this.of };
 
       if ( daoType == 'foam.dao.RequestResponseClientDAO' ) {
-        foam.assert(this.serverBox || this.serviceName, 'EasyDAO "client" type requires a serveBox or serviceName');
-        params.delegate = this.serverBox || this.HTTPBox.create({
-          of: this.model,
-          method: 'POST',
-          url: this.serviceName
-        });
+        foam.assert(this.hasOwnProperty('serverBox') || this.serviceName, 'EasyDAO "client" type requires a serveBox or serviceName');
+
+        if ( this.remoteListenerSupport ) {
+          daoType = 'foam.dao.ClientDAO';
+        }
+
+        params.delegate = this.serverBox;
       }
+
+      var daoModel = typeof daoType === 'string' ?
+        this.lookup(daoType) || global[daoType] :
+        daoType;
 
       if ( ! daoModel ) {
         this.warn(

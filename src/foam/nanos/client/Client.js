@@ -15,7 +15,8 @@ foam.CLASS({
   requires: [
     'foam.box.HTTPBox',
     'foam.box.WebSocketBox',
-    'foam.dao.RequestResponseClientDAO as ClientDAO',
+    'foam.dao.RequestResponseClientDAO',
+    'foam.dao.ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
@@ -67,7 +68,7 @@ foam.CLASS({
     {
       name: 'userDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.User,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -79,7 +80,7 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -233,7 +234,7 @@ foam.CLASS({
         {
           name: 'scriptDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.RequestResponseClientDAO.create({
               of: this.Script,
               delegate: this.HTTPBox.create({
                 method: 'POST',
@@ -253,11 +254,11 @@ foam.CLASS({
         {
           name: 'pmInfoDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.EasyDAO.create({
+              daoType: 'CLIENT',
+              remoteListenerSupport: true,
               of: this.PMInfo,
-              delegate: this.WebSocketBox.create({
-                uri: 'ws://localhost:8081/pmInfoDAO'
-              })});
+              serviceName: 'pmInfoDAO'});
           }
         },
 
@@ -276,7 +277,7 @@ foam.CLASS({
         {
           name: 'testDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.RequestResponseClientDAO.create({
               of: this.Test,
               delegate: this.HTTPBox.create({
               method: 'POST',
