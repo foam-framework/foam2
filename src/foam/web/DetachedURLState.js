@@ -134,18 +134,20 @@ foam.CLASS({
     },
     function stateToHash_() {
       var stateStr = '';
-      stateStr = this.appendMapToStateStr_(stateStr, this.bindingsMap_);
-      stateStr = this.appendMapToStateStr_(stateStr, this.unboundMap_);
+      stateStr = this.appendMapToStateStr_(
+          stateStr, this.bindingsMap_, this.getBoundValue);
+      stateStr = this.appendMapToStateStr_(
+          stateStr, this.unboundMap_, this.getUnboundValue);
 
       this.hash_ = '#' + this.path_ + '?' + stateStr;
     },
-    function appendMapToStateStr_(str, map) {
+    function appendMapToStateStr_(str, map, getMapValue) {
       for ( var key in map ) {
         if ( ! map.hasOwnProperty(key) ) continue;
 
         if ( str !== '' ) str += '&';
 
-        var value = this.serializer.stringify(map[key].get());
+        var value = this.serializer.stringify(getMapValue(key));
         str += this.window.encodeURIComponent(key) + '=' +
             this.window.encodeURIComponent(value);
       }
@@ -176,6 +178,10 @@ foam.CLASS({
 
   listeners: [
     function onStateChange() { this.stateToHash_(); },
+    function getBoundValue(key) {
+      return this.bindingsMap_[key] && this.bindingsMap_[key].get();
+    },
+    function getUnboundValue(key) { return this.unboundMap_[key]; }
   ],
 
   grammars: [
