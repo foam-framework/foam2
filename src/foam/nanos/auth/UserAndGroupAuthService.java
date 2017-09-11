@@ -203,7 +203,7 @@ public class UserAndGroupAuthService
     if ( user.getLastName() == "" ) {
       throw new RuntimeException("Last Name is required for creating a user");
     }
-    
+
     if ( user.getPassword() == "" ) {
       throw new RuntimeException("Password is required for creating a user");
     }
