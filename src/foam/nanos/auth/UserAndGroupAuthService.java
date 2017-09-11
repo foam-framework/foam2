@@ -200,18 +200,10 @@ public class UserAndGroupAuthService
       throw new RuntimeException("First Name is required for creating a user");
     }
 
-    if ( ! validateName(user.getFirstName()) ) {
-      throw new RuntimeException("Invalid First Name Format");
-    }
-
     if ( user.getLastName() == "" ) {
       throw new RuntimeException("Last Name is required for creating a user");
     }
-
-    if ( ! validateName(user.getLastName()) ) {
-      throw new RuntimeException("Invalid Last Name Format");
-    }
-
+    
     if ( user.getPassword() == "" ) {
       throw new RuntimeException("Password is required for creating a user");
     }
@@ -361,12 +353,6 @@ public class UserAndGroupAuthService
   public static boolean validatePassword(String password) {
     Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
     return pattern.matcher(password).matches();
-  }
-
-  //A - Z characters, '-
-  public static boolean validateName(String name) {
-    Pattern pattern = Pattern.compile("/^[a-z ,.'-]+$/i");
-    return pattern.matcher(name).matches();
   }
 
   /**
