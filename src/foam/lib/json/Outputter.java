@@ -110,7 +110,7 @@ public class Outputter {
   }
 
   protected void outputDate(StringBuilder out, java.util.Date date) {
-    java.text.DateFormat formatter = new java.text.SimpleDateFormat("YYYY-MM-dd'T'kk:hh:ss.S'Z'");
+    java.text.DateFormat formatter = new java.text.SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.S'Z'");
     formatter.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
     outputString(out, formatter.format(date));
   }

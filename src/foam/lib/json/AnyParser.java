@@ -16,8 +16,8 @@ public class AnyParser
         new NullParser(),
         new StringParser(),
         new BooleanParser(),
-        new DoubleParser(),
         new LongParser(),
+        new DoubleParser(),
         new PropertyReferenceParser(),
         new FObjectParser()));
   }
