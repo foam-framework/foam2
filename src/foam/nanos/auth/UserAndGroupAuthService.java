@@ -20,7 +20,6 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected Map challengeMap;
-
   public static final String HASH_METHOD = "SHA-512";
 
   @Override
@@ -33,19 +32,21 @@ public class UserAndGroupAuthService
   /**
    * A challenge is generated from the userID provided
    * This is saved in a LinkedHashMap with ttl of 5
-   *
-   * Should this throw an exception?
    */
-  public String generateChallenge(long userId) {
-    if ( userId < 1 ) return null;
-    if ( userDAO_.find(userId) == null )  return null;
+  public String generateChallenge(long userId) throws RuntimeException {
+    if ( userId < 1 ) {
+      throw new RuntimeException("Invalid User Id");
+    }
+
+    if ( userDAO_.find(userId) == null ) {
+      throw new RuntimeException("User not found");
+    }
 
     String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
     Calendar calendar           = Calendar.getInstance();
     calendar.add(Calendar.SECOND, 5);
 
     challengeMap.put(userId, new Challenge(generatedChallenge, calendar.getTime()));
-
     return generatedChallenge;
   }
 
@@ -199,8 +200,16 @@ public class UserAndGroupAuthService
       throw new RuntimeException("First Name is required for creating a user");
     }
 
+    if ( ! validateName(user.getFirstName()) ) {
+      throw new RuntimeException("Invalid First Name Format");
+    }
+
     if ( user.getLastName() == "" ) {
       throw new RuntimeException("Last Name is required for creating a user");
+    }
+
+    if ( ! validateName(user.getLastName()) ) {
+      throw new RuntimeException("Invalid Last Name Format");
     }
 
     if ( user.getPassword() == "" ) {
@@ -352,6 +361,12 @@ public class UserAndGroupAuthService
   public static boolean validatePassword(String password) {
     Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
     return pattern.matcher(password).matches();
+  }
+
+  //A - Z characters, '-
+  public static boolean validateName(String name) {
+    Pattern pattern = Pattern.compile("/^[a-z ,.'-]+$/i");
+    return pattern.matcher(name).matches();
   }
 
   /**
