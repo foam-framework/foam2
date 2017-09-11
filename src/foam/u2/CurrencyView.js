@@ -1,8 +1,8 @@
 /**
-@license
-Copyright 2017 The FOAM Authors. All Rights Reserved.
-http://www.apache.org/licenses/LICENSE-2.0
-*/
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 foam.CLASS({
   package: 'foam.u2',
@@ -19,19 +19,17 @@ foam.CLASS({
 
   properties: [
     [
-      [ 'precision', '2']
+      [ 'precision', '2' ]
     ]
   ],
 
   methods: [
     function dataToText(val) {
-      return this.precision !== undefined ?
-        this.formatNumber(val / 100) :
-        '' + val ;
+      return this.SUPER(val/100);
     },
 
     function textToData(text) {
-      return parseFloat(text) * 100 || 0;
+      return this.SUPER(text)*100;
     }
   ]
 });
