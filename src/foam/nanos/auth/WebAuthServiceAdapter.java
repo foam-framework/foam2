@@ -30,29 +30,37 @@ public class WebAuthServiceAdapter
 
   public void start() {
     service = (AuthService) getX().get("auth");
-    service.start();
   }
 
-  public String generateChallenge(long userId) {
-    return service.generateChallenge(userId);
-  }
-
-  public void challengedLogin(long userId, String challenge) {
+  public String generateChallenge(long userId) throws RuntimeException {
     try {
-      X x = service.challengedLogin(userId, challenge);
-      loginMap.put(userId, x);
+      return service.generateChallenge(userId);
     } catch (RuntimeException e) {
-      e.printStackTrace();
+      throw e;
     }
   }
 
-  public foam.nanos.auth.User login(String email, String password) {
-    DAO userDAO = (DAO) getX().get("localUserDAO");
+  public foam.nanos.auth.User challengedLogin(long userId, String challenge)
+    throws RuntimeException
+  {
+    try {
+      X x = service.challengedLogin(userId, challenge);
+      loginMap.put(userId, x);
+      return (User) x.get("user");
+    } catch (RuntimeException e) {
+      throw e;
+    }
+  }
+
+  public foam.nanos.auth.User login(String email, String password)
+    throws RuntimeException
+  {
+    DAO userDAO   = (DAO) getX().get("localUserDAO");
     ListSink sink = (ListSink) userDAO.where(MLang.EQ(email, User.EMAIL)).select(new ListSink());
 
     //There should only be one object returned for the User
     if ( sink.getData().size() != 1 ) {
-      return null;
+      throw new RuntimeException("Invalid User");
     }
 
     User user = (User) sink.getData().get(0);
@@ -63,13 +71,11 @@ public class WebAuthServiceAdapter
         loginMap.put(user.getId(), x);
         return (User) x.get("user");
       }
-
       return (User) loginMap.get(user.getId()).get("user");
 
     } catch (RuntimeException e) {
-      e.printStackTrace();
+      throw e;
     }
-    return null;
   }
 
   public Boolean check(long userId, foam.nanos.auth.Permission permission) {
@@ -78,15 +84,26 @@ public class WebAuthServiceAdapter
     if ( loginMap.containsKey(userId) ) {
       return service.check(loginMap.get(userId), new AuthPermission(permission.getId()));
     }
-
     return false;
   }
 
-  public void updatePassword(long userId, String oldPassword, String newPassword) {
-    if ( userId < 1 ) return;
+  public void updatePassword(long userId, String oldPassword, String newPassword)
+    throws RuntimeException
+  {
+    if ( userId < 1 ) {
+      throw new RuntimeException("Invalid User Id");
+    }
 
-    if ( loginMap.containsKey(userId) ) {
-      service.updatePassword(loginMap.get(userId), oldPassword, newPassword);
+    try {
+      if ( loginMap.containsKey(userId) ) {
+        X x = service.updatePassword(loginMap.get(userId), oldPassword, newPassword);
+        loginMap.put(userId, x);
+      }
+      else {
+        throw new RuntimeException("User not Logged in");
+      }
+    } catch (RuntimeException e) {
+      throw e;
     }
   }
 

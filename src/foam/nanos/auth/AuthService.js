@@ -12,6 +12,7 @@ foam.INTERFACE({
     {
       name: 'generateChallenge',
       javaReturns: 'String',
+      javaThrows: [ 'java.lang.RuntimeException' ],
       args: [
         {
           name: 'userId',
