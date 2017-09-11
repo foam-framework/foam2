@@ -52,8 +52,7 @@ public class AuthenticatedUserDAO
       throw e;
     }
     catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      return null;
+      throw new RuntimeException(e);
     }
   }
 
