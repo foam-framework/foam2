@@ -717,7 +717,7 @@ foam.CLASS({
         java.util.Date date = new java.util.Date((String) o);
         return date;
         }
-        return (java.util.Date)o;`;
+        return (java.util.Date) o;`;
 
       return info;
   }
