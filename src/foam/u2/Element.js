@@ -2020,6 +2020,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Currency',
+  requires: [ 'foam.u2.CurrencyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.CurrencyView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
