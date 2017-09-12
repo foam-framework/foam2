@@ -13,30 +13,28 @@ import foam.dao.ProxyDAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
+
+import javax.naming.AuthenticationException;
 import java.security.NoSuchAlgorithmException;
 
-//TODO: Throw exception for print statements when they are ready
 public class AuthenticatedUserDAO
   extends ProxyDAO
 {
-
   public AuthenticatedUserDAO(DAO delegate) {
     setDelegate(delegate);
   }
 
   @Override
-  public FObject put_(X x, FObject fObject) {
+  public FObject put_(X x, FObject fObject) throws RuntimeException {
     User user = (User) fObject;
 
     if ( getDelegate().find_(x, user.getId()) != null ) {
-      System.out.println("A user has already been registered with this account");
-      return null;
+      throw new RuntimeException("A user has already been registered with this account");
     }
 
     AuthService service = (AuthService) x.get("auth");
     if ( service == null ) {
-      System.out.println("Auth Service not started");
-      return null;
+      throw new RuntimeException("Auth Service not started");
     }
 
     try {
@@ -44,8 +42,7 @@ public class AuthenticatedUserDAO
       Count count = (Count) this.limit(1).where(MLang.EQ(User.EMAIL, user.getEmail())).select(new Count());
 
       if ( count.getValue() > 0 ) {
-        System.out.println("An account is already registered with this email address");
-        return null;
+        throw new RuntimeException("An account is already registered with this email address");
       }
 
       String salt = UserAndGroupAuthService.generateRandomSalt();
@@ -53,13 +50,11 @@ public class AuthenticatedUserDAO
 
       return getDelegate().put_(x, user);
     }
-    catch (RuntimeException e) {
-      e.printStackTrace();
-      return null;
+    catch (AuthenticationException e) {
+      throw new RuntimeException(e);
     }
     catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-      return null;
+      throw new RuntimeException(e);
     }
   }
 
@@ -67,29 +62,28 @@ public class AuthenticatedUserDAO
   /**
    * Restrict find method to only return the logged in user object
    * */
-  public FObject find_(X x, Object id) {
+  public FObject find_(X x, Object id) throws RuntimeException {
     User user = (User) x.get("user");
 
     if ( user == null || user.getId() != (long) id ) {
-      System.out.println("User is not logged in");
-      return null;
+      throw new RuntimeException("User is not logged in");
     }
 
     return super.find_(x, user.getId());
   }
 
   @Override
-  public Sink select(Sink sink) {
-    return null;
+  public Sink select(Sink sink) throws RuntimeException {
+    throw new RuntimeException("Select not allowed on Authenticated User DAO");
   }
 
   @Override
-  public FObject remove(FObject obj) {
-    return null;
+  public FObject remove(FObject obj) throws RuntimeException {
+    throw new RuntimeException("Remove not allowed on Authenticated User DAO");
   }
 
   @Override
-  public void removeAll() {
-    return;
+  public void removeAll() throws RuntimeException {
+    throw new RuntimeException("RemoveAll not allowed on Authenticated User DAO");
   }
 }
