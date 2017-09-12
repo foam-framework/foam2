@@ -32,9 +32,9 @@ foam.CLASS({
       class: 'Class',
       name: 'of',
       factory: function() {
-        if (this.array.length === 0) return this.lookup('foam.core.FObject');
-        return this.array[0].cls_;
-      },
+        if ( this.array.length === 0 ) return this.lookup('foam.core.FObject');
+        return null;
+      }
     },
     {
       name: 'array',
