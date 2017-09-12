@@ -13,6 +13,8 @@ import foam.dao.ProxyDAO;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
+
+import javax.naming.AuthenticationException;
 import java.security.NoSuchAlgorithmException;
 
 public class AuthenticatedUserDAO
@@ -48,8 +50,8 @@ public class AuthenticatedUserDAO
 
       return getDelegate().put_(x, user);
     }
-    catch (RuntimeException e) {
-      throw e;
+    catch (AuthenticationException e) {
+      throw new RuntimeException(e);
     }
     catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
