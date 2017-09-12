@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO(markdittmer): foam.dao.InternalException should be unnecessary here;
+// make this a PromisedDAO.
 foam.CLASS({
   package: 'foam.dao',
   name: 'VersionNoDAO',
