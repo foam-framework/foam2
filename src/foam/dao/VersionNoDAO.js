@@ -102,7 +102,7 @@ foam.CLASS({
 
       // Increment version number and put empty object (except for "id"
       // and "deleted = true") to delegate.
-      var deleted = this.of.create({ id: obj.id }, x);
+      var deleted = obj.clone(x);
       deleted[this.VersionTrait.DELETED_.name] = true;
       deleted[this.VersionTrait.VERSION_.name] = this.version;
       this.version++;
