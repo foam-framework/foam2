@@ -18,18 +18,16 @@ foam.CLASS({
   ],
 
   properties: [
-    [
-      [ 'precision', '2' ]
-    ]
+    [ 'precision', '2' ]
   ],
 
   methods: [
     function dataToText(val) {
-      return this.SUPER(val/100);
+      return this.SUPER(val / 100);
     },
 
     function textToData(text) {
-      return this.SUPER(text)*100;
+      return this.SUPER(text) * 100;
     }
   ]
 });
