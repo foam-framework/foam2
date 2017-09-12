@@ -13,6 +13,8 @@ import foam.mlang.MLang;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import foam.core.ContextAwareSupport;
+
+import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
 
 public class WebAuthServiceAdapter
@@ -32,35 +34,35 @@ public class WebAuthServiceAdapter
     service = (AuthService) getX().get("auth");
   }
 
-  public String generateChallenge(long userId) throws RuntimeException {
+  public String generateChallenge(long userId) throws AuthenticationException {
     try {
       return service.generateChallenge(userId);
-    } catch (RuntimeException e) {
+    } catch (AuthenticationException e) {
       throw e;
     }
   }
 
   public foam.nanos.auth.User challengedLogin(long userId, String challenge)
-    throws RuntimeException
+    throws AuthenticationException
   {
     try {
       X x = service.challengedLogin(userId, challenge);
       loginMap.put(userId, x);
       return (User) x.get("user");
-    } catch (RuntimeException e) {
+    } catch (AuthenticationException e) {
       throw e;
     }
   }
 
   public foam.nanos.auth.User login(String email, String password)
-    throws RuntimeException
+    throws AuthenticationException
   {
     DAO userDAO   = (DAO) getX().get("localUserDAO");
     ListSink sink = (ListSink) userDAO.where(MLang.EQ(email, User.EMAIL)).select(new ListSink());
 
     //There should only be one object returned for the User
     if ( sink.getData().size() != 1 ) {
-      throw new RuntimeException("Invalid User");
+      throw new AuthenticationException("Invalid User");
     }
 
     User user = (User) sink.getData().get(0);
@@ -73,7 +75,7 @@ public class WebAuthServiceAdapter
       }
       return (User) loginMap.get(user.getId()).get("user");
 
-    } catch (RuntimeException e) {
+    } catch (AuthenticationException e) {
       throw e;
     }
   }
@@ -88,10 +90,10 @@ public class WebAuthServiceAdapter
   }
 
   public void updatePassword(long userId, String oldPassword, String newPassword)
-    throws RuntimeException
+    throws AuthenticationException
   {
     if ( userId < 1 ) {
-      throw new RuntimeException("Invalid User Id");
+      throw new AuthenticationException("Invalid User Id");
     }
 
     try {
@@ -100,9 +102,9 @@ public class WebAuthServiceAdapter
         loginMap.put(userId, x);
       }
       else {
-        throw new RuntimeException("User not Logged in");
+        throw new AuthenticationException("User not Logged in");
       }
-    } catch (RuntimeException e) {
+    } catch (AuthenticationException e) {
       throw e;
     }
   }

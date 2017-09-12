@@ -12,7 +12,7 @@ foam.INTERFACE({
     {
       name: 'generateChallenge',
       javaReturns: 'String',
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
           name: 'userId',
@@ -23,7 +23,7 @@ foam.INTERFACE({
     {
       name: 'challengedLogin',
       javaReturns: 'foam.core.X',
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
           name: 'userId',
@@ -38,7 +38,7 @@ foam.INTERFACE({
     {
       name: 'login',
       javaReturns: 'foam.core.X',
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
           name: 'userId',
@@ -67,7 +67,7 @@ foam.INTERFACE({
     {
       name: 'updatePassword',
       javaReturns: 'foam.core.X',
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
           name: 'x',
@@ -86,7 +86,7 @@ foam.INTERFACE({
     {
       name: 'validateUser',
       javaReturns: 'void',
-      javaThrows: [ 'java.lang.RuntimeException' ],
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
           name: 'user',
