@@ -100,6 +100,7 @@ foam.CLASS({
             return Cls.create({ target: target, data: data }, x);
           });
     },
+
     function addSourcesToTargets(x, sink, localSink) {
       var put = sink.put.bind(sink);
       var array = localSink.array;
@@ -109,11 +110,13 @@ foam.CLASS({
       }
       return Promise.all(promises);
     },
+
     function getDataForTarget(target, sink) {
       var sources = sink.array;
       return Promise.all(
           sources.map(this.getDatumForTarget.bind(this, target)));
     },
+    
     function getDatumForTarget(target, source) {
       return this.junctionDAO.where(this.AND(
           this.EQ(this.junctionCls.SOURCE_ID, source.id),
