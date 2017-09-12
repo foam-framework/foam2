@@ -56,7 +56,7 @@ foam.LIB({
             return !!p.swiftCode;
           }.bind(this));
 
-      cls.classes.push(foam.swift.SwiftClass.create({
+      var classInfo = foam.swift.SwiftClass.create({
         visibility: 'private',
         name: 'ClassInfo_',
         implements: ['ClassInfo'],
@@ -96,7 +96,24 @@ foam.LIB({
             defaultValue: this.model_.swiftName + '.self',
           }),
         ],
-      }));
+      });
+      var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
+      if (multiton.length) {
+        classInfo.implements.push('Multiton')
+        classInfo.fields.push(foam.swift.Field.create({
+          defaultValue: '[:]',
+          lazy: true,
+          type: '[String:FObject]',
+          name: 'multitonMap',
+        }));
+        classInfo.fields.push(foam.swift.Field.create({
+          defaultValue: this.getAxiomByName(multiton[0].property).swiftAxiomName,
+          lazy: true,
+          type: 'PropertyInfo',
+          name: 'multitonProperty',
+        }));
+      }
+      cls.classes.push(classInfo);
       cls.fields.push(foam.swift.Field.create({
         static: true,
         visibility: 'private',

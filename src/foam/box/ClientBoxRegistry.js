@@ -19,6 +19,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'ClientBoxRegistry',
+  implements: ['foam.box.BoxRegistryInterface'],
 
   properties: [
     {

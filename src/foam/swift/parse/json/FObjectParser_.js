@@ -29,7 +29,7 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: 'Any!',
+      swiftType: 'ClassInfo?',
       name: 'defaultClass',
     },
     {
@@ -56,12 +56,9 @@ return
 var ps: PStream? = ps
 let ps1 = delegate.parse(ps!, x)
 
-let c = ps1 != nil ? x[ps1!.value() as! String] :
-   x["defaultClass"] != nil ? x["defaultClass"] :
-   defaultClass
-
-if c == nil {
-  fatalError("No class specified in JSON and no defaultClass available.");
+guard let c: ClassInfo = ps1 != nil ? x.lookup(ps1!.value() as! String) :
+    x.lookup("defaultClass") ?? defaultClass else {
+  return nil
 }
 
 if ps1 != nil {
@@ -69,9 +66,9 @@ if ps1 != nil {
 }
 
 let subx = x.createSubContext(args: [
-  "obj": (x["X"] as! Context).create(type: c!)!,
+  "obj": (x["X"] as! Context).create(cls: c)
 ])
-ps = ModelParserFactory.getInstance(c as! FObject.Type).parse(ps!, subx)
+ps = ModelParserFactory.getInstance(c).parse(ps!, subx)
 
 if ps != nil {
   return ps!.setValue(subx["obj"])

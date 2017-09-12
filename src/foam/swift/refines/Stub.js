@@ -17,7 +17,7 @@ foam.CLASS({
 let replyBox = ReplyBox_create([
   "delegate": RPCReturnBox_create()
 ])
-let registeredReplyBox = (registry as! BoxRegistry).register(
+let registeredReplyBox = (registry as! BoxRegistryInterface).register(
   replyBox.id,
   delegateReplyPolicy as? BoxService,
   replyBox)

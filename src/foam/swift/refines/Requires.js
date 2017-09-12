@@ -37,6 +37,9 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls) {
+      if (foam.core.InterfaceModel.isInstance(this.lookup(this.swiftPath).model_)) {
+        return;
+      }
       cls.methods.push(this.Method.create({
         name: this.name + '_create',
         returnType: this.swiftReturnType,
@@ -58,7 +61,7 @@ foam.CLASS({
       args: [],
       template: function() {/*
 return __subContext__.create(
-    type: <%=this.swiftReturnType%>.self, args: args) as! <%=this.swiftReturnType%>
+    cls: <%=this.swiftReturnType%>.classInfo(), args: args) as! <%=this.swiftReturnType%>
       */},
     },
   ],

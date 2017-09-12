@@ -230,10 +230,7 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testFObjectParse() {
-    let x = Context.GLOBAL.createSubContext(args: [
-      "X": Context.GLOBAL,
-      "Test": Test.self,
-    ])
+    let x = Context.GLOBAL.createSubContext(args: ["X": Context.GLOBAL])
     let ps = FObjectParser().parse(
         StringPStream(["str": "{class:'Test', prevFirstName: \"MY_PREV_NAME\"}"]), x)
     XCTAssertTrue(ps!.value() is Test)
@@ -499,24 +496,55 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testClientBoxRegistry() {
-    let serverContext = BoxContext()
+    let boxContext = BoxContext()
+    let X = boxContext.__subContext__
+
+    let outputter = X.create(cls: Outputter.classInfo()) as! Outputter
+    let parser = X.create(cls: FObjectParser.classInfo()) as! FObjectParser
+
     class TestBox: Box {
       var o: Any?
-      func send(_ msg: Message) throws { o = msg.object }
+      func send(_ msg: Message) throws {
+        o = msg.object
+      }
     }
     let testBox = TestBox()
     let registeredBox =
-        (serverContext.registry as! BoxRegistryBox).register("TestBox", nil, testBox) as? SubBox
+        (boxContext.registry as! BoxRegistryBox).register("TestBox", nil, testBox) as? SubBox
 
-    let clientContext = BoxContext()
-    let clientBoxRegistry = ClientBoxRegistry(X: clientContext.__subContext__)
-    clientBoxRegistry.delegate = serverContext.registry!
+    _ = (boxContext.registry as! BoxRegistryBox).register("", nil, boxContext.registry as! BoxRegistryBox) as? SubBox
+    boxContext.root = boxContext.registry
 
-    let box = clientBoxRegistry.doLookup("TestBox") as? SubBox
-    XCTAssertNotNil(box)
-    XCTAssertTrue(registeredBox === box)
+    class RegistryDelegate: Box {
+      var outputter: Outputter
+      var parser: FObjectParser
+      var registry: Box
+      init(registry: Box, outputter: Outputter, parser: FObjectParser) {
+        self.registry = registry
+        self.outputter = outputter
+        self.parser = parser
+      }
+      func send(_ msg: Message) throws {
+        let str = outputter.swiftStringify(msg)
+        let obj = parser.parse(
+          StringPStream(["str": str]),
+          Context.GLOBAL.createSubContext(args: ["X": parser.__subContext__]))
+        try registry.send(obj?.value() as! Message)
+      }
+    }
 
-    try? box?.send(Message(["object": "HELLO"]))
-    XCTAssertEqual(testBox.o as? String, "HELLO")
+    let clientBoxRegistry = ClientBoxRegistry(X: X)
+    clientBoxRegistry.delegate =
+        RegistryDelegate(registry: boxContext.registry!, outputter: outputter, parser: parser)
+
+    do {
+      let box = try clientBoxRegistry.doLookup("TestBox") as? SubBox
+      XCTAssertNotNil(box)
+      XCTAssertTrue(registeredBox === box)
+      try? box?.send(Message(["object": "HELLO"]))
+      XCTAssertEqual(testBox.o as? String, "HELLO")
+    } catch let e {
+      fatalError()
+    }
   }
 }

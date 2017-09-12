@@ -130,13 +130,22 @@ foam.CLASS({
               return self.blacklist.indexOf(m) == -1;
             });
 
+        var classes = [];
         for (var i = 0; i < models.length; i++) {
           var cls = self.lookup(models[i], self);
+          var swiftClass = cls.toSwiftClass();
+          if (foam.swift.SwiftClass.isInstance(swiftClass)) {
+            classes.push(swiftClass.name);
+          }
           var fileName = self.outdir + sep + cls.id.replace(/\./g, '_') + '.swift';
           self.fs.writeFileSync(
               fileName,
-              cls.toSwiftClass().toSwiftSource());
+              swiftClass.toSwiftSource());
         }
+        var registerCode = classes.map(function(c) {
+          return 'Context.GLOBAL.registerClass(cls: '+c+'.classInfo())'
+        }).join('\n');
+        console.log(registerCode);
       }).catch(function(err) {
         console.log('Error', err);
       });

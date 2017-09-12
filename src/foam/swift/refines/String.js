@@ -42,14 +42,5 @@ return ""
         return '"' + value.replace(/"/g, '\\"') + '"'
       },
     },
-    {
-      name: 'swiftJsonParser',
-      value: 'StringParser()',
-    },
-    {
-      class: 'String',
-      name: 'swiftJsonOutputter',
-      value: 'StringOutputter()',
-    },
   ],
 });
