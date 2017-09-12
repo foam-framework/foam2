@@ -33,8 +33,8 @@ foam.CLASS({
 
       o.out(
         ')',
-        this.returnType ? ' -> ' + this.returnType : '',
-        this.throws ? ' throws' : '');
+        this.throws ? ' throws' : '',
+        this.returnType ? ' -> ' + this.returnType : '');
     }
   ]
 });

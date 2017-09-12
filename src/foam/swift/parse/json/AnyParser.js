@@ -31,6 +31,8 @@ return Alt(["parsers": [
   FloatParser(),
   BooleanParser(),
   FObjectParser(),
+  ArrayParser(),
+  MapParser(),
 ]])
     */},
   },

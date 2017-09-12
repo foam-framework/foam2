@@ -27,7 +27,7 @@ class ListenerList {
 public protocol PropertyInfo: Axiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
-  var view: FObject.Type? { get }
+  var view: ClassInfo? { get }
   var label: String { get }
   var visibility: Visibility { get }
   var jsonParser: Parser? { get }
@@ -84,7 +84,22 @@ public class Context {
     return classMap[id]
   }
 
-  public func create(type: Any, args: [String:Any?] = [:]) -> Any? {
+  public func create(cls: ClassInfo, args: [String:Any?] = [:]) -> FObject {
+    if var multiton = cls as? Multiton, let key = args[multiton.multitonProperty.name] as? String {
+      if let value = multiton.multitonMap[key] {
+        return value
+      } else {
+        let value = create(type: cls.cls, args: args) as! FObject
+        multiton.multitonMap[key] = value
+        return value
+      }
+    } else {
+      return create(type: cls.cls, args: args) as! FObject
+    }
+  }
+
+  // TODO is this method needed?
+  private func create(type: Any, args: [String:Any?] = [:]) -> Any? {
     var o: Any? = nil
     if let t = type as? Initializable.Type {
       o = t.init(args)
@@ -94,6 +109,7 @@ public class Context {
     }
     return o
   }
+
   private var slotMap: [String:Slot] = [:]
   public subscript(key: String) -> Any? {
     if let slot = slotMap[key] {
@@ -131,9 +147,21 @@ public protocol ClassInfo {
 }
 
 extension ClassInfo {
+  /*
   func create(_ args: [String:Any?] = [:], x: Context = Context.GLOBAL) -> FObject {
-    return x.create(type: cls, args: args) as! FObject
+    if var multiton = self as? Multiton, let key = args[multiton.multitonProperty.name] as? String {
+      if let value = multiton.multitonMap[key] {
+        return value
+      } else {
+        let value = x.create(type: cls, args: args) as! FObject
+        multiton.multitonMap[key] = value
+        return value
+      }
+    } else {
+      return x.create(type: cls, args: args) as! FObject
+    }
   }
+  */
   var axioms: [Axiom] {
     get {
       var curCls: ClassInfo? = self
@@ -169,6 +197,11 @@ extension ClassInfo {
     }
     return nil
   }
+}
+
+public protocol Multiton {
+  var multitonProperty: PropertyInfo { get }
+  var multitonMap: [String:FObject] { get set }
 }
 
 public class Subscription {
@@ -434,11 +467,10 @@ extension Character {
 
 public class ModelParserFactory {
   private static var parsers: [String:Parser] = [:]
-  public static func getInstance(_ c: FObject.Type) -> Parser {
-    let info = (c as! AbstractFObject.Type).classInfo()
-    if let p = parsers[info.id] { return p }
-    let parser = buildInstance(info)
-    parsers[info.id] = parser
+  public static func getInstance(_ cls: ClassInfo) -> Parser {
+    if let p = parsers[cls.id] { return p }
+    let parser = buildInstance(cls)
+    parsers[cls.id] = parser
     return parser
   }
   private static func buildInstance(_ info: ClassInfo) -> Parser {

@@ -119,6 +119,52 @@ out.append(data ? "true" : "false")
       */},
     },
     {
+      name: 'outputMap',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: '[String:Any?]',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("{")
+for (i, d) in data.keys.enumerated() {
+  outputString(&out, d)
+  out.append(":")
+  output(&out, data[d]!)
+  if i < data.count - 1 { out.append(",") }
+}
+out.append("}")
+      */},
+    },
+    {
+      name: 'outputArray',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: '[Any?]',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("[")
+for (i, d) in data.enumerated() {
+  output(&out, d)
+  if i < data.count - 1 { out.append(",") }
+}
+out.append("]")
+      */},
+    },
+    {
       name: 'outputNumber',
       args: [
         {
@@ -157,6 +203,10 @@ if let data = data as? FObject {
   outputBoolean(&out, data)
 } else if let data = data as? NSNumber {
   outputNumber(&out, data)
+} else if let data = data as? [Any?] {
+  outputArray(&out, data)
+} else if let data = data as? [String:Any?] {
+  outputMap(&out, data)
 } else if data == nil {
   outputNil(&out)
 }

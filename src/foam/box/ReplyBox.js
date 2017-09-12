@@ -33,14 +33,22 @@ foam.CLASS({
         // Someone could store a box for days and then use it
         // at that point the ID might no longer be valid.
         return foam.next$UID();
-      }
+      },
+      swiftFactory: 'return String(FOAM_utils.next$UID())',
     }
   ],
 
   methods: [
-    function send(msg) {
-      this.registry.unregister(this.id);
-      this.delegate.send(msg);
-    }
+    {
+      name: 'send',
+      code: function() {
+        this.registry.unregister(this.id);
+        this.delegate.send(msg);
+      },
+      swiftCode: function() {/*
+(registry as! BoxRegistry).unregister(id)
+try delegate.send(msg)
+      */},
+    },
   ]
 });

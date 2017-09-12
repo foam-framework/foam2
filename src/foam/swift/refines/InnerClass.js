@@ -32,7 +32,7 @@ foam.CLASS({
       args: [],
       template: function() {/*
 return __subContext__.create(
-    type: <%=this.model.swiftName%>.self, args: args) as! <%=this.model.swiftName%>
+    cls: <%=this.model.swiftName%>.classInfo(), args: args) as! <%=this.model.swiftName%>
       */},
     },
   ],

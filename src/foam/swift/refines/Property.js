@@ -186,7 +186,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftJsonParser',
-      value: 'nil',
+      value: 'AnyParser()',
     },
     {
       class: 'Boolean',
@@ -413,9 +413,9 @@ class PInfo: PropertyInfo {
   let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
 <% if (this.swiftView && !this.hidden) { %>
-  let view: FObject.Type? = <%=this.swiftView.split('.').pop()%>.self
+  let view: ClassInfo? = <%=this.swiftView.split('.').pop()%>.classInfo()
 <% } else { %>
-  let view: FObject.Type? = nil
+  let view: ClassInfo? = nil
 <% } %>
   public func set(_ obj: FObject, value: Any?) {
     obj.set(key: name, value: value)

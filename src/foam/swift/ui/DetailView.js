@@ -174,7 +174,7 @@ subscript(key: String) -> FObject? {
   if let a = classInfo.axiom(byName: key) {
     if let a = a as? PropertyInfo, a.view != nil {
       let prop = a.name
-      let viewFobj = self.__subContext__.create(type: a.view!) as! FObject
+      let viewFobj = self.__subContext__.create(cls: a.view!)
       if let viewFobj = viewFobj as? PropertyView {
         viewFobj.fromProperty(a)
       }

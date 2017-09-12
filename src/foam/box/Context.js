@@ -88,16 +88,21 @@ foam.CLASS({
       swiftFactory: 'return BoxRegistryBox_create()',
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'root',
       hidden: true,
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
-      }
+      },
+      swiftPostSet: 'NamedBox_create(["name": ""]).delegate = newValue',
     },
     {
       class: 'String',
       name: 'myname',
       hidden: true,
+      swiftFactory:
+          'return "/com/foamdev/anonymous/" + String(FOAM_utils.next$UID())',
       factory: function() {
         return foam.isServer ?
           '/proc/' + require('process').pid + '/' + foam.uuid.randomGUID() :

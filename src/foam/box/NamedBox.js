@@ -74,10 +74,13 @@ return self.LookupBox_create([
         }, this);
       },
       swiftCode: function() {/*
-let index = name.range(of: ".", options: .backwards)!.lowerBound
-return ownClassInfo().create([
-  "name": name.substring(to: index)
-], x: self.__subContext__) as! Box
+var name = ""
+if let index = name.range(of: ".", options: .backwards)?.lowerBound {
+  name = name.substring(to: index)
+}
+return __subContext__.create(cls: ownClassInfo(), args: [
+  "name": name
+]) as! Box
       */},
     },
 
@@ -88,8 +91,10 @@ return ownClassInfo().create([
         return this.name.substring(this.name.lastIndexOf('/') + 1);
       },
       swiftCode: function getBaseName() {/*
-let index = name.range(of: ".", options: .backwards)!.lowerBound
-return name.substring(to: name.index(index, offsetBy: 1))
+if let index = name.range(of: ".", options: .backwards)?.lowerBound {
+  return name.substring(to: name.index(index, offsetBy: 1))
+}
+return ""
       */},
     },
   ]

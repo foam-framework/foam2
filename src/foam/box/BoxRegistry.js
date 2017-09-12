@@ -15,9 +15,59 @@
  * limitations under the License.
  */
 
+foam.INTERFACE({
+  package: 'foam.box',
+  name: 'BoxRegistryInterface',
+  methods: [
+    {
+      name: 'doLookup',
+      swiftEnabled: true,
+      returns: 'foam.box.Box',
+      throws: true,
+      args: [
+        {
+          class: 'String',
+          name: 'name',
+        },
+      ]
+    },
+    {
+      name: 'register',
+      returns: 'foam.box.Box',
+      swiftEnabled: true,
+      args: [
+        {
+          swiftClass: 'String?', // TODO better class+required:false
+          name: 'name',
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.BoxService',
+          name: 'service',
+        },
+        {
+          class: 'FObjectProperty',
+          of: 'foam.box.Box',
+          required: true,
+          name: 'localBox',
+        },
+      ],
+    },
+    {
+      name: 'unregister',
+      swiftEnabled: true,
+      returns: '',
+      args: [
+        'name'
+      ]
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.box',
   name: 'BoxRegistry',
+  implements: ['foam.box.BoxRegistryInterface'],
 
   requires: [
     'foam.box.NoSuchNameException',
@@ -133,6 +183,18 @@ return registration.exportBox!
     {
       name: 'unregister',
       returns: '',
+      swiftCode: function() {/*
+if let name = name as? String {
+  registry_.removeValue(forKey: name)
+} else if let name = name as? AnyClass {
+  for key in registry_.keys {
+    if ((registry_[key] as! Registration).exportBox as? AnyClass) === name {
+      registry_.removeValue(forKey: key)
+      return
+    }
+  }
+}
+      */},
       code: function(name) {
         if ( foam.box.Box.isInstance(name) ) {
           for ( var key in this.registry_ ) {
