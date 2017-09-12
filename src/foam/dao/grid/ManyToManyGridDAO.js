@@ -32,6 +32,7 @@ foam.CLASS({
       pushed off the UI thread.`,
 
   requires: [ 'foam.dao.ArraySink' ],
+
   imports: [ 'relationship' ],
 
   properties: [
