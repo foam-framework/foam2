@@ -27,7 +27,7 @@ describe('RestDAOHandler', function() {
   var clientDAO;
 
   beforeEach(function() {
-    serverDAO = foam.dao.ArrayDAO.create();
+    serverDAO = foam.dao.ArrayDAO.create({ of: foam.core.FObject });
     server = foam.net.node.Server.create({
       port: port,
     });
