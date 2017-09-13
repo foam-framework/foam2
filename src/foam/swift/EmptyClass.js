@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,9 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'HTTPReplyBox',
-  implements: ['foam.box.Box'],
-
-  imports: [
-    // Optional import.
-    //    'httpResponse'
-  ],
-
+  package: 'foam.swift',
+  name: 'EmptyClass',
   methods: [
-    {
-      name: 'send',
-      code: function(m) {
-        throw 'unimplemented';
-      },
-      swiftCode: function() {/*
-fatalError("unimplemented")
-      */},
-    }
+    function toSwiftSource() { return ' ' },
   ]
 });

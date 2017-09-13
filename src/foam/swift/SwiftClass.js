@@ -49,9 +49,8 @@ foam.CLASS({
       name: 'fields',
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.swift.SwiftClass',
       name: 'classes',
+      factory: function() { return []; },
     },
     {
       class: 'FObjectArray',

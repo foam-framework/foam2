@@ -11,9 +11,21 @@ foam.CLASS({
   implements: [ 'foam.box.Box' ],
 
   requires: [
-    'foam.json.Outputter',
-    'foam.json.Parser',
-    'foam.net.web.HTTPRequest'
+    {
+      name: 'Outputter',
+      path: 'foam.json.Outputter',
+      swiftPath: 'foam.swift.parse.json.output.HTTPBoxOutputter',
+    },
+    {
+      name: 'Parser',
+      path: 'foam.json.Parser',
+      swiftPath: 'foam.swift.parse.json.FObjectParser',
+    },
+    {
+      name: 'HTTPRequest',
+      path: 'foam.net.web.HTTPRequest',
+      swiftPath: '',
+    },
   ],
 
   imports: [
@@ -26,6 +38,7 @@ foam.CLASS({
     {
       name: 'JSONOutputter',
       extends: 'foam.json.Outputter',
+      swiftEnabled: false,
       requires: [
         'foam.box.HTTPReplyBox'
       ],
@@ -42,21 +55,25 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'url'
     },
     {
+      class: 'String',
       name: 'method'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.json.Parser',
+      swiftType: 'FObjectParser',
       name: 'parser',
       factory: function() {
         return this.Parser.create({
           strict:          true,
           creationContext: this.creationContext
         });
-      }
+      },
+      swiftFactory: 'return Parser_create()',
     },
     {
       class: 'FObjectProperty',
@@ -70,7 +87,8 @@ foam.CLASS({
           strict:               true,
           propertyPredicate:    function(o, p) { return ! p.networkTransient; }
         });
-      }
+      },
+      swiftFactory: 'return Outputter_create()',
     }
   ],
 
@@ -84,19 +102,34 @@ foam.CLASS({
       return url;
     },
 
-    function send(msg) {
-      var req = this.HTTPRequest.create({
-        url:     this.prepareURL(this.url),
-        method:  this.method,
-        payload: this.outputter.stringify(msg)
-      }).send();
+    {
+      name: 'send',
+      code: function(msg) {
+        var req = this.HTTPRequest.create({
+          url:     this.prepareURL(this.url),
+          method:  this.method,
+          payload: this.outputter.stringify(msg)
+        }).send();
 
-      req.then(function(resp) {
-        return resp.payload;
-      }).then(function(p) {
-        var msg = this.parser.parseString(p);
-        msg && this.me.send(msg);
-      }.bind(this));
-    }
+        req.then(function(resp) {
+          return resp.payload;
+        }).then(function(p) {
+          var msg = this.parser.parseString(p);
+          msg && this.me.send(msg);
+        }.bind(this));
+      },
+      swiftCode: function() {/*
+let semaphore = DispatchSemaphore(value: 0)
+
+var request = URLRequest(url: Foundation.URL(string: self.url)!)
+request.httpMethod = "POST"
+request.httpBody = outputter?.swiftStringify(msg).data(using: .utf8)
+let task = URLSession.shared.dataTask(with: request) { data, response, error in
+  semaphore.signal()
+}
+task.resume()
+semaphore.wait()
+      */},
+    },
   ]
 });

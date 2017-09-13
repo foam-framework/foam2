@@ -31,6 +31,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
       'foam.swift.ui.FOAMUITextFieldInt',
       'foam.swift.ui.PropertyView',
       'foam.swift.ui.ScrollingViewController',
+      'foam.swift.parse.json.output.HTTPBoxOutputter',
       'foam.u2.Visibility',
 
       'Tabata',
@@ -42,6 +43,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
 
       'foam.box.Context',
       'foam.box.Box',
+      'foam.box.HTTPBox',
       'foam.box.BoxService',
       'foam.box.BoxRegistry',
       'foam.box.ReplyBox',

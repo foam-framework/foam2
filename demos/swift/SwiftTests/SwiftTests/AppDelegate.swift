@@ -23,8 +23,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window?.rootViewController = app.navVc
     window?.makeKeyAndVisible()
 
-
-
     Context.GLOBAL.registerClass(cls: FloatParser.classInfo())
     Context.GLOBAL.registerClass(cls: PropertyParser.classInfo())
     Context.GLOBAL.registerClass(cls: ProxyParser.classInfo())
@@ -79,6 +77,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: SubBoxMessage.classInfo())
     Context.GLOBAL.registerClass(cls: NoSuchNameException.classInfo())
     Context.GLOBAL.registerClass(cls: BoxService.classInfo())
+    Context.GLOBAL.registerClass(cls: HTTPBox.classInfo())
+    Context.GLOBAL.registerClass(cls: HTTPBoxOutputter.classInfo())
+    Context.GLOBAL.registerClass(cls: HTTPReplyBox.classInfo())
     Context.GLOBAL.registerClass(cls: BoxContext.classInfo())
     Context.GLOBAL.registerClass(cls: LoggedLookupContext.classInfo())
     Context.GLOBAL.registerClass(cls: ClassWhitelistContext.classInfo())
@@ -111,8 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: FOAMUILabel.classInfo())
     Context.GLOBAL.registerClass(cls: DetailView.classInfo())
     Context.GLOBAL.registerClass(cls: FOAMActionUIButton.classInfo())
-
-
+    
     return true
   }
 }
