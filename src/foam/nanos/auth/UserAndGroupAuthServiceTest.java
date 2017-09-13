@@ -2,6 +2,8 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.dao.ListSink;
+
+import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -107,7 +109,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0; i < numUsers; i++ ) {
       try {
         xArray.add(login(i, "marc" + i));
-      } catch (RuntimeException e) {
+      } catch (AuthenticationException e) {
         e.printStackTrace();
       }
     }
@@ -163,7 +165,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0 ; i < numUsers ; i++ ) {
       try {
         challengedLogin(i, generateChallenge(i));
-      } catch (RuntimeException e) {
+      } catch (AuthenticationException e) {
         e.printStackTrace();
       }
     }
@@ -178,7 +180,7 @@ public class UserAndGroupAuthServiceTest
       String challenge = generateChallenge(0);
       TimeUnit.SECONDS.sleep(6);
       challengedLogin(0, challenge);
-    } catch (RuntimeException e) {
+    } catch (AuthenticationException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -192,7 +194,7 @@ public class UserAndGroupAuthServiceTest
     for ( int i = 0 ; i < xArray.size() ; i++ ) {
       try {
         updatePassword(xArray.get(i), "marc" + i, "marcasdf");
-      } catch (IllegalStateException e) {
+      } catch (AuthenticationException e) {
         e.printStackTrace();
       }
     }
