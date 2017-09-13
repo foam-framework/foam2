@@ -547,4 +547,17 @@ class SwiftTestsTests: XCTestCase {
       fatalError()
     }
   }
+
+  func testHTTPBox() {
+    let boxContext = BoxContext()
+    let X = boxContext.__subContext__
+
+    let httpBox = HTTPBox()
+    httpBox.url = "http://google.com"
+
+    let msg = Message()
+    msg.object = "HELLO WOLRD"
+
+    try? httpBox.send(msg)
+  }
 }

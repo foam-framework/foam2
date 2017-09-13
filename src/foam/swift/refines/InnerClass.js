@@ -6,6 +6,7 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls) {
+      if ( !this.model.swiftEnabled ) return;
       var innerClass = this.model.buildClass();
       var innerSwiftClass = innerClass.toSwiftClass();
       innerSwiftClass.imports = [];

@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.swift.Enum',
     'foam.swift.EnumValue',
     'foam.swift.SwiftClass',
+    'foam.swift.EmptyClass',
     'foam.swift.Field',
     'foam.swift.Method',
   ],
@@ -117,7 +118,7 @@ foam.CLASS({
             models[model] = 1;
             var cls = self.lookup(model);
             cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
-              queue.push(r.swiftPath);
+              r.swiftPath && queue.push(r.swiftPath);
             });
             cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
               queue.push(r.path);

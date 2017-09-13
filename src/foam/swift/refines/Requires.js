@@ -37,6 +37,7 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls) {
+      if (!this.swiftPath) return;
       if (foam.core.InterfaceModel.isInstance(this.lookup(this.swiftPath).model_)) {
         return;
       }
