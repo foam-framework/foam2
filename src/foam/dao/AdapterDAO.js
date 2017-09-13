@@ -35,7 +35,7 @@ foam.CLASS({
         {
           class: 'Function',
           name: 'adapt',
-          documentation: `"adapt(o)" adapts inputto type expected by
+          documentation: `"adapt(o)" adapts input to type expected by
               "delegate" sink.`,
           required: true
         }

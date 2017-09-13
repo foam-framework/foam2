@@ -41,6 +41,14 @@ public abstract class AbstractDAO
     throw new UnsupportedOperationException();
   }
 
+  protected Sink decorateListener_(Sink sink, Predicate predicate) {
+    if ( predicate != null ) {
+      sink = new PredicatedSink(predicate, sink);
+    }
+
+    return sink;
+  }
+
   protected Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( ( limit > 0 ) && ( limit < this.MAX_SAFE_INTEGER ) ) {
       sink = new LimitedSink(limit, 0, sink);
@@ -79,12 +87,80 @@ public abstract class AbstractDAO
     return getPrimaryKey().get(obj);
   }
 
-  public void listen() {
-    this.listen_(this.getX());
+  protected class DAOListener implements foam.core.Detachable {
+    protected Sink sink;
+    protected java.util.Collection listeners;
+
+    public DAOListener(Sink sink, java.util.Collection listeners) {
+      this.sink = sink;
+      this.listeners = listeners;
+    }
+
+    public void detach() {
+      listeners.remove(this);
+    }
+
+    public void put(FObject obj) {
+      try {
+        sink.put(obj, this);
+      } catch (Exception e) {
+        detach();
+      }
+    }
+
+    public void remove(FObject obj) {
+      try {
+        sink.remove(obj, this);
+      } catch (Exception e) {
+        detach();
+      }
+    }
+
+    public void reset() {
+      try {
+        sink.reset(this);
+      } catch (Exception e) {
+        detach();
+      }
+    }
   }
 
-  public void listen_(X x) {
-    // TODO
+  protected java.util.List<DAOListener> listeners_ = new java.util.concurrent.CopyOnWriteArrayList<DAOListener>();
+
+  public void listen(Sink sink, Predicate predicate) {
+    this.listen_(this.getX(), sink, predicate);
+  }
+
+  public void listen_(X x, Sink sink, Predicate predicate) {
+    sink = decorateListener_(sink, predicate);
+    listeners_.add(new DAOListener(sink, listeners_));
+  }
+
+  protected void onPut(FObject obj) {
+    java.util.Iterator<DAOListener> iter = listeners_.iterator();
+
+    while ( iter.hasNext() ) {
+      DAOListener s = iter.next();
+      s.put(obj);
+    }
+  }
+
+  protected void onRemove(FObject obj) {
+    java.util.Iterator<DAOListener> iter = listeners_.iterator();
+
+    while ( iter.hasNext() ) {
+      DAOListener s = iter.next();
+      s.remove(obj);
+    }
+  }
+
+  protected void onReset() {
+    java.util.Iterator<DAOListener> iter = listeners_.iterator();
+
+    while ( iter.hasNext() ) {
+      DAOListener s = iter.next();
+      s.reset();
+    }
   }
 
   public FObject put(FObject obj) {

@@ -14,7 +14,9 @@ foam.CLASS({
 
   requires: [
     'foam.box.HTTPBox',
-    'foam.dao.RequestResponseClientDAO as ClientDAO',
+    'foam.box.WebSocketBox',
+    'foam.dao.RequestResponseClientDAO',
+    'foam.dao.ClientDAO',
     'foam.dao.EasyDAO',
     'foam.nanos.auth.Country',
     'foam.nanos.auth.Group',
@@ -66,7 +68,7 @@ foam.CLASS({
     {
       name: 'userDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.User,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -78,7 +80,7 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
-        return this.ClientDAO.create({
+        return this.RequestResponseClientDAO.create({
           of: this.NSpec,
           delegate: this.HTTPBox.create({
             method: 'POST',
@@ -111,7 +113,7 @@ foam.CLASS({
             { code: 'CA', name: 'Canada' },
             { code: 'CN', name: 'China' },
             { code: 'IN', name: 'India' },
-            { code: 'JM', name: 'Jamacia' },
+            { code: 'JM', name: 'Jamaica' },
             { code: 'LB', name: 'Lebanon' },
             { code: 'MX', name: 'Mexico' },
             { code: 'MY', name: 'Malaysia' },
@@ -147,7 +149,8 @@ foam.CLASS({
           of: this.Region,
           testData: [
             { countryId: 'CA', code: 'ON', name: 'Ontario' },
-            { countryId: 'CA', code: 'PQ', name: 'Quebec' }
+            { countryId: 'CA', code: 'PQ', name: 'Quebec' },
+            { countryId: 'IN', code: 'MH', name: 'Maharashtra'}
           ]
         });
       }
@@ -172,7 +175,7 @@ foam.CLASS({
               { parent: 'admin', id: 'export',       label: 'Export Drivers', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
               { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', XXXsummaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
               { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' } },
-              { xxxparent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO', summaryView: { class: 'foam.nanos.test.TestBorder' } } },
+              { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO', summaryView: { class: 'foam.nanos.test.TestBorder' } } },
               { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' } },
               { parent: 'admin', id: 'pm',           label: 'Performance',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'pmInfoDAO', summaryView: { class: 'foam.nanos.pm.PMTableView' } } },
               { parent: 'admin', id: 'log',          label: 'View Logs' },
@@ -231,7 +234,7 @@ foam.CLASS({
         {
           name: 'scriptDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.RequestResponseClientDAO.create({
               of: this.Script,
               delegate: this.HTTPBox.create({
                 method: 'POST',
@@ -251,12 +254,11 @@ foam.CLASS({
         {
           name: 'pmInfoDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.EasyDAO.create({
+              daoType: 'CLIENT',
+              remoteListenerSupport: true,
               of: this.PMInfo,
-              delegate: this.HTTPBox.create({
-                method: 'POST',
-                url: 'http://localhost:8080/pmInfoDAO'
-              })});
+              serviceName: 'pmInfoDAO'});
           }
         },
 
@@ -275,7 +277,7 @@ foam.CLASS({
         {
           name: 'testDAO',
           factory: function() {
-            return this.ClientDAO.create({
+            return this.RequestResponseClientDAO.create({
               of: this.Test,
               delegate: this.HTTPBox.create({
               method: 'POST',

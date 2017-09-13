@@ -8,10 +8,12 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class IntParser implements Parser {
-  public PStream parse(PStream ps, ParserContext x) {
-    long n = 0;
+public class IntParser
+  implements Parser
+{
 
+  public PStream parse(PStream ps, ParserContext x) {
+    long    n      = 0;
     boolean negate = false;
 
     if ( ! ps.valid() ) return null;
@@ -25,8 +27,10 @@ public class IntParser implements Parser {
       c = ps.head();
     }
 
-    if ( Character.isDigit(c) ) n = Character.digit(c, 10);
-    else return null;
+    if ( Character.isDigit(c) )
+      n = Character.digit(c, 10);
+    else
+      return null;
 
     ps = ps.tail();
 
@@ -35,9 +39,7 @@ public class IntParser implements Parser {
       if ( Character.isDigit(c) ) {
         n *= 10;
         n += Character.digit(c, 10);
-        if (n > Integer.MAX_VALUE) {
-            return null;
-        }
+        if ( n > Integer.MAX_VALUE ) return null;
       } else {
         break;
       }
@@ -46,6 +48,6 @@ public class IntParser implements Parser {
 
     if ( negate ) n *= -1;
 
-    return ps.setValue((int)n);
+    return ps.setValue((int) n);
   }
 }
