@@ -4,6 +4,8 @@ import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.*;
 import foam.util.LRULinkedHashMap;
+
+import javax.naming.AuthenticationException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -20,7 +22,6 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected Map challengeMap;
-
   public static final String HASH_METHOD = "SHA-512";
 
   @Override
@@ -33,19 +34,21 @@ public class UserAndGroupAuthService
   /**
    * A challenge is generated from the userID provided
    * This is saved in a LinkedHashMap with ttl of 5
-   *
-   * Should this throw an exception?
    */
-  public String generateChallenge(long userId) {
-    if ( userId < 1 ) return null;
-    if ( userDAO_.find(userId) == null )  return null;
+  public String generateChallenge(long userId) throws AuthenticationException {
+    if ( userId < 1 ) {
+      throw new AuthenticationException("Invalid User Id");
+    }
+
+    if ( userDAO_.find(userId) == null ) {
+      throw new AuthenticationException("User not found");
+    }
 
     String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
     Calendar calendar           = Calendar.getInstance();
     calendar.add(Calendar.SECOND, 5);
 
     challengeMap.put(userId, new Challenge(generatedChallenge, calendar.getTime()));
-
     return generatedChallenge;
   }
 
@@ -55,25 +58,25 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(long userId, String challenge) throws RuntimeException {
+  public X challengedLogin(long userId, String challenge) throws AuthenticationException {
     if ( userId < 1 || challenge == null  || challenge == "" ) {
-      throw new RuntimeException("Invalid Parameters");
+      throw new AuthenticationException("Invalid Parameters");
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) throw new RuntimeException("Invalid userId");
+    if ( c == null ) throw new AuthenticationException("Invalid userId");
 
     if ( ! c.getChallenge().equals(challenge) ) {
-      throw new RuntimeException("Invalid Challenge");
+      throw new AuthenticationException("Invalid Challenge");
     }
 
     if ( new Date().after(c.getTtl()) ) {
       challengeMap.remove(userId);
-      throw new RuntimeException("Challenge expired");
+      throw new AuthenticationException("Challenge expired");
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new RuntimeException("User not found");
+    if ( user == null ) throw new AuthenticationException("User not found");
 
     challengeMap.remove(userId);
     return this.getX().put("user", user);
@@ -83,13 +86,13 @@ public class UserAndGroupAuthService
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(long userId, String password) throws RuntimeException {
+  public X login(long userId, String password) throws AuthenticationException {
     if ( userId < 1 || password == null || password == "" ) {
-      throw new RuntimeException("Invalid Parameters");
+      throw new AuthenticationException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new RuntimeException("User not found.");
+    if ( user == null ) throw new AuthenticationException("User not found.");
 
     String hashedPassword;
     String storedPassword;
@@ -100,11 +103,11 @@ public class UserAndGroupAuthService
       hashedPassword = hashPassword(password, salt);
       storedPassword = user.getPassword().split(":")[0];
     } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("Couldn't hash passwords with " + HASH_METHOD);
+      throw new AuthenticationException("Couldn't hash passwords with " + HASH_METHOD);
     }
 
     if ( ! storedPassword.equals(hashedPassword) ) {
-      throw new RuntimeException("Invalid Password");
+      throw new AuthenticationException("Invalid Password");
     }
 
     return this.getX().put("user", user);
@@ -135,16 +138,16 @@ public class UserAndGroupAuthService
    * and return a context with the updated user information
    */
   public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
-    throws RuntimeException {
+    throws AuthenticationException {
 
     if ( x == null || oldPassword == null || newPassword == null
       || oldPassword == "" || newPassword == "" ) {
-      throw new RuntimeException("Invalid Parameters");
+      throw new AuthenticationException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
     if ( user == null ) {
-      throw new RuntimeException("User not found");
+      throw new AuthenticationException("User not found");
     }
 
     String password = user.getPassword();
@@ -160,15 +163,15 @@ public class UserAndGroupAuthService
       hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
       hashedNewPassword = hashPassword(newPassword, newSalt);
     } catch (NoSuchAlgorithmException e) {
-      throw new IllegalStateException("Failed to hash passwords using " + HASH_METHOD);
+      throw new AuthenticationException("Failed to hash passwords using " + HASH_METHOD);
     }
 
     if ( ! hashedOldPassword.equals(storedPassword) ) {
-      throw new IllegalStateException("Invalid Password");
+      throw new AuthenticationException("Invalid Password");
     }
 
     if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
-      throw new IllegalStateException("New Password must be different");
+      throw new AuthenticationException("New Password must be different");
     }
 
     user.setPassword(hashedNewPassword + ":" + newSalt);
@@ -182,33 +185,33 @@ public class UserAndGroupAuthService
    * Will mainly be used as a veto method.
    * Users should have id, email, first name, last name, password for registration
    */
-  public void validateUser(User user) throws RuntimeException {
+  public void validateUser(User user) throws AuthenticationException {
     if ( user == null ) {
-      throw new RuntimeException("Invalid User");
+      throw new AuthenticationException("Invalid User");
     }
 
     if ( user.getEmail() == "" ) {
-      throw new RuntimeException("Email is required for creating a user");
+      throw new AuthenticationException("Email is required for creating a user");
     }
 
     if ( ! validateEmail(user.getEmail()) ) {
-      throw new RuntimeException("Email format is invalid");
+      throw new AuthenticationException("Email format is invalid");
     }
 
     if ( user.getFirstName() == "" ) {
-      throw new RuntimeException("First Name is required for creating a user");
+      throw new AuthenticationException("First Name is required for creating a user");
     }
 
     if ( user.getLastName() == "" ) {
-      throw new RuntimeException("Last Name is required for creating a user");
+      throw new AuthenticationException("Last Name is required for creating a user");
     }
 
     if ( user.getPassword() == "" ) {
-      throw new RuntimeException("Password is required for creating a user");
+      throw new AuthenticationException("Password is required for creating a user");
     }
 
     if ( ! validatePassword(user.getPassword()) ) {
-      throw new RuntimeException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
+      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
     }
   }
 
