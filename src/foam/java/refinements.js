@@ -488,7 +488,7 @@ foam.CLASS({
         ( o instanceof String ) ?
         Byte.valueOf((String) o) :
         (byte)o;`;
-      
+
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues(cast(key), get_(o));';
 
@@ -665,7 +665,7 @@ foam.CLASS({
       + 'return forOrdinal((int) o); '
       + '}'
       + ' return (java.lang.Enum) o;';
-      
+
       return info;
     }
   ]
@@ -717,7 +717,7 @@ foam.CLASS({
         java.util.Date date = new java.util.Date((String) o);
         return date;
         }
-        return (java.util.Date)o;`;
+        return (java.util.Date) o;`;
 
       return info;
   }
@@ -817,6 +817,16 @@ foam.CLASS({
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ExprParser']
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+
+  properties: [
+    ['javaType',       'String[]'],
+    ['javaJSONParser', 'foam.lib.json.StringArrayParser']
   ]
 });
 
@@ -1121,6 +1131,74 @@ foam.CLASS({
           foam.java.JavaImport.create({import: o}) :
           foam.java.JavaImport.create(o) ;
       }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Listener',
+  properties: [
+    {
+      class: 'String',
+      name: 'javaCode'
+    }
+  ],
+  methods: [
+    function buildJavaClass(cls) {
+      if ( ! this.javaCode ) return;
+
+      if ( ! this.isMerged && ! this.isFramed ) {
+        cls.method({
+          name: this.name,
+          type: 'void',
+          args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+          body: this.javaCode
+        });
+        return;
+      }
+
+      cls.method({
+        name: this.name + '_real_',
+        type: 'void',
+        visibility: 'protected',
+        args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+        body: this.javaCode
+      });
+
+      cls.method({
+        name: this.name,
+        type: 'void',
+        args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+        body: `${this.name + 'Listener_'}.fire(event);`
+      })
+
+      var listener = foam.java.Field.create({
+        name: this.name + 'Listener_',
+        visibility: 'protected',
+        type: 'foam.core.MergedListener',
+        initializer: foam.java.Class.create({
+          anonymous: true,
+          extends: 'foam.core.MergedListener',
+          methods: [
+            foam.java.Method.create({
+              name: 'getDelay',
+              type: 'int',
+              visibility: 'public',
+              body: `return ${this.isFramed ? 16 : this.mergeDelay};`
+            }),
+            foam.java.Method.create({
+              name: 'go',
+              type: 'void',
+              visibility: 'public',
+              args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+              body: `${this.name + '_real_'}(event);`
+            })
+          ]
+        })
+      });
+
+      cls.fields.push(listener);
     }
   ]
 });

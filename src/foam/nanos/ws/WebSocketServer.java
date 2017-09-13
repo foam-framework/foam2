@@ -42,9 +42,6 @@ public class WebSocketServer
     public void onMessage(WebSocket conn, String message) {
         Logger                log        = (Logger)getX().get("logger");
 
-        System.out.println("WS Request" + message);
-        log.info("Incoming websocket request");
-
         try {
             String                path       = conn.getResourceDescriptor();
             String[]              urlParts   = path.split("/");
@@ -70,8 +67,13 @@ public class WebSocketServer
 
             FObject request = requestContext.create(foam.lib.json.JSONParser.class).parseString(message);
 
-            if ( request == null || ! ( request instanceof foam.box.Message ) ) {
-                log.warning("Invalid request");
+            if ( request == null ) {
+                log.warning("Failed to parse request.", message);
+                return;
+            }
+
+            if ( ! ( request instanceof foam.box.Message ) ) {
+                log.warning("Request was not a box message.", message);
                 return;
             }
 

@@ -60,7 +60,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'method'
+      name: 'method',
+      value: 'POST'
     },
     {
       class: 'FObjectProperty',
