@@ -514,9 +514,9 @@ foam.CLASS({
   methods: [
     function init(){
       this.start('h3').add(this.title$).end()
-          .start('div', null, this.content$)
-            .style({ 'border': '2px solid black' })
-          .end();
+      .start('div', null, this.content$)
+        .style({ 'border': '2px solid black' })
+      .end();
     }
   ]
 });
