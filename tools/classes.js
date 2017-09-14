@@ -96,12 +96,23 @@ var classes = [
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
   'foam.nanos.menu.Menu',
+  'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.ListMenu',
+  'foam.nanos.menu.MenuBar',
+  'foam.nanos.menu.PopupMenu',
+  'foam.nanos.menu.SubMenu',
+  'foam.nanos.menu.SubMenuView',
+  'foam.nanos.menu.TabsMenu',
+  'foam.nanos.menu.ViewMenu',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
+  'foam.u2.Element',
+    
+
   'foam.nanos.export.ExportDriverRegistry'
 ];
 
