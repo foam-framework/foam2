@@ -37,6 +37,7 @@ foam.INTERFACE({
       swiftEnabled: true,
       args: [
         {
+          class: 'String',
           swiftClass: 'String?', // TODO better class+required:false
           name: 'name',
         },
@@ -58,7 +59,10 @@ foam.INTERFACE({
       swiftEnabled: true,
       returns: '',
       args: [
-        'name'
+        {
+          class: 'String',
+          name: 'name',
+        },
       ]
     }
   ]
@@ -108,7 +112,6 @@ foam.CLASS({
   methods: [
     {
       name: 'doLookup',
-      returns: 'foam.box.Box',
       code: function doLookup(name) {
         if ( this.registry_[name] &&
              this.registry_[name].exportBox )
@@ -122,17 +125,9 @@ if let exportBox = (registry_[name] as? Registration)?.exportBox {
 }
 throw NoSuchNameException_create(["name": name])
       */},
-      throws: true,
-      args: [
-        {
-          class: 'String',
-          name: 'name',
-        },
-      ]
     },
     {
       name: 'register',
-      returns: 'foam.box.Box',
       code: function(name, service, localBox) {
         name = name || foam.next$UID();
 
@@ -162,27 +157,9 @@ let registration = Registration_create([
 registry_[name] = registration
 return registration.exportBox!
       */},
-      args: [
-        {
-          swiftClass: 'String?', // TODO better class+required:false
-          name: 'name',
-        },
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.BoxService',
-          name: 'service',
-        },
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          required: true,
-          name: 'localBox',
-        },
-      ],
     },
     {
       name: 'unregister',
-      returns: '',
       swiftCode: function() {/*
 if let name = name as? String {
   registry_.removeValue(forKey: name)
@@ -211,9 +188,6 @@ if let name = name as? String {
 
         delete this.registry_[name];
       },
-      args: [
-        'name'
-      ]
     }
   ]
 });
