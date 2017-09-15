@@ -336,17 +336,6 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        ^ {
-          // align-items: center;
-          // bottom: 0;
-          // display: flex;
-          // justify-content: space-around;
-          // left: 0;
-          // position: fixed;
-          // right: 0;
-          // top: 0;
-          // z-index: 1000;
-        }
         ^container {
           align-items: center;
           display: flex;
