@@ -49,7 +49,7 @@ foam.CLASS({
   methods: [
     {
       /** Template method used to add additional code in subclasses. */
-      name: 'run',
+      name: 'runTest',
       javaReturns: 'void',
       javaCode: '/* NOOP */'
     },
@@ -110,7 +110,7 @@ foam.CLASS({
           // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else { currentTest.setFailed(currentTest.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
-          run();
+          runTest();
         } catch (EvalError e) {
           e.printStackTrace();
         } finally {

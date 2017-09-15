@@ -148,8 +148,19 @@ foam.CLASS({
         return this.createDAO({
           of: this.Region,
           testData: [
+            { countryId: 'CA', code: 'AB', name: 'Alberta' },
+            { countryId: 'CA', code: 'BC', name: 'British Columbia' },
+            { countryId: 'CA', code: 'MB', name: 'Manitoba' },
+            { countryId: 'CA', code: 'NB', name: 'New Brunswick' },
+            { countryId: 'CA', code: 'NL', name: 'Newfoundland' },
+            { countryId: 'CA', code: 'NS', name: 'Nova Scotia' },
+            { countryId: 'CA', code: 'NT', name: 'Northwest Territories' },
+            { countryId: 'CA', code: 'NU', name: 'Nunavut' },
             { countryId: 'CA', code: 'ON', name: 'Ontario' },
-            { countryId: 'CA', code: 'PQ', name: 'Quebec' },
+            { countryId: 'CA', code: 'PE', name: 'Prince Edward Island' },
+            { countryId: 'CA', code: 'QC', name: 'Quebec' },
+            { countryId: 'CA', code: 'SK', name: 'Saskatchewan' },
+            { countryId: 'CA', code: 'YT', name: 'Yukon' },
             { countryId: 'IN', code: 'MH', name: 'Maharashtra'}
           ]
         });
