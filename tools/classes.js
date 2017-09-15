@@ -111,8 +111,7 @@ var classes = [
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
   'foam.u2.Element',
-    
-
+  'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry'
 ];
 
