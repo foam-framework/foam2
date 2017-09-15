@@ -102,6 +102,7 @@ FOAM_FILES([
   { name: "lib/input", flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
+  { name: "foam/u2/Visibility"}, 
   { name: "foam/u2/ElementJava" ,  flags: ['java'] },
   { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
@@ -364,5 +365,4 @@ FOAM_FILES([
   { name: "foam/dao/history/HistoryRecord" },
   { name: "foam/mop/MOP" },
   { name: "foam/mop/MOPJava", flags: ['java'] },
-  { name: "foam/u2/Visibility"},
 ]);
