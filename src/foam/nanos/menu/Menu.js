@@ -186,7 +186,8 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      name: 'handler'
+      name: 'handler',
+      view: 'foam.u2.FObjectView'
     },
     {
       class: 'Int',
