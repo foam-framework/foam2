@@ -331,6 +331,11 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
+      if ( ! this.type ) {
+        console.warn("Skipping constant", this.name, "with unknown type.");
+        return;
+      }
+
       cls.constant({
         name:  this.name,
         type:  this.type || undefined,
