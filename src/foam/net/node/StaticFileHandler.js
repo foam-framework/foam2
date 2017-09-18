@@ -140,10 +140,14 @@ foam.CLASS({
       res.statusCode = 200;
       res.setHeader('Content-type', mimetype);
 
-      // Open the file as a stream.
-      var stream = this.fs.createReadStream(target);
-      stream.pipe(res);
-      this.info('200 OK ' + target);
+      this.fs.readFile(target, function(error, data) {
+        if (error) {
+          this.send404(req, res);
+          return;
+        }
+        this.info('200 OK ' + target);
+        res.end(data);
+      }.bind(this));
 
       return true;
     }

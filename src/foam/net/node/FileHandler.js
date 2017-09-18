@@ -83,8 +83,14 @@ foam.CLASS({
       res.statusCode = 200;
       res.setHeader('Content-type', mimetype);
 
-      this.fs.createReadStream(this.filePath).pipe(res);
-      this.info('200 OK ' + this.urlPath + ' => ' + this.filePath);
+      this.fs.readFile(this.filePath, function(error, data) {
+        if (error) {
+          this.send404(req, res);
+          return;
+        }
+        this.info('200 OK ' + this.urlPath + ' => ' + this.filePath);
+        res.end(data);
+      }.bind(this));
 
       return true;
     }
