@@ -128,12 +128,51 @@ foam.CLASS({
 
   properties: [ 'X', 'menu' ],
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+        ^inner {
+          -webkit-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+          -moz-box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+          box-shadow: 0px 0px 67px -15px rgba(0,0,0,0.75);
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+
+          position: absolute;
+          top: 65px;
+          font-weight: 300;
+        }
+        ^inner div {
+          box-sizing: border-box;
+          padding: 8px 24px;
+          padding-right: 48px;
+          cursor: pointer;
+          background: white;
+          color: black;
+          border-left: solid 1px #edf0f5;
+          border-right: solid 1px #edf0f5;
+        }
+        ^inner div:last-child {
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+        }
+        ^inner div:hover {
+          color: white;
+          background: #1cc2b7;
+          border-left: solid 1px #1cc2b7;
+          border-right: solid 1px #1cc2b7;
+        }
+      */}
+    })
+  ],
+
   methods: [
     function initE() {
       this.addClass(this.myClass());
       var self = this;
       var menu = this.menu;
       var X = this.X;
+
       menu.children.select({
         put: function(menu) {
           if ( ! menu.handler ) return;
@@ -154,15 +193,15 @@ foam.CLASS({
   name: 'SubMenu',
   extends: 'foam.nanos.menu.AbstractMenu',
 
-  requires: [ 'foam.nanos.menu.PopupMenu' ],
+  requires: [ 'foam.nanos.menu.SubMenuView' ],
 
   methods: [
-    function createView(X, menu) {
-      return this.SubMenuView.create({menu: menu}, X);
+    function createView(X, menu, parent) {
+      return this.SubMenuView.create({menu: menu, parent: parent}, X);
     },
 
-    function launch(X, menu) {
-      var view = this.createView(X, menu);
+    function launch(X, menu, parent) {
+      var view = this.createView(X, menu, parent);
       view.open();
     }
   ]
@@ -186,7 +225,8 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      name: 'handler'
+      name: 'handler',
+      view: 'foam.u2.FObjectView'
     },
     {
       class: 'Int',
@@ -272,8 +312,13 @@ foam.CLASS({
             .start('ul')
               .select(this.menuDAO.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
                 this.start('li')
-                  .on('click', function() { menu.launch(self.__context__); })
-                  .add(menu.label)
+                  .call(function() {
+                    var e = this;
+                    this.start()
+                      .add(menu.label)
+                      .on('click', function() { menu.handler && menu.handler.launch(self.__context__, menu, e) })
+                    .end();
+                  })
                 .end()
               })
             .end()
@@ -292,17 +337,6 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: function() {/*
-        ^ {
-          align-items: center;
-          bottom: 0;
-          display: flex;
-          justify-content: space-around;
-          left: 0;
-          position: fixed;
-          right: 0;
-          top: 0;
-          z-index: 1000;
-        }
         ^container {
           align-items: center;
           display: flex;
@@ -326,30 +360,35 @@ foam.CLASS({
     })
   ],
 
+  properties: [
+    'parent'
+  ],
+
   methods: [
     function init() {
       this.SUPER();
       var content;
 
       this.addClass(this.myClass())
-          .start()
-          .addClass(this.myClass('container'))
-          .start()
-              .addClass(this.myClass('background'))
-              .on('click', this.close)
-          .end()
-          .start()
-              .call(function() { content = this; })
-              .addClass(this.myClass('inner'))
-          .end()
-      .end();
+        .start()
+          .addClass(this.myClass('background'))
+          .on('click', this.close)
+        .end()
+        .start()
+          .call(function() { content = this; })
+          .addClass(this.myClass('inner'))
+        .end();
 
       this.content = content;
     },
 
     function open() {
-      this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
-      this.load();
+      if ( this.parent ) {
+        this.parent.add(this);
+      } else {
+        this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
+        this.load();
+      }
     }
   ],
 
