@@ -28,15 +28,17 @@ public class MainActivity extends android.app.ListActivity {
         dao = proxyX.create(foam.dao.ClientDAO.class);
         dao.setDelegate(box);
 
-        //        getListView().setAdapter(new ArrayAdapter<foam.nanos.boot.NSpec>(this, android.R.layout.simple_list_item_1, new foam.nanos.boot.NSpec[] { new foam.nanos.boot.NSpec((Object)"asdf", "hello", false, false, "serviceClass", "boxClass", "script", "client", null) }));
 
         final ArrayAdapter adapter = new ArrayAdapter<foam.nanos.boot.NSpec>(this, android.R.layout.simple_list_item_1);
         getListView().setAdapter(adapter);
 
-        //               adapter.add(new foam.nanos.boot.NSpec((Object)"asdf", "hello", false, false, "serviceClass", "boxClass", "script", "client", null));
-
         final android.widget.ListView view = getListView();
         final android.app.ListActivity parent = this;
+
+        // We can't make network calls from the main UI thread.  So we
+        // have to start a separate thread to do the DAO interaction.
+        // Once that's done we can post an event back to the UI thread
+        // to update.
         new Thread(new Runnable() {
                 public void run() {
                     final foam.dao.ArraySink sink;
