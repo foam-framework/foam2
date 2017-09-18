@@ -48,6 +48,44 @@ foam.CLASS({
 
   methods: [
     {
+      /** Template method used to add additional code in subclasses. */
+      name: 'runTest',
+      javaReturns: 'void',
+      javaCode: '/* NOOP */'
+    },
+    {
+      name: 'test',
+      args: [
+        {
+          name: 'exp', javaType: 'boolean'
+        },
+        {
+          name: 'message', javaType: 'String'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+        if ( exp ) {
+          setPassed(getPassed()+1);
+        } else {
+          setFailed(getFailed()+1);
+        }
+        print((exp ? "SUCCESS: " : "FAILURE: ") + message);
+      `
+    },
+    {
+      name: 'print',
+      args: [
+        {
+          name: 'message', javaType: 'String'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+        setOutput(getOutput() + "\\n" + message);
+      `
+    },
+    {
       name: 'runScript',
       args: [
         {
@@ -61,7 +99,6 @@ foam.CLASS({
         Interpreter           shell = new Interpreter();
         PM                    pm    = new PM(this.getClass(), getId());
 
-System.err.println("************************** Test: " + getCode());
         try {
           shell.set("currentTest", this);
           setPassed(0);
@@ -73,6 +110,7 @@ System.err.println("************************** Test: " + getCode());
           // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else { currentTest.setFailed(currentTest.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
+          runTest();
         } catch (EvalError e) {
           e.printStackTrace();
         } finally {
@@ -82,7 +120,7 @@ System.err.println("************************** Test: " + getCode());
         setLastRun(new Date());
         ps.flush();
         System.err.println("******************** Output: " + this.getPassed() + " " + this.getFailed() + " " + baos.toString());
-        setOutput(baos.toString());
+        setOutput(baos.toString() + getOutput());
     `
     }
   ]
