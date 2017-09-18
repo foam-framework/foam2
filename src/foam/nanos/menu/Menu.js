@@ -21,7 +21,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'handler',
-      view: 'foam.u2.FObjectView'
+      view: 'foam.u2.view.FObjectView'
     },
     {
       class: 'Int',
