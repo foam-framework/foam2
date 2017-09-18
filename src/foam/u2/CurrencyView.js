@@ -28,6 +28,11 @@ foam.CLASS({
 
     function textToData(text) {
       return this.SUPER(text) * 100;
+    },
+
+    function formatNumber(val) {
+      if ( ! val ) return '0';
+      return val.toFixed(this.precision);
     }
   ]
 });
