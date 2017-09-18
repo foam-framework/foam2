@@ -115,8 +115,10 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Array',
-      name: 'array'
+      class: 'List',
+      name: 'array',
+      factory: function() { return []; },
+      javaFactory: `return new java.util.ArrayList();`
     },
     {
       name: 'a',
@@ -125,12 +127,16 @@ foam.CLASS({
         this.warn('Use of deprecated ArraySink.a');
         return this.array;
       }
-    },
+    }
   ],
 
   methods: [
-    function put(o, sub) {
-      this.array.push(o);
+    {
+      name: 'put',
+      code: function put(o, sub) {
+        this.array.push(o);
+      },
+      javaCode: `getArray().add(obj);`
     }
   ]
 });
