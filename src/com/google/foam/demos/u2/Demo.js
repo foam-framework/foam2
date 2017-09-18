@@ -519,3 +519,20 @@ foam.CLASS({
 
 Child1View.create().write();
 Child2View.create().write();
+
+
+foam.CLASS({
+  name: 'FObjectViewTest',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      name: 'obj',
+      view: 'foam.u2.view.FObjectView',
+      value: foam.util.Timer.create()
+    }
+  ]
+});
+
+var fovt = FObjectViewTest.create();
+foam.u2.DetailView.create({data:fovt}).write();
+foam.u2.DetailView.create({data:fovt}).write();
