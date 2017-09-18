@@ -74,6 +74,7 @@ foam.CLASS({
       this.validate();
       this.SUPER();
     },
+
     function buildClass_() {
       this.versionedModel.validate();
       var cls = this.versionedModel.buildClass();
