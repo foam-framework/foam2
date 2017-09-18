@@ -109,50 +109,6 @@ protected class ResponseThread implements Runnable {
   }
 
   public void run() {
-    try {
-
-// TODO: There has to be a better way to do this.
-byte[] buf = new byte[8388608];
-java.io.InputStream input = conn_.getInputStream();
-
-int off = 0;
-int len = buf.length;
-int read = -1;
-while ( len != 0 && ( read = input.read(buf, off, len) ) != -1 ) {
-  off += read;
-  len -= read;
-}
-
-if ( len == 0 && read != -1 ) {
-  throw new RuntimeException("Message too large.");
-}
-
-String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
-
-foam.core.FObject message = getX().create(foam.lib.json.JSONParser.class).parseString(str);
-
-if ( message == null ) {
-  throw new RuntimeException("Error parsing request.");
-}
-
-if ( ! ( message instanceof foam.box.Message ) ) {
-  throw new RuntimeException("Invalid response type: " + message.getClass().getName() + " expected foam.box.Message.");
-}
-
-getMe().send((foam.box.Message)message);
-
-//      java.io.BufferedReader reader = new java.io.BufferedReader(
-//        new java.io.InputStreamReader(conn_.getInputStream(),
-//          java.nio.charset.StandardCharsets.UTF_8));
-
-
-//      StringBuilder buffer = new StringBuilder();
-//      while ( ( line = reader.readLine() ) != null ) {
-//        System.out.println(line);
-//      }
-    } catch(java.io.IOException e) {
-throw new RuntimeException(e);
-    }
   }
 }
 `}));
@@ -202,12 +158,42 @@ try {
 
   output.write(new Outputter().stringify(message));
   output.close();
+
+
+// TODO: There has to be a better way to do this.
+byte[] buf = new byte[8388608];
+java.io.InputStream input = conn.getInputStream();
+
+int off = 0;
+int len = buf.length;
+int read = -1;
+while ( len != 0 && ( read = input.read(buf, off, len) ) != -1 ) {
+  off += read;
+  len -= read;
+}
+
+if ( len == 0 && read != -1 ) {
+  throw new RuntimeException("Message too large.");
+}
+
+String str = new String(buf, 0, off, java.nio.charset.StandardCharsets.UTF_8);
+
+foam.core.FObject responseMessage = getX().create(foam.lib.json.JSONParser.class).parseString(str);
+
+if ( responseMessage == null ) {
+  throw new RuntimeException("Error parsing response.");
+}
+
+if ( ! ( responseMessage instanceof foam.box.Message ) ) {
+  throw new RuntimeException("Invalid response type: " + responseMessage.getClass().getName() + " expected foam.box.Message.");
+}
+
+getMe().send((foam.box.Message)responseMessage);
+
 } catch(java.io.IOException e) {
   // TODO: Error box?
   throw new RuntimeException(e);
 }
-
-new Thread(new ResponseThread(conn)).start();
 `
     }
   ]
