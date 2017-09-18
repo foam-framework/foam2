@@ -412,12 +412,20 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Import',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'javaType',
+      value: 'Object'
+    }
+  ],
+
   methods: [
     function buildJavaClass(cls) {
       cls.method({
-        type: 'Object',
+        type: this.javaType,
         name: 'get' + foam.String.capitalize(this.name),
-        body: 'return getX().get("' + this.key + '");',
+        body: `return (${this.javaType})getX().get("${this.key}");`,
         visibility: 'protected'
       });
     }
@@ -786,7 +794,8 @@ foam.CLASS({
   refines: 'foam.core.List',
 
   properties: [
-    ['javaType', 'java.util.List']
+    ['javaType', 'java.util.List'],
+    ['javaJSONParser', 'foam.lib.json.ListParser']
   ]
 });
 
