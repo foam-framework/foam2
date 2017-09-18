@@ -36,24 +36,24 @@ foam.CLASS({
   ],
 
   exports: [
-   // 'countryDAO',
-    // 'cronDAO',
-    // 'exportDriverRegistryDAO',
-    //'groupDAO',
-    // 'languageDAO',
-    // 'menuDAO',
-    //'nSpecDAO',
-    // 'permissionDAO',
-    // 'pmInfoDAO',
-    // 'regionDAO',
-    // 'scriptDAO',
-    // 'testDAO',
-    // 'userDAO',
-    // 'webAuth'
+   'countryDAO',
+    'cronDAO',
+    'exportDriverRegistryDAO',
+    'groupDAO',
+    'languageDAO',
+    'menuDAO',
+    'nSpecDAO',
+    'permissionDAO',
+    'pmInfoDAO',
+    'regionDAO',
+    'scriptDAO',
+    'testDAO',
+    'userDAO',
+    'webAuth'
   ],
 
   properties: [
-  /*  {
+   {
       name: 'webAuth',
       factory: function() {
         return this.ClientAuthService.create({
@@ -86,7 +86,7 @@ foam.CLASS({
             method: 'POST',
             url: 'http://localhost:8080/nSpecDAO'
           })});
-        /*
+       
         return this.createDAO({
           of: this.NSpec,
           seqNo: true,
@@ -99,11 +99,11 @@ foam.CLASS({
             { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
-        */
-//      }
-//    },
+        
+      }
+   },
 
-   /* {
+    {
       name: 'countryDAO',
       factory: function() {
         return this.createDAO({
@@ -166,41 +166,41 @@ foam.CLASS({
         });
       }
     },
-*/
-    // {
-    //   name: 'menuDAO',
-    //   factory: function() {
-    //     return this.createDAO({
 
-    //       of: this.Menu,
-    //       testData: [
-    //         { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ } },
-    //           // { parent: 'admin', id: 'auth',         label: 'Authentication', handler: { class: 'foam.nanos.menu.TabsMenu' } },
-    //             { parent: /*'auth'*/'admin', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
-    //             { parent: /*'auth'*/'admin', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
-    //             { parent: /*'auth'*/'admin', id: 'permissions', label: 'Permissions',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'permissionDAO' }  },
-    //             { parent: /*'auth'*/'admin', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
-    //             { parent: /*'auth'*/'admin', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
-    //             { parent: /*'auth'*/'admin', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
-    //           { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
-    //           { parent: 'admin', id: 'export',       label: 'Export Drivers', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
-    //           { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', XXXsummaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
-    //           { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' } },
-    //           { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO', summaryView: { class: 'foam.nanos.test.TestBorder' } } },
-    //           { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' } },
-    //           { parent: 'admin', id: 'pm',           label: 'Performance',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'pmInfoDAO', summaryView: { class: 'foam.nanos.pm.PMTableView' } } },
-    //           { parent: 'admin', id: 'log',          label: 'View Logs' },
-    //           /*
-    //         { id: 'support',                         label: 'Support',         handler: { class: 'foam.nanos.menu.TabsMenu' } },
-    //           { parent: 'support', id: 'api',        label: 'API Reference' },
-    //           { parent: 'support', id: 'context',    label: 'Context Walker' }
-    //           */
-    //       ]
-    //     }).orderBy(this.Menu.ORDER, this.Menu.ID);
-    //   }
-    // },
+    {
+      name: 'menuDAO',
+      factory: function() {
+        return this.createDAO({
 
-  /*  {
+          of: this.Menu,
+          testData: [
+            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ } },
+              // { parent: 'admin', id: 'auth',         label: 'Authentication', handler: { class: 'foam.nanos.menu.TabsMenu' } },
+                { parent: /*'auth'*/'admin', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
+                { parent: /*'auth'*/'admin', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
+                { parent: /*'auth'*/'admin', id: 'permissions', label: 'Permissions',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'permissionDAO' }  },
+                { parent: /*'auth'*/'admin', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
+                { parent: /*'auth'*/'admin', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
+                { parent: /*'auth'*/'admin', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
+              { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
+              { parent: 'admin', id: 'export',       label: 'Export Drivers', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
+              { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', XXXsummaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },
+              { parent: 'admin', id: 'scripts',      label: 'Scripts',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'scriptDAO' } },
+              { parent: 'admin', id: 'tests',        label: 'Tests',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'testDAO', summaryView: { class: 'foam.nanos.test.TestBorder' } } },
+              { parent: 'admin', id: 'cron',         label: 'Cron Jobs',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'cronDAO' } },
+              { parent: 'admin', id: 'pm',           label: 'Performance',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'pmInfoDAO', summaryView: { class: 'foam.nanos.pm.PMTableView' } } },
+              { parent: 'admin', id: 'log',          label: 'View Logs' },
+              /*
+            { id: 'support',                         label: 'Support',         handler: { class: 'foam.nanos.menu.TabsMenu' } },
+              { parent: 'support', id: 'api',        label: 'API Reference' },
+              { parent: 'support', id: 'context',    label: 'Context Walker' }
+              */
+          ]
+        }).orderBy(this.Menu.ORDER, this.Menu.ID);
+      }
+    },
+
+   {
       name: 'languageDAO',
       factory: function() {
         return this.createDAO({
@@ -213,7 +213,7 @@ foam.CLASS({
       }
     },
 
-   /*{
+   {
       name: 'groupDAO',
       factory: function() {
         return this.createDAO({
@@ -251,15 +251,15 @@ foam.CLASS({
                 method: 'POST',
                 url: 'http://localhost:8080/scriptDAO'
               })});
-              /*
+              
 
             return this.createDAO({
               of: this.Script,
               seqNo: true,
               testData: [
               ]
-            });*/
- /*         }
+            });
+         }
         },
 
         {
@@ -295,16 +295,16 @@ foam.CLASS({
               url: 'http://localhost:8080/testDAO'
             })});
 
-            /*
+            
             return this.createDAO({
               of: this.Test,
               seqNo: true,
               testData: [
               ]
             });
-            */
- //         }
- //       } 
+            
+         }
+       } 
 
   ],
 
