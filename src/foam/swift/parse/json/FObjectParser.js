@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.swift.parse.parser.ProxyParser',
   requires: [
     'foam.swift.parse.json.FObjectParser_',
+    'foam.swift.parse.StringPStream',
   ],
   properties: [
     {
@@ -39,6 +40,24 @@ return
     Whitespace(),
     Literal(["string": "}"]),
   ]])
+      */},
+    },
+  ],
+  methods: [
+    {
+      name: 'parseString',
+      swiftReturnType: 'FObject?',
+      args: [
+        {
+          class: 'String',
+          name: 'str',
+        },
+      ],
+      swiftCode: function() {/*
+let ps = StringPStream_create(["str": str])
+let x = ParserContext()
+x.set("X", __subContext__)
+return parse(ps, x)?.value() as? FObject
       */},
     },
   ],

@@ -73,10 +73,10 @@ subViewSubscriptions = [:]
       name: 'initAllViews',
       swiftCode: function() {/*
 var properties: [PropertyInfo] = []
-var actions: [Action] = []
+var actions: [ActionInfo] = []
 if let fobj = data as AnyObject as? FObject {
   properties += fobj.ownClassInfo().axioms(byType: PropertyInfo.self)
-  actions += fobj.ownClassInfo().axioms(byType: Action.self)
+  actions += fobj.ownClassInfo().axioms(byType: ActionInfo.self)
 }
 properties = properties.filter({ (p) -> Bool in
   return self[p.name] != nil
@@ -172,9 +172,9 @@ subscript(key: String) -> FObject? {
   }
   let classInfo = data.ownClassInfo()
   if let a = classInfo.axiom(byName: key) {
-    if let a = a as? PropertyInfo, a.view != nil {
+    if let a = a as? PropertyInfo, let viewFactory = a.viewFactory {
       let prop = a.name
-      let viewFobj = self.__subContext__.create(cls: a.view!)
+      let viewFobj = viewFactory(self.__subContext__)
       if let viewFobj = viewFobj as? PropertyView {
         viewFobj.fromProperty(a)
       }
@@ -187,7 +187,7 @@ subscript(key: String) -> FObject? {
       subViewSubscriptions[prop] =
           viewFobj.getSlot(key: "data")!.linkFrom(data.getSlot(key: prop)!)
       return viewFobj
-    } else if let a = a as? Action {
+    } else if let a = a as? ActionInfo {
       let btn = FOAMActionUIButton_create()
       btn.fobj = data
       btn.action = a

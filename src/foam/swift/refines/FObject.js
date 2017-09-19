@@ -19,10 +19,7 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     function toSwiftClass() {
-      if ( !this.model_.swiftEnabled ) {
-        console.log('YOO');
-        return foam.swift.EmptyClass.create()
-      }
+      if ( !this.model_.swiftEnabled ) return foam.swift.EmptyClass.create()
       var initImports = function(model) {
         if (!model) return [];
         var parent = foam.lookup(model.extends).model_;
@@ -60,6 +57,26 @@ foam.LIB({
             return !!p.swiftCode;
           }.bind(this));
 
+      var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
+      multiton = multiton.length ? multiton[0] : null;
+
+      var classInfoCreate = foam.templates.TemplateUtil.create().compile(
+          foam.String.multiline(function(swiftName, multiton) {/*
+<% if ( multiton ) { %>
+if let key = args[multitonProperty.name] as? String,
+   let value = multitonMap[key] {
+  return value
+} else {
+  let value = <%=swiftName%>(args, x)
+  if let key = multitonProperty.get(value) as? String {
+    multitonMap[key] = value
+  }
+  return value
+}
+<% } else { %>
+return <%=swiftName%>(args, x)
+<% } %>
+          */}), '', ['swiftName', 'multiton']).apply(this, [this.model_.swiftName, multiton]).trim();
       var classInfo = foam.swift.SwiftClass.create({
         visibility: 'private',
         name: 'ClassInfo_',
@@ -81,7 +98,8 @@ foam.LIB({
             lazy: true,
             name: 'parent',
             type: 'ClassInfo?',
-            defaultValue: this.model_.swiftExtends + '.classInfo()',
+            defaultValue: this.model_.swiftExtends == 'AbstractFObject' ?
+                'nil' : this.model_.swiftExtends + '.classInfo()',
           }),
           foam.swift.Field.create({
             lazy: true,
@@ -96,14 +114,32 @@ foam.LIB({
           foam.swift.Field.create({
             lazy: true,
             name: 'cls',
-            type: 'Any',
+            type: 'AnyClass',
             defaultValue: this.model_.swiftName + '.self',
           }),
         ],
+        methods: [
+          foam.swift.Method.create({
+            name: 'create',
+            returnType: 'Any',
+            args: [
+              foam.swift.Argument.create({
+                externalName: 'args',
+                localName: 'args',
+                defaultValue: '[:]',
+                type: '[String:Any?]',
+              }),
+              foam.swift.Argument.create({
+                externalName: 'x',
+                localName: 'x',
+                type: 'Context',
+              }),
+            ],
+            body: classInfoCreate,
+          }),
+        ],
       });
-      var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
-      if (multiton.length) {
-        classInfo.implements.push('Multiton')
+      if (multiton) {
         classInfo.fields.push(foam.swift.Field.create({
           defaultValue: '[:]',
           lazy: true,
@@ -111,7 +147,7 @@ foam.LIB({
           name: 'multitonMap',
         }));
         classInfo.fields.push(foam.swift.Field.create({
-          defaultValue: this.getAxiomByName(multiton[0].property).swiftAxiomName,
+          defaultValue: this.getAxiomByName(multiton.property).swiftAxiomName,
           lazy: true,
           type: 'PropertyInfo',
           name: 'multitonProperty',
@@ -305,32 +341,6 @@ super.set(key: key, value: value)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
-
-      var callActionBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(actions) {/*
-switch key {
-<% for (var i = 0, p; p = actions[i]; i++) { %>
-  case "<%=p.swiftName%>":
-    <%=p.swiftName%>()
-    break
-<% } %>
-  default:
-    super.callAction(key: key)
-}
-          */}), '', ['actions']).apply(this, [actions]).trim();
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'callAction',
-        visibility: 'public',
-	args: [
-          {
-            externalName: 'key',
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        body: callActionBody,
-      }));
 
       var exports = this.getOwnAxiomsByClass(foam.core.Export)
           .filter(function(p) {

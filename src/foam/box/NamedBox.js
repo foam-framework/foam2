@@ -78,9 +78,9 @@ var name = ""
 if let index = name.range(of: ".", options: .backwards)?.lowerBound {
   name = name.substring(to: index)
 }
-return __subContext__.create(cls: ownClassInfo(), args: [
+return ownClassInfo().create(args: [
   "name": name
-]) as! Box
+], x: __subContext__) as! Box
       */},
     },
 

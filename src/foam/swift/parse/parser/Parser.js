@@ -31,7 +31,7 @@ foam.INTERFACE({
           name: 'ps',
         },
         {
-          swiftType: 'Context',
+          swiftType: 'ParserContext',
           name: 'x',
         },
       ],

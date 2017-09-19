@@ -38,10 +38,14 @@ msg.attributes["errorBox"] = registeredReplyBox
 try? delegate.send(msg)
 
 <% if (this.swiftReturnType) { %>
-if let box = (try? (replyBox.delegate as? RPCReturnBox)?.future.get()) as? Box {
-  return box
+  <% if (this.swiftReturnType == 'Any?') { %>
+return (try? (replyBox.delegate as? RPCReturnBox)?.future.get())
+  <% } else { %>
+if let o = (try? (replyBox.delegate as? RPCReturnBox)?.future.get()) as? <%=this.swiftReturnType%> {
+  return o
 }
 fatalError()
+  <% } %>
 <% } %>
       */},
     },

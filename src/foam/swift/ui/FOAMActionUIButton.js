@@ -36,7 +36,7 @@ newValue.setTitle(self.action?.label, for: .normal)
       name: 'fobj',
     },
     {
-      swiftType: 'Action?',
+      swiftType: 'ActionInfo?',
       name: 'action',
     },
     {
@@ -52,7 +52,8 @@ newValue.setTitle(self.action?.label, for: .normal)
 if dismissKeyboardOnTap {
   UIApplication.shared.keyWindow?.rootViewController?.view.endEditing(true)
 }
-if fobj != nil { action?.call(fobj!) }
+// TODO Broken. Fix.
+// if fobj != nil { action?.call(fobj!) }
       */},
       swiftAnnotations: ['@objc'],
     },

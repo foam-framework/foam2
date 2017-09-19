@@ -46,7 +46,8 @@ return
       swiftCode: function() {/*
 let ps = super.parse(ps, x);
 if ps == nil { return nil }
-property.set(x["obj"] as! FObject, value: ps!.value())
+let args = x.get("obj") as! Reference<[String:Any?]>
+args.value[property.name] = ps!.value()
 return ps
       */},
     },

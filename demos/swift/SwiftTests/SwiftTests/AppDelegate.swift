@@ -15,13 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-    let app = SwiftApp()
-    app.startListeners()
-
-    window = UIWindow(frame: UIScreen.main.bounds)
-    window?.backgroundColor = .white
-    window?.rootViewController = app.navVc
-    window?.makeKeyAndVisible()
 
     Context.GLOBAL.registerClass(cls: FloatParser.classInfo())
     Context.GLOBAL.registerClass(cls: PropertyParser.classInfo())
@@ -31,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: LongParser.classInfo())
     Context.GLOBAL.registerClass(cls: IntParser.classInfo())
     Context.GLOBAL.registerClass(cls: FObjectParser.classInfo())
+    Context.GLOBAL.registerClass(cls: StringPStream.classInfo())
     Context.GLOBAL.registerClass(cls: FObjectParser_.classInfo())
     Context.GLOBAL.registerClass(cls: Seq1.classInfo())
     Context.GLOBAL.registerClass(cls: Optional.classInfo())
@@ -89,7 +83,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: SkeletonBox.classInfo())
     Context.GLOBAL.registerClass(cls: InvalidMessageException.classInfo())
     Context.GLOBAL.registerClass(cls: HelloMessage.classInfo())
-    Context.GLOBAL.registerClass(cls: StringPStream.classInfo())
     Context.GLOBAL.registerClass(cls: ArraySink.classInfo())
     Context.GLOBAL.registerClass(cls: ArrayDAO.classInfo())
     Context.GLOBAL.registerClass(cls: AbstractDAO.classInfo())
@@ -113,6 +106,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: DetailView.classInfo())
     Context.GLOBAL.registerClass(cls: FOAMActionUIButton.classInfo())
     
+    let app = SwiftApp()
+    app.startListeners()
+
+    window = UIWindow(frame: UIScreen.main.bounds)
+    window?.backgroundColor = .white
+    //window?.rootViewController = app.navVc
+    window?.rootViewController = UIViewController()
+    window?.makeKeyAndVisible()
+
     return true
   }
 }

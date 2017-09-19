@@ -120,16 +120,20 @@ foam.CLASS({
         }.bind(this));
       },
       swiftCode: function() {/*
-let semaphore = DispatchSemaphore(value: 0)
-
 var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
 request.httpBody = outputter?.swiftStringify(msg).data(using: .utf8)
 let task = URLSession.shared.dataTask(with: request) { data, response, error in
-  semaphore.signal()
+  guard let data = data else {
+    fatalError()
+  }
+  if let me = self.me as? Box,
+     let str = String(data: data, encoding: .utf8),
+     let obj = self.parser.parseString(str) as? Message {
+    try? me.send(obj)
+  }
 }
 task.resume()
-semaphore.wait()
       */},
     },
   ]

@@ -53,7 +53,7 @@ foam.CLASS({
       },
       swiftCode: function() {/*
 let box2: Box = next?.serverBox(box) ?? box
-return __subContext__.create(cls: server, args: ["delegate": box2]) as! Box
+return server.create(args: ["delegate": box2], x: __subContext__) as! Box
       */},
     },
     {
@@ -74,8 +74,8 @@ return __subContext__.create(cls: server, args: ["delegate": box2]) as! Box
           box;
       },
       swiftCode: function() {/*
-let box2 = __subContext__.create(cls: client, args: ["delegate": box]) as! Box
-return next?.clientBox(box2) ?? box
+let box2 = client.create(args: ["delegate": box], x: __subContext__) as! Box
+return next?.clientBox(box2) ?? box2
       */},
     },
   ]
