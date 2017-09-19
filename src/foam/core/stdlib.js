@@ -478,7 +478,7 @@ foam.LIB({
       code: foam.Function.memoize1(function toSlotName(key) {
         foam.assert(
             typeof key === 'string',
-            'Cannot toSlotName non-string values.');
+            'Cannot toSlotName non-string values.  Attempted: ', key);
 
         return key + '$';
       })

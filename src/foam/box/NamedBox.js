@@ -18,8 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'NamedBox',
-
-  implements: [ 'foam.box.Box' ],
+  extends: 'foam.box.ProxyBox',
 
   requires: [
     'foam.box.LookupBox',
@@ -35,8 +34,6 @@ foam.CLASS({
       name: 'name'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.box.Box',
       name: 'delegate',
       transient: true,
       factory: function() {
@@ -58,14 +55,6 @@ return self.LookupBox_create([
 
   methods: [
     {
-      name: 'send',
-      code: function(msg) {
-        this.delegate.send(msg);
-      },
-      swiftCode: 'try delegate!.send(msg)',
-    },
-
-    {
       name: 'getParentBox',
       returns: 'foam.box.Box',
       code: function() {
@@ -83,7 +72,6 @@ return ownClassInfo().create(args: [
 ], x: __subContext__) as! Box
       */},
     },
-
     {
       name: 'getBaseName',
       returns: 'String',

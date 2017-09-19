@@ -34,7 +34,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.box.BoxRegistryInterface',
+      of: 'foam.box.BoxRegistry',
       name: 'registry',
       transient: true,
       factory: function() {

@@ -134,8 +134,13 @@ extension ClassInfo {
     get {
       var curCls: ClassInfo? = self
       var axioms: [Axiom] = []
+      var seen = Set<String>()
       while curCls != nil {
-        axioms += curCls!.ownAxioms
+        for a in curCls!.ownAxioms {
+          if seen.contains(a.name) { continue }
+          axioms.append(a)
+          seen.insert(a.name)
+        }
         curCls = curCls!.parent
       }
       return axioms
