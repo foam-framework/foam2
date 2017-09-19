@@ -95,7 +95,7 @@ foam.CLASS({
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
       },
-      swiftPostSet: 'NamedBox_create(["name": ""]).delegate = newValue',
+      swiftPostSet: 'NamedBox_create(["name": ""]).delegate = newValue!',
     },
     {
       class: 'String',
@@ -120,7 +120,7 @@ foam.CLASS({
       },
       swiftFactory: function() {/*
         let me = NamedBox_create(["name": self.myname])
-        me.delegate = self.registry;
+        me.delegate = self.registry!
         return me
       */},
     },

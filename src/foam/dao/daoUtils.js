@@ -134,12 +134,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Class',
-      name: 'of',
-      value: null
-    },
-    {
-      class: 'Array',
+      class: 'List',
       name: 'array',
       adapt: function(old, nu) {
         if ( ! this.of ) return nu;
@@ -149,7 +144,14 @@ foam.CLASS({
             nu[i] = cls.create(nu[i], this.__subContext__);
         }
         return nu;
-      }
+      },
+      factory: function() { return []; },
+      javaFactory: `return new java.util.ArrayList();`
+    },
+    {
+      class: 'Class',
+      name: 'of',
+      value: null
     },
     {
       name: 'a',
@@ -162,16 +164,20 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(o, sub) {
-      var cls = this.of;
-      if ( ! cls ) {
-        this.array.push(o);
-        return;
-      }
-      if ( cls.isInstance(o) )
-        this.array.push(o);
-      else
-        this.array.push(cls.create(o, this.__subContext__));
+    {
+      name: 'put',
+      code: function put(o, sub) {
+        var cls = this.of;
+        if ( ! cls ) {
+          this.array.push(o);
+          return;
+        }
+        if ( cls.isInstance(o) )
+          this.array.push(o);
+        else
+          this.array.push(cls.create(o, this.__subContext__));
+      },
+      javaCode: `getArray().add(obj);`
     },
     function outputJSON(outputter) {
       outputter.start('{');

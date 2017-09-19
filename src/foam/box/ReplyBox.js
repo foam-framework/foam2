@@ -21,7 +21,11 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   imports: [
-    'registry'
+    {
+      name: 'registry',
+      key: 'registry',
+      javaType: 'foam.box.BoxRegistry'
+    }
   ],
 
   properties: [
@@ -41,7 +45,7 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      code: function() {
+      code: function send(msg) {
         this.registry.unregister(this.id);
         this.delegate.send(msg);
       },
@@ -49,6 +53,10 @@ foam.CLASS({
 (registry as! BoxRegistry).unregister(id)
 try delegate.send(msg)
       */},
-    },
+      javaCode: `
+getRegistry().unregister(getId());
+getDelegate().send(message);
+`
+    }
   ]
 });

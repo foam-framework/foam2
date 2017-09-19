@@ -18,7 +18,7 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'precision', '2' ]
+    ['precision', '2']
   ],
 
   methods: [
@@ -28,6 +28,10 @@ foam.CLASS({
 
     function textToData(text) {
       return this.SUPER(text) * 100;
+    },
+
+    function formatNumber(val) {
+      return val.toFixed(2);
     }
   ]
 });

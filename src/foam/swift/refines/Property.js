@@ -217,6 +217,14 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         getter: this.swiftGetter(),
         setter: this.swiftSetter(),
       }));
+      cls.fields.push(this.Field.create({
+        visibility: 'private',
+        static: true,
+        final: true,
+        name: this.swiftAxiomName,
+        type: 'PropertyInfo',
+        initializer: this.swiftPropertyInfoInit(),
+      }));
       if ( !isOverride ) {
         if (this.swiftExpression) {
           cls.fields.push(this.Field.create({
@@ -234,14 +242,6 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
           name: this.swiftInitedName,
           type: 'Bool',
           defaultValue: 'false',
-        }));
-        cls.fields.push(this.Field.create({
-          visibility: 'public',
-          static: true,
-          final: true,
-          name: this.swiftAxiomName,
-          type: 'PropertyInfo',
-          initializer: this.swiftPropertyInfoInit(),
         }));
         cls.fields.push(this.Field.create({
           visibility: 'private',

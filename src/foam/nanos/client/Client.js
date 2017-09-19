@@ -148,8 +148,19 @@ foam.CLASS({
         return this.createDAO({
           of: this.Region,
           testData: [
+            { countryId: 'CA', code: 'AB', name: 'Alberta' },
+            { countryId: 'CA', code: 'BC', name: 'British Columbia' },
+            { countryId: 'CA', code: 'MB', name: 'Manitoba' },
+            { countryId: 'CA', code: 'NB', name: 'New Brunswick' },
+            { countryId: 'CA', code: 'NL', name: 'Newfoundland' },
+            { countryId: 'CA', code: 'NS', name: 'Nova Scotia' },
+            { countryId: 'CA', code: 'NT', name: 'Northwest Territories' },
+            { countryId: 'CA', code: 'NU', name: 'Nunavut' },
             { countryId: 'CA', code: 'ON', name: 'Ontario' },
-            { countryId: 'CA', code: 'PQ', name: 'Quebec' },
+            { countryId: 'CA', code: 'PE', name: 'Prince Edward Island' },
+            { countryId: 'CA', code: 'QC', name: 'Quebec' },
+            { countryId: 'CA', code: 'SK', name: 'Saskatchewan' },
+            { countryId: 'CA', code: 'YT', name: 'Yukon' },
             { countryId: 'IN', code: 'MH', name: 'Maharashtra'}
           ]
         });
@@ -163,14 +174,14 @@ foam.CLASS({
 
           of: this.Menu,
           testData: [
-            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.TabsMenu' /*SubMenu*/ } },
+            { id: 'admin',                           label: 'Admin',          handler: { class: 'foam.nanos.menu.SubMenu' /*SubMenu*/ } },
               // { parent: 'admin', id: 'auth',         label: 'Authentication', handler: { class: 'foam.nanos.menu.TabsMenu' } },
-                { parent: /*'auth'*/'admin', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
-                { parent: /*'auth'*/'admin', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
-                { parent: /*'auth'*/'admin', id: 'permissions', label: 'Permissions',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'permissionDAO' }  },
-                { parent: /*'auth'*/'admin', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
-                { parent: /*'auth'*/'admin', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
-                { parent: /*'auth'*/'admin', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
+              { parent: /*'auth'*/'admin', id: 'users',       label: 'Users',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'userDAO' } },
+              { parent: /*'auth'*/'admin', id: 'groups',      label: 'Groups',         handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'groupDAO' } },
+              { parent: /*'auth'*/'admin', id: 'permissions', label: 'Permissions',    handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'permissionDAO' }  },
+              { parent: /*'auth'*/'admin', id: 'countries',   label: 'Countries',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'countryDAO' } },
+              { parent: /*'auth'*/'admin', id: 'regions',     label: 'Regions',        handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'regionDAO' } },
+              { parent: /*'auth'*/'admin', id: 'lang',        label: 'Languages',      handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'languageDAO' } },
               { parent: 'admin', id: 'nspec',        label: 'Nano Services',  handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'nSpecDAO' }  },
               { parent: 'admin', id: 'export',       label: 'Export Drivers', handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'exportDriverRegistryDAO' }  },
               { parent: 'admin', id: 'menus',        label: 'Menus',          handler: { class: 'foam.nanos.menu.DAOMenu', daoKey: 'menuDAO', XXXsummaryView: { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }  } },

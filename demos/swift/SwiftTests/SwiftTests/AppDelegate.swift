@@ -66,7 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: ReplyBox.classInfo())
     Context.GLOBAL.registerClass(cls: ProxyBox.classInfo())
     Context.GLOBAL.registerClass(cls: RPCErrorMessage.classInfo())
-    Context.GLOBAL.registerClass(cls: BoxRegistry.classInfo())
+    Context.GLOBAL.registerClass(cls: LocalBoxRegistry.classInfo())
     Context.GLOBAL.registerClass(cls: SubBox.classInfo())
     Context.GLOBAL.registerClass(cls: SubBoxMessage.classInfo())
     Context.GLOBAL.registerClass(cls: NoSuchNameException.classInfo())
