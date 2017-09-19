@@ -67,7 +67,7 @@ foam.CLASS({
       },
       javaCode: `
 // TODO: Support changing of delegate
-return getDelegate().listen_(x, sink, predicate);
+getDelegate().listen_(x, sink, predicate);
 `
     }
   ]
