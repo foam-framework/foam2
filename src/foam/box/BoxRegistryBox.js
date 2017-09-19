@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'BoxRegistryBox',
-  extends: 'foam.box.BoxRegistry',
+  extends: 'foam.box.LocalBoxRegistry',
 
   implements: [ 'foam.box.Box' ],
 
@@ -61,7 +61,28 @@ foam.CLASS({
         } else {
           this.registrySkeleton.send(msg);
         }
-      }
+      },
+      javaCode: `
+Object obj = message.getObject();
+
+if ( obj instanceof foam.box.SubBoxMessage ) {
+  foam.box.SubBoxMessage sbm = (foam.box.SubBoxMessage)obj;
+  String name = sbm.getName();
+
+  Registration dest = (Registration)getRegistry_().get(name);
+
+  if ( dest != null ) {
+    message.setObject(sbm.getObject());
+    dest.getLocalBox().send(message);
+  } else if ( message.getAttributes().containsKey("errorBox") ) {
+    foam.box.Box errorBox = (foam.box.Box)message.getAttributes().get("errorBox");
+    foam.box.Message errorMessage = getX().create(foam.box.Message.class);
+    errorMessage.setObject(getX().create(foam.box.NoSuchNameException.class));
+
+    errorBox.send(errorMessage);
+  }
+}
+`
     }
   ]
 });
