@@ -73,6 +73,16 @@ public class Outputter {
     out.append("}");
   }
 
+  protected void outputList(StringBuilder out, java.util.List list) {
+    out.append("[");
+    java.util.Iterator iter = list.iterator();
+    while ( iter.hasNext() ) {
+      output(out, iter.next());
+      if ( iter.hasNext() ) out.append(",");
+    }
+    out.append("]");
+  }
+
   protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p) {
     out.append(beforeKey_());
     out.append(p.getName());
@@ -98,6 +108,8 @@ public class Outputter {
       outputDate(out, (java.util.Date) value);
     } else if ( value instanceof java.util.Map ) {
       outputMap(out, (java.util.Map) value);
+    } else if ( value instanceof java.util.List ) {
+      outputList(out, (java.util.List) value);
     } else /*if ( value == null )*/ {
       out.append("null");
     }

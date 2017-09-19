@@ -19,6 +19,11 @@ foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
     {
+      class: 'Boolean',
+      name: 'generateJava',
+      value: true
+    },
+    {
       class: 'String',
       name: 'javaType',
       value: 'Object'
@@ -70,7 +75,13 @@ foam.CLASS({
     },
 
     function buildJavaClass(cls) {
-      // Use javaInfoType as an indicator that this property should be generated to java code.
+      if ( ! this.generateJava ) return;
+
+      // Use javaInfoType as an indicator that this property should be
+      // generated to java code.
+
+      // TODO: Evaluate if we still want this behaviour.  It might be
+      // better to only respect the generateJava flag
       if ( ! this.javaInfoType ) return;
 
       var privateName = this.name + '_';
@@ -151,8 +162,17 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.InnerClass',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'generateJava',
+      value: true
+    }
+  ],
   methods: [
     function buildJavaClass(cls) {
+      if ( ! this.generateJava ) return;
+
       var innerClass = this.model.buildClass().buildJavaClass();
       innerClass.innerClass = true;
       innerClass.static = true;
@@ -201,7 +221,7 @@ foam.LIB({
       // TODO: instead of doing this here, we should walk all Axioms
       // and introuce a new buildJavaAncestorClass() method
       cls.allProperties = this.getAxiomsByClass(foam.core.Property)
-        .filter(function(p) { return !!p.javaType && p.javaInfoType; })
+        .filter(function(p) { return !!p.javaType && p.javaInfoType && p.generateJava; })
         .map(function(p) {
           return foam.java.Field.create({name: p.name, type: p.javaType});
         });
@@ -311,6 +331,11 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
+      if ( ! this.type ) {
+        console.warn("Skipping constant", this.name, "with unknown type.");
+        return;
+      }
+
       cls.constant({
         name:  this.name,
         type:  this.type || undefined,
@@ -392,12 +417,20 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Import',
 
+  properties: [
+    {
+      class: 'String',
+      name: 'javaType',
+      value: 'Object'
+    }
+  ],
+
   methods: [
     function buildJavaClass(cls) {
       cls.method({
-        type: 'Object',
+        type: this.javaType,
         name: 'get' + foam.String.capitalize(this.name),
-        body: 'return getX().get("' + this.key + '");',
+        body: `return (${this.javaType})getX().get("${this.key}");`,
         visibility: 'protected'
       });
     }
@@ -766,7 +799,8 @@ foam.CLASS({
   refines: 'foam.core.List',
 
   properties: [
-    ['javaType', 'java.util.List']
+    ['javaType', 'java.util.List'],
+    ['javaJSONParser', 'foam.lib.json.ListParser']
   ]
 });
 

@@ -106,7 +106,7 @@ foam.CLASS({
 
         // Install our own CSS, and then all parent models as well.
         if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(this, axiom.code));
+          X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
           axiom.installedDocuments_.set(X.document, true);
         }
 

@@ -15,99 +15,50 @@
  * limitations under the License.
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.box',
   name: 'BoxRegistry',
-
-  requires: [
-    'foam.box.NoSuchNameException',
-    'foam.box.SubBox'
-  ],
-
-  imports: [
-    'me'
-  ],
-
-  properties: [
-    {
-      name: 'registry_',
-      hidden: true,
-      factory: function() { return {}; }
-    }
-  ],
-
-  classes: [
-    {
-      name: 'Registration',
-      properties: [
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          name: 'exportBox'
-        },
-        {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          name: 'localBox'
-        }
-      ]
-    }
-  ],
 
   methods: [
     {
       name: 'doLookup',
       returns: 'foam.box.Box',
-      code: function doLookup(name) {
-        if ( this.registry_[name] &&
-             this.registry_[name].exportBox )
-          return this.registry_[name].exportBox;
-
-        throw this.NoSuchNameException.create({ name: name });
-      },
+      javaReturns: 'foam.box.Box',
       args: [
-        'name'
+        {
+          name: 'name',
+          javaType: 'String'
+        }
       ]
     },
     {
       name: 'register',
       returns: 'foam.box.Box',
-      code: function(name, service, localBox) {
-        name = name || foam.next$UID();
-
-        var exportBox = this.SubBox.create({ name: name, delegate: this.me });
-        exportBox = service ? service.clientBox(exportBox) : exportBox;
-
-        this.registry_[name] = {
-          exportBox: exportBox,
-          localBox: service ? service.serverBox(localBox) : localBox
-        };
-
-        return this.registry_[name].exportBox;
-      },
-      args: [ 'name', 'service', 'box' ]
+      javaReturns: 'foam.box.Box',
+      args: [
+        {
+          name: 'name',
+          javaType: 'String'
+        },
+        {
+          name: 'service',
+          javaType: 'foam.box.BoxService'
+        },
+        {
+          name: 'box',
+          javaType: 'foam.box.Box'
+        }
+      ],
     },
     {
       name: 'unregister',
       returns: '',
-      code: function(name) {
-        if ( foam.box.Box.isInstance(name) ) {
-          for ( var key in this.registry_ ) {
-            // TODO(markdittmer): Should there be a specialized compare() should
-            // be implemented by NamedBox (to cut out delegate) and
-            // foam.util.compare()?
-            if ( this.registry_[key].exportBox === name ) {
-              delete this.registry_[key];
-              return;
-            }
-          }
-          return;
-        }
-
-        delete this.registry_[name];
-      },
+      javaReturns: 'void',
       args: [
-        'name'
+        {
+          name: 'name',
+          javaType: 'String'
+        }
       ]
     }
   ]
