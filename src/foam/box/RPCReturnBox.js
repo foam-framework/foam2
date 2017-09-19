@@ -45,21 +45,38 @@ foam.CLASS({
     },
     {
       name: 'reject_'
+    },
+    {
+      class: 'Object',
+      name: 'semaphore',
+      javaType: 'java.util.concurrent.Semaphore',
+      javaFactory: 'return new java.util.concurrent.Semaphore(0);'
+    },
+    {
+      class: 'Object',
+      name: 'message',
+      javaType: 'foam.box.Message'
     }
   ],
 
   methods: [
-    function send(msg) {
-      if ( this.RPCReturnMessage.isInstance(msg.object) ) {
-        this.resolve_(msg.object.data);
-        return;
-      } else if ( this.RPCErrorMessage.isInstance(msg.object) ) {
-        this.reject_(msg.object.data);
-        return;
-      }
+    {
+      name: 'send',
+      code: function send(msg) {
+        if ( this.RPCReturnMessage.isInstance(msg.object) ) {
+          this.resolve_(msg.object.data);
+          return;
+        } else if ( this.RPCErrorMessage.isInstance(msg.object) ) {
+          this.reject_(msg.object.data);
+          return;
+        }
 
-      this.warn('Invalid message to RPCReturnBox.');
-      return;
+        this.warn('Invalid message to RPCReturnBox.');
+      },
+      javaCode: `
+setMessage(message);
+getSemaphore().release();
+`
     }
   ]
 });

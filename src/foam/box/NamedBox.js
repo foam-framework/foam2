@@ -18,8 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'NamedBox',
-
-  implements: [ 'foam.box.Box' ],
+  extends: 'foam.box.ProxyBox',
 
   requires: [
     'foam.box.LookupBox',
@@ -49,10 +48,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function send(msg) {
-      this.delegate.send(msg);
-    },
-
     function getParentBox() {
       return this.cls_.create({
         name: this.name.substring(0, this.name.lastIndexOf('/'))
