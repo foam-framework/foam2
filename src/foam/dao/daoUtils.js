@@ -54,7 +54,7 @@ foam.CLASS({
     },
 
     {
-      name: 'listen',
+      name: 'listen_',
       code: function listen_(x, sink, predicate) {
         var listener = this.ProxyListener.create({
           delegate: sink,
