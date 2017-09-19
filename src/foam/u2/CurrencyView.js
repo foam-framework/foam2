@@ -17,6 +17,10 @@ foam.CLASS({
     })
   ],
 
+  properties: [
+    ['precision', '2']
+  ],
+
   methods: [
     function dataToText(val) {
       return this.SUPER(val / 100);
