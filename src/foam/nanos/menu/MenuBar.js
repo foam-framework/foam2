@@ -1,4 +1,3 @@
-
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'MenuBar',
@@ -49,8 +48,13 @@ foam.CLASS({
             .start('ul')
               .select(this.menuDAO.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
                 this.start('li')
-                  .on('click', function() { menu.launch(self.__context__); })
-                  .add(menu.label)
+                  .call(function() {
+                    var e = this;
+                    this.start()
+                      .add(menu.label)
+                      .on('click', function() { menu.handler && menu.handler.launch(self.__context__, menu, e) })
+                    .end();
+                  })
                 .end()
               })
             .end()

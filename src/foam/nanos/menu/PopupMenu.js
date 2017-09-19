@@ -7,15 +7,15 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function() {/*
         ^ {
-          align-items: center;
-          bottom: 0;
-          display: flex;
-          justify-content: space-around;
-          left: 0;
-          position: fixed;
-          right: 0;
-          top: 0;
-          z-index: 1000;
+          // align-items: center;
+          // bottom: 0;
+          // display: flex;
+          // justify-content: space-around;
+          // left: 0;
+          // position: fixed;
+          // right: 0;
+          // top: 0;
+          // z-index: 1000;
         }
         ^container {
           align-items: center;
@@ -39,31 +39,36 @@ foam.CLASS({
       */}
     })
   ],
+  
+  properties: [
+    'parent'
+  ],
 
   methods: [
     function init() {
       this.SUPER();
       var content;
 
-      this.addClass(this.myClass())
-          .start()
-          .addClass(this.myClass('container'))
-          .start()
-              .addClass(this.myClass('background'))
-              .on('click', this.close)
-          .end()
-          .start()
-              .call(function() { content = this; })
-              .addClass(this.myClass('inner'))
-          .end()
-      .end();
+   this.addClass(this.myClass())
+        .start()
+          .addClass(this.myClass('background'))
+          .on('click', this.close)
+        .end()
+        .start()
+          .call(function() { content = this; })
+          .addClass(this.myClass('inner'))
+        .end();
 
       this.content = content;
     },
 
     function open() {
-      this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
-      this.load();
+     if ( this.parent ) {
+        this.parent.add(this);
+      } else {
+        this.document.body.insertAdjacentHTML('beforeend', this.outerHTML);
+        this.load();
+      }
     }
   ],
 
