@@ -106,6 +106,8 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto) {
+      foam.assert(this.key, 'No key for import: ' + this.name);
+
       var name     = this.name;
       var key      = foam.String.toSlotName(this.key);
       var slotName = this.slotName_;

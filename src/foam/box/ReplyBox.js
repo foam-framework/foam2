@@ -21,11 +21,16 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   imports: [
-    'registry'
+    {
+      name: 'registry',
+      key: 'registry',
+      javaType: 'foam.box.BoxRegistry'
+    }
   ],
 
   properties: [
     {
+      class: 'String',
       name: 'id',
       factory: function() {
         // TODO: Do these need to be long lived?
@@ -37,9 +42,16 @@ foam.CLASS({
   ],
 
   methods: [
-    function send(msg) {
-      this.registry.unregister(this.id);
-      this.delegate.send(msg);
+    {
+      name: 'send',
+      code: function send(msg) {
+        this.registry.unregister(this.id);
+        this.delegate.send(msg);
+      },
+      javaCode: `
+getRegistry().unregister(getId());
+getDelegate().send(message);
+`
     }
   ]
 });

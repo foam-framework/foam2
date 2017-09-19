@@ -168,10 +168,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      function() {/*
-                    Provides Operator for the Cloud Datastore REST API.
-                    https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Operator_1
-                  */},
+      documentation: `Provides Operator for the Cloud Datastore REST API.
+          https://cloud.google.com/datastore/docs/reference/rest/v1/projects/runQuery#Operator_1`,
       name: 'datastoreOpName'
     }
   ],
