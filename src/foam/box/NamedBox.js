@@ -65,7 +65,7 @@ return self.LookupBox_create([
       swiftCode: function() {/*
 var name = ""
 if let index = name.range(of: ".", options: .backwards)?.lowerBound {
-  name = name.substring(to: index)
+  name = String(name[..<index])
 }
 return ownClassInfo().create(args: [
   "name": name
@@ -80,7 +80,7 @@ return ownClassInfo().create(args: [
       },
       swiftCode: function getBaseName() {/*
 if let index = name.range(of: ".", options: .backwards)?.lowerBound {
-  return name.substring(to: name.index(index, offsetBy: 1))
+  return String(name[..<name.index(index, offsetBy: 1)])
 }
 return ""
       */},

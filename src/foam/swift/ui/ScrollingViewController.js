@@ -98,7 +98,7 @@ class VC_: UIViewController {
   lazy var tap: UITapGestureRecognizer = {
     return UITapGestureRecognizer(target: self, action: #selector(onTap))
   }()
-  public func onTap() {
+  @objc public func onTap() {
     view.endEditing(true)
   }
   var onKeyboardFrameChangeObserver: Any?

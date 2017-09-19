@@ -74,7 +74,7 @@ return tail_!
       swiftCode: function() {/*
 let startIndex = str.value.index(str.value.startIndex, offsetBy: pos)
 let endIndex = str.value.index(str.value.startIndex, offsetBy: (end as! StringPStream).pos)
-return str.value[startIndex..<endIndex]
+return String(str.value[startIndex..<endIndex])
       */},
     },
     {
