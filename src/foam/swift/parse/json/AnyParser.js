@@ -26,9 +26,9 @@ foam.CLASS({
 return Alt(["parsers": [
   NullParser(),
   StringParser(),
+  FloatParser(),
   LongParser(),
   IntParser(),
-  FloatParser(),
   BooleanParser(),
   FObjectParser(),
   ArrayParser(),
@@ -38,4 +38,3 @@ return Alt(["parsers": [
   },
   ],
 });
-

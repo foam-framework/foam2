@@ -2,11 +2,6 @@ import Foundation
 
 public typealias Listener = (Subscription, [Any?]) -> Void
 
-public protocol Initializable {
-  init()
-  init(_ args: [String:Any?])
-}
-
 public protocol ContextAware {
   var __context__: Context { get set }
   var __subContext__: Context { get }
@@ -27,7 +22,7 @@ class ListenerList {
 public protocol PropertyInfo: Axiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
-  var view: ClassInfo? { get }
+  var viewFactory: ((Context) -> FObject)? { get }
   var label: String { get }
   var visibility: Visibility { get }
   var jsonParser: Parser? { get }
@@ -51,14 +46,6 @@ extension PropertyInfo {
   }
 }
 
-public class Action: Axiom {
-  public var name: String = ""
-  public var label: String = ""
-  public func call(_ obj: FObject) {
-    obj.callAction(key: name)
-  }
-}
-
 public class MethodArg {
   public var name: String = ""
 }
@@ -73,41 +60,37 @@ extension MethodInfo {
   }
 }
 
+public protocol ActionInfo: MethodInfo {
+  var label: String { get }
+}
+
 public class Context {
   public static let GLOBAL = Context()
+  var parent: Context?
 
-  private lazy var classMap: [String:ClassInfo] = [:]
+  private lazy var classIdMap: [String:ClassInfo] = [:]
+  private lazy var classNameMap: [String:String] = [:]
   public func registerClass(cls: ClassInfo) {
-    classMap[cls.id] = cls
+    classIdMap[cls.id] = cls
+    classNameMap[NSStringFromClass(cls.cls)] = cls.id
   }
   public func lookup(_ id: String) -> ClassInfo? {
-    return classMap[id]
+    return classIdMap[id] ?? parent?.lookup(id)
+  }
+  func lookup_(_ cls: AnyClass) -> ClassInfo? {
+    let str = NSStringFromClass(cls)
+    if let id = classNameMap[str] {
+      return lookup(id)
+    }
+    return parent?.lookup_(cls)
   }
 
-  public func create(cls: ClassInfo, args: [String:Any?] = [:]) -> FObject {
-    if var multiton = cls as? Multiton, let key = args[multiton.multitonProperty.name] as? String {
-      if let value = multiton.multitonMap[key] {
-        return value
-      } else {
-        let value = create(type: cls.cls, args: args) as! FObject
-        multiton.multitonMap[key] = value
-        return value
-      }
-    } else {
-      return create(type: cls.cls, args: args) as! FObject
+  public func create<T>(_ type: T.Type, args: [String:Any?] = [:]) -> T? {
+    if let type = type as? AnyClass,
+       let cls = lookup_(type) {
+      return cls.create(args: args, x: self) as? T
     }
-  }
-
-  // TODO is this method needed?
-  private func create(type: Any, args: [String:Any?] = [:]) -> Any? {
-    var o: Any? = nil
-    if let t = type as? Initializable.Type {
-      o = t.init(args)
-    }
-    if var o = o as? ContextAware {
-      o.__context__ = self
-    }
-    return o
+    return nil
   }
 
   private var slotMap: [String:Slot] = [:]
@@ -117,11 +100,11 @@ public class Context {
     } else if let slot = slotMap[toSlotName(name: key)] {
       return slot.swiftGet()
     }
-    return nil
+    return parent?[key]
   }
   private func toSlotName(name: String) -> String { return name + "$" }
   public func createSubContext(args: [String:Any?] = [:]) -> Context {
-    var slotMap = self.slotMap
+    var slotMap: [String:Slot] = [:]
     for (key, value) in args {
       let slotName = toSlotName(name: key)
       if let slot = value as AnyObject as? Slot {
@@ -130,10 +113,9 @@ public class Context {
         slotMap[slotName] = ConstantSlot(["value": value])
       }
     }
-
     let subContext = Context()
     subContext.slotMap = slotMap
-    subContext.classMap = classMap
+    subContext.parent = self
     return subContext
   }
 }
@@ -143,25 +125,11 @@ public protocol ClassInfo {
   var label: String { get }
   var parent: ClassInfo? { get }
   var ownAxioms: [Axiom] { get }
-  var cls: Any { get }
+  var cls: AnyClass { get }
+  func create(args: [String:Any?], x: Context) -> Any
 }
 
 extension ClassInfo {
-  /*
-  func create(_ args: [String:Any?] = [:], x: Context = Context.GLOBAL) -> FObject {
-    if var multiton = self as? Multiton, let key = args[multiton.multitonProperty.name] as? String {
-      if let value = multiton.multitonMap[key] {
-        return value
-      } else {
-        let value = x.create(type: cls, args: args) as! FObject
-        multiton.multitonMap[key] = value
-        return value
-      }
-    } else {
-      return x.create(type: cls, args: args) as! FObject
-    }
-  }
-  */
   var axioms: [Axiom] {
     get {
       var curCls: ClassInfo? = self
@@ -197,11 +165,7 @@ extension ClassInfo {
     }
     return nil
   }
-}
-
-public protocol Multiton {
-  var multitonProperty: PropertyInfo { get }
-  var multitonMap: [String:FObject] { get set }
+  func create(x: Context) -> Any { return create(args: [:], x: x) }
 }
 
 public class Subscription {
@@ -223,24 +187,13 @@ public protocol FObject: class {
   func getSlot(key: String) -> Slot?
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
-  func callAction(key: String)
   func compareTo(_ data: FObject?) -> Int
   func onDetach(_ sub: Subscription)
   func detach()
   init(_ args: [String:Any?])
 }
 
-// TODO figure out how to make FObjects implement Comparable.
-/*
-extension FObject {
-  public static func < (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) < 0 }
-  public static func == (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) == 0 }
-  public static func > (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) > 1 }
-}
-*/
-
-public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
-  public func ownClassInfo() -> ClassInfo { fatalError() }
+public class AbstractFObject: NSObject, FObject, ContextAware {
 
   public var __context__: Context = Context.GLOBAL {
     didSet {
@@ -250,25 +203,12 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   lazy private(set) public var __subContext__: Context = {
     return self.__context__.createSubContext(args: self._createExports_())
   }()
-
-  func _createExports_() -> [String:Any?] {
-    return [:]
-  }
+  func _createExports_() -> [String:Any?] { return [:] }
 
   lazy var listeners: ListenerList = ListenerList()
 
-  private static var classInfo_: ClassInfo = {
-    class ClassInfo_: ClassInfo {
-      lazy var cls: Any = AbstractFObject.self
-      lazy var id: String = "FObject"
-      lazy var label: String = "FObject"
-      lazy var parent: ClassInfo? = nil
-      lazy var ownAxioms: [Axiom] = []
-    }
-    return ClassInfo_()
-  }()
-
-  public class func classInfo() -> ClassInfo { return AbstractFObject.classInfo_ }
+  public class func classInfo() -> ClassInfo { fatalError() }
+  public func ownClassInfo() -> ClassInfo { fatalError() }
 
   public func set(key: String, value: Any?) {}
   public func get(key: String) -> Any? { return nil }
@@ -374,8 +314,6 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     }
     return 0
   }
-
-  public func callAction(key: String) { }
 
   public override required init() {
     super.init()
@@ -530,5 +468,17 @@ public class Future<T> {
     for _ in 0...numWaiting {
       semaphore.signal()
     }
+  }
+}
+
+public class ParserContext {
+  private lazy var map_: [String:Any] = [:]
+  private var parent_: ParserContext?
+  public func get(_ key: String) -> Any? { return map_[key] ?? parent_?.get(key) }
+  public func set(_ key: String, _ value: Any) { map_[key] = value }
+  public func sub() -> ParserContext {
+    let child = ParserContext()
+    child.parent_ = self
+    return child
   }
 }

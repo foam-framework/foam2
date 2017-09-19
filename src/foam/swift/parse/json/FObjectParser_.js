@@ -56,8 +56,9 @@ return
 var ps: PStream? = ps
 let ps1 = delegate.parse(ps!, x)
 
-guard let c: ClassInfo = ps1 != nil ? x.lookup(ps1!.value() as! String) :
-    x.lookup("defaultClass") ?? defaultClass else {
+guard let c: ClassInfo = ps1 != nil ?
+    __subContext__.lookup(ps1!.value() as! String) :
+    __subContext__.lookup("defaultClass") ?? defaultClass else {
   return nil
 }
 
@@ -65,14 +66,17 @@ if ps1 != nil {
  ps = ps1
 }
 
-let subx = x.createSubContext(args: [
-  "obj": (x["X"] as! Context).create(cls: c)
-])
+
+let subx = x.sub()
+let args: Reference<[String:Any?]> = Reference(value: [:])
+subx.set("obj", args)
 ps = ModelParserFactory.getInstance(c).parse(ps!, subx)
 
 if ps != nil {
-  return ps!.setValue(subx["obj"])
+  let obj = c.create(args: args.value, x: x.get("X") as! Context)
+  return ps!.setValue(obj)
 }
+
 return nil
       */},
     },

@@ -56,7 +56,7 @@ foam.CLASS({
         static: true,
         final: true,
         name: this.swiftAxiomName,
-        type: 'Action',
+        type: 'ActionInfo',
         initializer: this.swiftAxiomInit(),
       }));
     },
@@ -66,10 +66,12 @@ foam.CLASS({
       name: 'swiftAxiomInit',
       args: [],
       template: function() {/*
-let a = Action()
-a.name = "<%=this.swiftName%>"
-a.label = "<%=this.label%>" // TODO localize
-return a
+class ActionInfo_: ActionInfo {
+  let args: [MethodArg] = []
+  let label = "<%=this.label%>" // TODO localize
+  let name = "<%=this.swiftName%>"
+}
+return ActionInfo_()
       */},
     }
   ],

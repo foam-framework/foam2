@@ -412,10 +412,10 @@ class PInfo: PropertyInfo {
   let label = "<%=this.label%>" // TODO localize
   let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
-<% if (this.swiftView && !this.hidden) { %>
+<% if (false && this.swiftView && !this.hidden) { %>
   let view: ClassInfo? = <%=this.swiftView.split('.').pop()%>.classInfo()
 <% } else { %>
-  let view: ClassInfo? = nil
+  let viewFactory: ((Context) -> FObject)? = nil
 <% } %>
   public func set(_ obj: FObject, value: Any?) {
     obj.set(key: name, value: value)
