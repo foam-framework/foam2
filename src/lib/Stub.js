@@ -79,24 +79,52 @@ foam.CLASS({
 
       var name = this.name;
       var args = this.args;
-      var boxPropName = this.boxPropName;
+      var boxPropName = foam.String.capitalize(this.boxPropName);
+      var replyPolicyName = foam.String.capitalize(this.replyPolicyName);
 
-      if ( this.javaReturns && this.javaReturns !== "void" ) {
-        throw new Error("Java stubs which return values are not supported yet.  Method: " + this.name + ", returns: " + this.javaReturns);
-      }
-
-      // TODO: The "createChildMethod_" in foam/java/refinements.
-      this.javaCode = `
+      var code = `
 foam.box.Message message = getX().create(foam.box.Message.class);
 foam.box.RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
 rpc.setName("${name}");
 Object[] args = { ${ args.map( a => a.name ).join(',') } };
 rpc.setArgs(args);
 
-message.setObject(rpc);
+message.setObject(rpc);`;
 
-get${foam.String.capitalize(boxPropName)}().send(message);
+      if ( this.javaReturns && this.javaReturns !== "void" ) {
+        code += `
+foam.box.ReplyBox reply = getX().create(foam.box.ReplyBox.class);
+foam.box.RPCReturnBox handler = getX().create(foam.box.RPCReturnBox.class);
+reply.setDelegate(handler);
+
+foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, get${replyPolicyName}(), reply);
+reply.setId(export.getName());
+
+message.getAttributes().put("replyBox", export);
+message.getAttributes().put("errorBox", export);
+
+get${boxPropName}().send(message);
+
+try {
+  handler.getSemaphore().acquire();
+} catch (InterruptedException e) {
+  throw new RuntimeException(e);
+}
+
+Object result = handler.getMessage().getObject();
+if ( result instanceof foam.box.RPCReturnMessage )
+  return (${this.javaReturns})((foam.box.RPCReturnMessage)result).getData();
+
+if ( result instanceof foam.box.RPCErrorMessage )
+  throw new RuntimeException(((foam.box.RPCErrorMessage)result).getData().toString());
+
+throw new RuntimeException("Invalid repsonse type: " + result.getClass());
 `;
+      } else {
+        code += `get${boxPropName}().send(message);`;
+      }
+
+      this.javaCode = code;
 
       this.SUPER(cls);
     }
@@ -216,8 +244,9 @@ foam.CLASS({
       var model = this.lookup(this.of);
       var propName = this.name;
 
-      cls.installAxiom(foam.core.Property.create({
+      cls.installAxiom(foam.core.Object.create({
         name: this.replyPolicyName,
+        javaType: 'foam.box.BoxService',
         hidden: true
       }));
 
@@ -244,14 +273,11 @@ foam.CLASS({
         cls.installAxiom(a);
       });
 
-      [
-        'registry'
-      ].map(function(s) {
-        cls.installAxiom(foam.core.Import.create({
-          key: s,
-          name: s
-        }));
-      });
+      cls.installAxiom(foam.core.Import.create({
+        key: 'registry',
+        name: 'registry',
+        javaType: 'foam.box.BoxRegistry',
+      }));
     }
   ]
 });

@@ -77,79 +77,109 @@ foam.CLASS({
   ],
 
   methods: [
-    function put_(x, obj) {
-      return this.SUPER(null, obj);
+    {
+      name: 'put_',
+      code:     function put_(x, obj) {
+        return this.SUPER(null, obj);
+      },
+      javaCode: `
+return super.put_(null, obj);
+`
+    },
+    {
+      name: 'remove_',
+      code: function remove_(x, obj) {
+        return this.SUPER(null, obj);
+      },
+      javaCode: `
+return super.remove_(null, obj);
+`
+    },
+    {
+      name: 'find_',
+      code:     function find_(x, key) {
+        return this.SUPER(null, key);
+      },
+      javaCode: `
+return super.find_(null, id);
+`
+    },
+    {
+      name: 'select_',
+      code: function select_(x, sink, skip, limit, order, predicate) {
+        if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
+        if ( ! skip ) skip = 0;
+        if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
+
+        if ( ! this.Serializable.isInstance(sink) ) {
+          var self = this;
+
+          return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
+            var items = result.array;
+
+            if ( ! sink ) return result;
+
+            var sub = foam.core.FObject.create();
+            var detached = false;
+            sub.onDetach(function() { detached = true; });
+
+            for ( var i = 0 ; i < items.length ; i++ ) {
+              if ( detached ) break;
+
+              sink.put(items[i], sub);
+            }
+
+            sink.eof();
+
+            return sink;
+          });
+        }
+
+        return this.SUPER(null, sink, skip, limit, order, predicate);
+      },
+      javaCode: `
+return super.select_(null, sink, skip, limit, order, predicate);
+`
     },
 
-    function remove_(x, obj) {
-      return this.SUPER(null, obj);
+    {
+      name: 'removeAll_',
+      code: function removeAll_(x, skip, limit, order, predicate) {
+        if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
+        if ( ! skip ) skip = 0;
+        if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
+
+        return this.SUPER(null, skip, limit, order, predicate);
+      },
+      javaCode: `
+super.removeAll_(null, skip, limit, order, predicate);
+`
     },
 
-    function find_(x, key) {
-      return this.SUPER(null, key);
-    },
+    {
+      name: 'listen_',
+      code: function listen_(x, sink, predicate) {
+        // TODO: This should probably just be handled automatically via a RemoteSink/Listener
+        // TODO: Unsubscribe support.
 
-    function select_(x, sink, skip, limit, order, predicate) {
-      if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
-      if ( ! skip ) skip = 0;
-      if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
-
-      if ( ! this.Serializable.isInstance(sink) ) {
-        var self = this;
-
-        return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
-          var items = result.array;
-
-          if ( ! sink ) return result;
-
-          var sub = foam.core.FObject.create();
-          var detached = false;
-          sub.onDetach(function() { detached = true; });
-
-          for ( var i = 0 ; i < items.length ; i++ ) {
-            if ( detached ) break;
-
-            sink.put(items[i], sub);
-          }
-
-          sink.eof();
-
-          return sink;
+        var skeleton = this.SkeletonBox.create({
+          data: sink
         });
-      }
 
-      return this.SUPER(null, sink, skip, limit, order, predicate);
-    },
+        var clientSink = this.ClientSink.create({
+          delegate: this.__context__.registry.register(
+            null,
+            this.delegateReplyPolicy,
+            skeleton
+          )
+        });
 
-    function removeAll_(x, skip, limit, order, predicate) {
-      if ( predicate === foam.mlang.predicate.True.create() ) predicate = null;
-      if ( ! skip ) skip = 0;
-      if ( foam.Undefined.isInstance(limit) ) limit = Number.MAX_SAFE_INTEGER;
+        clientSink = foam.dao.MergedResetSink.create({
+          delegate: clientSink
+        });
 
-      return this.SUPER(null, skip, limit, order, predicate);
-    },
-
-    function listen_(x, sink, predicate) {
-      // TODO: This should probably just be handled automatically via a RemoteSink/Listener
-      // TODO: Unsubscribe support.
-
-      var skeleton = this.SkeletonBox.create({
-        data: sink
-      });
-
-      var clientSink = this.ClientSink.create({
-        delegate: this.__context__.registry.register(
-          null,
-          this.delegateReplyPolicy,
-          skeleton
-        )
-      });
-
-      clientSink = foam.dao.MergedResetSink.create({
-        delegate: clientSink
-      });
-
-      this.SUPER(null, clientSink, predicate);
+        this.SUPER(null, clientSink, predicate);
+      },
     }
   ]
 });
