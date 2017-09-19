@@ -89,8 +89,8 @@ let viewNames = properties.map { (p) -> String in return p.name }
 
 let labelViews = properties.map { (p) -> UILabel in return propertyLabelViews[p.name]! }
 labelViews.forEach { (v) in
-  v.setContentHuggingPriority(UILayoutPriorityDefaultHigh, for: .horizontal)
-  v.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .horizontal)
+  v.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+  v.setContentCompressionResistancePriority(.required, for: .horizontal)
 }
 
 let valueViews = properties.map { (p) -> UIView in
