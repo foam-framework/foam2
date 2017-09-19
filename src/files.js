@@ -197,6 +197,7 @@ FOAM_FILES([
   { name: "foam/box/NameAlreadyRegisteredException" },
   { name: "foam/box/NoSuchNameException" },
   { name: "foam/box/BoxRegistry" },
+  { name: "foam/box/LocalBoxRegistry" },
   { name: "foam/box/BoxRegistryBox" },
   { name: "foam/box/ClientBoxRegistry" },
   { name: "foam/box/PromisedBoxRegistry" },
