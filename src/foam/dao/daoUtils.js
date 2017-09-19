@@ -53,15 +53,22 @@ foam.CLASS({
       javaCode: 'if ( of_ == null && getDelegate() != null ) return getDelegate().getOf(); return of_;'
     },
 
-    function listen_(x, sink, predicate) {
-      var listener = this.ProxyListener.create({
-        delegate: sink,
-        args: [ predicate ]
-      });
+    {
+      name: 'listen',
+      code: function listen_(x, sink, predicate) {
+        var listener = this.ProxyListener.create({
+          delegate: sink,
+          args: [ predicate ]
+        });
 
-      listener.onDetach(listener.dao$.follow(this.delegate$));
+        listener.onDetach(listener.dao$.follow(this.delegate$));
 
-      return listener;
+        return listener;
+      },
+      javaCode: `
+// TODO: Support changing of delegate
+return getDelegate().listen_(x, sink, predicate);
+`
     }
   ]
 });
