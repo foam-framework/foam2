@@ -11,3 +11,6 @@ build
 foam-bin.js
 target/
 .idea/
+.gradle/
+local.properties
+*.iml
