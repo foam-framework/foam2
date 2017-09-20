@@ -21,7 +21,6 @@ foam.INTERFACE({
   methods: [
     {
       name: 'doLookup',
-      swiftEnabled: true,
       returns: 'foam.box.Box',
       javaReturns: 'foam.box.Box',
       throws: true,
@@ -35,7 +34,6 @@ foam.INTERFACE({
     },
     {
       name: 'register',
-      swiftEnabled: true,
       returns: 'foam.box.Box',
       javaReturns: 'foam.box.Box',
       args: [
@@ -61,7 +59,6 @@ foam.INTERFACE({
     },
     {
       name: 'unregister',
-      swiftEnabled: true,
       returns: '',
       javaReturns: 'void',
       args: [

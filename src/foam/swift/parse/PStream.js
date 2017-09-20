@@ -22,17 +22,14 @@ foam.INTERFACE({
     {
       name: 'head',
       swiftReturns: 'Character',
-      swiftEnabled: true,
     },
     {
       name: 'valid',
       swiftReturns: 'Bool',
-      swiftEnabled: true,
     },
     {
       name: 'tail',
       swiftReturns: 'PStream',
-      swiftEnabled: true,
     },
     {
       name: 'substring',
@@ -43,12 +40,10 @@ foam.INTERFACE({
           swiftType: 'PStream',
         },
       ],
-      swiftEnabled: true,
     },
     {
       name: 'value',
       swiftReturns: 'Any?',
-      swiftEnabled: true,
     },
     {
       name: 'setValue',
@@ -59,7 +54,6 @@ foam.INTERFACE({
           swiftType: 'Any?',
         },
       ],
-      swiftEnabled: true,
     },
   ]
 });

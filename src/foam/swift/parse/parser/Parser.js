@@ -21,7 +21,6 @@ foam.INTERFACE({
   methods: [
     {
       name: 'parse',
-      swiftEnabled: true,
       // TODO returnType: 'FObject', of: 'PStream',
       swiftReturns: 'PStream?',
       args: [

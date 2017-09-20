@@ -10,7 +10,6 @@ foam.INTERFACE({
         }
       ],
       throws: true,
-      swiftEnabled: true,
     },
   ]
 });
