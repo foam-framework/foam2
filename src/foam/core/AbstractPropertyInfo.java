@@ -8,6 +8,7 @@ package foam.core;
 
 import foam.lib.parse.Parser;
 import foam.nanos.logger.Logger;
+import java.sql.PreparedStatement;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -39,6 +40,16 @@ public abstract class AbstractPropertyInfo
   @Override
   public foam.mlang.Expr partialEval() {
     return this;
+  }
+
+  @Override
+  public String createStatement() {
+    return getName();
+  }
+
+  @Override
+  public Object prepareStatement() {
+    return getName();
   }
 
   @Override
