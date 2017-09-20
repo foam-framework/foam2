@@ -47,6 +47,8 @@ public class JDAO
     BufferedReader br            = new BufferedReader(new FileReader(file_));
 
     for ( String line ; ( line = br.readLine() ) != null ; ) {
+      if ( line.isEmpty() ) continue;
+
       try {
         char operation = line.charAt(0);
 
