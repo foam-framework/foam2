@@ -48,8 +48,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public Object prepareStatement() {
-    return getName();
+  public void prepareStatement(PreparedStatement stmt) {
   }
 
   @Override

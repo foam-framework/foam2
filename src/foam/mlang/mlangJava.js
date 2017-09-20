@@ -35,7 +35,13 @@ foam.INTERFACE({
     },
     {
       name: 'prepareStatement',
-      javaReturns: 'Object'
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'java.sql.PreparedStatement'
+        }
+      ]
     }
   ]
 });
@@ -476,8 +482,8 @@ foam.CLASS({
     },
     {
       name: 'prepareStatement',
-      javaReturns: 'Object',
-      javaCode: 'return getValue();'
+      javaReturns: 'void',
+      javaCode: ''
     }
   ]
 });
@@ -504,15 +510,16 @@ foam.CLASS({
     },
     {
       name: 'prepareStatement',
+      javaReturns: 'void',
       args: [{
         name: 'stmt',
         javaType: 'java.sql.PreparedStatement'
       }],
-      javaCode: 'try {\n'
-                + '  stmt.setObject(1, getArg2().prepareStatement());\n'
-                + '} catch (java.sql.SQLException e) {\n'
-                + '  e.printStackTrace();\n'
-                + '}'
+      javaCode: '// try {\n'
+                + '  // stmt.setObject(1, getArg2().prepareStatement());\n'
+                + '// } catch (java.sql.SQLException e) {\n'
+                + '  // e.printStackTrace();\n'
+                + '// }'
     }
   ]
 });
