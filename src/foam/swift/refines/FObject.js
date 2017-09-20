@@ -19,7 +19,7 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     function toSwiftClass() {
-      if ( !this.model_.swiftEnabled ) return foam.swift.EmptyClass.create()
+      if ( !this.model_.generateSwift ) return foam.swift.EmptyClass.create()
       var initImports = function(model) {
         if (!model) return [];
         var parent = foam.lookup(model.extends).model_;

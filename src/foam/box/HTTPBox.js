@@ -40,7 +40,7 @@ foam.CLASS({
 
   classes: [
     foam.core.InnerClass.create({
-      swiftEnabled: false,
+      generateSwift: false,
       generateJava: false,
       model: {
         name: 'JSONOutputter',

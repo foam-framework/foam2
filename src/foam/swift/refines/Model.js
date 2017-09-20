@@ -28,7 +28,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'swiftEnabled',
+      name: 'generateSwift',
       value: true,
     },
     {
