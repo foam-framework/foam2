@@ -15,6 +15,7 @@ import java.util.List;
 public class PostgresDAO
     extends AbstractDAO
 {
+  protected final ConnectionPool connectionPool = new ConnectionPool();
 
   public PostgresDAO(String host, String port, String dbName, String username, String password) {
 
@@ -25,7 +26,9 @@ public class PostgresDAO
     host = (host != null) ? host : "localhost";
     port = (port != null) ? port : "5432";
 
-    ConnectionPool.setup(host, port, dbName, username, password);
+
+
+    connectionPool.setup(host, port, dbName, username, password);
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -37,7 +40,7 @@ public class PostgresDAO
     try {
 
       String table = getOf().getObjClass().getSimpleName().toLowerCase();
-      Connection c = ConnectionPool.getConnection();
+      Connection c = connectionPool.getConnection();
 
       String sql = predicate.createStatement(table);
       PreparedStatement smt = c.prepareStatement(sql);
@@ -59,7 +62,7 @@ public class PostgresDAO
 
     try {
       SQLData data = new SQLData(o);
-      Connection c = ConnectionPool.getConnection();
+      Connection c = connectionPool.getConnection();
 
       PreparedStatement smt = c.prepareStatement(data.createDeleteStatement());
 
@@ -107,7 +110,7 @@ public class PostgresDAO
     try {
 
       String tableName = getOf().getObjClass().getSimpleName().toLowerCase();
-      Connection c = ConnectionPool.getConnection();
+      Connection c = connectionPool.getConnection();
 
       String sql = "select * from " + tableName;
       sql += " where id = ?";
@@ -131,7 +134,7 @@ public class PostgresDAO
   public FObject put_(X x, FObject obj) {
 
     try {
-      Connection c = ConnectionPool.getConnection();
+      Connection c = connectionPool.getConnection();
 
       // updating existing one
       // when FObject isIdSet is null it returns 0 , is it ok ?
