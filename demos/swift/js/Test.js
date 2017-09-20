@@ -103,7 +103,7 @@ myListener()
   methods: [
     {
       name: 'methodWithAnArgAndReturn',
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       args: [
         {
           name: 'name',

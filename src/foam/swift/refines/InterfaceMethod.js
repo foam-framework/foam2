@@ -17,7 +17,7 @@ foam.CLASS({
       if ( !this.swiftEnabled ) return;
       cls.method(this.ProtocolMethod.create({
         name: this.swiftName,
-        returnType: this.swiftReturnType,
+        returnType: this.swiftReturns,
         args: this.swiftArgs,
         throws: this.throws,
       }));

@@ -29,7 +29,7 @@ foam.CLASS({
       },
     },
     {
-      name: 'swiftReturnType',
+      name: 'swiftReturns',
       expression: function(swiftPath) {
         return this.lookup(swiftPath).model_.swiftName;
       },
@@ -43,7 +43,7 @@ foam.CLASS({
       }
       cls.methods.push(this.Method.create({
         name: this.name + '_create',
-        returnType: this.swiftReturnType,
+        returnType: this.swiftReturns,
         visibility: 'public',
 	body: this.swiftInitializer(),
         args: [
@@ -61,7 +61,7 @@ foam.CLASS({
       name: 'swiftInitializer',
       args: [],
       template: function() {/*
-return __subContext__.create(<%=this.swiftReturnType%>.self, args: args)!
+return __subContext__.create(<%=this.swiftReturns%>.self, args: args)!
       */},
     },
   ],

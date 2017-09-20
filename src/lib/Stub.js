@@ -205,7 +205,7 @@ foam.CLASS({
               name: m.name,
               replyPolicyName: replyPolicyName,
               boxPropName: name,
-              swiftReturnType: m.swiftReturnType,
+              swiftReturns: m.swiftReturns,
               args: m.args,
               returns: returns
             });

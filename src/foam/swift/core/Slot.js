@@ -4,7 +4,7 @@ foam.CLASS({
   methods: [
     {
       name: 'swiftGet',
-      swiftReturnType: 'Any?',
+      swiftReturns: 'Any?',
       swiftCode: 'fatalError()',
     },
     {
@@ -26,7 +26,7 @@ foam.CLASS({
           name: 'listener',
         },
       ],
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       swiftCode: 'fatalError()',
     },
     {
@@ -37,7 +37,7 @@ foam.CLASS({
           name: 's2',
         },
       ],
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       swiftCode: function() {/*
 let s1 = self
 var feedback1 = false
@@ -86,7 +86,7 @@ return Subscription {
           name: 'other',
         },
       ],
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       swiftCode: function() {/*
 return other.linkFrom(self)
       */},
@@ -99,7 +99,7 @@ return other.linkFrom(self)
           name: 'other',
         },
       ],
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       swiftCode: function() {/*
 let l = { () -> Void in
   if !FOAM_utils.equals(self.swiftGet(), other.swiftGet()) {
@@ -123,7 +123,7 @@ return other.swiftSub { (_, _) in l() }
           name: 'f',
         },
       ],
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       swiftCode: function() {/*
 let l = { () -> Void in
   self.swiftSet(f(other.swiftGet()))
@@ -145,7 +145,7 @@ return other.swiftSub { (_, _) in l() }
           name: 'f',
         },
       ],
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       swiftCode: function() {/*
 return other.mapFrom(self, f)
       */},
@@ -159,7 +159,7 @@ return other.mapFrom(self, f)
           name: 'f',
         },
       ],
-      swiftReturnType: 'ExpressionSlot',
+      swiftReturns: 'ExpressionSlot',
       swiftCode: function() {/*
 return ExpressionSlot([
   "code": { (args: [Any?]) -> Any? in f(args[0]) },
@@ -175,7 +175,7 @@ return ExpressionSlot([
           name: 'name',
         },
       ],
-      swiftReturnType: 'SubSlot',
+      swiftReturns: 'SubSlot',
       swiftCode: function() {/*
 let s = SubSlot([
   "parentSlot": self,
