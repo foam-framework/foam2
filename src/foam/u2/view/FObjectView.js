@@ -46,15 +46,20 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      if ( this.choices ) {
+      if ( this.choices && Array.isArray(this.choices) ) {
         this.tag({class: 'foam.u2.view.ChoiceView', choices: this.choices, data$: this.objectClass$});
         /*
          * NOTE:
          * Displays the first choice on init.
          * Compensates for both types of choices accepted in ChoicesView.
          */
-        if ( Array.isArray(this.choices[0]) ) this.objectClass = this.choices[0][0];
-        else this.objectClass = this.choices[0];
+        if ( ! this.objectClass ) {
+          if ( Array.isArray(this.choices[0]) ) {
+            this.objectClass = this.choices[0][0];
+          } else {
+            this.objectClass = this.choices[0];
+          }
+        }
       } else {
         this.add(this.OBJECT_CLASS);
       }
