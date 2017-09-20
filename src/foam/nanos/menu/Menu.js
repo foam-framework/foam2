@@ -226,7 +226,14 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'handler',
-      view: 'foam.u2.view.FObjectView'
+      view: {
+        class: 'foam.u2.view.FObjectView',
+        choices: [
+          [ 'foam.nanos.menu.DAOMenu',  'DAO'     ],
+          [ 'foam.nanos.menu.SubMenu',  'SubMenu' ],
+          [ 'foam.nanos.menu.TabsMenu', 'Tabs'    ]
+        ]
+      }
     },
     {
       class: 'Int',
