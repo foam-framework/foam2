@@ -276,11 +276,12 @@ foam.CLASS({
         {
           name: 'cronDAO',
           factory: function() {
-            return this.createDAO({
+            return this.RequestResponseClientDAO.create({
               of: this.Cron,
-              seqNo: true,
-              testData: [
-              ]
+              delegate: this.HTTPBox.create({
+                method: 'POST',
+                url: 'http://localhost:8080/cronDAO'
+              })
             });
           }
         },
