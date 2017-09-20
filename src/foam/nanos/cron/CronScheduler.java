@@ -22,7 +22,7 @@ import java.util.Date;
 
 public class CronScheduler
   extends    ContextAwareSupport
-  implements NanoService, Runnable
+  implements CronSchedulerService, Runnable
 {
   protected DAO cronDAO_;
 
@@ -32,13 +32,25 @@ public class CronScheduler
    * @return Date of the minimum scheduled cron job
    */
   private Date getMinScheduledTime() {
-    Min min = (Min) MLang.MIN(Cron.SCHEDULED_TIME);
-    cronDAO_.select(min);
-    return ((Cron) min.getValue()).getScheduledTime();
+    Date result;
+
+    cronDAO_.where(
+      MLang.MIN(Cron.SCHEDULED_TIME)
+    ).select(new AbstractSink() {
+      @Override
+      public void put(FObject obj, Detachable sub) {
+        result = ((Cron) obj).getScheduledTime();
+      }
+    });
+
+    System.out.println(result);
+
+    return result;
   }
 
   public void start() {
     cronDAO_ = (DAO) getX().get("cronDAO");
+
     new Thread(this).start();
   }
 
