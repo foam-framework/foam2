@@ -46,7 +46,7 @@ return
   methods: [
     {
       name: 'parseString',
-      swiftReturnType: 'FObject?',
+      swiftReturns: 'FObject?',
       args: [
         {
           class: 'String',

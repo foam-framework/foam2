@@ -3,7 +3,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
-      swiftReturnType: 'FObject?',
+      swiftReturns: 'FObject?',
       args: [
         {
           name: 'obj',
@@ -14,7 +14,7 @@ foam.INTERFACE({
     },
     {
       name: 'remove',
-      swiftReturnType: 'FObject?',
+      swiftReturns: 'FObject?',
       args: [
         {
           name: 'obj',
@@ -25,7 +25,7 @@ foam.INTERFACE({
     },
     {
       name: 'find',
-      swiftReturnType: 'FObject?',
+      swiftReturns: 'FObject?',
       args: [
         {
           name: 'id',
@@ -36,7 +36,7 @@ foam.INTERFACE({
     },
     {
       name: 'select',
-      swiftReturnType: 'Sink',
+      swiftReturns: 'Sink',
       args: [
         {
           name: 'sink',
@@ -109,7 +109,7 @@ foam.INTERFACE({
     },
     {
       name: 'where',
-      swiftReturnType: 'AbstractDAO',
+      swiftReturns: 'AbstractDAO',
       args: [
         {
           name: 'predicate',
@@ -120,7 +120,7 @@ foam.INTERFACE({
     },
     {
       name: 'orderBy',
-      swiftReturnType: 'AbstractDAO',
+      swiftReturns: 'AbstractDAO',
       args: [
         {
           name: 'comparator',
@@ -131,7 +131,7 @@ foam.INTERFACE({
     },
     {
       name: 'skip',
-      swiftReturnType: 'AbstractDAO',
+      swiftReturns: 'AbstractDAO',
       args: [
         {
           name: 'count',
@@ -142,7 +142,7 @@ foam.INTERFACE({
     },
     {
       name: 'limit',
-      swiftReturnType: 'AbstractDAO',
+      swiftReturns: 'AbstractDAO',
       args: [
         {
           name: 'count',
@@ -153,7 +153,7 @@ foam.INTERFACE({
     },
     {
       name: 'listen',
-      swiftReturnType: 'Subscription',
+      swiftReturns: 'Subscription',
       args: [
         {
           name: 'sink',

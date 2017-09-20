@@ -82,7 +82,7 @@ data = textField.text ?? ""
           swiftType: 'UITextField',
         },
       ],
-      swiftReturnType: 'Bool',
+      swiftReturns: 'Bool',
       swiftCode: function() {/*
 textField.resignFirstResponder()
 return true

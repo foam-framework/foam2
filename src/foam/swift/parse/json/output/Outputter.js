@@ -64,7 +64,7 @@ p.toJSON(outputter: self, out: &out, value: p.get(o))
           name: 'data',
         },
       ],
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       swiftCode: function() {/*
 return data.replacingOccurrences(of: "\"", with: "\\\"")
       */},
@@ -255,7 +255,7 @@ out.append("}");
           name: 'data',
         },
       ],
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       swiftCode: function() {/*
 var s = ""
 output(&s, data)

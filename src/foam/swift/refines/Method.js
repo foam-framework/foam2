@@ -87,7 +87,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'swiftReturnType',
+      name: 'swiftReturns',
       expression: function(returns) {
         if (!returns) return '';
         var cls = foam.lookup(returns, true)
@@ -137,7 +137,7 @@ foam.CLASS({
         name: this.swiftName,
         body: this.swiftCode,
         throws: this.swiftThrows,
-        returnType: this.swiftReturnType,
+        returnType: this.swiftReturns,
         args: this.swiftArgs,
         visibility: this.swiftVisibility,
         override: override || this.name == 'init',

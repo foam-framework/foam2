@@ -3,7 +3,7 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, swiftReturnType, swiftArgs) {
+      expression: function(swiftName, swiftReturns, swiftArgs) {
         return this.swiftCodeGenerator();
       }
     }
@@ -13,7 +13,7 @@ foam.CLASS({
       name: 'swiftCodeGenerator',
       args: [],
       template: function() {/*
-<% if (this.swiftReturnType) { %>
+<% if (this.swiftReturns) { %>
 let replyBox = ReplyBox_create([
   "delegate": RPCReturnBox_create()
 ])
@@ -30,18 +30,18 @@ let msg = Message_create([
   ]),
 ])
 
-<% if (this.swiftReturnType) { %>
+<% if (this.swiftReturns) { %>
 msg.attributes["replyBox"] = registeredReplyBox
 msg.attributes["errorBox"] = registeredReplyBox
 <% } %>
 
 try? delegate.send(msg)
 
-<% if (this.swiftReturnType) { %>
-  <% if (this.swiftReturnType == 'Any?') { %>
+<% if (this.swiftReturns) { %>
+  <% if (this.swiftReturns == 'Any?') { %>
 return (try? (replyBox.delegate as? RPCReturnBox)?.future.get())
   <% } else { %>
-if let o = (try? (replyBox.delegate as? RPCReturnBox)?.future.get()) as? <%=this.swiftReturnType%> {
+if let o = (try? (replyBox.delegate as? RPCReturnBox)?.future.get()) as? <%=this.swiftReturns%> {
   return o
 }
 fatalError()
