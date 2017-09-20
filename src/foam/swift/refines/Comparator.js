@@ -4,7 +4,6 @@ foam.INTERFACE({
     {
       name: 'compare',
       swiftReturns: 'Int',
-      swiftEnabled: true,
       args: ['o1', 'o2'],
     },
   ]

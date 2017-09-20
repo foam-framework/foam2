@@ -10,7 +10,6 @@ foam.INTERFACE({
           swiftType: 'FObject'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'remove',
@@ -21,7 +20,6 @@ foam.INTERFACE({
           swiftType: 'FObject'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'find',
@@ -32,7 +30,6 @@ foam.INTERFACE({
           swiftType: 'Any?'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'select',
@@ -69,7 +66,6 @@ foam.INTERFACE({
           swiftDefaultValue: 'nil',
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'removeAll',
@@ -95,7 +91,6 @@ foam.INTERFACE({
           swiftDefaultValue: 'nil',
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'pipe',
@@ -105,7 +100,6 @@ foam.INTERFACE({
           swiftType: 'Sink'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'where',
@@ -116,7 +110,6 @@ foam.INTERFACE({
           swiftType: 'FoamPredicate'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'orderBy',
@@ -127,7 +120,6 @@ foam.INTERFACE({
           swiftType: 'Comparator'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'skip',
@@ -138,7 +130,6 @@ foam.INTERFACE({
           swiftType: 'Int'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'limit',
@@ -149,7 +140,6 @@ foam.INTERFACE({
           swiftType: 'Int'
         }
       ],
-      swiftEnabled: true,
     },
     {
       name: 'listen',
@@ -181,7 +171,6 @@ foam.INTERFACE({
           swiftDefaultValue: 'nil',
         }
       ],
-      swiftEnabled: true,
     },
   ]
 });

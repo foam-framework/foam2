@@ -7,9 +7,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'swiftEnabled',
-      expression: function(swiftCode) {
-        return !!this.swiftCode;
-      }
+      value: true,
     }
   ],
   methods: [

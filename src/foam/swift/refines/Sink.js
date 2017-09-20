@@ -13,7 +13,6 @@ foam.INTERFACE({
           swiftType: 'FObject'
         },
       ],
-      swiftEnabled: true,
     },
     {
       name: 'remove',
@@ -27,7 +26,6 @@ foam.INTERFACE({
           swiftType: 'FObject'
         },
       ],
-      swiftEnabled: true,
     },
     {
       name: 'eof',
@@ -37,12 +35,10 @@ foam.INTERFACE({
           swiftType: 'Subscription'
         },
       ],
-      swiftEnabled: true,
     },
     {
       name: 'error',
       swiftName: 'foamError',
-      swiftEnabled: true,
     },
     {
       name: 'reset',
@@ -52,7 +48,6 @@ foam.INTERFACE({
           swiftType: 'Subscription'
         },
       ],
-      swiftEnabled: true,
     },
   ]
 });

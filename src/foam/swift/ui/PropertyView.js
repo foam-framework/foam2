@@ -21,7 +21,6 @@ foam.INTERFACE({
   methods: [
     {
       name: 'fromProperty',
-      swiftEnabled: true,
       args: [
         {
           swiftType: 'PropertyInfo',

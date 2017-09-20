@@ -4,7 +4,6 @@ foam.INTERFACE({
     {
       name: 'f',
       swiftReturns: 'Bool',
-      swiftEnabled: true,
       args: [
         'obj'
       ]
