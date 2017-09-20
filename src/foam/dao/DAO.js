@@ -29,7 +29,7 @@ foam.INTERFACE({
     },
     {
       name: 'put_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'Promise',
       args: [ 'x', 'obj' ]
     },
@@ -40,7 +40,7 @@ foam.INTERFACE({
     },
     {
       name: 'remove_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'Promise',
       args: [ 'x', 'obj' ]
     },
@@ -51,7 +51,7 @@ foam.INTERFACE({
     },
     {
       name: 'find_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'Promise',
       args: [ 'x', 'id' ]
     },
@@ -62,7 +62,7 @@ foam.INTERFACE({
     },
     {
       name: 'select_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'Promise',
       args: [ 'x', 'sink', 'skip', 'limit', 'order', 'predicate' ]
     },
@@ -73,7 +73,7 @@ foam.INTERFACE({
     },
     {
       name: 'removeAll_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: '',
       args: [ 'x', 'skip', 'limit', 'order', 'predicate' ]
     },
@@ -84,7 +84,7 @@ foam.INTERFACE({
     },
     {
       name: 'listen_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: '',
       args: [ 'x', 'sink', 'predicate' ]
     },
@@ -95,7 +95,7 @@ foam.INTERFACE({
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: '',
       args: [ 'x', 'sink', 'predicate' ]
     },
@@ -121,19 +121,19 @@ foam.INTERFACE({
     },
     {
       name: 'inX',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'foam.dao.DAO',
       args: [ 'x' ]
     },
     {
       name: 'cmd',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'obj',
       args: [ 'obj' ]
     },
     {
       name: 'cmd_',
-      swiftEnabled: false,
+      swiftSupport: false,
       returns: 'obj',
       args: [ 'x', 'obj' ]
     }
