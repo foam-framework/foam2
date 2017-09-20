@@ -11,7 +11,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'defaultBoolean',
-      label: 'CheckBox'
+      label: 'CheckBox',
+      view: 'foam.u2.CheckBox' // default
     },
     {
       class: 'Boolean',
