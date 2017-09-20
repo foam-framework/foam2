@@ -5,14 +5,14 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public abstract class ConnectionPool {
+public class ConnectionPool {
 
   protected static String base = "jdbc:postgresql://";
   // TODO(drish) get an accurate number for pool size.
   protected static int poolSize = 4;
   protected static BasicDataSource pool;
 
-  public static void setup(String host, String port, String dbName, String username, String password) {
+  public void setup(String host, String port, String dbName, String username, String password) {
     String url =  base + host + ":" + port + "/" + dbName;
 
     try {
@@ -26,7 +26,7 @@ public abstract class ConnectionPool {
     }
   }
 
-  public static Connection getConnection() throws SQLException {
+  public Connection getConnection() throws SQLException {
     return pool.getConnection();
   }
 }
