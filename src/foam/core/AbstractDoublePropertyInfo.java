@@ -24,4 +24,9 @@ public abstract class AbstractDoublePropertyInfo
     super.fromXML(x, reader);
     return Double.parseDouble(reader.getText());
   }
+
+  @Override
+  public String getSqlType() {
+    return "FLOAT";
+  }
 }

@@ -25,4 +25,9 @@ public abstract class AbstractBooleanPropertyInfo
     super.fromXML(x, reader);
     return Boolean.parseBoolean(reader.getText());
   }
+
+  @Override
+  public String getSqlType() {
+    return "BIT";
+  }
 }

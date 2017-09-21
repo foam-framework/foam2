@@ -89,4 +89,9 @@ public abstract class AbstractPropertyInfo
       objElement.appendChild(prop);
     }
   }
+
+  @Override
+  public String getSqlType() {
+    return "VARCHAR";
+  }
 }

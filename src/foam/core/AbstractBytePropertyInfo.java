@@ -25,4 +25,9 @@ public abstract class AbstractBytePropertyInfo
     super.fromXML(x, reader);
     return Byte.valueOf(reader.getText());
   }
+
+  @Override
+  public String getSqlType() {
+    return "TINYINT";
+  }
 }

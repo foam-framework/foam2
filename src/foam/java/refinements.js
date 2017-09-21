@@ -747,7 +747,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'java.util.Date'],
-    ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractDateTimePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DateParser'],
     ['sqlType', 'DATETIME']
   ],

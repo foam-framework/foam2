@@ -9,7 +9,7 @@ package foam.core;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Date;
 
-public abstract class AbstractDatePropertyInfo
+public abstract class AbstractDateTimePropertyInfo
   extends AbstractPropertyInfo
 {
 
@@ -34,6 +34,6 @@ public abstract class AbstractDatePropertyInfo
 
   @Override
   public String getSqlType() {
-    return "DATE";
+    return "DATETIME";
   }
 }
