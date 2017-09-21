@@ -80,9 +80,12 @@ public class PostgresDAO
 
     try {
       Connection c = connectionPool.getConnection();
+      StringBuilder builder = sb.get()
+          .append("delete from ")
+          .append(table)
+          .append(" where id = ?");
 
-      PreparedStatement smt = c.prepareStatement(data.createDeleteStatement());
-
+      PreparedStatement smt = c.prepareStatement(builder.toString());
       smt.setLong(1, ((Long) o.getProperty("id")));
 
       int removed = smt.executeUpdate();
