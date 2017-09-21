@@ -128,14 +128,13 @@ public class PostgresDAO
   public FObject find_(X x, Object o) {
 
     try {
-
-      String tableName = getOf().getObjClass().getSimpleName().toLowerCase();
       Connection c = connectionPool.getConnection();
+      StringBuilder builder = sb.get()
+          .append("select * from ")
+          .append(table)
+          .append(" where id = ?");
 
-      String sql = "select * from " + tableName;
-      sql += " where id = ?";
-
-      PreparedStatement smt = c.prepareStatement(sql);
+      PreparedStatement smt = c.prepareStatement(builder.toString());
       smt.setLong(1, ((Long) o));
       ResultSet rs = smt.executeQuery();
 
