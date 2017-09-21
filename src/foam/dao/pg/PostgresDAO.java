@@ -11,10 +11,7 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,23 +34,10 @@ public class PostgresDAO
   };
 
   protected final String table;
-  protected final List<String> columns;
+  protected final Map<String, String> columns;
 
-  public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) {
+  public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) throws SQLException {
     setOf(of);
-
-    // get table name and columns
-    table = of.getObjClass().getSimpleName().toLowerCase();
-    List props = of.getAxiomsByClass(PropertyInfo.class);
-    columns = new ArrayList<>(props.size());
-    Iterator i = props.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-      // ignore id property
-      if ( prop.getName().equals("id") )
-        continue;
-      columns.add(prop.getName());
-    }
 
     if ( dbName == null || username == null ) {
       throw new IllegalArgumentException("Illegal arguments");
@@ -62,7 +46,23 @@ public class PostgresDAO
     host = (host != null) ? host : "localhost";
     port = (port != null) ? port : "5432";
 
+    // set up connection pool
     connectionPool.setup(host, port, dbName, username, password);
+
+    // load columns and sql types
+    table = of.getObjClass().getSimpleName().toLowerCase();
+    List props = of.getAxiomsByClass(PropertyInfo.class);
+    columns = new HashMap<>(props.size());
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      // ignore id property
+      if ( prop.getName().equals("id") )
+        continue;
+      columns.put(prop.getName(), prop.getSqlType());
+    }
+
+    createTable();
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -113,31 +113,6 @@ public class PostgresDAO
       e.printStackTrace();
     }
     return null;
-  }
-
-  /**
-   * maps a database result row to an FObject
-   *
-   * @param row
-   * @return FObject
-   * @throws SQLException
-   */
-  private FObject createFObject(ResultSet row) throws Exception {
-
-    if ( getOf() == null ) {
-      throw new Exception("`Of` is not set");
-    }
-
-    List<PropertyInfo> props = getOf().getAxioms();
-    FObject result = (FObject) getOf().getObjClass().newInstance();
-
-    // set fields
-    for( int i = 0; i < props.size(); i++ ) {
-      String propName = props.get(i).getName();
-      Object value = row.getObject(i + 1);
-      result.setProperty(propName, value);
-    }
-    return result;
   }
 
   @Override
@@ -214,13 +189,77 @@ public class PostgresDAO
   }
 
   /**
+   * Creates a table if one does not exist already
+   * @throws SQLException
+   */
+  public void createTable() throws SQLException {
+    Connection conn = connectionPool.getConnection();
+    DatabaseMetaData meta = conn.getMetaData();
+    ResultSet resultSet = meta.getTables(null, null, table, new String[] { "TABLE" });
+    if ( resultSet.isBeforeFirst() ) {
+      // found a table, don't create
+      return;
+    }
+
+    StringBuilder builder = sb.get()
+        .append("CREATE TABLE ")
+        .append(table)
+        .append("(id int primary key not null,")
+        .append(columns.entrySet().stream().map(e -> {
+          // postgresql does not support these datatypes so use an alternative
+          switch (e.getValue()) {
+            case "DATETIME":
+              return e.getKey() + " TIMESTAMP WITHOUT TIME ZONE";
+            case "TINYINT":
+              return e.getKey() + " SMALLINT";
+            default:
+              return e.getKey() + " " + e.getValue();
+          }
+        }).collect(Collectors.joining(",")))
+        .append(")");
+
+    // execute statement
+    PreparedStatement stmt = conn.prepareStatement(builder.toString());
+    stmt.executeUpdate();
+
+    stmt.close();
+    resultSet.close();
+    conn.close();
+  }
+
+  /**
+   * maps a database result row to an FObject
+   *
+   * @param row
+   * @return FObject
+   * @throws SQLException
+   */
+  private FObject createFObject(ResultSet row) throws Exception {
+
+    if ( getOf() == null ) {
+      throw new Exception("`Of` is not set");
+    }
+
+    List<PropertyInfo> props = getOf().getAxioms();
+    FObject result = (FObject) getOf().getObjClass().newInstance();
+
+    // set fields
+    for( int i = 0; i < props.size(); i++ ) {
+      String propName = props.get(i).getName();
+      Object value = row.getObject(i + 1);
+      result.setProperty(propName, value);
+    }
+    return result;
+  }
+
+  /**
    * Prepare the formatted column names. Appends column names like: (c1,c2,c3)
    * @param builder builder to append to
    */
   public void buildFormattedColumnNames(StringBuilder builder) {
     // collect columns list into comma delimited string
     builder.append("(")
-        .append(columns.stream().collect(Collectors.joining(",")))
+        .append(columns.keySet().stream().collect(Collectors.joining(",")))
         .append(")");
   }
 
@@ -231,7 +270,7 @@ public class PostgresDAO
   public void buildFormattedColumnPlaceholders(StringBuilder builder) {
     // map columns into ? and collect into comma delimited string
     builder.append("(")
-        .append(columns.stream().map(String -> "?").collect(Collectors.joining(",")))
+        .append(columns.keySet().stream().map(String -> "?").collect(Collectors.joining(",")))
         .append(")");
   }
 

@@ -58,10 +58,6 @@ foam.CLASS({
           foam.typeOf(value) === foam.Undefined ? 'null' :
           value;
       }
-    },
-    {
-      class: 'String',
-      name: 'sqlType'
     }
   ],
 
@@ -485,8 +481,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'int'],
     ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.IntParser'],
-    ['sqlType', 'INT']
+    ['javaJSONParser', 'foam.lib.json.IntParser']
   ],
 
   methods: [
@@ -514,8 +509,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'byte'],
     ['javaInfoType', 'foam.core.AbstractBytePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.ByteParser'],
-    ['sqlType', 'TINYINT']
+    ['javaJSONParser', 'foam.lib.json.ByteParser']
   ],
 
   methods: [
@@ -543,8 +537,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'short'],
     ['javaInfoType', 'foam.core.AbstractShortPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.ShortParser'],
-    ['sqlType', 'SMALLINT']
+    ['javaJSONParser', 'foam.lib.json.ShortParser']
   ],
 
   methods: [
@@ -572,8 +565,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'long'],
     ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.LongParser'],
-    ['sqlType', 'BIGINT']
+    ['javaJSONParser', 'foam.lib.json.LongParser']
   ],
 
   methods: [
@@ -601,8 +593,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'double'],
     ['javaInfoType', 'foam.core.AbstractDoublePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FloatParser'],
-    ['sqlType', 'FLOAT']
+    ['javaJSONParser', 'foam.lib.json.FloatParser']
   ],
 
   methods: [
@@ -748,8 +739,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDateTimePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.DateParser'],
-    ['sqlType', 'DATETIME']
+    ['javaJSONParser', 'foam.lib.json.DateParser']
   ],
 
   methods: [
@@ -774,8 +764,7 @@ foam.CLASS({
    properties: [
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-       ['javaJSONParser', 'foam.lib.json.DateParser'],
-       ['sqlType', 'DATE']
+       ['javaJSONParser', 'foam.lib.json.DateParser']
    ],
 
    methods: [
@@ -829,8 +818,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.StringParser'],
-    ['sqlType', 'VARCHAR']
+    ['javaJSONParser', 'foam.lib.json.StringParser']
   ],
 
   methods: [
@@ -1040,8 +1028,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
-    ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo'],
-    ['sqlType', 'BIT']
+    ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
   ],
   methods: [
     function createJavaPropertyInfo_(cls) {
