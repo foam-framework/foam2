@@ -21,6 +21,7 @@ var classes = [
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',
+  'foam.mlang.predicate.Neq',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
