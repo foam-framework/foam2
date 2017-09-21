@@ -1,23 +1,41 @@
 package foam.dao.pg;
 
-import foam.core.*;
-import foam.dao.*;
-import java.sql.*;
-
+import foam.core.ClassInfo;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
+import foam.core.X;
+import foam.dao.AbstractDAO;
+import foam.dao.ListSink;
+import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.List;
 
 public class PostgresDAO
     extends AbstractDAO
 {
-  protected final ConnectionPool connectionPool = new ConnectionPool();
+  protected ConnectionPool connectionPool = new ConnectionPool();
+  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
 
-  public PostgresDAO(String host, String port, String dbName, String username, String password) {
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
+
+  protected final String table;
+
+  public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) {
+    setOf(of);
+    table = of.getObjClass().getSimpleName().toLowerCase();
 
     if ( dbName == null || username == null ) {
       throw new IllegalArgumentException("Illegal arguments");
@@ -61,7 +79,6 @@ public class PostgresDAO
   public FObject remove_(X x, FObject o) {
 
     try {
-      SQLData data = new SQLData(o);
       Connection c = connectionPool.getConnection();
 
       PreparedStatement smt = c.prepareStatement(data.createDeleteStatement());
