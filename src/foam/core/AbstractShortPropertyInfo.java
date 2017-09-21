@@ -24,4 +24,9 @@ public abstract class AbstractShortPropertyInfo
     super.fromXML(x, reader);
     return Short.valueOf(reader.getText());
   }
+
+  @Override
+  public String getSqlType() {
+    return "SMALLINT";
+  }
 }

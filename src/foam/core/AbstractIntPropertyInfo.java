@@ -24,4 +24,9 @@ public abstract class AbstractIntPropertyInfo
     super.fromXML(x, reader);
     return Integer.valueOf(reader.getText());
   }
+
+  @Override
+  public String getSqlType() {
+    return "INT";
+  }
 }

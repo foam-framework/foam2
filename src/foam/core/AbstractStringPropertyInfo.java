@@ -26,4 +26,9 @@ public abstract class AbstractStringPropertyInfo
     super.fromXML(x, reader);
     return reader.getText();
   }
+
+  @Override
+  public String getSqlType() {
+    return "VARCHAR";
+  }
 }
