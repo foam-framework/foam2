@@ -163,7 +163,9 @@ public class PostgresDAO
   }
 
   @Override
-  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {}
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    throw new UnsupportedOperationException("Unsupported operation: removeAll_");
+  }
 
   @Override
   public FObject put_(X x, FObject obj) {
