@@ -204,7 +204,7 @@ public class PostgresDAO
     StringBuilder builder = sb.get()
         .append("CREATE TABLE ")
         .append(table)
-        .append("(id int primary key not null,")
+        .append("(id serial primary key,")
         .append(columns.entrySet().stream().map(e -> {
           // postgresql does not support these datatypes so use an alternative
           switch (e.getValue()) {
