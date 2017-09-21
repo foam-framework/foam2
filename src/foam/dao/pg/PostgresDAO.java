@@ -14,6 +14,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PostgresDAO
     extends AbstractDAO
@@ -228,5 +231,27 @@ public class PostgresDAO
     }
 
     return obj;
+  }
+
+  /**
+   * Prepare the formatted column names. Appends column names like: (c1,c2,c3)
+   * @param builder builder to append to
+   */
+  public void buildFormattedColumnNames(StringBuilder builder) {
+    // collect columns list into comma delimited string
+    builder.append("(")
+        .append(columns.stream().collect(Collectors.joining(",")))
+        .append(")");
+  }
+
+  /**
+   * Prepare the formatted value placeholders. Appends value placeholders like: (?,?,?)
+   * @param builder builder to append to
+   */
+  public void buildFormattedColumnPlaceholders(StringBuilder builder) {
+    // map columns into ? and collect into comma delimited string
+    builder.append("(")
+        .append(columns.stream().map(String -> "?").collect(Collectors.joining(",")))
+        .append(")");
   }
 }
