@@ -196,7 +196,7 @@ public class PostgresDAO
         throw new SQLException("Error performing put_ command");
       }
 
-      // get auto-genearted postgres keys
+      // get auto-generated postgres keys
       ResultSet keys = stmt.getGeneratedKeys();
       if ( keys.next() ) {
         obj.setProperty("id", keys.getLong(1));
