@@ -49,6 +49,9 @@ public class PostgresDAO
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
+      // ignore id property
+      if ( prop.getName().equals("id") )
+        continue;
       columns.add(prop.getName());
     }
 
@@ -164,69 +167,44 @@ public class PostgresDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-
     try {
       Connection c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("insert into ")
-          .append(table)
-          .append("") // TODO: formatted column names
-          .append("values ")
-          .append("") // TODO: formatted values
-          .append("on conflict (id) do update set ")
-          .append(""); // TODO: formatted values
+          .append(table);
 
-      // updating existing one
-      // when FObject isIdSet is null it returns 0 , is it ok ?
-      if ( (Long)obj.getProperty("id") != 0 ) {
-        SQLData data = new SQLData(obj);
-        PreparedStatement smt = c.prepareStatement(data.createUpdateStatement());
+      buildFormattedColumnNames(builder);
+      builder.append(" values");
+      buildFormattedColumnPlaceholders(builder);
+      builder.append(" on conflict (id) do update set");
+      buildFormattedColumnNames(builder);
+      builder.append(" = ");
+      buildFormattedColumnPlaceholders(builder);
+      builder.append(" where id = ?");
 
-        // put data into statement preserving order.
-        int i = 1;
-        for ( Object value: data.getValues() ) {
-          smt.setObject(i, value);
-          i++;
-        }
+      int index = 1;
+      PreparedStatement stmt = c.prepareStatement(builder.toString(),
+          Statement.RETURN_GENERATED_KEYS);
+      // set statement values twice: once for the insert and once for the update on conflict
+      index = setStatementValues(index, stmt, obj);
+      index = setStatementValues(index, stmt, obj);
+      // set the object id for the update statement
+      stmt.setObject(index, obj.getProperty("id"));
 
-        int inserted = smt.executeUpdate();
-        if ( inserted == 0 ) {
-          throw new SQLException("Error while inserting.");
-        }
-
-        smt.close();
-        // inserting new one
-      } else {
-        SQLData data = new SQLData(obj);
-        PreparedStatement smt = c.prepareStatement(data.createInsertStatement(),
-            Statement.RETURN_GENERATED_KEYS);
-
-        // put data into statement preserving order.
-        int i = 1;
-        for ( Object key: data.getValues() ) {
-          smt.setObject(i, key);
-          i++;
-        }
-
-        int inserted = smt.executeUpdate();
-        if ( inserted == 0 ) {
-          throw new SQLException("Error while inserting.");
-        }
-
-        // get auto-generated postgres keys
-        ResultSet generatedKeys = smt.getGeneratedKeys();
-        if ( generatedKeys.next() ) {
-          long pgKey = generatedKeys.getLong(1);
-          obj.setProperty("id", pgKey);
-        } else {
-          throw new SQLException("Error while inserting: no ID returned");
-        }
-
-        smt.close();
+      int inserted = stmt.executeUpdate();
+      if (inserted == 0) {
+        throw new SQLException("Error performing put_ command");
       }
 
+      // get auto-genearted postgres keys
+      ResultSet keys = stmt.getGeneratedKeys();
+      if ( keys.next() ) {
+        obj.setProperty("id", keys.getLong(1));
+      }
+
+      stmt.close();
       c.close();
-    } catch (Exception e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
 
@@ -253,5 +231,25 @@ public class PostgresDAO
     builder.append("(")
         .append(columns.stream().map(String -> "?").collect(Collectors.joining(",")))
         .append(")");
+  }
+
+  /**
+   * Sets the value of the PrepareStatement
+   * @param index index to start from
+   * @param stmt statement to set values
+   * @param obj object to get values from
+   * @return the updated index
+   * @throws SQLException
+   */
+  public int setStatementValues(int index, PreparedStatement stmt, FObject obj) throws SQLException {
+    List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( prop.getName().equals("id") )
+        continue;
+      stmt.setObject(index++, prop.get(obj));
+    }
+    return index;
   }
 }
