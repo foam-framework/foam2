@@ -11,6 +11,8 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class PostgresDAO
@@ -32,10 +34,20 @@ public class PostgresDAO
   };
 
   protected final String table;
+  protected final List<String> columns;
 
   public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) {
     setOf(of);
+
+    // get table name and columns
     table = of.getObjClass().getSimpleName().toLowerCase();
+    List props = of.getAxiomsByClass(PropertyInfo.class);
+    columns = new ArrayList<>(props.size());
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      columns.add(prop.getName());
+    }
 
     if ( dbName == null || username == null ) {
       throw new IllegalArgumentException("Illegal arguments");
@@ -43,8 +55,6 @@ public class PostgresDAO
 
     host = (host != null) ? host : "localhost";
     port = (port != null) ? port : "5432";
-
-
 
     connectionPool.setup(host, port, dbName, username, password);
   }
@@ -154,6 +164,14 @@ public class PostgresDAO
 
     try {
       Connection c = connectionPool.getConnection();
+      StringBuilder builder = sb.get()
+          .append("insert into ")
+          .append(table)
+          .append("") // TODO: formatted column names
+          .append("values ")
+          .append("") // TODO: formatted values
+          .append("on conflict (id) do update set ")
+          .append(""); // TODO: formatted values
 
       // updating existing one
       // when FObject isIdSet is null it returns 0 , is it ok ?
