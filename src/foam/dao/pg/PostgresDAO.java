@@ -66,24 +66,32 @@ public class PostgresDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-
     if ( sink == null ) {
       sink = new ListSink();
     }
 
     try {
-
-      String table = getOf().getObjClass().getSimpleName().toLowerCase();
       Connection c = connectionPool.getConnection();
+      PreparedStatement stmt = null;
 
-      String sql = predicate.createStatement(table);
-      PreparedStatement smt = c.prepareStatement(sql);
+      // select all if predicate is null, else use predicate
+      if ( predicate == null ) {
+        StringBuilder builder = sb.get()
+            .append("select * from ")
+            .append(table);
+        stmt = c.prepareStatement(builder.toString());
+      } else {
+        stmt = c.prepareStatement(predicate.createStatement(table));
+      }
 
-      predicate.prepareStatement(smt);
-      ResultSet rs = smt.executeQuery();
+      ResultSet resultSet = stmt.executeQuery();
+      while ( resultSet.next() ) {
+        sink.put(createFObject(resultSet), null);
+      }
 
-      while ( rs.next() ) sink.put(createFObject(rs), null);
-
+      resultSet.close();
+      stmt.close();
+      c.close();
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -101,13 +109,16 @@ public class PostgresDAO
           .append(table)
           .append(" where id = ?");
 
-      PreparedStatement smt = c.prepareStatement(builder.toString());
-      smt.setLong(1, ((Long) o.getProperty("id")));
+      PreparedStatement stmt = c.prepareStatement(builder.toString());
+      stmt.setLong(1, ((Long) o.getProperty("id")));
 
-      int removed = smt.executeUpdate();
+      int removed = stmt.executeUpdate();
       if ( removed == 0 ) {
         throw new SQLException("Error while removing.");
       }
+
+      stmt.close();
+      c.close();
       return o;
     } catch (Exception e) {
       e.printStackTrace();
@@ -117,7 +128,6 @@ public class PostgresDAO
 
   @Override
   public FObject find_(X x, Object o) {
-
     try {
       Connection c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
@@ -125,16 +135,25 @@ public class PostgresDAO
           .append(table)
           .append(" where id = ?");
 
-      PreparedStatement smt = c.prepareStatement(builder.toString());
-      smt.setLong(1, ((Long) o));
-      ResultSet rs = smt.executeQuery();
+      PreparedStatement stmt = c.prepareStatement(builder.toString());
+      stmt.setLong(1, ((Long) o));
+      ResultSet resultSet = stmt.executeQuery();
+      if ( ! resultSet.isBeforeFirst() ) {
+        // no rows found
+        return null;
+      }
 
-      if ( rs.next() ) return createFObject(rs);
-      return null;
+      FObject result = createFObject(resultSet);
+
+      resultSet.close();
+      stmt.close();
+      c.close();
+
+      return result;
     } catch (Exception e) {
       e.printStackTrace();
+      return null;
     }
-    return null;
   }
 
   @Override
@@ -174,11 +193,12 @@ public class PostgresDAO
       }
 
       // get auto-generated postgres keys
-      ResultSet keys = stmt.getGeneratedKeys();
-      if ( keys.next() ) {
-        obj.setProperty("id", keys.getLong(1));
+      ResultSet resultSet = stmt.getGeneratedKeys();
+      if ( resultSet.next() ) {
+        obj.setProperty("id", resultSet.getLong(1));
       }
 
+      resultSet.close();
       stmt.close();
       c.close();
     } catch (SQLException e) {
@@ -222,8 +242,8 @@ public class PostgresDAO
     PreparedStatement stmt = conn.prepareStatement(builder.toString());
     stmt.executeUpdate();
 
-    stmt.close();
     resultSet.close();
+    stmt.close();
     conn.close();
   }
 
