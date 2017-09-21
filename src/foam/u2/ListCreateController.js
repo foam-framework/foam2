@@ -122,7 +122,7 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var view = this.createDetailView ? this.createDetailView : this.detailView
+          var view = this.createDetailView || this.detailView;
           this.tag(view, {data: this.obj}).add(this.CANCEL, this.SAVE);
         }
       ],
