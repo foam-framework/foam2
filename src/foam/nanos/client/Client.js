@@ -36,7 +36,7 @@ foam.CLASS({
   ],
 
   exports: [
-   'countryDAO',
+    'countryDAO',
     'cronDAO',
     'exportDriverRegistryDAO',
     'groupDAO',
@@ -53,7 +53,7 @@ foam.CLASS({
   ],
 
   properties: [
-   {
+    {
       name: 'webAuth',
       factory: function() {
         return this.ClientAuthService.create({
@@ -86,7 +86,7 @@ foam.CLASS({
             method: 'POST',
             url: 'http://localhost:8080/nSpecDAO'
           })});
-       
+        /*
         return this.createDAO({
           of: this.NSpec,
           seqNo: true,
@@ -99,9 +99,9 @@ foam.CLASS({
             { name: 'cron',   serve: true,  serviceClass: 'foam.nanos.cron.CronRunner' }
           ]
         });
-        
+        */
       }
-   },
+    },
 
     {
       name: 'countryDAO',
@@ -200,7 +200,7 @@ foam.CLASS({
       }
     },
 
-   {
+    {
       name: 'languageDAO',
       factory: function() {
         return this.createDAO({
@@ -213,7 +213,7 @@ foam.CLASS({
       }
     },
 
-   {
+    {
       name: 'groupDAO',
       factory: function() {
         return this.createDAO({
@@ -251,15 +251,15 @@ foam.CLASS({
                 method: 'POST',
                 url: 'http://localhost:8080/scriptDAO'
               })});
-              
+              /*
 
             return this.createDAO({
               of: this.Script,
               seqNo: true,
               testData: [
               ]
-            });
-         }
+            });*/
+          }
         },
 
         {
@@ -294,16 +294,16 @@ foam.CLASS({
               url: 'http://localhost:8080/testDAO'
             })});
 
-            
+            /*
             return this.createDAO({
               of: this.Test,
               seqNo: true,
               testData: [
               ]
             });
-            
-         }
-       } 
+            */
+          }
+        }
 
   ],
 
