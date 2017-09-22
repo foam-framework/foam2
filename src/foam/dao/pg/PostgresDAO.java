@@ -35,7 +35,6 @@ public class PostgresDAO
   };
 
   protected final String table;
-  protected final Map<String, SQLType> columns;
 
   public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) throws SQLException {
     setOf(of);
@@ -52,18 +51,7 @@ public class PostgresDAO
 
     // load columns and sql types
     table = of.getObjClass().getSimpleName().toLowerCase();
-    List props = of.getAxiomsByClass(PropertyInfo.class);
-    columns = new HashMap<>(props.size());
-    Iterator i = props.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-      // ignore id property
-      if ( prop.getName().equals("id") )
-        continue;
-      columns.put(prop.getName(), prop.getSqlType());
-    }
-
-    createTable();
+    createTable(of);
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -170,13 +158,13 @@ public class PostgresDAO
           .append("insert into ")
           .append(table);
 
-      buildFormattedColumnNames(builder);
+      buildFormattedColumnNames(obj, builder);
       builder.append(" values");
-      buildFormattedColumnPlaceholders(builder);
+      buildFormattedColumnPlaceholders(obj, builder);
       builder.append(" on conflict (id) do update set");
-      buildFormattedColumnNames(builder);
+      buildFormattedColumnNames(obj, builder);
       builder.append(" = ");
-      buildFormattedColumnPlaceholders(builder);
+      buildFormattedColumnPlaceholders(obj, builder);
       builder.append(" where id = ?");
 
       int index = 1;
@@ -187,6 +175,8 @@ public class PostgresDAO
       index = setStatementValues(index, stmt, obj);
       // set the object id for the update statement
       stmt.setObject(index, obj.getProperty("id"));
+
+      System.out.println(stmt.toString());
 
       int inserted = stmt.executeUpdate();
       if (inserted == 0) {
@@ -213,7 +203,7 @@ public class PostgresDAO
    * Creates a table if one does not exist already
    * @throws SQLException
    */
-  public void createTable() throws SQLException {
+  public void createTable(ClassInfo classInfo) throws SQLException {
     Connection conn = connectionPool.getConnection();
     DatabaseMetaData meta = conn.getMetaData();
     ResultSet resultSet = meta.getTables(null, null, table, new String[] { "TABLE" });
@@ -222,17 +212,19 @@ public class PostgresDAO
       return;
     }
 
+    List<PropertyInfo> props = classInfo.getAxiomsByClass(PropertyInfo.class);
     StringBuilder builder = sb.get()
         .append("CREATE TABLE ")
         .append(table)
         .append("(id serial primary key,")
-        .append(columns.entrySet().stream().map(e -> {
+        .append(props.stream().map(e -> {
           // postgresql does support tinyint, use small int instead
-          switch (e.getValue().getName()) {
+          SQLType type = e.getSqlType();
+          switch ( type.getName() ) {
             case "TINYINT":
-              return e.getKey() + " SMALLINT";
+              return e.getName() + " SMALLINT";
             default:
-              return e.getKey() + " " + e.getValue();
+              return e.getName() + " " + type.getName();
           }
         }).collect(Collectors.joining(",")))
         .append(")");
@@ -275,10 +267,11 @@ public class PostgresDAO
    * Prepare the formatted column names. Appends column names like: (c1,c2,c3)
    * @param builder builder to append to
    */
-  public void buildFormattedColumnNames(StringBuilder builder) {
+  public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
     // collect columns list into comma delimited string
+    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     builder.append("(")
-        .append(columns.keySet().stream().collect(Collectors.joining(",")))
+        .append(props.stream().map(PropertyInfo::getName).collect(Collectors.joining(",")))
         .append(")");
   }
 
@@ -286,10 +279,11 @@ public class PostgresDAO
    * Prepare the formatted value placeholders. Appends value placeholders like: (?,?,?)
    * @param builder builder to append to
    */
-  public void buildFormattedColumnPlaceholders(StringBuilder builder) {
+  public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
     // map columns into ? and collect into comma delimited string
+    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     builder.append("(")
-        .append(columns.keySet().stream().map(String -> "?").collect(Collectors.joining(",")))
+        .append(props.stream().map(String -> "?").collect(Collectors.joining(",")))
         .append(")");
   }
 
