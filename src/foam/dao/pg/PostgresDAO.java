@@ -173,6 +173,8 @@ public class PostgresDAO
       index = setStatementValues(index, stmt, obj);
       index = setStatementValues(index, stmt, obj);
 
+      System.out.println(stmt.toString());
+
       int inserted = stmt.executeUpdate();
       if (inserted == 0) {
         throw new SQLException("Error performing put_ command");
@@ -282,7 +284,7 @@ public class PostgresDAO
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     String columns = props.stream()
         .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
-        .map(PropertyInfo::getName)
+        .map(e -> e.getName().toLowerCase())
         .collect(Collectors.joining(","));
 
     builder.append("(")
