@@ -248,21 +248,21 @@ public class PostgresDAO
    * @throws SQLException
    */
   private FObject createFObject(ResultSet row) throws Exception {
-
     if ( getOf() == null ) {
       throw new Exception("`Of` is not set");
     }
 
-    List<PropertyInfo> props = getOf().getAxioms();
-    FObject result = (FObject) getOf().getObjClass().newInstance();
+    List<PropertyInfo> props = getOf().getAxiomsByClass(PropertyInfo.class);
+    FObject obj = (FObject) getOf().getObjClass().newInstance();
 
-    // set fields
-    for( int i = 0; i < props.size(); i++ ) {
-      String propName = props.get(i).getName();
-      Object value = row.getObject(i + 1);
-      result.setProperty(propName, value);
+    int index = 1;
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      prop.set(obj, row.getObject(index++));
     }
-    return result;
+
+    return obj;
   }
 
   /**
