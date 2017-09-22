@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.dao.SQLType;
+
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractBytePropertyInfo
@@ -27,7 +29,7 @@ public abstract class AbstractBytePropertyInfo
   }
 
   @Override
-  public String getSqlType() {
-    return "TINYINT";
+  public SQLType getSqlType() {
+    return SQLType.TINYINT;
   }
 }

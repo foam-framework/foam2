@@ -6,6 +6,7 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.AbstractDAO;
 import foam.dao.ListSink;
+import foam.dao.SQLType;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -34,7 +35,7 @@ public class PostgresDAO
   };
 
   protected final String table;
-  protected final Map<String, String> columns;
+  protected final Map<String, SQLType> columns;
 
   public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) throws SQLException {
     setOf(of);
@@ -226,10 +227,8 @@ public class PostgresDAO
         .append(table)
         .append("(id serial primary key,")
         .append(columns.entrySet().stream().map(e -> {
-          // postgresql does not support these datatypes so use an alternative
-          switch (e.getValue()) {
-            case "DATETIME":
-              return e.getKey() + " TIMESTAMP WITHOUT TIME ZONE";
+          // postgresql does support tinyint, use small int instead
+          switch (e.getValue().getName()) {
             case "TINYINT":
               return e.getKey() + " SMALLINT";
             default:
@@ -309,7 +308,7 @@ public class PostgresDAO
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( prop.getName().equals("id") )
         continue;
-      stmt.setObject(index++, prop.get(obj));
+      stmt.setObject(index++, prop.get(obj), prop.getSqlType().getOrdinal());
     }
     return index;
   }

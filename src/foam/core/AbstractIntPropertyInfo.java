@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.dao.SQLType;
+
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractIntPropertyInfo
@@ -26,7 +28,7 @@ public abstract class AbstractIntPropertyInfo
   }
 
   @Override
-  public String getSqlType() {
-    return "INT";
+  public SQLType getSqlType() {
+    return SQLType.INTEGER;
   }
 }

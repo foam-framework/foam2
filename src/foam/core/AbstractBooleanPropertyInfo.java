@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.dao.SQLType;
+
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractBooleanPropertyInfo
@@ -27,7 +29,7 @@ public abstract class AbstractBooleanPropertyInfo
   }
 
   @Override
-  public String getSqlType() {
-    return "BIT";
+  public SQLType getSqlType() {
+    return SQLType.BIT;
   }
 }

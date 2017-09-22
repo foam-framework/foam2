@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.dao.SQLType;
+
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractDoublePropertyInfo
@@ -26,7 +28,7 @@ public abstract class AbstractDoublePropertyInfo
   }
 
   @Override
-  public String getSqlType() {
-    return "FLOAT";
+  public SQLType getSqlType() {
+    return SQLType.FLOAT;
   }
 }
