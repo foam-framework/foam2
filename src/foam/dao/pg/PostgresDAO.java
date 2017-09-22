@@ -241,23 +241,26 @@ public class PostgresDAO
   /**
    * maps a database result row to an FObject
    *
-   * @param row
+   * @param resultSet
    * @return FObject
    * @throws SQLException
    */
-  private FObject createFObject(ResultSet row) throws Exception {
+  private FObject createFObject(ResultSet resultSet) throws Exception {
     if ( getOf() == null ) {
       throw new Exception("`Of` is not set");
     }
 
     List<PropertyInfo> props = getOf().getAxiomsByClass(PropertyInfo.class);
     FObject obj = (FObject) getOf().getObjClass().newInstance();
+    ResultSetMetaData metaData = resultSet.getMetaData();
 
     int index = 1;
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
+      if ( index > metaData.getColumnCount() )
+        break;
       PropertyInfo prop = (PropertyInfo) i.next();
-      Object value = row.getObject(index++);
+      Object value = resultSet.getObject(index++);
       if ( prop.getStorageTransient() )
         continue;
       prop.set(obj, value);
