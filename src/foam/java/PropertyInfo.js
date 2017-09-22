@@ -29,6 +29,20 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'networkTransient',
+      expression: function (transient) {
+        return transient;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'storageTransient',
+      expression: function (transient) {
+        return transient;
+      }
+    },
+    {
       name: 'getterName',
       expression: function(propName) {
         return 'get' + foam.String.capitalize(propName);
@@ -107,6 +121,18 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.transient + ';'
+          },
+          {
+            name: 'getNetworkTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.networkTransient + ';'
+          },
+          {
+            name: 'getStorageTransient',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.storageTransient + ';'
           },
           {
             name: 'getRequired',

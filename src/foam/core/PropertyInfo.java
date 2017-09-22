@@ -22,6 +22,8 @@ public interface PropertyInfo
   public ClassInfo getClassInfo();
 
   public boolean getTransient();
+  public boolean getNetworkTransient();
+  public boolean getStorageTransient();
   public boolean getRequired();
   public Class getValueClass();
   public String getName();
