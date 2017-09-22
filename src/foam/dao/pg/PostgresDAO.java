@@ -257,9 +257,10 @@ public class PostgresDAO
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
+      Object value = row.getObject(index++);
       if ( prop.getStorageTransient() )
         continue;
-      prop.set(obj, row.getObject(index++));
+      prop.set(obj, value);
     }
 
     return obj;
