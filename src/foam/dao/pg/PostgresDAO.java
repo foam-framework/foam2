@@ -90,7 +90,6 @@ public class PostgresDAO
 
   @Override
   public FObject remove_(X x, FObject o) {
-
     try {
       Connection c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
@@ -172,8 +171,6 @@ public class PostgresDAO
       // set statement values twice: once for the insert and once for the update on conflict
       index = setStatementValues(index, stmt, obj);
       index = setStatementValues(index, stmt, obj);
-
-      System.out.println(stmt.toString());
 
       int inserted = stmt.executeUpdate();
       if (inserted == 0) {
@@ -266,10 +263,9 @@ public class PostgresDAO
         break;
       // get the property and set the value
       PropertyInfo prop = (PropertyInfo) i.next();
-      Object value = resultSet.getObject(index++);
       if ( prop.getStorageTransient() )
         continue;
-      prop.set(obj, value);
+      prop.set(obj, resultSet.getObject(index++));
     }
 
     return obj;
