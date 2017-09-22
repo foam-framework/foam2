@@ -211,11 +211,13 @@ public class PostgresDAO
     String columns = props.stream()
         .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
         .map(e -> {
-          // postgresql does support tinyint, use small int instead
+          // map types to postgres types
           SQLType type = e.getSqlType();
           switch ( type.getName() ) {
             case "TINYINT":
               return e.getName() + " SMALLINT";
+            case "VARBINARY":
+              return e.getName() + " BYTEA";
             default:
               return e.getName() + " " + type.getName();
           }
