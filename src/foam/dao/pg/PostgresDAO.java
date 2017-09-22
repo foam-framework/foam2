@@ -165,7 +165,6 @@ public class PostgresDAO
       buildFormattedColumnNames(obj, builder);
       builder.append(" = ");
       buildFormattedColumnPlaceholders(obj, builder);
-      builder.append(" where id = ?");
 
       int index = 1;
       PreparedStatement stmt = c.prepareStatement(builder.toString(),
@@ -173,8 +172,6 @@ public class PostgresDAO
       // set statement values twice: once for the insert and once for the update on conflict
       index = setStatementValues(index, stmt, obj);
       index = setStatementValues(index, stmt, obj);
-      // set the object id for the update statement
-      stmt.setObject(index, obj.getProperty("id"));
 
       System.out.println(stmt.toString());
 
