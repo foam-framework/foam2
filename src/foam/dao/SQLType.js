@@ -51,6 +51,11 @@ foam.ENUM({
       ordinal: -6
     },
     {
+      name: 'VARBINARY',
+      label: 'VARBINARY',
+      ordinal: -3
+    },
+    {
       name: 'VARCHAR',
       label: 'VARCHAR',
       ordinal: 12
