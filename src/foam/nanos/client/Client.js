@@ -276,11 +276,10 @@ foam.CLASS({
         {
           name: 'cronDAO',
           factory: function() {
-            return this.createDAO({
+            return this.EasyDAO.create({
+              daoType: 'CLIENT',
               of: this.Cron,
-              seqNo: true,
-              testData: [
-              ]
+              serviceName: 'cronDAO'
             });
           }
         },
