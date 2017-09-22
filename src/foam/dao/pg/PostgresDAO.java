@@ -173,8 +173,6 @@ public class PostgresDAO
       index = setStatementValues(index, stmt, obj);
       index = setStatementValues(index, stmt, obj);
 
-      System.out.println(stmt.toString());
-
       int inserted = stmt.executeUpdate();
       if (inserted == 0) {
         throw new SQLException("Error performing put_ command");
@@ -211,7 +209,7 @@ public class PostgresDAO
 
     List<PropertyInfo> props = classInfo.getAxiomsByClass(PropertyInfo.class);
     String columns = props.stream()
-        .filter(e -> ! "id".equals(e.getName()) )
+        .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
         .map(e -> {
           // postgresql does support tinyint, use small int instead
           SQLType type = e.getSqlType();
@@ -259,6 +257,8 @@ public class PostgresDAO
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
+      if ( prop.getStorageTransient() )
+        continue;
       prop.set(obj, row.getObject(index++));
     }
 
@@ -273,7 +273,7 @@ public class PostgresDAO
     // collect columns list into comma delimited string
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     String columns = props.stream()
-        .filter(e -> ! "id".equals(e.getName()))
+        .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
         .map(PropertyInfo::getName)
         .collect(Collectors.joining(","));
 
@@ -290,7 +290,7 @@ public class PostgresDAO
     // map columns into ? and collect into comma delimited string
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     String placeholders = props.stream()
-        .filter(e -> ! "id".equals(e.getName()))
+        .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
         .map(String -> "?")
         .collect(Collectors.joining(","));
 
@@ -312,7 +312,7 @@ public class PostgresDAO
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( prop.getName().equals("id") )
+      if ( prop.getName().equals("id") || prop.getStorageTransient() )
         continue;
       stmt.setObject(index++, prop.get(obj), prop.getSqlType().getOrdinal());
     }
