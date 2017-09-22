@@ -257,8 +257,10 @@ public class PostgresDAO
     int index = 1;
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
+      // prevent reading out of bounds of result set
       if ( index > metaData.getColumnCount() )
         break;
+      // get the property and set the value
       PropertyInfo prop = (PropertyInfo) i.next();
       Object value = resultSet.getObject(index++);
       if ( prop.getStorageTransient() )
