@@ -112,7 +112,7 @@ foam.CLASS({
       extends: 'foam.u2.Element',
 
       imports: [ 'createDetailView', 'detailView', 'stack', 'dao', 'factory', 'showActions' ],
-      exports: [ 'as data', 'save', 'cancel' ],
+      exports: [ 'as data' ],
 
       properties: [
           {
