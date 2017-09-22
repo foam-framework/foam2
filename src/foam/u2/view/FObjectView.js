@@ -40,14 +40,30 @@ foam.CLASS({
           this.objectClass = data.cls_.id;
         }
       }
-    }
+    },
+    'choices'
   ],
 
   methods: [
     function initE() {
-      this
-        .add(this.OBJECT_CLASS)
-        .add(this.DATA);
+      if ( this.choices && Array.isArray(this.choices) ) {
+        this.tag({class: 'foam.u2.view.ChoiceView', choices: this.choices, data$: this.objectClass$});
+        /*
+         * NOTE:
+         * Displays the first choice on init.
+         * Compensates for both types of choices accepted in ChoicesView.
+         */
+        if ( ! this.objectClass ) {
+          if ( Array.isArray(this.choices[0]) ) {
+            this.objectClass = this.choices[0][0];
+          } else {
+            this.objectClass = this.choices[0];
+          }
+        }
+      } else {
+        this.add(this.OBJECT_CLASS);
+      }
+      this.add(this.DATA);
     }
   ]
 });
