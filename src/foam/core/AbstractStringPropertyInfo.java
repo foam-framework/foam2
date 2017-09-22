@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.dao.SQLType;
+
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractStringPropertyInfo
@@ -28,7 +30,7 @@ public abstract class AbstractStringPropertyInfo
   }
 
   @Override
-  public String getSqlType() {
-    return "VARCHAR";
+  public SQLType getSqlType() {
+    return SQLType.VARCHAR;
   }
 }

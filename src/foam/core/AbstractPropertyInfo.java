@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.dao.SQLType;
 import foam.lib.parse.Parser;
 import foam.nanos.logger.Logger;
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class AbstractPropertyInfo
-  implements PropertyInfo
+    implements PropertyInfo
 {
   protected ClassInfo parent;
 
@@ -91,7 +92,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public String getSqlType() {
-    return "VARCHAR";
+  public SQLType getSqlType() {
+    return SQLType.VARCHAR;
   }
 }
