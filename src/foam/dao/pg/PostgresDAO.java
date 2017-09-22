@@ -227,7 +227,7 @@ public class PostgresDAO
     StringBuilder builder = sb.get()
         .append("CREATE TABLE ")
         .append(table)
-        .append("(id serial primary key,")
+        .append("(id bigserial primary key,")
         .append(columns)
         .append(")");
 
