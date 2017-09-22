@@ -132,7 +132,7 @@ foam.CLASS({
             name: 'getStorageTransient',
             type: 'boolean',
             visibility: 'public',
-            body: 'return ' + this.networkTransient + ';'
+            body: 'return ' + this.storageTransient + ';'
           },
           {
             name: 'getRequired',
