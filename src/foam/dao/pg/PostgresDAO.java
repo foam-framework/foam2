@@ -213,11 +213,9 @@ public class PostgresDAO
     }
 
     List<PropertyInfo> props = classInfo.getAxiomsByClass(PropertyInfo.class);
-    StringBuilder builder = sb.get()
-        .append("CREATE TABLE ")
-        .append(table)
-        .append("(id serial primary key,")
-        .append(props.stream().map(e -> {
+    String columns = props.stream()
+        .filter(e -> ! "id".equals(e.getName()) )
+        .map(e -> {
           // postgresql does support tinyint, use small int instead
           SQLType type = e.getSqlType();
           switch ( type.getName() ) {
@@ -226,7 +224,14 @@ public class PostgresDAO
             default:
               return e.getName() + " " + type.getName();
           }
-        }).collect(Collectors.joining(",")))
+        })
+        .collect(Collectors.joining(","));
+
+    StringBuilder builder = sb.get()
+        .append("CREATE TABLE ")
+        .append(table)
+        .append("(id serial primary key,")
+        .append(columns)
         .append(")");
 
     // execute statement
@@ -270,8 +275,13 @@ public class PostgresDAO
   public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
     // collect columns list into comma delimited string
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    String columns = props.stream()
+        .filter(e -> ! "id".equals(e.getName()))
+        .map(PropertyInfo::getName)
+        .collect(Collectors.joining(","));
+
     builder.append("(")
-        .append(props.stream().map(PropertyInfo::getName).collect(Collectors.joining(",")))
+        .append(columns)
         .append(")");
   }
 
@@ -282,8 +292,13 @@ public class PostgresDAO
   public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
     // map columns into ? and collect into comma delimited string
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    String placeholders = props.stream()
+        .filter(e -> ! "id".equals(e.getName()))
+        .map(String -> "?")
+        .collect(Collectors.joining(","));
+
     builder.append("(")
-        .append(props.stream().map(String -> "?").collect(Collectors.joining(",")))
+        .append(placeholders)
         .append(")");
   }
 
