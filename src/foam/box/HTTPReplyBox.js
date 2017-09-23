@@ -31,9 +31,7 @@ foam.CLASS({
       code: function(m) {
         throw 'unimplemented';
       },
-      swiftCode: function() {/*
-fatalError("unimplemented")
-      */},
+      swiftCode: 'throw FoamError("unimplemented")',
     }
   ]
 });
