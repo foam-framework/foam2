@@ -125,18 +125,6 @@ foam.CLASS({
     },
   ],
   methods: [
-    // TODO remove.
-    function createChildMethod_(child) {
-      var m = child.clone();
-
-      for ( var key in this.instance_ ) {
-        if ( !m.hasOwnProperty(key) ) {
-          m[key] = this.instance_[key]
-        }
-      }
-
-      return m;
-    },
     function writeToSwiftClass(cls, superAxiom) {
       if (!this.swiftSupport) return;
       if ( !this.swiftOverride ) {

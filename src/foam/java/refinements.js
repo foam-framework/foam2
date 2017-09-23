@@ -272,7 +272,7 @@ foam.CLASS({
       for ( var i = 0 ; i < props.length ; i++ ) {
         var prop = props[i];
 
-        if ( ! child.hasOwnProperty(prop.name) ) {
+        if ( this.hasOwnProperty(prop.name) && ! child.hasOwnProperty(prop.name) ) {
           prop.set(result, prop.get(this));
         }
       }
