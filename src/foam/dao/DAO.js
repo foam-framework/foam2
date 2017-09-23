@@ -186,7 +186,7 @@ foam.INTERFACE({
     {
       name: 'listen',
       returns: '',
-      swiftReturns: 'Subscription',
+      swiftReturns: 'Detachable',
       args: [
         {
           name: 'sink',
@@ -203,7 +203,7 @@ foam.INTERFACE({
     {
       name: 'listen_',
       returns: '',
-      swiftReturns: 'Subscription',
+      swiftReturns: 'Detachable',
       args: [
         {
           name: 'x',

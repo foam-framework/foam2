@@ -6,7 +6,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'sub',
-          swiftType: 'Subscription'
+          swiftType: 'Detachable',
         },
         {
           name: 'obj',
@@ -19,7 +19,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'sub',
-          swiftType: 'Subscription'
+          swiftType: 'Detachable',
         },
         {
           name: 'obj',
@@ -32,7 +32,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'sub',
-          swiftType: 'Subscription'
+          swiftType: 'Detachable',
         },
       ],
     },
@@ -45,7 +45,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'sub',
-          swiftType: 'Subscription'
+          swiftType: 'Detachable',
         },
       ],
     },
