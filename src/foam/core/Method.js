@@ -66,9 +66,7 @@ foam.CLASS({
       name: 'args',
       factory: function() { return this.code ? foam.Function.args(this.code) : []; }
     },
-    {
-      name: 'parentCls',
-    },
+    { name: 'parentCls' },
   ],
 
   methods: [
