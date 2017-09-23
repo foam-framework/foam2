@@ -137,7 +137,7 @@ foam.INTERFACE({
     },
     {
       name: 'partialEval',
-      swiftReturns: 'FoamPredicate',
+      returns: 'foam.mlang.predicate.Predicate',
     },
     {
       name: 'toIndex',
@@ -147,7 +147,7 @@ foam.INTERFACE({
     },
     {
       name: 'toDisjunctiveNormalForm',
-      swiftReturns: 'FoamPredicate',
+      returns: 'foam.mlang.predicate.Predicate',
     }
   ]
 });
