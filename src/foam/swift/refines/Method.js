@@ -42,7 +42,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'swiftThrows',
-      factory: function() { return this.throws }, // TODO make expression.
     },
     {
       class: 'FObjectArray',

@@ -9,7 +9,7 @@ foam.INTERFACE({
           swiftType: 'Message'
         }
       ],
-      throws: true,
+      swiftThrows: true,
     },
   ]
 });
