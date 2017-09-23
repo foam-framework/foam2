@@ -122,7 +122,6 @@
 		10833DAF1F72C610008FB0EF /* foam_swift_ui_FOAMUITextFieldInt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833CEE1F72C5CB008FB0EF /* foam_swift_ui_FOAMUITextFieldInt.swift */; };
 		10833DB01F72C610008FB0EF /* foam_swift_ui_MidiNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833D331F72C5D8008FB0EF /* foam_swift_ui_MidiNote.swift */; };
 		10833DB11F72C610008FB0EF /* foam_swift_ui_PropertyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833D2C1F72C5D6008FB0EF /* foam_swift_ui_PropertyView.swift */; };
-		10833DB21F72C610008FB0EF /* foam_swift_ui_ScrollingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833D011F72C5CE008FB0EF /* foam_swift_ui_ScrollingViewController.swift */; };
 		10833DB31F72C610008FB0EF /* foam_u2_Visibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833D061F72C5CF008FB0EF /* foam_u2_Visibility.swift */; };
 		10833DB41F72C610008FB0EF /* foam_util_Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833CF81F72C5CD008FB0EF /* foam_util_Timer.swift */; };
 		10833DB51F72C610008FB0EF /* somepackage_RequiredClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10833CE11F72C5C9008FB0EF /* somepackage_RequiredClass.swift */; };
@@ -213,7 +212,6 @@
 		10833CFE1F72C5CD008FB0EF /* foam_dao_Sink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_dao_Sink.swift; sourceTree = "<group>"; };
 		10833CFF1F72C5CE008FB0EF /* foam_swift_parse_parser_Repeat0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_parse_parser_Repeat0.swift; sourceTree = "<group>"; };
 		10833D001F72C5CE008FB0EF /* foam_swift_parse_parser_NotChars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_parse_parser_NotChars.swift; sourceTree = "<group>"; };
-		10833D011F72C5CE008FB0EF /* foam_swift_ui_ScrollingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_ScrollingViewController.swift; sourceTree = "<group>"; };
 		10833D021F72C5CE008FB0EF /* foam_swift_ui_FOAMActionUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_FOAMActionUIButton.swift; sourceTree = "<group>"; };
 		10833D031F72C5CE008FB0EF /* foam_swift_ui_DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_DetailView.swift; sourceTree = "<group>"; };
 		10833D041F72C5CE008FB0EF /* foam_swift_parse_json_FObjectArrayParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_parse_json_FObjectArrayParser.swift; sourceTree = "<group>"; };
@@ -474,7 +472,6 @@
 				10833CEE1F72C5CB008FB0EF /* foam_swift_ui_FOAMUITextFieldInt.swift */,
 				10833D331F72C5D8008FB0EF /* foam_swift_ui_MidiNote.swift */,
 				10833D2C1F72C5D6008FB0EF /* foam_swift_ui_PropertyView.swift */,
-				10833D011F72C5CE008FB0EF /* foam_swift_ui_ScrollingViewController.swift */,
 				10833D061F72C5CF008FB0EF /* foam_u2_Visibility.swift */,
 				10833CF81F72C5CD008FB0EF /* foam_util_Timer.swift */,
 				10833CE11F72C5C9008FB0EF /* somepackage_RequiredClass.swift */,
@@ -733,7 +730,6 @@
 				10833DA01F72C610008FB0EF /* foam_swift_parse_parser_Parser.swift in Sources */,
 				10833DB11F72C610008FB0EF /* foam_swift_ui_PropertyView.swift in Sources */,
 				105984101E5E859A0063941D /* SwiftApp.swift in Sources */,
-				10833DB21F72C610008FB0EF /* foam_swift_ui_ScrollingViewController.swift in Sources */,
 				10833D571F72C610008FB0EF /* foam_box_ProxyBox.swift in Sources */,
 				10833D8E1F72C610008FB0EF /* foam_swift_parse_json_KeyParser.swift in Sources */,
 				10833D7F1F72C610008FB0EF /* foam_swift_core_Slot.swift in Sources */,
@@ -913,7 +909,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = foam.SwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -926,7 +921,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = foam.SwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
@@ -940,7 +934,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = foam.SwiftTestsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiftTests.app/SwiftTests";
 			};
@@ -955,7 +948,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = foam.SwiftTestsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwiftTests.app/SwiftTests";
 			};
@@ -969,7 +961,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = foam.SwiftTestsUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = SwiftTests;
 			};
@@ -983,7 +974,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = foam.SwiftTestsUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 4.0;
 				TEST_TARGET_NAME = SwiftTests;
 			};

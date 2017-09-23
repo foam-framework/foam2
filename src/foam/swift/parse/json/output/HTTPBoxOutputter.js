@@ -29,7 +29,7 @@ foam.CLASS({
     {
       name: 'output',
       swiftCode: function() {/*
-super.output(&out, (me as? AnyObject) === (data as? AnyObject) ?
+super.output(&out, (me as AnyObject) === (data as AnyObject) ?
     HTTPReplyBox_create() : data)
       */},
     },

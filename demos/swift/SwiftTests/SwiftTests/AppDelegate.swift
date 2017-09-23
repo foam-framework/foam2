@@ -116,15 +116,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Context.GLOBAL.registerClass(cls: RequiredClass.classInfo())
     Context.GLOBAL.registerClass(cls: Tabata.classInfo())
     Context.GLOBAL.registerClass(cls: FoamTimer.classInfo())
-    Context.GLOBAL.registerClass(cls: ScrollingViewController.classInfo())
     Context.GLOBAL.registerClass(cls: FOAMUITextFieldInt.classInfo())
     Context.GLOBAL.registerClass(cls: FOAMUITextField.classInfo())
     Context.GLOBAL.registerClass(cls: FOAMUILabel.classInfo())
     Context.GLOBAL.registerClass(cls: DetailView.classInfo())
     Context.GLOBAL.registerClass(cls: FOAMActionUIButton.classInfo())
-    
+
+    /*
     let app = SwiftApp()
     app.startListeners()
+    */
 
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.backgroundColor = .white
