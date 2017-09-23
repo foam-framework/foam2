@@ -505,3 +505,17 @@ foam.CLASS({
     },
   ],
 });
+
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+  properties: [
+    {
+      name: 'swiftType',
+      value: '[String]',
+    },
+    {
+      name: 'swiftValue',
+      value: '[]',
+    },
+  ],
+});
