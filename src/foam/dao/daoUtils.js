@@ -82,9 +82,11 @@ foam.CLASS({
     },
     {
       name: 'innerSub',
+      swiftType: 'Detachable?',
       postSet: function(_, s) {
         if (s) this.onDetach(s);
-      }
+      },
+      swiftPostSet: 'if let s = newValue { onDetach(s) }',
     },
     {
       name: 'dao',
@@ -102,6 +104,7 @@ foam.CLASS({
       code: function put(obj, s) {
         this.delegate.put(obj, this);
       },
+      swiftCode: 'delegate.put(obj, self)',
     },
 
     {
@@ -109,6 +112,7 @@ foam.CLASS({
       code: function remove(obj, s) {
         this.delegate.remove(obj, this);
       },
+      swiftCode: 'delegate.remove(obj, self)',
     },
 
     {
@@ -116,6 +120,7 @@ foam.CLASS({
       code: function reset(s) {
         this.delegate.reset(this);
       },
+      swiftCode: 'delegate.reset(self)',
     },
   ]
 });

@@ -173,18 +173,22 @@ extension ClassInfo {
   func create(x: Context) -> Any { return create(args: [:], x: x) }
 }
 
-public class Subscription {
+public protocol Detachable {
+  func detach()
+}
+
+public class Subscription: Detachable {
   private var detach_: (() -> Void)?
   init(detach: @escaping () ->Void) {
     self.detach_ = detach
   }
-  func detach() {
+  public func detach() {
     detach_?()
     detach_ = nil
   }
 }
 
-public protocol FObject: class {
+public protocol FObject: class, Detachable {
   func ownClassInfo() -> ClassInfo
   func sub(topics: [String], listener l: @escaping Listener) -> Subscription
   func set(key: String, value: Any?)
@@ -193,8 +197,7 @@ public protocol FObject: class {
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
   func compareTo(_ data: FObject?) -> Int
-  func onDetach(_ sub: Subscription)
-  func detach()
+  func onDetach(_ sub: Detachable)
   init(_ args: [String:Any?])
 }
 
@@ -221,7 +224,7 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
   public func hasOwnProperty(_ key: String) -> Bool { return false }
   public func clearProperty(_ key: String) {}
 
-  public func onDetach(_ sub: Subscription) {
+  public func onDetach(_ sub: Detachable) {
     _ = self.sub(topics: ["detach"]) { (s, _) in
       s.detach()
       sub.detach()
