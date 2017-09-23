@@ -184,6 +184,11 @@ foam.CLASS({
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
     {
+      class: 'Boolean',
+      name: 'swiftSupport',
+      value: true,
+    },
+    {
       class: 'String',
       name: 'swiftJsonParser',
       value: 'AnyParser()',

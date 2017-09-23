@@ -66,7 +66,10 @@ foam.CLASS({
     {
       name: 'args',
       factory: function() { return this.code ? foam.Function.args(this.code) : []; }
-    }
+    },
+    {
+      name: 'parentCls',
+    },
   ],
 
   methods: [
@@ -138,6 +141,7 @@ foam.CLASS({
 
     function installInClass(cls, superMethod, existingMethod) {
       var method = this;
+      method.parentCls = cls;
 
       var parent = superMethod;
       if ( parent && foam.core.AbstractMethod.isInstance(parent) ) {

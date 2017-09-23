@@ -1,20 +1,9 @@
-foam.INTERFACE({
-  refines: 'foam.mlang.predicate.Predicate',
+foam.CLASS({
+  refines: 'foam.mlang.predicate.AbstractPredicate',
   methods: [
     {
       name: 'f',
-      swiftReturns: 'Bool',
-      args: [
-        'obj'
-      ]
+      swiftCode: 'fatalError()',
     },
   ],
-  axioms: [
-    {
-      installInClass: function(cls) {
-        // Predicate is already a thing in Swift we avoid using that name.
-        cls.model_.swiftName = 'FoamPredicate';
-      }
-    }
-  ]
 });
