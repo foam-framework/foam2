@@ -75,7 +75,11 @@ foam.CLASS({
 
   properties: [
     'args',
-    'delegate',
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Sink',
+      name: 'delegate',
+    },
     {
       name: 'innerSub',
       postSet: function(_, s) {
@@ -93,17 +97,26 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, s) {
-      this.delegate.put(obj, this);
+    {
+      name: 'put',
+      code: function put(obj, s) {
+        this.delegate.put(obj, this);
+      },
     },
 
-    function remove(obj, s) {
-      this.delegate.remove(obj, this);
+    {
+      name: 'remove',
+      code: function remove(obj, s) {
+        this.delegate.remove(obj, this);
+      },
     },
 
-    function reset(s) {
-      this.delegate.reset(this);
-    }
+    {
+      name: 'reset',
+      code: function reset(s) {
+        this.delegate.reset(this);
+      },
+    },
   ]
 });
 

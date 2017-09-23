@@ -50,11 +50,10 @@ foam.LIB({
           }.bind(this));
       var methods = this.getOwnAxiomsByClass(foam.core.Method)
           .filter(function(p) {
-            var a = this.getSuperAxiomByName(p.name);
-            return !a || foam.core.internal.InterfaceMethod.isInstance(a);
+            return p.name != 'init';
           }.bind(this))
           .filter(function(p) {
-            return !!p.swiftCode;
+            return !!p.swiftSupport;
           }.bind(this));
 
       var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
@@ -107,7 +106,7 @@ return <%=swiftName%>(args, x)
             type: '[Axiom]',
             defaultValue: '[' +
               this.getOwnAxioms()
-                .filter(function(a) { return a.swiftAxiomName })
+                .filter(function(a) { return a.swiftSupport })
                 .map(function(a) { return a.swiftAxiomName }) +
             ']',
           }),

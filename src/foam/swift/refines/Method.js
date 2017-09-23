@@ -32,7 +32,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftAxiomName',
-      expression: function(swiftName, swiftCode) { return swiftCode && foam.String.constantize(swiftName); },
+      expression: function(swiftName) { return foam.String.constantize(swiftName) },
     },
     {
       class: 'String',
@@ -84,6 +84,29 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftCode',
+      expression: function(parentCls, name) {
+        if (foam.core.internal.InterfaceMethod.isInstance(
+            parentCls.getSuperAxiomByName(name))) {
+          return 'fatalError()';
+        }
+        return '';
+      },
+    },
+    {
+      class: 'Boolean',
+      name: 'swiftOverride',
+      expression: function(parentCls, name) {
+        var parentMethod = parentCls.getSuperAxiomByName(name);
+        return name == 'init' ||
+          !!( parentMethod &&
+              parentMethod.swiftSupport &&
+              !foam.core.internal.InterfaceMethod.isInstance(parentMethod))
+      },
+    },
+    {
+      class: 'String',
+      name: 'swiftSupport',
+      expression: function(swiftCode) { return !!swiftCode }
     },
     {
       class: 'String',
@@ -100,9 +123,10 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'swiftAnnotations',
-    }
+    },
   ],
   methods: [
+    // TODO remove.
     function createChildMethod_(child) {
       var m = child.clone();
 
@@ -115,24 +139,23 @@ foam.CLASS({
       return m;
     },
     function writeToSwiftClass(cls, superAxiom) {
-      if ( !this.swiftCode ) return;
-      var override = !!(superAxiom && superAxiom.swiftCode);
-      if ( !override ) {
+      if (!this.swiftSupport) return;
+      if ( !this.swiftOverride ) {
         cls.fields.push(this.Field.create({
           lazy: true,
           name: this.swiftSlotName,
           initializer: this.slotInit(),
           type: 'Slot',
         }));
-        cls.fields.push(this.Field.create({
-          visibility: 'public',
-          static: true,
-          final: true,
-          name: this.swiftAxiomName,
-          type: 'MethodInfo',
-          initializer: this.swiftMethodInfoInit(),
-        }));
       }
+      cls.fields.push(this.Field.create({
+        visibility: 'private',
+        static: true,
+        final: true,
+        name: this.swiftAxiomName,
+        type: 'MethodInfo',
+        initializer: this.swiftMethodInfoInit(),
+      }));
       cls.method(this.Method.create({
         name: this.swiftName,
         body: this.swiftCode,
@@ -140,7 +163,7 @@ foam.CLASS({
         returnType: this.swiftReturns,
         args: this.swiftArgs,
         visibility: this.swiftVisibility,
-        override: override || this.name == 'init',
+        override: this.swiftOverride,
         annotations: this.swiftAnnotations,
       }));
     },

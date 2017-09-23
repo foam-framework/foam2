@@ -25,46 +25,128 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: 'Promise',
-      args: [ 'obj' ]
+      swiftReturns: 'FObject?',
+      args: [
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
     },
     {
       name: 'put_',
-      swiftSupport: false,
       returns: 'Promise',
-      args: [ 'x', 'obj' ]
+      swiftReturns: 'FObject?',
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
     },
     {
       name: 'remove',
       returns: 'Promise',
-      args: [ 'obj' ]
+      swiftReturns: 'FObject?',
+      args: [
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
     },
     {
       name: 'remove_',
-      swiftSupport: false,
       returns: 'Promise',
-      args: [ 'x', 'obj' ]
+      swiftReturns: 'FObject?',
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
     },
     {
       name: 'find',
       returns: 'Promise',
-      args: [ 'id' ]
+      swiftReturns: 'FObject?',
+      args: [
+        {
+          name: 'id',
+          swiftType: 'Any?'
+        }
+      ],
     },
     {
       name: 'find_',
-      swiftSupport: false,
       returns: 'Promise',
-      args: [ 'x', 'id' ]
+      swiftReturns: 'FObject?',
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'id',
+          swiftType: 'Any?'
+        }
+      ],
     },
     {
       name: 'select',
       returns: 'Promise',
-      args: [ 'sink' ]
+      swiftReturns: 'Sink',
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+      ],
     },
     {
       name: 'select_',
-      swiftSupport: false,
       returns: 'Promise',
-      args: [ 'x', 'sink', 'skip', 'limit', 'order', 'predicate' ]
+      swiftReturns: 'Sink',
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'skip',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'limit',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'order',
+          swiftType: 'Comparator?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'removeAll',
@@ -73,51 +155,141 @@ foam.INTERFACE({
     },
     {
       name: 'removeAll_',
-      swiftSupport: false,
       returns: '',
-      args: [ 'x', 'skip', 'limit', 'order', 'predicate' ]
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'skip',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'limit',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'order',
+          swiftType: 'Comparator?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'listen',
       returns: '',
-      args: [ 'sink', 'predicate' ]
+      swiftReturns: 'Subscription',
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'listen_',
-      swiftSupport: false,
       returns: '',
-      args: [ 'x', 'sink', 'predicate' ]
+      swiftReturns: 'Subscription',
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
-      args: [ 'sink' ]
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink'
+        }
+      ],
     },
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
-      swiftSupport: false,
       returns: '',
-      args: [ 'x', 'sink', 'predicate' ]
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context'
+        },
+        {
+          name: 'sink',
+          swiftType: 'Sink'
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        },
+      ],
     },
     {
       name: 'where',
       returns: 'foam.dao.DAO',
-      args: [ 'predicate' ]
+      args: [
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'orderBy',
       returns: 'foam.dao.DAO',
-      args: [ 'comparator' ]
+      args: [
+        {
+          name: 'comparator',
+          swiftType: 'Comparator'
+        }
+      ],
     },
     {
       name: 'skip',
       returns: 'foam.dao.DAO',
-      args: [ 'count' ]
+      args: [
+        {
+          name: 'count',
+          swiftType: 'Int'
+        }
+      ],
     },
     {
       name: 'limit',
       returns: 'foam.dao.DAO',
-      args: [ 'count' ]
+      args: [
+        {
+          name: 'count',
+          swiftType: 'Int'
+        }
+      ],
     },
     {
       name: 'inX',

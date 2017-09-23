@@ -122,17 +122,22 @@ foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
 
+  // Predicate is already a thing in Swift we avoid using that name.
+  swiftName: 'FoamPredicate',
+
   documentation: 'Predicate interface: f(obj) -> boolean.',
 
   methods: [
     {
       name: 'f',
+      swiftReturns: 'Bool',
       args: [
         'obj'
       ]
     },
     {
-      name: 'partialEval'
+      name: 'partialEval',
+      swiftReturns: 'FoamPredicate',
     },
     {
       name: 'toIndex',
@@ -141,7 +146,8 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'toDisjunctiveNormalForm'
+      name: 'toDisjunctiveNormalForm',
+      swiftReturns: 'FoamPredicate',
     }
   ]
 });
@@ -206,11 +212,23 @@ foam.CLASS({
   documentation: 'Abstract Predicate base-class.',
 
   methods: [
-    function toIndex() { },
+    {
+      name: 'toIndex',
+      code: function() { },
+      swiftCode: 'return',
+    },
 
-    function toDisjunctiveNormalForm() { return this; },
+    {
+      name: 'toDisjunctiveNormalForm',
+      code: function() { return this },
+      swiftCode: 'return self',
+    },
 
-    function partialEval() { return this; },
+    {
+      name: 'partialEval',
+      code: function() { return this },
+      swiftCode: 'return self',
+    },
 
     function reduceAnd(other) {
       return foam.util.equals(this, other) ? this : null;
