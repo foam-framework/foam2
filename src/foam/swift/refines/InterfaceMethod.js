@@ -17,7 +17,7 @@ foam.CLASS({
         name: this.swiftName,
         returnType: this.swiftReturns,
         args: this.swiftArgs,
-        throws: this.throws,
+        throws: this.swiftThrows,
       }));
     },
   ]

@@ -23,7 +23,7 @@ foam.INTERFACE({
       name: 'doLookup',
       returns: 'foam.box.Box',
       javaReturns: 'foam.box.Box',
-      throws: true,
+      swiftThrows: true,
       args: [
         {
           class: 'String',
