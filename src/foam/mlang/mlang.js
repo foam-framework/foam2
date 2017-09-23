@@ -122,7 +122,7 @@ foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
 
-  // Predicate is already a thing in Swift we avoid using that name.
+  // Predicate is already a thing in Swift so avoid using that name.
   swiftName: 'FoamPredicate',
 
   documentation: 'Predicate interface: f(obj) -> boolean.',
