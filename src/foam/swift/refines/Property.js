@@ -412,11 +412,6 @@ class PInfo: PropertyInfo {
   let label = "<%=this.label%>" // TODO localize
   let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
-<% if (false && this.swiftView && !this.hidden) { %>
-  let view: ClassInfo? = <%=this.swiftView.split('.').pop()%>.classInfo()
-<% } else { %>
-  let viewFactory: ((Context) -> FObject)? = nil
-<% } %>
   public func set(_ obj: FObject, value: Any?) {
     obj.set(key: name, value: value)
   }
@@ -427,6 +422,13 @@ class PInfo: PropertyInfo {
     <%=this.swiftCompareValues%>
   }
   init(_ ci: ClassInfo) { classInfo = ci }
+  func viewFactory(x: Context) -> FObject? {
+<% if (this.swiftView && !this.hidden) { %>
+    return x.lookup("<%=this.swiftView%>")?.create(x: x) as? FObject
+<% } else { %>
+    return nil
+<% } %>
+  }
 }
 return PInfo(classInfo())
       */},

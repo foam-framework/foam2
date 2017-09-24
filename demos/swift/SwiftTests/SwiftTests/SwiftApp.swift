@@ -1,7 +1,6 @@
 import UIKit
 
 class SwiftApp {
-  /*
   lazy var data: Tabata = {
     return Context.GLOBAL.create(Tabata.self)!
   }()
@@ -24,5 +23,4 @@ class SwiftApp {
       UIApplication.shared.isIdleTimerDisabled = self.data.timer.isStarted
     }
   }
- */
 }

@@ -22,13 +22,13 @@ class ListenerList {
 public protocol PropertyInfo: Axiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
-  var viewFactory: ((Context) -> FObject)? { get }
   var label: String { get }
   var visibility: Visibility { get }
   var jsonParser: Parser? { get }
   func set(_ obj: FObject, value: Any?)
   func get(_ obj: FObject) -> Any? // TODO rename to f?
   func compareValues(_ v1: Any?, _ v2: Any?) -> Int
+  func viewFactory(x: Context) -> FObject?
 }
 
 extension PropertyInfo {
@@ -54,7 +54,7 @@ public protocol MethodInfo: Axiom {
   var args: [MethodArg] { get }
 }
 extension MethodInfo {
-  public func call(_ obj: FObject, args: [Any?]) throws -> Any? {
+  public func call(_ obj: FObject, args: [Any?] = []) throws -> Any? {
     let callback = obj.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
     return try callback(args)
   }

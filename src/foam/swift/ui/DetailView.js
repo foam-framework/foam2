@@ -172,9 +172,8 @@ subscript(key: String) -> FObject? {
   }
   let classInfo = data.ownClassInfo()
   if let a = classInfo.axiom(byName: key) {
-    if let a = a as? PropertyInfo, let viewFactory = a.viewFactory {
+    if let a = a as? PropertyInfo, let viewFobj = a.viewFactory(x: __context__) {
       let prop = a.name
-      let viewFobj = viewFactory(self.__subContext__)
       if let viewFobj = viewFobj as? PropertyView {
         viewFobj.fromProperty(a)
       }
