@@ -143,10 +143,21 @@ foam.CLASS({
               fileName,
               swiftClass.toSwiftSource());
         }
-        var registerCode = classes.map(function(c) {
-          return 'Context.GLOBAL.registerClass(cls: '+c+'.classInfo())'
-        }).join('\n');
-        console.log(registerCode);
+        var regClass = self.SwiftClass.create({
+          type: 'extension',
+          name: 'FOAM_utils',
+        });
+        regClass.methods.push(self.Method.create({
+          name: 'registerClasses',
+          static: true,
+          body: classes.map(function(c) {
+            return 'Context.GLOBAL.registerClass(cls: '+c+'.classInfo())'
+          }).join('\n')
+        }));
+        var fileName = self.outdir + sep + 'RegisterClasses.swift';
+        self.fs.writeFileSync(
+            fileName,
+            regClass.toSwiftSource());
       }).catch(function(err) {
         console.log('Error', err);
       });
