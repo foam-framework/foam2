@@ -57,6 +57,10 @@ foam.LIB({
           .filter(function(p) {
             return !!p.swiftSupport;
           }.bind(this));
+      var actions = this.getOwnAxiomsByClass(foam.core.Action)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
 
       var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
       multiton = multiton.length ? multiton[0] : null;
@@ -215,7 +219,7 @@ foam.LIB({
           },
 	],
         returnType: 'Slot?',
-        body: templates.slotGetterBody(properties, methods),
+        body: templates.slotGetterBody(properties, methods, actions),
       }));
 
       cls.methods.push(foam.swift.Method.create({
@@ -236,11 +240,6 @@ foam.LIB({
 	],
         body: templates.setterBody(properties),
       }));
-
-      var actions = this.getOwnAxiomsByClass(foam.core.Action)
-          .filter(function(p) {
-            return !this.getSuperAxiomByName(p.name);
-          }.bind(this));
 
       var exports = this.getOwnAxiomsByClass(foam.core.Export)
           .filter(function(p) {
@@ -306,13 +305,16 @@ super.set(key: key, value: value)
     },
     {
       name: 'slotGetterBody',
-      args: ['properties', 'methods'],
+      args: ['properties', 'methods', 'actions'],
       template: function() {/*
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
   case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
 <% } %>
 <% for (var i = 0, p; p = methods[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
+<% } %>
+<% for (var i = 0, p; p = actions[i]; i++) { %>
   case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
 <% } %>
   default:

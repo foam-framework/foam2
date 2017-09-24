@@ -132,6 +132,7 @@
 		1059842E1E5E859A0063941D /* SwiftTestsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1059842D1E5E859A0063941D /* SwiftTestsUITests.swift */; };
 		105984571E5F46750063941D /* FOAMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105984561E5F46750063941D /* FOAMSupport.swift */; };
 		10E1BA281F6AE50C00215766 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E1BA271F6AE50C00215766 /* ParserTests.swift */; };
+		10EBF1031F780A17000CFF15 /* foam_swift_ui_ScrollingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EBF1021F780A17000CFF15 /* foam_swift_ui_ScrollingViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -283,6 +284,7 @@
 		1059842F1E5E859A0063941D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		105984561E5F46750063941D /* FOAMSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FOAMSupport.swift; sourceTree = "<group>"; };
 		10E1BA271F6AE50C00215766 /* ParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
+		10EBF1021F780A17000CFF15 /* foam_swift_ui_ScrollingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = foam_swift_ui_ScrollingViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -474,6 +476,7 @@
 				1005422D1F77F43800C35A84 /* foam_swift_ui_FOAMUITextFieldInt.swift */,
 				100542721F77F45400C35A84 /* foam_swift_ui_MidiNote.swift */,
 				1005426B1F77F45200C35A84 /* foam_swift_ui_PropertyView.swift */,
+				10EBF1021F780A17000CFF15 /* foam_swift_ui_ScrollingViewController.swift */,
 				100542441F77F44700C35A84 /* foam_u2_Visibility.swift */,
 				100542371F77F43B00C35A84 /* foam_util_Timer.swift */,
 				100542551F77F44C00C35A84 /* RegisterClasses.swift */,
@@ -739,6 +742,7 @@
 				100542E11F77F4D600C35A84 /* foam_swift_parse_parser_Repeat.swift in Sources */,
 				100542C21F77F4D600C35A84 /* foam_swift_parse_json_AnyKeyParser.swift in Sources */,
 				100542DB1F77F4D600C35A84 /* foam_swift_parse_parser_Not.swift in Sources */,
+				10EBF1031F780A17000CFF15 /* foam_swift_ui_ScrollingViewController.swift in Sources */,
 				100542D41F77F4D600C35A84 /* foam_swift_parse_json_StringParser.swift in Sources */,
 				100542941F77F4D600C35A84 /* foam_box_NamedBox.swift in Sources */,
 				100542931F77F4D600C35A84 /* foam_box_Message.swift in Sources */,
@@ -852,6 +856,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -900,6 +905,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
