@@ -336,7 +336,6 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
   templates: [
     {
       name: 'swiftSlotInitializer',
-      args: [],
       template: function() {/*
 let s = PropertySlot([
   "object": self,
@@ -350,14 +349,12 @@ return s
     },
     {
       name: 'swiftSetter',
-      args: [],
       template: function() {/*
 self.set(key: "<%=this.swiftName%>", value: value)
       */},
     },
     {
       name: 'swiftGetter',
-      args: [],
       template: function() {/*
 if <%=this.swiftInitedName%> {
   return <%=this.swiftValueName%><% if ( this.swiftType != this.swiftValueType ) { %>!<% } %>
@@ -399,7 +396,6 @@ fatalError("No default value for <%=this.swiftName%>")
     },
     {
       name: 'swiftSlotSetter',
-      args: [],
       template: function() {/*
 self.<%=this.swiftSlotLinkSubName%>?.detach()
 self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(value)
@@ -408,7 +404,6 @@ self.onDetach(self.<%=this.swiftSlotLinkSubName%>!)
     },
     {
       name: 'swiftPropertyInfoInit',
-      args: [],
       template: function() {/*
 class PInfo: PropertyInfo {
   let name = "<%=this.swiftName%>"

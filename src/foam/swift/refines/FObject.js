@@ -20,6 +20,8 @@ foam.LIB({
   methods: [
     function toSwiftClass() {
       if ( !this.model_.generateSwift ) return foam.swift.EmptyClass.create()
+      var templates = foam.swift.FObjectTemplates.create();
+
       var initImports = function(model) {
         if (!model) return [];
         var parent = foam.lookup(model.extends).model_;
@@ -59,23 +61,6 @@ foam.LIB({
       var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
       multiton = multiton.length ? multiton[0] : null;
 
-      var classInfoCreate = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(swiftName, multiton) {/*
-<% if ( multiton ) { %>
-if let key = args[multitonProperty.name] as? String,
-   let value = multitonMap[key] {
-  return value
-} else {
-  let value = <%=swiftName%>(args, x)
-  if let key = multitonProperty.get(value) as? String {
-    multitonMap[key] = value
-  }
-  return value
-}
-<% } else { %>
-return <%=swiftName%>(args, x)
-<% } %>
-          */}), '', ['swiftName', 'multiton']).apply(this, [this.model_.swiftName, multiton]).trim();
       var classInfo = foam.swift.SwiftClass.create({
         visibility: 'private',
         name: 'ClassInfo_',
@@ -134,7 +119,7 @@ return <%=swiftName%>(args, x)
                 type: 'Context',
               }),
             ],
-            body: classInfoCreate,
+            body: templates.classInfoCreate(this.model_.swiftName, multiton),
           }),
         ],
       });
@@ -176,31 +161,6 @@ return <%=swiftName%>(args, x)
         body: 'return ' + this.model_.swiftName + '.classInfo_',
       }));
 
-      var clearPropertyBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties) {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>":
-    <%= p.swiftInitedName %> = false
-    <%= p.swiftValueName %> = nil
-
-  <% if ( p.swiftExpression ) { %>
-    if <%= p.swiftExpressionSubscriptionName %> != nil {
-      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
-    }
-    <%= p.swiftExpressionSubscriptionName %> = nil
-  <% } %>
-
-    // Only pub if there are listeners.
-    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
-      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
-    }
-    break
-<% } %>
-  default:
-    super.clearProperty(key)
-}
-          */}), '', ['properties']).apply(this, [properties]).trim();
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'clearProperty',
@@ -211,19 +171,9 @@ switch key {
             type: 'String',
           },
 	],
-        body: clearPropertyBody,
+        body: templates.clearPropertyBody(properties),
       }));
 
-      var hasOwnPropertyBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties) {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftInitedName%>`
-<% } %>
-  default:
-    return super.hasOwnProperty(key)
-}
-          */}), '', ['properties']).apply(this, [properties]).trim();
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'hasOwnProperty',
@@ -235,19 +185,9 @@ switch key {
           },
 	],
         returnType: 'Bool',
-        body: hasOwnPropertyBody,
+        body: templates.hasOwnPropertyBody(properties),
       }));
 
-      var getterBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties) {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftName%>`
-<% } %>
-  default:
-    return super.get(key: key)
-}
-          */}), '', ['properties']).apply(this, [properties]).trim();
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'get',
@@ -260,22 +200,9 @@ switch key {
           },
 	],
         returnType: 'Any?',
-        body: getterBody,
+        body: templates.getterBody(properties),
       }));
 
-      var slotGetterBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties, methods) {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
-<% } %>
-<% for (var i = 0, p; p = methods[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
-<% } %>
-  default:
-    return super.getSlot(key: key)
-}
-          */}), '', ['properties', 'methods']).apply(this, [properties, methods]).trim();
       cls.methods.push(foam.swift.Method.create({
         override: true,
         name: 'getSlot',
@@ -288,11 +215,70 @@ switch key {
           },
 	],
         returnType: 'Slot?',
-        body: slotGetterBody,
+        body: templates.slotGetterBody(properties, methods),
       }));
 
-      var setterBody = foam.templates.TemplateUtil.create().compile(
-          foam.String.multiline(function(properties) {/*
+      cls.methods.push(foam.swift.Method.create({
+        visibility: 'public',
+        override: true,
+        name: 'set',
+	args: [
+          {
+            externalName: 'key',
+            localName: 'key',
+            type: 'String',
+          },
+          {
+            externalName: 'value',
+            localName: 'value',
+            type: 'Any?',
+          },
+	],
+        body: templates.setterBody(properties),
+      }));
+
+      var actions = this.getOwnAxiomsByClass(foam.core.Action)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
+
+      var exports = this.getOwnAxiomsByClass(foam.core.Export)
+          .filter(function(p) {
+            return !this.getSuperAxiomByName(p.name);
+          }.bind(this));
+      if (exports.length) {
+        cls.methods.push(foam.swift.Method.create({
+          override: true,
+          name: '_createExports_',
+          body: templates.exportsBody(exports),
+          returnType: '[String:Any?]',
+        }));
+      }
+
+      return cls;
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.swift',
+  name: 'FObjectTemplates',
+  templates: [
+    {
+      name: 'exportsBody',
+      args: ['exports'],
+      template: function() {/*
+var args = super._createExports_()
+<% for (var i = 0, p; p = exports[i]; i++) { %>
+args["<%=p.exportName%>"] = <%=p.exportName%>$
+<% } %>
+return args
+      */},
+    },
+    {
+      name: 'setterBody',
+      args: ['properties'],
+      template: function() {/*
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
   case "<%=p.swiftSlotName%>":
@@ -316,53 +302,97 @@ switch key {
   default: break
 }
 super.set(key: key, value: value)
-          */}), '', ['properties']).apply(this, [properties]).trim();
-      cls.methods.push(foam.swift.Method.create({
-        visibility: 'public',
-        override: true,
-        name: 'set',
-	args: [
-          {
-            externalName: 'key',
-            localName: 'key',
-            type: 'String',
-          },
-          {
-            externalName: 'value',
-            localName: 'value',
-            type: 'Any?',
-          },
-	],
-        body: setterBody,
-      }));
-
-      var actions = this.getOwnAxiomsByClass(foam.core.Action)
-          .filter(function(p) {
-            return !this.getSuperAxiomByName(p.name);
-          }.bind(this));
-
-      var exports = this.getOwnAxiomsByClass(foam.core.Export)
-          .filter(function(p) {
-            return !this.getSuperAxiomByName(p.name);
-          }.bind(this));
-      if (exports.length) {
-        var exportsBody = foam.templates.TemplateUtil.create().compile(
-            foam.String.multiline(function(exports) {/*
-var args = super._createExports_()
-<% for (var i = 0, p; p = exports[i]; i++) { %>
-args["<%=p.exportName%>"] = <%=p.exportName%>$
+      */}
+    },
+    {
+      name: 'slotGetterBody',
+      args: ['properties', 'methods'],
+      template: function() {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
 <% } %>
-return args
-            */}), '', ['exports']).apply(this, [exports]).trim();
-        cls.methods.push(foam.swift.Method.create({
-          override: true,
-          name: '_createExports_',
-          body: exportsBody,
-          returnType: '[String:Any?]',
-        }));
-      }
+<% for (var i = 0, p; p = methods[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
+<% } %>
+  default:
+    return super.getSlot(key: key)
+}
+      */}
+    },
+    {
+      name: 'getterBody',
+      args: ['properties'],
+      template: function() {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftName%>`
+<% } %>
+  default:
+    return super.get(key: key)
+}
+      */},
+    },
+    {
+      name: 'hasOwnPropertyBody',
+      args: ['properties'],
+      template: function() {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>": return `<%=p.swiftInitedName%>`
+<% } %>
+  default:
+    return super.hasOwnProperty(key)
+}
+      */},
+    },
+    {
+      name: 'clearPropertyBody',
+      args: ['properties'],
+      template: function() {/*
+switch key {
+<% for (var i = 0, p; p = properties[i]; i++) { %>
+  case "<%=p.swiftName%>":
+    <%= p.swiftInitedName %> = false
+    <%= p.swiftValueName %> = nil
 
-      return cls;
+  <% if ( p.swiftExpression ) { %>
+    if <%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+    <%= p.swiftExpressionSubscriptionName %> = nil
+  <% } %>
+
+    // Only pub if there are listeners.
+    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
+      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
+    }
+    break
+<% } %>
+  default:
+    super.clearProperty(key)
+}
+      */},
+    },
+    {
+      name: 'classInfoCreate',
+      args: ['swiftName', 'multiton'],
+      template: function() {/*
+<% if ( multiton ) { %>
+if let key = args[multitonProperty.name] as? String,
+   let value = multitonMap[key] {
+  return value
+} else {
+  let value = <%=swiftName%>(args, x)
+  if let key = multitonProperty.get(value) as? String {
+    multitonMap[key] = value
+  }
+  return value
+}
+<% } else { %>
+return <%=swiftName%>(args, x)
+<% } %>
+      */}
     },
   ],
-});
+})
