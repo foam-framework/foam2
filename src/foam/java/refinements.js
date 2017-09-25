@@ -70,7 +70,6 @@ foam.CLASS({
         propRequired:     this.required,
         jsonParser:       this.javaJSONParser,
         extends:          this.javaInfoType,
-        transient:        this.transient,
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
         sqlType:          this.sqlType
