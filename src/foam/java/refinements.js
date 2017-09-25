@@ -64,14 +64,16 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls:    cls,
-        propName:     this.name,
-        propType:     this.javaType,
-        propRequired: this.required,
-        jsonParser:   this.javaJSONParser,
-        extends:      this.javaInfoType,
-        transient:    this.transient,
-        sqlType:      this.sqlType
+        sourceCls:        cls,
+        propName:         this.name,
+        propType:         this.javaType,
+        propRequired:     this.required,
+        jsonParser:       this.javaJSONParser,
+        extends:          this.javaInfoType,
+        transient:        this.transient,
+        networkTransient: this.networkTransient,
+        storageTransient: this.storageTransient,
+        sqlType:          this.sqlType
       })
     },
 
