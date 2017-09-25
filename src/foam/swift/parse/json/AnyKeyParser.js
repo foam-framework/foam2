@@ -36,7 +36,7 @@ return Alt(["parsers": [
   Seq1(["index": 0, "parsers": [
     Substring(["delegate":
       Repeat0(["delegate":
-        NotChars(["chars": " :"]),
+        NotChars(["chars": "{}, :"]),
       ])
     ])
   ]])
