@@ -25,13 +25,11 @@ foam.CLASS({
     'propName',
     {
       class: 'Boolean',
-      name: 'networkTransient',
-      value: false
+      name: 'networkTransient'
     },
     {
       class: 'Boolean',
-      name: 'storageTransient',
-      value: false
+      name: 'storageTransient'
     },
     {
       class: 'String',
