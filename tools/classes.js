@@ -111,6 +111,7 @@ var classes = [
   'foam.mop.MOP',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.pg.ConnectionPool',
+  'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream'
 ];
