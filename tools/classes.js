@@ -123,7 +123,9 @@ var classes = [
   'foam.mop.MOP',
   'foam.u2.Element',
   'foam.u2.Visibility',
-  'foam.nanos.export.ExportDriverRegistry'
+  'foam.nanos.export.ExportDriverRegistry',
+  'foam.dao.pg.ConnectionPool',
+  'foam.lib.json.OutputterMode'
 ];
 
 var abstractClasses = [
