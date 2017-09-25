@@ -98,7 +98,7 @@ public class PostgresDAO
           .append(" where id = ?");
 
       PreparedStatement stmt = c.prepareStatement(builder.toString());
-      stmt.setLong(1, ((Long) o.getProperty("id")));
+      stmt.setLong(1, ((Number) o.getProperty("id")).longValue());
 
       int removed = stmt.executeUpdate();
       if ( removed == 0 ) {
