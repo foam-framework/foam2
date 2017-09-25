@@ -87,9 +87,9 @@ let sub = Subscription(detach: { detached = true })
 
 for o in dao {
   if detached { break }
-  sink.put(sub, o)
+  sink.put(o, sub)
 }
-sink.eof(sub)
+sink.eof()
 
 return resultSink
       */},

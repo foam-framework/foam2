@@ -224,10 +224,10 @@ return sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
   guard let topic = args[0] as? String else { return }
   switch topic {
     case "put":
-      mySink.put(sub, args.last as! FObject)
+      mySink.put(args.last as! FObject, sub)
       break
     case "remove":
-      mySink.remove(sub, args.last as! FObject)
+      mySink.remove(args.last as! FObject, sub)
       break
     case "reset":
       mySink.reset(sub)

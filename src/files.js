@@ -139,7 +139,6 @@ FOAM_FILES([
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
   { name: "foam/dao/Sink" },
-  { name: "foam/swift/refines/Sink", flags: ['swift'] },
   { name: "foam/dao/SinkJava", flags: ['java'] },
   { name: "foam/dao/DAO" },
   { name: "foam/dao/DAOJava", flags: ['java'] },
