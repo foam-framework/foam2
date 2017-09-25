@@ -8,6 +8,8 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
+import static foam.mlang.MLang.*;
+import foam.nanos.script.*;
 import java.io.IOException;
 
 public class Boot {
@@ -38,7 +40,7 @@ public class Boot {
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
 
-    serviceDAO_.where(foam.mlang.MLang.EQ(NSpec.LAZY, false)).select(new AbstractSink() {
+    serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
@@ -46,6 +48,15 @@ public class Boot {
         root_.get(sp.getName());
       }
     });
+
+    String startScript = System.getProperty("foam.main", "main");
+    if ( startScript != null ) {
+      DAO    scriptDAO = (DAO) root_.get("scriptDAO");
+      Script script    = (Script) scriptDAO.find(startScript);
+      if ( script != null ) {
+        script.runScript(root_);
+      }
+     }
   }
 
   public X getX() { return root_; }

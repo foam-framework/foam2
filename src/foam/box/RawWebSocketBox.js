@@ -32,11 +32,7 @@ foam.CLASS({
     {
       name: 'send',
       code: function send(msg) {
-        try {
-          this.socket.send(msg);
-        } catch(e) {
-          if ( msg.errorBox ) msg.errorBox.send(foam.box.SendFailedError.create());
-        }
+        this.socket.send(msg);
       },
       javaCode: `
 getSocket().send(getX().create(foam.lib.json.Outputter.class).stringify(message));
