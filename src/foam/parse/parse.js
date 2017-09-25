@@ -123,6 +123,10 @@ foam.CLASS({
                   'Cannot make substring: end PStream is not a tail of this.');
 
       return this.str[0].substring(this.pos, end.pos);
+    },
+
+    function apply(p, obj) {
+      return p.parse(this, obj);
     }
   ]
 });
