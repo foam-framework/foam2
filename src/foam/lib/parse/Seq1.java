@@ -30,7 +30,7 @@ public class Seq1 implements Parser {
     Object value = null;
 
     for ( int i = 0 ; i < parsers.length ; i++ ) {
-      ps = parsers[i].parse(ps, x);
+      ps = ps.apply(parsers[i], x);
       if ( ps == null ) return null;
       if ( i == index ) value = ps.value();
     }
