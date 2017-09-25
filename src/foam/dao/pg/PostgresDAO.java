@@ -126,11 +126,9 @@ public class PostgresDAO
       PreparedStatement stmt = c.prepareStatement(builder.toString());
       stmt.setLong(1, ((Number) o).longValue());
       ResultSet resultSet = stmt.executeQuery();
-      if ( ! resultSet.isBeforeFirst() ) {
-        // no rows found
+      if ( ! resultSet.next() ) {
+        // no rows
         return null;
-      } else {
-        resultSet.next();
       }
 
       FObject result = createFObject(resultSet);
