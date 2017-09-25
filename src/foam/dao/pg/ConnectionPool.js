@@ -59,6 +59,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'connectionString',
+      transient: true,
       javaFactory: `return getPrefix() +
         getHostname() + ":" +
         getPort() + "/" +
