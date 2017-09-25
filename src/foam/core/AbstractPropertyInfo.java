@@ -82,7 +82,7 @@ public abstract class AbstractPropertyInfo
   @Override
   public void toXML(FObject obj, Document doc, Element objElement) {
     Object value = this.f(obj);
-    if ( this.getTransient() ) return;
+    if ( this.getNetworkTransient() || this.getStorageTransient() ) return;
     if ( value != null && value != "" ) {
       Element prop = doc.createElement(this.getName());
       prop.appendChild(doc.createTextNode(value.toString()));
