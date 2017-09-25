@@ -785,7 +785,7 @@ foam.CLASS({
         console.error('No symbol found for', this.name);
         return undefined;
       }
-      return p.parse(ps, grammar);
+      return ps.apply(p, grammar);
     },
 
     function toString() { return 'sym("' + this.name + '")'; }
@@ -998,7 +998,7 @@ foam.CLASS({
       var start = this.getSymbol(opt_name);
       foam.assert(start, 'No symbol found for', opt_name);
 
-      var result = start.parse(this.ps, this);
+      var result = this.ps.apply(start, this);
       return result && result.value;
     },
 
