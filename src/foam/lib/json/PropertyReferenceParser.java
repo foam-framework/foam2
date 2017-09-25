@@ -29,7 +29,7 @@ public class PropertyReferenceParser extends ProxyParser {
                       new Parser() {
                           private Parser delegate = new StringParser();
                           public PStream parse(PStream ps, ParserContext x) {
-                            ps = delegate.parse(ps, x);
+                            ps = ps.apply(delegate, x);
                             if ( ps != null ) {
                               x.set("forClass_", ps.value());
                             }

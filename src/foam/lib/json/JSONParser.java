@@ -26,7 +26,7 @@ public class JSONParser
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
     x.set("defaultClass", defaultClass);
-    ps = (StringPS) parser.parse(ps, x);
+    ps = (StringPS) ps.apply(parser, x);
 
     return ps == null ? null : (FObject) ps.value();
   }
