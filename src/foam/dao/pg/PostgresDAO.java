@@ -197,7 +197,7 @@ public class PostgresDAO
       index = setStatementValues(index, stmt, obj);
 
       int inserted = stmt.executeUpdate();
-      if (inserted == 0) {
+      if ( inserted == 0 ) {
         throw new SQLException("Error performing put_ command");
       }
 
@@ -234,7 +234,7 @@ public class PostgresDAO
       c = connectionPool.getConnection();
       DatabaseMetaData meta = c.getMetaData();
       resultSet = meta.getTables(null, null, table, new String[]{"TABLE"});
-      if (resultSet.isBeforeFirst()) {
+      if ( resultSet.isBeforeFirst() ) {
         // found a table, don't create
         return false;
       }
