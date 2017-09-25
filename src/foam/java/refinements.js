@@ -70,7 +70,8 @@ foam.CLASS({
         propRequired: this.required,
         jsonParser:   this.javaJSONParser,
         extends:      this.javaInfoType,
-        transient:    this.transient
+        transient:    this.transient,
+        sqlType:      this.sqlType
       })
     },
 
@@ -481,7 +482,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'int'],
     ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.IntParser']
+    ['javaJSONParser', 'foam.lib.json.IntParser'],
+    ['sqlType', 'INT']
   ],
 
   methods: [
@@ -509,7 +511,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'byte'],
     ['javaInfoType', 'foam.core.AbstractBytePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.ByteParser']
+    ['javaJSONParser', 'foam.lib.json.ByteParser'],
+    ['sqlType', 'SMALLINT']
   ],
 
   methods: [
@@ -537,7 +540,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'short'],
     ['javaInfoType', 'foam.core.AbstractShortPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.ShortParser']
+    ['javaJSONParser', 'foam.lib.json.ShortParser'],
+    ['sqlType', 'SMALLINT']
   ],
 
   methods: [
@@ -565,7 +569,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'long'],
     ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.LongParser']
+    ['javaJSONParser', 'foam.lib.json.LongParser'],
+    ['sqlType', 'BIGINT']
   ],
 
   methods: [
@@ -593,7 +598,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'double'],
     ['javaInfoType', 'foam.core.AbstractDoublePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.FloatParser']
+    ['javaJSONParser', 'foam.lib.json.FloatParser'],
+    ['sqlType', 'DOUBLE PRECISION']
   ],
 
   methods: [
@@ -739,7 +745,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.DateParser']
+    ['javaJSONParser', 'foam.lib.json.DateParser'],
+    ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
 
   methods: [
@@ -764,7 +771,8 @@ foam.CLASS({
    properties: [
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-       ['javaJSONParser', 'foam.lib.json.DateParser']
+       ['javaJSONParser', 'foam.lib.json.DateParser'],
+       ['sqlType', 'DATE']
    ],
 
    methods: [
@@ -833,6 +841,9 @@ foam.CLASS({
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((String) key, get_(o));';
+
+      var sql = info.getMethod('getSQLType');
+      sql.body = 'return "VARCHAR(' + this.width + ')";';
 
       return info;
     }
@@ -1028,7 +1039,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'boolean'],
     ['javaJSONParser', 'foam.lib.json.BooleanParser'],
-    ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo']
+    ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo'],
+    ['sqlType', 'BOOLEAN']
   ],
   methods: [
     function createJavaPropertyInfo_(cls) {
