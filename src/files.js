@@ -366,4 +366,5 @@ FOAM_FILES([
   { name: "foam/dao/history/HistoryRecord" },
   { name: "foam/mop/MOP" },
   { name: "foam/mop/MOPJava", flags: ['java'] },
+  { name: "foam/dao/pg/ConnectionPool" }
 ]);

@@ -739,7 +739,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.DateParser'],
+    ['javaJSONParser', 'foam.lib.json.DateParser']
   ],
 
   methods: [
@@ -838,7 +838,6 @@ foam.CLASS({
     }
   ]
 });
-
 
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
@@ -1020,33 +1019,6 @@ foam.CLASS({
     if ( result != 0 ) return result;
   }
   return 0;*/}
-    }
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.String',
-
-  properties: [
-    ['javaType', 'String'],
-    ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.StringParser']
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-      info.method({
-        name: 'getWidth',
-        visibility: 'public',
-        type: 'int',
-        body: 'return ' + this.width + ';'
-      });
-
-      var c = info.getMethod('comparePropertyToObject');
-      c.body = 'return compareValues((String) key, get_(o));';
-
-      return info;
     }
   ]
 });
