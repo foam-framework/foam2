@@ -111,7 +111,8 @@ foam.CLASS({
     'foam.box.Message',
     'foam.box.RegisterSelfMessage',
     'foam.json.Parser',
-    'foam.net.web.WebSocket'
+    'foam.net.web.WebSocket',
+    'foam.box.RawWebSocketBox'
   ],
   imports: [ 'creationContext' ],
 
@@ -134,14 +135,18 @@ foam.CLASS({
 
   methods: [
     function addSocket(socket) {
+      var X = this.creationContext.createSubContext({
+        returnBox: this.RawWebSocketBox.create({ socket: socket })
+      });
+
       var sub1 = socket.message.sub(function onMessage(s, _, msgStr) {
-        var msg = this.parser.parseString(msgStr);
+        var msg = this.parser.parseString(msgStr, X);
 
         if ( ! this.Message.isInstance(msg) ) {
           console.warn('Got non-message:', msg, msgStr);
         }
 
-        if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
+/*        if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
           var named = foam.box.NamedBox.create({
             name: msg.object.name
           });
@@ -149,9 +154,9 @@ foam.CLASS({
           named.delegate = foam.box.RawWebSocketBox.create({
             socket: socket
           });
-        } else {
+        } else {*/
           this.delegate.send(msg);
-        }
+//        }
       }.bind(this));
 
       socket.disconnected.sub(function(s) {
@@ -219,12 +224,8 @@ foam.CLASS({
     {
       name: 'resp',
       postSet: function(_, r) {
-        var iterator = r.headers.entries();
-        var next = iterator.next();
-        while ( ! next.done ) {
-          this.headers[next.value[0]] = next.value[1];
-          next = iterator.next();
-        }
+        if ( r.headers.entries ) this.copyHeaders_(r);
+        else                     this.copyHeadersEdge_(r);
         this.status = r.status;
       }
     }
@@ -257,6 +258,21 @@ foam.CLASS({
 
     function stop() {
       this.streaming = false;
+    },
+    function copyHeaders_(r) {
+      var iterator = r.headers.entries();
+      var next = iterator.next();
+      while ( ! next.done ) {
+        this.headers[next.value[0]] = next.value[1];
+        next = iterator.next();
+      }
+    },
+    function copyHeadersEdge_(r) {
+      // Deal with https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/13928907/
+      var headers = this.headers;
+      r.headers.forEach(function(value, key) {
+        headers[key] = value;
+      });
     }
   ]
 });
