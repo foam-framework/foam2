@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  SwiftTests
-//
-//  Created by Michael Carcasole on 2017-02-22.
-//  Copyright © 2017 FOAM. All rights reserved.
-//
-
 import UIKit
 
 @UIApplicationMain
