@@ -25,22 +25,11 @@ foam.CLASS({
     'propName',
     {
       class: 'Boolean',
-      name: 'transient',
-      value: false
+      name: 'networkTransient'
     },
     {
       class: 'Boolean',
-      name: 'networkTransient',
-      expression: function (transient) {
-        return transient;
-      }
-    },
-    {
-      class: 'Boolean',
-      name: 'storageTransient',
-      expression: function (transient) {
-        return transient;
-      }
+      name: 'storageTransient'
     },
     {
       class: 'String',
@@ -119,12 +108,6 @@ foam.CLASS({
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
             body: 'return new ' + this.jsonParser + '();'
-          },
-          {
-            name: 'getTransient',
-            type: 'boolean',
-            visibility: 'public',
-            body: 'return ' + this.transient + ';'
           },
           {
             name: 'getNetworkTransient',
