@@ -48,7 +48,7 @@
  */
 foam.CLASS({
   package: 'foam.parse',
-  name: 'StringPS',
+  name: 'StringPStream',
 
   properties: [
     {
@@ -934,7 +934,7 @@ foam.CLASS({
   name: 'Grammar',
 
   requires: [
-    'foam.parse.StringPS',
+    'foam.parse.StringPStream',
     'foam.parse.Parsers'
   ],
 
@@ -981,7 +981,7 @@ foam.CLASS({
     {
       name: 'ps',
       factory: function() {
-        return this.StringPS.create();
+        return this.StringPStream.create();
       }
     }
   ],
@@ -1116,5 +1116,5 @@ foam.CLASS({
 
 /*
 TODO(adamvy):
-  -detect non string values passed to StringPS.setString()
+  -detect non string values passed to StringPStream.setString()
 */
