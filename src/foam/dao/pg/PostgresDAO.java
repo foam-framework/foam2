@@ -12,9 +12,9 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class PostgresDAO
     extends AbstractDAO
@@ -37,18 +37,12 @@ public class PostgresDAO
   protected final String table;
   protected final List<PropertyInfo> props;
 
-  public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) throws SQLException {
+  public PostgresDAO(X x, ClassInfo of) throws SQLException {
+    setX(x);
     setOf(of);
 
-    if ( dbName == null || username == null ) {
-      throw new IllegalArgumentException("Illegal arguments");
-    }
-
-    host = (host != null) ? host : "localhost";
-    port = (port != null) ? port : "5432";
-
-    // set up connection pool
-    connectionPool.setup(host, port, dbName, username, password);
+    // fetch connection pool from context
+    connectionPool = (ConnectionPool) getX().get("connectionPool");
 
     // load columns and sql types
     table = of.getObjClass().getSimpleName().toLowerCase();
