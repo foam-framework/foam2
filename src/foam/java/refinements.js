@@ -828,7 +828,13 @@ foam.CLASS({
   properties: [
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.StringParser']
+    ['javaJSONParser', 'foam.lib.json.StringParser'],
+    {
+      name: 'sqlType',
+      expression: function (width) {
+        return 'VARCHAR(' + width + ')';
+      }
+    }
   ],
 
   methods: [
@@ -843,9 +849,6 @@ foam.CLASS({
 
       var c = info.getMethod('comparePropertyToObject');
       c.body = 'return compareValues((String) key, get_(o));';
-
-      var sql = info.getMethod('getSQLType');
-      sql.body = 'return "VARCHAR(' + this.width + ')";';
 
       return info;
     }
