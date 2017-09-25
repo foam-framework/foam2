@@ -124,15 +124,16 @@ public class PostgresDAO
           .append(" where id = ?");
 
       PreparedStatement stmt = c.prepareStatement(builder.toString());
-      stmt.setLong(1, ((Long) o));
+      stmt.setLong(1, ((Number) o).longValue());
       ResultSet resultSet = stmt.executeQuery();
       if ( ! resultSet.isBeforeFirst() ) {
         // no rows found
         return null;
+      } else {
+        resultSet.next();
       }
 
       FObject result = createFObject(resultSet);
-
       resultSet.close();
       stmt.close();
       c.close();
