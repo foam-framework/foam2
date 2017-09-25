@@ -87,12 +87,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      if ( resultSet != null )
-        try { resultSet.close(); } catch (Throwable ignored) {}
-      if ( stmt != null )
-        try { stmt.close(); } catch (Throwable ignored) {}
-      if ( c != null )
-        try { c.close(); } catch (Throwable ignored) {}
+      closeAllQuietly(resultSet, stmt, c);
     }
   }
 
@@ -122,10 +117,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      if ( stmt != null )
-        try { stmt.close(); } catch (Throwable ignored) {}
-      if ( c != null )
-        try { c.close(); } catch (Throwable ignored) {}
+      closeAllQuietly(null, stmt, c);
     }
   }
 
@@ -156,12 +148,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      if ( resultSet != null )
-        try { resultSet.close(); } catch (Throwable ignored) {}
-      if ( stmt != null )
-        try { stmt.close(); } catch (Throwable ignored) {}
-      if ( c != null )
-        try { c.close(); } catch (Throwable ignored) {}
+      closeAllQuietly(resultSet, stmt, c);
     }
   }
 
@@ -213,12 +200,7 @@ public class PostgresDAO
       e.printStackTrace();
       return null;
     } finally {
-      if ( resultSet != null )
-        try { resultSet.close(); } catch (Throwable ignored) {}
-      if ( stmt != null )
-        try { stmt.close(); } catch (Throwable ignored) {}
-      if ( c != null )
-        try { c.close(); } catch (Throwable ignored) {}
+      closeAllQuietly(resultSet, stmt, c);
     }
   }
 
@@ -271,12 +253,7 @@ public class PostgresDAO
       e.printStackTrace();
       return false;
     } finally {
-      if ( resultSet != null )
-        try { resultSet.close(); } catch (Throwable ignored) {}
-      if ( stmt != null )
-        try { stmt.close(); } catch (Throwable ignored) {}
-      if ( c != null )
-        try { c.close(); } catch (Throwable ignored) {}
+      closeAllQuietly(resultSet, stmt, c);
     }
   }
 
@@ -358,5 +335,20 @@ public class PostgresDAO
       stmt.setObject(index++, prop.get(obj), prop.getSqlType().getOrdinal());
     }
     return index;
+  }
+
+  /**
+   * Closes resources without throwing exceptions
+   * @param resultSet ResultSet
+   * @param stmt PreparedStatement
+   * @param c Connection
+   */
+  public void closeAllQuietly(ResultSet resultSet, PreparedStatement stmt, Connection c) {
+    if ( resultSet != null )
+      try { resultSet.close(); } catch (Throwable ignored) {}
+    if ( stmt != null )
+      try { stmt.close(); } catch (Throwable ignored) {}
+    if ( c != null )
+      try { c.close(); } catch (Throwable ignored) {}
   }
 }
