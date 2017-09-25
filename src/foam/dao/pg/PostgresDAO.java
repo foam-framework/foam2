@@ -110,6 +110,7 @@ public class PostgresDAO
           .append(" where id = ?");
 
       stmt = c.prepareStatement(builder.toString());
+      // TODO: add support for non-numbers
       stmt.setLong(1, ((Number) o.getProperty("id")).longValue());
 
       int removed = stmt.executeUpdate();
@@ -143,6 +144,7 @@ public class PostgresDAO
           .append(" where id = ?");
 
       stmt = c.prepareStatement(builder.toString());
+      // TODO: add support for non-numbers
       stmt.setLong(1, ((Number) o).longValue());
       resultSet = stmt.executeQuery();
       if ( ! resultSet.next() ) {
