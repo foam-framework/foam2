@@ -83,16 +83,16 @@ public class PostgresDAO
       }
 
       return sink;
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return null;
     } finally {
       if ( resultSet != null )
-        try { resultSet.close(); } catch (SQLException ignored) {}
+        try { resultSet.close(); } catch (Throwable ignored) {}
       if ( stmt != null )
-        try { stmt.close(); } catch (SQLException ignored) {}
+        try { stmt.close(); } catch (Throwable ignored) {}
       if ( c != null )
-        try { c.close(); } catch (SQLException ignored) {}
+        try { c.close(); } catch (Throwable ignored) {}
     }
   }
 
@@ -118,14 +118,14 @@ public class PostgresDAO
       }
 
       return o;
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return null;
     } finally {
       if ( stmt != null )
-        try { stmt.close(); } catch (SQLException ignored) {}
+        try { stmt.close(); } catch (Throwable ignored) {}
       if ( c != null )
-        try { c.close(); } catch (SQLException ignored) {}
+        try { c.close(); } catch (Throwable ignored) {}
     }
   }
 
@@ -152,16 +152,16 @@ public class PostgresDAO
       }
 
       return createFObject(resultSet);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return null;
     } finally {
       if ( resultSet != null )
-        try { resultSet.close(); } catch (SQLException ignored) {}
+        try { resultSet.close(); } catch (Throwable ignored) {}
       if ( stmt != null )
-        try { stmt.close(); } catch (SQLException ignored) {}
+        try { stmt.close(); } catch (Throwable ignored) {}
       if ( c != null )
-        try { c.close(); } catch (SQLException ignored) {}
+        try { c.close(); } catch (Throwable ignored) {}
     }
   }
 
@@ -209,16 +209,16 @@ public class PostgresDAO
       }
 
       return obj;
-    } catch (SQLException e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return null;
     } finally {
       if ( resultSet != null )
-        try { resultSet.close(); } catch (SQLException ignored) {}
+        try { resultSet.close(); } catch (Throwable ignored) {}
       if ( stmt != null )
-        try { stmt.close(); } catch (SQLException ignored) {}
+        try { stmt.close(); } catch (Throwable ignored) {}
       if ( c != null )
-        try { c.close(); } catch (SQLException ignored) {}
+        try { c.close(); } catch (Throwable ignored) {}
     }
   }
 
@@ -267,16 +267,16 @@ public class PostgresDAO
       stmt = c.prepareStatement(builder.toString());
       stmt.executeUpdate();
       return true;
-    } catch (SQLException e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return false;
     } finally {
       if ( resultSet != null )
-        try { resultSet.close(); } catch (SQLException ignored) {}
+        try { resultSet.close(); } catch (Throwable ignored) {}
       if ( stmt != null )
-        try { stmt.close(); } catch (SQLException ignored) {}
+        try { stmt.close(); } catch (Throwable ignored) {}
       if ( c != null )
-        try { c.close(); } catch (SQLException ignored) {}
+        try { c.close(); } catch (Throwable ignored) {}
     }
   }
 
