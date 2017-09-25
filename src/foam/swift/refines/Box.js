@@ -1,19 +1,3 @@
-foam.INTERFACE({
-  refines: 'foam.box.Box',
-  methods: [
-    {
-      name: 'send',
-      args: [
-        {
-          name: 'msg',
-          swiftType: 'Message'
-        }
-      ],
-      swiftThrows: true,
-    },
-  ]
-});
-
 foam.CLASS({
   name: 'RPCReturnBox',
   package: 'foam.swift.box',
