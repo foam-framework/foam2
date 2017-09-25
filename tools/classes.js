@@ -61,7 +61,6 @@ var classes = [
   'foam.box.ReturnBox',
   'foam.box.BoxService',
   'foam.box.CheckAuthenticationBox',
-  'foam.dao.SQLType',
   'foam.dao.DAO',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
