@@ -870,7 +870,8 @@ foam.CLASS({
 
   properties: [
     ['javaType',       'String[]'],
-    ['javaJSONParser', 'foam.lib.json.StringArrayParser']
+    ['javaJSONParser', 'foam.lib.json.StringArrayParser'],
+    ['sqlType', 'TEXT[]']
   ]
 });
 
