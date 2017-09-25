@@ -627,7 +627,7 @@ foam.CLASS({
         ps = ps.apply(p, obj);
         if ( ps ) ret.push(ps.value);
         if ( delim && ps ) {
-          ps = delim.parse(ps, obj) || ps;
+          ps = ps.apply(delim, obj) || ps;
         }
       }
 
@@ -691,7 +691,7 @@ foam.CLASS({
         ps = ps.apply(p, obj);
         if ( ps ) i++;
         if ( delim && ps ) {
-          ps = delim.parse(ps, obj) || ps;
+          ps = ps.apply(delim, obj) || ps;
         }
       }
 
@@ -732,7 +732,7 @@ foam.CLASS({
     function parse(ps, obj) {
       return ps.apply(this.p, obj) ?
         undefined :
-        (this.else ? this.else.parse(ps, obj) : ps);
+        (this.else ? ps.apply(this.else, obj) : ps);
     },
 
     function toString() {
