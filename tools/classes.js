@@ -111,6 +111,7 @@ var classes = [
   'foam.mop.MOP',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.pg.ConnectionPool',
+  'foam.lib.parse.Parser',
   'foam.lib.parse.PStream'
 ];
 
@@ -131,6 +132,7 @@ var proxies = [
   'foam.dao.Sink',
   'com.google.foam.demos.appengine.TestService',
   'foam.mop.MOP',
+  'foam.lib.parse.Parser',
   'foam.lib.parse.PStream'
 ];
 

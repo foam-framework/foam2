@@ -24,7 +24,7 @@ public class Optional implements Parser {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    PStream ret = p.parse(ps, x);
+    PStream ret = ps.apply(p, x);
     if ( ret != null ) return ret;
     return ps.setValue(null);
   }
