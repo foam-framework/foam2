@@ -6,7 +6,6 @@
 
 package foam.core;
 
-import foam.dao.SQLType;
 import foam.lib.parse.Parser;
 import foam.nanos.logger.Logger;
 import java.sql.PreparedStatement;
@@ -89,10 +88,5 @@ public abstract class AbstractPropertyInfo
       prop.appendChild(doc.createTextNode(value.toString()));
       objElement.appendChild(prop);
     }
-  }
-
-  @Override
-  public SQLType getSqlType() {
-    return SQLType.VARCHAR;
   }
 }

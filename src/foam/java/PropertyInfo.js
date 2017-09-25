@@ -43,6 +43,10 @@ foam.CLASS({
       }
     },
     {
+      class: 'String',
+      name: 'sqlType'
+    },
+    {
       name: 'getterName',
       expression: function(propName) {
         return 'get' + foam.String.capitalize(propName);
@@ -145,6 +149,12 @@ foam.CLASS({
             visibility: 'public',
             type: 'Class',
             body: `return ${this.propType}.class;`
+          },
+          {
+            name: 'getSQLType',
+            visibility: 'public',
+            type: 'String',
+            body: 'return "' + this.sqlType + '";'
           }
         ]
       }
