@@ -110,7 +110,8 @@ var classes = [
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
   'foam.nanos.export.ExportDriverRegistry',
-  'foam.dao.pg.ConnectionPool'
+  'foam.dao.pg.ConnectionPool',
+  'foam.lib.parse.PStream'
 ];
 
 var abstractClasses = [
@@ -129,7 +130,8 @@ var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
   'com.google.foam.demos.appengine.TestService',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.lib.parse.PStream'
 ];
 
 module.exports = {

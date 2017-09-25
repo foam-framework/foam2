@@ -73,4 +73,8 @@ public class StringPS
 
     return str.get().substring(pos, endps.pos);
   }
+
+  public PStream apply(Parser ps, ParserContext x) {
+    return ps.parse(this, x);
+  }
 }
