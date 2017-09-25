@@ -51,7 +51,9 @@ public class PostgresDAO
 
     // load columns and sql types
     table = of.getObjClass().getSimpleName().toLowerCase();
-    createTable(of);
+    if ( ! createTable(of) ) {
+      throw new SQLException("Error creating table");
+    }
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -59,9 +61,12 @@ public class PostgresDAO
       sink = new ListSink();
     }
 
+    Connection c = null;
+    PreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
     try {
-      Connection c = connectionPool.getConnection();
-      PreparedStatement stmt = null;
+      c = connectionPool.getConnection();
 
       // select all if predicate is null, else use predicate
       if ( predicate == null ) {
@@ -73,31 +78,38 @@ public class PostgresDAO
         stmt = c.prepareStatement(predicate.createStatement(table));
       }
 
-      ResultSet resultSet = stmt.executeQuery();
+      resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
         sink.put(createFObject(resultSet), null);
       }
 
-      resultSet.close();
-      stmt.close();
-      c.close();
+      return sink;
     } catch (Exception e) {
       e.printStackTrace();
+      return null;
+    } finally {
+      if ( resultSet != null )
+        try { resultSet.close(); } catch (SQLException ignored) {}
+      if ( stmt != null )
+        try { stmt.close(); } catch (SQLException ignored) {}
+      if ( c != null )
+        try { c.close(); } catch (SQLException ignored) {}
     }
-
-    return sink;
   }
 
   @Override
   public FObject remove_(X x, FObject o) {
+    Connection c = null;
+    PreparedStatement stmt = null;
+
     try {
-      Connection c = connectionPool.getConnection();
+      c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("delete from ")
           .append(table)
           .append(" where id = ?");
 
-      PreparedStatement stmt = c.prepareStatement(builder.toString());
+      stmt = c.prepareStatement(builder.toString());
       stmt.setLong(1, ((Number) o.getProperty("id")).longValue());
 
       int removed = stmt.executeUpdate();
@@ -105,41 +117,50 @@ public class PostgresDAO
         throw new SQLException("Error while removing.");
       }
 
-      stmt.close();
-      c.close();
       return o;
     } catch (Exception e) {
       e.printStackTrace();
+      return null;
+    } finally {
+      if ( stmt != null )
+        try { stmt.close(); } catch (SQLException ignored) {}
+      if ( c != null )
+        try { c.close(); } catch (SQLException ignored) {}
     }
-    return null;
   }
 
   @Override
   public FObject find_(X x, Object o) {
+    Connection c = null;
+    PreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
     try {
-      Connection c = connectionPool.getConnection();
+      c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("select * from ")
           .append(table)
           .append(" where id = ?");
 
-      PreparedStatement stmt = c.prepareStatement(builder.toString());
+      stmt = c.prepareStatement(builder.toString());
       stmt.setLong(1, ((Number) o).longValue());
-      ResultSet resultSet = stmt.executeQuery();
+      resultSet = stmt.executeQuery();
       if ( ! resultSet.next() ) {
         // no rows
         return null;
       }
 
-      FObject result = createFObject(resultSet);
-      resultSet.close();
-      stmt.close();
-      c.close();
-
-      return result;
+      return createFObject(resultSet);
     } catch (Exception e) {
       e.printStackTrace();
       return null;
+    } finally {
+      if ( resultSet != null )
+        try { resultSet.close(); } catch (SQLException ignored) {}
+      if ( stmt != null )
+        try { stmt.close(); } catch (SQLException ignored) {}
+      if ( c != null )
+        try { c.close(); } catch (SQLException ignored) {}
     }
   }
 
@@ -150,8 +171,12 @@ public class PostgresDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
+    Connection c = null;
+    PreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
     try {
-      Connection c = connectionPool.getConnection();
+      c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("insert into ")
           .append(table);
@@ -165,7 +190,7 @@ public class PostgresDAO
       buildFormattedColumnPlaceholders(obj, builder);
 
       int index = 1;
-      PreparedStatement stmt = c.prepareStatement(builder.toString(),
+      stmt = c.prepareStatement(builder.toString(),
           Statement.RETURN_GENERATED_KEYS);
       // set statement values twice: once for the insert and once for the update on conflict
       index = setStatementValues(index, stmt, obj);
@@ -177,65 +202,82 @@ public class PostgresDAO
       }
 
       // get auto-generated postgres keys
-      ResultSet resultSet = stmt.getGeneratedKeys();
+      resultSet = stmt.getGeneratedKeys();
       if ( resultSet.next() ) {
         obj.setProperty("id", resultSet.getLong(1));
       }
 
-      resultSet.close();
-      stmt.close();
-      c.close();
+      return obj;
     } catch (SQLException e) {
       e.printStackTrace();
+      return null;
+    } finally {
+      if ( resultSet != null )
+        try { resultSet.close(); } catch (SQLException ignored) {}
+      if ( stmt != null )
+        try { stmt.close(); } catch (SQLException ignored) {}
+      if ( c != null )
+        try { c.close(); } catch (SQLException ignored) {}
     }
-
-    return obj;
   }
 
   /**
    * Creates a table if one does not exist already
    * @throws SQLException
    */
-  public void createTable(ClassInfo classInfo) throws SQLException {
-    Connection conn = connectionPool.getConnection();
-    DatabaseMetaData meta = conn.getMetaData();
-    ResultSet resultSet = meta.getTables(null, null, table, new String[] { "TABLE" });
-    if ( resultSet.isBeforeFirst() ) {
-      // found a table, don't create
-      return;
+  public boolean createTable(ClassInfo classInfo) {
+    Connection c = null;
+    PreparedStatement stmt = null;
+    ResultSet resultSet = null;
+
+    try {
+      c = connectionPool.getConnection();
+      DatabaseMetaData meta = c.getMetaData();
+      resultSet = meta.getTables(null, null, table, new String[]{"TABLE"});
+      if (resultSet.isBeforeFirst()) {
+        // found a table, don't create
+        return false;
+      }
+
+      List<PropertyInfo> props = classInfo.getAxiomsByClass(PropertyInfo.class);
+      String columns = props.stream()
+          .filter(e -> !"id".equals(e.getName()) && !e.getStorageTransient())
+          .map(e -> {
+            // map types to postgres types
+            SQLType type = e.getSqlType();
+            switch (type.getName()) {
+              case "TINYINT":
+                return e.getName() + " SMALLINT";
+              case "VARBINARY":
+                return e.getName() + " BYTEA";
+              default:
+                return e.getName() + " " + type.getName();
+            }
+          })
+          .collect(Collectors.joining(","));
+
+      StringBuilder builder = sb.get()
+          .append("CREATE TABLE ")
+          .append(table)
+          .append("(id bigserial primary key,")
+          .append(columns)
+          .append(")");
+
+      // execute statement
+      stmt = c.prepareStatement(builder.toString());
+      stmt.executeUpdate();
+      return true;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    } finally {
+      if ( resultSet != null )
+        try { resultSet.close(); } catch (SQLException ignored) {}
+      if ( stmt != null )
+        try { stmt.close(); } catch (SQLException ignored) {}
+      if ( c != null )
+        try { c.close(); } catch (SQLException ignored) {}
     }
-
-    List<PropertyInfo> props = classInfo.getAxiomsByClass(PropertyInfo.class);
-    String columns = props.stream()
-        .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
-        .map(e -> {
-          // map types to postgres types
-          SQLType type = e.getSqlType();
-          switch ( type.getName() ) {
-            case "TINYINT":
-              return e.getName() + " SMALLINT";
-            case "VARBINARY":
-              return e.getName() + " BYTEA";
-            default:
-              return e.getName() + " " + type.getName();
-          }
-        })
-        .collect(Collectors.joining(","));
-
-    StringBuilder builder = sb.get()
-        .append("CREATE TABLE ")
-        .append(table)
-        .append("(id bigserial primary key,")
-        .append(columns)
-        .append(")");
-
-    // execute statement
-    PreparedStatement stmt = conn.prepareStatement(builder.toString());
-    stmt.executeUpdate();
-
-    resultSet.close();
-    stmt.close();
-    conn.close();
   }
 
   /**
