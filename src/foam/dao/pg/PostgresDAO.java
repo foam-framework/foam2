@@ -35,6 +35,7 @@ public class PostgresDAO
   };
 
   protected final String table;
+  protected final List<PropertyInfo> props;
 
   public PostgresDAO(ClassInfo of, String host, String port, String dbName, String username, String password) throws SQLException {
     setOf(of);
@@ -54,6 +55,10 @@ public class PostgresDAO
     if ( ! createTable(of) ) {
       throw new SQLException("Error creating table");
     }
+
+    props = ((List<PropertyInfo>) of.getAxiomsByClass(PropertyInfo.class))
+        .stream().filter(e -> ! e.getStorageTransient())
+        .collect(Collectors.toList());
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -241,9 +246,8 @@ public class PostgresDAO
         return false;
       }
 
-      List<PropertyInfo> props = classInfo.getAxiomsByClass(PropertyInfo.class);
       String columns = props.stream()
-          .filter(e -> !"id".equals(e.getName()) && !e.getStorageTransient())
+          .filter(e -> !"id".equals(e.getName()))
           .map(e -> {
             // map types to postgres types
             SQLType type = e.getSqlType();
@@ -294,7 +298,6 @@ public class PostgresDAO
       throw new Exception("`Of` is not set");
     }
 
-    List<PropertyInfo> props = getOf().getAxiomsByClass(PropertyInfo.class);
     FObject obj = (FObject) getOf().getObjClass().newInstance();
     ResultSetMetaData metaData = resultSet.getMetaData();
 
@@ -306,8 +309,6 @@ public class PostgresDAO
         break;
       // get the property and set the value
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( prop.getStorageTransient() )
-        continue;
       prop.set(obj, resultSet.getObject(index++));
     }
 
@@ -320,9 +321,8 @@ public class PostgresDAO
    */
   public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
     // collect columns list into comma delimited string
-    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     String columns = props.stream()
-        .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
+        .filter(e -> ! "id".equals(e.getName()))
         .map(e -> e.getName().toLowerCase())
         .collect(Collectors.joining(","));
 
@@ -337,9 +337,8 @@ public class PostgresDAO
    */
   public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
     // map columns into ? and collect into comma delimited string
-    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     String placeholders = props.stream()
-        .filter(e -> ! "id".equals(e.getName()) && ! e.getStorageTransient())
+        .filter(e -> ! "id".equals(e.getName()))
         .map(String -> "?")
         .collect(Collectors.joining(","));
 
@@ -357,11 +356,10 @@ public class PostgresDAO
    * @throws SQLException
    */
   public int setStatementValues(int index, PreparedStatement stmt, FObject obj) throws SQLException {
-    List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( prop.getName().equals("id") || prop.getStorageTransient() )
+      if ( prop.getName().equals("id") )
         continue;
       stmt.setObject(index++, prop.get(obj), prop.getSqlType().getOrdinal());
     }
