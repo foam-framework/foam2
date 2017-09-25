@@ -269,6 +269,9 @@ if ( foam.isServer ) {
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobStore',
+  requires: [
+    'foam.blob.IdentifiedBlob'
+  ],
 
   properties: [
     {
@@ -348,6 +351,10 @@ foam.CLASS({
     },
 
     function put(obj) {
+      if ( this.IdentifiedBlob.isInstance(obj) ) {
+        return obj;
+      }
+
       this.setup();
       // This process could probably be sped up a bit by
       // requesting chunks of the incoming blob in advance,
@@ -408,11 +415,24 @@ foam.CLASS({
                 reject(err);
                 return;
               }
-              resolve(digest);
+              resolve(self.IdentifiedBlob.create({ id: digest }));
             });
           });
         });
       });
+    },
+
+    function filename(blob) {
+      if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) return null;
+
+      var path = this.sha256 + require('path').sep + blob.id;
+      try {
+        require('fs').statSync(path);
+      } catch(e) {
+        return null;
+      }
+
+      return path;
     },
 
     function find(id) {
@@ -474,8 +494,9 @@ foam.CLASS({
 
       return req.send().then(function(resp) {
         return resp.payload;
-      }).then(function(id) {
-        return self.IdentifiedBlob.create({ id: id });
+      }).then(function(payload) {
+        return foam.json.Parser.create({ creationContext: self }).parseString(payload);
+//        return self.IdentifiedBlob.create({ id: id });
       });
     },
     function urlFor(blob) {
