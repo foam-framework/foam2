@@ -6,8 +6,6 @@
 
 package foam.core;
 
-import foam.dao.SQLType;
-
 import javax.xml.stream.XMLStreamReader;
 import java.util.Date;
 
@@ -32,10 +30,5 @@ public abstract class AbstractDatePropertyInfo
     super.fromXML(x, reader);
     Date date = new Date(reader.getText());
     return date;
-  }
-
-  @Override
-  public SQLType getSqlType() {
-    return SQLType.DATE;
   }
 }

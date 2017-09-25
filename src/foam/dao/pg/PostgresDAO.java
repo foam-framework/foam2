@@ -6,7 +6,6 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.AbstractDAO;
 import foam.dao.ListSink;
-import foam.dao.SQLType;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -224,18 +223,7 @@ public class PostgresDAO
 
       String columns = props.stream()
           .filter(e -> !"id".equals(e.getName()))
-          .map(e -> {
-            // map types to postgres types
-            SQLType type = e.getSqlType();
-            switch (type.getName()) {
-              case "TINYINT":
-                return e.getName() + " SMALLINT";
-              case "VARBINARY":
-                return e.getName() + " BYTEA";
-              default:
-                return e.getName() + " " + type.getName();
-            }
-          })
+          .map(e -> e.getName() + " " + e.getSQLType())
           .collect(Collectors.joining(","));
 
       StringBuilder builder = sb.get()
@@ -332,7 +320,7 @@ public class PostgresDAO
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( prop.getName().equals("id") )
         continue;
-      stmt.setObject(index++, prop.get(obj), prop.getSqlType().getOrdinal());
+      stmt.setObject(index++, prop.get(obj));
     }
     return index;
   }

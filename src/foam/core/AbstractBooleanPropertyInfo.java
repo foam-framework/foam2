@@ -6,8 +6,6 @@
 
 package foam.core;
 
-import foam.dao.SQLType;
-
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractBooleanPropertyInfo
@@ -26,10 +24,5 @@ public abstract class AbstractBooleanPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Boolean.parseBoolean(reader.getText());
-  }
-
-  @Override
-  public SQLType getSqlType() {
-    return SQLType.BIT;
   }
 }

@@ -6,8 +6,6 @@
 
 package foam.core;
 
-import foam.dao.SQLType;
-
 import javax.xml.stream.XMLStreamReader;
 
 public abstract class AbstractLongPropertyInfo
@@ -30,10 +28,5 @@ public abstract class AbstractLongPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Long.valueOf(reader.getText());
-  }
-
-  @Override
-  public SQLType getSqlType() {
-    return SQLType.BIGINT;
   }
 }
