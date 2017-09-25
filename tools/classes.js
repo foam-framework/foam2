@@ -109,7 +109,9 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
-  'foam.nanos.export.ExportDriverRegistry'
+  'foam.nanos.export.ExportDriverRegistry',
+  'foam.dao.pg.ConnectionPool',
+  'foam.lib.json.OutputterMode'
 ];
 
 var abstractClasses = [

@@ -16,12 +16,11 @@ import org.w3c.dom.Element;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-  extends foam.mlang.Expr, Comparator
+    extends foam.mlang.Expr, Comparator
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
 
-  public boolean getTransient();
   public boolean getNetworkTransient();
   public boolean getStorageTransient();
   public boolean getRequired();
@@ -36,4 +35,5 @@ public interface PropertyInfo
   public Object fromXML(X x, XMLStreamReader reader);
   public void toXML(FObject obj, Document doc, Element objElement);
   public int comparePropertyToObject(Object key, FObject o);
+  public String getSQLType();
 }
