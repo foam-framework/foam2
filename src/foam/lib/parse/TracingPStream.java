@@ -9,6 +9,9 @@ package foam.lib.parse;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.StdoutLogger;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class TracingPStream
     extends ProxyPStream
 {
@@ -52,7 +55,7 @@ public class TracingPStream
   @Override
   public PStream apply(Parser ps, ParserContext x) {
     char char1 = ( this.valid() ) ? this.head() : ' ';
-    logger.debug("Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
+    logger.debug(getIndentation() + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
 
     PStream result = ps.parse(this, x);
     if ( result == null ) {
@@ -61,5 +64,10 @@ public class TracingPStream
       logger.info("result = " + result.value());
     }
     return result;
+  }
+
+  public String getIndentation() {
+    return IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> "")
+        .collect(Collectors.joining(" "));
   }
 }
