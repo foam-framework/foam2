@@ -52,7 +52,7 @@ public class TracingPStream
   public PStream apply(Parser ps, ParserContext x) {
     String indentation = IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> " ")
         .collect(Collectors.joining(""));
-    
+
     char char1 = ( this.valid() ) ? this.head() : ' ';
     writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
 
@@ -60,7 +60,7 @@ public class TracingPStream
     if ( result == null ) {
       writer.println(indentation + "Parse error");
     } else {
-      writer.println(indentation + "result = " + result.value());
+      writer.println(indentation + "Result = " + result.value());
     }
     return result;
   }
