@@ -9,6 +9,8 @@ package foam.lib.parse;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.StdoutLogger;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -17,39 +19,33 @@ public class TracingPStream
 {
   protected int pos;
   protected int depth;
-  protected Logger logger;
+  protected PrintWriter writer;
   protected TracingPStream tail_ = null;
-
-  public static Logger createLogger() {
-    StdoutLogger logger = new StdoutLogger();
-    logger.start();
-    return logger;
-  }
 
   public TracingPStream() {
     this(null);
   }
 
   public TracingPStream(PStream delegate) {
-    this(delegate, createLogger(), 0, 0);
+    this(delegate, new PrintWriter(System.out), 0, 0);
   }
 
-  public TracingPStream(PStream delegate, Logger logger, int pos, int depth) {
+  public TracingPStream(PStream delegate, PrintWriter writer, int pos, int depth) {
     setDelegate(delegate);
-    this.logger = logger;
+    this.writer = writer;
     this.pos = pos;
     this.depth = depth;
   }
 
   @Override
   public PStream tail() {
-    if ( tail_ == null ) tail_ = new TracingPStream(super.tail(), logger, pos + 1, depth);
+    if ( tail_ == null ) tail_ = new TracingPStream(super.tail(), writer, pos + 1, depth);
     return tail_;
   }
 
   @Override
   public PStream setValue(Object value) {
-    return new TracingPStream(super.setValue(value), logger, pos, depth + 1);
+    return new TracingPStream(super.setValue(value), writer, pos, depth + 1);
   }
 
   @Override
@@ -58,14 +54,18 @@ public class TracingPStream
         .collect(Collectors.joining(" "));
 
     char char1 = ( this.valid() ) ? this.head() : ' ';
-    logger.debug(indentation + "Parsing '" + char1 + "' at: " + pos + " using " + ps.getClass().getSimpleName());
+    writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
 
     PStream result = ps.parse(this, x);
     if ( result == null ) {
-      logger.error(indentation + "Parsing failed");
+      writer.println(indentation + "Parse error");
     } else {
-      logger.info(indentation + "result = " + result.value());
+      writer.println(indentation + "result = " + result.value());
     }
     return result;
+  }
+
+  public String getIndentation() {
+    return
   }
 }
