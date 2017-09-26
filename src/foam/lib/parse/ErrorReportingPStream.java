@@ -23,13 +23,13 @@ public class ErrorReportingPStream
 
   @Override
   public PStream tail() {
-    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(super.tail(), pos + 1);
+    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(this, super.tail(), pos + 1);
     return tail_;
   }
 
   @Override
   public PStream setValue(Object value) {
-    return new ErrorReportingNodePStream(super.setValue(value), pos);
+    return new ErrorReportingNodePStream(this, super.setValue(value), pos);
   }
 
   @Override
