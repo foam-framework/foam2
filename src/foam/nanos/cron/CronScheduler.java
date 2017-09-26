@@ -36,7 +36,7 @@ public class CronScheduler
       MLang.MIN(Cron.SCHEDULED_TIME)
     );
 
-    if ((int) min.getValue() == 0) {
+    if ( min.getValue().equals(0) ) {
       return null;
     }
 
