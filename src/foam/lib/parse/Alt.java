@@ -26,7 +26,7 @@ public class Alt implements Parser {
 
   public PStream parse(PStream ps, ParserContext x) {
     for ( int i = 0 ; i < parsers.length ; i++ ) {
-      PStream ret = parsers[i].parse(ps, x);
+      PStream ret = ps.apply(parsers[i], x);
       if ( ret != null ) return ret;
     }
     return null;

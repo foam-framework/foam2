@@ -21,7 +21,6 @@ foam.CLASS({
   extends: 'foam.box.PromisedBox',
 
   requires: [
-    'foam.net.node.Socket',
     'foam.box.RawSocketBox'
   ],
 
@@ -32,9 +31,12 @@ foam.CLASS({
     {
       name: 'delegate',
       factory: function() {
-        return this.Socket.create().connectTo(this.address).then(function(s) {
-          return this.RawSocketBox.create({ socket: s });
-        }.bind(this));
+        // Use default FOAM implementation of Socket. Do not attempt to lookup
+        // sensitive "foam.net.node.Socket" class in box context.
+        return foam.lookup('foam.net.node.Socket').create(null, this).
+            connectTo(this.address).then(function(s) {
+              return this.RawSocketBox.create({ socket: s });
+            }.bind(this));
       }
     }
   ]
