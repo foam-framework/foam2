@@ -13,6 +13,17 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Outputter {
+
+  public final OutputterMode mode;
+
+  public Outputter() {
+    mode = OutputterMode.FULL;
+  }
+
+  public Outputter(OutputterMode mode) {
+    this.mode = mode;
+  }
+
   public String stringify(FObject obj) {
     StringBuilder sb = new StringBuilder();
     outputFObject(sb, obj);
@@ -117,8 +128,8 @@ public class Outputter {
 
   protected boolean isArray(Object value) {
     return ( value != null ) &&
-             ( value.getClass() != null ) &&
-             value.getClass().isArray();
+        ( value.getClass() != null ) &&
+        value.getClass().isArray();
   }
 
   protected void outputDate(StringBuilder out, java.util.Date date) {
@@ -142,7 +153,8 @@ public class Outputter {
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( prop.getTransient() ) continue;
+      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
+      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;

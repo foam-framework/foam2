@@ -32,7 +32,7 @@ public class Seq2 implements Parser {
     Object[] value = new Object[2];
 
     for ( int i = 0 ; i < parsers.length ; i++ ) {
-      ps = parsers[i].parse(ps, x);
+      ps = ps.apply(parsers[i], x);
       if ( ps == null ) return null;
       if ( i == index1 ) value[0] = ps.value();
       if ( i == index2 ) value[1] = ps.value();
