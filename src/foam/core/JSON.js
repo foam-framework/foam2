@@ -316,7 +316,7 @@ foam.CLASS({
     },
 
     function makeStubObj(o) {
-      var clientClsId = o.cls_.package + 'Client' + o.cls_.name;
+      var clientClsId = o.cls_.package + '.Client' + o.cls_.name;
       var clientCls = foam.lookup(clientClsId, true);
 
       if ( ! clientCls ) {
