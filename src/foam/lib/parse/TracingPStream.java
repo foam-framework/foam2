@@ -12,24 +12,53 @@ import foam.nanos.logger.StdoutLogger;
 public class TracingPStream
     extends ProxyPStream
 {
-  protected int pos = 0;
+  protected int pos;
+  protected int depth;
   protected Logger logger;
+  protected TracingPStream tail_ = null;
 
-  public TracingPStream(PStream delegate) {
-    setDelegate(delegate);
-    this.logger = new StdoutLogger();
+  public static Logger createLogger() {
+    StdoutLogger logger = new StdoutLogger();
+    logger.start();
+    return logger;
   }
 
-  public TracingPStream(PStream delegate, Logger logger) {
+  public TracingPStream() {
+    this(null);
+  }
+
+  public TracingPStream(PStream delegate) {
+    this(delegate, createLogger(), 0, 0);
+  }
+
+  public TracingPStream(PStream delegate, Logger logger, int pos, int depth) {
     setDelegate(delegate);
     this.logger = logger;
+    this.pos = pos;
+    this.depth = depth;
+  }
+
+  @Override
+  public PStream tail() {
+    if ( tail_ == null ) tail_ = new TracingPStream(super.tail(), logger, pos + 1, depth);
+    return tail_;
+  }
+
+  @Override
+  public PStream setValue(Object value) {
+    return new TracingPStream(super.setValue(value), logger, pos, depth + 1);
   }
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
-    PStream result = super.apply(ps, x);
+    char char1 = ( this.valid() ) ? this.head() : ' ';
+    logger.debug("Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
+
+    PStream result = ps.parse(this, x);
     if ( result == null ) {
-      // TODO: print using logger
+      logger.error("Parse error");
+    } else {
+      logger.info("result = " + result.value());
     }
     return result;
   }
