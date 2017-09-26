@@ -1,11 +1,10 @@
 package foam.nanos.tomcat;
 
 import foam.nanos.http.NanoRouter;
-
+import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class TomcatRouter
   extends NanoRouter
