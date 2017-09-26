@@ -73,7 +73,7 @@ public class CronScheduler
 
         Date minScheduledTime = getMinScheduledTime();
 
-        if (minScheduledTime != null) {
+        if ( minScheduledTime != null ) {
           Thread.sleep(minScheduledTime.getTime() - now.getTime());
         }
       }
