@@ -67,13 +67,7 @@ foam.CLASS({
       factory: function() {
         var ws = this.WebSocket.create({
           uri: this.prepareURL(this.uri),
-          outputter: this.JSONOutputter.create({
-            pretty:               false,
-            formatDatesAsNumbers: true,
-            outputDefaultValues:  false,
-            strict:               true,
-            propertyPredicate: function(o, p) { return ! p.networkTransient; }
-          })
+          outputter: this.JSONOutputter.create().copyFrom(foam.json.Network)
         });
 
         return ws.connect().then(function(ws) {
