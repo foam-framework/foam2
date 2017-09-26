@@ -24,7 +24,7 @@ public class Not implements Parser {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    PStream ret = p.parse(ps, x);
+    PStream ret = ps.apply(p, x);
     return ret != null ? null : ps;
   }
 }
