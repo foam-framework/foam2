@@ -17,26 +17,26 @@
 
 package foam.lib.parse;
 
-public class StringPStream
+public class StringPS
   implements PStream
 {
   protected Reference<String> str;
   protected int               pos;
-  protected StringPStream          tail_ = null;
+  protected StringPS          tail_ = null;
 
-  public StringPStream() {
+  public StringPS() {
     this(new Reference<String>());
   }
 
-  public StringPStream(Reference<String> s) {
+  public StringPS(Reference<String> s) {
     this(s, 0);
   }
 
-  public StringPStream(Reference<String> s, int p) {
+  public StringPS(Reference<String> s, int p) {
     this(s, p, null);
   }
 
-  public StringPStream(Reference<String> s, int p, Object value) {
+  public StringPS(Reference<String> s, int p, Object value) {
     str    = s;
     pos    = p;
     value_ = value;
@@ -55,7 +55,7 @@ public class StringPStream
   }
 
   public PStream tail() {
-    if ( tail_ == null ) tail_ = new StringPStream(str, pos + 1);
+    if ( tail_ == null ) tail_ = new StringPS(str, pos + 1);
     return tail_;
   }
 
@@ -65,11 +65,11 @@ public class StringPStream
   }
 
   public PStream setValue(Object value) {
-    return new StringPStream(str, pos, value);
+    return new StringPS(str, pos, value);
   }
 
   public String substring(PStream end) {
-    StringPStream endps = (StringPStream)end;
+    StringPS endps = (StringPS)end;
 
     return str.get().substring(pos, endps.pos);
   }
