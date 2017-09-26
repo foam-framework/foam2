@@ -40,7 +40,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'obj',
@@ -66,7 +66,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'obj',
@@ -92,7 +92,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'id',
@@ -119,7 +119,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'sink',
@@ -159,7 +159,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'skip',
@@ -207,7 +207,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'sink',
@@ -237,7 +237,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          swiftType: 'Context'
+          swiftType: 'Context?'
         },
         {
           name: 'sink',
