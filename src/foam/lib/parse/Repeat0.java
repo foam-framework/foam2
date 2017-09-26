@@ -51,12 +51,12 @@ public class Repeat0 implements Parser {
 
     for ( i = 0 ; max == -1 || i < max ; i++ ) {
       if ( delim != null && ! first ) {
-        result = delim.parse(ps, x);
+        result = ps.apply(delim, x);
         if ( result == null ) break;
         ps = result;
       }
 
-      result = p.parse(ps, x);
+      result = ps.apply(p, x);
       if ( result == null ) break;
       ps = result;
       first = false;
