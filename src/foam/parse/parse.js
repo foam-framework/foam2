@@ -123,6 +123,10 @@ foam.CLASS({
                   'Cannot make substring: end PStream is not a tail of this.');
 
       return this.str[0].substring(this.pos, end.pos);
+    },
+
+    function apply(p, obj) {
+      return p.parse(this, obj);
     }
   ]
 });
@@ -281,7 +285,7 @@ foam.CLASS({
       // passing the obj along via context or something?
       var args = this.args;
       for ( var i = 0, p ; p = args[i] ; i++ ) {
-        var ret = p.parse(ps, obj);
+        var ret = ps.apply(p, obj);
         if ( ret ) return ret;
       }
       return undefined;
@@ -318,7 +322,7 @@ foam.CLASS({
       var ret = [];
       var args = this.args;
       for ( var i = 0, p ; p = args[i] ; i++ ) {
-        if ( ! ( ps = p.parse(ps, obj) ) ) return undefined;
+        if ( ! ( ps = ps.apply(p, obj) ) ) return undefined;
         ret.push(ps.value);
       }
       return ps.setValue(ret);
@@ -342,7 +346,7 @@ foam.CLASS({
   extends: 'foam.parse.ParserDecorator',
   methods: [
     function parse(ps, obj) {
-      ps = this.p.parse(ps, obj);
+      ps = ps.apply(this.p, obj);
       return ps ? ps.setValue(ps.value.join('')) : undefined;
     },
 
@@ -360,7 +364,7 @@ foam.CLASS({
   methods: [
     function parse(ps, obj) {
       var start = ps;
-      ps = this.p.parse(ps, obj);
+      ps = ps.apply(this.p, obj);
       return ps ? ps.setValue(start.substring(ps)) : undefined;
     },
 
@@ -390,7 +394,7 @@ foam.CLASS({
     function parse(ps, obj) {
       var args = this.args;
       for ( var i = 0, p ; p = args[i] ; i++ ) {
-        if ( ! ( ps = p.parse(ps, obj) ) ) return undefined;
+        if ( ! ( ps = ps.apply(p, obj) ) ) return undefined;
       }
       return ps;
     },
@@ -431,7 +435,7 @@ foam.CLASS({
       var args = this.args;
       var n = this.n;
       for ( var i = 0, p ; p = args[i] ; i++ ) {
-        if ( ! ( ps = p.parse(ps, obj) ) ) return undefined;
+        if ( ! ( ps = ps.apply(p, obj) ) ) return undefined;
         if ( i === n ) ret = ps.value;
       }
       return ps.setValue(ret);
@@ -457,7 +461,7 @@ foam.CLASS({
 
   methods: [
     function parse(ps, obj) {
-      return this.p.parse(ps, obj) || ps.setValue(null);
+      return ps.apply(this.p, obj) || ps.setValue(null);
     },
 
     function toString() {
@@ -620,10 +624,10 @@ foam.CLASS({
         }
 
         last = ps;
-        ps = p.parse(ps, obj);
+        ps = ps.apply(p, obj);
         if ( ps ) ret.push(ps.value);
         if ( delim && ps ) {
-          ps = delim.parse(ps, obj) || ps;
+          ps = ps.apply(delim, obj) || ps;
         }
       }
 
@@ -684,10 +688,10 @@ foam.CLASS({
 
       while ( ps ) {
         last = ps;
-        ps = p.parse(ps, obj);
+        ps = ps.apply(p, obj);
         if ( ps ) i++;
         if ( delim && ps ) {
-          ps = delim.parse(ps, obj) || ps;
+          ps = ps.apply(delim, obj) || ps;
         }
       }
 
@@ -726,9 +730,9 @@ foam.CLASS({
 
   methods: [
     function parse(ps, obj) {
-      return this.p.parse(ps, obj) ?
+      return ps.apply(this.p, obj) ?
         undefined :
-        (this.else ? this.else.parse(ps, obj) : ps);
+        (this.else ? ps.apply(this.else, obj) : ps);
     },
 
     function toString() {
@@ -752,7 +756,7 @@ foam.CLASS({
 
   methods: [
     function parse(ps, obj) {
-      ps = this.p.parse(ps, obj);
+      ps = ps.apply(this.p, obj);
       return ps ?
         ps.setValue(this.action(ps.value)) :
         undefined;
@@ -781,7 +785,7 @@ foam.CLASS({
         console.error('No symbol found for', this.name);
         return undefined;
       }
-      return p.parse(ps, grammar);
+      return ps.apply(p, grammar);
     },
 
     function toString() { return 'sym("' + this.name + '")'; }
@@ -994,7 +998,7 @@ foam.CLASS({
       var start = this.getSymbol(opt_name);
       foam.assert(start, 'No symbol found for', opt_name);
 
-      var result = start.parse(this.ps, this);
+      var result = this.ps.apply(start, this);
       return result && result.value;
     },
 
