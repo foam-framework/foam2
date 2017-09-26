@@ -18,7 +18,8 @@ foam.CLASS({
     'detailView',
     'createDetailView',
     'factory',
-    'summaryView'
+    'summaryView',
+    'showActions'
   ],
 
   properties: [
@@ -43,7 +44,7 @@ foam.CLASS({
       class: 'String',
       name: 'createLabel'
     },
-    [ 'showActions', false ]
+    [ 'showActions', true ]
   ],
 
   methods: [
@@ -110,7 +111,7 @@ foam.CLASS({
       name: 'CreateController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'createDetailView', 'detailView', 'stack', 'dao', 'factory' ],
+      imports: [ 'createDetailView', 'detailView', 'stack', 'dao', 'factory', 'showActions' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -122,8 +123,9 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          var view = this.createDetailView || this.detailView;
-          this.tag(view, {data: this.obj}).add(this.CANCEL, this.SAVE);
+          var view = this.createDetailView ? this.createDetailView : this.detailView
+          this.tag(view, {data: this.obj})
+          if ( this.showActions ) this.add(this.CANCEL, this.SAVE);
         }
       ],
 
@@ -143,7 +145,7 @@ foam.CLASS({
       name: 'ViewController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'stack', 'detailView' ],
+      imports: [ 'stack', 'detailView', 'showActions' ],
       exports: [ 'as data' ],
 
       properties: [
@@ -155,7 +157,8 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.tag(this.detailView, {data: this.obj, controllerMode: foam.u2.ControllerMode.VIEW}).add(this.BACK);
+          this.tag(this.detailView, {data: this.obj, controllerMode: foam.u2.ControllerMode.VIEW})
+          if ( this.showActions ) this.add(this.BACK);          
         }
       ],
 
