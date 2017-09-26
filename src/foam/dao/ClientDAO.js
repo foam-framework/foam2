@@ -85,7 +85,7 @@ foam.CLASS({
       javaCode: `
 return super.put_(null, obj);
 `,
-      swiftCode: 'return super.put_(nil, obj)',
+      swiftCode: 'return try super.put_(nil, obj)',
     },
     {
       name: 'remove_',
@@ -95,7 +95,7 @@ return super.put_(null, obj);
       javaCode: `
 return super.remove_(null, obj);
 `,
-      swiftCode: 'return super.remove_(nil, obj)',
+      swiftCode: 'return try super.remove_(nil, obj)',
     },
     {
       name: 'find_',
@@ -105,7 +105,7 @@ return super.remove_(null, obj);
       javaCode: `
 return super.find_(null, id);
 `,
-      swiftCode: 'return super.find_(nil, id)',
+      swiftCode: 'return try super.find_(nil, id)',
     },
     {
       name: 'select_',
@@ -143,7 +143,7 @@ return super.find_(null, id);
       javaCode: `
 return super.select_(null, sink, skip, limit, order, predicate);
 `,
-      swiftCode: 'return super.select_(nil, sink, skip, limit, order, predicate)',
+      swiftCode: 'return try super.select_(nil, sink, skip, limit, order, predicate)',
     },
 
     {
@@ -158,7 +158,7 @@ return super.select_(null, sink, skip, limit, order, predicate);
       javaCode: `
 super.removeAll_(null, skip, limit, order, predicate);
 `,
-      swiftCode: 'super.removeAll_(nil, skip, limit, order, predicate)',
+      swiftCode: 'try super.removeAll_(nil, skip, limit, order, predicate)',
     },
 
     {
