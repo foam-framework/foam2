@@ -54,20 +54,18 @@ public class TracingPStream
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
+    String indentation = IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> "")
+        .collect(Collectors.joining(" "));
+
     char char1 = ( this.valid() ) ? this.head() : ' ';
-    logger.debug(getIndentation() + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
+    logger.debug(indentation + "Parsing '" + char1 + "' at: " + pos + " using " + ps.getClass().getSimpleName());
 
     PStream result = ps.parse(this, x);
     if ( result == null ) {
-      logger.error("Parse error");
+      logger.error(indentation + "Parsing failed");
     } else {
-      logger.info("result = " + result.value());
+      logger.info(indentation + "result = " + result.value());
     }
     return result;
-  }
-
-  public String getIndentation() {
-    return IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> "")
-        .collect(Collectors.joining(" "));
   }
 }
