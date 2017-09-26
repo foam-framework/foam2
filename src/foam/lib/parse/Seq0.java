@@ -26,7 +26,7 @@ public class Seq0 implements Parser {
 
   public PStream parse(PStream ps, ParserContext x) {
     for ( int i = 0 ; i < parsers.length ; i++ ) {
-      ps = parsers[i].parse(ps, x);
+      ps = ps.apply(parsers[i], x);
       if ( ps == null ) return null;
     }
 
