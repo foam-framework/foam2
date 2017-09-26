@@ -34,6 +34,10 @@ public class ErrorReportingPStream
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
-    return super.apply(ps, x);
+    return ps.parse(this, x);
+  }
+
+  public void report(ErrorReportingNodePStream ernps, Parser parser) {
+    pos = Math.max(pos, ernps.pos);
   }
 }
