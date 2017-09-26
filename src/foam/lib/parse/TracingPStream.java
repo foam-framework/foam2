@@ -50,9 +50,9 @@ public class TracingPStream
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
-    String indentation = IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> "")
-        .collect(Collectors.joining(" "));
-
+    String indentation = IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> " ")
+        .collect(Collectors.joining(""));
+    
     char char1 = ( this.valid() ) ? this.head() : ' ';
     writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());
 
@@ -63,9 +63,5 @@ public class TracingPStream
       writer.println(indentation + "result = " + result.value());
     }
     return result;
-  }
-
-  public String getIndentation() {
-    return
   }
 }
