@@ -1532,8 +1532,12 @@ foam.CLASS({
         }
       })
 
+      listener = foam.dao.MergedResetSink.create({
+        delegate: listener
+      });
+
       this.onDetach(dao.listen(listener));
-      listener.paint();
+      listener.delegate.paint();
 
       return this;
     },
