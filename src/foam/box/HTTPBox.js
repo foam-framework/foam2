@@ -76,13 +76,7 @@ foam.CLASS({
       name: 'outputter',
       generateJava: false,
       factory: function() {
-        return this.JSONOutputter.create({
-          pretty:               false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues:  false,
-          strict:               true,
-          propertyPredicate:    function(o, p) { return ! p.networkTransient; }
-        });
+        return this.JSONOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ],
