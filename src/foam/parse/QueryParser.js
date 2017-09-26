@@ -48,7 +48,7 @@ foam.CLASS({
     'foam.parse.LiteralIC',
     'foam.parse.Parsers',
     'foam.parse.PropertyRefinement',
-    'foam.parse.StringPStream'
+    'foam.parse.StringPS'
   ],
 
   properties: [
