@@ -167,6 +167,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'convertUnserializableToStubs',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'pretty',
       value: true,
       postSet: function(_, p) {
@@ -310,6 +315,68 @@ foam.CLASS({
       }
     },
 
+    function makeStubObj(o) {
+      var clientClsId = o.cls_.package + 'Client' + o.cls_.name;
+      var clientCls = foam.lookup(clientClsId, true);
+
+      if ( ! clientCls ) {
+        // TODO: Should this be a hard error?  Or should it be permitted.
+        throw new Error('Cannot find ' + clientClsId + ' as stub class for ' + o.cls_.id);
+      }
+
+      if ( ! foam.core.Stub.isInstance(clientCls.getAxiomByName('delegate')) ) {
+        throw new Error('Expected stub property to be named "delegate" for ' + clientCls.id);
+      }
+
+      if ( ! foam.core.Serializable.isSubClass(clientCls) ) {
+        throw new Error('Cannot replace ' + o.cls_.id + ' with ' + clientCls.id + ' as it is not serializable.');
+      }
+
+      var X = this.__subContext__;
+      var registry = X.registry;
+
+      var box = foam.box.SkeletonBox.create({ data: o }, X);
+      box = registry.register(null, null, box);
+
+      var obj = clientCls.create(null, X);
+      obj.delegate = box;
+
+      return obj;
+    },
+
+    function outputFObject(o, opt_cls) {
+      if ( o.outputJSON ) {
+        o.outputJSON(this);
+        return;
+      }
+
+
+      if ( this.convertUnserializableToStub &&
+           ! foam.core.Serializable.isInstance(o) ) {
+        o = this.makeStubObj(o);
+      }
+
+      this.start('{');
+      var cls = this.getCls(opt_cls);
+      var outputClassName = this.outputClassNames && o.cls_ !== cls;
+      if ( outputClassName ) {
+        this.out(
+          this.maybeEscapeKey('class'),
+          ':',
+          this.postColonStr,
+          '"',
+          o.cls_.id,
+          '"');
+      }
+      var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+      var outputComma = outputClassName;
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        outputComma = this.outputProperty(o, ps[i], outputComma) ||
+          outputComma;
+      }
+      this.nl().end('}');
+    },
+
     function outputObjectKeyValue_(key, value, first) {
       if ( ! first ) this.out(',').nl().indent();
       this.out(this.maybeEscapeKey(key), ':').output(value);
@@ -348,32 +415,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
-        FObject: function(o, opt_cls) {
-          if ( o.outputJSON ) {
-            o.outputJSON(this);
-            return;
-          }
-
-          this.start('{');
-          var cls = this.getCls(opt_cls);
-          var outputClassName = this.outputClassNames && o.cls_ !== cls;
-          if ( outputClassName ) {
-            this.out(
-                this.maybeEscapeKey('class'),
-                ':',
-                this.postColonStr,
-                '"',
-                o.cls_.id,
-                '"');
-          }
-          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-          var outputComma = outputClassName;
-          for ( var i = 0 ; i < ps.length ; i++ ) {
-            outputComma = this.outputProperty(o, ps[i], outputComma) ||
-                outputComma;
-          }
-          this.nl().end('}');
-        },
+        FObject: function(o, opt_cls) { this.outputFObject(o, opt_cls); },
         Array: function(o, opt_cls) {
           this.start('[');
           var cls = this.getCls(opt_cls);
@@ -551,7 +593,9 @@ foam.LIB({
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
-      strict: false,
+      // TODO: Currently faster to use strict JSON and native JSON.parse
+      strict: true,
+      convertUnserializableToStubs: true,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
