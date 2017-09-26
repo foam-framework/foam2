@@ -26,6 +26,7 @@ foam.INTERFACE({
       name: 'put',
       returns: 'Promise',
       swiftReturns: 'FObject?',
+      swiftThrows: true,
       args: [
         {
           name: 'obj',
@@ -37,6 +38,7 @@ foam.INTERFACE({
       name: 'put_',
       returns: 'Promise',
       swiftReturns: 'FObject?',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -52,6 +54,7 @@ foam.INTERFACE({
       name: 'remove',
       returns: 'Promise',
       swiftReturns: 'FObject?',
+      swiftThrows: true,
       args: [
         {
           name: 'obj',
@@ -63,6 +66,7 @@ foam.INTERFACE({
       name: 'remove_',
       returns: 'Promise',
       swiftReturns: 'FObject?',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -78,6 +82,7 @@ foam.INTERFACE({
       name: 'find',
       returns: 'Promise',
       swiftReturns: 'FObject?',
+      swiftThrows: true,
       args: [
         {
           name: 'id',
@@ -89,6 +94,7 @@ foam.INTERFACE({
       name: 'find_',
       returns: 'Promise',
       swiftReturns: 'FObject?',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -104,6 +110,7 @@ foam.INTERFACE({
       name: 'select',
       returns: 'Promise',
       swiftReturns: 'Sink',
+      swiftThrows: true,
       args: [
         {
           name: 'sink',
@@ -116,6 +123,7 @@ foam.INTERFACE({
       name: 'select_',
       returns: 'Promise',
       swiftReturns: 'Sink',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -151,11 +159,13 @@ foam.INTERFACE({
     {
       name: 'removeAll',
       returns: '',
+      swiftThrows: true,
       args: [ ]
     },
     {
       name: 'removeAll_',
       returns: '',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -187,6 +197,7 @@ foam.INTERFACE({
       name: 'listen',
       returns: '',
       swiftReturns: 'Detachable',
+      swiftThrows: true,
       args: [
         {
           name: 'sink',
@@ -204,6 +215,7 @@ foam.INTERFACE({
       name: 'listen_',
       returns: '',
       swiftReturns: 'Detachable',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -224,6 +236,7 @@ foam.INTERFACE({
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
+      swiftThrows: true,
       args: [
         {
           name: 'sink',
@@ -234,6 +247,7 @@ foam.INTERFACE({
     {
       name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -253,6 +267,7 @@ foam.INTERFACE({
     {
       name: 'where',
       returns: 'foam.dao.DAO',
+      swiftThrows: true,
       args: [
         {
           name: 'predicate',
@@ -264,6 +279,7 @@ foam.INTERFACE({
     {
       name: 'orderBy',
       returns: 'foam.dao.DAO',
+      swiftThrows: true,
       args: [
         {
           name: 'comparator',
@@ -274,6 +290,7 @@ foam.INTERFACE({
     {
       name: 'skip',
       returns: 'foam.dao.DAO',
+      swiftThrows: true,
       args: [
         {
           name: 'count',
@@ -284,6 +301,7 @@ foam.INTERFACE({
     {
       name: 'limit',
       returns: 'foam.dao.DAO',
+      swiftThrows: true,
       args: [
         {
           name: 'count',
