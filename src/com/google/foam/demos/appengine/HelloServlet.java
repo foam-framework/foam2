@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import foam.core.FObject;
 import foam.lib.json.Outputter;
 import foam.lib.json.JSONParser;
+import foam.lib.parse.StringPS;
 import foam.lib.parse.*;
 
 import com.google.foam.demos.appengine.TestModel;
