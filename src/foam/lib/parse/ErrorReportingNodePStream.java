@@ -13,7 +13,7 @@ package foam.lib.parse;
 public class ErrorReportingNodePStream
     extends ProxyPStream
 {
-  protected int pos;
+  protected int pos_;
   protected ErrorReportingPStream root_;
   protected ErrorReportingNodePStream tail_ = null;
 
@@ -24,18 +24,18 @@ public class ErrorReportingNodePStream
   public ErrorReportingNodePStream(ErrorReportingPStream root, PStream delegate, int pos) {
     setDelegate(delegate);
     this.root_ = root;
-    this.pos = pos;
+    this.pos_ = pos;
   }
 
   @Override
   public PStream tail() {
-    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(root_, super.tail(), pos + 1);
+    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(root_, super.tail(), pos_ + 1);
     return tail_;
   }
 
   @Override
   public PStream setValue(Object value) {
-    return new ErrorReportingNodePStream(root_, super.setValue(value), pos);
+    return new ErrorReportingNodePStream(root_, super.setValue(value), pos_);
   }
 
   @Override
