@@ -937,7 +937,9 @@ foam.CLASS({
     },
 
     function myClass(opt_extra) {
-      var f = this.cls_.myClass_;
+      // Use hasOwnProperty so that class doesn't inherit CSS classname
+      // from ancestor FOAM class.
+      var f = this.cls_.hasOwnProperty('myClass_') && this.cls_.myClass_;
 
       if ( ! f ) {
         var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
