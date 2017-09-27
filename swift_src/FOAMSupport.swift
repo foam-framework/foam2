@@ -445,6 +445,15 @@ public protocol FOAM_enum {
 public class FoamError: Error {
   var obj: Any?
   init(_ obj: Any?) { self.obj = obj }
+  func toString() -> String {
+    if let obj = self.obj as? FObject {
+      let o = Context.GLOBAL.create(Outputter.self)!
+      return o.swiftStringify(obj)
+    } else if let obj = self.obj as? FoamError {
+      return "FoamError(" + obj.toString() + ")"
+    }
+    return String(describing: self.obj as AnyObject)
+  }
 }
 
 public class Future<T> {
