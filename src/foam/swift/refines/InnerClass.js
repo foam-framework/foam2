@@ -32,8 +32,7 @@ foam.CLASS({
       name: 'swiftInitializer',
       args: [],
       template: function() {/*
-__subContext__.registerClass(cls: <%=this.model.swiftName%>.classInfo())
-return __subContext__.create(<%=this.model.swiftName%>.self, args: args)!
+return <%=this.model.swiftName%>(args, __subContext__)
       */},
     },
   ],
