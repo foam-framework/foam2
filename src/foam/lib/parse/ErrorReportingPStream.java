@@ -76,7 +76,7 @@ public class ErrorReportingPStream
 
   public void report(ErrorReportingNodePStream ernps, Parser parser, ParserContext x) {
     // get the report with the furthest position
-    if ( errStream == null || errStream.pos < ernps.pos ) {
+    if ( errStream == null || errStream.pos <= ernps.pos ) {
       errStream = ernps;
       errParser = parser;
       errContext = x;
