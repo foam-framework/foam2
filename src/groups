@@ -1,4 +1,1 @@
-p({"class":"foam.nanos.auth.Group", "id":"1", "firstName":"nanoPay Admin", "lastName":"nanoPay administration users" })
-p({"class":"foam.nanos.auth.Group", "id":"2", "firstName":"Admin",         "lastName":"Administration users" })
-p({"class":"foam.nanos.auth.Group", "id":"3", "firstName":"Tester",        "lastName":"Testers",                        "enabled":True})
-p({"class":"foam.nanos.auth.Group", "id":"4", "firstName":"End User",      "lastName":"End users" })
+p({"class":"foam.nanos.auth.Group","id":"0","description":"tester","parent":"","permissions":[]})
