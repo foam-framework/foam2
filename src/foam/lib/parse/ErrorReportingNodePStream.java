@@ -38,7 +38,7 @@ public class ErrorReportingNodePStream
   public PStream apply(Parser ps, ParserContext x) {
     PStream result = ps.parse(this, x);
     if ( result == null ) {
-      root.report(this, ps);
+      root.report(this, ps, x);
     }
     return result;
   }
