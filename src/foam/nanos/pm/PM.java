@@ -22,8 +22,8 @@ public class PM {
 
   public void log(X x) {
     endTime_ = System.currentTimeMillis();
-    PMLogger logger = (PMLogger) x.get(DAOPMLogger.ServiceName);
-    logger.log(this);
+    PMLogger logger = (PMLogger) x.get(DAOPMLogger.SERVICE_NAME);
+    if ( logger != null ) logger.log(this);
   }
 
   public Class getClassType() {
