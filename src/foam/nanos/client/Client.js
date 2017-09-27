@@ -287,21 +287,11 @@ foam.CLASS({
         {
           name: 'testDAO',
           factory: function() {
-            return this.RequestResponseClientDAO.create({
+            return this.EasyDAO.create({
+              daoType: 'CLIENT',
               of: this.Test,
-              delegate: this.HTTPBox.create({
-              method: 'POST',
-              url: 'http://localhost:8080/testDAO'
-            })});
-
-            /*
-            return this.createDAO({
-              of: this.Test,
-              seqNo: true,
-              testData: [
-              ]
+              serviceName: 'testDAO'
             });
-            */
           }
         }
 
