@@ -85,7 +85,6 @@ public class ErrorReportingPStream
       trap.setHead(character);
       trap.apply(errParser, errContext);
     }
-    
     return "Invalid character '" + invalid + "' found at " + errStream.pos;
   }
 }
