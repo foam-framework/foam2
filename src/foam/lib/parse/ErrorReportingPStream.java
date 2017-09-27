@@ -10,7 +10,7 @@ public class ErrorReportingPStream
     extends ProxyPStream
 {
   protected int pos;
-  protected char head;
+  protected ErrorReportingNodePStream err = null;
   protected ErrorReportingNodePStream tail_ = null;
 
   public ErrorReportingPStream(PStream delegate) {
@@ -43,11 +43,12 @@ public class ErrorReportingPStream
   }
 
   public void report(ErrorReportingNodePStream ernps, Parser parser) {
-    pos = Math.max(pos, ernps.pos);
-    head = ernps.head();
+    if ( err == null || err.pos < ernps.pos )
+      err = ernps;
   }
 
   public String getMessage() {
-    return "Invalid character '" + head + "' found at " + pos;
+    String invalid = ( err.valid() ) ? String.valueOf(err.head()) : "EOF";
+    return "Invalid character '" + invalid + "' found at " + err.pos;
   }
 }
