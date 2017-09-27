@@ -35,7 +35,8 @@ public class ErrorReportingPStream
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
-    return ps.parse(this, x);
+    PStream result = ps.parse(this, x);
+    return ( result == null ) ? null : new ErrorReportingPStream(result);
   }
 
   public void report(ErrorReportingNodePStream ernps, Parser parser) {
