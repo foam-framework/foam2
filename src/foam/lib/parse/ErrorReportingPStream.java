@@ -38,30 +38,24 @@ public class ErrorReportingPStream
   protected ParserContext errContext = null;
   protected ErrorReportingNodePStream errStream = null;
 
-  protected int pos;
   protected ErrorReportingNodePStream tail_ = null;
   protected Set<Character> validCharacters = new HashSet<>();
 
   public ErrorReportingPStream(PStream delegate) {
-    this(delegate, 0);
-  }
-
-  public ErrorReportingPStream(PStream delegate, int pos) {
     setDelegate(delegate);
-    this.pos = pos;
   }
 
   @Override
   public PStream tail() {
     // tail becomes new node with increased position
-    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(this, super.tail(), pos + 1);
+    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(this, super.tail(), 1);
     return tail_;
   }
 
   @Override
   public PStream setValue(Object value) {
     // create a new node
-    return new ErrorReportingNodePStream(this, super.setValue(value), pos);
+    return new ErrorReportingNodePStream(this, super.setValue(value), 0);
   }
 
   @Override
@@ -69,7 +63,7 @@ public class ErrorReportingPStream
     PStream result = parser.parse(this, x);
     if ( result == null ) {
       // if result is null then self report
-      this.report(new ErrorReportingNodePStream(this, getDelegate(), pos), parser, x);
+      this.report(new ErrorReportingNodePStream(this, getDelegate(), 0), parser, x);
     }
     return result;
   }
