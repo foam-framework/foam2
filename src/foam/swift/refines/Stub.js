@@ -3,8 +3,8 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, swiftReturns, swiftArgs) {
-        return this.swiftCodeGenerator();
+      expression: function(swiftName, swiftReturns, swiftArgs, swiftThrows) {
+        return swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
       }
     }
   ],
@@ -39,12 +39,13 @@ try? delegate.send(msg)
 
 <% if (this.swiftReturns) { %>
   <% if (this.swiftReturns == 'Any?') { %>
-return (try? (replyBox.delegate as? RPCReturnBox)?.future.get())
+return try (replyBox.delegate as? RPCReturnBox)?.future.get()
   <% } else { %>
-if let o = (try? (replyBox.delegate as? RPCReturnBox)?.future.get()) as? <%=this.swiftReturns%> {
+let o = try (replyBox.delegate as? RPCReturnBox)?.future.get()
+if let o = o as? <%=this.swiftReturns%> {
   return o
 }
-fatalError()
+throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.swiftReturns%>")
   <% } %>
 <% } %>
       */},

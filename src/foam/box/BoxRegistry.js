@@ -39,7 +39,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'name',
-          swiftClass: 'String?',
+          swiftType: 'String?',
           javaType: 'String'
         },
         {
