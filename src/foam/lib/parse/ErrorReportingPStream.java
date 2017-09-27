@@ -10,6 +10,7 @@ public class ErrorReportingPStream
     extends ProxyPStream
 {
   protected int pos;
+  protected char head;
   protected ErrorReportingNodePStream tail_ = null;
 
   public ErrorReportingPStream(PStream delegate) {
@@ -39,5 +40,10 @@ public class ErrorReportingPStream
 
   public void report(ErrorReportingNodePStream ernps, Parser parser) {
     pos = Math.max(pos, ernps.pos);
+    head = ernps.head();
+  }
+
+  public String getMessage() {
+    return "Invalid character '" + head + "' found at " + pos;
   }
 }
