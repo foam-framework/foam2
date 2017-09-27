@@ -14,7 +14,7 @@ public class ErrorReportingNodePStream
     extends ProxyPStream
 {
   protected int pos;
-  protected ErrorReportingPStream root;
+  protected ErrorReportingPStream root_;
   protected ErrorReportingNodePStream tail_ = null;
 
   public ErrorReportingNodePStream(ErrorReportingPStream root, PStream delegate) {
@@ -23,26 +23,26 @@ public class ErrorReportingNodePStream
 
   public ErrorReportingNodePStream(ErrorReportingPStream root, PStream delegate, int pos) {
     setDelegate(delegate);
-    this.root = root;
+    this.root_ = root;
     this.pos = pos;
   }
 
   @Override
   public PStream tail() {
-    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(root, super.tail(), pos + 1);
+    if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(root_, super.tail(), pos + 1);
     return tail_;
   }
 
   @Override
   public PStream setValue(Object value) {
-    return new ErrorReportingNodePStream(root, super.setValue(value), pos);
+    return new ErrorReportingNodePStream(root_, super.setValue(value), pos);
   }
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
     PStream result = ps.parse(this, x);
     if ( result == null ) {
-      root.report(this, ps, x);
+      root_.report(this, ps, x);
     }
     return result;
   }
