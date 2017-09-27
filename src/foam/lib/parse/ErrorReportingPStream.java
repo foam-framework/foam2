@@ -6,12 +6,27 @@
 
 package foam.lib.parse;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class ErrorReportingPStream
     extends ProxyPStream
 {
+  public static final List<Character> ASCII_CHARS = IntStream.rangeClosed(0, 255)
+      .mapToObj(i -> Character.forDigit(i, 10))
+      .collect(Collectors.toList());
+
+  protected Parser errParser = null;
+  protected ParserContext errContext = null;
+  protected ErrorReportingNodePStream errStream = null;
+
   protected int pos;
-  protected ErrorReportingNodePStream err = null;
   protected ErrorReportingNodePStream tail_ = null;
+  protected Set<Character> validCharacters = new HashSet<>();
 
   public ErrorReportingPStream(PStream delegate) {
     this(delegate, 0);
@@ -24,12 +39,14 @@ public class ErrorReportingPStream
 
   @Override
   public PStream tail() {
+    // tail becomes new node with increased position
     if ( tail_ == null ) tail_ = new ErrorReportingNodePStream(this, super.tail(), pos + 1);
     return tail_;
   }
 
   @Override
   public PStream setValue(Object value) {
+    // create a new node
     return new ErrorReportingNodePStream(this, super.setValue(value), pos);
   }
 
@@ -37,18 +54,38 @@ public class ErrorReportingPStream
   public PStream apply(Parser parser, ParserContext x) {
     PStream result = parser.parse(this, x);
     if ( result == null ) {
-      this.report(new ErrorReportingNodePStream(this, getDelegate(), pos), parser);
+      // if result is null then self report
+      this.report(new ErrorReportingNodePStream(this, getDelegate(), pos), parser, x);
     }
     return result;
   }
 
-  public void report(ErrorReportingNodePStream ernps, Parser parser) {
-    if ( err == null || err.pos < ernps.pos )
-      err = ernps;
+  public void report(ErrorReportingNodePStream ernps, Parser parser, ParserContext x) {
+    // get the report with the furthest position
+    if ( errStream == null || errStream.pos < ernps.pos ) {
+      errStream = ernps;
+      errParser = parser;
+      errContext = x;
+    }
+  }
+
+  public void reportValidCharacter(Character character) {
+    validCharacters.add(character);
   }
 
   public String getMessage() {
-    String invalid = ( err.valid() ) ? String.valueOf(err.head()) : "EOF";
-    return "Invalid character '" + invalid + "' found at " + err.pos;
+    // check if err is valid and print the char, if not print EOF
+    String invalid = ( errStream.valid() ) ? String.valueOf(errStream.head()) : "EOF";
+
+    // get a list of valid characters
+    TrapPStream trap = new TrapPStream(this);
+    Iterator i = ASCII_CHARS.iterator();
+    while ( i.hasNext() ) {
+      Character character = (Character) i.next();
+      trap.setHead(character);
+      trap.apply(errParser, errContext);
+    }
+    
+    return "Invalid character '" + invalid + "' found at " + errStream.pos;
   }
 }
