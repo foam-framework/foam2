@@ -17,8 +17,22 @@ public class ErrorReportingPStream
     extends ProxyPStream
 {
   public static final List<Character> ASCII_CHARS = IntStream.rangeClosed(0, 255)
-      .mapToObj(i -> Character.forDigit(i, 10))
+      .mapToObj(i -> (char) i)
       .collect(Collectors.toList());
+
+  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
 
   protected Parser errParser = null;
   protected ParserContext errContext = null;
@@ -70,6 +84,7 @@ public class ErrorReportingPStream
   }
 
   public void reportValidCharacter(Character character) {
+    System.out.println("report valid char = " + character);
     validCharacters.add(character);
   }
 
@@ -85,6 +100,16 @@ public class ErrorReportingPStream
       trap.setHead(character);
       trap.apply(errParser, errContext);
     }
-    return "Invalid character '" + invalid + "' found at " + errStream.pos;
+
+    StringBuilder builder = sb.get()
+        .append("Invalid character '")
+        .append(invalid)
+        .append("' found at ")
+        .append(errStream.pos)
+        .append("\n")
+        .append("Valid characters include: ")
+        .append(validCharacters.stream().map(Object::toString).collect(Collectors.joining(",")));
+
+    return builder.toString();
   }
 }

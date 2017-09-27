@@ -6,6 +6,10 @@
 
 package foam.lib.parse;
 
+/**
+ * This is a PStream decorator that listens for errors when parsing and reports them
+ * to the root ErrorReportingPStream
+ */
 public class ErrorReportingNodePStream
     extends ProxyPStream
 {

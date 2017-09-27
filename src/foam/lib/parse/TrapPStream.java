@@ -6,6 +6,9 @@
 
 package foam.lib.parse;
 
+/**
+ * This PStream is used to test against a single character to check if the parser accepts it or not
+ */
 public class TrapPStream
     implements PStream
 {
