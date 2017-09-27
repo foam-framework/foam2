@@ -20,8 +20,6 @@ foam.CLASS({
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
 
-  requires: [ 'foam.json.Outputter' ],
-
   properties: [
     {
       name: 'port'
@@ -33,13 +31,16 @@ foam.CLASS({
       factory: function() {
         // NOTE: Configuration must be consistent with parser in
         // foam.messageport.MessagePortService.
-        return this.Outputter.create({
+        //
+        // Use default FOAM implementation of Outputter. Do not attempt to
+        // lookup sensitive "foam.json.Outputter" class in box context.
+        return foam.lookup('foam.json.Outputter').create({
           pretty: false,
           formatDatesAsNumbers: true,
           outputDefaultValues: false,
           strict: true,
           propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        });
+        }, this);
       }
     }
   ],

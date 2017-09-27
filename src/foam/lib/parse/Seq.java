@@ -30,7 +30,7 @@ public class Seq
     Object[] values = new Object[parsers.length];
 
     for ( int i = 0 ; i < parsers.length ; i++ ) {
-      ps = parsers[i].parse(ps, x);
+      ps = ps.apply(parsers[i], x);
       if ( ps == null ) return null;
       values[i] = ps.value();
     }

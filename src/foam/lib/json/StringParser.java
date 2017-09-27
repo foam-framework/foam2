@@ -45,8 +45,7 @@ public class StringParser implements Parser {
         }
 
         if ( escapeSeqParser != null ) {
-          PStream escapePS = escapeSeqParser.parse(ps, x);
-
+          PStream escapePS = ps.apply(escapeSeqParser, x);
           if ( escapePS != null ) {
             sb.append(escapePS.value());
             tail = escapePS;

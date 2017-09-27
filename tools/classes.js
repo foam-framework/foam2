@@ -109,7 +109,11 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
-  'foam.nanos.export.ExportDriverRegistry'
+  'foam.nanos.export.ExportDriverRegistry',
+  'foam.dao.pg.ConnectionPool',
+  'foam.lib.json.OutputterMode',
+  'foam.lib.parse.Parser',
+  'foam.lib.parse.PStream'
 ];
 
 var abstractClasses = [
@@ -128,7 +132,9 @@ var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
   'com.google.foam.demos.appengine.TestService',
-  'foam.mop.MOP'
+  'foam.mop.MOP',
+  'foam.lib.parse.Parser',
+  'foam.lib.parse.PStream'
 ];
 
 module.exports = {
