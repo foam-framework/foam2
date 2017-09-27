@@ -25,7 +25,7 @@ foam.CLASS({
   requires: [
     'foam.parse.ImperativeGrammar',
     'foam.parse.Parsers',
-    'foam.parse.StringPS',
+    'foam.parse.StringPStream',
     'foam.parsers.html.Attribute',
     'foam.parsers.html.Tag',
     'foam.parsers.html.TagType'
@@ -173,7 +173,7 @@ foam.CLASS({
     {
       name: 'ps',
       factory: function() {
-        return this.StringPS.create();
+        return this.StringPStream.create();
       }
     }
   ],

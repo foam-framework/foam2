@@ -19,8 +19,6 @@ foam.CLASS({
   package: 'foam.net.web',
   name: 'WebSocket',
 
-  requires: [ 'foam.json.Outputter' ],
-
   topics: [
     'message',
     'connected',
@@ -40,13 +38,15 @@ foam.CLASS({
       of: 'foam.json.Outputter',
       name: 'outputter',
       factory: function() {
-        return this.Outputter.create({
+        // Use default FOAM implementation of Outputter. Do not attempt to
+        // lookup sensitive "foam.json.Outputter" class in box context.
+        return foam.lookup('foam.json.Outputter').create({
           pretty: false,
           formatDatesAsNumbers: true,
           outputDefaultValues: false,
           strict: true,
           propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        });
+        }, this);
       }
     }
   ],

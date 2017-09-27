@@ -31,28 +31,24 @@ foam.CLASS({
   */},
 
   requires: [
-    'foam.dao.MDAO',
-    'foam.dao.JDAO',
-    'foam.dao.GUIDDAO',
-    'foam.dao.IDBDAO',
-    'foam.dao.SequenceNumberDAO',
-    'foam.dao.CachingDAO',
-    'foam.dao.SyncDAO',
-    'foam.dao.ContextualizingDAO',
-    'foam.dao.DecoratedDAO',
-    'foam.dao.CompoundDAODecorator',
-    'foam.dao.DeDupDAO',
-    'foam.dao.ClientDAO',
-    'foam.dao.PromisedDAO',
     'foam.box.Context',
     'foam.box.HTTPBox',
     'foam.box.SocketBox',
     'foam.box.WebSocketBox',
-    //'foam.core.dao.MergeDAO',
-    //'foam.core.dao.MigrationDAO',
-    //'foam.core.dao.VersionNoDAO',
-    //'foam.dao.EasyClientDAO',
+    'foam.dao.CachingDAO',
+    'foam.dao.CompoundDAODecorator',
+    'foam.dao.ContextualizingDAO',
+    'foam.dao.DecoratedDAO',
+    'foam.dao.DeDupDAO',
+    'foam.dao.GUIDDAO',
+    'foam.dao.IDBDAO',
+    'foam.dao.JDAO',
     'foam.dao.LoggingDAO',
+    'foam.dao.MDAO',
+    'foam.dao.PromisedDAO',
+    'foam.dao.RequestResponseClientDAO',
+    'foam.dao.SequenceNumberDAO',
+    'foam.dao.SyncDAO',
     'foam.dao.TimingDAO'
   ],
 
@@ -62,10 +58,10 @@ foam.CLASS({
     // Aliases for daoType
     ALIASES: {
       ARRAY:  'foam.dao.ArrayDAO',
-      MDAO:   'foam.dao.MDAO',
+      CLIENT: 'foam.dao.RequestResponseClientDAO',
       IDB:    'foam.dao.IDBDAO',
       LOCAL:  'foam.dao.LocalStorageDAO',
-      CLIENT: 'foam.dao.RequestResponseClientDAO'
+      MDAO:   'foam.dao.MDAO'
     }
   },
 
@@ -244,6 +240,9 @@ foam.CLASS({
       if ( daoType == 'foam.dao.RequestResponseClientDAO' ) {
         foam.assert(this.hasOwnProperty('serverBox') || this.serviceName, 'EasyDAO "client" type requires a serveBox or serviceName');
 
+        // The RequestResonseClientDAO generates listener events locally
+        // but with remoteListenerSupport, this isn't needed, so switch
+        // to the regular ClientDAO instead.
         if ( this.remoteListenerSupport ) {
           daoType = 'foam.dao.ClientDAO';
         }
@@ -330,7 +329,7 @@ foam.CLASS({
         foam.assert(this.serverBox, 'syncWithServer requires serverBox');
 
         dao = this.SyncDAO.create({
-          remoteDAO: this.ClientDAO.create({
+          remoteDAO: this.RequestResponseClientDAO.create({
               name: this.name,
               delegate: this.serverBox
           }, boxContext),

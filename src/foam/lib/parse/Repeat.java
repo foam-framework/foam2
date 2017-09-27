@@ -50,12 +50,12 @@ public class Repeat implements Parser{
 
     for ( int i = 0 ; max == -1 || i < max ; i++ ) {
       if ( delim != null && values.size() != 0 ) {
-        result = delim.parse(ps, x);
+        result = ps.apply(delim, x);
         if ( result == null ) break;
         ps = result;
       }
 
-      result = p.parse(ps, x);
+      result = ps.apply(p, x);
       if ( result == null ) break;
 
       values.add(result.value());
