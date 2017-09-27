@@ -24,7 +24,7 @@ public class FObjectParser extends ProxyParser {
                                                         new StringParser(),
                                                         new Optional(new Literal(",")));
                      public PStream parse(PStream ps, ParserContext x) {
-                       PStream ps1 = delegate.parse(ps, x);
+                       PStream ps1 = ps.apply(delegate, x);
 
                        Class c;
 
@@ -49,8 +49,7 @@ public class FObjectParser extends ProxyParser {
                        Object obj = ((X)x.get("X")).create(c);
                        subx.set("obj", obj);
 
-                       ps = ModelParserFactory.getInstance(c).parse(ps, subx);
-
+                       ps = ps.apply(ModelParserFactory.getInstance(c), subx);
                        if ( ps != null ) {
                          return ps.setValue(subx.get("obj"));
                        }

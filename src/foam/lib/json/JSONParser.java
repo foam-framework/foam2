@@ -13,20 +13,20 @@ public class JSONParser
   extends foam.core.ContextAwareSupport
 {
   protected Parser   parser   = new ExprParser();
-  protected StringPS stringps = new StringPS();
+  protected StringPStream stringps = new StringPStream();
 
   public FObject parseString(String data) {
     return parseString(data, null);
   }
 
   public FObject parseString(String data, Class defaultClass) {
-    StringPS ps = stringps;
+    StringPStream ps = stringps;
 
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
     x.set("defaultClass", defaultClass);
-    ps = (StringPS) parser.parse(ps, x);
+    ps = (StringPStream) ps.apply(parser, x);
 
     return ps == null ? null : (FObject) ps.value();
   }

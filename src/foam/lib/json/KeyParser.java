@@ -19,6 +19,6 @@ public class KeyParser implements Parser {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    return delegate.parse(ps, x);
+    return ps.apply(delegate, x);
   }
 }
