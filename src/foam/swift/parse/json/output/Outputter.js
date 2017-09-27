@@ -209,6 +209,9 @@ if let data = data as? FObject {
   outputMap(&out, data)
 } else if data == nil {
   outputNil(&out)
+} else {
+  NSLog("Unable to output %@", (data as AnyObject).description)
+  outputNil(&out)
 }
       */},
     },

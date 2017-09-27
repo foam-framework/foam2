@@ -163,13 +163,23 @@ var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
 request.httpBody = outputter?.swiftStringify(msg).data(using: .utf8)
 let task = URLSession.shared.dataTask(with: request) { data, response, error in
-  guard let data = data else {
-    fatalError()
-  }
-  if let me = self.me as? Box,
-     let str = String(data: data, encoding: .utf8),
-     let obj = self.parser.parseString(str) as? Message {
-    try? me.send(obj)
+  do {
+    guard let data = data else {
+      throw FoamError("HTTPBox no response")
+    }
+    guard let str = String(data: data, encoding: .utf8),
+          let obj = self.parser.parseString(str) as? Message else {
+      throw FoamError("Failed to parse HTTPBox response")
+    }
+    guard let me = self.me as? Box else {
+      throw FoamError("HTTPBox response has nowhere to go")
+    }
+    try me.send(obj)
+  } catch let e {
+    if let eBox = msg.attributes["errorBox"] as? Box {
+      let eMsg = self.__context__.create(Message.self, args: ["object": e])!
+      try? eBox.send(eMsg)
+    }
   }
 }
 task.resume()
