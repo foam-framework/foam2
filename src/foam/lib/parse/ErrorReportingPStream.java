@@ -84,7 +84,6 @@ public class ErrorReportingPStream
   }
 
   public void reportValidCharacter(Character character) {
-    System.out.println("report valid char = " + character);
     validCharacters.add(character);
   }
 
