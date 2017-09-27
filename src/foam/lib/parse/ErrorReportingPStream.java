@@ -7,18 +7,12 @@
 package foam.lib.parse;
 
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class ErrorReportingPStream
     extends ProxyPStream
 {
-  public static final List<Character> ASCII_CHARS = IntStream.rangeClosed(0, 255)
-      .mapToObj(i -> (char) i)
-      .collect(Collectors.toList());
 
   protected Parser errParser = null;
   protected ParserContext errContext = null;
@@ -73,10 +67,8 @@ public class ErrorReportingPStream
 
     // get a list of valid characters
     TrapPStream trap = new TrapPStream(this);
-    Iterator i = ASCII_CHARS.iterator();
-    while ( i.hasNext() ) {
-      Character character = (Character) i.next();
-      trap.setHead(character);
+    for ( int i = 0; i <= 255; i++ ) {
+      trap.setHead((char) i);
       trap.apply(errParser, errContext);
     }
 
