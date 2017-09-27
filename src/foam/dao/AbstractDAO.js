@@ -146,7 +146,7 @@ return LimitedDAO_create([
       code: function(obj) {
         return this.put_(this.__context__, obj);
       },
-      swiftCode: 'return put_(__context__, obj)',
+      swiftCode: 'return try put_(__context__, obj)',
     },
 
     /**
@@ -160,7 +160,7 @@ return LimitedDAO_create([
       code: function(sink) {//, skip, limit, order, predicate) {
         this.pipe_(this.__context__, sink, undefined);
       },
-      swiftCode: 'return pipe_(__context__, sink)',
+      swiftCode: 'return try pipe_(__context__, sink)',
     },
 
     {
@@ -189,7 +189,7 @@ return LimitedDAO_create([
 
         return this.listen_(this.__context__, sink, undefined);
       },
-      swiftCode: 'return listen_(__context__, sink)',
+      swiftCode: 'return try listen_(__context__, sink)',
     },
 
     /**
@@ -369,7 +369,7 @@ return sink
       code: function remove(obj) {
         return this.remove_(this.__context__, obj);
       },
-      swiftCode: 'return remove_(__context__, obj)',
+      swiftCode: 'return try remove_(__context__, obj)',
     },
 
     {
@@ -377,7 +377,7 @@ return sink
       code: function removeAll() {
         return this.removeAll_(this.__context__, undefined, undefined, undefined, undefined);
       },
-      swiftCode: 'return removeAll_(__context__)',
+      swiftCode: 'return try removeAll_(__context__)',
     },
 
     function compareTo(other) {
@@ -390,7 +390,7 @@ return sink
       code: function select(sink) {
         return this.select_(this.__context__, sink, undefined, undefined, undefined, undefined);
       },
-      swiftCode: 'return select_(__context__, sink)',
+      swiftCode: 'return try select_(__context__, sink)',
     },
 
     {
@@ -398,7 +398,7 @@ return sink
       code: function find(id) {
         return this.find_(this.__context__, id);
       },
-      swiftCode: 'return find_(__context__, id)',
+      swiftCode: 'return try find_(__context__, id)',
     },
 
     function cmd_(x, obj) {
@@ -547,7 +547,7 @@ foam.CLASS({
         return this.delegate.select_(x, sink, this.skip_, limit, order, predicate);
       },
       swiftCode: function() {/*
-return delegate.select_(x, sink, skip_, limit, order, predicate)
+return try delegate.select_(x, sink, skip_, limit, order, predicate)
       */},
     },
     function removeAll_(x, skip, limit, order, predicate) {
@@ -579,7 +579,7 @@ foam.CLASS({
           order, predicate);
       },
       swiftCode: function() {/*
-return delegate.select_(
+return try delegate.select_(
     x, sink, skip,
     limit != nil ? min(limit_, limit!) : limit_,
     order, predicate);

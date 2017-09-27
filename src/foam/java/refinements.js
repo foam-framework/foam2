@@ -274,7 +274,8 @@ foam.CLASS({
       for ( var i = 0 ; i < props.length ; i++ ) {
         var prop = props[i];
 
-        if ( this.hasOwnProperty(prop.name) && ! child.hasOwnProperty(prop.name) ) {
+        // TODO Find way to remove this flag check. Removing breaks java gen.
+        if ( (global.FOAM_FLAGS.java || this.hasOwnProperty(prop.name)) && ! child.hasOwnProperty(prop.name) ) {
           prop.set(result, prop.get(this));
         }
       }
