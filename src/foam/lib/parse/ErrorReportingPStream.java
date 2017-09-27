@@ -84,6 +84,7 @@ public class ErrorReportingPStream
   }
 
   public void reportValidCharacter(Character character) {
+    System.out.println("report valid char = " + character);
     validCharacters.add(character);
   }
 
@@ -107,7 +108,9 @@ public class ErrorReportingPStream
         .append(errStream.pos)
         .append("\n")
         .append("Valid characters include: ")
-        .append(validCharacters.stream().map(Object::toString).collect(Collectors.joining(",")));
+        .append(validCharacters.stream()
+            .map(e -> "'" + e.toString() + "'")
+            .collect(Collectors.joining(",")));
 
     return builder.toString();
   }
