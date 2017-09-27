@@ -37,7 +37,7 @@ describe('basic parsers', function() {
   var anyChar = parsers.anyChar.bind(parsers);
 
   var mkStream = function(str) {
-    var ps = foam.parse.StringPS.create();
+    var ps = foam.parse.StringPStream.create();
     ps.setString(str);
     return ps;
   };

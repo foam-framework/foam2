@@ -263,6 +263,7 @@ FOAM_FILES([
   { name: "foam/u2/TableSelection", flags: ['web'] },
   { name: "foam/u2/Scroller", flags: ['web'] },
   { name: "foam/u2/ActionView", flags: ['web'] },
+  { name: "foam/u2/UnstyledActionView", flags: ['web'] },    
   { name: "foam/u2/DetailPropertyView", flags: ['web'] },
   { name: "foam/u2/DetailView", flags: ['web'] },
   { name: "foam/u2/tag/Image", flags: ['web'] },
@@ -367,5 +368,7 @@ FOAM_FILES([
   { name: "foam/mop/MOP" },
   { name: "foam/mop/MOPJava", flags: ['java'] },
   { name: "foam/dao/pg/ConnectionPool" },
-  { name: "foam/lib/json/OutputterMode" }
+  { name: "foam/lib/json/OutputterMode" },
+  { name: "foam/lib/parse/Parser" },
+  { name: "foam/lib/parse/PStream" }
 ]);
