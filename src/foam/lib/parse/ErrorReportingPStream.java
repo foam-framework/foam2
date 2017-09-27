@@ -20,20 +20,6 @@ public class ErrorReportingPStream
       .mapToObj(i -> (char) i)
       .collect(Collectors.toList());
 
-  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
-
   protected Parser errParser = null;
   protected ParserContext errContext = null;
   protected ErrorReportingNodePStream errStream = null;
@@ -94,17 +80,11 @@ public class ErrorReportingPStream
       trap.apply(errParser, errContext);
     }
 
-    StringBuilder builder = sb.get()
-        .append("Invalid character '")
-        .append(invalid)
-        .append("' found at ")
-        .append(errStream.pos)
-        .append("\n")
-        .append("Valid characters include: ")
-        .append(validCharacters.stream()
+    return "Invalid character '" + invalid +
+        "' found at " + errStream.pos + "\n" +
+        "Valid characters include: " +
+        validCharacters.stream()
             .map(e -> "'" + e.toString() + "'")
-            .collect(Collectors.joining(",")));
-
-    return builder.toString();
+            .collect(Collectors.joining(","));
   }
 }
