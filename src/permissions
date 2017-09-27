@@ -1,0 +1,2 @@
+p({"class":"foam.nanos.auth.Permission", "id":"*",         "description":"Do anything global permission." })
+p({"class":"foam.nanos.auth.Permission", "id":"menu.auth", "description":"Perform authentication related configuration" })
