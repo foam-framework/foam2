@@ -400,9 +400,9 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'String s1 = (String)getArg1().f(obj);\n'
-                + 'String s2 = (String)getArg2().f(obj);\n'
-                + 'return s1 != null ? s1.indexOf(s2) != -1 : false;\n'
+      javaCode: `String s1 = (String) getArg1().f(obj);
+String s2 = (String) getArg2().f(obj);
+return ( s1 != null && s2 != null && s1.contains(s2) );`
     },
     {
       name: 'createStatement',
@@ -421,6 +421,20 @@ foam.CLASS({
         javaType: 'java.sql.PreparedStatement'
       }],
       javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.ContainsIC',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `String s1 = (String) getArg1().f(obj);
+String s2 = (String) getArg2().f(obj);
+return ( s1 != null && s2 != null && s1.toUpperCase().contains(s2.toUpperCase()) );`
     }
   ]
 });
