@@ -96,9 +96,17 @@ public class ServiceWebAgent
    * @param buffer the buffer that failed to be parsed
    * @return the error message
    */
-  protected String getParsingError(String buffer) {
+  protected String getParsingError(X x, String buffer) {
     Parser parser = new ExprParser();
+    PStream ps = new StringPStream();
+    ParserContext psx = new ParserContextImpl();
 
+    ((StringPStream) ps).setString(buffer);
+    psx.set("X", ( x == null ) ? new ProxyX() : x);
+
+    ErrorReportingPStream eps = new ErrorReportingPStream(ps);
+    ps = eps.apply(parser, psx);
+    return eps.getMessage();
   }
 
 /*
