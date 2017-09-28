@@ -832,6 +832,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.order.CustomComparator',
 
@@ -850,6 +851,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Count',
@@ -872,6 +874,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Max',
@@ -922,6 +925,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.mlang.sink.Sum',
 
@@ -943,6 +947,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
@@ -970,4 +975,55 @@ foam.CLASS({
       javaCode: " return; "
     }
   ]
-})
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Keyword',
+
+  javaImports: [
+    'foam.core.PropertyInfo',
+     'java.util.Iterator',
+     'java.util.List'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+if ( ! ( getArg1().f(obj) instanceof String) )
+  return false;
+
+String arg1 = ((String) getArg1().f(obj)).toUpperCase();
+List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+Iterator i = props.iterator();
+while ( i.hasNext() ) {
+  PropertyInfo prop = (PropertyInfo) i.next();
+  if ( ! ( prop.f(obj) instanceof String ) )
+    continue;
+  String s = ((String) prop.f(obj)).toUpperCase();
+  if ( s.contains(arg1) )
+    return true;
+}
+
+return false;`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      args: [{
+        name: 'table',
+        javaType : 'String'
+      }],
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});

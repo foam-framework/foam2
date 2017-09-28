@@ -28,6 +28,7 @@ var classes = [
   'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
+  'foam.mlang.predicate.Keyword',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
