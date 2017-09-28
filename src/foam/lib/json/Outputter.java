@@ -17,7 +17,7 @@ public class Outputter {
   public final OutputterMode mode;
 
   public Outputter() {
-    mode = OutputterMode.FULL;
+    this(OutputterMode.FULL);
   }
 
   public Outputter(OutputterMode mode) {
