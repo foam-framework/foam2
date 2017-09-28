@@ -76,7 +76,20 @@ public class ErrorReportingPStream
         "' found at " + errStream.pos_ + "\n" +
         "Valid characters include: " +
         validCharacters.stream()
-            .map(e -> "'" + e.toString() + "'")
+            .map(e -> "'" + getPrintableCharacter(e) + "'")
             .collect(Collectors.joining(", "));
+  }
+
+  public String getPrintableCharacter(Character ch) {
+    switch ( (int) ch ) {
+      case 0x09:
+        return "\\t";
+      case 0x0A:
+        return "\\n";
+      case 0x0D:
+        return "\\r";
+      default:
+        return ch.toString();
+    }
   }
 }
