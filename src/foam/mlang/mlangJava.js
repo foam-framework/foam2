@@ -510,7 +510,7 @@ return false;`
         name: 'table',
         javaType : 'String'
       }],
-      javaCode: 'return "";'
+      javaCode: `return "UPPER(" + getArg1().createStatement() + ") like 'UPPER(" + getArg2().createStatement() + ")%'";`
     },
     {
       name: 'prepareStatement',
