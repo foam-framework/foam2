@@ -12,6 +12,7 @@ import foam.core.FObject;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
+import foam.nanos.logger.Logger;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -62,6 +63,7 @@ public class ServiceWebAgent
       Reader              reader         = req.getReader();
       int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
+      Logger              logger         = (Logger) x.get("logger");
 
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
@@ -70,7 +72,7 @@ public class ServiceWebAgent
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
         String message = getParsingError(x, buffer_.toString());
-        System.err.println(message);
+        logger.error(message);
         out.print(message);
         out.flush();
         return;
@@ -78,7 +80,7 @@ public class ServiceWebAgent
 
       if ( ! ( result instanceof foam.box.Message ) ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        System.err.println("Expected instance of foam.box.Message");
+        logger.error("Expected instance of foam.box.Message");
         out.print("Expected instance of foam.box.Message");
         out.flush();
         return;
