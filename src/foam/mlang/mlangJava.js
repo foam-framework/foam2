@@ -468,7 +468,7 @@ return false;`
         name: 'table',
         javaType : 'String'
       }],
-      javaCode: `return getArg1().createStatement() + " like '%" + getArg2().createStatement() + "'";`
+      javaCode: `return getArg1().createStatement() + " like '" + getArg2().createStatement() + "%'";`
     },
     {
       name: 'prepareStatement',
