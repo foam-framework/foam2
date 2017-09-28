@@ -983,8 +983,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.PropertyInfo',
-     'java.util.Iterator',
-     'java.util.List'
+    'java.util.Iterator',
+    'java.util.List'
   ],
 
   methods: [
