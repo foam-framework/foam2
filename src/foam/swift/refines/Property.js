@@ -327,13 +327,13 @@ self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
 return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftExpression ) { %>
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
-let valFunc = { () -> <%= this.swiftValueType %> in
+let valFunc = { [unowned self] () -> <%= this.swiftValueType %> in
   <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
   let <%=arg.join('$')%> = self.<%=arg[0]%><% if (arg.length > 1) {%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftGet()<% } %>
   <% } %>
   <%= this.swiftExpression %>
 }
-let detach: Listener = { _,_ in
+let detach: Listener = { [unowned self] _,_ in
   if self.<%=this.swiftExpressionSubscriptionName%> == nil { return }
   for s in self.<%=this.swiftExpressionSubscriptionName%>! {
     s.detach()
@@ -346,6 +346,9 @@ let detach: Listener = { _,_ in
   <%=arg[0]%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftSub(detach),
   <% } %>
 ]
+<%=this.swiftExpressionSubscriptionName%>?.forEach({ s in
+  onDetach(s)
+})
 <%=this.swiftValueName%> = valFunc()
 return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftValue ) { %>

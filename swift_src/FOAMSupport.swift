@@ -253,7 +253,6 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
     node.prev = listeners
     node.listener = l
     node.sub = Subscription(detach: {
-      _ = self
       node.next?.prev = node.prev
       node.prev?.next = node.next
       node.listener = nil
