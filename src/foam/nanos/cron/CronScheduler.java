@@ -22,7 +22,7 @@ import java.util.Date;
 
 public class CronScheduler
   extends    ContextAwareSupport
-  implements CronSchedulerService, Runnable
+  implements Runnable
 {
   protected DAO cronDAO_;
 
