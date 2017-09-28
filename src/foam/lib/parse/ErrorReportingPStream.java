@@ -77,6 +77,6 @@ public class ErrorReportingPStream
         "Valid characters include: " +
         validCharacters.stream()
             .map(e -> "'" + e.toString() + "'")
-            .collect(Collectors.joining(","));
+            .collect(Collectors.joining(", "));
   }
 }
