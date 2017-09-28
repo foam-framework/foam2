@@ -468,7 +468,7 @@ return false;`
         name: 'table',
         javaType : 'String'
       }],
-      javaCode: 'return "";'
+      javaCode: `return getArg1().createStatement() + " like '%" + getArg2().createStatement() + "'";`
     },
     {
       name: 'prepareStatement',
@@ -563,7 +563,7 @@ foam.CLASS({
         javaType: 'String'
       }],
       // TODO: select columns
-      javaCode: 'return "select * from " + table + " where " + getArg1().createStatement() + " = " + getArg2().createStatement();'
+      javaCode: 'return getArg1().createStatement() + " = " + getArg2().createStatement();'
     },
     {
       name: 'prepareStatement',
