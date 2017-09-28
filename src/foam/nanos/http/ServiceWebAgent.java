@@ -69,7 +69,7 @@ public class ServiceWebAgent
       FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        System.err.println("Failed to parse request");
+        System.err.println(getParsingError(x, buffer_.toString()));
         out.print("Failed to parse request: " + buffer_.toString());
         out.flush();
         return;
