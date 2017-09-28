@@ -35,6 +35,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaCSVParser'
+    },
+    {
+      class: 'String',
       name: 'javaInfoType'
     },
     {
@@ -69,6 +73,7 @@ foam.CLASS({
         propType:         this.javaType,
         propRequired:     this.required,
         jsonParser:       this.javaJSONParser,
+        csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
@@ -484,6 +489,7 @@ foam.CLASS({
     ['javaType', 'int'],
     ['javaInfoType', 'foam.core.AbstractIntPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser'],
+    ['javaCSVParser', 'foam.lib.json.IntParser'],
     ['sqlType', 'INT']
   ],
 
@@ -513,6 +519,7 @@ foam.CLASS({
     ['javaType', 'byte'],
     ['javaInfoType', 'foam.core.AbstractBytePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ByteParser'],
+    ['javaCSVParser', 'foam.lib.json.ByteParser'],
     ['sqlType', 'SMALLINT']
   ],
 
@@ -542,6 +549,7 @@ foam.CLASS({
     ['javaType', 'short'],
     ['javaInfoType', 'foam.core.AbstractShortPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.ShortParser'],
+    ['javaCSVParser', 'foam.lib.json.ShortParser'],
     ['sqlType', 'SMALLINT']
   ],
 
@@ -571,6 +579,7 @@ foam.CLASS({
     ['javaType', 'long'],
     ['javaInfoType', 'foam.core.AbstractLongPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.LongParser'],
+    ['javaCSVParser', 'foam.lib.json.LongParser'],
     ['sqlType', 'BIGINT']
   ],
 
@@ -600,6 +609,7 @@ foam.CLASS({
     ['javaType', 'double'],
     ['javaInfoType', 'foam.core.AbstractDoublePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.FloatParser'],
+    ['javaCSVParser', 'foam.lib.json.FloatParser'],
     ['sqlType', 'DOUBLE PRECISION']
   ],
 
@@ -646,7 +656,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.IntParser']
+    ['javaJSONParser', 'foam.lib.json.IntParser'],
+    ['javaCSVParser', 'foam.lib.json.IntParser']
   ],
 
   methods: [
@@ -747,6 +758,7 @@ foam.CLASS({
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.DateParser'],
+    ['javaCSVParser', 'foam.lib.json.DateParser'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
 
@@ -773,6 +785,7 @@ foam.CLASS({
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'foam.lib.json.DateParser'],
+       ['javaCSVParser', 'foam.lib.json.DateParser'],
        ['sqlType', 'DATE']
    ],
 
@@ -828,6 +841,7 @@ foam.CLASS({
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.StringParser'],
+    ['javaCSVParser', 'foam.lib.json.StringParser'],
     {
       name: 'sqlType',
       expression: function (width) {
@@ -1043,8 +1057,9 @@ foam.CLASS({
   refines: 'foam.core.Boolean',
   properties: [
     ['javaType', 'boolean'],
-    ['javaJSONParser', 'foam.lib.json.BooleanParser'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo'],
+    ['javaJSONParser', 'foam.lib.json.BooleanParser'],
+    ['javaCSVParser', 'foam.lib.json.BooleanParser'],
     ['sqlType', 'BOOLEAN']
   ],
   methods: [
@@ -1066,8 +1081,9 @@ foam.CLASS({
   refines: 'foam.core.Object',
   properties: [
     ['javaType', 'Object'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.AnyParser'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+    ['javaCSVParser', 'foam.lib.json.AnyParser']
   ],
 
   methods: [
