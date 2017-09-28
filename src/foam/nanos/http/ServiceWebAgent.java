@@ -64,7 +64,6 @@ public class ServiceWebAgent
       buffer_.rewind();
 
       FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
-
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
         System.err.println("Failed to parse request");
@@ -90,6 +89,16 @@ public class ServiceWebAgent
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
+  }
+
+  /**
+   * Gets the result of a failing parsing of a buffer
+   * @param buffer the buffer that failed to be parsed
+   * @return the error message
+   */
+  protected String getParsingError(String buffer) {
+    Parser parser = new ExprParser();
+
   }
 
 /*
