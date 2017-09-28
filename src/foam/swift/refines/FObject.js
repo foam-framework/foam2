@@ -31,7 +31,12 @@ foam.LIB({
 
       var impls = [this.model_.swiftExtends].concat(
           this.model_.swiftImplements,
-          (this.model_.implements || []).map(function(i) {
+          (this.model_.implements || [])
+          .filter(function(i) {
+            return foam.core.InterfaceModel.isInstance(
+                foam.lookup(i.path).model_)
+          })
+          .map(function(i) {
             return foam.lookup(i.path).model_.swiftName;
           }));
 
