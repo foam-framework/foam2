@@ -5,7 +5,7 @@ foam.CLASS({
   properties: [
     {
       name: 'object',
-      swiftType: 'FObject!',
+      swiftType: 'FObject?',
       swiftWeak: true,
     },
     {
@@ -17,19 +17,19 @@ foam.CLASS({
     {
       name: 'swiftGet',
       swiftCode: function() {/*
-return object.get(key: propertyName)
+return object?.get(key: propertyName) ?? nil
       */},
     },
     {
       name: 'swiftSet',
       swiftCode: function() {/*
-object.set(key: propertyName, value: value)
+object?.set(key: propertyName, value: value)
       */},
     },
     {
       name: 'swiftSub',
       swiftCode: function() {/*
-return object.sub(topics: ["propertyChange", propertyName], listener: listener)
+return object?.sub(topics: ["propertyChange", propertyName], listener: listener) ?? Subscription(detach: {})
       */},
     },
   ]

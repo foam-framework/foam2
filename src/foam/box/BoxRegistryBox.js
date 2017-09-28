@@ -39,10 +39,25 @@ foam.CLASS({
       },
       // TODO check if this leaks.
       swiftFactory: 'return SkeletonBox_create(["data": self])',
+      swiftPostSet: function() {/*
+if let oldValue = oldValue as? SkeletonBox {
+  oldValue.clearProperty("data")
+}
+      */},
     }
   ],
 
   methods: [
+    {
+      name: 'init',
+      swiftCode: function() {/*
+self.onDetach(Subscription(detach: {
+  if self.hasOwnProperty("registrySkeleton") {
+    (self.registrySkeleton as? FObject)?.clearProperty("data")
+  }
+}))
+      */},
+    },
     {
       name: 'send',
       swiftCode: function() {/*

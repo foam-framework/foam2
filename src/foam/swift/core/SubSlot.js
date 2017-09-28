@@ -29,7 +29,6 @@ foam.CLASS({
       name: 'init',
       swiftCode: function() {/*
 onDetach(parentSlot.swiftSub(parentChange_listener))
-onDetach(Subscription(detach: { self.value = nil }))
 parentChange()
       */},
     },

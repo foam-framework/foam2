@@ -42,6 +42,9 @@ try? delegate.send(msg)
 return try (replyBox.delegate as? RPCReturnBox)?.future.get()
   <% } else { %>
 let o = try (replyBox.delegate as? RPCReturnBox)?.future.get()
+replyBox.detach()
+(registeredReplyBox as? Detachable)?.detach()
+msg.detach()
 if let o = o as? <%=this.swiftReturns%> {
   return o
 }
