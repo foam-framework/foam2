@@ -179,7 +179,7 @@ class ParserTests: XCTestCase {
     XCTAssertEqual(parser.parse(StringPStream(["str": "0.1"]), x)!.value()! as! Float, 0.1)
     XCTAssertEqual(parser.parse(StringPStream(["str": "1."]), x)!.value()! as! Float, 1.0)
     XCTAssertEqual(parser.parse(StringPStream(["str": "-0.1123"]), x)!.value()! as! Float, -0.1123)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-50"]), x)!.value()! as! Float, -50.0)
+    XCTAssertNil(parser.parse(StringPStream(["str": "-50"]), x))
   }
 
   func testIntParser() {
