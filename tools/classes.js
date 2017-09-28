@@ -19,6 +19,7 @@ var classes = [
   'foam.mlang.predicate.ArrayBinary',
   'foam.mlang.predicate.Contains',
   'foam.mlang.predicate.ContainsIC',
+  'foam.mlang.predicate.StartsWith',
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',

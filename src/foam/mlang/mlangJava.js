@@ -441,24 +441,67 @@ return ( s1 != null && s2 != null && s1.toUpperCase().contains(s2.toUpperCase())
 
 
 foam.CLASS({
+  refines: 'foam.mlang.predicate.StartsWith',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+Object arg1 = getArg1().f(obj);
+String arg2 = (String) getArg2().f(obj);
+
+if ( arg1 instanceof Object[] ) {
+  Object[] values = (Object[]) arg1;
+  for ( int i = 0 ; i < values.length ; i++ ) {
+    if ( values[i] instanceof String && ((String) values[i]).startsWith(arg2) )
+      return true;
+  }
+} else if ( arg1 instanceof String ) {
+  return ((String) arg1).startsWith(arg2);
+}
+return false;`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      args: [{
+        name: 'table',
+        javaType : 'String'
+      }],
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.predicate.StartsWithIC',
 
   methods: [
     {
       name: 'f',
-      javaCode: 'String arg2 = ((String)getArg2().f(obj)).toUpperCase();\n'
-                + 'Object arg1 = getArg1().f(obj);\n'
-                + 'if ( arg1 instanceof Object[] ) {\n'
-                + '  Object[] values = (Object[])arg1;\n'
-                + '  for ( int i = 0 ; i < values.length ; i++ ) {\n'
-                + '    if ( ((String)values[i]).toUpperCase().startsWith(arg2) ) {\n'
-                + '      return true;\n'
-                + '    }\n'
-                + '  }\n'
-                + '  return false;'
-                + '}'
-                + 'String value = (String)arg1;\n'
-                + 'return value.toUpperCase().startsWith(arg2);\n'
+      javaCode: `
+Object arg1 = getArg1().f(obj);
+String arg2 = ((String) getArg2().f(obj)).toUpperCase();
+
+if ( arg1 instanceof Object[] ) {
+  Object[] values = (Object[]) arg1;
+  for ( int i = 0 ; i < values.length ; i++ ) {
+    if ( values[i] instanceof String && ((String) values[i]).toUpperCase().startsWith(arg2) )
+      return true;
+  }
+} else if ( arg1 instanceof String ) {
+  return ((String) arg1).toUpperCase().startsWith(arg2);
+}
+return false;`
     },
     {
       name: 'createStatement',
