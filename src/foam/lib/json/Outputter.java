@@ -50,12 +50,6 @@ public class Outputter {
     out.append(value.toString());
   }
 
-  protected void outputFloat(StringBuilder out) {
-  }
-
-  protected void outputDouble(StringBuilder out) {
-  }
-
   protected void outputBoolean(StringBuilder out, Boolean value) {
     if ( value ) out.append("true");
     else out.append("false");
