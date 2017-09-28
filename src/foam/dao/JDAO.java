@@ -6,10 +6,7 @@
 
 package foam.dao;
 
-import foam.core.ClassInfo;
-import foam.core.Detachable;
-import foam.core.FObject;
-import foam.core.X;
+import foam.core.*;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JournalParser;
 import foam.lib.json.Outputter;
@@ -94,7 +91,7 @@ public class JDAO
     ParserContext x = new ParserContextImpl();
 
     ((StringPStream) ps).setString(line);
-    x.set("X", getX());
+    x.set("X", ( getX() == null ) ? new ProxyX() : getX());
 
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
     ps = eps.apply(parser, x);
