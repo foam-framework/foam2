@@ -18,9 +18,11 @@ var classes = [
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.ArrayBinary',
   'foam.mlang.predicate.Contains',
+  'foam.mlang.predicate.ContainsIC',
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',
+  'foam.mlang.predicate.Neq',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
@@ -103,6 +105,17 @@ var classes = [
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
+  'foam.nanos.auth.Language',
+  'foam.nanos.auth.Region',
+  'foam.nanos.menu.Menu',
+  'foam.nanos.menu.DAOMenu',
+  'foam.nanos.menu.ListMenu',
+  'foam.nanos.menu.MenuBar',
+  'foam.nanos.menu.PopupMenu',
+  'foam.nanos.menu.SubMenu',
+  'foam.nanos.menu.SubMenuView',
+  'foam.nanos.menu.TabsMenu',
+  'foam.nanos.menu.ViewMenu',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -110,6 +123,8 @@ var classes = [
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
+  'foam.u2.Element',
+  'foam.u2.Visibility',
   'foam.nanos.export.ExportDriverRegistry',
   'foam.dao.pg.ConnectionPool',
   'foam.lib.json.OutputterMode',
@@ -118,6 +133,7 @@ var classes = [
 ];
 
 var abstractClasses = [
+  'foam.nanos.menu.AbstractMenu',
 //  'foam.json.Outputter'
 ];
 

@@ -10,9 +10,12 @@
 
    documentation: 'Region (province/state) information.',
 
-   ids: [ 'countryId', 'code' ],
 
    properties: [
+     {
+       class: 'Long',
+       name: 'id'
+     },
      {
        class: 'String',
        name: 'countryId'
