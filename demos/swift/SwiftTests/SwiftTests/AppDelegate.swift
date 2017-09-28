@@ -10,12 +10,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     FOAM_utils.registerClasses()
 
-    let app = SwiftApp()
-    app.startListeners()
-
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.backgroundColor = .white
-    window?.rootViewController = app.navVc
+//    let app = SwiftApp()
+//    app.startListeners()
+//    window?.rootViewController = app.navVc
+    window?.rootViewController = UIViewController()
     window?.makeKeyAndVisible()
 
     return true
