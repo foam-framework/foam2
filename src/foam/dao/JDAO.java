@@ -57,7 +57,7 @@ public class JDAO
           case 'p':
             FObject object = journalParser.parseObject(line);
             if ( object == null ) {
-              System.err.println(getErrorMessage(line));
+              System.err.println(getParsingErrorMessage(line));
             } else {
               getDelegate().put(object);
             }
@@ -66,7 +66,7 @@ public class JDAO
           case 'r':
             Object id = journalParser.parseObjectId(line);
             if ( id == null ) {
-              System.err.println(getErrorMessage(line));
+              System.err.println(getParsingErrorMessage(line));
             } else {
               getDelegate().remove(getDelegate().find(id));
             }
@@ -85,7 +85,7 @@ public class JDAO
    * @param line the line that was failed to be parse
    * @return the error message
    */
-  protected String getErrorMessage(String line) {
+  protected String getParsingErrorMessage(String line) {
     Parser parser = new ExprParser();
     PStream ps = new StringPStream();
     ParserContext x = new ParserContextImpl();
