@@ -1082,8 +1082,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser'],
-    ['javaCSVParser', 'foam.lib.json.AnyParser']
+    ['javaJSONParser', 'foam.lib.json.AnyParser']
   ],
 
   methods: [

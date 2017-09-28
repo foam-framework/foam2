@@ -38,6 +38,11 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
+  public void toCSV(foam.lib.csv.Outputter outputter, StringBuilder out, Object value) {
+    outputter.output(out, value);
+  }
+
+  @Override
   public foam.mlang.Expr partialEval() {
     return this;
   }
