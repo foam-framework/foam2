@@ -121,6 +121,7 @@ var classes = [
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
+  'foam.nanos.cron.CronSchedulerService',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
   'foam.mop.MOP',
