@@ -352,7 +352,7 @@ foam.CLASS({
 
 
       if ( this.convertUnserializableToStubs &&
-           ! foam.core.Serializable.isInstance(o) ) {
+           ! foam.core.Remote.isInstance(o) ) {
         o = this.makeStubObj(o);
       }
 
