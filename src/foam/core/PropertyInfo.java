@@ -30,7 +30,7 @@ public interface PropertyInfo
   public void set(Object obj, Object value);
   public Parser jsonParser();
   public Parser csvParser();
-  public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
+  public void toJSON(foam.lib.json.Outputter outputter, Object value);
   public void toCSV(foam.lib.csv.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   public void setFromString(Object obj, String value);
