@@ -94,11 +94,11 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
 protected class Outputter extends foam.lib.json.Outputter {
-  protected void outputFObject(StringBuilder out, foam.core.FObject o) {
+  protected void outputFObject(foam.core.FObject o) {
     if ( o == getMe() ) {
       o = getX().create(foam.box.HTTPReplyBox.class);
     }
-    super.outputFObject(out, o);
+    super.outputFObject(o);
   }
 }
 
