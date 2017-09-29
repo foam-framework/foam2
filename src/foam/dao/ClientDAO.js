@@ -19,16 +19,15 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ResetSink',
   extends: 'foam.dao.ProxySink',
-  implements: [ 'foam.core.Serializable' ],
   methods: [
     {
       name: 'put',
-      code: function(obj, sub) { this.reset(s); },
+      code: function(obj, sub) { this.reset(sub); },
       javaCode: 'reset(sub);'
     },
     {
       name: 'remove',
-      code: function(obj, sub) { this.reset(s); },
+      code: function(obj, sub) { this.reset(sub); },
       javaCode: 'reset(sub);'
     }
   ]
@@ -38,7 +37,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'MergedResetSink',
   extends: 'foam.dao.ResetSink',
-  implements: [ 'foam.core.Serializable' ],
   methods: [
     {
       name: 'reset',
@@ -159,27 +157,11 @@ super.removeAll_(null, skip, limit, order, predicate);
     {
       name: 'listen_',
       code: function listen_(x, sink, predicate) {
-        // TODO: This should probably just be handled automatically via a RemoteSink/Listener
-        // TODO: Unsubscribe support.
-
-        var skeleton = this.SkeletonBox.create({
-          data: sink
-        });
-
-        var clientSink = this.ClientSink.create({
-          delegate: this.__context__.registry.register(
-            null,
-            this.delegateReplyPolicy,
-            skeleton
-          )
-        });
-
-        clientSink = foam.dao.MergedResetSink.create({
-          delegate: clientSink
-        });
-
-        this.SUPER(null, clientSink, predicate);
+        this.SUPER(null, sink, predicate);
       },
+      javaCode: `
+super.listen_(null, sink, predicate);
+`
     }
   ]
 });

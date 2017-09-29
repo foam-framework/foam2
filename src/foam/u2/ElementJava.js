@@ -5,6 +5,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'CSS',
+  properties: [ 'code' ]
 });
 foam.CLASS({
   package: 'foam.u2',
