@@ -45,13 +45,19 @@ public class Outputter
   };
 
   public final OutputterMode mode;
+  public final boolean outputHeaders;
 
   public Outputter() {
     this(OutputterMode.FULL);
   }
 
   public Outputter(OutputterMode mode) {
+    this(mode, true);
+  }
+
+  public Outputter(OutputterMode mode, boolean outputHeaders) {
     this.mode = mode;
+    this.outputHeaders = outputHeaders;
   }
 
   public String stringify(FObject obj) {
