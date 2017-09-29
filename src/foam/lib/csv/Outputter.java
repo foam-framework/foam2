@@ -7,15 +7,54 @@
 package foam.lib.csv;
 
 import foam.core.FObject;
+import foam.core.PropertyInfo;
+import foam.lib.json.OutputterMode;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
 
 public class Outputter {
 
+  protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.S'Z'");
+      df.setTimeZone(TimeZone.getTimeZone("UTC"));
+      return df;
+    }
+  };
+
+  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
+
+  public final OutputterMode mode;
+
+  public Outputter() {
+    this(OutputterMode.FULL);
+  }
+
+  public Outputter(OutputterMode mode) {
+    this.mode = mode;
+  }
+
   public String stringify(FObject obj) {
-    StringBuilder sb = new StringBuilder();
-    outputFObject(sb, obj);
-    return sb.toString();
+    StringBuilder builder = sb.get();
+    outputFObject(builder, obj);
+    return builder.toString();
   }
 
   public String escape(String s) {
@@ -35,11 +74,24 @@ public class Outputter {
   }
 
   protected void outputDate(StringBuilder out, Date value) {
-
+    outputString(out, sdf.get().format(value));
   }
 
-  protected void outputFObject(StringBuilder out, FObject o) {
+  protected void outputFObject(StringBuilder out, FObject obj) {
+    List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
 
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
+      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
+
+      Object value = prop.f(obj);
+      if ( value == null ) continue;
+      prop.toCSV(this, out, value);
+      out.append(",");
+    }
+    out.append("\n");
   }
 
   public void output( StringBuilder out, Object value ) {
