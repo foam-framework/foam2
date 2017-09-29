@@ -151,8 +151,8 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      this.action && this.action.maybeCall(this.__subContext__, this.data);
       e.stopPropagation();
+      this.action && this.action.maybeCall(this.__subContext__, this.data);
     }
   ]
 });
