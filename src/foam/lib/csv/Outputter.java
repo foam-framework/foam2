@@ -168,8 +168,6 @@ public class Outputter
       outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
       outputDate((Date) value);
-    } else if ( value instanceof Enum ) {
-      outputNumber(((Enum) value).ordinal());
     }
   }
 

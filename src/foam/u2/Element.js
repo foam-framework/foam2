@@ -447,6 +447,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
+  implements: [ 'foam.dao.Sink' ],
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
   properties: [
     {
       class: 'Function',
@@ -1515,10 +1522,14 @@ foam.CLASS({
 
           es = {};
         }
-      })
+      }, this);
+
+      listener = foam.dao.MergedResetSink.create({
+        delegate: listener
+      }, this);
 
       this.onDetach(dao.listen(listener));
-      listener.paint();
+      listener.delegate.paint();
 
       return this;
     },
