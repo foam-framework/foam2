@@ -29,7 +29,7 @@ public interface PropertyInfo
   public Object get(Object obj);
   public void set(Object obj, Object value);
   public Parser jsonParser();
-  public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value);
+  public void toJSON(foam.lib.json.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   public void setFromString(Object obj, String value);
   public Object fromXML(X x, XMLStreamReader reader);
