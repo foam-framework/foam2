@@ -1027,3 +1027,51 @@ return false;`
     }
   ]
 });
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.GroupBy',
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'return;'
+    },
+    {
+      name: 'putInGroup_',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        },
+        {
+          name: 'key',
+          javaType: 'Object'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: 'return;'
+    },
+    {
+      name: 'sortedKeys',
+      javaReturns: 'String[]',
+      args: [
+        {
+          name: 'comparator',
+          javaType: 'foam.mlang.order.Comparator'
+        }
+      ],
+      javaCode: `
+if ( comparator != null ) {
+  java.util.Arrays.sort(getGroupKeys(), comparator);
+} else {
+  java.util.Arrays.sort(getGroupKeys());
+}
+return getGroupKeys();`
+    }
+  ]
+});
