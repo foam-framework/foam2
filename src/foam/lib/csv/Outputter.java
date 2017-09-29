@@ -6,15 +6,11 @@
 
 package foam.lib.csv;
 
-import foam.core.FObject;
-import foam.core.PropertyInfo;
+import foam.core.*;
 import foam.lib.json.OutputterMode;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Outputter {
@@ -84,10 +80,15 @@ public class Outputter {
     // also filter out null values and empty strings
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     props = props.stream().filter(prop -> {
-      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() )
+      // filter out network and storage transient values
+      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+
+      // filter out unsupported types
+      if ( prop instanceof AbstractArrayPropertyInfo || prop instanceof AbstractFObjectArrayPropertyInfo ||
+          prop instanceof AbstractFObjectPropertyInfo || prop instanceof AbstractObjectPropertyInfo ) {
         return false;
-      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() )
-        return false;
+      }
 
       Object value = prop.f(obj);
       return value != null && (!(value instanceof String) || !((String) value).isEmpty());
