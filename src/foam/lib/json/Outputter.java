@@ -7,116 +7,155 @@
 package foam.lib.json;
 
 import foam.core.ClassInfo;
+import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
+import foam.dao.AbstractSink;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 
-public class Outputter {
+public class Outputter
+    extends AbstractSink
+{
 
-  public final OutputterMode mode;
+  protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      SimpleDateFormat df = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.S'Z'");
+      df.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+      return df;
+    }
+  };
+
+  protected StringWriter stringWriter_ = null;
+  protected PrintWriter writer_;
+  protected OutputterMode mode_;
 
   public Outputter() {
     this(OutputterMode.FULL);
   }
 
   public Outputter(OutputterMode mode) {
-    this.mode = mode;
+    this((PrintWriter) null, mode);
+  }
+
+  public Outputter(File file, OutputterMode mode) throws FileNotFoundException {
+    this(new PrintWriter(file), mode);
+  }
+
+  public Outputter(PrintWriter writer, OutputterMode mode) {
+    if ( writer == null ) {
+      stringWriter_ = new StringWriter();
+      writer = new PrintWriter(stringWriter_);
+    }
+
+    this.mode_ = mode;
+    this.writer_ = writer;
   }
 
   public String stringify(FObject obj) {
-    StringBuilder sb = new StringBuilder();
-    outputFObject(sb, obj);
-    return sb.toString();
+    if ( stringWriter_ == null ) {
+      stringWriter_ = new StringWriter();
+      writer_ = new PrintWriter(stringWriter_);
+    }
+
+    stringWriter_.getBuffer().setLength(0);
+    outputFObject(obj);
+    return this.toString();
   }
 
-  protected void outputUndefined(StringBuilder out) {
+  protected void outputUndefined() {
   }
 
-  protected void outputNull(StringBuilder out) {
+  protected void outputNull() {
   }
 
-  protected void outputString(StringBuilder out, String s) {
-    out.append("\"");
-    out.append(escape(s));
-    out.append("\"");
+  protected void outputString(String s) {
+    writer_.append("\"");
+    writer_.append(escape(s));
+    writer_.append("\"");
   }
-
+  
   public String escape(String s) {
     return s.replace("\n","\\n").replace("\"", "\\\"");
   }
 
-  protected void outputNumber(StringBuilder out, Number value) {
-    out.append(value.toString());
+  protected void outputNumber(Number value) {
+    writer_.append(value.toString());
   }
 
-  protected void outputBoolean(StringBuilder out, Boolean value) {
-    if ( value ) out.append("true");
-    else out.append("false");
+  protected void outputBoolean(Boolean value) {
+    writer_.append( value ? "true" : "false" );
   }
 
-  protected void outputArray(StringBuilder out, Object[] array) {
-    out.append("[");
+  protected void outputArray(Object[] array) {
+    writer_.append("[");
     for ( int i = 0 ; i < array.length ; i++ ) {
-      output(out, array[i]);
-      if ( i < array.length - 1 ) out.append(",");
+      output(array[i]);
+      if ( i < array.length - 1 ) writer_.append(",");
     }
-    out.append("]");
+    writer_.append("]");
   }
 
-  protected void outputMap(StringBuilder out, java.util.Map map) {
-    out.append("{");
+  protected void outputMap(java.util.Map map) {
+    writer_.append("{");
     java.util.Iterator keys = map.keySet().iterator();
     while ( keys.hasNext() ) {
       Object key   = keys.next();
       Object value = map.get(key);
-      outputString(out, key.toString());
-      out.append(":");
-      output(out, value);
-      if ( keys.hasNext() ) out.append(",");
+      outputString(key.toString());
+      writer_.append(":");
+      output(value);
+      if ( keys.hasNext() ) writer_.append(",");
     }
-    out.append("}");
+    writer_.append("}");
   }
 
-  protected void outputList(StringBuilder out, java.util.List list) {
-    out.append("[");
+  protected void outputList(java.util.List list) {
+    writer_.append("[");
     java.util.Iterator iter = list.iterator();
     while ( iter.hasNext() ) {
-      output(out, iter.next());
-      if ( iter.hasNext() ) out.append(",");
+      output(iter.next());
+      if ( iter.hasNext() ) writer_.append(",");
     }
-    out.append("]");
+    writer_.append("]");
   }
 
-  protected void outputProperty(StringBuilder out, FObject o, PropertyInfo p) {
-    out.append(beforeKey_());
-    out.append(p.getName());
-    out.append(afterKey_());
-    out.append(":");
-    p.toJSON(this, out, p.get(o));
+  protected void outputProperty(FObject o, PropertyInfo p) {
+    writer_.append(beforeKey_());
+    writer_.append(p.getName());
+    writer_.append(afterKey_());
+    writer_.append(":");
+    p.toJSON(this, p.get(o));
   }
 
-  public void output(StringBuilder out, Object value) {
+  public void output(Object value) {
     if ( value instanceof OutputJSON ) {
-      ((OutputJSON) value).outputJSON(out, this);
+      ((OutputJSON) value).outputJSON(this);
     } else if ( value instanceof String ) {
-      outputString(out, (String) value);
+      outputString((String) value);
     } else if ( value instanceof FObject ) {
-      outputFObject(out, (FObject) value);
+      outputFObject((FObject) value);
     } else if ( value instanceof Number ) {
-      outputNumber(out, (Number) value);
+      outputNumber((Number) value);
     } else if ( isArray(value) ) {
-      outputArray(out, (Object[]) value);
+      outputArray((Object[]) value);
     } else if ( value instanceof Boolean ) {
-      outputBoolean(out, (Boolean) value);
+      outputBoolean((Boolean) value);
     } else if ( value instanceof java.util.Date ) {
-      outputDate(out, (java.util.Date) value);
+      outputDate((java.util.Date) value);
     } else if ( value instanceof java.util.Map ) {
-      outputMap(out, (java.util.Map) value);
+      outputMap((java.util.Map) value);
     } else if ( value instanceof java.util.List ) {
-      outputList(out, (java.util.List) value);
+      outputList((java.util.List) value);
     } else /*if ( value == null )*/ {
-      out.append("null");
+      writer_.append("null");
     }
   }
 
@@ -126,38 +165,36 @@ public class Outputter {
         value.getClass().isArray();
   }
 
-  protected void outputDate(StringBuilder out, java.util.Date date) {
-    java.text.DateFormat formatter = new java.text.SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss.S'Z'");
-    formatter.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-    outputString(out, formatter.format(date));
+  protected void outputDate(java.util.Date date) {
+    outputString(sdf.get().format(date));
   }
 
-  protected void outputFObject(StringBuilder out, FObject o) {
+  protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
-    out.append("{");
-    out.append(beforeKey_());
-    out.append("class");
-    out.append(afterKey_());
-    out.append(":");
+    writer_.append("{");
+    writer_.append(beforeKey_());
+    writer_.append("class");
+    writer_.append(afterKey_());
+    writer_.append(":");
 
-    outputString(out, info.getId());
+    outputString(info.getId());
 
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
+      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
+      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;
 
-      out.append(",");
-      outputProperty(out, o, prop);
+      writer_.append(",");
+      outputProperty(o, prop);
     }
 
-    out.append("}");
+    writer_.append("}");
   }
 
   protected String beforeKey_() {
@@ -173,5 +210,15 @@ public class Outputter {
 
   public FObject parse(String str) {
     return null;
+  }
+
+  @Override
+  public String toString() {
+    return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
+  }
+
+  @Override
+  public void put(FObject obj, Detachable sub) {
+    outputFObject(obj);
   }
 }
