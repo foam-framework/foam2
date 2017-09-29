@@ -23,9 +23,6 @@ public class ListSink
   }
 
   public void outputJSON(foam.lib.json.Outputter outputter) {
-    java.util.Map value = new java.util.TreeMap();
-    value.put("class", "foam.dao.ArraySink");
-    value.put("array", getData());
-    outputter.output(value);
+    outputter.outputMap("class", "foam.dao.ArraySink", "array", getData());
   }
 }
