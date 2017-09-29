@@ -700,15 +700,11 @@ foam.CLASS({
             type: 'foam.lib.json.Outputter'
           },
           {
-            name: 'out',
-            type: 'StringBuilder'
-          },
-          {
             name: 'value',
             type: 'Object'
           }
         ],
-        body: `outputter.output(out, getOrdinal(value));`
+        body: `outputter.output(getOrdinal(value));`
       });
 
       var cast = info.getMethod('cast');
