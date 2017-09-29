@@ -81,7 +81,7 @@ public class Outputter
     writer_.append(escape(s));
     writer_.append("\"");
   }
-  
+
   public String escape(String s) {
     return s.replace("\n","\\n").replace("\"", "\\\"");
   }
