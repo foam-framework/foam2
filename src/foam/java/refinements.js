@@ -707,6 +707,23 @@ foam.CLASS({
         body: `outputter.output(getOrdinal(value));`
       });
 
+      info.method({
+        name: 'toCSV',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.csv.Outputter'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `outputter.output(getOrdinal(value));`
+      });
+
       var cast = info.getMethod('cast');
       cast.body = 'if ( o instanceof Integer ) {'
       + 'return forOrdinal((int) o); '
