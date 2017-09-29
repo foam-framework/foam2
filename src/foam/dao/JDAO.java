@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JournalParser;
 import foam.lib.json.Outputter;
+import foam.lib.json.OutputterMode;
 import foam.lib.parse.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
@@ -19,7 +20,7 @@ public class JDAO
     extends ProxyDAO
 {
   protected final File           file_;
-  protected final Outputter      outputter_ = new Outputter();
+  protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
   public JDAO(ClassInfo classInfo, String filename)
