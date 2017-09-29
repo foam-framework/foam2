@@ -315,45 +315,10 @@ foam.CLASS({
       }
     },
 
-    function makeStubObj(o) {
-      var clientClsId = o.cls_.package + '.Client' + o.cls_.name;
-      var clientCls = foam.lookup(clientClsId, true);
-
-      if ( ! clientCls ) {
-        // TODO: Should this be a hard error?  Or should it be permitted.
-        throw new Error('Cannot find ' + clientClsId + ' as stub class for ' + o.cls_.id);
-      }
-
-      if ( ! foam.core.Stub.isInstance(clientCls.getAxiomByName('delegate')) ) {
-        throw new Error('Expected stub property to be named "delegate" for ' + clientCls.id);
-      }
-
-      if ( ! foam.core.Serializable.isSubClass(clientCls) ) {
-        throw new Error('Cannot replace ' + o.cls_.id + ' with ' + clientCls.id + ' as it is not serializable.');
-      }
-
-      var X = this.__subContext__;
-      var registry = X.registry;
-
-      var box = foam.box.SkeletonBox.create({ data: o }, X);
-      box = registry.register(null, null, box);
-
-      var obj = clientCls.create(null, X);
-      obj.delegate = box;
-
-      return obj;
-    },
-
     function outputFObject(o, opt_cls) {
       if ( o.outputJSON ) {
         o.outputJSON(this);
         return;
-      }
-
-
-      if ( this.convertUnserializableToStubs &&
-           ! foam.core.Remote.isInstance(o) ) {
-        o = this.makeStubObj(o);
       }
 
       this.start('{');
