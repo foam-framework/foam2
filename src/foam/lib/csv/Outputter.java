@@ -31,12 +31,15 @@ public class Outputter
     }
   };
 
+  protected ClassInfo of_ = null;
+  protected List<PropertyInfo> props_ = null;
+
   protected StringWriter stringWriter_ = null;
   protected PrintWriter writer_;
   protected OutputterMode mode_;
   protected boolean outputHeaders_;
   protected boolean isHeadersOutput_ = false;
-  
+
   public Outputter() {
     this(OutputterMode.FULL);
   }
@@ -84,8 +87,12 @@ public class Outputter
    * @return the filtered list of properties
    */
   public List<PropertyInfo> getFilteredPropertyInfoList(FObject obj) {
-    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    return props.stream().filter(prop -> {
+    if ( of_ != null && props_ != null && obj.equals(of_) )
+      return props_;
+
+    of_ = obj.getClassInfo();
+    props_ = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    props_.stream().filter(prop -> {
       // filter out network and storage transient values
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
@@ -101,6 +108,8 @@ public class Outputter
       return value != null && (!(value instanceof String) || !((String) value).isEmpty());
     })
         .collect(Collectors.toList());
+
+    return props_;
   }
 
   public void outputHeaders(FObject obj) {
