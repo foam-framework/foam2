@@ -63,7 +63,7 @@ public class MLang
   public static Sink MIN(Object o1) {
     return new Min(0, MLang.prepare(o1));
   }
-  
+
   public static Sink MAP(Object o1, foam.dao.Sink delegate) {
     return new Map(MLang.prepare(o1), delegate);
   }
