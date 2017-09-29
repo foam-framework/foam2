@@ -55,6 +55,10 @@ public class Outputter
     this(mode, true);
   }
 
+  public Outputter(boolean outputHeaders) {
+    this(OutputterMode.FULL, outputHeaders);
+  }
+
   public Outputter(OutputterMode mode, boolean outputHeaders) {
     this.mode = mode;
     this.outputHeaders = outputHeaders;
