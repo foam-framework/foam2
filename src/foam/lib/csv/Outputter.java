@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 public class Outputter {
 
@@ -62,6 +63,7 @@ public class Outputter {
   }
 
   protected void outputString(StringBuilder out, String s) {
+    if ( s == null || s.isEmpty() ) return;
     out.append(escape(s));
   }
 
@@ -78,7 +80,20 @@ public class Outputter {
   }
 
   protected void outputFObject(StringBuilder out, FObject obj) {
-    List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    // get a list of filtered properties, filtering out network & storage transient properties
+    // also filter out null values and empty strings
+    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    props = props.stream().filter(prop -> {
+      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() )
+        return false;
+      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() )
+        return false;
+
+      Object value = prop.f(obj);
+      return value != null && (!(value instanceof String) || !((String) value).isEmpty());
+    })
+        .collect(Collectors.toList());
+
     Iterator i = props.iterator();
 
     while ( i.hasNext() ) {
@@ -87,9 +102,12 @@ public class Outputter {
       if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       Object value = prop.f(obj);
-      if ( value == null ) continue;
+      if ( value == null || ( value instanceof String && ((String) value).isEmpty()) )
+        continue;
       prop.toCSV(this, out, value);
-      out.append(",");
+      if ( i.hasNext() ) {
+        out.append(",");
+      }
     }
     out.append("\n");
   }
