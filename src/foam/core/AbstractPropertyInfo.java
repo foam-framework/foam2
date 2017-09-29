@@ -6,15 +6,14 @@
 
 package foam.core;
 
-import foam.lib.parse.Parser;
 import foam.nanos.logger.Logger;
-import java.sql.PreparedStatement;
-import java.util.Map;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.sql.PreparedStatement;
+import java.util.Map;
 
 public abstract class AbstractPropertyInfo
     implements PropertyInfo
@@ -34,6 +33,11 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void toJSON(foam.lib.json.Outputter outputter, Object value) {
+    outputter.output(value);
+  }
+
+  @Override
+  public void toCSV(foam.lib.csv.Outputter outputter, Object value) {
     outputter.output(value);
   }
 
