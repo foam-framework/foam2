@@ -32,9 +32,9 @@ public class Outputter
   };
 
   protected StringWriter stringWriter_ = null;
-  protected final PrintWriter writer_;
-  protected final OutputterMode mode_;
-  protected final boolean outputHeaders_;
+  protected PrintWriter writer_;
+  protected OutputterMode mode_;
+  protected boolean outputHeaders_;
 
   public StringWriter createStringWriter() {
     return new StringWriter();
@@ -68,10 +68,16 @@ public class Outputter
   }
 
   public String stringify(FObject obj) {
+    if ( stringWriter_ == null ) {
+      stringWriter_ = new StringWriter();
+      writer_ = new PrintWriter(stringWriter_);
+    }
+
+    stringWriter_.getBuffer().setLength(0);
     if ( outputHeaders_ )
       outputHeaders(obj);
     outputFObject(obj);
-    return writer_.toString();
+    return this.toString();
   }
 
   /**
@@ -147,7 +153,7 @@ public class Outputter
     writer_.append("\n");
   }
 
-  public void output(Object value ) {
+  public void output(Object value) {
     if ( value instanceof String ) {
       outputString((String) value);
     } else if ( value instanceof Number ) {
