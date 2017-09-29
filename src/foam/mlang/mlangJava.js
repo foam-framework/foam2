@@ -388,6 +388,17 @@ foam.CLASS({
     },
     {
       name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
       javaCode: 'getDelegate().put(f(obj), sub);'
     }
   ]
@@ -1035,7 +1046,27 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: 'return;'
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode:
+`Object arg1 = getArg1();
+if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
+  Object[] keys = (Object[]) arg1;
+  for ( Object key : keys ) {
+    putInGroup_(sub, key, obj);
+  }
+} else {
+  putInGroup_(sub, "", obj);
+}`
     },
     {
       name: 'putInGroup_',
@@ -1065,8 +1096,8 @@ foam.CLASS({
           javaType: 'foam.mlang.order.Comparator'
         }
       ],
-      javaCode: `
-if ( comparator != null ) {
+      javaCode:
+`if ( comparator != null ) {
   java.util.Arrays.sort(getGroupKeys(), comparator);
 } else {
   java.util.Arrays.sort(getGroupKeys());
