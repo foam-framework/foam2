@@ -10,6 +10,7 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -30,46 +31,47 @@ public class Outputter
     }
   };
 
-  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
+  protected StringWriter stringWriter_ = null;
+  protected final PrintWriter writer_;
+  protected final OutputterMode mode_;
+  protected final boolean outputHeaders_;
 
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
-
-  public final OutputterMode mode;
-  public final boolean outputHeaders;
+  public StringWriter createStringWriter() {
+    return new StringWriter();
+  }
 
   public Outputter() {
     this(OutputterMode.FULL);
   }
 
   public Outputter(OutputterMode mode) {
-    this(mode, true);
-  }
-
-  public Outputter(boolean outputHeaders) {
-    this(OutputterMode.FULL, outputHeaders);
+    this((PrintWriter) null, mode, true);
   }
 
   public Outputter(OutputterMode mode, boolean outputHeaders) {
-    this.mode = mode;
-    this.outputHeaders = outputHeaders;
+    this((PrintWriter) null, mode, outputHeaders);
+  }
+
+  public Outputter(File file, OutputterMode mode, boolean outputHeaders) throws FileNotFoundException {
+    this(new PrintWriter(file), mode, outputHeaders);
+  }
+
+  public Outputter(PrintWriter writer, OutputterMode mode, boolean outputHeaders) {
+    if ( writer == null ) {
+      stringWriter_ = new StringWriter();
+      writer = new PrintWriter(stringWriter_);
+    }
+
+    this.mode_ = mode;
+    this.writer_ = writer;
+    this.outputHeaders_ = outputHeaders;
   }
 
   public String stringify(FObject obj) {
-    StringBuilder builder = sb.get();
-    if ( outputHeaders )
-      outputHeaders(builder, obj);
-    outputFObject(builder, obj);
-    return builder.toString();
+    if ( outputHeaders_ )
+      outputHeaders(obj);
+    outputFObject(obj);
+    return writer_.toString();
   }
 
   /**
@@ -82,8 +84,8 @@ public class Outputter
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     return props.stream().filter(prop -> {
       // filter out network and storage transient values
-      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
       // filter out unsupported types
       if ( prop instanceof AbstractArrayPropertyInfo ||
@@ -98,73 +100,72 @@ public class Outputter
         .collect(Collectors.toList());
   }
 
-  public void outputHeaders(StringBuilder out, FObject obj) {
+  public void outputHeaders(FObject obj) {
     List<PropertyInfo> props = getFilteredPropertyInfoList(obj);
     Iterator i = props.iterator();
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      out.append(prop.getName());
+      writer_.append(prop.getName());
       if ( i.hasNext() )
-        out.append(",");
+        writer_.append(",");
     }
-    out.append("\n");
+    writer_.append("\n");
   }
 
   public String escape(String s) {
     return s.replace("\n","\\n").replace("\"", "\\\"");
   }
 
-  protected void outputString(StringBuilder out, String s) {
+  protected void outputString(String s) {
     if ( s == null || s.isEmpty() ) return;
-    out.append(escape(s));
+    writer_.append(escape(s));
   }
 
-  protected void outputNumber(StringBuilder out, Number value) {
-    out.append(value.toString());
+  protected void outputNumber(Number value) {
+    writer_.append(value.toString());
   }
 
-  protected void outputBoolean(StringBuilder out, Boolean value) {
-    out.append(value ? "true" : "false");
+  protected void outputBoolean(Boolean value) {
+    writer_.append(value ? "true" : "false");
   }
 
-  protected void outputDate(StringBuilder out, Date value) {
-    outputString(out, sdf.get().format(value));
+  protected void outputDate(Date value) {
+    outputString(sdf.get().format(value));
   }
 
-  protected void outputFObject(StringBuilder out, FObject obj) {
+  protected void outputFObject(FObject obj) {
     List<PropertyInfo> props = getFilteredPropertyInfoList(obj);
     Iterator i = props.iterator();
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      prop.toCSV(this, out, prop.f(obj));
+      prop.toCSV(this, prop.f(obj));
       if ( i.hasNext() )
-        out.append(",");
+        writer_.append(",");
     }
-    out.append("\n");
+    writer_.append("\n");
   }
 
-  public void output( StringBuilder out, Object value ) {
+  public void output(Object value ) {
     if ( value instanceof String ) {
-      outputString(out, (String) value);
+      outputString((String) value);
     } else if ( value instanceof Number ) {
-      outputNumber(out, (Number) value);
+      outputNumber((Number) value);
     } else if ( value instanceof Boolean ) {
-      outputBoolean(out, (Boolean) value);
+      outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
-      outputDate(out, (Date) value);
+      outputDate((Date) value);
     }
   }
 
-  protected StringBuilder data_ = sb.get();
-
-  public String getData() {
-    return data_.toString();
+  @Override
+  public String toString() {
+    return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
   }
 
   @Override
   public void put(FObject obj, Detachable sub) {
-    outputFObject(data_, obj);
+//    outputFObject(data_, obj);
   }
 }
