@@ -100,6 +100,10 @@ foam.CLASS({
   ],
 
   methods: [
+    function outputJSON(outputter) {
+      outputter.output(this.delegate);
+    },
+
     function put(obj, s) {
       this.delegate.put(obj, this);
     },
