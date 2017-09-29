@@ -33,8 +33,8 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
-    outputter.output(out, value);
+  public void toJSON(foam.lib.json.Outputter outputter, Object value) {
+    outputter.output(value);
   }
 
   @Override
