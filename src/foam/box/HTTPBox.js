@@ -39,6 +39,9 @@ foam.CLASS({
         imports: [
           'me'
         ],
+        properties: [
+          [ 'propertyPredicate', function(o, p) { return ! p.networkTransient; } ]
+        ],
         methods: [
           function output(o) {
             return this.SUPER(o == this.me ? this.HTTPReplyBox.create() : o);
