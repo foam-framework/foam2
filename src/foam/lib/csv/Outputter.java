@@ -87,7 +87,7 @@ public class Outputter
    * @return the filtered list of properties
    */
   public List<PropertyInfo> getFilteredPropertyInfoList(FObject obj) {
-    if ( of_ != null && props_ != null && obj.equals(of_) )
+    if ( of_ != null && props_ != null && obj.getClassInfo().equals(of_) )
       return props_;
 
     of_ = obj.getClassInfo();
@@ -107,7 +107,7 @@ public class Outputter
       Object value = prop.f(obj);
       return value != null && (!(value instanceof String) || !((String) value).isEmpty());
     })
-        .collect(Collectors.toList());
+    .collect(Collectors.toList());
 
     return props_;
   }
