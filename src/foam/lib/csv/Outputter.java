@@ -62,8 +62,49 @@ public class Outputter
 
   public String stringify(FObject obj) {
     StringBuilder builder = sb.get();
+    if ( outputHeaders )
+      outputHeaders(builder, obj);
     outputFObject(builder, obj);
     return builder.toString();
+  }
+
+  /**
+   * Gets a filtered list of properties. Removes network and storage transient variables
+   * if necessary, removes unsupported types and removes null values / empty strings
+   * @param obj the object to get the property list from
+   * @return the filtered list of properties
+   */
+  public List<PropertyInfo> getFilteredPropertyInfoList(FObject obj) {
+    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    return props.stream().filter(prop -> {
+      // filter out network and storage transient values
+      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+
+      // filter out unsupported types
+      if ( prop instanceof AbstractArrayPropertyInfo ||
+          prop instanceof AbstractFObjectArrayPropertyInfo ||
+          prop instanceof AbstractFObjectPropertyInfo ) {
+        return false;
+      }
+
+      Object value = prop.f(obj);
+      return value != null && (!(value instanceof String) || !((String) value).isEmpty());
+    })
+        .collect(Collectors.toList());
+  }
+
+  public void outputHeaders(StringBuilder out, FObject obj) {
+    List<PropertyInfo> props = getFilteredPropertyInfoList(obj);
+    Iterator i = props.iterator();
+
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      out.append(prop.getName());
+      if ( i.hasNext() )
+        out.append(",");
+    }
+    out.append("\n");
   }
 
   public String escape(String s) {
@@ -88,40 +129,14 @@ public class Outputter
   }
 
   protected void outputFObject(StringBuilder out, FObject obj) {
-    // get a list of filtered properties, filtering out network & storage transient properties
-    // also filter out null values and empty strings
-    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    props = props.stream().filter(prop -> {
-      // filter out network and storage transient values
-      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
-
-      // filter out unsupported types
-      if ( prop instanceof AbstractArrayPropertyInfo ||
-          prop instanceof AbstractFObjectArrayPropertyInfo ||
-          prop instanceof AbstractFObjectPropertyInfo ) {
-        return false;
-      }
-
-      Object value = prop.f(obj);
-      return value != null && (!(value instanceof String) || !((String) value).isEmpty());
-    })
-        .collect(Collectors.toList());
-
+    List<PropertyInfo> props = getFilteredPropertyInfoList(obj);
     Iterator i = props.iterator();
 
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-
-      Object value = prop.f(obj);
-      if ( value == null || ( value instanceof String && ((String) value).isEmpty()) )
-        continue;
-      prop.toCSV(this, out, value);
-      if ( i.hasNext() ) {
+      prop.toCSV(this, out, prop.f(obj));
+      if ( i.hasNext() )
         out.append(",");
-      }
     }
     out.append("\n");
   }
