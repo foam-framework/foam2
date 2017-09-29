@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AuditDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
   protected final Outputter outputter = new Outputter();
 
@@ -60,11 +60,10 @@ public class AuditDAO
   public FObject remove_(X x, FObject obj) {
     User          user     = (User) x.get("user");
     Logger        logger   = (Logger) x.get("logger");
-    StringBuilder sb       = new StringBuilder();
     Object        objectId = obj.getProperty("id");
 
-    outputter.output(sb, obj);
-    logger.info("REMOVE", objectId, user.getId(), sb);
+    outputter.output(obj);
+    logger.info("REMOVE", objectId, user.getId(), outputter.toString());
 
     return super.remove_(x, obj);
   }
