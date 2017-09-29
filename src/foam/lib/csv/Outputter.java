@@ -7,13 +7,19 @@
 package foam.lib.csv;
 
 import foam.core.*;
+import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-public class Outputter {
+public class Outputter
+    extends AbstractSink
+{
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
@@ -123,5 +129,16 @@ public class Outputter {
     } else if ( value instanceof Date ) {
       outputDate(out, (Date) value);
     }
+  }
+
+  protected StringBuilder data_ = sb.get();
+
+  public String getData() {
+    return data_.toString();
+  }
+
+  @Override
+  public void put(FObject obj, Detachable sub) {
+    outputFObject(data_, obj);
   }
 }
