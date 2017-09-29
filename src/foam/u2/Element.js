@@ -28,23 +28,6 @@ foam.ENUM({
   ]
 });
 
-
-foam.ENUM({
-  package: 'foam.u2',
-  name: 'Visibility',
-
-  documentation: 'View visibility mode combines with current ControllerModel to determine DisplayMode.',
-
-  values: [
-    { name: 'RW',       label: 'Read-Write' },
-    { name: 'FINAL',    label: 'Final',     documentation: 'FINAL views are editable only in CREATE ControllerMode.' },
-    { name: 'DISABLED', label: 'Disabled',  documentation: 'DISABLED views are visible but not editable.' },
-    { name: 'RO',       label: 'Read-Only'  },
-    { name: 'HIDDEN',   label: 'Hidden'     }
-  ]
-});
-
-
 foam.ENUM({
   package: 'foam.u2',
   name: 'DisplayMode',
@@ -944,7 +927,9 @@ foam.CLASS({
     },
 
     function myClass(opt_extra) {
-      var f = this.cls_.myClass_;
+      // Use hasOwnProperty so that class doesn't inherit CSS classname
+      // from ancestor FOAM class.
+      var f = this.cls_.hasOwnProperty('myClass_') && this.cls_.myClass_;
 
       if ( ! f ) {
         var base = foam.String.cssClassize(this.cls_.id).split(/ +/);

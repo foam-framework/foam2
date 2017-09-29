@@ -17,52 +17,17 @@
 
 foam.CLASS({
   package: 'foam.u2',
-  name: 'ActionView',
-  extends: 'foam.u2.UnstyledActionView',
+  name: 'UnstyledActionView',
+  extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({code: function() {/*
-      button^ {
-        -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
-        box-shadow: inset 0 1px 0 0 #ffffff;
-        background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
-        background: -moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
-        background-color: #ededed;
-        -moz-border-radius: 3px;
-        -webkit-border-radius: 3px;
-        border-radius: 3px;
-        border: 1px solid #dcdcdc;
-        display: inline-block;
-        color: #777777;
-        font-family: Arial;
-        font-size: 12px;
-        font-weight: bold;
-        margin: 2px;
-        padding: 4px 16px;
-        text-decoration: none;
-      }
+  documentation: function() {`
+    A button View for triggering Actions.
 
-      ^unavailable {
-        visibility: hidden;
-      }
-
-      ^:hover {
-        background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
-        background: -moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
-        background-color: #dfdfdf;
-      }
-
-      ^ img {
-        vertical-align: middle;
-      }
-
-      ^:disabled { filter: grayscale(80%); }
-
-      ^.material-icons {
-        cursor: pointer;
-      }
-    */}})
-  ],
+    Icon Fonts
+    If using icon-fonts a css stylesheet link to the fonts is required in index.html.
+    The default of foam.core.Action.js is 'Material Icons' supported by the following
+    link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
+  `},
 
   properties: [
     {
@@ -142,8 +107,8 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      e.stopPropagation();
       this.action && this.action.maybeCall(this.__subContext__, this.data);
+      e.stopPropagation();
     }
   ]
 });

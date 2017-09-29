@@ -6,25 +6,24 @@
 
 package foam.dao;
 
-import foam.core.ClassInfo;
-import foam.core.Detachable;
-import foam.core.FObject;
-import foam.core.X;
+import foam.core.*;
+import foam.lib.json.ExprParser;
 import foam.lib.json.JournalParser;
 import foam.lib.json.Outputter;
+import foam.lib.parse.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import java.io.*;
 
 public class JDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
   protected final File           file_;
   protected final Outputter      outputter_ = new Outputter();
   protected final BufferedWriter out_;
 
   public JDAO(ClassInfo classInfo, String filename)
-    throws IOException
+      throws IOException
   {
     this(new MapDAO().setOf(classInfo), filename);
   }
@@ -41,7 +40,7 @@ public class JDAO
   }
 
   protected void loadJournal()
-    throws IOException
+      throws IOException
   {
     JournalParser  journalParser = new JournalParser();
     BufferedReader br            = new BufferedReader(new FileReader(file_));
@@ -51,12 +50,14 @@ public class JDAO
 
       try {
         char operation = line.charAt(0);
+        // remove first two characters and last character
+        line = line.trim().substring(2, line.trim().length() - 1);
 
         switch ( operation ) {
           case 'p':
             FObject object = journalParser.parseObject(line);
             if ( object == null ) {
-              System.err.println("Journal Error, unable to parse: " + line);
+              System.err.println(getParsingErrorMessage(line));
             } else {
               getDelegate().put(object);
             }
@@ -65,7 +66,7 @@ public class JDAO
           case 'r':
             Object id = journalParser.parseObjectId(line);
             if ( id == null ) {
-              System.err.println("Journal Error, unable to parse: " + line);
+              System.err.println(getParsingErrorMessage(line));
             } else {
               getDelegate().remove(getDelegate().find(id));
             }
@@ -77,6 +78,24 @@ public class JDAO
     }
 
     br.close();
+  }
+
+  /**
+   * Gets the result of a failed parsing of a journal line
+   * @param line the line that was failed to be parse
+   * @return the error message
+   */
+  protected String getParsingErrorMessage(String line) {
+    Parser parser = new ExprParser();
+    PStream ps = new StringPStream();
+    ParserContext x = new ParserContextImpl();
+
+    ((StringPStream) ps).setString(line);
+    x.set("X", ( getX() == null ) ? new ProxyX() : getX());
+
+    ErrorReportingPStream eps = new ErrorReportingPStream(ps);
+    ps = eps.apply(parser, x);
+    return eps.getMessage();
   }
 
   /**

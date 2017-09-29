@@ -29,13 +29,8 @@ public class JournalParser
 
 
   // TODO(drish): do not generate a second copy of the journalLine
-  public FObject parseObject(String journalLine) {
-
-    // get the actual object
-    int objectIndex = journalLine.indexOf("{");
-    String object = journalLine.substring(objectIndex, journalLine.lastIndexOf("}") + 1);
-
-    return this.jsonParser.parseString(object);
+  public FObject parseObject(String line) {
+    return this.jsonParser.parseString(line);
   }
 
   public Object parseObjectId(String journalLine) {

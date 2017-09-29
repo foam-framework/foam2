@@ -81,6 +81,25 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'createInterpreter',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
+      javaReturns: 'Interpreter',
+      javaCode: `
+        Interpreter shell = new Interpreter();
+
+        try {
+          shell.set("currentScript", this);
+          shell.set("x", getX());
+        } catch (EvalError e) {}
+
+        return shell;
+      `
+    },
+    {
       name: 'runScript',
       args: [
         {
@@ -91,14 +110,12 @@ foam.CLASS({
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = new Interpreter();
+        Interpreter           shell = createInterpreter(x);
         PM                    pm    = new PM(this.getClass(), getId());
 
         // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
-          shell.set("currentScript", this);
           setOutput("");
-          shell.set("x", getX());
           shell.setOut(ps);
           shell.eval(getCode());
         } catch (EvalError e) {
