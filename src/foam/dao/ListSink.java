@@ -9,8 +9,8 @@ package foam.dao;
 import java.util.*;
 
 public class ListSink
-  extends    AbstractSink
-  implements foam.lib.json.OutputJSON
+    extends    AbstractSink
+    implements foam.lib.json.OutputJSON
 {
   protected ArrayList data_ = new ArrayList();
 
@@ -22,10 +22,10 @@ public class ListSink
     getData().add(obj);
   }
 
-  public void outputJSON(StringBuilder out, foam.lib.json.Outputter outputter) {
+  public void outputJSON(foam.lib.json.Outputter outputter) {
     Object[] data = getData().toArray();
-    out.append("{\"class\":\"foam.dao.ArraySink\",\"array\":");
-    outputter.output(out, data);
-    out.append("}");
+    outputter.output("{\"class\":\"foam.dao.ArraySink\",\"array\":");
+    outputter.output(data);
+    outputter.output("}");
   }
 }
