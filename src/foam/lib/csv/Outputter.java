@@ -35,6 +35,7 @@ public class Outputter
   protected PrintWriter writer_;
   protected OutputterMode mode_;
   protected boolean outputHeaders_;
+  protected boolean isHeadersOutput_ = false;
 
   public StringWriter createStringWriter() {
     return new StringWriter();
@@ -172,6 +173,10 @@ public class Outputter
 
   @Override
   public void put(FObject obj, Detachable sub) {
-//    outputFObject(data_, obj);
+    if ( ! isHeadersOutput_ ) {
+      outputHeaders(obj);
+      isHeadersOutput_ = true;
+    }
+    outputFObject(obj);
   }
 }
