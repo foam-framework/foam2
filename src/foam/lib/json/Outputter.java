@@ -135,6 +135,24 @@ public class Outputter
     p.toJSON(this, p.get(o));
   }
 
+  public void outputMap(Object... values) {
+    if ( values.length % 2 != 0 ) {
+      throw new RuntimeException("Need even number of arguments for outputMap");
+    }
+
+    writer_.append("{");
+    int i = 0;
+    while(i < values.length ) {
+      writer_.append(beforeKey_());
+      writer_.append(values[i++].toString());
+      writer_.append(afterKey_());
+      writer_.append(":");
+      output(values[i++]);
+      if ( i < values.length ) writer_.append(",");
+    }
+    writer_.append("}");
+  }
+
   public void output(Object value) {
     if ( value instanceof OutputJSON ) {
       ((OutputJSON) value).outputJSON(this);
