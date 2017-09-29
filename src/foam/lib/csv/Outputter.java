@@ -91,8 +91,9 @@ public class Outputter
       if ( mode == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
       // filter out unsupported types
-      if ( prop instanceof AbstractArrayPropertyInfo || prop instanceof AbstractFObjectArrayPropertyInfo ||
-          prop instanceof AbstractFObjectPropertyInfo || prop instanceof AbstractObjectPropertyInfo ) {
+      if ( prop instanceof AbstractArrayPropertyInfo ||
+          prop instanceof AbstractFObjectArrayPropertyInfo ||
+          prop instanceof AbstractFObjectPropertyInfo ) {
         return false;
       }
 
