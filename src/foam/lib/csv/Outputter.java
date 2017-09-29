@@ -36,11 +36,7 @@ public class Outputter
   protected OutputterMode mode_;
   protected boolean outputHeaders_;
   protected boolean isHeadersOutput_ = false;
-
-  public StringWriter createStringWriter() {
-    return new StringWriter();
-  }
-
+  
   public Outputter() {
     this(OutputterMode.FULL);
   }
