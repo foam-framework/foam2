@@ -19,16 +19,15 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ResetSink',
   extends: 'foam.dao.ProxySink',
-  implements: [ 'foam.core.Serializable' ],
   methods: [
     {
       name: 'put',
-      code: function(obj, sub) { this.reset(s); },
+      code: function(obj, sub) { this.reset(sub); },
       javaCode: 'reset(sub);'
     },
     {
       name: 'remove',
-      code: function(obj, sub) { this.reset(s); },
+      code: function(obj, sub) { this.reset(sub); },
       javaCode: 'reset(sub);'
     }
   ]
@@ -38,7 +37,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'MergedResetSink',
   extends: 'foam.dao.ResetSink',
-  implements: [ 'foam.core.Serializable' ],
   methods: [
     {
       name: 'reset',
