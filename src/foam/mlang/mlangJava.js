@@ -1125,6 +1125,11 @@ group.put(obj, sub);`
   java.util.Collections.sort(getGroupKeys());
 }
 return getGroupKeys();`
+    },
+    {
+      name: 'toString',
+      javaReturns: 'String',
+      javaCode: 'return this.getGroups().toString();'
     }
   ]
 });
