@@ -102,7 +102,7 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
-            body: 'return compareValues(key, f(o));'
+            body: 'return compare(cast(key), get_(o));'
           },
           {
             name: 'jsonParser',
