@@ -1272,7 +1272,6 @@ foam.CLASS({
       factory: function() { return {}; }
     },
     {
-      class: 'StringArray',
       name: 'groupKeys',
       factory: function() { return []; }
     },
