@@ -378,13 +378,13 @@ struct FOAM_utils {
     return false
   }
   static var nextId = 1
+  static var nextIdSem = DispatchSemaphore(value: 1)
   static func next$UID() -> Int {
-    var id: Int?
-    DispatchQueue(label: "FObjectUIDLock", attributes: []).sync {
-      id = nextId
-      nextId += 1
-    }
-    return id!
+    nextIdSem.wait()
+    let id = nextId
+    nextId += 1
+    nextIdSem.signal()
+    return id
   }
 }
 
