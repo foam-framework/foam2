@@ -1127,6 +1127,15 @@ group.put(obj, sub);`
 return getGroupKeys();`
     },
     {
+      name: 'clone',
+      javaReturns: 'foam.mlang.sink.GroupBy',
+      javaCode:
+`GroupBy clone = new GroupBy();
+clone.setArg1(this.getArg1());
+clone.setArg2(this.getArg2());
+return clone;`
+    },
+    {
       name: 'toString',
       javaReturns: 'String',
       javaCode: 'return this.getGroups().toString();'
