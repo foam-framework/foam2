@@ -824,8 +824,9 @@ foam.CLASS({
   refines: 'foam.core.List',
 
   properties: [
-    ['javaType', 'java.util.List'],
-    ['javaJSONParser', 'foam.lib.json.ListParser']
+    [ 'javaType',       'java.util.List' ],
+    [ 'javaFactory',    'return new java.util.ArrayList();' ],
+    [ 'javaJSONParser', 'foam.lib.json.ListParser' ]
   ]
 });
 
