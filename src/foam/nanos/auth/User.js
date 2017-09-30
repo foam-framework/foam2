@@ -59,18 +59,16 @@ foam.CLASS({
       name: 'department'
     },
     {
-      class: 'String',
-      // class: 'Email',
+      class: 'EMail',
       name: 'email'
     },
     {
-      class: 'String',
-      // class: 'Phone',
+      class: 'PhoneNumber',
       name: 'phone'
     },
     {
       class: 'String',
-      // class: 'Phone',
+      class: 'PhoneNumber',
       name: 'mobile'
     },
     {
