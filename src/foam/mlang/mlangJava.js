@@ -1043,21 +1043,6 @@ return false;`
 foam.CLASS({
   refines: 'foam.mlang.sink.GroupBy',
 
-  properties: [
-    {
-      class: 'Map',
-      name: 'groups',
-      javaType: 'java.util.Map',
-      javaFactory: `return new java.util.HashMap<Object, foam.dao.Sink>();`
-    },
-    {
-      class: 'List',
-      name: 'groupKeys',
-      javaType: 'java.util.List',
-      javaFactory: `return new java.util.ArrayList();`
-    }
-  ],
-
   methods: [
     {
       name: 'put',
