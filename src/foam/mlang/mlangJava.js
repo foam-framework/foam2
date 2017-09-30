@@ -1065,7 +1065,7 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
     putInGroup_(sub, key, obj);
   }
 } else {
-  putInGroup_(sub, "", obj);
+  putInGroup_(sub, key, obj);
 }`
     },
     {
