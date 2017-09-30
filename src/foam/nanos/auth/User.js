@@ -20,6 +20,8 @@ foam.CLASS({
     'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
   ],
 
+  searchColumns: [ ],
+
   properties: [
     {
       class: 'Long',
