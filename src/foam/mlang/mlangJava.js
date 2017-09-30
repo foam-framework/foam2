@@ -1043,6 +1043,21 @@ return false;`
 foam.CLASS({
   refines: 'foam.mlang.sink.GroupBy',
 
+  properties: [
+    {
+      class: 'Map',
+      name: 'groups',
+      javaType: 'java.util.Map',
+      javaFactory: `return new java.util.HashMap<Object, foam.dao.Sink>();`
+    },
+    {
+      class: 'List',
+      name: 'groupKeys',
+      javaType: 'java.util.List',
+      javaFactory: `return new java.util.ArrayList();`
+    }
+  ],
+
   methods: [
     {
       name: 'put',
@@ -1085,11 +1100,18 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
           javaType: 'foam.core.FObject'
         }
       ],
-      javaCode: 'return;'
+      javaCode:
+`foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
+if ( group == null ) {
+  group = getArg2();
+  getGroups().put(key, group);
+  getGroupKeys().add(key);
+}
+group.put(obj, sub);`
     },
     {
       name: 'sortedKeys',
-      javaReturns: 'String[]',
+      javaReturns: 'java.util.List',
       args: [
         {
           name: 'comparator',
@@ -1098,9 +1120,9 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
       ],
       javaCode:
 `if ( comparator != null ) {
-  java.util.Arrays.sort(getGroupKeys(), comparator);
+  java.util.Collections.sort(getGroupKeys(), comparator);
 } else {
-  java.util.Arrays.sort(getGroupKeys());
+  java.util.Collections.sort(getGroupKeys());
 }
 return getGroupKeys();`
     }
