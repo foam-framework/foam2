@@ -1276,8 +1276,7 @@ foam.CLASS({
     {
       class: 'List',
       name: 'groupKeys',
-      factory: function() { return []; },
-      javaFactory: `return new java.util.ArrayList();`
+      factory: function() { return []; }
     },
     {
       class: 'Boolean',
