@@ -73,6 +73,7 @@ public class Context {
   public func registerClass(cls: ClassInfo) {
     classIdMap[cls.id] = cls
     classNameMap[NSStringFromClass(cls.cls)] = cls.id
+    _ = cls.ownAxioms
   }
   public func lookup(_ id: String) -> ClassInfo? {
     return classIdMap[id] ?? parent?.lookup(id)
