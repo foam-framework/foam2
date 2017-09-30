@@ -41,6 +41,20 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'swiftSynchronized',
+    },
+    {
+      class: 'String',
+      name: 'swiftSynchronizedSemaphoreName',
+      expression: function(swiftName) { return swiftName + '_semaphore_' },
+    },
+    {
+      class: 'String',
+      name: 'swiftSynchronizedMethodName',
+      expression: function(swiftName) { return swiftName + '_synchronized_' },
+    },
+    {
+      class: 'Boolean',
       name: 'swiftThrows',
     },
     {
@@ -143,16 +157,48 @@ foam.CLASS({
         type: 'MethodInfo',
         initializer: this.swiftMethodInfoInit(),
       }));
-      cls.method(this.Method.create({
-        name: this.swiftName,
-        body: this.swiftCode,
-        throws: this.swiftThrows,
-        returnType: this.swiftReturns,
-        args: this.swiftArgs,
-        visibility: this.swiftVisibility,
-        override: this.swiftOverride,
-        annotations: this.swiftAnnotations,
-      }));
+      var code = this.swiftCode;
+      if ( this.swiftSynchronized ) {
+        var sem = this.swiftSynchronizedSemaphoreName
+        cls.fields.push(this.Field.create({
+          visibility: 'private',
+          final: true,
+          name: sem,
+          type: 'DispatchSemaphore',
+          defaultValue: 'DispatchSemaphore(value: 1)',
+        }));
+        cls.method(this.Method.create({
+          name: this.swiftSynchronizedMethodName,
+          body: this.swiftCode,
+          throws: this.swiftThrows,
+          returnType: this.swiftReturns,
+          args: this.swiftArgs,
+          visibility: this.swiftVisibility,
+          override: this.swiftOverride,
+          annotations: this.swiftAnnotations,
+        }));
+        cls.method(this.Method.create({
+          name: this.swiftName,
+          body: this.syncronizedCode(),
+          throws: this.swiftThrows,
+          returnType: this.swiftReturns,
+          args: this.swiftArgs,
+          visibility: this.swiftVisibility,
+          override: this.swiftOverride,
+          annotations: this.swiftAnnotations,
+        }));
+      } else {
+        cls.method(this.Method.create({
+          name: this.swiftName,
+          body: this.swiftCode,
+          throws: this.swiftThrows,
+          returnType: this.swiftReturns,
+          args: this.swiftArgs,
+          visibility: this.swiftVisibility,
+          override: this.swiftOverride,
+          annotations: this.swiftAnnotations,
+        }));
+      }
     },
   ],
   templates: [
@@ -179,6 +225,18 @@ return ConstantSlot([
         }).join(', ')%>)
   }
 ])
+      */},
+    },
+    {
+      name: 'syncronizedCode',
+      args: [],
+      template: function() {/*
+<%=this.swiftSynchronizedSemaphoreName%>.wait()
+<%if (this.swiftReturns) {%>let ret = <%}%><%=
+    this.swiftSynchronizedMethodName%>(<%=
+        this.swiftArgs.map(function(a) { return a.localName }).join(',')%>)
+<%=this.swiftSynchronizedSemaphoreName%>.signal()
+<%if (this.swiftReturns) {%>return ret<%}%>
       */},
     },
     {

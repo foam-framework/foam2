@@ -101,6 +101,7 @@ return ((Registration)registration).getExportBox();
 
         return this.registry_[name].exportBox;
       },
+      swiftSynchronized: true,
       swiftCode: function() {/*
 let name: String = name ?? String(FOAM_utils.next$UID())
 
