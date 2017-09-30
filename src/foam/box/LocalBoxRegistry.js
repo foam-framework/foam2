@@ -151,6 +151,7 @@ return exportBox;
 
         delete this.registry_[name];
       },
+      swiftSynchronized: true,
       swiftCode: function() {/*
 if let name = name as? String {
   registry_.removeValue(forKey: name)
