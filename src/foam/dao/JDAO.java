@@ -57,6 +57,7 @@ public class JDAO
           case 'p':
             FObject object = journalParser.parseObject(line);
             if ( object == null ) {
+              System.err.println("file"+file_+", line "+ line);
               System.err.println(getParsingErrorMessage(line));
             } else {
               getDelegate().put(object);
@@ -66,6 +67,7 @@ public class JDAO
           case 'r':
             Object id = journalParser.parseObjectId(line);
             if ( id == null ) {
+              System.err.println("file"+file_+", line "+ line);
               System.err.println(getParsingErrorMessage(line));
             } else {
               getDelegate().remove(getDelegate().find(id));
@@ -92,7 +94,7 @@ public class JDAO
 
     ((StringPStream) ps).setString(line);
     x.set("X", ( getX() == null ) ? new ProxyX() : getX());
-
+    
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
     ps = eps.apply(parser, x);
     return eps.getMessage();
