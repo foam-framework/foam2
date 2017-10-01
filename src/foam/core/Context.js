@@ -152,21 +152,24 @@
 
           if ( ! foam.core.Slot.isInstance(v) ) {
             Object.defineProperty(sub, this.toSlotName_(key), {
-              value: foam.core.ConstantSlot.create({ value: v })
+              value: foam.core.ConstantSlot.create({ value: v }),
+              enumerable: true
             });
 
             Object.defineProperty(sub, key, {
-              value: v
+              value: v,
+              enumerable: true
             });
           } else {
             Object.defineProperty(sub, this.toSlotName_(key), {
-              value: v
+              value: v,
+              enumerable: true
             });
 
             (function(v) {
               Object.defineProperty(sub, key, {
                 get: function() { return v.get(); },
-                enumerable: false
+                enumerable: true
               });
             })(v);
           }
