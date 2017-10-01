@@ -388,6 +388,17 @@ foam.CLASS({
     },
     {
       name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
       javaCode: 'getDelegate().put(f(obj), sub);'
     }
   ]
@@ -1024,6 +1035,95 @@ return false;`
         javaType: 'java.sql.PreparedStatement'
       }],
       javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.GroupBy',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode:
+`Object arg1 = getArg1();
+if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
+  Object[] keys = (Object[]) arg1;
+  for ( Object key : keys ) {
+    putInGroup_(sub, key, obj);
+  }
+} else {
+  putInGroup_(sub, arg1, obj);
+}`
+    },
+    {
+      name: 'putInGroup_',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        },
+        {
+          name: 'key',
+          javaType: 'Object'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode:
+`foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
+if ( group == null ) {
+  group = getArg2();
+  getGroups().put(key, group);
+  getGroupKeys().add(key);
+}
+group.put(obj, sub);`
+    },
+    {
+      name: 'sortedKeys',
+      javaReturns: 'java.util.List',
+      args: [
+        {
+          name: 'comparator',
+          javaType: 'foam.mlang.order.Comparator'
+        }
+      ],
+      javaCode:
+`if ( comparator != null ) {
+  java.util.Collections.sort(getGroupKeys(), comparator);
+} else {
+  java.util.Collections.sort(getGroupKeys());
+}
+return getGroupKeys();`
+    },
+    {
+      name: 'clone',
+      javaReturns: 'foam.mlang.sink.GroupBy',
+      javaCode:
+`GroupBy clone = new GroupBy();
+clone.setArg1(this.getArg1());
+clone.setArg2(this.getArg2());
+return clone;`
+    },
+    {
+      name: 'toString',
+      javaReturns: 'String',
+      javaCode: 'return this.getGroups().toString();'
     }
   ]
 });
