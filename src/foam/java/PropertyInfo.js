@@ -51,6 +51,7 @@ foam.CLASS({
     'propType',
     'propRequired',
     'jsonParser',
+    'csvParser',
     {
       name: 'methods',
       factory: function() {
@@ -101,13 +102,23 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
-            body: 'return compareValues(key, f(o));'
+            body: 'return compare(cast(key), get_(o));'
           },
           {
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
-            body: 'return new ' + this.jsonParser + '();'
+            body: ( this.jsonParser ) ?
+              'return new ' + this.jsonParser + '();' :
+              'return null;'
+          },
+          {
+            name: 'csvParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: ( this.csvParser ) ?
+              'return new ' + this.csvParser + '();' :
+              'return null;'
           },
           {
             name: 'getNetworkTransient',

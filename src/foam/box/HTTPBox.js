@@ -76,13 +76,7 @@ foam.CLASS({
       name: 'outputter',
       generateJava: false,
       factory: function() {
-        return this.JSONOutputter.create({
-          pretty:               false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues:  false,
-          strict:               true,
-          propertyPredicate:    function(o, p) { return ! p.networkTransient; }
-        });
+        return this.JSONOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ],
@@ -94,11 +88,11 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
 protected class Outputter extends foam.lib.json.Outputter {
-  protected void outputFObject(StringBuilder out, foam.core.FObject o) {
+  protected void outputFObject(foam.core.FObject o) {
     if ( o == getMe() ) {
       o = getX().create(foam.box.HTTPReplyBox.class);
     }
-    super.outputFObject(out, o);
+    super.outputFObject(o);
   }
 }
 
