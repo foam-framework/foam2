@@ -1087,12 +1087,12 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
       ],
       javaCode:
 `foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
-if ( group == null ) {
-  group = getArg2();
-  getGroups().put(key, group);
-  getGroupKeys().add(key);
-}
-group.put(obj, sub);`
+ if ( group == null ) {
+   group = (foam.dao.Sink) ((foam.core.FObject) getArg2()).fclone();
+   getGroups().put(key, group);
+   getGroupKeys().add(key);
+ }
+ group.put(obj, sub);`
     },
     {
       name: 'sortedKeys',
