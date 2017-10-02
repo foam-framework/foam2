@@ -1058,14 +1058,14 @@ foam.CLASS({
         }
       ],
       javaCode:
-`Object arg1 = getArg1();
+`Object arg1 = getArg1().f(obj);
 if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
   Object[] keys = (Object[]) arg1;
   for ( Object key : keys ) {
-    putInGroup_(sub, (foam.mlang.Expr) key, obj);
+    putInGroup_(sub, key, obj);
   }
 } else {
-  putInGroup_(sub, (foam.mlang.Expr) arg1, obj);
+  putInGroup_(sub, arg1, obj);
 }`
     },
     {
@@ -1078,7 +1078,7 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
         },
         {
           name: 'key',
-          javaType: 'foam.mlang.Expr'
+          javaType: 'Object'
         },
         {
           name: 'obj',
@@ -1089,8 +1089,8 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
 `foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
 if ( group == null ) {
   group = getArg2();
-  getGroups().put(key.f(obj), group);
-  getGroupKeys().add(key.f(obj));
+  getGroups().put(key, group);
+  getGroupKeys().add(key);
 }
 group.put(obj, sub);`
     },
