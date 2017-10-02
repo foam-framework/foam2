@@ -160,6 +160,8 @@ public class Outputter
       outputString((String) value);
     } else if ( value instanceof FObject ) {
       outputFObject((FObject) value);
+    } else if ( value instanceof PropertyInfo) {
+      outputPropertyInfo((PropertyInfo) value);
     } else if ( value instanceof Number ) {
       outputNumber((Number) value);
     } else if ( isArray(value) ) {
@@ -215,15 +217,24 @@ public class Outputter
     writer_.append("}");
   }
 
+  protected void outputPropertyInfo(PropertyInfo prop) {
+    writer_.append("{");
+    outputString("class");
+    writer_.append(":");
+    outputString("__Property__");
+    writer_.append(",");
+    outputString("forClass_");
+    writer_.append(":");
+    outputString(prop.getClassInfo().getId() + "." + prop.getName());
+    writer_.append("}");
+  }
+
   protected String beforeKey_() {
     return "\"";
   }
 
   protected String afterKey_() {
     return "\"";
-  }
-
-  protected void outputObject(Object o) {
   }
 
   public FObject parse(String str) {
