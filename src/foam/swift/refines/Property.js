@@ -154,7 +154,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftJsonParser',
-      value: 'AnyParser()',
+      value: 'Context.GLOBAL.create(AnyParser.self)!',
     },
     {
       class: 'Boolean',
@@ -193,13 +193,14 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         type: 'PropertyInfo',
         initializer: this.swiftPropertyInfoInit(),
       }));
+      if (this.swiftExpression) {
+        cls.fields.push(this.Field.create({
+          visibility: 'private',
+          name: this.swiftExpressionSubscriptionName,
+          type: '[Subscription]?',
+        }));
+      }
       if ( !isOverride ) {
-        if (this.swiftExpression) {
-          cls.fields.push(this.Field.create({
-            name: this.swiftExpressionSubscriptionName,
-            type: '[Subscription]?',
-          }));
-        }
         cls.fields.push(this.Field.create({
           name: this.swiftValueName,
           type: this.swiftValueType,

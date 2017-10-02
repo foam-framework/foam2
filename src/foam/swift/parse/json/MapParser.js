@@ -19,32 +19,44 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'MapParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  requires: [
+    'foam.swift.parse.json.AnyKeyParser',
+    'foam.swift.parse.json.Whitespace',
+    'foam.swift.parse.parser.Literal',
+    'foam.swift.parse.parser.Repeat',
+    'foam.swift.parse.parser.Seq0',
+    'foam.swift.parse.parser.Seq1',
+    'foam.swift.parse.parser.Seq2',
+  ],
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   properties: [
     {
       name: 'delegate',
       swiftFactory: function() {/*
 return 
-  Seq1(["index": 2, "parsers": [
-    Whitespace(),
-    Literal(["string": "{"]),
-    Repeat([
+  Seq1_create(["index": 2, "parsers": [
+    Whitespace_create(),
+    Literal_create(["string": "{"]),
+    Repeat_create([
       "delegate":
-        Seq2(["index1": 1, "index2": 5, "parsers": [
-          Whitespace(),
-          AnyKeyParser(),
-          Whitespace(),
-          Literal(["string": ":"]),
-          Whitespace(),
-          AnyParser(),
+        Seq2_create(["index1": 1, "index2": 5, "parsers": [
+          Whitespace_create(),
+          AnyKeyParser_create(),
+          Whitespace_create(),
+          Literal_create(["string": ":"]),
+          Whitespace_create(),
+          __context__.create(AnyParser.self)!,
         ]]),
       "delim":
-        Seq0(["parsers": [
-          Whitespace(),
-          Literal(["string": ","]),
+        Seq0_create(["parsers": [
+          Whitespace_create(),
+          Literal_create(["string": ","]),
         ]])
     ]),
-    Whitespace(),
-    Literal(["string": "}"]),
+    Whitespace_create(),
+    Literal_create(["string": "}"]),
   ]])
       */},
     },

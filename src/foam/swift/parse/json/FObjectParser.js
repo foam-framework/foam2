@@ -20,25 +20,27 @@ foam.CLASS({
   name: 'FObjectParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
   requires: [
-    'foam.swift.parse.json.FObjectParser_',
     'foam.swift.parse.StringPStream',
+    'foam.swift.parse.json.FObjectParser_',
+    'foam.swift.parse.json.Whitespace',
+    'foam.swift.parse.parser.Seq1',
+    'foam.swift.parse.parser.Literal',
+  ],
+  axioms: [
+    foam.pattern.Singleton.create()
   ],
   properties: [
-    {
-      swiftType: 'Any!',
-      name: 'defaultClass',
-    },
     {
       name: 'delegate',
       swiftFactory: function() {/*
 return
-  Seq1(["index": 3, "parsers": [
-    Whitespace(),
-    Literal(["string": "{"]),
-    Whitespace(),
-    FObjectParser_(["defaultClass": self.defaultClass]),
-    Whitespace(),
-    Literal(["string": "}"]),
+  Seq1_create(["index": 3, "parsers": [
+    Whitespace_create(),
+    Literal_create(["string": "{"]),
+    Whitespace_create(),
+    FObjectParser__create(),
+    Whitespace_create(),
+    Literal_create(["string": "}"]),
   ]])
       */},
     },

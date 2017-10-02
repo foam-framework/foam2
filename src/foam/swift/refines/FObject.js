@@ -69,6 +69,8 @@ foam.LIB({
 
       var multiton = this.getOwnAxiomsByClass(foam.pattern.Multiton);
       multiton = multiton.length ? multiton[0] : null;
+      var singleton = this.getOwnAxiomsByClass(foam.pattern.Singleton)
+      singleton = singleton.length ? singleton[0] : null;
 
       var classInfo = foam.swift.SwiftClass.create({
         visibility: 'private',
@@ -128,7 +130,7 @@ foam.LIB({
                 type: 'Context',
               }),
             ],
-            body: templates.classInfoCreate(this.model_.swiftName, multiton),
+            body: templates.classInfoCreate(this.model_.swiftName, multiton, singleton),
           }),
         ],
       });
@@ -144,6 +146,12 @@ foam.LIB({
           lazy: true,
           type: 'PropertyInfo',
           name: 'multitonProperty',
+        }));
+      } else if (singleton) {
+        classInfo.fields.push(foam.swift.Field.create({
+          visibility: 'private',
+          type: 'FObject?',
+          name: 'instance',
         }));
       }
       cls.classes.push(classInfo);
@@ -333,7 +341,7 @@ switch key {
       template: function() {/*
 switch key {
 <% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftName%>`
+  case "<%=p.swiftName%>": return self.`<%=p.swiftName%>`
 <% } %>
   default:
     return super.get(key: key)
@@ -383,7 +391,7 @@ switch key {
     },
     {
       name: 'classInfoCreate',
-      args: ['swiftName', 'multiton'],
+      args: ['swiftName', 'multiton', 'singleton',],
       template: function() {/*
 <% if ( multiton ) { %>
 if let key = args[multitonProperty.name] as? String,
@@ -396,6 +404,11 @@ if let key = args[multitonProperty.name] as? String,
   }
   return value
 }
+<% } else if ( singleton ){ %>
+if instance == nil {
+  instance = <%=swiftName%>(args, x)
+}
+return instance!
 <% } else { %>
 return <%=swiftName%>(args, x)
 <% } %>

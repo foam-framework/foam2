@@ -12,6 +12,7 @@ import XCTest
 
 class ParserTests: XCTestCase {
   let x = ParserContext()
+  let X = Context.GLOBAL
 
   override func setUp() {
     super.setUp()
@@ -167,7 +168,7 @@ class ParserTests: XCTestCase {
   }
 
   func testAnyKeyParser() {
-    let parser = AnyKeyParser()
+    let parser = X.create(AnyKeyParser.self)!
     XCTAssertEqual(parser.parse(StringPStream(["str": "KEY"]), x)!.value()! as! String, "KEY")
     XCTAssertEqual(parser.parse(StringPStream(["str": "\"KEY\": "]), x)!.value()! as! String, "KEY")
   }
