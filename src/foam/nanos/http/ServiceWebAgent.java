@@ -73,7 +73,7 @@ public class ServiceWebAgent
         resp.setStatus(resp.SC_BAD_REQUEST);
         System.err.println("SERVER!!!!!!");
         String message = getParsingError(x, buffer_.toString());
-        logger.error(message);
+        logger.error(message + ", input: " + buffer_.toString());
         out.print(message);
         out.flush();
         return;

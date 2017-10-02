@@ -58,8 +58,7 @@ public class JDAO
           case 'p':
             FObject object = journalParser.parseObject(line);
             if ( object == null ) {
-              System.err.println("file"+file_+", line "+ line);
-              System.err.println(getParsingErrorMessage(line));
+              System.err.println(getParsingErrorMessage(line) + ", source: " + line);
             } else {
               getDelegate().put(object);
             }
