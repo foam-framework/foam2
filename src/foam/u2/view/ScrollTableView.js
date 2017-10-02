@@ -40,16 +40,9 @@
     },
     {
       name: 'scrollView',
-      factory: function() {
-        var self = this;
-        return this.ScrollCView.create({
-          value$: this.skip$,
-          extent$: this.limit$,
-          height: 40*18+48, // TODO use window height.
-          width: 22,
-          handleSize: 40
-          // TODO clicking away from scroller should deselect it.
-        });
+      postSet: function() {
+        this.onDaoUpdate();
+        debugger;
       },
     },
     {
@@ -72,7 +65,17 @@
         on('wheel', this.onWheel).
         start('tr').
           start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
+          start('td').style({ 'vertical-align': 'top' }).
+            start(this.ScrollCView.create, {
+              value$: this.skip$,
+              extent$: this.limit$,
+              height: 40*18+48, // TODO use window height.
+              width: 22,
+              handleSize: 40
+              // TODO clicking away from scroller should deselect it.
+            }, this.scrollView$).
+            end().
+          end().
         end().
       end();
     }
@@ -96,6 +99,7 @@
       code: function() {
         var self = this;
         this.data$proxy.select(this.Count.create()).then(function(s) {
+          debugger;
           self.scrollView.size = s.value;
         })
       },
