@@ -178,7 +178,7 @@ public class Outputter
 
   @Override
   public void put(FObject obj, Detachable sub) {
-    if ( ! isHeadersOutput_ ) {
+    if ( outputHeaders_ && ! isHeadersOutput_ ) {
       outputHeaders(obj);
       isHeadersOutput_ = true;
     }
