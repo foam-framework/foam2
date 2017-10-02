@@ -149,7 +149,7 @@ foam.CLASS({
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
 
-          with ( { log: log, print: log } ) {
+          with ( { log: log, print: log, x: self.__context__ } ) {
             var ret = eval(this.code);
             console.log('ret: ', ret);
             // TODO: if Promise returned, then wait
