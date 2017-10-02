@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.swift.parse.parser',
   name: 'NotChars',
   implements: ['foam.swift.parse.parser.Parser'],
+  axioms: [
+    foam.pattern.Multiton.create({ property: 'chars' })
+  ],
   properties: [
     {
       swiftType: 'String',

@@ -27,23 +27,22 @@ foam.CLASS({
     'foam.swift.parse.parser.Optional',
     'foam.swift.parse.parser.Seq1',
   ],
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   properties: [
-    {
-      swiftType: 'ClassInfo?',
-      name: 'defaultClass',
-    },
     {
       name: 'delegate',
       swiftFactory: function() {/*
 return 
-  Seq1(["index": 4, "parsers": [
-    KeyParser(["key": "class"]),
-    Whitespace(),
-    Literal(["string": ":"]),
-    Whitespace(),
-    StringParser(),
-    Optional(["delegate": 
-      Literal(["string": ","]),
+  Seq1_create(["index": 4, "parsers": [
+    KeyParser_create(["key": "class"]),
+    Whitespace_create(),
+    Literal_create(["string": ":"]),
+    Whitespace_create(),
+    StringParser_create(),
+    Optional_create(["delegate": 
+      Literal_create(["string": ","]),
     ])
   ]])
       */},
@@ -54,17 +53,11 @@ return
       name: 'parse',
       swiftCode: function() {/*
 var ps: PStream? = ps
-let ps1 = delegate.parse(ps!, x)
-
-guard let c: ClassInfo = ps1 != nil ?
-    __subContext__.lookup(ps1!.value() as! String) :
-    __subContext__.lookup("defaultClass") ?? defaultClass else {
+guard let ps1 = delegate.parse(ps!, x),
+      let c: ClassInfo = __subContext__.lookup(ps1.value() as! String) else {
   return nil
 }
-
-if ps1 != nil {
- ps = ps1
-}
+ps = ps1
 
 
 let subx = x.sub()

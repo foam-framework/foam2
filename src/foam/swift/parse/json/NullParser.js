@@ -19,10 +19,16 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'NullParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  requires: [
+    'foam.swift.parse.parser.Literal',
+  ],
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   properties: [
   {
     name: 'delegate',
-    swiftFactory: 'return Literal(["string": "null", "value": nil])',
+    swiftFactory: 'return Literal_create(["string": "null", "value": nil])',
   },
   ],
 });

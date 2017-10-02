@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.swift.parse.parser',
   name: 'AnyChar',
   implements: ['foam.swift.parse.parser.Parser'],
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   methods: [
     {
       name: 'parse',
