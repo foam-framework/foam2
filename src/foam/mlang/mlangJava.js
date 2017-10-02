@@ -1058,7 +1058,7 @@ foam.CLASS({
         }
       ],
       javaCode:
-`Object arg1 = getArg1();
+`Object arg1 = getArg1().f(obj);
 if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
   Object[] keys = (Object[]) arg1;
   for ( Object key : keys ) {
