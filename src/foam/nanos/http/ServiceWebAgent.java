@@ -72,7 +72,7 @@ public class ServiceWebAgent
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
         String message = getParsingError(x, buffer_.toString());
-        logger.error(message);
+        logger.error(message + ", input: " + buffer_.toString());
         out.print(message);
         out.flush();
         return;
