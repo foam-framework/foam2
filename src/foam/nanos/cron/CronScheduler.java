@@ -32,13 +32,20 @@ public class CronScheduler
    * @return Date of the minimum scheduled cron job
    */
   private Date getMinScheduledTime() {
-    Min min = (Min) MLang.MIN(Cron.SCHEDULED_TIME);
-    cronDAO_.select(min);
-    return ((Cron) min.getValue()).getScheduledTime();
+    Min min = (Min) cronDAO_.select(
+      MLang.MIN(Cron.SCHEDULED_TIME)
+    );
+
+    if ( min.getValue().equals(0) ) {
+      return null;
+    }
+
+    return (Date) min.getValue();
   }
 
   public void start() {
     cronDAO_ = (DAO) getX().get("cronDAO");
+
     new Thread(this).start();
   }
 
@@ -65,7 +72,10 @@ public class CronScheduler
         });
 
         Date minScheduledTime = getMinScheduledTime();
-        Thread.sleep(minScheduledTime.getTime() - now.getTime());
+
+        if ( minScheduledTime != null ) {
+          Thread.sleep(minScheduledTime.getTime() - now.getTime());
+        }
       }
     } catch (Throwable t) {
       logger.error(this.getClass(), t.getMessage());

@@ -167,6 +167,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'convertUnserializableToStubs',
+      value: false
+    },
+    {
+      class: 'Boolean',
       name: 'pretty',
       value: true,
       postSet: function(_, p) {
@@ -310,6 +315,33 @@ foam.CLASS({
       }
     },
 
+    function outputFObject(o, opt_cls) {
+      if ( o.outputJSON ) {
+        o.outputJSON(this);
+        return;
+      }
+
+      this.start('{');
+      var cls = this.getCls(opt_cls);
+      var outputClassName = this.outputClassNames && o.cls_ !== cls;
+      if ( outputClassName ) {
+        this.out(
+          this.maybeEscapeKey('class'),
+          ':',
+          this.postColonStr,
+          '"',
+          o.cls_.id,
+          '"');
+      }
+      var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+      var outputComma = outputClassName;
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        outputComma = this.outputProperty(o, ps[i], outputComma) ||
+          outputComma;
+      }
+      this.nl().end('}');
+    },
+
     function outputObjectKeyValue_(key, value, first) {
       if ( ! first ) this.out(',').nl().indent();
       this.out(this.maybeEscapeKey(key), ':').output(value);
@@ -348,32 +380,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
-        FObject: function(o, opt_cls) {
-          if ( o.outputJSON ) {
-            o.outputJSON(this);
-            return;
-          }
-
-          this.start('{');
-          var cls = this.getCls(opt_cls);
-          var outputClassName = this.outputClassNames && o.cls_ !== cls;
-          if ( outputClassName ) {
-            this.out(
-                this.maybeEscapeKey('class'),
-                ':',
-                this.postColonStr,
-                '"',
-                o.cls_.id,
-                '"');
-          }
-          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-          var outputComma = outputClassName;
-          for ( var i = 0 ; i < ps.length ; i++ ) {
-            outputComma = this.outputProperty(o, ps[i], outputComma) ||
-                outputComma;
-          }
-          this.nl().end('}');
-        },
+        FObject: function(o, opt_cls) { this.outputFObject(o, opt_cls); },
         Array: function(o, opt_cls) {
           this.start('[');
           var cls = this.getCls(opt_cls);
@@ -551,7 +558,9 @@ foam.LIB({
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
-      strict: false,
+      // TODO: Currently faster to use strict JSON and native JSON.parse
+      strict: true,
+      convertUnserializableToStubs: true,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 
