@@ -1271,11 +1271,12 @@ foam.CLASS({
       class: 'Map',
       name: 'groups',
       factory: function() { return {}; },
-      javaFactory: `return new java.util.HashMap<Object, foam.dao.Sink>();`
+      javaFactory: 'return new java.util.HashMap<Object, foam.dao.Sink>();'
     },
     {
       class: 'List',
       name: 'groupKeys',
+      javaFactory: 'return new java.util.ArrayList();',
       factory: function() { return []; }
     },
     {
