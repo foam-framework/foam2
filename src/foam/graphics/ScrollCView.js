@@ -116,7 +116,7 @@ foam.CLASS({
   methods: [
     function initCView() {
       this.canvas.pointer.touch.sub(this.onTouch);
-      this.mouseEvent$.sub(this.updateScrollFromEvent);
+      this.onDetach(this.mouseEvent$.sub(this.updateScrollFromEvent));
     },
 
     function yToValue(y) {
