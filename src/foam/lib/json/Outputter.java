@@ -109,7 +109,7 @@ public class Outputter
     while ( keys.hasNext() ) {
       Object key   = keys.next();
       Object value = map.get(key);
-      outputString(key.toString());
+      outputString(key == null ? "" : key.toString());
       writer_.append(":");
       output(value);
       if ( keys.hasNext() ) writer_.append(",");
