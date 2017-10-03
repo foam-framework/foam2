@@ -149,9 +149,15 @@ foam.CLASS({
         });
         regClass.methods.push(self.Method.create({
           name: 'registerClasses',
+          args: [
+            foam.swift.Argument.create({
+              localName: 'x',
+              type: 'Context',
+            })
+          ],
           static: true,
           body: classes.map(function(c) {
-            return 'Context.GLOBAL.registerClass(cls: '+c+'.classInfo())'
+            return 'x.registerClass(cls: '+c+'.classInfo())'
           }).join('\n')
         }));
         var fileName = self.outdir + sep + 'RegisterClasses.swift';
