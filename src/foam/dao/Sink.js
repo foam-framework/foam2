@@ -230,9 +230,14 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'QuickSink',
-
   extends: 'foam.dao.AbstractSink',
 
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
   properties: [
     {
       class: 'Function',
@@ -276,6 +281,13 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'AnonymousSink',
   implements: [ 'foam.dao.Sink' ],
+
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
 
   properties: [ 'sink' ],
 
@@ -568,6 +580,12 @@ foam.CLASS({
   name: 'FnSink',
   documentation: 'Converts all sink events to call to a singular function.' +
     '  Useful for subscribing a listener method to a DAO',
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
   properties: [
     'fn'
   ],

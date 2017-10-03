@@ -96,19 +96,17 @@ foam.CLASS({
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = new Interpreter();
+        Interpreter           shell = createInterpreter(x);
         PM                    pm    = new PM(this.getClass(), getId());
 
         try {
-          shell.set("currentTest", this);
           setPassed(0);
           setFailed(0);
           setOutput("");
-          shell.set("x", getX());
           shell.setOut(ps);
 
           // creates the testing method
-          shell.eval("test(boolean exp, String message) { if ( exp ) { currentTest.setPassed(currentTest.getPassed()+1); } else { currentTest.setFailed(currentTest.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
+          shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
           runTest();
         } catch (EvalError e) {

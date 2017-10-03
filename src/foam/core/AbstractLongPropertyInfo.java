@@ -15,10 +15,6 @@ public abstract class AbstractLongPropertyInfo
     return java.lang.Long.compare(o1, o2);
   }
 
-  public foam.lib.parse.Parser jsonParser() {
-    return new foam.lib.json.LongParser();
-  }
-
   @Override
   public void setFromString(Object obj, String value) {
     this.set(obj, Long.valueOf(value));

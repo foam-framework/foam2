@@ -22,10 +22,6 @@ public class TracingPStream
   protected PrintWriter writer;
   protected TracingPStream tail_ = null;
 
-  public TracingPStream() {
-    this(null);
-  }
-
   public TracingPStream(PStream delegate) {
     this(delegate, new PrintWriter(System.out), 0, 0);
   }
