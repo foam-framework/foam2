@@ -292,6 +292,9 @@ foam.CLASS({
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
         return false;
 
+      if ( foam.Array.isInstance(v) && v.length == 0 )
+        return false;
+
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
