@@ -9,7 +9,11 @@ package foam.nanos.http;
 import foam.box.*;
 import foam.core.*;
 import foam.core.FObject;
+import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
+import foam.lib.parse.*;
+import foam.nanos.logger.Logger;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -21,7 +25,7 @@ import javax.servlet.ServletException;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-  implements WebAgent
+    implements WebAgent
 {
   protected Object service_;
   protected Box    skeleton_;
@@ -59,23 +63,24 @@ public class ServiceWebAgent
       Reader              reader         = req.getReader();
       int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
+      Logger              logger         = (Logger) x.get("logger");
 
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
       FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
-
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        System.err.println("Failed to parse request");
-        out.print("Failed to parse request: " + buffer_.toString());
+        String message = getParsingError(x, buffer_.toString());
+        logger.error(message + ", input: " + buffer_.toString());
+        out.print(message);
         out.flush();
         return;
       }
 
       if ( ! ( result instanceof foam.box.Message ) ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        System.err.println("Expected instance of foam.box.Message");
+        logger.error("Expected instance of foam.box.Message");
         out.print("Expected instance of foam.box.Message");
         out.flush();
         return;
@@ -90,6 +95,24 @@ public class ServiceWebAgent
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
+  }
+
+  /**
+   * Gets the result of a failing parsing of a buffer
+   * @param buffer the buffer that failed to be parsed
+   * @return the error message
+   */
+  protected String getParsingError(X x, String buffer) {
+    Parser parser = new ExprParser();
+    PStream ps = new StringPStream();
+    ParserContext psx = new ParserContextImpl();
+
+    ((StringPStream) ps).setString(buffer);
+    psx.set("X", ( x == null ) ? new ProxyX() : x);
+
+    ErrorReportingPStream eps = new ErrorReportingPStream(ps);
+    ps = eps.apply(parser, psx);
+    return eps.getMessage();
   }
 
 /*

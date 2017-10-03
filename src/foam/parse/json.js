@@ -101,6 +101,7 @@ foam.CLASS({
 
       return ps.tail.setValue(str);
     },
+
     function isHexDigitCharCode_(charCode) {
       return ( ( charCode >= this.CHAR_CODE_0 &&
                  charCode <= this.CHAR_CODE_9 ) ||
@@ -112,10 +113,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.parse.json',
   name: 'Parsers',
   extends: 'foam.parse.Parsers',
+
   methods: [
     function string() {
       return foam.parse.json.String.create();

@@ -114,6 +114,10 @@ foam.CLASS({
       swiftCode: 'delegate.put(obj, self)',
     },
 
+    function outputJSON(outputter) {
+      outputter.output(this.delegate);
+    },
+
     {
       name: 'remove',
       code: function remove(obj, s) {
