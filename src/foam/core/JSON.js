@@ -408,6 +408,10 @@ foam.CLASS({
     },
 
     function stringify(o, opt_cls) {
+      // Focibly set this.buf_ to empty string.
+      // It can be non-empty if a previous serialized threw an exception and didn't complete.
+      this.buf_ = "";
+
       this.output(o, opt_cls);
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
