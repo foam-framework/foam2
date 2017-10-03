@@ -65,7 +65,11 @@ public protocol ActionInfo: MethodInfo {
 }
 
 public class Context {
-  public static let GLOBAL = Context()
+  public static let GLOBAL: Context = {
+    let x = Context()
+    FOAM_utils.registerClasses(x)
+    return x
+  }()
   var parent: Context?
 
   private lazy var classIdMap: [String:ClassInfo] = [:]
