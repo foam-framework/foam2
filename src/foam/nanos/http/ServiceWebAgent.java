@@ -13,7 +13,6 @@ import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -93,6 +92,7 @@ public class ServiceWebAgent
       foam.box.Message msg = (foam.box.Message) result;
       skeleton_.send(msg);
     } catch (Throwable t) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     }
   }
