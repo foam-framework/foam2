@@ -39,17 +39,8 @@
       },
     },
     {
-      name: 'scrollView',
-      postSet: function() {
-        this.onDaoUpdate();
-        debugger;
-      },
-    },
-    {
-      name: 'tableView',
-      factory: function() {
-        return this.TableView.create({data$: this.scrolledDao$});
-      },
+      class: 'Int',
+      name: 'daoCount',
     },
   ],
 
@@ -64,17 +55,21 @@
       this.start('table').
         on('wheel', this.onWheel).
         start('tr').
-          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
+          start('td').
+            style({ 'vertical-align': 'top' }).
+            start(this.TableView, {data$: this.scrolledDao$}).
+            end().
+          end().
           start('td').style({ 'vertical-align': 'top' }).
-            start(this.ScrollCView.create, {
+            add(this.ScrollCView.create({
               value$: this.skip$,
               extent$: this.limit$,
               height: 40*18+48, // TODO use window height.
               width: 22,
-              handleSize: 40
+              handleSize: 40,
+              size$: this.daoCount$,
               // TODO clicking away from scroller should deselect it.
-            }, this.scrollView$).
-            end().
+            })).
           end().
         end().
       end();
@@ -99,8 +94,7 @@
       code: function() {
         var self = this;
         this.data$proxy.select(this.Count.create()).then(function(s) {
-          debugger;
-          self.scrollView.size = s.value;
+          self.daoCount = s.value;
         })
       },
     },
