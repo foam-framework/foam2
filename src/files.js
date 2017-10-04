@@ -319,7 +319,7 @@ FOAM_FILES([
   { name: "foam/u2/search/TextSearchView", flags: ['web'] },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
-  { name: "foam/u2/FoamTagLoader", flags: ['loader'] },
+  { name: "foam/u2/FoamTagLoader", flags: ['js'] },
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
