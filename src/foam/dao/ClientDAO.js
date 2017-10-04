@@ -52,7 +52,10 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 200,
       code: function(sub) {
-        this.delegate.reset(sub);
+        // sub may contain ProxyListeners that contain
+        // listener.innerSub.delegate === listener cycles. Do not attempt
+        // to serialize it.
+        this.delegate.reset();
       },
       javaCode: `
 try {
