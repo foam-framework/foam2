@@ -411,9 +411,16 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `String s1 = (String) getArg1().f(obj);
+      javaCode:
+`Object s1 = getArg1().f(obj);
 String s2 = (String) getArg2().f(obj);
-return ( s1 != null && s2 != null && s1.contains(s2) );`
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.contains(s2) )
+      return true;
+  }
+}
+return ( s1 instanceof String && ((String) s1).contains(s2) );`
     },
     {
       name: 'createStatement',
@@ -443,9 +450,16 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `String s1 = (String) getArg1().f(obj);
-String s2 = (String) getArg2().f(obj);
-return ( s1 != null && s2 != null && s1.toUpperCase().contains(s2.toUpperCase()) );`
+      javaCode:
+`Object s1 = getArg1().f(obj);
+String s2 = ((String) getArg2().f(obj)).toUpperCase();
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.toUpperCase().contains(s2) )
+      return true;
+  }
+}
+return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
     }
   ]
 });
@@ -457,20 +471,16 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `
-Object arg1 = getArg1().f(obj);
+      javaCode:
+`Object arg1 = getArg1().f(obj);
 String arg2 = (String) getArg2().f(obj);
-
-if ( arg1 instanceof Object[] ) {
-  Object[] values = (Object[]) arg1;
-  for ( int i = 0 ; i < values.length ; i++ ) {
-    if ( values[i] instanceof String && ((String) values[i]).startsWith(arg2) )
+if ( arg1 instanceof String[] ) {
+  for ( String s : (String[]) arg1 ) {
+    if ( s.startsWith(arg2) )
       return true;
   }
-} else if ( arg1 instanceof String ) {
-  return ((String) arg1).startsWith(arg2);
 }
-return false;`
+return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
     },
     {
       name: 'createStatement',
@@ -499,20 +509,16 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `
-Object arg1 = getArg1().f(obj);
+      javaCode:
+`Object arg1 = getArg1().f(obj);
 String arg2 = ((String) getArg2().f(obj)).toUpperCase();
-
-if ( arg1 instanceof Object[] ) {
-  Object[] values = (Object[]) arg1;
-  for ( int i = 0 ; i < values.length ; i++ ) {
-    if ( values[i] instanceof String && ((String) values[i]).toUpperCase().startsWith(arg2) )
+if ( arg1 instanceof String[] ) {
+  for ( String s : (String[]) arg1 ) {
+    if ( s.toUpperCase().startsWith(arg2) )
       return true;
   }
-} else if ( arg1 instanceof String ) {
-  return ((String) arg1).toUpperCase().startsWith(arg2);
 }
-return false;`
+return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2) );`
     },
     {
       name: 'createStatement',
