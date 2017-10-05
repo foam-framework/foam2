@@ -24,25 +24,13 @@ foam.INTERFACE({
 foam.INTERFACE({
   refines: 'foam.mlang.Expr',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   methods: [
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
     },
-    {
-      name: 'createStatement',
-      javaReturns: 'String'
-    },
-    {
-      name: 'prepareStatement',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'stmt',
-          javaType: 'java.sql.PreparedStatement'
-        }
-      ]
-    }
   ]
 });
 
@@ -70,6 +58,8 @@ foam.CLASS({
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   methods: [
     {
       name: 'f',
@@ -80,23 +70,6 @@ foam.INTERFACE({
         }
       ],
       javaReturns: 'boolean'
-    },
-    {
-      name: 'createStatement',
-      javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType: 'String'
-      }]
-    },
-    {
-      name: 'prepareStatement',
-      args: [
-        {
-          name: 'stmt',
-          javaType: 'java.sql.PreparedStatement'
-        }
-      ]
     },
     {
       name: 'partialEval',
@@ -209,10 +182,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -238,10 +207,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -270,10 +235,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -302,10 +263,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -353,10 +310,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -425,11 +378,6 @@ return ( s1 instanceof String && ((String) s1).contains(s2) );`
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        // table as method argument because it can't be parametrized into a prepared statement
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -485,10 +433,6 @@ return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: `return getArg1().createStatement() + " like '" + getArg2().createStatement() + "%'";`
     },
     {
@@ -523,10 +467,6 @@ return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: `return "UPPER(" + getArg1().createStatement() + ") like 'UPPER(" + getArg2().createStatement() + ")%'";`
     },
     {
@@ -575,10 +515,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType: 'String'
-      }],
       // TODO: select columns
       javaCode: 'return getArg1().createStatement() + " = " + getArg2().createStatement();'
     },
@@ -610,10 +546,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -639,10 +571,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -668,10 +596,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -697,10 +621,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -726,10 +646,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return " ";'
     },
     {
@@ -785,10 +701,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -841,6 +753,19 @@ foam.CLASS({
         }
       ],
       javaCode: 'return -1 * getArg1().compare(o1, o2);'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     },
     {
       name: 'toString',
@@ -977,10 +902,6 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
@@ -1028,10 +949,6 @@ return false;`
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
