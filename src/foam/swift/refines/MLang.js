@@ -17,7 +17,7 @@ foam.CLASS({
       value: `
 if let newValue = newValue as? FObject { return newValue }
 if let newValue = newValue as? PropertyInfo { return newValue }
-return Context.GLOBAL.create(Constant.self, args: ["value": newValue])
+return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
       `,
     },
   ],
