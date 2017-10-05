@@ -90,7 +90,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o, p) { return p.adaptValue(o); }
-    }
+    },
   ],
 
   methods: [
@@ -510,7 +510,13 @@ foam.CLASS({
           if ( ! this.args[i].f(o) ) return false;
         }
         return true;
-      }
+      },
+      swiftCode: function() {/*
+for arg in args {
+  if !arg.f(obj) { return false }
+}
+return true
+      */},
     },
 
     function partialEval() {
