@@ -54,6 +54,9 @@ describe('MLang', function() {
         },
         {
           name: 'someArray',
+        },
+        {
+          name: 'stringArray'
         }
       ],
     });
@@ -79,6 +82,7 @@ describe('MLang', function() {
       name: 'Ritchie Blackmore',
       birthday: '1945-04-14',
       someArray: [1, 2, 4, 6],
+      stringArray: ["E striNg", "A strinG"],
       guitar: 'Fender',
       age: 72
     }, foam.__context__));
@@ -87,6 +91,7 @@ describe('MLang', function() {
       name: 'Mark Knopfler',
       birthday: '1949-08-12',
       someArray: [1, 6, 3],
+      stringArray: ["Whammy", "All Strings"],
       guitar: 'Gibson',
       age: 67
     }, foam.__context__));
@@ -95,6 +100,7 @@ describe('MLang', function() {
       name: 'Eric Clapton',
       birthday: '1945-03-30',
       someArray: [1, 4],
+      stringArray: ["Acoustic", "Whacky"],
       guitar: 'Fender',
       age: 72
     }, foam.__context__));
@@ -496,7 +502,7 @@ describe('MLang', function() {
     });
 
     it('works on arrays', function(done) {
-      dao.where(CONTAINS(test.mlang.Person.SOME_ARRAY, 4)).select()
+      dao.where(CONTAINS(test.mlang.Person.STRING_ARRAY, "ha")).select()
       .then(function(sink) {
         expect(sink.array.length).toBe(2);
         done();
@@ -520,6 +526,14 @@ describe('MLang', function() {
       dao.where(CONTAINS_IC(test.mlang.Person.NAME, 'JIM')).select()
       .then(function(sink) {
         expect(sink.array.length).toBe(2); // Jimi Hendrix and Jimmy Page
+        done();
+      });
+    });
+
+    it('works on arrays', function(done) {
+      dao.where(CONTAINS_IC(test.mlang.Person.STRING_ARRAY, "RING")).select()
+      .then(function(sink) {
+        expect(sink.array.length).toBe(2);
         done();
       });
     });

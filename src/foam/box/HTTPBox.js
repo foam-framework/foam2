@@ -123,17 +123,18 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function send(msg) {
+        var payload = this.outputter.stringify(msg);
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method:  this.method,
-          payload: this.outputter.stringify(msg)
+          payload: payload
         }).send();
 
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var msg = this.parser.parseString(p);
-          msg && this.me.send(msg);
+          var rmsg = this.parser.parseString(p);
+          rmsg && this.me.send(rmsg);
         }.bind(this));
       },
       javaCode: `
