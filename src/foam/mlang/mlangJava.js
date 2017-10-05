@@ -755,6 +755,19 @@ foam.CLASS({
       javaCode: 'return -1 * getArg1().compare(o1, o2);'
     },
     {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    },
+    {
       name: 'toString',
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
     }
