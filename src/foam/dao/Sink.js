@@ -433,7 +433,7 @@ foam.CLASS({
       name: 'put',
       code: function put(obj, sub) {
         this.array.push(obj);
-p      }
+      }
     },
     {
       name: 'eof',
