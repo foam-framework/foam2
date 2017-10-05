@@ -72,7 +72,7 @@ public class PostgresDAO
 
       if ( predicate != null ) {
         builder.append(" where ")
-            .append(predicate.createStatement(table));
+            .append(predicate.createStatement());
       }
 
 //      if ( order != null ) {
