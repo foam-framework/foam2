@@ -197,6 +197,8 @@ out.append(data.stringValue)
       swiftCode: function() {/*
 if let data = data as? FObject {
   outputFObject(&out, data)
+} else if let data = data as? PropertyInfo {
+  outputPropertyInfo(&out, data)
 } else if let data = data as? String {
   outputString(&out, data)
 } else if let data = data as? Bool {
@@ -213,6 +215,31 @@ if let data = data as? FObject {
   NSLog("Unable to output %@", (data as AnyObject).description)
   outputNil(&out)
 }
+      */},
+    },
+    {
+      name: 'outputPropertyInfo',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: 'PropertyInfo',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("{");
+outputString(&out, "class");
+out.append(":");
+outputString(&out, "__Property__");
+out.append(",");
+outputString(&out, "forClass_");
+out.append(":");
+outputString(&out, data.classInfo.id + "." + data.name)
+out.append("}");
       */},
     },
     {
