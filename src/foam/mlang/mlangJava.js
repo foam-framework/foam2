@@ -411,9 +411,17 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `String s1 = (String) getArg1().f(obj);
+      javaCode:
+`Object s1 = getArg1().f(obj);
 String s2 = (String) getArg2().f(obj);
-return ( s1 != null && s2 != null && s1.contains(s2) );`
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.contains(s2) ) {
+      return true;
+    }
+  }
+}
+return ( s1 instanceof String && s2 != null && ((String) s1).contains(s2) );`
     },
     {
       name: 'createStatement',
@@ -443,9 +451,17 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `String s1 = (String) getArg1().f(obj);
-String s2 = (String) getArg2().f(obj);
-return ( s1 != null && s2 != null && s1.toUpperCase().contains(s2.toUpperCase()) );`
+      javaCode:
+`Object s1 = getArg1().f(obj);
+String s2 = ((String) getArg2().f(obj)).toUpperCase();
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.toUpperCase().contains(s2) ) {
+      return true;
+    }
+  }
+}
+return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
     }
   ]
 });
