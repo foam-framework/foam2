@@ -11,7 +11,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'xmlAttribute',
-      default: false
+      value: false
     },
     {
       name: 'fromXML',
