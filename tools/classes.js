@@ -84,6 +84,7 @@ var classes = [
   'foam.dao.RelationshipDAO',
   'foam.dao.ManyToManyRelationshipDAO',
   'foam.dao.RelationshipPropertyValue',
+  'foam.dao.SQLStatement',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
