@@ -190,9 +190,8 @@ return LimitedDAO_create([
       name: 'listen',
       code: function(sink) {
         if ( ! foam.core.FObject.isInstance(sink) ) {
-          sink = foam.dao.AnonymousSink.create({ sink: sink });
+          sink = foam.dao.AnonymousSink.create({ sink: sink }, this);
         }
-
         return this.listen_(this.__context__, sink, undefined);
       },
       swiftCode: 'return try listen_(__context__, sink)',

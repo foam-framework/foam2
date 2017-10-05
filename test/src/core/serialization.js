@@ -256,7 +256,7 @@ describe('Serialization', function() {
     expect(stringifier.stringify(test.Alpha.create(), test.Alpha)).toBe('{}');
     expect(stringifier.stringify(test.Alpha.create({
       beta: test.Beta.create()
-    }), test.Alpha)).toBe('{"beta":{"deltas":[]}}');
+    }), test.Alpha)).toBe('{"beta":{}}');
     expect(stringifier.stringify(test.Alpha.create({
       beta: test.Beta2.create({
         charlie: test.Charlie.create(),

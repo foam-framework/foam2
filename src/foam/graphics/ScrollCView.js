@@ -109,12 +109,14 @@ foam.CLASS({
       expression: function(size, extent, yMax, innerBorder) {
         return size ? ( yMax - innerBorder ) / (size - extent) : 0;
       }
-    }
+    },
+    'mouseEvent'
   ],
 
   methods: [
     function initCView() {
       this.canvas.pointer.touch.sub(this.onTouch);
+      this.onDetach(this.mouseEvent$.sub(this.updateScrollFromEvent));
     },
 
     function yToValue(y) {
@@ -149,24 +151,24 @@ foam.CLASS({
   listeners: [
     {
       name: 'onTouch',
-      code: function(s, _, touch) {
-        var self = this;
-        var p = foam.graphics.Point.create();
-
+      code: function(_, _, touch) {
+        // prevents highlighting of other elements while scrolling
         touch.claimed = true;
+      }
+    },
+    {
+      name: 'updateScrollFromEvent',
+      code: function(mouseEvent) {
+        if ( ! mouseEvent || ! mouseEvent.src || ! mouseEvent.src.oldValue ) return;
+        var p = foam.graphics.Point.create();
+        var event = mouseEvent.src.oldValue;
 
-        function updateValue() {
-          p.x = touch.x;
-          p.y = touch.y - (self.handleSize/2);
-          p.w = 1;
+        p.x = event.clientX;
+        p.y = event.clientY - this.canvas.el().getBoundingClientRect().top - (this.handleSize/2);
+        p.w = 1;
 
-          self.globalToLocalCoordinates(p);
-
-          self.value = self.yToValue(p.y);
-        }
-
-        touch.onDetach(touch.sub('propertyChange', updateValue));
-        updateValue();
+        this.globalToLocalCoordinates(p);
+        this.value = this.yToValue(p.y);
       }
     }
   ]
