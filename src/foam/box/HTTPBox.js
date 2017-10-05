@@ -104,6 +104,10 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
 protected class Outputter extends foam.lib.json.Outputter {
+  public Outputter() {
+    super(foam.lib.json.OutputterMode.NETWORK);
+  }
+
   protected void outputFObject(foam.core.FObject o) {
     if ( o == getMe() ) {
       o = getX().create(foam.box.HTTPReplyBox.class);
@@ -139,17 +143,18 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function(msg) {
+        var payload = this.outputter.stringify(msg);
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method:  this.method,
-          payload: this.outputter.stringify(msg)
+          payload: payload
         }).send();
 
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var msg = this.parser.parseString(p);
-          msg && this.me.send(msg);
+          var rmsg = this.parser.parseString(p);
+          rmsg && this.me.send(rmsg);
         }.bind(this));
       },
       swiftCode: function() {/*

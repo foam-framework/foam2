@@ -1008,8 +1008,8 @@ foam.CLASS({
 
       var cast = info.getMethod('cast');
       cast.body = 'Object[] value = (Object[])o;\n'
-                + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
-                + 'System.arraycopy(value, 0, ret, 0, value.length);\n'
+                + this.javaType + ' ret = new ' + this.of + '[value == null ? 0 : value.length];\n'
+                + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
       // TODO: Change to ClassInfo return type once primitive support is added
       info.method({

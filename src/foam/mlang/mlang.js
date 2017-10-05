@@ -67,7 +67,7 @@ foam.INTERFACE({
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
-  implements: ['foam.mlang.F'],
+  implements: [ 'foam.mlang.F' ],
 
   documentation: 'Expr interface extends F interface: partialEval -> Expr.',
 
@@ -695,9 +695,14 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        var s1 = this.arg1.f(o);
-        return s1 ? s1.indexOf(this.arg2.f(o)) !== -1 : false;
-      }
+        var arg1 = this.arg1.f(o);
+        var arg2 = this.arg2.f(o);
+        if ( Array.isArray(arg1) ) {
+          return arg1.some(function(a) {
+            return a.indexOf(arg2) !== -1;
+          })
+        }
+        return arg1 ? arg1.indexOf(arg2) !== -1 : false;      }
     }
   ]
 });
@@ -713,15 +718,14 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      var s1 = this.arg1.f(o);
-      var s2 = this.arg2.f(o);
-      if ( typeof s1 !== 'string' || typeof s2 !== 'string' ) return false;
-      // TODO(braden): This is faster if we use a regex with the ignore-case
-      // option. That requires regex escaping arg2, though.
-      // TODO: port faster version from FOAM1
-      var uc1 = s1.toUpperCase();
-      var uc2 = s2.toUpperCase();
-      return uc1.indexOf(uc2) !== -1;
+      var arg1 = this.arg1.f(o);
+      var arg2 = this.arg2.f(o).toUpperCase();
+      if ( Array.isArray(arg1) ) {
+        return arg1.some(function(a) {
+          return a.toUpperCase().indexOf(arg2) !== -1;
+        })
+      }
+      return arg1 ? arg1.toUpperCase().indexOf(arg2) !== -1 : false;
     },
   ]
 });
@@ -1295,11 +1299,12 @@ foam.CLASS({
       class: 'Map',
       name: 'groups',
       factory: function() { return {}; },
-      javaFactory: `return new java.util.HashMap<Object, foam.dao.Sink>();`
+      javaFactory: 'return new java.util.HashMap<Object, foam.dao.Sink>();'
     },
     {
       class: 'List',
       name: 'groupKeys',
+      javaFactory: 'return new java.util.ArrayList();',
       factory: function() { return []; }
     },
     {
