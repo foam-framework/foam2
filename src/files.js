@@ -151,6 +151,7 @@ FOAM_FILES([
   { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
   { name: "foam/mlang/mlangJava", flags: ['java'] },
+  { name: "foam/swift/refines/MLang", flags: ['swift'] },
   { name: "foam/swift/refines/Predicate", flags: ['swift'] },
   { name: "foam/swift/refines/AbstractDAO", flags: ['swift'] },
   { name: "foam/mlang/LabeledValue" },

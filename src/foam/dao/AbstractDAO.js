@@ -85,6 +85,12 @@ foam.CLASS({
           predicate: p
         });
       },
+      swiftCode: function() {/*
+        return FilteredDAO_create([
+          "delegate": self,
+          "predicate": predicate,
+        ]);
+      */},
     },
 
     {
@@ -453,6 +459,8 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
       required: true
     },
@@ -460,7 +468,9 @@ foam.CLASS({
       name: 'of',
       factory: function() {
         return this.delegate.of;
-      }
+      },
+      swiftExpressionArgs: ['delegate$of'],
+      swiftExpression: 'return delegate$of as! ClassInfo',
     },
     {
       class: 'Proxy',
@@ -479,12 +489,22 @@ foam.CLASS({
       });
     },
 
-    function select_(x, sink, skip, limit, order, predicate) {
-      return this.delegate.select_(
-        x, sink, skip, limit, order,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
+    {
+      name: 'select_',
+      code: function(x, sink, skip, limit, order, predicate) {
+        return this.delegate.select_(
+          x, sink, skip, limit, order,
+          predicate ?
+            this.And.create({ args: [this.predicate, predicate] }) :
+            this.predicate);
+      },
+      swiftCode: function() {/*
+return try delegate.select_(
+  x, sink, skip, limit, order,
+  predicate != nil ?
+    And_create(["args": [self.predicate, predicate!] ]) :
+    self.predicate)
+      */},
     },
 
     function removeAll_(x, skip, limit, order, predicate) {
