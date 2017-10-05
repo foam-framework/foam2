@@ -146,5 +146,11 @@ foam.CLASS({
       name: 'bankIdentificationCode',
       documentation: 'Bank Identification Code (BIC)'
     }
+  ],
+
+  methods: [
+    function label() {
+      return this.organization || ( this.firstName + this.lastName );
+    }
   ]
 });

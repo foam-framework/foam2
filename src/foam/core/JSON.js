@@ -292,6 +292,9 @@ foam.CLASS({
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
         return false;
 
+      if ( foam.Array.isInstance(v) && v.length == 0 )
+        return false;
+
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
@@ -408,6 +411,10 @@ foam.CLASS({
     },
 
     function stringify(o, opt_cls) {
+      // Focibly set this.buf_ to empty string.
+      // It can be non-empty if a previous serialized threw an exception and didn't complete.
+      this.buf_ = "";
+
       this.output(o, opt_cls);
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage

@@ -241,6 +241,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
+      value: true,
       documentation: 'Set this to true to let the user select columns.'
     },
     {
