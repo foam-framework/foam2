@@ -75,10 +75,10 @@ public class PostgresDAO
             .append(predicate.createStatement());
       }
 
-//      if ( order != null ) {
-//        builder.append(" order by ")
-//            .append(order.createStatement(table));
-//      }
+      if ( order != null ) {
+        builder.append(" order by ")
+            .append(order.createStatement());
+      }
 
       if ( limit > 0 && limit < this.MAX_SAFE_INTEGER ) {
         builder.append(" limit ").append(limit);
