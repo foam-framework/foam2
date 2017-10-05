@@ -24,25 +24,13 @@ foam.INTERFACE({
 foam.INTERFACE({
   refines: 'foam.mlang.Expr',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   methods: [
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
     },
-    {
-      name: 'createStatement',
-      javaReturns: 'String'
-    },
-    {
-      name: 'prepareStatement',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'stmt',
-          javaType: 'java.sql.PreparedStatement'
-        }
-      ]
-    }
   ]
 });
 
@@ -70,6 +58,8 @@ foam.CLASS({
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   methods: [
     {
       name: 'f',
@@ -80,19 +70,6 @@ foam.INTERFACE({
         }
       ],
       javaReturns: 'boolean'
-    },
-    {
-      name: 'createStatement',
-      javaReturns: 'String'
-    },
-    {
-      name: 'prepareStatement',
-      args: [
-        {
-          name: 'stmt',
-          javaType: 'java.sql.PreparedStatement'
-        }
-      ]
     },
     {
       name: 'partialEval',
