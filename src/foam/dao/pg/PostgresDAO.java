@@ -75,6 +75,19 @@ public class PostgresDAO
             .append(predicate.createStatement(table));
       }
 
+//      if ( order != null ) {
+//        builder.append(" order by ")
+//            .append(order.createStatement(table));
+//      }
+
+      if ( limit > 0 && limit < this.MAX_SAFE_INTEGER ) {
+        builder.append(" limit ").append(limit);
+      }
+
+      if ( skip > 0 && skip < this.MAX_SAFE_INTEGER ) {
+        builder.append(" offset ").append(skip);
+      }
+
       stmt = c.prepareStatement(builder.toString());
       resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
