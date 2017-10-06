@@ -16,6 +16,7 @@ foam.INTERFACE({
     {
       name: 'prepareStatement',
       javaReturns: 'void',
+      javaThrows: ['java.sql.SQLException'],
       args: [
         {
           name: 'stmt',
