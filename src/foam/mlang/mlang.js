@@ -67,7 +67,7 @@ foam.INTERFACE({
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
-  implements: ['foam.mlang.F'],
+  implements: [ 'foam.mlang.F' ],
 
   documentation: 'Expr interface extends F interface: partialEval -> Expr.',
 

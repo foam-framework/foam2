@@ -88,6 +88,10 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
 protected class Outputter extends foam.lib.json.Outputter {
+  public Outputter() {
+    super(foam.lib.json.OutputterMode.NETWORK);
+  }
+
   protected void outputFObject(foam.core.FObject o) {
     if ( o == getMe() ) {
       o = getX().create(foam.box.HTTPReplyBox.class);
