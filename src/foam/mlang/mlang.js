@@ -767,6 +767,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ArrayBinary',
   extends: 'foam.mlang.predicate.Binary',
+  abstract: true,
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 

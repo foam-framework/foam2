@@ -833,6 +833,23 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return false;'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Binary',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: 'return false;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " ";'
     },
     {
       name: 'prepareStatement',
