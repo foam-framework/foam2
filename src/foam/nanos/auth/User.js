@@ -3,7 +3,10 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
+supressWarnings([
+  'Unknown property foam.core.String.displayWidth: 70',
+  'Unknown property foam.core.String.displayHeight: 10'
+])
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
