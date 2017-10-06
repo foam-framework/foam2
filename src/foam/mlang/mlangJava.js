@@ -247,16 +247,7 @@ for ( int i = 0 ; i < length ; i++ ) {
     stmt.append(" OR ");
   }
 }
-
 return stmt.toString();`
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
     }
   ]
 });
@@ -276,15 +267,19 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode:
+`StringBuilder stmt = new StringBuilder();
+Predicate[] predicates = getArgs();
+int length = predicates.length;
+
+for ( int i = 0 ; i < length ; i++ ) {
+  Predicate predicate = predicates[i];
+  stmt.append(" (").append(predicate.createStatement()).append(") ");
+  if ( i != length - 1 ) {
+    stmt.append(" AND ");
+  }
+}
+return stmt.toString();`
     }
   ]
 });
@@ -840,29 +835,13 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.mlang.predicate.ArrayBinary',
-
-  methods: [
-    {
-      name: 'f',
-      javaCode: 'return false;'
-    }
-  ]
-});
-
-
-foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
 
   methods: [
     {
-      name: 'f',
-      javaCode: 'return false;'
-    },
-    {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return " ";'
+      javaCode: 'return "";'
     },
     {
       name: 'prepareStatement',
@@ -877,6 +856,34 @@ foam.CLASS({
       javaCode:
 `getArg1().prepareStatement(stmt);
 getArg2().prepareStatement(stmt);`
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Nary',
+
+  methods: [
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode:
+`for ( Predicate predicate : getArgs() ) {
+  predicate.prepareStatement(stmt);
+}`
     }
   ]
 });
