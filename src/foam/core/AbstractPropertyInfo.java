@@ -49,7 +49,7 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public String createStatement() {
-    return getName();
+    return getName().toLowerCase();
   }
 
   @Override
