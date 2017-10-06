@@ -672,15 +672,8 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
+      // TODO: check for empty array
+      javaCode: `return " (" + getArg1().createStatement() + " <> '') is not true ";`
     }
   ]
 });
@@ -861,6 +854,31 @@ foam.CLASS({
         }
       ],
       javaCode: 'setValue(getValue() + (double) this.arg1_.f(obj));'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Unary',
+
+  methods: [
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: 'getArg1().prepareStatement(stmt);'
     }
   ]
 });
