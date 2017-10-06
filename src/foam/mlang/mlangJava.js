@@ -497,7 +497,7 @@ foam.CLASS({
     {
       name: 'prepareStatement',
       javaReturns: 'void',
-      javaCode: ''
+      javaCode: 'stmt.setObject(getValue());'
     }
   ]
 });
