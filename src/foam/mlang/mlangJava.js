@@ -494,6 +494,36 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.mlang.ArrayConstant',
+
+  javaImports: [
+    'java.util.Arrays',
+    'java.util.stream.Collectors'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: 'return getValue();'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " (" + Arrays.stream(getValue()).map(o -> "?").collect(Collectors.joining(",")) + ") ";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaCode:
+`for ( Object o : getValue() ) {
+  stmt.setObject(o);
+}`
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.predicate.Eq',
 
   methods: [
