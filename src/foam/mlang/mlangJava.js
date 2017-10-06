@@ -827,7 +827,7 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.mlang.predicate.Binary',
+  refines: 'foam.mlang.predicate.ArrayBinary',
 
   methods: [
     {
