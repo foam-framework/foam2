@@ -925,6 +925,32 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'ArrayConstant',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable'],
+
+  properties: [
+    {
+      class: 'Array',
+      name: 'value'
+    }
+  ],
+
+  methods: [
+    function f() { return this.value; },
+
+    function toString_(x) {
+      return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
+        x.toString ? x.toString :
+        x;
+    },
+
+    function toString() { return this.toString_(this.value); }
+  ]
+});
+
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
