@@ -864,11 +864,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'createStatement',
-      javaReturns: 'String',
-      javaCode: 'return "";'
-    },
-    {
       name: 'prepareStatement',
       javaReturns: 'void',
       javaThrows: [ 'java.sql.SQLException' ],
@@ -888,11 +883,6 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
 
   methods: [
-    {
-      name: 'createStatement',
-      javaReturns: 'String',
-      javaCode: 'return "";'
-    },
     {
       name: 'prepareStatement',
       javaReturns: 'void',
@@ -915,11 +905,6 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.Nary',
 
   methods: [
-    {
-      name: 'createStatement',
-      javaReturns: 'String',
-      javaCode: 'return "";'
-    },
     {
       name: 'prepareStatement',
       javaReturns: 'void',
