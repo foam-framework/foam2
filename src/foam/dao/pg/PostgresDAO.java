@@ -66,16 +66,29 @@ public class PostgresDAO
     try {
       c = connectionPool.getConnection();
 
-      // select all if predicate is null, else use predicate
-      if ( predicate == null ) {
-        StringBuilder builder = sb.get()
-            .append("select * from ")
-            .append(table);
-        stmt = c.prepareStatement(builder.toString());
-      } else {
-        stmt = c.prepareStatement(predicate.createStatement(table));
+      StringBuilder builder = sb.get()
+          .append("select * from ")
+          .append(table);
+
+      if ( predicate != null ) {
+        builder.append(" where ")
+            .append(predicate.createStatement());
       }
 
+      if ( order != null ) {
+        builder.append(" order by ")
+            .append(order.createStatement());
+      }
+
+      if ( limit > 0 && limit < this.MAX_SAFE_INTEGER ) {
+        builder.append(" limit ").append(limit);
+      }
+
+      if ( skip > 0 && skip < this.MAX_SAFE_INTEGER ) {
+        builder.append(" offset ").append(skip);
+      }
+
+      stmt = c.prepareStatement(builder.toString());
       resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
         sink.put(createFObject(resultSet), null);
