@@ -319,15 +319,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     }
   ]
 });
