@@ -728,15 +728,19 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
+      javaCode: 'return " " + getArg1().createStatement() + " DESC ";'
     },
     {
       name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: " "
     },
     {
       name: 'toString',
