@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.sql.SQLException;
 import java.util.Map;
 
 public abstract class AbstractPropertyInfo
@@ -52,8 +53,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void prepareStatement(IndexedPreparedStatement stmt) {
-  }
+  public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
   public Object f(FObject o) {
