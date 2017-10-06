@@ -378,7 +378,7 @@ return ( s1 instanceof String && ((String) s1).contains(s2) );`
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
+      javaCode: `return " '" + getArg1().createStatement() + "' like '%" + getArg2().createStatement() + "%' ";`
     },
     {
       name: 'prepareStatement',
@@ -408,6 +408,11 @@ if ( s1 instanceof String[] ) {
   }
 }
 return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: `return " '" + getArg1().createStatement() + "' ilike '%" + getArg2().createStatement() + "%' ";`
     }
   ]
 });
@@ -433,15 +438,7 @@ return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: `return getArg1().createStatement() + " like '" + getArg2().createStatement() + "%'";`
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: `return " '" + getArg1().createStatement() + "' like '" + getArg2().createStatement() + "%' ";`
     }
   ]
 });
@@ -467,15 +464,7 @@ return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: `return "UPPER(" + getArg1().createStatement() + ") like 'UPPER(" + getArg2().createStatement() + ")%'";`
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'foam.dao.pg.IndexedPreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: `return " '" + getArg1().createStatement() + "' ilike '" + getArg2().createStatement() + "%' ";`
     }
   ]
 });
