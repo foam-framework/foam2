@@ -188,7 +188,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -213,7 +213,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -241,7 +241,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -269,7 +269,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -316,7 +316,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -384,7 +384,7 @@ return ( s1 instanceof String && ((String) s1).contains(s2) );`
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -439,7 +439,7 @@ return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -473,7 +473,7 @@ return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -523,7 +523,7 @@ foam.CLASS({
       javaReturns: 'void',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: '// try {\n'
                 + '  // stmt.setObject(1, getArg2().prepareStatement());\n'
@@ -552,7 +552,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -577,7 +577,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -602,7 +602,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -627,7 +627,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -652,7 +652,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -677,7 +677,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -707,7 +707,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -763,7 +763,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     },
@@ -908,7 +908,7 @@ foam.CLASS({
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -955,7 +955,7 @@ return false;`
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
