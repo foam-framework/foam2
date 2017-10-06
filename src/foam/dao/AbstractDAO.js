@@ -458,8 +458,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.mlang.predicate.Predicate',
+      // TODO: FObjectProperty of Predicate. Doing this currently breaks java.
+      swiftType: 'FoamPredicate',
       name: 'predicate',
       required: true
     },
