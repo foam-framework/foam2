@@ -235,7 +235,20 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
+      javaCode:
+`StringBuilder stmt = new StringBuilder();
+Predicate[] predicates = getArgs();
+int length = predicates.length;
+
+for ( int i = 0 ; i < length ; i++ ) {
+  Predicate predicate = predicates[i];
+  stmt.append(" (").append(predicate.createStatement()).append(") ");
+  if ( i != length - 1 ) {
+    stmt.append(" OR ");
+  }
+}
+
+return stmt.toString();`
     },
     {
       name: 'prepareStatement',
