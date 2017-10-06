@@ -19,15 +19,17 @@ foam.CLASS({
   package: 'foam.android.tools',
   name: 'GenStrings',
   extends: 'foam.android.tools.GenResources',
+
   requires: [
     'foam.i18n.TranslationFormatStringParser',
   ],
+
   properties: [
     {
       name: 'locale',
       postSet: function(_, n) {
         foam.i18n = n;
-      },
+      }
     },
     {
       name: 'parser',
@@ -35,9 +37,10 @@ foam.CLASS({
         return this.TranslationFormatStringParser.create({
           stringSymbol: 's',
         });
-      },
-    },
+      }
+    }
   ],
+
   methods: [
     function classToResources(cls) {
       var resources = cls.model_.toAndroidStringResources();
@@ -51,8 +54,9 @@ foam.CLASS({
         });
       }
       return resources;
-    },
+    }
   ],
+
   templates: [
     {
       name: 'genResource',
@@ -66,14 +70,16 @@ foam.CLASS({
   </string>
 <% } %>
 </resources>
-      */},
+      */}
     }
-  ],
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.android.tools',
   name: 'StringResource',
+
   properties: [
     {
       class: 'String',
@@ -86,14 +92,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message'
-    },
+    }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.android.tools',
   name: 'ModelStringExtension',
   refines: 'foam.core.Model',
+
   methods: [
     function toAndroidStringResources(opt_resources) {
       var resources = opt_resources || [];
@@ -101,17 +109,20 @@ foam.CLASS({
         if ( a.toAndroidStringResources ) a.toAndroidStringResources(resources);
       }
       return resources;
-    },
-  ],
+    }
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.android.tools',
   name: 'PropertyStringExtension',
   refines: 'foam.core.Property',
+
   requires: [
     'foam.android.tools.StringResource',
   ],
+
   methods: [
     function toAndroidStringResources(opt_resources) {
       var resources = opt_resources || [];
@@ -121,17 +132,20 @@ foam.CLASS({
         message: this.label,
       }));
       return resources;
-    },
-  ],
+    }
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.android.tools',
   name: 'ActionStringExtension',
   refines: 'foam.core.Action',
+
   requires: [
     'foam.android.tools.StringResource',
   ],
+
   methods: [
     function toAndroidStringResources(opt_resources) {
       var resources = opt_resources || [];
@@ -141,17 +155,20 @@ foam.CLASS({
         message: this.label,
       }));
       return resources;
-    },
-  ],
+    }
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.android.tools',
   name: 'MessageStringExtension',
   refines: 'foam.i18n.MessageAxiom',
+
   requires: [
     'foam.android.tools.StringResource',
   ],
+
   methods: [
     function toAndroidStringResources(opt_resources) {
       var resources = opt_resources || [];
@@ -161,6 +178,6 @@ foam.CLASS({
         message: this.message,
       }));
       return resources;
-    },
-  ],
+    }
+  ]
 });
