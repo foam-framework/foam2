@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 supressWarnings([
-  "Unknown property foam.core.Password.displayWidth: 30",
+  `Unknown property foam.core.Password.displayWidth: 30`,
 ]);
 foam.CLASS({
   package: 'foam.nanos.auth',

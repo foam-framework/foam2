@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 supressWarnings([
-'Property foam.core.FObjectProperty.of "value" hidden by "getter"'
+  `Property foam.core.FObjectProperty.of "value" hidden by "getter"`
 ])
 foam.CLASS({
   package: 'foam.core',

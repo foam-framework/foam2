@@ -4,10 +4,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 supressWarnings([
-`Unknown property foam.core.Model.tableColumns: id,enabled,server,description,run`,
-`Unknown property foam.core.DateTime.visibility: RO`,
-`Unknown property foam.core.String.visibility: RO`
-
+  `Unknown property foam.core.Model.tableColumns: id,enabled,server,description,run`,
+  `Unknown property foam.core.DateTime.visibility: RO`,
+  `Unknown property foam.core.String.visibility: RO`
 ])
 foam.CLASS({
   package: 'foam.nanos.script',
