@@ -60,7 +60,7 @@ public class PostgresDAO
     }
 
     Connection c = null;
-    PreparedStatement stmt = null;
+    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
@@ -88,7 +88,7 @@ public class PostgresDAO
         builder.append(" offset ").append(skip);
       }
 
-      stmt = c.prepareStatement(builder.toString());
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
         sink.put(createFObject(resultSet), null);
@@ -106,7 +106,7 @@ public class PostgresDAO
   @Override
   public FObject remove_(X x, FObject o) {
     Connection c = null;
-    PreparedStatement stmt = null;
+    IndexedPreparedStatement stmt = null;
 
     try {
       c = connectionPool.getConnection();
@@ -115,9 +115,9 @@ public class PostgresDAO
           .append(table)
           .append(" where id = ?");
 
-      stmt = c.prepareStatement(builder.toString());
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       // TODO: add support for non-numbers
-      stmt.setLong(1, ((Number) o.getProperty("id")).longValue());
+      stmt.setLong(((Number) o.getProperty("id")).longValue());
 
       int removed = stmt.executeUpdate();
       if ( removed == 0 ) {
@@ -136,7 +136,7 @@ public class PostgresDAO
   @Override
   public FObject find_(X x, Object o) {
     Connection c = null;
-    PreparedStatement stmt = null;
+    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
@@ -146,9 +146,9 @@ public class PostgresDAO
           .append(table)
           .append(" where id = ?");
 
-      stmt = c.prepareStatement(builder.toString());
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       // TODO: add support for non-numbers
-      stmt.setLong(1, ((Number) o).longValue());
+      stmt.setLong(((Number) o).longValue());
       resultSet = stmt.executeQuery();
       if ( ! resultSet.next() ) {
         // no rows
@@ -172,7 +172,7 @@ public class PostgresDAO
   @Override
   public FObject put_(X x, FObject obj) {
     Connection c = null;
-    PreparedStatement stmt = null;
+    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
@@ -189,12 +189,11 @@ public class PostgresDAO
       builder.append(" = ");
       buildFormattedColumnPlaceholders(obj, builder);
 
-      int index = 1;
-      stmt = c.prepareStatement(builder.toString(),
-          Statement.RETURN_GENERATED_KEYS);
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString(),
+          Statement.RETURN_GENERATED_KEYS));
       // set statement values twice: once for the insert and once for the update on conflict
-      index = setStatementValues(index, stmt, obj);
-      index = setStatementValues(index, stmt, obj);
+      setStatementValues(stmt, obj);
+      setStatementValues(stmt, obj);
 
       int inserted = stmt.executeUpdate();
       if ( inserted == 0 ) {
@@ -222,7 +221,7 @@ public class PostgresDAO
    */
   public boolean createTable(ClassInfo classInfo) {
     Connection c = null;
-    PreparedStatement stmt = null;
+    IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
 
     try {
@@ -247,7 +246,7 @@ public class PostgresDAO
           .append(")");
 
       // execute statement
-      stmt = c.prepareStatement(builder.toString());
+      stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       stmt.executeUpdate();
       return true;
     } catch (Throwable e) {
@@ -321,30 +320,28 @@ public class PostgresDAO
 
   /**
    * Sets the value of the PrepareStatement
-   * @param index index to start from
    * @param stmt statement to set values
    * @param obj object to get values from
    * @return the updated index
    * @throws SQLException
    */
-  public int setStatementValues(int index, PreparedStatement stmt, FObject obj) throws SQLException {
+  public void setStatementValues(IndexedPreparedStatement stmt, FObject obj) throws SQLException {
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( prop.getName().equals("id") )
         continue;
-      stmt.setObject(index++, prop.get(obj));
+      stmt.setObject(prop.get(obj));
     }
-    return index;
   }
 
   /**
    * Closes resources without throwing exceptions
    * @param resultSet ResultSet
-   * @param stmt PreparedStatement
+   * @param stmt IndexedPreparedStatement
    * @param c Connection
    */
-  public void closeAllQuietly(ResultSet resultSet, PreparedStatement stmt, Connection c) {
+  public void closeAllQuietly(ResultSet resultSet, IndexedPreparedStatement stmt, Connection c) {
     if ( resultSet != null )
       try { resultSet.close(); } catch (Throwable ignored) {}
     if ( stmt != null )
