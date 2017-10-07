@@ -24,9 +24,9 @@ public class MapDAO
     setOf(of);
   }
 
-  public MapDAO(ClassInfo of, X x) {
-    setOf(of);
+  public MapDAO(X x, ClassInfo of) {
     setX(x);
+    setOf(of);
   }
 
   protected synchronized void data_factory() {
