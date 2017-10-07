@@ -29,7 +29,6 @@ global.supressWarnings = function (a) {
     SUPRESSED_WARNINGS[key] = true;
   })
 }
-
 FOAM_FILES([
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
