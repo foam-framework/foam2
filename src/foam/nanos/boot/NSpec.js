@@ -3,7 +3,30 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
+supressWarnings([
+`Property foam.dao.ArraySink.of "value" hidden by "getter"`,
+`Unknown property foam.core.Model.tableColumns: name,lazy,serve,serviceClass`,
+`Unknown property foam.core.Boolean.tableCellFormatter: function (value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); } else { this.entity('nbsp'); }
+            })
+            .add(obj.serve ? ' Y' : '-')
+          .end();
+      }`,
+`Unknown property foam.core.Boolean.tableCellView: function (obj, e) {
+        var e = e.E();
+        if ( obj.serve ) { e.style({color: 'green'}); } else { e.entity('nbsp'); }
+        e.add(obj.serve ? ' Y' : '-');
+        return e;
+      }`,
+`Import "warn" already exists in ancestor class of foam.box.RPCReturnBox.`,
+`Unknown property foam.core.FObjectProperty.view: foam.u2.DetailView`,
+`Unknown property foam.core.Long.tableCellFormatter: function (value) {
+        this.tag({class: 'foam.nanos.pm.TemperatureCView', totalTime: value}).add(' ', value);
+      }`,
+])
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
@@ -19,7 +42,6 @@ foam.CLASS({
 
   tableColumns: [ 'name', 'lazy', 'serve', 'serviceClass' ],
 
-  searchColumns: [ ],
 
   properties: [
     {
