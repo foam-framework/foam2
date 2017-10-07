@@ -4,8 +4,8 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 supressWarnings([
-  'Unknown property foam.core.Model.generateJava: false',
-  'Unknown property foam.core.InnerClass.generateJava: false',
+  `Unknown property foam.core.Model.generateJava: false`,
+  `Unknown property foam.core.InnerClass.generateJava: false`,
 ])
 foam.CLASS({
   package: 'foam.box',

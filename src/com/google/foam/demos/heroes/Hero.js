@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 supressWarnings([
-'Unknown property foam.core.String.view: [object Object]',
+  `Unknown property foam.core.String.view: [object Object]`,
 ])
 foam.CLASS({
   package: 'com.google.foam.demos.heroes',

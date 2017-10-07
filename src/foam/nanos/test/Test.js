@@ -4,12 +4,12 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 supressWarnings([
-`Unknown property foam.core.Model.tableColumns: id,enabled,description,passed,failed,lastRun,run`,
-`Unknown property foam.core.Long.visibility: RO`,
-`Unknown property foam.core.Long.tableCellFormatter: function (value) {
+  `Unknown property foam.core.Model.tableColumns: id,enabled,description,passed,failed,lastRun,run`,
+  `Unknown property foam.core.Long.visibility: RO`,
+  `Unknown property foam.core.Long.tableCellFormatter: function (value) {
         if ( value ) this.start().style({color: '#f00'}).add(value).end();
       }`,
-`Unknown property foam.core.Long.tableCellFormatter: function (value) {
+  `Unknown property foam.core.Long.tableCellFormatter: function (value) {
         if ( value ) this.start().style({color: '#0f0'}).add(value).end();
       }`
 ])
