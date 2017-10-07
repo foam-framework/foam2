@@ -20,16 +20,9 @@
  * format, so it can used from both nodejs scripts, and web
  * pages via script tags easily.
  */
-// var SUPRESSED_WARNINGS = {};
-// var supressWarnings = function () {
-//   arguments.forEach(function(key) {
-//     SUPRESSED_WARNINGS[key] = true;
-//   })
-// }
 
-// supressWarnings(
-//   "Unknown property foam.core.Password.displayWidth: 30"
-// );
+if ( typeof window !== 'undefined' ) global = window;
+
 global.SUPRESSED_WARNINGS = global.SUPRESSED_WARNINGS || {};
 global.supressWarnings = function (a) {
   a.forEach(function(key) {
