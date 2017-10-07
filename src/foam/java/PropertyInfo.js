@@ -149,6 +149,12 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.sqlType + '";'
+          },
+          {
+            name: 'createStatement',
+            visibility: 'public',
+            type: 'String',
+            body: 'return "' + this.propName.toLowerCase() + '";'
           }
         ]
       }
