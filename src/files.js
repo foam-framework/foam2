@@ -118,7 +118,11 @@ FOAM_FILES([
   { name: "foam/java/Skeleton", flags: ['java'] },
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
-  { name: "foam/java/refinements", flags: ['swift'] }, // For createChildMethod_.
+
+  // TODO: Move createChildMethod_ to core.
+  { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
+  { name: "foam/java/JavaSwiftRefines", flags: ['java'] },
+
   { name: "foam/util/Timer" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
