@@ -42,7 +42,11 @@ public class MapDAO
   }
 
   public FObject put_(X x, FObject obj) {
-    getData().put(getPrimaryKey().get(obj), obj);
+    Object key = getPrimaryKey().get(obj);
+    if ( key == null ) {
+      throw new RuntimeException("Missing Primary Key in " + this.getOf().getId() + ".put()");
+    }
+    getData().put(key, obj);
     onPut(obj.fclone());
     return obj;
   }
