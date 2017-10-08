@@ -58,7 +58,7 @@ foam.CLASS({
   methods: [
     function installInProto(proto, superAxiom) {
       // This can happen when there's no js implementation of a listener.
-      if (!this.code) return;
+      if ( ! this.code ) return;
 
       foam.assert(
         ! superAxiom ||
