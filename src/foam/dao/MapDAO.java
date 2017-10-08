@@ -24,6 +24,11 @@ public class MapDAO
     setOf(of);
   }
 
+  public MapDAO(X x, ClassInfo of) {
+    setX(x);
+    setOf(of);
+  }
+
   protected synchronized void data_factory() {
     if ( data_ == null ) {
       data_ = (Map<Object, FObject>) new ConcurrentHashMap();
