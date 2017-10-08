@@ -48,11 +48,6 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public String createStatement() {
-    return getName().toLowerCase();
-  }
-
-  @Override
   public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
