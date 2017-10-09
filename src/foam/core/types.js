@@ -452,7 +452,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of'
+      name: 'of',
+      value: 'foam.core.FObject'
     },
     {
       name: 'fromJSON',
