@@ -19,9 +19,37 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.u2',
-  name: 'tableColumns',
+  name: 'TableColumns',
+  properties: [
+    [ 'name', 'tableColumns' ],
+    'columns'
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
-  name: 'searchColumns',
+  name: 'SearchColumns',
+  properties: [
+    [ 'name', 'searchColumns' ],
+    'columns'
+  ]
+});
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'Entity',
+});
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'DefaultValidator',
+});
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'ElementState',
+});
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'RenderSink',
+});
+foam.CLASS({
+  package: 'foam.u2',
+  name: 'U2Context',
 });
