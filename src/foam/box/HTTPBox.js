@@ -76,13 +76,7 @@ foam.CLASS({
       name: 'outputter',
       generateJava: false,
       factory: function() {
-        return this.JSONOutputter.create({
-          pretty:               false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues:  false,
-          strict:               true,
-          propertyPredicate:    function(o, p) { return ! p.networkTransient; }
-        });
+        return this.JSONOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ],
@@ -94,11 +88,15 @@ foam.CLASS({
         cls.extras.push(foam.java.Code.create({
           data: `
 protected class Outputter extends foam.lib.json.Outputter {
-  protected void outputFObject(StringBuilder out, foam.core.FObject o) {
+  public Outputter() {
+    super(foam.lib.json.OutputterMode.NETWORK);
+  }
+
+  protected void outputFObject(foam.core.FObject o) {
     if ( o == getMe() ) {
       o = getX().create(foam.box.HTTPReplyBox.class);
     }
-    super.outputFObject(out, o);
+    super.outputFObject(o);
   }
 }
 
@@ -129,17 +127,18 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function send(msg) {
+        var payload = this.outputter.stringify(msg);
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method:  this.method,
-          payload: this.outputter.stringify(msg)
+          payload: payload
         }).send();
 
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var msg = this.parser.parseString(p);
-          msg && this.me.send(msg);
+          var rmsg = this.parser.parseString(p);
+          rmsg && this.me.send(rmsg);
         }.bind(this));
       },
       javaCode: `

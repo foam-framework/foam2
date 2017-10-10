@@ -18,16 +18,7 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ActionView',
-  extends: 'foam.u2.Element',
-
-  documentation: function() {`
-    A button View for triggering Actions.
-
-    Icon Fonts
-    If using icon-fonts a css stylesheet link to the fonts is required in index.html.
-    The default of foam.core.Action.js is 'Material Icons' supported by the following
-    link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
-  `},
+  extends: 'foam.u2.UnstyledActionView',
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
@@ -151,8 +142,8 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      this.action && this.action.maybeCall(this.__subContext__, this.data);
       e.stopPropagation();
+      this.action && this.action.maybeCall(this.__subContext__, this.data);
     }
   ]
 });

@@ -6,7 +6,10 @@
 
 package foam.lib.parse;
 
-public class Substring extends ProxyParser {
+public class Substring
+  extends ProxyParser
+{
+  
   public Substring(Parser delegate) {
     super(delegate);
   }

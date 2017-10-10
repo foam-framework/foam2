@@ -40,7 +40,7 @@ foam.CLASS({
 
       var client = {
         package: 'foam.nanos.client',
-        name: 'Client2',
+        name: 'Client',
 
         implements: [ 'foam.box.Context' ],
 
@@ -91,7 +91,7 @@ foam.CLASS({
         },
         eof: function() {
           foam.CLASS(client);
-          resolve(foam.nanos.client.Client2);
+          resolve(foam.nanos.client.Client);
         }
       });
     }

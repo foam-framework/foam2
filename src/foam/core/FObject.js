@@ -130,6 +130,12 @@ foam.LIB({
       var existing = new Array(axs.length);
 
       for ( var i = 0 ; i < axs.length ; i++ ) {
+      // Convert JSON axioms to real instances as late as possible
+        if ( foam.String.isInstance(axs[i].class) ) {
+          var axsCls = foam.lookup(axs[i].class, true);
+          if ( axsCls ) axs[i] = axsCls.create(axs[i]);
+        }
+
         var a = axs[i];
 
         // Store the destination class in the Axiom. Used by describe().
