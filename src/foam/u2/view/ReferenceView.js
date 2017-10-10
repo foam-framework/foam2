@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.view.ChoiceView',
 
   imports: [
-    'data as parentObj',
+    'data as parentObj'
   ],
 
   properties: [
@@ -39,6 +39,7 @@ foam.CLASS({
   methods: [
     function fromProperty(prop) {
       this.SUPER(prop);
+
       if ( ! this.hasOwnProperty('objToChoice') ) {
         var of = prop.of;
 
