@@ -35,7 +35,6 @@ public class NanoRouter
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String      path       = req.getRequestURI();
-    //AuthService auth       = this.X.get("authService");
     String[]    urlParams  = path.split("/");
     String      serviceKey = urlParams[1];
     Object      service    = getX().get(serviceKey);
