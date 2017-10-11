@@ -3,7 +3,9 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
+supressWarnings([
+  `Unknown property foam.core.Model.javaType: foam.core.PropertyInfo`,
+])
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
@@ -339,7 +341,7 @@ foam.CLASS({
   methods: [
     function buildJavaClass(cls) {
       if ( ! this.type ) {
-        console.warn("Skipping constant", this.name, "with unknown type.");
+        this.warn("Skipping constant ", this.name, " with unknown type.");
         return;
       }
 
@@ -1007,8 +1009,8 @@ foam.CLASS({
 
       var cast = info.getMethod('cast');
       cast.body = 'Object[] value = (Object[])o;\n'
-                + this.javaType + ' ret = new ' + this.of + '[value.length];\n'
-                + 'System.arraycopy(value, 0, ret, 0, value.length);\n'
+                + this.javaType + ' ret = new ' + this.of + '[value == null ? 0 : value.length];\n'
+                + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
       // TODO: Change to ClassInfo return type once primitive support is added
       info.method({

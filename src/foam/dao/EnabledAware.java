@@ -6,16 +6,16 @@
 
 package foam.dao;
 
+import foam.dao.pg.IndexedPreparedStatement;
 import foam.mlang.predicate.Predicate;
 
-import java.sql.PreparedStatement;
 import java.util.Date;
 
 public interface EnabledAware {
   public final static Predicate ENABLED = new Predicate() {
     public boolean f(foam.core.FObject obj) { return true; }
-    public String createStatement(String table) { return "enabled = 't'"; }
-    public void prepareStatement(PreparedStatement stmt) { }
+    public String createStatement() { return "enabled = 't'"; }
+    public void prepareStatement(IndexedPreparedStatement stmt) { }
     public foam.mlang.predicate.Predicate partialEval() { return this; }
   };
 

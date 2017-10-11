@@ -21,7 +21,9 @@
 // TODO:
 //   - don't output default classes
 */
-
+supressWarnings([
+  `Skipping constant PARSE_JSON with unknown type.`,
+]);
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -290,6 +292,9 @@ foam.CLASS({
       // Access property before checking o.hasOwnProperty.
       var v = o[p.name];
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
+        return false;
+
+      if ( foam.Array.isInstance(v) && v.length == 0 )
         return false;
 
       if ( includeComma ) this.out(',');

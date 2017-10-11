@@ -6,13 +6,14 @@
 
 package foam.core;
 
+import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Map;
 
 public abstract class AbstractPropertyInfo
@@ -47,13 +48,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public String createStatement() {
-    return getName();
-  }
-
-  @Override
-  public void prepareStatement(PreparedStatement stmt) {
-  }
+  public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
   public Object f(FObject o) {

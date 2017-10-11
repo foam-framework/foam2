@@ -161,8 +161,7 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'of',
-      value: null
+      name: 'of'
     },
     {
       name: 'a',
@@ -188,7 +187,8 @@ foam.CLASS({
         else
           this.array.push(cls.create(o, this.__subContext__));
       },
-      javaCode: `getArray().add(obj);`
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+                +`getArray().add(obj);`
     },
     function outputJSON(outputter) {
       outputter.start('{');

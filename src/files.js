@@ -21,6 +21,14 @@
  * pages via script tags easily.
  */
 
+if ( typeof window !== 'undefined' ) global = window;
+
+global.SUPRESSED_WARNINGS = global.SUPRESSED_WARNINGS || {};
+global.supressWarnings = function (a) {
+  a.forEach(function(key) {
+    SUPRESSED_WARNINGS[key] = true;
+  })
+}
 FOAM_FILES([
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
@@ -103,6 +111,7 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Visibility"},
+  { name: "foam/u2/NoJava" ,  flags: ['js','debug'] },
   { name: "foam/u2/ElementJava" ,  flags: ['java'] },
   { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
@@ -120,6 +129,7 @@ FOAM_FILES([
   { name: "foam/dao/DAODecorator" },
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/DAOProperty" },
+  { name: "foam/dao/SQLStatement" },
   { name: "foam/mlang/order/Comparator", flags: ['js'] },
   { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
@@ -320,7 +330,7 @@ FOAM_FILES([
   { name: "foam/u2/search/TextSearchView", flags: ['web'] },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
-  { name: "foam/u2/FoamTagLoader", flags: ['loader'] },
+  { name: "foam/u2/FoamTagLoader", flags: ['web'] },
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
   { name: "foam/physics/PhysicalCircle", flags: ['web'] },
@@ -344,7 +354,7 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
-  { name: "foam/doc/DocBrowser", flags: ['debug, web'] },
+  { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
