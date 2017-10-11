@@ -29,9 +29,9 @@ foam.CLASS({
 
   methods: [
     /** Scan each object for strings and internalize them. */
-    function put(obj) {
+    function put_(x, obj) {
       this.dedup(obj);
-      return this.delegate.put(obj);
+      return this.delegate.put_(x, obj);
     },
 
     /** Internalizes strings in the given object.

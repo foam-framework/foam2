@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,33 +20,26 @@ foam.CLASS({
   package: 'foam.comics',
   name: 'DAOCreateController',
 
-  imports: [
-    'stack'
-  ],
-
-  exports: [
-    'data'
+  topics: [
+    'finished'
   ],
 
   properties: [
     {
-      name: 'dao',
-      hidden: true,
-      factory: function() {
-        return this.__context__[foam.String.daoize(this.of.name)];
-      }
+      name: 'dao'
     },
     {
-      class: 'Class',
-      name: 'of',
-      hidden: true
+      class: 'Boolean',
+      name: 'inProgress'
+    },
+    {
+      name: 'exception'
     },
     {
       name: 'data',
-      label: '',
       view: { class: 'foam.u2.DetailView' },
       factory: function() {
-        return this.of.create(null, this);
+        return this.dao ? this.dao.of.create({}, this) : null;
       }
     }
   ],
@@ -53,18 +47,24 @@ foam.CLASS({
   actions: [
     {
       name: 'save',
+      isEnabled: function(dao, data$errors_, inProgress) { return !! dao && ! inProgress && ! data$errors_; },
       code: function() {
-        var stack = this.stack;
-
-        this.dao.put(this.data).then(function() {
-          if ( stack ) stack.back();
+        this.inProgress = true;
+        this.clearProperty('exception');
+        var self = this;
+        this.dao.put(this.data.clone()).then(function() {
+          self.inProgress = false;
+          self.finished.pub();
+        }, function(e) {
+          self.inProgress = false;
+          self.exception = e;
         });
       }
     },
     {
       name: 'cancel',
       code: function() {
-        this.stack && this.stack.back();
+        this.finished.pub();
       }
     }
   ]

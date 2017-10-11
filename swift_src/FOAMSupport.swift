@@ -2,11 +2,6 @@ import Foundation
 
 public typealias Listener = (Subscription, [Any?]) -> Void
 
-public protocol Initializable {
-  init()
-  init(_ args: [String:Any?])
-}
-
 public protocol ContextAware {
   var __context__: Context { get set }
   var __subContext__: Context { get }
@@ -27,12 +22,13 @@ class ListenerList {
 public protocol PropertyInfo: Axiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
-  var view: FObject.Type? { get }
   var label: String { get }
+  var visibility: Visibility { get }
   var jsonParser: Parser? { get }
   func set(_ obj: FObject, value: Any?)
   func get(_ obj: FObject) -> Any? // TODO rename to f?
   func compareValues(_ v1: Any?, _ v2: Any?) -> Int
+  func viewFactory(x: Context) -> FObject?
 }
 
 extension PropertyInfo {
@@ -50,26 +46,58 @@ extension PropertyInfo {
   }
 }
 
-public class Action: Axiom {
+public class MethodArg {
   public var name: String = ""
-  public var label: String = ""
-  public func call(_ obj: FObject) {
-    obj.callAction(key: name)
+}
+
+public protocol MethodInfo: Axiom {
+  var args: [MethodArg] { get }
+}
+extension MethodInfo {
+  public func call(_ obj: FObject, args: [Any?] = []) throws -> Any? {
+    let callback = obj.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
+    return try callback(args)
   }
 }
 
+public protocol ActionInfo: MethodInfo {
+  var label: String { get }
+}
+
 public class Context {
-  public static let GLOBAL = Context()
-  public func create(type: Any, args: [String:Any?] = [:]) -> Any? {
-    var o: Any? = nil
-    if let t = type as? Initializable.Type {
-      o = t.init(args)
-    }
-    if var o = o as? ContextAware {
-      o.__context__ = self
-    }
-    return o
+  public static let GLOBAL: Context = {
+    let x = Context()
+    FOAM_utils.registerClasses(x)
+    return x
+  }()
+  var parent: Context?
+
+  private lazy var classIdMap: [String:ClassInfo] = [:]
+  private lazy var classNameMap: [String:String] = [:]
+  public func registerClass(cls: ClassInfo) {
+    classIdMap[cls.id] = cls
+    classNameMap[NSStringFromClass(cls.cls)] = cls.id
+    _ = cls.ownAxioms
   }
+  public func lookup(_ id: String) -> ClassInfo? {
+    return classIdMap[id] ?? parent?.lookup(id)
+  }
+  func lookup_(_ cls: AnyClass) -> ClassInfo? {
+    let str = NSStringFromClass(cls)
+    if let id = classNameMap[str] {
+      return lookup(id)
+    }
+    return parent?.lookup_(cls)
+  }
+
+  public func create<T>(_ type: T.Type, args: [String:Any?] = [:]) -> T? {
+    if let type = type as? AnyClass,
+       let cls = lookup_(type) {
+      return cls.create(args: args, x: self) as? T
+    }
+    return nil
+  }
+
   private var slotMap: [String:Slot] = [:]
   public subscript(key: String) -> Any? {
     if let slot = slotMap[key] {
@@ -77,11 +105,11 @@ public class Context {
     } else if let slot = slotMap[toSlotName(name: key)] {
       return slot.swiftGet()
     }
-    return nil
+    return parent?[key]
   }
   private func toSlotName(name: String) -> String { return name + "$" }
   public func createSubContext(args: [String:Any?] = [:]) -> Context {
-    var slotMap = self.slotMap
+    var slotMap: [String:Slot] = [:]
     for (key, value) in args {
       let slotName = toSlotName(name: key)
       if let slot = value as AnyObject as? Slot {
@@ -90,27 +118,35 @@ public class Context {
         slotMap[slotName] = ConstantSlot(["value": value])
       }
     }
-
     let subContext = Context()
     subContext.slotMap = slotMap
+    subContext.parent = self
     return subContext
   }
 }
 
 public protocol ClassInfo {
   var id: String { get }
-  var parent: ClassInfo { get }
+  var label: String { get }
+  var parent: ClassInfo? { get }
   var ownAxioms: [Axiom] { get }
+  var cls: AnyClass { get }
+  func create(args: [String:Any?], x: Context) -> Any
 }
 
 extension ClassInfo {
   var axioms: [Axiom] {
     get {
-      var curCls: ClassInfo = self
+      var curCls: ClassInfo? = self
       var axioms: [Axiom] = []
-      while curCls.parent.id != curCls.id {
-        axioms += curCls.ownAxioms
-        curCls = curCls.parent
+      var seen = Set<String>()
+      while curCls != nil {
+        for a in curCls!.ownAxioms {
+          if seen.contains(a.name) { continue }
+          axioms.append(a)
+          seen.insert(a.name)
+        }
+        curCls = curCls!.parent
       }
       return axioms
     }
@@ -139,48 +175,39 @@ extension ClassInfo {
     }
     return nil
   }
+  func create(x: Context) -> Any { return create(args: [:], x: x) }
 }
 
-public class ClassInfoImpl: ClassInfo {
-  public lazy var id: String = "FObject"
-  public lazy var parent: ClassInfo = self
-  public lazy var ownAxioms: [Axiom] = []
+public protocol Detachable {
+  func detach()
 }
 
-public class Subscription {
+public class Subscription: Detachable {
   private var detach_: (() -> Void)?
   init(detach: @escaping () ->Void) {
     self.detach_ = detach
   }
-  func detach() {
+  public func detach() {
     detach_?()
     detach_ = nil
   }
 }
 
-public protocol FObject: class {
+public protocol FObject: class, Detachable {
+  func ownClassInfo() -> ClassInfo
   func sub(topics: [String], listener l: @escaping Listener) -> Subscription
-  static func classInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
   func getSlot(key: String) -> Slot?
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
-  func callAction(key: String)
   func compareTo(_ data: FObject?) -> Int
+  func onDetach(_ sub: Detachable)
   init(_ args: [String:Any?])
 }
 
-// TODO figure out how to make FObjects implement Comparable.
-/*
-extension FObject {
-  public static func < (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) < 0 }
-  public static func == (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) == 0 }
-  public static func > (lhs: FObject, rhs: FObject) -> Bool { return lhs.compareTo(rhs) > 1 }
-}
-*/
+public class AbstractFObject: NSObject, FObject, ContextAware {
 
-public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   public var __context__: Context = Context.GLOBAL {
     didSet {
       self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())
@@ -189,31 +216,30 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   lazy private(set) public var __subContext__: Context = {
     return self.__context__.createSubContext(args: self._createExports_())
   }()
-
-  func _createExports_() -> [String:Any?] {
-    return [:]
-  }
+  func _createExports_() -> [String:Any?] { return [:] }
 
   lazy var listeners: ListenerList = ListenerList()
 
-  private static var classInfo_: ClassInfo! = nil
-  public class func classInfo() -> ClassInfo {
-    if classInfo_ == nil { classInfo_ = createClassInfo_() }
-    return classInfo_
-  }
-
-  class func createClassInfo_() -> ClassInfo {
-    let classInfo = ClassInfoImpl()
-    classInfo.parent = classInfo
-    classInfo.id = "FObject"
-    return classInfo
-  }
+  public class func classInfo() -> ClassInfo { fatalError() }
+  public func ownClassInfo() -> ClassInfo { fatalError() }
 
   public func set(key: String, value: Any?) {}
   public func get(key: String) -> Any? { return nil }
   public func getSlot(key: String) -> Slot? { return nil }
   public func hasOwnProperty(_ key: String) -> Bool { return false }
   public func clearProperty(_ key: String) {}
+
+  public func onDetach(_ sub: Detachable) {
+    _ = self.sub(topics: ["detach"]) { (s, _) in
+      s.detach()
+      sub.detach()
+    }
+  }
+
+  public func detach() {
+    _ = pub(["detach"])
+    detachListeners(listeners: listeners)
+  }
 
   public func sub(
     topics: [String] = [],
@@ -246,6 +272,22 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     return node.sub!
   }
 
+  func hasListeners(_ args: [Any]) -> Bool {
+    var listeners: ListenerList? = self.listeners
+    var i = 0
+    while listeners != nil {
+      if listeners?.next != nil { return true }
+      if i == args.count { return false }
+      if let p = args[i] as? String {
+        listeners = listeners?.children[p]
+        i += 1
+      } else {
+        break
+      }
+    }
+    return false
+  }
+
   private func notify(listeners: ListenerList?, args: [Any]) -> Int {
     var count = 0
     var l = listeners
@@ -275,19 +317,20 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
     if self === data { return 0 }
     if data == nil { return 1 }
     let data = data!
-    if type(of: self).classInfo().id != type(of: data).classInfo().id {
-      return type(of: self).classInfo().id > type(of: data).classInfo().id ? 1 : -1
+    if ownClassInfo().id != data.ownClassInfo().id {
+      return ownClassInfo().id > data.ownClassInfo().id ? 1 : -1
     }
-    for props in type(of: data).classInfo().axioms(byType: PropertyInfo.self) {
+    for props in data.ownClassInfo().axioms(byType: PropertyInfo.self) {
       let diff = props.compare(self, data)
       if diff != 0 { return diff }
     }
     return 0
   }
 
-  public func callAction(key: String) { }
-
-  public override required init() {}
+  public override required init() {
+    super.init()
+    __foamInit__()
+  }
 
   public required init(_ args: [String:Any?]) {
     super.init()
@@ -295,6 +338,21 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
       self.set(key: key, value: value)
     }
     __foamInit__()
+  }
+
+  public required init(X x: Context) {
+    super.init()
+    __foamInit__()
+    __context__ = x
+  }
+
+  public required init(_ args: [String:Any?], _ x: Context) {
+    super.init()
+    for (key, value) in args {
+      self.set(key: key, value: value)
+    }
+    __foamInit__()
+    __context__ = x
   }
 
   func __foamInit__() {}
@@ -311,7 +369,7 @@ public class AbstractFObject: NSObject, FObject, Initializable, ContextAware {
   }
 
   deinit {
-    detachListeners(listeners: listeners)
+    detach()
   }
 }
 
@@ -322,6 +380,15 @@ struct FOAM_utils {
     if a === b { return true }
     if a != nil { return a!.isEqual(b) }
     return false
+  }
+  static var nextId = 1
+  static var nextIdSem = DispatchSemaphore(value: 1)
+  static func next$UID() -> Int {
+    nextIdSem.wait()
+    let id = nextId
+    nextId += 1
+    nextIdSem.signal()
+    return id
   }
 }
 
@@ -350,11 +417,10 @@ extension Character {
 
 public class ModelParserFactory {
   private static var parsers: [String:Parser] = [:]
-  public static func getInstance(_ c: FObject.Type) -> Parser {
-    let info = c.classInfo()
-    if let p = parsers[info.id] { return p }
-    let parser = buildInstance(info)
-    parsers[info.id] = parser
+  public static func getInstance(_ cls: ClassInfo) -> Parser {
+    if let p = parsers[cls.id] { return p }
+    let parser = buildInstance(cls)
+    parsers[cls.id] = parser
     return parser
   }
   private static func buildInstance(_ info: ClassInfo) -> Parser {
@@ -371,5 +437,69 @@ public class ModelParserFactory {
       ]]),
       "delim": Literal(["string": ","]),
     ])
+  }
+}
+
+public protocol FOAM_enum {
+  var ordinal: Int { get }
+  var name: String { get }
+  var label: String { get }
+}
+
+public class FoamError: Error {
+  var obj: Any?
+  init(_ obj: Any?) { self.obj = obj }
+  func toString() -> String {
+    if let obj = self.obj as? FObject {
+      let o = Context.GLOBAL.create(Outputter.self)!
+      return o.swiftStringify(obj)
+    } else if let obj = self.obj as? FoamError {
+      return "FoamError(" + obj.toString() + ")"
+    }
+    return String(describing: self.obj as AnyObject)
+  }
+}
+
+public class Future<T> {
+  var set: Bool = false
+  var value: T?
+  var error: Error?
+  var semaphore = DispatchSemaphore(value: 0)
+  var numWaiting = 0
+  public func get() throws -> T? {
+    if !set {
+      numWaiting += 1
+      semaphore.wait()
+    }
+    if error != nil {
+      throw error!
+    }
+    return value
+  }
+  public func set(_ value: T?) {
+    self.value = value
+    set = true
+    for _ in 0...numWaiting {
+      semaphore.signal()
+    }
+  }
+  public func error(_ value: Error?) {
+    self.error = value
+    set = true
+    for _ in 0...numWaiting {
+      semaphore.signal()
+    }
+  }
+}
+
+public class ParserContext {
+  private lazy var map_: [String:Any] = [:]
+  private var parent_: ParserContext?
+  public func get(_ key: String) -> Any? { return map_[key] ?? parent_?.get(key) }
+  public func set(_ key: String, _ value: Any) { map_[key] = value }
+  public func sub() -> ParserContext {
+    let child = ParserContext()
+    child.parent_ = self
+    return child
   }
 }

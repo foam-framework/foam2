@@ -3,8 +3,6 @@ import XCTest
 
 class SwiftTestsTests: XCTestCase {
 
-  let x = Context.GLOBAL
-
   override func setUp() {
     super.setUp()
   }
@@ -16,18 +14,18 @@ class SwiftTestsTests: XCTestCase {
   func testListen() {
     let test = Test()
     var numPubs = 0
-    let sub = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+    _ = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
       numPubs += 1
       sub.detach()
     })
 
     var numPubs2 = 0
-    let sub2 = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+    _ = test.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
       numPubs2 += 1
     })
 
     var numPubs3 = 0
-    let sub3 = test.lastName$.swiftSub({ (sub: Subscription, args: [Any?]) -> Void in
+    _ = test.lastName$.swiftSub({ (sub: Subscription, args: [Any?]) -> Void in
       numPubs3 += 1
     })
 
@@ -39,9 +37,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(numPubs2, 4) // Each set to first or last name triggers another set.
     XCTAssertEqual(numPubs3, 1)
 
-    sub.detach() // Should do nothing.
-    sub2.detach()
-    sub3.detach()
+    test.detach()
   }
 
   func testFollow() {
@@ -50,7 +46,8 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(o2.firstName, "A")
     o2.firstName = "B"
     XCTAssertEqual(o1.firstName, "B")
-    o2.firstName_Value_Sub_?.detach()
+    o1.detach()
+    o2.detach()
   }
 
   func testObjectCreationPerformance() {
@@ -61,184 +58,10 @@ class SwiftTestsTests: XCTestCase {
     }
   }
 
-  func testCharsParse() {
-    let parser = Alt([
-      "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": " "]),
-      ],
-    ])
-    var ps: PStream! = StringPStream(["str": "A string"])
-
-    // Parsing first character.
-    ps = parser.parse(ps, x)
-    XCTAssertNotNil(ps)
-
-    // Parsing second character.
-    ps = parser.parse(ps, x)
-    XCTAssertNotNil(ps)
-
-    // Parsing third character.
-    ps = parser.parse(ps, x)
-    XCTAssertNil(ps)
-  }
-
-  func testAnyCharParse() {
-    let parser = AnyChar()
-    var ps: PStream! = StringPStream(["str": "123"])
-
-    ps = parser.parse(ps, x) // 1
-    XCTAssertNotNil(ps)
-
-    ps = parser.parse(ps, x) // 2
-    XCTAssertNotNil(ps)
-
-    ps = parser.parse(ps, x) // 3
-    XCTAssertNotNil(ps)
-
-    ps = parser.parse(ps, x) // Error
-    XCTAssertNil(ps)
-  }
-
-
-  func testLiteralParse() {
-    let parser = Literal(["string": "myLiteral"])
-    XCTAssertNil(parser.parse(StringPStream(["str": "hello"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "myLiteralHello"]), x))
-  }
-
-  func testNotCharsParse() {
-    let parser = NotChars(["chars": "ABC"])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AHello"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "Hello"]), x))
-  }
-
-  func testRepeat() {
-    let parser = Repeat([
-      "delegate": Chars(["chars": "A"]),
-      "delim": Chars(["chars": ","]),
-      "min": 3,
-      "max": 5,
-    ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A,A"]), x))
-    XCTAssertEqual(parser.parse(
-        StringPStream(["str": "A,A,A"]), x)!.value()! as! [Character],
-        ["A","A","A"] as [Character])
-  }
-
-  func testRepeat0() {
-    let parser = Repeat0([
-      "delegate": Chars(["chars": "A"]),
-      "delim": Chars(["chars": ","]),
-      "min": 3,
-      "max": 5,
-      ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A"]), x))
-    XCTAssertNotNil(parser.parse(StringPStream(["str": "A,A,A,A,A"]), x))
-    XCTAssertEqual(parser.parse(
-        StringPStream(["str": "A,A,A,A,A"]), x)!.value()! as! Character,
-        "A")
-  }
-
-  func testSeq() {
-    let parser = Seq([
-      "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
-      ]
-    ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AAB"]), x))
-    XCTAssertEqual(
-      parser.parse(StringPStream(["str": "ABB"]), x)!.value()! as! [Character],
-      ["A", "B"])
-  }
-
-  func testSeq0() {
-    let parser = Seq0([
-      "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
-      ]
-    ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AAB"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "ABC"]), x)!.value()! as! Character, "B")
-  }
-
-  func testSeq1() {
-    let parser = Seq1([
-      "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
-      ],
-      "index": 0,
-    ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AAB"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "ABC"]), x)!.value()! as! Character, "A")
-  }
-
-  func testSeq2() {
-    let parser = Seq2([
-      "parsers": [
-        Chars(["chars": "A"]),
-        Chars(["chars": "B"]),
-        Chars(["chars": "C"]),
-      ],
-      "index1": 0,
-      "index2": 2,
-    ])
-    XCTAssertNil(parser.parse(StringPStream(["str": "AB"]), x))
-    XCTAssertEqual(
-      parser.parse(StringPStream(["str": "ABCD"]), x)!.value()! as! [Character],
-      ["A", "C"])
-  }
-
-  func testSubstring() {
-    let parser = Substring([
-      "delegate": Repeat([
-        "delegate": Chars(["chars": "BA"]),
-      ])
-    ])
-    XCTAssertEqual(parser.parse(StringPStream(["str": "ABCDEFG"]), x)!.value()! as! String, "AB")
-  }
-
-  func testAnyKeyParser() {
-    let parser = AnyKeyParser()
-    XCTAssertEqual(parser.parse(StringPStream(["str": "KEY"]), x)!.value()! as! String, "KEY")
-    XCTAssertEqual(parser.parse(StringPStream(["str": "\"KEY\": "]), x)!.value()! as! String, "KEY")
-  }
-
-  func testFloatParser() {
-    let parser = FloatParser()
-    XCTAssertNil(parser.parse(StringPStream(["str": "KEY"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "0.1"]), x)!.value()! as! Float, 0.1)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "1."]), x)!.value()! as! Float, 1.0)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-0.1123"]), x)!.value()! as! Float, -0.1123)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-50"]), x)!.value()! as! Float, -50.0)
-  }
-
-  func testIntParser() {
-    let parser = IntParser()
-    XCTAssertNil(parser.parse(StringPStream(["str": "KEY"]), x))
-    XCTAssertEqual(parser.parse(StringPStream(["str": "0.1"]), x)!.value()! as! Int, 0)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "1."]), x)!.value()! as! Int, 1)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-0.1123"]), x)!.value()! as! Int, 0)
-    XCTAssertEqual(parser.parse(StringPStream(["str": "-50"]), x)!.value()! as! Int, -50)
-  }
-
   func testFObjectParse() {
-    let x = Context.GLOBAL.createSubContext(args: [
-      "X": Context.GLOBAL,
-      "Test": Test.self,
-    ])
-    let ps = FObjectParser().parse(
-        StringPStream(["str": "{class:'Test', prevFirstName: \"MY_PREV_NAME\"}"]), x)
-    XCTAssertTrue(ps!.value() is Test)
-    XCTAssertEqual((ps!.value() as! Test).prevFirstName, "MY_PREV_NAME")
+    let ps = FObjectParser().parseString("{class:'Test', prevFirstName: \"MY_PREV_NAME\"}")
+    XCTAssertTrue(ps is Test)
+    XCTAssertEqual((ps as! Test).prevFirstName, "MY_PREV_NAME")
   }
 
   func testToJSON() {
@@ -262,6 +85,7 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(t.exprProp, "OVERRIDE")
     t.firstName = "Nope"
     XCTAssertEqual(t.exprProp, "OVERRIDE")
+    t.detach()
   }
 
   func testCompare() {
@@ -279,71 +103,71 @@ class SwiftTestsTests: XCTestCase {
   func testArrayDao() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.FIRST_NAME,
+      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
     ])
     let t1 = Test([
       "firstName": "Mike",
     ])
-    XCTAssertEqual(t1, dao.put(t1) as? Test)
+    XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
     XCTAssertEqual(dao.dao as! [Test], [t1])
-    XCTAssertEqual(t1, dao.put(t1) as? Test)
+    XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
     XCTAssertEqual(dao.dao as! [Test], [t1])
 
     let t2 = Test([
       "firstName": "Mike",
     ])
-    XCTAssertEqual(t2, dao.put(t2) as? Test)
+    XCTAssertEqual(t2, (try? dao.put(t2)) as? Test)
     XCTAssertEqual(dao.dao as! [Test], [t2])
 
     t1.firstName = "Mike2"
-    XCTAssertEqual(t1, dao.put(t1) as? Test)
+    XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
     XCTAssertEqual(dao.dao as! [Test], [t2, t1])
 
-    XCTAssertEqual(t1, dao.find(t1.firstName) as? Test)
+    XCTAssertEqual(t1, (try? dao.find(t1.firstName)) as? Test)
 
     let tToRemove = Test(["firstName": "Mike2"])
-    let tRemoved = dao.remove(tToRemove) as? Test
+    let tRemoved = (try? dao.remove(tToRemove)) as? Test
     XCTAssertNotEqual(tRemoved, tToRemove)
     XCTAssertEqual(tRemoved, t1)
 
-    let sink = dao.select() as! ArraySink
+    let sink = (try? dao.select()) as! ArraySink
     XCTAssertEqual(sink.dao as! [Test], [t2])
   }
 
   func testDaoListen() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.FIRST_NAME,
+      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
     ])
 
     let sink = ArraySink()
-    let detach = dao.listen(sink)
+    let detach = (try? dao.listen(sink))
 
-    let t1 = dao.put(Test(["firstName": "A"])) as! Test
+    let t1 = (try? dao.put(Test(["firstName": "A"]))) as! Test
     XCTAssertEqual(sink.dao as! [Test], [t1])
 
-    let t2 = dao.put(Test(["firstName": "B"])) as! Test
+    let t2 = (try? dao.put(Test(["firstName": "B"]))) as! Test
     XCTAssertEqual(sink.dao as! [Test], [t1, t2])
 
-    _ = dao.remove(Test(["firstName": "B"])) as! Test
+    _ = (try? dao.remove(Test(["firstName": "B"]))) as! Test
     XCTAssertEqual(sink.dao as! [Test], [t1])
 
-    detach.detach()
-    _ = dao.put(Test(["firstName": "C"]))
+    detach?.detach()
+    _ = (try? dao.put(Test(["firstName": "C"])))
     XCTAssertEqual(sink.dao.count, 1)
   }
 
   func testDaoSkipLimitSelect() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.FIRST_NAME,
+      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
     ])
 
     for i in 1...10 {
-      _ = dao.put(Test(["firstName": i]))
+      _ = (try? dao.put(Test(["firstName": i])))
     }
 
-    let sink = dao.select(skip: 2, limit: 5) as! ArraySink
+    let sink = (try? dao.skip(2).limit(5).select(ArraySink())) as! ArraySink
     XCTAssertEqual(sink.dao.count, 5)
     XCTAssertEqual("3", (sink.dao[0] as! Test).firstName)
   }
@@ -363,15 +187,186 @@ class SwiftTestsTests: XCTestCase {
     o.lastName = "D"
     XCTAssertEqual(slot.swiftGet() as! String, "Mike D")
 
-    slot.cleanup()
+    o.detach()
+    slot.detach()
   }
 
   func testMemLeaks() {
-    for _ in 1...5000 {
+    for _ in 1...5 {
       testFollow()
       testListen()
       testExpression()
       testExpressionSlot()
+      testSubSlot()
+      testSubSlot2()
+      testClientBoxRegistry()
+    }
+  }
+
+  func testHasOwnProperty() {
+    let o = Test()
+    o.firstName = "Mike"
+    o.lastName = "C"
+    XCTAssertEqual(o.exprProp, "Mike C")
+    XCTAssertFalse(o.hasOwnProperty("exprProp"))
+  }
+
+  func testSwiftSubFire() {
+    let o = Tabata()
+
+    var calls = 0
+    let sub = o.seconds$.swiftSub { (_, _) in
+      calls += 1
+    }
+
+    XCTAssertEqual(calls, 0)
+    o.seconds += 1
+    XCTAssertEqual(calls, 1)
+
+    sub.detach()
+  }
+
+  func testSubSlot() {
+    let t = Test()
+    let t2 = Test()
+    t2.firstName = "YO"
+    t.anyProp = t2
+
+    let s = t.anyProp$.dot("firstName")
+    XCTAssertEqual(s.swiftGet() as? String, "YO")
+
+    var i = 0
+    _ = s.swiftSub { (_, _) in
+      i += 1
+      XCTAssertEqual(s.swiftGet() as? String, "YO2")
+    }
+    t2.firstName = "YO2"
+    XCTAssertEqual(s.swiftGet() as? String, "YO2")
+    XCTAssertEqual(i, 1)
+  }
+
+  func testSubSlot2() {
+    let t = Test(["firstName": "a"])
+
+    var slot = 0
+    let s1 = t.firstName$.swiftSub { (_, _) in
+      slot += 1
+    }
+
+    var subSlot = 0
+    let t2 = Test(["anyProp": t])
+    let s2 = t2.anyProp$.dot("firstName").swiftSub { (_, _) in
+      subSlot += 1
+    }
+
+    XCTAssertEqual(t2.anyProp$.dot("firstName").swiftGet() as! String, "a")
+    XCTAssertEqual(slot, 0)
+    XCTAssertEqual(subSlot, 0)
+
+    t.firstName = "B"
+
+    XCTAssertEqual(t2.anyProp$.dot("firstName").swiftGet() as! String, "B")
+    XCTAssertEqual(slot, 1)
+    XCTAssertEqual(subSlot, 1)
+
+    s1.detach()
+    s2.detach()
+    t.detach()
+    t2.detach()
+  }
+
+  func testRPCBoxSuccess() {
+    let rpcBox = RPCReturnBox()
+
+    let sem = DispatchSemaphore(value: 0)
+
+    var dispatched = false
+    DispatchQueue(label: "TestDispatch").async {
+      let msg = try? rpcBox.future.get() as! String
+      dispatched = true
+      XCTAssertEqual(msg, "Hello there")
+      sem.signal()
+    }
+
+    let msg = Message(["object": RPCReturnMessage(["data": "Hello there"])])
+    XCTAssertFalse(dispatched)
+    try! rpcBox.send(msg)
+    sem.wait()
+    XCTAssertTrue(dispatched)
+  }
+
+  func testRPCBoxError() {
+    let rpcBox = RPCReturnBox()
+
+    let sem = DispatchSemaphore(value: 0)
+
+    var dispatched = false
+    DispatchQueue(label: "TestDispatch").async {
+      do {
+        _ = try rpcBox.future.get() as! String
+      } catch let e {
+        let e = e as! FoamError
+        dispatched = true
+        XCTAssertEqual(e.obj as? String, "Hello there")
+        sem.signal()
+      }
+    }
+
+    let msg = Message(["object": "Hello there"])
+    XCTAssertFalse(dispatched)
+    try! rpcBox.send(msg)
+    sem.wait()
+    XCTAssertTrue(dispatched)
+  }
+
+  func testClientBoxRegistry() {
+    let boxContext = BoxContext()
+    let X = boxContext.__subContext__
+
+    let outputter = X.create(Outputter.self)!
+    let parser = X.create(FObjectParser.self)!
+
+    class TestBox: Box {
+      var o: Any?
+      func send(_ msg: Message) throws {
+        o = msg.object
+      }
+    }
+    let testBox = TestBox()
+    let registeredBox =
+        (boxContext.registry as! BoxRegistryBox).register("TestBox", nil, testBox) as? SubBox
+
+    _ = (boxContext.registry as! BoxRegistryBox).register("", nil, boxContext.registry as! BoxRegistryBox) as? SubBox
+    boxContext.root = boxContext.registry
+
+    class RegistryDelegate: Box {
+      var outputter: Outputter
+      var parser: FObjectParser
+      var registry: Box
+      init(registry: Box, outputter: Outputter, parser: FObjectParser) {
+        self.registry = registry
+        self.outputter = outputter
+        self.parser = parser
+      }
+      func send(_ msg: Message) throws {
+        let str = outputter.swiftStringify(msg)
+        let obj = parser.parseString(str)
+        try registry.send(obj as! Message)
+      }
+    }
+
+    let clientBoxRegistry = ClientBoxRegistry(X: X)
+    clientBoxRegistry.delegate =
+        RegistryDelegate(registry: boxContext.registry!, outputter: outputter, parser: parser)
+
+    do {
+      let box = try clientBoxRegistry.doLookup("TestBox") as? SubBox
+      XCTAssertNotNil(box)
+      XCTAssertTrue(registeredBox === box)
+      try? box?.send(Message(["object": "HELLO"]))
+      XCTAssertEqual(testBox.o as? String, "HELLO")
+    } catch {
+      fatalError()
     }
   }
 

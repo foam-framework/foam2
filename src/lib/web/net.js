@@ -32,6 +32,22 @@ foam.CLASS({
     {
       name: 'socket',
       transient: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // Use default FOAM implementation of Outputter. Do not attempt to
+        // lookup sensitive "foam.json.Outputter" class in box context.
+        return foam.lookup('foam.json.Outputter').create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        }, this);
+      }
     }
   ],
 
@@ -46,7 +62,7 @@ foam.CLASS({
       if ( this.socket.readyState !== this.socket.OPEN ) {
         throw new Error('Socket is not open');
       }
-      this.socket.send(foam.json.Network.stringify(msg));
+      this.socket.send(this.outputter.stringify(msg));
     },
 
     function connect() {
@@ -92,27 +108,45 @@ foam.CLASS({
   name: 'WebSocketService',
 
   requires: [
-    'foam.net.web.WebSocket',
+    'foam.box.Message',
     'foam.box.RegisterSelfMessage',
-    'foam.box.Message'
+    'foam.json.Parser',
+    'foam.net.web.WebSocket',
+    'foam.box.RawWebSocketBox'
   ],
+  imports: [ 'creationContext' ],
 
   properties: [
     {
       name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
   methods: [
     function addSocket(socket) {
-      var sub1 = socket.message.sub(function onMessage(s, _, msg) {
-        msg = foam.json.parseString(msg, this);
+      var X = this.creationContext.createSubContext({
+        returnBox: this.RawWebSocketBox.create({ socket: socket })
+      });
+
+      var sub1 = socket.message.sub(function onMessage(s, _, msgStr) {
+        var msg = this.parser.parseString(msgStr, X);
 
         if ( ! this.Message.isInstance(msg) ) {
-          console.warn("Got non-message object.", msg);
+          console.warn('Got non-message:', msg, msgStr);
         }
 
-        if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
+/*        if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
           var named = foam.box.NamedBox.create({
             name: msg.object.name
           });
@@ -120,9 +154,9 @@ foam.CLASS({
           named.delegate = foam.box.RawWebSocketBox.create({
             socket: socket
           });
-        } else {
+        } else {*/
           this.delegate.send(msg);
-        }
+//        }
       }.bind(this));
 
       socket.disconnected.sub(function(s) {
@@ -190,12 +224,8 @@ foam.CLASS({
     {
       name: 'resp',
       postSet: function(_, r) {
-        var iterator = r.headers.entries();
-        var next = iterator.next();
-        while ( ! next.done ) {
-          this.headers[next.value[0]] = next.value[1];
-          next = iterator.next();
-        }
+        if ( r.headers.entries ) this.copyHeaders_(r);
+        else                     this.copyHeadersEdge_(r);
         this.status = r.status;
       }
     }
@@ -228,6 +258,21 @@ foam.CLASS({
 
     function stop() {
       this.streaming = false;
+    },
+    function copyHeaders_(r) {
+      var iterator = r.headers.entries();
+      var next = iterator.next();
+      while ( ! next.done ) {
+        this.headers[next.value[0]] = next.value[1];
+        next = iterator.next();
+      }
+    },
+    function copyHeadersEdge_(r) {
+      // Deal with https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/13928907/
+      var headers = this.headers;
+      r.headers.forEach(function(value, key) {
+        headers[key] = value;
+      });
     }
   ]
 });
@@ -238,7 +283,9 @@ foam.CLASS({
   name: 'HTTPRequest',
 
   requires: [
-    'foam.net.web.HTTPResponse'
+    'foam.net.web.HTTPResponse',
+    'foam.blob.Blob',
+    'foam.blob.BlobBlob'
   ],
 
   topics: [
@@ -310,6 +357,7 @@ foam.CLASS({
       this.hostname = u.hostname;
       if ( u.port ) this.port = u.port;
       this.path = u.pathname + u.search;
+      return this;
     },
 
     function send() {
@@ -334,7 +382,13 @@ foam.CLASS({
       };
 
       if ( this.payload ) {
-        options.body = this.payload;
+        if ( this.BlobBlob.isInstance(this.payload) ) {
+          options.body = this.payload.blob;
+        } else if ( this.Blob.isInstance(this.payload) ) {
+          foam.assert(false, 'TODO: Implemented sending of foam.blob.Blob over HTTPRequest.');
+        } else {
+          options.body = this.payload;
+        }
       }
 
       var request = new Request(
@@ -345,10 +399,13 @@ foam.CLASS({
           options);
 
       return fetch(request).then(function(resp) {
-        return this.HTTPResponse.create({
+        var resp = this.HTTPResponse.create({
           resp: resp,
           responseType: this.responseType
         });
+
+        if ( resp.success ) return resp;
+        throw resp;
       }.bind(this));
     },
     function addContentHeaders() {
@@ -374,6 +431,10 @@ foam.CLASS({
     }
   ]
 });
+// Registering BaseHTTPRequest facilitates decoration when HTTPRequest has been
+// re-overridden.
+foam.register(foam.lookup('foam.net.web.HTTPRequest'),
+              'foam.net.web.BaseHTTPRequest');
 
 
 foam.CLASS({
@@ -592,9 +653,12 @@ foam.CLASS({
           if ( this.readyState === this.LOADING ||
                this.readyState === this.DONE ) {
             this.removeEventListener('readystatechange', foo);
-            resolve(self.HTTPResponse.create({
+            var resp = self.HTTPResponse.create({
               xhr: this
-            }));
+            });
+
+            if ( resp.success ) resolve(resp);
+            else reject(resp);
           }
         });
         xhr.send(self.payload);

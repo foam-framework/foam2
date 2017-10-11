@@ -38,7 +38,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function find(id) {
+    function find_(x, id) {
       var self = this;
       var url  = this.url + '/' + id.replace(/\./g, '/') + '.js';
       var req  = this.HTTPRequest.create({
@@ -59,15 +59,18 @@ foam.CLASS({
         };
 
         try {
-          eval(js);
+          eval('//# sourceURL=' + url + '\n' + js);
         } catch(e) {
-          console.warn('Unable to load at ' + url + '. Error: ' + e.stack);
+          console.warn('At ', url, 'line:' + (e.lineNumber - 1));
+          console.warn(e.message);
           return Promise.resolve(null);
         } finally {
           foam.CLASS = foamCLASS;
         }
 
         return Promise.resolve(model);
+      }).catch(function(e) {
+        return Promise.resolve(null);
       });
     }
   ]

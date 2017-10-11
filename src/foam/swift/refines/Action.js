@@ -39,13 +39,28 @@ foam.CLASS({
       },
     },
     {
+      class: 'String',
+      name: 'swiftSlotName',
+      expression: function(swiftName) { return swiftName + '$'; },
+    },
+    {
       name: 'code',
       value: function() {},
+    },
+    {
+      name: 'swiftSupport',
+      expression: function(swiftCode) { return !!swiftCode },
     },
   ],
   methods: [
     function writeToSwiftClass(cls) {
       if ( !this.swiftCode ) return;
+      cls.fields.push(this.Field.create({
+        lazy: true,
+        name: this.swiftSlotName,
+        initializer: this.slotInit(),
+        type: 'Slot',
+      }));
       cls.methods.push(this.Method.create({
         name: this.swiftName,
         body: this.swiftCode,
@@ -56,7 +71,7 @@ foam.CLASS({
         static: true,
         final: true,
         name: this.swiftAxiomName,
-        type: 'Action',
+        type: 'ActionInfo',
         initializer: this.swiftAxiomInit(),
       }));
     },
@@ -66,11 +81,25 @@ foam.CLASS({
       name: 'swiftAxiomInit',
       args: [],
       template: function() {/*
-let a = Action()
-a.name = "<%=this.swiftName%>"
-a.label = "<%=this.label%>" // TODO localize
-return a
+class ActionInfo_: ActionInfo {
+  let args: [MethodArg] = []
+  let label = "<%=this.label%>" // TODO localize
+  let name = "<%=this.swiftName%>"
+}
+return ActionInfo_()
       */},
-    }
+    },
+    {
+      name: 'slotInit',
+      args: [],
+      template: function() {/*
+return ConstantSlot([
+  "value": { [weak self] (args: [Any?]) throws -> Any? in
+    if self == nil { fatalError() }
+    return self!.`<%=this.swiftName%>`()
+  }
+])
+      */},
+    },
   ],
 });

@@ -59,6 +59,11 @@ foam.CLASS({
             ( this.private_.instances = {} );
         var key = args[property];
 
+        // If key isn't provided, try using property.value instead
+        if ( key === undefined ) {
+          key = cls.getAxiomByName(property).value;
+        }
+
         return instances[key] ||
             ( instances[key] = oldCreate.apply(this, arguments) );
       };

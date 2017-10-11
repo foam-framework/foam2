@@ -28,26 +28,27 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj) {
-      return Promise.reject(this.ExternalException.create({
-        message: 'NullDAO: Cannot handle put()'
-      }));
+    function put_(x, obj) {
+      this.pub('on', 'put', obj);
+      return Promise.resolve(obj);
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
+      this.pub('on', 'remove', obj);
       return Promise.resolve();
     },
 
-    function find(id) {
+    function find_(x, id) {
       return Promise.resolve(null);
     },
 
-    function select(sink) {
+    function select_(x, sink, skip, limit, order, predicate) {
+      sink = sink || foam.dao.ArraySink.create();
       sink.eof();
       return Promise.resolve(sink);
     },
 
-    function removeAll() {
+    function removeAll_(x, skip, limit, order, predicate) {
       return Promise.resolve();
     }
   ]

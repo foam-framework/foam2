@@ -29,13 +29,21 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Class',
+      name: 'of',
+      factory: function() {
+        if ( this.array.length === 0 ) return this.lookup('foam.core.FObject');
+        return null;
+      }
+    },
+    {
       name: 'array',
       factory: function() { return []; }
     }
   ],
 
   methods: [
-    function put(obj) {
+    function put_(x, obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( obj.ID.compare(obj, this.array[i]) === 0 ) {
           this.array[i] = obj;
@@ -49,7 +57,7 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(obj.id, this.array[i].id) ) {
           var o2 = this.array.splice(i, 1)[0];
@@ -61,29 +69,31 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
 
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var fc = this.FlowControl.create();
-      for ( var i = 0 ; i < this.array.length ; i++ ) {
-        if ( fc.stopped ) break;
+      var detached = false;
+      var sub = foam.core.FObject.create();
+      sub.onDetach(function() { detached = true; });
 
-        if ( fc.errorEvt ) {
-          sink.error(fc.errorEvt);
-          return Promise.reject(fc.errorEvt);
+      var self = this;
+
+      return new Promise(function(resolve, reject) {
+        for ( var i = 0 ; i < self.array.length ; i++ ) {
+          if ( detached ) break;
+
+          sink.put(self.array[i], sub);
         }
 
-        sink.put(this.array[i], fc);
-      }
+        sink.eof();
 
-      sink.eof();
-
-      return Promise.resolve(resultSink);
+        resolve(resultSink);
+      });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       predicate = predicate || this.True.create();
       skip = skip || 0;
       limit = foam.Number.isInstance(limit) ? limit : Number.MAX_VALUE;
@@ -104,7 +114,8 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function find(id) {
+    function find_(x, key) {
+      var id = this.of.isInstance(key) ? key.id : key;
       for ( var i = 0 ; i < this.array.length ; i++ ) {
         if ( foam.util.equals(id, this.array[i].id) ) {
           return Promise.resolve(this.array[i]);

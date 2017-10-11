@@ -23,17 +23,27 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'swiftReturnType',
+      name: 'swiftPath',
       expression: function(path) {
-        return this.lookup(this.path).model_.swiftName;
+        return path;
+      },
+    },
+    {
+      name: 'swiftReturns',
+      expression: function(swiftPath) {
+        return this.lookup(swiftPath).model_.swiftName;
       },
     },
   ],
   methods: [
     function writeToSwiftClass(cls) {
+      if (!this.swiftPath) return;
+      if (foam.core.InterfaceModel.isInstance(this.lookup(this.swiftPath).model_)) {
+        return;
+      }
       cls.methods.push(this.Method.create({
         name: this.name + '_create',
-        returnType: this.swiftReturnType,
+        returnType: this.swiftReturns,
         visibility: 'public',
 	body: this.swiftInitializer(),
         args: [
@@ -51,9 +61,20 @@ foam.CLASS({
       name: 'swiftInitializer',
       args: [],
       template: function() {/*
-return __subContext__.create(
-    type: <%=this.swiftReturnType%>.self, args: args) as! <%=this.swiftReturnType%>
+return __subContext__.create(<%=this.swiftReturns%>.self, args: args)!
       */},
     },
   ],
+});
+
+foam.CLASS({
+  package: 'foam.classloader',
+  name: 'RequiresARequireExtension',
+  refines: 'foam.core.Requires',
+
+  methods: [
+    function arequire(opt_deps) {
+      return this.__context__.arequire(this.swiftPath, opt_deps);
+    }
+  ]
 });

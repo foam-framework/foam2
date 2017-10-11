@@ -22,13 +22,28 @@ foam.CLASS({
 
   documentation: 'View for editing Float Properties.',
 
+  axioms: [
+    foam.u2.CSS.create({
+      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
+    })
+  ],
+
   properties: [
     [ 'type', 'number' ],
     { class: 'Float', name: 'data' },
-    'precision'
+    'precision',
+    'min',
+    'max'
   ],
 
   methods: [
+    function initE() {
+      this.SUPER();
+      this.addClass(this.myClass());
+      if ( this.min != undefined ) this.setAttribute('min', this.min);
+      if ( this.max != undefined ) this.setAttribute('max', this.max);
+    },
+
     function link() {
       this.attrSlot(null, this.onKey ? 'input' : null).relateFrom(
           this.data$,
@@ -37,7 +52,11 @@ foam.CLASS({
     },
 
     function fromProperty(p) {
+      this.SUPER(p);
+
       this.precision = p.precision;
+      this.min       = p.min;
+      this.max       = p.max;
     },
 
     function formatNumber(val) {

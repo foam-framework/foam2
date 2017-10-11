@@ -19,7 +19,7 @@ foam.CLASS({
   package: 'foam.swift.parse.parser',
   // TODO: We should be able to auto generate all of this.
   name: 'ProxyParser',
-  extends: 'foam.swift.parse.parser.Parser',
+  implements: ['foam.swift.parse.parser.Parser'],
   properties: [
     {
       class: 'FObjectProperty',

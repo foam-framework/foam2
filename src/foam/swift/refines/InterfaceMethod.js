@@ -6,19 +6,18 @@ foam.CLASS({
   properties: [
     {
       class: 'Boolean',
-      name: 'swiftEnabled',
-      expression: function(swiftCode) {
-        return !!this.swiftCode;
-      }
+      name: 'swiftSupport',
+      value: true,
     }
   ],
   methods: [
     function writeToSwiftClass(cls, superAxiom) {
-      if ( !this.swiftEnabled ) return;
+      if ( !this.swiftSupport ) return;
       cls.method(this.ProtocolMethod.create({
         name: this.swiftName,
-        returnType: this.swiftReturnType,
+        returnType: this.swiftReturns,
         args: this.swiftArgs,
+        throws: this.swiftThrows,
       }));
     },
   ]

@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 /*
@@ -38,23 +27,6 @@ foam.ENUM({
     { name: 'EDIT',   label: 'Edit'   }
   ]
 });
-
-
-foam.ENUM({
-  package: 'foam.u2',
-  name: 'Visibility',
-
-  documentation: 'View visibility mode combines with current ControllerModel to determine DisplayMode.',
-
-  values: [
-    { name: 'RW',       label: 'Read-Write' },
-    { name: 'FINAL',    label: 'Final',     documentation: 'FINAL views are editable only in CREATE ControllerMode.' },
-    { name: 'DISABLED', label: 'Disabled',  documentation: 'DISABLED views are visible but not editable.' },
-    { name: 'RO',       label: 'Read-Only'  },
-    { name: 'HIDDEN',   label: 'Hidden'     }
-  ]
-});
-
 
 foam.ENUM({
   package: 'foam.u2',
@@ -134,7 +106,7 @@ foam.CLASS({
 
         // Install our own CSS, and then all parent models as well.
         if ( ! axiom.installedDocuments_.has(X.document) ) {
-          X.installCSS(axiom.expandCSS(this, axiom.code));
+          X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
           axiom.installedDocuments_.set(X.document, true);
         }
 
@@ -474,6 +446,65 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.u2',
+  name: 'RenderSink',
+  implements: [ 'foam.dao.Sink' ],
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
+  properties: [
+    {
+      class: 'Function',
+      name: 'addRow'
+    },
+    {
+      class: 'Function',
+      name: 'cleanup'
+    },
+    'dao',
+    {
+      class: 'Int',
+      name: 'batch'
+    }
+  ],
+  methods: [
+    function put(obj, s) {
+      this.reset();
+    },
+    function remove(obj, s) {
+      this.reset();
+    },
+    function reset() {
+      this.paint();
+    }
+  ],
+  listeners: [
+    {
+      name: 'paint',
+      isMerged: 100,
+      code: function() {
+        var batch = ++this.batch;
+        var self = this;
+        this.dao.select().then(function(a) {
+          // Check if this is a stale render
+          if ( self.batch !== batch ) return;
+
+          var objs = a.array;
+          self.cleanup();
+          for ( var i = 0 ; i < objs.length ; i++ ) {
+            self.addRow(objs[i]);
+          }
+        });
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2',
   name: 'Element',
 
   documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
@@ -571,9 +602,10 @@ foam.CLASS({
     },
 
     // Keys which respond to keydown but not keypress
-    KEYPRESS_CODES: { 8: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    KEYPRESS_CODES: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
 
     NAMED_CODES: {
+      '13': 'enter',
       '37': 'left',
       '38': 'up',
       '39': 'right',
@@ -723,6 +755,9 @@ foam.CLASS({
       }
     },
     {
+      name: 'scrollHeight',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -743,6 +778,24 @@ foam.CLASS({
         Template method for adding addtion element initialization
         just before Element is output().
       */
+    },
+
+    function observeScrollHeight() {
+      // TODO: This should be handled by an onsub event when someone subscribes to
+      // scroll height changes.
+      var self = this;
+      var observer = new MutationObserver(function(mutations) {
+        self.scrollHeight = self.el().scrollHeight;
+      });
+      var config = { attributes: true, childList: true, characterData: true };
+
+      this.onload.sub(function(s) {
+        observer.observe(self.el(), config);
+      });
+      this.onunload.sub(function(s) {
+        observer.disconnect()
+      });
+      return this;
     },
 
     function evtToCharCode(evt) {
@@ -874,7 +927,9 @@ foam.CLASS({
     },
 
     function myClass(opt_extra) {
-      var f = this.cls_.myClass_;
+      // Use hasOwnProperty so that class doesn't inherit CSS classname
+      // from ancestor FOAM class.
+      var f = this.cls_.hasOwnProperty('myClass_') && this.cls_.myClass_;
 
       if ( ! f ) {
         var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
@@ -1267,9 +1322,12 @@ foam.CLASS({
       return this;
     },
 
-    function tag(spec, args) {
+    function tag(spec, args, slot) {
       /* Create a new Element and add it as a child. Return this. */
-      return this.add(this.createChild_(spec, args));
+      var c = this.createChild_(spec, args);
+      this.add(c);
+      if ( slot ) slot.set(c);
+      return this;
     },
 
     function br() {
@@ -1418,56 +1476,60 @@ foam.CLASS({
       return this;
     },
 
+    function daoSlot(dao, sink) {
+      var slot = foam.dao.DAOSlot.create({
+        dao: dao,
+        sink: sink
+      });
+
+      this.onDetach(slot);
+
+      return slot;
+    },
+
     function select(dao, f, update) {
-      // TODO: cleanup on detach
       var es   = {};
       var self = this;
-      var reset = function() {
-        for ( var key in es ) {
-          removeRow(null, null, null, {id: key});
-        }
-        dao.select({
-          put: function(o) { addRow(null, null, null, o); },
-          eof: function() {}
-        });
-      };
-      var addRow = function(_, __, ___, o) {
-        if ( update ) {
-          o = o.clone();
-        }
 
-        // todo: add o listener and add in sub-context??
-        self.startContext({data: o});
-        var e = f.call(self, o);
-        if ( update ) {
-          // ???: Why is it necessary to delay this until after load?
-          e.onload.sub(function() {
+      var listener = foam.u2.RenderSink.create({
+        dao: dao,
+        addRow: function(o) {
+          if ( update ) o = o.clone();
+
+          self.startContext({data: o});
+
+          var e = f.call(self, o);
+
+          if ( update ) {
             o.propertyChange.sub(function(_,__,prop,slot) {
               dao.put(o.clone());
             });
-          });
-        }
-        self.endContext();
+          }
 
-        if ( es[o.id] ) {
-          self.replaceChild(es[o.id], e);
-        } else {
-          self.add(e);
-        }
-        es[o.id] = e;
-      };
-      var removeRow = function(_, __, ___, o) {
-        var e = es[o.id];
-        if ( e ) {
-          e.remove();
-          delete es[o.id];
-        }
-      }
+          self.endContext();
 
-      reset();
-      dao.on.put.sub(addRow);
-      dao.on.remove.sub(removeRow);
-      dao.on.reset.sub(reset);
+          if ( es[o.id] ) {
+            self.replaceChild(es[o.id], e);
+          } else {
+            self.add(e);
+          }
+          es[o.id] = e;
+        },
+        cleanup: function() {
+          for ( var key in es ) {
+            es[key].remove();
+          }
+
+          es = {};
+        }
+      }, this);
+
+      listener = foam.dao.MergedResetSink.create({
+        delegate: listener
+      }, this);
+
+      this.onDetach(dao.listen(listener));
+      listener.delegate.paint();
 
       return this;
     },
@@ -1640,7 +1702,7 @@ foam.CLASS({
 
         // Convert e or e[0] into a SPAN if needed,
         // So that it can be located later.
-        if ( ! e ) {
+        if ( e === undefined || e === null || e === '' ) {
           e = self.E('SPAN');
         } else if ( Array.isArray(e) ) {
           if ( e.length ) {
@@ -1680,7 +1742,7 @@ foam.CLASS({
       };
 
       var s = slot.sub(this.framed(l));
-      this.sub('onunload', foam.Function.bind(s.detach, s));
+      this.onDetach(s);
 
       return e;
     },
@@ -1875,7 +1937,8 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.u2.Visibility',
-      name: 'visibility'
+      name: 'visibility',
+      value: foam.u2.Visibility.RW
     }
   ],
 
@@ -1888,6 +1951,9 @@ foam.CLASS({
       if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         e.data$ = X.data$.dot(this.name);
       }
+
+      // e could be a Slot, so check if addClass exists
+      e.addClass && e.addClass('property-' + this.name);
 
       return e;
     }
@@ -1906,6 +1972,12 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+  properties: [
+    [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.Date',
@@ -1944,6 +2016,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Currency',
+  requires: [ 'foam.u2.CurrencyView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.CurrencyView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Boolean',
   requires: [ 'foam.u2.CheckBox' ],
   properties: [
@@ -1966,6 +2047,16 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.DetailView' },
+    }
+  ]
+});
+
 
 foam.CLASS({
   refines: 'foam.core.Class',
@@ -1984,6 +2075,15 @@ foam.CLASS({
         class: 'foam.u2.view.ReferenceView'
       }
     }
+  ]
+})
+
+
+foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [
+    [ 'view',          { class: 'foam.u2.EnumView' } ],
+    [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
   ]
 })
 
@@ -2112,8 +2212,7 @@ foam.CLASS({
       var view = foam.u2.ViewSpec.createView(
         { class: 'foam.u2.ActionView', action: this }, args, this, X);
 
-      if ( X.data$ &&
-           ! ( args && ( args.data || args.data$ ) ) ) {
+      if ( X.data$ && ! ( args && ( args.data || args.data$ ) ) ) {
         view.data$ = X.data$;
       }
 
@@ -2138,6 +2237,19 @@ foam.CLASS({
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'SearchColumns',
+
+  documentation: 'Axiom for storing Table Search Columns information in Class. Unlike most Axioms, doesn\'t modify the Class, but is just used to store information.',
+
+  properties: [
+    [ 'name', 'searchColumns' ],
+    'columns'
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
@@ -2152,6 +2264,12 @@ foam.CLASS({
       name: 'tableColumns',
       postSet: function(_, cs) {
         this.axioms_.push(foam.u2.TableColumns.create({columns: cs}));
+      }
+    },
+    {
+      name: 'searchColumns',
+      postSet: function(_, cs) {
+        this.axioms_.push(foam.u2.SearchColumns.create({columns: cs}));
       }
     }
   ]

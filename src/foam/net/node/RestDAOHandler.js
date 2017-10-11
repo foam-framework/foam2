@@ -20,9 +20,11 @@ foam.CLASS({
   name: 'RestDAOHandler',
   extends: 'foam.net.node.Handler',
 
+  requires: [ 'foam.json.Parser' ],
+
   imports: [
-    'info',
-    'warn'
+    'creationContext',
+    'info'
   ],
 
   properties: [
@@ -41,6 +43,19 @@ foam.CLASS({
     {
       name: 'url',
       factory: function() {  return require('url'); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        // NOTE: Configuration must be consistent with outputters in
+        // corresponding foam.dao.RestDAO.
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
@@ -75,7 +90,7 @@ foam.CLASS({
         // No suffix on put() requests.
         if ( target !== '' ) {
           self.send404(req, res);
-          self.warn('Attempt to put() with path suffix');
+          self.reportWarnMsg(req, 'Attempt to put() with path suffix');
           return true;
         }
 
@@ -126,7 +141,8 @@ foam.CLASS({
           }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unrecognized DAO GET URL fragment: '  + sep + target);
+          self.reportWarnMsg(
+            req, 'Unrecognized DAO GET URL fragment: '  + sep + target);
         }
       } else if ( req.method === 'POST' ) {
         if ( sep === ':' && target === 'select' ) {
@@ -142,7 +158,7 @@ foam.CLASS({
             var limit = data.limit;
             var order = data.order;
             var predicate = data.predicate;
-            self.dao.select(sink, skip, limit, order, predicate)
+            self.dao.select_(self.dao.__context__, sink, skip, limit, order, predicate)
                 .then(function(sink) {
                   // Prevent caching of select() responses.
                   var dateString = new Date().toUTCString();
@@ -167,18 +183,18 @@ foam.CLASS({
             var limit = data.limit;
             var order = data.order;
             var predicate = data.predicate;
-            return self.dao.removeAll(skip, limit, order, predicate);
+            return self.dao.removeAll_(self.dao.__context__, skip, limit, order, predicate);
           }).then(function() {
             self.sendJSON(res, 200, '{}');
             self.info('200 OK: removeAll()');
           }).catch(send500);
         } else {
           self.send404(req, res);
-          self.warn('Unknown POST request: ' + target);
+          self.reportWarnMsg(req, 'Unknown POST request: ' + target);
         }
       } else {
         self.send404(req, res);
-        self.warn('Method not supported: '  + req.method);
+        self.reportWarnMsg(req, 'Method not supported: '  + req.method);
       }
 
       return true;
@@ -190,19 +206,6 @@ foam.CLASS({
         return foam.json.Network.objectify(o);
       }
     },
-    {
-      name: 'jsonStr2fo_',
-      documentation: "Transform JSON string to FOAM object.",
-      code: function(str) {
-        // select() calls optionally contain a payload. To accept this case,
-        // return null on empty payload.
-        if ( ! str ) return null;
-
-        // TODO(markdittmer): Use a safe JSON deserializer that honours only
-        // an allowed list of classes.
-        return foam.json.parse(JSON.parse(str));
-      }
-    },
     function getPayload_(req) {
       var self = this;
       return new Promise(function(resolve, reject) {
@@ -212,7 +215,7 @@ foam.CLASS({
         });
         req.on('end', function () {
           try {
-            resolve(self.jsonStr2fo_(payload));
+            resolve(self.parser.parseString(payload));
           } catch (error) {
             reject(error);
           }

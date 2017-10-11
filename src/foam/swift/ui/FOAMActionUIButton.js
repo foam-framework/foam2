@@ -36,14 +36,24 @@ newValue.setTitle(self.action?.label, for: .normal)
       name: 'fobj',
     },
     {
-      swiftType: 'Action?',
+      swiftType: 'ActionInfo?',
       name: 'action',
+    },
+    {
+      class: 'Boolean',
+      name: 'dismissKeyboardOnTap',
+      value: true,
     },
   ],
   methods: [
     {
       name: 'onButtonClick',
-      swiftCode: 'if fobj != nil { action?.call(fobj!) }',
+      swiftCode: function() {/*
+if dismissKeyboardOnTap {
+  UIApplication.shared.keyWindow?.rootViewController?.view.endEditing(true)
+}
+if fobj != nil { _ = try? action?.call(fobj!) }
+      */},
       swiftAnnotations: ['@objc'],
     },
   ],

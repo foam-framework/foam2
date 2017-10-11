@@ -80,22 +80,47 @@ foam.CLASS({
     'com.google.cloud.datastore.DatastoreMutation',
     'com.google.cloud.datastore.DatastoreMutationType'
   ],
+  imports: [ 'info' ],
 
   properties: [
+    {
+      class: 'Int',
+      documentation: `Maximum number of operations to include in a batch.
+          Since each entity may be in a different entity group, default to
+          transaction entity group limit of 25 [1].
+
+          [1] https://cloud.google.com/datastore/docs/concepts/transactions#transactions_and_entity_groups`,
+      name: 'batchSize',
+      value: 25
+    },
+    {
+      class: 'Int',
+      documentation: `Maximum number of in-flight batches
+          (i.e., transactions). Default to 1 in case clients expect strict
+          ordering of operations. Increasing to ~25 seems to work well for bulk
+          updates where order-of-operations doesn't matter.`,
+      name: 'numBatches',
+      value: 1
+    },
     {
       class: 'FObjectArray',
       of: 'com.google.cloud.datastore.DatastoreMutation',
       name: 'mutations_'
     },
+    {
+      class: 'Int',
+      documentation: 'Number of in-flight transactions.',
+      name: 'numActiveTransactions_'
+    }
   ],
 
   methods: [
-    function put(o) {
+    function put_(x, o) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
           type: self.DatastoreMutationType.UPSERT,
-          data: o.toDatastoreEntity(),
+          data: o.toDatastoreEntity(this.partitionId_),
           resolve: function() {
             self.pub('on', 'put', o);
             resolve(o);
@@ -107,12 +132,12 @@ foam.CLASS({
         self.onBatchedOperation();
       });
     },
-    function remove(o) {
+    function remove_(x, o) {
       var self = this;
       return new Promise(function(resolve, reject) {
         self.mutations_.push(self.DatastoreMutation.create({
           type: self.DatastoreMutationType.DELETE,
-          data: o.getDatastoreKey(),
+          data: o.getDatastoreKey(this.partitionId_),
           resolve: function(didRemove) {
             if ( didRemove ) self.pub('on', 'remove', o);
             resolve(o);
@@ -124,6 +149,20 @@ foam.CLASS({
         self.onBatchedOperation();
       });
     },
+    function beginBatchTransaction() {
+      if ( this.mutations_.length === 0 ) return Promise.resolve();
+
+      this.info(`BatchedMutationDatastoreDAO: Sending batch from ${this.mutations_.length} backlog`);
+
+      var mutations = this.mutations_.slice(0, this.batchSize);
+      this.mutations_ = this.mutations_.slice(this.batchSize);
+
+      this.numActiveTransactions_++;
+
+      return this.getRequest('beginTransaction').send()
+          .then(this.onResponse.bind(this, 'batch transaction'))
+          .then(this.onBatchTransactionResponse.bind(this, mutations));
+    }
   ],
 
   listeners: [
@@ -136,18 +175,18 @@ foam.CLASS({
           this.mutations_.length > 0,
           'BatchedMutationDatastoreDAO: Attempt to batch no operations');
 
-        return this.getRequest('beginTransaction').send()
-          .then(this.onResponse.bind(this, 'batch transaction'))
-          .then(this.onBatchTransactionResponse);
+        var promises = [];
+        for ( var i = this.numActiveTransactions_; i < this.numBatches; i++ ) {
+          this.beginBatchTransaction();
+        }
+
+        return Promise.all(promises);
       }
     },
 
-    function onBatchTransactionResponse(json) {
-      var transaction = json.transaction;
-
-      var mutations = this.mutations_;
+    function onBatchTransactionResponse(mutations, json) {
       var mutationData = new Array(mutations.length);
-      this.mutations_ = [];
+      var transaction = json.transaction;
 
       for ( var i = 0; i < mutations.length; i++ ) {
         mutationData[i] = {};
@@ -160,8 +199,8 @@ foam.CLASS({
         mutations: mutationData,
         transaction: transaction
       })).send().then(this.onResponse.bind(this, 'batch commit'))
-        .then(this.onBatchResponse.bind(this, mutations))
-        .catch(this.onBatchFailure.bind(this, mutations));
+          .then(this.onBatchResponse.bind(this, mutations))
+          .catch(this.onBatchFailure.bind(this, mutations));
     },
     function onBatchResponse(mutations, json) {
       var results = json.mutationResults;
@@ -179,11 +218,21 @@ foam.CLASS({
       for ( var i = 0; i < mutations.length; i++ ) {
         mutations[i].resolve(operationComplete);
       }
+
+      this.numActiveTransactions_--;
+
+      // Replace this transaction with a new one.
+      this.beginBatchTransaction();
     },
     function onBatchFailure(mutations) {
       for ( var i = 0; i < mutations.length; i++ ) {
         mutations[i].reject();
       }
+
+      this.numActiveTransactions_--;
+
+      // Replace this transaction with a new one.
+      this.beginBatchTransaction();
     }
   ]
 });

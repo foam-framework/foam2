@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +22,103 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.comics.DAOController'
+    'foam.comics.DAOController',
+    'foam.u2.view.ScrollTableView'
+  ],
+
+  imports: [
+    'stack',
+    'summaryView? as importedSummaryView',
+    'data? as importedData'
+  ],
+
+  exports: [
+    'data.selection as selection',
+    'data.data as dao'
+  ],
+
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.comics.DAOController',
+      name: 'data',
+      expression: function(importedData) { return importedData; },
+    },
+    {
+      name: 'cls',
+      expression: function(data) { return data.cls_; }
+    },
+    {
+      name: 'summaryView',
+      factory: function() {
+        return this.importedSummaryView$ ? this.importedSummaryView : { class: 'foam.u2.view.ScrollTableView' };
+      }
+    },
+    {
+      class: 'String',
+      name: 'title',
+      expression: function(data$data$of) {
+        return 'Browse ' + data$data$of.name;
+      }
+    }
+  ],
+
+  reactions: [
+    [ 'data', 'action.create', 'onCreate' ],
+    [ 'data', 'edit', 'onEdit' ],
+    [ 'data', 'action.findRelatedObject', 'onFindRelated' ],
+    [ 'data', 'finished', 'onFinished']
   ],
 
   methods: [
     function initE() {
-      this.add(
-        this.DAOController.PREDICATE,
-        this.DAOController.FILTERED_DAO
-      );
+      this.
+        start('table').
+          start('tr').
+            start('td').style({ display: 'block' }).add(this.cls.PREDICATE).end().
+            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
+                tag(this.summaryView, {data$: this.data.filteredDAO$}).
+            end().
+          end().
+          start('tr').
+            style({background: 'rgba(0,0,0,0)'}).
+            show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+            tag('td').
+            start('td')/*.style({'padding-left':'26px'})*/.add(this.cls.getAxiomsByClass(foam.core.Action)).end().
+          end().
+        end();
+    }
+  ],
+
+  listeners: [
+    function onCreate() {
+      this.stack.push({
+        class: 'foam.comics.DAOCreateControllerView'
+      }, this);
+    },
+
+    function onEdit(s, edit, id) {
+      this.stack.push({
+        class: 'foam.comics.DAOUpdateControllerView',
+        key: id
+      }, this);
+    },
+
+    function onFindRelated() {
+      var data = this.DAOController.create({
+        data: this.data.relationship.targetDAO,
+        addEnabled: true,
+        relationship: this.data.relationship
+      });
+
+      this.stack.push({
+        class: 'foam.comics.DAOControllerView',
+        data: data
+      }, this);
+    },
+
+    function onFinished() {
+      this.stack.back();
     }
   ]
 });

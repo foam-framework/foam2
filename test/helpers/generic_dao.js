@@ -149,6 +149,18 @@ global.genericDAOTestBattery = function(daoFactory) {
         });
       });
 
+      it('should support find(object)', function(done) {
+        daoFactory(test.dao.generic.Person).then(function(dao) {
+          var p = mkPerson1();
+          dao.put(p).then(function() {
+            return dao.find(p);
+          }).then(function(p2) {
+            expect(p.id).toBe(p2.id);
+            done();
+          });
+        });
+      });
+
       it('should resolve with null if not found', function(done) {
         daoFactory(test.dao.generic.Person).then(function(dao) {
           var p = mkPerson1();
@@ -234,7 +246,7 @@ global.genericDAOTestBattery = function(daoFactory) {
             expect(obj).toBe(null);
           }).then(function() {
             return dao.select().then(function(sink) {
-              expect(sink.a.length).toEqual(0);
+              expect(sink.array.length).toEqual(0);
             });
           }).then(done);
         });
@@ -355,21 +367,55 @@ global.genericDAOTestBattery = function(daoFactory) {
           expect(filtered.select).toBeDefined();
         });
 
-        it('should honour where()', function(done) {
+        it('should honour where() on select()', function(done) {
           dao.where(exprs.EQ(test.dao.generic.Person.DECEASED, true)).select().then(function(a) {
             expect(a).toBeDefined();
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(1);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(1);
           }).catch(function(e) {
             fail(e);
           }).then(done);
         });
 
+        it('should honour where() on find()', function(done) {
+          var deceased = dao.where(
+              exprs.EQ(test.dao.generic.Person.DECEASED, true));
+          var p1;
+          var p2;
+
+          // Person 1 (id=1) is not deceased; Person 2 (id=2) is deceased.
+          Promise.all([
+            Promise.all([
+              dao.find(1).then(function(p) { p1 = p; }),
+              dao.find(2).then(function(p) { p2 = p; }),
+            ]).then(function() {
+              // Find by object.
+              return Promise.all([
+                deceased.find(p1).then(function(p) {
+                  expect(p).toBeNull();
+                }),
+                deceased.find(p2).then(function(p) {
+                  expect(p).not.toBeNull();
+                })
+              ]);
+            }),
+            // Find by id:
+            Promise.all([
+              deceased.find(1).then(function(p) {
+                expect(p).toBeNull();
+              }),
+              deceased.find(2).then(function(p) {
+                expect(p).not.toBeNull();
+              })
+            ])
+          ]).then(done, done.fail);
+        });
+
         it('should honour limit()', function(done) {
           dao.limit(1).select().then(function(a) {
             expect(a).toBeDefined();
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(1);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(1);
           }).catch(function(e) {
             fail(e);
           }).then(done);
@@ -382,12 +428,12 @@ global.genericDAOTestBattery = function(daoFactory) {
             dao.limit(1).select(first),
             dao.skip(1).limit(1).select(second)
           ]).then(function() {
-            expect(first.a).toBeDefined();
-            expect(first.a.length).toBe(1);
-            expect(second.a).toBeDefined();
-            expect(second.a.length).toBe(1);
+            expect(first.array).toBeDefined();
+            expect(first.array.length).toBe(1);
+            expect(second.array).toBeDefined();
+            expect(second.array.length).toBe(1);
 
-            expect(first.a[0].id).not.toEqual(second.a[0].id);
+            expect(first.array[0].id).not.toEqual(second.array[0].id);
           }).catch(function(e) {
             fail(e);
           }).then(done);
@@ -395,19 +441,53 @@ global.genericDAOTestBattery = function(daoFactory) {
 
         it('should honour orderBy()', function(done) {
           dao.orderBy(test.dao.generic.Person.LAST_NAME).select().then(function(a) {
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(2);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(2);
 
-            expect(a.a[0].lastName).toBe('Bonham');
-            expect(a.a[1].lastName).toBe('Young');
+            expect(a.array[0].lastName).toBe('Bonham');
+            expect(a.array[1].lastName).toBe('Young');
             return dao.orderBy(test.dao.generic.Person.FIRST_NAME).select();
           }).then(function(a) {
-            expect(a.a).toBeDefined();
-            expect(a.a.length).toBe(2);
+            expect(a.array).toBeDefined();
+            expect(a.array.length).toBe(2);
 
-            expect(a.a[0].firstName).toBe('Angus');
-            expect(a.a[1].firstName).toBe('Jon');
+            expect(a.array[0].firstName).toBe('Angus');
+            expect(a.array[1].firstName).toBe('Jon');
           }).then(done);
+        });
+
+        it('should honour sub.detach() with orderBy()', function(done) {
+          foam.CLASS({
+            package: 'test.dao.generic',
+            name: 'DetachAfterFirstSink',
+            extends: 'foam.dao.ProxySink',
+
+            methods: [
+              function put(o, sub) {
+                this.delegate.put(o, sub);
+                sub.detach();
+              }
+            ]
+          });
+
+          dao.orderBy(test.dao.generic.Person.LAST_NAME)
+              .select(test.dao.generic.DetachAfterFirstSink.create({
+                delegate: foam.dao.ArraySink.create()
+              })).then(function(sink) {
+                var array = sink.delegate.array;
+                expect(array).toBeDefined();
+                expect(array.length).toBe(1);
+                expect(array[0].lastName).toBe('Bonham');
+                return dao.orderBy(test.dao.generic.Person.FIRST_NAME)
+                    .select(test.dao.generic.DetachAfterFirstSink.create({
+                      delegate: foam.dao.ArraySink.create()
+                    }));
+              }).then(function(sink) {
+                var array = sink.delegate.array;
+                expect(array).toBeDefined();
+                expect(array.length).toBe(1);
+                expect(array[0].firstName).toBe('Angus');
+              }).then(done, done.fail);
         });
       });
     });

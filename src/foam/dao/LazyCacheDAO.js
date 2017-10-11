@@ -28,7 +28,18 @@ foam.CLASS({
 
   implements: [ 'foam.mlang.Expressions' ],
 
-  requires: [ 'foam.dao.ArraySink' ],
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.dao.DAOSink'
+  ],
+
+  classes: [
+    {
+      name: 'AnySink',
+      properties: [ { class: 'Boolean', name: 'hasAny' } ],
+      methods: [ function put() { this.hasAny = true; }, function eof() {} ]
+    }
+  ],
 
   properties: [
     {
@@ -129,10 +140,21 @@ foam.CLASS({
 
   methods: [
     /** Ensures removal from both cache and delegate before resolving. */
-    function remove(obj) {
+    function remove_(x, obj) {
       var self = this;
-      return self.cache.remove(obj).then(function() {
-        return self.delegate.remove(obj);
+      return self.cache.remove_(x, obj).then(function() {
+        return self.delegate.remove_(x, obj);
+      });
+    },
+
+    /**
+      Explicitly update cache, else caller will query stale data if
+      the staleTimeout is large
+    */
+    function put_(x, obj) {
+      var self = this;
+      return self.delegate.put_(x, obj).then(function(o) {
+        return self.cache.put_(x, o);
       });
     },
 
@@ -140,7 +162,7 @@ foam.CLASS({
       Executes the find on the cache first, and if it fails triggers an
       update from the delegate.
     */
-    function find(id) {
+    function find_(x, id) {
       var self = this;
       // TODO: Express this better.
       // Assigning to unused variable to keep Closure happy.
@@ -154,15 +176,15 @@ foam.CLASS({
         return self.finds_[id];
       } else {
         // Try the cache
-        return self.cache.find(id).then(
+        return self.cache.find_(x, id).then(
 
           function (val) {
             // Cache hit, but create background request if required
             if ( val ) {
               if ( self.refreshOnCacheHit ) {
                 // Don't record in finds_, since we don't want anyone waiting for it
-                self.delegate.find(id).then(function (val) {
-                  val && self.cache.put(val);
+                self.delegate.find_(x, id).then(function (val) {
+                  val && self.cache.put_(x, val);
                 });
               }
               return val;
@@ -171,7 +193,7 @@ foam.CLASS({
             // Another request may have come in the meantime, so check again for
             // an in-flight find for this ID.
             if ( ! self.finds_[id] ) {
-              self.finds_[id] = self.delegate.find(id);
+              self.finds_[id] = self.delegate.find_(x, id);
               // we created the remote request, so clean up finds_ later
               var errorHandler = function(err) {
                 delete self.finds_[id]; // in error case, still clean up
@@ -185,7 +207,7 @@ foam.CLASS({
                   return null;
                 }
 
-                return self.cache.put(val).then(function(val) {
+                return self.cache.put_(x, val).then(function(val) {
                   delete self.finds_[id];
                   return val;
                 }, errorHandler);
@@ -206,9 +228,9 @@ foam.CLASS({
       If .cacheOnSelect is false, the select()
       bypasses the cache and goes directly to the delegate.
     */
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       if ( ! this.cacheOnSelect ) {
-        return this.SUPER(sink, skip, limit, order, predicate);
+        return this.SUPER(x, sink, skip, limit, order, predicate);
       }
       sink = sink || this.ArraySink.create();
       var key = this.selectKey(sink, skip, limit, order, predicate);
@@ -225,29 +247,42 @@ foam.CLASS({
         self.selects_[key] = entry = {
           time: Date.now(),
           promise:
-            self.delegate.select(self.cache, skip, limit, order, predicate)
+            self.delegate.select_(x, self.DAOSink.create({ dao: self.cache }), skip, limit, order, predicate)
               .then(function(cache) {
-                self.pub('on', 'reset');
+                self.onCacheUpdate();
                 return cache;
               })
-        }
+        };
       }
 
       function readFromCache() {
-        return self.cache.select(sink, skip, limit, order, predicate);
+        return self.cache.select_(x, sink, skip, limit, order, predicate);
       }
 
       // If anything exists in the cache for this query, return it (updates
       // may arrive later and trigger a reset notification). If nothing,
       // wait on the pending cache update.
-      return self.cache.select(this.COUNT(), skip, limit, order, predicate)
-        .then(function(c) {
-          if ( c.count > 0 ) {
-            return readFromCache();
-          } else {
-            return entry.promise.then(readFromCache);
-          }
-        });
+      return self.cache.select_(
+          x, this.AnySink.create(), skip, 1, order, predicate)
+              .then(function(hasAny) {
+                if ( hasAny.hasAny ) {
+                  return readFromCache();
+                } else {
+                  return entry.promise.then(readFromCache);
+                }
+              });
+    }
+  ],
+
+  listeners: [
+    {
+      /* replaces self.pub('on', 'reset') in select promise select
+         which was triggering repeated/cyclic onDAOUpdate in caller */
+      name: 'onCacheUpdate',
+      isMerged: true,
+      code: function() {
+        this.pub('on', 'reset');
+      }
     }
   ]
 });

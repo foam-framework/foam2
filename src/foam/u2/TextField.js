@@ -22,9 +22,7 @@ foam.CLASS({
 
   axioms: [
     foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^:read-only { border-width: 0; }
-      */}
+      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
     })
   ],
 

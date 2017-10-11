@@ -109,10 +109,9 @@ describe('Date', function() {
     p.date = dateStr;
     expect(p.date).toEqual(new Date(dateStr));
   });
-  it('accepts invalid date strings, retains invalidity', function() {
-    dateStr = "d ";
-    p.date = dateStr;
-    expect(p.date.toUTCString()).toEqual((new Date(dateStr)).toUTCString());
+  it('throws on invalid date strings', function() {
+    var dateStr = "d ";
+    expect(function() { p.date = dateStr; }).toThrow();
   });
   it('compares', function() {
     p.date = 55555;

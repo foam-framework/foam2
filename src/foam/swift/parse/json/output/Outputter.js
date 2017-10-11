@@ -35,7 +35,8 @@ foam.CLASS({
       name: 'outputProperty',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -63,7 +64,7 @@ p.toJSON(outputter: self, out: &out, value: p.get(o))
           name: 'data',
         },
       ],
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       swiftCode: function() {/*
 return data.replacingOccurrences(of: "\"", with: "\\\"")
       */},
@@ -72,7 +73,8 @@ return data.replacingOccurrences(of: "\"", with: "\\\"")
       name: 'outputNil',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
       ],
@@ -84,7 +86,8 @@ out.append("null")
       name: 'outputString',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -102,7 +105,8 @@ out.append("\"")
       name: 'outputBoolean',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -115,10 +119,57 @@ out.append(data ? "true" : "false")
       */},
     },
     {
+      name: 'outputMap',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: '[String:Any?]',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("{")
+for (i, d) in data.keys.enumerated() {
+  outputString(&out, d)
+  out.append(":")
+  output(&out, data[d]!)
+  if i < data.count - 1 { out.append(",") }
+}
+out.append("}")
+      */},
+    },
+    {
+      name: 'outputArray',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: '[Any?]',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("[")
+for (i, d) in data.enumerated() {
+  output(&out, d)
+  if i < data.count - 1 { out.append(",") }
+}
+out.append("]")
+      */},
+    },
+    {
       name: 'outputNumber',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -134,7 +185,8 @@ out.append(data.stringValue)
       name: 'output',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -145,22 +197,57 @@ out.append(data.stringValue)
       swiftCode: function() {/*
 if let data = data as? FObject {
   outputFObject(&out, data)
+} else if let data = data as? PropertyInfo {
+  outputPropertyInfo(&out, data)
 } else if let data = data as? String {
   outputString(&out, data)
 } else if let data = data as? Bool {
   outputBoolean(&out, data)
 } else if let data = data as? NSNumber {
   outputNumber(&out, data)
+} else if let data = data as? [Any?] {
+  outputArray(&out, data)
+} else if let data = data as? [String:Any?] {
+  outputMap(&out, data)
 } else if data == nil {
   outputNil(&out)
+} else {
+  NSLog("Unable to output %@", (data as AnyObject).description)
+  outputNil(&out)
 }
+      */},
+    },
+    {
+      name: 'outputPropertyInfo',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: 'PropertyInfo',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+out.append("{");
+outputString(&out, "class");
+out.append(":");
+outputString(&out, "__Property__");
+out.append(",");
+outputString(&out, "forClass_");
+out.append(":");
+outputString(&out, data.classInfo.id + "." + data.name)
+out.append("}");
       */},
     },
     {
       name: 'outputFObject',
       args: [
         {
-          swiftType: 'inout String',
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
           name: 'out',
         },
         {
@@ -169,7 +256,7 @@ if let data = data as? FObject {
         },
       ],
       swiftCode: function() {/*
-let info = type(of:data).classInfo()
+let info = data.ownClassInfo()
 out.append("{")
 
 out.append(beforeKey)
@@ -198,7 +285,7 @@ out.append("}");
           name: 'data',
         },
       ],
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       swiftCode: function() {/*
 var s = ""
 output(&s, data)

@@ -36,6 +36,10 @@ foam.CLASS({
       name: 'swiftDefaultValue',
     },
     {
+      class: 'StringArray',
+      name: 'swiftAnnotations',
+    },
+    {
       class: 'String',
       name: 'swiftType',
       value: 'Any?',
@@ -47,6 +51,7 @@ foam.CLASS({
         localName: this.swiftLocalName,
         externalName: this.swiftExternalName,
         type: this.swiftType,
+        annotations: this.swiftAnnotations,
       });
       if (this.swiftDefaultValue) arg.defaultValue = this.swiftDefaultValue;
       return arg;

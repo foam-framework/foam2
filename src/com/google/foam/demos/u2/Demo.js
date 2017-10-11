@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -284,7 +273,7 @@ foam.CLASS({
   properties: [
     { class: 'Int', name: 'i' },
     'field1',
-    'field2',
+    { name: 'field2', view: 'foam.u2.view.PasswordView' },
     {
       name: 'choices',
       view: {
@@ -421,3 +410,129 @@ var d = Test.create();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
 foam.u2.DetailView.create({ data: d }).write();
+
+
+foam.CLASS({
+  name: 'ActionDemo',
+  properties: [ 'foo' ],
+  actions: [
+    function add() {
+      console.log('add');
+    },
+    {
+      name: 'add2',
+      label: 'Add',
+      icon: 'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png',
+      code: function() { console.log('add'); }
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'ActionDemoSubView',
+  extends: 'foam.u2.Element',
+
+  imports: [ 'viewAction' ],
+
+  exports: [ 'as data' ],
+
+  methods: [
+    function initE() {
+      this
+        // Default Button
+        .add('subView: ', this.SUB_VIEW_ACTION);
+    }
+  ],
+  actions: [
+    function subViewAction(X, obj) {
+      this.viewAction();
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'ActionDemoView',
+  extends: 'foam.u2.View',
+
+  exports: [ 'viewAction' ],
+
+  methods: [
+    function initE() {
+      this
+        // Default Button
+        .add(ActionDemo.ADD)
+
+        // Embed an Image manually
+        .start(ActionDemo.ADD).start('img').attr('src','https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png').end().end()
+
+        // Set the ActionView's icon
+        .start(ActionDemo.ADD, {icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).end()
+
+        // Set the ActionView's icon and hide the label
+        .start(ActionDemo.ADD, {showLabel: false, icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).end()
+
+        // Set the ActionView's icon and hide the label and make an anchor to avoid button decoration
+        .start(ActionDemo.ADD, {showLabel: false, icon:'https://cdn4.iconfinder.com/data/icons/48x48-free-object-icons/48/Add.png'}).setNodeName('a').end()
+
+        // Show an Action that already has an icon defined
+        .start(ActionDemo.ADD2).end()
+
+        .add(this.VIEW_ACTION)
+
+        .tag({class: 'ActionDemoSubView'});
+    }
+  ],
+  actions: [
+    function viewAction() {
+      console.log('view action');
+    }
+  ]
+});
+
+ActionDemoView.create({data: ActionDemo.create()}).write();
+
+
+foam.CLASS({
+  name: 'ParentView',
+  extends: 'foam.u2.Element',
+  axioms: [
+    foam.u2.CSS.create({code: `
+      ^ { background: pink }
+    `})
+  ],
+  methods: [ function initE() {
+    this.addClass(this.myClass()).add('text');
+  }]
+});
+
+foam.CLASS({
+  name: 'Child1View',
+  extends: 'ParentView',
+  axioms: [ foam.u2.CSS.create({code: ParentView.getAxiomsByClass(foam.u2.CSS)[0].code}) ]
+});
+
+foam.CLASS({
+  name: 'Child2View',
+  extends: 'ParentView',
+  axioms: [ foam.u2.CSS.create({code: ParentView.getAxiomsByClass(foam.u2.CSS)[0].code}) ]
+});
+
+Child1View.create().write();
+Child2View.create().write();
+
+
+foam.CLASS({
+  name: 'FObjectViewTest',
+  properties: [
+    {
+      class: 'FObjectProperty',
+      name: 'obj',
+      view: 'foam.u2.view.FObjectView',
+      value: foam.util.Timer.create()
+    }
+  ]
+});
+
+var fovt = FObjectViewTest.create();
+foam.u2.DetailView.create({data:fovt}).write();
+foam.u2.DetailView.create({data:fovt}).write();

@@ -73,55 +73,94 @@ subViewSubscriptions = [:]
       name: 'initAllViews',
       swiftCode: function() {/*
 var properties: [PropertyInfo] = []
-var actions: [Action] = []
+var actions: [ActionInfo] = []
 if let fobj = data as AnyObject as? FObject {
-  properties += type(of: fobj).classInfo().axioms(byType: PropertyInfo.self)
-  actions += type(of: fobj).classInfo().axioms(byType: Action.self)
+  properties += fobj.ownClassInfo().axioms(byType: PropertyInfo.self)
+  actions += fobj.ownClassInfo().axioms(byType: ActionInfo.self)
+}
+properties = properties.filter({ (p) -> Bool in
+  return self[p.name] != nil
+})
+actions = actions.filter({ (a) -> Bool in
+  return self[a.name] != nil
+})
+
+let viewNames = properties.map { (p) -> String in return p.name }
+
+let labelViews = properties.map { (p) -> UILabel in return propertyLabelViews[p.name]! }
+labelViews.forEach { (v) in
+  v.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+  v.setContentCompressionResistancePriority(.required, for: .horizontal)
 }
 
-var vstack: [UIView] = []
-for p in properties {
-  guard let dv = self[p.name] else { continue }
-  let hstack = UIStackView(arrangedSubviews: [
-    propertyLabelViews[p.name]!,
-    dv.get(key: "view") as! UIView
-  ])
-  hstack.axis = .horizontal
-  hstack.spacing = 10
-  vstack.append(hstack)
+let valueViews = properties.map { (p) -> UIView in
+  return self[p.name]!.get(key: "view") as! UIView
 }
 
-var actionButtons: [UIView] = []
-for a in actions {
-  guard let view = self[a.name] as? FOAMActionUIButton else { continue }
-  view.view.backgroundColor = UIColor.black
-  actionButtons.append(view.view)
+let actionViews = actions.map { (a) -> UIView in
+  return self[a.name]!.get(key: "view") as! UIView
 }
-let actionStack = UIStackView(arrangedSubviews: actionButtons)
-actionStack.axis = .horizontal
-actionStack.spacing = 10
-vstack.append(actionStack)
+actionViews.forEach { (v) in
+  v.backgroundColor = .black
+}
 
-let stackView = UIStackView(arrangedSubviews: vstack)
-stackView.axis = .vertical
-stackView.distribution = .equalSpacing
-stackView.alignment = .leading
+var viewMap: [String:UIView] = [:]
+for (index, name) in viewNames.enumerated() {
+  viewMap[name] = valueViews[index]
+  viewMap[name + "Label"] = labelViews[index]
+}
+for (index, a) in actions.enumerated() {
+  viewMap[a.name] = actionViews[index]
+}
 
-let views: [String:UIView] = ["v": stackView]
-for (_, v) in views {
+for v in viewMap.values {
   v.translatesAutoresizingMaskIntoConstraints = false
   view.addSubview(v)
 }
+
+for name in viewNames {
+  view.addConstraints(NSLayoutConstraint.constraints(
+      withVisualFormat: "H:|-["+name+"Label]-["+name+"]-|",
+      options: .alignAllCenterY,
+      metrics: nil,
+      views: viewMap))
+}
+
+let vVisForm = "V:|-" + viewNames.map { (s) -> String in return "["+s+"Label]" }.joined(separator: "-")
 view.addConstraints(NSLayoutConstraint.constraints(
-  withVisualFormat: "V:|-[v]-|",
-  options: NSLayoutFormatOptions.init(rawValue: 0),
-  metrics: nil,
-  views: views))
-view.addConstraints(NSLayoutConstraint.constraints(
-  withVisualFormat: "H:|-[v]-|",
-  options: NSLayoutFormatOptions.init(rawValue: 0),
-  metrics: nil,
-  views: views))
+    withVisualFormat: vVisForm,
+    options: .alignAllRight,
+    metrics: nil,
+    views: viewMap))
+
+if actions.count > 0 {
+  view.addConstraints(NSLayoutConstraint.constraints(
+    withVisualFormat: "H:|-"+actions.map({ (a) -> String in return "["+a.name+"]" }).joined(separator: "-"),
+    options: .alignAllCenterY,
+    metrics: nil,
+    views: viewMap))
+  if let anchor = labelViews.last {
+    view.addConstraint(NSLayoutConstraint(
+        item: actionViews[0],
+        attribute: .top,
+        relatedBy: .equal,
+        toItem: anchor,
+        attribute: .bottom,
+        multiplier: 1,
+        constant: 8))
+  }
+}
+
+if let bottom: UIView = actionViews.first ?? labelViews.last {
+  view.addConstraint(NSLayoutConstraint(
+    item: view,
+    attribute: .bottom,
+    relatedBy: .equal,
+    toItem: bottom,
+    attribute: .bottom,
+    multiplier: 1,
+    constant: 0))
+}
       */},
     },
   ],
@@ -131,11 +170,13 @@ subscript(key: String) -> FObject? {
   if let v = self.propertyViews[key] ?? self.actionViews[key] {
     return v
   }
-  let classInfo = type(of: data).classInfo()
+  let classInfo = data.ownClassInfo()
   if let a = classInfo.axiom(byName: key) {
-    if let a = a as? PropertyInfo, a.view != nil {
+    if let a = a as? PropertyInfo, let viewFobj = a.viewFactory(x: __context__) {
       let prop = a.name
-      let viewFobj = self.__subContext__.create(type: a.view!) as! FObject
+      if let viewFobj = viewFobj as? PropertyView {
+        viewFobj.fromProperty(a)
+      }
       propertyViews[prop] = viewFobj
 
       let label = UILabel()
@@ -145,7 +186,7 @@ subscript(key: String) -> FObject? {
       subViewSubscriptions[prop] =
           viewFobj.getSlot(key: "data")!.linkFrom(data.getSlot(key: prop)!)
       return viewFobj
-    } else if let a = a as? Action {
+    } else if let a = a as? ActionInfo {
       let btn = FOAMActionUIButton_create()
       btn.fobj = data
       btn.action = a

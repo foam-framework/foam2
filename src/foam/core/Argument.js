@@ -222,6 +222,9 @@ foam.CLASS({
       name: 'name'
     },
     {
+      name: 'of'
+    },
+    {
       /**
        * The string name of the type
        * (either a model name or foam.String, foam.Function, etc. or [])
@@ -293,5 +296,25 @@ foam.CLASS({
       validate.isTypeChecked__ = true; // avoid type checking this method
       return validate;
     })()
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Method',
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.core.Argument',
+      name: 'args',
+      adaptArrayElement: function(e, obj) {
+        var ctx = obj.__subContext__ || foam;
+        var of = e.class || this.of;
+        var cls = ctx.lookup(of);
+
+        return cls.isInstance(e) ? e :
+          foam.String.isInstance(e) ? cls.create({ name: e }) :
+          cls.create(e, obj);
+      }
+    }
   ]
 });

@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.swift.parse.parser',
   name: 'Alt',
-  extends: 'foam.swift.parse.parser.Parser',
+  implements: ['foam.swift.parse.parser.Parser'],
   properties: [
     {
       class: 'Array',

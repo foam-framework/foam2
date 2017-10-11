@@ -49,9 +49,8 @@ foam.CLASS({
       name: 'fields',
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.swift.SwiftClass',
       name: 'classes',
+      factory: function() { return []; },
     },
     {
       class: 'FObjectArray',
@@ -62,6 +61,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
+    },
+    {
+      class: 'String',
+      name: 'type',
+      value: 'class',
     },
   ],
 
@@ -80,7 +84,7 @@ foam.CLASS({
       this.imports.forEach(function(i) { o.out('import ', i, '\n') });
       o.indent();
       o.out(this.visibility ? this.visibility + ' ' : '');
-      o.out('class ', this.name);
+      o.out(this.type, ' ', this.name);
       if (this.implements.length) o.out(': ', this.implements.join(', '));
       o.out(' {\n');
       o.indent();

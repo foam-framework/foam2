@@ -6,6 +6,7 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls) {
+      if ( !this.model.generateSwift ) return;
       var innerClass = this.model.buildClass();
       var innerSwiftClass = innerClass.toSwiftClass();
       innerSwiftClass.imports = [];
@@ -31,8 +32,7 @@ foam.CLASS({
       name: 'swiftInitializer',
       args: [],
       template: function() {/*
-return __subContext__.create(
-    type: <%=this.model.swiftName%>.self, args: args) as! <%=this.model.swiftName%>
+return <%=this.model.swiftName%>(args, __subContext__)
       */},
     },
   ],

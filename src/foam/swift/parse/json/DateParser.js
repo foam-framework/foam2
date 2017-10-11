@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'DateParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   properties: [
   {
     name: 'delegate',

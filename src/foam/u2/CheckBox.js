@@ -23,16 +23,73 @@ foam.CLASS({
   documentation: 'Checkbox View.',
 
   properties: [
-    { class: 'Boolean', name: 'data' }
+    { 
+      class: 'Boolean', 
+      name: 'data' 
+    },
+    {
+      class: 'Boolean',
+      name: 'showLabel',
+      factory: function() { return !!this.label },
+    },
+    { 
+      class: 'String', 
+      name: 'label' 
+    }
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'checkbox');
+
+      if ( this.showLabel ) { 
+        this.start('label')
+          .addClass(this.myClass('label'))
+          .addClass(this.myClass('noselect'))
+          .add(this.label$)
+          .on('click', function() { 
+            this.data = !this.data; 
+          }.bind(this))
+        .end();
+      }
+    },
+    function updateMode_(mode) {
+      var disabled = mode === foam.u2.DisplayMode.RO ||
+                     mode === foam.u2.DisplayMode.DISABLED;
+      this.setAttribute('disabled', disabled);
     },
     function link() {
       this.data$.linkTo(this.attrSlot('checked'));
     }
+  ],
+
+  axioms: [
+    foam.u2.CSS.create({
+      code: function CSS() {/*
+      ^ {
+        margin: 8px;
+        padding: 8px;
+      }
+
+      ^label {
+        color: #444;
+        flex-grow: 1;
+        margin-left: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline;
+      }
+
+      ^noselect {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    */}
+    })
   ]
 });

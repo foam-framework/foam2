@@ -7,6 +7,7 @@ foam.CLASS({
   properties: [
     'name',
     'returnType',
+    'throws',
     {
       class: 'FObjectArray',
       of: 'foam.swift.ProtocolArgument',
@@ -32,6 +33,7 @@ foam.CLASS({
 
       o.out(
         ')',
+        this.throws ? ' throws' : '',
         this.returnType ? ' -> ' + this.returnType : '');
     }
   ]

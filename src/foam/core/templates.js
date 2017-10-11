@@ -180,7 +180,7 @@ foam.CLASS({
           ( result[0] ? t : result[1] ) +
           this.FOOTER;
 
-      var newArgs = ['opt_outputter'].concat(args);
+      var newArgs = ['opt_outputter'].concat(args.map(function(a) { return a.name || a }));
       var f = eval(
         '(function() { ' +
           'var TOC = function(o) { return foam.templates.TemplateOutput.create(); };' +
@@ -240,7 +240,7 @@ foam.CLASS({
       class: 'AxiomArray',
       of: 'foam.templates.TemplateAxiom',
       adaptArrayElement: function(o, prop) {
-        return foam.lookup(prop.of).create(o);
+        return this.lookup(prop.of).create(o);
       }
     }
   ]

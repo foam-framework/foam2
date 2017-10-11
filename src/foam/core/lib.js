@@ -124,11 +124,10 @@ foam.LIB = function LIB(model) {
          typeof m !== 'object' || typeof m.code === 'function',
         'Methods must have a code key which is a function');
 
-      foam.assert(
-        typeof m.name === 'string' && m.name !== '',
-        'Methods must be named with a non-empty string');
+      var name = m.name || foam.Function.getName(m);
+      foam.assert(name, 'Methods must be named with a non-empty string');
 
-      root[m.name] = m.code || m;
+      root[name] = m.code || m;
     }
   }
 };

@@ -19,6 +19,12 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'PropertyParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  requires: [
+    'foam.swift.parse.json.KeyParser',
+    'foam.swift.parse.json.Whitespace',
+    'foam.swift.parse.parser.Literal',
+    'foam.swift.parse.parser.Seq1',
+  ],
   properties: [
     {
       swiftType: 'PropertyInfo',
@@ -28,14 +34,14 @@ foam.CLASS({
       name: 'delegate',
       swiftFactory: function() {/*
 return 
-  Seq1(["index": 5, "parsers": [
-    Whitespace(),
-    KeyParser(["key": self.property.name]),
-    Whitespace(),
-    Literal(["string": ":"]),
-    Whitespace(),
+  Seq1_create(["index": 5, "parsers": [
+    Whitespace_create(),
+    KeyParser_create(["key": self.property.name]),
+    Whitespace_create(),
+    Literal_create(["string": ":"]),
+    Whitespace_create(),
     self.property.jsonParser!,
-    Whitespace(),
+    Whitespace_create(),
   ]])
       */},
     },
@@ -46,7 +52,8 @@ return
       swiftCode: function() {/*
 let ps = super.parse(ps, x);
 if ps == nil { return nil }
-property.set(x["obj"] as! FObject, value: ps!.value())
+let args = x.get("obj") as! Reference<[String:Any?]>
+args.value[property.name] = ps!.value()
 return ps
       */},
     },

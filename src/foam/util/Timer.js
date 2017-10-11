@@ -107,7 +107,7 @@ return newValue as! Int
          cycle(frequency, start, end) - cycle between start and end frequency times a second
       */
       name: 'cycle',
-      swiftReturnType: 'Float',
+      swiftReturns: 'Float',
       args: [
         {
           name: 'frequency',
@@ -157,7 +157,7 @@ return a! + (1 + s) * (b!-a!)/2;
       },
       swiftCode: function() {/*
 i+=1
-time  += interval * timeWarp
+time  += Int(Float(interval) * timeWarp)
 second = time /    1000 % 60 << 0;
 minute = time /   60000 % 60 << 0;
 hour   = time / 3600000 % 24 << 0;

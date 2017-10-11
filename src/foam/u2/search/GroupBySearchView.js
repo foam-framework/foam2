@@ -25,6 +25,7 @@ foam.CLASS({
     'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
+    'foam.dao.FnSink',
     'foam.u2.view.ChoiceView'
   ],
 
@@ -32,7 +33,7 @@ foam.CLASS({
     foam.u2.CSS.create({
       code: function CSS() {/*
         ^ select {
-          width: 100%;
+          min-width: 220px;
         }
       */}
     })
@@ -45,14 +46,12 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'viewSpec',
-      value: { class: 'foam.u2.view.ChoiceView' }
+      value: { class: 'foam.u2.view.ChoiceView', size: 10 }
     },
     {
+      class: 'foam.dao.DAOProperty',
       name: 'dao',
       required: true,
-      postSet: function() {
-        this.updateDAO();
-      }
     },
     {
       name: 'property',
@@ -86,30 +85,76 @@ foam.CLASS({
       expression: function(property) {
         return property.label;
       }
-    }
+    },
+    {
+      class: 'Function',
+      name: 'aFormatLabel',
+      value: function(key) { return Promise.resolve(''+key); }
+    },
+    'previewMode',
+    'hardData'
   ],
 
   methods: [
     function clear() {
       this.view.data = '';
     },
-    function initE() {
-      this.addClass(this.myClass());
-      this.view = this.start(this.viewSpec, {
-        label$: this.label$,
-        alwaysFloatLabel: true
-      });
-      this.view.end();
 
-      this.dao.on.sub(this.updateDAO);
+    function initE() {
+      var self = this;
+
+      this
+        .addClass(this.myClass())
+        .tag(this.viewSpec, {
+          label$: this.label$,
+          alwaysFloatLabel: true
+        }, this.view$)
+        .on('click', function(e) {
+          try {
+            self.previewMode = false;
+            var data         = self.view.choices[e.target.value][0];
+            self.hardData    = data;
+          } catch(x) {}
+        })
+        .on('mouseover', function(e) {
+          try {
+            var data = self.view.choices[e.target.value][0];
+
+            if ( ! self.previewMode ) {
+              self.previewMode = true;
+              self.hardData = self.view.data;
+            }
+
+            self.view.data = data;
+          } catch(x) {}
+        })
+        .on('mouseout', function(e) {
+          if ( e.relatedTarget && e.relatedTarget.nodeName === 'OPTION' ) return;
+          self.view.data   = self.hardData;
+          self.hardData    = undefined;
+          self.previewMode = false;
+        })
+        .onDetach(
+          this.dao$proxy.listen(
+            this.FnSink.create({fn: this.updateDAO})
+          )
+        );
+
+      this.updateDAO();
+
       this.view.data$.sub(this.updatePredicate);
     },
+
     function updatePredicate_(choice) {
       var exists = typeof choice !== 'undefined' && choice !== '';
       this.predicate = exists ? this.op.create({
         arg1: this.property,
         arg2: this.Constant.create({ value: choice })
       }) : this.True.create();
+    },
+
+    function formatLabels(keys) {
+      return Promise.all(keys.map(this.aFormatLabel.bind(this)));
     }
   ],
 
@@ -127,41 +172,43 @@ foam.CLASS({
           var options = [];
           var selected;
           var sortedKeys = groups.sortedKeys();
-          for ( var i = 0; i < sortedKeys.length; i++ ) {
-            var key = sortedKeys[i];
-            if ( typeof key === 'undefined' ) continue;
-            if ( key === '' ) continue;
-            var count = foam.String.intern(
-                '(' + groups.groups[key].value + ')');
-            var subKey = ('' + key)
-                .substring(0, self.width - count.length - 3);
-            var cleanKey = foam.core.Enum.isInstance(self.property) ?
-                self.property.of[key].label :
-                subKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;');
+          self.formatLabels(sortedKeys).then(function (labels) {
+            for ( var i = 0 ; i < sortedKeys.length ; i++ ) {
+              var key = sortedKeys[i];
+              if ( typeof key === 'undefined' ) continue;
+              if ( key === '' ) continue;
+              var count = foam.String.intern(
+                  '(' + groups.groups[key].value + ')');
+              var subKey = labels[i].substring(0, self.width - count.length - 3);
+              // ???: Why do we need to clean the key?
+              var cleanKey = foam.core.Enum.isInstance(self.property) ?
+                  self.property.of[key].label :
+                  subKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;');
 
-            if ( self.view && self.view.data === key ) {
-              selected = key;
+              if ( self.view && self.view.data === key ) {
+                selected = key;
+              }
+
+              options.push([
+                key,
+                cleanKey + foam.String.intern(
+                    Array(self.width - subKey.length - count.length).join(' ')) +
+                    count
+              ]);
             }
 
-            options.push([
-              key,
-              cleanKey + foam.String.intern(
-                  Array(self.width - subKey.length - count.length).join(' ')) +
-                  count
-            ]);
-          }
+            options.splice(0, 0, [ '', '--' ]);
 
-          options.splice(0, 0, [ '', '--' ]);
-
-          self.view.choices = options;
-          if ( typeof selected !== 'undefined' ) {
-            var oldData = self.view.data;
-            self.view.data = selected;
-            if ( typeof oldData === 'undefined' || oldData === '' ) {
-              self.updatePredicate_(selected);
+            self.view.choices = options;
+            if ( typeof selected !== 'undefined' ) {
+              var oldData = self.view.data;
+              self.view.data = selected;
+              if ( typeof oldData === 'undefined' || oldData === '' ) {
+                self.updatePredicate_(selected);
+              }
             }
-          }
+          });
         });
       }
     },

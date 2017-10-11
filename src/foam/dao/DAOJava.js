@@ -20,9 +20,34 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'getOf',
+      javaReturns: 'foam.core.ClassInfo'
+    },
+    {
+      name: 'setOf',
+      args: [
+        { name: 'of', javaType: 'foam.core.ClassInfo' }
+      ],
+      javaReturns: 'foam.dao.DAO'
+    },
+    {
       name: 'put',
       javaReturns: 'foam.core.FObject',
       args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
+      name: 'put_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'obj',
           javaType: 'foam.core.FObject'
@@ -40,9 +65,37 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'remove_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ]
+    },
+    {
       name: 'find',
       javaReturns: 'foam.core.FObject',
       args: [
+        {
+          name: 'id',
+          javaType: 'Object'
+        }
+      ]
+    },
+    {
+      name: 'find_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'id',
           javaType: 'Object'
@@ -56,14 +109,28 @@ foam.INTERFACE({
         {
           name: 'sink',
           javaType: 'foam.dao.Sink'
+        }
+      ]
+    },
+    {
+      name: 'select_',
+      javaReturns: 'foam.dao.Sink',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
         },
         {
           name: 'skip',
-          javaType: 'Integer'
+          javaType: 'long'
         },
         {
           name: 'limit',
-          javaType: 'Integer'
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -78,14 +145,23 @@ foam.INTERFACE({
     {
       name: 'removeAll',
       javaReturns: 'void',
+      args: [ ]
+    },
+    {
+      name: 'removeAll_',
+      javaReturns: 'void',
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'skip',
-          javaType: 'Integer'
+          javaType: 'long'
         },
         {
           name: 'limit',
-          javaType: 'Integer'
+          javaType: 'long'
         },
         {
           name: 'order',
@@ -100,12 +176,53 @@ foam.INTERFACE({
     {
       name: 'listen',
       javaReturns: 'void',
-      args: []
+      args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ]
+    },
+    {
+      name: 'listen_',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       javaReturns: 'void',
       args: [
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink'
+        }
+      ]
+    },
+    {
+      name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'sink',
           javaType: 'foam.dao.Sink'
@@ -138,7 +255,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
@@ -148,7 +265,41 @@ foam.INTERFACE({
       args: [
         {
           name: 'count',
-          javaType: 'int'
+          javaType: 'long'
+        }
+      ]
+    },
+    {
+      name: 'inX',
+      javaReturns: 'foam.dao.DAO',
+      args: [
+        {
+          name: 'x',
+          javaType:  'foam.core.X'
+        }
+      ]
+    },
+    {
+      name: 'cmd',
+      javaReturns: 'Object',
+      args: [
+        {
+          name: 'obj',
+          javaType:  'Object'
+        }
+      ]
+    },
+    {
+      name: 'cmd_',
+      javaReturns: 'Object',
+      args: [
+        {
+          name: 'x',
+          javaType:  'foam.core.X'
+        },
+        {
+          name: 'obj',
+          javaType:  'Object'
         }
       ]
     }

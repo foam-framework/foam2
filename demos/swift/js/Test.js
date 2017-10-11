@@ -36,6 +36,9 @@ foam.CLASS({
   ],
   properties: [
     {
+      name: 'anyProp',
+    },
+    {
       class: 'String',
       name: 'exprProp',
       swiftExpressionArgs: ['firstName', 'lastName'],
@@ -100,7 +103,7 @@ myListener()
   methods: [
     {
       name: 'methodWithAnArgAndReturn',
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       args: [
         {
           name: 'name',

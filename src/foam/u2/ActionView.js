@@ -18,13 +18,11 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'ActionView',
-  extends: 'foam.u2.Element',
-
-  documentation: 'A button View for triggering Actions.',
+  extends: 'foam.u2.UnstyledActionView',
 
   axioms: [
     foam.u2.CSS.create({code: function() {/*
-      ^ {
+      button^ {
         -webkit-box-shadow: inset 0 1px 0 0 #ffffff;
         box-shadow: inset 0 1px 0 0 #ffffff;
         background: -webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
@@ -58,11 +56,40 @@ foam.CLASS({
         vertical-align: middle;
       }
 
-      ^:disabled { color: #bbb; -webkit-filter: grayscale(0.8); }
+      ^:disabled { filter: grayscale(80%); }
+
+      ^.material-icons {
+        cursor: pointer;
+      }
     */}})
   ],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'showLabel',
+      expression: function(icon, iconFontName ) { return ! ( icon || iconFontName); }
+    },
+    {
+      class: 'URL',
+      name: 'icon',
+      factory: function(action) { return this.action.icon; }
+    },
+    {
+      class: 'String',
+      name: 'iconFontFamily',
+      factory: function(action) { return this.action.iconFontFamily; }
+    },
+    {
+      class: 'String',
+      name: 'iconFontClass',
+      factory: function(action) { return this.action.iconFontClass; }
+    },
+    {
+      class: 'String',
+      name: 'iconFontName',
+      factory: function(action) { return this.action.iconFontName; }
+    },
     'data',
     'action',
     [ 'nodeName', 'button' ],
@@ -77,8 +104,24 @@ foam.CLASS({
       this.initCls();
 
       this.
-        on('click', this.click).
-        add(this.label$);
+        on('click', this.click);
+
+      if ( this.icon ) {
+        // this.nodeName = 'a';
+        this.start('img').attr('src', this.icon).end();
+      } else if ( this.iconFontName ) {
+        this.nodeName = 'i';
+        this.cssClass(this.action.name);
+        this.cssClass(this.iconFontClass); // required by font package
+        this.style({'font-family': this.iconFontFamily});
+        this.add(this.iconFontName);
+      }
+
+      if ( this.showLabel ) {
+        this.add(this.label$);
+      }
+
+      this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
         if ( this.action.isAvailable ) {
@@ -93,13 +136,14 @@ foam.CLASS({
 
     function initCls() {
       this.addClass(this.myClass());
+      this.addClass(this.myClass(this.action.name));
     }
   ],
 
   listeners: [
     function click(e) {
-      this.action && this.action.maybeCall(this.__subContext__, this.data);
       e.stopPropagation();
+      this.action && this.action.maybeCall(this.__subContext__, this.data);
     }
   ]
 });

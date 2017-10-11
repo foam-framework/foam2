@@ -25,57 +25,307 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: 'Promise',
-      args: [ 'obj' ]
+      swiftReturns: 'FObject?',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
+    },
+    {
+      name: 'put_',
+      returns: 'Promise',
+      swiftReturns: 'FObject?',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
     },
     {
       name: 'remove',
       returns: 'Promise',
-      args: [ 'obj' ]
+      swiftReturns: 'FObject?',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
+    },
+    {
+      name: 'remove_',
+      returns: 'Promise',
+      swiftReturns: 'FObject?',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        }
+      ],
     },
     {
       name: 'find',
       returns: 'Promise',
-      args: [ 'id' ]
+      swiftReturns: 'FObject?',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'id',
+          swiftType: 'Any?'
+        }
+      ],
+    },
+    {
+      name: 'find_',
+      returns: 'Promise',
+      swiftReturns: 'FObject?',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'id',
+          swiftType: 'Any?'
+        }
+      ],
     },
     {
       name: 'select',
       returns: 'Promise',
-      args: [ 'sink', 'skip', 'limit', 'order', 'predicate' ]
+      swiftReturns: 'Sink',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+      ],
+    },
+    {
+      name: 'select_',
+      returns: 'Promise',
+      swiftReturns: 'Sink',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'skip',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'limit',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'order',
+          swiftType: 'Comparator?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'removeAll',
       returns: '',
-      args: [ 'skip', 'limit', 'order', 'predicate' ]
+      swiftThrows: true,
+      args: [ ]
+    },
+    {
+      name: 'removeAll_',
+      returns: '',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'skip',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'limit',
+          swiftType: 'Int?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'order',
+          swiftType: 'Comparator?',
+          swiftDefaultValue: 'nil',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'listen',
       returns: '',
-      args: [ 'sink', 'predicate' ]
+      swiftReturns: 'Detachable',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
+    },
+    {
+      name: 'listen_',
+      returns: '',
+      swiftReturns: 'Detachable',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+          swiftDefaultValue: 'ArraySink()',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
       returns: '',
-      args: [ 'sink' ]
+      swiftThrows: true,
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink'
+        }
+      ],
+    },
+    {
+      name: 'pipe_', // TODO: return a promise? don't put pipe and listen here?
+      returns: '',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'sink',
+          swiftType: 'Sink'
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        },
+      ],
     },
     {
       name: 'where',
       returns: 'foam.dao.DAO',
-      args: [ 'predicate' ]
+      swiftThrows: true,
+      args: [
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+          swiftDefaultValue: 'nil',
+        }
+      ],
     },
     {
       name: 'orderBy',
       returns: 'foam.dao.DAO',
-      args: [ 'comparator' ]
+      swiftThrows: true,
+      args: [
+        {
+          name: 'comparator',
+          swiftType: 'Comparator'
+        }
+      ],
     },
     {
       name: 'skip',
       returns: 'foam.dao.DAO',
-      args: [ 'count' ]
+      swiftThrows: true,
+      args: [
+        {
+          name: 'count',
+          swiftType: 'Int'
+        }
+      ],
     },
     {
       name: 'limit',
       returns: 'foam.dao.DAO',
-      args: [ 'count' ]
+      swiftThrows: true,
+      args: [
+        {
+          name: 'count',
+          swiftType: 'Int'
+        }
+      ],
+    },
+    {
+      name: 'inX',
+      swiftSupport: false,
+      returns: 'foam.dao.DAO',
+      args: [ 'x' ]
+    },
+    {
+      name: 'cmd',
+      swiftSupport: false,
+      returns: 'obj',
+      args: [ 'obj' ]
+    },
+    {
+      name: 'cmd_',
+      swiftSupport: false,
+      returns: 'obj',
+      args: [ 'x', 'obj' ]
     }
   ]
 });

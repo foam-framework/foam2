@@ -44,9 +44,14 @@ foam.CLASS({
       this.send(res, status, JSON.stringify(json));
     },
 
+    function sendStringAsHTML(res, status, str) {
+      res.setHeader('Content-type', 'text/html; charset=utf-8');
+      this.send(res, status, foam.parsers.html.escapeString(str));
+    },
+
     function send400(req, res, error) {
       this.sendMessage(req, res, 400, 'Bad request');
-      this.error('Bad request: ' + error);
+      this.reportErrorMsg(req, ' Bad request: ' + error);
     },
 
     function send404(req, res) {
@@ -55,15 +60,21 @@ foam.CLASS({
 
     function send500(req, res, error) {
       this.sendMessage(req, res, 500, 'Internal server error');
-      this.error('Internal server error: ' + error);
+      this.reportErrorMsg(req, 'Internal server error: ' + error);
     },
     function sendMessage(req, res, status, msg) {
       if ( req.headers.accept &&
           req.headers.accept.indexOf('application/json') !== -1 ) {
-        this.sendJSON(res, status, {message:msg});
+        this.sendJSON(res, status, { message: msg });
       } else {
-        this.send(res, status, msg);
+        this.sendStringAsHTML(res, status, msg);
       }
+    },
+    function reportWarnMsg(req, msg) {
+      this.warn(req.socket.remoteAddress, msg);
+    },
+    function reportErrorMsg(req, msg) {
+      this.error(req.socket.remoteAddress, msg);
     }
   ]
 });

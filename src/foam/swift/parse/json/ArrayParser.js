@@ -1,7 +1,7 @@
 /**
  * @license
  * Copyright 2017 Google Inc. All Rights Reserved.
- *
+Whitespace *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,24 +19,34 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'ArrayParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  requires: [
+    'foam.swift.parse.json.Whitespace',
+    'foam.swift.parse.parser.Literal',
+    'foam.swift.parse.parser.Repeat',
+    'foam.swift.parse.parser.Seq0',
+    'foam.swift.parse.parser.Seq1',
+  ],
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   properties: [
   {
     name: 'delegate',
     swiftFactory: function() {/*
-return Seq1(["index": 3, "parsers": [
-  Whitespace(),
-  Literal(["string": "["]),
-  Whitespace(),
-  Repeat([
-    "delegate": AnyParser(),
-    "delim": Seq0(["parsers": [
-      Whitespace(),
-      Literal(["string": ","]),
-      Whitespace(),
+return Seq1_create(["index": 3, "parsers": [
+  Whitespace_create(),
+  Literal_create(["string": "["]),
+  Whitespace_create(),
+  Repeat_create([
+    "delegate": __context__.create(AnyParser.self)!,
+    "delim": Seq0_create(["parsers": [
+      Whitespace_create(),
+      Literal_create(["string": ","]),
+      Whitespace_create(),
     ]]),
   ]),
-  Whitespace(),
-  Literal(["string": "]"]),
+  Whitespace_create(),
+  Literal_create(["string": "]"]),
 ]])
     */},
   },

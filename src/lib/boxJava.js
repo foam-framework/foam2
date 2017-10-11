@@ -35,95 +35,16 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      javaCode: function() {/*
-getDelegate().send(message.setObject(
-    getX().create(foam.box.SubBoxMessage.class)
-        .setName(getName())
-        .setObject(message.getObject())));
-*/}
+      javaCode: function() {
+/*foam.box.SubBoxMessage subBoxMessage = getX().create(foam.box.SubBoxMessage.class);
+subBoxMessage.setName(getName());
+subBoxMessage.setObject(message.getObject());
+message.setObject(subBoxMessage);
+getDelegate().send(message);*/
+      }
     }
   ]
 });
-
-foam.CLASS({
-  refines: 'foam.box.BoxRegistry',
-  properties: [
-    {
-      name: 'registry',
-      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
-      javaType: 'java.util.Map',
-      javaFactory: 'return getX().create(java.util.HashMap.class);'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'doLookup',
-      javaReturns: 'foam.box.Box',
-      args: [
-        {
-          name: 'name',
-          javaType: 'String'
-        }
-      ],
-      javaCode: 'Registration r = (Registration)getRegistry().get(name);\n'
-                + 'if ( r == null ) return null;\n'
-                + 'return r.getExportBox();'
-    },
-    {
-      name: 'register',
-      javaReturns: 'foam.box.Box',
-      args: [
-        {
-          name: 'name',
-          javaType: 'String'
-        },
-        {
-          name: 'service',
-          javaType: 'Object'
-        },
-        {
-          name: 'box',
-          javaType: 'foam.box.Box'
-        }
-      ],
-      javaCode: 'foam.box.Box exportBox = getX().create(foam.box.SubBox.class).setName(name).setDelegate((foam.box.Box)getMe());\n'
-                + '// TODO(adamvy): Apply service policy\n'
-                + 'getRegistry().put(name, getX().create(Registration.class).setExportBox(exportBox).setLocalBox(box));\n'
-                + 'return exportBox;'
-    },
-    {
-      name: 'unregister',
-      args: [
-        {
-          name: 'name',
-          javaType: 'String'
-        }
-      ],
-      javaCode: 'getRegistry().remove(name);'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  refines: 'foam.box.BoxRegistryBox',
-  methods: [
-    {
-      name: 'send',
-      javaCode: function() {/*
-if ( message.getObject() instanceof foam.box.SubBoxMessage ) {
-  foam.box.SubBoxMessage subBoxMessage = (foam.box.SubBoxMessage)message.getObject();
-  message.setObject(subBoxMessage.getObject());
-  ((Registration)getRegistry().get(subBoxMessage.getName())).getLocalBox().send(message);
-} else {
-  throw new RuntimeException("Invalid message type " + message.getClass().getName());
-}
-*/}
-    }
-  ]
-});
-
 
 foam.CLASS({
   refines: 'foam.box.NullBox',
@@ -140,13 +61,17 @@ foam.CLASS({
   methods: [
     {
       name: 'send',
-      javaCode: 'try {\n'
-              + '  java.io.PrintWriter writer = ((javax.servlet.ServletResponse)getX().get("httpResponse")).getWriter();\n'
-              + '  writer.print(new foam.lib.json.Outputter().stringify(message));\n'
-              + '  writer.flush();\n'
-              + '} catch(java.io.IOException e) {\n'
-              + '  throw new RuntimeException(e);\n'
-              + '}'
+      javaCode: `
+try {
+  javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
+  response.setContentType("application/json");
+  java.io.PrintWriter writer = response.getWriter();
+  writer.print(new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK).stringify(message));
+  writer.flush();
+} catch(java.io.IOException e) {
+  throw new RuntimeException(e);
+}
+`
     }
   ]
 });

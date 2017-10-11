@@ -58,7 +58,7 @@ foam.CLASS({
           (this.buffer.length > 125 ? 4 : 2);
 
       var i = 0;
-      var buffer = new Buffer(this.buffer.length + headerSize);
+      var buffer = Buffer.alloc(this.buffer.length + headerSize);
       // FIN = 1, RSV1-3 = 0
       buffer.writeUInt8(
         0x80 +
@@ -167,7 +167,7 @@ foam.CLASS({
 
     function maskingKey0(byte) {
       this.length = this.length_
-      this.buffer = new Buffer(this.length);
+      this.buffer = Buffer.alloc(this.length);
       this.bufferPos = 0;
       this.needed = this.length;
 
@@ -243,13 +243,11 @@ foam.CLASS({
   name: 'Socket',
 
   imports: [
-    'socketService',
-    'me'
+    'me',
+    'socketService'
   ],
 
-  requires: [
-    'foam.box.RegisterSelfMessage'
-  ],
+  requires: [ 'foam.box.RegisterSelfMessage' ],
 
   topics: [
     'message',
@@ -293,14 +291,30 @@ foam.CLASS({
       class: 'Int',
       name: 'nextSize',
       value: 0
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // Use default FOAM implementation of Outputter. Do not attempt to
+        // lookup sensitive "foam.json.Outputter" class in box context.
+        return foam.lookup('foam.json.Outputter').create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        }, this);
+      }
     }
   ],
 
   methods: [
     function write(msg) {
-      var serialized = foam.json.Network.stringify(msg);
+      var serialized = this.outputter.stringify(msg);
       var size = Buffer.byteLength(serialized);
-      var packet = new Buffer(size + 4);
+      var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
       packet.write(serialized, 4);
       this.socket_.write(packet);
@@ -350,7 +364,7 @@ foam.CLASS({
         while ( start != data.length ) {
           if ( this.nextSize == 0 ) {
             this.nextSize = data.readInt32LE(start);
-            this.buffer = new Buffer(this.nextSize);
+            this.buffer = Buffer.alloc(this.nextSize);
             this.offset = 0;
             remaining = this.nextSize - this.offset;
             start += 4;
@@ -392,8 +406,16 @@ foam.CLASS({
   name: 'SocketService',
 
   requires: [
-    'foam.net.node.Socket',
-    'foam.box.RegisterSelfMessage'
+    'foam.box.Message',
+    'foam.box.RegisterSelfMessage',
+    'foam.json.Parser',
+    'foam.net.node.Socket'
+  ],
+
+  imports: [
+    'creationContext',
+    'error',
+    'info'
   ],
 
   properties: [
@@ -401,6 +423,10 @@ foam.CLASS({
       class: 'Boolean',
       name: 'listen',
       value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'listening'
     },
     {
       class: 'Int',
@@ -412,6 +438,17 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
@@ -419,19 +456,37 @@ foam.CLASS({
     function init() {
       if ( ! this.listen ) return;
 
+      this.setupServer(this.port);
+    },
+
+    function setupServer(port) {
       var server = this.server = new require('net').Server();
       this.server.on('connection', this.onConnection);
-      this.server.on('error', function(e) {
-        console.log("Server error", e);
+      this.server.on('error', function(error) {
+        this.error('foam.net.node.SocketService: Server error', error);
         server.unref();
+        if ( error.code === 'EADDRINUSE' ) {
+          var port = Math.floor( 10000 + ( Math.random() * 10000 ) );
+          this.info('foam.net.node.SocketService: Retrying on port', port);
+          this.setupServer(port);
+        }
       }.bind(this));
 
-      if ( this.listen ) this.server.listen(this.port);
+      if ( this.listen ) {
+        this.server.on('listening', function() {
+          this.listening = true;
+        }.bind(this));
+        this.server.listen(this.port = port);
+      }
     },
 
     function addSocket(socket) {
-      var s1 = socket.message.sub(function(s, _, m) {
-        var m = foam.json.parseString(m, this);
+      var s1 = socket.message.sub(function(s, _, mStr) {
+        var m = this.parser.parseString(mStr);
+
+        if ( ! this.Message.isInstance(m) ) {
+          console.warn('Got non-message:', m, mStr);
+        }
 
         if ( this.RegisterSelfMessage.isInstance(m) ) {
           var named = foam.box.NamedBox.create({
@@ -470,6 +525,7 @@ foam.CLASS({
   name: 'WebSocket',
 
   requires: [
+    'foam.json.Outputter',
     'foam.net.node.Frame'
   ],
 
@@ -495,18 +551,32 @@ foam.CLASS({
     },
     'opcode',
     'parts',
-    'currentFrame'
+    'currentFrame',
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
+    }
   ],
 
   methods: [
     function send(data) {
       if ( foam.box.Message.isInstance(data) ) {
-        data = foam.json.Network.stringify(data);
+        data = this.outputter.stringify(data);
       }
 
       if ( typeof data == "string" ) {
         var opcode = 1;
-        data = new Buffer(data);
+        data = Buffer.from(data);
       } else {
         opcode = 2;
       }
@@ -607,14 +677,26 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      class: 'String',
+      name: 'privateKey'
+    },
+    {
+      class: 'String',
+      name: 'cert'
     }
   ],
 
   methods: [
     function init() {
-      this.server = require('http').createServer(this.onRequest);
-      this.server.listen(this.port);
+      if ( this.cert && this.privateKey )
+        this.server = require('https').createServer({ key: this.privateKey, cert: this.cert });
+      else
+        this.server = require('http').createServer();
+
       this.server.on('upgrade', this.onUpgrade);
+      this.server.listen(this.port);
     }
   ],
 
@@ -700,9 +782,12 @@ foam.CLASS({
       // 'Content-Length' or 'Transfer-Encoding' required for some requests
       // to be properly handled by Node JS servers.
       // See https://github.com/nodejs/node/issues/3009 for details.
+
       var buf;
-      if ( this.payload ) {
-        buf = new Buffer(this.payload, 'utf8');
+      if ( this.payload && this.Blob.isInstance(this.payload) ) {
+        this.headers['Content-Length'] = this.payload.size;
+      } else if ( this.payload ) {
+        buf = Buffer.from(this.payload, 'utf8');
         if ( ! this.headers['Content-Length'] ) {
           this.headers['Content-Length'] = buf.length;
         }
@@ -722,9 +807,6 @@ foam.CLASS({
             resp: nodeResp,
             responseType: this.responseType
           });
-
-          // Ensure that payload factory wires up listeners immediately.
-          resp.payload;
 
           // TODO(markdittmer): Write integration tests for redirects, including
           // same-origin/path-only redirects.
@@ -747,19 +829,36 @@ foam.CLASS({
           } else {
             resolve(resp);
           }
-
         }.bind(this));
 
         req.on('error', function(e) {
           reject(e);
         });
 
-        if ( this.payload ) req.write(buf);
+        if ( this.payload && this.Blob.isInstance(this.payload) ) {
+          this.payload.pipe(function(buf) {
+            if ( req.write(buf) ) {
+              return new Promise(function(resolve) { req.once('drain', resolve); });
+            }
+          }).then(function() {
+            req.end();
+          });
+          return;
+        } else if ( this.payload ) {
+          req.write(buf);
+          req.end();
+          return;
+        }
+
         req.end();
       }.bind(this));
     }
   ]
 });
+// Registering BaseHTTPRequest facilitates decoration when HTTPRequest has been
+// re-overridden.
+foam.register(foam.lookup('foam.net.node.HTTPRequest'),
+              'foam.net.node.BaseHTTPRequest');
 
 
 foam.CLASS({

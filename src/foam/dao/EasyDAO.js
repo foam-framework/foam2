@@ -31,25 +31,24 @@ foam.CLASS({
   */},
 
   requires: [
-    'foam.dao.MDAO',
-    'foam.dao.JournalDAO',
-    'foam.dao.GUIDDAO',
-    'foam.dao.IDBDAO',
-    'foam.dao.SequenceNumberDAO',
-    'foam.dao.CachingDAO',
-    'foam.dao.SyncDAO',
-    'foam.dao.ContextualizingDAO',
-    'foam.dao.DeDupDAO',
-    'foam.dao.ClientDAO',
-    'foam.dao.PromisedDAO',
     'foam.box.Context',
     'foam.box.HTTPBox',
     'foam.box.SocketBox',
-    //'foam.core.dao.MergeDAO',
-    //'foam.core.dao.MigrationDAO',
-    //'foam.core.dao.VersionNoDAO',
-    //'foam.dao.EasyClientDAO',
+    'foam.box.WebSocketBox',
+    'foam.dao.CachingDAO',
+    'foam.dao.CompoundDAODecorator',
+    'foam.dao.ContextualizingDAO',
+    'foam.dao.DecoratedDAO',
+    'foam.dao.DeDupDAO',
+    'foam.dao.GUIDDAO',
+    'foam.dao.IDBDAO',
+    'foam.dao.JDAO',
     'foam.dao.LoggingDAO',
+    'foam.dao.MDAO',
+    'foam.dao.PromisedDAO',
+    'foam.dao.RequestResponseClientDAO',
+    'foam.dao.SequenceNumberDAO',
+    'foam.dao.SyncDAO',
     'foam.dao.TimingDAO'
   ],
 
@@ -58,10 +57,11 @@ foam.CLASS({
   constants: {
     // Aliases for daoType
     ALIASES: {
-      ARRAY: 'foam.dao.ArrayDAO',
-      MDAO:  'foam.dao.MDAO',
-      IDB:   'foam.dao.IDBDAO',
-      LOCAL: 'foam.dao.LocalStorageDAO'
+      ARRAY:  'foam.dao.ArrayDAO',
+      CLIENT: 'foam.dao.RequestResponseClientDAO',
+      IDB:    'foam.dao.IDBDAO',
+      LOCAL:  'foam.dao.LocalStorageDAO',
+      MDAO:   'foam.dao.MDAO'
     }
   },
 
@@ -110,8 +110,9 @@ foam.CLASS({
     },
     {
       /** Keep a history of all state changes to the DAO. */
-      name: 'journal',
-      value: false
+      class: 'FObjectProperty',
+      of: 'foam.dao.Journal',
+      name: 'journal'
     },
     {
       /** Enable logging on the DAO. */
@@ -173,25 +174,18 @@ foam.CLASS({
       value: false
     },
     {
+      /** Turn on to enable remote listener support. Only useful with daoType = CLIENT. */
+      class: 'Boolean',
+      name: 'remoteListenerSupport',
+      value: false
+    },
+    {
       /** Setting to true activates polling, periodically checking in with
         the server. If sockets are used, polling is optional as the server
         can push changes to this client. */
       class: 'Boolean',
       name: 'syncPolling',
       value: true
-    },
-    {
-      /** The URI of the server to use. If sockets is true, this will use
-        a web socket, otherwise HTTP to contact the server-side DAO. On your
-        server, use an EasyDAO with isServer:true to provide the other end
-        of the connection. */
-      class: 'String',
-      name: 'serverUri',
-      factory: function() {
-        return this.document && this.document.location ?
-            this.document.location.origin + '/api' :
-            '';
-      }
     },
     {
       /** Set to true if you are running this on a server, and clients will
@@ -206,9 +200,22 @@ foam.CLASS({
       name: 'syncProperty'
     },
     {
-      /** If true, uses sockets instead of HTTP for server communication. */
-      name: 'sockets',
-      value: false
+      /** Destination address for server. */
+      name: 'serverBox',
+      factory: function() {
+        return this.remoteListenerSupport ?
+            this.WebSocketBox.create({of: this.model, uri: this.serviceName}) :
+            this.HTTPBox.create({of: this.model, url: this.serviceName}) ;
+      }
+    },
+    {
+      /** Simpler alternative than providing serverBox. */
+      name: 'serviceName'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.dao.DAODecorator',
+      name: 'decorators'
     },
     'testData'
   ],
@@ -228,11 +235,24 @@ foam.CLASS({
         this.ALIASES[this.daoType] || this.daoType :
         this.daoType;
 
+      var params = { of: this.of };
+
+      if ( daoType == 'foam.dao.RequestResponseClientDAO' ) {
+        foam.assert(this.hasOwnProperty('serverBox') || this.serviceName, 'EasyDAO "client" type requires a serveBox or serviceName');
+
+        // The RequestResonseClientDAO generates listener events locally
+        // but with remoteListenerSupport, this isn't needed, so switch
+        // to the regular ClientDAO instead.
+        if ( this.remoteListenerSupport ) {
+          daoType = 'foam.dao.ClientDAO';
+        }
+
+        params.delegate = this.serverBox;
+      }
+
       var daoModel = typeof daoType === 'string' ?
         this.lookup(daoType) || global[daoType] :
         daoType;
-
-      var params = { of: this.of };
 
       if ( ! daoModel ) {
         this.warn(
@@ -271,6 +291,13 @@ foam.CLASS({
         }
       }
 
+      if ( this.journal ) {
+        dao = this.JDAO.create({
+          delegate: dao,
+          journal: this.journal
+        });
+      }
+
       if ( this.seqNo && this.guid ) throw "EasyDAO 'seqNo' and 'guid' features are mutually exclusive.";
 
       if ( this.seqNo ) {
@@ -299,21 +326,12 @@ foam.CLASS({
       }
 
       if ( this.syncWithServer ) {
-        var boxContext = this.Context.create();
-        var boxSender = ( this.sockets ) ?
-          this.SocketBox.create({
-            address: this.serverUri
-          }, boxContext) :
-          this.HTTPBox.create({
-             url: this.serverUri,
-             method: 'POST'
-          }, boxContext); // TODO: retry?
-          //TODO: EasyClientDAO
+        foam.assert(this.serverBox, 'syncWithServer requires serverBox');
 
         dao = this.SyncDAO.create({
-          remoteDAO: this.ClientDAO.create({
+          remoteDAO: this.RequestResponseClientDAO.create({
               name: this.name,
-              delegate: boxSender
+              delegate: this.serverBox
           }, boxContext),
           syncProperty: this.syncProperty,
           delegate: dao,
@@ -339,16 +357,14 @@ foam.CLASS({
         dao = this.ContextualizingDAO.create({delegate: dao});
       }
 
-      if ( this.journal ) {
-        dao = this.JournalDAO.create({
-          delegate: dao,
-          journal: foam.dao.EasyDAO.create({
-            of:      foam.dao.JournalEntry,
-            daoType: this.daoType,
-            seqNo:   true,
-            name:    this.name + '_Journal'
-          })
+      if ( this.decorators.length ) {
+        var decorated = this.DecoratedDAO.create({
+          decorator: this.CompoundDAODecorator.create({
+            decorators: this.decorators
+          }),
+          delegate: dao
         });
+        dao = decorated;
       }
 
       if ( this.timing  ) {
@@ -361,23 +377,25 @@ foam.CLASS({
 
       var self = this;
 
+      if ( decorated ) decorated.dao = dao;
+
       if ( this.testData ) {
         var delegate = dao;
 
         dao = this.PromisedDAO.create({
           promise: new Promise(function(resolve, reject) {
             delegate.select(self.COUNT()).then(function(c) {
-              console.log("Loading test data");
               // Only load testData if DAO is empty
               if ( c.value ) {
                 resolve(delegate);
                 return;
               }
 
-              Promise.all(foam.json.parse(self.testData, self.of).map(
+              self.log("Loading test data");
+              Promise.all(foam.json.parse(self.testData, self.of, self).map(
                 function(o) { return delegate.put(o); }
               )).then(function() {
-                console.log("Loaded", self.testData.length, "records.");
+                self.log("Loaded", self.testData.length, "records.");
                 resolve(delegate);
               }, reject);
             });

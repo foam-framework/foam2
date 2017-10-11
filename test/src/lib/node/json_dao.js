@@ -62,9 +62,9 @@ describe('JSONFileDAO', function() {
       return dao2.select();
     }).then(function(a) {
       expect(a).toBeDefined();
-      expect(a.a).toBeDefined();
-      expect(a.a.length).toBe(3);
-      expect(a.a[1].name).toBe('bar');
+      expect(a.array).toBeDefined();
+      expect(a.array.length).toBe(3);
+      expect(a.array[1].name).toBe('bar');
     }).then(done);
   });
 });

@@ -21,45 +21,39 @@ foam.INTERFACE({
   methods: [
     {
       name: 'head',
-      swiftReturnType: 'Character',
-      swiftEnabled: true,
+      swiftReturns: 'Character',
     },
     {
       name: 'valid',
-      swiftReturnType: 'Bool',
-      swiftEnabled: true,
+      swiftReturns: 'Bool',
     },
     {
       name: 'tail',
-      swiftReturnType: 'PStream',
-      swiftEnabled: true,
+      swiftReturns: 'PStream',
     },
     {
       name: 'substring',
-      swiftReturnType: 'String',
+      swiftReturns: 'String',
       args: [
         {
           name: 'end',
           swiftType: 'PStream',
         },
       ],
-      swiftEnabled: true,
     },
     {
       name: 'value',
-      swiftReturnType: 'Any?',
-      swiftEnabled: true,
+      swiftReturns: 'Any?',
     },
     {
       name: 'setValue',
-      swiftReturnType: 'PStream',
+      swiftReturns: 'PStream',
       args: [
         {
           name: 'value',
           swiftType: 'Any?',
         },
       ],
-      swiftEnabled: true,
     },
   ]
 });

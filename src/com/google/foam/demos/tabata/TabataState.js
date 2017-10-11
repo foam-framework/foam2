@@ -9,7 +9,6 @@ foam.INTERFACE({
           swiftType: 'Tabata',
         },
       ],
-      swiftEnabled: true,
     },
     {
       name: 'next',
@@ -19,7 +18,6 @@ foam.INTERFACE({
           swiftType: 'Tabata',
         },
       ],
-      swiftEnabled: true,
     },
   ]
 });

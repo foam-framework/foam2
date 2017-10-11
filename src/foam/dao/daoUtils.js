@@ -20,6 +20,10 @@ foam.CLASS({
   name: 'ProxyDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  requires: [
+    'foam.dao.ProxyListener'
+  ],
+
   documentation: 'Proxy implementation for the DAO interface.',
 
   properties: [
@@ -27,14 +31,11 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      topics: [ 'on' ],
-      forwards: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
+      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_' ],
+      topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
+      factory: function() { return foam.dao.NullDAO.create() },
       postSet: function(old, nu) {
-        // Only fire a 'reset' when the delegate is actually changing, not being
-        // set for the first time.
-        if ( old ) {
-          this.on.reset.pub();
-        }
+        if ( old ) this.on.reset.pub();
       }
     },
     {
@@ -43,6 +44,95 @@ foam.CLASS({
         return this.delegate.of;
       }
     }
+  ],
+
+  methods: [
+    {
+      name: 'getOf',
+      javaReturns: 'foam.core.ClassInfo',
+      javaCode: 'if ( of_ == null && getDelegate() != null ) return getDelegate().getOf(); return of_;'
+    },
+
+    {
+      name: 'listen_',
+      code: function listen_(x, sink, predicate) {
+        var listener = this.ProxyListener.create({
+          delegate: sink,
+          args: [ predicate ]
+        });
+
+        listener.onDetach(listener.dao$.follow(this.delegate$));
+
+        return listener;
+      },
+      javaCode: `
+// TODO: Support changing of delegate
+getDelegate().listen_(x, sink, predicate);
+`
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyListener',
+
+  implements: ['foam.dao.Sink'],
+
+  properties: [
+    'args',
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Sink',
+      name: 'delegate',
+    },
+    {
+      name: 'innerSub',
+      swiftType: 'Detachable?',
+      postSet: function(_, s) {
+        if (s) this.onDetach(s);
+      },
+      swiftPostSet: 'if let s = newValue { onDetach(s) }',
+    },
+    {
+      name: 'dao',
+      postSet: function(old, nu) {
+        this.innerSub && this.innerSub.detach();
+        this.innerSub = nu && nu.listen.apply(nu, [this].concat(this.args));
+        if ( old ) this.reset();
+      }
+    }
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function put(obj, s) {
+        this.delegate.put(obj, this);
+      },
+      swiftCode: 'delegate.put(obj, self)',
+    },
+
+    function outputJSON(outputter) {
+      outputter.output(this.delegate);
+    },
+
+    {
+      name: 'remove',
+      code: function remove(obj, s) {
+        this.delegate.remove(obj, this);
+      },
+      swiftCode: 'delegate.remove(obj, self)',
+    },
+
+    {
+      name: 'reset',
+      code: function reset(s) {
+        this.delegate.reset(this);
+      },
+      swiftCode: 'delegate.reset(self)',
+    },
   ]
 });
 
@@ -52,19 +142,93 @@ foam.CLASS({
   name: 'ArraySink',
   extends: 'foam.dao.AbstractSink',
 
+  constants: {
+    // Dual to outputJSON method.
+    //
+    // TODO(markdittmer): Turn into static method: "parseJSON" once
+    // https://github.com/foam-framework/foam2/issues/613 is fixed.
+    PARSE_JSON: function(json, opt_cls, opt_ctx) {
+      var cls = json.of || opt_cls;
+      var array = json.array;
+      if ( ! array ) return foam.dao.ArraySink.create({ of: cls }, opt_ctx);
+      if ( foam.typeOf(cls) === foam.String )
+        cls = ( opt_ctx || foam ).lookup(cls);
+
+      return foam.dao.ArraySink.create({
+        of: cls,
+        array: foam.json.parse(array, cls, opt_ctx)
+      }, opt_ctx);
+    }
+  },
+
   properties: [
     {
-      name: 'a',
+      class: 'List',
+      name: 'array',
+      adapt: function(old, nu) {
+        if ( ! this.of ) return nu;
+        var cls = this.of;
+        for ( var i = 0; i < nu.length; i++ ) {
+          if ( ! cls.isInstance(nu[i]) )
+            nu[i] = cls.create(nu[i], this.__subContext__);
+        }
+        return nu;
+      },
       factory: function() { return []; },
-      fromJSON: function(json, ctx) {
-        return foam.json.parse(json, null, ctx);
+      javaFactory: `return new java.util.ArrayList();`
+    },
+    {
+      class: 'Class',
+      name: 'of',
+      value: null
+    },
+    {
+      name: 'a',
+      transient: true,
+      getter: function() {
+        this.warn('Use of deprecated ArraySink.a');
+        return this.array;
       }
     }
   ],
 
   methods: [
-    function put(o) {
-      this.a.push(o);
+    {
+      name: 'put',
+      code: function put(o, sub) {
+        var cls = this.of;
+        if ( ! cls ) {
+          this.array.push(o);
+          return;
+        }
+        if ( cls.isInstance(o) )
+          this.array.push(o);
+        else
+          this.array.push(cls.create(o, this.__subContext__));
+      },
+      javaCode: `getArray().add(obj);`
+    },
+    function outputJSON(outputter) {
+      outputter.start('{');
+      var outputClassName = outputter.outputClassNames;
+      if ( outputClassName ) {
+        outputter.nl().indent().out(
+            outputter.maybeEscapeKey('class'), ':', outputter.postColonStr, '"',
+            this.cls_.id, '"');
+      }
+
+      var array = this.array;
+      var outputComma = outputClassName;
+      if ( this.of ) {
+        outputter.outputProperty(this, this.OF, outputComma);
+        outputComma = true;
+      }
+      if ( array.length > 0 ) {
+        if ( outputComma ) outputter.out(',');
+        outputter.nl().indent().outputPropertyName(this.ARRAY).
+            out(':', outputter.postColonStr).output(array, this.of);
+      }
+      outputter.nl().end('}');
     }
   ]
 });
@@ -79,8 +243,7 @@ foam.CLASS({
     {
       class: 'Promised',
       of: 'foam.dao.DAO',
-      methods: [ 'put', 'remove', 'find', 'select', 'removeAll' ],
-      topics: [ 'on' ],
+      methods: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'listen_', 'cmd_' ],
       name: 'promise'
     }
   ]
@@ -135,6 +298,20 @@ foam.LIB({
         // of package.ClassName into package.ClassNameDAO
         return str.substring(0, 1).toLowerCase() + str.substring(1) + 'DAO';
       })
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'InvalidArgumentException',
+  extends: 'foam.dao.ExternalException',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'message'
     }
   ]
 });

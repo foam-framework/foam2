@@ -18,8 +18,9 @@
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
   requires: [
-    'foam.swift.Argument as SwiftArgument',
     'foam.core.Argument',
+    'foam.swift.Argument as SwiftArgument',
+    'foam.swift.Field',
     'foam.swift.Method',
   ],
   properties: [
@@ -27,6 +28,34 @@ foam.CLASS({
       class: 'String',
       name: 'swiftName',
       expression: function(name) { return name == 'init' ? '__foamInit__' : name; },
+    },
+    {
+      class: 'String',
+      name: 'swiftAxiomName',
+      expression: function(swiftName) { return foam.String.constantize(swiftName) },
+    },
+    {
+      class: 'String',
+      name: 'swiftSlotName',
+      expression: function(swiftName) { return swiftName + '$'; },
+    },
+    {
+      class: 'Boolean',
+      name: 'swiftSynchronized',
+    },
+    {
+      class: 'String',
+      name: 'swiftSynchronizedSemaphoreName',
+      expression: function(swiftName) { return swiftName + '_semaphore_' },
+    },
+    {
+      class: 'String',
+      name: 'swiftSynchronizedMethodName',
+      expression: function(swiftName) { return swiftName + '_synchronized_' },
+    },
+    {
+      class: 'Boolean',
+      name: 'swiftThrows',
     },
     {
       class: 'FObjectArray',
@@ -68,39 +97,160 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftCode',
+      expression: function(parentCls, name) {
+        if (foam.core.internal.InterfaceMethod.isInstance(
+            parentCls.getSuperAxiomByName(name))) {
+          return 'fatalError()';
+        }
+        return '';
+      },
+    },
+    {
+      class: 'Boolean',
+      name: 'swiftOverride',
+      expression: function(parentCls, name) {
+        var parentMethod = parentCls.getSuperAxiomByName(name);
+        return name == 'init' ||
+          !!( parentMethod &&
+              parentMethod.swiftSupport &&
+              !foam.core.internal.InterfaceMethod.isInstance(parentMethod))
+      },
     },
     {
       class: 'String',
-      name: 'swiftReturnType',
+      name: 'swiftSupport',
+      expression: function(swiftCode) { return !!swiftCode }
+    },
+    {
+      class: 'String',
+      name: 'swiftReturns',
+      expression: function(returns) {
+        if (!returns) return '';
+        var cls = foam.lookup(returns, true)
+        if (cls) {
+          return cls.model_.swiftName
+        }
+        return 'Any?';
+      },
     },
     {
       class: 'StringArray',
       name: 'swiftAnnotations',
-    }
+    },
   ],
   methods: [
-    function createChildMethod_(child) {
-      var m = child.clone();
-
-      for ( var key in this.instance_ ) {
-        if ( !m.hasOwnProperty(key) ) {
-          m[key] = this.instance_[key]
-        }
-      }
-
-      return m;
-    },
     function writeToSwiftClass(cls, superAxiom) {
-      if ( !this.swiftCode ) return;
-      cls.method(this.Method.create({
-        name: this.swiftName,
-        body: this.swiftCode,
-        returnType: this.swiftReturnType,
-        args: this.swiftArgs,
-        visibility: this.swiftVisibility,
-        override: !!(superAxiom && superAxiom.swiftCode) || this.name == 'init',
-        annotations: this.swiftAnnotations,
+      if (!this.swiftSupport) return;
+      if ( !this.swiftOverride ) {
+        cls.fields.push(this.Field.create({
+          lazy: true,
+          name: this.swiftSlotName,
+          initializer: this.slotInit(),
+          type: 'Slot',
+        }));
+      }
+      cls.fields.push(this.Field.create({
+        visibility: 'private',
+        static: true,
+        final: true,
+        name: this.swiftAxiomName,
+        type: 'MethodInfo',
+        initializer: this.swiftMethodInfoInit(),
       }));
+      var code = this.swiftCode;
+      if ( this.swiftSynchronized ) {
+        var sem = this.swiftSynchronizedSemaphoreName
+        cls.fields.push(this.Field.create({
+          visibility: 'private',
+          final: true,
+          name: sem,
+          type: 'DispatchSemaphore',
+          defaultValue: 'DispatchSemaphore(value: 1)',
+        }));
+        cls.method(this.Method.create({
+          name: this.swiftSynchronizedMethodName,
+          body: this.swiftCode,
+          throws: this.swiftThrows,
+          returnType: this.swiftReturns,
+          args: this.swiftArgs,
+          visibility: this.swiftVisibility,
+          override: this.swiftOverride,
+          annotations: this.swiftAnnotations,
+        }));
+        cls.method(this.Method.create({
+          name: this.swiftName,
+          body: this.syncronizedCode(),
+          throws: this.swiftThrows,
+          returnType: this.swiftReturns,
+          args: this.swiftArgs,
+          visibility: this.swiftVisibility,
+          override: this.swiftOverride,
+          annotations: this.swiftAnnotations,
+        }));
+      } else {
+        cls.method(this.Method.create({
+          name: this.swiftName,
+          body: this.swiftCode,
+          throws: this.swiftThrows,
+          returnType: this.swiftReturns,
+          args: this.swiftArgs,
+          visibility: this.swiftVisibility,
+          override: this.swiftOverride,
+          annotations: this.swiftAnnotations,
+        }));
+      }
     },
-  ]
+  ],
+  templates: [
+    {
+      name: 'slotInit',
+      args: [],
+      template: function() {/*
+<%
+var isMutable = function(a) { return a.annotations.indexOf('inout') != -1 };
+%>
+return ConstantSlot([
+  "value": { [weak self] (args: [Any?]) throws -> Any? in
+    if self == nil { fatalError() }
+<% this.swiftArgs.forEach(function(a, i) { %>
+    <%=isMutable(a) ? 'var' : 'let' %> <%
+  %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
+<% }) %>
+    
+    return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
+        <%=this.swiftArgs.map(function(a){
+          return (a.externalName ? a.externalName + ': ' : '') +
+                 (isMutable(a) ? '&' : '') +
+                 a.localName
+        }).join(', ')%>)
+  }
+])
+      */},
+    },
+    {
+      name: 'syncronizedCode',
+      args: [],
+      template: function() {/*
+<%=this.swiftSynchronizedSemaphoreName%>.wait()
+<%if (this.swiftReturns) {%>let ret = <%}%><%=
+    this.swiftSynchronizedMethodName%>(<%=
+        this.swiftArgs.map(function(a) { return a.localName }).join(',')%>)
+<%=this.swiftSynchronizedSemaphoreName%>.signal()
+<%if (this.swiftReturns) {%>return ret<%}%>
+      */},
+    },
+    {
+      name: 'swiftMethodInfoInit',
+      args: [],
+      template: function() {/*
+class MInfo: MethodInfo {
+  let name = "<%=this.swiftName%>"
+  let args: [MethodArg] = [] //TODO
+  let classInfo: ClassInfo
+  init(_ ci: ClassInfo) { classInfo = ci }
+}
+return MInfo(classInfo())
+      */},
+    }
+  ],
 });

@@ -23,6 +23,8 @@ foam.CLASS({
   properties: [
     'units',
     [ 'value', 0 ],
+    'min',
+    'max',
     [ 'adapt', function adaptInt(_, v) {
         return typeof v === 'number' ? Math.trunc(v) :
           v ? parseInt(v) :
@@ -45,7 +47,7 @@ foam.CLASS({
   documentation: 'StringProperties coerce their arguments into Strings.',
 
   properties: [
-    { class: 'Int', name: 'width' },
+    { class: 'Int', name: 'width', value: 30 },
     [ 'adapt', function(_, a) {
         return typeof a === 'function' ? foam.String.multiline(a) :
                typeof a === 'number'   ? String(a)                :
@@ -56,6 +58,7 @@ foam.CLASS({
     [ 'value', '' ]
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',
@@ -84,7 +87,7 @@ foam.CLASS({
         if ( typeof d === 'string' ) {
           var ret = new Date(d);
 
-          if ( ret.toUTCString() === 'InvalidDate' ) throw 'Invalid Date: ' + d;
+          if ( isNaN(ret.getTime()) ) throw 'Invalid Date: ' + d;
 
           return ret;
         }
@@ -111,6 +114,26 @@ foam.CLASS({
 
   documentation: 'Describes properties of type DateTime.',
   label: 'Date and time'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Byte',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Byte.',
+  label: 'Round byte numbers'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Short',
+  extends: 'Int',
+
+  documentation: 'Describes properties of type Short.',
+  label: 'Round short numbers'
 });
 
 
@@ -192,41 +215,6 @@ foam.CLASS({
   name: 'Object',
   extends: 'Property',
   documentation: ''
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
-  name: 'FObjectProperty',
-  extends: 'Property',
-
-  properties: [
-    {
-      name: 'of',
-      value: 'FObject'
-    },
-    {
-      name: 'fromJSON',
-      value: function(json, ctx, prop) {
-        return foam.json.parse(json, prop.of, ctx);
-      }
-    },
-    {
-      name: 'adapt',
-      value: function(_, v, prop) {
-        // All FObjects may be null.
-        if (v === null) return v;
-
-        var of = foam.lookup(prop.of);
-
-        return of.isInstance(v) ?
-            v :
-            ( v.class ?
-                foam.lookup(v.class) :
-                of ).create(v, this.__subContext__);
-      }
-    }
-  ]
 });
 
 
@@ -318,8 +306,8 @@ foam.CLASS({
         var c = this.instance_[prop.name];
 
         // Implement value and factory support.
-        if ( ! c ) {
-          if ( prop.value ) {
+        if ( foam.Undefined.isInstance(c) ) {
+          if ( ! foam.Undefined.isInstance(prop.value) ) {
             c = prop.value;
           } else if ( prop.factory ) {
             c = this.instance_[prop.name] = prop.factory.call(this, prop);
@@ -337,7 +325,7 @@ foam.CLASS({
     },
     {
       name: 'toJSON',
-      value: function(value) { return value.id; }
+      value: function(value) { return value ? value.id : value; }
     }
   ],
 
@@ -413,12 +401,81 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
+  name: 'Currency',
+  extends: 'Long'
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
   name: 'Map',
   extends: 'Property',
 
+  // TODO: Remove need for sorting
   properties: [
     [ 'factory', function() { return {} } ],
+    [
+      'comparePropertyValues',
+      function(o1, o2) {
+        if ( foam.typeOf(o1) != foam.typeOf(o2) ) return -1;
+
+        var keys1 = Object.keys(o1).sort();
+        var keys2 = Object.keys(o2).sort();
+        if ( keys1.length < keys2.length ) return -1;
+        if ( keys1.length > keys2.length ) return 1;
+        for ( var i = 0 ; i < keys1.length ; i++ ) {
+          var c = foam.String.compare(keys1[i], keys2[i]);
+          if ( c != 0 ) return c;
+          c = foam.util.compare(o1[keys1[i]], o2[keys2[i]]);
+          if ( c != 0 ) return c;
+        }
+
+        return 0;
+      }
+    ],
+    [
+      'diffPropertyValues',
+      function(o1, o2) {
+        // TODO
+      }
+    ],
     'of'
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectProperty',
+  extends: 'Property',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of',
+      value: 'foam.core.FObject'
+    },
+    {
+      name: 'fromJSON',
+      value: function(json, ctx, prop) {
+        return foam.json.parse(json, prop.of, ctx);
+      }
+    },
+    {
+      name: 'adapt',
+      value: function(_, v, prop) {
+        // All FObjects may be null.
+        if (v === null) return v;
+
+        var of = prop.of;
+
+        return of.isInstance(v) ?
+            v :
+            ( v.class ?
+                this.lookup(v.class) :
+                of ).create(v, this.__subContext__);
+      }
+    }
   ]
 });
 
@@ -436,7 +493,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'targetDAOKey',
-      expression: function(of) { return of + 'DAO'; }
+      expression: function(of) { return foam.String.daoize(of.name); }
     },
     {
       name: 'adapt',
@@ -445,6 +502,21 @@ foam.CLASS({
           newValue.id :
           newValue ;
       }
+    }
+  ],
+
+  methods: [
+    function installInProto(proto) {
+      this.SUPER(proto);
+      var key  = this.targetDAOKey;
+      var name = this.name;
+
+      Object.defineProperty(proto, name + '$find', {
+        get: function classGetter() {
+          return this.__context__[key].find(this[name]);
+        },
+        configurable: true
+      });
     }
   ]
 });
@@ -473,5 +545,27 @@ foam.CLASS({
     {
       name: 'of'
     }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'Property',
+
+  properties: [
+    /**
+      A short-name is an optional shorter name for a property.
+      It is used by JSON and XML support when 'useShortNames'
+      is enabled. Short-names enable output to be smaller,
+      which can save disk space and/or network bandwidth.
+      Ex.
+    <pre>
+      properties: [
+        { name: 'firstName', shortName: 'fn' },
+        { name: 'lastName',  shortName: 'ln' }
+      ]
+    </pre>
+    */
+    { class: 'String', name: 'shortName' }
   ]
 });

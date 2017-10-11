@@ -503,7 +503,7 @@ foam.CLASS({
           arg1: this.Entity.LAYER,
           arg2: visibleLayers
         })).select().then(function(a) {
-          var entities = a.a;
+          var entities = a.array;
           var cview = self.CView.create({
             canvas: self.sideCanvas
           });

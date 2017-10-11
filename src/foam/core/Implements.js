@@ -44,13 +44,21 @@ foam.CLASS({
   */},
 
   properties: [
-    { name: 'name', getter: function() { return 'implements_' + this.path; } },
+    { 
+      name: 'name', 
+      getter: function() { return 'implements_' + this.path; } 
+    },
+    {
+      name: 'java',
+      class: 'Boolean',
+      value: true
+    },
     'path'
   ],
 
   methods: [
     function installInClass(cls) {
-      var m = foam.lookup(this.path);
+      var m = this.lookup(this.path);
       if ( ! m ) throw 'No such interface or trait: ' + this.path;
 
       // TODO: clone these axioms since they could be reused and then would

@@ -16,7 +16,7 @@
  */
 
 describe('RestDAOHandler', function() {
-  var port = 8080;
+  var port = 8888;
   var urlPath = '/dao';
   var baseURL = 'http://0.0.0.0:' + port + urlPath;
   var server;
@@ -27,16 +27,15 @@ describe('RestDAOHandler', function() {
   var clientDAO;
 
   beforeEach(function() {
-    serverDAO = foam.dao.ArrayDAO.create();
+    serverDAO = foam.dao.ArrayDAO.create({ of: foam.core.FObject });
     server = foam.net.node.Server.create({
       port: port,
-      handlers: [
-        (handler = foam.net.node.RestDAOHandler.create({
-          urlPath: urlPath,
-          dao: serverDAO
-        }))
-      ]
     });
+    // Creation context provided by Server-as-context.
+    server.addHandler(handler = foam.net.node.RestDAOHandler.create({
+      urlPath: urlPath,
+      dao: serverDAO
+    }, server));
     serverPromise = shutdownPromise.then(function() {
       return server.start();
     });

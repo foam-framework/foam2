@@ -16,43 +16,6 @@
  */
 
 foam.CLASS({
-  package: 'foam.core.type',
-  name: 'Type',
-  properties: [
-    {
-      name: 'swiftType',
-      factory: function() {
-        return this.model_.name
-      },
-    },
-  ],
-})
-
-foam.CLASS({
-  package: 'foam.core.type',
-  name: 'String',
-  extends: 'foam.core.type.Type',
-})
-
-foam.CLASS({
-  package: 'foam.core.type',
-  name: 'Int',
-  extends: 'foam.core.type.Type',
-})
-
-foam.CLASS({
-  package: 'foam.core.type',
-  name: 'Boolean',
-  extends: 'foam.core.type.Type',
-  properties: [
-    {
-      name: 'swiftType',
-      value: 'Bool',
-    },
-  ],
-})
-
-foam.CLASS({
   refines: 'foam.core.Property',
   requires: [
     'foam.swift.Field',
@@ -184,9 +147,14 @@ foam.CLASS({
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
     {
+      class: 'Boolean',
+      name: 'swiftSupport',
+      value: true,
+    },
+    {
       class: 'String',
       name: 'swiftJsonParser',
-      value: 'nil',
+      value: 'Context.GLOBAL.create(AnyParser.self)!',
     },
     {
       class: 'Boolean',
@@ -217,13 +185,22 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         getter: this.swiftGetter(),
         setter: this.swiftSetter(),
       }));
+      cls.fields.push(this.Field.create({
+        visibility: 'private',
+        static: true,
+        final: true,
+        name: this.swiftAxiomName,
+        type: 'PropertyInfo',
+        initializer: this.swiftPropertyInfoInit(),
+      }));
+      if (this.swiftExpression) {
+        cls.fields.push(this.Field.create({
+          visibility: 'private',
+          name: this.swiftExpressionSubscriptionName,
+          type: '[Subscription]?',
+        }));
+      }
       if ( !isOverride ) {
-        if (this.swiftExpression) {
-          cls.fields.push(this.Field.create({
-            name: this.swiftExpressionSubscriptionName,
-            type: '[Subscription]?',
-          }));
-        }
         cls.fields.push(this.Field.create({
           name: this.swiftValueName,
           type: this.swiftValueType,
@@ -234,14 +211,6 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
           name: this.swiftInitedName,
           type: 'Bool',
           defaultValue: 'false',
-        }));
-        cls.fields.push(this.Field.create({
-          visibility: 'public',
-          static: true,
-          final: true,
-          name: this.swiftAxiomName,
-          type: 'PropertyInfo',
-          initializer: this.swiftPropertyInfoInit(),
         }));
         cls.fields.push(this.Field.create({
           visibility: 'private',
@@ -331,40 +300,41 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
   templates: [
     {
       name: 'swiftSlotInitializer',
-      args: [],
       template: function() {/*
-return PropertySlot([
+let s = PropertySlot([
   "object": self,
   "propertyName": "<%=this.swiftName%>",
 ])
+self.onDetach(Subscription(detach: {
+  s.detach()
+}))
+return s
       */},
     },
     {
       name: 'swiftSetter',
-      args: [],
       template: function() {/*
 self.set(key: "<%=this.swiftName%>", value: value)
       */},
     },
     {
       name: 'swiftGetter',
-      args: [],
       template: function() {/*
 if <%=this.swiftInitedName%> {
-  return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
+  return <%=this.swiftValueName%><% if ( this.swiftType != this.swiftValueType ) { %>!<% } %>
 }
 <% if ( this.swiftFactory ) { %>
 self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
 return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftExpression ) { %>
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
-let valFunc = { () -> <%= this.swiftValueType %> in
-  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { %>
-  let <%=arg%> = self.<%=arg%>
+let valFunc = { [unowned self] () -> <%= this.swiftValueType %> in
+  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
+  let <%=arg.join('$')%> = self.<%=arg[0]%><% if (arg.length > 1) {%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftGet()<% } %>
   <% } %>
   <%= this.swiftExpression %>
 }
-let detach: Listener = { _,_ in
+let detach: Listener = { [unowned self] _,_ in
   if self.<%=this.swiftExpressionSubscriptionName%> == nil { return }
   for s in self.<%=this.swiftExpressionSubscriptionName%>! {
     s.detach()
@@ -373,10 +343,13 @@ let detach: Listener = { _,_ in
   self.clearProperty("<%=this.swiftName%>")
 }
 <%=this.swiftExpressionSubscriptionName%> = [
-  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { %>
-  <%=arg%>$.swiftSub(detach),
+  <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
+  <%=arg[0]%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftSub(detach),
   <% } %>
 ]
+<%=this.swiftExpressionSubscriptionName%>?.forEach({ s in
+  onDetach(s)
+})
 <%=this.swiftValueName%> = valFunc()
 return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftValue ) { %>
@@ -390,27 +363,22 @@ fatalError("No default value for <%=this.swiftName%>")
     },
     {
       name: 'swiftSlotSetter',
-      args: [],
       template: function() {/*
 self.<%=this.swiftSlotLinkSubName%>?.detach()
 self.<%=this.swiftSlotLinkSubName%> = self.<%=this.swiftSlotName%>.linkFrom(value)
+self.onDetach(self.<%=this.swiftSlotLinkSubName%>!)
       */},
     },
     {
       name: 'swiftPropertyInfoInit',
-      args: [],
       template: function() {/*
 class PInfo: PropertyInfo {
   let name = "<%=this.swiftName%>"
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
+  let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
-<% if (this.swiftView && !this.hidden) { %>
-  let view: FObject.Type? = <%=this.swiftView.split('.').pop()%>.self
-<% } else { %>
-  let view: FObject.Type? = nil
-<% } %>
   public func set(_ obj: FObject, value: Any?) {
     obj.set(key: name, value: value)
   }
@@ -421,6 +389,13 @@ class PInfo: PropertyInfo {
     <%=this.swiftCompareValues%>
   }
   init(_ ci: ClassInfo) { classInfo = ci }
+  func viewFactory(x: Context) -> FObject? {
+<% if (this.swiftView && !this.hidden) { %>
+    return x.lookup("<%=this.swiftView%>")?.create(x: x) as? FObject
+<% } else { %>
+    return nil
+<% } %>
+  }
 }
 return PInfo(classInfo())
       */},
@@ -434,9 +409,19 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        of = of ? foam.lookup(of).model_.swiftName : 'FObject';
+        of = of ? of.model_.swiftName : 'FObject';
         return of + (required ? '' : '?');
       },
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.Class',
+  properties: [
+    {
+      name: 'swiftType',
+      value: 'ClassInfo',
     },
   ],
 });
@@ -467,6 +452,34 @@ foam.CLASS({
       expression: function(value) {
         return '' + value;
       },
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.Map',
+  properties: [
+    {
+      name: 'swiftType',
+      value: '[String:Any?]',
+    },
+    {
+      name: 'swiftValue',
+      value: '[:]',
+    },
+  ],
+});
+
+foam.CLASS({
+  refines: 'foam.core.StringArray',
+  properties: [
+    {
+      name: 'swiftType',
+      value: '[String]',
+    },
+    {
+      name: 'swiftValue',
+      value: '[]',
     },
   ],
 });

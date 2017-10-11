@@ -18,15 +18,19 @@
 foam.CLASS({
   package: 'foam.u2',
   name: 'DAOList',
-  extends: 'foam.u2.View',
-
-  requires: [
-    'foam.u2.ViewSpec'
-  ],
-
-  // documentation: 'Expects its data to be a DAO, and renders one viewFactory for each one.',
+  extends: 'foam.u2.Element',
 
   topics: [ 'rowClick' ],
+
+  exports: [
+    'selection',
+    'hoverSelection'
+  ],
+
+  imports: [
+    'editRecord?',
+    'selection? as importSelection'
+  ],
 
   properties: [
     {
@@ -42,97 +46,50 @@ foam.CLASS({
       class: 'foam.u2.ViewFactory',
       name: 'rowFactory'
     },
-    {
-      name: 'rows_',
-      factory: function() { return {}; }
-    }
+    'selection',
+    'hoverSelection'
   ],
 
   methods: [
     function initE() {
-      // Just starts out empty.
+      var view = this;
       this.
         addClass(this.myClass()).
-        on('click', this.onClick);
-
-      var dao = this.data$proxy;
-      // Kick off the select(), that will populate the view.
-      dao.on.put.sub(this.onDAOPut);
-      dao.on.remove.sub(this.onDAORemove);
-      dao.on.reset.sub(this.onDAOReset);
-      this.reloadData();
-    },
-
-    function createRowView(obj, ctx) {
-      // TODO: remove rowFactory support when all code ported
-      return this.rowView ?
-        this.ViewSpec.createView(this.rowView, {data: obj}, this, ctx) :
-        this.rowFactory$f({data: obj}, ctx) ;
-    },
-
-    function reloadData() {
-      this.data.select({
-        put: this.daoPut,
-        eof: function() { }
-      });
-    }
-  ],
-
-  listeners: [
-    function onClick(e) {
-      var c = this.findChildForEvent(e);
-      if ( c ) this.rowClick.pub(c.data);
-    },
-
-    function daoPut(obj) {
-      if ( this.rows_[obj.id] ) {
-        this.rows_[obj.id].data = obj;
-        return;
-      }
-
-      var child = this.createRowView(obj, this.__subContext__.createSubContext());
-      this.rows_[obj.id] = child;
-      this.add(child);
-    },
-
-    function onDAOPut(_, __, ___, obj) {
-      this.daoPut(obj);
-    },
-
-    function daoRemove(obj) {
-      if ( this.rows_[obj.id] ) {
-        this.removeChild(this.rows_[obj.id]);
-        delete this.rows_[obj.id];
-      }
-    },
-
-    function onDAORemove(_, __, ___, obj) {
-      this.daoRemove(obj);
-    },
-
-    function onDAOReset() {
-      this.removeAllChildren();
-      this.rows_ = {};
-      this.reloadData();
+        select(this.data$proxy, function(obj) {
+          return ( this.rowView ?
+                       foam.u2.ViewSpec.createView(this.rowView, { data: obj }, this, this.__subSubContext__) :
+                       this.rowFactory$f({ data: obj }) ).
+              on('mouseover', function() { view.hoverSelection = obj; }).
+              on('click', function() {
+                view.selection = obj;
+                if ( view.importSelection$ ) view.importSelection = obj;
+                if ( view.editRecord$ ) view.editRecord(obj);
+                view.rowClick.pub(obj)
+              }).
+              addClass(this.slot(function(selection) {
+                if ( obj === selection ) return view.myClass('selected');
+                  return '';
+              }, view.selection$));
+        });
     }
   ]
 });
 
 foam.CLASS({
   refines: 'foam.dao.RelationshipDAO',
-  
+
   requires: [
     'foam.u2.CitationView',
     'foam.u2.DAOList'
   ],
-  
+
   methods: [
     function toE(args, ctx) {
       args = args || {};
       args.data = this;
       args.rowView = this.CitationView;
       return this.DAOList.create(args, ctx);
-    }    
+    }
   ]
-  
+
 })
