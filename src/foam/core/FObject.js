@@ -336,9 +336,11 @@ foam.LIB({
            The long-form will support many options (many of which are defined
            in Method.js), but only 'name' and 'code' are mandatory.
        */
+
       if ( m.methods ) {
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
+
           if ( foam.Function.isInstance(a) ) {
             var name = foam.Function.getName(a);
             m.methods[i] = a = { name: name, code: a };

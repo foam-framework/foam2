@@ -1,11 +1,13 @@
 <html>
   <head>
     <script language="javascript" src="../../foam.js"></script>
+    <script language="javascript" src="../../foam/nanos/nanos.js"></script>
+    <script language="javascript" src="DocBrowser.js"></script>
   </head>
   <body>
     <script>
       for ( var key in foam.UNUSED ) foam.lookup(key);
-      foam.doc.DocBrowser.create({path: 'foam.core.Property'}).write();
     </script>
+    <foam class="foam.doc.DocBrowser" path="foam.core.Property"></foam>
   </body>
 </html>
