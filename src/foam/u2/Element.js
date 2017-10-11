@@ -2047,6 +2047,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
   properties: [

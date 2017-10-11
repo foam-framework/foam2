@@ -3,7 +3,9 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
+supressWarnings([
+  `Unknown property foam.core.Long.visibility: RO`,
+])
 foam.CLASS({
   package: 'foam.nanos.test',
   name: 'Test',
@@ -24,7 +26,6 @@ foam.CLASS({
     'id', 'enabled', 'description', 'passed', 'failed', 'lastRun', 'run'
   ],
 
-  searchColumns: [ ],
 
   properties: [
     'id',

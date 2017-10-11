@@ -106,7 +106,9 @@ foam.CLASS({
     },
 
     function warn() {
-      this.console.warn.apply(this.console, arguments);
+      var msg = Array.prototype.join.call(arguments, '');
+      if (SUPRESSED_WARNINGS[msg]) return;
+      this.console.warn(msg)
     },
 
     function async(l) {

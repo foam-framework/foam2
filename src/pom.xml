@@ -155,10 +155,6 @@
                             <filtering>true</filtering>
                             <targetPath>WEB-INF</targetPath>
                         </resource>
-                        <resource>
-                            <directory>static</directory>
-                            <targetPath>static</targetPath>
-                        </resource>
                     </webResources>
                 </configuration>
             </plugin>

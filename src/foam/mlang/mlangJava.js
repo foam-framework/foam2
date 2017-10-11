@@ -24,25 +24,13 @@ foam.INTERFACE({
 foam.INTERFACE({
   refines: 'foam.mlang.Expr',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   methods: [
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
     },
-    {
-      name: 'createStatement',
-      javaReturns: 'String'
-    },
-    {
-      name: 'prepareStatement',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'stmt',
-          javaType: 'java.sql.PreparedStatement'
-        }
-      ]
-    }
   ]
 });
 
@@ -70,6 +58,8 @@ foam.CLASS({
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
 
+  implements: [ 'foam.dao.SQLStatement' ],
+
   methods: [
     {
       name: 'f',
@@ -80,23 +70,6 @@ foam.INTERFACE({
         }
       ],
       javaReturns: 'boolean'
-    },
-    {
-      name: 'createStatement',
-      javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType: 'String'
-      }]
-    },
-    {
-      name: 'prepareStatement',
-      args: [
-        {
-          name: 'stmt',
-          javaType: 'java.sql.PreparedStatement'
-        }
-      ]
     },
     {
       name: 'partialEval',
@@ -179,6 +152,23 @@ foam.CLASS({
     {
       name: 'toString',
       javaCode: 'return classInfo_.getId();'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: ' '
     }
   ]
 });
@@ -209,19 +199,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " 1 = 1 ";'
     }
   ]
 });
@@ -238,19 +216,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " 1 <> 1 ";'
     }
   ]
 });
@@ -270,19 +236,19 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode:
+`StringBuilder stmt = new StringBuilder();
+Predicate[] predicates = getArgs();
+int length = predicates.length;
+
+for ( int i = 0 ; i < length ; i++ ) {
+  Predicate predicate = predicates[i];
+  stmt.append(" (").append(predicate.createStatement()).append(") ");
+  if ( i != length - 1 ) {
+    stmt.append(" OR ");
+  }
+}
+return stmt.toString();`
     }
   ]
 });
@@ -302,19 +268,19 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode:
+`StringBuilder stmt = new StringBuilder();
+Predicate[] predicates = getArgs();
+int length = predicates.length;
+
+for ( int i = 0 ; i < length ; i++ ) {
+  Predicate predicate = predicates[i];
+  stmt.append(" (").append(predicate.createStatement()).append(") ");
+  if ( i != length - 1 ) {
+    stmt.append(" AND ");
+  }
+}
+return stmt.toString();`
     }
   ]
 });
@@ -353,19 +319,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " in " + getArg2().createStatement();'
     }
   ]
 });
@@ -411,25 +365,27 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `String s1 = (String) getArg1().f(obj);
+      javaCode:
+`Object s1 = getArg1().f(obj);
 String s2 = (String) getArg2().f(obj);
-return ( s1 != null && s2 != null && s1.contains(s2) );`
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.contains(s2) )
+      return true;
+  }
+}
+return ( s1 instanceof String && ((String) s1).contains(s2) );`
     },
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        // table as method argument because it can't be parametrized into a prepared statement
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
+      javaCode: `return " '" + getArg1().createStatement() + "' like '%" + getArg2().createStatement() + "%' ";`
     },
     {
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }
@@ -443,9 +399,21 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `String s1 = (String) getArg1().f(obj);
-String s2 = (String) getArg2().f(obj);
-return ( s1 != null && s2 != null && s1.toUpperCase().contains(s2.toUpperCase()) );`
+      javaCode:
+`Object s1 = getArg1().f(obj);
+String s2 = ((String) getArg2().f(obj)).toUpperCase();
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.toUpperCase().contains(s2) )
+      return true;
+  }
+}
+return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: `return " '" + getArg1().createStatement() + "' ilike '%" + getArg2().createStatement() + "%' ";`
     }
   ]
 });
@@ -457,37 +425,21 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `
-Object arg1 = getArg1().f(obj);
+      javaCode:
+`Object arg1 = getArg1().f(obj);
 String arg2 = (String) getArg2().f(obj);
-
-if ( arg1 instanceof Object[] ) {
-  Object[] values = (Object[]) arg1;
-  for ( int i = 0 ; i < values.length ; i++ ) {
-    if ( values[i] instanceof String && ((String) values[i]).startsWith(arg2) )
+if ( arg1 instanceof String[] ) {
+  for ( String s : (String[]) arg1 ) {
+    if ( s.startsWith(arg2) )
       return true;
   }
-} else if ( arg1 instanceof String ) {
-  return ((String) arg1).startsWith(arg2);
 }
-return false;`
+return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
     },
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: `return getArg1().createStatement() + " like '" + getArg2().createStatement() + "%'";`
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: `return " '" + getArg1().createStatement() + "' like '" + getArg2().createStatement() + "%' ";`
     }
   ]
 });
@@ -499,37 +451,21 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: `
-Object arg1 = getArg1().f(obj);
+      javaCode:
+`Object arg1 = getArg1().f(obj);
 String arg2 = ((String) getArg2().f(obj)).toUpperCase();
-
-if ( arg1 instanceof Object[] ) {
-  Object[] values = (Object[]) arg1;
-  for ( int i = 0 ; i < values.length ; i++ ) {
-    if ( values[i] instanceof String && ((String) values[i]).toUpperCase().startsWith(arg2) )
+if ( arg1 instanceof String[] ) {
+  for ( String s : (String[]) arg1 ) {
+    if ( s.toUpperCase().startsWith(arg2) )
       return true;
   }
-} else if ( arg1 instanceof String ) {
-  return ((String) arg1).toUpperCase().startsWith(arg2);
 }
-return false;`
+return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2) );`
     },
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: `return "UPPER(" + getArg1().createStatement() + ") like 'UPPER(" + getArg2().createStatement() + ")%'";`
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: `return " '" + getArg1().createStatement() + "' ilike '" + getArg2().createStatement() + "%' ";`
     }
   ]
 });
@@ -551,7 +487,37 @@ foam.CLASS({
     {
       name: 'prepareStatement',
       javaReturns: 'void',
-      javaCode: ''
+      javaCode: 'stmt.setObject(getValue());'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.ArrayConstant',
+
+  javaImports: [
+    'java.util.Arrays',
+    'java.util.stream.Collectors'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: 'return getValue();'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " (" + Arrays.stream(getValue()).map(o -> "?").collect(Collectors.joining(",")) + ") ";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaCode:
+`for ( Object o : getValue() ) {
+  stmt.setObject(o);
+}`
     }
   ]
 });
@@ -569,25 +535,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType: 'String'
-      }],
-      // TODO: select columns
-      javaCode: 'return getArg1().createStatement() + " = " + getArg2().createStatement();'
-    },
-    {
-      name: 'prepareStatement',
-      javaReturns: 'void',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: '// try {\n'
-                + '  // stmt.setObject(1, getArg2().prepareStatement());\n'
-                + '// } catch (java.sql.SQLException e) {\n'
-                + '  // e.printStackTrace();\n'
-                + '// }'
+      javaCode: 'return " " + getArg1().createStatement() + " = " + getArg2().createStatement() + " ";'
     }
   ]
 });
@@ -604,19 +552,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " <> " + getArg2().createStatement() + " ";'
     }
   ]
 });
@@ -633,19 +569,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " < " + getArg2().createStatement() + " ";'
     }
   ]
 });
@@ -662,19 +586,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " <= " + getArg2().createStatement() + " ";'
     }
   ]
 });
@@ -691,19 +603,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " > " + getArg2().createStatement() + " ";'
     }
   ]
 });
@@ -720,19 +620,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return " ";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaCode: 'return " " + getArg1().createStatement() + " >= " + getArg2().createStatement() + " ";'
     }
   ]
 });
@@ -749,15 +637,20 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return "";'
+      javaCode: 'return " NOT (" + getArg1().createStatement() + ") ";'
     },
+
     {
       name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: 'getArg1().prepareStatement(stmt);'
     }
   ]
 });
@@ -779,19 +672,8 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
-    {
-      name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      // TODO: check for empty array
+      javaCode: `return " (" + getArg1().createStatement() + " <> '') is not true ";`
     }
   ]
 });
@@ -835,6 +717,23 @@ foam.CLASS({
         }
       ],
       javaCode: 'return -1 * getArg1().compare(o1, o2);'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " " + getArg1().createStatement() + " DESC ";'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: " "
     },
     {
       name: 'toString',
@@ -961,29 +860,65 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.mlang.predicate.Unary',
+
+  methods: [
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode: 'getArg1().prepareStatement(stmt);'
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.predicate.Binary',
 
   methods: [
     {
-      name: 'f',
-      javaCode: 'return false;'
-    },
-    {
-      name: 'createStatement',
-      javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
-      javaCode: 'return "";'
-    },
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode:
+`getArg1().prepareStatement(stmt);
+getArg2().prepareStatement(stmt);`
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Nary',
+
+  methods: [
     {
       name: 'prepareStatement',
-      args: [{
-        name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
-      }],
-      javaCode: " return; "
+      javaReturns: 'void',
+      javaThrows: [ 'java.sql.SQLException' ],
+      args: [
+        {
+          name: 'stmt',
+          javaType: 'foam.dao.pg.IndexedPreparedStatement'
+        }
+      ],
+      javaCode:
+`for ( Predicate predicate : getArgs() ) {
+  predicate.prepareStatement(stmt);
+}`
     }
   ]
 });
@@ -1022,17 +957,13 @@ return false;`
     {
       name: 'createStatement',
       javaReturns: 'String',
-      args: [{
-        name: 'table',
-        javaType : 'String'
-      }],
       javaCode: 'return "";'
     },
     {
       name: 'prepareStatement',
       args: [{
         name: 'stmt',
-        javaType: 'java.sql.PreparedStatement'
+        javaType: 'foam.dao.pg.IndexedPreparedStatement'
       }],
       javaCode: " return; "
     }

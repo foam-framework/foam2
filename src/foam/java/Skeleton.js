@@ -81,7 +81,7 @@ foam.CLASS({
   templates: [
     {
       name: 'sendMethodCode',
-      template: function() {/*if ( ! ( message.getObject() instanceof foam.box.RPCMessage) ) {
+      template: `if ( ! ( message.getObject() instanceof foam.box.RPCMessage) ) {
       // TODO error to errorBox
       return;
     }
@@ -117,9 +117,11 @@ foam.CLASS({
         break;
     <%
   }%>
-        default: throw new RuntimeException("No such method found \\"" + rpc.getName() + "\\"");
+        default: throw new RuntimeException("Method not found: " + rpc.getName());
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      e.printStackTrace();
+
       if ( errorBox == null ) {
         // TODO(adamvy): Do we care?
         return;
@@ -147,7 +149,7 @@ foam.CLASS({
       foam.box.Message message1 = getX().create(foam.box.Message.class);
       message1.setObject(reply);
       replyBox.send(message1);
-    }*/}
+    }`
     }
   ]
 });
