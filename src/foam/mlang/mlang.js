@@ -791,6 +791,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ArrayBinary',
   extends: 'foam.mlang.predicate.Binary',
+  abstract: true,
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
@@ -945,6 +946,32 @@ foam.CLASS({
     function xxoutputJSON(os) {
       os.output(this.value);
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'ArrayConstant',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable'],
+
+  properties: [
+    {
+      class: 'Array',
+      name: 'value'
+    }
+  ],
+
+  methods: [
+    function f() { return this.value; },
+
+    function toString_(x) {
+      return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
+        x.toString ? x.toString :
+        x;
+    },
+
+    function toString() { return this.toString_(this.value); }
   ]
 });
 

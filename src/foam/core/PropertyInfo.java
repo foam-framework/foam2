@@ -6,17 +6,19 @@
 
 package foam.core;
 
+import foam.dao.SQLStatement;
 import foam.lib.parse.Parser;
+import foam.mlang.Expr;
 import foam.mlang.order.Comparator;
-import java.util.Map;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.xml.stream.XMLStreamReader;
+import java.util.Map;
+
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends foam.mlang.Expr, Comparator
+    extends Expr, Comparator, SQLStatement
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
