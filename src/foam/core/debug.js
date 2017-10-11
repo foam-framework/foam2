@@ -75,10 +75,7 @@ foam.CLASS({
           ! this.name.endsWith('$'),
           'Illegal Property Name: Can\'t end with "$": ', this.name);
 
-      var mName =
-        model.id      ? model.id + '.'      :
-        model.refines ? model.refines + '.' :
-        '' ;
+      var mName;
 
       var es = foam.core.Property.SHADOW_MAP || {};
       for ( var key in es ) {
@@ -86,6 +83,12 @@ foam.CLASS({
         if ( this[key] ) {
           for ( var j = 0 ; j < e.length ; j++ ) {
             if ( this.hasOwnProperty(e[j]) ) {
+              if ( ! mName ) {
+                mName = model.id      ? model.id      + '.' :
+                        model.refines ? model.refines + '.' :
+                        '' ;
+              }
+
               console.warn(
                   'Property ' + mName +
                   this.name + ' "' + e[j] +

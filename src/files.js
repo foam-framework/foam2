@@ -120,6 +120,7 @@ FOAM_FILES([
   { name: "foam/dao/DAODecorator" },
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/DAOProperty" },
+  { name: "foam/dao/SQLStatement" },
   { name: "foam/mlang/order/Comparator", flags: ['js'] },
   { name: "foam/mlang/order/ComparatorJava", flags: ['java'] },
   { name: "foam/mlang/mlang" },
