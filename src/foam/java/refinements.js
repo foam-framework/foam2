@@ -3,7 +3,9 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
+supressWarnings([
+  `Unknown property foam.core.Model.javaType: foam.core.PropertyInfo`,
+])
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
@@ -339,7 +341,7 @@ foam.CLASS({
   methods: [
     function buildJavaClass(cls) {
       if ( ! this.type ) {
-        console.warn("Skipping constant", this.name, "with unknown type.");
+        this.warn("Skipping constant ", this.name, " with unknown type.");
         return;
       }
 

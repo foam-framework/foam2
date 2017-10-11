@@ -21,6 +21,14 @@
  * pages via script tags easily.
  */
 
+if ( typeof window !== 'undefined' ) global = window;
+
+global.SUPRESSED_WARNINGS = global.SUPRESSED_WARNINGS || {};
+global.supressWarnings = function (a) {
+  a.forEach(function(key) {
+    SUPRESSED_WARNINGS[key] = true;
+  })
+}
 FOAM_FILES([
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
@@ -103,6 +111,7 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Visibility"},
+  { name: "foam/u2/NoJava" ,  flags: ['js','debug'] },
   { name: "foam/u2/ElementJava" ,  flags: ['java'] },
   { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
