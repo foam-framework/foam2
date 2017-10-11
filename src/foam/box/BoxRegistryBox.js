@@ -57,6 +57,7 @@ self.onDetach(Subscription(detach: {
   }
 }))
       */},
+      code: function() { this.SUPER() },
     },
     {
       name: 'send',
