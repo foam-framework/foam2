@@ -6,7 +6,6 @@
 supressWarnings([
   `Unknown property foam.core.String.displayWidth: 70`,
   `Unknown property foam.core.String.displayHeight: 10`,
-  `Unknown property foam.core.Model.tableColumns: id,enabled,firstName,lastName,organization,lastModified`,
 ])
 foam.CLASS({
   package: 'foam.nanos.auth',

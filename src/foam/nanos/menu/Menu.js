@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 supressWarnings([
-  `Unknown property foam.core.Model.tableColumns: id,parent,label,order`,
   `Unknown property foam.core.FObjectProperty.view: foam.u2.view.FObjectView`,
 ])
 foam.CLASS({

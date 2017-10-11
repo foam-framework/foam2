@@ -18,38 +18,97 @@ foam.CLASS({
   name: 'View',
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'TableColumns',
+  refines: 'foam.core.Model',
   properties: [
-    [ 'name', 'tableColumns' ],
-    'columns'
+    {
+      name: 'tableProperties',
+    },
+    {
+      name: 'tableColumns',
+      
+    },
+    {
+      name: 'searchColumns',
+    },
+    {
+      name: 'tableCellFormatter',
+    },
+    {
+      name: 'generateJava'
+    }
   ]
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'SearchColumns',
+  refines: 'foam.core.Currency',
   properties: [
-    [ 'name', 'searchColumns' ],
-    'columns'
+    {
+      name: 'tableCellFormatter',
+    },
   ]
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'Entity',
+  refines: 'foam.core.Double',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+  ]
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'DefaultValidator',
+  refines: 'foam.core.Long',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+  ]
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'ElementState',
+  refines: 'foam.core.Date',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+  ]
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'RenderSink',
+  refines: 'foam.core.Property',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+  ]
 });
 foam.CLASS({
-  package: 'foam.u2',
-  name: 'U2Context',
+  refines: 'foam.core.Boolean',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+    {
+      name: 'tableCellView',
+    },
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.String',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+    {
+      name: 'tableCellView',
+    },
+   
+    {
+      name: 'view'
+    },
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.Method',
+  properties: [
+    {
+      name: 'javaCode',
+    },
+  ]
 });
