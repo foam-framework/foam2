@@ -179,6 +179,8 @@ FOAM_FILES([
   { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
+  { name: "foam/net/web/WebSocket" },
+  { name: "foam/net/web/WebSocketService" },
   { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
   { name: "foam/messageport/MessagePortService", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
@@ -205,7 +207,6 @@ FOAM_FILES([
   { name: "foam/box/SelectorRegistry" },
   { name: "foam/box/LookupBox" },
   { name: "foam/box/NamedBox" },
-  { name: "foam/box/RetryBox" },
   { name: "foam/box/ReplyBox" },
   { name: "foam/box/FunctionBox" },
   { name: "foam/box/RPCReturnMessage" },
