@@ -179,8 +179,7 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'of',
-      value: null
+      name: 'of'
     },
     {
       name: 'a',

@@ -114,6 +114,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'PipeSink',
@@ -128,6 +129,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -151,6 +153,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -187,6 +190,7 @@ foam.CLASS({
       value: 0
     }
   ],
+
   methods: [
     function sub(l) {
       return arguments.length === 1 ?
@@ -226,6 +230,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -560,11 +565,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DescribeSink',
-  documentation: 'Calls .describe() on every object.  Useful for debugging to quickly see what items are in a DAO.',
   implements: [ 'foam.dao.Sink' ],
+
+  documentation: 'Calls .describe() on every object.  Useful for debugging to quickly see what items are in a DAO.',
+
   methods: [
     function put(o) {
       o.describe();
@@ -575,20 +583,25 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FnSink',
+
   documentation: 'Converts all sink events to call to a singular function.' +
     '  Useful for subscribing a listener method to a DAO',
+
   axioms: [
     {
       class: 'foam.box.Remote',
       clientClass: 'foam.dao.ClientSink'
     }
   ],
+
   properties: [
     'fn'
   ],
+
   methods: [
     function put(obj, s) {
       this.fn('put', obj, s);
@@ -605,14 +618,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FramedSink',
   extends: 'foam.dao.ProxySink',
+
   documentation: 'A proxy that waits until the next frame to flush the calls to the delegate.',
+
   properties: [
     { class: 'Array', name: 'calls' },
   ],
+
   methods: [
     {
       name: 'put',
@@ -643,6 +660,7 @@ foam.CLASS({
       }
     }
   ],
+
   listeners: [
     {
       name: 'flushCalls',
@@ -658,13 +676,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DAOSink',
-  implements: ['foam.dao.Sink'],
+
+  implements: [ 'foam.dao.Sink' ],
+
   properties: [
     { class: 'foam.dao.DAOProperty', name: 'dao' },
   ],
+
   methods: [
     {
       name: 'put',
@@ -688,5 +710,5 @@ foam.CLASS({
         this.dao.removeAll();
       }
     }
-  ],
+  ]
 });

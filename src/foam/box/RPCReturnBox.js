@@ -19,15 +19,11 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RPCReturnBox',
 
-  implements: ['foam.box.Box'],
+  implements: [ 'foam.box.Box' ],
 
   requires: [
     'foam.box.RPCReturnMessage',
     'foam.box.RPCErrorMessage'
-  ],
-
-  imports: [
-    'warn'
   ],
 
   properties: [
