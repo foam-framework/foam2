@@ -69,6 +69,11 @@ foam.LIB({
       // initArgs() is the standard argument extraction method.
       obj.initArgs(args, opt_parent);
 
+      var axioms = this.getInitAgents();
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
+        axioms[i].initObject(obj);
+      }
+
       // init() is called when object is created.
       // This is where class-specific initialization code should
       // be put (not in initArgs).
@@ -103,6 +108,10 @@ foam.LIB({
       return this;
     },
 
+    function getSuperClass() {
+      return this.model_.__context__.lookup(this.model_.extends);
+    },
+
     function installAxioms(axs) {
       /**
        * Install Axioms into the class and prototype.
@@ -121,6 +130,12 @@ foam.LIB({
       var existing = new Array(axs.length);
 
       for ( var i = 0 ; i < axs.length ; i++ ) {
+      // Convert JSON axioms to real instances as late as possible
+        if ( foam.String.isInstance(axs[i].class) ) {
+          var axsCls = foam.lookup(axs[i].class, true);
+          if ( axsCls ) axs[i] = axsCls.create(axs[i]);
+        }
+
         var a = axs[i];
 
         // Store the destination class in the Axiom. Used by describe().
@@ -251,14 +266,6 @@ foam.LIB({
       }.bind(this));
     },
 
-    function hasOwnAxiom(name) {
-      /**
-       * Return true if an axiom named "name" is defined on this class
-       * directly, regardless of what parent classes define.
-       */
-      return Object.hasOwnProperty.call(this.axiomMap_, name);
-    },
-
     function getOwnAxioms() {
       /** Returns all axioms defined on this class. */
       return this.getAxioms().filter(function(a) {
@@ -277,6 +284,17 @@ foam.LIB({
         this.private_.axiomCache[''] = as;
       }
       return as;
+    },
+
+    function getInitAgents() {
+      if ( ! this.private_.initAgentsCache ) {
+        this.private_.initAgentsCache = [];
+        for ( var key in this.axiomMap_ ) {
+          var axiom = this.axiomMap_[key];
+          if (axiom.initObject) this.private_.initAgentsCache.push(axiom);
+        }
+      }
+      return this.private_.initAgentsCache;
     },
 
     // NOP, is replaced if debug.js is loaded
@@ -322,7 +340,8 @@ foam.LIB({
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
           if ( foam.Function.isInstance(a) ) {
-            m.methods[i] = a = { name: a.name, code: a };
+            var name = foam.Function.getName(a);
+            m.methods[i] = a = { name: name, code: a };
           }
           if ( foam.core.Method ) {
             foam.assert(a.cls_ !== foam.core.Method,
@@ -438,6 +457,7 @@ foam.CLASS({
       if ( this.hasOwnProperty(name) ) {
         var oldValue = this[name];
         this.instance_[name] = undefined;
+        this.clearPrivate_(name);
 
         // Avoid creating slot and publishing event if nobody is listening.
         if ( this.hasListeners('propertyChange', name) ) {
@@ -483,7 +503,9 @@ foam.CLASS({
     // Imports aren't implemented yet, so mimic:
     //   imports: [ 'lookup', 'assert', 'error', 'log', 'warn' ],
 
-    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
+
+    // Bootstrap form replaced after this.__context__ is added.
+    function lookup() { return foam.lookup.apply(foam, arguments); },
 
     function error() { this.__context__.error.apply(null, arguments); },
 
@@ -737,12 +759,26 @@ foam.CLASS({
                 });
       }
 
-      var axiom = this.cls_.getAxiomByName(obj);
+      if ( foam.Array.isInstance(obj) ) {
+        return foam.core.ExpressionSlot.create({
+          obj: this,
+          args: obj[0].map(this.slot.bind(this)),
+          code: obj[1],
+        });
+      }
+
+      var names = obj.split('$');
+      var axiom = this.cls_.getAxiomByName(names.shift());
 
       foam.assert(axiom, 'slot() called with unknown axiom name:', obj);
       foam.assert(axiom.toSlot, 'Called slot() on unslottable axiom:', obj);
 
-      return axiom.toSlot(this);
+      var slot = axiom.toSlot(this)
+      names.forEach(function(n) {
+        slot = slot.dot(n);
+      });
+
+      return slot;
     },
 
 
@@ -959,6 +995,12 @@ foam.CLASS({
       // Distinguish between prototypes and instances.
       return this.cls_.id + (
           this.cls_.prototype === this ? 'Proto' : '');
+    },
+
+    function dot(name) {
+      // Behaves just like Slot.dot().  Makes it easy for creating sub-slots
+      // without worrying if you're holding an FObject or a slot.
+      return this[name + '$'];
     }
   ]
 });

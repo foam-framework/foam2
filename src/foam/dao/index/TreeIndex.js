@@ -87,7 +87,7 @@ foam.CLASS({
     'foam.core.Property',
     'foam.dao.ArraySink',
     'foam.mlang.sink.NullSink',
-    'foam.dao.index.AltPlan',
+    'foam.dao.index.MergePlan',
     'foam.dao.index.CountPlan',
     'foam.dao.index.CustomPlan',
     'foam.dao.index.NotFoundPlan',
@@ -121,7 +121,7 @@ foam.CLASS({
         //  been cloned.
         if ( model.isInstance(predicate) &&
             ( predicate.arg1 === prop || foam.util.equals(predicate.arg1, prop) )
-        ){
+        ) {
           var arg2 = predicate.arg2;
           predicate = undefined;
           return { arg2: arg2, predicate: predicate };
@@ -136,7 +136,7 @@ foam.CLASS({
               predicate = predicate.clone();
               predicate.args[i] = self.True.create();
               predicate = predicate.partialEval();
-              if (  self.True.isInstance(predicate) ) predicate = undefined;
+              if ( self.True.isInstance(predicate) ) predicate = undefined;
               return { arg2: q.arg2, predicate: predicate };
             }
           }
@@ -163,9 +163,7 @@ foam.CLASS({
     },
     {
       name: 'treeNode',
-      factory: function() {
-        return this.TreeNode;
-      }
+      factory: function() { return this.TreeNode; }
     },
     {
       name: 'tail',
@@ -175,10 +173,7 @@ foam.CLASS({
 
   methods: [
     function init() {
-
-      // TODO: replace with bound methods when available
-      this.dedup = this.dedup.bind(this, this.prop.name); //foam.Function.bind(this.index.dedup, this);
-      //this.compare = foam.Function.bind(this.compare, this);
+      this.dedup = this.dedup.bind(this, this.prop.name);
     },
 
     /** Set the value's property to be the same as the key in the index.
@@ -293,10 +288,9 @@ foam.CLASS({
       if ( tail.trim().length > 0 ) ret += tail;
       return ret;
     }
-
   ]
-
 });
+
 
 /** A tree-based Index. Defaults to an AATree (balanced binary search tree) **/
 foam.CLASS({
@@ -312,7 +306,7 @@ foam.CLASS({
     {
       class: 'Simple',
       name: 'root',
-    },
+    }
   ],
 
   methods: [
@@ -326,7 +320,7 @@ foam.CLASS({
      * Faster than loading individually, and produces a balanced tree.
      **/
     function bulkLoad(a) {
-      a = a.a || a;
+      a = a.array || a;
       this.root = this.index.nullNode;
 
       // Only safe if children aren't themselves trees
@@ -343,7 +337,6 @@ foam.CLASS({
         }
       }
     },
-
 
     function put(newValue) {
       this.root = this.root.putKeyValue(
@@ -378,7 +371,6 @@ foam.CLASS({
     },
 
     function size() { return this.root.size; },
-
 
     function plan(sink, skip, limit, order, predicate, root) {
       var index = this;
@@ -429,8 +421,7 @@ foam.CLASS({
 
           if ( subPlans.length === 0 ) return m.NotFoundPlan.create();
 
-          // TODO: If ordering, AltPlan may need to sort like MergePlan.
-          return m.AltPlan.create({
+          return m.MergePlan.create({
             subPlans: subPlans,
             prop: prop
           });
@@ -447,11 +438,7 @@ foam.CLASS({
 
         subPlan = result.plan(sink, skip, limit, order, predicate, root);
 
-        // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return m.AltPlan.create({
-          subPlans: [subPlan],
-          prop: prop
-        });
+        return subPlan;
       }
 
       var ic = false;
@@ -488,8 +475,7 @@ foam.CLASS({
           subPlans.push(indexes[i].plan(sink, skip, limit, order, predicate, root));
         }
 
-        // TODO: If ordering, AltPlan may need to sort like MergePlan.
-        return m.AltPlan.create({
+        return m.MergePlan.create({
           subPlans: subPlans,
           prop: prop
         });
@@ -538,7 +524,7 @@ foam.CLASS({
             index.selectCount++;
             subTree.select(arrSink, null, null, null, predicate, {});
             index.selectCount--;
-            var a = arrSink.a;
+            var a = arrSink.array;
             a.sort(order.compare.bind(order));
 
             skip = skip || 0;
@@ -546,8 +532,13 @@ foam.CLASS({
             limit += skip;
             limit = Math.min(a.length, limit);
 
-            for ( var i = skip; i < limit; i++ )
-              sink.put(a[i]);
+            var sub = foam.core.FObject.create();
+            var detached = false;
+            sub.onDetach(function() { detached = true; });
+            for ( var i = skip; i < limit; i++ ) {
+              sink.put(a[i], sub);
+              if ( detached ) break;
+            }
           } else {
             index.selectCount++;
             // Note: pass skip and limit by reference, as they are modified in place
@@ -566,6 +557,8 @@ foam.CLASS({
         },
         customToString: function() {
           return 'scan(key=' + prop.name + ', cost=' + this.cost +
+              ', sorting=' + ( sortRequired ? order.toString() : 'none' ) +
+              ', reverseScan=' + reverseSort +
               (predicate && predicate.toSQL ? ', predicate: ' + predicate.toSQL() : '') +
               ')';
         }
@@ -574,8 +567,7 @@ foam.CLASS({
 
     function toString() {
       return 'TreeIndex(' + (this.index || this).prop.name + ', ' + (this.index || this).tail + ')';
-    },
-
+    }
   ]
 });
 
@@ -586,6 +578,8 @@ foam.CLASS({
   name: 'CITreeIndex',
   extends: 'foam.dao.index.TreeIndex',
 });
+
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'CITreeIndexNode',
@@ -614,12 +608,12 @@ foam.CLASS({
      * Do not optimize bulkload
      **/
     function bulkLoad(a) {
-      a = a.a || a;
+      a = a.array || a;
       this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
       }
-    },
+    }
   ]
 });
 
@@ -630,6 +624,8 @@ foam.CLASS({
   name: 'SetIndex',
   extends: 'foam.dao.index.TreeIndex',
 });
+
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'SetIndexNode',
@@ -645,7 +641,7 @@ foam.CLASS({
      * Do not optimize bulkload to SetIndex
      **/
     function bulkLoad(a) {
-      a = a.a || a;
+      a = a.array || a;
       this.root = this.index.nullNode;
       for ( var i = 0 ; i < a.length ; i++ ) {
         this.put(a[i]);
@@ -678,7 +674,6 @@ foam.CLASS({
       } else {
         this.root = this.root.removeKeyValue('', value, this.index.compare, this.index.nullNode);
       }
-    },
-
+    }
   ]
 });

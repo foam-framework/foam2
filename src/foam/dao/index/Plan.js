@@ -42,7 +42,7 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   properties: [
-    { name: 'cost', value: Number.MAX_VALUE }
+    { name: 'cost', value: 0 }
   ],
 
   methods: [
@@ -168,6 +168,8 @@ foam.CLASS({
   ]
 });
 
+
+
 /**
   Merges results from multiple sub-plans and deduplicates, sorts, and
   filters the results.
@@ -190,9 +192,9 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'of',
-      required: true
-    }
+      name: 'of'
+    },
+    'predicates',
   ],
 
   methods: [
@@ -201,8 +203,8 @@ foam.CLASS({
       removes duplicates, sorts, skips, and limits.
     */
     function execute(promise, sink, skip, limit, order, predicate) {
-      if ( order ) return this.executeOrdered.apply(this, arguments);
-      return this.executeFallback.apply(this, arguments);
+      if ( order ) return this.executeOrdered(promise, sink, skip, limit, order, predicate);
+      return this.executeFallback(promise, sink, skip, limit, order, predicate);
     },
 
     function executeOrdered(promise, sink, skip, limit, order, predicate) {
@@ -211,6 +213,8 @@ foam.CLASS({
        * results from the subPlans are also sorted, and can be merged
        * efficiently.
        */
+      foam.assert(order && order.compare, "Order.compare() must be supplied in MergePlan.executeOrdered()");
+      foam.assert(( ! this.predicates ) || ( this.predicates.size == this.subPlans.size ), "MergePlan.predicates, when specified, must match the number of subplans." );
 
       // quick linked list
       var NodeProto = { next: null, data: null };
@@ -219,13 +223,11 @@ foam.CLASS({
       // TODO: track list size, cut off if above skip+limit
 
       var sp = this.subPlans;
-      var predicates = predicate ? predicate.args : [];
+      var predicates = this.predicates;
       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
       var promises = []; // track any async subplans
-      var dedupCompare = this.of.ID.compare.bind(this.of.ID);
-      // TODO: FIX In the case of no external ordering, a sort must be imposed
-      //   (fall back to old dedupe sink impl?)
-      var compare = order ? order.compare.bind(order) : foam.util.compare;
+      var dedupCompare = ( this.of ) ? this.of.ID.compare.bind(this.of.ID) : foam.util.compare;
+      var compare = order.compare.bind(order);
 
       // Each plan inserts into the list
       for ( var i = 0 ; i < sp.length ; ++i) {
@@ -239,7 +241,6 @@ foam.CLASS({
           //   and leave the insertion point where it is, so the next
           //   item can check if it is equal to the just-inserted item.
           var insertAfter = head;
-          // TODO: refactor with insertAfter as a property of a new class?
           insertPlanSink = foam.dao.QuickSink.create({
             putFn: function(o) {
               function insert() {
@@ -294,20 +295,24 @@ foam.CLASS({
           undefined,
           subLimit,
           order,
-          predicates[i]
+          predicates ? predicates[i] : predicate // array mode (one per subplan) or repeated use of single predicate
         );
         if ( nuPromiseRef[0] ) promises.push(nuPromiseRef[0]);
       }
 
       // result reading may by async, so define it but don't call it yet
       var resultSink = this.decorateSink_(sink, skip, limit);
-      var fc = this.FlowControl.create();
+
+      var sub = foam.core.FObject.create();
+      var detached = false;
+      sub.onDetach(function() { detached = true; });
+
       function scanResults() {
         // The list starting at head now contains the results plus possible
         //  overflow of skip+limit
         var node = head.next;
-        while ( node && ( ! fc.stopped ) ) {
-          resultSink.put(node.data, fc);
+        while ( node && ! detached ) {
+          resultSink.put(node.data, sub);
           node = node.next;
         }
       }
@@ -328,7 +333,7 @@ foam.CLASS({
       }
     },
 
-    function executeFallback(promise, sink, skip, limit, unusedOrder, predicate) {
+    function executeFallback(promise, sink, skip, limit, order, predicate) {
        /**
         * Executes a merge where ordering is unknown, therefore no
         * sorting is done and deduplication must be done separately.
@@ -337,8 +342,10 @@ foam.CLASS({
          delegate: this.decorateSink_(sink, skip, limit)
        });
 
+       foam.assert(( ! this.predicates ) || ( this.predicates.size == this.subPlans.size ), "MergePlan.predicates, when specified, must match the number of subplans." );
+
        var sp = this.subPlans;
-       var predicates = predicate ? predicate.args : [];
+       var predicates = this.predicates;
        var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
 
        for ( var i = 0 ; i < sp.length ; ++i) {
@@ -347,8 +354,8 @@ foam.CLASS({
            resultSink,
            undefined,
            subLimit,
-           undefined,
-           predicates[i]
+           order,
+           predicates ? predicates[i] : predicate // array mode (one per subplan) or repeated use of single predicate
          );
        }
        // Since this execute doesn't collect results into a temporary
@@ -382,4 +389,3 @@ foam.CLASS({
 
   ]
 });
-

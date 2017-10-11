@@ -23,13 +23,13 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: 'Reference<String>',
+      swiftType: '[Character]',
       name: 'str',
       swiftAdapt: function() {/*
 if let s = newValue as? String {
-  return Reference(value: s)
+  return Array(s)
 }
-return newValue as! Reference<String>
+return newValue as! [Character]
       */},
     },
     {
@@ -48,13 +48,13 @@ return newValue as! Reference<String>
     {
       name: 'head',
       swiftCode: function() {/*
-return str.value.char(at: pos)
+return str[pos]
       */},
     },
     {
       name: 'valid',
       swiftCode: function() {/*
-return pos < str.value.characters.count
+return pos < str.count
       */},
     },
     {
@@ -72,14 +72,14 @@ return tail_!
     {
       name: 'substring',
       swiftCode: function() {/*
-let startIndex = str.value.index(str.value.startIndex, offsetBy: pos)
-let endIndex = str.value.index(str.value.startIndex, offsetBy: (end as! StringPStream).pos)
-return str.value[startIndex..<endIndex]
+let startIndex = pos
+let endIndex = (end as! StringPStream).pos
+return String(str[startIndex..<endIndex])
       */},
     },
     {
       name: 'value',
-      swiftReturnType: 'Any?',
+      swiftReturns: 'Any?',
       swiftCode: function() {/*
 return value_
       */},

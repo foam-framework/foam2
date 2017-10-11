@@ -265,9 +265,15 @@ foam.CLASS({
   ],
 
   properties: [
+    { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
     {
       class: 'Int',
       name: 'ordinal',
+      // NOTE: Default value of -1 forces legitimate values (starting at 0) to
+      // all be non-default. This is important for, e.g., serialization of enum
+      // values:
+      // https://github.com/foam-framework/foam2/issues/637
+      value: -1,
       final: true
     },
     {
@@ -278,7 +284,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'label',
-      final: true
+      final: true,
+      factory: function() {
+        return this.name;
+      }
     }
   ],
 
@@ -288,7 +297,6 @@ foam.CLASS({
 });
 
 
-// TODO(adamvy): Support default values.
 foam.CLASS({
   package: 'foam.core',
   name: 'Enum',
@@ -301,6 +309,22 @@ foam.CLASS({
       class: 'Class',
       name: 'of',
       required: true
+    },
+    {
+      name: 'value',
+      adapt: function(_, n) {
+        if ( foam.String.isInstance(n) ) n = this.of[n];
+        return n
+      },
+      expression: function(of) {
+        return of && of.VALUES[0];
+      },
+    },
+    {
+      name: 'javaValue',
+      expression: function(of, value) {
+        return of.id + '.' + value;
+      },
     },
     [
       'adapt',
@@ -321,7 +345,11 @@ foam.CLASS({
 
         throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
-    ]
+    ],
+    {
+      name: 'toJSON',
+      value: function(value) { return value.ordinal; }
+    }
   ]
 });
 

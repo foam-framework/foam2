@@ -27,6 +27,11 @@ foam.CLASS({
       expression: function(name) { return name; },
     },
     {
+      class: 'Boolean',
+      name: 'generateSwift',
+      value: true,
+    },
+    {
       class: 'StringArray',
       name: 'swiftImports',
     },
@@ -37,7 +42,7 @@ foam.CLASS({
         // TODO: This should be an expression on extends but putting extends in
         // the args makes js unhappy.
         if ( this.extends == 'FObject' ) return 'AbstractFObject';
-        return this.extends.split('.').pop();
+        return foam.lookup(this.extends).model_.swiftName;
       },
     },
     {

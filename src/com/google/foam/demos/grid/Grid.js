@@ -195,10 +195,10 @@ foam.CLASS({
       code: function() {
         console.log('show');
         this.dao.select().then(function(s) {
-          window.alert(foam.json.Outputer.create({
+          window.alert(foam.json.Outputter.create({
             pretty: false,
             outputClassNames: false
-          }).stringify(s.a));
+          }).stringify(s.array));
         });
       }
     },

@@ -14,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'com.google.foam.demos.olympics',
   name: 'Controller',
   extends: 'foam.u2.Element',
+
   requires: [
     'com.google.foam.demos.olympics.Medal',
     'foam.dao.EasyDAO',

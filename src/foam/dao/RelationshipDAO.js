@@ -24,10 +24,13 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'obj'
+      name: 'obj',
+      class: 'FObjectProperty'
     },
     {
       name: 'relationship',
+      class: 'FObjectProperty',
+      of: 'foam.dao.Relationship',
       required: true
     },
     {
@@ -50,10 +53,9 @@ foam.CLASS({
   ],
 
   methods: [
-    function put(obj, sink) {
-      return this.SUPER(this.relationship.adaptTarget(this.obj, obj), sink);
+    function put_(x, obj) {
+      return this.SUPER(x, this.relationship.adaptTarget(this.obj, obj));
     },
-
     function clone() {
       // Prevent cloneing
       return this;

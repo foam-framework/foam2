@@ -52,17 +52,19 @@ foam.CLASS({
         if ( ! of ) return this;
         X = X || foam.__context__;
 
-        var name   = foam.String.isInstance(of) ? of : of.name;
-        var facets = this.private_.facets || ( this.private_.facets = {} );
-
-        if ( ! facets.hasOwnProperty(name) ) {
-          var id = this.package ?
-            this.package + '.' + name + this.name :
-            name + this.name ;
-          facets[name] = X.lookup(id, true) || this;
+        var name;
+        var pkg;
+        if ( foam.String.isInstance(of) ) {
+          name = of.substring(of.lastIndexOf('.') + 1);
+          pkg = of.substring(0, of.lastIndexOf('.'))
+        } else {
+          name = of.name;
+          pkg  = of.package;
         }
 
-        return facets[name];
+        var id = ( pkg ? pkg + '.' : '' ) + name + this.name;
+
+        return X.lookup(id, true) || this;
       };
 
       // ignoreFacets is set to true when called to prevent a second-level

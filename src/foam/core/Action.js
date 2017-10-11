@@ -51,7 +51,27 @@ foam.CLASS({
       expression: function(label) { return label; }
     },
     {
+      documentation: 'displayed on :hover',
+      class: 'String',
+      name: 'toolTip',
+      expression: function(label) { return label; }
+    },
+    {
       name: 'icon'
+    },
+    {
+      class: 'String',
+      name: 'iconFontFamily',
+      value: 'Material Icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontClass',
+      value: 'material-icons'
+    },
+    {
+      class: 'String',
+      name: 'iconFontName'
     },
     {
       class: 'Array',
@@ -92,7 +112,7 @@ foam.CLASS({
   methods: [
     function isEnabledFor(data) {
       return this.isEnabled ?
-        foam.Function.withArgs(this.isEnabled, data) :
+        data.slot(this.isEnabled).get() :
         true;
     },
 
@@ -119,7 +139,7 @@ foam.CLASS({
     function maybeCall(ctx, data) {
       if ( this.isEnabledFor(data) && this.isAvailableFor(data) ) {
         this.code.call(data, ctx, this);
-        data.pub('action', this.name, this);
+        data && data.pub('action', this.name, this);
         return true;
       }
 
@@ -152,7 +172,7 @@ foam.CLASS({
       adaptArrayElement: function(o, prop) {
         return typeof o === 'function' ?
             foam.core.Action.create({name: o.name, code: o}) :
-            foam.lookup(prop.of).create(o) ;
+            this.lookup(prop.of).create(o) ;
       }
     }
   ]

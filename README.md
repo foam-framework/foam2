@@ -25,6 +25,10 @@ for any language or platform, including Android Java and iOS Swift.
 
 # Development
 
+## Building Java
+
+_cd src; ./gen.sh; cd ../build; mvn compile; mvn package_
+
 ## Installing Dependencies
 
 FOAM has no runtime dependencies, but uses a number of third party tools for
@@ -38,7 +42,7 @@ tools by doing the following.
 
 ## Style Guide
 
-All code should folow the [style guide.](doc/guides/StyleGuide.md)
+All code should follow the [style guide.](doc/guides/StyleGuide.md)
 
 ## Testing
 
@@ -59,7 +63,7 @@ to run the unit tests.
 
 Documentation is created by JSDoc with a plugin to account for FOAM's package
 structure and declarative nature. JSDoc modules correspond with FOAM packages.
-See [./doc/Documentation.md](./doc/Documentation.md) for information on comment
+See [/doc/guides/Documentation.md](/doc/guides/Documentation.md) for information on comment
 formatting.
 
 # Contributing

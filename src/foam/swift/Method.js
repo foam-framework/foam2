@@ -26,6 +26,7 @@ foam.CLASS({
     'static',
     'class',
     'body',
+    'throws',
     'override',
     {
       class: 'FObjectArray',
@@ -59,6 +60,7 @@ foam.CLASS({
 
       o.out(
         ')',
+        this.throws ? ' throws' : '',
         this.returnType ? ' -> ' + this.returnType : '',
         ' {\n');
 

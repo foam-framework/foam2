@@ -19,24 +19,35 @@ foam.CLASS({
   package: 'foam.swift.parse.json',
   name: 'FObjectArrayParser',
   extends: 'foam.swift.parse.parser.ProxyParser',
+  requires: [
+    'foam.swift.parse.json.FObjectParser',
+    'foam.swift.parse.json.Whitespace',
+    'foam.swift.parse.parser.Literal',
+    'foam.swift.parse.parser.Repeat',
+    'foam.swift.parse.parser.Seq0',
+    'foam.swift.parse.parser.Seq1',
+  ],
+  axioms: [
+    foam.pattern.Singleton.create()
+  ],
   properties: [
   {
     name: 'delegate',
     swiftFactory: function() {/*
-return Seq1(["index": 3, "parsers": [
-  Whitespace(),
-  Literal(["string": "["]),
-  Whitespace(),
-  Repeat([
-    "delegate": FObjectParser(),
-    "delim": Seq0(["parsers": [
-      Whitespace(),
-      Literal(["string": ","]),
-      Whitespace(),
+return Seq1_create(["index": 3, "parsers": [
+  Whitespace_create(),
+  Literal_create(["string": "["]),
+  Whitespace_create(),
+  Repeat_create([
+    "delegate": FObjectParser_create(),
+    "delim": Seq0_create(["parsers": [
+      Whitespace_create(),
+      Literal_create(["string": ","]),
+      Whitespace_create(),
     ]]),
   ]),
-  Whitespace(),
-  Literal(["string": "]"]),
+  Whitespace_create(),
+  Literal_create(["string": "]"]),
 ]])
     */},
   },

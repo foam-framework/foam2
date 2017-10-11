@@ -43,20 +43,28 @@ foam.CLASS({
       attribute: true,
       // documentation: 'When true, $$DOC{ref:".data"} is updated on every keystroke, rather than on blur.'
     },
+    {
+      class: 'Int',
+      name: 'maxLength',
+      attribute: true,
+      // documentation: 'When set, will limit the length of the input to a certain number'
+    },
     'type'
   ],
 
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
-        ^:read-only { border-width: 0; }
+        ^:read-only { border: none; background: rgba(0,0,0,0); }
       */}
     })
   ],
 
   methods: [
     function initE() {
+      this.SUPER();
       if ( this.type ) this.attrs({ type: this.type });
+      if ( this.maxLength > 0 ) this.setAttribute('maxlength', this.maxLength);
       this.initCls();
       this.link();
     },

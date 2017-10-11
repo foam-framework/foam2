@@ -51,29 +51,29 @@ foam.CLASS({
   ],
 
   methods: [
-    function remove(obj) {
+    function remove_(x, obj) {
       var self = this;
       return obj[this.name].removeAll().then(function() {
-        return self.delegate.remove(obj);
+        return self.delegate.remove_(x, obj);
       });
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       var self = this;
 
       // NOTE: grabbing the first object as we have no other access
       // to the relationship.
 
-      return self.delegate.select(skip, limit, order, predicate).then(function(sink) {
+      return self.delegate.select_(x, skip, limit, order, predicate).then(function(sink) {
         return Promise.all(
-            sink.a.map(function(obj) {
+            sink.array.map(function(obj) {
               if (self.pending_.has(obj.id)) {
                 return self.delegate.removeAll();
               } else {
                 self.pending_.set(obj.id, true);
                 return new Promise(function(resolve, reject) {
                   return obj[self.name].removeAll().then(function() {
-                    return self.delegate.removeAll(skip, limit, order, predicate).then(function() {
+                    return self.delegate.removeAll_(x, skip, limit, order, predicate).then(function() {
                       self.pending_.delete(obj.id);
                       resolve(obj);
                     });

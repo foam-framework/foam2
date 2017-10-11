@@ -22,10 +22,7 @@ foam.CLASS({
 
   documentation: 'HTTP(S) server handler for a single file.',
 
-  imports: [
-    'info',
-    'warn'
-  ],
+  imports: [ 'info' ],
 
   properties: [
     {
@@ -68,7 +65,7 @@ foam.CLASS({
       // Ensure that file exists.
       if ( ! this.fs.existsSync(this.filePath) ) {
         this.send404(req, res);
-        this.warn('File not found: ' + this.filePath);
+        this.reportWarnMsg(req, 'File not found: ' + this.filePath);
         return true;
       }
 
@@ -76,7 +73,7 @@ foam.CLASS({
       var stats = this.fs.statSync(this.filePath);
       if ( stats.isDirectory() ) {
         this.send404(req, res);
-        this.warn('Attempt to read directory: ' + this.filePath);
+        this.reportWarnMsg(req, 'Attempt to read directory: ' + this.filePath);
         return true;
       }
 

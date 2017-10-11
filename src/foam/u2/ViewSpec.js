@@ -27,9 +27,9 @@ foam.CLASS({
   axioms: [
     {
       installInClass: function(cls) {
-        cls.createView = function(spec, args, that, ctx) {
+        cls.createView = function(spec, args, self, ctx) {
           if ( foam.u2.Element.isInstance(spec) )
-            return spec;
+            return spec.copyFrom(args);
 
           if ( foam.core.Slot.isInstance(spec) )
             return spec;
@@ -38,14 +38,16 @@ foam.CLASS({
             return spec.toE(args, ctx);
 
           if ( foam.Function.isInstance(spec) )
-            return foam.u2.ViewSpec.createView(spec.call(that, args, ctx), args, that, ctx);
+            return foam.u2.ViewSpec.createView(spec.call(self, args, ctx), args, self, ctx);
 
           if ( foam.Object.isInstance(spec) ) {
             var ret = spec.create ?
                 spec.create(args, ctx) :
-                ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {}) ;
+                ctx.lookup(spec.class).create(spec, ctx).copyFrom(args || {});
 
-            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec result must extend foam.u2.Element or be toE()-able.');
+            foam.assert(
+                foam.u2.Element.isInstance(ret) || ret.toE,
+                'ViewSpec result must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
@@ -53,7 +55,7 @@ foam.CLASS({
           if ( foam.core.FObject.isSubClass(spec) ) {
             var ret = spec.create(args, ctx);
 
-            foam.assert(foam.u2.Element.isInstance(ret) || ret.toE, 'ViewSpec class must extend foam.u2.Element or be toE()-able.');
+            foam.assert(foam.u2.Element.isInstance(ret), 'ViewSpec class must extend foam.u2.Element or be toE()-able.');
 
             return ret;
           }
@@ -68,6 +70,14 @@ foam.CLASS({
   ],
 
   properties: [
+    /* TODO: uncomment this to fix ViewSpecs converting into Views when loading.
+    [
+      'fromJSON',
+      function fromJSON(value, ctx, prop, json) {
+        return value;
+      }
+    ],
+    */
     [ 'adapt', function(_, spec, prop) {
       return foam.String.isInstance(spec) ? { class: spec } : spec ;
     } ]

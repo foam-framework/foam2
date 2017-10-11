@@ -48,11 +48,15 @@ foam.CLASS({
   documentation: 'An Interface Mode/definition. Created with foam.INTERFACE().',
 
   properties: [
-    ['extends', 'foam.core.AbstractInterface'],
+    [ 'extends', 'foam.core.AbstractInterface' ],
     {
       class: 'AxiomArray',
       name: 'methods',
       of: 'foam.core.internal.InterfaceMethod'
+    },
+    {
+      class: 'StringArray',
+      name: 'javaExtends'
     }
   ]
 });
@@ -81,7 +85,24 @@ foam.LIB({
 
   methods: [
     function INTERFACE(m) {
+
       m.class = m.class || 'foam.core.InterfaceModel';
+      // if m.implements not defined, add it as an array, otherwise add its content
+      // in an array
+      if ( ! m.implements ) {
+        m.implements = [];
+      } else if ( typeof m.implements === 'string' ) {
+        m.implements = [m.implements];
+      }
+      // adds m.extends content to m.implements and then remove it
+      if ( m.extends ) {
+        if ( typeof m.extends === 'string' ) {
+          m.implements.push(m.extends);
+        } else if( m.extends.length > 0 ) {
+          m.implements = m.implements.concat(m.extends);
+        }
+        delete m.extends;
+      }
       foam.CLASS(m);
     }
   ]

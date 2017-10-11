@@ -27,6 +27,7 @@ foam.CLASS({
     'foam.dao.ArraySink',
     'foam.dao.ExternalException',
     'foam.dao.InternalException',
+    'foam.dao.InvalidArgumentException',
     'foam.dao.ObjectNotFoundException',
     'foam.dao.index.AltIndex',
     'foam.dao.index.AutoIndex',
@@ -53,15 +54,16 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'autoIndex',
-      value: false
+      name: 'autoIndex'
     },
     {
-      name: 'idIndex'
+      name: 'idIndex',
+      transient: true
     },
     {
       /** The root IndexNode of our index. */
-      name: 'index'
+      name: 'index',
+      transient: true
     }
   ],
 
@@ -137,7 +139,7 @@ foam.CLASS({
       var self = this;
       var sink = self.ArraySink.create();
       return dao.select(sink).then(function() {
-        var a = sink.a;
+        var a = sink.array;
         self.index.bulkLoad(a);
         for ( var i = 0; i < a.length; ++i ) {
           var obj = a[i];
@@ -145,8 +147,8 @@ foam.CLASS({
       });
     },
 
-    function put(obj) {
-      var oldValue = this.find_(obj.id);
+    function put_(x, obj) {
+      var oldValue = this.findSync_(obj.id);
       if ( oldValue ) {
         this.index.remove(oldValue);
       }
@@ -155,16 +157,19 @@ foam.CLASS({
       return Promise.resolve(obj);
     },
 
-    function find(key) {
-      if ( key === undefined ) {
-        return Promise.reject(this.InternalException.create({ id: key })); // TODO: err
+    function find_(x, objOrKey) {
+      if ( objOrKey === undefined ) {
+        return Promise.reject(this.InvalidArgumentException.create({
+          message: '"key" cannot be undefined/null'
+        }));
       }
 
-      return Promise.resolve(this.find_(key));
+      return Promise.resolve(this.findSync_(
+          this.of.isInstance(objOrKey) ? objOrKey.id : objOrKey));
     },
 
     /** internal, synchronous version of find, does not throw */
-    function find_(key) {
+    function findSync_(key) {
       var index = this.idIndex;
       index = index.get(key);
 
@@ -173,7 +178,7 @@ foam.CLASS({
       return null;
     },
 
-    function remove(obj) {
+    function remove_(x, obj) {
       if ( ! obj || obj.id === undefined ) {
         return Promise.reject(this.ExternalException.create({ id: 'no_id' })); // TODO: err
       }
@@ -181,7 +186,7 @@ foam.CLASS({
       var id   = obj.id;
       var self = this;
 
-      var found = this.find_(id);
+      var found = this.findSync_(id);
       if ( found ) {
         self.index.remove(found);
         self.pub('on', 'remove', found);
@@ -190,12 +195,12 @@ foam.CLASS({
       return Promise.resolve();
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       if ( ! predicate ) predicate = this.True.create();
       var self = this;
       return self.where(predicate).select(self.ArraySink.create()).then(
         function(sink) {
-          var a = sink.a;
+          var a = sink.array;
           for ( var i = 0 ; i < a.length ; i++ ) {
             self.index.remove(a[i]);
             self.pub('on', 'remove', a[i]);
@@ -205,7 +210,7 @@ foam.CLASS({
       );
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       sink = sink || this.ArraySink.create();
       var plan;
 //console.log("----select");
@@ -231,7 +236,6 @@ foam.CLASS({
           return Promise.resolve(sink);
         },
         function(err) {
-          sink && sink.error && sink.error(err);
           return Promise.reject(err);
         }
       );
@@ -250,11 +254,11 @@ foam.CLASS({
         // NOTE: we pass sink here, but it's not going to be the one eventually
         // used.
         plans.push(
-          this.index.plan(sink, undefined, subLimit, undefined, args[i], this.index)
+          this.index.plan(sink, undefined, subLimit, order, args[i], this.index)
         );
       }
 
-      return this.MergePlan.create({ of: this.of, subPlans: plans });
+      return this.MergePlan.create({ of: this.of, subPlans: plans, predicates: args });
     },
 
     function toString() {

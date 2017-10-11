@@ -60,11 +60,11 @@ updateTable();
 
 // dao.select().then(function(m) {
 //   var out = "";
-//   out += '<div>Read ' + m.a.length + ' mails.';
+//   out += '<div>Read ' + m.array.length + ' mails.';
 //   out += '<table><thead><td>Subject</td><td>Body</td></thead><tbody>';
 
-//   for ( var i = 0 ; i < m.a.length ; i++ ) {
-//     var mail = m.a[i];
+//   for ( var i = 0 ; i < m.array.length ; i++ ) {
+//     var mail = m.array[i];
 //     out += '<tr><td>' + mail.subject + '</td><td>' + mail.body + '</td></tr>';
 //   }
 //   out += '</tbody></table>';

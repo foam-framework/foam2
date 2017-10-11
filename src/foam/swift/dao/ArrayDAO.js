@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.swift.dao',
   name: 'ArrayDAO',
-  extends: 'foam.swift.dao.AbstractDAO',
+  extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       class: 'Array',
@@ -26,10 +26,20 @@ foam.CLASS({
       name: 'dao',
       swiftFactory: 'return []',
     },
+    {
+      swiftType: 'ClassInfo',
+      name: 'of',
+    },
+    {
+      swiftType: 'PropertyInfo',
+      name: 'primaryKey',
+      swiftExpressionArgs: ['of'],
+      swiftExpression: 'return of.axiom(byName: "id") as! PropertyInfo',
+    },
   ],
   methods: [
     {
-      name: 'put',
+      name: 'put_',
       swiftCode: function() {/*
 var found = false
 for (i, o) in dao.enumerated() {
@@ -45,7 +55,7 @@ return obj
       */},
     },
     {
-      name: 'remove',
+      name: 'remove_',
       swiftCode: function() {/*
 let i = dao.index { (o) -> Bool in
   return self.primaryKey.compare(obj, o) == 0
@@ -57,7 +67,7 @@ return o
       */},
     },
     {
-      name: 'find',
+      name: 'find_',
       swiftCode: function() {/*
 let i = dao.index { (o) -> Bool in
   return self.primaryKey.compareValues(id, self.primaryKey.get(o)) == 0
@@ -67,7 +77,7 @@ return dao[i!]
       */},
     },
     {
-      name: 'select',
+      name: 'select_',
       swiftCode: function() {/*
 let resultSink = sink
 let sink = decorateSink_(resultSink, skip, limit, order, predicate)
@@ -77,9 +87,9 @@ let sub = Subscription(detach: { detached = true })
 
 for o in dao {
   if detached { break }
-  sink.put(sub, o)
+  sink.put(o, sub)
 }
-sink.eof(sub)
+sink.eof()
 
 return resultSink
       */},

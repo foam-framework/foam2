@@ -22,7 +22,7 @@ foam.CLASS({
     {
       name: 'buffer',
       factory: function() {
-        return new Buffer(this.length);
+        return Buffer.alloc(this.length);
       }
     }
   ],

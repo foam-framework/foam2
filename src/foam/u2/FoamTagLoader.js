@@ -33,6 +33,35 @@ foam.CLASS({
       for ( var i = 0 ; i < ps.length ; i++ ) {
         if ( name === ps[i].name.toLowerCase() ) return ps[i];
       }
+    },
+
+    function loadTag(el, modelName) {
+      var cls = this.lookup(modelName, true);
+      var id  = el.id;
+
+      if ( cls ) {
+        var view = cls.create(null, foam.__context__);
+
+        if ( view.toE ) {
+          view = view.toE({}, foam.__context__);
+        } else if ( ! foam.u2.Element.isInstance(view) )  {
+          view = foam.u2.DetailView.create({data: view, showActions: true});
+        }
+
+        for ( var j = 0 ; j < el.attributes.length ; j++ ) {
+          var attr = el.attributes[j];
+          var p    = this.findPropertyIC(view.cls_, attr.name);
+          if ( p ) p.set(view, attr.value);
+        }
+
+        el.outerHTML = view.outerHTML;
+        view.load();
+
+        // Store view in global variable if named. Useful for testing.
+        if ( id ) global[id] = view;
+      } else {
+        console.error('Unknow class: ', modelName);
+      }
     }
   ],
 
@@ -43,29 +72,14 @@ foam.CLASS({
 
       // Install last to first to avoid messing up the 'els' list.
       for ( var i = els.length-1 ; i >= 0 ; i-- ) {
-        var el = els[i];
-        var modelName = el.getAttribute('class');
-        var cls = foam.lookup(modelName, true);
+        let el        = els[i];
+        let modelName = el.getAttribute('class');
+        var arequire  = foam.AREQUIRES[modelName];
 
-        if ( cls ) {
-          var view = cls.create(null, foam.__context__);
-
-          if ( view.toE ) {
-            view = view.toE({}, foam.__context__);
-          } else if ( ! foam.u2.Element.isInstance(view) )  {
-            view = foam.u2.DetailView.create({data: view, showActions: true});
-          }
-
-          for ( var j = 0 ; j < el.attributes.length ; j++ ) {
-            var attr = el.attributes[j];
-            var p = this.findPropertyIC(view.cls_, attr.name);
-            if ( p ) p.set(view, attr.value);
-          }
-
-          el.outerHTML = view.outerHTML;
-          view.load();
+        if ( arequire ) {
+          arequire().then(function() { this.loadTag(el, modelName); }.bind(this));
         } else {
-          console.error('Unknow class: ', modelName);
+          this.loadTag(el, modelName);
         }
       }
     }

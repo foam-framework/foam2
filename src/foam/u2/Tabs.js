@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+// TODO: don't instantiate tabs until viewed
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'Tab',
@@ -42,11 +44,15 @@ foam.CLASS({
         }
         ^tabRow { height: 37px; }
         ^tab {
-          float: left;
-          border: 1px solid black;
-          border-bottom: none;
-          padding: 5px;
           background: lightgray;
+          border-bottom: none;
+          border-top: 1px solid black;
+          border-left: 1px solid black;
+          border-right: 1px solid black;
+          border-top-right-radius: 4px;
+          border-top-left-radius: 4px;
+          float: left;
+          padding: 6px;
         }
         ^tab.selected {
           background: white;
@@ -54,14 +60,14 @@ foam.CLASS({
           z-index: 1;
         }
         ^content {
-box-shadow: 3px 3px 6px 0 gray; 
-          margin: 4px;
-          padding: 0;
           background: white;
           border: 1px solid black;
+          box-shadow: 3px 3px 6px 0 gray;
+          left: -4px;
+          margin: 4px;
+          padding: 0;
           position: relative;
           top: -13px;
-          left: -4px;
         }
       */}
     })
@@ -87,13 +93,13 @@ box-shadow: 3px 3px 6px 0 gray;
   methods: [
     function init() {
       this.
-          addClass(this.myClass()).
-          start('div', null, this.tabRow$).
-            addClass(this.myClass('tabRow')).
-          end().
-          start('div', null, this.content$).
-            addClass(this.myClass('content')).
-          end();
+        addClass(this.myClass()).
+        start('div', null, this.tabRow$).
+          addClass(this.myClass('tabRow')).
+        end().
+        start('div', null, this.content$).
+          addClass(this.myClass('content')).
+        end();
     },
 
     function add(tab) {
@@ -102,10 +108,10 @@ box-shadow: 3px 3px 6px 0 gray;
         if ( ! this.selected ) this.selected = tab;
 
         this.tabRow.start('span').
-            addClass(this.myClass('tab')).
-            enableClass('selected', tab.selected$).
-            on('click', function() { this.selected = tab; }.bind(this)).
-            add(tab.label).
+          addClass(this.myClass('tab')).
+          enableClass('selected', tab.selected$).
+          on('click', function() { this.selected = tab; }.bind(this)).
+          add(tab.label).
         end();
 
         tab.shown$ = tab.selected$;

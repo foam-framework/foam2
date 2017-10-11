@@ -42,7 +42,6 @@ foam.CLASS({
     'data as unfilteredDAO'
   ],
 
-
   axioms: [
     foam.u2.CSS.create({
       code: function CSS() {/*
@@ -80,12 +79,10 @@ foam.CLASS({
           flex-grow: 1;
           overflow: hidden;
         }
-
         ^filter-area {
           flex-grow: 1;
           overflow-y: auto;
         }
-
         ^filter-header {
           align-items: center;
           display: flex;
@@ -211,7 +208,9 @@ foam.CLASS({
       class: 'StringArray',
       name: 'searchFields',
       documentation: 'Property names that are currently selected as filters.',
-      factory: function() { return []; }
+      factory: function() {
+        return ( this.data && this.data.of && this.data.of.tableColumns ) || [];
+      }
     },
     {
       name: 'searchViews_',
@@ -374,7 +373,8 @@ foam.CLASS({
 
     function splitName(key) {
       var match = key.match(/^(.*)_(\d+)$/);
-      return match ? { name: match[1], count: match[2] } :
+      return match ?
+          { name: match[1], count: match[2] } :
           { name: key, count: 1 };
     }
   ],

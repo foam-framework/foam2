@@ -49,6 +49,14 @@ foam.CLASS({
           body: this.swiftListenerName + '(Subscription(detach: {}), [])',
           override: !!(superAxiom && superAxiom.swiftCode),
         }));
+        cls.fields.push(this.Field.create({
+          visibility: 'public',
+          static: true,
+          final: true,
+          name: this.swiftAxiomName,
+          type: 'MethodInfo',
+          initializer: this.swiftMethodInfoInit(),
+        }));
       }
       cls.method(this.Method.create({
         name: this.swiftListenerMethodName,

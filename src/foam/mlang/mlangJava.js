@@ -1,22 +1,11 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.INTERFACE({
-  refines: 'foam.mlang.Expr',
+  refines: 'foam.mlang.F',
 
   methods: [
     {
@@ -28,11 +17,20 @@ foam.INTERFACE({
         }
       ],
       javaReturns: 'Object'
-    },
+    }
+  ]
+});
+
+foam.INTERFACE({
+  refines: 'foam.mlang.Expr',
+
+  implements: [ 'foam.dao.SQLStatement' ],
+
+  methods: [
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.Expr'
-    }
+    },
   ]
 });
 
@@ -47,8 +45,20 @@ foam.CLASS({
 });
 
 
+foam.CLASS({
+  refines: 'foam.mlang.SinkProperty',
+
+  properties: [
+    ['javaType', 'foam.dao.Sink'],
+    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+  ]
+});
+
+
 foam.INTERFACE({
   refines: 'foam.mlang.predicate.Predicate',
+
+  implements: [ 'foam.dao.SQLStatement' ],
 
   methods: [
     {
@@ -108,6 +118,33 @@ foam.CLASS({
 
   methods: [
     {
+      // TODO: This is a duplicate of the method in Predicate,
+      // but it's necessary because when we refine Predicate, it doesn't
+      // update classes that copied their axioms in from Predicate as a trait.
+      // If we were more careful about the ordering of classes this wouldn't be
+      // necessary.
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode: 'return false;',
+      javaReturns: 'boolean'
+    },
+    {
+      // TODO: Same TODO as .f method above
+      name: 'toIndex',
+      javaSupport: false
+    },
+    {
+      // TODO: Same TODO as .f
+      name: 'toDisjunctiveNormalForm',
+      javaSupport: false,
+      javaReturns: 'foam.mlang.predicate.Predicate'
+    },
+    {
       name: 'partialEval',
       javaCode: 'return this;',
       javaReturns: 'foam.mlang.predicate.Predicate'
@@ -141,6 +178,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return true;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -153,6 +203,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return false;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -168,6 +231,19 @@ foam.CLASS({
                 + '  if ( getArgs()[i].f(obj) ) return true;\n'
                 + '}\n'
                 + 'return false;\n'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -183,6 +259,100 @@ foam.CLASS({
                 + '  if ( ! getArgs()[i].f(obj) ) return false;\n'
                 + '}\n'
                 + 'return true;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.In',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode:
+  `
+  Object lhs = getArg1().f(obj);
+  // boolean uppercase = lhs.getClass().isEnum(); TODO: Account for ENUMs? (See js)
+  Object rhs = getArg2().f(obj);
+
+  if ( rhs instanceof Object[] ) {
+    // Checks if rhs array contains the lhs object
+    Object[] values = (Object[])rhs;
+
+    for ( int i = 0 ; i < values.length ; i++ ) {
+      if ( ( ( (Comparable) lhs ).compareTo( (Comparable) values[i] ) ) == 0 ) {
+        return true;
+      }
+    }
+  } else if ( rhs instanceof String ) {
+    // Checks if lhs is substring of rhs
+    return ( lhs instanceof String ) &&
+      ( ( (String) rhs ).contains( (String) lhs ) );
+  }
+
+  return false;
+  `
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Map',
+
+  methods: [
+    {
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaReturns: 'foam.core.FObject',
+      javaCode: `return (foam.core.FObject) getArg1().f(obj);`
+    },
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'getDelegate().put(f(obj), sub);'
     }
   ]
 });
@@ -194,9 +364,84 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'String s1 = (String)getArg1().f(obj);\n'
-                + 'String s2 = (String)getArg2().f(obj);\n'
-                + 'return s1 != null ? s1.indexOf(s2) != -1 : false;\n'
+      javaCode:
+`Object s1 = getArg1().f(obj);
+String s2 = (String) getArg2().f(obj);
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.contains(s2) )
+      return true;
+  }
+}
+return ( s1 instanceof String && ((String) s1).contains(s2) );`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.ContainsIC',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode:
+`Object s1 = getArg1().f(obj);
+String s2 = ((String) getArg2().f(obj)).toUpperCase();
+if ( s1 instanceof String[] ) {
+  for ( String s : (String[]) s1 ) {
+    if ( s.toUpperCase().contains(s2) )
+      return true;
+  }
+}
+return ( s1 instanceof String && ((String) s1).toUpperCase().contains(s2) );`
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.StartsWith',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode:
+`Object arg1 = getArg1().f(obj);
+String arg2 = (String) getArg2().f(obj);
+if ( arg1 instanceof String[] ) {
+  for ( String s : (String[]) arg1 ) {
+    if ( s.startsWith(arg2) )
+      return true;
+  }
+}
+return ( arg1 instanceof String && ((String) arg1).startsWith(arg2) );`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: `return getArg1().createStatement() + " like '" + getArg2().createStatement() + "%'";`
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -208,19 +453,29 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'String arg2 = ((String)getArg2().f(obj)).toUpperCase();\n'
-                + 'Object arg1 = getArg1().f(obj);\n'
-                + 'if ( arg1 instanceof Object[] ) {\n'
-                + '  Object[] values = (Object[])arg1;\n'
-                + '  for ( int i = 0 ; i < values.length ; i++ ) {\n'
-                + '    if ( ((String)values[i]).toUpperCase().startsWith(arg2) ) {\n'
-                + '      return true;\n'
-                + '    }\n'
-                + '  }\n'
-                + '  return false;'
-                + '}'
-                + 'String value = (String)arg1;\n'
-                + 'return value.toUpperCase().startsWith(arg2);\n'
+      javaCode:
+`Object arg1 = getArg1().f(obj);
+String arg2 = ((String) getArg2().f(obj)).toUpperCase();
+if ( arg1 instanceof String[] ) {
+  for ( String s : (String[]) arg1 ) {
+    if ( s.toUpperCase().startsWith(arg2) )
+      return true;
+  }
+}
+return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2) );`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: `return "UPPER(" + getArg1().createStatement() + ") like 'UPPER(" + getArg2().createStatement() + ")%'";`
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -233,6 +488,16 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return getValue();'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " ? "; '
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaCode: ''
     }
   ]
 });
@@ -246,6 +511,25 @@ foam.CLASS({
       name: 'f',
       // TODO(adamvy): Is there a better option than all the Comparable casts?
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      // TODO: select columns
+      javaCode: 'return getArg1().createStatement() + " = " + getArg2().createStatement();'
+    },
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: '// try {\n'
+                + '  // stmt.setObject(1, getArg2().prepareStatement());\n'
+                + '// } catch (java.sql.SQLException e) {\n'
+                + '  // e.printStackTrace();\n'
+                + '// }'
     }
   ]
 });
@@ -258,6 +542,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) != 0;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -270,6 +567,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) < 0;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -282,6 +592,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) <= 0;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -294,6 +617,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) > 0;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -306,6 +642,19 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) >= 0;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return " ";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -318,36 +667,49 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ! getArg1().f(obj);'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
 
 
-foam.INTERFACE({
-  refines: 'foam.mlang.order.Comparator',
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Has',
 
   methods: [
     {
-      name: 'compare',
-      args: [
-        {
-          name: 'o1',
-          javaType: 'Object'
-        },
-        {
-          name: 'o2',
-          javaType: 'Object'
-        }
-      ]
+      name: 'f',
+      // TODO(kgr): Instead of checking type, use polymorphims and add a
+      // type-specific has() method to the Property.
+      javaCode: `Object value = getArg1().f(obj);
+        return ! (value == null ||
+          (value instanceof String && ((String)value).length() == 0) ||
+          (value.getClass().isArray() && java.lang.reflect.Array.getLength(value) == 0));`
     },
     {
-      name: 'toIndex',
-      javaSupport: false,
-      args: [
-        {
-          name: 'tail'
-        }
-      ]
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     }
   ]
 });
@@ -379,72 +741,35 @@ foam.CLASS({
   methods: [
     {
       name: 'compare',
+      javaReturns: 'int',
+      args: [
+        {
+          name: 'o1',
+          javaType: 'Object'
+        },
+        {
+          name: 'o2',
+          javaType: 'Object'
+        }
+      ],
       javaCode: 'return -1 * getArg1().compare(o1, o2);'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
     },
     {
       name: 'toString',
       javaCode: 'return "DESC(" + getArg1().toString() + ")";'
-    },
-    {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();'+
-        'if ( arg1 != null ) {' +
-          'return arg1.toIndex(tail);'+
-        '}'+
-        'return null;'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return null;'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'Object ret = getArg1().orderDirection().reverse();' +
-        'ret.setSrcOrder(this); return ret;'
-    }
-  ]
-});
-
-
-foam.CLASS({
-  refines: 'foam.mlang.order.ThenBy',
-
-  methods: [
-    {
-      name: 'compare',
-      javaCode: 'int c = getArg1().compare(o1, o2); ' +
-        'if ( c == 0 ) c = getArg2().compare(o1, o2); ' +
-        'return c;'
-    },
-    {
-      name: 'toString',
-      javaCode: 'return "THEN_BY(" + getArg1().toString() + ' +
-        '"," + getArg1().toString() + ")";'
-    },
-    {
-      name: 'toIndex',
-      javaCode: 'foam.mlang.order.Comparator arg1 = getArg1();' +
-        'foam.mlang.order.Comparator arg2 = getArg2();' +
-        'if ( arg1 != null && arg2 != null ) {' +
-          'return arg1.toIndex(arg2.toIndex(tail));' +
-        '}' +
-        'return null;'
-    },
-    {
-      name: 'orderTail',
-      javaCode: 'return getArg2();'
-    },
-    {
-      name: 'orderPrimaryProperty',
-      javaCode: 'return getArg1().orderPrimaryProperty();'
-    },
-    {
-      name: 'orderDirection',
-      javaCode: 'return getArg1().orderDirection();'
     }
   ]
 });
@@ -465,6 +790,263 @@ foam.CLASS({
     {
       name: 'orderDirection',
       javaCode: 'return 1;'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Count',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'setValue(this.getValue() + 1);'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Max',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'setValue(Math.max(((Number) getArg1().f(obj)).doubleValue(), getValue()));'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Min',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: function() {
+/*if (obj.compareTo(this.getValue()) > 0) {
+  this.setValue(obj);
+}*/
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Sum',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode: 'setValue(getValue() + (double) this.arg1_.f(obj));'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Binary',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: 'return false;'
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.Keyword',
+
+  javaImports: [
+    'foam.core.PropertyInfo',
+    'java.util.Iterator',
+    'java.util.List'
+  ],
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+if ( ! ( getArg1().f(obj) instanceof String) )
+  return false;
+
+String arg1 = ((String) getArg1().f(obj)).toUpperCase();
+List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+Iterator i = props.iterator();
+while ( i.hasNext() ) {
+  PropertyInfo prop = (PropertyInfo) i.next();
+  if ( ! ( prop.f(obj) instanceof String ) )
+    continue;
+  String s = ((String) prop.f(obj)).toUpperCase();
+  if ( s.contains(arg1) )
+    return true;
+}
+
+return false;`
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: 'return "";'
+    },
+    {
+      name: 'prepareStatement',
+      args: [{
+        name: 'stmt',
+        javaType: 'java.sql.PreparedStatement'
+      }],
+      javaCode: " return; "
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.GroupBy',
+
+  methods: [
+    {
+      name: 'put',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        },
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        }
+      ],
+      javaCode:
+`Object arg1 = getArg1().f(obj);
+if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
+  Object[] keys = (Object[]) arg1;
+  for ( Object key : keys ) {
+    putInGroup_(sub, key, obj);
+  }
+} else {
+  putInGroup_(sub, arg1, obj);
+}`
+    },
+    {
+      name: 'putInGroup_',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'sub',
+          javaType: 'foam.core.Detachable'
+        },
+        {
+          name: 'key',
+          javaType: 'Object'
+        },
+        {
+          name: 'obj',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode:
+`foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
+ if ( group == null ) {
+   group = (foam.dao.Sink) ((foam.core.FObject) getArg2()).fclone();
+   getGroups().put(key, group);
+   getGroupKeys().add(key);
+ }
+ group.put(obj, sub);`
+    },
+    {
+      name: 'sortedKeys',
+      javaReturns: 'java.util.List',
+      args: [
+        {
+          name: 'comparator',
+          javaType: 'foam.mlang.order.Comparator'
+        }
+      ],
+      javaCode:
+`if ( comparator != null ) {
+  java.util.Collections.sort(getGroupKeys(), comparator);
+} else {
+  java.util.Collections.sort(getGroupKeys());
+}
+return getGroupKeys();`
+    },
+    {
+      name: 'clone',
+      javaReturns: 'foam.mlang.sink.GroupBy',
+      javaCode:
+`GroupBy clone = new GroupBy();
+clone.setArg1(this.getArg1());
+clone.setArg2(this.getArg2());
+return clone;`
+    },
+    {
+      name: 'toString',
+      javaReturns: 'String',
+      javaCode: 'return this.getGroups().toString();'
     }
   ]
 });

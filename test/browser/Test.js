@@ -166,27 +166,27 @@ var e = foam.mlang.Expressions.create();
 
 dao.where(e.EQ(Test2.LNAME, null)).select().then(function (a) {
   console.log('EQ(null)');
-  a.a.forEach(function (t) { console.log(t.fname); });
+  a.array.forEach(function (t) { console.log(t.fname); });
 });
 
 dao.where(e.NOT(e.HAS(Test2.LNAME))).select().then(function (a) {
   console.log('NOT(HAS())');
-  a.a.forEach(function (t) { console.log(t.fname); });
+  a.array.forEach(function (t) { console.log(t.fname); });
 });
 
 dao.orderBy(Test2.LNAME).select().then(function (a) {
   console.log('by LNAME');
-  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+  a.array.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
 
 dao.orderBy(Test2.FNAME).select().then(function (a) {
   console.log('by FNAME');
-  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+  a.array.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
 
 dao.orderBy(Test2.LNAME, Test2.FNAME).select().then(function (a) {
   console.log('by LNAME, FNAME');
-  a.a.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
+  a.array.forEach(function (t) { console.log(t.fname + ' ' + t.lname); });
 });
 
 // dao.removeAll();
@@ -514,9 +514,9 @@ foam.CLASS({
   methods: [
     function init(){
       this.start('h3').add(this.title$).end()
-          .start('div', null, this.content$)
-            .style({ 'border': '2px solid black' })
-          .end();
+      .start('div', null, this.content$)
+        .style({ 'border': '2px solid black' })
+      .end();
     }
   ]
 });
@@ -535,3 +535,30 @@ var p2 = PredicateTest.create({id: 2, pred: M.EQ(PredicateTest.ID, 2)});
 var p3 = PredicateTest.create({id: 3, pred: M.EQ(PredicateTest.ID, 3)});
 dao.put(p2);
 dao.put(p3);
+
+
+foam.CLASS({
+  name: 'DAOSlotTest',
+  extends: 'foam.u2.Element',
+  implements: ['foam.mlang.Expressions'],
+  properties: [
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
+    }
+  ],
+  methods: [
+    function initE() {
+      this.add(this.slot(function(count) {
+        return count.value == 0 ? 'No records' : ( count.value + ' records.');
+      }, this.daoSlot(this.dao$proxy, this.COUNT())));
+    }
+  ]
+});
+
+var daoslottest = DAOSlotTest.create();
+daoslottest.write();
+daoslottest.dao = dao;
+setInterval(function() { dao.removeAll(); }, 5500 );
+var nextId = 4;
+setInterval(function() { dao.put(PredicateTest.create({ id: nextId++ })); }, 1000);

@@ -31,6 +31,7 @@ foam.CLASS({
   requires: [
     'foam.core.Serializable',
     'foam.dao.ArraySink',
+    'foam.json.Outputter',
     'foam.net.HTTPRequest'
   ],
 
@@ -41,11 +42,27 @@ foam.CLASS({
       documentation: 'URL for most rest calls. Some calls add "/<some-info>".',
       final: true,
       required: true
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        // NOTE: Configuration must be consistent with parser in
+        // corresponding foam.net.node.RestDAOHandler.
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
     }
   ],
 
   methods: [
-    function put(o) {
+    function put_(x, o) {
       /**
        * PUT baseURL
        * <network-foam-jsonified FOAM object>
@@ -53,34 +70,37 @@ foam.CLASS({
       return this.createRequest_({
         method: 'PUT',
         url: this.baseURL,
-        payload: this.jsonify_(o)
+        payload: this.outputter.stringify(o)
       }).send().then(this.onResponse.bind(this, 'put'))
           .then(this.onPutResponse);
     },
 
-    function remove(o) {
+    function remove_(x, o) {
       /**
        * DELETE baseURL/<network-foam-jsonified FOAM object id>
        */
       return this.createRequest_({
         method: 'DELETE',
-        url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(o.id))
+        url: this.baseURL + '/' +
+            encodeURIComponent(this.outputter.stringify(o.id))
       }).send().then(this.onResponse.bind(this, 'remove'))
           .then(this.onRemoveResponse);
     },
 
-    function find(id) {
+    function find_(x, key) {
       /**
        * GET baseURL/<network-foam-jsonified FOAM object id>
        */
+      var id = this.of.isInstance(key) ? key.id : key;
       return this.createRequest_({
         method: 'GET',
-        url: this.baseURL + '/' + encodeURIComponent(this.jsonify_(id))
+        url: this.baseURL + '/' +
+            encodeURIComponent(this.outputter.stringify(id))
       }).send().then(this.onResponse.bind(this, 'find'))
           .then(this.onFindResponse);
     },
 
-    function select(sink, skip, limit, order, predicate) {
+    function select_(x, sink, skip, limit, order, predicate) {
       /**
        * GET baseURL
        * { skip, limit, order, predicate }
@@ -105,13 +125,13 @@ foam.CLASS({
       return this.createRequest_({
         method: 'POST',
         url: this.baseURL + ':select',
-        payload: this.jsonify_(payload)
+        payload: this.outputter.stringify(payload)
       }).send().then(this.onResponse.bind(this, 'select'))
           .then(this.onSelectResponse.bind(
               this, sink || this.ArraySink.create()));
     },
 
-    function removeAll(skip, limit, order, predicate) {
+    function removeAll_(x, skip, limit, order, predicate) {
       /**
        * POST baseURL/removeAll
        * { skip, limit, order, predicate }
@@ -127,7 +147,7 @@ foam.CLASS({
       return this.createRequest_({
         method: 'POST',
         url: this.baseURL + ':removeAll',
-        payload: this.jsonify_(payload)
+        payload: this.outputter.stringify(payload)
       }).send().then(this.onResponse.bind(this, 'removeAll'))
           .then(this.onRemoveAllResponse);
     },
@@ -137,13 +157,6 @@ foam.CLASS({
       this.validate();
       // Each request should default to a json responseType.
       return this.HTTPRequest.create(Object.assign({responseType: 'json'}, o));
-    },
-
-    function jsonify_(o) {
-      // What's meant by network-foam-jsonified for HTTP/JSON/REST APIs:
-      // Construct JSON-like object using foam's network strategy, then
-      // construct well-formed JSON from the object.
-      return JSON.stringify(foam.json.Network.objectify(o));
     }
   ],
 
@@ -180,13 +193,17 @@ foam.CLASS({
       // If not proxying a local unserializable sink, just return the remote.
       if ( wasSerializable ) return remoteSink;
 
-      var array = remoteSink.a;
+      var array = remoteSink.array;
       if ( ! array )
         throw new Error('Expected ArraySink from REST endpoint when proxying local sink');
 
       if ( localSink.put ) {
+        var sub = foam.core.FObject.create();
+        var detached = false;
+        sub.onDetach(function() { detached = true; });
         for ( var i = 0; i < array.length; i++ ) {
-          localSink.put(array[i]);
+          localSink.put(array[i], sub);
+          if ( detached ) break;
         }
       }
       if ( localSink.eof ) localSink.eof();

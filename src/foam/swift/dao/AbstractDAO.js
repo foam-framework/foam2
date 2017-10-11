@@ -105,7 +105,7 @@ foam.CLASS({
           swiftType: 'FoamPredicate?',
         },
       ],
-      swiftReturnType: 'Sink',
+      swiftReturns: 'Sink',
       swiftCode: function() {/*
 var sink = sink
 if limit != nil {
@@ -159,7 +159,7 @@ return sink
           swiftType: 'FoamPredicate?',
         },
       ],
-      swiftReturnType: 'Sink',
+      swiftReturns: 'Sink',
       swiftCode: function() {/*
 // TODO: There are probably optimizations we can make here
 // but every time I try it comes out broken.  So for the time being,

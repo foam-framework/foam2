@@ -21,7 +21,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of) {
-        return '[' + foam.lookup(of).model_.swiftName + ']';
+        return '[' + (of ? foam.lookup(of).model_.swiftName : 'Any?') + ']';
       },
     },
     {
@@ -32,4 +32,3 @@ foam.CLASS({
     },
   ],
 });
-

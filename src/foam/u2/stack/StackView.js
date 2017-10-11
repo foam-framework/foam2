@@ -19,16 +19,47 @@ foam.CLASS({
   package: 'foam.u2.stack',
   name: 'StackView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.stack.Stack'
   ],
+
+  exports: [ 'data as stack' ],
+
+  properties: [
+    {
+      name: 'data',
+      factory: function() { return this.Stack.create(); }
+    },
+    {
+      class: 'Boolean',
+      name: 'showActions',
+      value: true
+    }
+  ],
+
   methods: [
-    function initE() {
-      this.setNodeName('div').
-        add(this.Stack.BACK, this.Stack.FORWARD).
-        add(this.slot(function(s) {
-          return foam.u2.ViewSpec.createView(s, null, this, this.__subSubContext__);
-        }, this.data$.dot('top')));
+    // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
+    function init() {
+      this.setNodeName('div');
+
+      if ( this.showActions )
+        this.add(this.Stack.BACK, this.Stack.FORWARD);
+
+      this.add(this.slot(function(s) {
+        if ( ! s ) return this.E('span');
+
+        var view = s[0];
+        var parent = s[1];
+
+
+        // Do a bit of a dance with the context, to ensure that exports from "parent"
+        // are available to "view"
+        var X = parent ? this.__subSubContext__.createSubContext(parent) : this.__subSubContext__;
+
+        return foam.u2.ViewSpec.createView(view, null, this, X);
+
+      }, this.data$.dot('top')));
     }
   ]
 });

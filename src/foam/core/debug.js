@@ -102,7 +102,9 @@ foam.CLASS({
         var expression = this.expression;
         var pName = cls.id + '.' + this.name + '.expression: ';
 
-        var argNames = foam.Function.argNames(expression);
+        var argNames = foam.Function.argNames(expression).map(function(a) {
+          return a.split('$').shift();
+        });
         for ( var i = 0 ; i < argNames.length ; i++ ) {
           var name  = argNames[i];
           var axiom = cls.getAxiomByName(name);
@@ -134,7 +136,7 @@ foam.core.FObject.describe = function(opt_name) {
     var a = this.axiomMap_[key];
     console.log(
       foam.String.pad(a.cls_ ? a.cls_.name : 'anonymous', 20),
-      foam.String.pad(a.sourceCls_.name, 14),
+      foam.String.pad((a.sourceCls_ && a.sourceCls_.name) || 'unknown', 14),
       a.name);
   }
   console.log('\n');

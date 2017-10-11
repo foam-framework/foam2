@@ -89,7 +89,7 @@ foam.CLASS({
         });
 
         this.networkApplicationDAO.select().then(function(objs) {
-          objs.a.map(function(o) { dao.put(o); });
+          objs.array.map(function(o) { dao.put(o); });
         });
 
         return sync;
@@ -126,7 +126,7 @@ foam.CLASS({
         });
 
         this.networkExperimentDAO.select().then(function(objs) {
-          objs.a.map(function(o) { dao.put(o); });
+          objs.array.map(function(o) { dao.put(o); });
         });
 
         return sync;

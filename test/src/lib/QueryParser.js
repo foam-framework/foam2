@@ -87,9 +87,9 @@ describe('Query parser', function() {
     return function(actual) {
       // Check there were no extras.
       var seen = {};
-      for ( var i = 0; i < actual.a.length; i++ ) {
-        seen[actual.a[i].id] = true;
-        expect(expected.indexOf(actual.a[i].id)).toBeGreaterThan(-1);
+      for ( var i = 0; i < actual.array.length; i++ ) {
+        seen[actual.array[i].id] = true;
+        expect(expected.indexOf(actual.array[i].id)).toBeGreaterThan(-1);
       }
 
       // And all expected values were covered.
@@ -102,6 +102,7 @@ describe('Query parser', function() {
   var testQuery = function(str, expected, opt_dao) {
     return function(done) {
       var q = parser.parseString(str);
+      console.log('Test query', q.toString());
       expect(q).toBeDefined();
       (opt_dao || dao)
           .where(q)
@@ -237,11 +238,11 @@ describe('Query parser', function() {
 
   // This one needs to go last because it mangles the DAO.
   // DISABLED: Pending fix for "today" not handling local time zone
-  xdescribe('relative dates', function() {
+  describe('relative dates', function() {
     var dao2 = foam.dao.ArrayDAO.create({
       of: Item
     }, foam.__context__);
-    dao.select(dao2);
+    dao.select(foam.dao.DAOSink.create({ dao: dao2 }));
 
     var todayItem = Item.create({
       id: 6,
@@ -260,15 +261,15 @@ describe('Query parser', function() {
     }, foam.__context__);
     dao2.put(yesterdayItem);
 
-    it('should recognize the keyword "today"',
+    xit('should recognize the keyword "today"',
         testQuery('timestamp>=today', [6], dao2));
-    it('should recognize the keyword "today"',
+    xit('should recognize the keyword "today"',
         testQuery('timestamp<today', [1, 2, 3, 4, 5, 7], dao2));
-    it('should handle relative day counts with "-N"',
+    xit('should handle relative day counts with "-N"',
         testQuery('timestamp>today-2', [6, 7], dao2));
-    it('should handle relative day counts with "-N"',
+    xit('should handle relative day counts with "-N"',
         testQuery('timestamp>today-1', [6], dao2));
-    it('should handle relative day counts with "-N"',
+    xit('should handle relative day counts with "-N"',
         testQuery('timestamp>=today-1', [6, 7], dao2));
   });
 

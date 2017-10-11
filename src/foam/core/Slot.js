@@ -87,10 +87,10 @@ foam.CLASS({
       var l1 = function(e) {
         if ( feedback1 ) return;
 
-        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+        if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback1 = true;
           s2.set(s1.get());
-          if ( ! foam.util.equals(s1.get(), s2.get()) )
+          if ( ! foam.util.is(s1.get(), s2.get()) )
             s1.set(s2.get());
           feedback1 = false;
         }
@@ -99,10 +99,10 @@ foam.CLASS({
       var l2 = function(e) {
         if ( feedback2 ) return;
 
-        if ( ! foam.util.equals(s1.get(), s2.get()) ) {
+        if ( ! foam.util.is(s1.get(), s2.get()) ) {
           feedback2 = true;
           s1.set(s2.get());
-          if ( ! foam.util.equals(s1.get(), s2.get()) )
+          if ( ! foam.util.is(s1.get(), s2.get()) )
             s2.set(s1.get());
           feedback2 = false;
         }
@@ -134,7 +134,7 @@ foam.CLASS({
       foam.assert(other, 'Slot.follow requires Slot argument.');
       var self = this;
       var l = function() {
-        if ( ! foam.util.equals(self.get(), other.get()) ) {
+        if ( ! foam.util.is(self.get(), other.get()) ) {
           self.set(other.get());
         }
       };
@@ -320,16 +320,9 @@ foam.CLASS({
 
       // If the parent object changes class, then don't update
       // because a new class will have different sub-slots.
-      if ( this.of ) {
-        if ( this.of !== ( o && o.cls_ ) ) {
-          s.detach();
-          return;
-        }
-      } else {
-        if ( o ) this.of = o.cls_;
-      }
+      if ( ( ! this.of  ) && o ) this.of = o.cls_;
 
-      this.prevSub = o && o.sub('propertyChange', this.name, this.valueChange);
+      this.prevSub = o && o.slot(this.name).sub(this.valueChange);
       this.valueChange();
     },
 

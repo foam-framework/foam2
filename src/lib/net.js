@@ -18,6 +18,7 @@
 (function() {
   var pkg = 'foam.net.' + (foam.isServer ? 'node' : 'web');
   var clss = [
+    'BaseHTTPRequest',
     'HTTPRequest',
     'HTTPResponse',
     'WebSocket',

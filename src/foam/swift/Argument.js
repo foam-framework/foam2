@@ -22,6 +22,10 @@ foam.CLASS({
   properties: [
     ['externalName', '_'],
     'localName',
+    {
+      class: 'StringArray',
+      name: 'annotations',
+    },
     'type',
     'defaultValue',
     'mutable',
@@ -36,6 +40,7 @@ foam.CLASS({
         ': ',
         this.mutable ? 'inout ' : '',
         this.escaping ? '@escaping ' : '',
+        this.annotations.length ? this.annotations.join(' ') + ' ' : '',
         this.type,
         this.defaultValue ? ' = ' + this.defaultValue : '');
     }

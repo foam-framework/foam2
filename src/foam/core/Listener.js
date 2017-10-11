@@ -57,7 +57,9 @@ foam.CLASS({
 
   methods: [
     function installInProto(proto, superAxiom) {
-      if (!this.code) return;
+      // This can happen when there's no js implementation of a listener.
+      if ( ! this.code ) return;
+
       foam.assert(
         ! superAxiom ||
           foam.core.Listener.isInstance(superAxiom),
@@ -109,8 +111,9 @@ foam.CLASS({
       name: 'listeners',
       adaptArrayElement: function(o) {
         if ( typeof o === 'function' ) {
-          foam.assert(o.name, 'Listener must be named');
-          return foam.core.Listener.create({name: o.name, code: o});
+          var name = foam.Function.getName(o);
+          foam.assert(name, 'Listener must be named');
+          return foam.core.Listener.create({name: name, code: o});
         }
 
         return foam.core.Listener.isInstance(o) ?

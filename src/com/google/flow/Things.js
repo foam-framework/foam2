@@ -275,7 +275,7 @@ foam.CLASS({
       // Movement.animate(200, function() {
       //   this.scaleX = this.scaleY = 30;
       //   this.alpha = 0;
-      //   this.a = Math.PI * 1.5;
+      //   this.array = Math.PI * 1.5;
       //   this.stem.alpha = 0;
       // }.bind(this)/*, function() { this.table.removeChild(o2); }.bind(this)*/)();
     }

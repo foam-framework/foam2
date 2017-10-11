@@ -56,7 +56,7 @@ foam.CLASS({
         }
 
         if ( o.class ) {
-          var m = foam.lookup(o.class);
+          var m = this.lookup(o.class);
           if ( ! m ) throw 'Unknown class : ' + o.class;
           return m.create(o, this);
         }
@@ -70,13 +70,14 @@ foam.CLASS({
       name: 'methods',
       adaptArrayElement: function(o, prop) {
         if ( typeof o === 'function' ) {
-          foam.assert(o.name, 'Method must be named');
-          var m = foam.lookup(prop.of).create();
-          m.name = o.name;
+          var name = foam.Function.getName(o);
+          foam.assert(name, 'Method must be named');
+          var m = this.lookup(prop.of).create();
+          m.name = name;
           m.code = o;
           return m;
         }
-        if ( foam.lookup(prop.of).isInstance(o) ) return o;
+        if ( this.lookup(prop.of).isInstance(o) ) return o;
         if ( o.class ) return this.lookup(o.class).create(o, this);
         return foam.lookup(prop.of).create(o);
       }
@@ -157,10 +158,11 @@ foam.CLASS({
     */
     function unknownArg(key, value) {
       // NOP
-    }
+    },
+
+    function lookup() { return this.__context__.lookup.apply(this.__context__, arguments); },
   ]
 });
-
 
 foam.boot.end();
 
@@ -216,8 +218,13 @@ foam.CLASS({
  */
 (function() {
   // List of unused Models in the system.
-  foam.USED   = {};
-  foam.UNUSED = {};
+  foam.USED      = {};
+  foam.UNUSED    = {};
+
+  // Used to store an async. arequire() function which must be called
+  // before the class can be created. Used by FoamTagLoader, but should
+  // be extended into a more general classloader.
+  foam.AREQUIRES = {};
 
   var CLASS = foam.CLASS;
 
@@ -226,6 +233,9 @@ foam.CLASS({
 
     m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = true;
+
+    if ( m.arequire ) foam.AREQUIRES[m.id] = m.arequire;
+
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
       var c = CLASS(m);

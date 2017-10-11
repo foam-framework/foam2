@@ -51,6 +51,7 @@ foam.CLASS({
     'clearInterval',
     'clearTimeout',
     'console',
+    'debug',
     'delayed',
     'document',
     'error',
@@ -86,6 +87,10 @@ foam.CLASS({
 
     function getElementsByClassName(cls) {
       return this.document.getElementsByClassName(cls);
+    },
+
+    function debug() {
+      this.console.debug.apply(this.console, arguments);
     },
 
     function error() {
@@ -191,10 +196,10 @@ foam.CLASS({
     function cancelAnimationFrame(id) {
       this.window.cancelAnimationFrame(id);
     },
-    function installCSS(text) {
+    function installCSS(text, id) {
       /* Create a new <style> tag containing the given CSS code. */
       this.document.head.insertAdjacentHTML('beforeend',
-          '<style>' + text + '</style>');
+          '<style owner="' + id + '">' + text + '</style>');
     }
   ]
 });

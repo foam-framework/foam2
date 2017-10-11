@@ -40,6 +40,7 @@ foam.CLASS({
     'label',
     'alwaysFloatLabel',
     'type',
+    'placeholder',
     'autocompleter',
     'autocompleteList_'
   ],
@@ -52,6 +53,9 @@ foam.CLASS({
         alwaysFloatLabel: this.alwaysFloatLabel,
         type:             this.type,
         onKey:            this.onKey
+      });
+      e.attrs({
+        placeholder: this.placeholder$,
       });
       e.end();
 
@@ -84,7 +88,7 @@ foam.CLASS({
         this.autocompleteList_.removeAllChildren();
         this.autocompleter.dao.select(foam.dao.ArraySink.create())
             .then(function(sink) {
-              sink.a.forEach(function(x) {
+              sink.array.forEach(function(x) {
                 list.start('option').attrs({ value: x.label }).end();
               });
             });

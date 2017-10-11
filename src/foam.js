@@ -17,14 +17,15 @@
 
 (function() {
 
-  var isServer = typeof window === 'undefined';
   var isWorker = typeof importScripts !== 'undefined';
+  var isServer = ( ! isWorker ) && typeof window === 'undefined';
 
-  var flags = this.FOAM_FLAGS || {};
-  flags.web = ! isServer,
-  flags.node = isServer;
+  var flags    = this.FOAM_FLAGS || {};
+  flags.web    = ! isServer,
+  flags.node   = isServer;
   flags.loader = ! isServer;
   if ( ! flags.hasOwnProperty('debug') ) flags.debug = true;
+  if ( ! flags.hasOwnProperty('js')    ) flags.js    = true;
 
   function createLoadBrowser() {
     var path = document.currentScript && document.currentScript.src;
@@ -41,7 +42,7 @@
       }
     }
 
-    path = path.substring(0, path.lastIndexOf('/')+1);
+    path = path.substring(0, path.lastIndexOf('src/')+4);
 
     return function(filename) {
       document.writeln(
@@ -49,8 +50,13 @@
     };
   }
 
-  function loadServer(filename) {
-    require('./' + filename + '.js');
+  function loadServer() {
+    var caller = flags.src || __filename;
+    var path = caller.substring(0, caller.lastIndexOf('src/')+4);
+
+    return function (filename) {
+      require(path + filename + '.js');
+    }
   }
 
   function createLoadWorker(filename) {
@@ -60,11 +66,15 @@
     };
   }
 
-  var load = isServer ? loadServer :
-    isWorker ? createLoadWorker() :
-    createLoadBrowser();
+  function getLoader() {
+    return isServer ? loadServer() :
+      isWorker ? createLoadWorker() :
+      createLoadBrowser();
+  }
 
   this.FOAM_FILES = function(files) {
+    var load = getLoader();
+
     files.
       filter(function(f) {
         if ( ! f.flags ) return true;
@@ -76,8 +86,8 @@
       map(function(f) { return f.name; }).
       forEach(load);
 
-    delete this.FOAM_FILES;
+  //  delete this.FOAM_FILES;
   };
 
-  load('files');
+  getLoader()('files');
 })();
