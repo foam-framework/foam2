@@ -27,14 +27,15 @@ foam.CLASS({
       name: 'tableColumns',
     },
     {
+      name: 'generateJava'
+    },
+    {
       name: 'searchColumns',
     },
     {
       name: 'tableCellFormatter',
     },
-    {
-      name: 'generateJava'
-    }
+   
   ]
 });
 foam.CLASS({
@@ -91,7 +92,7 @@ foam.CLASS({
     },
     {
       name: 'searchView',
-    }
+    },
   ]
 });
 foam.CLASS({
