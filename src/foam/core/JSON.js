@@ -40,7 +40,11 @@ foam.CLASS({
 
   methods: [
     function outputJSON(o) {
-      o.output({ class: '__Property__', forClass_: this.forClass_ });
+      if ( o.passPropertiesByReference ) {
+        o.output({ class: '__Property__', forClass_: this.forClass_ });
+      } else {
+        o.outputFObject_(this);
+      }
     }
   ]
 });
@@ -122,6 +126,12 @@ foam.CLASS({
       class: 'Boolean',
       name: 'alwaysQuoteKeys',
       help: 'If true, keys are always quoted, as required by the JSON standard. If false, only quote keys which aren\'tvalid JS identifiers.',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'passPropertiesByReference',
+      help: 'If true, Property objects are passed as __Property__ references rather than by value.',
       value: true
     },
     {
@@ -321,9 +331,13 @@ foam.CLASS({
     function outputFObject(o, opt_cls) {
       if ( o.outputJSON ) {
         o.outputJSON(this);
-        return;
+      } else {
+        this.outputFObject_(o, opt_cls);
       }
+    },
 
+    function outputFObject_(o, opt_cls) {
+      /** Output an FObject without checking if it implements outputJSON. **/
       this.start('{');
       var cls = this.getCls(opt_cls);
       var outputClassName = this.outputClassNames && o.cls_ !== cls;
