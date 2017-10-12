@@ -50,10 +50,18 @@ foam.CLASS({
 
         if ( ! of ) return [];
 
-        return of.model_.searchColumns || of.model_.tableColumns ||
-            of.getAxiomsByClass(foam.core.Property)
-                .filter(function(p) { return ! p.hidden })
-                .map(foam.core.Property.NAME.f);
+        if ( of.model_.searchColumns )
+          return of.model_.searchColumns;
+
+        if ( of.model_.tableColumns )
+          return of.model_.tableColumns.filter(function(c) {
+            var axiom = of.getAxiomByName(c);
+            return axiom && axiom.searchView;
+          });
+
+        return of.getAxiomsByClass(foam.core.Property)
+            .filter(function(p) { return ! p.hidden })
+            .map(foam.core.Property.NAME.f);
       }
     },
     {
