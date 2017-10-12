@@ -3,6 +3,9 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+supressWarnings([
+  `Unknown property foam.core.FObjectProperty.view: foam.u2.view.FObjectView`,
+])
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
