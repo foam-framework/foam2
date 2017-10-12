@@ -52,9 +52,7 @@ if ( client == null )
   return false;
 
 PhoneVerification phoneVerification = client.getPhoneVerification();
-Params params = new Params();
-params.setAttribute("locale", "en");
-Verification verification = phoneVerification.start(user.getPhone(), "1", "sms", params);
+Verification verification = phoneVerification.start(user.getPhone(), "1", "sms", new Params());
 return verification.isOk();`
     },
     {
