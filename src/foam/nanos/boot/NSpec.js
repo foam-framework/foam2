@@ -78,7 +78,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: 'foam.u2.DetailView'
+      view: 'foam.u2.view.FObjectView'
     }
     // TODO: permissions, keywords, lazy, parent
   ],
