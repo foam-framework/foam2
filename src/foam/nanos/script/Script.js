@@ -28,6 +28,7 @@ foam.CLASS({
     'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
   ],
 
+  searchColumns: [],
 
   properties: [
     {
