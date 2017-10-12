@@ -103,8 +103,14 @@ if ( bcc != null && bcc.length == 1 ) {
     Arrays.stream(bcc).collect(Collectors.joining(",")), false));
 }
 
+// set date
 message.setSentDate(new Date());
-Transport.send(message);`
+
+// send message
+Transport transport = getSession().getTransport("smtp");
+transport.connect(getHost(), getUsername(), getPassword());
+transport.sendMessage(message, message.getAllRecipients());
+transport.close();`
     },
     {
       name: 'start',
@@ -116,12 +122,7 @@ props.put("mail.smtp.starttls.enable", "true");
 props.put("mail.smtp.host", getHost());
 props.put("mail.smtp.port", getPort());
 
-setSession(Session.getInstance(props, new Authenticator() {
-  @Override
-  protected PasswordAuthentication getPasswordAuthentication() {
-    return new PasswordAuthentication(getUsername(), getPassword());
-  }
-}));`
+setSession(Session.getInstance(props, null));`
     }
   ]
 });
