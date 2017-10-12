@@ -52,6 +52,7 @@ if ( client == null )
   return false;
 
 PhoneVerification phoneVerification = client.getPhoneVerification();
+// TODO: Remove hardcoded country code of 1
 Verification verification = phoneVerification.start(user.getPhone(), "1", "sms", new Params());
 return verification.isOk();`
     },
@@ -74,6 +75,7 @@ if ( client == null )
   return false;
 
 PhoneVerification phoneVerification = client.getPhoneVerification();
+// TODO: Remove hardcoded country code of 1
 Verification verification = phoneVerification.check(user.getPhone(), "1", token);
 return verification.isOk();`
     },
