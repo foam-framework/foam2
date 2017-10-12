@@ -28,11 +28,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'apiKey'
+      name: 'apiHost'
     },
     {
       class: 'String',
-      name: 'apiHost'
+      name: 'apiKey'
     }
   ],
 
