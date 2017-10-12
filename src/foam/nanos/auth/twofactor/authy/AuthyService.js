@@ -29,8 +29,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'apiHost',
-      javaFactory: `return getDebug() ? "http://sandbox-api.authy.com" : "https://api.authy.com";`
+      name: 'apiHost'
     }
   ],
 
