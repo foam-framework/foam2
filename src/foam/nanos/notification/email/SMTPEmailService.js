@@ -68,7 +68,7 @@ message.setSubject(subject);
 String body = emailMessage.getBody();
 if ( body == null || body.isEmpty() )
   return;
-message.setText(body, "text/html");
+message.setContent(body, "text/html; charset=utf-8");
 
 // don't send email if no recipient
 String[] to = emailMessage.getTo();
