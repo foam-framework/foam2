@@ -4,6 +4,10 @@ foam.CLASS({
 
   documentation: 'Implementation of 2FA using Authy',
 
+  implements: [
+    'foam.nanos.NanoService'
+  ],
+
   javaImports: [
     'com.authy.AuthyApiClient',
     'com.authy.api.Params',
@@ -20,8 +24,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'debug',
-      value: true
+      name: 'debug'
     },
     {
       class: 'String',
