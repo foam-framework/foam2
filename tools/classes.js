@@ -107,6 +107,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.WebAuthService',
+  'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
