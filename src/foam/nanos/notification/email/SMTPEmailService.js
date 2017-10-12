@@ -23,6 +23,7 @@ foam.CLASS({
       class: 'Object',
       name: 'session',
       javaType: 'javax.mail.Session',
+      hidden: true
     },
     {
       class: 'String',
