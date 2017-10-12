@@ -51,9 +51,6 @@ foam.CLASS({
       ],
       javaCode:
 `MimeMessage message = new MimeMessage(getSession());
-message.addHeader("Content-type", "text/HTML; charset=UTF-8");
-message.addHeader("format", "flowed");
-message.addHeader("Content-Transfer-Encoding", "8bit");
 
 // don't send email if no sender
 String from = emailMessage.getFrom();
@@ -65,13 +62,13 @@ message.setFrom(new InternetAddress(from));
 String subject = emailMessage.getSubject();
 if ( subject == null || subject.isEmpty() )
   return;
-message.setSubject(subject, "UTF-8");
+message.setSubject(subject);
 
 // don't send email if no body
 String body = emailMessage.getBody();
 if ( body == null || body.isEmpty() )
   return;
-message.setText(body, "UTF-8");
+message.setText(body, "text/html");
 
 // don't send email if no recipient
 String[] to = emailMessage.getTo();
