@@ -16,16 +16,15 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.dao.ListSink',
-    'foam.dao.Sink',
-    'foam.mlang.MLang',
     'org.apache.commons.text.StrSubstitutor',
-    'javax.mail.*',
+    'javax.mail.Message',
+    'javax.mail.MessagingException',
+    'javax.mail.Session',
+    'javax.mail.Transport',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'java.util.Arrays',
     'java.util.Date',
-    'java.util.List',
     'java.util.Properties',
     'java.util.stream.Collectors'
   ],
