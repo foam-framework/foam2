@@ -197,6 +197,7 @@ FOAM_FILES([
   { name: "lib/firebase" },
   { name: "lib/fcm" },
   { name: "lib/Stub" },
+  { name: "lib/StubJava", flags: ['java'] },
   { name: "foam/box/Box" },
   { name: "foam/box/RemoteException" },
   { name: "foam/box/Skeleton" },
