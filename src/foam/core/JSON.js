@@ -21,9 +21,6 @@
 // TODO:
 //   - don't output default classes
 */
-supressWarnings([
-  `Skipping constant PARSE_JSON with unknown type.`,
-]);
 foam.CLASS({
   refines: 'foam.core.Property',
 

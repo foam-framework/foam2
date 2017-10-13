@@ -73,7 +73,6 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
-
   properties: [
     {
       name: 'javaCode'
