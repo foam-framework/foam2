@@ -162,6 +162,7 @@ EmailTemplate template = (EmailTemplate) emailTemplateDAO.find(name);
 if ( template == null )
   return false;
 StrSubstitutor sub = new StrSubstitutor(args);
+sub.setVariableResolver(new EmailTemplateStrLookup(getX(), sub.getVariableResolver()));
 emailMessage.setBody(sub.replace(template.getBody()));
 return sendMessage(emailMessage);`
     },
