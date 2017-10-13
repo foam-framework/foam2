@@ -19,6 +19,7 @@ foam.CLASS({
     'foam.dao.ListSink',
     'foam.dao.Sink',
     'foam.mlang.MLang',
+    'org.apache.commons.text.StrSubstitutor',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
@@ -165,7 +166,8 @@ if ( data == null || data.size() < 1 )
   return false;
 
 EmailTemplate template = (EmailTemplate) data.get(0);
-emailMessage.setBody(template.getBody());
+StrSubstitutor sub = new StrSubstitutor(args);
+emailMessage.setBody(sub.replace(template.getBody()));
 return sendMessage(emailMessage);`
     },
     {
