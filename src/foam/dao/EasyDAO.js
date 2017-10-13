@@ -205,7 +205,7 @@ foam.CLASS({
       factory: function() {
         return this.remoteListenerSupport ?
             this.WebSocketBox.create({of: this.model, uri: this.serviceName}) :
-            this.HTTPBox.create({of: this.model, url: this.serviceName}) ;
+            this.HTTPBox.create({url: this.serviceName}) ;
       }
     },
     {
