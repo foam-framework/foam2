@@ -27,6 +27,8 @@ global.SUPRESSED_WARNINGS = global.SUPRESSED_WARNINGS || {};
 global.supressWarnings = function (a) {
   a.push(`Property foam.core.FObjectProperty.of "value" hidden by "getter"`);
   a.push(`Unknown property foam.nanos.menu.DAOMenu.XXXsummaryView: [object Object]`);
+  a.push(`Import "scriptDAO" already exists in ancestor class of foam.nanos.test.Test.`);
+
   a.forEach(function(key) {
     SUPRESSED_WARNINGS[key] = true;
   })
