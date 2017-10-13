@@ -65,7 +65,11 @@ foam.CLASS({
       factory: function() {
         return this.Parser.create({
           strict:          true,
-          creationContext: this.creationContext
+          // Trust our own server, but force other servers to go through
+          // whitelist.
+          creationContext: this.url.indexOf(':') == -1 ?
+            this.__context__     :
+            this.creationContext
         });
       }
     },
