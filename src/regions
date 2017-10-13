@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.auth.Region", "id":0, "countryId":"CA", "code":"ON", "name":"Ontairo"})
+p({"class":"foam.nanos.auth.Region", "id":0, "countryId":"CA", "code":"ON", "name":"Ontario"})
 p({"class":"foam.nanos.auth.Region", "id":1, "countryId":"CA", "code":"QC", "name":"Quebec"})
 p({"class":"foam.nanos.auth.Region", "id":2, "countryId":"CA", "code":"AB", "name":"Alberta"})
 p({"class":"foam.nanos.auth.Region", "id":3, "countryId":"CA", "code":"BC", "name":"British Columbia"})
