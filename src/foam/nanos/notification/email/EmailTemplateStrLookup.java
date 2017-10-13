@@ -24,6 +24,7 @@ public class EmailTemplateStrLookup
   @Override
   public String lookup(String s) {
     if ( s.contains("includes:") ) {
+      // limit result to 2 strings in case for whatever reason the key has colon's in it
       String key = s.split(":", 2)[1];
       DAO emailTemplateDAO = (DAO) x_.get("emailTemplateDAO");
       EmailTemplate template = (EmailTemplate) emailTemplateDAO.find(key);
