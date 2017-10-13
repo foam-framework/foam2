@@ -89,7 +89,7 @@ foam.CLASS({
                         '' ;
               }
 
-              console.warn(
+              this.warn(
                   'Property ' + mName +
                   this.name + ' "' + e[j] +
                   '" hidden by "' + key + '"');
