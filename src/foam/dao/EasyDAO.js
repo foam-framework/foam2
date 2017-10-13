@@ -281,7 +281,7 @@ foam.CLASS({
 //           });
 //         }
         if ( this.cache ) {
-          this.mdao = this.MDAO.create(params);
+          this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
               this.mdao :
