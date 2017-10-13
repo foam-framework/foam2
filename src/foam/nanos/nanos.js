@@ -51,6 +51,7 @@ FOAM_FILES([
   { name: "foam/nanos/pm/TemperatureCView" },
   { name: 'foam/nanos/notification/email/EmailMessage' },
   { name: 'foam/nanos/notification/email/EmailService' },
+  { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
 ]);
