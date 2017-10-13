@@ -100,7 +100,7 @@ foam.CLASS({
       ],
       javaReturns: 'java.lang.Object',
       javaCode: `
-        // if ( getService() != null ) return getService();
+        if ( getService() != null ) return getService();
 
         if ( getServiceClass().length() > 0 ) {
           Object service = Class.forName(getServiceClass()).newInstance();
