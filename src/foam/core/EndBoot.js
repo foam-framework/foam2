@@ -234,7 +234,14 @@ foam.CLASS({
     m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = true;
 
-    if ( m.arequire ) foam.AREQUIRES[m.id] = m.arequire;
+    if ( m.arequire ) {
+      foam.AREQUIRES[m.id] = m.arequire;
+
+      // arequire appears to be a property on Model, but it isn't.
+      // It should be, but Model already has a method named arequire
+      // for class-loading purposes. TODO: resolve the two features.
+      delete m['arequire'];
+    }
 
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];
