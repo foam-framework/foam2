@@ -3,11 +3,6 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-supressWarnings([
-  `Property foam.dao.ArraySink.of "value" hidden by "getter"`,
-  `Import "warn" already exists in ancestor class of foam.box.RPCReturnBox.`,
-  `Unknown property foam.core.FObjectProperty.view: foam.u2.DetailView`,
-])
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',

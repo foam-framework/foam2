@@ -25,7 +25,9 @@ foam.CLASS({
     },
     {
       name: 'tableColumns',
-      
+    },
+    {
+      name: 'generateJava'
     },
     {
       name: 'searchColumns',
@@ -33,9 +35,6 @@ foam.CLASS({
     {
       name: 'tableCellFormatter',
     },
-    {
-      name: 'generateJava'
-    }
   ]
 });
 foam.CLASS({
@@ -60,6 +59,9 @@ foam.CLASS({
     {
       name: 'tableCellFormatter',
     },
+    {
+      name: 'visibility',
+    }
   ]
 });
 foam.CLASS({
@@ -71,11 +73,34 @@ foam.CLASS({
   ]
 });
 foam.CLASS({
+  refines: 'foam.core.DateTime',
+  properties: [
+    {
+      name: 'tableCellFormatter',
+    },
+    {
+      name: 'visibility',
+    }
+  ]
+});
+foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
     {
       name: 'tableCellFormatter',
     },
+    {
+      name: 'searchView',
+    },   
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+  properties: [
+    {
+      name: 'view',
+    },
+    
   ]
 });
 foam.CLASS({
@@ -98,10 +123,15 @@ foam.CLASS({
     {
       name: 'tableCellView',
     },
-   
+    {
+      name: 'displayWidth'
+    },
     {
       name: 'view'
     },
+    {
+      name: 'visibility',
+    }
   ]
 });
 foam.CLASS({
