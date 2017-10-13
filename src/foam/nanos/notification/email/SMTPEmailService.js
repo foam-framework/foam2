@@ -159,13 +159,9 @@ try {
       javaReturns: 'boolean',
       javaCode:
 `DAO emailTemplateDAO = (DAO) getX().get("emailTemplateDAO");
-Sink sink = new ListSink();
-sink = emailTemplateDAO.where(MLang.EQ(EmailTemplate.NAME, name)).select(sink);
-List data = ((ListSink) sink).getData();
-if ( data == null || data.size() < 1 )
+EmailTemplate template = (EmailTemplate) emailTemplateDAO.find(name);
+if ( template == null )
   return false;
-
-EmailTemplate template = (EmailTemplate) data.get(0);
 StrSubstitutor sub = new StrSubstitutor(args);
 emailMessage.setBody(sub.replace(template.getBody()));
 return sendMessage(emailMessage);`
