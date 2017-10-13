@@ -86,7 +86,7 @@ foam.CLASS({
     function register(name, service, box) {
       var delegates = this.delegates;
       var dispatchDelegates = new Array(delegates.length);
-      let dispatchDelegateNames = new Array(delegates.length);
+      var dispatchDelegateNames = new Array(delegates.length);
       for ( var i = 0; i < delegates.length; i++ ) {
         var delegateName = dispatchDelegateNames[i] = foam.uuid.randomGUID();
         dispatchDelegates[i] = delegates[i].register(delegateName, null, box);
