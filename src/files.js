@@ -25,6 +25,8 @@ if ( typeof window !== 'undefined' ) global = window;
 
 global.SUPRESSED_WARNINGS = global.SUPRESSED_WARNINGS || {};
 global.supressWarnings = function (a) {
+  a.push(`Property foam.core.FObjectProperty.of "value" hidden by "getter"`);
+  a.push(`Unknown property foam.nanos.menu.DAOMenu.XXXsummaryView: [object Object]`);
   a.forEach(function(key) {
     SUPRESSED_WARNINGS[key] = true;
   })
