@@ -70,15 +70,11 @@ foam.CLASS({
       self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
         put: function(spec) {
           if ( spec.client ) {
-            var stub =
-            console.log('*************', spec.stringify());
-
             client.exports.push(spec.name);
 
             client.properties.push({
               name: spec.name,
               factory: function() {
-                console.log('********************* creating stub', spec.client);
                 var json = JSON.parse(spec.client);
                 if ( ! json.serviceName ) json.serviceName = spec.name;
                 if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
