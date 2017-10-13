@@ -35,7 +35,6 @@ foam.CLASS({
     {
       name: 'tableCellFormatter',
     },
-   
   ]
 });
 foam.CLASS({
@@ -92,7 +91,7 @@ foam.CLASS({
     },
     {
       name: 'searchView',
-    },
+    },   
   ]
 });
 foam.CLASS({

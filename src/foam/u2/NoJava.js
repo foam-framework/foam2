@@ -31,6 +31,9 @@ foam.CLASS({
     {
       name: 'generateJava',
     },
+    {
+      name: 'javaFactory'
+    },
   ]
 });
 foam.CLASS({
@@ -54,6 +57,32 @@ foam.CLASS({
   properties: [
     {
       name: 'generateJava',
+    },
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.Model',
+  properties: [
+    {
+      name: 'javaImports',
+    }, 
+    {
+      name: 'generateJava',
+    },
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.AbstractMethod',
+
+  properties: [
+    {
+      name: 'javaCode'
+    },
+    {
+      name: 'javaReturns'
+    },
+    {
+      name: 'javaThrows'
     },
   ]
 });
