@@ -15,13 +15,18 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.dao.DAO',
+    'foam.dao.ListSink',
+    'foam.dao.Sink',
+    'foam.mlang.MLang',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'java.util.Arrays',
     'java.util.Date',
+    'java.util.List',
     'java.util.Properties',
-    'java.util.stream.Collectors',
+    'java.util.stream.Collectors'
   ],
 
   properties: [
@@ -53,9 +58,6 @@ foam.CLASS({
     {
       name: 'createMimeMessage',
       javaReturns: 'MimeMessage',
-      javaThrows: [
-        'javax.mail.MessagingException'
-      ],
       args: [
         {
           name: 'emailMessage',
@@ -63,85 +65,108 @@ foam.CLASS({
         }
       ],
       javaCode:
-`MimeMessage message = new MimeMessage(getSession());
+`try {
+  MimeMessage message = new MimeMessage(getSession());
 
-// don't send email if no sender
-String from = emailMessage.getFrom();
-if ( from == null || from.isEmpty() )
+  // don't send email if no sender
+  String from = emailMessage.getFrom();
+  if ( from == null || from.isEmpty() )
+    return null;
+  message.setFrom(new InternetAddress(from));
+
+  // don't send email if no subject
+  String subject = emailMessage.getSubject();
+  if ( subject == null || subject.isEmpty() )
+    return null;
+  message.setSubject(subject);
+
+  // don't send email if no body
+  String body = emailMessage.getBody();
+  if ( body == null || body.isEmpty() )
+    return null;
+  message.setContent(body, "text/html; charset=utf-8");
+
+  // don't send email if no recipient
+  String[] to = emailMessage.getTo();
+  if ( to == null || to.length <= 0 )
+    return null;
+
+  if ( to.length == 1 ) {
+    message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
+  } else {
+    message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(
+        Arrays.stream(to).collect(Collectors.joining(",")), false));
+  }
+
+   // send email even if no CC
+   String[] cc = emailMessage.getCc();
+   if ( cc != null && cc.length == 1 ) {
+     message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
+  } else if ( cc != null && cc.length > 1 ) {
+    message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(
+        Arrays.stream(cc).collect(Collectors.joining(",")), false));
+  }
+
+  // send email even if no BCC
+  String[] bcc = emailMessage.getBcc();
+  if ( bcc != null && bcc.length == 1 ) {
+    message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
+  } else if ( bcc != null && bcc.length > 1 ) {
+    message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(
+        Arrays.stream(bcc).collect(Collectors.joining(",")), false));
+  }
+
+  // set date
+  message.setSentDate(new Date());
+  return message;
+} catch (MessagingException e) {
   return null;
-message.setFrom(new InternetAddress(from));
-
-// don't send email if no subject
-String subject = emailMessage.getSubject();
-if ( subject == null || subject.isEmpty() )
-  return null;
-message.setSubject(subject);
-
-// don't send email if no body
-String body = emailMessage.getBody();
-if ( body == null || body.isEmpty() )
-  return null;
-message.setContent(body, "text/html; charset=utf-8");
-
-// don't send email if no recipient
-String[] to = emailMessage.getTo();
-if ( to == null || to.length <= 0 )
-  return null;
-
-if ( to.length == 1 ) {
-  message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
-} else {
-  message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(
-      Arrays.stream(to).collect(Collectors.joining(",")), false));
-}
-
- // send email even if no CC
- String[] cc = emailMessage.getCc();
- if ( cc != null && cc.length == 1 ) {
-   message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
-} else if ( cc != null && cc.length > 1 ) {
-  message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(
-      Arrays.stream(cc).collect(Collectors.joining(",")), false));
-}
-
-// send email even if no BCC
-String[] bcc = emailMessage.getBcc();
-if ( bcc != null && bcc.length == 1 ) {
-  message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
-} else if ( bcc != null && bcc.length > 1 ) {
-  message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(
-      Arrays.stream(bcc).collect(Collectors.joining(",")), false));
-}
-
-// set date
-message.setSentDate(new Date());
-return message;`
+}`
     },
     {
-      name: 'sendEmail',
-      javaReturns: 'void',
-      javaThrows: [
-        'javax.mail.MessagingException'
+      name: 'sendMessage',
+      javaReturns: 'boolean',
+      args: [
+        {
+          name: 'emailMessage',
+          javaType: 'foam.nanos.notification.email.EmailMessage'
+        }
       ],
       javaCode:
 `MimeMessage message = createMimeMessage(emailMessage);
 if ( message == null )
-  return;
+  return false;
 
-// send message
-Transport transport = getSession().getTransport("smtp");
-transport.connect(getHost(), getUsername(), getPassword());
-transport.sendMessage(message, message.getAllRecipients());
-transport.close();`
+try {
+  // send message
+  Transport transport = getSession().getTransport("smtp");
+  transport.connect(getHost(), getUsername(), getPassword());
+  transport.sendMessage(message, message.getAllRecipients());
+  transport.close();
+  return true;
+} catch (MessagingException e) {
+  return false;
+}`
+    },
+    {
+      name: 'sendEmail',
+      javaReturns: 'boolean',
+      javaCode: 'return sendMessage(emailMessage);'
     },
     {
       name: 'sendEmailFromTemplate',
-      javaReturns: 'void',
-      javaThrows: [
-        'javax.mail.MessagingException'
-      ],
+      javaReturns: 'boolean',
       javaCode:
-`return;`,
+`DAO emailTemplateDAO = (DAO) getX().get("emailTemplateDAO");
+Sink sink = new ListSink();
+sink = emailTemplateDAO.where(MLang.EQ(EmailTemplate.NAME, name)).select(sink);
+List data = ((ListSink) sink).getData();
+if ( data == null || data.size() < 1 )
+  return false;
+
+EmailTemplate template = (EmailTemplate) data.get(0);
+emailMessage.setBody(template.getBody());
+return sendMessage(emailMessage);`
     },
     {
       name: 'start',

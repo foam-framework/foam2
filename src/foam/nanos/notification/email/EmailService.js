@@ -12,11 +12,8 @@ foam.INTERFACE({
   methods: [
     {
       name: 'sendEmail',
-      javaReturns: 'void',
+      javaReturns: 'boolean',
       returns: 'Promise',
-      javaThrows: [
-        'javax.mail.MessagingException'
-      ],
       args: [
         {
           name: 'emailMessage',
@@ -26,23 +23,23 @@ foam.INTERFACE({
     },
     {
       name: 'sendEmailFromTemplate',
-      javaReturns: 'void',
+      javaReturns: 'boolean',
       returns: 'Promise',
-      javaThrows: [
-        'javax.mail.MessagingException'
-      ],
       args: [
         {
           name: 'emailMessage',
-          javaType: 'foam.nanos.notification.email.EmailMessage'
+          javaType: 'foam.nanos.notification.email.EmailMessage',
+          documentation: 'Email message'
         },
         {
-          name: 'template',
-          javaType: 'String'
+          name: 'name',
+          javaType: 'String',
+          documentation: 'Template name'
         },
         {
           name: 'args',
-          javaType: 'Object[]'
+          javaType: 'Object[]',
+          documentation: 'Template arguments'
         }
       ]
     }
