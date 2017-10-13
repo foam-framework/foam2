@@ -45,7 +45,7 @@ public class EnumParserFactory {
                                               try {
                                                 java.lang.reflect.Method forOrdinal = c.getDeclaredMethod("forOrdinal", int.class);
 
-                                                value = forOrdinal.invoke(null, 1);
+                                                value = forOrdinal.invoke(null, (int)ps.value());
                                               } catch(NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
                                                 throw new RuntimeException(e);
                                               }
