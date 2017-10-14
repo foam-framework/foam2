@@ -10,6 +10,8 @@ foam.CLASS({
 
   documentation: 'Represents an email template',
 
+  ids: [ 'name' ],
+
   properties: [
     {
       class: 'String',

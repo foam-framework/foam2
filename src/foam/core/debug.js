@@ -90,7 +90,7 @@ foam.CLASS({
               }
 
               var source = this.source;
-              console.warn(
+              this.warn(
                   (source ? source + ' ' : '') +
                   'Property ' + mName +
                   this.name + ' "' + e[j] +
