@@ -110,7 +110,9 @@ foam.CLASS({
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
           runTest();
-        } catch (EvalError e) {
+        } catch (Throwable e) {
+          ps.println();
+          e.printStackTrace(ps);
           e.printStackTrace();
         } finally {
           pm.log(x);
@@ -118,7 +120,6 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
-        System.err.println("******************** Output: " + this.getPassed() + " " + this.getFailed() + " " + baos.toString());
         setOutput(baos.toString() + getOutput());
     `
     }
