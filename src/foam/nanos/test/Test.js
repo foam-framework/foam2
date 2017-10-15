@@ -23,9 +23,7 @@ foam.CLASS({
     'id', 'enabled', 'description', 'passed', 'failed', 'lastRun', 'run'
   ],
 
-
   properties: [
-    'id',
     {
       class: 'Long',
       name: 'passed',
