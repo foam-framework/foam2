@@ -135,8 +135,8 @@ foam.assert(
 foam.core.FObject.describe = function(opt_name) {
   console.log('CLASS:  ', this.name);
   console.log('extends:', this.model_.extends);
-  console.log('Axiom Type           Source Class   Name            Source Path');
-  console.log('----------------------------------------------------------------------');
+  console.log('Axiom Type           Source Class   Name                 Source Path');
+  console.log('-------------------------------------------------------------------------------------------------');
   for ( var key in this.axiomMap_ ) {
     var a = this.axiomMap_[key];
     console.log(
