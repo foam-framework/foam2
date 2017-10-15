@@ -32,6 +32,21 @@ foam = {
 /** Setup nodejs-like 'global' on web */
 if ( ! foam.isServer ) global = window;
 
+global.SUPPRESSED_WARNINGS = global.SUPPRESSED_WARNINGS || {};
+global.suppressWarnings = function (a) {
+
+  a.forEach(function(key) {
+    SUPPRESSED_WARNINGS[key] = true;
+  })
+}
+
+suppressWarnings([ `Skipping constant PARSE_JSON with unknown type.`,
+  `Property foam.core.FObjectProperty.of "value" hidden by "getter"`,
+  `Unknown property foam.nanos.menu.DAOMenu.XXXsummaryView: [object Object]`,
+  `Import "scriptDAO" already exists in ancestor class of foam.nanos.test.Test.`,
+  `Unknown property foam.core.Model.javaType: foam.core.PropertyInfo`,
+  `Property foam.dao.index.Index.nodeClass "factory" hidden by "getter"`,
+]);
 
 Object.defineProperty(
   Object.prototype,
