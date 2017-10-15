@@ -16,7 +16,6 @@ foam.CLASS({
 
   documentation: 'FOAM class that models a Cron script',
 
-
   properties: [
     {
       class: 'Int',
