@@ -169,6 +169,10 @@ foam.CLASS({
           arg1: this.property,
           arg2: this.Count.create()
         })).then(function(groups) {
+          // TODO: next line is needed because Java isn't marshalling Properties
+          // correctly. Remove when fixed.
+          groups.arg1 = self.property;
+
           var options = [];
           var selected;
           var sortedKeys = groups.sortedKeys();

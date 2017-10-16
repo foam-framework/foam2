@@ -83,7 +83,10 @@ public class Outputter
   }
 
   public String escape(String s) {
-    return s.replace("\n","\\n").replace("\"", "\\\"");
+    return s
+      .replace("\t", "\\t")
+      .replace("\n","\\n")
+      .replace("\"", "\\\"");
   }
 
   protected void outputNumber(Number value) {
