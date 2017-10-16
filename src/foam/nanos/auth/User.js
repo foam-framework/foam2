@@ -142,7 +142,19 @@ foam.CLASS({
       class: 'String',
       name: 'bankIdentificationCode',
       documentation: 'Bank Identification Code (BIC)'
-    }
+    },
+    {
+      class: 'String',
+      name: 'website'
+    },
+    {
+      class: 'String',
+      name: 'businessType'
+    },
+    {
+      class: 'String',
+      name: 'businessSector'
+    },
   ],
 
   methods: [
