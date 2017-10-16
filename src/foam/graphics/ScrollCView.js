@@ -151,7 +151,7 @@ foam.CLASS({
   listeners: [
     {
       name: 'onTouch',
-      code: function(_, _, touch) {
+      code: function(_, __, touch) {
         // prevents highlighting of other elements while scrolling
         touch.claimed = true;
       }
