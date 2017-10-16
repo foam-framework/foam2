@@ -25,7 +25,7 @@ foam.CLASS({
     'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
   ],
 
-  searchColumns: [ ],
+  searchColumns: [],
 
   properties: [
     {
@@ -119,7 +119,9 @@ foam.CLASS({
           setOutput("");
           shell.setOut(ps);
           shell.eval(getCode());
-        } catch (EvalError e) {
+        } catch (Throwable e) {
+          ps.println();
+          e.printStackTrace(ps);
           e.printStackTrace();
         } finally {
           pm.log(x);
@@ -127,7 +129,6 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
-      System.err.println("******************** Output: " + baos.toString());
         setOutput(baos.toString());
     `
     }

@@ -46,13 +46,24 @@ public class FObjectParser extends ProxyParser {
                        }
 
                        ParserContext subx = x.sub();
-                       Object obj = ((X)x.get("X")).create(c);
-                       subx.set("obj", obj);
 
-                       ps = ps.apply(ModelParserFactory.getInstance(c), subx);
-                       if ( ps != null ) {
-                         return ps.setValue(subx.get("obj"));
+                       Parser subParser;
+
+                       if ( c.isEnum() ) {
+                           subx.set("enum", c);
+                           subParser = EnumParserFactory.getInstance(c);
+                       } else {
+                           Object obj = ((X)x.get("X")).create(c);
+                           subx.set("obj", obj);
+                           subParser = ModelParserFactory.getInstance(c);
                        }
+
+                       ps = ps.apply(subParser, subx);
+
+                       if ( ps != null ) {
+                           return ps.setValue(subx.get("obj"));
+                       }
+
                        return null;
                      }
                    },
