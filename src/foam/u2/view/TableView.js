@@ -84,7 +84,7 @@ foam.CLASS({
       value: function(value) {
         this.start()
           .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value*100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
         .end();
       }
     }
