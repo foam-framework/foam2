@@ -21,6 +21,8 @@
  * pages via script tags easily.
  */
 
+if ( typeof window !== 'undefined' ) global = window;
+
 FOAM_FILES([
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
@@ -134,9 +136,11 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Visibility"},
+  { name: "foam/u2/NoJava" ,  flags: ['js','debug'] },
   { name: "foam/u2/ElementJava" ,  flags: ['java'] },
   { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
+  { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
@@ -176,7 +180,7 @@ FOAM_FILES([
   { name: "foam/dao/ReadOnlyDAO", flags: ['js'] },
   { name: "foam/dao/ReadOnlyDAOJava", flags: ['java'] },
   { name: "foam/dao/StoreAndForwardDAO" },
-  { name: "foam/dao/JDAO" },
+  { name: "foam/dao/JDAO", flags: ['node'] },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/RelationshipDAOJava", flags: ['java'] },
@@ -214,12 +218,15 @@ FOAM_FILES([
   { name: "foam/blob/Blob" },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
+  { name: "foam/net/web/WebSocket" },
+  { name: "foam/net/web/WebSocketService" },
   { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
   { name: "foam/messageport/MessagePortService", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "lib/firebase" },
   { name: "lib/fcm" },
   { name: "lib/Stub" },
+  { name: "lib/StubJava", flags: ['java'] },
   { name: "foam/box/Box" },
   { name: "foam/box/RemoteException" },
   { name: "foam/box/Skeleton" },
@@ -240,7 +247,6 @@ FOAM_FILES([
   { name: "foam/box/SelectorRegistry" },
   { name: "foam/box/LookupBox" },
   { name: "foam/box/NamedBox" },
-  { name: "foam/box/RetryBox" },
   { name: "foam/box/ReplyBox" },
   { name: "foam/box/FunctionBox" },
   { name: "foam/box/RPCReturnMessage" },

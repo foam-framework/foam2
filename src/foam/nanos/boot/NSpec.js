@@ -3,7 +3,6 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
@@ -19,7 +18,6 @@ foam.CLASS({
 
   tableColumns: [ 'name', 'lazy', 'serve', 'serviceClass' ],
 
-  searchColumns: [ ],
 
   properties: [
     {
@@ -75,7 +73,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: 'foam.u2.DetailView'
+      view: 'foam.u2.view.FObjectView'
     }
     // TODO: permissions, keywords, lazy, parent
   ],
@@ -85,7 +83,7 @@ foam.CLASS({
       name: 'saveService',
       args: [ { name: 'service', javaType: 'Object' } ],
       javaCode: `
-      System.err.println("***** saveService: " + service.getClass() + " " + (service instanceof FObject));
+        System.err.println("saveService: " + this.getName());
         if ( service instanceof FObject ) {
           setService((FObject) service);
           DAO dao = (DAO) getX().get("nSpecDAO");
@@ -102,7 +100,7 @@ foam.CLASS({
       ],
       javaReturns: 'java.lang.Object',
       javaCode: `
-        // if ( getService() != null ) return getService();
+        if ( getService() != null ) return getService();
 
         if ( getServiceClass().length() > 0 ) {
           Object service = Class.forName(getServiceClass()).newInstance();
