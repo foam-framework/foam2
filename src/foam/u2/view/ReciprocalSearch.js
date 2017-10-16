@@ -60,7 +60,7 @@ foam.CLASS({
           });
 
         return of.getAxiomsByClass(foam.core.Property)
-            .filter(function(p) { return ! p.hidden })
+            .filter(function(p) { return p.searchView && ! p.hidden })
             .map(foam.core.Property.NAME.f);
       }
     },
