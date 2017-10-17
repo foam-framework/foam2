@@ -9,3 +9,13 @@ foam.CLASS({
     { name: 'removeAll_' },
   ],
 })
+
+foam.CLASS({
+  refines: 'foam.dao.DAOProperty',
+  properties: [
+    {
+      name: 'swiftType',
+      value: 'DAO',
+    },
+  ],
+});
