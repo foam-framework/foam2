@@ -154,7 +154,7 @@ try {
                                                                      java.nio.charset.StandardCharsets.UTF_8);
 
 
-  output.write(new Outputter().stringify(message));
+  output.write(getX().create(Outputter.class).stringify(message));
   output.close();
 
 
