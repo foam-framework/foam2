@@ -23,21 +23,31 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: 'UIView?',
+      swiftType: 'FObject?',
       name: 'view',
     },
     {
       class: 'String',
       name: 'title',
+      swiftExpressionArgs: ['view$title'],
+      swiftExpression: function() {/*
+return view$title as? String ?? ""
+      */},
+    },
+    {
+      swiftType: 'UIColor',
+      name: 'backgroundColor',
+      swiftValue: 'UIColor.white',
     },
     {
       swiftType: 'UIViewController',
       name: 'vc',
-      swiftExpressionArgs: ['view', 'title'],
+      swiftExpressionArgs: ['view$view', 'title', 'backgroundColor'],
       swiftExpression: function() {/*
 let vc = VC_()
-vc.innerView = view
+vc.innerView = view$view as! UIView
 vc.title = title
+vc.backgroundColor = backgroundColor
 return vc
       */},
     },
@@ -50,8 +60,11 @@ class VC_: UIViewController {
     return scrollView
   }()
   var innerView: UIView!
+  var backgroundColor: UIColor!
   override func viewDidLoad() {
     super.viewDidLoad()
+
+    view.backgroundColor = backgroundColor
 
     view.addSubview(scrollView)
     scrollView.addSubview(innerView)
