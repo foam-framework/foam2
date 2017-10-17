@@ -31,6 +31,14 @@ foam.CLASS({
       swiftFactory: 'return UIView()',
     },
     {
+      class: 'String',
+      name: 'title',
+      swiftExpressionArgs: ['data'],
+      swiftExpression: function() {/*
+return data?.ownClassInfo().label ?? self.ownClassInfo().label
+      */},
+    },
+    {
       name: 'propertyLabelViews',
       swiftType: '[String:UILabel]',
       swiftFactory: 'return [:]',
@@ -183,8 +191,10 @@ subscript(key: String) -> FObject? {
       label.text = a.label
       propertyLabelViews[prop] = label
 
-      subViewSubscriptions[prop] =
-          viewFobj.getSlot(key: "data")!.linkFrom(data.getSlot(key: prop)!)
+      let sub = viewFobj.getSlot(key: "data")!.linkFrom(data.getSlot(key: prop)!)
+      subViewSubscriptions[prop] = sub
+      self.onDetach(sub)
+
       return viewFobj
     } else if let a = a as? ActionInfo {
       let btn = FOAMActionUIButton_create()
