@@ -6,9 +6,10 @@
 
 package foam.lib.parse;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ErrorReportingPStream
     extends ProxyPStream
@@ -19,7 +20,7 @@ public class ErrorReportingPStream
   protected ErrorReportingNodePStream errStream = null;
 
   protected ErrorReportingNodePStream tail_ = null;
-  protected Set<Character> validCharacters = new HashSet<>();
+  protected Set<String> validCharacters = new HashSet<>();
 
   public ErrorReportingPStream(PStream delegate) {
     setDelegate(delegate);
@@ -57,8 +58,8 @@ public class ErrorReportingPStream
     }
   }
 
-  public void reportValidCharacter(Character character) {
-    validCharacters.add(character);
+  public void reportValidCharacter(Character ch) {
+    validCharacters.add("'" + getPrintableCharacter(ch) + "'");
   }
 
   public String getMessage() {
@@ -75,9 +76,7 @@ public class ErrorReportingPStream
     return "Invalid character '" + invalid +
         "' found at " + errStream.pos_ + "\n" +
         "Valid characters include: " +
-        validCharacters.stream()
-            .map(e -> "'" + getPrintableCharacter(e) + "'")
-            .collect(Collectors.joining(", "));
+        StringUtils.join(validCharacters, ",");
   }
 
   public String getPrintableCharacter(Character ch) {
