@@ -282,7 +282,7 @@ foam.CLASS({
       template: function() {/*
 var args = super._createExports_()
 <% for (var i = 0, p; p = exports[i]; i++) { %>
-args["<%=p.exportName%>"] = <%=p.exportName%>$
+args["<%=p.exportName%>"] = <%if (p.key) {%><%=p.exportName%>$<%}else{%>__context__.create(ConstantSlot.self, args: ["value": self])<%}%>
 <% } %>
 return args
       */},
