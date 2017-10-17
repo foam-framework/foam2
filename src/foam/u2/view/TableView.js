@@ -76,6 +76,13 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+
+  properties: [ [ 'tableCellFormatter', null ] ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Currency',
 
   properties: [
@@ -234,7 +241,7 @@ foam.CLASS({
         if ( tableColumns ) return tableColumns.columns;
 
         return of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return ! p.hidden; }).
+            filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
             map(foam.core.Property.NAME.f);
       }
     },
