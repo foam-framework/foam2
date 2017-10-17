@@ -6,13 +6,7 @@
 
 package foam.lib.parse;
 
-import foam.nanos.logger.Logger;
-import foam.nanos.logger.StdoutLogger;
-
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class TracingPStream
     extends ProxyPStream
@@ -46,8 +40,7 @@ public class TracingPStream
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
-    String indentation = IntStream.range(1, ( depth * 2 ) + 1).mapToObj(i -> " ")
-        .collect(Collectors.joining(""));
+    String indentation = String.format("%" + (depth*2) + "s", "");
 
     char char1 = ( this.valid() ) ? this.head() : ' ';
     writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());

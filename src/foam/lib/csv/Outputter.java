@@ -91,23 +91,26 @@ public class Outputter
       return props_;
 
     of_ = obj.getClassInfo();
-    props_ = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    props_.stream().filter(prop -> {
+    List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo prop : props ) {
       // filter out network and storage transient values
-      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
-      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
+      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       // filter out unsupported types
       if ( prop instanceof AbstractArrayPropertyInfo ||
           prop instanceof AbstractFObjectArrayPropertyInfo ||
           prop instanceof AbstractFObjectPropertyInfo ) {
-        return false;
+        continue;
       }
 
+      // filter out null values & empty strings
       Object value = prop.f(obj);
-      return value != null && (!(value instanceof String) || !((String) value).isEmpty());
-    })
-    .collect(Collectors.toList());
+      if ( value == null ) continue;
+      if ( value instanceof String && ((String) value).isEmpty() ) continue;
+
+      props_.add(prop);
+    }
 
     return props_;
   }

@@ -3,7 +3,6 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   package: 'foam.nanos.test',
   name: 'Test',
@@ -27,7 +26,6 @@ foam.CLASS({
   searchColumns: [ ],
 
   properties: [
-    'id',
     {
       class: 'Long',
       name: 'passed',
@@ -109,7 +107,9 @@ foam.CLASS({
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
           runTest();
-        } catch (EvalError e) {
+        } catch (Throwable e) {
+          ps.println();
+          e.printStackTrace(ps);
           e.printStackTrace();
         } finally {
           pm.log(x);
@@ -117,7 +117,6 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
-        System.err.println("******************** Output: " + this.getPassed() + " " + this.getFailed() + " " + baos.toString());
         setOutput(baos.toString() + getOutput());
     `
     }

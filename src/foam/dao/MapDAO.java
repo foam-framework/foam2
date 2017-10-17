@@ -24,6 +24,11 @@ public class MapDAO
     setOf(of);
   }
 
+  public MapDAO(X x, ClassInfo of) {
+    setX(x);
+    setOf(of);
+  }
+
   protected synchronized void data_factory() {
     if ( data_ == null ) {
       data_ = (Map<Object, FObject>) new ConcurrentHashMap();
@@ -42,7 +47,11 @@ public class MapDAO
   }
 
   public FObject put_(X x, FObject obj) {
-    getData().put(getPrimaryKey().get(obj), obj);
+    Object key = getPrimaryKey().get(obj);
+    if ( key == null ) {
+      throw new RuntimeException("Missing Primary Key in " + this.getOf().getId() + ".put()");
+    }
+    getData().put(key, obj);
     onPut(obj.fclone());
     return obj;
   }

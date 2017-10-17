@@ -21,7 +21,9 @@ public class MLang
   public static final Predicate FALSE = new False();
 
   public static Expr prepare(Object o) {
-    return o instanceof Expr ? (Expr) o : new Constant(o);
+    return o instanceof Expr ? (Expr) o :
+        o instanceof Object[] ? new ArrayConstant((Object[]) o) :
+        new Constant(o);
   }
 
   public static Predicate LT(Object o1, Object o2) {
