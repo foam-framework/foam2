@@ -23,12 +23,6 @@
 
 if ( typeof window !== 'undefined' ) global = window;
 
-global.SUPRESSED_WARNINGS = global.SUPRESSED_WARNINGS || {};
-global.supressWarnings = function (a) {
-  a.forEach(function(key) {
-    SUPRESSED_WARNINGS[key] = true;
-  })
-}
 FOAM_FILES([
   { name: "foam/core/poly" },
   { name: "foam/core/lib" },
@@ -115,6 +109,7 @@ FOAM_FILES([
   { name: "foam/u2/ElementJava" ,  flags: ['java'] },
   { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
+  { name: "foam/u2/WeakMap", flags: ['web'] },
   { name: "foam/u2/Element", flags: ['js'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
@@ -151,7 +146,7 @@ FOAM_FILES([
   { name: "foam/dao/ReadOnlyDAO", flags: ['js'] },
   { name: "foam/dao/ReadOnlyDAOJava", flags: ['java'] },
   { name: "foam/dao/StoreAndForwardDAO" },
-  { name: "foam/dao/JDAO" },
+  { name: "foam/dao/JDAO", flags: ['node'] },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/RelationshipDAOJava", flags: ['java'] },
@@ -197,6 +192,7 @@ FOAM_FILES([
   { name: "lib/firebase" },
   { name: "lib/fcm" },
   { name: "lib/Stub" },
+  { name: "lib/StubJava", flags: ['java'] },
   { name: "foam/box/Box" },
   { name: "foam/box/RemoteException" },
   { name: "foam/box/Skeleton" },

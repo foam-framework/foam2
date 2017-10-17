@@ -124,6 +124,7 @@ var classes = [
   'foam.nanos.menu.ViewMenu',
   'foam.nanos.notification.email.EmailMessage',
   'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
