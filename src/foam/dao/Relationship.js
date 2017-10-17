@@ -173,6 +173,7 @@ foam.CLASS({
               name: forwardName,
               cloneProperty: function(value, map) {},
               transient: true,
+              tableCellFormatter: null,
               expression: function(id) {
                 return foam.dao.RelationshipDAO.create({
                   obj: this,
@@ -218,6 +219,7 @@ foam.CLASS({
               name: forwardName,
               cloneProperty: function(value, map) {},
               transient: true,
+              tableCellFormatter: null,
               expression: function(id) {
                 return  foam.dao.RelationshipPropertyValue.create({
                   sourceId: id,
@@ -248,6 +250,7 @@ foam.CLASS({
               name: inverseName,
               cloneProperty: function(value, map) {},
               transient: true,
+              tableCellFormatter: null,
               expression: function(id) {
                 return  foam.dao.RelationshipPropertyValue.create({
                   targetId: id,
