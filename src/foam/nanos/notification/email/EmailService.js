@@ -7,7 +7,6 @@
 foam.INTERFACE({
   package: 'foam.nanos.notification.email',
   name: 'EmailService',
-  extends: 'foam.nanos.NanoService',
 
   methods: [
     {
@@ -37,7 +36,7 @@ foam.INTERFACE({
           documentation: 'Template name'
         },
         {
-          name: 'args',
+          name: 'templateArgs',
           javaType: 'java.util.Map',
           documentation: 'Template arguments'
         }
