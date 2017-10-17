@@ -11,6 +11,7 @@ foam.CLASS({
   documentation: 'Implementation of Email Service using SMTP',
 
   implements: [
+    'foam.nanos.NanoService',
     'foam.nanos.notification.email.EmailService'
   ],
 
@@ -161,7 +162,7 @@ try {
 EmailTemplate template = (EmailTemplate) emailTemplateDAO.find(name);
 if ( template == null )
   return false;
-StrSubstitutor sub = new StrSubstitutor(args);
+StrSubstitutor sub = new StrSubstitutor(templateArgs);
 sub.setVariableResolver(new EmailTemplateStrLookup(getX(), sub.getVariableResolver()));
 emailMessage.setBody(sub.replace(template.getBody()));
 return sendMessage(emailMessage);`
