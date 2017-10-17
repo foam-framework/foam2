@@ -351,7 +351,7 @@ let detach: Listener = { [unowned self] _,_ in
   onDetach(s)
 })
 <%=this.swiftValueName%> = valFunc()
-return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
+return <%=this.swiftValueName%>
 <% } else if ( this.swiftValue ) { %>
 return <%=this.swiftValue%>
 <% } else if ( this.swiftType.match(/[!?]$/) ) { %>
