@@ -206,7 +206,8 @@ foam.CLASS({
         else
           this.array.push(cls.create(o, this.__subContext__));
       },
-      javaCode: `getArray().add(obj);`
+      javaCode: `getArray().add(obj);`,
+      swiftCode: 'array.append(obj)',
     },
     function outputJSON(outputter) {
       outputter.start('{');
