@@ -3,9 +3,6 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-supressWarnings([
-  `Unknown property foam.core.Model.javaType: foam.core.PropertyInfo`,
-])
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
@@ -161,6 +158,13 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Implements',
+  properties: [
+    {
+      name: 'java',
+      class: 'Boolean',
+      value: true
+    }
+  ],
   methods: [
     function buildJavaClass(cls) {
       if ( this.java ) cls.implements = (cls.implements || []).concat(this.path);
