@@ -3,7 +3,6 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
@@ -159,6 +158,13 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Implements',
+  properties: [
+    {
+      name: 'java',
+      class: 'Boolean',
+      value: true
+    }
+  ],
   methods: [
     function buildJavaClass(cls) {
       if ( this.java ) cls.implements = (cls.implements || []).concat(this.path);
@@ -320,7 +326,7 @@ foam.CLASS({
   methods: [
     function buildJavaClass(cls) {
       if ( ! this.type ) {
-        console.warn("Skipping constant", this.name, "with unknown type.");
+        this.warn("Skipping constant ", this.name, " with unknown type.");
         return;
       }
 

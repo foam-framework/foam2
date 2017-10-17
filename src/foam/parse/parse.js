@@ -379,7 +379,7 @@ foam.CLASS({
   package: 'foam.parse',
   name: 'Sequence0',
 
-  documentation: `Parses the parser properties sequentially, 
+  documentation: `Parses the parser properties sequentially,
     without returning value`,
 
   properties: [
@@ -632,7 +632,7 @@ foam.CLASS({
       }
 
       if ( this.minimum > 0 && ret.length < this.minimum ) return undefined;
-      
+
       return last.setValue(ret);
     },
 
@@ -1036,7 +1036,7 @@ foam.CLASS({
   ]
 });
 
-
+/*
 foam.CLASS({
   package: 'foam.parse',
   name: 'GrammarAxiom',
@@ -1060,6 +1060,7 @@ foam.CLASS({
   ],
   methods: [
     function installInProto(proto) {
+      debugger;
       var name = this.name;
       var axiom = this;
       Object.defineProperty(proto, name, {
@@ -1080,6 +1081,7 @@ foam.CLASS({
       var symbols;
 
       if ( typeof this.symbols == 'function' ) {
+        debugger;
         with(obj.lookup(this.language).create()) {
           symbols = eval('(' + this.symbols.toString() + ')()');
         }
@@ -1110,7 +1112,7 @@ foam.CLASS({
     }
   ]
 });
-
+*/
 
 foam.CLASS({
   package: 'foam.parse',

@@ -3,7 +3,6 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
@@ -20,14 +19,13 @@ foam.CLASS({
     'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
   ],
 
-  searchColumns: [ ],
+ 
 
   properties: [
     {
       class: 'Long',
       name: 'id',
-      displayWidth: 30,
-      width: 100
+      max: 999
     },
     {
       class: 'String',
@@ -128,7 +126,6 @@ foam.CLASS({
       class: 'String',
       name: 'note',
       displayWidth: 70,
-      displayHeight: 10
     },
     // TODO: remove after demo
     {
@@ -145,7 +142,19 @@ foam.CLASS({
       class: 'String',
       name: 'bankIdentificationCode',
       documentation: 'Bank Identification Code (BIC)'
-    }
+    },
+    {
+      class: 'String',
+      name: 'website'
+    },
+    {
+      class: 'String',
+      name: 'businessType'
+    },
+    {
+      class: 'String',
+      name: 'businessSector'
+    },
   ],
 
   methods: [

@@ -24,6 +24,7 @@ var classes = [
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Neq',
+  'foam.mlang.predicate.Not',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
@@ -36,6 +37,7 @@ var classes = [
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
+  'foam.mlang.ArrayConstant',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.ProxyBox',
@@ -105,6 +107,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.WebAuthService',
+  'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
@@ -119,6 +122,10 @@ var classes = [
   'foam.nanos.menu.SubMenuView',
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
+  'foam.nanos.notification.email.EmailMessage',
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.email.EmailTemplate',
+  'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -144,7 +151,8 @@ var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
-  'foam.nanos.auth.WebAuthService'
+  'foam.nanos.auth.WebAuthService',
+  'foam.nanos.notification.email.EmailService'
 ];
 
 var proxies = [
