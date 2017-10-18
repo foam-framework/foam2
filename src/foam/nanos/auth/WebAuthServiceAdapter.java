@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ListSink;
 import foam.mlang.MLang;
+import foam.nanos.NanoService;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import foam.core.ContextAwareSupport;
@@ -19,7 +20,7 @@ import javax.security.auth.AuthPermission;
 
 public class WebAuthServiceAdapter
   extends    ContextAwareSupport
-  implements WebAuthService
+  implements WebAuthService, NanoService
 {
   /**
    * Map of { userId: X }
