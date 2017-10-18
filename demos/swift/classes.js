@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 var classes = [
   'foam.swift.ui.DetailView',
   'foam.swift.ui.FOAMUILabel',
