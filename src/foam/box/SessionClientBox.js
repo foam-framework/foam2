@@ -14,6 +14,11 @@ foam.CLASS({
     // 'requestLogin'
   ],
 
+  properties: [
+    'msg',
+    'clientBox'
+  ],
+
   methods: [
     {
       name: 'send',
@@ -70,6 +75,8 @@ foam.CLASS({
         console.log('***** SEND: ', foam.json.stringify(msg));
 
         msg.attributes.replyBox = this.SessionReplyBox.create({
+          msg: msg,
+          clientBox: this,
           delegate: msg.attributes.replyBox
         });
 
