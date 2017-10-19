@@ -40,7 +40,7 @@ return
       swiftReturns: 'FObject?',
       args: [
         {
-          class: 'String',
+          swiftType: 'String',
           name: 'str',
         },
       ],

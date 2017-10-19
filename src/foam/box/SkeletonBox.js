@@ -39,8 +39,7 @@ foam.CLASS({
       name: 'call',
       args: [
         {
-          class: 'FObjectProperty',
-          of: 'foam.box.Message',
+          swiftType: 'Message?',
           name: 'message',
         },
       ],
