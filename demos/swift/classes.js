@@ -15,10 +15,11 @@ var classes = [
   'foam.u2.Visibility',
 
   'Tabata',
-  'TestExtended',
   'TabataSoundView',
+  'TestExtended',
+  'foam.dao.ArraySink',
+  'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',
-  'foam.swift.dao.ArraySink',
   'foam.swift.parse.StringPStream',
 
   'foam.box.Context',
