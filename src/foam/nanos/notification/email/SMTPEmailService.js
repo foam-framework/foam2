@@ -17,17 +17,17 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'org.apache.commons.text.StrSubstitutor',
+    'org.apache.commons.lang3.StringUtils',
+    'org.jtwig.JtwigModel',
+    'org.jtwig.JtwigTemplate',
     'javax.mail.Message',
     'javax.mail.MessagingException',
     'javax.mail.Session',
     'javax.mail.Transport',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
-    'java.util.Arrays',
     'java.util.Date',
-    'java.util.Properties',
-    'java.util.stream.Collectors'
+    'java.util.Properties'
   ],
 
   properties: [
@@ -95,8 +95,7 @@ foam.CLASS({
   if ( to.length == 1 ) {
     message.setRecipient(Message.RecipientType.TO, new InternetAddress(to[0], false));
   } else {
-    message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(
-        Arrays.stream(to).collect(Collectors.joining(",")), false));
+    message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(StringUtils.join(to, ",")));
   }
 
    // send email even if no CC
@@ -104,8 +103,7 @@ foam.CLASS({
    if ( cc != null && cc.length == 1 ) {
      message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
   } else if ( cc != null && cc.length > 1 ) {
-    message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(
-        Arrays.stream(cc).collect(Collectors.joining(",")), false));
+    message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(cc, ",")));
   }
 
   // send email even if no BCC
@@ -113,8 +111,7 @@ foam.CLASS({
   if ( bcc != null && bcc.length == 1 ) {
     message.setRecipient(Message.RecipientType.BCC, new InternetAddress(bcc[0], false));
   } else if ( bcc != null && bcc.length > 1 ) {
-    message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(
-        Arrays.stream(bcc).collect(Collectors.joining(",")), false));
+    message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(StringUtils.join(bcc, ",")));
   }
 
   // set date
@@ -159,12 +156,12 @@ try {
       javaReturns: 'boolean',
       javaCode:
 `DAO emailTemplateDAO = (DAO) getX().get("emailTemplateDAO");
-EmailTemplate template = (EmailTemplate) emailTemplateDAO.find(name);
-if ( template == null )
+EmailTemplate emailTemplate = (EmailTemplate) emailTemplateDAO.find(name);
+if ( emailMessage == null )
   return false;
-StrSubstitutor sub = new StrSubstitutor(templateArgs);
-sub.setVariableResolver(new EmailTemplateStrLookup(getX(), sub.getVariableResolver()));
-emailMessage.setBody(sub.replace(template.getBody()));
+JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody());
+JtwigModel model = JtwigModel.newModel(templateArgs);
+emailMessage.setBody(template.render(model));
 return sendMessage(emailMessage);`
     },
     {
