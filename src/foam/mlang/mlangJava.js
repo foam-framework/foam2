@@ -497,8 +497,7 @@ foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
 
   javaImports: [
-    'java.util.Arrays',
-    'java.util.stream.Collectors'
+    'org.apache.commons.lang3.StringUtils'
   ],
 
   methods: [
@@ -509,7 +508,7 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return " (" + Arrays.stream(getValue()).map(o -> "?").collect(Collectors.joining(",")) + ") ";'
+      javaCode: 'return " (" + StringUtils.join(getValue(), ",") + ") ";'
     },
     {
       name: 'prepareStatement',
