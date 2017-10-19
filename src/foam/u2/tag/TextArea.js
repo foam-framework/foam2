@@ -45,16 +45,24 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.addClass(this.myClass());
+      this.style({'white-space': 'pre'});
       this.attrs({rows: this.rows, cols: this.cols});
 
       // This is required because textarea accepts setting the 'value'
       // after it's output, but before requires output to be between
       // the tags when it's first output.
-      this.add(this.data + '');
+     // this.add((this.data + '').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
 
       this.attrSlot(
         'value',
         this.onKey ? 'input' : 'change').linkFrom(this.data$);
+    },
+
+    function load() {
+      // value can't be set before object is created, so set value
+      // once loaded
+      this.SUPER();
+      this.attrs({value: this.data + ''});
     },
 
     function updateMode_(mode) {
