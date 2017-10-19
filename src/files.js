@@ -189,6 +189,7 @@ FOAM_FILES([
   { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
   { name: "foam/messageport/MessagePortService", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
+  { name: "foam/net/node/WebSocketService", flags: ['node'] },
   { name: "lib/firebase" },
   { name: "lib/fcm" },
   { name: "lib/Stub" },

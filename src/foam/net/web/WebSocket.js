@@ -79,6 +79,10 @@ foam.CLASS({
           self.disconnected.pub();
         });
       });
+    },
+
+    function disconnect() {
+      this.socket && this.socket.close();
     }
   ],
 
