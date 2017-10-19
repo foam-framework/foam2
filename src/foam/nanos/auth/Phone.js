@@ -18,10 +18,6 @@ foam.CLASS({
       class: 'PhoneNumber',
       name: 'number',
       required: true
-    },
-    {
-      class: 'String',
-      name: 'type'
     }
   ]
 });
