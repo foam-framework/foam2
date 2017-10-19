@@ -107,6 +107,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.WebAuthService',
+  'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -126,6 +127,7 @@ var classes = [
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.SMTPEmailService',
+  'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -142,7 +144,7 @@ var classes = [
 ];
 
 var abstractClasses = [
-  'foam.nanos.menu.AbstractMenu',
+  'foam.nanos.menu.AbstractMenu'
 //  'foam.json.Outputter'
 ];
 
