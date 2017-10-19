@@ -37,7 +37,7 @@ foam.INTERFACE({
         },
         {
           name: 'templateArgs',
-          javaType: 'java.util.Map',
+          javaType: 'java.util.Map<String, Object>',
           documentation: 'Template arguments'
         }
       ]
