@@ -11,9 +11,9 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PostgresDAO
     extends AbstractDAO
@@ -33,8 +33,8 @@ public class PostgresDAO
     }
   };
 
-  protected final String table;
-  protected final List<PropertyInfo> props;
+  protected String table_;
+  protected List<PropertyInfo> props_ = new ArrayList<>();
 
   public PostgresDAO(X x, ClassInfo of) throws SQLException {
     setX(x);
@@ -44,14 +44,17 @@ public class PostgresDAO
     connectionPool = (ConnectionPool) getX().get("connectionPool");
 
     // load columns and sql types
-    table = of.getObjClass().getSimpleName().toLowerCase();
-    if ( ! createTable(of) ) {
+    table_ = of.getObjClass().getSimpleName().toLowerCase();
+    if ( ! createTable() ) {
       throw new SQLException("Error creating table");
     }
 
-    props = ((List<PropertyInfo>) of.getAxiomsByClass(PropertyInfo.class))
-        .stream().filter(e -> ! e.getStorageTransient())
-        .collect(Collectors.toList());
+    List<PropertyInfo> props = of.getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo prop : props ) {
+      if ( prop.getStorageTransient() )
+        continue;
+      props_.add(prop);
+    }
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -68,7 +71,7 @@ public class PostgresDAO
 
       StringBuilder builder = sb.get()
           .append("select * from ")
-          .append(table);
+          .append(table_);
 
       if ( predicate != null ) {
         builder.append(" where ")
@@ -112,7 +115,7 @@ public class PostgresDAO
       c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("delete from ")
-          .append(table)
+          .append(table_)
           .append(" where id = ?");
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
@@ -143,7 +146,7 @@ public class PostgresDAO
       c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("select * from ")
-          .append(table)
+          .append(table_)
           .append(" where id = ?");
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
@@ -179,7 +182,7 @@ public class PostgresDAO
       c = connectionPool.getConnection();
       StringBuilder builder = sb.get()
           .append("insert into ")
-          .append(table);
+          .append(table_);
 
       buildFormattedColumnNames(obj, builder);
       builder.append(" values");
@@ -219,7 +222,7 @@ public class PostgresDAO
    * Creates a table if one does not exist already
    * @throws SQLException
    */
-  public boolean createTable(ClassInfo classInfo) {
+  public boolean createTable() {
     Connection c = null;
     IndexedPreparedStatement stmt = null;
     ResultSet resultSet = null;
@@ -227,23 +230,32 @@ public class PostgresDAO
     try {
       c = connectionPool.getConnection();
       DatabaseMetaData meta = c.getMetaData();
-      resultSet = meta.getTables(null, null, table, new String[]{"TABLE"});
+      resultSet = meta.getTables(null, null, table_, new String[]{"TABLE"});
       if ( resultSet.isBeforeFirst() ) {
         // found a table, don't create
         return false;
       }
 
-      String columns = props.stream()
-          .filter(e -> !"id".equals(e.getName()))
-          .map(e -> e.getName() + " " + e.getSQLType())
-          .collect(Collectors.joining(","));
-
       StringBuilder builder = sb.get()
           .append("CREATE TABLE ")
-          .append(table)
-          .append("(id bigserial primary key,")
-          .append(columns)
-          .append(")");
+          .append(table_)
+          .append("(id bigserial primary key,");
+
+      Iterator i = props_.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( "id".equals(prop.getName()) )
+          continue;
+
+        builder.append(prop.getName())
+            .append(" ")
+            .append(prop.getSQLType());
+
+        if ( i.hasNext() ) {
+          builder.append(",");
+        }
+      }
+      builder.append(")");
 
       // execute statement
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
@@ -273,7 +285,7 @@ public class PostgresDAO
     ResultSetMetaData metaData = resultSet.getMetaData();
 
     int index = 1;
-    Iterator i = props.iterator();
+    Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       // prevent reading out of bounds of result set
       if ( index > metaData.getColumnCount() )
@@ -292,14 +304,19 @@ public class PostgresDAO
    */
   public void buildFormattedColumnNames(FObject obj, StringBuilder builder) {
     // collect columns list into comma delimited string
-    String columns = props.stream()
-        .filter(e -> ! "id".equals(e.getName()))
-        .map(e -> e.getName().toLowerCase())
-        .collect(Collectors.joining(","));
+    builder.append("(");
+    Iterator i = props_.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( "id".equals(prop.getName()) )
+        continue;
 
-    builder.append("(")
-        .append(columns)
-        .append(")");
+      builder.append(prop.getName().toLowerCase());
+      if ( i.hasNext() ) {
+        builder.append(",");
+      }
+    }
+    builder.append(")");
   }
 
   /**
@@ -308,14 +325,19 @@ public class PostgresDAO
    */
   public void buildFormattedColumnPlaceholders(FObject obj, StringBuilder builder) {
     // map columns into ? and collect into comma delimited string
-    String placeholders = props.stream()
-        .filter(e -> ! "id".equals(e.getName()))
-        .map(String -> "?")
-        .collect(Collectors.joining(","));
+    builder.append("(");
+    Iterator i = props_.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( "id".equals(prop.getName()) )
+        continue;
 
-    builder.append("(")
-        .append(placeholders)
-        .append(")");
+      builder.append("?");
+      if ( i.hasNext() ) {
+        builder.append(",");
+      }
+    }
+    builder.append(")");
   }
 
   /**
@@ -326,7 +348,7 @@ public class PostgresDAO
    * @throws SQLException
    */
   public void setStatementValues(IndexedPreparedStatement stmt, FObject obj) throws SQLException {
-    Iterator i = props.iterator();
+    Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( prop.getName().equals("id") )

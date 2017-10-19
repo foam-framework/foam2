@@ -158,6 +158,13 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Implements',
+  properties: [
+    {
+      name: 'java',
+      class: 'Boolean',
+      value: true
+    }
+  ],
   methods: [
     function buildJavaClass(cls) {
       if ( this.java ) cls.implements = (cls.implements || []).concat(this.path);

@@ -355,7 +355,7 @@ foam.CLASS({
         outputComma = this.outputProperty(o, ps[i], outputComma) ||
           outputComma;
       }
-      this.nl().end('}');
+      this.end('}');
     },
 
     function outputObjectKeyValue_(key, value, first) {
