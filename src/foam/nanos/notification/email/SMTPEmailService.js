@@ -20,6 +20,9 @@ foam.CLASS({
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
+    'org.jtwig.environment.EnvironmentConfiguration',
+    'org.jtwig.environment.EnvironmentConfigurationBuilder',
+    'org.jtwig.resource.loader.TypedResourceLoader',
     'javax.mail.Message',
     'javax.mail.MessagingException',
     'javax.mail.Session',
@@ -35,6 +38,12 @@ foam.CLASS({
       class: 'Object',
       name: 'session',
       javaType: 'javax.mail.Session',
+      hidden: true
+    },
+    {
+      class: 'Object',
+      name: 'config',
+      javaType: 'org.jtwig.environment.EnvironmentConfiguration',
       hidden: true
     },
     {
@@ -142,7 +151,7 @@ try {
   transport.sendMessage(message, message.getAllRecipients());
   transport.close();
   return true;
-} catch (MessagingException e) {
+} catch (Throwable t) {
   return false;
 }`
     },
@@ -159,7 +168,20 @@ try {
 EmailTemplate emailTemplate = (EmailTemplate) emailTemplateDAO.find(name);
 if ( emailMessage == null )
   return false;
-JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody());
+
+EnvironmentConfiguration config = getConfig();
+if ( config == null ) {
+  config = EnvironmentConfigurationBuilder
+      .configuration()
+      .resources()
+      .resourceLoaders()
+      .add(new TypedResourceLoader("dao", new DAOResourceLoader(emailTemplateDAO)))
+      .and().and()
+      .build();
+  setConfig(config);
+}
+
+JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage.setBody(template.render(model));
 return sendMessage(emailMessage);`
