@@ -8,7 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class DAOResourceLoader
     implements ResourceLoader
@@ -27,7 +26,7 @@ public class DAOResourceLoader
   @Override
   public InputStream load(String s) {
     EmailTemplate template = (EmailTemplate) dao_.find(s);
-    return new ByteArrayInputStream(template.getBody().getBytes(StandardCharsets.UTF_8));
+    return new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
   @Override
