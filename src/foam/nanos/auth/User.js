@@ -19,8 +19,6 @@ foam.CLASS({
     'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
   ],
 
- 
-
   properties: [
     {
       class: 'Long',
@@ -63,12 +61,13 @@ foam.CLASS({
       name: 'email'
     },
     {
-      class: 'PhoneNumber',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Phone',
       name: 'phone'
     },
     {
-      class: 'String',
-      class: 'PhoneNumber',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.Phone',
       name: 'mobile'
     },
     {

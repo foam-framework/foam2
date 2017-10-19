@@ -4,29 +4,28 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
-   package: 'foam.nanos.auth',
-   name: 'Region',
+foam.CLASS({
+  package: 'foam.nanos.auth',
+  name: 'Region',
 
-   documentation: 'Region (province/state) information.',
+  documentation: 'Region (province/state) information.',
 
+  ids: [ 'code' ],
 
-   properties: [
-     {
-       class: 'Long',
-       name: 'id'
-     },
-     {
-       class: 'String',
-       name: 'countryId'
-     },
-     {
-       class: 'String',
-       name: 'code'
-     },
-     {
-       class: 'String',
-       name: 'name'
-     }
-   ]
- });
+  properties: [
+    {
+      class: 'String',
+      name: 'code'
+    },
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'Reference',
+      targetDAOKey: 'countryDAO',
+      name: 'countryId',
+      of: 'foam.nanos.auth.Country'
+    }
+  ]
+});
