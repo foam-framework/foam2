@@ -42,7 +42,7 @@ foam.CLASS({
           name: 'X',
         },
         {
-          class: 'String',
+          swiftType: 'String',
           name: 'id',
         },
       ],
