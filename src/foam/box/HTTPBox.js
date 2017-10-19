@@ -199,6 +199,7 @@ try {
   java.io.OutputStreamWriter output = new java.io.OutputStreamWriter(conn.getOutputStream(),
                                                                      java.nio.charset.StandardCharsets.UTF_8);
 
+
   Outputter outputter = new Outputter();
   outputter.setX(getX());
   output.write(outputter.stringify(message));

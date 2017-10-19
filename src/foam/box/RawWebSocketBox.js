@@ -35,7 +35,9 @@ foam.CLASS({
         this.socket.send(msg);
       },
       javaCode: `
-getSocket().send(getX().create(foam.lib.json.Outputter.class).stringify(message));
+foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
+outputter.setX(getX());
+getSocket().send(outputter.stringify(message));
 `
     }
   ]
