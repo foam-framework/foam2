@@ -36,5 +36,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: '../../build/target', include: ['*.jar'])
     compile group: 'org.apache-extras.beanshell', name: 'bsh', version: '2.0b6'
 }

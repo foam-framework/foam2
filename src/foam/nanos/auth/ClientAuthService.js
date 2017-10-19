@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ClientAuthService',
 
+  implements: [
+    'foam.nanos.auth.WebAuthService'
+  ],
+
   properties: [
     {
       class: 'Stub',

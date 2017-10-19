@@ -8,6 +8,10 @@ foam.CLASS({
   package: 'foam.nanos.notification.email',
   name: 'ClientEmailService',
 
+  implements: [
+    'foam.nanos.notification.email.EmailService'
+  ],
+
   properties: [
     {
       class: 'Stub',
