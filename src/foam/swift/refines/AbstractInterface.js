@@ -17,7 +17,7 @@ foam.CLASS({
           var axioms = this.getAxioms();
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
-            axioms[i].writeToSwiftClass && axioms[i].writeToSwiftClass(cls);
+            axioms[i].writeToSwiftClass && axioms[i].writeToSwiftClass(cls, null, this);
           }
 
           return cls;

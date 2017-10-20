@@ -37,7 +37,7 @@ foam.LIB({
         code: this.model_.swiftCode,
       });
       this.getOwnAxioms().forEach(function(axiom) {
-        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name));
+        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name), this);
       }.bind(this));
 
       var properties = this.getOwnAxiomsByClass(foam.core.Property)
@@ -49,7 +49,7 @@ foam.LIB({
             return p.name != 'init';
           }.bind(this))
           .filter(function(p) {
-            return !!p.swiftSupport;
+            return !!p.getSwiftSupport(this);
           }.bind(this));
       var actions = this.getOwnAxiomsByClass(foam.core.Action)
           .filter(function(p) {
@@ -91,7 +91,10 @@ foam.LIB({
             type: '[Axiom]',
             defaultValue: '[' +
               this.getOwnAxioms()
-                .filter(function(a) { return a.swiftSupport })
+                .filter(function(a) {
+                  return a.getSwiftSupport ?
+                      a.getSwiftSupport(this) : a.swiftSupport
+                }.bind(this))
                 .map(function(a) { return a.swiftAxiomName }) +
             ']',
           }),
