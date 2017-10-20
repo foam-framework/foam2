@@ -134,7 +134,10 @@ protected class ResponseThread implements Runnable {
         }.bind(this));
       },
       javaCode: `
+// TODO: Go async and make request in a separate thread.
 java.net.HttpURLConnection conn;
+foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+
 try {
   java.net.URL url = new java.net.URL(getUrl());
   conn = (java.net.HttpURLConnection)url.openConnection();
@@ -147,12 +150,19 @@ try {
                                                                      java.nio.charset.StandardCharsets.UTF_8);
 
 
-  Outputter outputter = new Outputter();
+  // TODO: Clone message or something when it clones safely.
+  message.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
+
+
+  foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
   outputter.setX(getX());
   output.write(outputter.stringify(message));
+
+  message.getAttributes().put("replyBox", replyBox);
+
   output.close();
 
-// TODO: There has to be a better way to do this.
+// TODO: Switch to ReaderPStream when https://github.com/foam-framework/foam2/issues/745 is fixed.
 byte[] buf = new byte[8388608];
 java.io.InputStream input = conn.getInputStream();
 
@@ -180,11 +190,13 @@ if ( ! ( responseMessage instanceof foam.box.Message ) ) {
   throw new RuntimeException("Invalid response type: " + responseMessage.getClass().getName() + " expected foam.box.Message.");
 }
 
-getMe().send((foam.box.Message)responseMessage);
+
+replyBox.send((foam.box.Message)responseMessage);
 
 } catch(java.io.IOException e) {
-  // TODO: Error box?
-  throw new RuntimeException(e);
+  foam.box.Message replyMessage = getX().create(foam.box.Message.class);
+  replyMessage.setObject(e);
+  replyBox.send(replyMessage);
 }
 `
     }
