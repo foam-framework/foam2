@@ -6,6 +6,7 @@
 
 var classes = [
   'foam.core.Serializable',
+  'foam.core.Exception',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
