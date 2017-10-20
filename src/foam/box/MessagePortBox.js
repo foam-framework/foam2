@@ -24,7 +24,8 @@ foam.CLASS({
   requires: [
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage',
-    'foam.box.Message'
+    'foam.box.Message',
+    'foam.json.Outputter'
   ],
 
   imports: [
@@ -62,13 +63,7 @@ foam.CLASS({
         //
         // Use default FOAM implementation of Outputter. Do not attempt to
         // lookup sensitive "foam.json.Outputter" class in box context.
-        return foam.lookup('foam.json.Outputter').create({
-          pretty: false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues: false,
-          strict: true,
-          propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        }, this);
+        return this.Outputter.create().copyFrom(foam.json.Network)
       }
     }
   ]
