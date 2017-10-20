@@ -35,7 +35,6 @@ foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, get${repl
 reply.setId(export.getName());
 
 message.getAttributes().put("replyBox", export);
-message.getAttributes().put("errorBox", export);
 
 get${boxPropName}().send(message);
 
