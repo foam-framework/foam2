@@ -40,4 +40,5 @@ public interface PropertyInfo
   public void toXML(FObject obj, Document doc, Element objElement);
   public int comparePropertyToObject(Object key, FObject o);
   public String getSQLType();
+  public boolean hasOwnProperty(Object obj);
 }
