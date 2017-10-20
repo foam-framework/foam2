@@ -95,7 +95,6 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
-      var isEnum      = this.javaType === 'java.lang.Enum';
 
       cls.
         field({
@@ -116,7 +115,7 @@ foam.CLASS({
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
             ( this.hasOwnProperty('javaFactory') ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
-                ' return ' + ( ! isEnum ? this.javaValue : 'null' ) + ';\n' ) +
+                ' return ' + this.javaValue + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';')
         }).
@@ -651,6 +650,7 @@ foam.CLASS({
   refines: 'foam.core.Enum',
 
   properties: [
+    ['javaValue', null],
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser'],
