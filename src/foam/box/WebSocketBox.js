@@ -63,11 +63,19 @@ foam.CLASS({
       name: 'uri',
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      generateJava: false,
+      factory: function() {
+        return this.JSONOutputter.create().copyFrom(foam.json.Network);
+      }
+    },
+    {
       name: 'socket',
       factory: function() {
         var ws = this.WebSocket.create({
           uri: this.prepareURL(this.uri),
-          outputter: this.JSONOutputter.create().copyFrom(foam.json.Network)
         });
 
         return ws.connect().then(function(ws) {
@@ -100,21 +108,19 @@ foam.CLASS({
     },
 
     function send(msg) {
+      var replyBox = msg.attributes.replyBox;
+      if ( replyBox ) {
+        msg = msg.clone();
+
+        msg.attributes.replyBox =
+          this.__context__.registry.register(null, null, msg.attributes.replyBox);
+      }
+
       this.socket.then(function(s) {
-        try {
-          s.send(msg);
-        } catch(e) {
-          this.socket = undefined;
-          if ( msg.errorBox ) {
-            msg.errorBox.send(foam.box.SendFailedError.create());
-          }
-        }
+        s.send(this.outputter.stringify(msg));
       }.bind(this), function(e) {
-        if ( msg.errorBox ) {
-          msg.errorBox.send(e);
-        }
-        this.socket = undefined;
-      }.bind(this));
+        replyBox && replyBox.send(foam.box.Message.create({ object: e }));
+      });
     }
   ]
 });

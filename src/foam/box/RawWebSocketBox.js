@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
+  requires: [
+    'foam.json.Outputter'
+  ],
 
   properties: [
     {
@@ -32,7 +35,20 @@ foam.CLASS({
     {
       name: 'send',
       code: function send(msg) {
-        this.socket.send(msg);
+        var replyBox = msg.attributes.replyBox;
+
+        if ( replyBox ) {
+          msg = msg.clone();
+
+          msg.attributes.replyBox =
+            this.__context__.registry.register(null, null, msg.attributes.replyBox);
+        }
+
+        try {
+          this.socket.send(this.Outputter.create().copyFrom(foam.json.Network).stringify(msg));
+        } catch(e) {
+          replyBox && replyBox.send(foam.box.Message.create({ object: e }));
+        }
       },
       javaCode: `
 foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);

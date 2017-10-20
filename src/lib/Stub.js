@@ -28,14 +28,7 @@ foam.CLASS({
               delegate: this.RPCReturnBox.create()
             });
 
-            var errorBox = replyBox;
-
             var ret = replyBox.delegate.promise;
-
-            replyBox = this.registry.register(
-              replyBox.id,
-              this[replyPolicyName],
-              replyBox);
 
             // TODO: Move this into RPCReturnBox ?
             if ( returns !== 'Promise' ) {

@@ -130,7 +130,15 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function send(msg) {
+        if ( msg.attributes.replyBox ) {
+          msg = msg.clone();
+
+          msg.attributes.replyBox =
+            this.__context__.registry.register(null, null, msg.attributes.replyBox);
+        }
+
         var payload = this.outputter.stringify(msg);
+
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method:  this.method,

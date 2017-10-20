@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
+  requires: [
+    'foam.json.Outputter'
+  ],
 
   properties: [
     {
@@ -34,18 +37,20 @@ foam.CLASS({
         //
         // Use default FOAM implementation of Outputter. Do not attempt to
         // lookup sensitive "foam.json.Outputter" class in box context.
-        return foam.lookup('foam.json.Outputter').create({
-          pretty: false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues: false,
-          strict: true,
-          propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        }, this);
+        return this.Outputter.create().copyFrom(foam.json.Network)
       }
     }
   ],
   methods: [
     function send(m) {
+      var replyBox = m.attributes.replyBox;
+      if ( replyBox ) {
+        m = m.clone();
+
+        m.attributes.replyBox =
+          this.__context__.registry.register(null, null, m.attributes.replyBox);
+      }
+
       this.port.postMessage(this.outputter.stringify((m)));
     }
   ]
