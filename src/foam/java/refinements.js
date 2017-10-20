@@ -115,7 +115,7 @@ foam.CLASS({
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
             ( this.hasOwnProperty('javaFactory') ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
-                ' return ' + this.javaValue  + ';\n' ) +
+                ' return ' + this.javaValue + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';')
         }).
@@ -650,6 +650,7 @@ foam.CLASS({
   refines: 'foam.core.Enum',
 
   properties: [
+    ['javaValue', null],
     ['javaType', 'java.lang.Enum'],
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.IntParser'],
