@@ -38,6 +38,10 @@ foam.CLASS({
         // at that point the ID might no longer be valid.
         return foam.next$UID();
       }
+    },
+    {
+      name: 'delegate',
+      transient: true
     }
   ],
 
