@@ -104,6 +104,7 @@ var classes = [
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.Address',
+  'foam.nanos.auth.Phone',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
