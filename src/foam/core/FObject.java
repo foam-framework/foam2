@@ -17,4 +17,5 @@ public interface FObject
   Object setProperty(String prop, Object value);
   Object getProperty(String prop);
   boolean hasOwnProperty(String prop);
+  boolean hasDefaultValue(String prop);
 }

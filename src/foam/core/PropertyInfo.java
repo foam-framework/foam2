@@ -41,4 +41,5 @@ public interface PropertyInfo
   public int comparePropertyToObject(Object key, FObject o);
   public String getSQLType();
   public boolean hasOwnProperty(Object obj);
+  public boolean isDefaultValue(Object obj);
 }

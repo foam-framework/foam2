@@ -19,6 +19,15 @@ import org.w3c.dom.Element;
 public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo {
 
+  public int compareValues(Object[] b1, Object[] b2) {
+    if (b1 == b2) return 0;
+    if (b2 == null) return 1;
+    if (b1 == null) return -1;
+    int h1 = b1.hashCode();
+    int h2 = b2.hashCode();
+    return h1 == h2 ? 0 : h1 > h2 ? 1 : -1;
+  }
+
   @Override
   public void setFromString(Object obj, String value) {
     // TODO
