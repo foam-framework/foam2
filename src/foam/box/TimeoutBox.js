@@ -27,7 +27,6 @@ foam.CLASS({
       var tooLate = false;
       var timer = setTimeout(function() {
         tooLate = true;
-        console.error("Timeout");
         replyBox.send(this.Message.create({
           object: this.TimeoutException.create()
         }));
@@ -42,8 +41,12 @@ foam.CLASS({
             replyBox.send(msg);
             return;
           }
-          // Consider increasing timer if we're still getting responses just a little too late.
-          console.warn("Got stale response messsage");
+
+          // TODO: Is it wise to increase the timeout?  Seems
+          // reasonable, if our timeout value is too conservative and
+          // the server is just slow we're better to wait longer
+          // rather than hit it with additional requests while its
+          // still processing our old ones.
           self.timeout *= 2;
         }
       };
