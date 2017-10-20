@@ -8,11 +8,27 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ClientAuthService',
 
+  implements: [
+    'foam.nanos.auth.WebAuthService'
+  ],
+
+  requires: [ 'foam.box.HTTPBox' ],
+
   properties: [
     {
+      class: 'String',
+      name: 'serviceName'
+    },
+    {
       class: 'Stub',
+      name: 'delegate',
       of: 'foam.nanos.auth.WebAuthService',
-      name: 'delegate'
+      factory: function() {
+        return this.HTTPBox.create({
+          method: 'POST',
+          url: this.serviceName
+        });
+      }
     }
   ]
 });

@@ -10,7 +10,13 @@ foam.CLASS({
 
   documentation: 'Represents an email template',
 
+  javaImports: [
+    'java.nio.charset.StandardCharsets'
+  ],
+
   ids: [ 'name' ],
+
+  tableColumns: [ 'name' ],
 
   properties: [
     {
@@ -21,7 +27,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'body',
-      documentation: 'Template body'
+      documentation: 'Template body',
+      view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150 },
+      javaSetter:
+`body_ = val;
+bodyIsSet_ = true;
+bodyAsByteArray_ = null;
+bodyAsByteArrayIsSet_ = false;`
+    },
+    {
+      class: 'Array',
+      name: 'bodyAsByteArray',
+      hidden: true,
+      transient: true,
+      javaType: 'byte[]',
+      javaFactory: 'return getBody() != null ? getBody().getBytes(StandardCharsets.UTF_8) : null;'
     }
   ]
 });
