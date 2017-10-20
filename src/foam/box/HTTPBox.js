@@ -200,9 +200,10 @@ try {
                                                                      java.nio.charset.StandardCharsets.UTF_8);
 
 
-  output.write(new Outputter().stringify(message));
+  Outputter outputter = new Outputter();
+  outputter.setX(getX());
+  output.write(outputter.stringify(message));
   output.close();
-
 
 // TODO: There has to be a better way to do this.
 byte[] buf = new byte[8388608];
