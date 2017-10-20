@@ -155,6 +155,13 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.propName.toLowerCase() + '";'
+          },
+          {
+            name: 'hasOwnProperty',
+            visibility: 'public',
+            type: 'boolean',
+            args: [ { name: 'o', type: 'Object' } ],
+            body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
           }
         ]
       }
