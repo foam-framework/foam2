@@ -12,6 +12,7 @@ foam.CLASS({
   requires: [
     'foam.json.Outputter',
     'foam.json.Parser',
+    'foam.box.HTTPReplyBox',
     'foam.net.web.HTTPRequest'
   ],
 
@@ -23,28 +24,6 @@ foam.CLASS({
       javaType: 'foam.box.Box'
     },
     'window'
-  ],
-
-  classes: [
-    foam.core.InnerClass.create({
-      generateJava: false,
-      model: {
-        name: 'JSONOutputter',
-        extends: 'foam.json.Outputter',
-        generateJava: false,
-        requires: [
-          'foam.box.HTTPReplyBox'
-        ],
-        imports: [
-          'me'
-        ],
-        methods: [
-          function output(o) {
-            return this.SUPER(o == this.me ? this.HTTPReplyBox.create() : o);
-          }
-        ]
-      }
-    })
   ],
 
   properties: [
@@ -79,7 +58,7 @@ foam.CLASS({
       name: 'outputter',
       generateJava: false,
       factory: function() {
-        return this.JSONOutputter.create().copyFrom(foam.json.Network);
+        return this.Outputter.create().copyFrom(foam.json.Network);
       }
     }
   ],
@@ -130,14 +109,16 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function send(msg) {
-        if ( msg.attributes.replyBox ) {
-          msg = msg.clone();
+        // TODO: We should probably clone here, but often the message
+        // contains RPC arguments that don't clone properly.  So
+        // instead we will mutate replyBox and put it back after.
+        var replyBox = msg.attributes.replyBox;
 
-          msg.attributes.replyBox =
-            this.__context__.registry.register(null, null, msg.attributes.replyBox);
-        }
+        msg.attributes.replyBox = this.HTTPReplyBox.create();
 
         var payload = this.outputter.stringify(msg);
+
+        msg.attributes.replyBox = replyBox;
 
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
@@ -149,7 +130,7 @@ protected class ResponseThread implements Runnable {
           return resp.payload;
         }).then(function(p) {
           var rmsg = this.parser.parseString(p);
-          rmsg && this.me.send(rmsg);
+          rmsg && replyBox && replyBox.send(rmsg);
         }.bind(this));
       },
       javaCode: `
