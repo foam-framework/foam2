@@ -22,6 +22,18 @@ foam.CLASS({
   requires: [
     'foam.json.Outputter'
   ],
+  imports: [
+    {
+      name: 'me',
+      key: 'me',
+      javaType: 'foam.box.Box'
+    },
+    {
+      key: 'registry',
+      name: 'registry',
+      javaType: 'foam.box.BoxRegistry',
+    }
+  ],
 
   properties: [
     {
@@ -29,6 +41,30 @@ foam.CLASS({
       name: 'socket',
       javaType: 'org.java_websocket.WebSocket'
     }
+  ],
+
+  classes: [
+    foam.core.InnerClass.create({
+      generateJava: false,
+      model: {
+        name: 'JSONOutputter',
+        extends: 'foam.json.Outputter',
+        requires: [
+          'foam.box.ReturnBox'
+        ],
+        imports: [
+          'me'
+        ],
+        methods: [
+          function output(o) {
+            if ( o === this.me ) {
+              return this.SUPER(this.ReturnBox.create());
+            }
+            return this.SUPER(o);
+          }
+        ]
+      }
+    })
   ],
 
   methods: [
@@ -61,10 +97,43 @@ foam.CLASS({
         }
       },
       javaCode: `
-foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
+foam.lib.json.Outputter outputter = new Outputter();
 outputter.setX(getX());
-getSocket().send(outputter.stringify(message));
+
+// TODO: Clone message or something when it clones safely.
+foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+
+foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, null, replyBox);
+
+String payload = outputter.stringify(message);
+
+message.getAttributes().put("replyBox", replyBox);
+
+getSocket().send(payload);
 `
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+protected class Outputter extends foam.lib.json.Outputter {
+  public Outputter() {
+    super(foam.lib.json.OutputterMode.NETWORK);
+  }
+
+  protected void outputFObject(foam.core.FObject o) {
+    if ( o == getMe() ) {
+      o = getX().create(foam.box.ReturnBox.class);
+    }
+    super.outputFObject(o);
+  }
+}
+`}));
+      }
     }
   ]
 });

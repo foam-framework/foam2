@@ -22,34 +22,13 @@ foam.CLASS({
   requires: [
     'foam.net.web.WebSocket',
     'foam.box.Message',
-    'foam.box.RegisterSelfMessage'
+    'foam.box.RawWebSocketBox'
   ],
 
   imports: [
     'webSocketService',
     'me',
     'window'
-  ],
-
-  classes: [
-    {
-      name: 'JSONOutputter',
-      extends: 'foam.json.Outputter',
-      requires: [
-        'foam.box.ReturnBox'
-      ],
-      imports: [
-        'me'
-      ],
-      methods: [
-        function output(o) {
-          if ( o === this.me ) {
-            return this.SUPER(this.ReturnBox.create());
-          }
-          return this.SUPER(o);
-        }
-      ]
-    }
   ],
 
   axioms: [
@@ -63,16 +42,7 @@ foam.CLASS({
       name: 'uri',
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.json.Outputter',
-      name: 'outputter',
-      generateJava: false,
-      factory: function() {
-        return this.JSONOutputter.create().copyFrom(foam.json.Network);
-      }
-    },
-    {
-      name: 'socket',
+      name: 'delegate',
       factory: function() {
         var ws = this.WebSocket.create({
           uri: this.prepareURL(this.uri),
@@ -87,7 +57,7 @@ foam.CLASS({
 
           this.webSocketService.addSocket(ws);
 
-          return ws;
+          return this.RawWebSocketBox.create({ socket: ws });
         }.bind(this));
       }
     }
@@ -103,31 +73,13 @@ foam.CLASS({
       return url;
     },
 
-    function send(msg) {
-      var replyBox = msg.attributes.replyBox;
-      if ( replyBox ) {
-        // TODO: We should probably clone here, but often the message
-        // contains RPC arguments that don't clone properly.  So
-        // instead we will mutate replyBox and put it back after.
-
-        // Even better solution would be to move replyBox to a
-        // property on Message and have custom serialization in it to
-        // do the registration.
-        msg.attributes.replyBox =
-          this.__context__.registry.register(null, null, msg.attributes.replyBox);
+    {
+      name: 'send',
+      code: function send(msg) {
+        this.delegate.then(function(d) {
+          d.send(msg);
+        });
       }
-
-      var payload = this.outputter.stringify(msg);
-
-      if ( replyBox ) {
-        msg.attributes.replyBox = replyBox;
-      }
-
-      this.socket.then(function(s) {
-        s.send(payload);
-      }.bind(this), function(e) {
-        replyBox && replyBox.send(foam.box.Message.create({ object: e }));
-      });
     }
   ]
 });
