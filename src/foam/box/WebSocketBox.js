@@ -85,10 +85,6 @@ foam.CLASS({
             this.socket = undefined;
           }.bind(this));
 
-          ws.send(this.Message.create({
-            object: this.RegisterSelfMessage.create({ name: this.me.name })
-          }));
-
           this.webSocketService.addSocket(ws);
 
           return ws;
