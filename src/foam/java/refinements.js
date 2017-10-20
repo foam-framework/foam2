@@ -70,6 +70,7 @@ foam.CLASS({
         sourceCls:        cls,
         propName:         this.name,
         propType:         this.javaType,
+        propValue:        this.javaValue,
         propRequired:     this.required,
         jsonParser:       this.javaJSONParser,
         csvParser:        this.javaCSVParser,

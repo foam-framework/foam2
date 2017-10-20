@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class AbstractFObjectArrayPropertyInfo
-        extends AbstractPropertyInfo {
+        extends AbstractArrayPropertyInfo {
 
   public int compareValues(Object[] b1, Object[] b2) {
     if (b1 == b2) return 0;
