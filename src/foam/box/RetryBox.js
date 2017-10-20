@@ -17,13 +17,52 @@
 
 foam.CLASS({
   package: 'foam.box',
+  name: 'RetryReplyBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.core.Exception'
+  ],
+  properties: [
+    {
+      name: 'attempt',
+      value: 0
+    },
+    {
+      name: 'maxAttempts'
+    },
+    {
+      name: 'message'
+    },
+    {
+      name: 'destination'
+    }
+  ],
+  methods: [
+    {
+      name: 'send',
+      code: function send(msg) {
+        if ( this.Exception.isInstance(msg.object) && this.attempt < this.maxAttempts) {
+          this.attempt++;
+          this.destination.send(this.message);
+          return;
+        }
+
+        this.delegate.send(msg);
+      }
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'RetryBox',
+  extends: 'foam.box.ProxyBox',
+  requires: [
+    'foam.box.RetryReplyBox'
+  ],
 
   properties: [
     'attempts',
-    'errorBox',
-    'delegate',
-    'message',
     {
       name: 'maxAttempts',
       value: 3
@@ -32,12 +71,18 @@ foam.CLASS({
 
   methods: [
     function send(msg) {
-      if ( this.attempts == this.maxAttempts ) {
-        this.errorBox && this.errorBox.send(msg);
-        return;
+      var replyBox = msg.attributes.replyBox;
+
+      if ( replyBox ) {
+        msg.attributes.replyBox = this.RetryReplyBox.create({
+          delegate: replyBox,
+          maxAttempts: this.maxAttempts,
+          message: msg,
+          destination: this.delegate
+        });
       }
 
-      this.delegate.send(this.message);
+      this.delegate.send(msg);
     }
   ]
 });
