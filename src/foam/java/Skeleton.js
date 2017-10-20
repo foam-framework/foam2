@@ -82,13 +82,12 @@ foam.CLASS({
     {
       name: 'sendMethodCode',
       template: `if ( ! ( message.getObject() instanceof foam.box.RPCMessage) ) {
-      // TODO error to errorBox
+      // TODO return an error?
       return;
     }
 
     foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
     foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
-    foam.box.Box        errorBox = (foam.box.Box) message.getAttributes().get("errorBox");
     Object result = null;
 
     try {
@@ -122,8 +121,7 @@ foam.CLASS({
     } catch (Throwable e) {
       e.printStackTrace();
 
-      if ( errorBox == null ) {
-        // TODO(adamvy): Do we care?
+      if ( replyBox == null ) {
         return;
       }
 
@@ -137,8 +135,7 @@ foam.CLASS({
       foam.box.Message replyMessage = getX().create(foam.box.Message.class);
       replyMessage.setObject(reply);
 
-      errorBox.send(replyMessage);
-      // Don't send to replyBox if we've sent to the errorBox
+      replyBox.send(replyMessage);
       return;
     }
 
