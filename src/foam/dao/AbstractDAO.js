@@ -282,25 +282,16 @@ foam.CLASS({
 
 
 foam.CLASS({
-  package: 'foam.core',
-  name: 'Exception',
-  properties: [
-    'message'
-  ]
-});
-
-
-foam.CLASS({
   package: 'foam.dao',
   name: 'InternalException',
-  extends: 'Exception'
+  implements: ['foam.core.Exception']
 });
 
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'ExternalException',
-  extends: 'Exception'
+  implements: ['foam.core.Exception']
 })
 
 

@@ -54,6 +54,7 @@ FOAM_FILES([
   { name: "foam/core/Proxy" },
   { name: "foam/core/Promised" },
   { name: "foam/core/Interface" },
+  { name: "foam/core/Exception" },
   { name: "foam/core/ContextMethod" },
   { name: "foam/core/Window" },
   { name: "foam/core/ContextMultipleInheritence" },
