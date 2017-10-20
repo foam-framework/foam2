@@ -209,8 +209,8 @@ foam.CLASS({
         return this.RetryBox.create({
           delegate: this.TimeoutBox.create({
             delegate: this.remoteListenerSupport ?
-              this.WebSocketBox.create({of: this.model, uri: this.serviceName}) :
-              this.HTTPBox.create({url: this.serviceName})
+              this.WebSocketBox.create({ uri: this.serviceName }) :
+              this.HTTPBox.create({ url: this.serviceName })
           })
         });
       }
