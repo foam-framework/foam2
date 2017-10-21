@@ -25,36 +25,35 @@ rpc.setArgs(args);
 
 message.setObject(rpc);`;
 
-      if ( this.javaReturns && this.javaReturns !== "void" ) {
-        code += `
-foam.box.ReplyBox reply = getX().create(foam.box.ReplyBox.class);
-foam.box.RPCReturnBox handler = getX().create(foam.box.RPCReturnBox.class);
-reply.setDelegate(handler);
+      if ( this.javaReturns && this.javaReturns !== 'void' ) {
+        code += `foam.box.RPCReturnBox replyBox = getX().create(foam.box.RPCReturnBox.class);
 
-foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, get${replyPolicyName}(), reply);
-reply.setId(export.getName());
+message.getAttributes().put("replyBox", replyBox);
+`;
+      }
 
-message.getAttributes().put("replyBox", export);
+      code += `get${boxPropName}().send(message);`;
 
-get${boxPropName}().send(message);
-
-try {
-  handler.getSemaphore().acquire();
+      if ( this.javaReturns && this.javaReturns !== 'void' ) {
+        code += `try {
+  replyBox.getSemaphore().acquire();
 } catch (InterruptedException e) {
   throw new RuntimeException(e);
 }
 
-Object result = handler.getMessage().getObject();
+Object result = replyBox.getMessage().getObject();
+
 if ( result instanceof foam.box.RPCReturnMessage )
   return (${this.javaReturns})((foam.box.RPCReturnMessage)result).getData();
+
+if ( result instanceof java.lang.Throwable )
+  throw new RuntimeException((java.lang.Throwable)result);
 
 if ( result instanceof foam.box.RPCErrorMessage )
   throw new RuntimeException(((foam.box.RPCErrorMessage)result).getData().toString());
 
 throw new RuntimeException("Invalid repsonse type: " + result.getClass());
 `;
-      } else {
-        code += `get${boxPropName}().send(message);`;
       }
 
       this.javaCode = code;
