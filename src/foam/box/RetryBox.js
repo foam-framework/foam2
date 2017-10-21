@@ -47,7 +47,7 @@ foam.CLASS({
           return;
         }
 
-        this.delegate.send(msg);
+        this.delegate && this.delegate.send(msg);
       }
     }
   ]
