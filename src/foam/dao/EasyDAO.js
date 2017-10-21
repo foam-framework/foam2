@@ -33,6 +33,7 @@ foam.CLASS({
   requires: [
     'foam.box.Context',
     'foam.box.HTTPBox',
+    'foam.box.SessionClientBox',
     'foam.box.SocketBox',
     'foam.box.WebSocketBox',
     'foam.dao.CachingDAO',
@@ -203,9 +204,10 @@ foam.CLASS({
       /** Destination address for server. */
       name: 'serverBox',
       factory: function() {
-        return this.remoteListenerSupport ?
+        return this.SessionClientBox.create({
+          delegate:this.remoteListenerSupport ?
             this.WebSocketBox.create({of: this.model, uri: this.serviceName}) :
-            this.HTTPBox.create({url: this.serviceName}) ;
+            this.HTTPBox.create({url: this.serviceName})});
       }
     },
     {
