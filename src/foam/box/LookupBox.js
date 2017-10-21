@@ -21,8 +21,7 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   requires: [
-    'foam.box.ClientBoxRegistry',
-    'foam.box.LookupRetryBox'
+    'foam.box.ClientBoxRegistry'
   ],
 
   properties: [

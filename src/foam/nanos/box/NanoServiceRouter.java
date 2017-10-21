@@ -49,7 +49,8 @@ public class NanoServiceRouter
 
       box.send(message);
     } catch (Throwable t) {
-      logger.error(this.getClass(), "Error servicing request");
+      logger.error(this.getClass(), "Error servicing request", t);
+      t.printStackTrace();
     } finally {
       pm.log(getX());
     }
