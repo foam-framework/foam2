@@ -24,6 +24,11 @@ foam.CLASS({
     function send(msg) {
       var replyBox = msg.attributes.replyBox;
 
+      if ( ! replyBox ) {
+        this.delegate.send(msg);
+        return;
+      }
+
       var tooLate = false;
       var timer = setTimeout(function() {
         tooLate = true;
