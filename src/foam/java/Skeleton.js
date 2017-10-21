@@ -140,8 +140,8 @@ foam.CLASS({
     }
 
     if ( replyBox != null ) {
-      foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
-      reply.setData(result);
+      foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);<% if ( m.javaReturns && m.javaReturns != 'void' ) { %>
+      reply.setData(result);<% } %>
 
       foam.box.Message message1 = getX().create(foam.box.Message.class);
       message1.setObject(reply);
