@@ -19,9 +19,6 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
-  requires: [
-    'foam.json.Outputter'
-  ],
   imports: [
     {
       name: 'me',
@@ -84,7 +81,7 @@ foam.CLASS({
             this.__context__.registry.register(null, null, msg.attributes.replyBox);
         }
 
-        var payload = this.Outputter.create().copyFrom(foam.json.Network).stringify(msg);
+        var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
 
         if ( replyBox ) {
           msg.attributes.replyBox = replyBox;
