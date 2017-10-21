@@ -23,17 +23,14 @@ foam.CLASS({
         var name            = this.name;
 
         return function() {
-          if ( returns ) {
-            var replyBox = this.ReplyBox.create({
-              delegate: this.RPCReturnBox.create()
-            });
+          var replyBox = this.RPCReturnBox.create()
 
-            var ret = replyBox.delegate.promise;
+          var ret = replyBox.promise;
 
-            // TODO: Move this into RPCReturnBox ?
-            if ( returns !== 'Promise' ) {
-              ret = this.lookup(returns).create({ delegate: ret });
-            }
+          // Automatically wrap RPCs that return a "PromisedAbc" or similar
+          // TODO: Move this into RPCReturnBox ?
+          if ( returns && returns !== 'Promise' ) {
+            ret = this.lookup(returns).create({ delegate: ret });
           }
 
           var msg = this.Message.create({
@@ -43,9 +40,7 @@ foam.CLASS({
             })
           });
 
-          if ( replyBox ) {
-            msg.attributes.replyBox = replyBox;
-          }
+          msg.attributes.replyBox = replyBox;
 
           this[boxPropName].send(msg);
 
