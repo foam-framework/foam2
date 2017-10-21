@@ -50,8 +50,8 @@ foam.CLASS({
             msg.object = msg.object.object;
             this.registry_[name].localBox.send(msg);
           } else {
-            if ( msg.attributes.errorBox ) {
-              msg.attributes.errorBox.send(
+            if ( msg.attributes.replyBox ) {
+              msg.attributes.replyBox.send(
                 this.Message.create({
                   object: this.NoSuchNameException.create({ name: name })
                 }));
@@ -74,12 +74,12 @@ if ( obj instanceof foam.box.SubBoxMessage ) {
   if ( dest != null ) {
     message.setObject(sbm.getObject());
     dest.getLocalBox().send(message);
-  } else if ( message.getAttributes().containsKey("errorBox") ) {
-    foam.box.Box errorBox = (foam.box.Box)message.getAttributes().get("errorBox");
+  } else if ( message.getAttributes().containsKey("replyBox") ) {
+    foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
     foam.box.Message errorMessage = getX().create(foam.box.Message.class);
     errorMessage.setObject(getX().create(foam.box.NoSuchNameException.class));
 
-    errorBox.send(errorMessage);
+    replyBox.send(errorMessage);
   }
 }
 `
