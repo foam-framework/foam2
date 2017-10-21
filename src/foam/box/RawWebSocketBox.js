@@ -19,6 +19,9 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
+  requires: [
+    'foam.box.ReplyBox'
+  ],
   imports: [
     {
       name: 'me',
@@ -77,8 +80,14 @@ foam.CLASS({
           // Even better solution would be to move replyBox to a
           // property on Message and have custom serialization in it to
           // do the registration.
+
           msg.attributes.replyBox =
             this.__context__.registry.register(null, null, msg.attributes.replyBox);
+
+          // TODO: There should be a better way to do this.
+          replyBox = this.ReplyBox.create({
+            id: msg.attributes.replyBox.name
+          });
         }
 
         var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
@@ -100,7 +109,11 @@ outputter.setX(getX());
 // TODO: Clone message or something when it clones safely.
 foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
 
-foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, null, replyBox);
+if ( replyBox != null ) {
+  foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, null, replyBox);
+
+  replyBox = new foam.box.ReplyBox(getX(), export.getName(), replyBox);
+}
 
 String payload = outputter.stringify(message);
 
