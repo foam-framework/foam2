@@ -20,7 +20,8 @@ foam.CLASS({
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
   requires: [
-    'foam.json.Outputter'
+    'foam.json.Outputter',
+    'foam.box.ReplyBox'
   ],
 
   properties: [
@@ -54,6 +55,11 @@ foam.CLASS({
         // do the registration.
         msg.attributes.replyBox =
           this.__context__.registry.register(null, null, msg.attributes.replyBox);
+
+        // TODO: There should be a better way to do this.
+        replyBox = this.ReplyBox.create({
+          id: msg.attributes.replyBox.name
+        });
       }
 
       var payload = this.outputter.stringify(msg);
