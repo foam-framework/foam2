@@ -255,6 +255,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/Remote" },
+  { name: "foam/box/SessionClientBox" },
   { name: "lib/boxJava", flags: ['java'] },
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },

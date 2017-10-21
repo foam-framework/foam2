@@ -72,6 +72,7 @@ foam.CLASS({
       code: function send(msg) {
         msg.attributes[this.SESSION_KEY] = this.sessionID;
 
+/*
         console.log('***** SEND: ', foam.json.stringify(msg));
 
         msg.attributes.replyBox = this.SessionReplyBox.create({
@@ -79,6 +80,7 @@ foam.CLASS({
           clientBox: this,
           delegate: msg.attributes.replyBox
         });
+        */
 
         this.delegate.send(msg);
       }
