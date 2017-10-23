@@ -79,10 +79,7 @@ function generateClass(cls) {
 
   ensurePath(outfile);
 
-  var buildJavaSource = cls.buildJavaClass().toJavaSource();
-  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
-    fs_.writeFileSync(outfile, buildJavaSource);
-  }
+  writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
 }
 
 function generateAbstractClass(cls) {
@@ -99,10 +96,7 @@ function generateAbstractClass(cls) {
   var javaclass = cls.buildJavaClass();
   javaclass.abstract = true;
 
-  var buildAbstractJavaSource = javaclass.toJavaSource();
-  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildAbstractJavaSource))) {
-    fs_.writeFileSync(outfile, buildAbstractJavaSource);
-  }
+    writeFileIfUpdated(outfile, javaclass.toJavaSource());
 }
 
 function generateSkeleton(cls) {
@@ -117,10 +111,7 @@ function generateSkeleton(cls) {
 
   ensurePath(outfile);
 
-  var buildSkeletonJavaSource = foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource();
-  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildSkeletonJavaSource))) {
-    fs_.writeFileSync(outfile,buildSkeletonJavaSource);
-  }
+  writeFileIfUpdated(outfile, foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
 }
 
 function generateProxy(intf) {
@@ -168,7 +159,7 @@ function copyJavaClassesToBuildFolder(startPath) {
 
       result = result.concat(copyJavaClassesToBuildFolder(filePath));
     } else if (f.search('.js') < 0) {
-      var readFilePath = fs_.readFileSync(filePath)
+      var readFilePath = fs_.readFileSync(filePath);
         if (! ( fs_.existsSync(outputPath) && (fs_.readFileSync(outputPath).toString() == readFilePath.toString()))) {
           fs_.writeFileSync(outputPath, readFilePath);
           result.push(outputPath);
@@ -177,6 +168,12 @@ function copyJavaClassesToBuildFolder(startPath) {
   });
 
   return result;
+}
+
+function writeFileIfUpdated(outfile,buildJavaSource) {
+  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
+    fs_.writeFileSync(outfile, buildJavaSource);
+  }
 }
 
 classes.forEach(loadClass);
