@@ -159,11 +159,7 @@ function copyJavaClassesToBuildFolder(startPath) {
 
       result = result.concat(copyJavaClassesToBuildFolder(filePath));
     } else if (f.search('.js') < 0) {
-      var readFilePath = fs_.readFileSync(filePath);
-        if (! ( fs_.existsSync(outputPath) && (fs_.readFileSync(outputPath).toString() == readFilePath.toString()))) {
-          fs_.writeFileSync(outputPath, readFilePath);
-          result.push(outputPath);
-        } //else the source haven't been changed
+      writeFileIfUpdated(outputPath, fs_.readFileSync(filePath).toString());
     }
   });
 
@@ -173,6 +169,9 @@ function copyJavaClassesToBuildFolder(startPath) {
 function writeFileIfUpdated(outfile,buildJavaSource) {
   if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
     fs_.writeFileSync(outfile, buildJavaSource);
+    if (result !==undefined) {
+      result.push(outputPath);
+    }
   }
 }
 
