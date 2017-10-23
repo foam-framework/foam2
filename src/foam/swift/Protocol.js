@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.swift',
   name: 'Protocol',
@@ -15,6 +21,10 @@ foam.CLASS({
       class: 'String',
       name: 'visibility',
       value: 'public'
+    },
+    {
+      class: 'StringArray',
+      name: 'implements',
     },
     {
       class: 'FObjectArray',
@@ -43,9 +53,11 @@ foam.CLASS({
         this.visibility,
         this.visibility ? ' ' : '',
         'protocol ',
-        this.name);
-
-      o.out(' {\n');
+        this.name,
+        this.implements.length ? ': ' : '',
+        this.implements.join(', '),
+        ' {\n'
+      );
 
       o.increaseIndent();
       for ( var i = 0 ; i < this.methods.length ; i++ ) {

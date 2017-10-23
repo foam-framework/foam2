@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -97,29 +86,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftCode',
-      expression: function(parentCls, name) {
-        if (foam.core.internal.InterfaceMethod.isInstance(
-            parentCls.getSuperAxiomByName(name))) {
-          return 'fatalError()';
-        }
-        return '';
-      },
     },
     {
       class: 'Boolean',
       name: 'swiftOverride',
-      expression: function(parentCls, name) {
-        var parentMethod = parentCls.getSuperAxiomByName(name);
-        return name == 'init' ||
-          !!( parentMethod &&
-              parentMethod.swiftSupport &&
-              !foam.core.internal.InterfaceMethod.isInstance(parentMethod))
-      },
     },
     {
       class: 'String',
       name: 'swiftSupport',
-      expression: function(swiftCode) { return !!swiftCode }
     },
     {
       class: 'String',
@@ -139,9 +113,9 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom) {
-      if (!this.swiftSupport) return;
-      if ( !this.swiftOverride ) {
+    function writeToSwiftClass(cls, superAxiom, parentCls) {
+      if ( ! this.getSwiftSupport(parentCls) ) return;
+      if ( ! this.getSwiftOverride(parentCls) ) {
         cls.fields.push(this.Field.create({
           lazy: true,
           name: this.swiftSlotName,
@@ -157,7 +131,7 @@ foam.CLASS({
         type: 'MethodInfo',
         initializer: this.swiftMethodInfoInit(),
       }));
-      var code = this.swiftCode;
+      var code = this.getSwiftCode(parentCls);
       if ( this.swiftSynchronized ) {
         var sem = this.swiftSynchronizedSemaphoreName
         cls.fields.push(this.Field.create({
@@ -169,12 +143,12 @@ foam.CLASS({
         }));
         cls.method(this.Method.create({
           name: this.swiftSynchronizedMethodName,
-          body: this.swiftCode,
+          body: this.getSwiftCode(parentCls),
           throws: this.swiftThrows,
           returnType: this.swiftReturns,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
-          override: this.swiftOverride,
+          override: this.getSwiftOverride(parentCls),
           annotations: this.swiftAnnotations,
         }));
         cls.method(this.Method.create({
@@ -184,21 +158,48 @@ foam.CLASS({
           returnType: this.swiftReturns,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
-          override: this.swiftOverride,
+          override: this.getSwiftOverride(parentCls),
           annotations: this.swiftAnnotations,
         }));
       } else {
         cls.method(this.Method.create({
           name: this.swiftName,
-          body: this.swiftCode,
+          body: this.getSwiftCode(parentCls),
           throws: this.swiftThrows,
           returnType: this.swiftReturns,
           args: this.swiftArgs,
           visibility: this.swiftVisibility,
-          override: this.swiftOverride,
+          override: this.getSwiftOverride(parentCls),
           annotations: this.swiftAnnotations,
         }));
       }
+    },
+    function getSwiftCode(parentCls) {
+      if (this.swiftCode) return this.swiftCode;
+      if (foam.core.internal.InterfaceMethod.isInstance(
+          parentCls.getSuperAxiomByName(this.name))) {
+        return 'fatalError()';
+      }
+      return '';
+    },
+    function getSwiftSupport(parentCls) {
+      if (this.hasOwnProperty('swiftSupport')) return this.swiftSupport;
+      return !!this.getSwiftCode(parentCls);
+    },
+    function getSwiftOverride(parentCls) {
+      if (this.hasOwnProperty('swiftOverride')) return this.swiftOverride;
+      var parentMethod = parentCls.getSuperAxiomByName(this.name);
+      var parentMethodParentCls = parentCls.getSuperClass();
+      while (
+          (parentMethodParentCls != parentMethodParentCls.getSuperClass()) &&
+          ! parentMethodParentCls.hasOwnAxiom(this.name) ) {
+        parentMethodParentCls = parentMethodParentCls.getSuperClass();
+      }
+      return this.name == 'init' ||
+        !!( parentMethod &&
+            parentMethodParentCls &&
+            parentMethod.getSwiftSupport(parentMethodParentCls) &&
+            !foam.core.internal.InterfaceMethod.isInstance(parentMethod))
     },
   ],
   templates: [

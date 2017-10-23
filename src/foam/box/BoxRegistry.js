@@ -26,8 +26,8 @@ foam.INTERFACE({
       swiftThrows: true,
       args: [
         {
-          class: 'String',
           name: 'name',
+          swiftType: 'String',
           javaType: 'String'
         }
       ]
@@ -43,16 +43,13 @@ foam.INTERFACE({
           javaType: 'String'
         },
         {
-          class: 'FObjectProperty',
-          of: 'foam.box.BoxService',
           name: 'service',
+          swiftType: 'BoxService?',
           javaType: 'foam.box.BoxService'
         },
         {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          required: true,
           name: 'box',
+          swiftType: 'Box',
           javaType: 'foam.box.Box'
         }
       ],

@@ -11,11 +11,6 @@ foam.CLASS({
 
   requires: [
     {
-      name: 'Outputter',
-      path: 'foam.json.Outputter',
-      swiftPath: 'foam.swift.parse.json.output.HTTPBoxOutputter',
-    },
-    {
       name: 'Parser',
       path: 'foam.json.Parser',
       swiftPath: 'foam.swift.parse.json.FObjectParser',
@@ -25,6 +20,12 @@ foam.CLASS({
       path: 'foam.net.web.HTTPRequest',
       swiftPath: '',
     },
+    {
+      name: 'Outputter',
+      path: 'foam.json.Outputter',
+      swiftPath: 'foam.swift.parse.json.output.Outputter',
+    },
+    'foam.box.HTTPReplyBox',
   ],
 
   imports: [
@@ -35,29 +36,6 @@ foam.CLASS({
       javaType: 'foam.box.Box'
     },
     'window'
-  ],
-
-  classes: [
-    foam.core.InnerClass.create({
-      generateSwift: false,
-      generateJava: false,
-      model: {
-        name: 'JSONOutputter',
-        extends: 'foam.json.Outputter',
-        generateJava: false,
-        requires: [
-          'foam.box.HTTPReplyBox'
-        ],
-        imports: [
-          'me'
-        ],
-        methods: [
-          function output(o) {
-            return this.SUPER(o == this.me ? this.HTTPReplyBox.create() : o);
-          }
-        ]
-      }
-    })
   ],
 
   properties: [
@@ -93,10 +71,10 @@ foam.CLASS({
       of: 'foam.json.Outputter',
       name: 'outputter',
       generateJava: false,
-      factory: function() {
-        return this.JSONOutputter.create().copyFrom(foam.json.Network);
-      },
       swiftFactory: 'return Outputter_create()',
+      factory: function() {
+        return this.Outputter.create().copyFrom(foam.json.Network);
+      }
     }
   ],
 
@@ -146,7 +124,17 @@ protected class ResponseThread implements Runnable {
     {
       name: 'send',
       code: function(msg) {
+        // TODO: We should probably clone here, but often the message
+        // contains RPC arguments that don't clone properly.  So
+        // instead we will mutate replyBox and put it back after.
+        var replyBox = msg.attributes.replyBox;
+
+        msg.attributes.replyBox = this.HTTPReplyBox.create();
+
         var payload = this.outputter.stringify(msg);
+
+        msg.attributes.replyBox = replyBox;
+
         var req = this.HTTPRequest.create({
           url:     this.prepareURL(this.url),
           method:  this.method,
@@ -157,13 +145,19 @@ protected class ResponseThread implements Runnable {
           return resp.payload;
         }).then(function(p) {
           var rmsg = this.parser.parseString(p);
-          rmsg && this.me.send(rmsg);
+          rmsg && replyBox && replyBox.send(rmsg);
         }.bind(this));
       },
       swiftCode: function() {/*
+let replyBox = msg.attributes["replyBox"] as? Box
+msg.attributes["replyBox"] = HTTPReplyBox_create()
+
 var request = URLRequest(url: Foundation.URL(string: self.url)!)
 request.httpMethod = "POST"
 request.httpBody = outputter?.swiftStringify(msg).data(using: .utf8)
+
+msg.attributes["replyBox"] = replyBox
+
 let task = URLSession.shared.dataTask(with: request) { data, response, error in
   do {
     guard let data = data else {
@@ -173,21 +167,18 @@ let task = URLSession.shared.dataTask(with: request) { data, response, error in
           let obj = self.parser.parseString(str) as? Message else {
       throw FoamError("Failed to parse HTTPBox response")
     }
-    guard let me = self.me as? Box else {
-      throw FoamError("HTTPBox response has nowhere to go")
-    }
-    try me.send(obj)
+    try replyBox?.send(obj)
   } catch let e {
-    if let eBox = msg.attributes["errorBox"] as? Box {
-      let eMsg = self.__context__.create(Message.self, args: ["object": e])!
-      try? eBox.send(eMsg)
-    }
+    try? replyBox?.send(self.__context__.create(Message.self, args: ["object": e])!)
   }
 }
 task.resume()
       */},
       javaCode: `
+// TODO: Go async and make request in a separate thread.
 java.net.HttpURLConnection conn;
+foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+
 try {
   java.net.URL url = new java.net.URL(getUrl());
   conn = (java.net.HttpURLConnection)url.openConnection();
@@ -200,12 +191,19 @@ try {
                                                                      java.nio.charset.StandardCharsets.UTF_8);
 
 
-  Outputter outputter = new Outputter();
+  // TODO: Clone message or something when it clones safely.
+  message.getAttributes().put("replyBox", getX().create(foam.box.HTTPReplyBox.class));
+
+
+  foam.lib.json.Outputter outputter = new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK);
   outputter.setX(getX());
   output.write(outputter.stringify(message));
+
+  message.getAttributes().put("replyBox", replyBox);
+
   output.close();
 
-// TODO: There has to be a better way to do this.
+// TODO: Switch to ReaderPStream when https://github.com/foam-framework/foam2/issues/745 is fixed.
 byte[] buf = new byte[8388608];
 java.io.InputStream input = conn.getInputStream();
 
@@ -233,11 +231,13 @@ if ( ! ( responseMessage instanceof foam.box.Message ) ) {
   throw new RuntimeException("Invalid response type: " + responseMessage.getClass().getName() + " expected foam.box.Message.");
 }
 
-getMe().send((foam.box.Message)responseMessage);
+
+replyBox.send((foam.box.Message)responseMessage);
 
 } catch(java.io.IOException e) {
-  // TODO: Error box?
-  throw new RuntimeException(e);
+  foam.box.Message replyMessage = getX().create(foam.box.Message.class);
+  replyMessage.setObject(e);
+  replyBox.send(replyMessage);
 }
 `
     }

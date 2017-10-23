@@ -4,8 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-console.log('yooo');
-
 var execSync = require('child_process').execSync
 var path_ = require('path');
 
