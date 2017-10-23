@@ -40,9 +40,7 @@ foam.CLASS({
       name: 'serverBox',
       args: [
         {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          required: true,
+          swiftType: 'Box',
           name: 'box',
         },
       ],
@@ -60,10 +58,8 @@ return server.create(args: ["delegate": box2], x: __subContext__) as! Box
       name: 'clientBox',
       args: [
         {
-          class: 'FObjectProperty',
-          of: 'foam.box.Box',
-          required: true,
           name: 'box',
+          swiftType: 'Box',
         },
       ],
       returns: 'foam.box.Box',

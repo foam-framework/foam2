@@ -22,9 +22,21 @@ foam.CLASS({
   ],
 
   methods: [
-    function put() { this.value++; },
-    function remove() { this.value--; },
-    function reset() { this.value = 0; },
+    {
+      name: 'put',
+      code: function() { this.value++ },
+      swiftCode: 'value+=1',
+    },
+    {
+      name: 'remove',
+      code: function() { this.value-- },
+      swiftCode: 'value-=1',
+    },
+    {
+      name: 'reset',
+      code: function() { this.value = 0 },
+      swiftCode: 'value = 0',
+    },
     function toString() { return 'COUNT()'; }
   ]
 });

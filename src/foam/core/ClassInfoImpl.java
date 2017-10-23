@@ -56,7 +56,7 @@ public class ClassInfoImpl
         parent_ = (ClassInfo)m.invoke(null);
       } catch (NoSuchMethodException e) {
         parent_ = new EmptyClassInfo();
-      } catch (Exception e) {
+      } catch (java.lang.Exception e) {
         throw new RuntimeException(e);
       }
     }

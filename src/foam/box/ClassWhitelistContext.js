@@ -58,7 +58,7 @@ return w
           name: 'X',
         },
         {
-          class: 'String',
+          swiftType: 'String',
           name: 'id',
         },
       ],

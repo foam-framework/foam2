@@ -36,7 +36,7 @@ public class WebSocketServer
     public void onClose(WebSocket connection, int code, String reason, boolean remote) {
     }
 
-    public void onError(WebSocket conn, Exception ex) {
+    public void onError(WebSocket conn, java.lang.Exception ex) {
     }
 
     public void onMessage(WebSocket conn, String message) {
@@ -78,7 +78,7 @@ public class WebSocketServer
             }
 
             getRouter().service(serviceKey, (foam.box.Message)request);
-        } catch(Exception e) {
+        } catch(java.lang.Exception e) {
             log.error("Error handling websocket request", e);
         }
     }

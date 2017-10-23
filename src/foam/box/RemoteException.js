@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RemoteException',
+  implements: ['foam.core.Exception'],
   properties: [
     {
       class: 'String',

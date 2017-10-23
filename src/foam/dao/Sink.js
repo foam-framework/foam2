@@ -97,19 +97,23 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'remove',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'eof',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'reset',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     }
   ]
 });
@@ -587,7 +591,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.dao',
   name: 'FnSink',
-
+  implements: [ 'foam.dao.Sink' ],
   documentation: 'Converts all sink events to call to a singular function.' +
     '  Useful for subscribing a listener method to a DAO',
 
@@ -599,12 +603,20 @@ foam.CLASS({
   ],
 
   properties: [
-    'fn'
+    {
+      name: 'fn',
+      swiftType: '((String, FObject, Detachable) -> Void)',
+      swiftRequiresEscaping: true,
+    },
   ],
 
   methods: [
-    function put(obj, s) {
-      this.fn('put', obj, s);
+    {
+      name: 'put',
+      code: function put(obj, s) {
+        this.fn('put', obj, s);
+      },
+      swiftCode: 'fn("put", obj, sub)',
     },
     function remove(obj, s) {
       this.fn('remove', obj, s);

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 var classes = [
   'foam.swift.ui.DetailView',
   'foam.swift.ui.FOAMUILabel',
@@ -9,10 +15,11 @@ var classes = [
   'foam.u2.Visibility',
 
   'Tabata',
-  'TestExtended',
   'TabataSoundView',
+  'TestExtended',
+  'foam.dao.ArraySink',
+  'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',
-  'foam.swift.dao.ArraySink',
   'foam.swift.parse.StringPStream',
 
   'foam.box.Context',

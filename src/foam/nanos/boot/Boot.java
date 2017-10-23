@@ -62,7 +62,7 @@ public class Boot {
   public X getX() { return root_; }
 
   public static void main (String[] args)
-    throws Exception
+    throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
     new Boot();

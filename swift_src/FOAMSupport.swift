@@ -1,6 +1,13 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 import Foundation
 
 public typealias Listener = (Subscription, [Any?]) -> Void
+public typealias MethodSlotClosure = ([Any?]) throws -> Any?
 
 public protocol ContextAware {
   var __context__: Context { get set }
@@ -203,19 +210,16 @@ public protocol FObject: class, Detachable {
   func clearProperty(_ key: String)
   func compareTo(_ data: FObject?) -> Int
   func onDetach(_ sub: Detachable)
+  func toString() -> String
   init(_ args: [String:Any?])
 }
 
 public class AbstractFObject: NSObject, FObject, ContextAware {
 
-  public var __context__: Context = Context.GLOBAL {
-    didSet {
-      self.__subContext__ = self.__context__.createSubContext(args: self._createExports_())
-    }
-  }
-  lazy private(set) public var __subContext__: Context = {
-    return self.__context__.createSubContext(args: self._createExports_())
-  }()
+  public var __context__: Context = Context.GLOBAL
+  private var ___subContext___: Context!
+  public var __subContext__: Context { get { return self.___subContext___ } }
+
   func _createExports_() -> [String:Any?] { return [:] }
 
   lazy var listeners: ListenerList = ListenerList()
@@ -329,11 +333,13 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
 
   public override required init() {
     super.init()
+    ___subContext___ = __context__.createSubContext(args: self._createExports_())
     __foamInit__()
   }
 
   public required init(_ args: [String:Any?]) {
     super.init()
+    ___subContext___ = __context__.createSubContext(args: self._createExports_())
     for (key, value) in args {
       self.set(key: key, value: value)
     }
@@ -342,17 +348,19 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
 
   public required init(X x: Context) {
     super.init()
-    __foamInit__()
     __context__ = x
+    ___subContext___ = __context__.createSubContext(args: self._createExports_())
+    __foamInit__()
   }
 
   public required init(_ args: [String:Any?], _ x: Context) {
     super.init()
+    __context__ = x
+    ___subContext___ = __context__.createSubContext(args: self._createExports_())
     for (key, value) in args {
       self.set(key: key, value: value)
     }
     __foamInit__()
-    __context__ = x
   }
 
   func __foamInit__() {}
@@ -370,6 +378,10 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
 
   deinit {
     detach()
+  }
+
+  public func toString() -> String {
+    return __context__.create(Outputter.self)!.swiftStringify(self)
   }
 }
 
