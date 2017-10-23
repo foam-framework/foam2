@@ -95,7 +95,7 @@ foam.LIB({
                   return a.getSwiftSupport ?
                       a.getSwiftSupport(this) : a.swiftSupport
                 }.bind(this))
-                .map(function(a) { return a.swiftAxiomName }) +
+                .map(function(a) { return a.swiftPrivateAxiomName }) +
             ']',
           }),
           foam.swift.Field.create({
@@ -134,7 +134,7 @@ foam.LIB({
           name: 'multitonMap',
         }));
         classInfo.fields.push(foam.swift.Field.create({
-          defaultValue: this.getAxiomByName(multiton.property).swiftAxiomName,
+          defaultValue: this.getAxiomByName(multiton.property).swiftPrivateAxiomName,
           lazy: true,
           type: 'PropertyInfo',
           name: 'multitonProperty',
