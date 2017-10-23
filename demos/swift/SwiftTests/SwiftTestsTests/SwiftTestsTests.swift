@@ -434,4 +434,25 @@ class SwiftTestsTests: XCTestCase {
     try! XCTAssertEqual(complete.get() as! Int, 1)
   }
 
+  func testASeqErr() {
+    let complete = Future<Bool>()
+    Async.aSeq([
+      { _, aThrow, _ in
+        DispatchQueue.global(qos: .utility).async {
+          aThrow(nil)
+        }
+      },
+      { ret, _, t in
+        XCTFail()
+        ret(nil)
+      },
+    ])({ _ in
+      complete.set(false)
+    }, { _ in
+      complete.set(true)
+    }, nil)
+
+    try! XCTAssertEqual(complete.get(), true)
+  }
+
 }
