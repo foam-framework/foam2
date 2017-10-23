@@ -23,6 +23,10 @@ foam.CLASS({
       value: 'public'
     },
     {
+      class: 'StringArray',
+      name: 'implements',
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.swift.ProtocolMethod',
       name: 'methods',
@@ -49,9 +53,11 @@ foam.CLASS({
         this.visibility,
         this.visibility ? ' ' : '',
         'protocol ',
-        this.name);
-
-      o.out(' {\n');
+        this.name,
+        this.implements.length ? ': ' : '',
+        this.implements.join(', '),
+        ' {\n'
+      );
 
       o.increaseIndent();
       for ( var i = 0 ; i < this.methods.length ; i++ ) {

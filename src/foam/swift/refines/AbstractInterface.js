@@ -12,6 +12,7 @@ foam.CLASS({
         cls.toSwiftClass =  function() {
           var cls = foam.lookup('foam.swift.Protocol').create({
             name: this.model_.swiftName,
+            implements: this.model_.swiftImplements,
           });
 
           var axioms = this.getAxioms();

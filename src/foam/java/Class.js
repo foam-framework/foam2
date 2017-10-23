@@ -194,14 +194,23 @@ foam.CLASS({
           body: ''
         }));
 
-        // All-property constructor
         if ( props.length ) {
+          // All-property constructor
           this.method(this.Method.create({
             visibility: 'public',
             name: this.name,
             type: '',
             args: props.map(function(f) { return self.Argument.create({name: f.name, type: f.type}); }),
             body: props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; }).join(';\n') + ';'
+          }));
+
+          // Context oriented all-property constructor
+          this.method(this.Method.create({
+            visibility: 'public',
+            name: this.name,
+            type: '',
+            args: [self.Argument.create({name: 'x', type: 'foam.core.X' })].concat(props.map(function(f) { return self.Argument.create({name: f.name, type: f.type}); })),
+            body: ['setX(x);'].concat(props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; })).join(';\n') + ';'
           }));
         }
       }

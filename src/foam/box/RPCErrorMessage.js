@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCErrorMessage',
+  implements: ['foam.core.Exception'],
   properties: [
     {
       class: 'Object',

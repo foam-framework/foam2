@@ -21,7 +21,7 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   requires: [
-    'foam.box.ClientBoxRegistry',
+    'foam.box.ClientBoxRegistry'
   ],
 
   properties: [
