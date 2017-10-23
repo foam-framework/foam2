@@ -39,6 +39,10 @@ foam.CLASS({
         return foam.next$UID();
       },
       swiftFactory: 'return String(FOAM_utils.next$UID())',
+    },
+    {
+      name: 'delegate',
+      transient: true
     }
   ],
 

@@ -57,10 +57,9 @@ foam.CLASS({
             });
             args[0] = x;
           }
-
           p = this.data[message.object.name].apply(this.data, args);
         } catch(e) {
-          message.attributes.errorBox && message.attributes.errorBox.send(this.Message.create({
+          message.attributes.replyBox && message.attributes.replyBox.send(this.Message.create({
             object: this.RPCErrorMessage.create({ data: e.message })
           }));
 
@@ -79,7 +78,7 @@ foam.CLASS({
               }));
             },
             function(error) {
-              message.attributes.errorBox && message.attributes.errorBox.send(self.Message.create({
+              message.attributes.replyBox && message.attributes.replyBox.send(self.Message.create({
                 object: self.RPCErrorMessage.create({ data: error && error.toString() })
               }));
             });
