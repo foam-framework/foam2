@@ -170,6 +170,10 @@ foam.LIB({
 
       // Will be replaced in phase2.
       foam.CLASS = function(m) {
+        if ( ! m.source && global.document && global.document.currentScript ) {
+          m.source = global.document.currentScript.src;
+        }
+
         m.id = m.package + '.' + m.name;
         var cls = buildClass.call(m);
 
@@ -196,6 +200,10 @@ foam.LIB({
           @method CLASS
           @memberof module:foam */
       foam.CLASS = function(m, skipRegistration) {
+        if ( ! m.source && global.document && global.document.currentScript ) {
+          m.source = global.document.currentScript.src;
+        }
+
         var cls   = m.class ? foam.lookup(m.class) : foam.core.Model;
         var model = cls.create(m);
         model.validate();
@@ -240,6 +248,7 @@ foam.LIB({
     function phase3() {
       // Substitute foam.core.installModel() with simpler axiom-only version.
       foam.core.FObject.installModel = function installModel(m) {
+        if ( m.source ) m.axioms_.forEach(function(a) { a.source = m.source; });
         this.installAxioms(m.axioms_);
       };
     },

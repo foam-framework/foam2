@@ -28,6 +28,18 @@ public class ProxyX
     return getX().get(x, name);
   }
 
+  public int getInt(Object key) {
+    return getInt(key, 0);
+  }
+
+  public int getInt(Object key, int defaultValue) {
+    return getInt(this, key, defaultValue);
+  }
+
+  public int getInt(X x, Object key, int defaultValue) {
+    return getX().getInt(x, key, defaultValue);
+  }
+
   public X put(Object name, Object value) {
     setX(getX().put(name, value));
 
