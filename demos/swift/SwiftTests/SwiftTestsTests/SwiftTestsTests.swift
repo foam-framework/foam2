@@ -103,7 +103,7 @@ class SwiftTestsTests: XCTestCase {
   func testArrayDao() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])
     let t1 = Test([
       "firstName": "Mike",
@@ -137,7 +137,7 @@ class SwiftTestsTests: XCTestCase {
   func testDaoListen() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])
 
     let sink = Count()
@@ -160,7 +160,7 @@ class SwiftTestsTests: XCTestCase {
   func testDaoSkipLimitSelect() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])
 
     for i in 1...10 {
@@ -405,7 +405,7 @@ class SwiftTestsTests: XCTestCase {
     let x = Context.GLOBAL
     let dao = x.create(ArrayDAO.self, args: [
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])!
 
     let complete = Future<Any?>()

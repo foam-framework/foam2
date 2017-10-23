@@ -22,7 +22,7 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom) {
+    function writeToSwiftClass(cls, superAxiom, parentCls) {
       if ( !this.swiftCode ) return;
       var override = !!(superAxiom && superAxiom.swiftCode)
       cls.field(this.Field.create({
@@ -42,9 +42,17 @@ foam.CLASS({
           visibility: 'public',
           static: true,
           final: true,
-          name: this.swiftAxiomName,
+          name: this.swiftPrivateAxiomName,
           type: 'MethodInfo',
           initializer: this.swiftMethodInfoInit(),
+        }));
+        cls.methods.push(this.Method.create({
+          visibility: 'public',
+          class: true,
+          name: this.swiftAxiomName,
+          returnType: 'MethodInfo',
+          body: 'return ' + this.swiftPrivateAxiomName,
+          override: this.getSwiftOverride(parentCls),
         }));
       }
       cls.method(this.Method.create({

@@ -132,6 +132,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftPrivateAxiomName',
+      expression: function(swiftName) { return '_' + foam.String.constantize(swiftName) + '_'; },
+    },
+    {
+      class: 'String',
       name: 'swiftAxiomName',
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
@@ -178,9 +183,17 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         visibility: 'private',
         static: true,
         final: true,
-        name: this.swiftAxiomName,
+        name: this.swiftPrivateAxiomName,
         type: 'PropertyInfo',
         initializer: this.swiftPropertyInfoInit(),
+      }));
+      cls.methods.push(this.Method.create({
+        visibility: 'public',
+        class: true,
+        name: this.swiftAxiomName,
+        returnType: 'PropertyInfo',
+        body: 'return ' + this.swiftPrivateAxiomName,
+        override: isOverride,
       }));
       if (this.swiftExpression) {
         cls.fields.push(this.Field.create({
