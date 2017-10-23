@@ -58,18 +58,18 @@ function ensurePath(p) {
 
 function loadClass(c) {
   var path = srcPath;
-  
+
   if ( foam.Array.isInstance(c) ) {
     path = path + c[0];
-    c = c[1];  
+    c = c[1];
   }
-  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');  
+  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');
   return foam.lookup(c);
 }
 
 function generateClass(cls) {
   if ( foam.Array.isInstance(cls) ) {
-    cls = cls[1];  
+    cls = cls[1];
   }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
@@ -79,12 +79,12 @@ function generateClass(cls) {
 
   ensurePath(outfile);
 
-  fs_.writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
+  writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
 }
 
 function generateAbstractClass(cls) {
   if ( foam.Array.isInstance(cls) ) {
-    cls = cls[1];  
+    cls = cls[1];
   }
   cls = foam.lookup(cls);
 
@@ -96,12 +96,12 @@ function generateAbstractClass(cls) {
   var javaclass = cls.buildJavaClass();
   javaclass.abstract = true;
 
-  fs_.writeFileSync(outfile, javaclass.toJavaSource());
+    writeFileIfUpdated(outfile, javaclass.toJavaSource());
 }
 
 function generateSkeleton(cls) {
   if ( foam.Array.isInstance(cls) ) {
-    cls = cls[1];  
+    cls = cls[1];
   }
   cls = foam.lookup(cls);
 
@@ -111,14 +111,12 @@ function generateSkeleton(cls) {
 
   ensurePath(outfile);
 
-  fs_.writeFileSync(
-    outfile,
-    foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
+  writeFileIfUpdated(outfile, foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
 }
 
 function generateProxy(intf) {
   if ( foam.Array.isInstance(intf) ) {
-    intf = intf[1];  
+    intf = intf[1];
   }
   intf = foam.lookup(intf);
 
@@ -161,12 +159,20 @@ function copyJavaClassesToBuildFolder(startPath) {
 
       result = result.concat(copyJavaClassesToBuildFolder(filePath));
     } else if (f.search('.js') < 0) {
-      fs_.writeFileSync(outputPath, fs_.readFileSync(filePath));
-      result.push(outputPath);
+      writeFileIfUpdated(outputPath, fs_.readFileSync(filePath).toString());
     }
   });
 
   return result;
+}
+
+function writeFileIfUpdated(outfile,buildJavaSource) {
+  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
+    fs_.writeFileSync(outfile, buildJavaSource);
+    if (result !==undefined) {
+      result.push(outputPath);
+    }
+  }
 }
 
 classes.forEach(loadClass);
