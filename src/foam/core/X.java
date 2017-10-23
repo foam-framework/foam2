@@ -21,6 +21,9 @@ public interface X
 {
   public Object get(Object key);
   public Object get(X x, Object key);
+  public int getInt(Object key);
+  public int getInt(Object key, int defaultValue);
+  public int getInt(X x, Object key, int defaultValue);
   public X put(Object key, Object value);
   public X putFactory(Object key, XFactory factory);
 
