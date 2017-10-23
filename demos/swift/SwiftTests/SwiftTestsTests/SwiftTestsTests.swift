@@ -375,28 +375,28 @@ class SwiftTestsTests: XCTestCase {
     let lock = DispatchSemaphore(value: 0)
     var secondBeforeFirst = false
     Async.aPar([
-      { ret, _ in
+      { ret, _, _ in
         DispatchQueue.global(qos: .utility).async {
           lock.wait()
           XCTAssertTrue(secondBeforeFirst)
           ret("A")
         }
       },
-      { ret, _ in
+      { ret, _, _ in
         DispatchQueue.global(qos: .userInitiated).async {
           secondBeforeFirst = true
           lock.signal()
           ret("B")
         }
       },
-      { ret, _ in
+      { ret, _, _ in
         DispatchQueue.global(qos: .background).async {
           ret("C")
         }
       },
     ])({ r in
       complete.set((r as! [String]).joined())
-    }, nil)
+    }, { _ in }, nil)
 
     try! XCTAssertEqual(complete.get() as! String, "ABC")
   }
@@ -411,25 +411,25 @@ class SwiftTestsTests: XCTestCase {
     let complete = Future<Any?>()
 
     Async.aSeq([
-      { ret, name in
+      { ret, _, name in
         DispatchQueue.global(qos: .utility).async {
           try? ret(dao.put(x.create(Test.self, args: ["firstName": name])!)!)
         }
       },
-      { ret, t in
+      { ret, _, t in
         XCTAssertEqual((t as! Test).firstName, "joe")
         DispatchQueue.global(qos: .userInteractive).async {
           try? ret(dao.select(Count()))
         }
       },
-      { ret, sink in
+      { ret, _, sink in
         let sink = sink as! Count
         XCTAssertEqual(sink.value, 1)
         ret(sink.value)
       },
     ])({ r in
       complete.set(r)
-    }, "joe")
+    }, { _ in }, "joe")
 
     try! XCTAssertEqual(complete.get() as! Int, 1)
   }
