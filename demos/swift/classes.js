@@ -11,7 +11,7 @@ var classes = [
   'foam.swift.ui.FOAMUITextFieldInt',
   'foam.swift.ui.PropertyView',
   'foam.swift.ui.ScrollingViewController',
-  'foam.swift.parse.json.output.HTTPBoxOutputter',
+  'foam.swift.parse.json.output.Outputter',
   'foam.u2.Visibility',
 
   'Tabata',

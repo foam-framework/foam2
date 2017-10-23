@@ -167,7 +167,7 @@ class SwiftTestsTests: XCTestCase {
       _ = (try? dao.put(Test(["firstName": i])))
     }
 
-    let sink = (try? dao.skip(2).limit(5).select(ArraySink())) as! ArraySink
+    let sink = (try? dao.skip(2).limit(5).select()) as! ArraySink
     XCTAssertEqual(sink.array.count, 5)
     XCTAssertEqual("3", (sink.array[0] as! Test).firstName)
   }

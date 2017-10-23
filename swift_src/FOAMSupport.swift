@@ -582,3 +582,8 @@ public class ParserContext {
   }
 }
 
+extension DAO {
+  func select() throws -> Sink {
+    return try select(Context.GLOBAL.create(ArraySink.self)!)
+  }
+}
