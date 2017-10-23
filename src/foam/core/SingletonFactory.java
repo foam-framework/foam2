@@ -16,7 +16,7 @@ public class SingletonFactory
     delegate_ = delegate;
   }
 
-  public Object create(X x) {
+  public synchronized Object create(X x) {
     if ( delegate_ != null ) {
       instance_ = delegate_.create(x);
       delegate_ = null;
