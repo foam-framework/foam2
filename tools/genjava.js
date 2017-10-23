@@ -58,18 +58,18 @@ function ensurePath(p) {
 
 function loadClass(c) {
   var path = srcPath;
-  
+
   if ( foam.Array.isInstance(c) ) {
     path = path + c[0];
-    c = c[1];  
+    c = c[1];
   }
-  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');  
+  if ( ! foam.lookup(c, true) ) require(path + c.replace(/\./g, '/') + '.js');
   return foam.lookup(c);
 }
 
 function generateClass(cls) {
   if ( foam.Array.isInstance(cls) ) {
-    cls = cls[1];  
+    cls = cls[1];
   }
   if ( typeof cls === 'string' )
     cls = foam.lookup(cls);
@@ -79,12 +79,15 @@ function generateClass(cls) {
 
   ensurePath(outfile);
 
-  fs_.writeFileSync(outfile, cls.buildJavaClass().toJavaSource());
+  var buildJavaSource = cls.buildJavaClass().toJavaSource();
+  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildJavaSource))) {
+    fs_.writeFileSync(outfile, buildJavaSource);
+  }
 }
 
 function generateAbstractClass(cls) {
   if ( foam.Array.isInstance(cls) ) {
-    cls = cls[1];  
+    cls = cls[1];
   }
   cls = foam.lookup(cls);
 
@@ -96,12 +99,15 @@ function generateAbstractClass(cls) {
   var javaclass = cls.buildJavaClass();
   javaclass.abstract = true;
 
-  fs_.writeFileSync(outfile, javaclass.toJavaSource());
+  var buildAbstractJavaSource = javaclass.toJavaSource();
+  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildAbstractJavaSource))) {
+    fs_.writeFileSync(outfile, buildAbstractJavaSource);
+  }
 }
 
 function generateSkeleton(cls) {
   if ( foam.Array.isInstance(cls) ) {
-    cls = cls[1];  
+    cls = cls[1];
   }
   cls = foam.lookup(cls);
 
@@ -111,14 +117,15 @@ function generateSkeleton(cls) {
 
   ensurePath(outfile);
 
-  fs_.writeFileSync(
-    outfile,
-    foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource());
+  var buildSkeletonJavaSource = foam.java.Skeleton.create({ of: cls }).buildJavaClass().toJavaSource();
+  if (! ( fs_.existsSync(outfile) && (fs_.readFileSync(outfile).toString() == buildSkeletonJavaSource))) {
+    fs_.writeFileSync(outfile,buildSkeletonJavaSource);
+  }
 }
 
 function generateProxy(intf) {
   if ( foam.Array.isInstance(intf) ) {
-    intf = intf[1];  
+    intf = intf[1];
   }
   intf = foam.lookup(intf);
 
@@ -161,8 +168,11 @@ function copyJavaClassesToBuildFolder(startPath) {
 
       result = result.concat(copyJavaClassesToBuildFolder(filePath));
     } else if (f.search('.js') < 0) {
-      fs_.writeFileSync(outputPath, fs_.readFileSync(filePath));
-      result.push(outputPath);
+      var readFilePath = fs_.readFileSync(filePath)
+        if (! ( fs_.existsSync(outputPath) && (fs_.readFileSync(outputPath).toString() == readFilePath.toString()))) {
+          fs_.writeFileSync(outputPath, readFilePath);
+          result.push(outputPath);
+        } //else the source haven't been changed
     }
   });
 
