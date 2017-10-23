@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'NoSuchNameException',
-  swiftImplements: ['Error'],
+  implements: ['foam.core.Exception'],
 
   properties: [
     {

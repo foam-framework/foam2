@@ -31,14 +31,13 @@ public class Outputter
     }
   };
 
-  protected ClassInfo of_ = null;
-  protected List<PropertyInfo> props_ = null;
-
-  protected StringWriter stringWriter_ = null;
-  protected PrintWriter writer_;
-  protected OutputterMode mode_;
-  protected boolean outputHeaders_;
-  protected boolean isHeadersOutput_ = false;
+  protected ClassInfo          of_           = null;
+  protected List<PropertyInfo> props_        = null;
+  protected StringWriter       stringWriter_ = null;
+  protected PrintWriter        writer_;
+  protected OutputterMode      mode_;
+  protected boolean            outputHeaders_;
+  protected boolean            isHeadersOutput_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -76,6 +75,7 @@ public class Outputter
     stringWriter_.getBuffer().setLength(0);
     if ( outputHeaders_ )
       outputHeaders(obj);
+
     outputFObject(obj);
     return this.toString();
   }

@@ -433,6 +433,17 @@ foam.CLASS({
       }
     ],
     [
+      'cloneProperty',
+      function(value, cloneMap) {
+        if ( value ) {
+          var tmp = cloneMap[this.name] = {};
+          for ( var key in value ) {
+            tmp[key] = value[key];
+          }
+        }
+      }
+    ],
+    [
       'diffPropertyValues',
       function(o1, o2) {
         // TODO
