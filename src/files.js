@@ -258,7 +258,6 @@ FOAM_FILES([
   { name: "foam/box/ForwardedMessage" },
   { name: "foam/box/ForwardBox" },
   { name: "foam/box/ForwardingBox" },
-  { name: "foam/box/SessionClientBox" },
   { name: "foam/box/Remote" },
   { name: "foam/box/SessionClientBox" },
   { name: "lib/boxJava", flags: ['java'] },
