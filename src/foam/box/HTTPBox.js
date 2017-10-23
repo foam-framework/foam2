@@ -20,8 +20,12 @@ foam.CLASS({
       path: 'foam.net.web.HTTPRequest',
       swiftPath: '',
     },
+    {
+      name: 'Outputter',
+      path: 'foam.json.Outputter',
+      swiftPath: 'foam.swift.parse.json.output.Outputter',
+    },
     'foam.box.HTTPReplyBox',
-    'foam.json.Outputter',
   ],
 
   imports: [
