@@ -99,7 +99,7 @@ public class Context {
 
   public func create<T>(_ type: T.Type, args: [String:Any?] = [:]) -> T? {
     if let type = type as? AnyClass,
-       let cls = lookup_(type) {
+      let cls = lookup_(type) {
       return cls.create(args: args, x: self) as? T
     }
     return nil
@@ -445,9 +445,9 @@ public class ModelParserFactory {
       "delegate": Seq0(["parsers": [
         Whitespace(),
         Alt(["parsers": parsers])
-      ]]),
+        ]]),
       "delim": Literal(["string": ","]),
-    ])
+      ])
   }
 }
 
@@ -471,11 +471,11 @@ public class FoamError: Error {
   }
 }
 
-public typealias AFunc = (@escaping (Any?) -> Void, Any?) -> Void
+public typealias AFunc = (@escaping (Any?) -> Void, @escaping (Any?) -> Void, Any?) -> Void
 public struct Async {
 
   public static func aPar(_ funcs: [AFunc]) -> AFunc {
-    return { (ret: @escaping (Any?) -> Void, args: Any?) in
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
       var numCompleted = 0
       var returnValues = Array<Any?>(repeating: nil, count: funcs.count)
       for i in 0...funcs.count-1 {
@@ -487,15 +487,15 @@ public struct Async {
           }
           numCompleted += 1
           if numCompleted == funcs.count {
-            ret(returnValues)
+            aRet(returnValues)
           }
-        }, args)
+        }, aThrow, args)
       }
     }
   }
 
   public static func aSeq(_ funcs: [AFunc]) -> AFunc {
-    return { (ret: @escaping (Any?) -> Void, args: Any?) in
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
       var i = 0
       var next: ((Any?) -> Void)!
       next = { d in
@@ -503,25 +503,25 @@ public struct Async {
         f({ d2 in
           i += 1
           if i == funcs.count {
-            ret(d2)
+            aRet(d2)
           } else {
             next(d2)
           }
-        }, d)
+        }, aThrow, d)
       }
       next(args)
     }
   }
 
   public static func aWhile(_ cond: @escaping () -> Bool, afunc: @escaping AFunc) -> AFunc {
-    return { (ret: @escaping (Any?) -> Void, args: Any?) in
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
       var next: ((Any?) -> Void)!
       next = { d in
         if !cond() {
-          ret(args)
+          aRet(args)
           return
         }
-        afunc(next, args)
+        afunc(next, aThrow, args)
       }
       next(args)
     }
@@ -529,11 +529,11 @@ public struct Async {
 
   public static func aWait(delay: TimeInterval = 0,
                            queue: DispatchQueue = DispatchQueue.main,
-                           afunc: @escaping AFunc = { ret, _ in ret(nil) }) -> AFunc {
-    return { (ret: @escaping (Any?) -> Void, args: Any?) in
+                           afunc: @escaping AFunc = { aRet, _, _ in aRet(nil) }) -> AFunc {
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
       queue.asyncAfter(
         deadline: DispatchTime.now() + Double(Int64(UInt64(delay * 1000.0) * NSEC_PER_MSEC)) / Double(NSEC_PER_SEC),
-        execute: { () -> Void in afunc(ret, args) })
+        execute: { () -> Void in afunc(aRet, aThrow, args) })
     }
   }
 }
@@ -581,3 +581,4 @@ public class ParserContext {
     return child
   }
 }
+
