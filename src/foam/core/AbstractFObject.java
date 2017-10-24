@@ -78,13 +78,13 @@ public abstract class AbstractFObject
     return property == null ? null : property.get(this);
   }
 
-  public boolean hasOwnProperty(String prop) {
+  public boolean isPropertySet(String prop) {
     PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
-    return property != null && property.hasOwnProperty(this);
+    return property != null && property.isSet(this);
   }
 
   public boolean hasDefaultValue(String prop) {
-    if ( ! this.hasOwnProperty(prop) )
+    if ( ! this.isPropertySet(prop) )
       return true;
     PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
     return property != null && property.isDefaultValue(this);
