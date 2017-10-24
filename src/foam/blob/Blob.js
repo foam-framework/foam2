@@ -20,6 +20,13 @@ foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
 
+  properties: [
+    {
+      class: 'Long',
+      name: 'size'
+    }
+  ],
+
   methods: [
     {
       name: 'read',
@@ -79,13 +86,6 @@ foam.CLASS({
   name: 'AbstractBlob',
 
   implements: ['foam.blob.Blob'],
-
-  properties: [
-    {
-      class: 'Long',
-      name: 'size'
-    }
-  ],
 
   methods: [
     function pipe(writeFn) {
