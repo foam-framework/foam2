@@ -101,7 +101,7 @@ foam.INTERFACE({
     },
     {
       name: 'urlFor',
-      returns: 'Strings',
+      returns: 'String',
       args: [
         {
           name: 'blob',
