@@ -52,9 +52,37 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'put_',
+      javaReturns: 'foam.blob.Blob',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'blob',
+          javaType: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
       name: 'find',
       javaReturns: 'foam.blob.Blob',
       args: [
+        {
+          name: 'id',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'find_',
+      javaReturns: 'foam.blob.Blob',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'id',
           javaType: 'String'
