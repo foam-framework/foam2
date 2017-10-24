@@ -20,13 +20,6 @@ foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
 
-  properties: [
-    {
-      class: 'Long',
-      name: 'size'
-    }
-  ],
-
   methods: [
     {
       name: 'read',
@@ -101,7 +94,7 @@ foam.INTERFACE({
     },
     {
       name: 'urlFor',
-      returns: 'Strings',
+      returns: 'String',
       args: [
         {
           name: 'blob',
@@ -115,8 +108,16 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.blob',
   name: 'AbstractBlob',
+  abstract: true,
 
   implements: ['foam.blob.Blob'],
+
+  properties: [
+    {
+      class: 'Long',
+      name: 'size'
+    }
+  ],
 
   methods: [
     function pipe(writeFn) {
@@ -257,7 +258,8 @@ foam.CLASS({
       transient: true,
       factory: function() {
         return this.blobService.find(this.id);
-      }
+      },
+      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
     }
   ],
   methods: [
