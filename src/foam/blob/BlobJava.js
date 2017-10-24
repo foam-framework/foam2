@@ -101,3 +101,14 @@ foam.INTERFACE({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.blob.IdentifiedBlob',
+
+  properties: [
+    {
+      name: 'delegate',
+      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
+    }
+  ]
+});
