@@ -49,12 +49,14 @@ foam.CLASS({
     },
     'sourceCls',
     'propType',
+    'propValue',
     'propRequired',
     'jsonParser',
     'csvParser',
     {
       name: 'methods',
       factory: function() {
+
         return [
           {
             name: 'getName',
@@ -157,11 +159,19 @@ foam.CLASS({
             body: 'return "' + this.propName.toLowerCase() + '";'
           },
           {
-            name: 'hasOwnProperty',
+            name: 'isSet',
             visibility: 'public',
             type: 'boolean',
             args: [ { name: 'o', type: 'Object' } ],
             body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
+          },
+          {
+            name: 'isDefaultValue',
+            visibility: 'public',
+            type: 'boolean',
+            args: [ { name: 'o', type: 'Object' } ],
+            /* TODO: revise when/if expression support is added to Java */
+            body: `return compareValues(get_(o), ${this.propValue}) == 0;`
           }
         ]
       }
