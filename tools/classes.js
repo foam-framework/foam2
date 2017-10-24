@@ -144,7 +144,8 @@ var classes = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
-  'foam.blob.BlobService'
+  'foam.blob.BlobService',
+  'foam.blob.IdentifiedBlob'
 ];
 
 var abstractClasses = [
