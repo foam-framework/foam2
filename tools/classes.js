@@ -142,7 +142,9 @@ var classes = [
   'foam.dao.pg.ConnectionPool',
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
-  'foam.lib.parse.PStream'
+  'foam.lib.parse.PStream',
+  'foam.blob.Blob',
+  'foam.blob.BlobService'
 ];
 
 var abstractClasses = [
