@@ -258,7 +258,8 @@ foam.CLASS({
       transient: true,
       factory: function() {
         return this.blobService.find(this.id);
-      }
+      },
+      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
     }
   ],
   methods: [
