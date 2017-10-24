@@ -153,6 +153,23 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.blob',
+  name: 'ProxyBlob',
+  extends: 'foam.blob.AbstractBlob',
+
+  documentation: 'Proxy implementation for the Blob interface',
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.blob.Blob',
+      name: 'delegate',
+      forwards: [ 'read' ]
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
   name: 'SubBlob',
   extends: 'foam.blob.AbstractBlob',
   properties: [
