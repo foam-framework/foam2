@@ -170,6 +170,7 @@ foam.CLASS({
             visibility: 'public',
             type: 'boolean',
             args: [ { name: 'o', type: 'Object' } ],
+            /* TODO: revise when/if expression support is added to Java */
             body: `return compareValues(get_(o), ${this.propValue}) == 0;`
           }
         ]
