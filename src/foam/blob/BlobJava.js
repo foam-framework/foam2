@@ -91,7 +91,7 @@ foam.INTERFACE({
     },
     {
       name: 'urlFor',
-      javaReturns: 'String[]',
+      javaReturns: 'String',
       args: [
         {
           name: 'blob',
