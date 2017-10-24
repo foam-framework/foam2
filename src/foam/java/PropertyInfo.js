@@ -159,7 +159,7 @@ foam.CLASS({
             body: 'return "' + this.propName.toLowerCase() + '";'
           },
           {
-            name: 'hasOwnProperty',
+            name: 'isSet',
             visibility: 'public',
             type: 'boolean',
             args: [ { name: 'o', type: 'Object' } ],
