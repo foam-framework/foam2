@@ -47,6 +47,9 @@ foam.INTERFACE({
 foam.INTERFACE({
   package: 'foam.blob',
   name: 'BlobService',
+
+  documentation: 'BlobService Interface',
+
   methods: [
     {
       name: 'put',
@@ -59,9 +62,37 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'put_',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
       name: 'find',
       returns: 'Promise',
       args: [
+        {
+          name: 'id',
+          of: 'String'
+        }
+      ]
+    },
+    {
+      name: 'find_',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
         {
           name: 'id',
           of: 'String'
