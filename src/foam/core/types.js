@@ -201,16 +201,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'Blob',
-  extends: 'Property',
-
-  // documentation: 'A chunk of binary data.',
-  label: 'Binary data',
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'Object',
   extends: 'Property',
   documentation: ''
