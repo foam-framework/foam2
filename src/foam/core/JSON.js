@@ -524,7 +524,7 @@ foam.CLASS({
           // Create new parser iff different context was injected; otherwise
           // use same parser bound to "creationContext" each time.
           opt_ctx ? foam.parsers.FON.create({
-            creationContext: opt_ctx
+            creationContext: opt_ctx || this.creationContext
           }).parseClassFromString(str, opt_cls) :
           this.fonParser_.parseClassFromString(str, opt_cls);
     }
