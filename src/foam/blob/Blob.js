@@ -243,7 +243,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'IdentifiedBlob',
-  extends: 'foam.blob.AbstractBlob',
+  extends: 'foam.blob.ProxyBlob',
   imports: [
     'blobService?'
   ],
