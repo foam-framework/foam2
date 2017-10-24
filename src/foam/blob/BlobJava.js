@@ -43,7 +43,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'put',
-      javaReturns: 'void',
+      javaReturns: 'foam.blob.Blob',
       args: [
         {
           name: 'blob',
@@ -53,7 +53,7 @@ foam.INTERFACE({
     },
     {
       name: 'find',
-      javaReturns: 'void',
+      javaReturns: 'foam.blob.Blob',
       args: [
         {
           name: 'id',
