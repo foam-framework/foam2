@@ -47,6 +47,9 @@ foam.INTERFACE({
 foam.INTERFACE({
   package: 'foam.blob',
   name: 'BlobService',
+
+  documentation: 'BlobService Interface',
+
   methods: [
     {
       name: 'put',
@@ -59,9 +62,37 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'put_',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
       name: 'find',
       returns: 'Promise',
       args: [
+        {
+          name: 'id',
+          of: 'String'
+        }
+      ]
+    },
+    {
+      name: 'find_',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
         {
           name: 'id',
           of: 'String'
@@ -84,7 +115,9 @@ foam.INTERFACE({
 foam.CLASS({
   package: 'foam.blob',
   name: 'AbstractBlob',
+
   implements: ['foam.blob.Blob'],
+
   methods: [
     function pipe(writeFn) {
       var self = this;
@@ -114,6 +147,23 @@ foam.CLASS({
         offset: offset,
         size: length
       });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'ProxyBlob',
+  extends: 'foam.blob.AbstractBlob',
+
+  documentation: 'Proxy implementation for the Blob interface',
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.blob.Blob',
+      name: 'delegate',
+      forwards: [ 'read' ]
     }
   ]
 });
@@ -193,7 +243,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'IdentifiedBlob',
-  extends: 'foam.blob.AbstractBlob',
+  extends: 'foam.blob.ProxyBlob',
   imports: [
     'blobService?'
   ],
