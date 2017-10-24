@@ -44,6 +44,43 @@ foam.INTERFACE({
   ]
 });
 
+foam.INTERFACE({
+  package: 'foam.blob',
+  name: 'BlobService',
+  methods: [
+    {
+      name: 'put',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
+      name: 'find',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'id',
+          of: 'String'
+        }
+      ]
+    },
+    {
+      name: 'urlFor',
+      returns: 'Strings',
+      args: [
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'AbstractBlob',
