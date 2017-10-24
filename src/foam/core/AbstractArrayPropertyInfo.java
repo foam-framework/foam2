@@ -17,8 +17,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public abstract class AbstractArrayPropertyInfo
-  extends AbstractPropertyInfo {
-
+  extends AbstractPropertyInfo
+{
   @Override
   public void setFromString(Object obj, String value) {
     // TODO
