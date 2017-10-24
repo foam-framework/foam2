@@ -70,6 +70,7 @@ foam.CLASS({
         sourceCls:        cls,
         propName:         this.name,
         propType:         this.javaType,
+        propValue:        this.javaValue,
         propRequired:     this.required,
         jsonParser:       this.javaJSONParser,
         csvParser:        this.javaCSVParser,
@@ -915,6 +916,9 @@ foam.CLASS({
         body: 'return "String";'
       });
 
+      var isDefaultValue = info.getMethod('isDefaultValue');
+      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);'
+
       return info;
     }
   ],
@@ -962,6 +966,9 @@ foam.CLASS({
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
       });
+
+      var isDefaultValue = info.getMethod('isDefaultValue');
+      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);'
 
       return info;
     }
@@ -1023,6 +1030,9 @@ foam.CLASS({
         type: 'String',
         body: 'return "' + (this.of ? this.of.id ? this.of.id : this.of : null) + '";'
       });
+
+      var isDefaultValue = info.getMethod('isDefaultValue');
+      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);'
 
       return info;
     }
