@@ -79,7 +79,7 @@ foam.CLASS({
       name: 'birthday'
     },
     {
-      class: 'foam.core.Blob',
+      class: 'String',
       name: 'profilePicture'
     },
     {
