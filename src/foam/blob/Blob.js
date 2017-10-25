@@ -656,7 +656,10 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'address'
+      name: 'address',
+      factory: function() {
+        return window.location.origin + "/blobService";
+      }
     }
   ],
   methods: [
@@ -677,7 +680,6 @@ foam.CLASS({
         return resp.payload;
       }).then(function(payload) {
         return foam.json.Parser.create({ creationContext: self }).parseString(payload);
-//        return self.IdentifiedBlob.create({ id: id });
       });
     },
     function urlFor(blob) {
