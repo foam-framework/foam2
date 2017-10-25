@@ -37,7 +37,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'expiry',
-      javaFactory: 'return new Date(System.currentTimeMillis()+30*24*60*60*1000);'
+      javaFactory: 'return new Date(System.currentTimeMillis()+30l*24l*60l*60l*1000l);'
     },
     {
       class: 'String',
