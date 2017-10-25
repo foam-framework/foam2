@@ -111,7 +111,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'id',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ]
     },
@@ -125,7 +125,7 @@ foam.INTERFACE({
         },
         {
           name: 'id',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ]
     },
@@ -133,6 +133,20 @@ foam.INTERFACE({
       name: 'urlFor',
       javaReturns: 'String',
       args: [
+        {
+          name: 'blob',
+          javaType: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
+      name: 'urlFor_',
+      javaReturns: 'String',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'blob',
           javaType: 'foam.blob.Blob'
@@ -164,6 +178,25 @@ foam.CLASS({
         }
       ],
       javaCode: 'return new SubBlob(this, offset, length);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.AbstractBlobService',
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'return this.put_(getX(), blob);'
+    },
+    {
+      name: 'find',
+      javaCode: 'return this.find_(getX(), id);'
+    },
+    {
+      name: 'urlFor',
+      javaCode: 'return this.urlFor_(getX(), blob);'
     }
   ]
 });
@@ -203,6 +236,34 @@ foam.CLASS({
     {
       name: 'setSize',
       javaCode: 'getBlob().setSize(size);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.TestBlobService',
+
+  methods: [
+    {
+      name: 'put_',
+      javaCode:
+`int id = this.nextId_++;
+getBlobs().put(id, blob);
+IdentifiedBlob identifiedBlob = new IdentifiedBlob();
+identifiedBlob.setId(id);
+return identifiedBlob;`
+    },
+    {
+      name: 'find_',
+      javaCode:
+`if ( getBlobs().containsKey(id) ) {
+  return new BlobBlob((Blob) getBlobs().get(id));
+}
+return null;`
+    },
+    {
+      name: 'urlFor_',
+      javaCode: 'return "";'
     }
   ]
 });
