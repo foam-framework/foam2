@@ -332,7 +332,7 @@ foam.CLASS({
     {
       class: 'Stub',
       of: 'foam.blob.Blob',
-      name: 'box'
+      name: 'delegate'
     }
   ]
 });
