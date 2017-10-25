@@ -220,22 +220,3 @@ return getParent().read(buffer, offset + getOffset());`
     }
   ]
 });
-
-foam.CLASS({
-  refines: 'foam.blob.BlobBlob',
-
-  methods: [
-    {
-      name: 'read',
-      javaCode: 'return null;'
-    },
-    {
-      name: 'getSize',
-      javaCode: 'return getBlob().getSize();'
-    },
-    {
-      name: 'setSize',
-      javaCode: 'getBlob().setSize(size);'
-    }
-  ]
-});
