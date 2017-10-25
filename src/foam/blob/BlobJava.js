@@ -16,21 +16,43 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  refines: 'foam.blob.Buffer',
+
+  methods: [
+    {
+      name: 'slice',
+      javaReturns: 'foam.blob.Buffer',
+      args: [
+        {
+          name: 'start',
+          javaType: 'int'
+        },
+        {
+          name: 'end',
+          javaType: 'int'
+        }
+      ],
+      javaCode: 'return new Buffer(end - start, ByteBuffer.wrap(getData().array(), start, end - start));'
+    }
+  ]
+});
+
 foam.INTERFACE({
   refines: 'foam.blob.Blob',
 
   methods: [
     {
       name: 'read',
-      javaReturns: 'java.nio.Buffer',
+      javaReturns: 'foam.blob.Buffer',
       args: [
         {
           name: 'buffer',
-          javaType: 'java.nio.Buffer'
+          javaType: 'foam.blob.Buffer'
         },
         {
           name: 'offset',
-          javaType: 'long'
+          javaType: 'int'
         }
       ]
     }
@@ -98,6 +120,52 @@ foam.INTERFACE({
           javaType: 'foam.blob.Blob'
         }
       ]
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.AbstractBlob',
+
+  methods: [
+    {
+      name: 'pipe',
+      javaCode: 'return;'
+    },
+    {
+      name: 'slice',
+      javaReturns: 'foam.blob.Blob',
+      args: [
+        {
+          name: 'offset',
+          javaType: 'int'
+        },
+        {
+          name: 'length',
+          javaType: 'int'
+        }
+      ],
+      javaCode: 'return new SubBlob(this, offset, length);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.SubBlob',
+
+  methods: [
+    {
+      name: 'read',
+      javaCode:
+`if ( buffer.getLength() > getSize() - offset ) {
+  buffer = buffer.slice(0, getSize() - offset);
+}
+
+return getParent().read(buffer, offset + getOffset());`
+    },
+    {
+      name: 'slice',
+      javaCode: 'return new SubBlob(getParent(), getOffset() + offset, length);'
     }
   ]
 });
