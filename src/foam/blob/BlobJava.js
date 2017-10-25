@@ -30,14 +30,14 @@ foam.CLASS({
       args: [
         {
           name: 'start',
-          javaType: 'int'
+          javaType: 'long'
         },
         {
           name: 'end',
-          javaType: 'int'
+          javaType: 'long'
         }
       ],
-      javaCode: 'return new Buffer(end - start, ByteBuffer.wrap(getData().array(), start, end - start));'
+      javaCode: 'return new Buffer(end - start, ByteBuffer.wrap(getData().array(), (int) start, (int) (end - start)));'
     }
   ]
 });
@@ -56,13 +56,13 @@ foam.INTERFACE({
         },
         {
           name: 'offset',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
     {
       name: 'getSize',
-      javaReturns: 'int'
+      javaReturns: 'long'
     }
   ]
 });
@@ -160,11 +160,11 @@ foam.CLASS({
       args: [
         {
           name: 'offset',
-          javaType: 'int'
+          javaType: 'long'
         },
         {
           name: 'length',
-          javaType: 'int'
+          javaType: 'long'
         }
       ],
       javaCode: 'return new SubBlob(this, offset, length);'
