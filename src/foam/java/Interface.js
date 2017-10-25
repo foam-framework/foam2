@@ -75,6 +75,11 @@ foam.CLASS({
     },
 
     function field() {
+      return this;
+    },
+
+    function getField() {
+      return null;
     },
 
     function toJavaSource() {
