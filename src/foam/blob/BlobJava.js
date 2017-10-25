@@ -19,6 +19,10 @@
 foam.CLASS({
   refines: 'foam.blob.Buffer',
 
+  javaImports: [
+    'java.nio.ByteBuffer'
+  ],
+
   methods: [
     {
       name: 'slice',
@@ -52,6 +56,20 @@ foam.INTERFACE({
         },
         {
           name: 'offset',
+          javaType: 'int'
+        }
+      ]
+    },
+    {
+      name: 'getSize',
+      javaReturns: 'int'
+    },
+    {
+      name: 'setSize',
+      javaReturns: 'void',
+      args: [
+        {
+          name: 'size',
           javaType: 'int'
         }
       ]
