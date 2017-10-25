@@ -1,6 +1,7 @@
 package foam.blob;
 
-public class InputStreamBlob {
+public class InputStreamBlob
+  extends foam.blob.AbstractBlob {
   private java.io.InputStream stream_;
 
   public InputStreamBlob(java.io.InputStream stream) {
@@ -8,7 +9,7 @@ public class InputStreamBlob {
   }
 
   @Override
-  public void read(Buffer buffer, long offset) {
+  public Buffer read(Buffer buffer, long offset) {
     throw new RuntimeException("Not implemented yet.");
   }
 

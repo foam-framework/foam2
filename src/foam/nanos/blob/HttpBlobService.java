@@ -34,13 +34,13 @@ public class HttpBlobService
     foam.blob.Blob blob = blobService_.find(id);
 
     if ( blob == null ) {
-      req.setStatus(resp.SC_NOT_FOUND);
+      resp.setStatus(resp.SC_NOT_FOUND);
       return;
     }
 
     resp.setStatus(resp.SC_OK);
     resp.setHeader("Content-Type", "application/octet-stream");
-    resp.setHeader("Content-Length", blob.getSize());
+    resp.setHeader("Content-Length", Long.toString(blob.getSize()));
     resp.setHeader("ETag", id);
     resp.setHeader("Cache-Control", "public");
 
