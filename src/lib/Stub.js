@@ -23,9 +23,17 @@ foam.CLASS({
         var name            = this.name;
 
         return function() {
-          var replyBox = this.RPCReturnBox.create()
-
+          var replyBox = this.RPCReturnBox.create();
           var ret = replyBox.promise;
+          if ( returns ) {
+            replyBox = this.ReplyBox.create({
+              delegate: replyBox
+            });
+            replyBox = this.registry.register(
+                replyBox.id,
+                this[replyPolicyName],
+                replyBox);
+          }
 
           // Automatically wrap RPCs that return a "PromisedAbc" or similar
           // TODO: Move this into RPCReturnBox ?
