@@ -16,7 +16,7 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
+    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified', 'profilePicture'
   ],
 
   properties: [
