@@ -239,31 +239,3 @@ foam.CLASS({
     }
   ]
 });
-
-foam.CLASS({
-  refines: 'foam.blob.TestBlobService',
-
-  methods: [
-    {
-      name: 'put_',
-      javaCode:
-`int id = this.nextId_++;
-getBlobs().put(id, blob);
-IdentifiedBlob identifiedBlob = new IdentifiedBlob();
-identifiedBlob.setId(id);
-return identifiedBlob;`
-    },
-    {
-      name: 'find_',
-      javaCode:
-`if ( getBlobs().containsKey(id) ) {
-  return new BlobBlob((Blob) getBlobs().get(id));
-}
-return null;`
-    },
-    {
-      name: 'urlFor_',
-      javaCode: 'return "";'
-    }
-  ]
-});
