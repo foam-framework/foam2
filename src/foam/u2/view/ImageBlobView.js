@@ -24,7 +24,9 @@ foam.CLASS({
         start('img').
         attrs({
           src: this.data$.map(function(data) {
-            return view.blobService.urlFor(data) || '';
+            return view.BlobBlob.isInstance(data) ?
+              URL.createObjectURL(data.blob) :
+              ( view.blobService.urlFor(data) || '' );
           })
         }).
         end().
