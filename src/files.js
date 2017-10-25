@@ -183,6 +183,7 @@ FOAM_FILES([
   { name: "foam/physics/Collider" },
   { name: "foam/physics/PhysicsEngine" },
   { name: "foam/blob/Blob" },
+  { name: "foam/blob/BlobJava", flags: ['java'] },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
   { name: "foam/net/web/WebSocket" },
