@@ -173,7 +173,8 @@ var proxies = [
   'foam.mop.MOP',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
-  'foam.blob.Blob'
+  'foam.blob.Blob',
+  'foam.blob.BlobService'
 ];
 
 module.exports = {
