@@ -48,7 +48,7 @@ foam.CLASS({
             })
           });
 
-          msg.attributes.replyBox = replyBox;
+          if ( returns ) msg.attributes.replyBox = replyBox;
 
           this[boxPropName].send(msg);
 
