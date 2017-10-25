@@ -192,7 +192,7 @@ foam.CLASS({
   extends: 'foam.blob.AbstractBlob',
   properties: [
     {
-      class: 'foam.core.Blob',
+      class: 'Blob',
       name: 'parent',
     },
     {
