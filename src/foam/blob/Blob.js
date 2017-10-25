@@ -20,13 +20,6 @@ foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
 
-  properties: [
-    {
-      class: 'Long',
-      name: 'size'
-    }
-  ],
-
   methods: [
     {
       name: 'read',
@@ -44,10 +37,88 @@ foam.INTERFACE({
   ]
 });
 
+foam.INTERFACE({
+  package: 'foam.blob',
+  name: 'BlobService',
+
+  documentation: 'BlobService Interface',
+
+  methods: [
+    {
+      name: 'put',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
+      name: 'put_',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    },
+    {
+      name: 'find',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'id',
+          of: 'String'
+        }
+      ]
+    },
+    {
+      name: 'find_',
+      returns: 'Promise',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          name: 'id',
+          of: 'String'
+        }
+      ]
+    },
+    {
+      name: 'urlFor',
+      returns: 'String',
+      args: [
+        {
+          name: 'blob',
+          of: 'foam.blob.Blob'
+        }
+      ]
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'AbstractBlob',
+  abstract: true,
+
   implements: ['foam.blob.Blob'],
+
+  properties: [
+    {
+      class: 'Long',
+      name: 'size'
+    }
+  ],
+
   methods: [
     function pipe(writeFn) {
       var self = this;
@@ -77,6 +148,23 @@ foam.CLASS({
         offset: offset,
         size: length
       });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'ProxyBlob',
+  extends: 'foam.blob.AbstractBlob',
+
+  documentation: 'Proxy implementation for the Blob interface',
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.blob.Blob',
+      name: 'delegate',
+      forwards: [ 'read' ]
     }
   ]
 });
@@ -156,7 +244,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'IdentifiedBlob',
-  extends: 'foam.blob.AbstractBlob',
+  extends: 'foam.blob.ProxyBlob',
   imports: [
     'blobService?'
   ],
@@ -170,7 +258,8 @@ foam.CLASS({
       transient: true,
       factory: function() {
         return this.blobService.find(this.id);
-      }
+      },
+      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
     }
   ],
   methods: [
