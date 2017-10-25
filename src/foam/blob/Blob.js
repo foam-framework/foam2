@@ -16,9 +16,42 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'Buffer',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'length'
+    },
+    {
+      class: 'Object',
+      name: 'data',
+      javaType: 'java.nio.ByteBuffer',
+      factory: function() {
+        return new ArrayBuffer(this.length);
+      }
+    }
+  ],
+
+  methods: [
+    function slice(start, end) {
+      return foam.blob.Buffer.create();
+    }
+  ]
+});
+
 foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'size'
+    }
+  ],
 
   methods: [
     {
@@ -29,8 +62,8 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          name: 'offset',
-          of: 'Long'
+          class: 'Int',
+          name: 'offset'
         }
       ]
     }
@@ -112,13 +145,6 @@ foam.CLASS({
 
   implements: ['foam.blob.Blob'],
 
-  properties: [
-    {
-      class: 'Long',
-      name: 'size'
-    }
-  ],
-
   methods: [
     function pipe(writeFn) {
       var self = this;
@@ -175,12 +201,15 @@ foam.CLASS({
   extends: 'foam.blob.AbstractBlob',
   properties: [
     {
+      class: 'foam.core.Blob',
       name: 'parent',
     },
     {
+      class: 'Int',
       name: 'offset'
     },
     {
+      class: 'Int',
       name: 'size',
       assertValue: function(value) {
         foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
@@ -311,7 +340,7 @@ foam.CLASS({
       name: 'fd'
     },
     {
-      class: 'Long',
+      class: 'Int',
       name: 'size',
       expression: function(fd) {
         return require('fs').fstatSync(fd).size;
