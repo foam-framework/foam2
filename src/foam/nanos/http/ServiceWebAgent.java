@@ -13,9 +13,7 @@ import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
+import java.io.*;
 import java.nio.CharBuffer;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +65,7 @@ public class ServiceWebAgent
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
-      FObject result = requestContext.create(JSONParser.class).parseReader(reader);
+      FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
 
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
