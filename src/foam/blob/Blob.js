@@ -77,32 +77,74 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: 'Promise',
-      args: [ 'blob' ]
+      args: [
+        {
+          class: 'Blob',
+          name: 'blob'
+        }
+      ]
     },
     {
       name: 'put_',
       returns: 'Promise',
-      args: [ 'x', 'blob' ]
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          class: 'Blob',
+          name: 'blob'
+        }
+      ]
     },
     {
       name: 'find',
       returns: 'Promise',
-      args: [ 'id' ]
+      args: [
+        {
+          class: 'String',
+          name: 'id'
+        }
+      ]
     },
     {
       name: 'find_',
       returns: 'Promise',
-      args: [ 'x', 'id' ]
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          class: 'String',
+          name: 'id'
+        }
+      ]
     },
     {
       name: 'urlFor',
       returns: 'String',
-      args: [ 'blob' ]
+      args: [
+        {
+          class: 'Blob',
+          name: 'blob'
+        }
+      ]
     },
     {
       name: 'urlFor_',
       returns: 'String',
-      args: [ 'x', 'blob' ]
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          class: 'Blob',
+          name: 'blob'
+        }
+      ]
     }
   ]
 });
@@ -232,7 +274,7 @@ foam.CLASS({
   extends: 'foam.blob.AbstractBlob',
   properties: [
     {
-      class: 'foam.core.Blob',
+      class: 'Blob',
       name: 'blob'
     },
     {
@@ -273,7 +315,7 @@ foam.CLASS({
   ],
   properties: [
     {
-      class: 'Int',
+      class: 'String',
       name: 'id'
     },
     {
@@ -334,7 +376,7 @@ foam.CLASS({
       name: 'fd'
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'size',
       expression: function(fd) {
         return require('fs').fstatSync(fd).size;
