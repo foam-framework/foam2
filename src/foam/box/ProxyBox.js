@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'ProxyBox',
-  implements: ['foam.box.Box'],
+  implements: [ 'foam.box.Box' ],
 
   properties: [
     {

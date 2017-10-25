@@ -13,9 +13,7 @@ import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
+import java.io.*;
 import java.nio.CharBuffer;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -53,13 +51,13 @@ public class ServiceWebAgent
   }
 */
 
-  public void execute(X x) {
+  public synchronized void execute(X x) {
     try {
       HttpServletRequest  req            = (HttpServletRequest)  x.get(HttpServletRequest.class);
       HttpServletResponse resp           = (HttpServletResponse) x.get(HttpServletResponse.class);
       PrintWriter         out            = (PrintWriter) x.get(PrintWriter.class);
       CharBuffer          buffer_        = CharBuffer.allocate(65535);
-      Reader              reader         = req.getReader();
+      BufferedReader      reader         = req.getReader();
       int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
@@ -68,6 +66,7 @@ public class ServiceWebAgent
       buffer_.rewind();
 
       FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
         String message = getParsingError(x, buffer_.toString());
@@ -90,7 +89,7 @@ public class ServiceWebAgent
         ((ContextAware) service_).setX(x);
 
       foam.box.Message msg = (foam.box.Message) result;
-      skeleton_.send(msg);
+      new SessionServerBox(x, skeleton_).send(msg);
     } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException(t);

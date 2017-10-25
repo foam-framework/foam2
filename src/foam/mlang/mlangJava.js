@@ -852,7 +852,7 @@ foam.CLASS({
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: 'setValue(getValue() + (double) this.arg1_.f(obj));'
+      javaCode: 'setValue(getValue() + ((Number) this.arg1_.f(obj)).doubleValue());'
     }
   ]
 });
