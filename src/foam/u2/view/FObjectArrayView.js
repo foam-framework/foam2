@@ -17,12 +17,19 @@ foam.CLASS({
   documentation: 'View for editing FObjects.',
 
   axioms: [
-    foam.u2.CSS.create({/*
-      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
-      .btn{
-        background: lightpink;
-      }
+    foam.u2.CSS.create({
+      code: function(){/*
+        .rmv-button{
+          background: rgba(216, 30, 5, 0.3);
+          width: 125px;
+          text-align: center;
+          color: indianred;
+          padding: 10px;
+          font-size: 12px;
+          border-radius: 3px;
+        }
       */
+      }
     })
   ],
 
@@ -53,7 +60,7 @@ foam.CLASS({
       this.add(this.ADD_ITEM).add(this.slot(function(data) {
         return this.E().forEach(data, function(o, index) {
           this.tag({class: self.detailView}, {data: o})
-          .start().add('Remove').addClass('btn').style({ 'background' : 'rgba(216, 30, 5, 0.3)' }).on('click', function(){ self.removeIt(index) }).end()
+          .start().add('Remove').addClass('rmv-button').on('click', function(){ self.removeIt(index) }).end()
         })
       }))
       this.endContext();
