@@ -1,26 +1,36 @@
 import UIKit
 
 class SwiftApp {
-  lazy var data: Tabata = {
-    return Context.GLOBAL.create(Tabata.self)!
+  lazy var data: Test = {
+    return Context.GLOBAL.create(Test.self)!
   }()
 
-  lazy var navVc: UINavigationController = {
+  lazy var scrollVc: ScrollingViewController = {
 
-    let dv = Context.GLOBAL.create(DetailView.self, args: ["data": self.data])!
-    dv.initAllViews()
+    let dv = Context.GLOBAL.create(DetailView.self, args: [
+      "data": self.data,
+      "config": [
+        "exprProp": [
+          "viewFactory": { (x: Context) -> FObject? in
+            return x.create(FOAMUILabel.self)
+          }
+        ]
+      ]
+    ])!
 
-    let vc = ScrollingViewController([
-      "view$": dv.view$,
+    let svc = ScrollingViewController([
+      "view": dv,
       "title": self.data.ownClassInfo().label
     ])
 
-    return UINavigationController(rootViewController: vc.vc)
+    let nib = UINib(nibName: "CustomView", bundle: Bundle.main)
+    let customView = nib.instantiate(withOwner: svc.vc, options: nil)[0] as! TestDetailView
+    customView.dv_Test = dv
+
+    return svc
   }()
-  func startListeners() {
-    _ = Context.GLOBAL.create(TabataSoundView.self, args: ["data": self.data])
-    _ = data.timer$.dot("isStarted").swiftSub { (_, _) in
-      UIApplication.shared.isIdleTimerDisabled = self.data.timer.isStarted
-    }
-  }
+
+  lazy var navVc: UINavigationController = {
+    return UINavigationController(rootViewController: scrollVc.vc)
+  }()
 }
