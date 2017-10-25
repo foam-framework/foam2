@@ -301,7 +301,6 @@ foam.CLASS({
   extends: 'foam.blob.AbstractBlob',
   properties: [
     {
-      class: 'Blob',
       name: 'blob'
     },
     {
