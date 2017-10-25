@@ -63,16 +63,6 @@ foam.INTERFACE({
     {
       name: 'getSize',
       returns: 'Int'
-    },
-    {
-      name: 'setSize',
-      returns: '',
-      args: [
-        {
-          class: 'Int',
-          name: 'size'
-        }
-      ]
     }
   ]
 });
@@ -191,7 +181,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.blob.Blob',
       name: 'delegate',
-      forwards: [ 'read', 'getSize', 'setSize' ]
+      forwards: [ 'read', 'getSize' ]
     }
   ]
 });
