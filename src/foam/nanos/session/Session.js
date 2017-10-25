@@ -41,7 +41,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'hostname'
+      name: 'remoteHost'
     },
     {
       class: 'Object',
