@@ -53,13 +53,13 @@ public class ServiceWebAgent
   }
 */
 
-  public void execute(X x) {
+  public synchronized void execute(X x) {
     try {
       HttpServletRequest  req            = (HttpServletRequest)  x.get(HttpServletRequest.class);
       HttpServletResponse resp           = (HttpServletResponse) x.get(HttpServletResponse.class);
       PrintWriter         out            = (PrintWriter) x.get(PrintWriter.class);
       CharBuffer          buffer_        = CharBuffer.allocate(65535);
-      Reader              reader         = req.getReader();
+      BufferedReader      reader         = req.getReader();
       int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
@@ -67,7 +67,8 @@ public class ServiceWebAgent
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
-      FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      FObject result = requestContext.create(JSONParser.class).parseReader(reader);
+
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
         String message = getParsingError(x, buffer_.toString());
