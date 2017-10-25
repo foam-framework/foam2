@@ -196,7 +196,17 @@ foam.CLASS({
 
   implements: ['foam.blob.BlobService'],
 
+  requires: [
+    'foam.blob.ProxyBlobService'
+  ],
+
   methods: [
+    {
+      name: 'inX',
+      code: function (x) {
+        return this.ProxyBlobService.create({ delegate: this }, x);
+      }
+    },
     function put(blob) {
       return this.put_(this.__context__, blob);
     },
@@ -224,6 +234,23 @@ foam.CLASS({
       of: 'foam.blob.Blob',
       name: 'delegate',
       forwards: [ 'read', 'getSize' ]
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'ProxyBlobService',
+  extends: 'foam.blob.AbstractBlobService',
+
+  documentation: 'Proxy implementation for the BlobService interface',
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.blob.BlobService',
+      name: 'delegate',
+      forwards: [ 'put_', 'find_', 'urlFor_' ]
     }
   ]
 });
