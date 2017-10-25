@@ -46,13 +46,6 @@ foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
 
-  properties: [
-    {
-      class: 'Int',
-      name: 'size'
-    }
-  ],
-
   methods: [
     {
       name: 'read',
@@ -64,6 +57,20 @@ foam.INTERFACE({
         {
           class: 'Int',
           name: 'offset'
+        }
+      ]
+    },
+    {
+      name: 'getSize',
+      returns: 'Int'
+    },
+    {
+      name: 'setSize',
+      returns: '',
+      args: [
+        {
+          class: 'Int',
+          name: 'size'
         }
       ]
     }
@@ -190,7 +197,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.blob.Blob',
       name: 'delegate',
-      forwards: [ 'read' ]
+      forwards: [ 'read', 'getSize', 'setSize' ]
     }
   ]
 });
