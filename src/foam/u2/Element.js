@@ -2062,6 +2062,17 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.FObjectArrayView' },
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Class',
   properties: [
     [ 'view', { class: 'foam.u2.ClassView' } ]
