@@ -87,60 +87,32 @@ foam.INTERFACE({
     {
       name: 'put',
       returns: 'Promise',
-      args: [
-        {
-          name: 'blob',
-          of: 'foam.blob.Blob'
-        }
-      ]
+      args: [ 'blob' ]
     },
     {
       name: 'put_',
       returns: 'Promise',
-      args: [
-        {
-          name: 'x',
-          of: 'foam.core.X'
-        },
-        {
-          name: 'blob',
-          of: 'foam.blob.Blob'
-        }
-      ]
+      args: [ 'x', 'blob' ]
     },
     {
       name: 'find',
       returns: 'Promise',
-      args: [
-        {
-          name: 'id',
-          of: 'String'
-        }
-      ]
+      args: [ 'id' ]
     },
     {
       name: 'find_',
       returns: 'Promise',
-      args: [
-        {
-          name: 'x',
-          of: 'foam.core.X'
-        },
-        {
-          name: 'id',
-          of: 'String'
-        }
-      ]
+      args: [ 'x', 'id' ]
     },
     {
       name: 'urlFor',
       returns: 'String',
-      args: [
-        {
-          name: 'blob',
-          of: 'foam.blob.Blob'
-        }
-      ]
+      args: [ 'blob' ]
+    },
+    {
+      name: 'urlFor_',
+      returns: 'String',
+      args: [ 'x', 'blob' ]
     }
   ]
 });
@@ -181,6 +153,28 @@ foam.CLASS({
         offset: offset,
         size: length
       });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'AbstractBlobService',
+  abstract: true,
+
+  implements: ['foam.blob.BlobService'],
+
+  methods: [
+    function put(blob) {
+      return this.put_(this.__context__, blob);
+    },
+
+    function find(id) {
+      return this.find_(this.__context__, id);
+    },
+
+    function urlFor(blob) {
+      return this.urlFor_(this.__context__, blob);
     }
   ]
 });
@@ -289,7 +283,7 @@ foam.CLASS({
   ],
   properties: [
     {
-      class: 'String',
+      class: 'Int',
       name: 'id'
     },
     {
@@ -705,6 +699,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'TestBlobService',
+  extends: 'foam.blob.AbstractBlobService',
+
   requires: [
     'foam.blob.IdentifiedBlob',
     'foam.blob.BlobBlob'
@@ -712,7 +708,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Map',
-      name: 'blobs'
+      name: 'blobs',
+      javaFactory: 'return new java.util.HashMap<Integer, foam.blob.Blob>();'
     },
     {
       class: 'Int',
@@ -721,17 +718,17 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(file) {
+    function put_(x, file) {
       var id = this.nextId++;
       this.blobs[id] = file;
       return Promise.resolve(this.IdentifiedBlob.create({ id: id }));
     },
-    function find(id) {
+    function find_(x, id) {
       return Promise.resolve(this.blobs[id] ?
                              this.BlobBlob.create({ blob: this.blobs[id] }) :
                              null);
     },
-    function urlFor(id) {
+    function urlFor_(x, id) {
       return this.blobs[id] ?
         URL.createObjectURL(this.blobs[id]) :
         null;
