@@ -23,6 +23,14 @@ foam.CLASS({
       class: 'String',
     },
     {
+      name: 'didSet',
+      class: 'String',
+    },
+    {
+      name: 'willSet',
+      class: 'String',
+    },
+    {
       name: 'getter',
       class: 'String',
     },
@@ -30,10 +38,16 @@ foam.CLASS({
       name: 'setter',
       class: 'String',
     },
+    {
+      class: 'StringArray',
+      name: 'annotations',
+    },
   ],
 
   methods: [
     function outputSwift(o) {
+      o.indent();
+      o.out(this.annotations.join('\n'), this.annotations.length ? '\n' : '');
       o.indent();
       o.out(
         this.override ? 'override ' : '',
@@ -52,7 +66,7 @@ foam.CLASS({
         o.decreaseIndent();
         o.indent();
         o.out('}()');
-      } else if (this.getter || this.setter) {
+      } else if (this.getter || this.setter || this.didSet || this.willSet) {
         o.out(' {\n');
         o.increaseIndent();
         o.indent();
@@ -70,6 +84,24 @@ foam.CLASS({
           o.increaseIndent();
           o.indent();
           o.out(this.setter, '\n');
+          o.decreaseIndent();
+          o.indent();
+          o.out('}\n');
+        }
+        if (this.didSet) {
+          o.out('didSet {\n');
+          o.increaseIndent();
+          o.indent();
+          o.out(this.didSet, '\n');
+          o.decreaseIndent();
+          o.indent();
+          o.out('}\n');
+        }
+        if (this.willSet) {
+          o.out('willSet {\n');
+          o.increaseIndent();
+          o.indent();
+          o.out(this.willSet, '\n');
           o.decreaseIndent();
           o.indent();
           o.out('}\n');

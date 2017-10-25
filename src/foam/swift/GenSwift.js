@@ -74,6 +74,7 @@ foam.CLASS({
         'foam.core.AbstractInterface',
         'foam.core.AbstractEnum',
         'foam.box.RPCReturnBox',
+        'foam.swift.ui.AbstractGenIBOutletDetailView',
       ],
     },
     {
@@ -124,7 +125,7 @@ foam.CLASS({
         for (var i = 0; i < models.length; i++) {
           var cls = self.lookup(models[i], self);
           var swiftClass = cls.toSwiftClass();
-          if (foam.swift.SwiftClass.isInstance(swiftClass)) {
+          if (swiftClass.getMethod && swiftClass.getMethod('classInfo')) {
             classes.push(swiftClass.name);
           }
           var fileName = self.outdir + sep + cls.id.replace(/\./g, '_') + '.swift';

@@ -485,3 +485,64 @@ foam.CLASS({
     },
   ],
 });
+
+foam.CLASS({
+  name: 'GenIBOutletDetailViewModel',
+  package: 'foam.swift.ui',
+  extends: 'foam.core.Model',
+  properties: [
+    [ 'extends', 'foam.swift.ui.AbstractGenIBOutletDetailView' ],
+    {
+      class: 'StringArray',
+      name: 'classes',
+    },
+  ],
+});
+
+foam.CLASS({
+  package: 'foam.swift.ui',
+  name: 'AbstractGenIBOutletDetailView',
+
+  axioms: [
+    {
+      installInClass: function(cls) {
+        cls.toSwiftClass =  function() {
+          var cls = foam.swift.SwiftClass.create({
+            visibility: 'public',
+            name: this.name,
+            implements: ['UIView'],
+            imports: ['UIKit'],
+          });
+
+          this.model_.classes.map(function(c) { return foam.lookup(c) }).forEach(function(c) {
+            var suf = '_' + c.model_.swiftName;
+            var dvName = 'dv' + suf;
+
+            var didSets = [];
+            var addViewAxioms = function(a) {
+              var pName = a.name + suf;
+              var didSet = `if ${pName} != nil { self.${dvName}?["${a.name}"]?.set(key: "view", value: self.${pName}) }`;
+              cls.fields.push(foam.swift.Field.create({
+                visibility: 'public',
+                annotations: ['@IBOutlet'],
+                type: 'UIView?',
+                name: pName,
+                didSet: didSet,
+              }))
+              didSets.push(didSet);
+            };
+            c.getAxiomsByClass(foam.core.Property).forEach(addViewAxioms);
+            c.getAxiomsByClass(foam.core.Action).forEach(addViewAxioms);
+            cls.fields.push(foam.swift.Field.create({
+              name: dvName,
+              weak: true,
+              type: 'DetailView?',
+              didSet: didSets.join('\n') + `\n${dvName}?.view = self`,
+            }));
+          })
+          return cls;
+        }
+      }
+    }
+  ]
+});

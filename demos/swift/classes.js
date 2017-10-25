@@ -14,9 +14,8 @@ var classes = [
   'foam.swift.parse.json.output.Outputter',
   'foam.u2.Visibility',
 
-  'Tabata',
-  'TabataSoundView',
   'TestExtended',
+  'TestDetailView',
   'foam.dao.ArraySink',
   'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',

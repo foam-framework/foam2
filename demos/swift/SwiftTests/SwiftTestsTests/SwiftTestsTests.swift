@@ -212,15 +212,15 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testSwiftSubFire() {
-    let o = Tabata()
+    let o = Test()
 
     var calls = 0
-    let sub = o.seconds$.swiftSub { (_, _) in
+    let sub = o.firstName$.swiftSub { (_, _) in
       calls += 1
     }
 
     XCTAssertEqual(calls, 0)
-    o.seconds += 1
+    o.firstName = "YOO"
     XCTAssertEqual(calls, 1)
 
     sub.detach()
