@@ -22,7 +22,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Long',
       name: 'length'
     },
     {
@@ -55,14 +55,14 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          class: 'Int',
+          class: 'Long',
           name: 'offset'
         }
       ]
     },
     {
       name: 'getSize',
-      returns: 'Int'
+      returns: 'Long'
     }
   ]
 });
@@ -238,11 +238,11 @@ foam.CLASS({
       name: 'parent',
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'offset'
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'size',
       assertValue: function(value) {
         foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
@@ -740,8 +740,7 @@ foam.CLASS({
   properties: [
     {
       class: 'Map',
-      name: 'blobs',
-      javaFactory: 'return new java.util.HashMap<Integer, foam.blob.Blob>();'
+      name: 'blobs'
     },
     {
       class: 'Int',
