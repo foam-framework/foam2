@@ -144,9 +144,12 @@ var classes = [
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.blob.AbstractBlob',
+  'foam.blob.AbstractBlobService',
+  'foam.blob.SubBlob',
   'foam.blob.IdentifiedBlob'
 ];
 
@@ -171,7 +174,8 @@ var proxies = [
   'foam.mop.MOP',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
-  'foam.blob.Blob'
+  'foam.blob.Blob',
+  'foam.blob.BlobService'
 ];
 
 module.exports = {
