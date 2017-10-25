@@ -300,10 +300,7 @@ foam.CLASS({
   name: 'BlobBlob',
   extends: 'foam.blob.AbstractBlob',
   properties: [
-    {
-      class: 'Blob',
-      name: 'blob'
-    },
+    'blob',
     {
       name: 'size',
       factory: function() {
