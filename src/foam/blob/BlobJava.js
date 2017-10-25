@@ -16,23 +16,53 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  refines: 'foam.blob.Buffer',
+
+  javaImports: [
+    'java.nio.ByteBuffer'
+  ],
+
+  methods: [
+    {
+      name: 'slice',
+      javaReturns: 'foam.blob.Buffer',
+      args: [
+        {
+          name: 'start',
+          javaType: 'long'
+        },
+        {
+          name: 'end',
+          javaType: 'long'
+        }
+      ],
+      javaCode: 'return new Buffer(end - start, ByteBuffer.wrap(getData().array(), (int) start, (int) (end - start)));'
+    }
+  ]
+});
+
 foam.INTERFACE({
   refines: 'foam.blob.Blob',
 
   methods: [
     {
       name: 'read',
-      javaReturns: 'java.nio.Buffer',
+      javaReturns: 'foam.blob.Buffer',
       args: [
         {
           name: 'buffer',
-          javaType: 'java.nio.Buffer'
+          javaType: 'foam.blob.Buffer'
         },
         {
           name: 'offset',
           javaType: 'long'
         }
       ]
+    },
+    {
+      name: 'getSize',
+      javaReturns: 'long'
     }
   ]
 });
@@ -71,7 +101,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'id',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ]
     },
@@ -85,7 +115,7 @@ foam.INTERFACE({
         },
         {
           name: 'id',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ]
     },
@@ -98,6 +128,85 @@ foam.INTERFACE({
           javaType: 'foam.blob.Blob'
         }
       ]
+    },
+    {
+      name: 'urlFor_',
+      javaReturns: 'String',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'blob',
+          javaType: 'foam.blob.Blob'
+        }
+      ]
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.AbstractBlob',
+
+  methods: [
+    {
+      name: 'pipe',
+      javaCode: 'return;'
+    },
+    {
+      name: 'slice',
+      javaReturns: 'foam.blob.Blob',
+      args: [
+        {
+          name: 'offset',
+          javaType: 'long'
+        },
+        {
+          name: 'length',
+          javaType: 'long'
+        }
+      ],
+      javaCode: 'return new SubBlob(this, offset, length);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.AbstractBlobService',
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'return this.put_(getX(), blob);'
+    },
+    {
+      name: 'find',
+      javaCode: 'return this.find_(getX(), id);'
+    },
+    {
+      name: 'urlFor',
+      javaCode: 'return this.urlFor_(getX(), blob);'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.blob.SubBlob',
+
+  methods: [
+    {
+      name: 'read',
+      javaCode:
+`if ( buffer.getLength() > getSize() - offset ) {
+  buffer = buffer.slice(0, getSize() - offset);
+}
+
+return getParent().read(buffer, offset + getOffset());`
+    },
+    {
+      name: 'slice',
+      javaCode: 'return new SubBlob(getParent(), getOffset() + offset, length);'
     }
   ]
 });
