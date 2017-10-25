@@ -728,10 +728,14 @@ foam.CLASS({
                              this.BlobBlob.create({ blob: this.blobs[id] }) :
                              null);
     },
-    function urlFor_(x, id) {
-      return this.blobs[id] ?
-        URL.createObjectURL(this.blobs[id]) :
-        null;
+    function urlFor_(x, blob) {
+      if ( this.IdentifiedBlob.isInstance(blob) ) {
+        return URL.createObjectURL(this.blobs[blob.id]);
+      } else if ( this.BlobBlob.isInstance(blob) ) {
+        return URL.createObjectURL(blob.blob);
+      }
+
+      return null;
     }
   ]
 });
