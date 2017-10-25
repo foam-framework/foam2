@@ -16,6 +16,32 @@
  * limitations under the License.
  */
 
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'Buffer',
+
+  properties: [
+    {
+      class: 'Long',
+      name: 'length'
+    },
+    {
+      class: 'Object',
+      name: 'data',
+      javaType: 'java.nio.ByteBuffer',
+      factory: function() {
+        return new ArrayBuffer(this.length);
+      }
+    }
+  ],
+
+  methods: [
+    function slice(start, end) {
+      return foam.blob.Buffer.create();
+    }
+  ]
+});
+
 foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
@@ -29,10 +55,14 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          name: 'offset',
-          of: 'Long'
+          class: 'Long',
+          name: 'offset'
         }
       ]
+    },
+    {
+      name: 'getSize',
+      returns: 'Long'
     }
   ]
 });
@@ -49,8 +79,8 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          name: 'blob',
-          of: 'foam.blob.Blob'
+          class: 'Blob',
+          name: 'blob'
         }
       ]
     },
@@ -63,8 +93,8 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          name: 'blob',
-          of: 'foam.blob.Blob'
+          class: 'Blob',
+          name: 'blob'
         }
       ]
     },
@@ -73,8 +103,8 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          name: 'id',
-          of: 'String'
+          class: 'String',
+          name: 'id'
         }
       ]
     },
@@ -87,8 +117,8 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          name: 'id',
-          of: 'String'
+          class: 'String',
+          name: 'id'
         }
       ]
     },
@@ -97,8 +127,22 @@ foam.INTERFACE({
       returns: 'String',
       args: [
         {
-          name: 'blob',
-          of: 'foam.blob.Blob'
+          class: 'Blob',
+          name: 'blob'
+        }
+      ]
+    },
+    {
+      name: 'urlFor_',
+      returns: 'String',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          class: 'Blob',
+          name: 'blob'
         }
       ]
     }
@@ -111,13 +155,6 @@ foam.CLASS({
   abstract: true,
 
   implements: ['foam.blob.Blob'],
-
-  properties: [
-    {
-      class: 'Long',
-      name: 'size'
-    }
-  ],
 
   methods: [
     function pipe(writeFn) {
@@ -154,6 +191,38 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.blob',
+  name: 'AbstractBlobService',
+  abstract: true,
+
+  implements: ['foam.blob.BlobService'],
+
+  requires: [
+    'foam.blob.ProxyBlobService'
+  ],
+
+  methods: [
+    {
+      name: 'inX',
+      code: function (x) {
+        return this.ProxyBlobService.create({ delegate: this }, x);
+      }
+    },
+    function put(blob) {
+      return this.put_(this.__context__, blob);
+    },
+
+    function find(id) {
+      return this.find_(this.__context__, id);
+    },
+
+    function urlFor(blob) {
+      return this.urlFor_(this.__context__, blob);
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
   name: 'ProxyBlob',
   extends: 'foam.blob.AbstractBlob',
 
@@ -164,7 +233,24 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.blob.Blob',
       name: 'delegate',
-      forwards: [ 'read' ]
+      forwards: [ 'read', 'getSize' ]
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.blob',
+  name: 'ProxyBlobService',
+  extends: 'foam.blob.AbstractBlobService',
+
+  documentation: 'Proxy implementation for the BlobService interface',
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.blob.BlobService',
+      name: 'delegate',
+      forwards: [ 'put_', 'find_', 'urlFor_' ]
     }
   ]
 });
@@ -175,12 +261,15 @@ foam.CLASS({
   extends: 'foam.blob.AbstractBlob',
   properties: [
     {
+      class: 'Blob',
       name: 'parent',
     },
     {
+      class: 'Long',
       name: 'offset'
     },
     {
+      class: 'Long',
       name: 'size',
       assertValue: function(value) {
         foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
@@ -211,7 +300,10 @@ foam.CLASS({
   name: 'BlobBlob',
   extends: 'foam.blob.AbstractBlob',
   properties: [
-    'blob',
+    {
+      class: 'Blob',
+      name: 'blob'
+    },
     {
       name: 'size',
       factory: function() {
@@ -296,7 +388,7 @@ foam.CLASS({
     {
       class: 'Stub',
       of: 'foam.blob.Blob',
-      name: 'box'
+      name: 'delegate'
     }
   ]
 });
@@ -666,6 +758,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'TestBlobService',
+  extends: 'foam.blob.AbstractBlobService',
+
   requires: [
     'foam.blob.IdentifiedBlob',
     'foam.blob.BlobBlob'
@@ -682,17 +776,17 @@ foam.CLASS({
     }
   ],
   methods: [
-    function put(file) {
+    function put_(x, file) {
       var id = this.nextId++;
       this.blobs[id] = file;
       return Promise.resolve(this.IdentifiedBlob.create({ id: id }));
     },
-    function find(id) {
+    function find_(x, id) {
       return Promise.resolve(this.blobs[id] ?
                              this.BlobBlob.create({ blob: this.blobs[id] }) :
                              null);
     },
-    function urlFor(blob) {
+    function urlFor_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         return URL.createObjectURL(this.blobs[blob.id]);
       } else if ( this.BlobBlob.isInstance(blob) ) {
