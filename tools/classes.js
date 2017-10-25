@@ -148,6 +148,7 @@ var classes = [
   'foam.blob.BlobService',
   'foam.blob.AbstractBlob',
   'foam.blob.SubBlob',
+  'foam.blob.BlobBlob',
   'foam.blob.IdentifiedBlob'
 ];
 
