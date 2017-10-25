@@ -80,7 +80,10 @@ foam.CLASS({
     },
     {
       class: 'Blob',
-      name: 'profilePicture'
+      name: 'profilePicture',
+      tableCellFormatter: function (value) {
+        this.tag({ class: 'foam.u2.view.BlobView' });
+      }
     },
     {
       class: 'FObjectProperty',
