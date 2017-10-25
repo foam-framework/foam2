@@ -8,13 +8,14 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectArrayView',
   extends: 'foam.u2.View',
+  documentation: 'View for editing FObjects inside of FObjectArrays.',
   
   requires: [
     'foam.core.Property',
     'foam.u2.DetailPropertyView'
   ],
 
-  documentation: 'View for editing FObjects.',
+  exports: [ 'as data' ],
 
   axioms: [
     foam.u2.CSS.create({
@@ -41,10 +42,6 @@ foam.CLASS({
     {
       name: 'data'
     },
-    {
-      class: 'Int',
-      name: 'arrayIndex'
-    },
     'choices',
     {
       name: 'detailView',
@@ -56,15 +53,12 @@ foam.CLASS({
     function initE() {
       var self = this;
 
-      this.startContext({data: this})
       this.add(this.ADD_ITEM).add(this.slot(function(data) {
         return this.E().forEach(data, function(o, index) {
           this.tag({class: self.detailView}, {data: o})
           .start().add('Remove').addClass('rmv-button').on('click', function(){ self.removeIt(index) }).end()
         })
-      }))
-      this.endContext();
-      
+      }));
     },
 
     function fromProperty(p) {
