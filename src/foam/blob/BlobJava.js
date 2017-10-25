@@ -63,16 +63,6 @@ foam.INTERFACE({
     {
       name: 'getSize',
       javaReturns: 'int'
-    },
-    {
-      name: 'setSize',
-      javaReturns: 'void',
-      args: [
-        {
-          name: 'size',
-          javaType: 'int'
-        }
-      ]
     }
   ]
 });
