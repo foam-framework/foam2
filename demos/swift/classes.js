@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.swift.ui.DAOTableViewSource',
   'foam.swift.ui.DetailView',
   'foam.swift.ui.FOAMUILabel',
   'foam.swift.ui.FOAMUITextField',
