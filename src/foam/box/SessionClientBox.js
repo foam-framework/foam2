@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 foam.CLASS({
   package: 'foam.box',
   name: 'SessionReplyBox',
@@ -72,9 +71,9 @@ foam.CLASS({
       code: function send(msg) {
         msg.attributes[this.SESSION_KEY] = this.sessionID;
 
-/*
-        console.log('***** SEND: ', foam.json.stringify(msg));
+        console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
+        /*
         msg.attributes.replyBox = this.SessionReplyBox.create({
           msg: msg,
           clientBox: this,
