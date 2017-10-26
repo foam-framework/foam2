@@ -118,24 +118,9 @@ foam.CLASS({
   }%>
         default: throw new RuntimeException("Method not found: " + rpc.getName());
       }
-    } catch (Throwable e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      message.replyWithException(t);
 
-      if ( replyBox == null ) {
-        return;
-      }
-
-      foam.box.RemoteException wrapper = getX().create(foam.box.RemoteException.class);
-      wrapper.setId(e.getClass().getName());
-      wrapper.setMessage(e.getMessage());
-
-      foam.box.RPCErrorMessage reply = getX().create(foam.box.RPCErrorMessage.class);
-      reply.setData(wrapper);
-
-      foam.box.Message replyMessage = getX().create(foam.box.Message.class);
-      replyMessage.setObject(reply);
-
-      replyBox.send(replyMessage);
       return;
     }
 
