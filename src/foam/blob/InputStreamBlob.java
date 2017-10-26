@@ -17,11 +17,7 @@ public class InputStreamBlob
   @Override
   public Buffer read(Buffer buffer, long offset) {
     int length = (int) (getSize() - offset);
-    ByteBuffer bb = ByteBuffer.allocate(length);
-    for ( int i = (int) offset; i < length; i++ ) {
-      bb.put(buffer_[i]);
-    }
-    return new Buffer(length, bb);
+    return new Buffer(length, ByteBuffer.wrap(buffer_, (int) offset, length));
   }
 
   @Override
