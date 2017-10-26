@@ -7,19 +7,55 @@
 package foam.box;
 
 import foam.core.*;
+import foam.dao.*;
+import foam.nanos.session.Session;
+import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+
 
 public class SessionServerBox
   extends ProxyBox
 {
 
-  // protected Map map_ = new LRULinkedHash
-  public SessionServerBox(X x, Box delegate) {
+  protected boolean authenticate_;
+
+  public SessionServerBox(X x, Box delegate, boolean authenticate) {
     super(x, delegate);
+    authenticate_ = authenticate;
   }
 
   public void send(Message msg) {
     String sessionID = (String) msg.getAttributes().get("sessionId");
-    System.err.println("**** SESSIONID: " + sessionID);
+
+    try {
+
+      if ( sessionID != null ) {
+        System.err.println("**** SESSIONID: " + sessionID);
+
+        DAO     dao     = (DAO) getX().get("sessionDAO");
+        Session session = (Session) dao.find(sessionID);
+
+        if ( session == null ) {
+          session = new Session();
+          session.setId(sessionID);
+
+          HttpServletRequest req = (HttpServletRequest) getX().get(HttpServletRequest.class);
+          session.setRemoteHost(req.getRemoteHost());
+        }
+
+        session.setLastUsed(new Date());
+        session.setUses(session.getUses()+1);
+
+        dao.put(session);
+
+        if ( authenticate_ && session.getUserId() == 0 ) {
+
+        }
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+
     getDelegate().send(msg);
   }
 }

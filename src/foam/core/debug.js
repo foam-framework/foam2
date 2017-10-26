@@ -30,6 +30,8 @@
 foam.CLASS({
   refines: 'foam.core.Model',
 
+  properties: [ 'source' ],
+
   methods: [
     function validate() {
       this.SUPER();
@@ -66,6 +68,8 @@ foam.CLASS({
 /* Validating a Model should also validate all of its Axioms. */
 foam.CLASS({
   refines: 'foam.core.Property',
+
+  properties: [ 'source' ],
 
   methods: [
     function validate(model) {

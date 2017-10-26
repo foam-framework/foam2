@@ -22,15 +22,16 @@ import javax.servlet.ServletException;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-    implements WebAgent
+  implements WebAgent
 {
-  protected Object service_;
-  protected Box    skeleton_;
-//  protected X      x_;
+  protected Object  service_;
+  protected Box     skeleton_;
+  protected boolean authenticate_;
 
-  public ServiceWebAgent(Object service, Box skeleton) {
+  public ServiceWebAgent(Object service, Box skeleton, boolean authenticate) {
     service_  = service;
     skeleton_ = skeleton;
+    authenticate_ = authenticate;
   }
 
 /*
@@ -89,7 +90,7 @@ public class ServiceWebAgent
         ((ContextAware) service_).setX(x);
 
       foam.box.Message msg = (foam.box.Message) result;
-      new SessionServerBox(x, skeleton_).send(msg);
+      new SessionServerBox(x, skeleton_, authenticate_).send(msg);
     } catch (Throwable t) {
       t.printStackTrace();
       throw new RuntimeException(t);
