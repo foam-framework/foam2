@@ -17,9 +17,11 @@ public class SessionServerBox
   extends ProxyBox
 {
 
-  public SessionServerBox(X x, Box delegate) {
+  protected boolean authenticate_;
+
+  public SessionServerBox(X x, Box delegate, boolean authenticate) {
     super(x, delegate);
-    System.err.println("*** creating session server box");
+    authenticate_ = authenticate;
   }
 
   public void send(Message msg) {
@@ -45,6 +47,10 @@ public class SessionServerBox
         session.setUses(session.getUses()+1);
 
         dao.put(session);
+
+        if ( authenticate_ && session.getUserId() == 0 ) {
+
+        }
       }
     } catch (Throwable t) {
       t.printStackTrace();
