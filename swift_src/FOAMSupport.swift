@@ -209,8 +209,9 @@ public protocol FObject: class, Detachable {
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
   func compareTo(_ data: FObject?) -> Int
-  func onDetach(_ sub: Detachable)
+  func onDetach(_ sub: Detachable?)
   func toString() -> String
+  func copyFrom(_ o: FObject)
   init(_ args: [String:Any?])
 }
 
@@ -233,7 +234,8 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
   public func hasOwnProperty(_ key: String) -> Bool { return false }
   public func clearProperty(_ key: String) {}
 
-  public func onDetach(_ sub: Detachable) {
+  public func onDetach(_ sub: Detachable?) {
+    guard let sub = sub else { return }
     _ = self.sub(topics: ["detach"]) { (s, _) in
       s.detach()
       sub.detach()
@@ -382,6 +384,21 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
 
   public func toString() -> String {
     return __context__.create(Outputter.self)!.swiftStringify(self)
+  }
+
+  public func copyFrom(_ o: FObject) {
+    ownClassInfo().axioms(byType: PropertyInfo.self).forEach { (p) in
+      if o.hasOwnProperty(p.name) {
+        p.set(self, value: p.get(o))
+      }
+    }
+  }
+
+  public override func isEqual(_ object: Any?) -> Bool {
+    if let o = object as? FObject {
+      return compareTo(o) == 0
+    }
+    return super.isEqual(object)
   }
 }
 
