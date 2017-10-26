@@ -715,18 +715,12 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
-    },
-    {
-      name: 'props',
-      expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Blob);
-      }
     }
   ],
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
-      var props = this.props;
+      var props = obj.cls_.getAxiomsByClass(foam.core.Blob);
       var self = this;
 
       return Promise.resolve().then(function a() {
