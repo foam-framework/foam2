@@ -229,6 +229,10 @@ foam.CLASS({
   var CLASS = foam.CLASS;
 
   foam.CLASS = function(m) {
+    if ( ! m.source && global.document && global.document.currentScript ) {
+      m.source = global.document.currentScript.src;
+    }
+
     if ( m.refines ) return CLASS(m);
 
     m.id = m.package ? m.package + '.' + m.name : m.name;
