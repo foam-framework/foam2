@@ -300,10 +300,7 @@ foam.CLASS({
   name: 'BlobBlob',
   extends: 'foam.blob.AbstractBlob',
   properties: [
-    {
-      class: 'Blob',
-      name: 'blob'
-    },
+    'blob',
     {
       name: 'size',
       factory: function() {
@@ -656,7 +653,10 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'address'
+      name: 'address',
+      factory: function() {
+        return window.location.origin + "/blobService";
+      }
     }
   ],
   methods: [
@@ -677,7 +677,6 @@ foam.CLASS({
         return resp.payload;
       }).then(function(payload) {
         return foam.json.Parser.create({ creationContext: self }).parseString(payload);
-//        return self.IdentifiedBlob.create({ id: id });
       });
     },
     function urlFor(blob) {
@@ -716,18 +715,12 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
-    },
-    {
-      name: 'props',
-      expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Blob);
-      }
     }
   ],
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
-      var props = this.props;
+      var props = obj.cls_.getAxiomsByClass(foam.core.Blob);
       var self = this;
 
       return Promise.resolve().then(function a() {
