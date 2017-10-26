@@ -20,7 +20,7 @@ public class HttpBlobService
 
   @Override
   public void start() {
-    blobService_ = (foam.blob.BlobService)getX().get("blobService");
+    blobService_ = (foam.blob.BlobService)getX().get("blobStore");
   }
 
   @Override
