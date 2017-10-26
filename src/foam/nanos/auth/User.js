@@ -16,7 +16,7 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
+    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified', 'profilePicture'
   ],
 
   properties: [
@@ -79,8 +79,11 @@ foam.CLASS({
       name: 'birthday'
     },
     {
-      class: 'String',
-      name: 'profilePicture'
+      class: 'Blob',
+      name: 'profilePicture',
+      tableCellFormatter: function (value) {
+        this.tag({ class: 'foam.u2.view.ImageBlobView' });
+      }
     },
     {
       class: 'FObjectProperty',
