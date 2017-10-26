@@ -13,9 +13,9 @@ public class BlobStore
 {
   protected static final int BUFFER_SIZE = 8192;
 
-  protected String root_ = "/Users/kirk/backend";
-  protected String tmp_ = "/Users/kirk/backend/tmp";
-  protected String sha256_ = "/Users/kirk/backend/sha256";
+  protected String root_;
+  protected String tmp_;
+  protected String sha256_;
   protected boolean isSet_ = false;
 
   @Override
