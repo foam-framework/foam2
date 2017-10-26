@@ -455,4 +455,18 @@ class SwiftTestsTests: XCTestCase {
     try! XCTAssertEqual(complete.get(), true)
   }
 
+  func testCopyFrom() {
+    let x = Context.GLOBAL
+    let t1 = x.create(Test.self)!
+    let t2 = x.create(Test.self)!
+
+    XCTAssertTrue(t1.isEqual(t2))
+
+    t1.firstName = "a"
+    XCTAssertFalse(t1.isEqual(t2))
+
+    t2.copyFrom(t1)
+    XCTAssertTrue(t1.isEqual(t2))
+    XCTAssertEqual(t2.firstName, "a")
+  }
 }
