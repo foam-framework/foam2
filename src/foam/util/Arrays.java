@@ -2,7 +2,7 @@ package foam.util;
 
 import java.lang.reflect.Array;
 
-public class ArrayUtils {
+public class Arrays {
 
   /* Append an existing array to one or more Items of the same Type
     Example:
@@ -19,9 +19,6 @@ public class ArrayUtils {
   */
   public static <T> T[] append(T[] array, T... items) {
 
-    if( array == null && items == null ) {
-      return null;
-    }
     if( array == null ) {
       return items;
     }
