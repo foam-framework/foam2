@@ -8,6 +8,7 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.core.*;
+import java.io.StringReader;
 
 public class JSONParser
   extends foam.core.ContextAwareSupport
