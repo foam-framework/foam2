@@ -28,7 +28,6 @@ updateLabel();
   ],
   listeners: [
     {
-      isMerged: true,
       name: 'updateLabel',
       swiftCode: function() {/*
 view.text = data == nil ? "nil" : String(describing: data!)
