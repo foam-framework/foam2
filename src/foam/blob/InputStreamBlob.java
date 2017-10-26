@@ -1,6 +1,7 @@
 package foam.blob;
 
-import java.io.ByteArrayOutputStream;
+import com.google.common.io.ByteStreams;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -9,13 +10,8 @@ public class InputStreamBlob
 {
   protected byte[] buffer_;
 
-  public InputStreamBlob(java.io.InputStream is) throws IOException {
-    int bit;
-    ByteArrayOutputStream o = new ByteArrayOutputStream();
-    while ( ( bit = is.read() ) != -1 ) {
-      o.write(bit);
-    }
-    buffer_ = o.toByteArray();
+  public InputStreamBlob(java.io.InputStream in) throws IOException {
+    buffer_ = ByteStreams.toByteArray(in);
   }
 
   @Override
