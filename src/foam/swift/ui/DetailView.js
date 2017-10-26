@@ -43,9 +43,14 @@ return data?.ownClassInfo().label ?? self.ownClassInfo().label
       swiftFactory: 'return [:]',
     },
     {
+      swiftType: 'ClassInfo?',
+      name: 'of',
+      swiftExpressionArgs: ['data'],
+      swiftExpression: 'return data?.ownClassInfo() ?? nil',
+    },
+    {
       swiftType: 'FObject?',
       name: 'data',
-      swiftPostSet: 'self.reset()',
     },
     {
       class: 'Map',
@@ -53,6 +58,14 @@ return data?.ownClassInfo().label ?? self.ownClassInfo().label
     },
   ],
   methods: [
+    {
+      name: 'init',
+      swiftCode: function() {/*
+onDetach(of$.sub(listener: { (_, _) in
+  self.reset()
+}))
+      */},
+    },
     {
       name: 'reset',
       swiftCode: function() {/*
@@ -182,12 +195,11 @@ return a.viewFactory(x: __context__)
   ],
   swiftCode: function() {/*
 subscript(key: String) -> FObject? {
-  guard let data = self.data as AnyObject as? FObject else { return nil }
+  guard let of = self.of else { return nil }
   if let v = self.propertyViews[key] ?? self.actionViews[key] {
     return v
   }
-  let classInfo = data.ownClassInfo()
-  if let a = classInfo.axiom(byName: key) {
+  if let a = of.axiom(byName: key) {
     if let a = a as? PropertyInfo, let viewFobj = getView(a) {
       let prop = a.name
       if let viewFobj = viewFobj as? PropertyView {
@@ -195,14 +207,14 @@ subscript(key: String) -> FObject? {
       }
       propertyViews[prop] = viewFobj
 
-      let sub = viewFobj.getSlot(key: "data")!.linkFrom(data.getSlot(key: prop)!)
+      let sub = viewFobj.getSlot(key: "data")!.linkFrom(data$.dot(prop))
       subViewSubscriptions[prop] = sub
       self.onDetach(sub)
 
       return viewFobj
     } else if let a = a as? ActionInfo {
       let btn = FOAMActionUIButton_create()
-      btn.fobj = data
+      btn.fobj$ = data$
       btn.action = a
       actionViews[a.name] = btn
       return btn
