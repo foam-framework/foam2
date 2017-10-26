@@ -335,7 +335,7 @@ foam.CLASS({
   name: 'IdentifiedBlob',
   extends: 'foam.blob.ProxyBlob',
   imports: [
-    'blobService?'
+    'blobStore?'
   ],
   properties: [
     {
@@ -348,7 +348,7 @@ foam.CLASS({
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
+      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
     }
   ],
   methods: [
@@ -644,12 +644,17 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'RestBlobService',
+
+  extends: 'foam.blob.AbstractBlobService',
+
   documentation: 'Implementation of a BlobService against a REST interface.',
+
   requires: [
     'foam.net.HTTPRequest',
     'foam.blob.BlobBlob',
     'foam.blob.IdentifiedBlob'
   ],
+
   properties: [
     {
       class: 'String',
@@ -659,8 +664,9 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
-    function put(blob) {
+    function put_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         // Already stored.
         return Promise.resolve(blob);
@@ -679,14 +685,16 @@ foam.CLASS({
         return foam.json.Parser.create({ creationContext: self }).parseString(payload);
       });
     },
-    function urlFor(blob) {
+
+    function urlFor_(x, blob) {
       if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) {
         return null;
       }
 
       return this.address + '/' + blob.id;
     },
-    function find(id) {
+
+    function find_(x, id) {
       var req = this.HTTPRequest.create();
       req.fromUrl(this.address + '/' + id);
       req.method = 'GET';
