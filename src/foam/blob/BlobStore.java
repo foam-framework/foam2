@@ -13,9 +13,9 @@ public class BlobStore
 {
   protected static final int BUFFER_SIZE = 8192;
 
-  protected String root_;
-  protected String tmp_;
-  protected String sha256_;
+  protected String root_ = "/Users/kirk/backend";
+  protected String tmp_ = "/Users/kirk/backend/tmp";
+  protected String sha256_ = "/Users/kirk/backend/sha256";
   protected boolean isSet_ = false;
 
   @Override
@@ -64,16 +64,19 @@ public class BlobStore
   public Blob find_(X x, Object id) {
     this.setup();
     if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
-      throw new RuntimeException("Invalid file name");
+      return null;
+//      throw new RuntimeException("Invalid file name");
     }
 
     File file = new File(sha256_ + File.separator + id);
     if ( ! file.exists() ) {
-      throw new RuntimeException("File does not exist");
+      return null;
+//      throw new RuntimeException("File does not exist");
     }
 
     if ( ! file.canRead() ) {
-      throw new RuntimeException("Cannot read file");
+      return null;
+//      throw new RuntimeException("Cannot read file");
     }
 
     return new FdBlob(file);
