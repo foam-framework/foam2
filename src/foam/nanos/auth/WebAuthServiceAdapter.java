@@ -69,6 +69,7 @@ public class WebAuthServiceAdapter
 
     User user = (User) sink.getData().get(0);
 
+    System.err.println("********************************** LOGIN" + user.getId());
     try {
       if ( ! loginMap.containsKey(user.getId()) ) {
         X userX = service.login(user.getId(), password);

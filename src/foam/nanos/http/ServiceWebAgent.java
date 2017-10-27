@@ -66,7 +66,13 @@ public class ServiceWebAgent
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
-      FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      FObject result;
+      try {
+        result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      } catch (Throwable t) {
+        System.err.println("Unable to parse: " + buffer_.toString());
+        throw t;
+      }
 
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
@@ -92,7 +98,6 @@ public class ServiceWebAgent
       foam.box.Message msg = (foam.box.Message) result;
       new SessionServerBox(x, skeleton_, authenticate_).send(msg);
     } catch (Throwable t) {
-      t.printStackTrace();
       throw new RuntimeException(t);
     }
   }
