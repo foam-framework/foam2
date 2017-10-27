@@ -50,10 +50,7 @@ foam.CLASS({
 
   methods: [
     function out() {
-      for ( var i = 0 ; i < arguments.length ; i++ ) { 
-        this.buf_ += arguments[i];
-      }
-
+      for ( var i = 0 ; i < arguments.length ; i++ ) this.buf_ += arguments[i];
       return this;
     },
 
@@ -164,7 +161,13 @@ foam.CLASS({
             this.outputProperty(o, ps[i], (i == 0 && first));
           }
         },
-        Array:        function(o) { /* Ignore arrays in CSV */ },
+        Array: function(o, opt_cls) { 
+          var cls = this.getCls(opt_cls);
+          for (var i = 0; i < o.length; i++) {
+            this.output(o[i], cls);
+            if ( i < o.length-1) this.out('\n');
+          }
+        },
         Function:     function(o) { /* Ignore functions in CSV */ },
         Object:       function(o) { /* Ignore generic objects in CSV */ }
       }, function(o, first) { this.outputPrimitive(o, first); })
@@ -249,6 +252,11 @@ foam.CLASS({
       }
 
       return model;
+    },
+
+    function getCls(opt_cls) {
+      return foam.typeOf(opt_cls) === foam.String ? this.lookup(opt_cls, true) :
+          opt_cls;
     }
   ]
 });
