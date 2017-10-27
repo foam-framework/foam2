@@ -231,6 +231,11 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    { class: 'String', name: 'tmp', javaFactory: 'return getRoot() + File.separator + "tmp";' },
+    { class: 'String', name: 'sha256', javaFactory: 'return getRoot() + File.separator + "sha256";' }
+  ],
+
   methods: [
     {
       name: 'put_',
@@ -282,7 +287,7 @@ if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
   throw new RuntimeException("Invalid file name");
 }
 
-File file = new File(sha256_ + File.separator + id);
+File file = new File(getSha256() + File.separator + id);
 if ( ! file.exists() ) {
   throw new RuntimeException("File does not exist");
 }

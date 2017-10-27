@@ -2,16 +2,22 @@ package foam.nanos.blob;
 
 import foam.blob.Blob;
 import foam.blob.BlobService;
+import foam.blob.Buffer;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.NanoService;
 
 import javax.servlet.http.HttpServlet;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 
 public class HttpBlobService
     extends HttpServlet
     implements NanoService, ContextAware, BlobService
 {
+  public static final int BUFFER_SIZE = 8192;
+
   private foam.core.X x_;
 
   private foam.blob.BlobService store_;
@@ -71,7 +77,10 @@ public class HttpBlobService
 
     System.out.println("***HTTPBlobService.doGet()");
 
-    String id = req.getContextPath();
+    String path = req.getRequestURI();
+    String id = path.substring(path.lastIndexOf("/") + 1);
+
+    System.out.println("***id = " + id);
 
     foam.blob.Blob blob = store_.find(id);
 
@@ -80,15 +89,30 @@ public class HttpBlobService
       return;
     }
 
+    long chunk = 0;
+    long size = blob.getSize();
+    long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
+    Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
+
     resp.setStatus(resp.SC_OK);
     resp.setHeader("Content-Type", "application/octet-stream");
-    resp.setHeader("Content-Length", Long.toString(blob.getSize()));
+    resp.setHeader("Content-Length", Long.toString(size));
     resp.setHeader("ETag", id);
     resp.setHeader("Cache-Control", "public");
 
-    java.io.OutputStream output = resp.getOutputStream();
 
-    // TODO: Read chunks of "blob" and write them to "output"
+    java.io.OutputStream output = resp.getOutputStream();
+    WritableByteChannel channel = Channels.newChannel(output);
+
+    while ( chunk < chunks ) {
+      buffer = blob.read(buffer, chunk * BUFFER_SIZE);
+      if ( buffer == null ) {
+        break;
+      }
+      channel.write(buffer.getData());
+      buffer.getData().clear();
+      chunk++;
+    }
   }
 
   @Override
