@@ -3,6 +3,7 @@ package foam.nanos.blob;
 import foam.blob.Blob;
 import foam.blob.BlobService;
 import foam.blob.Buffer;
+import foam.blob.FdBlob;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.NanoService;
@@ -64,23 +65,15 @@ public class HttpBlobService
 
   @Override
   public void start() {
-    System.out.println("Starting HTTPBlobService.");
     store_ = (foam.blob.BlobService)getX().get("blobStore");
   }
 
   @Override
   protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-      throws javax.servlet.ServletException, java.io.IOException {
-    // TODO: Handle HTTP Range requests.
-
-    // TODO: Verify that this is the right id.
-
-    System.out.println("***HTTPBlobService.doGet()");
-
+      throws javax.servlet.ServletException, java.io.IOException
+  {
     String path = req.getRequestURI();
     String id = path.substring(path.lastIndexOf("/") + 1);
-
-    System.out.println("***id = " + id);
 
     foam.blob.Blob blob = store_.find(id);
 
@@ -96,10 +89,9 @@ public class HttpBlobService
 
     resp.setStatus(resp.SC_OK);
     resp.setHeader("Content-Type", "application/octet-stream");
-    resp.setHeader("Content-Length", Long.toString(size));
+    resp.setHeader("Content-Length", Long.toString(size, 10));
     resp.setHeader("ETag", id);
     resp.setHeader("Cache-Control", "public");
-
 
     java.io.OutputStream output = resp.getOutputStream();
     WritableByteChannel channel = Channels.newChannel(output);
@@ -113,17 +105,16 @@ public class HttpBlobService
       buffer.getData().clear();
       chunk++;
     }
+    output.flush();
+    output.close();
   }
 
   @Override
   protected void doPut(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-      throws javax.servlet.ServletException, java.io.IOException {
-    System.out.println("****HTTPBlobservice.doPut()");
-
+      throws javax.servlet.ServletException, java.io.IOException
+  {
     foam.blob.InputStreamBlob blob = new foam.blob.InputStreamBlob(req.getInputStream());
-
     foam.blob.Blob result = store_.put(blob);
-
     new foam.lib.json.Outputter(resp.getWriter(), foam.lib.json.OutputterMode.NETWORK).output(result);
   }
 }

@@ -1,7 +1,5 @@
 package foam.blob;
 
-import com.google.common.io.ByteStreams;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +19,8 @@ public class FdBlob
   @Override
   public Buffer read(Buffer buffer, long offset) {
     try {
+      int outOffset = 0;
+
       long length = Math.min(buffer.getLength(), getSize() - offset);
       if (length < buffer.getLength()) {
         buffer = buffer.slice(0, length);
@@ -29,11 +29,17 @@ public class FdBlob
       ByteBuffer bb = buffer.getData();
       FileInputStream fileInputStream = new FileInputStream(file_);
       BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
-      // skip amount of bytes specified in offset
       bufferedInputStream.skip(offset);
-      bb.put(ByteStreams.toByteArray(bufferedInputStream));
-      buffer.setData(bb);
 
+      byte[] buf = new byte[(int) length];
+      while ( outOffset < length ) {
+        int bytesRead = bufferedInputStream.read(buf, outOffset, (int) length);
+        bb.put(buf, outOffset, bytesRead);
+        outOffset += bytesRead;
+      }
+
+      bb.rewind();
+      buffer.setData(bb);
       return buffer;
     } catch (Throwable t) {
       t.printStackTrace();
