@@ -88,6 +88,7 @@ public class HttpBlobService
     Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
 
     resp.setStatus(resp.SC_OK);
+    // TODO: set appropriate content type
     resp.setHeader("Content-Type", "application/octet-stream");
     resp.setHeader("Content-Length", Long.toString(size, 10));
     resp.setHeader("ETag", id);
