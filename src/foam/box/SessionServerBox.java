@@ -41,6 +41,7 @@ public class SessionServerBox
 
           HttpServletRequest req = (HttpServletRequest) getX().get(HttpServletRequest.class);
           session.setRemoteHost(req.getRemoteHost());
+          session.setContext(getX());
         }
 
         session.setLastUsed(new Date());
@@ -48,9 +49,14 @@ public class SessionServerBox
 
         dao.put(session);
 
+/*
         if ( authenticate_ && session.getUserId() == 0 ) {
-
+          msg.replyWithException(new java.security.AccessControlException("not logged in"));
+          return;
         }
+        */
+
+        msg.getLocalAttributes().put('x', getX().put(Session.class, session));
       }
     } catch (Throwable t) {
       t.printStackTrace();

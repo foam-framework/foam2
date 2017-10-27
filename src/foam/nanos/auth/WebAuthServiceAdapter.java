@@ -13,6 +13,7 @@ import foam.dao.DAO;
 import foam.dao.ListSink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
+import foam.nanos.session.Session;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
 import javax.naming.AuthenticationException;
@@ -55,7 +56,7 @@ public class WebAuthServiceAdapter
     }
   }
 
-  public foam.nanos.auth.User login(String email, String password)
+  public foam.nanos.auth.User login(X x, String email, String password)
     throws AuthenticationException
   {
     DAO      userDAO = (DAO) getX().get("localUserDAO");
@@ -70,12 +71,20 @@ public class WebAuthServiceAdapter
 
     try {
       if ( ! loginMap.containsKey(user.getId()) ) {
-        X x = service.login(user.getId(), password);
-        loginMap.put(user.getId(), x);
+        X userX = service.login(user.getId(), password);
+
+        // Login the Session
+        Session session = (Session) x.get(Session.class);
+        session.setUserId(user.getId());
+        session.setContext(userX);
+        DAO dao = (DAO) getX().get("sessionDAO");
+        dao.put(session);
+
+        loginMap.put(user.getId(), userX);
         return (User) x.get("user");
       }
-      return (User) loginMap.get(user.getId()).get("user");
 
+      return (User) loginMap.get(user.getId()).get("user");
     } catch (AuthenticationException e) {
       throw e;
     }
