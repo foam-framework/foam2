@@ -1,17 +1,50 @@
 package foam.nanos.blob;
 
+import foam.blob.Blob;
+import foam.blob.BlobService;
 import foam.core.ContextAware;
+import foam.core.X;
 import foam.nanos.NanoService;
 
 import javax.servlet.http.HttpServlet;
 
 public class HttpBlobService
     extends HttpServlet
-    implements NanoService, ContextAware
+    implements NanoService, ContextAware, BlobService
 {
   private foam.core.X x_;
 
   private foam.blob.BlobService store_;
+
+  @Override
+  public Blob put(Blob blob) {
+    return this.put_(getX(), blob);
+  }
+
+  @Override
+  public Blob put_(X x, Blob blob) {
+    return this.store_.put_(x, blob);
+  }
+
+  @Override
+  public Blob find(Object id) {
+    return this.find_(getX(), id);
+  }
+
+  @Override
+  public Blob find_(X x, Object id) {
+    return this.store_.find_(x, id);
+  }
+
+  @Override
+  public String urlFor(Blob blob) {
+    return this.urlFor_(getX(), blob);
+  }
+
+  @Override
+  public String urlFor_(X x, Blob blob) {
+    return this.store_.urlFor_(x, blob);
+  }
 
   @Override
   public foam.core.X getX() {
