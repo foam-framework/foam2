@@ -447,6 +447,8 @@ if ( foam.isServer ) {
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobStore',
+  extends: 'foam.blob.AbstractBlobService',
+
   requires: [
     'foam.blob.IdentifiedBlob'
   ],
@@ -528,7 +530,7 @@ foam.CLASS({
       });
     },
 
-    function put(obj) {
+    function put_(x, obj) {
       if ( this.IdentifiedBlob.isInstance(obj) ) {
         return obj;
       }
@@ -613,7 +615,7 @@ foam.CLASS({
       return path;
     },
 
-    function find(id) {
+    function find_(x, id) {
       this.setup();
       if ( id.indexOf(require('path').sep) != -1 ) {
         return Promise.reject(new Error("Invalid file name"));
@@ -644,7 +646,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'RestBlobService',
-
   extends: 'foam.blob.AbstractBlobService',
 
   documentation: 'Implementation of a BlobService against a REST interface.',
