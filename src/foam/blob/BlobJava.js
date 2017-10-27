@@ -255,7 +255,7 @@ try {
   long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
 
   File tmp = allocateTmp(1);
-  while (chunk < chunks) {
+  while ( chunk < chunks ) {
     buffer = blob.read(buffer, chunkOffset(chunk));
     byte[] buf = buffer.getData().array();
     hash.update(buf);
