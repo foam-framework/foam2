@@ -349,13 +349,13 @@ foam.CLASS({
         Array: function(o, opt_cls) {
           this.start('<objects>\n');
           var cls = this.getCls(opt_cls);
-          for (var i = 0; i < o.length; i++) {
+          for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], cls);
-            if ( i < o.length-1) this.out('\n').nl().indent();
+            if ( i < o.length-1 ) this.out('\n').nl().indent();
           }
-          this.end('\n</objects>')
+          this.end('\n</objects>');
         },
-        Object: function(o) {
+        Object:        function(o) {
           if ( o.outputXML ) {
             o.outputXML(this);
           } else {
@@ -448,8 +448,7 @@ foam.CLASS({
     },
 
     function getCls(opt_cls) {
-      return foam.typeOf(opt_cls) === foam.String ? this.lookup(opt_cls, true) :
-          opt_cls;
+      return foam.String.isInstance(opt_cls);
     }
   ]
 });
