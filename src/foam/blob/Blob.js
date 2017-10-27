@@ -458,15 +458,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'tmp',
+      transient: true,
       expression: function(root) {
-        return root + '/' + 'tmp';
+        return root + '/tmp';
       }
     },
     {
       class: 'String',
       name: 'sha256',
+      transient: true,
       expression: function(root) {
-        return root + '/' + 'sha256';
+        return root + '/sha256';
       }
     },
     {
