@@ -161,11 +161,11 @@ foam.CLASS({
             this.outputProperty(o, ps[i], (i == 0 && first));
           }
         },
-        Array: function(o, opt_cls) { 
+        Array:  function(o, opt_cls) { 
           var cls = this.getCls(opt_cls);
-          for (var i = 0; i < o.length; i++) {
+          for ( var i = 0 ; i < o.length ; i++ ) {
             this.output(o[i], cls);
-            if ( i < o.length-1) this.out('\n');
+            if ( i < o.length-1 ) this.out('\n');
           }
         },
         Function:     function(o) { /* Ignore functions in CSV */ },
@@ -255,8 +255,7 @@ foam.CLASS({
     },
 
     function getCls(opt_cls) {
-      return foam.typeOf(opt_cls) === foam.String ? this.lookup(opt_cls, true) :
-          opt_cls;
+      return foam.String.isInstance(opt_cls);
     }
   ]
 });
