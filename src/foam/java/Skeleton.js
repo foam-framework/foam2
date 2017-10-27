@@ -88,7 +88,7 @@ foam.CLASS({
 
     foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
     foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
-    Object result = null;
+    Object              result   = null;
 
     try {
       switch ( rpc.getName() ) {<%
@@ -100,7 +100,7 @@ foam.CLASS({
           <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
       if ( m.args[j].javaType == 'foam.core.X' ) {
-        %>getX()<%
+        %>getMessageX(message)<%
       } else {
         if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {
           %>to<%= m.args[j].javaType %><%
