@@ -441,9 +441,6 @@ foam.CLASS({
   ]
 });
 
-
-if ( foam.isServer ) {
-
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobStore',
@@ -462,14 +459,14 @@ foam.CLASS({
       class: 'String',
       name: 'tmp',
       expression: function(root) {
-        return root + require('path').sep + 'tmp';
+        return root + '/' + 'tmp';
       }
     },
     {
       class: 'String',
       name: 'sha256',
       expression: function(root) {
-        return root + require('path').sep + 'sha256';
+        return root + '/' + 'sha256';
       }
     },
     {
@@ -640,8 +637,6 @@ foam.CLASS({
     }
   ]
 });
-
-}
 
 foam.CLASS({
   package: 'foam.blob',
