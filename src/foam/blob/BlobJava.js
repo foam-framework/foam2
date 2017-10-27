@@ -247,7 +247,6 @@ try {
 
   long chunk = 0;
   long size = blob.getSize();
-  long remaining = size;
   long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
 
   File tmp = allocateTmp(1);
