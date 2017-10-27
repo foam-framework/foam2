@@ -9,9 +9,12 @@ import foam.core.X;
 import foam.nanos.NanoService;
 
 import javax.servlet.http.HttpServlet;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class HttpBlobService
     extends HttpServlet
@@ -88,8 +91,12 @@ public class HttpBlobService
     Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
 
     resp.setStatus(resp.SC_OK);
-    // TODO: set appropriate content type
-    resp.setHeader("Content-Type", "application/octet-stream");
+    if ( blob instanceof FdBlob ) {
+      File file = ((FdBlob) blob).getFile();
+      resp.setHeader("Content-Type", Files.probeContentType(Paths.get(file.toURI())));
+    } else {
+      resp.setHeader("Content-Type", "application/octet-stream");
+    }
     resp.setHeader("Content-Length", Long.toString(size, 10));
     resp.setHeader("ETag", id);
     resp.setHeader("Cache-Control", "public");

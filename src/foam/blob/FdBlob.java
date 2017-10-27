@@ -16,6 +16,10 @@ public class FdBlob
     this.size_ = file.length();
   }
 
+  public File getFile() {
+    return this.file_;
+  }
+
   @Override
   public Buffer read(Buffer buffer, long offset) {
     try {
