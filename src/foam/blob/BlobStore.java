@@ -53,6 +53,7 @@ public class BlobStore
 
       IdentifiedBlob result = new IdentifiedBlob();
       result.setId(digest);
+      result.setX(getX());
       return result;
     } catch (Throwable t) {
       t.printStackTrace();
