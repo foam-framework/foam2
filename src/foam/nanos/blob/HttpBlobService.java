@@ -1,44 +1,17 @@
 package foam.nanos.blob;
 
+import foam.core.ContextAware;
+import foam.nanos.NanoService;
+
+import javax.servlet.http.HttpServlet;
+
 public class HttpBlobService
-  extends javax.servlet.http.HttpServlet
-  implements foam.nanos.NanoService, foam.core.ContextAware, foam.blob.BlobService
+    extends HttpServlet
+    implements NanoService, ContextAware
 {
   private foam.core.X x_;
 
   private foam.blob.BlobService store_;
-
-
-  // Proxy BlobService methods to the actual BlobStore.
-  @Override
-  public foam.blob.Blob put(foam.blob.Blob blob) {
-    return store_.put(blob);
-  }
-
-  @Override
-  public foam.blob.Blob put_(foam.core.X x, foam.blob.Blob blob) {
-    return store_.put_(x, blob);
-  }
-
-  @Override
-  public foam.blob.Blob find(Object id) {
-    return store_.find(id);
-  }
-
-  @Override
-  public foam.blob.Blob find_(foam.core.X x, Object id) {
-    return store_.find_(x, id);
-  }
-
-  @Override
-  public String urlFor(foam.blob.Blob blob) {
-    return store_.urlFor(blob);
-  }
-
-  @Override
-  public String urlFor_(foam.core.X x, foam.blob.Blob blob) {
-    return store_.urlFor_(x, blob);
-  }
 
   @Override
   public foam.core.X getX() {
@@ -58,7 +31,7 @@ public class HttpBlobService
 
   @Override
   protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-    throws javax.servlet.ServletException, java.io.IOException {
+      throws javax.servlet.ServletException, java.io.IOException {
     // TODO: Handle HTTP Range requests.
 
     // TODO: Verify that this is the right id.
@@ -87,7 +60,7 @@ public class HttpBlobService
 
   @Override
   protected void doPut(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-    throws javax.servlet.ServletException, java.io.IOException {
+      throws javax.servlet.ServletException, java.io.IOException {
     System.out.println("****HTTPBlobservice.doPut()");
 
     foam.blob.InputStreamBlob blob = new foam.blob.InputStreamBlob(req.getInputStream());
