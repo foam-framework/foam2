@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.swift.ui.DAOTableViewSource',
   'foam.swift.ui.DetailView',
   'foam.swift.ui.FOAMUILabel',
   'foam.swift.ui.FOAMUITextField',
@@ -13,9 +14,9 @@ var classes = [
   'foam.swift.ui.ScrollingViewController',
   'foam.u2.Visibility',
 
-  'Tabata',
-  'TabataSoundView',
+  'TestApp',
   'TestExtended',
+  'TestDetailView',
   'foam.dao.ArraySink',
   'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',

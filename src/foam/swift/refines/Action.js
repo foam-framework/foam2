@@ -29,6 +29,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftPrivateAxiomName',
+      expression: function(swiftName) { return '_' + foam.String.constantize(swiftName) + '_'; },
+    },
+    {
+      class: 'String',
       name: 'swiftSlotName',
       expression: function(swiftName) { return swiftName + '$'; },
     },
@@ -59,9 +64,16 @@ foam.CLASS({
         visibility: 'public',
         static: true,
         final: true,
-        name: this.swiftAxiomName,
+        name: this.swiftPrivateAxiomName,
         type: 'ActionInfo',
         initializer: this.swiftAxiomInit(),
+      }));
+      cls.methods.push(this.Method.create({
+        visibility: 'public',
+        class: true,
+        name: this.swiftAxiomName,
+        returnType: 'MethodInfo',
+        body: 'return ' + this.swiftPrivateAxiomName,
       }));
     },
   ],

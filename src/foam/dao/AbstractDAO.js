@@ -591,7 +591,7 @@ foam.CLASS({
       swiftCode: function() {/*
 return try delegate.select_(
     x, sink, skip,
-    limit != nil ? min(limit_, limit!) : limit_,
+    min(limit_, limit),
     order, predicate);
       */},
     },

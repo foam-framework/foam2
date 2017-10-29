@@ -115,7 +115,6 @@ foam.INTERFACE({
         {
           name: 'sink',
           swiftType: 'Sink',
-          swiftDefaultValue: 'ArraySink()',
         },
       ],
     },
@@ -136,13 +135,13 @@ foam.INTERFACE({
         },
         {
           name: 'skip',
-          swiftType: 'Int?',
-          swiftDefaultValue: 'nil',
+          swiftType: 'Int',
+          swiftDefaultValue: '0',
         },
         {
           name: 'limit',
-          swiftType: 'Int?',
-          swiftDefaultValue: 'nil',
+          swiftType: 'Int',
+          swiftDefaultValue: 'Int.max',
         },
         {
           name: 'order',
