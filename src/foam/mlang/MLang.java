@@ -66,6 +66,10 @@ public class MLang
     return new Min(0, MLang.prepare(o1));
   }
 
+  public static Sink SUM(Object o1) {
+    return new Sum(MLang.prepare(o1), 0.0);
+  }
+
   public static Sink MAP(Object o1, foam.dao.Sink delegate) {
     return new Map(MLang.prepare(o1), delegate);
   }

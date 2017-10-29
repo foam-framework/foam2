@@ -40,7 +40,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'foam.mlang.Expr'],
-    ['javaJSONParser', 'foam.lib.json.ExprParser']
+    ['javaJSONParser', 'new foam.lib.json.ExprParser()']
   ]
 });
 
@@ -50,7 +50,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'foam.dao.Sink'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
   ]
 });
 
@@ -852,7 +852,7 @@ foam.CLASS({
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: 'setValue(getValue() + (double) this.arg1_.f(obj));'
+      javaCode: 'setValue(getValue() + ((Number) this.arg1_.f(obj)).doubleValue());'
     }
   ]
 });

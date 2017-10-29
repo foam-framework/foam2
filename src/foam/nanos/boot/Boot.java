@@ -8,9 +8,9 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
-import static foam.mlang.MLang.*;
 import foam.nanos.script.*;
 import java.io.IOException;
+import static foam.mlang.MLang.*;
 
 public class Boot {
   protected DAO serviceDAO_;

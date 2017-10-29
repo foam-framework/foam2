@@ -16,5 +16,6 @@ public interface FObject
   Map diff(FObject obj);
   Object setProperty(String prop, Object value);
   Object getProperty(String prop);
-  boolean hasOwnProperty(String prop);
+  boolean isPropertySet(String prop);
+  boolean hasDefaultValue(String prop);
 }
