@@ -60,10 +60,6 @@ foam.CLASS({
       class: 'StringArray',
       name: 'annotations',
     },
-    {
-      class: 'StringArray',
-      name: 'footers',
-    },
   ],
 
   methods: [
@@ -104,7 +100,6 @@ foam.CLASS({
       o.decreaseIndent();
       o.indent();
       o.out('}');
-      o.out(this.footers.length ? '\n' + this.footers.join('\n') : '');
     },
     function toSwiftSource() {
       var output = this.Outputter.create({outputMethod: 'outputSwift'});
