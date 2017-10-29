@@ -25,12 +25,15 @@ foam.CLASS({
     }
   ],
   methods: [
-    function parseString(str, X) {
+    function parseString(str) {
+      return this.parseClassFromString(str, null);
+    },
+    function parseClassFromString(str, opt_cls) {
       foam.assert(this.creationContext, 'No creation context assigned.');
 
       var res = this.grammar.parseString(str, 'obj');
       if ( ! res ) return null;
-      return foam.json.parse(res, null, this.creationContext);
+      return foam.json.parse(res, opt_cls, this.creationContext);
     }
   ],
   grammars: [

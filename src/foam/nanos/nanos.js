@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/client/ClientBuilder" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },

@@ -84,7 +84,7 @@ public class NanoRouter
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceWebAgent(service, skeleton);
+        service = new ServiceWebAgent(service, skeleton, spec.getAuthenticate());
         informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
