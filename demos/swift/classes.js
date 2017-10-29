@@ -15,6 +15,7 @@ var classes = [
   'foam.swift.parse.json.output.Outputter',
   'foam.u2.Visibility',
 
+  'TestApp',
   'TestExtended',
   'TestDetailView',
   'foam.dao.ArraySink',
