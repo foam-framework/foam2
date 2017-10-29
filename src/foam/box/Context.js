@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
+  swiftName: 'BoxContext',
 
   requires: [
     'foam.box.BoxRegistryBox',
@@ -77,23 +78,31 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'registry',
       hidden: true,
       factory: function() {
         return this.BoxRegistryBox.create();
-      }
+      },
+      swiftFactory: 'return BoxRegistryBox_create()',
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'root',
       hidden: true,
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
-      }
+      },
+      swiftPostSet: 'NamedBox_create(["name": ""]).delegate = newValue!',
     },
     {
       class: 'String',
       name: 'myname',
       hidden: true,
+      swiftFactory:
+          'return "/com/foamdev/anonymous/" + String(FOAM_utils.next$UID())',
       factory: function() {
         return foam.isServer ?
           '/proc/' + require('process').pid + '/' + foam.uuid.randomGUID() :
@@ -108,7 +117,12 @@ foam.CLASS({
         var me = this.NamedBox.create({ name: this.myname });
         me.delegate = this.registry;
         return me;
-      }
+      },
+      swiftFactory: function() {/*
+        let me = NamedBox_create(["name": self.myname])
+        me.delegate = self.registry!
+        return me
+      */},
     },
     {
       class: 'Boolean',

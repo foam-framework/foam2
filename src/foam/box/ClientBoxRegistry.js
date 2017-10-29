@@ -19,7 +19,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'ClientBoxRegistry',
-
+  implements: ['foam.box.BoxRegistry'],
   properties: [
     {
       class: 'Stub',

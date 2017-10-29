@@ -10,10 +10,22 @@ foam.CLASS({
   implements: [ 'foam.box.Box' ],
 
   requires: [
-    'foam.json.Outputter',
-    'foam.json.Parser',
+    {
+      name: 'Parser',
+      path: 'foam.json.Parser',
+      swiftPath: 'foam.swift.parse.json.FObjectParser',
+    },
+    {
+      name: 'HTTPRequest',
+      path: 'foam.net.web.HTTPRequest',
+      swiftPath: '',
+    },
+    {
+      name: 'Outputter',
+      path: 'foam.json.Outputter',
+      swiftPath: 'foam.swift.parse.json.output.Outputter',
+    },
     'foam.box.HTTPReplyBox',
-    'foam.net.web.HTTPRequest'
   ],
 
   imports: [
@@ -39,6 +51,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.json.Parser',
+      swiftType: 'FObjectParser',
       name: 'parser',
       generateJava: false,
       factory: function() {
@@ -50,13 +63,15 @@ foam.CLASS({
             this.__context__     :
             this.creationContext
         });
-      }
+      },
+      swiftFactory: 'return Parser_create()',
     },
     {
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
       name: 'outputter',
       generateJava: false,
+      swiftFactory: 'return Outputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
       }
@@ -108,7 +123,7 @@ protected class ResponseThread implements Runnable {
 
     {
       name: 'send',
-      code: function send(msg) {
+      code: function(msg) {
         // TODO: We should probably clone here, but often the message
         // contains RPC arguments that don't clone properly.  So
         // instead we will mutate replyBox and put it back after.
@@ -133,6 +148,32 @@ protected class ResponseThread implements Runnable {
           rmsg && replyBox && replyBox.send(rmsg);
         }.bind(this));
       },
+      swiftCode: function() {/*
+let replyBox = msg.attributes["replyBox"] as? Box
+msg.attributes["replyBox"] = HTTPReplyBox_create()
+
+var request = URLRequest(url: Foundation.URL(string: self.url)!)
+request.httpMethod = "POST"
+request.httpBody = outputter?.swiftStringify(msg).data(using: .utf8)
+
+msg.attributes["replyBox"] = replyBox
+
+let task = URLSession.shared.dataTask(with: request) { data, response, error in
+  do {
+    guard let data = data else {
+      throw FoamError("HTTPBox no response")
+    }
+    guard let str = String(data: data, encoding: .utf8),
+          let obj = self.parser.parseString(str) as? Message else {
+      throw FoamError("Failed to parse HTTPBox response")
+    }
+    try replyBox?.send(obj)
+  } catch let e {
+    try? replyBox?.send(self.__context__.create(Message.self, args: ["object": e])!)
+  }
+}
+task.resume()
+      */},
       javaCode: `
 // TODO: Go async and make request in a separate thread.
 java.net.HttpURLConnection conn;

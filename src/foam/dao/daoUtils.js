@@ -82,12 +82,18 @@ foam.CLASS({
 
   properties: [
     'args',
-    'delegate',
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Sink',
+      name: 'delegate',
+    },
     {
       name: 'innerSub',
+      swiftType: 'Detachable?',
       postSet: function(_, s) {
         if (s) this.onDetach(s);
-      }
+      },
+      swiftPostSet: 'if let s = newValue { onDetach(s) }',
     },
     {
       name: 'dao',
@@ -100,21 +106,33 @@ foam.CLASS({
   ],
 
   methods: [
+    {
+      name: 'put',
+      code: function put(obj, s) {
+        this.delegate.put(obj, this);
+      },
+      swiftCode: 'delegate.put(obj, self)',
+    },
+
     function outputJSON(outputter) {
       outputter.output(this.delegate);
     },
 
-    function put(obj, s) {
-      this.delegate.put(obj, this);
+    {
+      name: 'remove',
+      code: function remove(obj, s) {
+        this.delegate.remove(obj, this);
+      },
+      swiftCode: 'delegate.remove(obj, self)',
     },
 
-    function remove(obj, s) {
-      this.delegate.remove(obj, this);
+    {
+      name: 'reset',
+      code: function reset(s) {
+        this.delegate.reset(this);
+      },
+      swiftCode: 'delegate.reset(self)',
     },
-
-    function reset(s) {
-      this.delegate.reset(this);
-    }
   ]
 });
 
@@ -187,6 +205,7 @@ foam.CLASS({
         else
           this.array.push(cls.create(o, this.__subContext__));
       },
+      swiftCode: 'array.append(obj)',
       javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
                 +`getArray().add(obj);`
     },
