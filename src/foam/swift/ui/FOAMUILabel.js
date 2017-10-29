@@ -15,11 +15,22 @@ foam.CLASS({
       name: 'view',
       swiftType: 'UILabel',
       swiftFactory: 'return UILabel()',
+      swiftPostSet: function() {/*
+updateLabel();
+      */},
     },
     {
       name: 'data',
       swiftPostSet: function() {/*
-self.view.text = newValue == nil ? "nil" : String(describing: newValue!)
+updateLabel();
+      */},
+    },
+  ],
+  listeners: [
+    {
+      name: 'updateLabel',
+      swiftCode: function() {/*
+view.text = data == nil ? "nil" : String(describing: data!)
       */},
     },
   ],

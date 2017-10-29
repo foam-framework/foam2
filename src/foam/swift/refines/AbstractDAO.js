@@ -21,7 +21,9 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftType',
-      value: 'DAO',
+      expression: function(required) {
+        return '(DAO & FObject)' + (required ? '' : '?');
+      },
     },
   ],
 });
