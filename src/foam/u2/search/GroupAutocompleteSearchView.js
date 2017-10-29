@@ -145,10 +145,6 @@ foam.CLASS({
           arg1: this.property,
           arg2: foam.mlang.sink.Count.create()
         })).then(function(groups) {
-          // TODO: next line is needed because Java isn't marshalling Properties
-          // correctly. Remove when fixed.
-          groups.arg1 = this.property;
-
           this.groups = groups.sortedKeys();
         }.bind(this));
       }

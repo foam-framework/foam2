@@ -111,6 +111,7 @@ var classes = [
   'foam.nanos.auth.WebAuthService',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
+  'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
@@ -142,11 +143,19 @@ var classes = [
   'foam.dao.pg.ConnectionPool',
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
-  'foam.lib.parse.PStream'
+  'foam.lib.parse.PStream',
+  'foam.blob.Buffer',
+  'foam.blob.Blob',
+  'foam.blob.BlobService',
+  'foam.blob.AbstractBlob',
+  'foam.blob.AbstractBlobService',
+  'foam.blob.SubBlob',
+  'foam.blob.IdentifiedBlob',
+  'foam.blob.BlobStore'
 ];
 
 var abstractClasses = [
-  'foam.nanos.menu.AbstractMenu'
+  'foam.nanos.menu.AbstractMenu',
 //  'foam.json.Outputter'
 ];
 
@@ -165,7 +174,9 @@ var proxies = [
   'com.google.foam.demos.appengine.TestService',
   'foam.mop.MOP',
   'foam.lib.parse.Parser',
-  'foam.lib.parse.PStream'
+  'foam.lib.parse.PStream',
+  'foam.blob.Blob',
+  'foam.blob.BlobService'
 ];
 
 module.exports = {

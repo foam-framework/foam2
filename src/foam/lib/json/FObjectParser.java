@@ -31,10 +31,12 @@ public class FObjectParser extends ProxyParser {
                        try {
 
                          c = ps1 != null ? Class.forName(ps1.value().toString()) :
-                           x.get("defaultClass") != null ? (Class)x.get("defaultClass") :
+                           x.get("defaultClass") != null ? (Class) x.get("defaultClass") :
                            defaultClass;
 
                          if ( c == null ) {
+                           if ( ps1 != null ) throw new RuntimeException("Can't find class: " + ps1.value().toString());
+
                            throw new RuntimeException("No class specified in JSON and no defaultClass available.");
                          }
                        } catch(ClassNotFoundException e) {
