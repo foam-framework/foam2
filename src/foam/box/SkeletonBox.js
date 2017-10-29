@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'SkeletonBox',
+  implements: ['foam.box.Box'],
 
   requires: [
     'foam.box.Message',
@@ -34,62 +35,111 @@ foam.CLASS({
   ],
 
   methods: [
-    function call(message) {
-      var p;
+    {
+      name: 'call',
+      args: [
+        {
+          swiftType: 'Message?',
+          name: 'message',
+        },
+      ],
+      code: function(message) {
+        var p;
 
-      try {
-        var method = this.data.cls_.getAxiomByName(message.object.name);
-        var args = message.object.args.slice();
+        try {
+          var method = this.data.cls_.getAxiomByName(message.object.name);
+          var args = message.object.args.slice();
 
-        // TODO: This is pretty hackish.  Context-Oriented methods should just be modeled.
-        if ( method && method.args && method.args[0] && method.args[0].name == 'x' ) {
-          var x = this.__context__.createSubContext({
-            message: message
-          });
-          args[0] = x;
+          // TODO: This is pretty hackish.  Context-Oriented methods should just be modeled.
+          if ( method && method.args && method.args[0] && method.args[0].name == 'x' ) {
+            var x = this.__context__.createSubContext({
+              message: message
+            });
+            args[0] = x;
+          }
+          p = this.data[message.object.name].apply(this.data, args);
+        } catch(e) {
+          message.attributes.replyBox && message.attributes.replyBox.send(this.Message.create({
+            object: this.RPCErrorMessage.create({ data: e.message })
+          }));
+
+          return;
         }
 
-        p = this.data[message.object.name].apply(this.data, args);
-      } catch(e) {
-        message.attributes.replyBox && message.attributes.replyBox.send(this.Message.create({
-          object: this.RPCErrorMessage.create({ data: e.message })
-        }));
+        var replyBox = message.attributes.replyBox;
 
-        return;
-      }
+        var self = this;
 
-      var replyBox = message.attributes.replyBox;
+        if ( p instanceof Promise ) {
+          p.then(
+            function(data) {
+              replyBox.send(self.Message.create({
+                object: self.RPCReturnMessage.create({ data: data })
+              }));
+            },
+            function(error) {
+              message.attributes.replyBox && message.attributes.replyBox.send(self.Message.create({
+                object: self.RPCErrorMessage.create({ data: error && error.toString() })
+              }));
+            });
+        } else {
+          replyBox && replyBox.send(this.Message.create({
+            object: this.RPCReturnMessage.create({ data: p })
+          }));
+        }
+      },
+      swiftCode: function() {/*
+do {
+  guard let object = message?.object as? RPCMessage,
+        let data = self.data as? FObject,
+        let method = data.ownClassInfo().axiom(byName: object.name) as? MethodInfo
+  else {
+    throw InvalidMessageException_create()
+  }
 
-      var self = this;
+  // TODO handle context oriented methods.
 
-      if ( p instanceof Promise ) {
-        p.then(
-          function(data) {
-            replyBox.send(self.Message.create({
-              object: self.RPCReturnMessage.create({ data: data })
-            }));
-          },
-          function(error) {
-            message.attributes.replyBox && message.attributes.replyBox.send(self.Message.create({
-              object: self.RPCErrorMessage.create({ data: error && error.toString() })
-            }));
-          });
-      } else {
-        replyBox && replyBox.send(this.Message.create({
-          object: this.RPCReturnMessage.create({ data: p })
-        }));
-      }
+  var p = try method.call(data, args: object.args)
+
+  guard let replyBox = message?.attributes["replyBox"] as? Box else { return }
+  if let pFut = p as? Future<Any> { p = try pFut.get() }
+  try replyBox.send(Message_create([
+    "object": RPCReturnMessage_create(["data": p])
+  ]))
+} catch let e {
+  if let errorBox = message?.attributes["errorBox"] as? Box {
+    try? errorBox.send(Message_create([
+      "object": RPCErrorMessage_create([
+        "data": e.localizedDescription
+      ])
+    ]))
+  }
+}
+      */},
     },
 
-    function send(message) {
-      if ( this.RPCMessage.isInstance(message.object) ) {
-        this.call(message);
-        return;
-      }
+    {
+      name: 'send',
+      code: function(message) {
+        if ( this.RPCMessage.isInstance(message.object) ) {
+          this.call(message);
+          return;
+        }
 
-      throw this.InvalidMessageException.create({
-        messageType: message.cls_ && message.cls_.id
-      });
-    }
+        throw this.InvalidMessageException.create({
+          messageType: message.cls_ && message.cls_.id
+        });
+      },
+      swiftCode: function() {/*
+if let _ = msg.object as? RPCMessage {
+  call(msg)
+  return
+}
+
+throw InvalidMessageException_create([
+  "messageType": msg.ownClassInfo().id,
+])
+      */},
+    },
   ]
 });
