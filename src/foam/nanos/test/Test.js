@@ -108,6 +108,7 @@ foam.CLASS({
           shell.eval(getCode());
           runTest();
         } catch (Throwable e) {
+          setFailed(getFailed()+1);
           ps.println();
           e.printStackTrace(ps);
           e.printStackTrace();

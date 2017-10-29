@@ -12,7 +12,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      value: true
+      value: true,
+      searchView: false
     }
   ]
 });
