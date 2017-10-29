@@ -127,6 +127,8 @@ foam.CLASS({
               name: m.name,
               replyPolicyName: replyPolicyName,
               boxPropName: name,
+              swiftReturns: m.swiftReturns,
+              args: m.args,
               returns: returns
             });
           });
