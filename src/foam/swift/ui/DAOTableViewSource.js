@@ -13,11 +13,11 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: '(FObject & DAO)',
-      required: true,
+      class: 'foam.dao.DAOProperty',
       name: 'dao',
       swiftPostSet: function() {/*
-daoSub = try? newValue.listen(FnSink_create([
+if newValue == nil { return }
+daoSub = try? newValue!.listen(FnSink_create([
   "fn": { [weak self] str, obj, sub in
     self?.onDAOUpdate()
   } as (String, FObject, Detachable) -> Void,
@@ -62,7 +62,7 @@ onDAOUpdate()
       name: 'onDAOUpdate',
       isMerged: true,
       swiftCode: function() {/*
-let sink = try? dao.select(ArraySink_create()) as? ArraySink
+let sink = try? dao!.select(ArraySink_create()) as? ArraySink
 daoContents = sink??.array ?? []
 tableView?.reloadData()
       */},
