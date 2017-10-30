@@ -74,7 +74,13 @@ foam.CLASS({
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       },
-      javaFactory: 'return java.util.UUID.randomUUID().toString();'
+      javaFactory:
+`String uuid = (String) getX().get(getSessionName());
+if ( "".equals(uuid) ) {
+  uuid = java.util.UUID.randomUUID().toString();
+  getX().put(getSessionName(), uuid);
+}
+return uuid;`
     }
   ],
 
