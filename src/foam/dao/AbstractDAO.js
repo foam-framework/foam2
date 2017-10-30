@@ -27,19 +27,14 @@ foam.CLASS({
     'foam.dao.FilteredDAO',
     'foam.dao.InternalException',
     'foam.dao.LimitedDAO',
-    'foam.dao.LimitedListener',
     'foam.dao.LimitedSink',
-    'foam.dao.ObjectNotFoundException',
     'foam.dao.OrderedDAO',
-    'foam.dao.OrderedListener',
     'foam.dao.OrderedSink',
     'foam.dao.PipeSink',
-    'foam.dao.PredicatedListener',
     'foam.dao.PredicatedSink',
     'foam.dao.ProxyDAO',
     'foam.dao.ResetListener',
     'foam.dao.SkipDAO',
-    'foam.dao.SkipListener',
     'foam.dao.SkipSink'
   ],
 
@@ -89,7 +84,13 @@ foam.CLASS({
           delegate: this,
           predicate: p
         });
-      }
+      },
+      swiftCode: function() {/*
+        return FilteredDAO_create([
+          "delegate": self,
+          "predicate": predicate,
+        ]);
+      */},
     },
 
     {
@@ -103,7 +104,7 @@ foam.CLASS({
           delegate: this,
           comparator: foam.compare.toCompare(Array.from(arguments))
         });
-      }
+      },
     },
 
     {
@@ -117,7 +118,13 @@ foam.CLASS({
           delegate: this,
           skip_: s
         });
-      }
+      },
+      swiftCode: function() {/*
+return SkipDAO_create([
+  "delegate": self,
+  "skip_": count,
+])
+      */},
     },
 
     {
@@ -131,11 +138,21 @@ foam.CLASS({
           delegate: this,
           limit_: l
         });
-      }
+      },
+      swiftCode: function() {/*
+return LimitedDAO_create([
+  "delegate": self,
+  "limit_": count,
+])
+      */},
     },
 
-    function put(obj) {
-      return this.put_(this.__context__, obj);
+    {
+      name: 'put',
+      code: function(obj) {
+        return this.put_(this.__context__, obj);
+      },
+      swiftCode: 'return try put_(__context__, obj)',
     },
 
     /**
@@ -144,63 +161,119 @@ foam.CLASS({
       TODO: This will probably miss events that happen during the select but before the
       listen call.  We should check if this is the case and fix it if so.
     */
-    function pipe(sink) {//, skip, limit, order, predicate) {
-      this.pipe_(this.__context__, sink, undefined);
+    {
+      name: 'pipe',
+      code: function(sink) {//, skip, limit, order, predicate) {
+        this.pipe_(this.__context__, sink, undefined);
+      },
+      swiftCode: 'return try pipe_(__context__, sink)',
     },
 
-    function pipe_(x, sink, predicate) {
-      var dao = this;
+    {
+      name: 'pipe_',
+      code: function(x, sink, predicate) {
+        var dao = this;
 
-      var sink = this.PipeSink.create({
-        delegate: sink,
-        dao: this
-      });
+        var sink = this.PipeSink.create({
+          delegate: sink,
+          dao: this
+        });
 
-      var sub = this.listen(sink); //, skip, limit, order, predicate);
-      sink.reset();
+        var sub = this.listen(sink); //, skip, limit, order, predicate);
+        sink.reset();
 
-      return sub;
+        return sub;
+      },
     },
 
-    function listen(sink) {
-      if ( ! foam.core.FObject.isInstance(sink) ) {
-        sink = foam.dao.AnonymousSink.create({ sink: sink }, this);
-      }
-
-      return this.listen_(this.__context__, sink, undefined);
+    {
+      name: 'listen',
+      code: function(sink) {
+        if ( ! foam.core.FObject.isInstance(sink) ) {
+          sink = foam.dao.AnonymousSink.create({ sink: sink }, this);
+        }
+        return this.listen_(this.__context__, sink, undefined);
+      },
+      swiftCode: 'return try listen_(__context__, sink)',
     },
 
     /**
       Keeps the given sink up to date with changes to this DAO.
     */
-    function listen_(x, sink, predicate) {
-      var mySink = this.decorateListener_(sink, predicate);
+    {
+      name: 'listen_',
+      code: function(x, sink, predicate) {
+        var mySink = this.decorateListener_(sink, predicate);
 
-      var sub = foam.core.FObject.create();
+        var sub = foam.core.FObject.create();
 
-      sub.onDetach(this.on.sub(function(s, on, e, obj) {
-        switch(e) {
-          case 'put':
-            mySink.put(obj, sub);
-            break;
-          case 'remove':
-            mySink.remove(obj, sub);
-            break;
-          case 'reset':
-            mySink.reset(sub);
-            break;
-        }
-      }));
+        sub.onDetach(this.on.sub(function(s, on, e, obj) {
+          switch(e) {
+            case 'put':
+              mySink.put(obj, sub);
+              break;
+            case 'remove':
+              mySink.remove(obj, sub);
+              break;
+            case 'reset':
+              mySink.reset(sub);
+              break;
+          }
+        }));
 
-      return sub;
+        return sub;
+      },
+      swiftCode: function() {/*
+let mySink = decorateListener_(sink, predicate)
+return sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+  guard let topic = args[0] as? String else { return }
+  switch topic {
+    case "put":
+      mySink.put(args.last as! FObject, sub)
+      break
+    case "remove":
+      mySink.remove(args.last as! FObject, sub)
+      break
+    case "reset":
+      mySink.reset(sub)
+      break
+    default:
+      break
+  }
+})
+      */},
     },
 
-    function decorateListener_(sink, predicate) {
-      if ( predicate ) {
-        return this.ResetListener.create({ delegate: sink });
-      }
+    {
+      name: 'decorateListener_',
+      swiftReturns: 'Sink',
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+        },
+      ],
+      code: function decorateListener_(sink, predicate) {
+        if ( predicate ) {
+          return this.ResetListener.create({ delegate: sink });
+        }
 
-      return sink;
+        return sink;
+      },
+      swiftCode: function() {/*
+// TODO: There are probably optimizations we can make here
+// but every time I try it comes out broken.  So for the time being,
+// if you have any sort of skip/limit/order/predicate we will just
+// issue reset events for everything.
+if predicate != nil {
+  return self.ResetListener_create(["delegate": sink])
+}
+return sink
+      */},
     },
 
     /**
@@ -208,46 +281,108 @@ foam.CLASS({
       select() or removeAll() implementation.
       @private
     */
-    function decorateSink_(sink, skip, limit, order, predicate) {
-      if ( limit != undefined ) {
-        sink = this.LimitedSink.create({
-          limit: limit,
-          delegate: sink
-        });
-      }
+    {
+      name: 'decorateSink_',
+      swiftReturns: 'Sink',
+      args: [
+        {
+          name: 'sink',
+          swiftType: 'Sink',
+        },
+        {
+          name: 'skip',
+          swiftType: 'Int?',
+        },
+        {
+          name: 'limit',
+          swiftType: 'Int?',
+        },
+        {
+          name: 'order',
+          swiftType: 'Comparator?',
+        },
+        {
+          name: 'predicate',
+          swiftType: 'FoamPredicate?',
+        },
+      ],
+      code: function decorateSink_(sink, skip, limit, order, predicate) {
+        if ( limit != undefined ) {
+          sink = this.LimitedSink.create({
+            limit: limit,
+            delegate: sink
+          });
+        }
 
-      if ( skip != undefined ) {
-        sink = this.SkipSink.create({
-          skip: skip,
-          delegate: sink
-        });
-      }
+        if ( skip != undefined ) {
+          sink = this.SkipSink.create({
+            skip: skip,
+            delegate: sink
+          });
+        }
 
-      if ( order != undefined ) {
-        sink = this.OrderedSink.create({
-          comparator: order,
-          delegate: sink
-        });
-      }
+        if ( order != undefined ) {
+          sink = this.OrderedSink.create({
+            comparator: order,
+            delegate: sink
+          });
+        }
 
-      if ( predicate != undefined ) {
-        sink = this.PredicatedSink.create({
-          predicate: predicate.partialEval ?
-            predicate.partialEval() :
-            predicate,
-          delegate: sink
-        });
-      }
+        if ( predicate != undefined ) {
+          sink = this.PredicatedSink.create({
+            predicate: predicate.partialEval ?
+              predicate.partialEval() :
+              predicate,
+            delegate: sink
+          });
+        }
 
-      return sink;
+        return sink;
+      },
+      swiftCode: function() {/*
+var sink = sink
+if limit != nil {
+  sink = LimitedSink_create([
+    "limit": limit,
+    "delegate": sink
+  ])
+}
+if skip != nil {
+  sink = SkipSink_create([
+    "skip": skip,
+    "delegate": sink
+  ])
+}
+if order != nil {
+  sink = OrderedSink_create([
+    "comparator": order,
+    "delegate": sink,
+  ])
+}
+if predicate != nil {
+  sink = PredicatedSink_create([
+    "predicate": predicate,
+    "delegate": sink,
+  ])
+}
+return sink
+      */},
     },
 
-    function remove(obj) {
-      return this.remove_(this.__context__, obj);
+    {
+      name: 'remove',
+      code: function remove(obj) {
+        return this.remove_(this.__context__, obj);
+      },
+      swiftCode: 'return try remove_(__context__, obj)',
     },
 
-    function removeAll() {
-      return this.removeAll_(this.__context__, undefined, undefined, undefined, undefined);
+    {
+      name: 'removeAll',
+      code: function removeAll() {
+        return this.removeAll_(this.__context__, undefined, undefined, undefined, undefined);
+      },
+      swiftCode: 'return try removeAll_(__context__)',
     },
 
     function compareTo(other) {
@@ -255,12 +390,20 @@ foam.CLASS({
       return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
     },
 
-    function select(sink) {
-      return this.select_(this.__context__, sink, undefined, undefined, undefined, undefined);
+    {
+      name: 'select',
+      code: function select(sink) {
+        return this.select_(this.__context__, sink, undefined, undefined, undefined, undefined);
+      },
+      swiftCode: 'return try select_(__context__, sink)',
     },
 
-    function find(id) {
-      return this.find_(this.__context__, id);
+    {
+      name: 'find',
+      code: function find(id) {
+        return this.find_(this.__context__, id);
+      },
+      swiftCode: 'return try find_(__context__, id)',
     },
 
     function cmd_(x, obj) {
@@ -276,7 +419,7 @@ foam.CLASS({
     function eof() {},
 
     /** @private */
-    function reset() {}
+    function reset() {},
   ]
 });
 
@@ -306,6 +449,8 @@ foam.CLASS({
 
   properties: [
     {
+      // TODO: FObjectProperty of Predicate. Doing this currently breaks java.
+      swiftType: 'FoamPredicate',
       name: 'predicate',
       required: true
     },
@@ -313,7 +458,9 @@ foam.CLASS({
       name: 'of',
       factory: function() {
         return this.delegate.of;
-      }
+      },
+      swiftExpressionArgs: ['delegate$of'],
+      swiftExpression: 'return delegate$of as! ClassInfo',
     },
     {
       class: 'Proxy',
@@ -332,12 +479,22 @@ foam.CLASS({
       });
     },
 
-    function select_(x, sink, skip, limit, order, predicate) {
-      return this.delegate.select_(
-        x, sink, skip, limit, order,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
+    {
+      name: 'select_',
+      code: function(x, sink, skip, limit, order, predicate) {
+        return this.delegate.select_(
+          x, sink, skip, limit, order,
+          predicate ?
+            this.And.create({ args: [this.predicate, predicate] }) :
+            this.predicate);
+      },
+      swiftCode: function() {/*
+return try delegate.select_(
+  x, sink, skip, limit, order,
+  predicate != nil ?
+    And_create(["args": [self.predicate, predicate!] ]) :
+    self.predicate)
+      */},
     },
 
     function removeAll_(x, skip, limit, order, predicate) {
@@ -388,13 +545,20 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'skip_'
+      class: 'Int',
+      name: 'skip_',
     }
   ],
 
   methods: [
-    function select_(x, sink, skip, limit, order, predicate) {
-      return this.delegate.select_(x, sink, this.skip_, limit, order, predicate);
+    {
+      name: 'select_',
+      code: function select_(x, sink, skip, limit, order, predicate) {
+        return this.delegate.select_(x, sink, this.skip_, limit, order, predicate);
+      },
+      swiftCode: function() {/*
+return try delegate.select_(x, sink, skip_, limit, order, predicate)
+      */},
     },
     function removeAll_(x, skip, limit, order, predicate) {
       return this.delegate.removeAll_(x, this.skip_, limit, order, predicate);
@@ -410,16 +574,26 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Int',
       name: 'limit_'
     }
   ],
 
   methods: [
-    function select_(x, sink, skip, limit, order, predicate) {
-      return this.delegate.select_(
-        x, sink, skip,
-        limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
-        order, predicate);
+    {
+      name: 'select_',
+      code: function select_(x, sink, skip, limit, order, predicate) {
+        return this.delegate.select_(
+          x, sink, skip,
+          limit !== undefined ? Math.min(this.limit_, limit) : this.limit_,
+          order, predicate);
+      },
+      swiftCode: function() {/*
+return try delegate.select_(
+    x, sink, skip,
+    min(limit_, limit),
+    order, predicate);
+      */},
     },
 
     function removeAll_(x, skip, limit, order, predicate) {

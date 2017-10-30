@@ -110,9 +110,7 @@ foam.CLASS({
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
-            body: ( this.jsonParser ) ?
-              'return new ' + this.jsonParser + '();' :
-              'return null;'
+            body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
           },
           {
             name: 'csvParser',

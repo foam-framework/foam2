@@ -1800,7 +1800,7 @@ foam.CLASS({
           var value = attr.value;
 
           out(' ', name);
-          if ( value !== false ) out('="', encodeURIComponent(value), '"');
+          if ( value !== false ) out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
         }
       }
 
