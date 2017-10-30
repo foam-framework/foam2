@@ -26,7 +26,6 @@ describe('Stub', function() {
     var remoteRegistry = sf.get(foam.box.BoxRegistry).create({
       delegate: foam.box.node.ForkBox.create({
         critical: true,
-        nodeParams: ['--inspect', '--debug-brk'],
         childScriptPath: `${__dirname}/StubForkScript.js`
       }, ctx)
     }, ctx);

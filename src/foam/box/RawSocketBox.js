@@ -53,10 +53,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      this.SUPER();
-      debugger;
-    },
     {
       name: 'send',
       code: function send(msg) {
