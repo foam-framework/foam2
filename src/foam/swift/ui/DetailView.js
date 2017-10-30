@@ -28,11 +28,6 @@ return data?.ownClassInfo().label ?? self.ownClassInfo().label
       */},
     },
     {
-      name: 'propertyLabelViews',
-      swiftType: '[String:UILabel]',
-      swiftFactory: 'return [:]',
-    },
-    {
       name: 'propertyViews',
       swiftType: '[String:FObject]',
       swiftFactory: 'return [:]',
@@ -48,18 +43,34 @@ return data?.ownClassInfo().label ?? self.ownClassInfo().label
       swiftFactory: 'return [:]',
     },
     {
+      swiftType: 'ClassInfo?',
+      name: 'of',
+      swiftExpressionArgs: ['data'],
+      swiftExpression: 'return data?.ownClassInfo() ?? nil',
+    },
+    {
       swiftType: 'FObject?',
       name: 'data',
-      swiftPostSet: 'self.reset()',
+    },
+    {
+      class: 'Map',
+      name: 'config',
     },
   ],
   methods: [
+    {
+      name: 'init',
+      swiftCode: function() {/*
+onDetach(of$.sub(listener: { (_, _) in
+  self.reset()
+}))
+      */},
+    },
     {
       name: 'reset',
       swiftCode: function() {/*
 self.actionViews = [:]
 self.propertyViews = [:]
-self.propertyLabelViews = [:]
 for (_, sub) in subViewSubscriptions {
   sub.detach()
 }
@@ -84,7 +95,11 @@ actions = actions.filter({ (a) -> Bool in
 
 let viewNames = properties.map { (p) -> String in return p.name }
 
-let labelViews = properties.map { (p) -> UILabel in return propertyLabelViews[p.name]! }
+let labelViews = properties.map { (p) -> UILabel in
+  let label = UILabel()
+  label.text = p.label
+  return label
+}
 labelViews.forEach { (v) in
   v.setContentHuggingPriority(.defaultHigh, for: .horizontal)
   v.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -160,34 +175,46 @@ if let bottom: UIView = actionViews.first ?? labelViews.last {
 }
       */},
     },
+    {
+      name: 'getView',
+      args: [
+        {
+          name: 'a',
+          swiftType: 'PropertyInfo',
+        }
+      ],
+      swiftReturns: 'FObject?',
+      swiftCode: function() {/*
+if let c = config[a.name] as? [String:Any?],
+    let vf = c["viewFactory"] as? (Context) -> FObject? {
+  return vf(__context__)
+}
+return a.viewFactory(x: __context__)
+      */},
+    },
   ],
   swiftCode: function() {/*
 subscript(key: String) -> FObject? {
-  guard let data = self.data as AnyObject as? FObject else { return nil }
+  guard let of = self.of else { return nil }
   if let v = self.propertyViews[key] ?? self.actionViews[key] {
     return v
   }
-  let classInfo = data.ownClassInfo()
-  if let a = classInfo.axiom(byName: key) {
-    if let a = a as? PropertyInfo, let viewFobj = a.viewFactory(x: __context__) {
+  if let a = of.axiom(byName: key) {
+    if let a = a as? PropertyInfo, let viewFobj = getView(a) {
       let prop = a.name
       if let viewFobj = viewFobj as? PropertyView {
         viewFobj.fromProperty(a)
       }
       propertyViews[prop] = viewFobj
 
-      let label = UILabel()
-      label.text = a.label
-      propertyLabelViews[prop] = label
-
-      let sub = viewFobj.getSlot(key: "data")!.linkFrom(data.getSlot(key: prop)!)
+      let sub = viewFobj.getSlot(key: "data")!.linkFrom(data$.dot(prop))
       subViewSubscriptions[prop] = sub
       self.onDetach(sub)
 
       return viewFobj
     } else if let a = a as? ActionInfo {
       let btn = FOAMActionUIButton_create()
-      btn.fobj = data
+      btn.fobj$ = data$
       btn.action = a
       actionViews[a.name] = btn
       return btn

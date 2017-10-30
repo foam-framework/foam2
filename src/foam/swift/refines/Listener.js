@@ -17,12 +17,17 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftListenerDispatchQueue',
+      value: 'DispatchQueue.main',
+    },
+    {
+      class: 'String',
       name: 'swiftListenerMethodName',
       expression: function(swiftName) { return swiftName + '_method'; },
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom) {
+    function writeToSwiftClass(cls, superAxiom, parentCls) {
       if ( !this.swiftCode ) return;
       var override = !!(superAxiom && superAxiom.swiftCode)
       cls.field(this.Field.create({
@@ -42,9 +47,17 @@ foam.CLASS({
           visibility: 'public',
           static: true,
           final: true,
-          name: this.swiftAxiomName,
+          name: this.swiftPrivateAxiomName,
           type: 'MethodInfo',
           initializer: this.swiftMethodInfoInit(),
+        }));
+        cls.methods.push(this.Method.create({
+          visibility: 'public',
+          class: true,
+          name: this.swiftAxiomName,
+          returnType: 'MethodInfo',
+          body: 'return ' + this.swiftPrivateAxiomName,
+          override: this.getSwiftOverride(parentCls),
         }));
       }
       cls.method(this.Method.create({
@@ -76,11 +89,15 @@ var triggered = false
 return { [weak self] sub, args in
   if triggered { return }
   triggered = true
-  Timer.scheduledTimer(
-      withTimeInterval: <%= (this.isMerged ? this.mergeDelay : 30)/1000 %>,
-      repeats: false) { _ in
-    triggered = false
-    self?.<%=this.swiftListenerMethodName%>(sub, args)
+  DispatchQueue.main.async {
+    Timer.scheduledTimer(
+        withTimeInterval: <%= (this.isMerged ? this.mergeDelay : 30)/1000 %>,
+        repeats: false) { _ in
+      triggered = false
+      <%=this.swiftListenerDispatchQueue%>.async {
+        self?.<%=this.swiftListenerMethodName%>(sub, args)
+      }
+    }
   }
 } as (Subscription, [Any?]) -> Void
 

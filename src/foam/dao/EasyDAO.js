@@ -207,12 +207,12 @@ foam.CLASS({
       name: 'serverBox',
       factory: function() {
         // TODO: This should come from the server via a lookup from a NamedBox.
-        return /*this.SessionClientBox.create({ delegate:*/ this.RetryBox.create({ delegate:
+        return this.SessionClientBox.create({ delegate: this.RetryBox.create({ delegate:
           this.TimeoutBox.create({ delegate:
           this.remoteListenerSupport ?
               this.WebSocketBox.create({ uri: this.serviceName }) :
               this.HTTPBox.create({ url: this.serviceName })
-        })})/*})*/;
+        })})});
       }
     },
     {

@@ -99,7 +99,7 @@ public class Context {
 
   public func create<T>(_ type: T.Type, args: [String:Any?] = [:]) -> T? {
     if let type = type as? AnyClass,
-       let cls = lookup_(type) {
+      let cls = lookup_(type) {
       return cls.create(args: args, x: self) as? T
     }
     return nil
@@ -209,8 +209,9 @@ public protocol FObject: class, Detachable {
   func hasOwnProperty(_ key: String) -> Bool
   func clearProperty(_ key: String)
   func compareTo(_ data: FObject?) -> Int
-  func onDetach(_ sub: Detachable)
+  func onDetach(_ sub: Detachable?)
   func toString() -> String
+  func copyFrom(_ o: FObject)
   init(_ args: [String:Any?])
 }
 
@@ -233,7 +234,8 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
   public func hasOwnProperty(_ key: String) -> Bool { return false }
   public func clearProperty(_ key: String) {}
 
-  public func onDetach(_ sub: Detachable) {
+  public func onDetach(_ sub: Detachable?) {
+    guard let sub = sub else { return }
     _ = self.sub(topics: ["detach"]) { (s, _) in
       s.detach()
       sub.detach()
@@ -383,6 +385,21 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
   public func toString() -> String {
     return __context__.create(Outputter.self)!.swiftStringify(self)
   }
+
+  public func copyFrom(_ o: FObject) {
+    ownClassInfo().axioms(byType: PropertyInfo.self).forEach { (p) in
+      if o.hasOwnProperty(p.name) {
+        p.set(self, value: p.get(o))
+      }
+    }
+  }
+
+  public override func isEqual(_ object: Any?) -> Bool {
+    if let o = object as? FObject {
+      return compareTo(o) == 0
+    }
+    return super.isEqual(object)
+  }
 }
 
 struct FOAM_utils {
@@ -403,7 +420,6 @@ struct FOAM_utils {
     return id
   }
 }
-
 public class Reference<T> {
   var value: T
   init(value: T) { self.value = value }
@@ -446,9 +462,9 @@ public class ModelParserFactory {
       "delegate": Seq0(["parsers": [
         Whitespace(),
         Alt(["parsers": parsers])
-      ]]),
+        ]]),
       "delim": Literal(["string": ","]),
-    ])
+      ])
   }
 }
 
@@ -472,13 +488,80 @@ public class FoamError: Error {
   }
 }
 
+public typealias AFunc = (@escaping (Any?) -> Void, @escaping (Any?) -> Void, Any?) -> Void
+public struct Async {
+
+  public static func aPar(_ funcs: [AFunc]) -> AFunc {
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
+      var numCompleted = 0
+      var returnValues = Array<Any?>(repeating: nil, count: funcs.count)
+      for i in 0...funcs.count-1 {
+        returnValues[i] = 0
+        let f = funcs[i]
+        f({ data in
+          if let data = data as Any? {
+            returnValues[i] = data
+          }
+          numCompleted += 1
+          if numCompleted == funcs.count {
+            aRet(returnValues)
+          }
+        }, aThrow, args)
+      }
+    }
+  }
+
+  public static func aSeq(_ funcs: [AFunc]) -> AFunc {
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
+      var i = 0
+      var next: ((Any?) -> Void)!
+      next = { d in
+        let f = funcs[i]
+        f({ d2 in
+          i += 1
+          if i == funcs.count {
+            aRet(d2)
+          } else {
+            next(d2)
+          }
+        }, aThrow, d)
+      }
+      next(args)
+    }
+  }
+
+  public static func aWhile(_ cond: @escaping () -> Bool, afunc: @escaping AFunc) -> AFunc {
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
+      var next: ((Any?) -> Void)!
+      next = { d in
+        if !cond() {
+          aRet(args)
+          return
+        }
+        afunc(next, aThrow, args)
+      }
+      next(args)
+    }
+  }
+
+  public static func aWait(delay: TimeInterval = 0,
+                           queue: DispatchQueue = DispatchQueue.main,
+                           afunc: @escaping AFunc = { aRet, _, _ in aRet(nil) }) -> AFunc {
+    return { (aRet: @escaping (Any?) -> Void, aThrow: @escaping (Any?) -> Void, args: Any?) in
+      queue.asyncAfter(
+        deadline: DispatchTime.now() + Double(Int64(UInt64(delay * 1000.0) * NSEC_PER_MSEC)) / Double(NSEC_PER_SEC),
+        execute: { () -> Void in afunc(aRet, aThrow, args) })
+    }
+  }
+}
+
 public class Future<T> {
-  var set: Bool = false
-  var value: T?
-  var error: Error?
-  var semaphore = DispatchSemaphore(value: 0)
-  var numWaiting = 0
-  public func get() throws -> T? {
+  private var set: Bool = false
+  private var value: T!
+  private var error: Error?
+  private var semaphore = DispatchSemaphore(value: 0)
+  private var numWaiting = 0
+  public func get() throws -> T {
     if !set {
       numWaiting += 1
       semaphore.wait()
@@ -488,7 +571,7 @@ public class Future<T> {
     }
     return value
   }
-  public func set(_ value: T?) {
+  public func set(_ value: T) {
     self.value = value
     set = true
     for _ in 0...numWaiting {
@@ -513,5 +596,11 @@ public class ParserContext {
     let child = ParserContext()
     child.parent_ = self
     return child
+  }
+}
+
+extension DAO {
+  func select() throws -> Sink {
+    return try select(Context.GLOBAL.create(ArraySink.self)!)
   }
 }

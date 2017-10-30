@@ -5,18 +5,18 @@
  */
 
 var classes = [
+  'foam.swift.ui.DAOTableViewSource',
   'foam.swift.ui.DetailView',
   'foam.swift.ui.FOAMUILabel',
   'foam.swift.ui.FOAMUITextField',
   'foam.swift.ui.FOAMUITextFieldInt',
   'foam.swift.ui.PropertyView',
   'foam.swift.ui.ScrollingViewController',
-  'foam.swift.parse.json.output.HTTPBoxOutputter',
   'foam.u2.Visibility',
 
-  'Tabata',
-  'TabataSoundView',
+  'TestApp',
   'TestExtended',
+  'TestDetailView',
   'foam.dao.ArraySink',
   'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',
