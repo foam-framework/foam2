@@ -17,5 +17,6 @@
 
 foam.INTERFACE({
   package: 'foam.core',
-  name: 'Exception'
+  name: 'Exception',
+  swiftImplements: ['Error'],
 });

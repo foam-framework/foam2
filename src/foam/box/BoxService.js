@@ -29,21 +29,50 @@ foam.CLASS({
       name: 'client'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxService',
       name: 'next'
     }
   ],
 
   methods: [
-    function serverBox(box) {
-      box = this.next ? this.next.serverBox(box) : box;
-      return this.server.create({ delegate: box })
+    {
+      name: 'serverBox',
+      args: [
+        {
+          swiftType: 'Box',
+          name: 'box',
+        },
+      ],
+      returns: 'foam.box.Box',
+      code: function serverBox(box) {
+        box = this.next ? this.next.serverBox(box) : box;
+        return this.server.create({ delegate: box })
+      },
+      swiftCode: function() {/*
+let box2: Box = next?.serverBox(box) ?? box
+return server.create(args: ["delegate": box2], x: __subContext__) as! Box
+      */},
     },
-
-    function clientBox(box) {
-      box = this.client.create({ delegate: box });
-      return this.next ?
-        this.next.clientBox(box) :
-        box;
-    }
+    {
+      name: 'clientBox',
+      args: [
+        {
+          name: 'box',
+          swiftType: 'Box',
+        },
+      ],
+      returns: 'foam.box.Box',
+      code: function(box) {
+        box = this.client.create({ delegate: box });
+        return this.next ?
+          this.next.clientBox(box) :
+          box;
+      },
+      swiftCode: function() {/*
+let box2 = client.create(args: ["delegate": box], x: __subContext__) as! Box
+return next?.clientBox(box2) ?? box2
+      */},
+    },
   ]
 });
