@@ -63,7 +63,10 @@ return w
         },
       ],
       code: function(X, id) {
-        if ( ! this.whitelist_[id] ) {
+        // TODO: This should be:
+        // if ( ! this.whitelist_[id] ) { ... }
+        // Change it back once #777 is closed.
+        if ( ! this.whitelist.includes(id) ) {
           throw new Error('Class "' + id + '" is not whitelisted.');
         }
         return this.__context__.lookup.call(X, id);
