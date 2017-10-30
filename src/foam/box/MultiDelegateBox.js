@@ -17,17 +17,23 @@
 
 foam.CLASS({
   package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+  name: 'MultiDelegateBox',
+  implements: [ 'foam.box.Box' ],
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
+  documentation: `Base class for boxes that manage dispatch to multiple
+      delegates.`,
+
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.box.Box',
+      name: 'delegates'
+    }
+  ],
 
   methods: [
     function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
+      throw new Error('Call to abstract MultiDelegateBox.send(message)');
     }
   ]
 });
