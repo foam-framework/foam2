@@ -158,13 +158,21 @@ describe('selector registry', function() {
     expect(selector.registries['foam.box.test.MockBox']).toBeDefined();
     expect(selector.registries['foam.box.test.MockBox2']).toBeDefined();
     var mockBoxRegistry = selector.registries['foam.box.test.MockBox'];
-    // Note: Names are set to null in delegate register action.
+    // Note: Names are set to a random GUID in delegate register action.
     // Correct routing by name is tested in other tests.
+    mockBoxRegistry.actions = mockBoxRegistry.actions.map(function(action) {
+      action.name = null;
+      return action;
+    });
     expect(mockBoxRegistry.actions).toEqual([
       { action: 'register', name: null, service: null, box: foo },
       { action: 'register', name: null, service: null, box: bar }
     ]);
     var mockBox2Registry = selector.registries['foam.box.test.MockBox2'];
+    mockBox2Registry.actions = mockBox2Registry.actions.map(function(action) {
+      action.name = null;
+      return action;
+    });
     expect(mockBox2Registry.actions).toEqual([
       { action: 'register', name: null, service: null, box: baz }
     ]);
