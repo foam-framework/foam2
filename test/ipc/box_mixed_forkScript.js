@@ -15,19 +15,10 @@
  * limitations under the License.
  */
 
-foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+var path = require('path');
+var process = require('process');
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
+require(path.resolve(`${__dirname}/../../src/foam.js`));
+require(path.resolve(`${__dirname}/box_mixed_shared.js`));
 
-  methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
-    }
-  ]
-});
+foam.box.node.ForkBox.CONNECT_TO_PARENT(foam.box.Context.create());

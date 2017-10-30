@@ -265,6 +265,7 @@ FOAM_FILES([
   { name: "foam/box/PromisedBoxRegistry" },
   { name: "foam/box/RegistrySelector" },
   { name: "foam/box/SelectorRegistry" },
+  { name: "foam/box/BroadcastRegistry" },
   { name: "foam/box/LookupBox" },
   { name: "foam/box/NamedBox" },
   { name: "foam/box/ReplyBox" },
@@ -317,6 +318,7 @@ FOAM_FILES([
 
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
+  { name: "foam/box/MultiDelegateBox" },
   { name: "foam/box/BroadcastBox" },
   { name: "foam/box/RoundRobinBox" },
   { name: "foam/box/pipeline/RunnableRPCBox" },
