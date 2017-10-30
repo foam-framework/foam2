@@ -1800,7 +1800,7 @@ foam.CLASS({
           var value = attr.value;
 
           out(' ', name);
-          if ( value !== false ) out('="', value, '"');
+          if ( value !== false ) out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
         }
       }
 
@@ -2056,6 +2056,17 @@ foam.CLASS({
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.FObjectArrayView' },
     }
   ]
 });

@@ -44,6 +44,10 @@ foam.INTERFACE({
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'email',
           javaType: 'String'
         },

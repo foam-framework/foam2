@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'NoSuchNameException',
+  implements: ['foam.core.Exception'],
 
   properties: [
     {
@@ -30,7 +31,9 @@ foam.CLASS({
       transient: true,
       expression: function(name) {
         return 'Could not find registration for ' + name;
-      }
+      },
+      swiftExpressionArgs: ['name'],
+      swiftExpression: 'return "Could not find registration for " + name',
     }
   ]
 });

@@ -201,16 +201,6 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'Blob',
-  extends: 'Property',
-
-  // documentation: 'A chunk of binary data.',
-  label: 'Binary data',
-});
-
-
-foam.CLASS({
-  package: 'foam.core',
   name: 'Object',
   extends: 'Property',
   documentation: ''
@@ -430,6 +420,17 @@ foam.CLASS({
         }
 
         return 0;
+      }
+    ],
+    [
+      'cloneProperty',
+      function(value, cloneMap) {
+        if ( value ) {
+          var tmp = cloneMap[this.name] = {};
+          for ( var key in value ) {
+            tmp[key] = value[key];
+          }
+        }
       }
     ],
     [

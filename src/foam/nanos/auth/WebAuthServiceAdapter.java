@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -6,15 +7,15 @@
 
 package foam.nanos.auth;
 
+import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ListSink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
+import foam.nanos.session.Session;
 import foam.util.LRULinkedHashMap;
 import java.util.Map;
-import foam.core.ContextAwareSupport;
-
 import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
 
@@ -29,7 +30,7 @@ public class WebAuthServiceAdapter
    * marshall a context
    * */
   protected Map<Long, X> loginMap = new LRULinkedHashMap<>(10000);
-  protected AuthService service;
+  protected AuthService  service;
 
   public void start() {
     service = (AuthService) getX().get("auth");
@@ -55,11 +56,11 @@ public class WebAuthServiceAdapter
     }
   }
 
-  public foam.nanos.auth.User login(String email, String password)
+  public foam.nanos.auth.User login(X x, String email, String password)
     throws AuthenticationException
   {
-    DAO userDAO   = (DAO) getX().get("localUserDAO");
-    ListSink sink = (ListSink) userDAO.where(MLang.EQ(email, User.EMAIL)).select(new ListSink());
+    DAO      userDAO = (DAO) getX().get("localUserDAO");
+    ListSink sink    = (ListSink) userDAO.where(MLang.EQ(email, User.EMAIL)).select(new ListSink());
 
     //There should only be one object returned for the User
     if ( sink.getData().size() != 1 ) {
@@ -68,14 +69,23 @@ public class WebAuthServiceAdapter
 
     User user = (User) sink.getData().get(0);
 
+    System.err.println("********************************** LOGIN" + user.getId());
     try {
       if ( ! loginMap.containsKey(user.getId()) ) {
-        X x = service.login(user.getId(), password);
-        loginMap.put(user.getId(), x);
+        X userX = service.login(user.getId(), password);
+
+        // Login the Session
+        Session session = (Session) x.get(Session.class);
+        session.setUserId(user.getId());
+        session.setContext(userX);
+        DAO dao = (DAO) getX().get("sessionDAO");
+        dao.put(session);
+
+        loginMap.put(user.getId(), userX);
         return (User) x.get("user");
       }
-      return (User) loginMap.get(user.getId()).get("user");
 
+      return (User) loginMap.get(user.getId()).get("user");
     } catch (AuthenticationException e) {
       throw e;
     }

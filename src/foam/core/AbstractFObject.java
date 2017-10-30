@@ -77,4 +77,16 @@ public abstract class AbstractFObject
     PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
     return property == null ? null : property.get(this);
   }
+
+  public boolean isPropertySet(String prop) {
+    PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
+    return property != null && property.isSet(this);
+  }
+
+  public boolean hasDefaultValue(String prop) {
+    if ( ! this.isPropertySet(prop) )
+      return true;
+    PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
+    return property != null && property.isDefaultValue(this);
+  }
 }

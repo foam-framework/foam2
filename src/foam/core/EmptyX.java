@@ -26,6 +26,20 @@ abstract class AbstractX
     return get(this, key);
   }
 
+  public int getInt(Object key) {
+    return getInt(key, 0);
+  }
+
+  public int getInt(Object key, int defaultValue) {
+    return getInt(this, key, defaultValue);
+  }
+
+  public int getInt(X x, Object key, int defaultValue) {
+    Number i = (Number) x.get(key);
+
+    return i == null ? defaultValue : i.intValue();
+  }
+
   public X put(Object key, Object value) {
     return new XI(this, key, value);
   }
