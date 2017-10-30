@@ -223,7 +223,15 @@ FOAM_FILES([
   { name: "lib/utf8" },
   { name: "foam/net/web/WebSocket" },
   { name: "foam/net/web/WebSocketService" },
-  { name: "lib/web/net" }, // No flags: ['web']: base classes for lib/node/net.
+  // foam.net.web: No 'web' flag, because some are base classes for
+  // foam.net.node.
+  { name: "foam/net/web/HTTPResponse" },
+  { name: "foam/net/web/HTTPRequest" },
+  { name: "foam/net/web/BaseHTTPRequest" },
+  { name: "foam/net/web/EventSource" },
+  { name: "foam/net/web/XMLHTTPRequest" },
+  { name: "foam/net/web/XMLHTTPResponse" },
+  { name: "foam/net/web/SafariEventSource" },
   { name: "foam/messageport/MessagePortService", flags: ['web'] },
   { name: "lib/node/net", flags: ['node'] },
   { name: "foam/net/node/WebSocketService", flags: ['node'] },
@@ -341,7 +349,7 @@ FOAM_FILES([
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
-  { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },  
+  { name: "foam/u2/view/FObjectArrayView", flags: ['web'] },
   { name: "foam/u2/view/ChoiceView", flags: ['web'] },
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
