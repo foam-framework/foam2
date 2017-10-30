@@ -56,12 +56,22 @@ foam.CLASS({
       name: 'type',
       value: 'class',
     },
+    {
+      class: 'StringArray',
+      name: 'annotations',
+    },
   ],
 
   methods: [
     function method(m) {
       this.methods.push(m);
       return this;
+    },
+    function getMethod(name) {
+      var m = this.methods.find(function(m) {
+        return m.name === name;
+      });
+      return m;
     },
     function field(f) {
       this.fields.push(f);
@@ -71,6 +81,8 @@ foam.CLASS({
       o.indent();
       o.out('// GENERATED CODE. DO NOT MODIFY BY HAND.\n');
       this.imports.forEach(function(i) { o.out('import ', i, '\n') });
+      o.indent();
+      o.out(this.annotations.join('\n'), '\n');
       o.indent();
       o.out(this.visibility ? this.visibility + ' ' : '');
       o.out(this.type, ' ', this.name);

@@ -20,6 +20,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftPrivateAxiomName',
+      expression: function(swiftName) { return '_' + foam.String.constantize(swiftName) + '_'; },
+    },
+    {
+      class: 'String',
       name: 'swiftAxiomName',
       expression: function(swiftName) { return foam.String.constantize(swiftName) },
     },
@@ -127,10 +132,20 @@ foam.CLASS({
         visibility: 'private',
         static: true,
         final: true,
-        name: this.swiftAxiomName,
+        name: this.swiftPrivateAxiomName,
         type: 'MethodInfo',
         initializer: this.swiftMethodInfoInit(),
       }));
+      if (this.name != 'init') {
+        cls.methods.push(this.Method.create({
+          visibility: 'public',
+          class: true,
+          name: this.swiftAxiomName,
+          returnType: 'MethodInfo',
+          body: 'return ' + this.swiftPrivateAxiomName,
+          override: this.getSwiftOverride(parentCls),
+        }));
+      }
       var code = this.getSwiftCode(parentCls);
       if ( this.swiftSynchronized ) {
         var sem = this.swiftSynchronizedSemaphoreName

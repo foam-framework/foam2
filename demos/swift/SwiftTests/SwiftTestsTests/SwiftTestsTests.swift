@@ -103,7 +103,7 @@ class SwiftTestsTests: XCTestCase {
   func testArrayDao() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])
     let t1 = Test([
       "firstName": "Mike",
@@ -137,7 +137,7 @@ class SwiftTestsTests: XCTestCase {
   func testDaoListen() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])
 
     let sink = Count()
@@ -160,14 +160,14 @@ class SwiftTestsTests: XCTestCase {
   func testDaoSkipLimitSelect() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
-      "primaryKey": Test.classInfo().axiom(byName: "firstName"),
+      "primaryKey": Test.FIRST_NAME(),
     ])
 
     for i in 1...10 {
       _ = (try? dao.put(Test(["firstName": i])))
     }
 
-    let sink = (try? dao.skip(2).limit(5).select(ArraySink())) as! ArraySink
+    let sink = (try? dao.skip(2).limit(5).select()) as! ArraySink
     XCTAssertEqual(sink.array.count, 5)
     XCTAssertEqual("3", (sink.array[0] as! Test).firstName)
   }
@@ -212,15 +212,15 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testSwiftSubFire() {
-    let o = Tabata()
+    let o = Test()
 
     var calls = 0
-    let sub = o.seconds$.swiftSub { (_, _) in
+    let sub = o.firstName$.swiftSub { (_, _) in
       calls += 1
     }
 
     XCTAssertEqual(calls, 0)
-    o.seconds += 1
+    o.firstName = "YOO"
     XCTAssertEqual(calls, 1)
 
     sub.detach()
@@ -369,5 +369,104 @@ class SwiftTestsTests: XCTestCase {
       fatalError()
     }
   }
+  func testAPar() {
+    let complete = Future<Any?>()
 
+    let lock = DispatchSemaphore(value: 0)
+    var secondBeforeFirst = false
+    Async.aPar([
+      { ret, _, _ in
+        DispatchQueue.global(qos: .utility).async {
+          lock.wait()
+          XCTAssertTrue(secondBeforeFirst)
+          ret("A")
+        }
+      },
+      { ret, _, _ in
+        DispatchQueue.global(qos: .userInitiated).async {
+          secondBeforeFirst = true
+          lock.signal()
+          ret("B")
+        }
+      },
+      { ret, _, _ in
+        DispatchQueue.global(qos: .background).async {
+          ret("C")
+        }
+      },
+    ])({ r in
+      complete.set((r as! [String]).joined())
+    }, { _ in }, nil)
+
+    try! XCTAssertEqual(complete.get() as! String, "ABC")
+  }
+
+  func testASeq() {
+    let x = Context.GLOBAL
+    let dao = x.create(ArrayDAO.self, args: [
+      "of": Test.classInfo(),
+      "primaryKey": Test.FIRST_NAME(),
+    ])!
+
+    let complete = Future<Any?>()
+
+    Async.aSeq([
+      { ret, _, name in
+        DispatchQueue.global(qos: .utility).async {
+          try? ret(dao.put(x.create(Test.self, args: ["firstName": name])!)!)
+        }
+      },
+      { ret, _, t in
+        XCTAssertEqual((t as! Test).firstName, "joe")
+        DispatchQueue.global(qos: .userInteractive).async {
+          try? ret(dao.select(Count()))
+        }
+      },
+      { ret, _, sink in
+        let sink = sink as! Count
+        XCTAssertEqual(sink.value, 1)
+        ret(sink.value)
+      },
+    ])({ r in
+      complete.set(r)
+    }, { _ in }, "joe")
+
+    try! XCTAssertEqual(complete.get() as! Int, 1)
+  }
+
+  func testASeqErr() {
+    let complete = Future<Bool>()
+    Async.aSeq([
+      { _, aThrow, _ in
+        DispatchQueue.global(qos: .utility).async {
+          aThrow(nil)
+        }
+      },
+      { ret, _, t in
+        XCTFail()
+        ret(nil)
+      },
+    ])({ _ in
+      complete.set(false)
+    }, { _ in
+      complete.set(true)
+    }, nil)
+
+    try! XCTAssertEqual(complete.get(), true)
+  }
+
+  func testCopyFrom() {
+    let x = Context.GLOBAL
+    let t1 = x.create(Test.self)!
+    let t2 = x.create(Test.self)!
+
+    XCTAssertTrue(t1.isEqual(t2))
+
+    t1.firstName = "a"
+    XCTAssertFalse(t1.isEqual(t2))
+
+    t2.copyFrom(t1)
+    XCTAssertTrue(t1.isEqual(t2))
+    XCTAssertEqual(t2.firstName, "a")
+  }
 }
