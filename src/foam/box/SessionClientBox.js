@@ -53,9 +53,13 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
-  constants: {
-    SESSION_KEY: 'sessionId'
-  },
+  constants: [
+    {
+      name: 'SESSION_KEY',
+      value: 'sessionId',
+      type: 'String'
+    }
+  ],
 
   properties: [
     {
@@ -69,7 +73,8 @@ foam.CLASS({
       factory: function() {
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      }
+      },
+      javaFactory: 'return "";'
     }
   ],
 
