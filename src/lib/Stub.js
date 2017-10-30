@@ -246,7 +246,6 @@ foam.CLASS({
         return this.Model.create({
           package: this.package,
           name: this.name,
-          implements: [this.of.id],
 
           properties: [
             {
