@@ -82,14 +82,13 @@ foam.CLASS({
     {
       name: 'sendMethodCode',
       template: `if ( ! ( message.getObject() instanceof foam.box.RPCMessage) ) {
-      // TODO error to errorBox
+      // TODO return an error?
       return;
     }
 
     foam.box.RPCMessage rpc      = (foam.box.RPCMessage) message.getObject();
     foam.box.Box        replyBox = (foam.box.Box) message.getAttributes().get("replyBox");
-    foam.box.Box        errorBox = (foam.box.Box) message.getAttributes().get("errorBox");
-    Object result = null;
+    Object              result   = null;
 
     try {
       switch ( rpc.getName() ) {<%
@@ -101,7 +100,7 @@ foam.CLASS({
           <%
     for ( var j = 0 ; j < m.args.length ; j++ ) {
       if ( m.args[j].javaType == 'foam.core.X' ) {
-        %>getX()<%
+        %>getMessageX(message)<%
       } else {
         if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {
           %>to<%= m.args[j].javaType %><%
@@ -119,32 +118,15 @@ foam.CLASS({
   }%>
         default: throw new RuntimeException("Method not found: " + rpc.getName());
       }
-    } catch (Throwable e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      message.replyWithException(t);
 
-      if ( errorBox == null ) {
-        // TODO(adamvy): Do we care?
-        return;
-      }
-
-      foam.box.RemoteException wrapper = getX().create(foam.box.RemoteException.class);
-      wrapper.setId(e.getClass().getName());
-      wrapper.setMessage(e.getMessage());
-
-      foam.box.RPCErrorMessage reply = getX().create(foam.box.RPCErrorMessage.class);
-      reply.setData(wrapper);
-
-      foam.box.Message replyMessage = getX().create(foam.box.Message.class);
-      replyMessage.setObject(reply);
-
-      errorBox.send(replyMessage);
-      // Don't send to replyBox if we've sent to the errorBox
       return;
     }
 
     if ( replyBox != null ) {
-      foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);
-      reply.setData(result);
+      foam.box.RPCReturnMessage reply = (foam.box.RPCReturnMessage)getX().create(foam.box.RPCReturnMessage.class);<% if ( m.javaReturns && m.javaReturns != 'void' ) { %>
+      reply.setData(result);<% } %>
 
       foam.box.Message message1 = getX().create(foam.box.Message.class);
       message1.setObject(reply);

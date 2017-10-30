@@ -1036,7 +1036,6 @@ foam.CLASS({
   ]
 });
 
-/*
 foam.CLASS({
   package: 'foam.parse',
   name: 'GrammarAxiom',
@@ -1060,7 +1059,6 @@ foam.CLASS({
   ],
   methods: [
     function installInProto(proto) {
-      debugger;
       var name = this.name;
       var axiom = this;
       Object.defineProperty(proto, name, {
@@ -1081,7 +1079,6 @@ foam.CLASS({
       var symbols;
 
       if ( typeof this.symbols == 'function' ) {
-        debugger;
         with(obj.lookup(this.language).create()) {
           symbols = eval('(' + this.symbols.toString() + ')()');
         }
@@ -1093,7 +1090,7 @@ foam.CLASS({
       }
 
       for ( var i = 0 ; i < this.actions.length ; i++ ) {
-        g.addAction(this.actions[i].name, this.actions[i].code || this.actions[i]);
+        g.addAction(this.actions[i].name, (this.actions[i].code || this.actions[i]).bind(obj));
       }
 
       return g;
@@ -1112,7 +1109,6 @@ foam.CLASS({
     }
   ]
 });
-*/
 
 foam.CLASS({
   package: 'foam.parse',

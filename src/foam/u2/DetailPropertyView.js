@@ -35,7 +35,7 @@ foam.CLASS({
         float: left;
         font-size: 13px;
         padding: 2px 8px 2px 6px;
-        text-align: right;
+        text-align: left;
         vertical-align: top;
       }
       .foam-u2-PropertyView-view {

@@ -11,7 +11,6 @@ foam.CLASS({
 
   requires: [
     'foam.box.Message',
-    'foam.box.RegisterSelfMessage',
     'foam.json.Parser',
     'foam.net.web.WebSocket',
     'foam.box.RawWebSocketBox'
@@ -45,20 +44,12 @@ foam.CLASS({
         var msg = this.parser.parseString(msgStr, X);
 
         if ( ! this.Message.isInstance(msg) ) {
-          console.warn('Got non-message:', msg, msgStr);
+          console.warn('Got non-message', msg.cls_.id);
+          console.warn('  payload was: ', msgStr);
+          return;
         }
 
-/*        if ( this.RegisterSelfMessage.isInstance(msg.object) ) {
-          var named = foam.box.NamedBox.create({
-            name: msg.object.name
-          });
-
-          named.delegate = foam.box.RawWebSocketBox.create({
-            socket: socket
-          });
-        } else {*/
-          this.delegate.send(msg);
-//        }
+        this.delegate.send(msg);
       }.bind(this));
 
       socket.disconnected.sub(function(s) {

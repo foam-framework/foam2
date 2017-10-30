@@ -4,11 +4,14 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 foam.CLASS({
   package: 'foam.box',
   name: 'SessionReplyBox',
   extends: 'foam.box.ProxyBox',
+
+  requires: [
+    'foam.box.RPCErrorMessage'
+  ],
 
   imports: [
     // 'requestLogin'
@@ -25,8 +28,16 @@ foam.CLASS({
       code: function send(msg) {
         // TODO: if I get an AuthException the call the requestLogin
         // handler then retry once it finishes.
-        console.log('***** REPLY: ', foam.json.stringify(msg));
-        this.delegate.send(msg);
+        console.log('************************* REPLY: ', foam.json.stringify(msg));
+// {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"java.security.AccessControlException",message:"not logged in"}}}
+        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === "java.security.AccessControlException" ) {
+          this.requestLogin().then(function() {
+            console.log('***** LOGGED IN');
+            this.clientBox.send(this.msg);
+          });
+        } else {
+          this.delegate.send(msg);
+        }
       }
     }
   ]
@@ -41,10 +52,6 @@ foam.CLASS({
   implements: [ 'foam.box.Box' ],
 
   requires: [ 'foam.box.SessionReplyBox' ],
-
-  imports: [
-    // 'requestLogin'
-  ],
 
   constants: {
     SESSION_KEY: 'sessionId'
@@ -72,7 +79,7 @@ foam.CLASS({
       code: function send(msg) {
         msg.attributes[this.SESSION_KEY] = this.sessionID;
 
-        console.log('***** SEND: ', foam.json.stringify(msg));
+        console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
         msg.attributes.replyBox = this.SessionReplyBox.create({
           msg: msg,

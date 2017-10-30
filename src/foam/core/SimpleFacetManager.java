@@ -27,7 +27,7 @@ public class SimpleFacetManager
       if ( obj instanceof ContextAware ) ((ContextAware)obj).setX(x);
 
       return obj;
-    } catch (Exception e) {
+    } catch (java.lang.Exception e) {
       throw new RuntimeException(e);
     }
   }
