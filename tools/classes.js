@@ -150,7 +150,8 @@ var classes = [
   'foam.blob.AbstractBlob',
   'foam.blob.AbstractBlobService',
   'foam.blob.SubBlob',
-  'foam.blob.IdentifiedBlob'
+  'foam.blob.IdentifiedBlob',
+  'foam.blob.BlobStore'
 ];
 
 var abstractClasses = [

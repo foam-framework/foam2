@@ -19,7 +19,8 @@ foam.CLASS({
   name: 'Tabata',
 
   requires: [
-    'foam.util.Timer'
+    'TabataState',
+    'foam.util.Timer',
   ],
 
   properties: [
@@ -68,11 +69,18 @@ foam.CLASS({
       name: 'remaining',
       units: 'seconds',
       value: 0,
+      preSet: function(_, n) { return Math.max(0, n) },
+      swiftPreSet: 'return max(0, newValue)',
       postSet: function(_, s) {
         if ( s == 0 ) {
           this.state.next(this);
         }
-      }
+      },
+      swiftPostSet: function() {/*
+if newValue == 0 {
+  state.next(self);
+}
+      */}
     },
     {
       class: 'String',
@@ -91,95 +99,210 @@ foam.CLASS({
       units: 'seconds'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.util.Timer',
       name: 'timer',
+      required: true,
       hidden: true,
       factory: function() {
         var t = this.Timer.create();
         this.seconds$ = t.time$.map(function(t) { return Math.floor(t / 1000); });
         return t;
-      }
+      },
+      swiftFactory: function() {/*
+let t = Timer_create()
+self.seconds$ = t.time$.map({ t in
+  let t = t as! Int
+  return t/1000
+})
+return t
+      */},
     },
     {
+      class: 'FObjectProperty',
+      of: 'TabataState',
       name: 'state',
-      factory: function() {
-        return this.Warmup.create();
-      },
+      required: true,
+      factory: function() { return this.Warmup.create(); },
+      swiftFactory: 'return Warmup_create()',
       hidden: true
     }
   ],
 
   methods: [
-    function init() {
-      this.elapsed$ = this.slot(function(seconds, roundStart) {
-        return seconds - roundStart;
-      });
-      this.remaining$ = this.slot(function(elapsed, roundLength) {
-        return roundLength - elapsed;
-      });
+    {
+      name: 'init',
+      code: function() {
+        this.elapsed$ = this.slot(function(seconds, roundStart) {
+          return seconds - roundStart;
+        });
+        this.remaining$ = this.slot(function(elapsed, roundLength) {
+          return roundLength - elapsed;
+        });
+      },
+      swiftCode: function() {/*
+elapsed$ = ExpressionSlot([
+  "args": [seconds$, roundStart$],
+  "code": { (args: [Any?]) -> Any? in
+    return (args[0] as! Int) - (args[1] as! Int)
+  },
+])
+remaining$ = ExpressionSlot([
+  "args": [elapsed$, roundLength$],
+  "code": { (args: [Any?]) -> Any? in
+    return (args[1] as! Int) - (args[0] as! Int)
+  },
+])
+      */},
     }
   ],
 
   classes: [
     {
       name: 'Warmup',
+      implements: ['TabataState'],
       methods: [
-        function start(t) {
-          t.roundLength = t.setupTime;
-          t.roundStart = t.seconds;
-          t.action = 'Warmup';
+        {
+          name: 'start',
+          code: function(t) {
+            t.roundLength = t.setupTime;
+            t.roundStart = t.seconds;
+            t.action = 'Warmup';
+          },
+          swiftCode: function() {/*
+t.roundLength = t.setupTime
+t.roundStart = t.seconds
+t.action = "Warmup"
+          */},
         },
-        function next(t) {
-          t.state = t.Work.create();
-          t.state.start(t);
-        }
+        {
+          name: 'next',
+          code: function(t) {
+            t.state = t.Work.create();
+            t.state.start(t);
+          },
+          swiftCode: function() {/*
+t.state = t.Work_create();
+t.state.start(t);
+          */},
+        },
       ]
     },
     {
       name: 'Work',
-      methods: [
-        function start(t) {
-          t.roundLength = t.workTime;
-          t.roundStart = t.seconds;
-          t.action = 'WORK!';
+      messages: [
+        {
+          name: 'action_string',
+          message: 'WORK!',
         },
-        function next(t) {
-          t.currentRound++;
-          if ( t.currentRound >= t.rounds + 1 ) {
-            t.state = t.Finish.create();
-            t.currentRound = t.rounds;
-          } else {
-            t.state = t.Rest.create();
-          }
+      ],
+      implements: ['TabataState'],
+      methods: [
+        {
+          name: 'start',
+          code: function(t) {
+            t.roundLength = t.workTime;
+            t.roundStart = t.seconds;
+            t.action = this.action_string;
+          },
+          swiftCode: function() {/*
+t.roundLength = t.workTime
+t.roundStart = t.seconds
+t.action = type(of: self).action_string
+          */},
+        },
+        {
+          name: 'next',
+          code: function(t) {
+            t.currentRound++;
+            if ( t.currentRound >= t.rounds + 1 ) {
+              t.state = t.Finish.create();
+              t.currentRound = t.rounds;
+            } else {
+              t.state = t.Rest.create();
+            }
 
-          t.state.start(t);
-        }
+            t.state.start(t);
+          },
+          swiftCode: function() {/*
+t.currentRound += 1
+if t.currentRound >= t.rounds + 1 {
+  t.state = t.Finish_create()
+  t.currentRound = t.rounds
+} else {
+  t.state = t.Rest_create()
+}
+t.state.start(t);
+          */},
+        },
       ]
     },
     {
       name: 'Rest',
-      methods: [
-        function start(t) {
-          t.roundLength = t.restTime;
-          t.roundStart = t.seconds;
-          t.action = 'Rest';
+      implements: ['TabataState'],
+      messages: [
+        {
+          name: 'action_string',
+          message: 'Rest',
         },
-        function next(t) {
-          t.state = t.Work.create();
-          t.state.start(t);
-        }
+      ],
+      methods: [
+        {
+          name: 'start',
+          code: function(t) {
+            t.roundLength = t.restTime;
+            t.roundStart = t.seconds;
+            t.action = this.action_string;
+          },
+          swiftCode: function() {/*
+t.roundLength = t.restTime
+t.roundStart = t.seconds
+t.action = type(of: self).action_string
+          */},
+        },
+        {
+          name: 'next',
+          code: function(t) {
+            t.state = t.Work.create();
+            t.state.start(t);
+          },
+          swiftCode: function() {/*
+t.state = t.Work_create();
+t.state.start(t);
+          */},
+        },
       ]
     },
     {
       name: 'Finish',
-      methods: [
-        function start(t) {
-          t.action = 'Finished';
-          t.roundLength = 0;
-          t.roundStart = t.seconds;
-          t.stop();
+      implements: ['TabataState'],
+      messages: [
+        {
+          name: 'action_string',
+          message: 'Finished',
         },
-        function next(t) {
-        }
+      ],
+      methods: [
+        {
+          name: 'start',
+          code: function(t) {
+            t.action = this.action_string;
+            t.roundLength = 0;
+            t.roundStart = t.seconds;
+            t.stop();
+          },
+          swiftCode: function() {/*
+t.action = type(of: self).action_string
+t.roundLength = 0;
+t.roundStart = t.seconds;
+t.stop()
+          */},
+        },
+        {
+          name: 'next',
+          code: function(t) {},
+          swiftCode: '// Finished!',
+        },
       ]
     }
   ],
@@ -190,13 +313,16 @@ foam.CLASS({
       code: function() {
         this.timer.start();
         this.state.start(this);
-      }
+      },
+      swiftCode: function() {/*
+timer.start()
+state.start(self)
+      */}
     },
     {
       name: 'stop',
-      code: function() {
-        this.timer.stop();
-      }
+      code: function() { this.timer.stop(); },
+      swiftCode: 'timer.stop()',
     },
     {
       name: 'reset',
@@ -206,7 +332,14 @@ foam.CLASS({
         this.currentRound = undefined;
         this.state = undefined;
         this.action = undefined;
-      }
+      },
+      swiftCode: function() {/*
+stop();
+clearProperty("timer")
+clearProperty("currentRound")
+clearProperty("state")
+clearProperty("action")
+      */}
     }
   ]
 });

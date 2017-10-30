@@ -42,9 +42,10 @@ foam.CLASS({
       expression: function(translationHint, valueParserResults) {
         var matches = valueParserResults.matches;
         if (!translationHint || ! matches) return '';
-        return this.createParser(function(a) {
+        this.onMatchFn = function(a) {
           return matches[a[1]] || a.join('');
-        }).parseString(translationHint);
+        };
+        return this.grammar.parseString(translationHint);
       },
     },
     {
@@ -52,11 +53,15 @@ foam.CLASS({
       value: '@',
     },
     {
+      name: 'onMatchFn',
+      hidden: true,
+    },
+    {
       name: 'valueParserResults',
       hidden: true,
       expression: function(value, stringSymbol) {
         var matches = {};
-        var parsedValue = this.createParser(function(a) {
+        this.onMatchFn = function(a) {
           if (!matches[a[1]]) {
             matches[a[1]] = [
               '%',
@@ -66,7 +71,8 @@ foam.CLASS({
             ].join('');
           }
           return matches[a[1]];
-        }).parseString(value);
+        };
+        var parsedValue = this.grammar.parseString(value);
         return {
           matches: matches,
           parsedValue: parsedValue,
@@ -74,41 +80,34 @@ foam.CLASS({
       },
     },
   ],
-  methods: [
-    function createParser(onMatchFn) {
-      var parsers = this.Parsers.create();
-      var sym = parsers.sym;
-      var repeat = parsers.repeat;
-      var alt = parsers.alt;
-      var anyChar = parsers.anyChar;
-      var seq = parsers.seq;
-      var not = parsers.not;
-
-      return this.ImperativeGrammar.create({
-        symbols: function() {
-          return {
-            START: sym('string'),
-            string: repeat(
-              alt(
-                sym('parameter'),
-                anyChar()
-              )
-            ),
-            parameter: seq('${', sym('identifier'), '}'),
-            identifier: repeat(not('}', anyChar())),
-          }
+  grammars: [
+    {
+      name: 'grammar',
+      language: 'foam.parse.json.Parsers',
+      symbols: function() {
+        return {
+          START: sym('string'),
+          string: repeat(
+            alt(
+              sym('parameter'),
+              anyChar()
+            )
+          ),
+          parameter: seq('${', sym('identifier'), '}'),
+          identifier: repeat(not('}', anyChar())),
+        }
+      },
+      actions: [
+        function parameter(a) {
+          return this.onMatchFn(a);
         },
-      }).addActions({
-        parameter: function(a) {
-          return onMatchFn(a);
-        },
-        identifier: function(a) {
+        function identifier(a) {
           return a.join('');
         },
-        string: function(a) {
+        function string(a) {
           return a.join('');
         }
-      });
-    }
+      ],
+    },
   ],
 });

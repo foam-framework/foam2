@@ -10,7 +10,7 @@ public class TomcatRouter
   extends NanoRouter
 {
   @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected synchronized void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     setX(ContextLocator.getX());
     super.service(req, resp);
   }
