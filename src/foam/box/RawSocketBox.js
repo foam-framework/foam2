@@ -18,14 +18,76 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RawSocketBox',
+  implements: [ 'foam.box.Box' ],
+
+  requires: [ 'foam.box.ReplyBox' ],
+  imports: [
+    'me',
+    'registry',
+  ],
 
   properties: [
-    'socket'
+    {
+      class: 'Object',
+      name: 'socket',
+      javaType: 'org.java_websocket.WebSocket'
+    }
+  ],
+
+  classes: [
+    {
+      name: 'JSONOutputter',
+      extends: 'foam.json.Outputter',
+
+      requires: [ 'foam.box.ReturnBox' ],
+      imports: [ 'me' ],
+      methods: [
+        function output(o) {
+          if ( o === this.me ) {
+            return this.SUPER(this.ReturnBox.create());
+          }
+          return this.SUPER(o);
+        }
+      ]
+    }
   ],
 
   methods: [
-    function send(msg) {
-      this.socket.write(msg);
+    function init() {
+      this.SUPER();
+      debugger;
+    },
+    {
+      name: 'send',
+      code: function send(msg) {
+        var replyBox = msg.attributes.replyBox;
+        if ( replyBox ) {
+          // TODO: We should probably clone here, but often the message
+          // contains RPC arguments that don't clone properly.  So
+          // instead we will mutate replyBox and put it back after.
+
+          // Even better solution would be to move replyBox to a
+          // property on Message and have custom serialization in it to
+          // do the registration.
+
+          msg.attributes.replyBox =
+            this.__context__.registry.register(null, null, msg.attributes.replyBox);
+
+          // TODO: There should be a better way to do this.
+          replyBox = this.ReplyBox.create({
+            id: msg.attributes.replyBox.name
+          });
+        }
+
+        try {
+          this.socket.write(msg);
+          if ( replyBox ) {
+            msg.attributes.replyBox = replyBox;
+          }
+        } catch (error) {
+          replyBox && replyBox.send(foam.box.Message.create({ object: error }));
+        }
+      }
     }
   ]
 });
