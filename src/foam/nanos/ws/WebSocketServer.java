@@ -75,7 +75,7 @@ public class WebSocketServer
         return;
       }
 
-      if ( ! ( request instanceof foam.box.Message ) ) {
+      if ( ! request instanceof foam.box.Message ) {
         log.warning("Request was not a box message.", message);
         return;
       }
