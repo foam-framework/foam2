@@ -605,7 +605,7 @@ foam.CLASS({
   properties: [
     {
       name: 'fn',
-      swiftType: '((String, FObject, Detachable) -> Void)',
+      swiftType: '((String, FObject?, Detachable) -> Void)',
       swiftRequiresEscaping: true,
     },
   ],
@@ -613,20 +613,28 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function put(obj, s) {
+      code: function(obj, s) {
         this.fn('put', obj, s);
       },
       swiftCode: 'fn("put", obj, sub)',
     },
-    function remove(obj, s) {
-      this.fn('remove', obj, s);
+    {
+      name: 'remove',
+      code: function(obj, s) {
+        this.fn('remove', obj, s);
+      },
+      swiftCode: 'fn("remove", obj, sub)',
     },
     function eof() {
       this.fn('eof');
     },
-    function reset(s) {
-      this.fn('reset', s);
-    }
+    {
+      name: 'reset',
+      code: function(s) {
+        this.fn('reset', s);
+      },
+      swiftCode: 'fn("reset", nil, sub)',
+    },
   ]
 });
 

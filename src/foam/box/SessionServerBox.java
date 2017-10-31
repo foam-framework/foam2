@@ -31,7 +31,6 @@ public class SessionServerBox
       System.err.println("**** SESSIONID: " + sessionID);
 
       if ( sessionID != null ) {
-
         DAO     dao     = (DAO) getX().get("sessionDAO");
         Session session = (Session) dao.find(sessionID);
 
