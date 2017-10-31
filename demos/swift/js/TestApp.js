@@ -29,7 +29,6 @@ return UINavigationController(rootViewController: daoController.vc)
       swiftFactory: function() {/*
 return ArrayDAO_create([
   "of": Test.classInfo(),
-  "primaryKey": Test.FIRST_NAME(),
 ])
       */},
     },

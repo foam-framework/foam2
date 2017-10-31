@@ -22,11 +22,28 @@ foam.CLASS({
   swiftImplements: [
     'UITableViewDelegate',
   ],
+  messages: [
+    {
+      name: 'UPDATE_VC_TITLE',
+      message: 'Update ${name}',
+      description: 'Title for the update view where ${name} is the name of the object.',
+    },
+  ],
   properties: [
     {
       class: 'FObjectProperty',
       of: 'foam.swift.ui.DAOTableViewSource',
       name: 'dataSource',
+    },
+    {
+      swiftType: 'UITableViewRowAction',
+      name: 'deleteAction',
+      swiftFactory: function() {/*
+return UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
+  _ = try? self.dataSource?.dao?.remove(
+      self.dataSource?.daoContents[indexPath.row] as! FObject)
+}
+      */},
     },
     {
       swiftType: '((FObject) -> UIViewController)',
@@ -41,6 +58,11 @@ return { (o: FObject) -> UIViewController in
   let svc = self.ScrollingViewController_create([
     "view": v,
   ])
+
+  svc.title = String(
+      format: type(of: self).UPDATE_VC_TITLE,
+      o.ownClassInfo().label)
+
   return svc.vc
 }
       */},
@@ -52,6 +74,14 @@ public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexP
 
   let vc = updateVcFactory(data)
   (stack as? UINavigationController)?.pushViewController(vc, animated: true)
+}
+
+public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+  return [deleteAction]
+}
+
+public func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+  dataSource?.rowViewRemoved?(indexPath, cell)
 }
   */},
 });

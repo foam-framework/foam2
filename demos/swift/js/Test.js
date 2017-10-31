@@ -25,6 +25,12 @@ foam.CLASS({
   ],
   properties: [
     {
+      name: 'id',
+      hidden: true,
+      swiftExpressionArgs: ['firstName'],
+      swiftExpression: 'return firstName',
+    },
+    {
       name: 'anyProp',
     },
     {
