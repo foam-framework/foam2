@@ -614,10 +614,10 @@ foam.CLASS({
   refines: 'foam.core.Enum',
 
   properties: [
-    ['javaType', 'java.lang.Enum'],
-    ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
+    ['javaType',       'java.lang.Enum'],
+    ['javaInfoType',   'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser', 'foam.lib.json.IntParser']
+    ['javaCSVParser',  'foam.lib.json.IntParser']
   ],
 
   methods: [
