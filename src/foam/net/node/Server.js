@@ -21,16 +21,13 @@ foam.CLASS({
 
   documentation: `An modeled HTTP server implementation.
 
-      The server stores an array of "handlers" for handling
-      requests. Handlers are given the chance to handle requests in the order
-      they appear in the array. The server starts listening on its "port"
-      when start() is invoked. Listening ceases on shutdown().`,
+      The server stores a Router, which is responsible for handling requests to
+      routes. The server starts listening on its "port" when start() is invoked.
+      Listening ceases on shutdown().`,
 
   requires: [
     'foam.dao.ArrayDAO',
-    'foam.net.node.FileHandler',
-    'foam.net.node.RestDAOHandler',
-    'foam.net.node.StaticFileHandler'
+    'foam.net.node.PrefixRouter',
   ],
 
   imports: [
@@ -42,9 +39,10 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectArray',
-      of: 'foam.net.node.Handler',
-      name: 'handlers'
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Router',
+      name: 'router',
+      required: true
     },
     {
       type: 'Int',
@@ -72,13 +70,14 @@ foam.CLASS({
     function start() {
       if ( this.server ) return Promise.resolve(this.server);
 
+      this.validate();
+
       this.server = this.http.createServer(this.onRequest);
 
       var self = this;
       return new Promise(function(resolve, reject) {
         self.server.listen(self.port, function() {
-        self.info(
-          self.handlers.length + ' handlers listening on port ' + self.port);
+          self.info(this.router + ' listening on port ' + self.port);
           resolve(self.server);
         });
       });
@@ -94,51 +93,12 @@ foam.CLASS({
           resolve(null);
         });
       });
-    },
-
-    function addHandler(handler) {
-      this.handlers.push(handler);
-    },
-
-    function exportDAO(dao, urlPath) {
-      this.addHandler(this.RestDAOHandler.create({
-        dao: dao,
-        urlPath: urlPath
-      }));
-
-      this.log('Export DAO to ' + urlPath);
-    },
-
-    function exportFile(urlPath, filePath) {
-      this.handlers.push(this.FileHandler.create({
-        urlPath: urlPath,
-        filePath: filePath
-      }));
-
-      this.log('Export File ' + filePath + ' to ' + urlPath);
-    },
-
-    function exportDirectory(urlPath, dir) {
-      this.handlers.push(
-        this.StaticFileHandler.create({
-          dir: dir,
-          urlPath: urlPath
-        }));
-
-      this.log('Export directory ' + dir + ' to ' + urlPath);
     }
   ],
 
   listeners: [
     function onRequest(req, res) {
-      for ( var i = 0 ; i < this.handlers.length ; i++ ) {
-        if ( this.handlers[i].handle(req, res) ) break;
-      }
-      if ( i === this.handlers.length ) {
-        res.statusCode = 404;
-        res.write('File not found: ' + req.url, 'utf8');
-        res.end();
-      }
+      this.router.onRequest(req, res);
     }
   ]
 });
