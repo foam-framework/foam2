@@ -701,6 +701,15 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.order.Desc',
 
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1',
+      javaType: 'foam.mlang.order.Comparator',
+      javaJSONParser: 'new foam.lib.json.ExprParser()'
+    }
+  ],
+
   methods: [
     {
       name: 'compare',
