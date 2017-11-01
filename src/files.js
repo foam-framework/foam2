@@ -310,7 +310,7 @@ FOAM_FILES([
   { name: "foam/box/ForwardingBox" },
   { name: "foam/box/Remote" },
   { name: "foam/box/SessionClientBox" },
-  { name: "lib/boxJava" },
+  { name: "lib/boxJava", flags: ['java'] },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
   { name: "foam/swift/refines/Box", flags: ['swift'] },
