@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.ws;
 
 import foam.core.*;
@@ -75,19 +81,19 @@ public class WebSocketServer
         return;
       }
 
-      if ( ! request instanceof foam.box.Message ) {
+      if ( ! ( request instanceof foam.box.Message ) ) {
         log.warning("Request was not a box message.", message);
         return;
       }
 
-      getRouter().service(serviceKey, (foam.box.Message)request);
+      getRouter().service(serviceKey, (foam.box.Message) request);
     } catch(java.lang.Exception e) {
-      log.error("Error handling websocket request", e);
+      log.error("Error handling websocket request", e, message);
     }
   }
 
   public void onOpen(WebSocket conn, ClientHandshake handshake) {
-    Logger log = (Logger)getX().get("logger");
+    Logger log = (Logger) getX().get("logger");
     log.info("WebSocket client connect.");
   }
 
