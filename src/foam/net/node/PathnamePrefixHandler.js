@@ -15,24 +15,23 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.net.node',
-  name: 'Route',
+  name: 'PathnamePrefixHandler',
+  extends: 'foam.net.node.BaseHandler',
 
-  methods: [
+  documentation: `Handler that recieves its pathname prefix from a
+      PathnamePrefixRoute (or similar) export.`,
+
+  imports: [ 'parentPrefix? as ctxPathnamePrefix' ],
+
+  properties: [
     {
-      name: 'match',
-      documentation: `Indicates whether or not a particular NodeJS URL object
-          matches this Route object.`,
-      args: [
-        {
-          name: 'url',
-          documentation: `The URL to test against this route.`,
-          typeName: 'URL'
-        }
-      ],
-      returns: 'Boolean',
-      code: function(url) {}
+      class: 'String',
+      name: 'pathnamePrefix',
+      expression: function(ctxPathnamePrefix) {
+        return this.ctxPathnamePrefix || '';
+      }
     }
   ]
 });

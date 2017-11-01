@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,23 +26,69 @@ foam.CLASS({
       Listening ceases on shutdown().`,
 
   requires: [
-    'foam.dao.ArrayDAO',
-    'foam.net.node.PrefixRouter',
+    'foam.net.node.EntityEncoding',
+    'foam.net.node.ErrorHandler',
+    'foam.net.node.ServerRequest',
+    'foam.net.node.ServerResponse',
+    'foam.net.node.SimpleRouter',
   ],
 
   imports: [
     'creationContext? as creationContextFromCtx',
+    'defaultEntityEncoding? as ctxDefaultEntityEncoding',
+    'entityEncodings? as ctxEntityEncodings',
     'info',
-    'log'
+    'log',
+    'error'
   ],
-  exports: [ 'creationContext' ],
+  exports: [
+    'creationContext',
+    'defaultEntityEncoding',
+    'entityEncodings'
+  ],
+
+  constants: {
+    DEFAULT_ENTITY_ENCODINGS: [
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'ascii',
+        charsetRegExp: /^(US-ASCII|us|IBM367|cp367|csASCII|iso-ir-100|ISO_8859-1|ISO-8859-1)$/i
+      }),
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'utf8',
+        charsetRegExp: /UTF-8/i
+      }),
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'utf16le',
+        charsetRegExp: /^UTF-16LE$/i
+      }),
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'ucs2',
+        charsetRegExp: /^$ISO-10646-UCS-2/i
+      })
+    ],
+    DEFAULT_DEFAULT_ENTITY_ENCODING: foam.net.node.EntityEncoding.create({
+      bufferEncoding: 'ascii',
+      charsetRegExp: /^(US-ASCII|us|IBM367|cp367|csASCII|iso-ir-100|ISO_8859-1|ISO-8859-1)$/i
+    }),
+  },
 
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.net.node.Router',
-      name: 'router',
-      required: true
+      of: 'foam.net.node.Handler',
+      name: 'handler',
+      factory: function() { return this.SimpleRouter.create(); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Handler',
+      name: 'errorHandler',
+      factory: function() {
+        return this.ErrorHandler.create({
+          logMessage: 'Server.handler failed to handle request',
+          httpCode: 404
+        });
+      }
     },
     {
       type: 'Int',
@@ -57,13 +103,27 @@ foam.CLASS({
     },
     {
       name: 'server',
-      documentation: 'The Node JS HTTP Server object.',
+      documentation: 'The Node JS http.Server object.',
       value: null
     },
     {
       name: 'http',
       factory: function() { return require('http'); }
-    }
+    },
+    {
+      name: 'defaultEntityEncoding',
+      factory: function() {
+        return this.ctxDefaultEntityEncoding ||
+            this.DEFAULT_DEFAULT_ENTITY_ENCODING;
+      },
+    },
+    {
+      name: 'entityEncodings',
+      factory: function() {
+        return this.ctxEntityEncoding ||
+            this.DEFAULT_ENTITY_ENCODINGS;
+      },
+    },
   ],
 
   methods: [
@@ -77,7 +137,8 @@ foam.CLASS({
       var self = this;
       return new Promise(function(resolve, reject) {
         self.server.listen(self.port, function() {
-          self.info(this.router + ' listening on port ' + self.port);
+          self.info('Listening on port ' + self.port + '\n' +
+                    foam.json.Pretty.stringify(self.handler));
           resolve(self.server);
         });
       });
@@ -97,8 +158,23 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onRequest(req, res) {
-      this.router.onRequest(req, res);
+    function onRequest(nodeReq, nodeRes) {
+      var req = this.ServerRequest.create({
+        msg: nodeReq
+      });
+      var res = this.ServerResponse.create({
+        res: nodeRes
+      });
+      var handled = this.handler.handle(req, res);
+
+      if ( ! handled ) {
+        handled = this.errorHandler.handle(req, res);
+        if ( ! handled ) {
+          this.error(`foam.net.node.Server:
+                         Handler + error handler failed to handle request:
+                         ${nodeReq.url}`);
+        }
+      }
     }
   ]
 });

@@ -15,24 +15,28 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.net.node',
-  name: 'Route',
+  name: 'PathnamePrefixRoute',
+  implements: [ 'foam.net.node.Route' ],
+
+  imports: [ 'parentPrefix?' ],
+  exports: [ 'pathnamePrefix as parentPrefix' ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'pathnamePrefix',
+      preSet: function(_, nu) {
+        return `${this.parentPrefix || ''}${nu}`;
+      },
+      required: true
+    }
+  ],
 
   methods: [
-    {
-      name: 'match',
-      documentation: `Indicates whether or not a particular NodeJS URL object
-          matches this Route object.`,
-      args: [
-        {
-          name: 'url',
-          documentation: `The URL to test against this route.`,
-          typeName: 'URL'
-        }
-      ],
-      returns: 'Boolean',
-      code: function(url) {}
+    function match(url) {
+      return url.pathname.indexOf(this.pathnamePrefix) === 0;
     }
   ]
 });

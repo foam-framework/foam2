@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,14 @@
 foam.INTERFACE({
   package: 'foam.net.node',
   name: 'Router',
+  extends: [ 'foam.net.node.Handler' ],
 
   methods: [
     {
       name: 'addRoute',
       documentation: `Bind a route to a handler in the context of this Router
-          object.`,
+          object. The handler that was actually added is returned; some Routers
+          produce a modified and/or decorated Handler`,
       args: [
         {
           name: 'route',
@@ -34,9 +36,9 @@ foam.INTERFACE({
           name: 'handler',
           documentation: `The handler responsible for the route.`,
           typeName: 'foam.net.node.Handler'
-        }
+        },
       ],
-      returns: 'Boolean',
+      returns: 'foam.net.node.Handler',
       code: function(route, handler) {}
     }
   ]

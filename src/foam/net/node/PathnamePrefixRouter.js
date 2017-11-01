@@ -15,24 +15,25 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.net.node',
-  name: 'Route',
+  name: 'PathnamePrefixRouter',
+  extends: 'foam.net.node.SimpleRouter',
+  implements: [ 'foam.net.node.PathnamePrefixHandler' ],
+
+  requires: [
+    'foam.net.node.PathnamePrefixHandler',
+    'foam.net.node.PathnamePrefixRoute'
+  ],
 
   methods: [
-    {
-      name: 'match',
-      documentation: `Indicates whether or not a particular NodeJS URL object
-          matches this Route object.`,
-      args: [
-        {
-          name: 'url',
-          documentation: `The URL to test against this route.`,
-          typeName: 'URL'
-        }
-      ],
-      returns: 'Boolean',
-      code: function(url) {}
+    function addPathnamePrefix(pathnamePrefix, handler) {
+      var route = this.PathnamePrefixRoute.create({
+        pathnamePrefix: pathnamePrefix
+      });
+      foam.assert(this.PathnamePrefixHandler.isInstance(handler),
+                  'PathnamePrefixRouter: Expected PathnamePrefixHandler');
+      return this.addRoute(route, handler);
     }
   ]
 });

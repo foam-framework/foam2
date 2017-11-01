@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.net.node',
-  name: 'Route',
+  name: 'RouteBinding',
 
-  methods: [
+  properties: [
     {
-      name: 'match',
-      documentation: `Indicates whether or not a particular NodeJS URL object
-          matches this Route object.`,
-      args: [
-        {
-          name: 'url',
-          documentation: `The URL to test against this route.`,
-          typeName: 'URL'
-        }
-      ],
-      returns: 'Boolean',
-      code: function(url) {}
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Route',
+      name: 'route'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Handler',
+      name: 'handler'
     }
   ]
 });

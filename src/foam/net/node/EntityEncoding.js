@@ -15,24 +15,23 @@
  * limitations under the License.
  */
 
-foam.INTERFACE({
+foam.CLASS({
   package: 'foam.net.node',
-  name: 'Route',
+  name: 'EntityEncoding',
 
-  methods: [
+  properties: [
     {
-      name: 'match',
-      documentation: `Indicates whether or not a particular NodeJS URL object
-          matches this Route object.`,
-      args: [
-        {
-          name: 'url',
-          documentation: `The URL to test against this route.`,
-          typeName: 'URL'
-        }
-      ],
-      returns: 'Boolean',
-      code: function(url) {}
+      class: 'String',
+      name: 'bufferEncoding',
+      documentation: 'Node JS Buffer class encoding name.',
+      required: true
+    },
+    {
+      class: 'String',
+      name: 'charsetRegExp',
+      documentation: `Regular expression matching HTTP Content-Encoding header
+          charset value.`,
+      required: true
     }
   ]
 });

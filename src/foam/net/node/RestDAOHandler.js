@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'RestDAOHandler',
-  extends: 'foam.net.node.Handler',
+  extends: 'foam.net.node.BaseHandler',
 
   requires: [ 'foam.json.Parser' ],
 
@@ -41,13 +41,10 @@ foam.CLASS({
       required: true
     },
     {
-      name: 'url',
-      factory: function() {  return require('url'); }
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.json.Parser',
       name: 'parser',
+      transient: true,
       factory: function() {
         // NOTE: Configuration must be consistent with outputters in
         // corresponding foam.dao.RestDAO.
@@ -62,7 +59,7 @@ foam.CLASS({
   methods: [
     function handle(req, res) {
       // Check the URL for the prefix.
-      var url = this.url.parse(req.url, true);
+      var url = req.url;
       var target = url.pathname;
       if ( target.indexOf(this.urlPath) !== 0 ) return false;
 
@@ -207,20 +204,9 @@ foam.CLASS({
       }
     },
     function getPayload_(req) {
-      var self = this;
-      return new Promise(function(resolve, reject) {
-        var payload = '';
-        req.on('data', function (chunk) {
-          payload += chunk.toString();
-        });
-        req.on('end', function () {
-          try {
-            resolve(self.parser.parseString(payload));
-          } catch (error) {
-            reject(error);
-          }
-        });
-      });
+      return req.payload.then(function(buffer) {
+        return this.parser.parseString(buffer.toString());
+      }.bind(this));
     }
   ]
 });
