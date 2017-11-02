@@ -50,8 +50,6 @@ foam.CLASS({
   name: 'SessionClientBox',
   extends: 'foam.box.ProxyBox',
 
-  implements: [ 'foam.box.Box' ],
-
   requires: [ 'foam.box.SessionReplyBox' ],
 
   constants: [
@@ -81,7 +79,14 @@ if ( "".equals(uuid) ) {
   uuid = java.util.UUID.randomUUID().toString();
   getX().put(getSessionName(), uuid);
 }
-return uuid;`
+return uuid;`,
+      swiftFactory:
+`var uuid: String = String(sessionName)
+if uuid == "" {
+  uuid = UUID().uuidString
+  //X.put(sessionName, uuid)
+}
+return uuid`
     }
   ],
 
