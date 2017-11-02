@@ -77,9 +77,15 @@
 
     files.
       filter(function(f) {
-        if ( ! f.flags ) return true;
-        for ( var i = 0; i < f.flags.length; i++ ) {
-          if ( ! flags[f.flags[i]] ) return false;
+        if ( f.flags ) {
+          for ( var i = 0; i < f.flags.length; i++ ) {
+            if ( ! flags[f.flags[i]] ) return false;
+          }
+        }
+        if ( f.notFlags ) {
+          for ( var i = 0; i < f.notFlags.length; i++ ) {
+            if ( flags[f.notFlags[i]] ) return false;
+          }
         }
         return true;
       }).
