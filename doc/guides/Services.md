@@ -3,7 +3,7 @@
 ### Server
 1. Create foam.Interface for Service
 
-Eg: https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/WebAuthService.js
+Eg: https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/AuthService.js
 
 
 If you method is returning some value to the client, make sure to include
@@ -16,7 +16,7 @@ var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
-  'foam.nanos.auth.WebAuthService'
+  'foam.nanos.auth.AuthService'
 ];
 ```
 
