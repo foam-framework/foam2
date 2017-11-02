@@ -19,23 +19,24 @@ foam.CLASS({
   refines: 'foam.core.Method',
   properties: [
     {
-      name: 'javaCode',
+      name: 'swiftCode',
+    },
+    {
+      name: 'swiftReturns',
     },
   ]
 });
 foam.CLASS({
-  refines: 'foam.core.String',
+  refines: 'foam.core.internal.InterfaceMethod',
   properties: [
     {
-      name: 'javaGetter',
+      name: 'swiftReturns',
     },
-  ]
-});
-foam.CLASS({
-  refines: 'foam.core.Listener',
-  properties: [
     {
-      name: 'javaCode',
+      name: 'swiftThrows',
+    },
+    {
+      name: 'swiftSupport',
     },
   ]
 });
@@ -43,13 +44,19 @@ foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
     {
-      name: 'javaType',
+      name: 'swiftType',
     },
     {
-      name: 'generateJava',
+      name: 'swiftExpression',
     },
     {
-      name: 'javaFactory',
+      name: 'swiftExpressionArgs',
+    },
+    {
+      name: 'swiftPostSet',
+    },
+    {
+      name: 'swiftFactory',
     },
   ]
 });
@@ -57,23 +64,21 @@ foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
     {
-      name: 'javaType',
+      name: 'swiftType',
+    },
+    {
+      name: 'swiftDefaultValue',
     },
   ]
 });
 foam.CLASS({
-  refines: 'foam.core.Import',
+  refines: 'foam.core.InterfaceModel',
   properties: [
     {
-      name: 'javaType',
+      name: 'swiftName',
     },
-  ]
-});
-foam.CLASS({
-  refines: 'foam.core.InnerClass',
-  properties: [
     {
-      name: 'generateJava',
+      name: 'swiftImplements',
     },
   ]
 });
@@ -81,32 +86,34 @@ foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
     {
-      name: 'javaImports',
-    },
-    {
-      name: 'generateJava',
+      name: 'swiftName',
     },
   ]
 });
 foam.CLASS({
-  refines: 'foam.core.AbstractMethod',
+  refines: 'foam.core.FObjectProperty',
   properties: [
     {
-      name: 'javaCode',
+      name: 'swiftFactory',
     },
     {
-      name: 'javaReturns',
-    },
-    {
-      name: 'javaThrows',
+      name: 'swiftPostSet',
     },
   ]
 });
 foam.CLASS({
-  refines: 'foam.core.Implements',
+  refines: 'foam.core.Requires',
   properties: [
     {
-      name: 'java',
+      name: 'swiftPath',
+    },
+  ]
+});
+foam.CLASS({
+  refines: 'foam.core.String',
+  properties: [
+    {
+      name: 'swiftFactory',
     },
   ]
 });
