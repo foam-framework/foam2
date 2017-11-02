@@ -29,8 +29,8 @@ public class ServiceWebAgent
   protected boolean authenticate_;
 
   public ServiceWebAgent(Object service, Box skeleton, boolean authenticate) {
-    service_  = service;
-    skeleton_ = skeleton;
+    service_      = service;
+    skeleton_     = skeleton;
     authenticate_ = authenticate;
   }
 
@@ -108,12 +108,12 @@ public class ServiceWebAgent
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser parser = new ExprParser();
-    PStream ps = new StringPStream();
-    ParserContext psx = new ParserContextImpl();
+    Parser        parser = new ExprParser();
+    PStream       ps     = new StringPStream();
+    ParserContext psx    = new ParserContextImpl();
 
     ((StringPStream) ps).setString(buffer);
-    psx.set("X", ( x == null ) ? new ProxyX() : x);
+    psx.set("X", x == null ? new ProxyX() : x);
 
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
     ps = eps.apply(parser, psx);
