@@ -7,7 +7,7 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
-  extends: 'foam.nanos.NanoService',
+
   methods: [
     {
       name: 'generateChallenge',
