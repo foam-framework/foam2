@@ -46,7 +46,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
-  { name: "foam/nanos/auth/WebAuthService" },
+  { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
