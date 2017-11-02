@@ -19,79 +19,45 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [
-    'tableProperties',
-    'tableColumns',
-    'generateJava',
-    'searchColumns',
-    'tableCellFormatter',
-  ]
+  properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.Currency',
-  properties: [
-    'tableCellFormatter',
-  ]
+  properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.Double',
-  properties: [
-    'tableCellFormatter',
-  ]
+  properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.Long',
-  properties: [
-    'tableCellFormatter',
-    'visibility',
-  ]
+  properties: [ 'tableCellFormatter', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Date',
-  properties: [
-    'tableCellFormatter',
-  ]
+  properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.DateTime',
-  properties: [
-    'tableCellFormatter',
-    'visibility',
-  ]
+  properties: [ 'tableCellFormatter', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Property',
-  properties: [
-    'tableCellFormatter',
-    'searchView',
-  ]
+  properties: [ 'tableCellFormatter', 'searchView' ]
 });
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
-  properties: [
-    'view',
-  ]
+  properties: [ 'view' ]
 });
 foam.CLASS({
   refines: 'foam.core.Boolean',
-  properties: [
-    'tableCellFormatter',
-    'tableCellView',
-  ]
+  properties: [ 'tableCellFormatter', 'tableCellView' ]
 });
 foam.CLASS({
   refines: 'foam.core.String',
-  properties: [
-    'tableCellFormatter',
-    'tableCellView',
-    'displayWidth',
-    'view',
-    'visibility',
-  ]
+  properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Method',
-  properties: [
-    'javaCode',
-  ]
+  properties: [ 'javaCode' ]
 });
