@@ -1540,6 +1540,12 @@ foam.CLASS({
       return this;
     },
 
+    function callIf(bool, f, args) {
+      if ( bool ) f.apply(this, args);
+
+      return this;
+    },
+
     function forEach(a, f) {
       for ( var i = 0 ; i < a.length ; i++ ) {
         f.call(this, a[i], i);
