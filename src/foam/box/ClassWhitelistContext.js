@@ -27,7 +27,6 @@ foam.CLASS({
       name: 'whitelist'
     },
     {
-      class: 'Map',
       name: 'whitelist_',
       expression: function(whitelist) {
         var w = {};
