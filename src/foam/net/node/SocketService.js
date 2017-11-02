@@ -21,6 +21,7 @@ foam.CLASS({
 
   requires: [
     'foam.box.Message',
+    'foam.box.RawSocketBox',
     'foam.box.RegisterSelfMessage',
     'foam.json.Parser',
     'foam.net.node.Socket'
@@ -107,7 +108,7 @@ foam.CLASS({
             name: m.name
           });
 
-          named.delegate = foam.box.RawSocketBox.create({
+          named.delegate = this.RawSocketBox.create({
             socket: socket
           });
           return;
