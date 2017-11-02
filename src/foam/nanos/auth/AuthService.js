@@ -51,6 +51,21 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'loginByEmail',
+      javaReturns: 'foam.core.X',
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
+      args: [
+        {
+          name: 'email',
+          javaType: 'String'
+        },
+        {
+          name: 'password',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
       name: 'check',
       javaReturns: 'Boolean',
       args: [
