@@ -28,10 +28,9 @@ public class SessionServerBox
     String sessionID = (String) msg.getAttributes().get("sessionId");
 
     try {
+      System.err.println("**** SESSIONID: " + sessionID);
 
       if ( sessionID != null ) {
-        System.err.println("**** SESSIONID: " + sessionID);
-
         DAO     dao     = (DAO) getX().get("sessionDAO");
         Session session = (Session) dao.find(sessionID);
 
@@ -49,14 +48,17 @@ public class SessionServerBox
 
         dao.put(session);
 
-/*
+        /*
+        TODO: uncomment to activate
         if ( authenticate_ && session.getUserId() == 0 ) {
+          System.err.println("*************** NOT LOGGED IN");
           msg.replyWithException(new java.security.AccessControlException("not logged in"));
           return;
         }
         */
 
-        msg.getLocalAttributes().put('x', getX().put(Session.class, session));
+        System.err.println("**************************SETTING SESSION*********");
+        msg.getLocalAttributes().put("x", getX().put("Session.class", session));
       }
     } catch (Throwable t) {
       t.printStackTrace();
