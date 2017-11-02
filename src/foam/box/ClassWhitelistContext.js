@@ -27,7 +27,6 @@ foam.CLASS({
       name: 'whitelist'
     },
     {
-      class: 'Map',
       name: 'whitelist_',
       expression: function(whitelist) {
         var w = {};
@@ -63,10 +62,7 @@ return w
         },
       ],
       code: function(X, id) {
-        // TODO: This should be:
-        // if ( ! this.whitelist_[id] ) { ... }
-        // Change it back once #777 is closed.
-        if ( this.whitelist.indexOf(id) === -1 ) {
+        if ( ! this.whitelist_[id] ) {
           throw new Error('Class "' + id + '" is not whitelisted.');
         }
         return this.__context__.lookup.call(X, id);
