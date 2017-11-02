@@ -35,6 +35,7 @@ foam.CLASS({
       name: 'launch',
       code: function(X) {
         console.log('MENU: ', this.id, this.label);
+        window.location.hash = this.id;      
         this.handler && this.handler.launch(X, this);
       }
     }

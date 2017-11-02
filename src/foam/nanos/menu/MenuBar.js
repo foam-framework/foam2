@@ -58,7 +58,7 @@ foam.CLASS({
                     var e = this;
                     this.start()
                       .add(menu.label)
-                      .on('click', function() { menu.handler && menu.handler.launch(self.__context__, menu, e) })
+                      .on('click', function() { window.location.hash = menu.id; menu.handler && menu.handler.launch(self.__context__, menu, e) })
                     .end();
                   })
                 .end()
