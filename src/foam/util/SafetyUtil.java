@@ -15,9 +15,9 @@ public class SafetyUtil{
       double d1 = ( (Number) o1 ).doubleValue();
       double d2 = ( (Number) o2 ).doubleValue();
      
-      if( d1 == d2 ) return 0;
-      if( d1 > d2 ) return 1;
-      if( d1 < d2 ) return -1;
+      if ( d1 == d2 ) return 0;
+      if ( d1 > d2 ) return 1;
+      if ( d1 < d2 ) return -1;
      
     }
     return ( (Comparable) o1 ).compareTo(o2);
