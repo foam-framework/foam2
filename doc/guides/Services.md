@@ -22,7 +22,7 @@ var skeletons = [
   - If serve is set to true, the skeleton will be generated
 
  Eg
- p({"class":"foam.nanos.boot.NSpec","name": "webAuth","lazy":true,"serve":true, "boxClass": "foam.nanos.auth.WebAuthServiceSkeleton", "serviceClass":"foam.nanos.auth.WebAuthServiceAdapter"})
+ p({"class":"foam.nanos.boot.NSpec", "name":"auth",                        "lazy":true,  "serve":true,  "authenticate": false, "boxClass":"foam.nanos.auth.AuthServiceSkeleton", "serviceClass":"foam.nanos.auth.UserAndGroupAuthService","client":"{\"class\":\"foam.nanos.auth.ClientAuthService\"}"})
 
 //CLIENT SIDE
 4. Create stub for Service on the client side
@@ -31,12 +31,12 @@ Eg https://github.com/foam-framework/foam2/blob/master/src/foam/nanos/auth/Clien
 5. Add Service to foam.nano.client.Client.js
 Eg
 {
-  name: 'webAuth',
+  name: 'auth',
   factory: function() {
     return this.ClientAuthService.create({
       delegate: this.HTTPBox.create({
         method: 'POST',
-        url: 'http://localhost:8080/webAuth'
+        url: 'http://localhost:8080/auth'
       })
     });
   }
@@ -45,10 +45,10 @@ Eg
 6. In controller, import the service
 Eg
 imports: [
-  'stack', 'userDAO', 'user', 'webAuth'
+  'stack', 'userDAO', 'user', 'auth'
 ],
 
 Now, you can call the service in the controller:
-self.webAuth.login("marc4@marc.com", "marc123").then(function(response) {
+self.auth.loginByEmail("marc4@marc.com", "marc123").then(function(response) {
   console.log(response);
 }
