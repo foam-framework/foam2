@@ -3,8 +3,10 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftType',
-    name: 'swiftDefaultValue'
-  }
+  },
+  {
+    name: 'swiftDefaultValue',
+  },
 ],
 });
 foam.CLASS({
@@ -12,9 +14,13 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftCode',
-    name: 'swiftReturns',
-    name: 'swiftSynchronized'
-  }
+  },
+  {
+      name: 'swiftReturns',
+  },
+  {
+      name: 'swiftSynchronized',
+  },
 ],
 });
 foam.CLASS({
@@ -22,7 +28,7 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftPath',
-  }
+  },
  ],
 });
 foam.CLASS({
@@ -30,9 +36,13 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftType',
+  },
+  {
     name: 'swiftFactory',
-    name: 'swiftPostSet'
-  }
+  },
+  {
+    name: 'swiftPostSet',
+  },
 ],
 });
 foam.CLASS({
@@ -40,11 +50,16 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftType',
+  },
+  {
     name: 'swiftFactory',
+  },
+  {
     name: 'swiftExpression',
+  },
+  {
     name: 'swiftExpressionArgs',
-    
-  }
+  },
 ],
 });
 foam.CLASS({
@@ -52,8 +67,21 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftThrows',
-    name: 'swiftSupport'
-  }
+  },
+  {
+    name: 'swiftSupport',
+  },
+],
+});
+foam.CLASS({
+  refines: 'foam.core.InterfaceModel',
+  properties: [
+  {
+    name: 'swiftName',
+  },
+  {
+    name: 'swiftImplements',
+  },
 ],
 });
 foam.CLASS({
@@ -61,9 +89,15 @@ foam.CLASS({
   properties: [
   {
     name: 'swiftThrows',
+  },
+  {
     name: 'swiftSupport',
+  },
+  {
     name: 'swiftExpression',
-    name: 'swiftFactory'
-  }
+  },
+  {
+    name: 'swiftFactory',
+  },
 ],
 });
