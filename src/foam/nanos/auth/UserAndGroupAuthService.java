@@ -324,7 +324,7 @@ public class UserAndGroupAuthService
       hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
       hashedNewPassword = hashPassword(newPassword, newSalt);
     } catch (NoSuchAlgorithmException e) {
-      throw new AuthenticationException("Failed to hash passwords using " + HASH_METHOD);
+      throw new AuthenticationException("Invalid Password");
     }
 
     if ( ! hashedOldPassword.equals(storedPassword) ) {
