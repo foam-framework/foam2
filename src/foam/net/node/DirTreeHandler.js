@@ -140,7 +140,7 @@ foam.CLASS({
       if ( mimetype === this.mimeTypes.__default ) {
         this.info('Unknown MIME type: ' + ext);
       }
-      res.statusCode = 200;
+      res.setStatusCode(200);
       res.setHeader('Content-type', mimetype);
 
       // Stream file.
