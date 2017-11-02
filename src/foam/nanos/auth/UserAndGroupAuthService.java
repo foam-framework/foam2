@@ -336,7 +336,7 @@ public class UserAndGroupAuthService
     }
 
     user.setPassword(hashedNewPassword + ":" + newSalt);
-    userDAO_.put(user);
+    user = userDAO_.put(user);
 
     return this.getX().put("user", user);
   }
