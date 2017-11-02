@@ -93,14 +93,11 @@ return uuid;`
 
         console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
-        /*
-        TODO: uncomment when webAuth removed
         msg.attributes.replyBox = this.SessionReplyBox.create({
           msg: msg,
           clientBox: this,
           delegate: msg.attributes.replyBox
         });
-        */
 
         this.delegate.send(msg);
       }
