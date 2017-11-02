@@ -165,7 +165,12 @@ foam.CLASS({
       this.child_.stdout.pipe(process.stdout);
       this.child_.stderr.pipe(process.stderr);
 
-      this.socketService.listening$.sub(this.onSocketListening);
+      if ( this.socketService.listening ) {
+        this.onSocketListening(foam.core.FObject.create(), null, null,
+                               this.socketService.listening$);
+      } else {
+        this.socketService.listening$.sub(this.onSocketListening);
+      }
     }
   ],
 

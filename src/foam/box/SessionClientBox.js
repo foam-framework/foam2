@@ -14,7 +14,7 @@ foam.CLASS({
   ],
 
   imports: [
-    // 'requestLogin'
+    'requestLogin'
   ],
 
   properties: [
@@ -29,7 +29,8 @@ foam.CLASS({
         // TODO: if I get an AuthException the call the requestLogin
         // handler then retry once it finishes.
         console.log('************************* REPLY: ', foam.json.stringify(msg));
-// {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"java.security.AccessControlException",message:"not logged in"}}}
+        // Exception looks like this:
+        // {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"java.security.AccessControlException",message:"not logged in"}}}
         if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === "java.security.AccessControlException" ) {
           this.requestLogin().then(function() {
             console.log('***** LOGGED IN');
@@ -53,9 +54,13 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
-  constants: {
-    SESSION_KEY: 'sessionId'
-  },
+  constants: [
+    {
+      name: 'SESSION_KEY',
+      value: 'sessionId',
+      type: 'String'
+    }
+  ],
 
   properties: [
     {
@@ -69,7 +74,14 @@ foam.CLASS({
       factory: function() {
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      }
+      },
+      javaFactory:
+`String uuid = (String) getX().get(getSessionName());
+if ( "".equals(uuid) ) {
+  uuid = java.util.UUID.randomUUID().toString();
+  getX().put(getSessionName(), uuid);
+}
+return uuid;`
     }
   ],
 
@@ -81,11 +93,14 @@ foam.CLASS({
 
         console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
+        /*
+        TODO: uncomment when webAuth removed
         msg.attributes.replyBox = this.SessionReplyBox.create({
           msg: msg,
           clientBox: this,
           delegate: msg.attributes.replyBox
         });
+        */
 
         this.delegate.send(msg);
       }

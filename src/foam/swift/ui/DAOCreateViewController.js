@@ -17,10 +17,26 @@ foam.CLASS({
   imports: [
     'stack',
   ],
+  messages: [
+    {
+      name: 'CREATE_VC_TITLE',
+      message: 'Create ${name}',
+      description: 'Title for the create view where ${name} is the name of the object.',
+    },
+  ],
   properties: [
     {
       swiftType: '(FObject & DAO)',
       name: 'dao',
+    },
+    {
+      name: 'title',
+      swiftExpressionArgs: ['data'],
+      swiftExpression: function() {/*
+return String(
+    format: type(of: self).CREATE_VC_TITLE,
+    data.ownClassInfo().label)
+      */}
     },
     {
       swiftType: 'FObject',
@@ -58,7 +74,7 @@ let onVcChange = { [weak self] () -> Void in
       target: self,
       action: #selector(DAOCreateViewController.onSaveButtonPressed))
 }
-self.onDetach(self.vc$.sub(listener: { (_, _) in
+self.onDetach(self.vc$.swiftSub({ (_, _) in
   onVcChange()
 }))
 onVcChange()
