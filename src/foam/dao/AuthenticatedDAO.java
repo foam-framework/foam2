@@ -39,7 +39,7 @@ public class AuthenticatedDAO
     }
 
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException();
+      throw new RuntimeException("Insufficient permissions");
     }
 
     return super.put_(x, obj);
@@ -50,7 +50,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
     Permission permission = new AuthPermission(prefix + ".remove." + obj.getProperty("id"));
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException();
+      throw new RuntimeException("Insufficient permissions");
     }
 
     return super.remove_(x, obj);
@@ -61,7 +61,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
     Permission permission = new AuthPermission(prefix + ".read." + id);
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("");
+      throw new RuntimeException("Insufficient permissions");
     }
 
     return super.find_(x, id);
@@ -72,7 +72,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
     Permission permission = new AuthPermission(prefix + ".read");
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("");
+      throw new RuntimeException("Insufficient permissions");
     }
 
     return super.select_(x, sink, skip, limit, order, predicate);
@@ -83,7 +83,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
     Permission permission = new AuthPermission(prefix + ".delete");
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("");
+      throw new RuntimeException("Insufficient permissions");
     }
 
     super.removeAll_(x, skip, limit, order, predicate);
@@ -94,7 +94,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
     Permission permission = new AuthPermission(prefix + ".listen");
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("");
+      throw new RuntimeException("Insufficient permissions");
     }
 
     super.listen_(x, sink, predicate);
@@ -105,7 +105,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
     Permission permission = new AuthPermission(prefix + ".pipe");
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("");
+      throw new RuntimeException("Insufficient permissions");
     }
 
     super.pipe_(x, sink);
