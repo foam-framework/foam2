@@ -19,11 +19,11 @@ import java.security.Permission;
 public class AuthenticatedDAO
     extends ProxyDAO
 {
-  protected String prefix;
+  protected String name_;
 
-  public AuthenticatedDAO(DAO delegate) {
+  public AuthenticatedDAO(String name, DAO delegate) {
+    this.name_ = name;
     setDelegate(delegate);
-    prefix = delegate.getClass().getSimpleName();
   }
 
   @Override
@@ -33,9 +33,9 @@ public class AuthenticatedDAO
 
     Object id = obj.getProperty("id");
     if ( id == null || getDelegate().find(id) == null ) {
-      permission = new AuthPermission(prefix + ".create");
+      permission = new AuthPermission(name_ + ".create");
     } else {
-      permission = new AuthPermission(prefix + ".update." + id);
+      permission = new AuthPermission(name_ + ".update." + id);
     }
 
     if ( ! authService.check(x, permission) ) {
@@ -48,7 +48,7 @@ public class AuthenticatedDAO
   @Override
   public FObject remove_(X x, FObject obj) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(prefix + ".remove." + obj.getProperty("id"));
+    Permission permission = new AuthPermission(name_ + ".remove." + obj.getProperty("id"));
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
@@ -59,7 +59,7 @@ public class AuthenticatedDAO
   @Override
   public FObject find_(X x, Object id) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(prefix + ".read." + id);
+    Permission permission = new AuthPermission(name_ + ".read." + id);
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
@@ -70,7 +70,7 @@ public class AuthenticatedDAO
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(prefix + ".read");
+    Permission permission = new AuthPermission(name_ + ".read");
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
@@ -81,7 +81,7 @@ public class AuthenticatedDAO
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(prefix + ".delete");
+    Permission permission = new AuthPermission(name_ + ".delete");
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
@@ -92,7 +92,7 @@ public class AuthenticatedDAO
   @Override
   public void listen_(X x, Sink sink, Predicate predicate) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(prefix + ".listen");
+    Permission permission = new AuthPermission(name_ + ".listen");
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
@@ -103,7 +103,7 @@ public class AuthenticatedDAO
   @Override
   public void pipe_(X x, Sink sink) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(prefix + ".pipe");
+    Permission permission = new AuthPermission(name_ + ".pipe");
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
