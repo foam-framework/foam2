@@ -17,41 +17,37 @@
 
 foam.CLASS({
   refines: 'foam.core.Method',
-  properties: [ 'javaCode' ]
+  properties: [ 'swiftReturns', 'swiftCode' ]
 });
 foam.CLASS({
-  refines: 'foam.core.String',
-  properties: [ 'javaGetter' ]
-});
-foam.CLASS({
-  refines: 'foam.core.Listener',
-  properties: [ 'javaCode' ]
+  refines: 'foam.core.internal.InterfaceMethod',
+  properties: [ 'swiftReturns', 'swiftThrows', 'swiftSupport' ]
 });
 foam.CLASS({
   refines: 'foam.core.Property',
-  properties: [ 'javaType', 'generateJava', 'javaFactory' ]
+  properties: [ 'swiftType', 'swiftExpression', 'swiftExpressionArgs', 'swiftPostSet', 'swiftFactory' ]
 });
 foam.CLASS({
   refines: 'foam.core.Argument',
-  properties: [ 'javaType' ]
+  properties: [ 'swiftType', 'swiftDefaultValue' ]
 });
 foam.CLASS({
-  refines: 'foam.core.Import',
-  properties: [ 'javaType' ]
-});
-foam.CLASS({
-  refines: 'foam.core.InnerClass',
-  properties: [ 'generateJava' ]
+  refines: 'foam.core.InterfaceModel',
+  properties: [ 'swiftName', 'swiftImplements' ]
 });
 foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [ 'javaImports', 'generateJava' ]
+  properties: [ 'swiftName' ]
 });
 foam.CLASS({
-  refines: 'foam.core.AbstractMethod',
-  properties: [ 'javaCode', 'javaReturns', 'javaThrows' ]
+  refines: 'foam.core.FObjectProperty',
+  properties: [ 'swiftFactory', 'swiftPostSet' ]
 });
 foam.CLASS({
-  refines: 'foam.core.Implements',
-  properties: [ 'java' ]
+  refines: 'foam.core.Requires',
+  properties: [ 'swiftPath' ]
+});
+foam.CLASS({
+  refines: 'foam.core.String',
+  properties: [ 'swiftFactory' ]
 });
