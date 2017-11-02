@@ -12,9 +12,13 @@ public class SafetyUtil{
     if ( o1 == null ) return -1;
 
     if (o1 instanceof Number && o2 instanceof Number) {      
-      if( ((Number) o1).doubleValue() == ((Number) o2).doubleValue()) return 0;
-      if( ((Number) o1).doubleValue() >  ((Number) o2).doubleValue()) return 1;
-      if( ((Number) o1).doubleValue() <  ((Number) o2).doubleValue()) return -1;
+      Double d1 =((Number) o1).doubleValue();
+      Double d2 =((Number) o2).doubleValue();
+     
+      if( d1 == d2) return 0;
+      if( d1 > d2) return 1;
+      if( d1 < d2) return -1;
+     
     }
     return ((Comparable) o1).compareTo(o2);
   }
