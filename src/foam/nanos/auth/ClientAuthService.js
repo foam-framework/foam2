@@ -12,7 +12,10 @@ foam.CLASS({
     'foam.nanos.auth.WebAuthService'
   ],
 
-  requires: [ 'foam.box.HTTPBox' ],
+  requires: [
+    'foam.box.SessionClientBox',
+    'foam.box.HTTPBox'
+  ],
 
   properties: [
     {
@@ -24,10 +27,10 @@ foam.CLASS({
       name: 'delegate',
       of: 'foam.nanos.auth.WebAuthService',
       factory: function() {
-        return this.HTTPBox.create({
+        return this.SessionClientBox.create({delegate:this.HTTPBox.create({
           method: 'POST',
           url: this.serviceName
-        });
+        })});
       }
     }
   ]

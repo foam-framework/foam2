@@ -56,13 +56,15 @@ foam.INTERFACE({
         },
         {
           class: 'Long',
+          swiftType: 'Int',
           name: 'offset'
         }
       ]
     },
     {
       name: 'getSize',
-      returns: 'Long'
+      returns: 'Long',
+      swiftReturns: 'Int',
     }
   ]
 });

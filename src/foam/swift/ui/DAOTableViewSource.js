@@ -17,11 +17,38 @@ foam.CLASS({
       name: 'dao',
       swiftPostSet: function() {/*
 if newValue == nil { return }
+
+
+let findIndex = { (o: FObject) -> Int? in
+  let id = o.get(key: "id")
+  return self.daoContents.index(where: { (o) -> Bool in
+    let o = o as! FObject
+    return FOAM_utils.equals(id, o.get(key: "id"))
+  })
+}
+
 daoSub = try? newValue!.listen(FnSink_create([
   "fn": { [weak self] str, obj, sub in
-    self?.onDAOUpdate()
-  } as (String, FObject, Detachable) -> Void,
+    if self == nil { return }
+    if str == "add" {
+      if let index = findIndex(obj!) {
+        self?.daoContents[index] = obj
+        self?.tableView?.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+      } else {
+        self?.daoContents.append(obj)
+        self?.tableView?.insertRows(at: [IndexPath(row: self!.daoContents.count - 1, section: 0)], with: .automatic)
+      }
+    } else if str == "remove" {
+      if let index = findIndex(obj!) {
+        self?.daoContents.remove(at: index)
+        self?.tableView?.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+      }
+    } else {
+      self?.onDAOUpdate()
+    }
+  } as (String, FObject?, Detachable) -> Void,
 ]), nil)
+
 onDetach(daoSub)
 onDAOUpdate()
       */},
@@ -55,6 +82,10 @@ onDAOUpdate()
       swiftType: '((UITableViewCell, FObject) -> Void)',
       swiftRequiresEscaping: true,
       name: 'rowViewPrepare',
+    },
+    {
+      swiftType: '((IndexPath, UITableViewCell) -> Void)?',
+      name: 'rowViewRemoved',
     },
   ],
   listeners: [

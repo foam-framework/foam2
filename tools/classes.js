@@ -68,6 +68,8 @@ var classes = [
   'foam.box.ReturnBox',
   'foam.box.BoxService',
   'foam.box.CheckAuthenticationBox',
+  'foam.box.SessionReplyBox',
+  'foam.box.SessionClientBox',
   'foam.dao.DAO',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',

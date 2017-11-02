@@ -44,7 +44,7 @@ public class PropertyReferenceParser extends ProxyParser {
     ps = super.parse(ps, x);
 
     if ( ps != null ) {
-      String forClass = (String)x.get("forClass_");
+      String forClass = (String) x.get("forClass_");
       String classId  = forClass.substring(0, forClass.lastIndexOf("."));
       String propName = forClass.substring(forClass.lastIndexOf(".") + 1);
 
