@@ -18,7 +18,21 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'RestDAOHandler',
-  extends: 'foam.net.node.BaseHandler',
+  extends: 'foam.net.node.PathnamePrefixHandler',
+
+  documentation: `Server-side handler that is the dual of a client-side
+      foam.dao.RestDAO.
+
+      E.g.,
+
+      // Client:
+      var dao = foam.dao.RestDAO.create({ baseURL: 'https://my.server/a/dao' });
+
+      // Server:
+      myServerRootPathnamePrefixRouter.addPathnamePrefix(
+          '/a/dao', foam.net.node.RestDAOHandler.create({
+            dao: daoOnMyServer
+          }, myServerRootPathnamePrefixRouter));`,
 
   requires: [ 'foam.json.Parser' ],
 
@@ -28,12 +42,6 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      class: 'String',
-      name: 'urlPath',
-      documentation: 'URL path prefix.',
-      required: true
-    },
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
@@ -61,10 +69,16 @@ foam.CLASS({
       // Check the URL for the prefix.
       var url = req.url;
       var target = url.pathname;
-      if ( target.indexOf(this.urlPath) !== 0 ) return false;
+      if ( target.indexOf(this.pathnamePrefix) !== 0 ) {
+        this.send404(req, res);
+        this.reportWarnMsg(req, `PathnamePrefix Route/Handler mismatch:
+                                    URL pathname: ${req.url.pathname}
+                                    Handler prefix: ${this.pathnamePrefix}`);
+        return true;
+      }
 
       // Look past prefix.
-      target = target.substring(this.urlPath.length);
+      target = target.substring(this.pathnamePrefix.length);
       // Any suffix should be "/"- or ":"-separated from prefix. Otherwise,
       // it's not really a match.
       var sep = target.charAt(0);
