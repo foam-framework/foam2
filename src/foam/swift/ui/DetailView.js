@@ -9,6 +9,7 @@ foam.CLASS({
   name: 'DetailView',
   requires: [
     'foam.swift.ui.FOAMActionUIButton',
+    'foam.swift.ui.PropertyView',
   ],
   swiftImports: [
     'UIKit',
