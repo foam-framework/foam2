@@ -229,7 +229,7 @@ public class UserAndGroupAuthService
       salt = split[1];
       storedPassword = split[0];
       hashedPassword = hashPassword(password, salt);
-    } catch (NoSuchAlgorithmException e) {
+    } catch (Throwable e) {
       throw new AuthenticationException("Invalid Password");
     }
 
