@@ -18,95 +18,65 @@
 foam.CLASS({
   refines: 'foam.core.Method',
   properties: [
-    {
-      name: 'javaCode',
-    },
+    'javaCode',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
-    {
-      name: 'javaGetter',
-    },
+    'javaGetter',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.Listener',
   properties: [
-    {
-      name: 'javaCode',
-    },
+    'javaCode',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
-    {
-      name: 'javaType',
-    },
-    {
-      name: 'generateJava',
-    },
-    {
-      name: 'javaFactory',
-    },
+    'javaType',
+    'generateJava',
+    'javaFactory',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
-    {
-      name: 'javaType',
-    },
+    'javaType',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.Import',
   properties: [
-    {
-      name: 'javaType',
-    },
+    'javaType',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.InnerClass',
   properties: [
-    {
-      name: 'generateJava',
-    },
+    'generateJava',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.Model',
   properties: [
-    {
-      name: 'javaImports',
-    },
-    {
-      name: 'generateJava',
-    },
+    'javaImports',
+    'generateJava', 
   ]
 });
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
   properties: [
-    {
-      name: 'javaCode',
-    },
-    {
-      name: 'javaReturns',
-    },
-    {
-      name: 'javaThrows',
-    },
+    'javaCode',
+    'javaReturns',
+    'javaThrows',
   ]
 });
 foam.CLASS({
   refines: 'foam.core.Implements',
   properties: [
-    {
-      name: 'java',
-    },
+    'java',
   ]
 });

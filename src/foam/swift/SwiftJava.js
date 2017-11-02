@@ -1,103 +1,61 @@
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
-  {
-    name: 'swiftType',
-  },
-  {
-    name: 'swiftDefaultValue',
-  },
-],
+    'swiftType',
+    'swiftDefaultValue',
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.Method',
   properties: [
-  {
-    name: 'swiftCode',
-  },
-  {
-      name: 'swiftReturns',
-  },
-  {
-      name: 'swiftSynchronized',
-  },
-],
+    'swiftCode',
+    'swiftReturns',
+    'swiftSynchronized',
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.Requires',
   properties: [
-  {
-    name: 'swiftPath',
-  },
- ],
+    'swiftPath',  
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
   properties: [
-  {
-    name: 'swiftType',
-  },
-  {
-    name: 'swiftFactory',
-  },
-  {
-    name: 'swiftPostSet',
-  },
-],
+    'swiftType',
+    'swiftFactory',
+    'swiftPostSet',
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.Property',
   properties: [
-  {
-    name: 'swiftType',
-  },
-  {
-    name: 'swiftFactory',
-  },
-  {
-    name: 'swiftExpression',
-  },
-  {
-    name: 'swiftExpressionArgs',
-  },
-],
+    'swiftType',
+    'swiftFactory',
+    'swiftExpression',
+    'swiftExpressionArgs',
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.internal.InterfaceMethod',
   properties: [
-  {
-    name: 'swiftThrows',
-  },
-  {
-    name: 'swiftSupport',
-  },
-],
+    'swiftThrows',
+    'swiftSupport', 
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.InterfaceModel',
   properties: [
-  {
-    name: 'swiftName',
-  },
-  {
-    name: 'swiftImplements',
-  },
-],
+    'swiftName',
+    'swiftImplements',
+  ],
 });
 foam.CLASS({
   refines: 'foam.core.String',
   properties: [
-  {
-    name: 'swiftThrows',
-  },
-  {
-    name: 'swiftSupport',
-  },
-  {
-    name: 'swiftExpression',
-  },
-  {
-    name: 'swiftFactory',
-  },
-],
+    'swiftThrows',
+    'swiftSupport',
+    'swiftExpression',
+    'swiftFactory',
+  ],
 });
