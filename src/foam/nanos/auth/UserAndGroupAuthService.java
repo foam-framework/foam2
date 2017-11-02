@@ -3,6 +3,7 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.*;
+import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.util.LRULinkedHashMap;
 
@@ -88,37 +89,68 @@ public class UserAndGroupAuthService
    * and return the user in the context.
    */
   public X login(long userId, String password) throws AuthenticationException {
-    if ( true || ! password.equals("secret") ) {
-      User user = new User();
-      user.setId(42);
-      return this.getX().put("user", user);
-    }
-
-    if ( userId < 1 || password == null || password == "" ) {
+    if ( userId < 1 || "".equals(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new AuthenticationException("User not found.");
+    if ( user == null ) {
+      throw new AuthenticationException("User not found.");
+    }
 
     String hashedPassword;
     String storedPassword;
     String salt;
 
-
     try {
-      salt = user.getPassword().split(":")[1];
+      String[] split = user.getPassword().split(":");
+      salt = split[1];
+      storedPassword = split[0];
       hashedPassword = hashPassword(password, salt);
-      storedPassword = user.getPassword().split(":")[0];
     } catch (NoSuchAlgorithmException e) {
-      throw new AuthenticationException("Couldn't hash passwords with " + HASH_METHOD);
-    }
-
-    if ( ! storedPassword.equals(hashedPassword) ) {
       throw new AuthenticationException("Invalid Password");
     }
 
-    return this.getX().put("user", user);
+    if ( ! hashedPassword.equals(storedPassword) ) {
+      throw new AuthenticationException("Invalid Password");
+    }
+
+    return getX().put("user", user);
+  }
+
+  public X loginByEmail(String email, String password) throws AuthenticationException {
+    if ( "".equals(email) || "".equals(password) ) {
+      throw new AuthenticationException("Invalid Parameters");
+    }
+
+    Sink sink = new ListSink();
+    sink = userDAO_.where(MLang.EQ(User.EMAIL, email)).limit(1).select(sink);
+
+    List data = ((ListSink) sink).getData();
+    if ( data == null || data.size() != 1 ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    User user = (User) data.get(0);
+
+    String salt;
+    String hashedPassword;
+    String storedPassword;
+
+    try {
+      String[] split = user.getPassword().split(":");
+      salt = split[1];
+      storedPassword = split[0];
+      hashedPassword = hashPassword(password, salt);
+    } catch (Throwable t) {
+      throw new AuthenticationException("Invalid password");
+    }
+
+    if ( ! hashedPassword.equals(storedPassword) ) {
+      throw new AuthenticationException("Invalid password");
+    }
+
+    return getX().put("user", user);
   }
 
   /**
