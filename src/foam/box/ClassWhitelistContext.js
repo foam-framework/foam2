@@ -35,11 +35,12 @@ foam.CLASS({
         }
         return w;
       },
+      swiftType: 'Set<String>',
       swiftExpressionArgs: ['whitelist'],
       swiftExpression: function() {/*
-var w = [String:Bool]()
+var w = Set<String>()
 for i in whitelist {
-  w[i] = true
+  w.insert(i)
 }
 return w
       */}
@@ -68,7 +69,7 @@ return w
         return this.__context__.lookup.call(X, id);
       },
       swiftCode: function() {/*
-if whitelist_[id] as? Bool ?? false {
+if whitelist.contains(id) {
   throw FoamError("Class " + id + " is not whitelisted.")
 }
 return X.lookup(id)
