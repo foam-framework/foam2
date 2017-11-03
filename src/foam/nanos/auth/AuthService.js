@@ -11,7 +11,13 @@ foam.INTERFACE({
   methods: [
     {
       name: 'getCurrentUser',
-      javaReturns: 'foam.nanos.auth.User'
+      javaReturns: 'foam.nanos.auth.User',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ]
     },
     {
       name: 'generateChallenge',
