@@ -155,8 +155,8 @@ public class UserAndGroupAuthService
     challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
-  public User getCurrentUser() {
-    return (User) getX().get("user");
+  public User getCurrentUser(X x) {
+    return (User) x.get("user");
   }
 
   /**
