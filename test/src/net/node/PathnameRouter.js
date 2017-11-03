@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-describe('PathnamePrefixRouter', function() {
+describe('PathnameRouter', function() {
   it('should reflect prefix in handler', function() {
     var PREFIX = '/hello';
-    var router = foam.net.node.PathnamePrefixRouter.create();
+    var router = foam.net.node.PathnameRouter.create();
     var handler = router.addPathnamePrefix(
         PREFIX, foam.net.node.PathnamePrefixHandler.create());
     expect(handler.pathnamePrefix).toBe(PREFIX);
@@ -27,9 +27,9 @@ describe('PathnamePrefixRouter', function() {
   it('should compose over routers', function() {
     var PREFIX1 = '/hello';
     var PREFIX2 = '/world';
-    var router1 = foam.net.node.PathnamePrefixRouter.create();
+    var router1 = foam.net.node.PathnameRouter.create();
     var router2 = router1.addPathnamePrefix(
-        PREFIX1, foam.net.node.PathnamePrefixRouter.create());
+        PREFIX1, foam.net.node.PathnameRouter.create());
     var handler = router2.addPathnamePrefix(
         PREFIX2, foam.net.node.PathnamePrefixHandler.create());
     expect(handler.pathnamePrefix).toBe(`${PREFIX1}${PREFIX2}`);
