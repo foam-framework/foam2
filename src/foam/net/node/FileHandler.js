@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,13 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'FileHandler',
-  extends: 'foam.net.node.Handler',
+  extends: 'foam.net.node.PathnamePrefixHandler',
 
   documentation: 'HTTP(S) server handler for a single file.',
 
   imports: [ 'info' ],
 
   properties: [
-    {
-      class: 'String',
-      name: 'urlPath',
-      documentation: 'Path part of URL to map to file.',
-      required: true
-    },
     {
       class: 'String',
       name: 'filePath',
@@ -50,17 +44,25 @@ foam.CLASS({
     },
     {
       name: 'fs',
+      transient: true,
       factory: function() { return require('fs'); }
     },
     {
       name: 'path',
+      transient: true,
       factory: function() { return require('path'); }
     }
   ],
 
   methods: [
     function handle(req, res) {
-      if ( req.url !== this.urlPath ) return false;
+      if ( req.url.pathname.indexOf(this.pathnamePrefix) !== 0 ) {
+        this.send404(req, res);
+        this.reportWarnMsg(req, `PathnamePrefix Route/Handler mismatch:
+                                    URL pathname: ${req.url.pathname}
+                                    Handler prefix: ${this.pathnamePrefix}`);
+        return true;
+      }
 
       // Ensure that file exists.
       if ( ! this.fs.existsSync(this.filePath) ) {
@@ -80,11 +82,11 @@ foam.CLASS({
       // Lookup mime type and set header accordingly.
       var ext = this.path.extname(this.filePath);
       var mimetype = this.mimeTypes[ext] || this.mimeTypes.__default;
-      res.statusCode = 200;
+      res.setStatusCode(200);
       res.setHeader('Content-type', mimetype);
 
-      this.fs.createReadStream(this.filePath).pipe(res);
-      this.info('200 OK ' + this.urlPath + ' => ' + this.filePath);
+      res.pipeFrom(this.fs.createReadStream(this.filePath));
+      this.info('200 OK ' + this.pathnamePrefix + ' => ' + this.filePath);
 
       return true;
     }
