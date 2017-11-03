@@ -11,8 +11,8 @@ import foam.core.X;
 import foam.dao.*;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
-import foam.nanos.crypto.Password;
 import foam.util.Email;
+import foam.util.Password;
 import foam.util.LRULinkedHashMap;
 
 import javax.naming.AuthenticationException;
@@ -232,15 +232,9 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Password is required for creating a user");
     }
 
-    if ( ! validatePassword(user.getPassword()) ) {
+    if ( ! Password.isValid(user.getPassword()) ) {
       throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
     }
-  }
-
-  //Min 8 characters, at least one uppercase, one lowercase, one number
-  public static boolean validatePassword(String password) {
-
-    return pattern.matcher(password).matches();
   }
 
   /**
