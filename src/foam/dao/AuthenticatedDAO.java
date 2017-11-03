@@ -69,9 +69,7 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( ! ( sink instanceof AuthenticatedSink ) ) {
-      sink = new AuthenticatedSink(name_, "read", sink);
-    }
+    sink = new AuthenticatedSink(name_, "read", sink);
     return super.select_(x, sink, skip, limit, order, predicate);
   }
 
@@ -83,17 +81,13 @@ public class AuthenticatedDAO
 
   @Override
   public void listen_(X x, Sink sink, Predicate predicate) {
-    if ( ! ( sink instanceof AuthenticatedSink ) ) {
-      sink = new AuthenticatedSink(name_, "listen", sink);
-    }
+    sink = new AuthenticatedSink(name_, "listen", sink);
     super.listen_(x, sink, predicate);
   }
 
   @Override
   public void pipe_(X x, Sink sink) {
-    if ( ! ( sink instanceof AuthenticatedSink ) ) {
-      sink = new AuthenticatedSink(name_, "pipe", sink);
-    }
+    sink = new AuthenticatedSink(name_, "pipe", sink);
     super.pipe_(x, sink);
   }
 }
