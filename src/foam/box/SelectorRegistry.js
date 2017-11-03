@@ -52,6 +52,12 @@ foam.CLASS({
               managed registration.`
         },
         {
+          class: 'String',
+          name: 'delegateRegisteredName',
+          documentation: `Name under which registration was stored in
+              "delegateRegistry".`
+        },
+        {
           class: 'FObjectProperty',
           of: 'foam.box.Box',
           name: 'delegateRegisteredBox',
@@ -85,7 +91,9 @@ foam.CLASS({
 
       var delegate = this.selector.select(name, service, box);
 
-      var delegateRegisteredBox = delegate.register(null, null, box);
+      var delegateRegisteredName = foam.uuid.randomGUID();
+      var delegateRegisteredBox = delegate.register(
+          delegateRegisteredName, null, box);
 
       // Create relay to desired service name, but return box from delegate.
       // This creates a consistent namespace for clients of this registry while
@@ -95,6 +103,7 @@ foam.CLASS({
       this.selectorRegistrations_.push(this.Registration.create({
         name: name,
         delegateRegistry: delegate,
+        delegateRegisteredName: delegateRegisteredName,
         delegateRegisteredBox: delegateRegisteredBox
       }));
 
@@ -114,11 +123,13 @@ foam.CLASS({
 
       var registrations = this.selectorRegistrations_;
       var delegateRegistry = null;
+      var delegateRegisteredName = '';
       for ( var i = 0; i < registrations.length; i++ ) {
         if ( registrations[i].delegateRegisteredBox !== delegateRegisteredBox )
           continue;
 
         delegateRegistry = registrations[i].delegateRegistry;
+        delegateRegisteredName = registrations[i].delegateRegisteredName;
 
         // When name was not previously known, delete from this registry after
         // finding associated Registration.
@@ -129,10 +140,7 @@ foam.CLASS({
       foam.assert(delegateRegistry,
                   'SelectorRegistry: Expected to find delegate registry');
 
-      // TODO(markdittmer): See TODO in BoxRegistry.unregister();
-      // unregistering remote boxes this way will not work unless something
-      // more nuanced than object identity is used.
-      delegateRegistry.unregister(delegateRegisteredBox);
+      delegateRegistry.unregister(delegateRegisteredName);
     }
   ]
 });
