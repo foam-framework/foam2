@@ -57,7 +57,8 @@ foam.CLASS({
   methods: [
     function handle(req, res) {
       this.sendMessage(req, res, this.httpCode, this.clientMessage);
-      this.reportErrorMsg(req, this.httpCode + ': ' + this.logMessage);
+      this.reportErrorMsg(req, this.httpCode + ' ' + this.clientMessage + ': ' +
+                          req.urlString + ' ' + this.logMessage);
       return true;
     }
   ]
