@@ -155,6 +155,10 @@ public class UserAndGroupAuthService
     challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
+  public User getCurrentUser(X x) {
+    return (User) x.get("user");
+  }
+
   /**
    * A challenge is generated from the userID provided
    * This is saved in a LinkedHashMap with ttl of 5
