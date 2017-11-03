@@ -16,18 +16,24 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+  package: 'foam.net.node',
+  name: 'PathnamePrefixRouter',
+  extends: 'foam.net.node.SimpleRouter',
+  implements: [ 'foam.net.node.PathnamePrefixHandler' ],
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
+  requires: [
+    'foam.net.node.PathnamePrefixHandler',
+    'foam.net.node.PathnamePrefixRoute'
+  ],
 
   methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
+    function addPathnamePrefix(pathnamePrefix, handler) {
+      var route = this.PathnamePrefixRoute.create({
+        pathnamePrefix: pathnamePrefix
+      });
+      foam.assert(this.PathnamePrefixHandler.isInstance(handler),
+                  'PathnamePrefixRouter: Expected PathnamePrefixHandler');
+      return this.addRoute(route, handler);
     }
   ]
 });
