@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.crypto;
+package foam.util;
 
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 public class Password {
 
+  // Min 8 characters, at least one uppercase, one lowercase, one number
   public static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
 
   private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {

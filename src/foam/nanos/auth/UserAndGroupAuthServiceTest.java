@@ -2,11 +2,10 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.dao.ListSink;
-import foam.nanos.crypto.Password;
+import foam.util.Password;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;

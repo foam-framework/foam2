@@ -22,7 +22,8 @@ foam.CLASS({
     'foam.dao.DAO',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
-    'foam.nanos.crypto.Password'
+    'foam.util.Email',
+    'foam.util.Password'
   ],
 
   properties: [
@@ -44,6 +45,10 @@ if ( "".equals(user.getEmail()) ) {
   throw new RuntimeException("Email required");
 }
 
+if ( ! Email.isValid(user.getEmail()) ) {
+  throw new RuntimeException("Invalid Email");
+}
+
 if ( "".equals(user.getFirstName()) ) {
   throw new RuntimeException("First name required");
 }
@@ -54,6 +59,10 @@ if ( "".equals(user.getLastName()) ) {
 
 if ( "".equals(user.getPassword()) ) {
   throw new RuntimeException("Password required");
+}
+
+if ( ! Password.isValid(user.getPassword()) ) {
+  throw new RuntimeException("Invalid password");
 }
 
 Group group = (Group) ((DAO) getGroupDAO()).find(getGroupId());
