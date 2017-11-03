@@ -2,6 +2,7 @@ package foam.nanos.auth;
 
 import foam.core.X;
 import foam.dao.ListSink;
+import foam.nanos.crypto.Password;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.AuthPermission;
@@ -11,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class UserAndGroupAuthServiceTest
-  extends CachedUserAndGroupAuthService
+    extends CachedUserAndGroupAuthService
 {
 
   protected int numUsers        = 10;
@@ -79,12 +80,7 @@ public class UserAndGroupAuthServiceTest
       user.setEmail("marc" + i + "@nanopay.net");
       user.setFirstName("Marc" + i);
       user.setLastName("R" + i);
-      try {
-        String salt = UserAndGroupAuthService.generateRandomSalt();
-        user.setPassword(UserAndGroupAuthService.hashPassword("marc" + i, salt) + ":" + salt);
-      } catch (NoSuchAlgorithmException e) {
-        System.out.println("Couldn't hash password with " + UserAndGroupAuthService.HASH_METHOD + "\nTest Failed");
-      }
+      user.setPassword(Password.hash("marc" + i));
 
       int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
       Group group = (Group) sink.getData().get(randomGroup);
