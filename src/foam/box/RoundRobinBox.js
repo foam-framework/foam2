@@ -18,16 +18,12 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RoundRobinBox',
-  implements: [ 'foam.box.Box' ],
+  extends: 'foam.box.MultiDelegateBox',
 
-  documentation: 'Delegates messages to box workers using round robin strategy.',
+  documentation: `Delegates messages to box workers using round robin
+      strategy.`,
 
   properties: [
-    {
-      class: 'Array',
-      of: 'foam.box.Box',
-      name: 'delegates',
-    },
     {
       name: 'currentBoxId_',
       value: 0,
