@@ -7,8 +7,18 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
-  extends: 'foam.nanos.NanoService',
+
   methods: [
+    {
+      name: 'getCurrentUser',
+      javaReturns: 'foam.nanos.auth.User',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ]
+    },
     {
       name: 'generateChallenge',
       javaReturns: 'String',
@@ -43,6 +53,21 @@ foam.INTERFACE({
         {
           name: 'userId',
           javaType: 'long'
+        },
+        {
+          name: 'password',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'loginByEmail',
+      javaReturns: 'foam.core.X',
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
+      args: [
+        {
+          name: 'email',
+          javaType: 'String'
         },
         {
           name: 'password',
