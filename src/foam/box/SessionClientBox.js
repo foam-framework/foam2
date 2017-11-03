@@ -54,9 +54,13 @@ foam.CLASS({
 
   requires: [ 'foam.box.SessionReplyBox' ],
 
-  constants: {
-    SESSION_KEY: 'sessionId'
-  },
+  constants: [
+    {
+      name: 'SESSION_KEY',
+      value: 'sessionId',
+      type: 'String'
+    }
+  ],
 
   properties: [
     {
@@ -70,7 +74,14 @@ foam.CLASS({
       factory: function() {
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
-      }
+      },
+      javaFactory:
+`String uuid = (String) getX().get(getSessionName());
+if ( "".equals(uuid) ) {
+  uuid = java.util.UUID.randomUUID().toString();
+  getX().put(getSessionName(), uuid);
+}
+return uuid;`
     }
   ],
 
@@ -82,14 +93,11 @@ foam.CLASS({
 
         console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
-        /*
-        TODO: uncomment when webAuth removed
         msg.attributes.replyBox = this.SessionReplyBox.create({
           msg: msg,
           clientBox: this,
           delegate: msg.attributes.replyBox
         });
-        */
 
         this.delegate.send(msg);
       }

@@ -102,6 +102,8 @@ FOAM_FILES([
   { name: "foam/swift/refines/Requires", flags: ['swift'] },
   { name: "foam/swift/refines/IntProperty", flags: ['swift'] },
   { name: "foam/swift/refines/String", flags: ['swift'] },
+  { name: "foam/swift/SwiftJava", flags: ['java'] },
+
 
   { name: "foam/java/Argument", flags: ['java'] },
   { name: "foam/java/Class", flags: ['java'] },
@@ -137,8 +139,9 @@ FOAM_FILES([
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
   { name: "foam/u2/Visibility"},
-  { name: "foam/u2/NoJava" ,  flags: ['js','debug'] },
-  { name: "foam/u2/ElementJava" ,  flags: ['java'] },
+  { name: "foam/u2/NoSwift", notFlags: ['swift'] },
+  { name: "foam/u2/NoJava", flags: ['js','debug'] },
+  { name: "foam/u2/ElementJava", flags: ['java'] },
   { name: "foam/u2/RowFormatter" },
 //  { name: "foam/u2/AttrSlot", flags: ['web'] },
   { name: "foam/u2/WeakMap", flags: ['web'] },
