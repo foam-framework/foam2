@@ -533,7 +533,7 @@ foam.CLASS({
 StringBuilder builder = sb.get().append(" (");
 for ( int i = 0; i < length; i++ ){
   builder.append("?");
-  if ( i <= length - 1 ) {
+  if ( i < length - 1 ) {
     builder.append(",");
   }
 }
