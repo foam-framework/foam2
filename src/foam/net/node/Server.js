@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,30 +21,74 @@ foam.CLASS({
 
   documentation: `An modeled HTTP server implementation.
 
-      The server stores an array of "handlers" for handling
-      requests. Handlers are given the chance to handle requests in the order
-      they appear in the array. The server starts listening on its "port"
-      when start() is invoked. Listening ceases on shutdown().`,
+      The server stores a Router, which is responsible for handling requests to
+      routes. The server starts listening on its "port" when start() is invoked.
+      Listening ceases on shutdown().`,
 
   requires: [
-    'foam.dao.ArrayDAO',
-    'foam.net.node.FileHandler',
-    'foam.net.node.RestDAOHandler',
-    'foam.net.node.StaticFileHandler'
+    'foam.net.node.EntityEncoding',
+    'foam.net.node.ErrorHandler',
+    'foam.net.node.ServerRequest',
+    'foam.net.node.ServerResponse',
+    'foam.net.node.SimpleRouter',
   ],
 
   imports: [
     'creationContext? as creationContextFromCtx',
+    'defaultEntityEncoding? as ctxDefaultEntityEncoding',
+    'entityEncodings? as ctxEntityEncodings',
     'info',
-    'log'
+    'log',
+    'error'
   ],
-  exports: [ 'creationContext' ],
+  exports: [
+    'creationContext',
+    'defaultEntityEncoding',
+    'entityEncodings'
+  ],
+
+  constants: {
+    DEFAULT_ENTITY_ENCODINGS: [
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'ascii',
+        charsetRegExp: /^(US-ASCII|us|IBM367|cp367|csASCII|iso-ir-100|ISO_8859-1|ISO-8859-1)$/i
+      }),
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'utf8',
+        charsetRegExp: /UTF-8/i
+      }),
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'utf16le',
+        charsetRegExp: /^UTF-16LE$/i
+      }),
+      foam.net.node.EntityEncoding.create({
+        bufferEncoding: 'ucs2',
+        charsetRegExp: /^$ISO-10646-UCS-2/i
+      })
+    ],
+    DEFAULT_DEFAULT_ENTITY_ENCODING: foam.net.node.EntityEncoding.create({
+      bufferEncoding: 'ascii',
+      charsetRegExp: /^(US-ASCII|us|IBM367|cp367|csASCII|iso-ir-100|ISO_8859-1|ISO-8859-1)$/i
+    }),
+  },
 
   properties: [
     {
-      class: 'FObjectArray',
+      class: 'FObjectProperty',
       of: 'foam.net.node.Handler',
-      name: 'handlers'
+      name: 'handler',
+      factory: function() { return this.SimpleRouter.create(); }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Handler',
+      name: 'errorHandler',
+      factory: function() {
+        return this.ErrorHandler.create({
+          logMessage: 'Server.handler failed to handle request',
+          httpCode: 404
+        });
+      }
     },
     {
       type: 'Int',
@@ -59,26 +103,42 @@ foam.CLASS({
     },
     {
       name: 'server',
-      documentation: 'The Node JS HTTP Server object.',
+      documentation: 'The Node JS http.Server object.',
       value: null
     },
     {
       name: 'http',
       factory: function() { return require('http'); }
-    }
+    },
+    {
+      name: 'defaultEntityEncoding',
+      factory: function() {
+        return this.ctxDefaultEntityEncoding ||
+            this.DEFAULT_DEFAULT_ENTITY_ENCODING;
+      },
+    },
+    {
+      name: 'entityEncodings',
+      factory: function() {
+        return this.ctxEntityEncoding ||
+            this.DEFAULT_ENTITY_ENCODINGS;
+      },
+    },
   ],
 
   methods: [
     function start() {
       if ( this.server ) return Promise.resolve(this.server);
 
+      this.validate();
+
       this.server = this.http.createServer(this.onRequest);
 
       var self = this;
       return new Promise(function(resolve, reject) {
         self.server.listen(self.port, function() {
-        self.info(
-          self.handlers.length + ' handlers listening on port ' + self.port);
+          self.info('Listening on port ' + self.port + '\n' +
+                    foam.json.Pretty.stringify(self.handler));
           resolve(self.server);
         });
       });
@@ -94,50 +154,26 @@ foam.CLASS({
           resolve(null);
         });
       });
-    },
-
-    function addHandler(handler) {
-      this.handlers.push(handler);
-    },
-
-    function exportDAO(dao, urlPath) {
-      this.addHandler(this.RestDAOHandler.create({
-        dao: dao,
-        urlPath: urlPath
-      }));
-
-      this.log('Export DAO to ' + urlPath);
-    },
-
-    function exportFile(urlPath, filePath) {
-      this.handlers.push(this.FileHandler.create({
-        urlPath: urlPath,
-        filePath: filePath
-      }));
-
-      this.log('Export File ' + filePath + ' to ' + urlPath);
-    },
-
-    function exportDirectory(urlPath, dir) {
-      this.handlers.push(
-        this.StaticFileHandler.create({
-          dir: dir,
-          urlPath: urlPath
-        }));
-
-      this.log('Export directory ' + dir + ' to ' + urlPath);
     }
   ],
 
   listeners: [
-    function onRequest(req, res) {
-      for ( var i = 0 ; i < this.handlers.length ; i++ ) {
-        if ( this.handlers[i].handle(req, res) ) break;
-      }
-      if ( i === this.handlers.length ) {
-        res.statusCode = 404;
-        res.write('File not found: ' + req.url, 'utf8');
-        res.end();
+    function onRequest(nodeReq, nodeRes) {
+      var req = this.ServerRequest.create({
+        msg: nodeReq
+      });
+      var res = this.ServerResponse.create({
+        res: nodeRes
+      });
+      var handled = this.handler.handle(req, res);
+
+      if ( ! handled ) {
+        handled = this.errorHandler.handle(req, res);
+        if ( ! handled ) {
+          this.error(`foam.net.node.Server:
+                         Handler + error handler failed to handle request:
+                         ${nodeReq.url}`);
+        }
       }
     }
   ]
