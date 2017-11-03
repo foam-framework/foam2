@@ -82,7 +82,7 @@ foam.CLASS({
       // Lookup mime type and set header accordingly.
       var ext = this.path.extname(this.filePath);
       var mimetype = this.mimeTypes[ext] || this.mimeTypes.__default;
-      res.statusCode = 200;
+      res.setStatusCode(200);
       res.setHeader('Content-type', mimetype);
 
       res.pipeFrom(this.fs.createReadStream(this.filePath));

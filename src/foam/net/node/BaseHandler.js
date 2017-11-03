@@ -44,7 +44,7 @@ foam.CLASS({
     },
 
     function send(res, status, body) {
-      res.statusCode = status;
+      res.setStatusCode(status);
       res.write(body, 'utf8');
       res.end();
     },
