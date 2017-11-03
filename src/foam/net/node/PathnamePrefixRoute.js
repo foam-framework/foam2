@@ -16,18 +16,27 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+  package: 'foam.net.node',
+  name: 'PathnamePrefixRoute',
+  implements: [ 'foam.net.node.Route' ],
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
+  imports: [ 'parentPrefix?' ],
+  exports: [ 'pathnamePrefix as parentPrefix' ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'pathnamePrefix',
+      preSet: function(_, nu) {
+        return `${this.parentPrefix || ''}${nu}`;
+      },
+      required: true
+    }
+  ],
 
   methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
+    function match(url) {
+      return url.pathname.indexOf(this.pathnamePrefix) === 0;
     }
   ]
 });

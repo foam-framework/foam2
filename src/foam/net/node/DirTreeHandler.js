@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 foam.CLASS({
   package: 'foam.net.node',
-  name: 'StaticFileHandler',
-  extends: 'foam.net.node.Handler',
+  name: 'DirTreeHandler',
+  extends: 'foam.net.node.PathnamePrefixHandler',
 
   documentation: `HTTP(S) server handler for an entire directory.
 
@@ -33,7 +33,7 @@ foam.CLASS({
       /foo/bar/quz/beta.js
       /foo/bar/quz/charlie.xyz
 
-     Suppose dir=/foo/bar and urlPath=/frobinator
+     Suppose dir=/foo/bar and pathnamePrefix=/frobinator
 
      This exposes URLs (relative to the server's root):
 
@@ -57,11 +57,6 @@ foam.CLASS({
       factory: function() { return process.cwd(); }
     },
     {
-      class: 'String',
-      name: 'urlPath',
-      documentation: 'URL path prefix. Stripped before searching "dir".'
-    },
-    {
       name: 'mimeTypes',
       factory: function() {
         return {
@@ -74,10 +69,12 @@ foam.CLASS({
     },
     {
       name: 'path',
+      transient: true,
       factory: function() { return require('path'); }
     },
     {
       name: 'fs',
+      transient: true,
       factory: function() { return require('fs'); }
     }
   ],
@@ -88,10 +85,16 @@ foam.CLASS({
       if ( ! this.dir ) return false;
 
       // Check the URL for the prefix.
-      var target = req.url;
-      if ( target.indexOf(this.urlPath) !== 0 ) return false;
+      var target = req.url.pathname;
+      if ( target.indexOf(this.pathnamePrefix) !== 0 ) {
+        this.send404(req, res);
+        this.reportWarnMsg(req, `PathnamePrefix Route/Handler mismatch:
+                                    URL pathname: ${req.url.pathname}
+                                    Handler prefix: ${this.pathnamePrefix}`);
+        return true;
+      }
 
-      target = target.substring(this.urlPath.length);
+      target = target.substring(this.pathnamePrefix.length);
 
       // Check and strip the prefix off the URL.
       if ( target.indexOf('?') >= 0 )
@@ -137,12 +140,11 @@ foam.CLASS({
       if ( mimetype === this.mimeTypes.__default ) {
         this.info('Unknown MIME type: ' + ext);
       }
-      res.statusCode = 200;
+      res.setStatusCode(200);
       res.setHeader('Content-type', mimetype);
 
-      // Open the file as a stream.
-      var stream = this.fs.createReadStream(target);
-      stream.pipe(res);
+      // Stream file.
+      res.pipeFrom(this.fs.createReadStream(target));
       this.info('200 OK ' + target);
 
       return true;
