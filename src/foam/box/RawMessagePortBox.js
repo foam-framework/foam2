@@ -43,8 +43,8 @@ foam.CLASS({
     }
   ],
   methods: [
-    function send(m) {
-      var replyBox = msg.attributes.replyBox;
+    function send(message) {
+      var replyBox = message.attributes.replyBox;
       if ( replyBox ) {
         // TODO: We should probably clone here, but often the message
         // contains RPC arguments that don't clone properly.  So
@@ -53,19 +53,19 @@ foam.CLASS({
         // Even better solution would be to move replyBox to a
         // property on Message and have custom serialization in it to
         // do the registration.
-        msg.attributes.replyBox =
-          this.__context__.registry.register(null, null, msg.attributes.replyBox);
+        message.attributes.replyBox = this.__context__.registry.register(
+            null, null, message.attributes.replyBox);
 
         // TODO: There should be a better way to do this.
         replyBox = this.ReplyBox.create({
-          id: msg.attributes.replyBox.name
+          id: message.attributes.replyBox.name
         });
       }
 
-      var payload = this.outputter.stringify(msg);
+      var payload = this.outputter.stringify(message);
 
       if ( replyBox ) {
-        msg.attributes.replyBox = replyBox;
+        message.attributes.replyBox = replyBox;
       }
 
       this.port.postMessage(payload);
