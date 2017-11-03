@@ -75,6 +75,7 @@ public class AuthenticatedDAO
       throw new RuntimeException("Insufficient permissions");
     }
 
+    sink = new AuthenticatedSink(name_, "read", sink);
     return super.select_(x, sink, skip, limit, order, predicate);
   }
 
@@ -97,6 +98,7 @@ public class AuthenticatedDAO
       throw new RuntimeException("Insufficient permissions");
     }
 
+    sink = new AuthenticatedSink(name_, "listen", sink);
     super.listen_(x, sink, predicate);
   }
 
@@ -108,6 +110,7 @@ public class AuthenticatedDAO
       throw new RuntimeException("Insufficient permissions");
     }
 
+    sink = new AuthenticatedSink(name_, "pipe", sink);
     super.pipe_(x, sink);
   }
 }
