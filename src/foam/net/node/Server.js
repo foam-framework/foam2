@@ -29,8 +29,8 @@ foam.CLASS({
     'foam.net.node.EntityEncoding',
     'foam.net.node.ErrorHandler',
     'foam.net.node.ServerRequest',
-    'foam.net.node.ServerResponse',
     'foam.net.node.SimpleRouter',
+    'foam.net.node.SimpleServerResponse'
   ],
 
   imports: [
@@ -162,7 +162,7 @@ foam.CLASS({
       var req = this.ServerRequest.create({
         msg: nodeReq
       });
-      var res = this.ServerResponse.create({
+      var res = this.SimpleServerResponse.create({
         res: nodeRes
       });
       var handled = this.handler.handle(req, res);

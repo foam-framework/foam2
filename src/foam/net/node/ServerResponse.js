@@ -15,39 +15,95 @@
  * limitations under the License.
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.net.node',
   name: 'ServerResponse',
 
-  documentation: `Reponse sent by HTTP server. Underlying Node JS response
-      should be injected upon creation but treated as private.`,
-
-  properties: [
-    {
-      name: 'statusCode',
-      getter: function() { return this.res.statusCode; },
-      setter: function(statusCode) { return this.res.statusCode = statusCode; }
-    },
-    {
-      name: 'res',
-      documentation: 'Node JS http.ServerResponse object.',
-      required: true,
-      final: true
-    }
-  ],
+  documentation: `Reponse sent by HTTP server.`,
 
   methods: [
-    function setHeader(header, value) {
-      return this.res.setHeader(header, value);
+    {
+      name: 'getStatusCode',
+      documentation: 'Get HTTP status code.',
+      returns: 'Int',
+      code: function() {}
     },
-    function write(data, encoding) {
-      return this.res.write(data, encoding);
+    {
+      name: 'setStatusCode',
+      documentation: 'Set HTTP status code.',
+      args: [
+        {
+          name: 'statusCode',
+          typeName: 'Int'
+        }
+      ],
+      code: function(statusCode) {}
     },
-    function end(data, encoding) {
-      return this.res.end(data, encoding);
+    {
+      name: 'setHeader',
+      documentation: 'Set HTTP header value.',
+      args: [
+        {
+          name: 'header',
+          documentation: 'The header name.',
+          typeName: 'String'
+        },
+        {
+          name: 'value',
+          documentation: 'The header value.',
+          typeName: 'String'
+        }
+      ],
+      code: function(header, value) {}
     },
-    function pipeFrom(stream) {
-      return stream.pipe(this.res);
+    {
+      name: 'write',
+      documentation: 'Write data to HTTP response body.',
+      args: [
+        {
+          name: 'data',
+          documentation: `Data to write to response body. Type must be supported
+              by first argument in
+              https://nodejs.org/api/stream.html#stream_writable_write_chunk_encoding_callback`,
+        },
+        {
+          name: 'encoding',
+          documentation: `Encoding of data supported by second argument in
+              https://nodejs.org/api/stream.html#stream_writable_write_chunk_encoding_callback`,
+        }
+      ],
+      code: function(data, encoding) {}
+    },
+    {
+      name: 'end',
+      documentation: 'Finalize HTTP response body.',
+      args: [
+        {
+          name: 'data',
+          documentation: `Data to write to response body. Type must be supported
+              by first argument in
+              https://nodejs.org/api/stream.html#stream_writable_end_chunk_encoding_callback`,
+        },
+        {
+          name: 'encoding',
+          documentation: `Encoding of data supported by second argument in
+              https://nodejs.org/api/stream.html#stream_writable_end_chunk_encoding_callback`,
+        }
+      ],
+      code: function(data, encoding) {}
+    },
+    {
+      name: 'pipeFrom',
+      documentation: `Inversion of control for NodeJS
+          fromStream.pipe(toStream)`,
+      args: [
+        {
+          name: 'stream',
+          documentation: `Stream to pipe from (implementer of
+              https://nodejs.org/api/stream.html#stream_readable_pipe_destination_options`,
+        }
+      ],
+      code: function(stream) {}
     }
   ]
 });
