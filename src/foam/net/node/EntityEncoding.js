@@ -16,18 +16,22 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+  package: 'foam.net.node',
+  name: 'EntityEncoding',
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
-
-  methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
+  properties: [
+    {
+      class: 'String',
+      name: 'bufferEncoding',
+      documentation: 'Node JS Buffer class encoding name.',
+      required: true
+    },
+    {
+      class: 'String',
+      name: 'charsetRegExp',
+      documentation: `Regular expression matching HTTP Content-Encoding header
+          charset value.`,
+      required: true
     }
   ]
 });

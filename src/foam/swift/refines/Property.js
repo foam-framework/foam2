@@ -496,6 +496,11 @@ foam.CLASS({
       class: 'StringArray',
       name: 'classes',
     },
+    {
+      class: 'String',
+      name: 'viewType',
+      value: 'UIView',
+    },
   ],
 });
 
@@ -510,7 +515,7 @@ foam.CLASS({
           var cls = foam.swift.SwiftClass.create({
             visibility: 'public',
             name: this.name,
-            implements: ['UIView'],
+            implements: [this.model_.viewType],
             imports: ['UIKit'],
           });
 
@@ -534,6 +539,7 @@ foam.CLASS({
             c.getAxiomsByClass(foam.core.Property).forEach(addViewAxioms);
             c.getAxiomsByClass(foam.core.Action).forEach(addViewAxioms);
             cls.fields.push(foam.swift.Field.create({
+              visibility: 'public',
               name: dvName,
               weak: true,
               type: 'DetailView?',

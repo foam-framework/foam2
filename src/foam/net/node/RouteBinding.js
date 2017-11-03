@@ -16,18 +16,19 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+  package: 'foam.net.node',
+  name: 'RouteBinding',
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
-
-  methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
+  properties: [
+    {
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Route',
+      name: 'route'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.net.node.Handler',
+      name: 'handler'
     }
   ]
 });
