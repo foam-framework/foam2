@@ -12,70 +12,87 @@ foam.INTERFACE({
     {
       name: 'generateChallenge',
       javaReturns: 'String',
+      swiftReturns: 'String',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
+      swiftThrows: true,
       args: [
         {
           name: 'userId',
-          javaType: 'long'
+          javaType: 'long',
+          swiftType: 'Int'
         }
       ]
     },
     {
       name: 'challengedLogin',
       javaReturns: 'foam.core.X',
+      swiftReturns: 'Context',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
+      swiftThrows: true,
       args: [
         {
           name: 'userId',
-          javaType: 'long'
+          javaType: 'long',
+          swiftType: 'Int'
         },
         {
           name: 'challenge',
-          javaType: 'String'
+          javaType: 'String',
+          swiftType: 'String'
         }
       ]
     },
     {
       name: 'login',
       javaReturns: 'foam.core.X',
+      swiftReturns: 'Context',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
+      swiftThrows: true,
       args: [
         {
           name: 'userId',
-          javaType: 'long'
+          javaType: 'long',
+          swiftType: 'Int'
         },
         {
           name: 'password',
-          javaType: 'String'
+          javaType: 'String',
+          swiftType: 'String'
         }
       ]
     },
     {
       name: 'loginByEmail',
       javaReturns: 'foam.core.X',
+      swiftReturns: 'Context',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
+      swiftThrows: true,
       args: [
         {
           name: 'email',
-          javaType: 'String'
+          javaType: 'String',
+          swiftType: 'String'
         },
         {
           name: 'password',
-          javaType: 'String'
+          javaType: 'String',
+          swiftType: 'String'
         }
       ]
     },
     {
       name: 'check',
       javaReturns: 'Boolean',
+      swiftReturns: 'Bool',
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         },
         {
           name: 'permission',
-          javaType: 'java.security.Permission'
+          javaType: 'java.security.Permission',
         }
       ]
     },
@@ -86,15 +103,18 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         },
         {
           name: 'oldPassword',
-          javaType: 'String'
+          javaType: 'String',
+          swiftType: 'String'
         },
         {
           name: 'newPassword',
-          javaType: 'String'
+          javaType: 'String',
+          swiftType: 'String'
         }
       ]
     },
@@ -102,10 +122,12 @@ foam.INTERFACE({
       name: 'validateUser',
       javaReturns: 'void',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
+      swiftThrows: true,
       args: [
         {
           name: 'user',
-          javaType: 'User'
+          javaType: 'User',
+          swiftType: 'User'
         }
       ]
     },
@@ -115,7 +137,8 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         }
       ]
     }
