@@ -134,6 +134,7 @@ var classes = [
   'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.register.RegistrationService',
   'foam.nanos.register.ClientRegistrationService',
+  'foam.nanos.register.UserRegistrationService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
