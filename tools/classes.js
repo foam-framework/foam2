@@ -132,6 +132,8 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
+  'foam.nanos.register.RegistrationService',
+  'foam.nanos.register.ClientRegistrationService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -166,7 +168,8 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
-  'foam.nanos.notification.email.EmailService'
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.register.RegistrationService'
 ];
 
 var proxies = [
@@ -177,7 +180,8 @@ var proxies = [
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
-  'foam.blob.BlobService'
+  'foam.blob.BlobService',
+  'foam.nanos.register.RegistrationService'
 ];
 
 module.exports = {
