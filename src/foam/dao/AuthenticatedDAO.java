@@ -69,48 +69,31 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(name_ + ".read");
-    if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
+    if ( ! ( sink instanceof AuthenticatedSink ) ) {
+      sink = new AuthenticatedSink(name_, "read", sink);
     }
-
-    sink = new AuthenticatedSink(name_, "read", sink);
     return super.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(name_ + ".delete");
-    if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
-    }
-
-    super.removeAll_(x, skip, limit, order, predicate);
+    Sink sink = new AuthenticatedSink(name_, "delete", new RemoveSink(this));
+    this.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
   public void listen_(X x, Sink sink, Predicate predicate) {
-    AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(name_ + ".listen");
-    if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
+    if ( ! ( sink instanceof AuthenticatedSink ) ) {
+      sink = new AuthenticatedSink(name_, "listen", sink);
     }
-
-    sink = new AuthenticatedSink(name_, "listen", sink);
     super.listen_(x, sink, predicate);
   }
 
   @Override
   public void pipe_(X x, Sink sink) {
-    AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(name_ + ".pipe");
-    if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
+    if ( ! ( sink instanceof AuthenticatedSink ) ) {
+      sink = new AuthenticatedSink(name_, "pipe", sink);
     }
-
-    sink = new AuthenticatedSink(name_, "pipe", sink);
     super.pipe_(x, sink);
   }
 }
