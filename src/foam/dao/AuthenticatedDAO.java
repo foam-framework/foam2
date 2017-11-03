@@ -69,25 +69,25 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    sink = new AuthenticatedSink(name_, "read", sink);
+    sink = new AuthenticatedSink(x, name_, "read", sink);
     return super.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink sink = new AuthenticatedSink(name_, "delete", new RemoveSink(this));
+    Sink sink = new AuthenticatedSink(x, name_, "delete", new RemoveSink(this));
     this.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
   public void listen_(X x, Sink sink, Predicate predicate) {
-    sink = new AuthenticatedSink(name_, "listen", sink);
+    sink = new AuthenticatedSink(x, name_, "listen", sink);
     super.listen_(x, sink, predicate);
   }
 
   @Override
   public void pipe_(X x, Sink sink) {
-    sink = new AuthenticatedSink(name_, "pipe", sink);
+    sink = new AuthenticatedSink(x, name_, "pipe", sink);
     super.pipe_(x, sink);
   }
 }
