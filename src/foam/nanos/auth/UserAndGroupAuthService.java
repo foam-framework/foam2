@@ -11,6 +11,7 @@ import foam.core.X;
 import foam.dao.*;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
+import foam.nanos.crypto.Password;
 import foam.util.LRULinkedHashMap;
 
 import javax.naming.AuthenticationException;
@@ -220,20 +221,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found.");
     }
 
-    String hashedPassword;
-    String storedPassword;
-    String salt;
-
-    try {
-      String[] split = user.getPassword().split(":");
-      salt = split[1];
-      storedPassword = split[0];
-      hashedPassword = hashPassword(password, salt);
-    } catch (Throwable e) {
-      throw new AuthenticationException("Invalid Password");
-    }
-
-    if ( ! hashedPassword.equals(storedPassword) ) {
+    if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid Password");
     }
 
@@ -254,21 +242,11 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) data.get(0);
-
-    String salt;
-    String hashedPassword;
-    String storedPassword;
-
-    try {
-      String[] split = user.getPassword().split(":");
-      salt = split[1];
-      storedPassword = split[0];
-      hashedPassword = hashPassword(password, salt);
-    } catch (Throwable t) {
-      throw new AuthenticationException("Invalid password");
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
     }
 
-    if ( ! hashedPassword.equals(storedPassword) ) {
+    if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid password");
     }
 
@@ -311,33 +289,20 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    String password = user.getPassword();
-    String storedPassword = password.split(":")[0];
-    String oldSalt = password.split(":")[1];
-    String hashedOldPassword;
-    String hashedNewPasswordOldSalt;
-    String hashedNewPassword;
-    String newSalt = generateRandomSalt();
-
-    try {
-      hashedOldPassword = hashPassword(oldPassword, oldSalt);
-      hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
-      hashedNewPassword = hashPassword(newPassword, newSalt);
-    } catch (NoSuchAlgorithmException e) {
-      throw new AuthenticationException("Invalid Password");
+    // old password does not match
+    if ( ! Password.verify(oldPassword, user.getPassword()) ) {
+      throw new AuthenticationException("Invalid password");
     }
 
-    if ( ! hashedOldPassword.equals(storedPassword) ) {
-      throw new AuthenticationException("Invalid Password");
+    // new password is the same
+    if ( Password.verify(newPassword, user.getPassword()) ) {
+      throw new AuthenticationException("New password must be different");
     }
 
-    if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
-      throw new AuthenticationException("New Password must be different");
-    }
-
-    user.setPassword(hashedNewPassword + ":" + newSalt);
+    // store new password in DAO and put in context
+    String hash = Password.hash(newPassword);
+    user.setPassword(newPassword);
     user = (User) userDAO_.put(user);
-
     return this.getX().put("user", user);
   }
 
@@ -374,29 +339,6 @@ public class UserAndGroupAuthService
     if ( ! validatePassword(user.getPassword()) ) {
       throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
     }
-  }
-
-  public static String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
-    MessageDigest messageDigest = MessageDigest.getInstance(HASH_METHOD);
-    messageDigest.update(salt.getBytes());
-    byte[] hashedBytes = messageDigest.digest(password.getBytes());
-    StringBuilder hashedPasswordBuilder = new StringBuilder();
-    for( byte b : hashedBytes ) {
-      hashedPasswordBuilder.append(String.format("%02x", b & 0xFF));
-    }
-    return hashedPasswordBuilder.toString();
-  }
-
-  public static String generateRandomSalt() {
-    SecureRandom secureRandom = new SecureRandom();
-    byte bytes[] = new byte[20];
-    secureRandom.nextBytes(bytes);
-
-    StringBuilder saltBuilder = sb.get();
-    for ( byte b : bytes ) {
-      saltBuilder.append(String.format("%02x", b & 0xFF));
-    }
-    return saltBuilder.toString();
   }
 
   //Min 8 characters, at least one uppercase, one lowercase, one number
