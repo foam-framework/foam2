@@ -12,8 +12,11 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Base64;
 
 import java.security.SecureRandom;
+import java.util.regex.Pattern;
 
 public class Password {
+
+  public static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
 
   private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
     @Override
@@ -91,5 +94,14 @@ public class Password {
    */
   public static boolean verify(String password, String hash) {
     return hash(password, decode(getSalt(hash))).equals(hash);
+  }
+
+  /**
+   * Determines whether or not password is valid or not
+   * @param password password to validate
+   * @return true if valid, false otherwise
+   */
+  public static boolean isValid(String password) {
+    return PASSWORD_PATTERN.matcher(password).matches();
   }
 }
