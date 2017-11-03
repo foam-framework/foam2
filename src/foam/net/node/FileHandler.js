@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.net.node',
   name: 'FileHandler',
-  extends: 'foam.net.node.PathnamePrefixHandler',
+  extends: 'foam.net.node.PathnameHandler',
 
   documentation: 'HTTP(S) server handler for a single file.',
 
@@ -56,11 +56,11 @@ foam.CLASS({
 
   methods: [
     function handle(req, res) {
-      if ( req.url.pathname.indexOf(this.pathnamePrefix) !== 0 ) {
+      if ( req.url.pathname !== this.pathname ) {
         this.send404(req, res);
-        this.reportWarnMsg(req, `PathnamePrefix Route/Handler mismatch:
+        this.reportWarnMsg(req, `File Route/Handler mismatch:
                                     URL pathname: ${req.url.pathname}
-                                    Handler prefix: ${this.pathnamePrefix}`);
+                                    Handler pathname: ${this.pathname}`);
         return true;
       }
 
@@ -86,7 +86,7 @@ foam.CLASS({
       res.setHeader('Content-type', mimetype);
 
       res.pipeFrom(this.fs.createReadStream(this.filePath));
-      this.info('200 OK ' + this.pathnamePrefix + ' => ' + this.filePath);
+      this.info('200 OK ' + req.url.pathname + ' => ' + this.filePath);
 
       return true;
     }
