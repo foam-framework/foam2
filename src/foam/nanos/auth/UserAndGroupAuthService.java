@@ -11,6 +11,8 @@ import foam.core.X;
 import foam.dao.*;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
+import foam.util.Email;
+import foam.util.Password;
 import foam.util.LRULinkedHashMap;
 
 import javax.naming.AuthenticationException;
@@ -24,111 +26,6 @@ public class UserAndGroupAuthService
     extends    ContextAwareSupport
     implements AuthService, NanoService
 {
-  public static final Pattern emailPattern = Pattern.compile("(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\" +
-      "\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\" +
-      "\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\" +
-      "n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\" +
-      "031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[" +
-      "^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(" +
-      "?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?" +
-      "[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*" +
-      "\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\" +
-      "[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[" +
-      "\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@," +
-      ";:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;" +
-      ":\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:" +
-      "\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] " +
-      "\\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]" +
-      "))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\" +
-      "n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t]" +
-      ")+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?" +
-      ":(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[" +
-      "\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[" +
-      "\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\" +
-      "r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\" +
-      "t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\]" +
-      "(?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\" +
-      "[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\" +
-      "[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[" +
-      " \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031" +
-      "]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\" +
-      "\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:" +
-      "\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[" +
-      " \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*" +
-      "\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\"." +
-      "\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\"." +
-      "\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?" +
-      ":\\r\\n)?[ \\t])*)|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n" +
-      ")?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\." +
-      "|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*:(?:(?:\\r\\n)?[ \\t])*" +
-      "(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\" +
-      "Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\" +
-      "n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()" +
-      "<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()" +
-      "<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"" +
-      "(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] " +
-      "\\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]" +
-      "))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n" +
-      ")?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t]" +
-      ")+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?" +
-      ":(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:" +
-      "\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\" +
-      "]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)" +
-      "?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ " +
-      "\\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*" +
-      "\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\"" +
-      ".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\"" +
-      ".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?" +
-      ":(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\" +
-      "n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\" +
-      "\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\" +
-      "\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\" +
-      "\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:" +
-      "(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:" +
-      "\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]" +
-      "|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)" +
-      "?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+" +
-      "|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r" +
-      "\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@" +
-      ",;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@" +
-      ",;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)" +
-      "(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:" +
-      "(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\" +
-      "\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)(?:,\\s*(" +
-      "?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?" +
-      "=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ " +
-      "\\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:" +
-      "\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:" +
-      "\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:" +
-      "\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-" +
-      "\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[" +
-      "([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\" +
-      "t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(" +
-      "?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\" +
-      "n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\" +
-      "t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:" +
-      "\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:" +
-      "[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"" +
-      "()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t" +
-      "])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:" +
-      "(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\" +
-      "\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;" +
-      ":\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\" +
-      "\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:" +
-      "(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ " +
-      "\\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?" +
-      ":(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\" +
-      "000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(" +
-      "?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(" +
-      "?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[" +
-      " \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\" +
-      "r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\" +
-      "\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\" +
-      "[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)" +
-      "?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?" +
-      "=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\" +
-      "t])*))*\\>(?:(?:\\r\\n)?[ \\t])*))*)?;\\s*)");
-
   protected static final ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
@@ -186,7 +83,7 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(long userId, String challenge) throws AuthenticationException {
+  public User challengedLogin(long userId, String challenge) throws AuthenticationException {
     if ( userId < 1 || "".equals(challenge) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -207,14 +104,15 @@ public class UserAndGroupAuthService
     if ( user == null ) throw new AuthenticationException("User not found");
 
     challengeMap.remove(userId);
-    return this.getX().put("user", user);
+    getX().put("user", user);
+    return user;
   }
 
   /**
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(long userId, String password) throws AuthenticationException {
+  public User login(long userId, String password) throws AuthenticationException {
     if ( userId < 1 || "".equals(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -224,27 +122,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found.");
     }
 
-    String hashedPassword;
-    String storedPassword;
-    String salt;
-
-    try {
-      String[] split = user.getPassword().split(":");
-      salt = split[1];
-      storedPassword = split[0];
-      hashedPassword = hashPassword(password, salt);
-    } catch (Throwable e) {
+    if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid Password");
     }
 
-    if ( ! hashedPassword.equals(storedPassword) ) {
-      throw new AuthenticationException("Invalid Password");
-    }
-
-    return getX().put("user", user);
+    getX().put("user", user);
+    return user;
   }
 
-  public X loginByEmail(String email, String password) throws AuthenticationException {
+  public User loginByEmail(String email, String password) throws AuthenticationException {
     if ( "".equals(email) || "".equals(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -258,25 +144,16 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) data.get(0);
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
 
-    String salt;
-    String hashedPassword;
-    String storedPassword;
-
-    try {
-      String[] split = user.getPassword().split(":");
-      salt = split[1];
-      storedPassword = split[0];
-      hashedPassword = hashPassword(password, salt);
-    } catch (Throwable t) {
+    if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid password");
     }
 
-    if ( ! hashedPassword.equals(storedPassword) ) {
-      throw new AuthenticationException("Invalid password");
-    }
-
-    return getX().put("user", user);
+    getX().put("user", user);
+    return user;
   }
 
   /**
@@ -315,33 +192,20 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    String password = user.getPassword();
-    String storedPassword = password.split(":")[0];
-    String oldSalt = password.split(":")[1];
-    String hashedOldPassword;
-    String hashedNewPasswordOldSalt;
-    String hashedNewPassword;
-    String newSalt = generateRandomSalt();
-
-    try {
-      hashedOldPassword = hashPassword(oldPassword, oldSalt);
-      hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
-      hashedNewPassword = hashPassword(newPassword, newSalt);
-    } catch (NoSuchAlgorithmException e) {
-      throw new AuthenticationException("Invalid Password");
+    // old password does not match
+    if ( ! Password.verify(oldPassword, user.getPassword()) ) {
+      throw new AuthenticationException("Invalid password");
     }
 
-    if ( ! hashedOldPassword.equals(storedPassword) ) {
-      throw new AuthenticationException("Invalid Password");
+    // new password is the same
+    if ( Password.verify(newPassword, user.getPassword()) ) {
+      throw new AuthenticationException("New password must be different");
     }
 
-    if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
-      throw new AuthenticationException("New Password must be different");
-    }
-
-    user.setPassword(hashedNewPassword + ":" + newSalt);
+    // store new password in DAO and put in context
+    String hash = Password.hash(newPassword);
+    user.setPassword(newPassword);
     user = (User) userDAO_.put(user);
-
     return this.getX().put("user", user);
   }
 
@@ -359,7 +223,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Email is required for creating a user");
     }
 
-    if ( ! emailPattern.matcher(user.getEmail()).matches() ) {
+    if ( ! Email.isValid(user.getEmail()) ) {
       throw new AuthenticationException("Email format is invalid");
     }
 
@@ -375,38 +239,9 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Password is required for creating a user");
     }
 
-    if ( ! validatePassword(user.getPassword()) ) {
+    if ( ! Password.isValid(user.getPassword()) ) {
       throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
     }
-  }
-
-  public static String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
-    MessageDigest messageDigest = MessageDigest.getInstance(HASH_METHOD);
-    messageDigest.update(salt.getBytes());
-    byte[] hashedBytes = messageDigest.digest(password.getBytes());
-    StringBuilder hashedPasswordBuilder = new StringBuilder();
-    for( byte b : hashedBytes ) {
-      hashedPasswordBuilder.append(String.format("%02x", b & 0xFF));
-    }
-    return hashedPasswordBuilder.toString();
-  }
-
-  public static String generateRandomSalt() {
-    SecureRandom secureRandom = new SecureRandom();
-    byte bytes[] = new byte[20];
-    secureRandom.nextBytes(bytes);
-
-    StringBuilder saltBuilder = sb.get();
-    for ( byte b : bytes ) {
-      saltBuilder.append(String.format("%02x", b & 0xFF));
-    }
-    return saltBuilder.toString();
-  }
-
-  //Min 8 characters, at least one uppercase, one lowercase, one number
-  public static boolean validatePassword(String password) {
-    Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
-    return pattern.matcher(password).matches();
   }
 
   /**
