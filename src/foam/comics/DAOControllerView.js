@@ -75,16 +75,18 @@ foam.CLASS({
       this.
         start('table').
           start('tr').
-            start('td').style({ display: 'block' }).add(this.cls.PREDICATE).end().
-            start('td').style({ 'vertical-align': 'top', 'width': '100%' }).
-                tag(this.summaryView, {data$: this.data.filteredDAO$}).
+            start('td').style({display: 'block', padding: '8px'}).add(this.cls.PREDICATE).end().
+            start('td').style({'vertical-align': 'top', 'width': '100%'}).
+              start('span').
+                style({background: 'rgba(0,0,0,0)'}).
+                show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+                start().
+                  style({padding: '4px'}).
+                  add(this.cls.getAxiomsByClass(foam.core.Action)).
+                end().
+              end().
+              tag(this.summaryView, {data$: this.data.filteredDAO$}).
             end().
-          end().
-          start('tr').
-            style({background: 'rgba(0,0,0,0)'}).
-            show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-            tag('td').
-            start('td')/*.style({'padding-left':'26px'})*/.add(this.cls.getAxiomsByClass(foam.core.Action)).end().
           end().
         end();
     }
