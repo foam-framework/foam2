@@ -16,17 +16,21 @@
  */
 
 foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
+  package: 'foam.net.node',
+  name: 'PathnamePrefixHandler',
+  extends: 'foam.net.node.BaseHandler',
 
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
+  documentation: `Handler that recieves its pathname prefix from a
+      PathnamePrefixRoute (or similar) export.`,
 
-  methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
+  imports: [ 'parentPrefix? as ctxPathnamePrefix' ],
+
+  properties: [
+    {
+      class: 'String',
+      name: 'pathnamePrefix',
+      expression: function(ctxPathnamePrefix) {
+        return this.ctxPathnamePrefix || '';
       }
     }
   ]
