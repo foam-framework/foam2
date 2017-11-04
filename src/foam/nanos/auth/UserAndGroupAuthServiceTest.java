@@ -19,6 +19,7 @@ public class UserAndGroupAuthServiceTest
   protected int numPermissions  = 10;
 
   protected ArrayList<X> xArray               = new ArrayList<>();
+  protected ArrayList<User> userArray         = new ArrayList<>();
   protected ArrayList<Permission> permissions = new ArrayList<>();
 
   @Override
@@ -103,7 +104,7 @@ public class UserAndGroupAuthServiceTest
      * */
     for ( int i = 0; i < numUsers; i++ ) {
       try {
-        xArray.add(login(i, "marc" + i));
+        userArray.add(login(i, "marc" + i));
       } catch (AuthenticationException e) {
         e.printStackTrace();
       }
