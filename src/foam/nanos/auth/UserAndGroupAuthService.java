@@ -83,7 +83,7 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(long userId, String challenge) throws AuthenticationException {
+  public User challengedLogin(long userId, String challenge) throws AuthenticationException {
     if ( userId < 1 || "".equals(challenge) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -104,14 +104,15 @@ public class UserAndGroupAuthService
     if ( user == null ) throw new AuthenticationException("User not found");
 
     challengeMap.remove(userId);
-    return this.getX().put("user", user);
+    getX().put("user", user);
+    return user;
   }
 
   /**
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(long userId, String password) throws AuthenticationException {
+  public User login(long userId, String password) throws AuthenticationException {
     if ( userId < 1 || "".equals(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -125,10 +126,11 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Password");
     }
 
-    return getX().put("user", user);
+    getX().put("user", user);
+    return user;
   }
 
-  public X loginByEmail(String email, String password) throws AuthenticationException {
+  public User loginByEmail(String email, String password) throws AuthenticationException {
     if ( "".equals(email) || "".equals(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -150,7 +152,8 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid password");
     }
 
-    return getX().put("user", user);
+    getX().put("user", user);
+    return user;
   }
 
   /**
