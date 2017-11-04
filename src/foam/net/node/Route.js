@@ -15,19 +15,24 @@
  * limitations under the License.
  */
 
-foam.CLASS({
-  package: 'foam.box',
-  name: 'BroadcastBox',
-  extends: 'foam.box.MultiDelegateBox',
-
-  documentation: `Broadcast all messages to multiple delegate boxes.`,
+foam.INTERFACE({
+  package: 'foam.net.node',
+  name: 'Route',
 
   methods: [
-    function send(message) {
-      var ds = this.delegates;
-      for ( var i = 0; i < ds.length; i++ ) {
-        ds[i].send(message);
-      }
+    {
+      name: 'match',
+      documentation: `Indicates whether or not a particular NodeJS URL object
+          matches this Route object.`,
+      args: [
+        {
+          name: 'url',
+          documentation: `The URL to test against this route.`,
+          typeName: 'URL'
+        }
+      ],
+      returns: 'Boolean',
+      code: function(url) {}
     }
   ]
 });
