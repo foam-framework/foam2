@@ -46,7 +46,7 @@ public class PostgresDAO
     // load columns and sql types
     table_ = of.getObjClass().getSimpleName().toLowerCase();
     if ( ! createTable() ) {
-      throw new SQLException("Error creating table");
+      //throw new SQLException("Error creating table");
     }
 
     List<PropertyInfo> props = of.getAxiomsByClass(PropertyInfo.class);
