@@ -94,6 +94,11 @@ public class PostgresDAO
       }
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+
+      if ( predicate != null ) {
+        predicate.prepareStatement(stmt);
+      }
+      
       resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
         sink.put(createFObject(resultSet), null);
