@@ -200,7 +200,9 @@ public class PostgresDAO
       buildFormattedColumnNames(obj, builder);
       builder.append(" values");
       buildFormattedColumnPlaceholders(obj, builder);
-      builder.append(" on conflict (id) do update set");
+      builder.append(" on conflict (")
+             .append(getPrimaryKey().createStatement())
+             .append(") do update set");
       buildFormattedColumnNames(obj, builder);
       builder.append(" = ");
       buildFormattedColumnPlaceholders(obj, builder);
@@ -219,7 +221,7 @@ public class PostgresDAO
       // get auto-generated postgres keys
       resultSet = stmt.getGeneratedKeys();
       if ( resultSet.next() ) {
-        obj.setProperty("id", resultSet.getLong(1));
+        obj.setProperty(getPrimaryKey().getName(), resultSet.getObject(1));
       }
 
       return obj;
