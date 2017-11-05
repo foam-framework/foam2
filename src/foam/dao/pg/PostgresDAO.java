@@ -98,7 +98,7 @@ public class PostgresDAO
       if ( predicate != null ) {
         predicate.prepareStatement(stmt);
       }
-      
+
       resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
         sink.put(createFObject(resultSet), null);
@@ -123,11 +123,14 @@ public class PostgresDAO
       StringBuilder builder = sb.get()
           .append("delete from ")
           .append(table_)
-          .append(" where id = ?");
+          .append(" where ")
+          .append(getPrimaryKey().createStatement())
+          .append(" = ?");
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       // TODO: add support for non-numbers
-      stmt.setLong(((Number) o.getProperty("id")).longValue());
+      //stmt.setLong(((Number) o.getProperty("id")).longValue());
+      stmt.setObject(o.getProperty(getPrimaryKey().getName()));
 
       int removed = stmt.executeUpdate();
       if ( removed == 0 ) {
