@@ -87,4 +87,9 @@ public abstract class AbstractPropertyInfo
       objElement.appendChild(prop);
     }
   }
+
+  @Override
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
+    stmt.setObject(this.get(o));
+  }
 }
