@@ -37,6 +37,7 @@ foam.CLASS({
     'data.data as dao'
   ],
 
+  // TODO: wrong class name, fix when ActionView fixed.
   css: `
     .net-nanopay-ui-ActionView {
       background: #59aadd;
