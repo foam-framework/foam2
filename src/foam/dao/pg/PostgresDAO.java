@@ -370,9 +370,7 @@ public class PostgresDAO
     Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( prop.getName().equals("id") )
-        continue;
-      stmt.setObject(prop.get(obj));
+      prop.setStatementValue(stmt, obj);
     }
   }
 
