@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.dao.pg.IndexedPreparedStatement;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Date;
 
@@ -30,5 +31,10 @@ public abstract class AbstractDatePropertyInfo
     super.fromXML(x, reader);
     Date date = new Date(reader.getText());
     return date;
+  }
+
+  @Override
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
+    stmt.setObject(this.get(o), java.sql.Types.TIMESTAMP);
   }
 }
