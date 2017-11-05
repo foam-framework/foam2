@@ -157,11 +157,14 @@ public class PostgresDAO
       StringBuilder builder = sb.get()
           .append("select * from ")
           .append(table_)
-          .append(" where id = ?");
+          .append(" where ")
+          .append(getPrimaryKey().createStatement())
+          .append(" = ?");
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       // TODO: add support for non-numbers
-      stmt.setLong(((Number) o).longValue());
+      //stmt.setLong(((Number) o).longValue());
+      stmt.setObject(o);
       resultSet = stmt.executeQuery();
       if ( ! resultSet.next() ) {
         // no rows
