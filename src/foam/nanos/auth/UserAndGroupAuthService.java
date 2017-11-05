@@ -136,7 +136,7 @@ public class UserAndGroupAuthService
     }
 
     Sink sink = new ListSink();
-    sink = userDAO_.where(MLang.EQ(User.EMAIL, email)).limit(1).select(sink);
+    sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
     List data = ((ListSink) sink).getData();
     if ( data == null || data.size() != 1 ) {
