@@ -254,15 +254,19 @@ public class PostgresDAO
       StringBuilder builder = sb.get()
           .append("CREATE TABLE ")
           .append(table_)
-          .append("(id bigserial primary key,");
+          .append("(")
+          .append(getPrimaryKey().createStatement())
+          .append(" ")
+          .append(getPrimaryKey().getSQLType())
+          .append(" primary key,");
 
       Iterator i = props_.iterator();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
-        if ( "id".equals(prop.getName()) )
+        if ( getPrimaryKey().getName().equals(prop.getName()) )
           continue;
 
-        builder.append(prop.getName())
+        builder.append(prop.createStatement())
             .append(" ")
             .append(prop.getSQLType());
 
