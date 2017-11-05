@@ -219,10 +219,10 @@ public class PostgresDAO
       }
 
       // get auto-generated postgres keys
-      resultSet = stmt.getGeneratedKeys();
+/*       resultSet = stmt.getGeneratedKeys();
       if ( resultSet.next() ) {
         obj.setProperty(getPrimaryKey().getName(), resultSet.getObject(1));
-      }
+      } */
 
       return obj;
     } catch (Throwable e) {
