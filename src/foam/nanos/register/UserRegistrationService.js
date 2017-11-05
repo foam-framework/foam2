@@ -54,6 +54,9 @@ if ( ! Email.isValid(user.getEmail()) ) {
   throw new RuntimeException("Invalid Email");
 }
 
+// convert to lowecase
+user.setEmail(user.getEmail().toLowerCase());
+
 Sink count = new Count();
 count = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail())).limit(1).select(count);
 if ( ((Count) count).getValue() == 1 ) {
