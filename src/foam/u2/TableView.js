@@ -91,18 +91,27 @@ foam.CLASS({
     function initE() {
       var self = this;
       this.on('click', function(event) {
-        var me = self.el();
-        var e = event.target;
-        while ( e.nodeName !== 'TR' && e !== me ) {
-          e = e.parentNode;
-        }
-
-        // If we managed to click between rows, do nothing.
-        if ( e === me ) return;
-        // Otherwise, we found the tr.
-        var obj = self.rows_[e.id];
+        var obj = self.eToObj(event);
         if ( obj ) self.tableView.selection = obj;
+      }).
+      on('dblclick', function(event) {
+        var obj = self.eToObj(event);
+        if ( obj ) 1;
       });
+    },
+
+    function eToObj(event) {
+      /** Find the object associated with a DOM element. **/
+      var me = this.el();
+      var e = event.target;
+      while ( e.nodeName !== 'TR' && e !== me )
+        e = e.parentNode;
+
+      // If we managed to click between rows, do nothing.
+      if ( e === me ) return;
+
+      // Otherwise, we found the tr.
+      return this.rows_[e.id];
     },
 
     function addObj(obj) {
