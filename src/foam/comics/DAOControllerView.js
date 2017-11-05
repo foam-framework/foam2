@@ -37,6 +37,14 @@ foam.CLASS({
     'data.data as dao'
   ],
 
+  css: `
+    .net-nanopay-ui-ActionView {
+      background: #59aadd;
+      color: white;
+      margin-right: 4px;
+    }
+  `,
+
   properties: [
     {
       class: 'FObjectProperty',
