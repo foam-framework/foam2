@@ -327,10 +327,10 @@ public class PostgresDAO
     Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( "id".equals(prop.getName()) )
-        continue;
+/*       if ( "id".equals(prop.getName()) )
+        continue; */
 
-      builder.append(prop.getName().toLowerCase());
+      builder.append(prop.createStatement());
       if ( i.hasNext() ) {
         builder.append(",");
       }
