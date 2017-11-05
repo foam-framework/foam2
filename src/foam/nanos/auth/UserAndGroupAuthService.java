@@ -131,10 +131,14 @@ public class UserAndGroupAuthService
   }
 
   public User loginByEmail(String email, String password) throws AuthenticationException {
-    if ( "".equals(email) || "".equals(password) ) {
-      throw new AuthenticationException("Invalid Parameters");
+    if ( "".equals(email) || ! Email.isValid(email) ) {
+      throw new AuthenticationException("Invalid email");
     }
 
+    if ( "".equals(password) || Password.isValid(password) ) {
+      throw new AuthenticationException("Invalid password");
+    }
+    
     Sink sink = new ListSink();
     sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
