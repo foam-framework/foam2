@@ -240,8 +240,7 @@ foam.CLASS({
                 .add(sorting$)
             .end()
             .add(this.columns_[i].columnLabel)
-            .on('click', this.tableView.sortBy.bind(this.tableView,
-                  this.columns_[i]))
+            .on('click', this.tableView.sortBy.bind(this.tableView, this.columns_[i]))
             .end();
       }
       e.end();
