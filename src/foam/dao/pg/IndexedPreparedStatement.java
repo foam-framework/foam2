@@ -46,4 +46,8 @@ public class IndexedPreparedStatement
   public void setObject(Object x) throws SQLException {
     delegate_.setObject(index_++, x);
   }
+
+  public void setObject(Object x, int targetSqlType) throws SQLException {
+    delegate_.setObject(index_++, x, targetSqlType);
+  }
 }
