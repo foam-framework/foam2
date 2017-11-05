@@ -20,6 +20,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.dao.Sink',
+    'foam.mlang.MLang',
+    'foam.mlang.sink.Count',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
     'foam.util.Email',
@@ -37,7 +40,9 @@ foam.CLASS({
     {
       name: 'register',
       javaCode:
-`if ( user == null ) {
+`DAO userDAO = (DAO) getLocalUserDAO();
+
+if ( user == null ) {
   throw new RuntimeException("Invalid user");
 }
 
@@ -47,6 +52,12 @@ if ( "".equals(user.getEmail()) ) {
 
 if ( ! Email.isValid(user.getEmail()) ) {
   throw new RuntimeException("Invalid Email");
+}
+
+Sink count = new Count();
+count = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail())).limit(1).select(count);
+if ( ((Count) count).getValue() == 1 ) {
+  throw new RuntimeException("User already exists");
 }
 
 if ( "".equals(user.getFirstName()) ) {
@@ -72,7 +83,7 @@ if ( group == null ) {
 
 user.setGroup(group);
 user.setPassword(Password.hash(user.getPassword()));
-return (User) ((DAO) getLocalUserDAO()).put(user);`
+return (User) userDAO.put(user);`
     },
     { name: 'start' }
   ]
