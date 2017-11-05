@@ -44,16 +44,18 @@ public class PostgresDAO
     connectionPool = (ConnectionPool) getX().get("connectionPool");
 
     // load columns and sql types
-    table_ = of.getObjClass().getSimpleName().toLowerCase();
-    if ( ! createTable() ) {
-      //throw new SQLException("Error creating table");
-    }
-
     List<PropertyInfo> props = of.getAxiomsByClass(PropertyInfo.class);
     for ( PropertyInfo prop : props ) {
       if ( prop.getStorageTransient() )
         continue;
+      if ( "".equals(prop.getSQLType()) )
+        continue;
       props_.add(prop);
+    }
+
+    table_ = of.getObjClass().getSimpleName().toLowerCase();
+    if ( ! createTable() ) {
+      //throw new SQLException("Error creating table");
     }
   }
 
