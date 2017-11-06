@@ -271,5 +271,11 @@ public class UserAndGroupAuthService
    * Just return a null user for now. Not sure how to handle the cleanup
    * of the current context
    */
-  public void logout(X x) {}
+  public void logout(X x) {
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      return;
+    }
+    sessionDAO_.remove(session);
+  }
 }
