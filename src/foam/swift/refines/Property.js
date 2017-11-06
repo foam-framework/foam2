@@ -520,12 +520,11 @@ foam.CLASS({
           });
 
           this.model_.classes.map(function(c) { return foam.lookup(c) }).forEach(function(c) {
-            var suf = '_' + c.model_.swiftName;
-            var dvName = 'dv' + suf;
+            var dvName = 'dv_' + c.model_.swiftName;
 
             var didSets = [];
             var addViewAxioms = function(a) {
-              var pName = a.name + suf;
+              var pName = c.model_.swiftName + '_' + a.name;
               var didSet = `if ${pName} != nil { self.${dvName}?["${a.name}"]?.set(key: "view", value: self.${pName}) }`;
               cls.fields.push(foam.swift.Field.create({
                 visibility: 'public',
