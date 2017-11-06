@@ -84,6 +84,10 @@ public abstract class AbstractArrayPropertyInfo
     Object[] os = (Object[]) obj;
     java.lang.StringBuilder sb = new java.lang.StringBuilder();
     int length = os.length;
+    if ( length == 0 ) {
+      stmt.setObject(null);
+      return;
+    }
     for ( int i=0; i < length; i++) {
       if( os[i] == null )
         sb.append("");
