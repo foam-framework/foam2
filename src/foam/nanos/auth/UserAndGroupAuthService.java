@@ -233,8 +233,7 @@ public class UserAndGroupAuthService
     }
 
     // store new password in DAO and put in context
-    String hash = Password.hash(newPassword);
-    user.setPassword(newPassword);
+    user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
     session.setX(getX().put("user", user));
     return user;
