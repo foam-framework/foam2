@@ -11,6 +11,7 @@ import foam.core.X;
 import foam.dao.*;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
+import foam.nanos.session.Session;
 import foam.util.Email;
 import foam.util.Password;
 import foam.util.LRULinkedHashMap;
@@ -53,7 +54,28 @@ public class UserAndGroupAuthService
   }
 
   public User getCurrentUser(X x) {
-    return (User) x.get("user");
+    // return user stored in context
+    User user = (User) x.get("user");
+    if ( user != null ) {
+      return user;
+    }
+
+    // fetch context and check if not null or user id is 0
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      // no user found
+      return null;
+    }
+
+    // get user from session id
+    user = (User) userDAO_.find(session.getUserId());
+    if ( user == null ) {
+      return null;
+    }
+
+    // store user and return
+    getX().put("user", user);
+    return user;
   }
 
   /**
@@ -138,7 +160,7 @@ public class UserAndGroupAuthService
     if ( "".equals(password) || ! Password.isValid(password) ) {
       throw new AuthenticationException("Invalid password");
     }
-    
+
     Sink sink = new ListSink();
     sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
