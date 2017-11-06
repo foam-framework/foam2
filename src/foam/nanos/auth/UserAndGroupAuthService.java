@@ -40,12 +40,6 @@ public class UserAndGroupAuthService
   }
 
   public User getCurrentUser(X x) {
-    // return user stored in context
-    User user = (User) x.get("user");
-    if ( user != null ) {
-      return user;
-    }
-
     // fetch context and check if not null or user id is 0
     Session session = (Session) x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
@@ -54,7 +48,7 @@ public class UserAndGroupAuthService
     }
 
     // get user from session id
-    user = (User) userDAO_.find(session.getUserId());
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       return null;
     }
@@ -97,7 +91,9 @@ public class UserAndGroupAuthService
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) throw new AuthenticationException("Invalid userId");
+    if ( c == null ) {
+      throw new AuthenticationException("Invalid userId");
+    }
 
     if ( ! c.getChallenge().equals(challenge) ) {
       throw new AuthenticationException("Invalid Challenge");
@@ -109,7 +105,9 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new AuthenticationException("User not found");
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
 
     challengeMap.remove(userId);
 
@@ -125,7 +123,7 @@ public class UserAndGroupAuthService
    * and return the user in the context.
    */
   public User login(X x, long userId, String password) throws AuthenticationException {
-    if ( userId < 1 || "".equals(password) ) {
+    if ( userId < 1 || password == null || password.isEmpty() ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
@@ -146,11 +144,11 @@ public class UserAndGroupAuthService
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    if ( "".equals(email) || ! Email.isValid(email) ) {
+    if ( email == null || email.isEmpty() || ! Email.isValid(email) ) {
       throw new AuthenticationException("Invalid email");
     }
 
-    if ( "".equals(password) || ! Password.isValid(password) ) {
+    if ( password == null || password.isEmpty() || ! Password.isValid(password) ) {
       throw new AuthenticationException("Invalid password");
     }
 
@@ -183,15 +181,22 @@ public class UserAndGroupAuthService
    * Return Boolean for this
    */
   public Boolean check(foam.core.X x, java.security.Permission permission) {
-    if ( x == null || permission == null ) return false;
+    if ( x == null || permission == null ) {
+      return false;
+    }
 
-    User user = (User) x.get("user");
-    if ( user == null ) return false;
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      return false;
+    }
+
+    User user = (User) userDAO_.find(session.getUserId());
+    if ( user == null ) {
+      return false;
+    }
 
     Group group = (Group) user.getGroup();
-    if ( group == null ) return false;
-
-    if ( userDAO_.find_(x, user.getId()) == null ) {
+    if ( group == null ) {
       return false;
     }
 
@@ -202,14 +207,17 @@ public class UserAndGroupAuthService
    * Given a context with a user, validate the password to be updated
    * and return a context with the updated user information
    */
-  public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
-      throws AuthenticationException {
-
-    if ( x == null || "".equals(oldPassword) || "".equals(newPassword) ) {
-      throw new AuthenticationException("Invalid Parameters");
+  public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
+    if ( x == null || oldPassword == null || oldPassword.isEmpty() || newPassword == null || newPassword.isEmpty() ) {
+      throw new AuthenticationException("Invalid parameters");
     }
 
-    User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
@@ -225,10 +233,10 @@ public class UserAndGroupAuthService
     }
 
     // store new password in DAO and put in context
-    String hash = Password.hash(newPassword);
-    user.setPassword(newPassword);
+    user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
-    return this.getX().put("user", user);
+    session.setX(getX().put("user", user));
+    return user;
   }
 
   /**
@@ -241,7 +249,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid User");
     }
 
-    if ( "".equals(user.getEmail()) ) {
+    if ( user.getEmail() == null || user.getEmail().isEmpty() ) {
       throw new AuthenticationException("Email is required for creating a user");
     }
 
@@ -249,15 +257,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Email format is invalid");
     }
 
-    if ( "".equals(user.getFirstName()) ) {
+    if ( user.getFirstName() == null || user.getFirstName().isEmpty() ) {
       throw new AuthenticationException("First Name is required for creating a user");
     }
 
-    if ( "".equals(user.getLastName()) ) {
+    if ( user.getLastName() == null || user.getLastName().isEmpty() ) {
       throw new AuthenticationException("Last Name is required for creating a user");
     }
 
-    if ( "".equals(user.getPassword()) ) {
+    if ( user.getPassword() == null || user.getPassword().isEmpty() ) {
       throw new AuthenticationException("Password is required for creating a user");
     }
 
