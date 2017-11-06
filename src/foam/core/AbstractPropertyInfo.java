@@ -92,4 +92,9 @@ public abstract class AbstractPropertyInfo
   public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
     stmt.setObject(this.get(o));
   }
+
+  @Override
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) {
+    prop.set(o, resultSet.getObject(index));
+  }
 }

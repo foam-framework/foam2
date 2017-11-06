@@ -94,4 +94,9 @@ public abstract class AbstractArrayPropertyInfo
     }
     stmt.setObject(sb.toString());
   }
+
+  @Override
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) {
+    prop.setFromString(o, (String)resultSet.getObject(index));
+  }
 }
