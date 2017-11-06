@@ -311,7 +311,8 @@ public class PostgresDAO
         break;
       // get the property and set the value
       PropertyInfo prop = (PropertyInfo) i.next();
-      prop.set(obj, resultSet.getObject(index++));
+      prop.setFromResultSet(obj, resultSet, index++);
+//      prop.set(obj, resultSet.getObject(index++));
     }
 
     return obj;
