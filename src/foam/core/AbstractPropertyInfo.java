@@ -94,7 +94,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) {
-    prop.set(o, resultSet.getObject(index));
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
+    this.set(o, resultSet.getObject(index));
   }
 }
