@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
 import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
@@ -66,5 +67,27 @@ public abstract class AbstractArrayPropertyInfo
       nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
       prop.appendChild(nestedProp);
     }
+  }
+
+  @Override
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
+    Object obj = this.get(o);
+    if ( obj == null ) {
+      stmt.setObject(null);
+      return;
+    }
+    Object[] os = (Object[]) obj;
+    java.lang.StringBuilder sb = new java.lang.StringBuilder();
+    int length = os.length;
+    for ( int i=0; i < length; i++) {
+      if( os[i] == null )
+        sb.append("");
+      else
+        sb.append(os[i]);
+      if ( i < length - 1 ) {
+        sb.append(",");
+      }
+    }
+    stmt.setObject(sb.toString());
   }
 }
