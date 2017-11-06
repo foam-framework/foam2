@@ -50,8 +50,6 @@ foam.CLASS({
   name: 'SessionClientBox',
   extends: 'foam.box.ProxyBox',
 
-  implements: [ 'foam.box.Box' ],
-
   requires: [ 'foam.box.SessionReplyBox' ],
 
   constants: [
