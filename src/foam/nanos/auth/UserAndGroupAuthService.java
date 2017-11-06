@@ -135,7 +135,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid email");
     }
 
-    if ( "".equals(password) || Password.isValid(password) ) {
+    if ( "".equals(password) || ! Password.isValid(password) ) {
       throw new AuthenticationException("Invalid password");
     }
     
