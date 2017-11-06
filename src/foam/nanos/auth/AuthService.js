@@ -44,6 +44,10 @@ foam.INTERFACE({
       swiftThrows: true,
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'userId',
           javaType: 'long',
           swiftType: 'Int'
@@ -63,6 +67,10 @@ foam.INTERFACE({
       swiftThrows: true,
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'userId',
           javaType: 'long',
           swiftType: 'Int'
@@ -81,6 +89,10 @@ foam.INTERFACE({
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'email',
           javaType: 'String',
@@ -139,6 +151,10 @@ foam.INTERFACE({
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'user',
           javaType: 'User',
