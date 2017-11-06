@@ -13,10 +13,12 @@ foam.INTERFACE({
       name: 'getCurrentUser',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'User',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         }
       ]
     },
@@ -95,6 +97,7 @@ foam.INTERFACE({
       name: 'check',
       javaReturns: 'Boolean',
       swiftReturns: 'Bool',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -111,6 +114,7 @@ foam.INTERFACE({
       name: 'updatePassword',
       javaReturns: 'foam.core.X',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
+      swiftThrows: true,
       args: [
         {
           name: 'x',
@@ -145,6 +149,7 @@ foam.INTERFACE({
     {
       name: 'logout',
       javaReturns: 'void',
+      swiftThrows: true,
       args: [
         {
           name: 'x',
