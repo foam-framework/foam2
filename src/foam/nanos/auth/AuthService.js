@@ -45,7 +45,8 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         },
         {
           name: 'userId',
@@ -68,7 +69,8 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         },
         {
           name: 'userId',
@@ -91,7 +93,8 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         },
         {
           name: 'email',
@@ -153,7 +156,8 @@ foam.INTERFACE({
       args: [
         {
           name: 'x',
-          javaType: 'foam.core.X'
+          javaType: 'foam.core.X',
+          swiftType: 'Context'
         },
         {
           name: 'user',
