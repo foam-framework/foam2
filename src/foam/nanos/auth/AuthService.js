@@ -35,8 +35,8 @@ foam.INTERFACE({
     },
     {
       name: 'challengedLogin',
-      javaReturns: 'foam.core.X',
-      swiftReturns: 'Context',
+      javaReturns: 'foam.nanos.auth.User',
+      swiftReturns: 'User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -54,8 +54,8 @@ foam.INTERFACE({
     },
     {
       name: 'login',
-      javaReturns: 'foam.core.X',
-      swiftReturns: 'Context',
+      javaReturns: 'foam.nanos.auth.User',
+      swiftReturns: 'User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
@@ -73,8 +73,8 @@ foam.INTERFACE({
     },
     {
       name: 'loginByEmail',
-      javaReturns: 'foam.core.X',
-      swiftReturns: 'Context',
+      javaReturns: 'foam.nanos.auth.User',
+      swiftReturns: 'User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
