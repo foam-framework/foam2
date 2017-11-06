@@ -23,10 +23,11 @@ public abstract class AbstractArrayPropertyInfo
   @Override
   public void setFromString(Object obj, String value) {
     if ( value == null ) {
-      set(obj, value);
-    } 
-    String[] s  = value.split(",", -1);
-    set(obj, s);
+      this.set(obj, null);
+      return;
+   } 
+   String[] s  = value.split(",", -1);
+   this.set(obj, s);
   }
 
   public abstract String of();
@@ -97,6 +98,7 @@ public abstract class AbstractArrayPropertyInfo
 
   @Override
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
-    this.setFromString(o, (String)resultSet.getObject(index));
+    String value = (String)resultSet.getObject(index);
+    setFromString(o, value);
   }
 }
