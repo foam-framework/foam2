@@ -12,6 +12,7 @@ foam.INTERFACE({
     {
       name: 'getCurrentUser',
       javaReturns: 'foam.nanos.auth.User',
+      swiftReturns: 'User',
       args: [
         {
           name: 'x',
