@@ -458,6 +458,7 @@ public class ModelParserFactory {
         parsers.append(PropertyParser(["property": p]))
       }
     }
+    parsers.append(UnknownPropertyParser())
     return Repeat0([
       "delegate": Seq0(["parsers": [
         Whitespace(),
