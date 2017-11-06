@@ -27,29 +27,16 @@ public class UserAndGroupAuthService
     extends    ContextAwareSupport
     implements AuthService, NanoService
 {
-  protected static final ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
-
   protected DAO userDAO_;
   protected DAO groupDAO_;
+  protected DAO sessionDAO_;
   protected Map challengeMap;
-  public static final String HASH_METHOD = "SHA-512";
 
   @Override
   public void start() {
     userDAO_      = (DAO) getX().get("localUserDAO");
     groupDAO_     = (DAO) getX().get("groupDAO");
+    sessionDAO_   = (DAO) getX().get("sessionDAO");
     challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
@@ -74,7 +61,7 @@ public class UserAndGroupAuthService
     }
 
     // store user and return
-    getX().put("user", user);
+    session.setX(getX().put("user", user));
     return user;
   }
 
@@ -105,7 +92,7 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public User challengedLogin(long userId, String challenge) throws AuthenticationException {
+  public User challengedLogin(X x, long userId, String challenge) throws AuthenticationException {
     if ( userId < 1 || "".equals(challenge) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -126,7 +113,11 @@ public class UserAndGroupAuthService
     if ( user == null ) throw new AuthenticationException("User not found");
 
     challengeMap.remove(userId);
-    getX().put("user", user);
+
+    Session session = (Session) x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setX(getX().put("user", user));
+    sessionDAO_.put(session);
     return user;
   }
 
@@ -134,7 +125,7 @@ public class UserAndGroupAuthService
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public User login(long userId, String password) throws AuthenticationException {
+  public User login(X x, long userId, String password) throws AuthenticationException {
     if ( userId < 1 || "".equals(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
@@ -148,11 +139,14 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Password");
     }
 
-    getX().put("user", user);
+    Session session = (Session) x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setX(getX().put("user", user));
+    sessionDAO_.put(session);
     return user;
   }
 
-  public User loginByEmail(String email, String password) throws AuthenticationException {
+  public User loginByEmail(X x, String email, String password) throws AuthenticationException {
     if ( "".equals(email) || ! Email.isValid(email) ) {
       throw new AuthenticationException("Invalid email");
     }
@@ -178,7 +172,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid password");
     }
 
-    getX().put("user", user);
+    Session session = (Session) x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setX(getX().put("user", user));
+    sessionDAO_.put(session);
     return user;
   }
 
@@ -240,7 +237,7 @@ public class UserAndGroupAuthService
    * Will mainly be used as a veto method.
    * Users should have id, email, first name, last name, password for registration
    */
-  public void validateUser(User user) throws AuthenticationException {
+  public void validateUser(X x, User user) throws AuthenticationException {
     if ( user == null ) {
       throw new AuthenticationException("Invalid User");
     }
