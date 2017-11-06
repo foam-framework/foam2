@@ -22,7 +22,11 @@ public abstract class AbstractArrayPropertyInfo
 {
   @Override
   public void setFromString(Object obj, String value) {
-    // TODO
+    if ( value == null ) {
+      set(obj, value);
+    } 
+    String[] s  = value.split(",", -1);
+    set(obj, s);
   }
 
   public abstract String of();
