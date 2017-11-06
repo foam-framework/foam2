@@ -492,6 +492,24 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'DateConstant',
+  extends: 'foam.mlang.Constant',
+
+  methods: [
+    {
+      name: 'prepareStatement',
+      javaReturns: 'void',
+      javaCode: 
+`if ( getValue() instanceof java.util.Date ){
+  stmt.setObject(getValue(), java.sql.Types.TIMESTAMP);
+} else {
+  stmt.setObject(getValue());
+}`
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
