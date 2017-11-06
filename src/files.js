@@ -92,6 +92,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Array", flags: ['swift'] },
   { name: "foam/swift/refines/FObjectArray", flags: ['swift'] },
   { name: "foam/swift/refines/Import", flags: ['swift'] },
+  { name: "foam/swift/refines/Constant", flags: ['swift'] },
   { name: "foam/swift/refines/Message", flags: ['swift'] },
   { name: "foam/swift/refines/Method", flags: ['swift'] },
   { name: "foam/swift/refines/Listener", flags: ['swift'] },
