@@ -13,15 +13,14 @@ import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
-import foam.util.Password;
 import foam.util.LRULinkedHashMap;
-
-import javax.naming.AuthenticationException;
+import foam.util.Password;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Pattern;
+import javax.naming.AuthenticationException;
 
 public class UserAndGroupAuthService
     extends    ContextAwareSupport
@@ -30,7 +29,7 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
-  protected Map challengeMap;
+  protected Map challengeMap; // TODO: let's store in Session Context instead
 
   @Override
   public void start() {
@@ -273,9 +272,8 @@ public class UserAndGroupAuthService
    */
   public void logout(X x) {
     Session session = (Session) x.get(Session.class);
-    if ( session == null || session.getUserId() == 0 ) {
-      return;
+    if ( session != null && session.getUserId() != 0 ) {
+      sessionDAO_.remove(session);
     }
-    sessionDAO_.remove(session);
   }
 }
