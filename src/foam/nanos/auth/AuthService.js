@@ -127,7 +127,7 @@ foam.INTERFACE({
     },
     {
       name: 'updatePassword',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
