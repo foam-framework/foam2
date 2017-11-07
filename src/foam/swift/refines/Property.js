@@ -411,6 +411,27 @@ class PInfo: PropertyInfo {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     obj.<%=this.swiftSlotName%> = value
   }
+  public func hasOwnProperty(_ obj: FObject) -> Bool {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.`<%=p.swiftInitedName%>`
+  }
+  public func clearProperty(_ obj: FObject) {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    obj.<%= p.swiftInitedName %> = false
+    obj.<%= p.swiftValueName %> = nil
+
+<% if ( p.swiftExpression ) { %>
+    if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+    obj.<%= p.swiftExpressionSubscriptionName %> = nil
+<% } %>
+
+    // Only pub if there are listeners.
+    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
+      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    }
+  }
   public func compareValues(_ v1: Any?, _ v2: Any?) -> Int {
     <%=this.swiftCompareValues%>
   }
