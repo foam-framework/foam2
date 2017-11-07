@@ -194,33 +194,6 @@ foam.LIB({
         body: 'return ' + this.model_.swiftName + '.classInfo_',
       }));
 
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'clearProperty',
-        visibility: 'public',
-	args: [
-          {
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        body: templates.clearPropertyBody(properties),
-      }));
-
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'hasOwnProperty',
-        visibility: 'public',
-	args: [
-          {
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        returnType: 'Bool',
-        body: templates.hasOwnPropertyBody(properties),
-      }));
-
       var exports = this.getOwnAxiomsByClass(foam.core.Export)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
@@ -252,47 +225,6 @@ var args = super._createExports_()
 args["<%=p.exportName%>"] = <%if (p.key) {%><%=p.exportName%>$<%}else{%>__context__.create(ConstantSlot.self, args: ["value": self])<%}%>
 <% } %>
 return args
-      */},
-    },
-    {
-      name: 'hasOwnPropertyBody',
-      args: ['properties'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftInitedName%>`
-<% } %>
-  default:
-    return super.hasOwnProperty(key)
-}
-      */},
-    },
-    {
-      name: 'clearPropertyBody',
-      args: ['properties'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>":
-    <%= p.swiftInitedName %> = false
-    <%= p.swiftValueName %> = nil
-
-  <% if ( p.swiftExpression ) { %>
-    if <%= p.swiftExpressionSubscriptionName %> != nil {
-      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
-    }
-    <%= p.swiftExpressionSubscriptionName %> = nil
-  <% } %>
-
-    // Only pub if there are listeners.
-    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
-      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
-    }
-    break
-<% } %>
-  default:
-    super.clearProperty(key)
-}
       */},
     },
     {
