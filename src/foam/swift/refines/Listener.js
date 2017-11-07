@@ -49,7 +49,7 @@ foam.CLASS({
           final: true,
           name: this.swiftPrivateAxiomName,
           type: 'MethodInfo',
-          initializer: this.swiftMethodInfoInit(),
+          initializer: this.swiftMethodInfoInit(parentCls),
         }));
         cls.methods.push(this.Method.create({
           visibility: 'public',
@@ -58,6 +58,12 @@ foam.CLASS({
           returnType: 'MethodInfo',
           body: 'return ' + this.swiftPrivateAxiomName,
           override: this.getSwiftOverride(parentCls),
+        }));
+        cls.fields.push(this.Field.create({
+          lazy: true,
+          name: this.swiftSlotName,
+          initializer: this.slotInit(),
+          type: 'Slot',
         }));
       }
       cls.method(this.Method.create({
