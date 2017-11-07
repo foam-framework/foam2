@@ -155,26 +155,12 @@ public protocol ClassInfo {
   var parent: ClassInfo? { get }
   var ownAxioms: [Axiom] { get }
   var cls: AnyClass { get }
+  var axioms: [Axiom] { get }
+  func axiom(byName name: String) -> Axiom?
   func create(args: [String:Any?], x: Context) -> Any
 }
 
 extension ClassInfo {
-  var axioms: [Axiom] {
-    get {
-      var curCls: ClassInfo? = self
-      var axioms: [Axiom] = []
-      var seen = Set<String>()
-      while curCls != nil {
-        for a in curCls!.ownAxioms {
-          if seen.contains(a.name) { continue }
-          axioms.append(a)
-          seen.insert(a.name)
-        }
-        curCls = curCls!.parent
-      }
-      return axioms
-    }
-  }
   func ownAxioms<T>(byType type: T.Type) -> [T] {
     var axs: [T] = []
     for axiom in ownAxioms {
@@ -192,12 +178,6 @@ extension ClassInfo {
       }
     }
     return axs
-  }
-  func axiom(byName name: String) -> Axiom? {
-    for axiom in axioms {
-      if axiom.name == name { return axiom }
-    }
-    return nil
   }
   func create(x: Context) -> Any { return create(args: [:], x: x) }
 }
