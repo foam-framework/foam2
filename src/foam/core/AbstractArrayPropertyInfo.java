@@ -88,8 +88,8 @@ public abstract class AbstractArrayPropertyInfo
       stmt.setObject(null);
       return;
     }
-    for ( int i=0; i < length; i++) {
-      if( os[i] == null )
+    for ( int i = 0 ; i < length ; i++ ) {
+      if ( os[i] == null )
         sb.append("");
       else
         sb.append(os[i]);
@@ -102,7 +102,7 @@ public abstract class AbstractArrayPropertyInfo
 
   @Override
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
-    String value = (String)resultSet.getObject(index);
+    String value = (String) resultSet.getObject(index);
     setFromString(o, value);
   }
 }
