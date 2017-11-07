@@ -50,6 +50,8 @@ public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxi
   var jsonParser: Parser? { get }
   func compareValues(_ v1: Any?, _ v2: Any?) -> Int
   func viewFactory(x: Context) -> FObject?
+  func hasOwnProperty(_ o: FObject) -> Bool
+  func clearProperty(_ o: FObject)
 }
 
 extension PropertyInfo {
@@ -248,8 +250,12 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
   public func getSlot(key: String) -> Slot? {
     return (self.ownClassInfo().axiom(byName: key) as? SlotGetterAxiom)?.getSlot(self) ?? nil
   }
-  public func hasOwnProperty(_ key: String) -> Bool { return false }
-  public func clearProperty(_ key: String) {}
+  public func hasOwnProperty(_ key: String) -> Bool {
+    return (self.ownClassInfo().axiom(byName: key) as? PropertyInfo)?.hasOwnProperty(self) ?? false
+  }
+  public func clearProperty(_ key: String) {
+    (self.ownClassInfo().axiom(byName: key) as? PropertyInfo)?.clearProperty(self)
+  }
 
   public func onDetach(_ sub: Detachable?) {
     guard let sub = sub else { return }
