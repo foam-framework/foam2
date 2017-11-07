@@ -51,7 +51,7 @@ public class TraceWebAgent
           out.println(cookie.toString());
         }
       }catch(NullPointerException e){
-         System.out.println("Cookies are not supported");
+         System.out.println("--------Cookies are not supported--------");
       }
     } catch (Throwable t) {
       t.printStackTrace();
