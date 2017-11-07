@@ -26,7 +26,8 @@ foam.CLASS({
     'foam.dao.LRUDAOManager',
     'foam.dao.MDAO',
     'foam.net.node.CachedResponse',
-    'foam.net.node.CachingResponse'
+    'foam.net.node.CachingResponse',
+    'foam.net.node.RequestIdentifier'
   ],
   imports: [
     'error',
@@ -40,35 +41,58 @@ foam.CLASS({
       of: 'foam.net.node.Handler',
       name: 'delegate',
       required: true
-    }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.net.node.RequestIdentifier',
+      name: 'requestIdentifier',
+      factory: function() { return this.RequestIdentifier.create(); },
+    },
   ],
 
   methods: [
     function handle(req, res) {
       var self = this;
-      var id = self.CachedResponse.ID_FROM_REQ(req);
-      self.requestCacheDAO.find(id).then(function(cachedResponse) {
-        if ( cachedResponse ) {
-          cachedResponse.replay(res);
-          self.info(`CacheHandler: Delegate to cached response: ${id}`);
-          return;
-        }
 
-        var cachingResponse = self.CachingResponse.create({
-          req: req,
-          res: res
-        });
-        cachingResponse.sub('recorded', function(sub, topic, cachedResponse) {
-          self.requestCacheDAO.put(cachedResponse).then(function() {
-            self.info(`CacheHandler: Cached new response: ${id}`);
+      this.requestIdentifier.getId(req).then(function(id) {
+        return self.requestCacheDAO.find(id).then(function(cachedResponse) {
+          if ( cachedResponse ) {
+            cachedResponse.replay(res);
+            self.info(`CacheHandler: Delegate to cached response: ${id}`);
+            return;
+          }
+
+          var cachingResponse = self.CachingResponse.create({
+            id: id,
+            req: req,
+            res: res
           });
-          self.info(`CacheHandler: Cache new response: ${id}`);
+          var recordedSub = cachingResponse.sub(
+              'recorded', function(sub, topic, cachedResponse) {
+                self.requestCacheDAO.put(cachedResponse).then(function() {
+                  self.info(`CacheHandler: Cached new response: ${id}`);
+                });
+                self.info(`CacheHandler: Cache new response: ${id}`);
+              });
+          var handled = self.delegate.handle(req, cachingResponse);
+
+          if ( ! handled ) {
+            recordedSub.detach();
+            self.send500(req, res, 'Failed to handle request');
+            self.error(`CacheHandler: Delegate failed to handle request: ${id}`);
+            return;
+          }
+
+          self.info(`CacheHandler: Record new response: ${id}`);
+        }).catch(function(error) {
+          self.send500(req, res, error);
+          self.error(`CacheHandler: Error on requestCacheDAO.find(${id}):
+                         ${error}`);
         });
-        self.delegate.handle(req, cachingResponse);
-        self.info(`CacheHandler: Record new response: ${id}`);
       }).catch(function(error) {
         self.send500(req, res, error);
-        self.error(`CacheHandler: Error on requestCacheDAO.find(${id})`);
+        self.error(`CacheHandler: Error on requestIdentifier.getId():
+                       ${error}`);
       });
 
       return true;
