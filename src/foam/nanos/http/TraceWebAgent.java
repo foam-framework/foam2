@@ -19,10 +19,10 @@ public class TraceWebAgent
 
   public void execute(X x) {
     try {
-      PrintWriter        out     = (PrintWriter)        x.get(PrintWriter.class);
-      HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
-      
-  
+      PrintWriter        out = (PrintWriter)        x.get(PrintWriter.class);
+      HttpServletRequest req = (HttpServletRequest) x.get(HttpServletRequest.class);
+
+
       out.println("<HTML>\n" +
           "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
           "<BODY BGCOLOR=\"#FDF5E6\">\n" +
@@ -36,6 +36,7 @@ public class TraceWebAgent
           "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
           "<TR BGCOLOR=\"#FFAD00\">\n" +
           "<TH>Header Name<TH>Header Value");
+
       Enumeration headerNames = req.getHeaderNames();
       while ( headerNames.hasMoreElements() ) {
         String headerName = (String) headerNames.nextElement();
@@ -45,13 +46,14 @@ public class TraceWebAgent
       }
       out.println("</TABLE>");
       out.println("</BODY></HTML>");
-      try{
-        Cookie[]           cookies = req.getCookies();
+
+      try {
+        Cookie[] cookies = req.getCookies();
         for ( Cookie cookie : cookies ) {
           out.println(cookie.toString());
         }
-      }catch(NullPointerException e){
-         System.out.println("--------Cookies are not supported--------");
+      } catch(NullPointerException e) {
+         out.println("cookies are not supported");
       }
     } catch (Throwable t) {
       t.printStackTrace();
