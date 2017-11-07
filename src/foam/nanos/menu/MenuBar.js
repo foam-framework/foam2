@@ -25,7 +25,7 @@ foam.CLASS({
           vertical-align: top;
         }
         ^ ul{
-          margin-top: 20px;
+          margin-top: 0;
           font-size: 13px;
           list-style-type: none;
         }
@@ -34,6 +34,10 @@ foam.CLASS({
           display: inline-block;
           cursor: pointer;
         }
+        ^ div {
+          padding: 10px;
+        }
+
       */}
     })
   ],
