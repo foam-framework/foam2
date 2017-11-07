@@ -32,6 +32,8 @@ foam.CLASS({
     'error'
   ],
 
+  swiftImports: ['os'],
+
   properties: [
     {
       class: 'String',
@@ -62,13 +64,16 @@ foam.CLASS({
       },
       swiftCode: `
 let output = msg.object;
-/*
-let logMethod = get(key: logLevel.consoleMethodName) as? (String) -> Void
-logMethod([
+let logMsg = [
   name,
-  output is Error ? (output as! Error).description : msg.toString()
-].join(" "))
-*/
+  output is Error ? (output as! Error).localizedDescription : msg.toString()
+].joined(separator: " ")
+if let logLevelStr = logLevel?.consoleMethodName,
+   let logMethod = get(key: logLevelStr) as? (String) -> Void {
+  logMethod(logMsg)
+} else {
+  os_log("%@", logMsg)
+}
 try delegate.send(msg)
       `,
     },
