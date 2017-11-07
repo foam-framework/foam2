@@ -132,6 +132,8 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.register.RegistrationService',
   'foam.nanos.register.ClientRegistrationService',
   'foam.nanos.register.UserRegistrationService',
@@ -170,6 +172,7 @@ var skeletons = [
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
   'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.push.PushService',
   'foam.nanos.register.RegistrationService'
 ];
 
@@ -182,6 +185,8 @@ var proxies = [
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
   'foam.blob.BlobService',
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.push.PushService',
   'foam.nanos.register.RegistrationService'
 ];
 
