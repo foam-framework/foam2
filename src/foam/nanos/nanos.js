@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/client/ClientBuilder" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
@@ -45,7 +46,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
-  { name: "foam/nanos/auth/WebAuthService" },
+  { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
@@ -54,5 +55,8 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
+  { name: 'foam/nanos/register/RegistrationService' },
+  { name: 'foam/nanos/register/ClientRegistrationService' },
+  { name: 'foam/nanos/register/UserRegistrationService' },
   { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
 ]);

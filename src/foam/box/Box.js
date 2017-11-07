@@ -23,8 +23,12 @@ foam.INTERFACE({
     {
       name: 'send',
       args: [
-        'message'
-      ]
-    }
+        {
+          name: 'msg',
+          swiftType: 'Message'
+        }
+      ],
+      swiftThrows: true,
+    },
   ]
 });
