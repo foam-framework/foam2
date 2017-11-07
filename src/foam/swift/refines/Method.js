@@ -134,7 +134,7 @@ foam.CLASS({
         final: true,
         name: this.swiftPrivateAxiomName,
         type: 'MethodInfo',
-        initializer: this.swiftMethodInfoInit(),
+        initializer: this.swiftMethodInfoInit(parentCls),
       }));
       if (this.name != 'init') {
         cls.methods.push(this.Method.create({
@@ -257,13 +257,17 @@ return ConstantSlot([
     },
     {
       name: 'swiftMethodInfoInit',
-      args: [],
+      args: ['parentCls'],
       template: function() {/*
 class MInfo: MethodInfo {
   let name = "<%=this.swiftName%>"
   let args: [MethodArg] = [] //TODO
   let classInfo: ClassInfo
   init(_ ci: ClassInfo) { classInfo = ci }
+  public func getSlot(_ obj: FObject) -> Slot {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftSlotName%>
+  }
 }
 return MInfo(classInfo())
       */},
