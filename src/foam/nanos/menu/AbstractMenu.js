@@ -10,7 +10,7 @@ foam.CLASS({
 
   methods: [
     function setMenuId(id) {
-      if (window.location.hash.substr(1) != id){    
+      if ( window.location.hash.substr(1) != id ){    
         window.location.hash = id; 
       }
     },
