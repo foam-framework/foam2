@@ -18,6 +18,22 @@ public protocol Axiom {
   var name: String { get }
 }
 
+public protocol GetterAxiom {
+  func get(_ obj: FObject) -> Any?
+}
+
+public protocol SetterAxiom {
+  func set(_ obj: FObject, value: Any?)
+}
+
+public protocol SlotGetterAxiom {
+  func getSlot(_ obj: FObject) -> Slot
+}
+
+public protocol SlotSetterAxiom {
+  func setSlot(_ obj: FObject, value: Slot)
+}
+
 class ListenerList {
   var next: ListenerList?
   var prev: ListenerList?
@@ -26,14 +42,12 @@ class ListenerList {
   var sub: Subscription?
 }
 
-public protocol PropertyInfo: Axiom {
+public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
   var label: String { get }
   var visibility: Visibility { get }
   var jsonParser: Parser? { get }
-  func set(_ obj: FObject, value: Any?)
-  func get(_ obj: FObject) -> Any? // TODO rename to f?
   func compareValues(_ v1: Any?, _ v2: Any?) -> Int
   func viewFactory(x: Context) -> FObject?
 }
@@ -57,13 +71,16 @@ public class MethodArg {
   public var name: String = ""
 }
 
-public protocol MethodInfo: Axiom {
+public protocol MethodInfo: Axiom, GetterAxiom, SlotGetterAxiom {
   var args: [MethodArg] { get }
 }
 extension MethodInfo {
   public func call(_ obj: FObject, args: [Any?] = []) throws -> Any? {
     let callback = obj.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
     return try callback(args)
+  }
+  public func get(_ obj: FObject) -> Any? {
+    return obj.getSlot(key: name)!.swiftGet()
   }
 }
 
@@ -225,12 +242,32 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
 
   lazy var listeners: ListenerList = ListenerList()
 
+  lazy var __foamInit__$: Slot = {
+    return ConstantSlot([
+      "value": { [weak self] (args: [Any?]) throws -> Any? in
+        if self == nil { fatalError() }
+        return self!.__foamInit__()
+      }
+    ])
+  }()
+
   public class func classInfo() -> ClassInfo { fatalError() }
   public func ownClassInfo() -> ClassInfo { fatalError() }
 
-  public func set(key: String, value: Any?) {}
-  public func get(key: String) -> Any? { return nil }
-  public func getSlot(key: String) -> Slot? { return nil }
+  public func set(key: String, value: Any?) {
+    if key.last == "$" && value is Slot {
+      let slot = String(key[..<(key.index(before: key.endIndex))])
+      (self.ownClassInfo().axiom(byName: slot) as? SlotSetterAxiom)?.setSlot(self, value: value as! Slot)
+    } else {
+      (self.ownClassInfo().axiom(byName: key) as? SetterAxiom)?.set(self, value: value)
+    }
+  }
+  public func get(key: String) -> Any? {
+    return (self.ownClassInfo().axiom(byName: key) as? GetterAxiom)?.get(self) ?? nil
+  }
+  public func getSlot(key: String) -> Slot? {
+    return (self.ownClassInfo().axiom(byName: key) as? SlotGetterAxiom)?.getSlot(self) ?? nil
+  }
   public func hasOwnProperty(_ key: String) -> Bool { return false }
   public func clearProperty(_ key: String) {}
 
