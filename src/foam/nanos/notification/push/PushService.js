@@ -19,6 +19,10 @@ foam.INTERFACE({
           javaType: 'foam.nanos.auth.User'
         },
         {
+          name: 'msg',
+          javaType: 'String'
+        },
+        {
           name: 'data',
           javaType: 'java.util.Map'
         }
