@@ -64,7 +64,6 @@ foam.CLASS({
                   .call(function() {
                     var e = this;
                     if ( ! self.selected ) self.selected = menu;
-                    
                     this.start().addClass('menuItem').enableClass('selected', menu.selected$)
                       .add(menu.label)
                       .on('click', function() {
