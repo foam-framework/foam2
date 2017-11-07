@@ -4,6 +4,18 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+/* refinement to add device token property for Firebase */
+foam.CLASS({
+  refines: 'foam.nanos.auth.User',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'deviceToken'
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.nanos.notification.push',
   name: 'FirebasePushService',
@@ -15,7 +27,7 @@ foam.CLASS({
   javaImports: [
     'foam.lib.json.Outputter',
     'foam.lib.json.OutputterMode',
-    'java.io.BufferedReader',
+    'java.io.OutputStreamWriter',
     'java.net.HttpURLConnection',
     'java.net.URL',
     'java.util.HashMap',
@@ -42,15 +54,13 @@ foam.CLASS({
       name: 'sendPush',
       javaCode:
 `HttpURLConnection conn = null;
-BufferedReader in = null;
+OutputStreamWriter wr = null;
 
 try {
-//  if (user == null)
-//    throw new RuntimeException("Invalid Parameters: Missing user");
-//  if (data == null)
-//    throw new RuntimeException("Invalid Parameters: Missing data");
-//  if ( message == null || message.isEmpty() )
-//    throw new RuntimeException("Invalid Parameter: Missing message");
+  if ( user == null || user.getDeviceToken() == null || user.getDeviceToken().isEmpty() )
+    throw new RuntimeException("Invalid Parameters: Missing user");
+  if ( msg == null || msg.isEmpty() )
+    throw new RuntimeException("Invalid Parameter: Missing message");
 
   URL url = new URL(FIREBASE_URL);
   conn = (HttpURLConnection) url.openConnection();
@@ -60,7 +70,7 @@ try {
   conn.setRequestProperty("Content-Type", "application/json");
 
   Map<String, Object> body = new HashMap<String, Object>();
-//      body.put("to", user.getDeviceToken());
+  body.put("to", user.getDeviceToken());
 
   Map<String, Object> notification = new HashMap<String, Object>();
   notification.put("body", msg);
@@ -70,25 +80,25 @@ try {
 
   body.put("content_available", true);
   body.put("priority", "high");
-  body.put("data", data);
+  if ( data != null ) {
+    body.put("data", data);
+  }
 
   Outputter outputter = new Outputter(OutputterMode.NETWORK);
   outputter.output(body);
-  System.out.println(outputter.toString());
 
-  return true;
+  wr = new OutputStreamWriter(conn.getOutputStream());
+  wr.write(outputter.toString());
+  wr.flush();
+
+  return ( conn.getResponseCode() == 200 );
 } catch (Throwable t) {
   throw new RuntimeException(t);
 } finally {
-  if ( in != null ) {
-    try {
-      in.close();
-    } catch (Throwable ignored) {}
-  }
-
-  if ( conn != null ) {
+  if ( wr != null )
+    try { wr.close(); } catch (Throwable ignored) {}
+  if ( conn != null )
     conn.disconnect();
-  }
 }`
     }
   ]
