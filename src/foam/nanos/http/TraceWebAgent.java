@@ -22,8 +22,7 @@ public class TraceWebAgent
       PrintWriter        out     = (PrintWriter)        x.get(PrintWriter.class);
       HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
       
-     
-
+  
       out.println("<HTML>\n" +
           "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
           "<BODY BGCOLOR=\"#FDF5E6\">\n" +
@@ -46,6 +45,14 @@ public class TraceWebAgent
       }
       out.println("</TABLE>");
       out.println("</BODY></HTML>");
+      try{
+        Cookie[]           cookies = req.getCookies();
+        for ( Cookie cookie : cookies ) {
+          out.println(cookie.toString());
+        }
+      }catch(NullPointerException e){
+         System.out.println("Cookies are not supported");
+      }
     } catch (Throwable t) {
       t.printStackTrace();
     }
