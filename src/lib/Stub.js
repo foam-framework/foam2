@@ -127,6 +127,8 @@ foam.CLASS({
               name: m.name,
               replyPolicyName: replyPolicyName,
               boxPropName: name,
+              swiftReturns: m.swiftReturns,
+              args: m.args,
               returns: returns
             });
           });
@@ -244,6 +246,7 @@ foam.CLASS({
         return this.Model.create({
           package: this.package,
           name: this.name,
+          implements: [this.of.id],
 
           properties: [
             {

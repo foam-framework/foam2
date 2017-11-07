@@ -40,7 +40,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'foam.mlang.Expr'],
-    ['javaJSONParser', 'foam.lib.json.ExprParser']
+    ['javaJSONParser', 'new foam.lib.json.ExprParser()']
   ]
 });
 
@@ -50,7 +50,7 @@ foam.CLASS({
 
   properties: [
     ['javaType', 'foam.dao.Sink'],
-    ['javaJSONParser', 'foam.lib.json.FObjectParser']
+    ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
   ]
 });
 
@@ -496,8 +496,28 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
 
-  javaImports: [
-    'org.apache.commons.lang3.StringUtils'
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data:
+`protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+  @Override
+  protected StringBuilder initialValue() {
+    return new StringBuilder();
+  }
+
+  @Override
+  public StringBuilder get() {
+    StringBuilder b = super.get();
+    b.setLength(0);
+    return b;
+  }
+};`
+        }))
+      }
+    }
   ],
 
   methods: [
@@ -508,7 +528,17 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode: 'return " (" + StringUtils.join(getValue(), ",") + ") ";'
+      javaCode:
+`int length = getValue().length;
+StringBuilder builder = sb.get().append(" (");
+for ( int i = 0; i < length; i++ ){
+  builder.append("?");
+  if ( i < length - 1 ) {
+    builder.append(",");
+  }
+}
+builder.append(") ");
+return builder.toString();`
     },
     {
       name: 'prepareStatement',
@@ -529,7 +559,7 @@ foam.CLASS({
     {
       name: 'f',
       // TODO(adamvy): Is there a better option than all the Comparable casts?
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) == 0;'
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))==0;'
     },
     {
       name: 'createStatement',
@@ -546,7 +576,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) != 0;'
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))!=0;'
     },
     {
       name: 'createStatement',
@@ -563,7 +593,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) < 0;'
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))<0;'  
     },
     {
       name: 'createStatement',
@@ -580,7 +610,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) <= 0;'
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))<=0;'
     },
     {
       name: 'createStatement',
@@ -597,7 +627,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) > 0;'
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))>0;'
     },
     {
       name: 'createStatement',
@@ -614,7 +644,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return ((Comparable)getArg1().f(obj)).compareTo((Comparable)getArg2().f(obj)) >= 0;'
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))>=0;' 
     },
     {
       name: 'createStatement',
@@ -700,6 +730,15 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.order.Desc',
+
+  properties: [
+    {
+      class: 'foam.mlang.ExprProperty',
+      name: 'arg1',
+      javaType: 'foam.mlang.order.Comparator',
+      javaJSONParser: 'new foam.lib.json.ExprParser()'
+    }
+  ],
 
   methods: [
     {

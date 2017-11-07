@@ -56,13 +56,15 @@ foam.INTERFACE({
         },
         {
           class: 'Long',
+          swiftType: 'Int',
           name: 'offset'
         }
       ]
     },
     {
       name: 'getSize',
-      returns: 'Long'
+      returns: 'Long',
+      swiftReturns: 'Int',
     }
   ]
 });
@@ -300,10 +302,7 @@ foam.CLASS({
   name: 'BlobBlob',
   extends: 'foam.blob.AbstractBlob',
   properties: [
-    {
-      class: 'Blob',
-      name: 'blob'
-    },
+    'blob',
     {
       name: 'size',
       factory: function() {
@@ -338,7 +337,7 @@ foam.CLASS({
   name: 'IdentifiedBlob',
   extends: 'foam.blob.ProxyBlob',
   imports: [
-    'blobService?'
+    'blobService'
   ],
   properties: [
     {
@@ -444,12 +443,11 @@ foam.CLASS({
   ]
 });
 
-
-if ( foam.isServer ) {
-
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobStore',
+  extends: 'foam.blob.AbstractBlobService',
+
   requires: [
     'foam.blob.IdentifiedBlob'
   ],
@@ -462,15 +460,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'tmp',
+      transient: true,
       expression: function(root) {
-        return root + require('path').sep + 'tmp';
+        return root + '/tmp';
       }
     },
     {
       class: 'String',
       name: 'sha256',
+      transient: true,
       expression: function(root) {
-        return root + require('path').sep + 'sha256';
+        return root + '/sha256';
       }
     },
     {
@@ -531,7 +531,7 @@ foam.CLASS({
       });
     },
 
-    function put(obj) {
+    function put_(x, obj) {
       if ( this.IdentifiedBlob.isInstance(obj) ) {
         return obj;
       }
@@ -616,7 +616,7 @@ foam.CLASS({
       return path;
     },
 
-    function find(id) {
+    function find_(x, id) {
       this.setup();
       if ( id.indexOf(require('path').sep) != -1 ) {
         return Promise.reject(new Error("Invalid file name"));
@@ -642,25 +642,31 @@ foam.CLASS({
   ]
 });
 
-}
-
 foam.CLASS({
   package: 'foam.blob',
   name: 'RestBlobService',
+  extends: 'foam.blob.AbstractBlobService',
+
   documentation: 'Implementation of a BlobService against a REST interface.',
+
   requires: [
     'foam.net.HTTPRequest',
     'foam.blob.BlobBlob',
     'foam.blob.IdentifiedBlob'
   ],
+
   properties: [
     {
       class: 'String',
-      name: 'address'
+      name: 'address',
+      factory: function() {
+        return window.location.origin + "/httpBlobService";
+      }
     }
   ],
+
   methods: [
-    function put(blob) {
+    function put_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         // Already stored.
         return Promise.resolve(blob);
@@ -677,17 +683,18 @@ foam.CLASS({
         return resp.payload;
       }).then(function(payload) {
         return foam.json.Parser.create({ creationContext: self }).parseString(payload);
-//        return self.IdentifiedBlob.create({ id: id });
       });
     },
-    function urlFor(blob) {
+
+    function urlFor_(x, blob) {
       if ( ! foam.blob.IdentifiedBlob.isInstance(blob) ) {
         return null;
       }
 
       return this.address + '/' + blob.id;
     },
-    function find(id) {
+
+    function find_(x, id) {
       var req = this.HTTPRequest.create();
       req.fromUrl(this.address + '/' + id);
       req.method = 'GET';
@@ -716,18 +723,12 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'of'
-    },
-    {
-      name: 'props',
-      expression: function(of) {
-        return of.getAxiomsByClass(foam.core.Blob);
-      }
     }
   ],
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
-      var props = this.props;
+      var props = obj.cls_.getAxiomsByClass(foam.core.Blob);
       var self = this;
 
       return Promise.resolve().then(function a() {

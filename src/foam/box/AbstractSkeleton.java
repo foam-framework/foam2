@@ -6,7 +6,9 @@
 
 package foam.box;
 
+import foam.box.Message;
 import foam.core.ContextAwareSupport;
+import foam.core.X;
 import java.util.Date;
 
 public abstract class AbstractSkeleton
@@ -19,4 +21,11 @@ public abstract class AbstractSkeleton
   public int     toint(Object o)    { return ((Number) o).intValue(); }
   public long    tolong(Object o)   { return ((Number) o).longValue(); }
   public short   toshort(Object o)  { return ((Number) o).shortValue(); }
+
+  /** Return context stored in message if present, otherwise getX(). */
+  public X getMessageX(Message msg) {
+    X x = (X) msg.getLocalAttributes().get("x");
+
+    return x == null ? getX() : x;
+  }
 }
