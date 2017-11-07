@@ -56,7 +56,9 @@ foam.CLASS({
     {
       name: 'SESSION_KEY',
       value: 'sessionId',
-      type: 'String'
+      type: 'String',
+      swiftValue: '"sessionId"',
+      swiftType: 'String',
     }
   ],
 
@@ -73,6 +75,16 @@ foam.CLASS({
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       },
+      swiftExpressionArgs: ['sessionName'],
+      swiftExpression: `
+let defaults = UserDefaults.standard // TODO allow us to configure?
+if let id = defaults.string(forKey: sessionName) {
+  return id
+}
+let id = UUID().uuidString
+defaults.set(id, forKey: sessionName)
+return id
+      `,
       javaFactory:
 `String uuid = (String) getX().get(getSessionName());
 if ( "".equals(uuid) ) {
@@ -105,7 +117,16 @@ return uuid`
         });
 
         this.delegate.send(msg);
-      }
+      },
+      swiftCode: `
+msg.attributes[SessionClientBox.SESSION_KEY] = sessionID
+msg.attributes["replyBox"] = SessionReplyBox_create([
+  "msg": msg,
+  "clientBox": self,
+  "delegate": msg.attributes["replyBox"]!,
+])
+try delegate.send(msg)
+      `,
     }
   ]
 });
