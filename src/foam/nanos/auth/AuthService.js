@@ -32,9 +32,13 @@ foam.INTERFACE({
     },
     {
       name: 'challengedLogin',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'userId',
           javaType: 'long'
@@ -47,9 +51,13 @@ foam.INTERFACE({
     },
     {
       name: 'login',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'userId',
           javaType: 'long'
@@ -62,9 +70,13 @@ foam.INTERFACE({
     },
     {
       name: 'loginByEmail',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'email',
           javaType: 'String'
@@ -91,7 +103,7 @@ foam.INTERFACE({
     },
     {
       name: 'updatePassword',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
@@ -113,6 +125,10 @@ foam.INTERFACE({
       javaReturns: 'void',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'user',
           javaType: 'User'
