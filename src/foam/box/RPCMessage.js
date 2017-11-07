@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RPCMessage',
+  extends: 'foam.box.Message',
   properties: [
     {
       class: 'String',

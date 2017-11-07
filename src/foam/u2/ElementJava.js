@@ -19,126 +19,45 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [
-    {
-      name: 'tableProperties',
-    },
-    {
-      name: 'tableColumns',
-    },
-    {
-      name: 'generateJava'
-    },
-    {
-      name: 'searchColumns',
-    },
-    {
-      name: 'tableCellFormatter',
-    },
-  ]
+  properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.Currency',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-  ]
+  properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.Double',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-  ]
+  properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.Long',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-    {
-      name: 'visibility',
-    }
-  ]
+  properties: [ 'tableCellFormatter', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Date',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-  ]
+  properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
   refines: 'foam.core.DateTime',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-    {
-      name: 'visibility',
-    }
-  ]
+  properties: [ 'tableCellFormatter', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Property',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-    {
-      name: 'searchView',
-    },   
-  ]
+  properties: [ 'tableCellFormatter', 'searchView' ]
 });
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
-  properties: [
-    {
-      name: 'view',
-    },
-    
-  ]
+  properties: [ 'view' ]
 });
 foam.CLASS({
   refines: 'foam.core.Boolean',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-    {
-      name: 'tableCellView',
-    },
-  ]
+  properties: [ 'tableCellFormatter', 'tableCellView' ]
 });
 foam.CLASS({
   refines: 'foam.core.String',
-  properties: [
-    {
-      name: 'tableCellFormatter',
-    },
-    {
-      name: 'tableCellView',
-    },
-    {
-      name: 'displayWidth'
-    },
-    {
-      name: 'view'
-    },
-    {
-      name: 'visibility',
-    }
-  ]
+  properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Method',
-  properties: [
-    {
-      name: 'javaCode',
-    },
-  ]
+  properties: [ 'javaCode' ]
 });

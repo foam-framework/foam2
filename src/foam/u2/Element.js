@@ -613,14 +613,10 @@ foam.CLASS({
     }
   },
 
-  axioms: [
-    foam.u2.CSS.create({
-      // We hide Elements by adding this style rather than setting
-      // 'display: none' directly because then when we re-show the
-      // Element we don't need to remember it's desired 'display' value.
-      code: '.foam-u2-Element-hidden { display: none !important; }'
-    })
-  ],
+  // We hide Elements by adding this style rather than setting
+  // 'display: none' directly because then when we re-show the
+  // Element we don't need to remember it's desired 'display' value.
+  css: '.foam-u2-Element-hidden { display: none !important; }',
 
   properties: [
     {
@@ -1540,6 +1536,12 @@ foam.CLASS({
       return this;
     },
 
+    function callIf(bool, f, args) {
+      if ( bool ) f.apply(this, args);
+
+      return this;
+    },
+
     function forEach(a, f) {
       for ( var i = 0 ; i < a.length ; i++ ) {
         f.call(this, a[i], i);
@@ -1800,7 +1802,7 @@ foam.CLASS({
           var value = attr.value;
 
           out(' ', name);
-          if ( value !== false ) out('="', encodeURIComponent(value), '"');
+          if ( value !== false ) out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
         }
       }
 
@@ -2265,7 +2267,15 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+
   properties: [
+    {
+      class: 'String',
+      name: 'css',
+      postSet: function(_, code) {
+        this.axioms_.push(foam.u2.CSS.create({code: code}));
+      }
+    },
     {
       // TODO: remove when all code ported
       name: 'tableProperties',

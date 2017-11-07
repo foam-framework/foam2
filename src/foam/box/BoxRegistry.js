@@ -18,15 +18,16 @@
 foam.INTERFACE({
   package: 'foam.box',
   name: 'BoxRegistry',
-
   methods: [
     {
       name: 'doLookup',
       returns: 'foam.box.Box',
       javaReturns: 'foam.box.Box',
+      swiftThrows: true,
       args: [
         {
           name: 'name',
+          swiftType: 'String',
           javaType: 'String'
         }
       ]
@@ -38,14 +39,17 @@ foam.INTERFACE({
       args: [
         {
           name: 'name',
+          swiftType: 'String?',
           javaType: 'String'
         },
         {
           name: 'service',
+          swiftType: 'BoxService?',
           javaType: 'foam.box.BoxService'
         },
         {
           name: 'box',
+          swiftType: 'Box',
           javaType: 'foam.box.Box'
         }
       ],

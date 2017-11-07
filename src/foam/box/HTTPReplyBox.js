@@ -30,7 +30,8 @@ foam.CLASS({
       name: 'send',
       code: function(m) {
         throw 'unimplemented';
-      }
+      },
+      swiftCode: 'throw FoamError("unimplemented")',
     }
   ]
 });

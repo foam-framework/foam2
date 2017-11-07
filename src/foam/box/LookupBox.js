@@ -26,26 +26,35 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
       name: 'name'
     },
     {
       name: 'parentBox'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxRegistry',
       name: 'registry',
       transient: true,
       factory: function() {
         return this.ClientBoxRegistry.create({
           delegate: this.parentBox
         });
-      }
+      },
+      swiftFactory: function() {/*
+return ClientBoxRegistry_create([
+  "delegate": parentBox
+])
+      */}
     },
     {
       name: 'delegate',
       transient: true,
       factory: function() {
         return this.registry.doLookup(this.name);
-      }
+      },
+      swiftFactory: 'return try! registry!.doLookup(name)',
     }
   ]
 });

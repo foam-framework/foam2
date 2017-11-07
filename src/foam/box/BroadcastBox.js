@@ -18,17 +18,9 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'BroadcastBox',
-  implements: [ 'foam.box.Box' ],
+  extends: 'foam.box.MultiDelegateBox',
 
   documentation: `Broadcast all messages to multiple delegate boxes.`,
-
-  properties: [
-    {
-      class: 'FObjectArray',
-      of: 'foam.box.Box',
-      name: 'delegates'
-    }
-  ],
 
   methods: [
     function send(message) {

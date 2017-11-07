@@ -22,15 +22,16 @@ import javax.servlet.ServletException;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-    implements WebAgent
+  implements WebAgent
 {
-  protected Object service_;
-  protected Box    skeleton_;
-//  protected X      x_;
+  protected Object  service_;
+  protected Box     skeleton_;
+  protected boolean authenticate_;
 
-  public ServiceWebAgent(Object service, Box skeleton) {
-    service_  = service;
-    skeleton_ = skeleton;
+  public ServiceWebAgent(Object service, Box skeleton, boolean authenticate) {
+    service_      = service;
+    skeleton_     = skeleton;
+    authenticate_ = authenticate;
   }
 
 /*
@@ -65,7 +66,13 @@ public class ServiceWebAgent
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
-      FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      FObject result;
+      try {
+        result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      } catch (Throwable t) {
+        System.err.println("Unable to parse: " + buffer_.toString());
+        throw t;
+      }
 
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
@@ -89,9 +96,8 @@ public class ServiceWebAgent
         ((ContextAware) service_).setX(x);
 
       foam.box.Message msg = (foam.box.Message) result;
-      new SessionServerBox(x, skeleton_).send(msg);
+      new SessionServerBox(x, skeleton_, authenticate_).send(msg);
     } catch (Throwable t) {
-      t.printStackTrace();
       throw new RuntimeException(t);
     }
   }
@@ -102,12 +108,12 @@ public class ServiceWebAgent
    * @return the error message
    */
   protected String getParsingError(X x, String buffer) {
-    Parser parser = new ExprParser();
-    PStream ps = new StringPStream();
-    ParserContext psx = new ParserContextImpl();
+    Parser        parser = new ExprParser();
+    PStream       ps     = new StringPStream();
+    ParserContext psx    = new ParserContextImpl();
 
     ((StringPStream) ps).setString(buffer);
-    psx.set("X", ( x == null ) ? new ProxyX() : x);
+    psx.set("X", x == null ? new ProxyX() : x);
 
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
     ps = eps.apply(parser, psx);

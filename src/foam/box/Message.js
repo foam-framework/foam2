@@ -35,5 +35,35 @@ foam.CLASS({
       name: 'localAttributes',
       javaFactory: 'return new java.util.HashMap();'
     }
+  ],
+
+  methods: [
+    {
+      name: 'replyWithException',
+      javaReturns: 'void',
+      args: [
+        { name: 't', javaType: 'Throwable' }
+      ],
+      javaCode: `
+      // TODO: log
+      t.printStackTrace();
+
+        Box replyBox = (Box) getAttributes().get("replyBox");
+
+        if ( replyBox == null ) return;
+
+        RemoteException wrapper = new RemoteException();
+        wrapper.setId(t.getClass().getName());
+        wrapper.setMessage(t.getMessage());
+
+        RPCErrorMessage reply = new RPCErrorMessage();
+        reply.setData(wrapper);
+
+        Message replyMessage = new Message();
+        replyMessage.setObject(reply);
+
+        replyBox.send(replyMessage);
+      `
+    }
   ]
 });

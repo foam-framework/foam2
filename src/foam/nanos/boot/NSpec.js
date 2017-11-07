@@ -52,6 +52,11 @@ foam.CLASS({
       documentation: 'If true, this service is served over the network.'
     },
     {
+      class: 'Boolean',
+      name: 'authenticate',
+      value: true
+    },
+    {
       class: 'String',
       name: 'serviceClass'
     },
