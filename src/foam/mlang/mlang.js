@@ -22,9 +22,21 @@ foam.CLASS({
   ],
 
   methods: [
-    function put() { this.value++; },
-    function remove() { this.value--; },
-    function reset() { this.value = 0; },
+    {
+      name: 'put',
+      code: function() { this.value++ },
+      swiftCode: 'value+=1',
+    },
+    {
+      name: 'remove',
+      code: function() { this.value-- },
+      swiftCode: 'value-=1',
+    },
+    {
+      name: 'reset',
+      code: function() { this.value = 0 },
+      swiftCode: 'value = 0',
+    },
     function toString() { return 'COUNT()'; }
   ]
 });
@@ -90,7 +102,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o, p) { return p.adaptValue(o); }
-    }
+    },
   ],
 
   methods: [
@@ -122,17 +134,22 @@ foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
 
+  // Predicate is already a thing in Swift so avoid using that name.
+  swiftName: 'FoamPredicate',
+
   documentation: 'Predicate interface: f(obj) -> boolean.',
 
   methods: [
     {
       name: 'f',
+      swiftReturns: 'Bool',
       args: [
         'obj'
       ]
     },
     {
-      name: 'partialEval'
+      name: 'partialEval',
+      returns: 'foam.mlang.predicate.Predicate',
     },
     {
       name: 'toIndex',
@@ -141,7 +158,8 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'toDisjunctiveNormalForm'
+      name: 'toDisjunctiveNormalForm',
+      returns: 'foam.mlang.predicate.Predicate',
     }
   ]
 });
@@ -206,11 +224,23 @@ foam.CLASS({
   documentation: 'Abstract Predicate base-class.',
 
   methods: [
-    function toIndex() { },
+    {
+      name: 'toIndex',
+      code: function() { },
+      swiftCode: 'return',
+    },
 
-    function toDisjunctiveNormalForm() { return this; },
+    {
+      name: 'toDisjunctiveNormalForm',
+      code: function() { return this },
+      swiftCode: 'return self',
+    },
 
-    function partialEval() { return this; },
+    {
+      name: 'partialEval',
+      code: function() { return this },
+      swiftCode: 'return self',
+    },
 
     function reduceAnd(other) {
       return foam.util.equals(this, other) ? this : null;
@@ -492,7 +522,13 @@ foam.CLASS({
           if ( ! this.args[i].f(o) ) return false;
         }
         return true;
-      }
+      },
+      swiftCode: function() {/*
+for arg in args {
+  if !arg.f(obj) { return false }
+}
+return true
+      */},
     },
 
     function partialEval() {

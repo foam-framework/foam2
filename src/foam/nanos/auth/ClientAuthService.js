@@ -9,10 +9,13 @@ foam.CLASS({
   name: 'ClientAuthService',
 
   implements: [
-    'foam.nanos.auth.WebAuthService'
+    'foam.nanos.auth.AuthService'
   ],
 
-  requires: [ 'foam.box.HTTPBox' ],
+  requires: [
+    'foam.box.SessionClientBox',
+    'foam.box.HTTPBox'
+  ],
 
   properties: [
     {
@@ -22,12 +25,12 @@ foam.CLASS({
     {
       class: 'Stub',
       name: 'delegate',
-      of: 'foam.nanos.auth.WebAuthService',
+      of: 'foam.nanos.auth.AuthService',
       factory: function() {
-        return this.HTTPBox.create({
+        return this.SessionClientBox.create({delegate:this.HTTPBox.create({
           method: 'POST',
           url: this.serviceName
-        });
+        })});
       }
     }
   ]

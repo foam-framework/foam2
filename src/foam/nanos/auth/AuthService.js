@@ -7,8 +7,18 @@
 foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
-  extends: 'foam.nanos.NanoService',
+
   methods: [
+    {
+      name: 'getCurrentUser',
+      javaReturns: 'foam.nanos.auth.User',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ]
+    },
     {
       name: 'generateChallenge',
       javaReturns: 'String',
@@ -22,9 +32,13 @@ foam.INTERFACE({
     },
     {
       name: 'challengedLogin',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'userId',
           javaType: 'long'
@@ -37,12 +51,35 @@ foam.INTERFACE({
     },
     {
       name: 'login',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
           name: 'userId',
           javaType: 'long'
+        },
+        {
+          name: 'password',
+          javaType: 'String'
+        }
+      ]
+    },
+    {
+      name: 'loginByEmail',
+      javaReturns: 'foam.nanos.auth.User',
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
+        {
+          name: 'email',
+          javaType: 'String'
         },
         {
           name: 'password',
@@ -66,7 +103,7 @@ foam.INTERFACE({
     },
     {
       name: 'updatePassword',
-      javaReturns: 'foam.core.X',
+      javaReturns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
         {
@@ -88,6 +125,10 @@ foam.INTERFACE({
       javaReturns: 'void',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'user',
           javaType: 'User'

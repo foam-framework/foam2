@@ -18,15 +18,11 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'SubBoxMessage',
-
+  extends: 'foam.box.Message',
   properties: [
     {
       class: 'String',
       name: 'name'
-    },
-    {
-      class: 'Object',
-      name: 'object'
     }
   ]
 });

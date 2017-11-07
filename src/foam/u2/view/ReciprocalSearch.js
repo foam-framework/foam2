@@ -22,16 +22,22 @@ foam.CLASS({
     'as data'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^count {
-          font-size: 14pt;
-          color: #555;
-        }
-      */}
-    })
-  ],
+  // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
+  css: `
+    ^count {
+      font-size: 14pt;
+      color: #555;
+    }
+
+    ^ .net-nanopay-ui-ActionView-clear {
+      background: #59aadd;
+      color: white;
+      float: right;
+      margin-top: 10px;
+      padding: 12px;
+      width: auto;
+    }
+  `,
 
   properties: [
     {
@@ -82,6 +88,7 @@ foam.CLASS({
       this.updateTotalCount();
 
       this.
+        addClass(self.myClass()).
         add(this.slot(function(filters) {
           self.show(filters.length);
 
@@ -129,7 +136,7 @@ foam.CLASS({
           .entity('nbsp')
           .add('selected')
         .end()
-        .start(this.CLEAR).style({float: 'right'}).end();
+        .tag(this.CLEAR);
     },
 
     function addFilter(key) {
