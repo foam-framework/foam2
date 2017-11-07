@@ -36,25 +36,41 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
-      factory: function() { return `LogBox${this.$UID}`; }
+      factory: function() { return `LogBox${this.$UID}`; },
+      swiftFactory: 'return "LogBox$"+UUID().uuidString',
     },
     {
       class: 'FObjectProperty',
       of: 'foam.log.LogLevel',
       name: 'logLevel',
-      factory: function() { return this.LogLevel.INFO; }
+      factory: function() { return this.LogLevel.INFO; },
+      swiftFactory: 'return LogLevel.INFO',
     }
   ],
 
   methods: [
-    function send(message) {
-      var output = message.object;
-      this[this.logLevel.consoleMethodName].apply(this, [
-        this.name,
-        output instanceof Error ? output.toString() :
-          foam.json.Pretty.stringify(message)
-      ]);
-      this.delegate && this.delegate.send(message);
-    }
+    {
+      name: 'send',
+      code: function(message) {
+        var output = message.object;
+        this[this.logLevel.consoleMethodName].apply(this, [
+          this.name,
+          output instanceof Error ? output.toString() :
+            foam.json.Pretty.stringify(message)
+        ]);
+        this.delegate && this.delegate.send(message);
+      },
+      swiftCode: `
+let output = msg.object;
+/*
+let logMethod = get(key: logLevel.consoleMethodName) as? (String) -> Void
+logMethod([
+  name,
+  output is Error ? (output as! Error).description : msg.toString()
+].join(" "))
+*/
+try delegate.send(msg)
+      `,
+    },
   ]
 });
