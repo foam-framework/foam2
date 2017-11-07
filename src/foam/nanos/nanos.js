@@ -56,6 +56,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/notification/push/PushService' },
+  { name: 'foam/nanos/notification/push/FirebasePushService' },
   { name: 'foam/nanos/register/RegistrationService' },
   { name: 'foam/nanos/register/ClientRegistrationService' },
   { name: 'foam/nanos/register/UserRegistrationService' },

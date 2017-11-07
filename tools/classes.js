@@ -133,7 +133,7 @@ var classes = [
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.notification.push.ClientPushService',
+  'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.register.RegistrationService',
   'foam.nanos.register.ClientRegistrationService',
   'foam.nanos.register.UserRegistrationService',
