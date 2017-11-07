@@ -32,10 +32,7 @@ foam.CLASS({
 
   methods: [
     function launch_(X, e) {
-      if (window.location.hash.substr(1) != this.id){    
-        var stateObj = { id: this.id };
-        window.location.hash = this.id; 
-      }
+      
       this.handler && this.handler.launch(X, this, e);
     }
   ],

@@ -9,6 +9,14 @@ foam.CLASS({
   name: 'AbstractMenu',
 
   methods: [
-    function launch(X, menu) { X.stack.push(this.createView(X, menu)); }
+    function setMenuId(id) {
+      if (window.location.hash.substr(1) != id){    
+        window.location.hash = this.id; 
+      }
+    },
+    function launch(X, menu) {
+      this.setMenuId(menu.id);
+      X.stack.push(this.createView(X, menu));
+    }
   ]
 });
