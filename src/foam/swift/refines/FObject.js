@@ -74,6 +74,18 @@ foam.LIB({
           }),
           foam.swift.Field.create({
             lazy: true,
+            name: 'axioms',
+            type: '[Axiom]',
+            initializer: templates.axiomsInitializer(),
+          }),
+          foam.swift.Field.create({
+            lazy: true,
+            name: 'nameAxiomMap_',
+            type: '[String:Axiom]',
+            initializer: templates.nameAxiomMapInitializer(),
+          }),
+          foam.swift.Field.create({
+            lazy: true,
             name: 'label',
             type: 'String',
             defaultValue: '"' + this.model_.label + '"',
@@ -123,6 +135,18 @@ foam.LIB({
               }),
             ],
             body: templates.classInfoCreate(this.model_.swiftName, multiton, singleton),
+          }),
+          foam.swift.Method.create({
+            name: 'axiom',
+            returnType: 'Axiom?',
+            args: [
+              foam.swift.Argument.create({
+                externalName: 'byName',
+                localName: 'name',
+                type: 'String',
+              }),
+            ],
+            body: 'return nameAxiomMap_[name]',
           }),
         ],
       });
@@ -294,6 +318,33 @@ return instance!
 <% } else { %>
 return <%=swiftName%>(args, x)
 <% } %>
+      */}
+    },
+    {
+      name: 'axiomsInitializer',
+      template: function() {/*
+var curCls: ClassInfo? = self
+var axioms: [Axiom] = []
+var seen = Set<String>()
+while curCls != nil {
+  for a in curCls!.ownAxioms {
+    if seen.contains(a.name) { continue }
+    axioms.append(a)
+    seen.insert(a.name)
+  }
+  curCls = curCls!.parent
+}
+return axioms
+      */}
+    },
+    {
+      name: 'nameAxiomMapInitializer',
+      template: function() {/*
+var map: [String:Axiom] = [:]
+for axiom in axioms {
+  map[axiom.name] = axiom
+}
+return map
       */}
     },
   ],
