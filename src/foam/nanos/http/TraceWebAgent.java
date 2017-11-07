@@ -19,39 +19,42 @@ public class TraceWebAgent
 
   public void execute(X x) {
     try {
-    PrintWriter        out     = (PrintWriter)        x.get(PrintWriter.class);
-    HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
-    Cookie[]           cookies = req.getCookies();
-
-    out.println("<HTML>\n" +
-        "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
-        "<BODY BGCOLOR=\"#FDF5E6\">\n" +
-        "<H1 ALIGN=\"CENTER\">trace</H1>\n" +
-        "<B>Request Method: </B>" +
-        req.getMethod() + "<BR>\n" +
-        "<B>Request URI: </B>" +
-        req.getRequestURI() + "<BR>\n" +
-        "<B>Request Protocol: </B>" +
-        req.getProtocol() + "<BR><BR>\n" +
-        "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
-        "<TR BGCOLOR=\"#FFAD00\">\n" +
-        "<TH>Header Name<TH>Header Value");
-        Enumeration headerNames = req.getHeaderNames();
-        while ( headerNames.hasMoreElements() ) {
-          String headerName = (String) headerNames.nextElement();
-          System.err.println("Header: " + headerName);
-          out.println("<TR><TD>" + headerName);
-          out.println("    <TD>" + req.getHeader(headerName));
-        }
-        out.println("</TABLE>");
-
+      PrintWriter        out     = (PrintWriter)        x.get(PrintWriter.class);
+      HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
+      
+  
+      out.println("<HTML>\n" +
+          "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
+          "<BODY BGCOLOR=\"#FDF5E6\">\n" +
+          "<H1 ALIGN=\"CENTER\">trace</H1>\n" +
+          "<B>Request Method: </B>" +
+          req.getMethod() + "<BR>\n" +
+          "<B>Request URI: </B>" +
+          req.getRequestURI() + "<BR>\n" +
+          "<B>Request Protocol: </B>" +
+          req.getProtocol() + "<BR><BR>\n" +
+          "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
+          "<TR BGCOLOR=\"#FFAD00\">\n" +
+          "<TH>Header Name<TH>Header Value");
+      Enumeration headerNames = req.getHeaderNames();
+      while ( headerNames.hasMoreElements() ) {
+        String headerName = (String) headerNames.nextElement();
+        System.err.println("Header: " + headerName);
+        out.println("<TR><TD>" + headerName);
+        out.println("    <TD>" + req.getHeader(headerName));
+      }
+      out.println("</TABLE>");
+      out.println("</BODY></HTML>");
+      try{
+        Cookie[]           cookies = req.getCookies();
         for ( Cookie cookie : cookies ) {
           out.println(cookie.toString());
         }
-
-        out.println("</BODY></HTML>");
-      } catch (Throwable t) {
-          t.printStackTrace();
-        }
+      }catch(NullPointerException e){
+         System.out.println("--------Cookies are not supported--------");
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
   }
 }
