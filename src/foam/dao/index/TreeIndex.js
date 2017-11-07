@@ -233,8 +233,9 @@ foam.CLASS({
 
       var expr = isExprMatch(this.In);
       if ( expr ) {
+        var numCmp = expr.arg2 ? expr.arg2.f().length : 0;
         // tree depth * number of compares
-        return subEstimate() * expr.arg2.f().length;
+        return subEstimate() * numCmp;
       }
 
       expr = isExprMatch(this.Eq);
@@ -402,9 +403,10 @@ foam.CLASS({
       var expr = isExprMatch(m.In);
       if ( expr ) {
         predicate = expr.predicate;
-        var keys = expr.arg2.f();
+        // Marshalled empty array may be undefined.
+        var keys = expr.arg2.f() || [];
         // Just scan if that would be faster.
-        if ( Math.log(this.size())/Math.log(2) * keys.length < this.size() ) {
+        if ( Math.log(this.size()) / Math.log(2) * keys.length < this.size() ) {
           var subPlans = [];
           cost = 1;
 

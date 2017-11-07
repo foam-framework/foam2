@@ -885,7 +885,8 @@ foam.CLASS({
     function partialEval() {
       if ( ! this.Constant.isInstance(this.arg2) ) return this;
 
-      return this.arg2.value.length === 0 ? this.FALSE : this;
+      return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
+          this.FALSE : this;
     }
   ]
 });
