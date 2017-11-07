@@ -32,7 +32,6 @@ foam.CLASS({
 
   methods: [
     function launch_(X, e) {
-      
       this.handler && this.handler.launch(X, this, e);
     }
   ],
