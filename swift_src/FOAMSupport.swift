@@ -18,6 +18,22 @@ public protocol Axiom {
   var name: String { get }
 }
 
+public protocol GetterAxiom {
+  func get(_ obj: FObject) -> Any?
+}
+
+public protocol SetterAxiom {
+  func set(_ obj: FObject, value: Any?)
+}
+
+public protocol SlotGetterAxiom {
+  func getSlot(_ obj: FObject) -> Slot
+}
+
+public protocol SlotSetterAxiom {
+  func setSlot(_ obj: FObject, value: Slot)
+}
+
 class ListenerList {
   var next: ListenerList?
   var prev: ListenerList?
@@ -26,16 +42,16 @@ class ListenerList {
   var sub: Subscription?
 }
 
-public protocol PropertyInfo: Axiom {
+public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
   var label: String { get }
   var visibility: Visibility { get }
   var jsonParser: Parser? { get }
-  func set(_ obj: FObject, value: Any?)
-  func get(_ obj: FObject) -> Any? // TODO rename to f?
   func compareValues(_ v1: Any?, _ v2: Any?) -> Int
   func viewFactory(x: Context) -> FObject?
+  func hasOwnProperty(_ o: FObject) -> Bool
+  func clearProperty(_ o: FObject)
 }
 
 extension PropertyInfo {
@@ -57,13 +73,16 @@ public class MethodArg {
   public var name: String = ""
 }
 
-public protocol MethodInfo: Axiom {
+public protocol MethodInfo: Axiom, GetterAxiom, SlotGetterAxiom {
   var args: [MethodArg] { get }
 }
 extension MethodInfo {
   public func call(_ obj: FObject, args: [Any?] = []) throws -> Any? {
     let callback = obj.getSlot(key: name)!.swiftGet() as! ([Any?]) throws -> Any?
     return try callback(args)
+  }
+  public func get(_ obj: FObject) -> Any? {
+    return obj.getSlot(key: name)!.swiftGet()
   }
 }
 
@@ -138,26 +157,12 @@ public protocol ClassInfo {
   var parent: ClassInfo? { get }
   var ownAxioms: [Axiom] { get }
   var cls: AnyClass { get }
+  var axioms: [Axiom] { get }
+  func axiom(byName name: String) -> Axiom?
   func create(args: [String:Any?], x: Context) -> Any
 }
 
 extension ClassInfo {
-  var axioms: [Axiom] {
-    get {
-      var curCls: ClassInfo? = self
-      var axioms: [Axiom] = []
-      var seen = Set<String>()
-      while curCls != nil {
-        for a in curCls!.ownAxioms {
-          if seen.contains(a.name) { continue }
-          axioms.append(a)
-          seen.insert(a.name)
-        }
-        curCls = curCls!.parent
-      }
-      return axioms
-    }
-  }
   func ownAxioms<T>(byType type: T.Type) -> [T] {
     var axs: [T] = []
     for axiom in ownAxioms {
@@ -175,12 +180,6 @@ extension ClassInfo {
       }
     }
     return axs
-  }
-  func axiom(byName name: String) -> Axiom? {
-    for axiom in axioms {
-      if axiom.name == name { return axiom }
-    }
-    return nil
   }
   func create(x: Context) -> Any { return create(args: [:], x: x) }
 }
@@ -225,14 +224,38 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
 
   lazy var listeners: ListenerList = ListenerList()
 
+  lazy var __foamInit__$: Slot = {
+    return ConstantSlot([
+      "value": { [weak self] (args: [Any?]) throws -> Any? in
+        if self == nil { fatalError() }
+        return self!.__foamInit__()
+      }
+    ])
+  }()
+
   public class func classInfo() -> ClassInfo { fatalError() }
   public func ownClassInfo() -> ClassInfo { fatalError() }
 
-  public func set(key: String, value: Any?) {}
-  public func get(key: String) -> Any? { return nil }
-  public func getSlot(key: String) -> Slot? { return nil }
-  public func hasOwnProperty(_ key: String) -> Bool { return false }
-  public func clearProperty(_ key: String) {}
+  public func set(key: String, value: Any?) {
+    if key.last == "$" && value is Slot {
+      let slot = String(key[..<(key.index(before: key.endIndex))])
+      (self.ownClassInfo().axiom(byName: slot) as? SlotSetterAxiom)?.setSlot(self, value: value as! Slot)
+    } else {
+      (self.ownClassInfo().axiom(byName: key) as? SetterAxiom)?.set(self, value: value)
+    }
+  }
+  public func get(key: String) -> Any? {
+    return (self.ownClassInfo().axiom(byName: key) as? GetterAxiom)?.get(self) ?? nil
+  }
+  public func getSlot(key: String) -> Slot? {
+    return (self.ownClassInfo().axiom(byName: key) as? SlotGetterAxiom)?.getSlot(self) ?? nil
+  }
+  public func hasOwnProperty(_ key: String) -> Bool {
+    return (self.ownClassInfo().axiom(byName: key) as? PropertyInfo)?.hasOwnProperty(self) ?? false
+  }
+  public func clearProperty(_ key: String) {
+    (self.ownClassInfo().axiom(byName: key) as? PropertyInfo)?.clearProperty(self)
+  }
 
   public func onDetach(_ sub: Detachable?) {
     guard let sub = sub else { return }
@@ -458,6 +481,7 @@ public class ModelParserFactory {
         parsers.append(PropertyParser(["property": p]))
       }
     }
+    parsers.append(UnknownPropertyParser())
     return Repeat0([
       "delegate": Seq0(["parsers": [
         Whitespace(),

@@ -173,7 +173,7 @@ describe('CacheHandler', function() {
 
     cache.listen(foam.dao.QuickSink.create({
       putFn: function(cachedResponse) {
-        expect(cachedResponse.id).toBe(req.urlString);
+        expect(cachedResponse.id.indexOf(req.urlString)).toBeGreaterThan(-1);
         expect(cachedResponse.statusCode).toBe(200);
         expect(cachedResponse.headers).toEqual({});
         expect(cachedResponse.data.toString()).toBe(HELLO_WORLD);
@@ -235,10 +235,12 @@ describe('CacheHandler', function() {
 
     // Store cached response that should set statusCode=200.
     var req = foam.net.node.test.ExampleReq.create(null, ctx);
-    cache.put(foam.net.node.CachedResponse.create({
-      id: foam.net.node.CachedResponse.ID_FROM_REQ(req),
-      statusCode: 200
-    }, ctx)).then(function() {
+    handler.requestIdentifier.getId(req).then(function(id) {
+      return cache.put(foam.net.node.CachedResponse.create({
+        id: id,
+        statusCode: 200
+      }, ctx));
+    }).then(function() {
       // Setup statusCode=200 expectation.
       var res = foam.net.node.test.ExpectedStatusCodeRes.create({
         expectedStatusCode: 200,
@@ -249,7 +251,7 @@ describe('CacheHandler', function() {
     });
   });
 
-  it('should replay when result is cached', function(done) {
+  it('should not replay when result is not cached', function(done) {
     // Setup ErrorHandler to fire if CacheHandler doesn't intervene.
     setup(foam.net.node.test.ErrorHandler.create({
       statusCode: 500
@@ -263,6 +265,70 @@ describe('CacheHandler', function() {
     }, ctx);
 
     handler.handle(req, res);
+  });
+
+  it('should not replay same URL with different method', function(done) {
+    // Setup ErrorHandler to fire if CacheHandler doesn't intervene.
+    setup(foam.net.node.test.ErrorHandler.create({
+      statusCode: 500
+    }), 1);
+
+    // Store cached response that should set statusCode=200.
+    var req1 = foam.net.node.test.ExampleReq.create({
+      method: 'GET'
+    }, ctx);
+    var req2 = foam.net.node.test.ExampleReq.create({
+      method: 'PUT'
+    }, ctx);
+    handler.requestIdentifier.getId(req1).then(function(id) {
+      // Cache req1: GET with statusCode=200.
+      return cache.put(foam.net.node.CachedResponse.create({
+        id: id,
+        statusCode: 200
+      }, ctx));
+    }).then(function() {
+      // Setup statusCode=500 expectation.
+      var res = foam.net.node.test.ExpectedStatusCodeRes.create({
+        expectedStatusCode: 500,
+        done: done
+      }, ctx);
+
+      // Handle req2: PUT that falls through to statusCode=500.
+      handler.handle(req2, res);
+    });
+  });
+
+  it('should not replay same non-GET URL with different payloads', function(done) {
+    // Setup ErrorHandler to fire if CacheHandler doesn't intervene.
+    setup(foam.net.node.test.ErrorHandler.create({
+      statusCode: 500
+    }), 1);
+
+    // Store cached response that should set statusCode=200.
+    var req1 = foam.net.node.test.ExampleReq.create({
+      method: 'PUT',
+      payload: Promise.resolve('{"reqNo":1}\n')
+    }, ctx);
+    var req2 = foam.net.node.test.ExampleReq.create({
+      method: 'PUT',
+      payload: Promise.resolve('{"reqNo":2}\n')
+    }, ctx);
+    handler.requestIdentifier.getId(req1).then(function(id) {
+      // Cache req1: PUT{"reqNo":1} with statusCode=200.
+      return cache.put(foam.net.node.CachedResponse.create({
+        id: id,
+        statusCode: 200
+      }, ctx));
+    }).then(function() {
+      // Setup statusCode=500 expectation.
+      var res = foam.net.node.test.ExpectedStatusCodeRes.create({
+        expectedStatusCode: 500,
+        done: done
+      }, ctx);
+
+      // Handle req2: PUT{"reqNo":2} that falls through to statusCode=500.
+      handler.handle(req2, res);
+    });
   });
 
   it('should keep most recent entries in cache', function(done) {
@@ -288,7 +354,8 @@ describe('CacheHandler', function() {
     var i = 0;
     cache.listen(foam.dao.QuickSink.create({
       putFn: function(cachedResponse) {
-        expect(cachedResponse.id).toBe(reqs[i].urlString);
+        expect(cachedResponse.id.indexOf(reqs[i].urlString))
+            .toBeGreaterThan(-1);
         expect(cachedResponse.statusCode).toBe(200);
         expect(cachedResponse.data.toString()).toBe(HELLO_WORLD);
 
@@ -305,9 +372,12 @@ describe('CacheHandler', function() {
                   var array = arraySink.array;
                   expect(array.length).toBe(3);
 
-                  expect(array[0].id).toBe(reqs[2].urlString);
-                  expect(array[1].id).toBe(reqs[3].urlString);
-                  expect(array[2].id).toBe(reqs[4].urlString);
+                  expect(array[0].id.indexOf(reqs[2].urlString))
+                      .toBeGreaterThan(-1);
+                  expect(array[1].id.indexOf(reqs[3].urlString))
+                      .toBeGreaterThan(-1);
+                  expect(array[2].id.indexOf(reqs[4].urlString))
+                      .toBeGreaterThan(-1);
 
                   array.forEach(function(cachedResponse) {
                     expect(cachedResponse.statusCode).toBe(200);

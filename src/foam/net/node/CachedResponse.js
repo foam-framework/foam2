@@ -23,14 +23,6 @@ foam.CLASS({
 
   imports: [ 'info' ],
 
-  constants: {
-    // TODO(markdittmer): Turn into static method: "idFromReq" once
-    // https://github.com/foam-framework/foam2/issues/613 is fixed.
-    ID_FROM_REQ: function(req) {
-      return req.urlString;
-    }
-  },
-
   properties: [
     {
       class: 'String',

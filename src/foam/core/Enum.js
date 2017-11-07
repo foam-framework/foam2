@@ -265,7 +265,13 @@ foam.CLASS({
   ],
 
   properties: [
-    { name: 'documentation', adapt: function(_, d) { return typeof d === 'function' ? foam.String.multiline(d).trim() : d; } },
+    {
+      class: 'String',
+      name: 'documentation',
+      adapt: function(_, d) {
+        return typeof d === 'function' ? foam.String.multiline(d).trim() : d;
+      }
+    },
     {
       class: 'Int',
       name: 'ordinal',
