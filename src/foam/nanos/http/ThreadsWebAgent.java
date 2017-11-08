@@ -26,8 +26,9 @@ public class ThreadsWebAgent
     Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 
     Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+    out.println("<HTML>");
     out.println("<HEAD><TITLE>Threads</TITLE></HEAD>\n");
-    out.println("<HTML><BODY>");
+    out.println("<BODY>");
     out.println("<pre>");
     out.println("<H1>Threads</H1>\n");
 
