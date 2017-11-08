@@ -579,7 +579,7 @@ stmt.setObject(builder.toString());`
       args: [
         {
           name: 'builder',
-          javaType: 'java.lang.StringBuilder'
+          javaType: 'StringBuilder'
         },
         {
           name: 'o',
