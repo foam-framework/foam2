@@ -27,25 +27,26 @@ public class ThreadsWebAgent
 
     Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
     out.println("<HEAD><TITLE>Threads</TITLE></HEAD>\n");
+    out.println("<HTML><BODY>");
     out.println("<pre>");
     out.println("<H1>Threads</H1>\n");
 
-    for (Thread thread : threadArray){
+    for ( Thread thread : threadArray ){
       out.println("<a href=\"threads?id="+ thread.getId() + "\">" + thread.toString() + "</a>");
     }
 
     String param = req.getParameter("id");
-    if(param != null && !param.isEmpty()){
+    if( param != null && !param.isEmpty() ){
       out.println("<H1>Stack Trace</H1>\n");
       
-      for (Thread thread : threadArray){
+      for ( Thread thread : threadArray ){
         Long id = new Long(thread.getId());
 
-        if(param.equals(id.toString())){
+        if( param.equals(id.toString()) ){
           out.println("<H4>Thread: " + thread.getName() + "</H4>\n");
           StackTraceElement[] elements = thread.getStackTrace();
 
-          for(StackTraceElement element : elements) {
+          for( StackTraceElement element : elements ) {
             out.println(element.toString());
           }
           break;
@@ -53,5 +54,6 @@ public class ThreadsWebAgent
       }
     }
     out.println("</pre>");
+    out.println("</BODY></HTML>");
   }
 }
