@@ -9,6 +9,23 @@ foam.CLASS({
   requires: [
     'foam.swift.Field',
   ],
+  properties: [
+    {
+      class: 'String',
+      name: 'swiftName',
+      expression: function(name) { return name; },
+    },
+    {
+      class: 'Boolean',
+      name: 'swiftSupport',
+      value: true,
+    },
+    {
+      class: 'String',
+      name: 'swiftPrivateAxiomName',
+      expression: function(swiftName) { return '_' + foam.String.constantize(swiftName) + '_'; },
+    },
+  ],
   methods: [
     function writeToSwiftClass(cls) {
       cls.fields.push(this.Field.create({
@@ -23,6 +40,14 @@ foam.CLASS({
         type: 'Slot?',
         getter: this.slotGetter(),
         visibility: 'public',
+      }));
+      cls.fields.push(this.Field.create({
+        visibility: 'private',
+        static: true,
+        final: true,
+        name: this.swiftPrivateAxiomName,
+        type: 'Axiom',
+        initializer: this.swiftPropertyInfoInit(),
       }));
     },
   ],
@@ -48,5 +73,16 @@ return __context__["<%=this.key%>"]
 self.<%=this.name%>$?.swiftSet(value)
       */},
     },
+    {
+      name: 'swiftPropertyInfoInit',
+      template: function() {/*
+class PInfo: Axiom {
+  let name = "<%=this.swiftName%>"
+  let classInfo: ClassInfo
+  init(_ ci: ClassInfo) { classInfo = ci }
+}
+return PInfo(classInfo())
+      */},
+    }
   ],
 });

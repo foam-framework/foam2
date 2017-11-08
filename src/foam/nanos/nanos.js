@@ -46,7 +46,7 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
-  { name: "foam/nanos/auth/WebAuthService" },
+  { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
@@ -55,5 +55,10 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
+  { name: 'foam/nanos/notification/push/PushService' },
+  { name: 'foam/nanos/notification/push/FirebasePushService' },
+  { name: 'foam/nanos/register/RegistrationService' },
+  { name: 'foam/nanos/register/ClientRegistrationService' },
+  { name: 'foam/nanos/register/UserRegistrationService' },
   { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
 ]);
