@@ -10,6 +10,7 @@ import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
 import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -26,7 +27,8 @@ public abstract class AbstractArrayPropertyInfo
       this.set(obj, null);
       return;
     }
-    java.util.List<String> list = new java.util.LinkedList<String>();
+    // TODO: TO REUSE THIS LIST WITH A THREADLOCAL FOR BETTER PERFORMANCE
+    List<String> list = new LinkedList<String>();
     StringBuilder sb = new StringBuilder(); 
     char prev = '$';
     int length = value.length();
@@ -54,10 +56,9 @@ public abstract class AbstractArrayPropertyInfo
     }
     list.add(sb.toString());
     int resultSize = list.size();
-    System.out.println("list size: " + list.size());
     String[] result = new String[resultSize];
     //add support for other array types
-    this.set(obj, list.subList(0, resultSize).toArray(result));
+    this.set(obj, list.toArray(result));
   }
 
   public abstract String of();
@@ -112,7 +113,7 @@ public abstract class AbstractArrayPropertyInfo
       return;
     }
     Object[] os = (Object[]) obj;
-    java.lang.StringBuilder sb = new java.lang.StringBuilder();
+    StringBuilder sb = new StringBuilder();
     int length = os.length;
     if ( length == 0 ) {
       stmt.setObject(null);
@@ -122,7 +123,7 @@ public abstract class AbstractArrayPropertyInfo
       if ( os[i] == null )
         sb.append("");
       else {
-        sb.append(os[i].toString().replace("\\","\\\\").replace(",","\\,"));
+        escapeCommasAndAppend(sb, os[i]);
       }
       if ( i < length - 1 ) {
         sb.append(",");
@@ -132,8 +133,17 @@ public abstract class AbstractArrayPropertyInfo
   }
 
   @Override
-  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException {
     String value = (String) resultSet.getObject(index);
     setFromString(o, value);
+  }
+
+  private void escapeCommasAndAppend(StringBuilder builder, Object o) {
+    String s = o.toString();
+    //replace backslash to double backslash
+    s = s.replace("\\", "\\\\");
+    //replace comma to backslash+comma
+    s = s.replace(",", "\\,");
+    builder.append(s);
   }
 }
