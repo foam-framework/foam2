@@ -22,43 +22,42 @@ public abstract class AbstractArrayPropertyInfo
 {
   @Override
   public void setFromString(Object obj, String value) {
-    System.out.println("return String: " + value);
     if ( value == null ) {
       this.set(obj, null);
       return;
-   }
-   java.util.List<String> list = new java.util.LinkedList<String>();
-   StringBuilder sb = new StringBuilder(); 
-   char prev = '$';
-   int length = value.length();
-   char[] cs = value.toCharArray();
-   for ( int i = 0 ; i < cs.length ; i++ ) {
-       if ( cs[i] == '\\' ) {
-           if ( prev == '\\' ) {
-               sb.append("\\");
-               prev = '$';
-           } else {
-               prev = '\\';
-           }
-       } else if ( cs[i] == ',' ) {
-           if ( prev == '\\' ) {
-               sb.append(',');
-           } else {
-               list.add(sb.toString());
-               sb.setLength(0);
-           }
-           prev = '$';
-       } else {
-           sb.append(cs[i]);
-           prev = cs[i];
-       }
-   }
-   list.add(sb.toString());
-   int resultSize = list.size();
-   System.out.println("list size: " + list.size());
-   String[] result = new String[resultSize];
-   //add support for other array types
-   this.set(obj, list.subList(0, resultSize).toArray(result));
+    }
+    java.util.List<String> list = new java.util.LinkedList<String>();
+    StringBuilder sb = new StringBuilder(); 
+    char prev = '$';
+    int length = value.length();
+    char[] cs = value.toCharArray();
+    for ( int i = 0 ; i < cs.length ; i++ ) {
+      if ( cs[i] == '\\' ) {
+        if ( prev == '\\' ) {
+          sb.append("\\");
+          prev = '$';
+        } else {
+          prev = '\\';
+        }
+      } else if ( cs[i] == ',' ) {
+        if ( prev == '\\' ) {
+          sb.append(',');
+        } else {
+          list.add(sb.toString());
+          sb.setLength(0);
+        }
+        prev = '$';
+      } else {
+        sb.append(cs[i]);
+        prev = cs[i];
+      }
+    }
+    list.add(sb.toString());
+    int resultSize = list.size();
+    System.out.println("list size: " + list.size());
+    String[] result = new String[resultSize];
+    //add support for other array types
+    this.set(obj, list.subList(0, resultSize).toArray(result));
   }
 
   public abstract String of();
@@ -125,7 +124,7 @@ public abstract class AbstractArrayPropertyInfo
       else {
         sb.append(os[i].toString().replace("\\","\\\\").replace(",","\\,"));
       }
-        if ( i < length - 1 ) {
+      if ( i < length - 1 ) {
         sb.append(",");
       }
     }
