@@ -567,7 +567,7 @@ for ( int i = 0; i < length; i++ ) {
   if ( obj[i] == null )
     builder.append("");
   else 
-    builder.append(obj[i]);
+    builder.append(obj[i].toString().replace("\\\\","\\\\\\\\").replace(",","\\\\,"));
   if ( i < length - 1 ) {
     builder.append(",");
   }
