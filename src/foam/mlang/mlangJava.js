@@ -567,12 +567,34 @@ for ( int i = 0; i < length; i++ ) {
   if ( obj[i] == null )
     builder.append("");
   else 
-    builder.append(obj[i].toString().replace("\\\\","\\\\\\\\").replace(",","\\\\,"));
+    escapeCommasAndAppend(builder, obj[i]);
   if ( i < length - 1 ) {
     builder.append(",");
   }
 }
 stmt.setObject(builder.toString());`
+    },
+    {
+      name: 'escapeCommasAndAppend',
+      args: [
+        {
+          name: 'builder',
+          javaType: 'java.lang.StringBuilder'
+        },
+        {
+          name: 'o',
+          javaType: 'Object'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: 
+`String s = o.toString();
+//replace backslash to double backslash
+s = s.replace("\\\\", "\\\\\\\\");
+//replace comma to backslash+comma
+s = s.replace(",", "\\\\,");
+builder.append(s);
+`
     }
   ]
 });
