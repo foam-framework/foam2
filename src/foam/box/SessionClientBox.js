@@ -28,7 +28,7 @@ foam.CLASS({
       code: function send(msg) {
         // TODO: if I get an AuthException the call the requestLogin
         // handler then retry once it finishes.
-        console.log('************************* REPLY: ', foam.json.stringify(msg));
+        // console.log('************************* REPLY: ', foam.json.stringify(msg));
         // Exception looks like this:
         // {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"java.security.AccessControlException",message:"not logged in"}}}
         if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === "java.security.AccessControlException" ) {
@@ -50,15 +50,15 @@ foam.CLASS({
   name: 'SessionClientBox',
   extends: 'foam.box.ProxyBox',
 
-  implements: [ 'foam.box.Box' ],
-
   requires: [ 'foam.box.SessionReplyBox' ],
 
   constants: [
     {
       name: 'SESSION_KEY',
       value: 'sessionId',
-      type: 'String'
+      type: 'String',
+      swiftValue: '"sessionId"',
+      swiftType: 'String',
     }
   ],
 
@@ -75,6 +75,16 @@ foam.CLASS({
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       },
+      swiftExpressionArgs: ['sessionName'],
+      swiftExpression: `
+let defaults = UserDefaults.standard // TODO allow us to configure?
+if let id = defaults.string(forKey: sessionName) {
+  return id
+}
+let id = UUID().uuidString
+defaults.set(id, forKey: sessionName)
+return id
+      `,
       javaFactory:
 `String uuid = (String) getX().get(getSessionName());
 if ( "".equals(uuid) ) {
@@ -93,17 +103,23 @@ return uuid;`
 
         console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
-        /*
-        TODO: uncomment when webAuth removed
         msg.attributes.replyBox = this.SessionReplyBox.create({
           msg: msg,
           clientBox: this,
           delegate: msg.attributes.replyBox
         });
-        */
 
         this.delegate.send(msg);
-      }
+      },
+      swiftCode: `
+msg.attributes[SessionClientBox.SESSION_KEY] = sessionID
+msg.attributes["replyBox"] = SessionReplyBox_create([
+  "msg": msg,
+  "clientBox": self,
+  "delegate": msg.attributes["replyBox"]!,
+])
+try delegate.send(msg)
+      `,
     }
   ]
 });
