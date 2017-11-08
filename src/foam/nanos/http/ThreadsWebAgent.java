@@ -21,7 +21,7 @@ public class ThreadsWebAgent
 
   public void execute(X x) {
     final PrintWriter out  = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletRequest req = (HttpServletRequest) x.get(HttpServletRequest.class);
+    final HttpServletRequest req = (HttpServletRequest) x.get(HttpServletRequest.class);
 
     Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 
