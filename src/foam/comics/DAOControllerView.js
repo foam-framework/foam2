@@ -27,7 +27,7 @@ foam.CLASS({
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
-    .net-nanopay-ui-ActionView {
+    ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
       margin-right: 4px;
@@ -72,6 +72,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
+        addClass(this.myCls()).
         start('table').
           start('tr').
             start('td').style({display: 'block', padding: '8px'}).add(this.cls.PREDICATE).end().
