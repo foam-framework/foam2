@@ -35,6 +35,7 @@ foam.CLASS({
       // Fill in any missing methods with a method that just calls fatalError().
       // We need to do this in swift because abstract classes aren't a thing so
       // we need to implement all methods.
+      if ( ! foam.swift.SwiftClass.isInstance(cls) ) return;
       var of = foam.lookup(this.path);
       var interfaceMethods = of.getOwnAxiomsByClass(foam.core.Method).filter(function(m) {
         return m.swiftSupport;
