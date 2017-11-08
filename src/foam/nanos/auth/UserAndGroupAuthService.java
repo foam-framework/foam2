@@ -222,9 +222,14 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    // invalid password
+    if ( ! Password.isValid(newPassword) ) {
+      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
+    }
+
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
-      throw new AuthenticationException("Invalid password");
+      throw new AuthenticationException("Old password does not match current password");
     }
 
     // new password is the same
