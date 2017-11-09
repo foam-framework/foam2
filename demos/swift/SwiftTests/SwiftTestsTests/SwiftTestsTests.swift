@@ -350,9 +350,13 @@ class SwiftTestsTests: XCTestCase {
         self.parser = parser
       }
       func send(_ msg: Message) throws {
+        let reply = msg.attributes["replyBox"] as? Box
+
         let str = outputter.swiftStringify(msg)
-        let obj = parser.parseString(str)
-        try registry.send(obj as! Message)
+        let obj = parser.parseString(str) as! Message
+        obj.attributes["replyBox"] = reply
+
+        try registry.send(obj)
       }
     }
 
