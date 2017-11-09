@@ -58,7 +58,10 @@ foam.CLASS({
     },
     {
       class: 'EMail',
-      name: 'email'
+      name: 'email',
+      javaSetter:
+`email_ = val.toLowerCase();
+emailIsSet_ = true;`
     },
     {
       class: 'FObjectProperty',
