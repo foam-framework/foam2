@@ -17,8 +17,6 @@ foam.CLASS({
   templates: [
     {
       name: 'swiftCodeGenerator',
-      args: [],
-      template2: ``,
       template: function() {/*
 let delegate = try! self.obj.<%=this.property%>.get()
 let method = delegate.getSlot(key: "<%=this.swiftName%>")!.swiftGet() as! MethodSlotClosure
@@ -30,8 +28,6 @@ _ = try! method(args)
 <% } %>
       */},
     },
-  ],
-  methods: [
   ],
 });
 

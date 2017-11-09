@@ -42,11 +42,14 @@ foam.CLASS({
         to the src, and cache is updated to match.
       */
       class: 'foam.dao.DAOProperty',
+      required: true,
       name: 'src'
     },
     {
       /** The cache to read items quickly. Cache contains a complete
         copy of src. */
+      class: 'foam.dao.DAOProperty',
+      required: true,
       name: 'cache',
     },
     {
@@ -77,18 +80,39 @@ foam.CLASS({
         return this.PromisedDAO.create({
           promise: cacheFilled
         });
-      }
+      },
+      swiftExpressionArgs: ['src', 'cache'],
+      swiftExpression: `
+let pDao = self.PromisedDAO_create()
+DispatchQueue.global(qos: .background).async {
+  try? cache.removeAll()
+  _ = try? src.select(self.DAOSink_create(["dao": cache]))
+  pDao.promise.set(cache)
+}
+return pDao
+      `,
     },
   ],
 
   methods: [
-    function init() {
-      this.SUPER();
+    {
+      name: 'init',
+      code: function() {
+        this.SUPER();
 
-      var proxy = this.src$proxy;
-      proxy.sub('on', 'put',    this.onSrcPut);
-      proxy.sub('on', 'remove', this.onSrcRemove);
-      proxy.sub('on', 'reset',  this.onSrcReset);
+        var proxy = this.src$proxy;
+        proxy.sub('on', 'put',    this.onSrcPut);
+        proxy.sub('on', 'remove', this.onSrcRemove);
+        proxy.sub('on', 'reset',  this.onSrcReset);
+      },
+      swiftCode: `
+super.__foamInit__()
+
+let proxy = src$proxy;
+_ = proxy.sub(topics: ["on", "put"], listener: onSrcPut_listener);
+_ = proxy.sub(topics: ["on", "remove"], listener: onSrcRemove_listener);
+_ = proxy.sub(topics: ["on", "reset"], listener: onSrcReset_listener);
+      `,
     },
 
     /** Puts are sent to the cache and to the source, ensuring both
@@ -122,20 +146,40 @@ foam.CLASS({
   listeners: [
     /** Keeps the cache in sync with changes from the source.
       @private */
-    function onSrcPut(s, on, put, obj) {
-      this.delegate.put(obj);
+    {
+      name: 'onSrcPut',
+      code: function(s, on, put, obj) {
+        this.delegate.put(obj);
+      },
+      swiftCode: `
+let obj = args.last as! FObject
+_ = try? delegate.put(obj)
+      `,
     },
 
     /** Keeps the cache in sync with changes from the source.
       @private */
-    function onSrcRemove(s, on, remove, obj) {
-      this.delegate.remove(obj);
+    {
+      name: 'onSrcRemove',
+      code: function(s, on, remove, obj) {
+        this.delegate.remove(obj);
+      },
+      swiftCode: `
+let obj = args.last as! FObject
+_ = try? delegate.remove(obj)
+      `,
     },
 
     /** Keeps the cache in sync with changes from the source.
       @private */
-    function onSrcReset() {
-      // TODO: Should this removeAll from the cache?
+    {
+      name: 'onSrcReset',
+      code: function() {
+        // TODO: Should this removeAll from the cache?
+      },
+      swiftCode: `
+// TODO: Should this removeAll from the cache?
+      `,
     }
   ]
 });
