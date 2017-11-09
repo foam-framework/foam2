@@ -142,6 +142,8 @@
 		10ABA6761F9F9C2A0045BCA2 /* CustomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10ABA6751F9F9C2A0045BCA2 /* CustomView.xib */; };
 		10ABA67E1FA1626A0045BCA2 /* TestRowView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10ABA67D1FA1626A0045BCA2 /* TestRowView.xib */; };
 		10E1BA281F6AE50C00215766 /* ParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E1BA271F6AE50C00215766 /* ParserTests.swift */; };
+		10F46DD41FB4BD610036AB27 /* foam_core_EventProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F46DD31FB4BD610036AB27 /* foam_core_EventProxy.swift */; };
+		10F46DD61FB4F8CC0036AB27 /* foam_dao_NullDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F46DD51FB4F8CB0036AB27 /* foam_dao_NullDAO.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -303,6 +305,8 @@
 		10ABA6751F9F9C2A0045BCA2 /* CustomView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomView.xib; sourceTree = "<group>"; };
 		10ABA67D1FA1626A0045BCA2 /* TestRowView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TestRowView.xib; sourceTree = "<group>"; };
 		10E1BA271F6AE50C00215766 /* ParserTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParserTests.swift; sourceTree = "<group>"; };
+		10F46DD31FB4BD610036AB27 /* foam_core_EventProxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_core_EventProxy.swift; sourceTree = "<group>"; };
+		10F46DD51FB4F8CB0036AB27 /* foam_dao_NullDAO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = foam_dao_NullDAO.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -392,6 +396,7 @@
 				1048A98C1FB26FFD00F5DF98 /* foam_box_BoxRegistryBox.swift */,
 				1048A97D1FB26FFC00F5DF98 /* foam_box_BoxService.swift */,
 				1048A98A1FB26FFD00F5DF98 /* foam_box_ClassWhitelistContext.swift */,
+				10F46DD51FB4F8CB0036AB27 /* foam_dao_NullDAO.swift */,
 				1048A99B1FB26FFF00F5DF98 /* foam_box_ClientBoxRegistry.swift */,
 				1048A96A1FB26FFA00F5DF98 /* foam_box_Context.swift */,
 				1048A9881FB26FFD00F5DF98 /* foam_box_HelloMessage.swift */,
@@ -412,6 +417,7 @@
 				1048A9331FB26FF500F5DF98 /* foam_box_SkeletonBox.swift */,
 				1048A9991FB26FFE00F5DF98 /* foam_box_SubBox.swift */,
 				1048A9691FB26FFA00F5DF98 /* foam_box_SubBoxMessage.swift */,
+				10F46DD31FB4BD610036AB27 /* foam_core_EventProxy.swift */,
 				1048A9871FB26FFD00F5DF98 /* foam_core_Exception.swift */,
 				1048A94B1FB26FF700F5DF98 /* foam_core_Serializable.swift */,
 				1048A9371FB26FF500F5DF98 /* foam_dao_AbstractDAO.swift */,
@@ -703,6 +709,7 @@
 				1048AA151FB2700000F5DF98 /* foam_swift_parse_json_Whitespace.swift in Sources */,
 				1048AA231FB2700000F5DF98 /* foam_swift_ui_FOAMActionUIButton.swift in Sources */,
 				1048A9BB1FB2700000F5DF98 /* foam_swift_core_SubSlot.swift in Sources */,
+				10F46DD41FB4BD610036AB27 /* foam_core_EventProxy.swift in Sources */,
 				1048A9BC1FB2700000F5DF98 /* foam_swift_parse_json_AnyParser.swift in Sources */,
 				1048A9F01FB2700000F5DF98 /* foam_swift_ui_PropertyView.swift in Sources */,
 				1048AA051FB2700000F5DF98 /* foam_core_Exception.swift in Sources */,
@@ -775,6 +782,7 @@
 				1048A9A71FB2700000F5DF98 /* foam_swift_parse_json_output_Outputter.swift in Sources */,
 				1048AA1F1FB2700000F5DF98 /* RegisterClasses.swift in Sources */,
 				1048A9AA1FB2700000F5DF98 /* foam_swift_parse_parser_Seq2.swift in Sources */,
+				10F46DD61FB4F8CC0036AB27 /* foam_dao_NullDAO.swift in Sources */,
 				1048A9F51FB2700000F5DF98 /* foam_dao_PromisedDAO.swift in Sources */,
 				1048A9E01FB2700000F5DF98 /* foam_swift_parse_parser_Not.swift in Sources */,
 				1048A9C31FB2700000F5DF98 /* foam_box_ProxyBox.swift in Sources */,

@@ -39,7 +39,7 @@ for (i, o) in dao.enumerated() {
   }
 }
 if !found { dao.append(obj) }
-_ = pub(["put", obj])
+_ = on["put"].pub([obj])
 return obj
       */},
     },
@@ -51,7 +51,7 @@ let i = dao.index { (o) -> Bool in
 }
 if i == nil { return nil }
 let o = dao.remove(at: i!)
-_ = pub(["remove", o])
+_ = on["remove"].pub([obj])
 return o
       */},
     },

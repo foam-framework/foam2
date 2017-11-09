@@ -136,8 +136,10 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testDaoListen() {
-    let dao = ArrayDAO([
-      "of": Test.classInfo(),
+    let dao = ProxyDAO([
+      "delegate": ArrayDAO([
+        "of": Test.classInfo(),
+      ])
     ])
 
     let sink = Count()
