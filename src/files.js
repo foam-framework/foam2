@@ -318,6 +318,7 @@ FOAM_FILES([
   { name: "lib/boxJava", flags: ['java'] },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
+  { name: "foam/swift/refines/Promised", flags: ['swift'] },
   { name: "foam/swift/refines/Box", flags: ['swift'] },
 
   { name: "foam/box/Runnable" },
