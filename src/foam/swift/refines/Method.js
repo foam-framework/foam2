@@ -247,7 +247,7 @@ return ConstantSlot([
     <%=isMutable(a) ? 'var' : 'let' %> <%
   %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
 <% }) %>
-    
+
     return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
         <%=this.swiftArgs.map(function(a){
           return (a.externalName ? a.externalName + ': ' : '') +
