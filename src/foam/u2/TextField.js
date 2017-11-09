@@ -31,7 +31,8 @@ foam.CLASS({
       class: 'Int',
       name: 'displayWidth'
     },
-    'type'
+    'type',
+    'placeholder'
   ],
 
   methods: [
@@ -40,6 +41,7 @@ foam.CLASS({
 
       if ( this.type         ) this.setAttribute('type', this.type);
       if ( this.displayWidth ) this.setAttribute('size', this.displayWidth);
+      if ( this.placeholder )  this.setAttribute('placeholder', this.placeholder);
     },
 
     function fromProperty(prop) {
