@@ -49,7 +49,8 @@ foam.CLASS({
       attribute: true,
       // documentation: 'When set, will limit the length of the input to a certain number'
     },
-    'type'
+    'type',
+    'placeholder'
   ],
 
   axioms: [
@@ -64,6 +65,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       if ( this.type ) this.attrs({ type: this.type });
+      if ( this.placeholder ) this.setAttribute('placeholder', this.placeholder);
       if ( this.maxLength > 0 ) this.setAttribute('maxlength', this.maxLength);
       this.initCls();
       this.link();
