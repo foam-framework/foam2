@@ -11,7 +11,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'sendEmail',
-      javaReturns: 'boolean',
+      javaReturns: 'void',
       returns: 'Promise',
       args: [
         {
@@ -22,7 +22,7 @@ foam.INTERFACE({
     },
     {
       name: 'sendEmailFromTemplate',
-      javaReturns: 'boolean',
+      javaReturns: 'void',
       returns: 'Promise',
       args: [
         {

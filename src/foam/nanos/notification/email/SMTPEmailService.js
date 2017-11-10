@@ -16,7 +16,10 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.core.ContextAgent',
+    'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.pool.FixedThreadPool',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
@@ -61,6 +64,18 @@ foam.CLASS({
     {
       class: 'String',
       name: 'password'
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function (cls) {
+        cls.extras.push(foam.java.Code.create({
+          data:
+  `FixedThreadPool pool = new FixedThreadPool();`
+        }));
+      }
     }
   ],
 
@@ -127,47 +142,46 @@ foam.CLASS({
   message.setSentDate(new Date());
   return message;
 } catch (MessagingException e) {
+  e.printStackTrace();
   return null;
 }`
     },
     {
-      name: 'sendMessage',
-      javaReturns: 'boolean',
+      name: 'sendEmail',
       args: [
         {
           name: 'emailMessage',
-          javaType: 'foam.nanos.notification.email.EmailMessage'
+          javaType: 'final foam.nanos.notification.email.EmailMessage'
         }
       ],
       javaCode:
-`MimeMessage message = createMimeMessage(emailMessage);
-if ( message == null )
-  return false;
+`pool.submit(getX(), new ContextAgent() {
+  @Override
+  public void execute(X x) {
+    try {
+      MimeMessage message = createMimeMessage(emailMessage);
+      if ( message == null ) {
+        return;
+      }
 
-try {
-  // send message
-  Transport transport = getSession().getTransport("smtp");
-  transport.connect(getHost(), getUsername(), getPassword());
-  transport.sendMessage(message, message.getAllRecipients());
-  transport.close();
-  return true;
-} catch (Throwable t) {
-  return false;
-}`
-    },
-    {
-      name: 'sendEmail',
-      javaReturns: 'boolean',
-      javaCode: 'return sendMessage(emailMessage);'
+      // send message
+      Transport transport = getSession().getTransport("smtp");
+      transport.connect(getHost(), getUsername(), getPassword());
+      transport.sendMessage(message, message.getAllRecipients());
+      transport.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+});`
     },
     {
       name: 'sendEmailFromTemplate',
-      javaReturns: 'boolean',
       javaCode:
 `DAO emailTemplateDAO = (DAO) getX().get("emailTemplateDAO");
 EmailTemplate emailTemplate = (EmailTemplate) emailTemplateDAO.find(name);
 if ( emailMessage == null )
-  return false;
+  return;
 
 EnvironmentConfiguration config = getConfig();
 if ( config == null ) {
@@ -184,7 +198,7 @@ if ( config == null ) {
 JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage.setBody(template.render(model));
-return sendMessage(emailMessage);`
+sendEmail(emailMessage);`
     },
     {
       name: 'start',
