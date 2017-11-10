@@ -15,6 +15,10 @@ foam.CLASS({
     'foam.nanos.notification.email.EmailService'
   ],
 
+  imports: [
+    'threadPool'
+  ],
+
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
@@ -64,18 +68,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'password'
-    }
-  ],
-
-  axioms: [
-    {
-      name: 'javaExtras',
-      buildJavaClass: function (cls) {
-        cls.extras.push(foam.java.Code.create({
-          data:
-  `FixedThreadPool pool = new FixedThreadPool();`
-        }));
-      }
     }
   ],
 
@@ -155,7 +147,7 @@ foam.CLASS({
         }
       ],
       javaCode:
-`pool.submit(getX(), new ContextAgent() {
+`((FixedThreadPool) getThreadPool()).submit(getX(), new ContextAgent() {
   @Override
   public void execute(X x) {
     try {
