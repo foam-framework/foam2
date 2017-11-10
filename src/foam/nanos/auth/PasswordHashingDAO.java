@@ -23,10 +23,27 @@ public class PasswordHashingDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
+    // get password prop info, check if exists and is set
     PropertyInfo prop = (PropertyInfo) obj.getClassInfo().getAxiomByName("password");
-    if ( prop != null && prop.get(obj) instanceof String ) {
-      prop.set(obj, Password.hash((String) prop.get(obj)));
+    if ( prop == null || ! prop.isSet(obj) ) {
+      return super.put_(x, obj);
     }
+
+    Object id = obj.getProperty("id");
+    FObject result = getDelegate().find(id);
+    // hash password if result does not exist or does not have password set
+    if ( result == null || ! prop.isSet(result) ) {
+      prop.set(obj, Password.hash((String) prop.get(obj)));
+      return super.put_(x, obj);
+    }
+
+    // check if incoming password equals stored password
+    String pass1 = (String) prop.get(obj);
+    String pass2 = (String) prop.get(result);
+    if ( ! pass1.equals(pass2) || ! Password.verify(pass1, pass2) ) {
+      throw new RuntimeException("Illegal change of password");
+    }
+
     return super.put_(x, obj);
   }
 }
