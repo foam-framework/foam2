@@ -8,19 +8,19 @@ package foam.nanos.auth;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import foam.dao.*;
+import foam.dao.DAO;
+import foam.dao.ListSink;
+import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.Email;
 import foam.util.LRULinkedHashMap;
 import foam.util.Password;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.regex.Pattern;
+import foam.util.SafetyUtil;
+
 import javax.naming.AuthenticationException;
+import java.util.*;
 
 public class UserAndGroupAuthService
     extends    ContextAwareSupport
@@ -123,7 +123,7 @@ public class UserAndGroupAuthService
    * and return the user in the context.
    */
   public User login(X x, long userId, String password) throws AuthenticationException {
-    if ( userId < 1 || password == null || password.isEmpty() ) {
+    if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
@@ -144,11 +144,11 @@ public class UserAndGroupAuthService
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    if ( email == null || email.isEmpty() || ! Email.isValid(email) ) {
+    if ( SafetyUtil.isEmpty(email) || ! Email.isValid(email) ) {
       throw new AuthenticationException("Invalid email");
     }
 
-    if ( password == null || password.isEmpty() || ! Password.isValid(password) ) {
+    if ( SafetyUtil.isEmpty(password) || ! Password.isValid(password) ) {
       throw new AuthenticationException("Invalid password");
     }
 
@@ -208,7 +208,7 @@ public class UserAndGroupAuthService
    * and return a context with the updated user information
    */
   public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
-    if ( x == null || oldPassword == null || oldPassword.isEmpty() || newPassword == null || newPassword.isEmpty() ) {
+    if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
       throw new AuthenticationException("Invalid parameters");
     }
 
@@ -254,7 +254,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid User");
     }
 
-    if ( user.getEmail() == null || user.getEmail().isEmpty() ) {
+    if ( SafetyUtil.isEmpty(user.getEmail()) ) {
       throw new AuthenticationException("Email is required for creating a user");
     }
 
@@ -262,15 +262,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Email format is invalid");
     }
 
-    if ( user.getFirstName() == null || user.getFirstName().isEmpty() ) {
+    if ( SafetyUtil.isEmpty(user.getFirstName()) ) {
       throw new AuthenticationException("First Name is required for creating a user");
     }
 
-    if ( user.getLastName() == null || user.getLastName().isEmpty() ) {
+    if ( SafetyUtil.isEmpty(user.getLastName()) ) {
       throw new AuthenticationException("Last Name is required for creating a user");
     }
 
-    if ( user.getPassword() == null || user.getPassword().isEmpty() ) {
+    if ( SafetyUtil.isEmpty(user.getPassword()) ) {
       throw new AuthenticationException("Password is required for creating a user");
     }
 
