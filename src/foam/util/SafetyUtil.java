@@ -25,6 +25,6 @@ public class SafetyUtil {
   }
 
   public static boolean isEmpty(String s) {
-    return ( s != null && ! s.isEmpty() );
+    return s == null || s.isEmpty();
   }
 }
