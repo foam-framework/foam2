@@ -68,8 +68,8 @@ foam.CLASS({
       var bg = this.E('div').
         style({
           position: 'absolute',
-          width: '10000px',
-          height: '10000px',
+          width: '100%',
+          height: '100%',
           opacity: 0,
           top: 0,
           zIndex: 998
