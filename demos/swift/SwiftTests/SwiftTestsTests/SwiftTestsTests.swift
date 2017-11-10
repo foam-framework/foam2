@@ -3,6 +3,8 @@ import XCTest
 
 class SwiftTestsTests: XCTestCase {
 
+  let x = Context.GLOBAL
+
   override func setUp() {
     super.setUp()
   }
@@ -134,8 +136,10 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testDaoListen() {
-    let dao = ArrayDAO([
-      "of": Test.classInfo(),
+    let dao = ProxyDAO([
+      "delegate": ArrayDAO([
+        "of": Test.classInfo(),
+      ])
     ])
 
     let sink = Count()
@@ -346,9 +350,13 @@ class SwiftTestsTests: XCTestCase {
         self.parser = parser
       }
       func send(_ msg: Message) throws {
+        let reply = msg.attributes["replyBox"] as? Box
+
         let str = outputter.swiftStringify(msg)
-        let obj = parser.parseString(str)
-        try registry.send(obj as! Message)
+        let obj = parser.parseString(str) as! Message
+        obj.attributes["replyBox"] = reply
+
+        try registry.send(obj)
       }
     }
 
@@ -464,5 +472,19 @@ class SwiftTestsTests: XCTestCase {
     t2.copyFrom(t1)
     XCTAssertTrue(t1.isEqual(t2))
     XCTAssertEqual(t2.firstName, "a")
+  }
+
+  func testPromisedDAO() {
+    let dao = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+    let pDao = x.create(PromisedDAO.self)!
+
+    DispatchQueue.global(qos: .background).async {
+      _ = try? dao.put(self.x.create(Test.self, args: ["firstName": "A"])!)
+      _ = try? dao.put(self.x.create(Test.self, args: ["firstName": "B"])!)
+      pDao.promise.set(dao)
+    }
+
+    let a = try? pDao.select() as! ArraySink
+    XCTAssertEqual(a?.array.count, 2)
   }
 }
