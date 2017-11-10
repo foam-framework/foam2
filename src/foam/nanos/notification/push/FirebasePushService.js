@@ -27,6 +27,7 @@ foam.CLASS({
   javaImports: [
     'foam.lib.json.Outputter',
     'foam.lib.json.OutputterMode',
+    'foam.util.SafetyUtil',
     'java.io.OutputStreamWriter',
     'java.net.HttpURLConnection',
     'java.net.URL',
@@ -57,7 +58,7 @@ foam.CLASS({
 OutputStreamWriter wr = null;
 
 try {
-  if ( user == null || user.getDeviceToken() == null || user.getDeviceToken().isEmpty() )
+  if ( user == null || SafetyUtil.isEmpty(user.getDeviceToken()) )
     throw new RuntimeException("Invalid Parameters: Missing user");
   if ( msg == null || msg.isEmpty() )
     throw new RuntimeException("Invalid Parameter: Missing message");
