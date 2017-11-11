@@ -79,7 +79,8 @@ foam.CLASS({
         .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))
       .endContext()
       */
-      this.addClass(this.myCls()).
+      this.
+      addClass(this.myCls()).
       start('table').
         start('tr').
           start('td').style({'vertical-align': 'top', 'width': '100%'}).
@@ -95,11 +96,6 @@ foam.CLASS({
           end().
         end().
       end();
-      /*
-      this.add(
-        this.data.cls_.getAxiomsByClass(foam.core.Action),
-        this.DAOUpdateController.OBJ);
-        */
     }
   ],
 
