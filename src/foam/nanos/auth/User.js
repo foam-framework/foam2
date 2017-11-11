@@ -16,7 +16,7 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified', 'profilePicture'
+    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
   ],
 
   properties: [
@@ -69,16 +69,22 @@ emailIsSet_ = true;`
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
-      name: 'phone'
+      name: 'phone',
+      factory: function() { return foam.nanos.auth.Phone.create(); }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
-      name: 'mobile'
+      name: 'mobile',
+      factory: function() { return foam.nanos.auth.Phone.create(); }
     },
     {
       class: 'String',
-      name: 'type'
+      name: 'type',
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ 'Personal', 'Business', 'Broker', 'Bank' ]
+      }
     },
     {
       class: 'DateTime',
@@ -115,12 +121,14 @@ emailIsSet_ = true;`
     {
       class: 'Password',
       name: 'password',
+      hidden: true,
       displayWidth: 30,
       width: 100
     },
     {
       class: 'Password',
       name: 'previousPassword',
+      hidden: true,
       displayWidth: 30,
       width: 100
     },
@@ -134,6 +142,7 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'note',
       displayWidth: 70,
+      displayHeight: 6
     },
     // TODO: remove after demo
     {
