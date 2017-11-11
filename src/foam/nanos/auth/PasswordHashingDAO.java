@@ -40,7 +40,7 @@ public class PasswordHashingDAO
     // check if incoming password equals stored password
     String pass1 = (String) prop.get(obj);
     String pass2 = (String) prop.get(result);
-    if ( ! pass1.equals(pass2) || ! Password.verify(pass1, pass2) ) {
+    if ( ! pass1.equals(pass2) ) {
       throw new RuntimeException("Illegal change of password");
     }
 
