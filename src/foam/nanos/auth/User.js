@@ -148,7 +148,7 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'note',
       displayWidth: 70,
-      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
     },
     // TODO: remove after demo
     {
