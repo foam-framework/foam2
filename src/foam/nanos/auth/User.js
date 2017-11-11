@@ -50,15 +50,18 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'organization'
+      name: 'organization',
+      width: 50
     },
     {
       class: 'String',
-      name: 'department'
+      name: 'department',
+      width: 50
     },
     {
       class: 'EMail',
       name: 'email',
+      width: 50,
       preSet: function (_, val) {
         return val.toLowerCase();
       },
@@ -87,7 +90,7 @@ emailIsSet_ = true;`
       }
     },
     {
-      class: 'DateTime',
+      class: 'Date',
       name: 'birthday'
     },
     {
@@ -100,12 +103,14 @@ emailIsSet_ = true;`
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
-      name: 'address'
+      name: 'address',
+      factory: function() { return foam.nanos.auth.Address.create(); }
     },
     {
       class: 'FObjectArray',
       of: 'foam.core.FObject',
-      name: 'accounts'
+      name: 'accounts',
+      hidden: true
     },
     {
       class: 'Reference',
@@ -115,7 +120,8 @@ emailIsSet_ = true;`
     },
     {
       class: 'String',
-      name: 'timeZone'
+      name: 'timeZone',
+      width: 5
       // TODO: create custom view or DAO
     },
     {
@@ -148,30 +154,36 @@ emailIsSet_ = true;`
     {
       class: 'String',
       name: 'businessName',
-      documentation: 'Name of the business'
+      documentation: 'Name of the business',
+      width: 50
     },
     {
       class: 'String',
       name: 'businessIdentificationNumber',
+      width: 20,
       documentation: 'Business Identification Number (BIN)'
     },
     {
       class: 'String',
       name: 'bankIdentificationCode',
+      width: 20,
       documentation: 'Bank Identification Code (BIC)'
     },
     {
       class: 'String',
-      name: 'website'
+      name: 'website',
+      width: 50
     },
     {
       class: 'String',
-      name: 'businessType'
+      name: 'businessType',
+      width: 15
     },
     {
       class: 'String',
-      name: 'businessSector'
-    },
+      name: 'businessSector',
+      width: 15
+    }
   ],
 
   methods: [
