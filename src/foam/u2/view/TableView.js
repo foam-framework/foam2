@@ -33,6 +33,10 @@ foam.CLASS({
       value: function(value, obj, axiom) {
         this.add(value);
       }
+    },
+    {
+      class: 'Int',
+      name: 'tableWidth'
     }
   ]
 });
@@ -332,6 +336,9 @@ foam.CLASS({
               forEach(columns_, function(column) {
                 this.start('th').
                   addClass(view.myClass('th-' + column.name)).
+                  callIf(column.tableWidth, function() {
+                    this.style({width: column.tableWidth});
+                  }).
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   add(' ', this.slot(function(order) {
