@@ -14,8 +14,8 @@ foam.INTERFACE({
         {
           swiftType: 'PropertyInfo',
           name: 'prop',
-        },
-      ],
-    },
-  ],
+        }
+      ]
+    }
+  ]
 });
