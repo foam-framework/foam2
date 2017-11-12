@@ -19,8 +19,8 @@ describe('FileHandler', function() {
   var fs = require('fs');
 
   var PORT = 8888;
-  var PREFIX1 = '/greetings/hello';
-  var PREFIX2 = '/greetings/goodbye';
+  var PATHNAME1 = '/greetings/hello';
+  var PATHNAME2 = '/greetings/goodbye';
   var FILE1 = `${__dirname}/data/hello_world.txt`;
   var FILE2 = `${__dirname}/data/subdir/goodbye_world.txt`;
   var DATA1 = fs.readFileSync(FILE1).toString();
@@ -35,11 +35,11 @@ describe('FileHandler', function() {
     server = foam.net.node.Server.create({
       port: PORT
     });
-    router = foam.net.node.PathnamePrefixRouter.create(null, server);
-    router.addPathnamePrefix(PREFIX1, foam.net.node.FileHandler.create({
+    router = foam.net.node.PathnameRouter.create(null, server);
+    router.addPathname(PATHNAME1, foam.net.node.FileHandler.create({
       filePath: FILE1
     }));
-    router.addPathnamePrefix(PREFIX2, foam.net.node.FileHandler.create({
+    router.addPathname(PATHNAME2, foam.net.node.FileHandler.create({
       filePath: FILE2
     }));
     server.handler = router;
@@ -52,10 +52,10 @@ describe('FileHandler', function() {
     shutdownPromise = server.shutdown();
   });
 
-  it('should serve file based on path prefix', function(done) {
+  fit('should serve file based on pathname', function(done) {
     serverPromise.then(function() {
       return foam.net.node.HTTPRequest.create({
-        url: `http://0.0.0.0:${PORT}${PREFIX1}`
+        url: `http://0.0.0.0:${PORT}${PATHNAME1}`
       }).send();
     }).then(function(response) {
       expect(response.status).toBe(200);
@@ -64,7 +64,7 @@ describe('FileHandler', function() {
       expect(payload).toBe(DATA1);
     }).then(function() {
       return foam.net.node.HTTPRequest.create({
-        url: `http://0.0.0.0:${PORT}${PREFIX2}`
+        url: `http://0.0.0.0:${PORT}${PATHNAME2}`
       }).send();
     }).then(function(response) {
       expect(response.status).toBe(200);

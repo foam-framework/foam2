@@ -13,6 +13,7 @@ import foam.dao.ProxyDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
 import foam.util.Email;
+import foam.util.SafetyUtil;
 
 /**
  * DAO decorator that prevents putting a user with the same email
@@ -31,7 +32,7 @@ public class PreventDuplicateEmailDAO
     boolean newUser = ( getDelegate().find(user.getId()) == null );
 
     if ( newUser ) {
-      if ( user.getEmail() == null || user.getEmail().isEmpty() ) {
+      if ( SafetyUtil.isEmpty(user.getEmail()) ) {
         throw new RuntimeException("Email required");
       }
 
