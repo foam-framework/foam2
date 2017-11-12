@@ -24,7 +24,7 @@ foam.CLASS({
       class: 'Long',
       name: 'id',
       max: 999,
-      tableWidth: 40
+      tableWidth: 45
     },
     {
       class: 'String',
