@@ -31,11 +31,11 @@ public class PasswordHashingDAO
   @Override
   public FObject find_(X x, Object id) {
     FObject result = super.find_(x, id);
-    FObject cloned = result.fclone();
-    cloned.setProperty("password", null);
-    cloned.setProperty("previousPassword", null);
-    cloned.setProperty("passwordLastModified", null);
-    return cloned;
+    FObject clone = result.fclone();
+    clone.setProperty("password", null);
+    clone.setProperty("previousPassword", null);
+    clone.setProperty("passwordLastModified", null);
+    return clone;
   }
 
   @Override
@@ -60,10 +60,10 @@ public class PasswordHashingDAO
 
     // clone result and return copy with no password parameters
     FObject result = super.put_(x, obj);
-    FObject cloned = result.fclone();
-    cloned.setProperty("password", null);
-    cloned.setProperty("previousPassword", null);
-    cloned.setProperty("passwordLastModified", null);
-    return cloned;
+    FObject clone = result.fclone();
+    clone.setProperty("password", null);
+    clone.setProperty("previousPassword", null);
+    clone.setProperty("passwordLastModified", null);
+    return clone;
   }
 }
