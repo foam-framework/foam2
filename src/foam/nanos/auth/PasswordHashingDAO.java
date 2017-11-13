@@ -28,14 +28,8 @@ public class PasswordHashingDAO
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( sink == null ) sink = new ListSink();
-    ProxySink proxy = new ProxySink(x, sink) {
-      @Override
-      public void put(FObject obj, Detachable sub) {
-        super.put(sanitize(obj), sub);
-      }
-    };
-
-    super.select_(x, proxy, skip, limit, order, predicate);
+    PasswordRemovalSink passwordRemovalSink = new PasswordRemovalSink(x, sink);
+    super.select_(x, passwordRemovalSink, skip, limit, order, predicate);
     return sink;
   }
 
