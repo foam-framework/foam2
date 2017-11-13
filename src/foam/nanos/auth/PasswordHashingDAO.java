@@ -6,12 +6,19 @@
 
 package foam.nanos.auth;
 
+import foam.core.Detachable;
 import foam.core.FObject;
-import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import foam.dao.ProxySink;
+import foam.dao.Sink;
+import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
 import foam.util.Password;
+import foam.util.SafetyUtil;
+
+import java.util.Calendar;
 
 public class PasswordHashingDAO
     extends ProxyDAO
@@ -22,28 +29,41 @@ public class PasswordHashingDAO
   }
 
   @Override
+  public FObject find_(X x, Object id) {
+    FObject result = super.find_(x, id);
+    FObject cloned = result.fclone();
+    cloned.setProperty("password", null);
+    cloned.setProperty("previousPassword", null);
+    cloned.setProperty("passwordLastModified", null);
+    return cloned;
+  }
+
+  @Override
   public FObject put_(X x, FObject obj) {
     // get password prop info, check if exists and is set
-    PropertyInfo prop = (PropertyInfo) obj.getClassInfo().getAxiomByName("password");
-    if ( prop == null || ! prop.isSet(obj) ) {
+    if ( SafetyUtil.isEmpty((String) obj.getProperty("password")) ) {
       return super.put_(x, obj);
     }
 
     Object id = obj.getProperty("id");
-    FObject result = getDelegate().find(id);
+    FObject stored = getDelegate().find(id);
     // hash password if result does not exist or does not have password set
-    if ( result == null || ! prop.isSet(result) ) {
-      prop.set(obj, Password.hash((String) prop.get(obj)));
-      return super.put_(x, obj);
+    if ( stored == null || SafetyUtil.isEmpty((String) stored.getProperty("password")) ) {
+      obj.setProperty("password", Password.hash((String) obj.getProperty("password")));
+      obj.setProperty("previousPassword", null);
+      obj.setProperty("passwordLastModified", Calendar.getInstance().getTime());
+    } else {
+      obj.setProperty("password", stored.getProperty("password"));
+      obj.setProperty("previousPassword", stored.getProperty("previousPassword"));
+      obj.setProperty("passwordLastModified", stored.getProperty("passwordLastModified"));
     }
 
-    // check if incoming password equals stored password
-    String pass1 = (String) prop.get(obj);
-    String pass2 = (String) prop.get(result);
-    if ( ! pass1.equals(pass2) ) {
-      throw new RuntimeException("Illegal change of password");
-    }
-
-    return super.put_(x, obj);
+    // clone result and return copy with no password parameters
+    FObject result = super.put_(x, obj);
+    FObject cloned = result.fclone();
+    cloned.setProperty("password", null);
+    cloned.setProperty("previousPassword", null);
+    cloned.setProperty("passwordLastModified", null);
+    return cloned;
   }
 }
