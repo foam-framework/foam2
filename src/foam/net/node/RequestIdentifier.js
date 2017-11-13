@@ -17,21 +17,20 @@
 
 foam.CLASS({
   package: 'foam.net.node',
-  name: 'PathnamePrefixHandler',
-  extends: 'foam.net.node.BaseHandler',
+  name: 'RequestIdentifier',
 
-  documentation: `Handler that recieves its pathname prefix from a
-      PathnamePrefixRoute (or similar) export.`,
+  documentation: `An object responsible for generating an identifier for a
+      ServerRequest. This is leveraged by handlers that need to uniquely
+      identify related requests, such as CacheHandler.`,
 
-  imports: [ 'parentPrefix? as ctxPathnamePrefix' ],
-
-  properties: [
-    {
-      class: 'String',
-      name: 'pathnamePrefix',
-      expression: function(ctxPathnamePrefix) {
-        return ctxPathnamePrefix || '';
+  methods: [
+    function getId(req) {
+      if ( req.method === 'GET' ) {
+        return Promise.resolve(`GET ${req.urlString}`);
       }
-    }
-  ]
+      return req.payload.then(function(payload) {
+        return `${req.method} ${req.urlString}\n${payload}`;
+      });
+    },
+  ],
 });

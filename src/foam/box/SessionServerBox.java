@@ -58,7 +58,7 @@ public class SessionServerBox
         */
 
         System.err.println("**************************SETTING SESSION*********");
-        msg.getLocalAttributes().put("x", getX().put("Session.class", session));
+        msg.getLocalAttributes().put("x", getX().put(Session.class, session));
       }
     } catch (Throwable t) {
       t.printStackTrace();

@@ -17,21 +17,26 @@
 
 foam.CLASS({
   package: 'foam.net.node',
-  name: 'PathnamePrefixHandler',
-  extends: 'foam.net.node.BaseHandler',
+  name: 'PathnameRoute',
+  implements: [ 'foam.net.node.Route' ],
 
-  documentation: `Handler that recieves its pathname prefix from a
-      PathnamePrefixRoute (or similar) export.`,
-
-  imports: [ 'parentPrefix? as ctxPathnamePrefix' ],
+  imports: [ 'parentPrefix?' ],
+  exports: [ 'pathname' ],
 
   properties: [
     {
       class: 'String',
-      name: 'pathnamePrefix',
-      expression: function(ctxPathnamePrefix) {
-        return ctxPathnamePrefix || '';
-      }
+      name: 'pathname',
+      preSet: function(_, nu) {
+        return `${this.parentPrefix || ''}${nu}`;
+      },
+      required: true
+    }
+  ],
+
+  methods: [
+    function match(url) {
+      return url.pathname === this.pathname;
     }
   ]
 });
