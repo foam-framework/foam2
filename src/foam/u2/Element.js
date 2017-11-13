@@ -2005,6 +2005,7 @@ foam.CLASS({
   refines: 'foam.core.Float',
   requires: [ 'foam.u2.FloatView' ],
   properties: [
+    [ 'displayWidth', 12 ],
     [ 'view', { class: 'foam.u2.FloatView' } ]
   ]
 });
@@ -2014,6 +2015,7 @@ foam.CLASS({
   refines: 'foam.core.Int',
   requires: [ 'foam.u2.IntView' ],
   properties: [
+    [ 'displayWidth', 10 ],
     [ 'view', { class: 'foam.u2.IntView' } ]
   ]
 });
@@ -2023,6 +2025,7 @@ foam.CLASS({
   refines: 'foam.core.Currency',
   requires: [ 'foam.u2.CurrencyView' ],
   properties: [
+    [ 'displayWidth', 15 ],
     [ 'view', { class: 'foam.u2.CurrencyView' } ]
   ]
 });

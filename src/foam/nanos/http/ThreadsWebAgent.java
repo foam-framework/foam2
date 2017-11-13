@@ -7,6 +7,8 @@
 package foam.nanos.http;
 
 import foam.core.*;
+import foam.util.SafetyUtil;
+
 import java.io.PrintWriter;
 import java.lang.StackTraceElement;
 import java.lang.String;
@@ -15,7 +17,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 public class ThreadsWebAgent
-  implements WebAgent
+    implements WebAgent
 {
   public ThreadsWebAgent() {}
 
@@ -36,7 +38,7 @@ public class ThreadsWebAgent
     }
 
     String param = req.getParameter("id");
-    if ( param != null && ! param.isEmpty() ) {
+    if ( ! SafetyUtil.isEmpty(param) ) {
       out.println("<br><br><H2>Stack Trace</H2>\n");
 
       for ( Thread thread : threadArray ) {
