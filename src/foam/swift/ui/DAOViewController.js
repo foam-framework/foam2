@@ -4,29 +4,33 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 foam.CLASS({
   package: 'foam.swift.ui',
   name: 'DAOViewController',
+
   imports: [
-    'stack',
+    'stack'
   ],
+
   requires: [
     'foam.swift.ui.DAOCreateViewController',
     'foam.swift.ui.DAOTableViewSource',
     'foam.swift.ui.DAOUITableViewDelegate',
-    'foam.swift.ui.ScrollingViewController',
+    'foam.swift.ui.ScrollingViewController'
   ],
+
   swiftImports: [
-    'UIKit',
+    'UIKit'
   ],
+
   swiftImplements: [
-    'UITableViewDelegate',
+    'UITableViewDelegate'
   ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',
-      name: 'dao',
+      name: 'dao'
     },
     {
       class: 'FObjectProperty',
@@ -39,7 +43,7 @@ let dataSource = DAOTableViewSource_create([
   "dao$": self.dao$,
 ])
 return dataSource
-      */},
+      */}
     },
     {
       class: 'FObjectProperty',
@@ -49,7 +53,7 @@ return dataSource
 return DAOUITableViewDelegate_create([
   "dataSource$": dataSource$,
 ])
-      */},
+      */}
     },
     {
       class: 'FObjectProperty',
@@ -81,9 +85,10 @@ return tvc
       swiftPostSet: function() {/*
 dataSource.tableView = newValue.tableView
 newValue.tableView.delegate = tableViewDelegate
-      */},
+      */}
     },
   ],
+
   methods: [
     {
       name: 'onCreate',
@@ -91,7 +96,7 @@ newValue.tableView.delegate = tableViewDelegate
       swiftCode: function() {/*
 createVc.clearProperty("data")
 (stack as? UINavigationController)?.pushViewController(createVc.vc, animated: true)
-      */},
-    },
-  ],
+      */}
+    }
+  ]
 });

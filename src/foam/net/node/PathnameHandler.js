@@ -17,23 +17,11 @@
 
 foam.CLASS({
   package: 'foam.net.node',
-  name: 'PathnamePrefixRouter',
-  extends: 'foam.net.node.SimpleRouter',
-  implements: [ 'foam.net.node.PathnamePrefixHandler' ],
+  name: 'PathnameHandler',
+  extends: 'foam.net.node.PathnamePrefixHandler',
 
-  requires: [
-    'foam.net.node.PathnamePrefixHandler',
-    'foam.net.node.PathnamePrefixRoute'
-  ],
+  documentation: `Handler that recieves its pathname from a PathnameRoute (or
+      similar) export.`,
 
-  methods: [
-    function addPathnamePrefix(pathnamePrefix, handler) {
-      var route = this.PathnamePrefixRoute.create({
-        pathnamePrefix: pathnamePrefix
-      });
-      foam.assert(this.PathnamePrefixHandler.isInstance(handler),
-                  'PathnamePrefixRouter: Expected PathnamePrefixHandler');
-      return this.addRoute(route, handler);
-    }
-  ]
+  imports: [ 'pathname?' ],
 });

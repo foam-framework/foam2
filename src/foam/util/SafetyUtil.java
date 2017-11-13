@@ -23,4 +23,8 @@ public class SafetyUtil {
 
     return ((Comparable) o1).compareTo(o2);
   }
+
+  public static boolean isEmpty(String s) {
+    return s == null || s.isEmpty();
+  }
 }
