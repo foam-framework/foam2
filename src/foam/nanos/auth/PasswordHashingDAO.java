@@ -29,13 +29,19 @@ public class PasswordHashingDAO
   }
 
   @Override
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    ProxySink proxy = new ProxySink(x, sink) {
+      @Override
+      public void put(FObject obj, Detachable sub) {
+        super.put(sanitize(obj), sub);
+      }
+    };
+    return super.select_(x, proxy, skip, limit, order, predicate);
+  }
+
+  @Override
   public FObject find_(X x, Object id) {
-    FObject result = super.find_(x, id);
-    FObject clone = result.fclone();
-    clone.setProperty("password", null);
-    clone.setProperty("previousPassword", null);
-    clone.setProperty("passwordLastModified", null);
-    return clone;
+    return sanitize(super.find_(x, id));
   }
 
   @Override
@@ -55,7 +61,15 @@ public class PasswordHashingDAO
 
     // clone result and return copy with no password parameters
     FObject result = super.put_(x, obj);
-    FObject clone = result.fclone();
+    return sanitize(result);
+  }
+
+  private FObject sanitize(FObject obj) {
+    if ( obj == null ) {
+      return null;
+    }
+
+    FObject clone = obj.fclone();
     clone.setProperty("password", null);
     clone.setProperty("previousPassword", null);
     clone.setProperty("passwordLastModified", null);
