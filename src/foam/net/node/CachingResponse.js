@@ -38,7 +38,7 @@ foam.CLASS({
   properties: [
     {
       name: 'id',
-      factory: function() { return this.CachedResponse.ID_FROM_REQ(this.req); }
+      required: true
     },
     {
       class: 'FObjectProperty',

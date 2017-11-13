@@ -169,7 +169,8 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom) {
+    function writeToSwiftClass(cls, superAxiom, parentCls) {
+      if ( ! this.swiftSupport ) return;
       var isOverride = !!superAxiom;
       cls.fields.push(this.Field.create({
         visibility: 'public',
@@ -185,7 +186,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         final: true,
         name: this.swiftPrivateAxiomName,
         type: 'PropertyInfo',
-        initializer: this.swiftPropertyInfoInit(),
+        initializer: this.swiftPropertyInfoInit(parentCls),
       }));
       cls.methods.push(this.Method.create({
         visibility: 'public',
@@ -373,6 +374,7 @@ self.onDetach(self.<%=this.swiftSlotLinkSubName%>!)
     },
     {
       name: 'swiftPropertyInfoInit',
+      args: ['parentCls'],
       template: function() {/*
 class PInfo: PropertyInfo {
   let name = "<%=this.swiftName%>"
@@ -382,10 +384,53 @@ class PInfo: PropertyInfo {
   let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
   public func set(_ obj: FObject, value: Any?) {
-    obj.set(key: name, value: value)
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+<% var p = this %>
+<% if ( p.swiftExpression ) { %>
+    if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+<% } %>
+    let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.swiftName%>` : nil
+    obj.<%=p.swiftValueName%> = obj.<%=p.swiftPreSetFuncName%>(oldValue, obj.<%=p.swiftAdaptFuncName%>(oldValue, value))
+    obj.<%=p.swiftInitedName%> = true
+    obj.<%=p.swiftPostSetFuncName%>(oldValue, obj.<%=p.swiftValueName%>)
+    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) && !FOAM_utils.equals(oldValue, obj.<%=p.swiftValueName%>) {
+      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    }
   }
   public func get(_ obj: FObject) -> Any? {
-    return obj.get(key: name)
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftName%>
+  }
+  public func getSlot(_ obj: FObject) -> Slot {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftSlotName%>
+  }
+  public func setSlot(_ obj: FObject, value: Slot) {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    obj.<%=this.swiftSlotName%> = value
+  }
+  public func hasOwnProperty(_ obj: FObject) -> Bool {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.`<%=p.swiftInitedName%>`
+  }
+  public func clearProperty(_ obj: FObject) {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    obj.<%= p.swiftInitedName %> = false
+    obj.<%= p.swiftValueName %> = nil
+
+<% if ( p.swiftExpression ) { %>
+    if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+    obj.<%= p.swiftExpressionSubscriptionName %> = nil
+<% } %>
+
+    // Only pub if there are listeners.
+    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
+      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    }
   }
   public func compareValues(_ v1: Any?, _ v2: Any?) -> Int {
     <%=this.swiftCompareValues%>
@@ -520,12 +565,11 @@ foam.CLASS({
           });
 
           this.model_.classes.map(function(c) { return foam.lookup(c) }).forEach(function(c) {
-            var suf = '_' + c.model_.swiftName;
-            var dvName = 'dv' + suf;
+            var dvName = 'dv_' + c.model_.swiftName;
 
             var didSets = [];
             var addViewAxioms = function(a) {
-              var pName = a.name + suf;
+              var pName = c.model_.swiftName + '_' + a.name;
               var didSet = `if ${pName} != nil { self.${dvName}?["${a.name}"]?.set(key: "view", value: self.${pName}) }`;
               cls.fields.push(foam.swift.Field.create({
                 visibility: 'public',
