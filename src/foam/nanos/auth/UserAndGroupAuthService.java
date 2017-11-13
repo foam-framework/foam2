@@ -243,7 +243,7 @@ public class UserAndGroupAuthService
     user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
     session.setX(getX().put("user", user));
-    return Password.sanitize(user);
+    return (User) Password.sanitize(user);
   }
 
   /**
