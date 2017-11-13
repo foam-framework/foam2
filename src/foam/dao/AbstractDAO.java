@@ -180,6 +180,7 @@ public abstract class AbstractDAO
   }
 
   public Sink select(Sink sink) {
+    if ( sink == null ) sink = new ListSink();
     return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
