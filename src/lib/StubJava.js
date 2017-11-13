@@ -33,7 +33,8 @@ try {
   throw new RuntimeException(t);
 }
 
-Object result = replyBox.getMessage().getObject();`;
+Object result = replyBox.getMessage().getObject();
+`;
 
       if ( this.javaReturns && this.javaReturns !== 'void' ) {
         code += `if ( result instanceof foam.box.RPCReturnMessage )
@@ -46,9 +47,11 @@ code += `if ( result instanceof java.lang.Throwable )
 
 if ( result instanceof foam.box.RPCErrorMessage )
   throw new RuntimeException(((foam.box.RPCErrorMessage)result).getData().toString());
-
-throw new RuntimeException("Invalid repsonse type: " + result.getClass());
 `;
+
+      if ( this.javaReturns && this.javaReturns !== 'void') {
+        code += `throw new RuntimeException("Invalid response type: " + result.getClass());`;
+      }
 
       this.javaCode = code;
 
