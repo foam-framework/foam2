@@ -55,7 +55,7 @@ public class UserAndGroupAuthService
 
     // store user and return
     session.setX(getX().put("user", user));
-    return user;
+    return sanitizeUser(user);
   }
 
   /**
@@ -115,7 +115,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setX(getX().put("user", user));
     sessionDAO_.put(session);
-    return user;
+    return sanitizeUser(user);
   }
 
   /**
@@ -140,7 +140,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setX(getX().put("user", user));
     sessionDAO_.put(session);
-    return user;
+    return sanitizeUser(user);
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -173,7 +173,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setX(getX().put("user", user));
     sessionDAO_.put(session);
-    return user;
+    return sanitizeUser(user);
   }
 
   /**
@@ -241,7 +241,7 @@ public class UserAndGroupAuthService
     user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
     session.setX(getX().put("user", user));
-    return user;
+    return sanitizeUser(user);
   }
 
   /**
@@ -288,5 +288,18 @@ public class UserAndGroupAuthService
     if ( session != null && session.getUserId() != 0 ) {
       sessionDAO_.remove(session);
     }
+  }
+
+  /**
+   * Removes any sensitive properties from user
+   * @param user user to return
+   * @return sanitized user
+   */
+  private User sanitizeUser(User user) {
+    User clone = (User) user.fclone();
+    clone.setPassword(null);
+    clone.setPreviousPassword(null);
+    clone.setPasswordLastModified(null);
+    return clone;
   }
 }
