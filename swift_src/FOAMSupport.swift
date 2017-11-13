@@ -199,9 +199,8 @@ public class Subscription: Detachable {
   }
 }
 
-public protocol FObject: class, Detachable {
+public protocol FObject: class, Detachable, Topic {
   func ownClassInfo() -> ClassInfo
-  func sub(topics: [String], listener l: @escaping Listener) -> Subscription
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
   func getSlot(key: String) -> Slot?
@@ -301,7 +300,7 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
     return node.sub!
   }
 
-  func hasListeners(_ args: [Any]) -> Bool {
+  public func hasListeners(_ args: [Any]) -> Bool {
     var listeners: ListenerList? = self.listeners
     var i = 0
     while listeners != nil {
@@ -317,7 +316,7 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
     return false
   }
 
-  private func notify(listeners: ListenerList?, args: [Any]) -> Int {
+  private func notify(listeners: ListenerList?, args: [Any?]) -> Int {
     var count = 0
     var l = listeners
     while l != nil {
@@ -330,7 +329,7 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
     return count
   }
 
-  public func pub(_ args: [Any]) -> Int {
+  public func pub(_ args: [Any?]) -> Int {
     var listeners: ListenerList = self.listeners
     var count = notify(listeners: listeners.next, args: args)
     for arg in args {
@@ -624,7 +623,40 @@ public class ParserContext {
 }
 
 extension DAO {
-  func select() throws -> Sink {
+  public func select() throws -> Sink {
     return try select(Context.GLOBAL.create(ArraySink.self)!)
+  }
+}
+
+public protocol Topic {
+  func hasListeners(_ args: [Any]) -> Bool
+  func sub(topics: [String], listener l: @escaping Listener) -> Subscription
+  func pub(_ args: [Any?]) -> Int
+}
+extension Topic {
+  func pub() -> Int {
+    return pub([])
+  }
+}
+
+public class BasicTopic: Topic {
+  var name_: String!
+  var parent_: Topic!
+  var map_: [String:Topic] = [:]
+
+  public func hasListeners(_ args: [Any] = []) -> Bool {
+    return parent_.hasListeners([name_] + args)
+  }
+
+  public func sub(topics: [String] = [], listener l: @escaping Listener) -> Subscription {
+    return parent_.sub(topics: [name_] + topics, listener: l)
+  }
+
+  public func pub(_ args: [Any?]) -> Int {
+    return parent_.pub([name_] + args)
+  }
+
+  subscript(key: String) -> Topic {
+    return map_[key]!
   }
 }
