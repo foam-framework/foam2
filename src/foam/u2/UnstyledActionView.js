@@ -123,8 +123,8 @@ foam.CLASS({
       var self = this;
       if( this.action.confirmationRequired && !this.confirmationState ){
         this.confirmationTimer = true;
+        this.confirmationState = true;        
         this.label = 'Confirm ' + this.label + '?';
-        this.confirmationState = true;
         setTimeout(function(){ self.confirmationTimer = false }, 1000);
         return;
       }
