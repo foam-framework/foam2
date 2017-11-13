@@ -41,9 +41,11 @@ abstract class AbstractX
   }
 
   public X put(Object key, Object value) {
-    if ( getKey().toString().compareTo(key.toString()) == 0 ) {
+    String okey = getKey().toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
       return new XI(getLeftParent(), getRightParent(), getKey(), value);
-    } else if ( getKey().toString().compareTo(key.toString()) < 0 ) {
+    } else if ( nkey.compareTo(okey) < 0 ) {
       return clone(getLeftParent().put(key, value), getRightParent());
     } else {
       return clone(getLeftParent(), getRightParent().put(key, value));
@@ -51,9 +53,11 @@ abstract class AbstractX
   }
 
   public X putFactory(Object key, XFactory factory) {
-    if ( getKey().toString().compareTo(key.toString()) == 0 ) {
+    String okey = getKey().toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
       return new FactoryXI(getLeftParent(), getRightParent(), getKey(), factory);
-    } else if ( getKey().toString().compareTo(key.toString()) < 0 ) {
+    } else if ( nkey.compareTo(okey) < 0 ) {
       return clone(getLeftParent().putFactory(key, factory), getRightParent());
     } else {
       return clone(getLeftParent(), getRightParent().putFactory(key, factory));
@@ -119,11 +123,11 @@ class XI
   public Object get(X x, Object key) {
     System.out.println("key: " + key.toString());
     System.out.println("key_: " + key_.toString());
-    if ( key_.toString().compareTo(key.toString()) == 0 ) {
+    if ( key.toString().compareTo(getKey().toString()) == 0 ) {
       System.out.println("success: " + key.toString());
       System.out.println("");
       return value_;
-    } else if ( key_.toString().compareTo(key.toString()) < 0 ) {
+    } else if ( key.toString().compareTo(getKey().toString()) < 0 ) {
       return getLeftParent().get(key);
     } else {
       return getRightParent().get(key);
@@ -157,11 +161,11 @@ class FactoryXI
   public Object get(X x, Object key) {
     System.out.println("keyFactory: " + key.toString());
     System.out.println("keyFactory_: " + key_.toString());
-    if ( key_.toString().compareTo(key.toString()) == 0 ) {
+    if ( key.toString().compareTo(getKey().toString()) == 0 ) {
       System.out.println("successFactory: " + key.toString());
       System.out.println("");
       return factory_.create(x);
-    } else if ( key_.toString().compareTo(key.toString()) < 0 ) {
+    } else if ( key.toString().compareTo(getKey().toString()) < 0 ) {
       return getLeftParent().get(x, key);
     } else {
       return getRightParent().get(x, key);
