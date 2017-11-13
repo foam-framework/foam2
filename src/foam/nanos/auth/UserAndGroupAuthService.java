@@ -298,6 +298,9 @@ public class UserAndGroupAuthService
    * @return sanitized user
    */
   private User sanitizeUser(User user) {
+    if ( user == null ) {
+      return null;
+    }
     User clone = (User) user.fclone();
     clone.setPassword(null);
     clone.setPreviousPassword(null);
