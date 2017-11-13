@@ -40,11 +40,6 @@ public class PasswordHashingDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    // get password prop info, check if exists and is set
-    if ( SafetyUtil.isEmpty((String) obj.getProperty("password")) ) {
-      return super.put_(x, obj);
-    }
-
     Object id = obj.getProperty("id");
     FObject stored = getDelegate().find(id);
     // hash password if result does not exist or does not have password set
