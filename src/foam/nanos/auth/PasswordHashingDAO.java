@@ -6,10 +6,12 @@
 
 package foam.nanos.auth;
 
-import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
-import foam.dao.*;
+import foam.dao.DAO;
+import foam.dao.ListSink;
+import foam.dao.ProxyDAO;
+import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.Password;
@@ -35,7 +37,7 @@ public class PasswordHashingDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    return sanitize(super.find_(x, id));
+    return Password.sanitize(super.find_(x, id));
   }
 
   @Override
@@ -55,18 +57,6 @@ public class PasswordHashingDAO
 
     // clone result and return copy with no password parameters
     FObject result = super.put_(x, obj);
-    return sanitize(result);
-  }
-
-  private FObject sanitize(FObject obj) {
-    if ( obj == null ) {
-      return null;
-    }
-
-    FObject clone = obj.fclone();
-    clone.setProperty("password", null);
-    clone.setProperty("previousPassword", null);
-    clone.setProperty("passwordLastModified", null);
-    return clone;
+    return Password.sanitize(result);
   }
 }
