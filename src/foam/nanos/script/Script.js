@@ -93,7 +93,7 @@ foam.CLASS({
 
         try {
           shell.set("currentScript", this);
-          shell.set("x", getX());
+          shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
         } catch (EvalError e) {}
 
