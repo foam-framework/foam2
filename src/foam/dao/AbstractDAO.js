@@ -225,8 +225,8 @@ return LimitedDAO_create([
       },
       swiftCode: function() {/*
 let mySink = decorateListener_(sink, predicate)
-return sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
-  guard let topic = args[0] as? String else { return }
+return on.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+  guard let topic = args[1] as? String else { return }
   switch topic {
     case "put":
       mySink.put(args.last as! FObject, sub)

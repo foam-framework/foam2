@@ -18,6 +18,7 @@ var classes = [
   'TestExtended',
   'TestDetailView',
   'foam.dao.ArraySink',
+  'foam.dao.CachingDAO',
   'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',
   'foam.swift.parse.StringPStream',
