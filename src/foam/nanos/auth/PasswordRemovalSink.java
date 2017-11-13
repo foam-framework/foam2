@@ -11,6 +11,7 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.ProxySink;
 import foam.dao.Sink;
+import foam.util.Password;
 
 public class PasswordRemovalSink
     extends ProxySink
@@ -22,10 +23,6 @@ public class PasswordRemovalSink
 
   @Override
   public void put(FObject obj, Detachable sub) {
-    FObject clone = obj.fclone();
-    clone.setProperty("password", null);
-    clone.setProperty("previousPassword", null);
-    clone.setProperty("passwordLastModified", null);
-    super.put(clone, sub);
+    super.put(Password.sanitize(obj), sub);
   }
 }
