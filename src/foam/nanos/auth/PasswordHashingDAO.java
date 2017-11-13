@@ -9,10 +9,7 @@ package foam.nanos.auth;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
-import foam.dao.DAO;
-import foam.dao.ProxyDAO;
-import foam.dao.ProxySink;
-import foam.dao.Sink;
+import foam.dao.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.Password;
@@ -37,7 +34,9 @@ public class PasswordHashingDAO
         super.put(sanitize(obj), sub);
       }
     };
-    return super.select_(x, proxy, skip, limit, order, predicate);
+
+    super.select_(x, proxy, skip, limit, order, predicate);
+    return sink;
   }
 
   @Override
