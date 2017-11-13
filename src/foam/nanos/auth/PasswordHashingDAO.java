@@ -30,6 +30,7 @@ public class PasswordHashingDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( sink == null ) sink = new ListSink();
     ProxySink proxy = new ProxySink(x, sink) {
       @Override
       public void put(FObject obj, Detachable sub) {
