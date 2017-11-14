@@ -529,6 +529,5 @@ foam.debug.doc = function(opt_obj, showUnused) {
       'foam.core.FObject' });
 };
 
-
 // TODO:
 //    remove LinkView
