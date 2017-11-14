@@ -25,8 +25,12 @@ foam.CLASS({
           type: 'ProxyDAO',
           initializer: `
 let d = __context__.create(ProxyDAO.self, args: ["delegate": ${this.swiftName}])!
-_ = ${this.swiftSlotName}.sub(listener: { _, topics in
-  d.delegate = topics.last as! DAO
+_ = ${this.swiftSlotName}.sub(listener: { sub, topics in
+  if let dao = topics.last as? DAO {
+    d.delegate = dao
+  } else {
+    d.clearProperty("delegate")
+  }
 })
 return d
           `,
