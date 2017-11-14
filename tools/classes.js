@@ -154,7 +154,13 @@ var classes = [
   'foam.blob.AbstractBlobService',
   'foam.blob.SubBlob',
   'foam.blob.IdentifiedBlob',
-  'foam.blob.BlobStore'
+  'foam.blob.BlobStore',
+
+  'foam.nanos.geocode.GoogleMapsCoordinates',
+  'foam.nanos.geocode.GoogleMapsGeocodeResponse',
+  'foam.nanos.geocode.GoogleMapsGeocodeResult',
+  'foam.nanos.geocode.GoogleMapsGeometry',
+  'foam.nanos.geocode.GoogleMapsViewport'
 ];
 
 var abstractClasses = [

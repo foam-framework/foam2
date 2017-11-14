@@ -27,7 +27,7 @@ foam.CLASS({
       class: 'Int',
       name: 'buildingNumber',
       documentation: 'Building number'
-    },
+    },-
     {
       class: 'String',
       name: 'address',
