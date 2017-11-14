@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.nanos.geocode',
-  name: 'GoogleMapsViewport',
+  name: 'GoogleMapsBoundary',
 
   properties: [
     {
