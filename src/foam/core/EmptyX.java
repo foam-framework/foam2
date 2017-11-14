@@ -121,16 +121,12 @@ class XI
   protected void setRightParent(X rightParent) { rightParent_ = rightParent; }
 
   public Object get(X x, Object key) {
-    System.out.println("key: " + key.toString());
-    System.out.println("key_: " + key_.toString());
     if ( key.toString().compareTo(getKey().toString()) == 0 ) {
-      System.out.println("success: " + key.toString());
-      System.out.println("");
       return value_;
     } else if ( key.toString().compareTo(getKey().toString()) < 0 ) {
-      return getLeftParent().get(key);
+      return getLeftParent().get(x, key);
     } else {
-      return getRightParent().get(key);
+      return getRightParent().get(x, key);
     }
   }
 }
@@ -159,11 +155,7 @@ class FactoryXI
   protected void setRightParent(X rightParent) { rightParent_ = rightParent; }
 
   public Object get(X x, Object key) {
-    System.out.println("keyFactory: " + key.toString());
-    System.out.println("keyFactory_: " + key_.toString());
     if ( key.toString().compareTo(getKey().toString()) == 0 ) {
-      System.out.println("successFactory: " + key.toString());
-      System.out.println("");
       return factory_.create(x);
     } else if ( key.toString().compareTo(getKey().toString()) < 0 ) {
       return getLeftParent().get(x, key);
@@ -184,7 +176,7 @@ public class EmptyX
 
   public static X instance() { return x_; }
 
-  public Object get(X x, Object key) { System.out.println("emtpy: " + key.toString());return null; }
+  public Object get(X x, Object key) { return null; }
 
   public X put(Object key, Object value) {
     return new XI(this, this, key, value);
