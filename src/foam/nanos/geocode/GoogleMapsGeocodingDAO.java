@@ -107,22 +107,33 @@ public class GoogleMapsGeocodingDAO
 
       GoogleMapsGeocodeResponse response =
           (GoogleMapsGeocodeResponse) parser_.parseString(builder.toString(), GoogleMapsGeocodeResponse.class);
-      if ( ! "OK".equals(response.getStatus()) ) {
-        throw new
-      }
-
-
       if ( response == null ) {
         throw new Exception("Invalid response");
       }
-      if ( response == null || response.getResults() == null || response.getResults().length ) {
-        return super.put_(x, obj);
+
+      if ( ! "OK".equals(response.getStatus()) ) {
+        throw new Exception(response.getError_message());
       }
 
+      GoogleMapsGeocodeResult[] results = response.getResults();
+      if ( results == null || results.length == 0 ) {
+        throw new Exception("Results not found");
+      }
 
+      GoogleMapsGeometry geometry = (GoogleMapsGeometry) results[0].getGeometry();
+      if ( geometry == null ) {
+        throw new Exception("Unable to determine latitude and longitude");
+      }
 
+      GoogleMapsCoordinates coords = geometry.getLocation();
+      if ( coords == null ) {
+        throw new Exception("Unable to determine latitude and longitude");
+      }
 
-
+      // set latitude and longitude
+      address.setLatitude(coords.getLat());
+      address.setLongitude(coords.getLng());
+      ((User) obj).setAddress(address);
     } catch (Throwable t) {
       t.printStackTrace();
     } finally {
