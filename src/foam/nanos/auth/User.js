@@ -106,9 +106,9 @@ emailIsSet_ = true;`
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.nanos.auth.Address',
+      //of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return foam.nanos.auth.Address.create(); }
+      view: 'foam.u2.AddressDetailView'
     },
     {
       class: 'FObjectArray',
