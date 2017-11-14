@@ -29,7 +29,6 @@ public class JSONParser
       parser = new ExprParser(defaultClass);
     }
     ps = (StringPStream) ps.apply(parser, x);
-
     return ps == null ? null : (FObject) ps.value();
   }
 }

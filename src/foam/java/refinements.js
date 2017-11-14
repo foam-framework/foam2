@@ -876,6 +876,12 @@ foam.CLASS({
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
 
+      var cast = info.getMethod('cast');
+      cast.body = 'Object[] value = (Object[])o;\n'
+                + this.javaType + ' ret = new String[value == null ? 0 : value.length];\n'
+                + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
+                + 'return ret;';
+
       // TODO: figure out what this is used for
       info.method({
         name: 'of',
