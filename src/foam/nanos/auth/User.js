@@ -106,7 +106,6 @@ emailIsSet_ = true;`
     },
     {
       class: 'FObjectProperty',
-      //of: 'foam.nanos.auth.Address',
       name: 'address',
       view: 'foam.u2.AddressDetailView'
     },
