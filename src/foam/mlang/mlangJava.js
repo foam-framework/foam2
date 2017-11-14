@@ -501,12 +501,7 @@ foam.CLASS({
     {
       name: 'prepareStatement',
       javaReturns: 'void',
-      javaCode: 
-`if ( getValue() instanceof java.util.Date ){
-  stmt.setObject(getValue(), java.sql.Types.TIMESTAMP);
-} else {
-  stmt.setObject(getValue());
-}`
+      javaCode: 'stmt.setObject(getValue(), java.sql.Types.TIMESTAMP);'
     }
   ]
 });
