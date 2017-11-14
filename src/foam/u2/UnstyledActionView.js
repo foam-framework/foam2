@@ -55,6 +55,19 @@ foam.CLASS({
       name: 'iconFontName',
       factory: function(action) { return this.action.iconFontName; }
     },
+    {
+      class: 'String',
+      name: 'labelPlaceholder',
+      expression: function(label) { return this.action.label; }
+    },
+    {
+      class: 'Boolean',
+      name: 'confirmationState'
+    },
+    {
+      class: 'Boolean',
+      name: 'confirmationTimer'
+    },
     'data',
     'action',
     [ 'nodeName', 'button' ],
@@ -107,8 +120,21 @@ foam.CLASS({
 
   listeners: [
     function click(e) {
-      this.action && this.action.maybeCall(this.__subContext__, this.data);
-      e.stopPropagation();
+      var self = this;
+      if( this.action.confirmationRequired && !this.confirmationState ){
+        this.confirmationTimer = true;
+        this.confirmationState = true;        
+        this.label = 'Confirm ' + this.label + '?';
+        setTimeout(function(){ self.confirmationTimer = false }, 1000);
+        return;
+      }
+
+      if( !this.confirmationTimer ){
+        this.confirmationState = false;
+        this.label = this.labelPlaceholder;
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
+        e.stopPropagation();
+      }
     }
   ]
 });
