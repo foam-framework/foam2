@@ -15,11 +15,6 @@ foam.CLASS({
       class: 'String',
       name: 'status',
       documentation: 'Contains the status of the request'
-    },
-    {
-      class: 'String',
-      name: 'error_message',
-      value: 'Invalid response'
     }
   ]
 });

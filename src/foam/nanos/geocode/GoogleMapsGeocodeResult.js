@@ -8,7 +8,7 @@ foam.CLASS({
     {
       class: 'FObjectArray',
       of: 'foam.nanos.geocode.GoogleMapsAddressComponent',
-      name: 'address_component',
+      name: 'address_components',
       documentation: 'Array of geocoded address information'
     },
     {
