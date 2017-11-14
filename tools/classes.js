@@ -156,6 +156,7 @@ var classes = [
   'foam.blob.IdentifiedBlob',
   'foam.blob.BlobStore',
 
+  'foam.nanos.geocode.GoogleMapsAddressComponent',
   'foam.nanos.geocode.GoogleMapsCoordinates',
   'foam.nanos.geocode.GoogleMapsGeocodeResponse',
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
