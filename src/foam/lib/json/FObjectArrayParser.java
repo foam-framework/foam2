@@ -22,8 +22,9 @@ public class FObjectArrayParser extends ProxyParser {
             // Parses Alt(__Property__, FObject)
             new ExprParser(defaultClass),
             new Seq0(new Whitespace(),
-                new Optional(new Literal(",")),
+                new Literal(","),
                 new Whitespace())),
+        new Whitespace(),
         new Literal("]"),
         new Whitespace()));
   }
