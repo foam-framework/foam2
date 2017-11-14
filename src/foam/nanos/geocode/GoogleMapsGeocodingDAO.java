@@ -20,7 +20,7 @@ public class GoogleMapsGeocodingDAO
   public static String API_HOST = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
   protected String apiKey_;
-  protected JSONParser parser_ = new JSONParser();
+  protected JSONParser parser_;
   protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
@@ -39,6 +39,7 @@ public class GoogleMapsGeocodingDAO
     setX(x);
     setDelegate(delegate);
     this.apiKey_ = apiKey;
+    this.parser_ = getX().create(JSONParser.class);
   }
 
   @Override
@@ -104,7 +105,6 @@ public class GoogleMapsGeocodingDAO
         builder.append(line);
       }
 
-
       GoogleMapsGeocodeResponse response =
           (GoogleMapsGeocodeResponse) parser_.parseString(builder.toString(), GoogleMapsGeocodeResponse.class);
       if ( response == null ) {
@@ -112,7 +112,7 @@ public class GoogleMapsGeocodingDAO
       }
 
       if ( ! "OK".equals(response.getStatus()) ) {
-        throw new Exception(response.getError_message());
+        throw new Exception("Invalid response");
       }
 
       GoogleMapsGeocodeResult[] results = response.getResults();

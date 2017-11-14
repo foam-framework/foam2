@@ -25,7 +25,9 @@ public class JSONParser
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
-    x.set("defaultClass", defaultClass);
+    if ( defaultClass != null ) {
+      parser = new ExprParser(defaultClass);
+    }
     ps = (StringPStream) ps.apply(parser, x);
 
     return ps == null ? null : (FObject) ps.value();
