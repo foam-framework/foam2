@@ -110,19 +110,19 @@ class SwiftTestsTests: XCTestCase {
       "firstName": "Mike",
     ])
     XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t1])
+    XCTAssertEqual(dao.array as! [Test], [t1])
     XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t1])
+    XCTAssertEqual(dao.array as! [Test], [t1])
 
     let t2 = Test([
       "firstName": "Mike",
     ])
     XCTAssertEqual(t2, (try? dao.put(t2)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t2])
+    XCTAssertEqual(dao.array as! [Test], [t2])
 
     t1.firstName = "Mike2"
     XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t2, t1])
+    XCTAssertEqual(dao.array as! [Test], [t2, t1])
 
     XCTAssertEqual(t1, (try? dao.find(t1.firstName)) as? Test)
 
@@ -486,5 +486,34 @@ class SwiftTestsTests: XCTestCase {
 
     let a = try? pDao.select() as! ArraySink
     XCTAssertEqual(a?.array.count, 2)
+  }
+
+  func testCachingDAO() {
+    let numItems = 50
+
+    let aDao = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+    for i in 0..<numItems {
+      _ = try! aDao.put(x.create(Test.self, args: ["firstName": i])!)
+    }
+
+    let sDao = x.create(SlowDAO.self, args: [
+      "delegate": aDao,
+      "delayMs": 1000,
+    ])!
+
+    let cDao = x.create(CachingDAO.self, args: [
+      "cache": x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!,
+      "src": sDao,
+    ])!
+
+    measure {
+      for i in 0..<numItems {
+        try! XCTAssertNotNil(cDao.find(String(i)))
+      }
+    }
+
+    _ = try? sDao.put(x.create(Test.self, args: ["firstName": "TEST"])!)
+    let c = try! cDao.select(x.create(Count.self)!) as! Count
+    XCTAssertEqual(c.value, numItems + 1)
   }
 }

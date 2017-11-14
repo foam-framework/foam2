@@ -18,9 +18,10 @@ var classes = [
   'TestExtended',
   'TestDetailView',
   'foam.dao.ArraySink',
-  'foam.dao.CachingDAO',
+  'foam.swift.dao.CachingDAO',
   'foam.mlang.sink.Count',
   'foam.swift.dao.ArrayDAO',
+  'foam.dao.SlowDAO',
   'foam.swift.parse.StringPStream',
 
   'foam.box.Context',
