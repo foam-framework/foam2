@@ -42,6 +42,10 @@ foam.CLASS({
     }
   ],
 
+  messages: [
+    { name: 'confirm', message: 'Confirm' }
+  ],
+
   properties: [
     {
       class: 'Boolean',
@@ -98,10 +102,6 @@ foam.CLASS({
       this.setAttribute('title', this.action.toolTip); // hover text
 
       if ( this.action ) {
-        if ( ! this.hasOwnProperty('confirmationRequired') ) {
-          this.confirmationRequired = this.action.confirmationRequired;
-        }
-
         if ( this.action.isAvailable ) {
           this.enableClass(this.myClass('unavailable'), this.action.createIsAvailable$(this.data$), true);
         }
@@ -144,7 +144,7 @@ foam.CLASS({
       else if ( this.buttonState == this.ButtonState.CONFIRM ) {
         this.buttonState = this.ButtonState.DEBOUNCE;
         this.removeAllChildren();
-        this.add('Confirm');
+        this.add(this.confirm);
         this.debounce();
       }
       else if ( this.buttonState == this.ButtonState.ARMED ) {
@@ -167,7 +167,7 @@ foam.CLASS({
     {
       name: 'deactivateConfirm',
       isMerged: true,
-      mergeDelay: 8000,
+      mergeDelay: 6000,
       code: function() {
         this.removeAllChildren();
         this.addContent();
