@@ -161,7 +161,7 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResponse',
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
-  'foam.nanos.geocode.GoogleMapsViewport'
+  'foam.nanos.geocode.GoogleMapsBoundary'
 ];
 
 var abstractClasses = [

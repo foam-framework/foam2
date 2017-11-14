@@ -5,6 +5,11 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
+      of: 'foam.nanos.geocode.GoogleMapsBoundary',
+      name: 'bounds'
+    },
+    {
+      class: 'FObjectProperty',
       of: 'foam.nanos.geocode.GoogleMapsCoordinates',
       name: 'location'
     },
@@ -14,7 +19,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.nanos.geocode.GoogleMapsViewport',
+      of: 'foam.nanos.geocode.GoogleMapsBoundary',
       name: 'viewport'
     }
   ]
