@@ -31,7 +31,6 @@ public abstract class AbstractArrayPropertyInfo
     List<String> list = new LinkedList<String>();
     StringBuilder sb = new StringBuilder(); 
     char prev = '$';
-    int length = value.length();
     char[] cs = value.toCharArray();
     for ( int i = 0 ; i < cs.length ; i++ ) {
       if ( cs[i] == '\\' ) {
@@ -55,8 +54,7 @@ public abstract class AbstractArrayPropertyInfo
       }
     }
     list.add(sb.toString());
-    int resultSize = list.size();
-    String[] result = new String[resultSize];
+    String[] result = new String[list.size()];
     //add support for other array types
     this.set(obj, list.toArray(result));
   }
@@ -120,9 +118,9 @@ public abstract class AbstractArrayPropertyInfo
       return;
     }
     for ( int i = 0 ; i < length ; i++ ) {
-      if ( os[i] == null )
+      if ( os[i] == null ) {
         sb.append("");
-      else {
+      } else {
         escapeCommasAndAppend(sb, os[i]);
       }
       if ( i < length - 1 ) {
