@@ -121,9 +121,11 @@ class XI
   protected void setRightParent(X rightParent) { rightParent_ = rightParent; }
 
   public Object get(X x, Object key) {
-    if ( key.toString().compareTo(getKey().toString()) == 0 ) {
+    String okey = getKey().toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
       return value_;
-    } else if ( key.toString().compareTo(getKey().toString()) < 0 ) {
+    } else if ( nkey.compareTo(okey) < 0 ) {
       return getLeftParent().get(x, key);
     } else {
       return getRightParent().get(x, key);
@@ -155,9 +157,11 @@ class FactoryXI
   protected void setRightParent(X rightParent) { rightParent_ = rightParent; }
 
   public Object get(X x, Object key) {
-    if ( key.toString().compareTo(getKey().toString()) == 0 ) {
+    String okey = getKey().toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
       return factory_.create(x);
-    } else if ( key.toString().compareTo(getKey().toString()) < 0 ) {
+    } else if ( nkey.compareTo(okey) < 0 ) {
       return getLeftParent().get(x, key);
     } else {
       return getRightParent().get(x, key);
