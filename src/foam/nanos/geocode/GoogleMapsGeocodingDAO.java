@@ -112,7 +112,7 @@ public class GoogleMapsGeocodingDAO
       }
 
       if ( ! "OK".equals(response.getStatus()) ) {
-        throw new Exception("Invalid response");
+        throw new Exception(! SafetyUtil.isEmpty(response.getError_message()) ? response.getError_message() : "Invalid response");
       }
 
       GoogleMapsGeocodeResult[] results = response.getResults();
@@ -120,7 +120,7 @@ public class GoogleMapsGeocodingDAO
         throw new Exception("Results not found");
       }
 
-      GoogleMapsGeometry geometry = (GoogleMapsGeometry) results[0].getGeometry();
+      GoogleMapsGeometry geometry = results[0].getGeometry();
       if ( geometry == null ) {
         throw new Exception("Unable to determine latitude and longitude");
       }
