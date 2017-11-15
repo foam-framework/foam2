@@ -26,7 +26,6 @@ public class GoogleMapsGeocodingDAO
   public static String API_HOST = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
   protected String apiKey_;
-  protected JSONParser parser_;
   protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
@@ -45,11 +44,12 @@ public class GoogleMapsGeocodingDAO
     setX(x);
     setDelegate(delegate);
     this.apiKey_ = apiKey;
-    this.parser_ = getX().create(JSONParser.class);
   }
 
   @Override
   public FObject put_(X x, FObject obj) {
+    Addres
+
     // don't geocode if not instance of user
     if ( !(obj instanceof User) ) {
       return super.put_(x, obj);
@@ -122,8 +122,8 @@ public class GoogleMapsGeocodingDAO
         builder.append(line);
       }
 
-      GoogleMapsGeocodeResponse response =
-          (GoogleMapsGeocodeResponse) parser_.parseString(builder.toString(), GoogleMapsGeocodeResponse.class);
+      GoogleMapsGeocodeResponse response = (GoogleMapsGeocodeResponse) getX().create(JSONParser.class)
+          .parseString(builder.toString(), GoogleMapsGeocodeResponse.class);
       if ( response == null ) {
         throw new Exception("Invalid response");
       }

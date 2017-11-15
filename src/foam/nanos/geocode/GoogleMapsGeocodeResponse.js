@@ -24,7 +24,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'error_message'
+      name: 'error_message',
+      documentation: 'Contains an error message'
     }
   ]
 });

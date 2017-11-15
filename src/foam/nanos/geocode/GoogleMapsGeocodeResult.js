@@ -20,21 +20,23 @@ foam.CLASS({
     {
       class: 'String',
       name: 'formatted_address',
-      documentation: 'Formatted address'
+      documentation: 'String containing the human-readable address of this location'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.geocode.GoogleMapsGeometry',
-      name: 'geometry'
+      name: 'geometry',
+      documentation: 'Address geometry information'
     },
     {
       class: 'String',
       name: 'place_id',
-      documentation: 'Place Id'
+      documentation: 'Unique identifier that can be used with other Google APIs'
     },
     {
       class: 'StringArray',
-      name: 'types'
+      name: 'types',
+      documentation: 'Indicates the type of the returned result'
     }
   ]
 });
