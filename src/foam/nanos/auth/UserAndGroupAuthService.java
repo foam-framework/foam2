@@ -55,7 +55,7 @@ public class UserAndGroupAuthService
 
     // store user and return
     session.setX(getX().put("user", user));
-    return user;
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -115,7 +115,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setX(getX().put("user", user));
     sessionDAO_.put(session);
-    return user;
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -140,7 +140,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setX(getX().put("user", user));
     sessionDAO_.put(session);
-    return user;
+    return (User) Password.sanitize(user);
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -173,7 +173,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setX(getX().put("user", user));
     sessionDAO_.put(session);
-    return user;
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -229,7 +229,7 @@ public class UserAndGroupAuthService
 
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
-      throw new AuthenticationException("Old password does not match current password");
+      throw new AuthenticationException("Old password is incorrect");
     }
 
     // new password is the same
@@ -238,10 +238,12 @@ public class UserAndGroupAuthService
     }
 
     // store new password in DAO and put in context
+    user.setPasswordLastModified(Calendar.getInstance().getTime());
+    user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
     session.setX(getX().put("user", user));
-    return user;
+    return (User) Password.sanitize(user);
   }
 
   /**

@@ -13,6 +13,10 @@ import java.util.Date;
 public class LastModifiedAwareDAO
   extends ProxyDAO
 {
+  public LastModifiedAwareDAO(DAO delegate) {
+    setDelegate(delegate);
+  }
+
   public FObject put_(X x, FObject value) {
     ((LastModifiedAware) value).setLastModified(new Date());
 

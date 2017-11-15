@@ -23,7 +23,8 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
-      max: 999
+      max: 999,
+      tableWidth: 45
     },
     {
       class: 'String',
@@ -38,7 +39,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'firstName'
+      name: 'firstName',
+      tableWidth: 160
     },
     {
       class: 'String',
@@ -46,12 +48,14 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'lastName'
+      name: 'lastName',
+      tableWidth: 160
     },
     {
       class: 'String',
       name: 'organization',
-      width: 50
+      width: 50,
+      tableWidth: 160
     },
     {
       class: 'String',
@@ -86,7 +90,7 @@ emailIsSet_ = true;`
       name: 'type',
       view: {
         class: 'foam.u2.view.ChoiceView',
-        choices: [ 'Personal', 'Business', 'Broker', 'Bank' ]
+        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
       }
     },
     {
