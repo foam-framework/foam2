@@ -22,16 +22,19 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      tableWidth: 260
     },
     {
       class: 'Boolean',
       name: 'lazy',
+      tableWidth: 60,
       value: true
     },
     {
       class: 'Boolean',
       name: 'serve',
+      tableWidth: 50,
       // Used by u2.view.TableView
       tableCellFormatter: function(value, obj, property) {
         this
