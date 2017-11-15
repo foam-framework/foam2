@@ -8,6 +8,8 @@ foam.ENUM({
   package: 'foam.nanos.auth',
   name: 'DayOfWeek',
 
+  documentation: 'Represents day of the week',
+
   values: [
     { name: 'SUNDAY',    label: 'Sunday' },
     { name: 'MONDAY',    label: 'Monday' },
