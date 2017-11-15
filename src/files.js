@@ -366,6 +366,7 @@ FOAM_FILES([
   { name: "foam/u2/view/RadioView", flags: ['web'] },
   { name: "foam/u2/view/TextField", flags: ['web'] },
   { name: "foam/u2/view/TreeView", flags: ['web'] },
+  { name: "foam/u2/view/AltView", flags: ['web'] },    
   { name: "foam/u2/view/DualView", flags: ['web'] },
   { name: "foam/u2/view/ColorPicker", flags: ['web'] },
   { name: "foam/u2/view/PasswordView", flags: ['web'] },
