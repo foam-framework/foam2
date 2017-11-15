@@ -63,6 +63,7 @@ foam.CLASS({
     {
       name: 'delete',
       isEnabled: function(obj) { return !! obj; },
+      confirmationRequired: true,
       code: function() {
         var self = this;
         this.dao.remove(this.obj).then(function() {
