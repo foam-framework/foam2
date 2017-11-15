@@ -29,10 +29,10 @@ foam.CLASS({
       var dao = foam.dao.RestDAO.create({ baseURL: 'https://my.server/a/dao' });
 
       // Server:
-      myServerRootPathnamePrefixRouter.addPathnamePrefix(
+      myServerRootPathnameRouter.addPathnamePrefix(
           '/a/dao', foam.net.node.RestDAOHandler.create({
             dao: daoOnMyServer
-          }, myServerRootPathnamePrefixRouter));`,
+          }, myServerRootPathnameRouter));`,
 
   requires: [ 'foam.json.Parser' ],
 

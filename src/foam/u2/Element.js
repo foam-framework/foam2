@@ -928,7 +928,9 @@ foam.CLASS({
       var f = this.cls_.hasOwnProperty('myClass_') && this.cls_.myClass_;
 
       if ( ! f ) {
-        var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
+        var base = this.cls_.hasOwnProperty('CSS_CLASS') ?
+          this.cls_.CSS_CLASS.split(/ +/) :
+          foam.String.cssClassize(this.cls_.id).split(/ +/) ;
 
         f = this.cls_.myClass_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
@@ -2005,6 +2007,7 @@ foam.CLASS({
   refines: 'foam.core.Float',
   requires: [ 'foam.u2.FloatView' ],
   properties: [
+    [ 'displayWidth', 12 ],
     [ 'view', { class: 'foam.u2.FloatView' } ]
   ]
 });
@@ -2014,6 +2017,7 @@ foam.CLASS({
   refines: 'foam.core.Int',
   requires: [ 'foam.u2.IntView' ],
   properties: [
+    [ 'displayWidth', 10 ],
     [ 'view', { class: 'foam.u2.IntView' } ]
   ]
 });
@@ -2023,6 +2027,7 @@ foam.CLASS({
   refines: 'foam.core.Currency',
   requires: [ 'foam.u2.CurrencyView' ],
   properties: [
+    [ 'displayWidth', 15 ],
     [ 'view', { class: 'foam.u2.CurrencyView' } ]
   ]
 });

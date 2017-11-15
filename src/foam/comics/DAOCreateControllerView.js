@@ -33,6 +33,14 @@ foam.CLASS({
     'data'
   ],
 
+  css: `
+    ^ .net-nanopay-ui-ActionView {
+      background: #59aadd;
+      color: white;
+      margin-right: 4px;
+    }
+  `,
+
   properties: [
     {
       class: 'FObjectProperty',
@@ -58,8 +66,27 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
+      addClass(this.myCls()).
+      start('table').
+        start('tr').
+          start('td').style({'vertical-align': 'top', 'width': '100%'}).
+            start('span').
+              style({background: 'rgba(0,0,0,0)'}).
+              show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+              start().
+                style({'padding-bottom': '4px'}).
+                add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
+              end().
+            end().
+            add(this.DAOCreateController.DATA).
+          end().
+        end().
+      end();
+      /*
+      this.
         add(this.DAOCreateController.DATA,
             this.data.cls_.getAxiomsByClass(foam.core.Action))
+            */
     }
   ],
 
