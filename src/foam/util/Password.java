@@ -6,6 +6,7 @@
 
 package foam.util;
 
+import foam.core.FObject;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -104,5 +105,17 @@ public class Password {
    */
   public static boolean isValid(String password) {
     return PASSWORD_PATTERN.matcher(password).matches();
+  }
+
+  public static FObject sanitize(FObject obj) {
+    if ( obj == null ) {
+      return null;
+    }
+
+    FObject clone = obj.fclone();
+    clone.setProperty("password", null);
+    clone.setProperty("previousPassword", null);
+    clone.setProperty("passwordLastModified", null);
+    return clone;
   }
 }
