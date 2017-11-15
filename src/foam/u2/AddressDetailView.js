@@ -28,16 +28,44 @@ foam.CLASS({
     ^ {
       height: auto;
     }
-    ^ .foam-u2-TextField {
-      width: 400px;
+    ^ .property-type {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+    ^ .property-verified {
+      margin-left: 100px;
+      margin-bottom: 10px;
+    }
+    ^ .property-buildingNumber {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+    ^ .property-address {
+      width: 250px;
+      margin-left: 100px;
+      margin-bottom: 10px;
+    }
+    ^ .property-suite {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+    ^ .property-city {
+      width: 120px;
+      margin-left: 100px;
+      margin-bottom: 10px;
+    }
+    ^ .property-postalCode {
+      width: 120px;
+      margin-bottom: 10px;
     }
     ^ .property-countryId {
       display: inline;
-      margin-left: 10px;
+      margin-bottom: 10px;
     }
     ^ .property-regionId {
       display: inline;
-      margin-left: 10px;
+      margin-left: 180px;
+      margin-bottom: 10px;
     }
   `,
 
@@ -47,18 +75,41 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        start('table').
-        start('tr').start('td').add(this.data.TYPE.label, this.data.TYPE).end().end().
-        start('tr').start('td').add(this.data.VERIFIED.label, this.data.VERIFIED).end().end().
-        start('tr').start('td').add(this.data.DELETED.label, this.data.DELETED).end().end().
-        start('tr').start('td').add(this.data.BUILDING_NUMBER.label, this.data.BUILDING_NUMBER).end().end().
-        start('tr').start('td').add(this.data.ADDRESS.label, this.data.ADDRESS).end().end().
-        start('tr').start('td').add(this.data.SUITE.label, this.data.SUITE).end().end().
-        start('tr').start('td').add(this.data.CITY.label, this.data.CITY).end().end().
-        start('tr').start('td').add(this.data.POSTAL_CODE.label, this.data.POSTAL_CODE).end().end().
-        start('tr').start('td').add(this.data.COUNTRY_ID.label, this.data.COUNTRY_ID).end().end().
-        start('tr').start('td').add(this.data.REGION_ID.label, this.data.REGION_ID).end().end().
-        start('tr').start('td').add(this.data.ENCRYPTED.label, this.data.ENCRYPTED).end().end().
+        start().
+          start().
+            start('p').style({'display': 'inline', 'margin-top': '10px'}).add(this.data.TYPE.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '185px', 'margin-top': '10px'}).add(this.data.VERIFIED.label).end().
+          end().
+          start().
+            add(this.data.TYPE).add(this.data.VERIFIED).
+          end().
+          start().
+            start('p').style({'display': 'inline'}).add(this.data.BUILDING_NUMBER.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '98px'}).add(this.data.ADDRESS.label).end().
+          end().
+          start().
+            add(this.data.BUILDING_NUMBER).add(this.data.ADDRESS).
+          end().
+          start().
+            start('p').style({'display': 'inline'}).add(this.data.SUITE.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '180px'}).add(this.data.CITY.label).end().
+          end().
+          start().
+            add(this.data.SUITE).add(this.data.CITY).
+          end().
+          start().
+            start('p').style({'display': 'inline'}).add(this.data.POSTAL_CODE.label).end().
+          end().
+          start().
+            add(this.data.POSTAL_CODE).
+          end().
+          start().
+            start('p').style({'display': 'inline'}).add('Country').end().
+            start('p').style({'display': 'inline', 'margin-left': '165px'}).add('Province/State').end().
+          end().
+          start().
+            add(this.data.COUNTRY_ID).add(this.data.REGION_ID).
+          end().
         end()
     }
   ]
