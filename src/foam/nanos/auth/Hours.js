@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Hours',
 
-  documentation: 'Represents open and closing time'
+  documentation: 'Represents open and closing time',
 
   properties: [
     {
