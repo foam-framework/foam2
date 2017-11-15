@@ -62,6 +62,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'encrypted'
+    },
+    {
+      class: 'Double',
+      name: 'latitude'
+    },
+    {
+      class: 'Double',
+      name: 'longitude'
     }
   ]
 });
