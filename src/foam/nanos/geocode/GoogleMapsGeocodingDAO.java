@@ -7,12 +7,12 @@
 package foam.nanos.geocode;
 
 import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.lib.json.JSONParser;
 import foam.nanos.auth.Address;
-import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
 
 import java.io.BufferedReader;
@@ -26,6 +26,7 @@ public class GoogleMapsGeocodingDAO
   public static String API_HOST = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
   protected String apiKey_;
+  protected PropertyInfo prop_;
   protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
     @Override
     protected StringBuilder initialValue() {
@@ -40,32 +41,26 @@ public class GoogleMapsGeocodingDAO
     }
   };
 
-  public GoogleMapsGeocodingDAO(X x, String apiKey, DAO delegate) {
+  public GoogleMapsGeocodingDAO(X x, String apiKey, PropertyInfo prop, DAO delegate) {
     setX(x);
     setDelegate(delegate);
     this.apiKey_ = apiKey;
+    this.prop_ = prop;
   }
 
   @Override
   public FObject put_(X x, FObject obj) {
-    Addres
-
-    // don't geocode if not instance of user
-    if ( !(obj instanceof User) ) {
-      return super.put_(x, obj);
-    }
-
     // don't geocode if no address property
-    Address address = ((User) obj).getAddress();
+    Address address = (Address) prop_.get(obj);
     if ( address == null ) {
       return super.put_(x, obj);
     }
 
     // check if address updated
     if ( address.getLatitude() != 0 && address.getLongitude() != 0 ) {
-      User stored = (User) getDelegate().find(((User) obj).getId());
-      if (stored != null && stored.getAddress() != null) {
-        Address storedAddress = stored.getAddress();
+      FObject stored = getDelegate().find(obj.getProperty("id"));
+      if (stored != null && prop_.get(obj) != null ) {
+        Address storedAddress = (Address) prop_.get(obj);
         // compare fields that are used to populate Google maps query
         if ( SafetyUtil.compare(address.getAddress(), storedAddress.getAddress()) == 0 &&
             SafetyUtil.compare(address.getCity(), storedAddress.getCity()) == 0 &&
@@ -150,7 +145,7 @@ public class GoogleMapsGeocodingDAO
       // set latitude and longitude
       address.setLatitude(coords.getLat());
       address.setLongitude(coords.getLng());
-      ((User) obj).setAddress(address);
+      prop_.set(obj, address);
     } catch (Throwable t) {
       t.printStackTrace();
     } finally {
