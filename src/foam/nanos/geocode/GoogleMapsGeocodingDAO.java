@@ -61,9 +61,20 @@ public class GoogleMapsGeocodingDAO
       return super.put_(x, obj);
     }
 
-    // don't geocode if already set
+    // check if address updated
     if ( address.getLatitude() != 0 && address.getLongitude() != 0 ) {
-      return super.put_(x, obj);
+      User stored = (User) getDelegate().find(((User) obj).getId());
+      if (stored != null && stored.getAddress() != null) {
+        Address storedAddress = stored.getAddress();
+        // compare fields that are used to populate Google maps query
+        if ( SafetyUtil.compare(address.getAddress(), storedAddress.getAddress()) == 0 &&
+            SafetyUtil.compare(address.getCity(), storedAddress.getCity()) == 0 &&
+            SafetyUtil.compare(address.getRegionId(), storedAddress.getRegionId()) == 0 &&
+            SafetyUtil.compare(address.getPostalCode(), storedAddress.getPostalCode()) == 0 &&
+            SafetyUtil.compare(address.getCountryId(), storedAddress.getCountryId()) == 0 ) {
+          return super.put_(x, obj);
+        }
+      }
     }
 
     StringBuilder builder = sb.get().append(API_HOST);
