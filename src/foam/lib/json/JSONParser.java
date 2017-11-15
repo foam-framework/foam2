@@ -25,10 +25,7 @@ public class JSONParser
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
-    if ( defaultClass != null ) {
-      parser = new ExprParser(defaultClass);
-    }
-    ps = (StringPStream) ps.apply(parser, x);
+    ps = (StringPStream) ps.apply(defaultClass == null ? parser : new ExprParser(defaultClass), x);
     return ps == null ? null : (FObject) ps.value();
   }
 }

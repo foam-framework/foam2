@@ -8,14 +8,18 @@ foam.CLASS({
   package: 'foam.nanos.geocode',
   name: 'GoogleMapsCoordinates',
 
+  documentation: 'Represents latitude and longitude coordinates',
+
   properties: [
     {
       class: 'Double',
-      name: 'lat'
+      name: 'lat',
+      documentation: 'Latitude'
     },
     {
       class: 'Double',
-      name: 'lng'
+      name: 'lng',
+      documentation: 'Longitude'
     }
   ]
 });
