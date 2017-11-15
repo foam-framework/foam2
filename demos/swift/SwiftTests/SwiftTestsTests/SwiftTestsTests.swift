@@ -488,32 +488,59 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(a?.array.count, 2)
   }
 
-  func testCachingDAO() {
+  func testCachingSlowDAO() {
     let numItems = 50
 
-    let aDao = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+    var src: DAO = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
     for i in 0..<numItems {
-      _ = try! aDao.put(x.create(Test.self, args: ["firstName": i])!)
+      _ = try! src.put(x.create(Test.self, args: ["firstName": i])!)
     }
-
-    let sDao = x.create(SlowDAO.self, args: [
-      "delegate": aDao,
+    src = x.create(SlowDAO.self, args: [
+      "delegate": src,
       "delayMs": 1000,
     ])!
 
-    let cDao = x.create(CachingDAO.self, args: [
+    let dao = x.create(CachingDAO.self, args: [
       "cache": x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!,
-      "src": sDao,
+      "src": src,
     ])!
 
     measure {
       for i in 0..<numItems {
-        try! XCTAssertNotNil(cDao.find(String(i)))
+        try! XCTAssertNotNil(dao.find(String(i)))
       }
     }
+  }
 
-    _ = try? sDao.put(x.create(Test.self, args: ["firstName": "TEST"])!)
-    let c = try! cDao.select(x.create(Count.self)!) as! Count
-    XCTAssertEqual(c.value, numItems + 1)
+  func testCachingDAO() {
+    let src = x.create(SlowDAO.self, args: [
+      "delegate": x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!,
+      "delayMs": 1000,
+    ])!
+
+    let cache = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+
+    let dao = x.create(CachingDAO.self, args: [
+      "cache": cache,
+      "src": src,
+    ])!
+
+    _ = try? dao.put(x.create(Test.self, args: ["firstName": "1"])!)
+
+    try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 1)
+    try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 1)
+    try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 1)
+
+    _ = try? src.put(x.create(Test.self, args: ["firstName": "2"])!)
+
+    try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 2)
+    try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 2)
+    try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 2)
+
+    _ = try? cache.put(x.create(Test.self, args: ["firstName": "3"])!)
+
+    try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 3)
+    try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 2)
+    try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 3)
   }
 }
