@@ -20,7 +20,9 @@ foam.CLASS({
   name: 'AltView',
   extends: 'foam.u2.View',
 
-  documentation: 'Provides the ability to switch between multiple views for data set',
+  documentation: "Provides the ability to switch between multiple views for data set" +
+  "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
+  "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
   requires: [    
     'foam.u2.stack.Stack'
