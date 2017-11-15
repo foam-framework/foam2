@@ -16,56 +16,68 @@ foam.CLASS({
 
   ids: [ 'name' ],
 
-  tableColumns: [ 'name', 'lazy', 'serve', 'serviceClass' ],
+  tableColumns: [ 'name', 'lazy', 'serve', 'authenticate', /*'serviceClass',*/ 'configure' ],
 
 
   properties: [
     {
       class: 'String',
       name: 'name',
-      tableWidth: 260
+      tableWidth: 460
     },
     {
       class: 'Boolean',
       name: 'lazy',
       tableWidth: 60,
-      value: true
+      value: true,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
+      },
     },
     {
       class: 'Boolean',
       name: 'serve',
       tableWidth: 50,
-      // Used by u2.view.TableView
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
             .call(function() {
-              if ( value ) { this.style({color: 'green'}); } else { this.entity('nbsp'); }
+              if ( value ) { this.style({color: 'green'}); }
             })
-            .add(obj.serve ? ' Y' : '-')
+            .add(value ? ' Y' : '-')
           .end();
-      },
-      // Used by u2.TableView
-      tableCellView: function(obj, e) {
-        var e = e.E();
-        if ( obj.serve ) { e.style({color: 'green'}); } else { e.entity('nbsp'); }
-        e.add(obj.serve ? ' Y' : '-');
-        return e;
       },
       documentation: 'If true, this service is served over the network.'
     },
     {
       class: 'Boolean',
       name: 'authenticate',
-      value: true
+      value: true,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
+      }
     },
     {
       class: 'String',
-      name: 'serviceClass'
+      name: 'serviceClass',
+      displayWidth: 80
     },
     {
       class: 'String',
-      name: 'boxClass'
+      name: 'boxClass',
+      displayWidth: 80
     },
     {
       class: 'String',
@@ -135,6 +147,15 @@ foam.CLASS({
         'java.lang.InstantiationException',
         'java.lang.IllegalAccessException'
       ],
+    }
+  ],
+
+  actions: [
+    {
+      name: 'configure',
+      code: function() {
+        console.log('foo');
+      }
     }
   ]
 });
