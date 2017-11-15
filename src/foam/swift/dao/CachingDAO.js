@@ -52,7 +52,7 @@ DispatchQueue.global(qos: .background).async {
   try? cache.removeAll()
   let sink = self.DAOSink_create(["dao": cache])
   _ = try? src.select(sink)
-  try? src.listen(sink, nil)
+  _ = try? src.listen(sink, nil)
   pDao.promise.set(cache)
 }
 return pDao
