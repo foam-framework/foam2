@@ -90,7 +90,7 @@ emailIsSet_ = true;`
       name: 'type',
       view: {
         class: 'foam.u2.view.ChoiceView',
-        choices: [ 'Personal', 'Business', 'Broker', 'Bank' ]
+        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
       }
     },
     {
