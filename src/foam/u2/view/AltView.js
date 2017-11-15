@@ -68,7 +68,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      this.SUPER();      
+      this.SUPER();  
+      var self = this;      
       this.altStack = null;      
       this.altStack = this.Stack.create();
       this.viewChoices$.sub(this.changeView);
@@ -85,7 +86,10 @@ foam.CLASS({
 
       if(!this.views[0]){
         this.views.push([ { class: 'foam.u2.view.TableView' , data: this.data }, 'Table' ]);        
-      } else { 
+      } else {
+        this.views.forEach(function(view){
+          view[0].data ? view[0].data : self.data;
+        });
         this.altStack.push(this.views[0][0]);
       }
     }
