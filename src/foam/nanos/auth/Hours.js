@@ -10,13 +10,6 @@ foam.CLASS({
 
   documentation: 'Represents open and closing time',
 
-  constants: [
-    {
-      name: 'SUNDAY',
-
-    }
-  ],
-
   properties: [
     {
       class: 'Enum',
