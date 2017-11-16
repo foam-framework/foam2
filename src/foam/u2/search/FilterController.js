@@ -484,7 +484,10 @@ foam.CLASS({
     {
       class: 'foam.u2.ViewSpec',
       name: 'searchView',
-      value: { class: 'foam.u2.search.GroupBySearchView' }
+      value: {
+        class: 'foam.u2.search.GroupBySearchView',
+        viewSpec: { class: 'foam.u2.view.ChoiceView', size: 3 }
+      }
     }
   ]
 });
