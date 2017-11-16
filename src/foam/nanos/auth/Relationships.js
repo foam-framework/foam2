@@ -50,11 +50,3 @@ foam.RELATIONSHIP({
     hidden: true
   }
 });
-
-foam.RELATIONSHIP({
-  cardinality: '1:*',
-  sourceModel: 'foam.nanos.auth.Address',
-  targetModel: 'foam.nanos.auth.Hours',
-  forwardName: 'hours',
-  inverseName: 'address'
-});
