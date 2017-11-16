@@ -1202,7 +1202,11 @@ foam.CLASS({
         cls.method({
           name: this.name,
           type: 'void',
-          args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+          args: this.args && this.args.map(function(a) {
+            return {
+              name: a.name, type: a.javaType
+            };
+          }),
           body: this.javaCode
         });
         return;
@@ -1212,15 +1216,23 @@ foam.CLASS({
         name: this.name + '_real_',
         type: 'void',
         visibility: 'protected',
-        args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+        args: this.args && this.args.map(function(a) {
+          return {
+            name: a.name, type: a.javaType
+          };
+        }),
         body: this.javaCode
       });
 
       cls.method({
         name: this.name,
         type: 'void',
-        args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
-        body: `${this.name + 'Listener_'}.fire(event);`
+          args: this.args && this.args.map(function(a) {
+            return {
+              name: a.name, type: a.javaType
+            };
+          }),
+        body: `${this.name + 'Listener_'}.fire(new Object[] { ${ this.args.map(function(a) { return a.name; }).join(', ') } });`
       })
 
       var listener = foam.java.Field.create({
@@ -1241,8 +1253,8 @@ foam.CLASS({
               name: 'go',
               type: 'void',
               visibility: 'public',
-              args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
-              body: `${this.name + '_real_'}(event);`
+              args: [ foam.java.Argument.create({ type: 'Object[]', name: 'args' }) ],
+              body: `${this.name + '_real_'}(${ this.args && this.args.map(function(a, i) { return "(" + a.javaType + ")args[" + i + "]";}).join(', ') });`
             })
           ]
         })
