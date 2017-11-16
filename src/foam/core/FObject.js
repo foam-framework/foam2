@@ -113,6 +113,8 @@ foam.LIB({
     },
 
     function installAxioms(axs) {
+      if ( ! axs || ! axs.length ) return;
+
       /**
        * Install Axioms into the class and prototype.
        * Invalidate the axiom-cache, used by getAxiomsByName().
