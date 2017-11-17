@@ -76,7 +76,7 @@ public class RestBlobService
 
       os.flush();
 
-      if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
+      if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
         is = connection.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String json = "";
@@ -113,7 +113,7 @@ public class RestBlobService
       connection.setRequestMethod("GET");
       connection.connect();
 
-      if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
+      if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
         is = connection.getInputStream();
         blob = new InputStreamBlob(is);
       } else {
