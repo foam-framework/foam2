@@ -1,7 +1,6 @@
 package foam.blob;
 
 import foam.core.X;
-import jdk.internal.jline.internal.InputStreamReader;
 
 import java.net.URL;
 import java.net.HttpURLConnection;
@@ -11,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.InputStreamReader;
 
 public class RestBlobService
     extends AbstractBlobService
@@ -69,7 +69,7 @@ public class RestBlobService
       while ( chunk < chunks ) {
         buffer = blob.read(buffer, chunkOffset(chunk));
         byte[] buf = buffer.getData().array();
-        os.write(buf, 0, buf.length);
+        os.write(buf, 0, (int) buffer.getLength());
         buffer.getData().clear();
         chunk++;
       }
@@ -77,17 +77,18 @@ public class RestBlobService
       os.flush();
 
       if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
-        //get respone from server id is in it
         is = connection.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String id = "";
+        String json = "";
         String line = null;
         while ( (line = reader.readLine()) != null ) {
-          id += line;
+          json += line;
         }
-        result = new IdentifiedBlob();
-        result.setId(id);
+
+        result = (IdentifiedBlob) (new foam.lib.json.JSONParser()).parseString(json, IdentifiedBlob.class);
         result.setX(getX());
+      } else {
+        throw new RuntimeException("upload fail");
       }
     } catch ( MalformedURLException e ) {
       e.printStackTrace();
@@ -129,6 +130,8 @@ public class RestBlobService
       if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
         is = connection.getInputStream();
         blob = new InputStreamBlob(is);
+      } else {
+        throw new RuntimeException("download fail");
       }
     } catch ( MalformedURLException e ) {
       e.printStackTrace();
