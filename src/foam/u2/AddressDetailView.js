@@ -108,21 +108,6 @@ foam.CLASS({
           start().
             add(this.data.VERIFIED).add(this.data.STRUCTURE).
           end().
-
-          //startContext({data: this.data}).
-            /*start().hide(this.data.STRUCTURE$).
-              //start().addClass('frequency-div').
-                start().addClass('label').add(this.data.ADDRESS1.label).end().
-                  start(this.data.ADDRESS1).end().
-              //end().
-              start().addClass('inline').style({ 'margin-right' : '36px'}).
-                start().addClass('label').add(this.data.ADDRESS2.label).end().
-                start(this.data.ADDRESS2).end().
-              end().
-            end().*/
-
-          //endContext().
-
           startContext({data: this.data}).
             start().hide(this.data.structure$).
               start().
@@ -145,16 +130,6 @@ foam.CLASS({
               end().
             end().
           endContext().
-
-
-          /*start().
-            start('p').style({'display': 'inline'}).add(this.data.STREET_NUMBER.label).end().
-            start('p').style({'display': 'inline', 'margin-left': '120px'}).add(this.data.STREET_NAME.label).end().
-            start('p').style({'display': 'inline', 'margin-left': '125px'}).add(this.data.SUITE.label).end().
-          end().
-          start().
-            add(this.data.STREET_NUMBER).add(this.data.STREET_NAME).add(this.data.SUITE).
-          end().*/
           start().
             start('p').style({'display': 'inline'}).add(this.data.CITY.label).end().
             start('p').style({'display': 'inline', 'margin-left': '195px'}).add('Province/State').end().
