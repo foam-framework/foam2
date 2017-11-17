@@ -229,7 +229,7 @@ public class UserAndGroupAuthService
 
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
-      throw new AuthenticationException("Old password does not match current password");
+      throw new AuthenticationException("Old password is incorrect");
     }
 
     // new password is the same
