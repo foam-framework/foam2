@@ -288,6 +288,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        static : this.static ? 'static ' : '',
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
