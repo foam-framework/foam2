@@ -7,6 +7,7 @@
 var classes = [
   'foam.core.Serializable',
   'foam.core.Exception',
+  'foam.core.ContextAgent',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -51,6 +52,7 @@ var classes = [
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
+  'foam.nanos.http.WebAgent',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
@@ -190,6 +192,7 @@ var proxies = [
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
   'foam.blob.BlobService',
+  'foam.nanos.http.WebAgent',  
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];
