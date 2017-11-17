@@ -95,21 +95,7 @@ public class RestBlobService
     } catch ( IOException e ) {
       e.printStackTrace();
     } finally {
-      if ( os != null ) {
-        try {
-          os.close();
-        } catch ( IOException e ) {
-          e.printStackTrace();
-        }
-      }
-
-      if ( is != null ) {
-        try {
-          is.close();
-        } catch ( IOException e ) {
-          e.printStackTrace();
-        }
-      }
+      closeSource(is, os);
       return result;
     }
   }
@@ -138,13 +124,7 @@ public class RestBlobService
     } catch ( IOException e ) {
       e.printStackTrace();
     } finally {
-      if ( is != null ) {
-        try {
-          is.close();
-        } catch ( IOException e ) {
-          e.printStackTrace();
-        }
-      }
+      closeSource(is, null);
       return blob;
     }
   }
@@ -159,5 +139,22 @@ public class RestBlobService
 
   private long chunkOffset(long i) {
     return i * BUFFER_SIZE;
+  }
+
+  private void closeSource(InputStream is, OutputStream os) {
+    if ( os != null ) {
+      try {
+        os.close();
+      } catch ( IOException e ) {
+        e.printStackTrace();
+      }
+    }
+    if ( is != null ) {
+      try {
+        is.close();
+      } catch ( IOException e ) {
+        e.printStackTrace();
+      }
+    }
   }
 }
