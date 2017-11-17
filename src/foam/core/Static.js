@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,12 @@ foam.CLASS({
 
   properties: [
     //get prop from foam.core.AbstractMethod
-    { name: 'code', required: true },//TODO javaCode
-    { name: 'static', value: true }
   ],
 
   methods: [
     function exportAs(obj) {
-      /*var m = obj[this.name];
-      // Bind the method to 'this' when exported so that it still works.
-      return function exportedMethod() { return m.apply(obj, arguments); };*/
-    }
+    },
+    function isStatic(){ return true;}
   ]
 });
 
