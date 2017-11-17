@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 package foam.blob;
 
 import foam.core.X;
@@ -100,7 +105,6 @@ public class RestBlobService
     }
   }
 
-  //retrive file from url
   @Override
   public Blob find_(X x, Object id) {
     InputStream is = null;
