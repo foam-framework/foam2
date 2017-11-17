@@ -90,7 +90,7 @@ emailIsSet_ = true;`
       name: 'type',
       view: {
         class: 'foam.u2.view.ChoiceView',
-        choices: [ 'Personal', 'Business', 'Broker', 'Bank' ]
+        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
       }
     },
     {
@@ -108,7 +108,7 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return foam.nanos.auth.Address.create(); }
+      factory: function() { return foam.nanos.auth.Address.create({}, this); }
     },
     {
       class: 'FObjectArray',

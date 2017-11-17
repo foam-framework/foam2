@@ -29,6 +29,23 @@ foam.CLASS({
     link: <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
   `},
 
+  enums: [
+    {
+      name: 'ButtonState',
+
+      values: [
+        { name: 'NO_CONFIRM' }, // No confirmation required, fire on click
+        { name: 'CONFIRM' },    // Confirmation required, debounce on click
+        { name: 'DEBOUNCE' },   // Move to Armed after delay, NOP on click
+        { name: 'ARMED' }       // Waiting for confirmation, fire on click
+      ]
+    }
+  ],
+
+  messages: [
+    { name: 'confirm', message: 'Confirm' }
+  ],
+
   properties: [
     {
       class: 'Boolean',
@@ -61,12 +78,8 @@ foam.CLASS({
       expression: function(label) { return this.action.label; }
     },
     {
-      class: 'Boolean',
-      name: 'confirmationState'
-    },
-    {
-      class: 'Boolean',
-      name: 'confirmationTimer'
+      name: 'buttonState',
+      factory: function() { return this.action && this.action.confirmationRequired ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM; }
     },
     'data',
     'action',
@@ -84,20 +97,7 @@ foam.CLASS({
       this.
         on('click', this.click);
 
-      if ( this.icon ) {
-        // this.nodeName = 'a';
-        this.start('img').attr('src', this.icon).end();
-      } else if ( this.iconFontName ) {
-        this.nodeName = 'i';
-        this.cssClass(this.action.name);
-        this.cssClass(this.iconFontClass); // required by font package
-        this.style({'font-family': this.iconFontFamily});
-        this.add(this.iconFontName);
-      }
-
-      if ( this.showLabel ) {
-        this.add(this.label$);
-      }
+      this.addContent();
 
       this.setAttribute('title', this.action.toolTip); // hover text
 
@@ -115,25 +115,63 @@ foam.CLASS({
     function initCls() {
       this.addClass(this.myClass());
       this.addClass(this.myClass(this.action.name));
+    },
+
+    function addContent() {
+      /** Add text or icon to button. **/
+      if ( this.icon ) {
+        // this.nodeName = 'a';
+        this.start('img').attr('src', this.icon).end();
+      } else if ( this.iconFontName ) {
+        this.nodeName = 'i';
+        this.cssClass(this.action.name);
+        this.cssClass(this.iconFontClass); // required by font package
+        this.style({'font-family': this.iconFontFamily});
+        this.add(this.iconFontName);
+      }
+
+      if ( this.showLabel ) {
+        this.add(this.label$);
+      }
     }
   ],
 
   listeners: [
     function click(e) {
-      var self = this;
-      if( this.action.confirmationRequired && !this.confirmationState ){
-        this.confirmationTimer = true;
-        this.confirmationState = true;        
-        this.label = 'Confirm ' + this.label + '?';
-        setTimeout(function(){ self.confirmationTimer = false }, 1000);
-        return;
+      if ( this.buttonState == this.ButtonState.NO_CONFIRM ) {
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
+      }
+      else if ( this.buttonState == this.ButtonState.CONFIRM ) {
+        this.buttonState = this.ButtonState.DEBOUNCE;
+        this.removeAllChildren();
+        this.add(this.confirm);
+        this.debounce();
+      }
+      else if ( this.buttonState == this.ButtonState.ARMED ) {
+        this.removeAllChildren();
+        this.addContent();
+        this.action && this.action.maybeCall(this.__subContext__, this.data);
       }
 
-      if( !this.confirmationTimer ){
-        this.confirmationState = false;
-        this.label = this.labelPlaceholder;
-        this.action && this.action.maybeCall(this.__subContext__, this.data);
-        e.stopPropagation();
+      e.stopPropagation();
+    },
+    {
+      name: 'debounce',
+      isMerged: true,
+      mergeDelay: 200,
+      code: function() {
+        this.buttonState = this.ButtonState.ARMED;
+        this.deactivateConfirm();
+      }
+    },
+    {
+      name: 'deactivateConfirm',
+      isMerged: true,
+      mergeDelay: 6000,
+      code: function() {
+        this.removeAllChildren();
+        this.addContent();
+        this.buttonState = this.ButtonState.CONFIRM;
       }
     }
   ]
