@@ -30,28 +30,42 @@ foam.CLASS({
     }
     ^ .property-type {
       width: 120px;
+      margin-left: 180px;
       margin-bottom: 10px;
     }
     ^ .property-verified {
-      margin-left: 100px;
+      margin-left: 20px;
       margin-bottom: 10px;
     }
-    ^ .property-buildingNumber {
-      width: 120px;
+    ^ .property-structure {
+      margin-left: 215px;
+      margin-bottom: 10px;
+    }
+    ^ .property-streetNumber {
+      width: 110px;
+      margin-bottom: 10px;
+    }
+    ^ .property-streetName {
+      width: 160px;
+      margin-left: 114px;
       margin-bottom: 10px;
     }
     ^ .property-address {
-      width: 250px;
-      margin-left: 100px;
+      width: 200px;
+      margin-bottom: 10px;
+    }
+    ^ .property-address2 {
+      width: 200px;
+      margin-left: 23px;
       margin-bottom: 10px;
     }
     ^ .property-suite {
-      width: 120px;
+      width: 90px;
+      margin-left: 60px;
       margin-bottom: 10px;
     }
     ^ .property-city {
-      width: 120px;
-      margin-left: 100px;
+      width: 110px;
       margin-bottom: 10px;
     }
     ^ .property-postalCode {
@@ -64,8 +78,12 @@ foam.CLASS({
     }
     ^ .property-regionId {
       display: inline;
-      margin-left: 180px;
+      margin-left: 110px;
       margin-bottom: 10px;
+    }
+    ^ .frequency-div {
+      display: inline-block;
+      margin: 0 36px 20px 0;
     }
   `,
 
@@ -77,38 +95,72 @@ foam.CLASS({
         addClass(this.myClass()).
         start().
           start().
-            start('p').style({'display': 'inline', 'margin-top': '10px'}).add(this.data.TYPE.label).end().
-            start('p').style({'display': 'inline', 'margin-left': '185px', 'margin-top': '10px'}).add(this.data.VERIFIED.label).end().
+            start('p').style({'display': 'inline', 'margin-top': '10px'}).add('Country').end().
+            start('p').style({'display': 'inline', 'margin-top': '10px', 'margin-left': '170px'}).add(this.data.TYPE.label).end().
           end().
           start().
-            add(this.data.TYPE).add(this.data.VERIFIED).
+            add(this.data.COUNTRY_ID).add(this.data.TYPE).
           end().
           start().
-            start('p').style({'display': 'inline'}).add(this.data.BUILDING_NUMBER.label).end().
-            start('p').style({'display': 'inline', 'margin-left': '98px'}).add(this.data.ADDRESS.label).end().
+            start('p').style({'display': 'inline', 'margin-top': '10px'}).add(this.data.VERIFIED.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '170px', 'margin-top': '10px'}).add(this.data.STRUCTURE.label).end().
           end().
           start().
-            add(this.data.BUILDING_NUMBER).add(this.data.ADDRESS).
+            add(this.data.VERIFIED).add(this.data.STRUCTURE).
+          end().
+
+          //startContext({data: this.data}).
+            /*start().hide(this.data.STRUCTURE$).
+              //start().addClass('frequency-div').
+                start().addClass('label').add(this.data.ADDRESS1.label).end().
+                  start(this.data.ADDRESS1).end().
+              //end().
+              start().addClass('inline').style({ 'margin-right' : '36px'}).
+                start().addClass('label').add(this.data.ADDRESS2.label).end().
+                start(this.data.ADDRESS2).end().
+              end().
+            end().*/
+
+          //endContext().
+
+          startContext({data: this.data}).
+            start().hide(this.data.structure$).
+              start().
+                start('p').style({'display': 'inline'}).add('Address1').end().
+                start('p').style({'display': 'inline', 'margin-left': '158px'}).add(this.data.ADDRESS2.label).end().
+              end().
+              start().
+                add(this.data.ADDRESS).add(this.data.ADDRESS2).
+              end().
+            end().
+
+            start().show(this.data.structure$).
+              start().
+                start('p').style({'display': 'inline'}).add(this.data.STREET_NUMBER.label).end().
+                start('p').style({'display': 'inline', 'margin-left': '120px'}).add(this.data.STREET_NAME.label).end().
+                start('p').style({'display': 'inline', 'margin-left': '125px'}).add(this.data.SUITE.label).end().
+              end().
+              start().
+                add(this.data.STREET_NUMBER).add(this.data.STREET_NAME).add(this.data.SUITE).
+              end().
+            end().
+          endContext().
+
+
+          /*start().
+            start('p').style({'display': 'inline'}).add(this.data.STREET_NUMBER.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '120px'}).add(this.data.STREET_NAME.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '125px'}).add(this.data.SUITE.label).end().
           end().
           start().
-            start('p').style({'display': 'inline'}).add(this.data.SUITE.label).end().
-            start('p').style({'display': 'inline', 'margin-left': '180px'}).add(this.data.CITY.label).end().
+            add(this.data.STREET_NUMBER).add(this.data.STREET_NAME).add(this.data.SUITE).
+          end().*/
+          start().
+            start('p').style({'display': 'inline'}).add(this.data.CITY.label).end().
+            start('p').style({'display': 'inline', 'margin-left': '195px'}).add('Province/State').end().
           end().
           start().
-            add(this.data.SUITE).add(this.data.CITY).
-          end().
-          start().
-            start('p').style({'display': 'inline'}).add(this.data.POSTAL_CODE.label).end().
-          end().
-          start().
-            add(this.data.POSTAL_CODE).
-          end().
-          start().
-            start('p').style({'display': 'inline'}).add('Country').end().
-            start('p').style({'display': 'inline', 'margin-left': '165px'}).add('Province/State').end().
-          end().
-          start().
-            add(this.data.COUNTRY_ID).add(this.data.REGION_ID).
+            add(this.data.CITY).add(this.data.REGION_ID).
           end().
         end()
     }
