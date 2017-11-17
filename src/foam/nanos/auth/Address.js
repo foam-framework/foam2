@@ -24,14 +24,35 @@ foam.CLASS({
       name: 'deleted'
     },
     {
+      class: 'Boolean',
+      name: 'structure',
+      value: true
+    },
+    {
       class: 'Int',
       name: 'buildingNumber',
       documentation: 'Building number'
     },
-    {
+    /*{
       class: 'String',
       name: 'address',
       required: true
+    },*/
+    {
+      class: 'Int',
+      name: 'streetNumber',
+    },
+    {
+      class: 'String',
+      name: 'streetName',
+    },
+    {
+      class: 'String',
+      name: 'address',
+    },
+    {
+      class: 'String',
+      name: 'address2',
     },
     {
       class: 'String',
