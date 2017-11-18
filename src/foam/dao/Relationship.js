@@ -162,9 +162,8 @@ foam.CLASS({
       var source        = this.lookup(sourceModel);
       var target        = this.lookup(targetModel);
       var junction      = this.lookup(junctionModel, true);
-
-      var sourceDAOKey   = this.sourceDAOKey;
-      var targetDAOKey   = this.targetDAOKey;
+      var sourceDAOKey  = this.sourceDAOKey;
+      var targetDAOKey  = this.targetDAOKey;
 
       if ( cardinality === '1:*' ) {
         if ( ! sourceProps.length ) {
