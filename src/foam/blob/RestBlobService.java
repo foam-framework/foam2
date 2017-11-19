@@ -25,7 +25,7 @@ public class RestBlobService
   protected String address_;
 
   public RestBlobService(String address) {
-    this.address_ = address + "/httpBlobService";
+    this(null, address);
   }
 
   public RestBlobService(foam.core.X x, String address) {
@@ -96,11 +96,11 @@ public class RestBlobService
         throw new RuntimeException("upload fail");
       }
     } catch ( MalformedURLException e ) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     } catch ( IOException e ) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     } finally {
-      closeSource(is, os);
+      closeSource(is, os, connection);
       return result;
     }
   }
@@ -124,11 +124,11 @@ public class RestBlobService
         throw new RuntimeException("download fail");
       }
     } catch ( MalformedURLException e ) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     } catch ( IOException e ) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     } finally {
-      closeSource(is, null);
+      closeSource(is, null, connection);
       return blob;
     }
   }
@@ -145,7 +145,7 @@ public class RestBlobService
     return i * BUFFER_SIZE;
   }
 
-  private void closeSource(InputStream is, OutputStream os) {
+  private void closeSource(InputStream is, OutputStream os, HttpURLConnection connection) {
     if ( os != null ) {
       try {
         os.close();
@@ -159,6 +159,9 @@ public class RestBlobService
       } catch ( IOException e ) {
         e.printStackTrace();
       }
+    }
+    if ( connection != null ) {
+      connection.disconnect();
     }
   }
 }
