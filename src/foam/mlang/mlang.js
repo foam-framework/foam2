@@ -280,7 +280,11 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
-    function f() { return true; }
+    {
+      name: 'f',
+      code: function() { return true; },
+      swiftCode: 'return true',
+    },
   ]
 });
 

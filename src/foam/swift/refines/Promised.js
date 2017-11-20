@@ -42,17 +42,5 @@ foam.CLASS({
       name: 'swiftFactory',
       value: 'return Future<FObject>()',
     },
-    {
-      name: 'swiftPostSet',
-      expression: function(name) {
-        return `
-clearProperty("${name}State")
-clearProperty("${name}Delegate")
-DispatchQueue.global(qos: .background).async {
-  self.${name}Delegate = try? newValue.get()
-}
-        `;
-      },
-    },
   ]
 });

@@ -78,6 +78,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftGetter',
+    },
+    {
+      class: 'String',
       name: 'swiftPreSet',
       expression: function() {
         return 'return newValue';
@@ -177,7 +181,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         override: isOverride,
         name: this.swiftName,
         type: this.swiftType,
-        getter: this.swiftGetter(),
+        getter: this.swiftGetter || this.swiftGetterTemplate(),
         setter: this.swiftSetter(),
       }));
       cls.fields.push(this.Field.create({
@@ -321,7 +325,7 @@ self.set(key: "<%=this.swiftName%>", value: value)
       */},
     },
     {
-      name: 'swiftGetter',
+      name: 'swiftGetterTemplate',
       template: function() {/*
 if <%=this.swiftInitedName%> {
   return <%=this.swiftValueName%><% if ( this.swiftType != this.swiftValueType ) { %>!<% } %>

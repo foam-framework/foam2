@@ -141,7 +141,7 @@ foam.CLASS({
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
           },
-          swiftPostSet: `${stateName} = ${fulfilledState}_create()`,
+          swiftGetter: `return try! ${myName}.get() as! ${foam.lookup(this.of).model_.swiftName}`,
         }),
         foam.core.ProxySub.create({
           topics: this.topics,
@@ -181,7 +181,6 @@ foam.CLASS({
         foam.core.InnerClass.create({
           model: {
             name: fulfilledState,
-            implements: [this.of],
             properties: [
               {
                 class:    'Proxy',
@@ -193,7 +192,8 @@ foam.CLASS({
             ],
             axioms: [
               foam.pattern.Singleton.create()
-            ]
+            ],
+            generateSwift: false,
           }
         }));
 

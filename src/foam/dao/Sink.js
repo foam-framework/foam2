@@ -712,23 +712,27 @@ foam.CLASS({
       name: 'put',
       code: function(o) {
         this.dao.put(o);
-      }
+      },
+      swiftCode: '_ = try? dao?.put(obj)',
     },
     {
       name: 'remove',
       code: function(o) {
         this.dao.remove(o);
-      }
+      },
+      swiftCode: '_ = try? dao?.remove(obj)',
     },
     {
       name: 'eof',
       code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'reset',
       code: function() {
         this.dao.removeAll();
-      }
+      },
+      swiftCode: '_ = try? dao?.removeAll()',
     }
   ]
 });
