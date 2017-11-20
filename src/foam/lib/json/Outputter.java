@@ -156,8 +156,8 @@ public class Outputter
     writer_.append("}");
   }
 
-  public void outputEnum(Enum<?> enum) {
-    writer.outputNumber(enum.ordinal());
+  public void outputEnum(Enum<?> value) {
+    writer.outputNumber(value.ordinal());
   }
 
   public void output(Object value) {
