@@ -6,48 +6,38 @@
 
 package foam.dao;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import foam.core.FObject;
-import foam.core.X;
-import foam.core.PropertyInfo;
-import foam.core.ClassInfo;
-import foam.mlang.order.Comparator;
-import foam.mlang.predicate.Predicate;
-
-import foam.nanos.logger.Logger;
-
-// FObject JSON Parsing
-import foam.core.EmptyX;
-import foam.lib.json.JSONParser;
-import foam.lib.json.Outputter;
-
-// MongoDB Driver Dependencies
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.ServerAddress;
 import com.mongodb.MongoCredential;
-
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-
+import com.mongodb.client.MongoDatabase;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
+import foam.core.X;
+import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
+import foam.nanos.logger.Logger;
+import foam.util.SafetyUtil;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentReader;
 import org.bson.BsonType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+// FObject JSON Parsing
+// MongoDB Driver Dependencies
+
 
 public class MongoDAO
-        extends AbstractDAO
+    extends AbstractDAO
 {
   private MongoDatabase database;
   private String collectionName;
 
   public MongoDAO(String host, int port, String dbName, String collectionName, String username, String password) {
-    if ( dbName == null || dbName.isEmpty() || collectionName == null || collectionName.isEmpty() ) {
+    if ( SafetyUtil.isEmpty(dbName) || SafetyUtil.isEmpty(collectionName) ) {
       throw new IllegalArgumentException("Illegal arguments");
     }
 
@@ -75,8 +65,7 @@ public class MongoDAO
   }
 
   private boolean isUserPassProvided(String username, String password) {
-    return ( ( username != null ) && ( ! username.isEmpty() ) ) &&
-            ( ( password != null ) && ( ! password.isEmpty() ) );
+    return ( ! SafetyUtil.isEmpty(username) && ! SafetyUtil.isEmpty(password) );
   }
 
   @Override
@@ -123,8 +112,8 @@ public class MongoDAO
     while ( reader.readBsonType() != BsonType.END_OF_DOCUMENT ) {
       String fieldName = reader.readName();
 
-      PropertyInfo prop = ( obj == null) ? null : 
-        (PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName);
+      PropertyInfo prop = ( obj == null) ? null :
+          (PropertyInfo) obj.getClassInfo().getAxiomByName(fieldName);
 
       if ( prop == null ) {
         logger.warning("Unknown key in Mongo Document", fieldName);
@@ -148,7 +137,7 @@ public class MongoDAO
       case INT32:
         value = reader.readInt32();
         break;
-        
+
       case INT64:
         value = reader.readInt64();
         break;

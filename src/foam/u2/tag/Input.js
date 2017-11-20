@@ -45,6 +45,10 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'size'
+    },
+    {
+      class: 'Int',
       name: 'maxLength',
       attribute: true,
       // documentation: 'When set, will limit the length of the input to a certain number'
@@ -64,10 +68,12 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      
+
+      if ( this.size          ) this.setAttribute('size',        this.size);
       if ( this.type          ) this.setAttribute('type',        this.type);
       if ( this.placeholder   ) this.setAttribute('placeholder', this.placeholder);
       if ( this.maxLength > 0 ) this.setAttribute('maxlength',   this.maxLength);
+
       this.initCls();
       this.link();
     },

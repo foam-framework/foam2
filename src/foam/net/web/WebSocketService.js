@@ -15,6 +15,7 @@ foam.CLASS({
     'foam.net.web.WebSocket',
     'foam.box.RawWebSocketBox'
   ],
+
   imports: [ 'creationContext' ],
 
   properties: [

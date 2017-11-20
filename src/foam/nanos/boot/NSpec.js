@@ -16,53 +16,68 @@ foam.CLASS({
 
   ids: [ 'name' ],
 
-  tableColumns: [ 'name', 'lazy', 'serve', 'serviceClass' ],
+  tableColumns: [ 'name', 'lazy', 'serve', 'authenticate', /*'serviceClass',*/ 'configure' ],
 
 
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      tableWidth: 460
     },
     {
       class: 'Boolean',
       name: 'lazy',
-      value: true
-    },
-    {
-      class: 'Boolean',
-      name: 'serve',
-      // Used by u2.view.TableView
+      tableWidth: 60,
+      value: true,
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
             .call(function() {
-              if ( value ) { this.style({color: 'green'}); } else { this.entity('nbsp'); }
+              if ( value ) { this.style({color: 'green'}); }
             })
-            .add(obj.serve ? ' Y' : '-')
+            .add(value ? ' Y' : '-')
           .end();
       },
-      // Used by u2.TableView
-      tableCellView: function(obj, e) {
-        var e = e.E();
-        if ( obj.serve ) { e.style({color: 'green'}); } else { e.entity('nbsp'); }
-        e.add(obj.serve ? ' Y' : '-');
-        return e;
+    },
+    {
+      class: 'Boolean',
+      name: 'serve',
+      tableWidth: 50,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
       },
       documentation: 'If true, this service is served over the network.'
     },
     {
       class: 'Boolean',
       name: 'authenticate',
-      value: true
+      value: true,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
+      }
     },
     {
       class: 'String',
-      name: 'serviceClass'
+      name: 'serviceClass',
+      displayWidth: 80
     },
     {
       class: 'String',
-      name: 'boxClass'
+      name: 'boxClass',
+      displayWidth: 80
     },
     {
       class: 'String',
@@ -132,6 +147,28 @@ foam.CLASS({
         'java.lang.InstantiationException',
         'java.lang.IllegalAccessException'
       ],
+    }
+  ],
+
+  actions: [
+    {
+      // Let user configure this service. Is hard-coded to work with DAO's
+      // for now, but should get the config object from the NSpec itself
+      // to be extensible.
+      name: 'configure',
+      isAvailable: function(boxClass) {
+        return ! boxClass;
+//        return foam.dao.DAO.isInstance(this.__context__[this.name]);
+      },
+      code: function() {
+        var service = this.__context__[this.name];
+        if ( foam.dao.DAO.isInstance(service) ) {
+          this.__context__.stack.push({
+            class: 'foam.comics.BrowserView',
+            data: service
+          });
+        }
+      }
     }
   ]
 });

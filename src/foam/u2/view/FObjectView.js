@@ -21,6 +21,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'objectClass',
+      displayWidth: 70,
       postSet: function(oldValue, newValue) {
         if ( newValue !== oldValue ) {
           var m = this.lookup(newValue, true);

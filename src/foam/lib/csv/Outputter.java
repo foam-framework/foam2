@@ -9,6 +9,7 @@ package foam.lib.csv;
 import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
+import foam.util.SafetyUtil;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -16,7 +17,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 public class Outputter
     extends AbstractSink
@@ -133,7 +133,7 @@ public class Outputter
   }
 
   protected void outputString(String s) {
-    if ( s == null || s.isEmpty() ) return;
+    if ( SafetyUtil.isEmpty(s) ) return;
     writer_.append(escape(s));
   }
 

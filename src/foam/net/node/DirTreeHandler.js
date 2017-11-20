@@ -145,7 +145,7 @@ foam.CLASS({
 
       // Stream file.
       res.pipeFrom(this.fs.createReadStream(target));
-      this.info('200 OK ' + target);
+      this.info('200 OK ' + req.url.pathname + ' => ' + target);
 
       return true;
     }
