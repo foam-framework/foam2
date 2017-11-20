@@ -50,6 +50,34 @@ throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.
   ],
 });
 
+
+foam.CLASS({
+  refines: 'foam.core.StubNotification',
+  properties: [
+    {
+      name: 'swiftCode',
+      expression: function(swiftName, swiftReturns, swiftArgs, swiftThrows) {
+        return swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
+      }
+    }
+  ],
+  templates: [
+    {
+      name: 'swiftCodeGenerator',
+      args: [],
+      template: function() {/*
+let msg = Message_create([
+  "object": RPCMessage_create([
+    "name": "<%=this.swiftName%>",
+    "args": [<%=this.swiftArgs.map(function(a) { return a.localName }).join(', ')%>] as [Any?],
+  ]),
+])
+try? delegate.send(msg)
+      */},
+    },
+  ],
+});
+
 foam.CLASS({
   refines: 'foam.core.Stub',
   properties: [

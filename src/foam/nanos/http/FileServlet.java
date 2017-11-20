@@ -17,6 +17,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+// TODO: Should be a WebAgent instead of a Servlet so that it doesn't need to
+// extend HttpServlet so it can be modelled so it can be configured through
+// the GUI.
 public class FileServlet
   extends HttpServlet
   implements NSpecAware
@@ -24,7 +27,8 @@ public class FileServlet
   protected static final String                  DEFAULT_EXT  = "application/octet-stream";
   protected static final HashMap<String, String> EXTS         = new HashMap();
 
-  protected NSpec nspec_;
+  protected NSpec  nspec_;
+  protected String path_;
 
   static {
     EXTS.put("js",    "application/javascript");
@@ -39,6 +43,14 @@ public class FileServlet
     EXTS.put("csv",   "text/csv");
     EXTS.put("txt",   "text/plain");
     EXTS.put("html",  "text/html");
+  }
+
+  public FileServlet() {
+    this("");
+  }
+
+  public FileServlet(String path) {
+    path_ = path;
   }
 
   protected void fileNotFoundError(HttpServletResponse resp, String file) {
@@ -60,7 +72,12 @@ public class FileServlet
       pathInfo = req.getPathInfo();
     }
 
-    String filePath = pathInfo.substring(nspec_.getName().length() + (pathInfo.startsWith("/" + nspec_.getName() + "/") ? 2 : 1));
+    int startPos = nspec_.getName().length() +
+        (pathInfo.startsWith("/" + nspec_.getName() + "/") ?
+          2 :
+          1 );
+    String filePath = pathInfo.substring(startPos) + path_;
+
     try {
       File   srcFile = new File(filePath.isEmpty() ? "./" : filePath);
       String path    = srcFile.getAbsolutePath();
@@ -79,7 +96,7 @@ public class FileServlet
 
         if ( files != null && files.length > 0 ) {
           for ( File file : files ) {
-            pw.write("<li>" + "<a href=\"/static/" + filePath
+            pw.write("<li>" + "<a href=\"/" + nspec_.getName() + "/" + filePath
                 + ( ! filePath.isEmpty() && ! filePath.endsWith("/") ? "/" : "" )
                 + file.getName() + "\"?>" + file.getName() + "</a></li>");
           }
