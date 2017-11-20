@@ -41,7 +41,7 @@ foam.CLASS({
       swiftFactory: 'return NullDAO_create()',
       swiftPostSet: `
 if let oldValue = oldValue as? AbstractDAO {
-  oldValue.on["reset"].pub()
+  _ = oldValue.on["reset"].pub()
 }
       `,
     },
@@ -75,7 +75,7 @@ if let oldValue = oldValue as? AbstractDAO {
         return listener;
       },
       swiftCode: `
-var listener = ProxyListener_create([
+let listener = ProxyListener_create([
   "delegate": sink,
   "args": [ predicate ]
 ])

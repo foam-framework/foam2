@@ -42,7 +42,7 @@ class ListenerList {
   var sub: Subscription?
 }
 
-public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom {
+public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxiom, SetterAxiom, Expr {
   var classInfo: ClassInfo { get }
   var transient: Bool { get }
   var label: String { get }
@@ -52,6 +52,17 @@ public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxi
   func viewFactory(x: Context) -> FObject?
   func hasOwnProperty(_ o: FObject) -> Bool
   func clearProperty(_ o: FObject)
+}
+extension PropertyInfo {
+  public func f(_ obj: Any?) -> Any? {
+    if let obj = obj as? FObject {
+      return get(obj)
+    }
+    return nil
+  }
+  public func partialEval() {
+    // TODO
+  }
 }
 
 extension PropertyInfo {
@@ -163,6 +174,16 @@ public protocol ClassInfo {
 }
 
 extension ClassInfo {
+  func create() -> Any {
+    return create(args: [:], x: Context.GLOBAL)
+  }
+  func create(x: Context) -> Any {
+    return create(args: [:], x: x)
+  }
+  func create(args: [String:Any?]) -> Any {
+    return create(args: args, x: Context.GLOBAL)
+  }
+
   func ownAxioms<T>(byType type: T.Type) -> [T] {
     var axs: [T] = []
     for axiom in ownAxioms {
@@ -181,7 +202,6 @@ extension ClassInfo {
     }
     return axs
   }
-  func create(x: Context) -> Any { return create(args: [:], x: x) }
 }
 
 public protocol Detachable {
@@ -431,15 +451,6 @@ struct FOAM_utils {
     if a === b { return true }
     if a != nil { return a!.isEqual(b) }
     return false
-  }
-  static var nextId = 1
-  static var nextIdSem = DispatchSemaphore(value: 1)
-  static func next$UID() -> Int {
-    nextIdSem.wait()
-    let id = nextId
-    nextId += 1
-    nextIdSem.signal()
-    return id
   }
 }
 public class Reference<T> {

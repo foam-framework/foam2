@@ -21,11 +21,16 @@ foam.CLASS({
   extends: 'foam.box.PromisedBox',
 
   requires: [
-    'foam.box.RawSocketBox'
+    {
+      name: 'RawSocketBox',
+      path: 'foam.box.RawSocketBox',
+      swiftPath: 'foam.swift.net.RawSocketBox',
+    },
   ],
 
   properties: [
     {
+      class: 'String',
       name: 'address'
     },
     {
@@ -37,7 +42,20 @@ foam.CLASS({
             connectTo(this.address).then(function(s) {
               return this.RawSocketBox.create({ socket: s });
             }.bind(this));
-      }
+      },
+      swiftFactory: `
+let fut = Future<FObject>()
+let cls = Context.GLOBAL.lookup("foam.swift.net.Socket")!
+let socket = cls.create(x: self.__subContext__) as! Socket
+let socketService = __context__["socketService"] as! SocketService // TODO import
+_ = socket.connect.sub(listener: { s, _ in
+  s.detach()
+  socketService.addSocket(socket)
+  fut.set(self.RawSocketBox_create(["socket": socket]))
+})
+socket.connectTo(self.address)
+return fut
+      `
     }
   ]
 });
