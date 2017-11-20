@@ -50,7 +50,7 @@ public class RestBlobService
     try {
       URL url = new URL(address_);
       connection = (HttpURLConnection) url.openConnection();
-      
+
       //configure HttpURLConnection
       connection.setConnectTimeout(5 * 1000);
       connection.setReadTimeout(5 * 1000);
@@ -117,14 +117,12 @@ public class RestBlobService
 
       if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
         is = connection.getInputStream();
-        blob = new InputStreamBlob(is);
+        blob = new InputStreamBlob(is, connection.getContentLengthLong());
       } else {
         throw new RuntimeException("download fail");
       }
-    } catch ( MalformedURLException e ) {
-      throw new RuntimeException(e);
-    } catch ( IOException e ) {
-      throw new RuntimeException(e);
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
     } finally {
       closeSource(is, null, connection);
       return blob;
