@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,14 +84,11 @@ public class RestBlobService
 
       if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
         is = connection.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        String json = "";
-        String line = null;
-        while ( (line = reader.readLine()) != null ) {
-          json += line;
-        }
-
-        result = (IdentifiedBlob) (new foam.lib.json.JSONParser()).parseString(json, IdentifiedBlob.class);
+        BufferedReader  reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        CharBuffer cb = CharBuffer.allocate(65535);
+        reader.read(cb);
+        cb.rewind();
+        result = (IdentifiedBlob) (new foam.lib.json.JSONParser()).parseString(cb.toString(), IdentifiedBlob.class);
         result.setX(getX());
       } else {
         throw new RuntimeException("upload fail");
