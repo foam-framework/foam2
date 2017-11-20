@@ -38,7 +38,7 @@ foam.CLASS({
         // at that point the ID might no longer be valid.
         return foam.next$UID();
       },
-      swiftFactory: 'return String(FOAM_utils.next$UID())',
+      swiftFactory: 'return UUID().uuidString',
     },
     {
       name: 'delegate',
