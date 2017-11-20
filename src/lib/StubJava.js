@@ -14,7 +14,6 @@ foam.CLASS({
       var name = this.name;
       var args = this.args;
       var boxPropName = foam.String.capitalize(this.boxPropName);
-      var replyPolicyName = foam.String.capitalize(this.replyPolicyName);
 
       var code =
 `foam.box.Message message = getX().create(foam.box.Message.class);
@@ -52,6 +51,36 @@ if ( result instanceof foam.box.RPCErrorMessage )
       if ( this.javaReturns && this.javaReturns !== 'void') {
         code += `throw new RuntimeException("Invalid response type: " + result.getClass());`;
       }
+
+      this.javaCode = code;
+
+      this.SUPER(cls);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.StubNotification',
+
+  methods: [
+    function buildJavaClass(cls) {
+      if ( ! this.javaSupport ) return;
+
+      var name = this.name;
+      var args = this.args;
+      var boxPropName = foam.String.capitalize(this.boxPropName);
+
+      var code =
+`foam.box.Message message = getX().create(foam.box.Message.class);
+foam.box.RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
+rpc.setName("${name}");
+Object[] args = { ${ args.map( a => a.name ).join(',') } };
+rpc.setArgs(args);
+
+message.setObject(rpc);
+get${boxPropName}().send(message);
+`;
 
       this.javaCode = code;
 
