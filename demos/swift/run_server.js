@@ -32,6 +32,10 @@ Promise.all([
   var box = foam.box.Context.create({
     myname: '/test',
   });
+  box.socketService = foam.net.node.SocketService.create({
+    port: 7000,
+    delegate: box.registry,
+  }, box)
 
   var dao = foam.dao.EasyDAO.create({
     of: Test,
