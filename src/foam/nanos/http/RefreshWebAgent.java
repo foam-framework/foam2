@@ -7,17 +7,10 @@
 package foam.nanos.http;
 
 import foam.core.*;
-import foam.mlang.predicate.And;
-import foam.mlang.predicate.Predicate;
-import foam.mlang.order.Comparator;
 import java.io.PrintWriter;
-import foam.dao.Sink;
 import foam.nanos.http.WebAgent;
 import foam.nanos.http.ProxyWebAgent;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.Thread;
-import java.util.TimerTask;
-import java.util.Timer;
 
 public class RefreshWebAgent
   extends ProxyWebAgent
