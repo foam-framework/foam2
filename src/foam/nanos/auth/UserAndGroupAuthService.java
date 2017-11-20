@@ -237,6 +237,10 @@ public class UserAndGroupAuthService
       throw new RuntimeException("Password must have one capital letter");
     }
 
+    if ( ! newPassword.matches(".*\\d+.*") ) {
+      throw new RuntimeException("Password must have one numeric character");
+    }
+
     if ( p.matcher(newPassword).matches() ) {
       throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
     }
