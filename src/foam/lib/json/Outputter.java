@@ -156,6 +156,10 @@ public class Outputter
     writer_.append("}");
   }
 
+  public void outputEnum(Enum<?> enum) {
+    writer.outputNumber(enum.ordinal());
+  }
+
   public void output(Object value) {
     if ( value instanceof OutputJSON ) {
       ((OutputJSON) value).outputJSON(this);
@@ -177,6 +181,8 @@ public class Outputter
       outputMap((java.util.Map) value);
     } else if ( value instanceof java.util.List ) {
       outputList((java.util.List) value);
+    } else if ( value instanceof Enum<?> ) {
+      outputEnum((Enum<?>) value);
     } else /*if ( value == null )*/ {
       writer_.append("null");
     }
