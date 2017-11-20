@@ -54,9 +54,9 @@ foam.CLASS({
       },
       javaCode: `
 try {
-  getDelegate().reset((foam.core.Detachable)event);
+  getDelegate().reset(sub);
 } catch(Exception e) {
-  ((foam.core.Detachable)event).detach();
+  sub.detach();
 }
 `
     }

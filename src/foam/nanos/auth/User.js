@@ -108,7 +108,7 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return foam.nanos.auth.Address.create(); }
+      factory: function() { return foam.nanos.auth.Address.create({}, this); }
     },
     {
       class: 'FObjectArray',
