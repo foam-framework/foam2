@@ -31,6 +31,8 @@ public class UserAndGroupAuthService
   protected DAO sessionDAO_;
   protected Map challengeMap; // TODO: let's store in Session Context instead
 
+  java.util.regex.Pattern p = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
+
   @Override
   public void start() {
     userDAO_      = (DAO) getX().get("localUserDAO");
@@ -209,7 +211,7 @@ public class UserAndGroupAuthService
    */
   public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
     if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
-      throw new AuthenticationException("Invalid parameters");
+      throw new RuntimeException("Invalid parameters");
     }
 
     Session session = (Session) x.get(Session.class);
@@ -222,19 +224,31 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    // invalid password
-    if ( ! Password.isValid(newPassword) ) {
-      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
+    if ( newPassword.contains(" ") ) {
+      throw new RuntimeException("Password cannot contain spaces");
+    }
+
+    int length = newPassword.length();
+    if ( length < 7 || length > 32 ) {
+      throw new RuntimeException("Password must be 7-32 characters long");
+    }
+
+    if ( newPassword.equals(newPassword.toLowerCase()) ) {
+      throw new RuntimeException("Password must have one capital letter");
+    }
+
+    if ( p.matcher(newPassword).matches() ) {
+      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
     }
 
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
-      throw new AuthenticationException("Old password is incorrect");
+      throw new RuntimeException("Old password is incorrect");
     }
 
     // new password is the same
     if ( Password.verify(newPassword, user.getPassword()) ) {
-      throw new AuthenticationException("New password must be different");
+      throw new RuntimeException("New password must be different");
     }
 
     // store new password in DAO and put in context
