@@ -6,10 +6,7 @@
 
 package foam.nanos.blob;
 
-import foam.blob.Blob;
-import foam.blob.BlobService;
-import foam.blob.Buffer;
-import foam.blob.FileBlob;
+import foam.blob.*;
 import foam.core.ContextAware;
 import foam.core.X;
 import foam.nanos.NanoService;
@@ -127,8 +124,8 @@ public class HttpBlobService
   protected void doPut(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
       throws javax.servlet.ServletException, java.io.IOException
   {
-    foam.blob.InputStreamBlob blob = new foam.blob.InputStreamBlob(req.getInputStream());
-    foam.blob.Blob result = store_.put(blob);
+    HttpServletRequestBlob blob = new HttpServletRequestBlob(req);
+    Blob result = store_.put(blob);
     new foam.lib.json.Outputter(resp.getWriter(), foam.lib.json.OutputterMode.NETWORK).output(result);
   }
 }
