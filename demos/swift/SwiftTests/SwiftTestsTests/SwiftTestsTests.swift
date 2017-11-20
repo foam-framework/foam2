@@ -135,6 +135,36 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(sink.array as! [Test], [t2])
   }
 
+
+  func testDaoWhere() {
+    let dao = ArrayDAO([
+      "of": Test.classInfo(),
+    ])
+    let t1 = Test([
+      "firstName": "Joe1",
+      "lastName": "Bob",
+    ])
+    let t2 = Test([
+      "firstName": "Joe2",
+      "lastName": "Bob",
+    ])
+    try! _ = dao.put(t1)
+    try! _ = dao.put(t2)
+
+    do {
+      let sink = ArraySink()
+      _ = try! dao.`where`(Eq(["arg1": Test.LAST_NAME(), "arg2": Constant(["value": "Bob"])])).select(sink)
+      XCTAssertEqual(2, sink.array.count)
+    }
+
+    do {
+      let sink = ArraySink()
+      _ = try! dao.`where`(Eq(["arg1": Test.FIRST_NAME(), "arg2": Constant(["value": "Joe2"])])).select(sink)
+      XCTAssertEqual(1, sink.array.count)
+      XCTAssertTrue(t2.isEqual(sink.array[0]))
+    }
+  }
+
   func testDaoListen() {
     let dao = ProxyDAO([
       "delegate": ArrayDAO([
@@ -542,5 +572,57 @@ class SwiftTestsTests: XCTestCase {
     try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 3)
     try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 2)
     try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 3)
+  }
+
+  func testSocketWorking() {
+    // Note: For this test to work, you need to run the run_server.js script in the demo dir
+    let boxContext = Context.GLOBAL.create(BoxContext.self)!
+    let x = boxContext.__subContext__
+
+    let expect = expectation(description: "finish")
+
+    _ = x.create(NamedBox.self, args: [
+      "name": "/test",
+      "delegate": x.create(SocketBox.self, args: ["address": "localhost:7000"])!
+    ])
+
+    let dao = x.create(ClientDAO.self)!
+    dao.delegate = x.create(NamedBox.self, args: [
+      "name": "/test/TestDAO",
+    ])!
+    DispatchQueue.global(qos: .background).async {
+
+      let t = x.create(Test.self, args: ["firstName": "YOO"])!
+      do {
+        try _ = dao.put(t)
+      } catch let e {
+        NSLog(e.localizedDescription)
+      }
+
+      let sink = try! dao.select() as? ArraySink
+      XCTAssertEqual(sink?.array.count, 2)
+      expect.fulfill()
+    }
+
+    wait(for: [expect], timeout: 100)
+  }
+
+  func testSocketError() {
+    let boxContext = Context.GLOBAL.create(BoxContext.self)!
+    let x = boxContext.__subContext__
+
+    let expect = expectation(description: "finish")
+
+    let socket = x.create(Socket.self)!
+    _ = socket.connect.sub { (sub, _) in
+      XCTFail()
+    }
+    _ = socket.errorEvent.sub { (sub, _) in
+      sub.detach()
+      expect.fulfill()
+    }
+    socket.connectTo("localhost:7000")
+
+    wait(for: [expect], timeout: 20)
   }
 }
