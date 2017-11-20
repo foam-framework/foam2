@@ -31,7 +31,8 @@ public class UserAndGroupAuthService
   protected DAO sessionDAO_;
   protected Map challengeMap; // TODO: let's store in Session Context instead
 
-  java.util.regex.Pattern p = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
+  // pattern used to check if password has only alphanumeric characters
+  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
   @Override
   public void start() {
@@ -241,7 +242,7 @@ public class UserAndGroupAuthService
       throw new RuntimeException("Password must have one numeric character");
     }
 
-    if ( p.matcher(newPassword).matches() ) {
+    if ( alphanumeric.matcher(newPassword).matches() ) {
       throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
     }
 
