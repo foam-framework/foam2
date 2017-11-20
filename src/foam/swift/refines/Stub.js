@@ -9,8 +9,8 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, swiftReturns, swiftArgs, swiftThrows) {
-        return swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
+      getter: function() {
+        return this.swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
       }
     }
   ],
