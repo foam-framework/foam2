@@ -62,7 +62,7 @@ public class GoogleMapsGeocodingDAO
       if (stored != null && prop_.get(obj) != null ) {
         Address storedAddress = (Address) prop_.get(obj);
         // compare fields that are used to populate Google maps query
-        if ( SafetyUtil.compare(address.getAddress1(), storedAddress.getAddress1()) == 0 &&
+        if ( SafetyUtil.compare(address.getAddress(), storedAddress.getAddress()) == 0 &&
             SafetyUtil.compare(address.getCity(), storedAddress.getCity()) == 0 &&
             SafetyUtil.compare(address.getRegionId(), storedAddress.getRegionId()) == 0 &&
             SafetyUtil.compare(address.getPostalCode(), storedAddress.getPostalCode()) == 0 &&
@@ -74,8 +74,8 @@ public class GoogleMapsGeocodingDAO
 
     StringBuilder builder = sb.get().append(API_HOST);
     // append address
-    if ( ! SafetyUtil.isEmpty(address.getAddress1()) ) {
-      builder.append(address.getAddress1()).append(",");
+    if ( ! SafetyUtil.isEmpty(address.getAddress()) ) {
+      builder.append(address.getAddress()).append(",");
     }
 
     // append city
