@@ -79,6 +79,11 @@ return newValue
 return ["Hello", "World"]
       */},
     },
+    {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
+      name: 'enumProp',
+    },
   ],
   actions: [
     {

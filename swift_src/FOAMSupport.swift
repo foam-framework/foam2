@@ -510,10 +510,16 @@ public class ModelParserFactory {
   }
 }
 
-public protocol FOAM_enum {
+public protocol FOAM_enum: JSONOutputter {
   var ordinal: Int { get }
   var name: String { get }
   var label: String { get }
+}
+
+extension FOAM_enum {
+  public func toJSON(outputter: Outputter, out: inout String) {
+    outputter.outputNumber(&out, ordinal as NSNumber)
+  }
 }
 
 public class FoamError: Error {

@@ -71,8 +71,9 @@ class SwiftTestsTests: XCTestCase {
     t.prevFirstName = "MY_PREV_NAME"
     t.boolProp = false
     t.intProp = 34
+    t.enumProp = Visibility.FINAL
     XCTAssertEqual(Outputter().swiftStringify(t),
-    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\"}")
+    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\",\"enumProp\":1}")
   }
 
   func testExpression() {
