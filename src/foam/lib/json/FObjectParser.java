@@ -30,10 +30,7 @@ public class FObjectParser extends ProxyParser {
 
                        try {
 
-                         c = ps1 != null ? Class.forName(ps1.value().toString()) :
-                           x.get("defaultClass") != null ? (Class) x.get("defaultClass") :
-                           defaultClass;
-
+                         c = ps1 != null ? Class.forName(ps1.value().toString()) : defaultClass;
                          if ( c == null ) {
                            if ( ps1 != null ) throw new RuntimeException("Can't find class: " + ps1.value().toString());
 

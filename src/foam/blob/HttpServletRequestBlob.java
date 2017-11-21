@@ -6,20 +6,25 @@
 
 package foam.blob;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class InputStreamBlob
+public class HttpServletRequestBlob
     extends foam.blob.AbstractBlob
 {
   protected long size_;
   protected long pos_ = 0;
   protected BufferedInputStream reader_;
 
-  public InputStreamBlob(java.io.InputStream in, long size) throws IOException {
-    this.size_ = size;
-    this.reader_ = new BufferedInputStream(in);
+
+  public HttpServletRequestBlob(HttpServletRequest request) throws IOException {
+    this.reader_ = new BufferedInputStream(request.getInputStream());
+    if ( request.getContentLengthLong() == -1 ) {
+      throw new RuntimeException("Invalid content length");
+    }
+    this.size_ = request.getContentLengthLong();
   }
 
   @Override
@@ -31,7 +36,7 @@ public class InputStreamBlob
 
       int outOffset = 0;
       long length = Math.min(buffer.getLength(), getSize() - offset);
-      if ( length < buffer.getLength() ) {
+      if (length < buffer.getLength()) {
         buffer = buffer.slice(0, length);
       }
 
