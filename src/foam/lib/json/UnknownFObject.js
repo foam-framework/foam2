@@ -27,7 +27,7 @@ foam.CLASS({
           javaType: 'foam.lib.json.Outputter'
         }
       ],
-      javaCode: 'outputter.put(this, null);'
+      javaCode: 'outputter.outputRawString(getJson());'
     }
   ]
 });
