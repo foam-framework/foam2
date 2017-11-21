@@ -185,7 +185,7 @@ out.append(data.stringValue)
       ],
       swiftCode: function() {/*
 if let data = data as? FObject {
-  outputFObject(&out, data)
+  data.toJSON(outputter: self, out: &out)
 } else if let data = data as? PropertyInfo {
   outputPropertyInfo(&out, data)
 } else if let data = data as? String {

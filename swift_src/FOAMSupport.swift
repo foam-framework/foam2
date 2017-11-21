@@ -65,6 +65,10 @@ extension PropertyInfo {
   }
 }
 
+public protocol JSONOutputter {
+  func toJSON(outputter: Outputter, out: inout String)
+}
+
 extension PropertyInfo {
   public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
     outputter.output(&out, value)
@@ -219,7 +223,7 @@ public class Subscription: Detachable {
   }
 }
 
-public protocol FObject: class, Detachable, Topic {
+public protocol FObject: class, Detachable, Topic, JSONOutputter {
   func ownClassInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
@@ -441,6 +445,10 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
       return compareTo(o) == 0
     }
     return super.isEqual(object)
+  }
+
+  public func toJSON(outputter: Outputter, out: inout String) {
+    outputter.outputFObject(&out, self)
   }
 }
 
