@@ -103,8 +103,14 @@ foam.CLASS({
     [ 'nodeName', 'div' ]
   ],
 
-  templates: [
-    function CSS() {/*
+  css: `
+    ^toolbar {
+      padding-top: 4px;
+    }
+  `,
+
+  /*
+  TODO: port old FOAM1 CSS
       ^ {
         background: #fdfdfd;
         border: solid 1px #dddddd;
@@ -148,8 +154,7 @@ foam.CLASS({
         margin: 2px 0 0px 2px;
         padding: 4px 2px;
       }
-    */}
-  ],
+  */
 
   methods: [
     function initE() {
