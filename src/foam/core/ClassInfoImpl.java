@@ -103,7 +103,7 @@ public class ClassInfoImpl
 
   public List getAxiomsByClass(Class cls) {
     if ( axiomMap_.containsKey(cls) ) {
-      return (List)axiomMap_.get(cls);
+      return (List) axiomMap_.get(cls);
     }
 
     ArrayList ret = new ArrayList();
