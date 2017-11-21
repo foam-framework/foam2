@@ -5,6 +5,7 @@
  */
 
 var classes = [
+  'foam.core.Axiom',
   'foam.core.Serializable',
   'foam.core.Exception',
   'foam.mlang.predicate.Predicate',
