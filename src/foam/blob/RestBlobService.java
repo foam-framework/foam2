@@ -3,9 +3,11 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 package foam.blob;
 
 import foam.core.X;
+import foam.lib.json.JSONParser;
 
 import java.net.URL;
 import java.net.HttpURLConnection;
@@ -46,11 +48,11 @@ public class RestBlobService
     HttpURLConnection connection = null;
     OutputStream os = null;
     InputStream is = null;
-    IdentifiedBlob result = null;
+
     try {
       URL url = new URL(address_);
       connection = (HttpURLConnection) url.openConnection();
-      
+
       //configure HttpURLConnection
       connection.setConnectTimeout(5 * 1000);
       connection.setReadTimeout(5 * 1000);
@@ -82,24 +84,21 @@ public class RestBlobService
 
       os.flush();
 
-      if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
-        is = connection.getInputStream();
-        BufferedReader  reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        CharBuffer cb = CharBuffer.allocate(65535);
-        reader.read(cb);
-        cb.rewind();
-        result = (IdentifiedBlob) (new foam.lib.json.JSONParser()).parseString(cb.toString(), IdentifiedBlob.class);
-        result.setX(getX());
-      } else {
-        throw new RuntimeException("upload fail");
+      if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
+        throw new RuntimeException("Upload failed");
       }
-    } catch ( MalformedURLException e ) {
-      throw new RuntimeException(e);
-    } catch ( IOException e ) {
-      throw new RuntimeException(e);
+
+      is = connection.getInputStream();
+      BufferedReader  reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      CharBuffer cb = CharBuffer.allocate(65535);
+      reader.read(cb);
+      cb.rewind();
+
+      return (Blob) getX().create(JSONParser.class).parseString(cb.toString(), IdentifiedBlob.class);
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
     } finally {
       closeSource(is, os, connection);
-      return result;
     }
   }
 
@@ -108,6 +107,7 @@ public class RestBlobService
     InputStream is = null;
     HttpURLConnection connection = null;
     Blob blob = null;
+
     try {
       URL url = new URL(this.address_ + "/" + id.toString());
       connection = (HttpURLConnection) url.openConnection();
@@ -115,16 +115,15 @@ public class RestBlobService
       connection.setRequestMethod("GET");
       connection.connect();
 
-      if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
-        is = connection.getInputStream();
-        blob = new InputStreamBlob(is);
-      } else {
-        throw new RuntimeException("download fail");
+      if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ||
+          connection.getContentLengthLong() == -1 ) {
+        throw new RuntimeException("Failed to find blob");
       }
-    } catch ( MalformedURLException e ) {
-      throw new RuntimeException(e);
-    } catch ( IOException e ) {
-      throw new RuntimeException(e);
+
+      is = connection.getInputStream();
+      blob = new InputStreamBlob(is, connection.getContentLengthLong());
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
     } finally {
       closeSource(is, null, connection);
       return blob;
