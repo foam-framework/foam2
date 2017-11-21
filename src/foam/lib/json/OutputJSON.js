@@ -7,6 +7,8 @@ foam.INTERFACE({
   package: 'foam.lib.json',
   name: 'OutputJSON',
 
+  documentation: 'define interface for Json output',
+
   methods: [
     {
       name: 'outputJSON',
