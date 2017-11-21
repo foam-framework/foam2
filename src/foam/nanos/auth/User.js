@@ -89,7 +89,7 @@ emailIsSet_ = true;`
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: 'foam.nanos.auth.PhoneDetailView' 
     },
     {
       class: 'String',
