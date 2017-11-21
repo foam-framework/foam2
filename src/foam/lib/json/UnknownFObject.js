@@ -1,40 +1,33 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.lib.json',
   name: 'UnknownFObject',
+  implements: [ 'foam.lib.json.OutputJSON' ],
 
   documentation: 'A FObject for unknown model',
 
   properties: [
     {
       class: 'String',
-      name: 'Json'
+      name: 'json'
     }
   ],
 
   methods: [
     {
-      name: 'fclone',
-      javaReturns: 'foam.core.FObject',
-      javaCode: 'return new UnknownFObject(getX(), getJson());'
-    },
-    {
-      name: 'compareTo',
+      name: 'outputJSON',
       args: [
         {
-          name: 'o',
-          javaType: 'Object'
+          name: 'outputter',
+          javaType: 'foam.lib.json.Outputter'
         }
       ],
-      javaReturns: 'int',
-      javaCode:
-`if ( o == this ) return 0;
-if ( o == null ) return 1;
-if ( ! ( o instanceof UnknownFObject ) ) return 1;
-return getJson().equals(((UnknownFObject) o).getJson()) ? 0 : 1;`
-    },
-    {
-      name: 'toString',
-      javaCode: 'return getJson();'
+      javaCode: 'outputter.put(this, null);'
     }
   ]
 });
