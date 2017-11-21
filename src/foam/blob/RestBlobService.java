@@ -108,6 +108,7 @@ public class RestBlobService
     InputStream is = null;
     HttpURLConnection connection = null;
     Blob blob = null;
+    
     try {
       URL url = new URL(this.address_ + "/" + id.toString());
       connection = (HttpURLConnection) url.openConnection();
@@ -115,12 +116,13 @@ public class RestBlobService
       connection.setRequestMethod("GET");
       connection.connect();
 
-      if ( connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
-        is = connection.getInputStream();
-        blob = new InputStreamBlob(is, connection.getContentLengthLong());
-      } else {
-        throw new RuntimeException("download fail");
+      if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ||
+          connection.getContentLengthLong() == -1 ) {
+        throw new RuntimeException("Failed to find blob");
       }
+
+      is = connection.getInputStream();
+      blob = new InputStreamBlob(is, connection.getContentLengthLong());
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
