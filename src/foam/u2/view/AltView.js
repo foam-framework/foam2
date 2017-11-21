@@ -65,12 +65,17 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();  
-      var self = this;      
+      var self = this;
       this.altStack = null;      
       this.altStack = this.Stack.create();
       this.viewChoices$.sub(this.changeView);
+
+      this.views.forEach(function(view){
+        view[0].data = view[0].data ? view[0].data : self.data;
+      })
+      this.altStack.push(this.views[0][0]);  
+
       this.addClass(this.myClass())
-      
       this.startContext({data: this})
         this.start()
           .add(this.VIEW_CHOICES)
@@ -79,11 +84,7 @@ foam.CLASS({
       .start('div').addClass('stack-wrapper')
         .tag({class: 'foam.u2.stack.StackView', data: this.altStack, showActions: false})
       .end()
-      this.views.forEach(function(view){
-        view[0].data = view[0].data ? view[0].data : self.data;
-      })
-      this.altStack.push(this.views[0][0]);
-    
+
     }
   ],
 
