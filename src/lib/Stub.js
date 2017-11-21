@@ -178,7 +178,7 @@ foam.CLASS({
           });
       }
     },
-    ['javaType', 'foam.box.Box'],
+    ['javaType',     'foam.box.Box'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo']
   ],
 
@@ -309,8 +309,8 @@ foam.CLASS({
     {
       name: 'code',
       factory: function() {
-        var boxPropName     = this.boxPropName;
-        var name            = this.name;
+        var boxPropName = this.boxPropName;
+        var name        = this.name;
 
         return function() {
           var msg = this.Message.create({
