@@ -130,7 +130,6 @@ public class ClassInfoImpl
 
       @Override
       public boolean add(Object o) {
-        System.out.println("here");
         if ( ! cls.isInstance(o) ) {
           return false;
         }
