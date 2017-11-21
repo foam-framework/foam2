@@ -58,13 +58,10 @@ return super.output(&out, data)
     {
       name: 'send',
       swiftCode: `
-var replyBox = msg.attributes["replyBox"] as? Box
+let replyBox = msg.attributes["replyBox"] as? Box
 if replyBox != nil {
   let export = registry.register(nil, nil, replyBox!) as! SubBox
   msg.attributes["replyBox"] = export
-  replyBox = ReplyBox_create([
-    "id": export.name
-  ])
 }
 let payload = outputter.swiftStringify(msg)
 socket?.write(payload)

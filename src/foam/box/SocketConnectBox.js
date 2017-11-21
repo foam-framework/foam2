@@ -44,17 +44,8 @@ foam.CLASS({
             }.bind(this));
       },
       swiftFactory: `
-let fut = Future<FObject>()
-let cls = Context.GLOBAL.lookup("foam.swift.net.Socket")!
-let socket = cls.create(x: self.__subContext__) as! Socket
 let socketService = __context__["socketService"] as! SocketService // TODO import
-_ = socket.connect.sub(listener: { s, _ in
-  s.detach()
-  socketService.addSocket(socket)
-  fut.set(self.RawSocketBox_create(["socket": socket]))
-})
-socket.connectTo(self.address)
-return fut
+return socketService.getSocketBoxFuture(address)
       `
     }
   ]

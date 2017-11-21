@@ -65,6 +65,10 @@ extension PropertyInfo {
   }
 }
 
+public protocol JSONOutputter {
+  func toJSON(outputter: Outputter, out: inout String)
+}
+
 extension PropertyInfo {
   public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
     outputter.output(&out, value)
@@ -219,7 +223,7 @@ public class Subscription: Detachable {
   }
 }
 
-public protocol FObject: class, Detachable, Topic {
+public protocol FObject: class, Detachable, Topic, JSONOutputter {
   func ownClassInfo() -> ClassInfo
   func set(key: String, value: Any?)
   func get(key: String) -> Any?
@@ -442,6 +446,10 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
     }
     return super.isEqual(object)
   }
+
+  public func toJSON(outputter: Outputter, out: inout String) {
+    outputter.outputFObject(&out, self)
+  }
 }
 
 struct FOAM_utils {
@@ -502,10 +510,16 @@ public class ModelParserFactory {
   }
 }
 
-public protocol FOAM_enum {
+public protocol FOAM_enum: JSONOutputter {
   var ordinal: Int { get }
   var name: String { get }
   var label: String { get }
+}
+
+extension FOAM_enum {
+  public func toJSON(outputter: Outputter, out: inout String) {
+    outputter.outputNumber(&out, ordinal as NSNumber)
+  }
 }
 
 public class FoamError: Error {
