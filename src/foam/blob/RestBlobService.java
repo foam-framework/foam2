@@ -108,7 +108,7 @@ public class RestBlobService
     InputStream is = null;
     HttpURLConnection connection = null;
     Blob blob = null;
-    
+
     try {
       URL url = new URL(this.address_ + "/" + id.toString());
       connection = (HttpURLConnection) url.openConnection();
