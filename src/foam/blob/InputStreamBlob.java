@@ -14,6 +14,7 @@ public class InputStreamBlob
     extends foam.blob.AbstractBlob
 {
   protected long size_;
+  protected long pos_ = 0;
   protected BufferedInputStream reader_;
 
   public InputStreamBlob(java.io.InputStream in, long size) throws IOException {
@@ -24,8 +25,11 @@ public class InputStreamBlob
   @Override
   public Buffer read(Buffer buffer, long offset) {
     try {
-      int outOffset = 0;
+      if ( offset != pos_ ) {
+        throw new RuntimeException("Offset does not match stream position");
+      }
 
+      int outOffset = 0;
       long length = Math.min(buffer.getLength(), getSize() - offset);
       if ( length < buffer.getLength() ) {
         buffer = buffer.slice(0, length);
@@ -37,6 +41,7 @@ public class InputStreamBlob
         int bytesRead = reader_.read(buf, outOffset, (int) length);
         bb.put(buf, outOffset, bytesRead);
         outOffset += bytesRead;
+        pos_ += bytesRead;
       }
 
       bb.rewind();
