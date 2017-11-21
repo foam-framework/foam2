@@ -71,8 +71,9 @@ class SwiftTestsTests: XCTestCase {
     t.prevFirstName = "MY_PREV_NAME"
     t.boolProp = false
     t.intProp = 34
+    t.enumProp = Visibility.FINAL
     XCTAssertEqual(Outputter().swiftStringify(t),
-    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\"}")
+    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\",\"enumProp\":1}")
   }
 
   func testExpression() {
@@ -591,20 +592,18 @@ class SwiftTestsTests: XCTestCase {
       "name": "/test/TestDAO",
     ])!
     DispatchQueue.global(qos: .background).async {
-
-//      let listener = x.create(FnSink.self)!
-//      listener.fn = { s, o, sub in
-//        XCTAssertEqual(s, "put")
-//        XCTAssertTrue(o is Test)
-//        sub.detach()
-//        expect.fulfill()
-//      }
-//      try! _ = dao.listen(listener)
+      let listener = x.create(FnSink.self)!
+      listener.fn = { s, o, sub in
+        XCTAssertEqual(s, "put")
+        XCTAssertTrue(o is Test)
+        sub.detach()
+        expect.fulfill()
+      }
+      try! _ = dao.listen(listener)
 
       let t = x.create(Test.self, args: ["firstName": UUID().uuidString])!
       let t2 = try! dao.put(t)
       XCTAssertEqual(t.firstName, t2!.get(key: "firstName") as! String)
-      expect.fulfill() // TODO remove when listening works.
     }
 
     wait(for: [expect], timeout: 100)
