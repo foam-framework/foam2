@@ -484,7 +484,7 @@ foam.CLASS({
                   return this.ClassDocView.create({data: selectedClass});
                 })).
               end().
-            end().              
+            end().
               start('td').
               style({
                 'vertical-align': 'top'
@@ -658,8 +658,9 @@ foam.CLASS({
       this.addRequiredBy(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
       this.addSubClasses(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
       /*this.addImports(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
-      this.addExports(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
-      this.addRelatedto(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);*/
+      this.addExports(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);*/
+      this.addRelatedto(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
+      this.addRelatedFrom(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
       this.addLegend();
 
       this.
@@ -701,18 +702,18 @@ foam.CLASS({
       }
     },
 
-    function triangleLegend(ptX, ptY, ang) {
+    function triangle(ptX, ptY, ang) {
       return foam.graphics.Polygon.create({
-        xCoordinates: [ptX + this.triangleSize, ptX, ptX, ptX + this.triangleSize],
-        yCoordinates: [ptY, ptY + this.triangleSize, ptY - this.triangleSize, ptY],
+        xCoordinates: [ptX + this.triangleSize * Math.sin(ang), ptX + this.triangleSize * Math.cos(ang), ptX - this.triangleSize * Math.cos(ang), ptX + this.triangleSize * Math.sin(ang)],
+        yCoordinates: [ptY, ptY + this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang), ptY - this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang), ptY],
         color: 'black'
       });
     },
 
     function addLegend(x, y, w, h) {
-      var startX=180;
-      var startY=20;
-      var d=120;
+      var startX = 180;
+      var startY = 20;
+      var d = 120;
 
       var marge = 4;
       var cls = this.data;
@@ -720,7 +721,7 @@ foam.CLASS({
         x: x || 0,
         y: y || 0,
         width: w || 350,
-        height: h || 120,
+        height: h || 160,
         color: '#ffffe0' || this.UNSELECTED_COLOR,
         border: 'black'
       });
@@ -750,24 +751,24 @@ foam.CLASS({
       var extendsLinkLine = foam.graphics.Line.create({
         startX: x - 510 || startX,
         startY: y - 570 || startY * 2,
-        endX: x + 530 || startX+d,
+        endX: x + 530 || startX + d,
         endY: y + 530 || startY * 2,
         color: 'black',
         lineWidth: 2
       });
 
-      var triangleEnd = this.triangleLegend(extendsLinkLine.endX, extendsLinkLine.endY, 2 * Math.PI);
+      var triangleEnd = this.triangle(extendsLinkLine.endX, extendsLinkLine.endY, Math.PI / 2);
 
       this.selected = this.canvas.addChildren(legendBox, legendLabel, extendsLinkLine, triangleEnd, ExtendsNameLabel);
 
-      var dashedLine = this.dashedLine(d, startX, startY*3, startX+d, startY*3);
+      var dashedLine = this.dashedLine(d, startX, startY * 3, startX + d, startY * 3);
 
-      var triangleEndImplement = this.triangleLegend(startX + d, startY*3);
+      var triangleEndImplement = this.triangle(startX + d, startY * 3, Math.PI / 2);
 
       var ImplementNameLabel = foam.graphics.Label.create({
         align: 'center',
         x: x || 0,
-        y: y - marge || startY*2,
+        y: y - marge || startY * 2,
         color: 'black',
         font: '20px Arial',
         width: w || 200,
@@ -779,9 +780,9 @@ foam.CLASS({
 
       requiredLine = foam.graphics.Line.create({
         startX: x - 510 || startX,
-        startY: y - 570 || startY*4,
-        endX: x + 530 || startX+d,
-        endY: y + 530 + this.triangleSize || startY*4,
+        startY: y - 570 || startY * 4,
+        endX: x + 530 || startX + d,
+        endY: y + 530 + this.triangleSize || startY * 4,
         color: 'black',
         lineWidth: 2
       });
@@ -797,7 +798,7 @@ foam.CLASS({
       var requiredNameLabel = foam.graphics.Label.create({
         align: 'center',
         x: x || 0,
-        y: y - marge || startY*4,
+        y: y - marge || startY * 4,
         color: 'black',
         font: '20px Arial',
         width: w || 200,
@@ -809,9 +810,9 @@ foam.CLASS({
 
       requiresLink = foam.graphics.Line.create({
         startX: x - 510 || startX,
-        startY: y - 570 || startY*5,
-        endX: x + 530 || startX+d,
-        endY: y + 530 || startY*5,
+        startY: y - 570 || startY * 5,
+        endX: x + 530 || startX + d,
+        endY: y + 530 || startY * 5,
         color: 'black',
         lineWidth: 2
       });
@@ -829,7 +830,7 @@ foam.CLASS({
       var RequiresNameLabel = foam.graphics.Label.create({
         align: 'center',
         x: x || 0,
-        y: y - marge || startY*3,
+        y: y - marge || startY * 3,
         color: 'black',
         font: '20px Arial',
         width: w || 200,
@@ -837,6 +838,51 @@ foam.CLASS({
         text: 'Requires'
       });
       this.selected = this.canvas.addChildren(requiresLink, requiresConnectorCircle, RequiresNameLabel);
+
+      var RelatedToNameLabel = foam.graphics.Label.create({
+        align: 'center',
+        x: x || 0,
+        y: y || startY * 5,
+        color: 'black',
+        font: '20px Arial',
+        width: w || 200,
+        height: h || 30,
+        text: 'Related To'
+      });
+
+      var RelatedToLinkLine = foam.graphics.Line.create({
+        startX: x - 510 || startX,
+        startY: y - 570 || startY * 6,
+        endX: x + 530 || startX + d,
+        endY: y + 530 || startY * 6,
+        color: 'black',
+        lineWidth: 2
+      });
+      var arrowRelatedto = this.arrowEnd(RelatedToLinkLine.endX, RelatedToLinkLine.endY, 3 * Math.PI / 2); //3*Math.PI/2
+      this.selected = this.canvas.addChildren(RelatedToNameLabel, RelatedToLinkLine, arrowRelatedto); //, RequiresNameLabel
+
+      var RelatedFromNameLabel = foam.graphics.Label.create({
+        align: 'center',
+        x: x || 0,
+        y: y || startY * 6,
+        color: 'black',
+        font: '20px Arial',
+        width: w || 200,
+        height: h || 30,
+        text: 'Related From'
+      });
+
+      var RelatedFromLinkLine = foam.graphics.Line.create({
+        startX: x - 510 || startX,
+        startY: y - 570 || startY * 7,
+        endX: x + 530 || startX + d,
+        endY: y + 530 || startY * 7,
+        color: 'black',
+        lineWidth: 2
+      });
+      var arrowRelatedFrom = this.arrowEnd(RelatedFromLinkLine.startX, RelatedFromLinkLine.startY, Math.PI / 2);
+
+      this.selected = this.canvas.addChildren(RelatedFromNameLabel, RelatedFromLinkLine, arrowRelatedFrom);
     },
 
     function addModel(x, y, w, h) {
@@ -867,7 +913,7 @@ foam.CLASS({
         x: x,
         y: y + step,
         width: w || 200,
-        height: h || step * 4,
+        height: h || step * 5,
         color: '#ffffe0', //this.UNSELECTED_COLOR
         border: 'black',
         text: this.prop
@@ -917,28 +963,19 @@ foam.CLASS({
         text: cls.getAxiomsByClass(foam.core.Listener) !== undefined ? 'Listener : ' + cls.getAxiomsByClass(foam.core.Listener).length : 'Listener : ' + 0
       });
 
-      //TODO add Relationship Label
       var RelationshipNameLabel = foam.graphics.Label.create({
         align: 'left',
         x: x - 160,
-        y: y + step * -1,
+        y: y + step * 5,
         color: 'black',
         font: '20px Arial',
         width: w || 200,
         height: h || 30,
-        text: cls.prototype.cls_.getAxiomsByClass(foam.dao.Relationship) !== undefined ? 'Relationship : ' + cls.prototype.cls_.getAxiomsByClass(foam.dao.Relationship).length : 'Relationship : ' + 0
+        text: cls.getAxiomsByClass(foam.dao.Relationship) !== undefined ? 'Relationship : ' + cls.getAxiomsByClass(foam.dao.Relationship).length : 'Relationship : ' + 0
       });
 
-      this.selected = this.canvas.addChildren(modelBox, modelNameLabel, propertyBox, propertyNameLabel, methodsNameLabel, actionsNameLabel, listenersNameLabel); //TODO , RelationshipNameLabel
-    },
-
-    function triangleEnd(ptX, ptY, ang) {
-      return foam.graphics.Polygon.create({
-        xCoordinates: [ptX, ptX + this.triangleSize, ptX - this.triangleSize, ptX],
-        yCoordinates: [ptY, ptY + this.triangleSize, ptY + this.triangleSize, ptY],
-        color: 'black'
-      });
-    },
+      this.selected = this.canvas.addChildren(modelBox, modelNameLabel, propertyBox, propertyNameLabel, methodsNameLabel, actionsNameLabel, listenersNameLabel,RelationshipNameLabel); //TODO , RelationshipNameLabel
+    },    
 
     function setData(mapDataX, mapDataY, cls) {
       this.elementMap.set({
@@ -985,7 +1022,7 @@ foam.CLASS({
           lineWidth: 2
         });
 
-        var triangleEndExtends = this.triangleEnd(x + extendsBox.width / 2, y - (d * i) - (extendsBox.height * 2));
+        var triangleEndExtends = this.triangle(x + extendsBox.width / 2, y - (d * i) - (extendsBox.height * 2),0);
 
         this.selected = this.canvas.addChildren(extendsBox, extendsNameLabel, extendsLine, triangleEndExtends);
 
@@ -1029,7 +1066,7 @@ foam.CLASS({
 
             var dashedLine = this.dashedLine(sideY, x + implementsName.width * 3 / 4 + this.dashedstep, y - this.dashedstep, x + sideY + (implementsName.width * 3 / 4) - implementsName.height, y - sideY + implementsName.height);
 
-            var triangleEndImplement = this.triangleEnd(x + sideY + implementsName.width * 3 / 4 - implementsName.height, y - sideY + implementsName.height);
+            var triangleEndImplement = this.triangle(x + sideY + implementsName.width * 3 / 4 - implementsName.height, y - sideY + implementsName.height,0);
 
             this.selected = this.canvas.addChildren(implementsName, implementsNameLabel, triangleEndImplement);
           }
@@ -1149,10 +1186,9 @@ foam.CLASS({
 
     function addSubClasses(x, y, w, h) {
       var marge = 4;
-      var d = 300;
-      //var step = 30;
+      var d = 300;      
       var boxLarge = 35;
-      var endPtD = 150;
+      var endPtD = 180;
 
       var cls = this.data;
 
@@ -1200,57 +1236,179 @@ foam.CLASS({
           lineWidth: 2
         });
 
-        var triangleEndSubClasses = this.triangleEnd(x + subClassesName.width / 2 + ((nbr) * boxLarge), y + endPtD, 0);
+        var triangleEndSubClasses = this.triangle(x + subClassesName.width / 2 + ((nbr) * boxLarge), y + endPtD, 0);
 
         this.selected = this.canvas.addChildren(subClassesName, subClassesNameLabel, subClassesLine, triangleEndSubClasses);
       }
     },
 
-    //************** not supported yet **************************
+    function arrowEnd(ptX, ptY, ang) {
+      return foam.graphics.Polygon.create({
+        xCoordinates: [ptX + this.triangleSize * Math.sin(ang) - this.triangleSize * Math.cos(ang), ptX, ptX + this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang)],
+        yCoordinates: [ptY + this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang), ptY, ptY - this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang)],
+        color: 'black'
+      });
+    },
 
     function addRelatedto(x, y, w, h) {
-      var d = 100;
+
+      var d = 300;
+      var d1 = 200;
       var cls = this.data;
 
       if (cls.getAxioms(foam.dao.Relationship) !== undefined) {
+
         for (var key in cls.getAxiomsByClass(foam.dao.Relationship)) {
           var a = cls.getAxiomsByClass(foam.dao.Relationship)[key];
+          if (a.targetModel === cls.id) {
 
-          var relatedtoName = this.Box.create({
-            x: x + d,
-            y: y + 5 * (key + 1),
+            var relatedtoName = this.Box.create({
+              x: x + d,
+              y: y + d1 + 5 * (key + 1),
+              width: w || 200,
+              height: h || 30,
+              color: '#ffffe0', //this.UNSELECTED_COLOR
+              border: 'black'
+            });
+
+            this.setData(relatedtoName.x, relatedtoName.y, a.sourceModel);
+
+            var relatedtoNameLabel = foam.graphics.Label.create({
+              align: 'center',
+              x: x + d,
+              y: y + d1 + 5 * (key + 1),
+              color: 'black',
+              font: '20px Arial',
+              width: w || 200,
+              height: h || 30,
+              text: eval(a.sourceModel).name
+            });
+
+            relatedtoline = foam.graphics.Line.create({
+              startX: x + relatedtoName.width || 0,
+              startY: y + relatedtoName.height || 0,
+              endX: x + d || 0,
+              endY: y + d1 + 5 * (key + 1) + relatedtoName.height * 1 / 3 || 0,
+              color: 'black',
+              lineWidth: 2
+            });
+
+            var arrowRelatedto = this.arrowEnd(relatedtoline.endX, relatedtoline.endY, Math.PI);
+
+            var cardinalityToNameLabel;
+            if (a.cardinality !== 'undefined') {
+              cardinalityToNameLabel = foam.graphics.Label.create({
+                align: 'center',
+                x: relatedtoline.endX - relatedtoName.width / 2 - 25,
+                y: relatedtoline.endY - relatedtoName.height * 1 / 3,
+                color: 'black',
+                font: '20px Arial',
+                width: w || 200,
+                height: h || 30,
+                text: a.cardinality
+              });
+              this.selected = this.canvas.addChildren(relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto, cardinalityToNameLabel);
+            } else {
+              this.selected = this.canvas.addChildren(relatedtoName, relatedtoNameLabel, relatedtoline, arrowRelatedto);
+            }
+          }
+        }
+      }
+    },
+
+    function addRelatedFrom(x, y, w, h) {
+      
+      var marge = 45;
+      var d = -300;
+      var d1 = 210;
+      var cls = this.data;
+
+      var axeX = x + d;
+      var axeY = y + d1;
+
+      var req = Object.values(foam.USED)
+        .forEach(function(key11) {
+          return key11.getAxioms(foam.dao.Relationship);
+
+        }, this);
+      var fruits = [];
+
+      for (var key1 in Object.values(foam.USED)) {
+        for (var key in Object.values(foam.USED)[key1].getAxiomsByClass(foam.dao.Relationship)) {
+          var a = Object.values(foam.USED)[key1].getAxiomsByClass(foam.dao.Relationship)[key];
+          reteive = false;
+          for (var key11 in fruits) {
+            if (fruits[key11].sourceModel == a.sourceModel && fruits[key11].targetModel == a.targetModel) {
+              reteive = true;
+              break;
+            }
+          }
+          if (!reteive) {
+            fruits.push(a);
+          }
+        }
+      }
+
+      for (var k in fruits) {
+        var a = fruits[k];
+        if (a.sourceModel === cls.id) {
+          axeY = axeY + marge;
+
+          var RelatedFromName = foam.graphics.Box.create({
+            x: axeX,
+            y: axeY,
             width: w || 200,
             height: h || 30,
             color: '#ffffe0', //this.UNSELECTED_COLOR
             border: 'black'
           });
 
-          this.setData(relatedtoName.x, relatedtoName.y, a.id);
+          this.setData(RelatedFromName.x, RelatedFromName.y, a.targetModel);
 
-          var relatedtoNameLabel = foam.graphics.Label.create({
+          var RelatedFromNameLabel = foam.graphics.Label.create({
             align: 'center',
-            x: x + d,
-            y: y + 5 * (key + 1),
+            x: axeX,            
+            y: axeY,
             color: 'black',
             font: '20px Arial',
             width: w || 200,
             height: h || 30,
-            text: a.name
+            text: eval(a.targetModel).name
           });
 
-          relatedtoline = foam.graphics.Line.create({
-            startX: x + exportsName.width / 2 || 0,
-            startY: y || 0,
-            endX: x + exportsName.width / 2 || 0,
-            endY: y - d + exportsName.height || 0,
+          RelatedFromLine = foam.graphics.Line.create({
+            startX: axeX + RelatedFromName.width + RelatedFromName.width / 2 || 0,
+            startY: y + RelatedFromName.height || 0,
+
+            endX: axeX + RelatedFromName.width || 0,
+            endY: axeY + RelatedFromName.height / 2 || 0,
             color: 'black',
             lineWidth: 2
           });
 
-          this.selected = this.canvas.addChildren(relatedtoName, relatedtoNameLabel); //TODO add the link
+          var arrowRelatedFrom = this.arrowEnd(RelatedFromLine.startX, RelatedFromLine.startY, 0);
+
+          var cardinalityFromNameLabel;
+          if (a.cardinality !== 'undefined') {
+            cardinalityFromNameLabel = foam.graphics.Label.create({
+              align: 'center',
+              x: RelatedFromLine.endX - RelatedFromName.width / 2 + 25,
+              y: RelatedFromLine.endY - RelatedFromName.height / 2,              
+              color: 'black',
+              font: '20px Arial',
+              width: w || 200,
+              height: h || 30,
+              text: a.cardinality
+            });
+            this.selected = this.canvas.addChildren(RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom, cardinalityFromNameLabel);
+          } else {
+            this.selected = this.canvas.addChildren(RelatedFromName, RelatedFromNameLabel, RelatedFromLine, arrowRelatedFrom);
+          }
+		  
         }
       }
     },
+    //************** not supported yet **************************
 
     function addExports(x, y, w, h) {
       var d = 100;
@@ -1352,4 +1510,3 @@ foam.CLASS({
     }
   ]
 });
-
