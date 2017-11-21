@@ -591,20 +591,18 @@ class SwiftTestsTests: XCTestCase {
       "name": "/test/TestDAO",
     ])!
     DispatchQueue.global(qos: .background).async {
-
-//      let listener = x.create(FnSink.self)!
-//      listener.fn = { s, o, sub in
-//        XCTAssertEqual(s, "put")
-//        XCTAssertTrue(o is Test)
-//        sub.detach()
-//        expect.fulfill()
-//      }
-//      try! _ = dao.listen(listener)
+      let listener = x.create(FnSink.self)!
+      listener.fn = { s, o, sub in
+        XCTAssertEqual(s, "put")
+        XCTAssertTrue(o is Test)
+        sub.detach()
+        expect.fulfill()
+      }
+      try! _ = dao.listen(listener)
 
       let t = x.create(Test.self, args: ["firstName": UUID().uuidString])!
       let t2 = try! dao.put(t)
       XCTAssertEqual(t.firstName, t2!.get(key: "firstName") as! String)
-      expect.fulfill() // TODO remove when listening works.
     }
 
     wait(for: [expect], timeout: 100)
