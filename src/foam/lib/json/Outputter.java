@@ -253,4 +253,8 @@ public class Outputter
   public void put(FObject obj, Detachable sub) {
     outputFObject(obj);
   }
+
+  public void outputRawString(String str) {
+    writer_.append(str);
+  }
 }
