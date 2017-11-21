@@ -34,11 +34,6 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'Int',
-      name: 'buildingNumber',
-      documentation: 'Building number'
-    },
-    {
       class: 'String',
       name: 'address1',
       //required: true
