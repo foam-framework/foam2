@@ -99,51 +99,49 @@ foam.CLASS({
 
       this.
         addClass(this.myClass()).
-        start().
           start().
             start('span').add('Country').end().
-            start('span').style({'margin-left': '170px'}).add(this.data.TYPE.label).end().
+            start('span').style({'margin-left': '170px'}).add(this.Address.TYPE.label).end().
           end().
           start().
-            add(this.data.COUNTRY_ID).add(this.data.TYPE).
+            add(this.Address.COUNTRY_ID).add(this.Address.TYPE).
           end().
           start().
-            start('span').add(this.data.VERIFIED.label).end().
-            start('span').style({'margin-left': '170px'}).add(this.data.STRUCTURED.label).end().
+            start('span').add(this.Address.VERIFIED.label).end().
+            start('span').style({'margin-left': '170px'}).add(this.Address.STRUCTURED.label).end().
           end().
           start().
-            add(this.data.VERIFIED).add(this.data.STRUCTURED).
+            add(this.Address.VERIFIED).add(this.Address.STRUCTURED).
           end().
           startContext({data: this.data}).
             start().hide(this.data.structured$).
               start().
-                start('span').add(this.data.ADDRESS1.label).end().
-                start('span').style({'margin-left': '158px'}).add(this.data.ADDRESS2.label).end().
+                start('span').add(this.Address.ADDRESS1.label).end().
+                start('span').style({'margin-left': '158px'}).add(this.Address.ADDRESS2.label).end().
               end().
               start().
-                add(this.data.ADDRESS1).add(this.data.ADDRESS2).
+                add(this.Address.ADDRESS1).add(this.Address.ADDRESS2).
               end().
             end().
 
             start().show(this.data.structured$).
               start().
-                start('span').add(this.data.STREET_NUMBER.label).end().
-                start('span').style({'margin-left': '120px'}).add(this.data.STREET_NAME.label).end().
-                start('span').style({'margin-left': '127px'}).add(this.data.SUITE.label).end().
+                start('span').add(this.Address.STREET_NUMBER.label).end().
+                start('span').style({'margin-left': '120px'}).add(this.Address.STREET_NAME.label).end().
+                start('span').style({'margin-left': '127px'}).add(this.Address.SUITE.label).end().
               end().
               start().
-                add(this.data.STREET_NUMBER).add(this.data.STREET_NAME).add(this.data.SUITE).
+                add(this.Address.STREET_NUMBER).add(this.Address.STREET_NAME).add(this.Address.SUITE).
               end().
             end().
           endContext().
           start().
-            start('span').add(this.data.CITY.label).end().
+            start('span').add(this.Address.CITY.label).end().
             start('span').style({'margin-left': '198px'}).add('Province/State').end().
           end().
           start().
-            add(this.data.CITY).add(this.data.REGION_ID).
-          end().
-        end()
+            add(this.Address.CITY).add(this.Address.REGION_ID).
+          end()
     }
   ]
 });
