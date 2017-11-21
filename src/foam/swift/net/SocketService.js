@@ -31,6 +31,11 @@ foam.CLASS({
       name: 'delegate',
     },
     {
+      swiftType: '[String:Future<FObject>]',
+      name: 'futureMap',
+      swiftFactory: `return [:]`,
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.swift.parse.json.FObjectParser',
       name: 'parser',
@@ -40,7 +45,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'addSocket',
+      name: 'addSocket_',
       args: [
         {
           swiftType: 'Socket',
@@ -76,6 +81,31 @@ _ = socket.disconnect.sub(listener: { s, _ in
   s.detach()
   messageSub.detach()
 })
+      `,
+    },
+    {
+      name: 'getSocketBoxFuture',
+      args: [
+        {
+          swiftType: 'String',
+          name: 'address',
+        },
+      ],
+      swiftReturns: 'Future<FObject>',
+      swiftCode: `
+if let fut = futureMap[address] { return fut }
+
+let fut = Future<FObject>()
+futureMap[address] = fut
+
+let socket = Socket_create()
+_ = socket.connect.sub(listener: { s, _ in
+  s.detach()
+  self.addSocket_(socket)
+  fut.set(self.RawSocketBox_create(["socket": socket]))
+})
+socket.connectTo(address)
+return fut
       `,
     },
   ]
