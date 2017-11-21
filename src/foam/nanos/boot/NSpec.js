@@ -152,9 +152,22 @@ foam.CLASS({
 
   actions: [
     {
+      // Let user configure this service. Is hard-coded to work with DAO's
+      // for now, but should get the config object from the NSpec itself
+      // to be extensible.
       name: 'configure',
+      isAvailable: function(boxClass) {
+        return ! boxClass;
+//        return foam.dao.DAO.isInstance(this.__context__[this.name]);
+      },
       code: function() {
-        console.log('foo');
+        var service = this.__context__[this.name];
+        if ( foam.dao.DAO.isInstance(service) ) {
+          this.__context__.stack.push({
+            class: 'foam.comics.BrowserView',
+            data: service
+          });
+        }
       }
     }
   ]
