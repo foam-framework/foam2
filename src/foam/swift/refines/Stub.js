@@ -34,8 +34,12 @@ try? <%=this.boxPropName%>.send(msg)
 replyBox.detach()
 msg.detach()
 
-<% if (this.swiftReturns) { %>
 let o = try replyBox.future.get()
+if let o = o as? Error {
+  throw o
+}
+
+<% if (this.swiftReturns) { %>
   <% if (this.swiftReturns == 'Any?') { %>
 return o
   <% } else { %>
