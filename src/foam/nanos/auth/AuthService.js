@@ -13,6 +13,7 @@ foam.INTERFACE({
       name: 'getCurrentUser',
       javaReturns: 'foam.nanos.auth.User',
       swiftReturns: 'User?',
+      javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
         {

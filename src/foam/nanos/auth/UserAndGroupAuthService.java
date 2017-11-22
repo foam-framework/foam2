@@ -42,18 +42,17 @@ public class UserAndGroupAuthService
     challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
-  public User getCurrentUser(X x) {
+  public User getCurrentUser(X x) throws AuthenticationException {
     // fetch context and check if not null or user id is 0
     Session session = (Session) x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
-      // no user found
-      return null;
+      throw new AuthenticationException("User not found");
     }
 
     // get user from session id
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
-      return null;
+      throw new AuthenticationException("User not found");
     }
 
     // store user and return
