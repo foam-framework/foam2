@@ -47,48 +47,6 @@ foam.CLASS({
       content: "";
       display: block;
     }
-
-    ^ .foam-nanos-menu-MenuBar {
-      background: #093649;
-      width: 100%;
-      min-width: 992px;
-      height: 60px;
-      color: white;
-      padding-top: 5px;
-    }
-    ^ .menuBar > div > ul {
-      margin-top: 0;
-      padding-left: 0;
-      font-weight: 100;
-      color: #ffffff;
-    }
-    ^ .foam-nanos-menu-MenuBar li {
-      display: inline-block;
-      cursor: pointer;
-    }
-    ^ .menuItem{
-      display: inline-block;
-      padding: 0px 0px 10px 0px;
-      cursor: pointer;
-      border-bottom: 4px solid transparent;
-      transition: text-shadow;
-    }
-    ^ .menuItem:hover {
-      border-bottom: 4px solid #1cc2b7;
-      padding-bottom: 5px;
-      text-shadow: 0 0 0px white, 0 0 0px white;
-    }
-    ^ .selected {
-      border-bottom: 4px solid #1cc2b7;
-      padding-bottom: 5px;
-      text-shadow: 0 0 0px white, 0 0 0px white;
-    }
-    ^ .menuBar{
-      width: 50%;
-      overflow: auto;
-      white-space: nowrap;
-      margin-left: 60px;
-    }    
   `,
 
   properties: [
