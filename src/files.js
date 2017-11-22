@@ -128,7 +128,7 @@ FOAM_FILES([
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
   { name: "foam/java/JavaSwiftRefines", flags: ['java'] },
-
+  { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/util/Timer" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
