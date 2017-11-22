@@ -1,4 +1,3 @@
-#!/bin/sh
 # run from parent directory of foam2
 cd foam2/build/
 mvn dependency:build-classpath -Dmdep.outputFile=cp.txt;
