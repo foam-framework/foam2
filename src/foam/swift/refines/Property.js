@@ -600,3 +600,31 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+  properties: [
+    {
+      name: 'swiftType',
+      expression: function(required) {
+        return 'Date' + (required ? '' : '?')
+      },
+    },
+    {
+      name: 'swiftAdapt',
+      value: `
+if let n = newValue as? Date {
+  return n
+} else if let n = newValue as? String {
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZ"
+  return dateFormatter.date(from: n)
+} else if let n = newValue as? NSNumber {
+  return Date(timeIntervalSince1970: n.doubleValue)
+}
+
+return Date()
+      `,
+    },
+  ],
+})

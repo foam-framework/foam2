@@ -84,6 +84,10 @@ return ["Hello", "World"]
       of: 'foam.u2.Visibility',
       name: 'enumProp',
     },
+    {
+      class: 'DateTime',
+      name: 'dateProp',
+    },
   ],
   actions: [
     {
