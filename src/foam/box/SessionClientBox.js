@@ -116,7 +116,7 @@ msg.attributes[SessionClientBox.SESSION_KEY] = sessionID
 msg.attributes["replyBox"] = SessionReplyBox_create([
   "msg": msg,
   "clientBox": self,
-  "delegate": msg.attributes["replyBox"]!,
+  "delegate": msg.attributes["replyBox"] as? Box,
 ])
 try delegate.send(msg)
       `,
