@@ -8,6 +8,7 @@ package foam.blob;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class InputStreamBlob
@@ -15,11 +16,15 @@ public class InputStreamBlob
 {
   protected long size_;
   protected long pos_ = 0;
-  protected BufferedInputStream reader_;
+  protected InputStream in_;
 
   public InputStreamBlob(java.io.InputStream in, long size) throws IOException {
     this.size_ = size;
-    this.reader_ = new BufferedInputStream(in);
+    this.in_ = new BufferedInputStream(in);
+  }
+
+  public InputStream getInputStream() {
+    return in_;
   }
 
   @Override
@@ -38,7 +43,7 @@ public class InputStreamBlob
       ByteBuffer bb = buffer.getData();
       byte[] buf = new byte[(int) length];
       while ( outOffset < length ) {
-        int bytesRead = reader_.read(buf, outOffset, (int) length);
+        int bytesRead = in_.read(buf, outOffset, (int) length);
         bb.put(buf, outOffset, bytesRead);
         outOffset += bytesRead;
         pos_ += bytesRead;
