@@ -38,7 +38,6 @@ foam.CLASS({
       required: true,
       name: 'dataSource',
       swiftFactory: function() {/*
-let x = __subContext__
 let dataSource = DAOTableViewSource_create([
   "dao$": self.dao$,
 ])
