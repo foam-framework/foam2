@@ -627,4 +627,17 @@ class SwiftTestsTests: XCTestCase {
 
     wait(for: [expect], timeout: 20)
   }
+
+  func testDateProp() {
+    let t = x.create(Test.self)!
+
+    t.set(key: "dateProp", value: 123456)
+    XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 123456))
+
+    t.set(key: "dateProp", value: "2017-11-21T01:00:00+01:00")
+    XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1511222400))
+
+    t.set(key: "dateProp", value: Date(timeIntervalSince1970: 1234))
+    XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1234))
+  }
 }
