@@ -707,6 +707,13 @@ foam.CLASS({
     { class: 'foam.dao.DAOProperty', name: 'dao' },
   ],
 
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
+
   methods: [
     {
       name: 'put',

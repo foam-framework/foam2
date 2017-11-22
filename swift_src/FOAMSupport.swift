@@ -518,7 +518,7 @@ public protocol FOAM_enum: JSONOutputter {
 
 extension FOAM_enum {
   public func toJSON(outputter: Outputter, out: inout String) {
-    outputter.outputNumber(&out, ordinal as NSNumber)
+    outputter.outputEnum(&out, self)
   }
 }
 
