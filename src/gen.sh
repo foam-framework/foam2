@@ -12,6 +12,7 @@ find foam2/src -type f -name regions -exec cat {} \; > regions
 find foam2/src -type f -name scripts -exec cat {} \; > scripts
 find foam2/src -type f -name tests -exec cat {} \; > tests
 find foam2/src -type f -name users -exec cat {} \; > users
+find foam2/src -type f -name services -exec cat {} \; > services
 
 cd foam2/src
 node ../tools/genjava.js ../tools/classes.js ../build/
