@@ -178,7 +178,7 @@ super.removeAll_(null, skip, limit, order, predicate);
       code: function listen_(x, sink, predicate) {
         this.SUPER(null, sink, predicate);
       },
-      javaCode: `super.listen_(null, sink, predicate)`,
+      javaCode: `super.listen_(null, sink, predicate);`,
       swiftCode: `return try super.listen_(nil, sink, predicate)`,
     }
   ]
