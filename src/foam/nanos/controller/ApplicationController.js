@@ -10,22 +10,21 @@ foam.CLASS({
   extends: 'foam.u2.Element',
   arequire: function() { return foam.nanos.client.ClientBuilder.create(); },  
   documentation: 'FOAM Application Controller.',
+  
   implements: [
     'foam.nanos.client.Client',
   ],
 
   requires: [
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView'
+    'foam.u2.stack.StackView',
+    'foam.nanos.auth.User'
   ],
 
   exports: [
     'stack',
+    'user',
     'as ctrl'
-  ],
-
-  imports: [
-    'userDAO'
   ],
 
   css: `
@@ -53,6 +52,12 @@ foam.CLASS({
     {
       name: 'stack',
       factory: function() { return this.Stack.create(); }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.User',
+      name: 'user',
+      factory: function() { return this.User.create(); }
     }
   ],
 
@@ -78,7 +83,7 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .tag({class: 'foam.nanos.menu.MenuBar'})
+        .tag({class: 'foam.u2.navigation.TopNavigation'})
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end()
