@@ -24,6 +24,7 @@ foam.CLASS({
   exports: [
     'stack',
     'user',
+    'logo',
     'as ctrl'
   ],
 
@@ -58,7 +59,8 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'user',
       factory: function() { return this.User.create(); }
-    }
+    },
+    'logo'
   ],
 
   methods: [
@@ -80,7 +82,6 @@ foam.CLASS({
 
     function initE() {
       var self = this;
-
       this
         .addClass(this.myClass())
         .tag({class: 'foam.u2.navigation.TopNavigation'})
