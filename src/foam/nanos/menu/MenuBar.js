@@ -34,6 +34,9 @@ foam.CLASS({
           display: inline-block;
           cursor: pointer;
         }
+        ^ .foam-nanos-menu-SubMenuView-inner{
+          z-index: 10001;
+        }
       */}
     })
   ],
