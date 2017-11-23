@@ -7,7 +7,7 @@ p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "region",         "la
 p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "lang",           "label": "Languages",        "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"languageDAO"} })
 p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "nspec",          "label": "Nano Services",    "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"nSpecDAO"} })
 p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "export",         "label": "Export Drivers",   "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"exportDriverRegistryDAO"} })
-p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "menu",           "label": "Menus",            "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"menuDAO", "XXXsummaryView":{"class":"foam.u2.view.TreeView","relationship":"MenuRelationship","formatter":"function() { this.add(this.data.label); }"} })
+p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "menu",           "label": "Menus",            "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"menuDAO", "summaryView":{"class":"foam.nanos.menu.TreeAltView"}})
 p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "script",         "label": "Scripts",          "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"scriptDAO"} })
 p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "test",           "label": "Tests",            "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"testDAO",    "summaryView":{"class":"foam.nanos.test.TestBorder"}}})
 p({"class":"foam.nanos.menu.Menu" ,"parent":"admin" ,"id": "cron",           "label": "Crons",            "handler": { "class":"foam.nanos.menu.DAOMenu", "daoKey":"cronDAO"} })
