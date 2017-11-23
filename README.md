@@ -24,7 +24,7 @@ While FOAM is written in JavaScript, it can be used to generate code
 for any language or platform, including Android Java and iOS Swift.
 
 # Development
-
+NOTE: Make sure execute **Building Java** first, and then to **Installing Dependencies**, or you could get maven errors.
 ## Building Java
 
 cd src; ./gen.sh; cd ../build; mvn compile; mvn package
