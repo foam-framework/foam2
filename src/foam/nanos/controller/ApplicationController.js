@@ -25,7 +25,13 @@ foam.CLASS({
     'stack',
     'user',
     'logo',
+    'requestLogin',
+    'loginSuccess',
     'as ctrl'
+  ],
+
+  imports: [
+    'sessionSuccess'
   ],
 
   css: `
@@ -60,13 +66,31 @@ foam.CLASS({
       name: 'user',
       factory: function() { return this.User.create(); }
     },
-    'logo'
+    'logo',
+    {
+      class: 'Boolean',
+      name: 'loginSuccess',
+      value: false
+    }
   ],
 
   methods: [
     function init() {
       this.SUPER();
       var self = this;
+
+      // get current user, else show login
+      this.auth.getCurrentUser(null).then(function (result) {
+        self.loginSuccess = result ? true : false;
+        self.user.copyFrom(result);
+        return self.accountDAO.where(self.EQ(self.Account.OWNER, self.user.id)).limit(1).select();
+      })
+      .then(function (result) {
+        self.account.copyFrom(result.array[0]);
+      })
+      .catch(function (err) {
+        self.requestLogin();
+      });
 
       window.onpopstate = function(event) {
         if ( location.hash != null ) {
@@ -88,6 +112,19 @@ foam.CLASS({
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end()
+    },
+
+    function requestLogin(){
+      var self = this;
+      // don't go to log in screen if going to reset password screen
+      if ( location.hash != null && location.hash === '#reset' ) {
+        return;
+      }
+
+      return new Promise(function(resolve, reject) {
+        self.stack.push({ class: 'net.nanopay.auth.ui.SignInView' });
+        self.loginSuccess$.sub(resolve);
+      });
     }
   ]
 });
