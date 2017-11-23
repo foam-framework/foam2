@@ -71,15 +71,18 @@ foam.CLASS({
 
   methods: [
     function initE(){
+      var self = this;
       this
         .addClass(this.myClass())
         .start().addClass('topNavContainer')
-          .start({class: 'foam.u2.navigation.BusinessLogoView', data: this.user })
+          .start({class: 'foam.u2.navigation.BusinessLogoView'})
           .end()
           .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
           .end()
-          .start({class: 'foam.u2.navigation.UserView'})
-          .end()
+          .callIf( this.user.firstName, function(){
+            self.start({class: 'foam.u2.navigation.UserView'})
+            .end()
+          })
         .end()
     }
   ]
