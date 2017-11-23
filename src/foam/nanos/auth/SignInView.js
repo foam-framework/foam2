@@ -41,9 +41,44 @@ foam.CLASS({
       ^ p{
         display: inline-block;
       }
-      ^ .net-nanopay-ui-ActionView-signIn{
+      ^ .full-width-button{
+        width: 90%;
+        height: 40px;
+        border-radius: 2px;
+        border: solid 1px #59a5d5;
+        margin: 0 auto;
+        background-color: #59aadd;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
+        color: #ffffff;
+        margin-top: 10px;
+      }
+      ^ .full-width-input{
+        width: 90%;
+        height: 40px;
+        margin-left: 5%;
+        margin-bottom: 15px;
+        outline: none;
+        padding: 10px;
+      }
+      ^ .label{
+        height: 16px;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: 300;
+        text-align: left;
+        color: #093649;
+        margin-bottom: 8px;
+        margin-left: 25px;
+      }
+      ^ .foam-u2-ActionView-signIn{
         width: 90%;
         margin-left: 25px;
+      }
+      ^ .foam-u2-ActionView-signIn > span{
+        position: relative;
+        top: -5px;
       }
     */}
     })
@@ -76,17 +111,17 @@ foam.CLASS({
           .start(this.PASSWORD).addClass('full-width-input').end()
           .start(this.SIGN_IN).addClass('full-width-button').end()
         .end()
-        .start('div')
-          .start('p').add("Don't have an account?").end()
-          // .start('p').style({ 'margin-left': '2px' }).addClass('link')
-          //   .add("Sign up.")
-          //   .on('click', this.signUp)
-          // .end()
-          // .start('p').style({ 'margin-left': '150px' }).addClass('link')
-          //   .add("Forgot Password?")
-          //   .on('click', function(){ self.stack.push({ class: 'net.nanopay.ui.forgotPassword.EmailView' })})
-          // .end()
-        .end()
+        // .start('div')
+        //   .start('p').add("Don't have an account?").end()
+        //   // .start('p').style({ 'margin-left': '2px' }).addClass('link')
+        //   //   .add("Sign up.")
+        //   //   .on('click', this.signUp)
+        //   // .end()
+        //   // .start('p').style({ 'margin-left': '150px' }).addClass('link')
+        //   //   .add("Forgot Password?")
+        //   //   .on('click', function(){ self.stack.push({ class: 'net.nanopay.ui.forgotPassword.EmailView' })})
+        //   // .end()
+        // .end()
       .end();
     }
   ],
