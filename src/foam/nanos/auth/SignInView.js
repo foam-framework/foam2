@@ -129,10 +129,7 @@ foam.CLASS({
         this.auth.loginByEmail(null, this.email, this.password).then(function(user){
           self.loginSuccess = user ? true : false;
           self.user.copyFrom(user);
-          return self.accountDAO.where(self.EQ(self.Account.OWNER, self.user.id)).limit(1).select();
-        }).then(function (result) {
-          self.account.copyFrom(result.array[0]);
-          self.stack.push({ class: 'net.nanopay.invoice.ui.InvoiceDashboardView' });
+          // self.stack.push({ class: 'net.nanopay.invoice.ui.InvoiceDashboardView' });
         }).catch(function(a) {
           self.add(self.NotificationMessage.create({ message: a.message + '. Please try again.', type: 'error' }))
         });

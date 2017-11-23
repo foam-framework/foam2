@@ -122,7 +122,7 @@ foam.CLASS({
       }
 
       return new Promise(function(resolve, reject) {
-        self.stack.push({ class: 'net.nanopay.auth.ui.SignInView' });
+        self.stack.push({ class: 'foam.nanos.auth.SignInView' });
         self.loginSuccess$.sub(resolve);
       });
     }
