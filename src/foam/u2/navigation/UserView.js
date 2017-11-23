@@ -109,10 +109,10 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .start({class:'foam.u2.tag.Image', data: 'images/alert-exclamation.png'}).on('click', function(){
-          self.window.location.assign('https://nanopay.net/contact/')
-        })
-        .end()
+        // .start({class:'foam.u2.tag.Image', data: 'images/alert-exclamation.png'}).on('click', function(){
+        //   self.window.location.assign('https://nanopay.net/contact/')
+        // })
+        // .end()
         .start().addClass('profile-container')
           .on('click', function() {
             this.tag(this.SubMenuView.create({menu: this.Menu.create({id: 'settings'})}))
