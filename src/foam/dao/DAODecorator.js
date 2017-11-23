@@ -185,7 +185,7 @@ foam.CLASS({
       name: 'remove_',
       code: function(x, obj) {
         var self = this;
-        return this.decorator.remove(x, self.dao, self.obj).then(function(obj) {
+        return this.decorator.remove(x, self.dao, obj).then(function(obj) {
           if ( obj ) return self.delegate.remove_(x, obj);
           return Promise.resolve();
         });
