@@ -10,7 +10,7 @@
 */
 
 foam.CLASS({
-  package: 'foam.u2.view',
+  package: 'foam.nanos.menu',
   name: 'TreeAltView',
   extends: 'foam.u2.view.AltView',
 

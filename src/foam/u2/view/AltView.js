@@ -72,7 +72,7 @@ foam.CLASS({
 
       this.views.forEach(function(view){
         view[0].data = view[0].data ? view[0].data : self.data;
-      })
+      });
       this.altStack.push(this.views[0][0]);  
 
       this.addClass(this.myClass())
@@ -83,8 +83,7 @@ foam.CLASS({
       .endContext()
       .start('div').addClass('stack-wrapper')
         .tag({class: 'foam.u2.stack.StackView', data: this.altStack, showActions: false})
-      .end()
-
+      .end();
     }
   ],
 
