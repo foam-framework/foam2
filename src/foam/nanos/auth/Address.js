@@ -83,7 +83,7 @@ foam.CLASS({
       name: 'longitude'
     },
     {
-      class: 'Int',
+      class: 'String',
       name: 'streetNumber'
     },
     {
