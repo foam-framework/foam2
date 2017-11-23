@@ -31,7 +31,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'structured',
-      value: true
+      value: true,
+      documentation: 'Checked, shown Street Number, Street Name, Suite. Unchecked, shown Address1, Address2.'
     },
     {
       class: 'String',
