@@ -7,7 +7,8 @@ foam.CLASS({
 
   imports: [ 
     'menuDAO', 
-    'user' 
+    'user',
+    'logo'
   ],
 
   axioms: [
@@ -75,8 +76,10 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start().addClass('topNavContainer')
-          .start({class: 'foam.u2.navigation.BusinessLogoView'})
-          .end()
+          .callIf( this.logo, function(){
+            self.start({class: 'foam.u2.navigation.BusinessLogoView'})
+            .end()
+          })
           .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
           .end()
           .callIf( this.user.firstName, function(){
