@@ -22,12 +22,18 @@ foam.CLASS({
   properties: [
     {
       class: 'Function',
+      swiftType: '((Any?) -> ())',
+      swiftRequiresEscaping: true,
       name: 'fn'
     }
   ],
   methods: [
-    function send(m) {
-      this.fn(m.object);
-    }
+    {
+      name: 'send',
+      code: function send(m) {
+        this.fn(m.object);
+      },
+      swiftCode: 'fn(msg.object)',
+    },
   ]
 });
