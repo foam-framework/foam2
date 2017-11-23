@@ -77,13 +77,13 @@ foam.CLASS({
         .addClass(this.myClass())
         .start().addClass('topNavContainer')
           .callIf( this.logo, function(){
-            self.start({class: 'foam.u2.navigation.BusinessLogoView'})
+            this.start({class: 'foam.u2.navigation.BusinessLogoView'})
             .end()
           })
           .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
           .end()
           .callIf( this.user.firstName, function(){
-            self.start({class: 'foam.u2.navigation.UserView'})
+            this.start({class: 'foam.u2.navigation.UserView'})
             .end()
           })
         .end()
