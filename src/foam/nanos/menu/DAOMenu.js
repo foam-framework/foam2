@@ -17,7 +17,7 @@ foam.CLASS({
     { 
       class: 'foam.u2.ViewSpec', 
       name: 'summaryView', 
-      javaType: 'foam.core.FObject',
+      javaType: 'foam.lib.json.UnknownFObject',
       javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
       javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
       // TODO: remove next line when permanently fixed in ViewSpec
