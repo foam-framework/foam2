@@ -440,7 +440,13 @@ foam.CLASS({
           if ( this.args[i].f(o) ) return true;
         }
         return false;
-      }
+      },
+      swiftCode: `
+for arg in args {
+  if arg.f(obj) { return true }
+}
+return false
+      `,
     },
 
     function partialEval() {
