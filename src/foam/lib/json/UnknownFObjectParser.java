@@ -14,16 +14,26 @@ public class UnknownFObjectParser implements Parser {
     ps = ps.apply(new Whitespace(), x);
     if ( ps == null ) return null;
 
+    //TODO: use ThreadLocal
     StringBuilder sb = new StringBuilder();
+    int count = 1;
+    char head;
 
-    while( ps.valid() ) {
-      sb.append(ps.head());
+    sb.append(ps.head());
+    ps = ps.tail();
+    while( ps.valid() && count != 0 ) {
+      head = ps.head();
+      if ( head == '{') {
+        count++;
+      } else if ( head == '}') {
+        count--;
+      }
+      sb.append(head);
       ps = ps.tail();
     }
 
-    UnknownFObject unknownFObject = ((X)x.get("x")).create(UnknownFObject.class);
+    UnknownFObject unknownFObject = ((X)x.get("X")).create(UnknownFObject.class);
     unknownFObject.setJson(sb.toString());
-
     return ps.setValue(unknownFObject);
   }
 }
