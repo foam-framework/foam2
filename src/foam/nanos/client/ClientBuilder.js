@@ -28,7 +28,7 @@ foam.CLASS({
           of: this.NSpec,
           delegate: this.HTTPBox.create({
             method: 'POST',
-            url: 'nSpecDAO'
+            url: 'service/nSpecDAO'
           })});
         }
     }
@@ -76,7 +76,7 @@ foam.CLASS({
               name: spec.name,
               factory: function() {
                 var json = JSON.parse(spec.client);
-                if ( ! json.serviceName ) json.serviceName = spec.name;
+                if ( ! json.serviceName ) json.serviceName = 'service/' + spec.name;
                 if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
                 if ( ! json.daoType     ) json.daoType     = 'CLIENT';
                 return foam.json.parse(json, null, this);
