@@ -14,7 +14,6 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.nanos.auth.DayOfWeek',
-      swiftType: 'Int',
       name: 'day'
     },
     {
