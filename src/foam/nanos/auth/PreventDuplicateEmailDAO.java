@@ -45,7 +45,7 @@ public class PreventDuplicateEmailDAO
           .where(MLang.EQ(User.EMAIL, user.getEmail()))
           .limit(1).select(count);
       if ( count.getValue() == 1 ) {
-        throw new RuntimeException("User already exists");
+        throw new RuntimeException("User with same email address already exists: " + user.getEmail());
       }
     }
 
