@@ -131,7 +131,7 @@ foam.CLASS({
       var request = new Request(
           this.protocol + "://" +
           this.hostname +
-          ( this.port ? ( ':' + this.port ) : '' ) + "/service" +
+          ( this.port ? ( ':' + this.port ) : '' ) +
           this.path,
           options);
 
