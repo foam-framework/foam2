@@ -103,7 +103,7 @@ return ((Registration)registration).getExportBox();
       },
       swiftSynchronized: true,
       swiftCode: function() {/*
-let name: String = name ?? String(FOAM_utils.next$UID())
+let name: String = name ?? UUID().uuidString
 
 var exportBox: Box = SubBox_create([
   "name": name,

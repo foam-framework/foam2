@@ -10,8 +10,8 @@ foam.CLASS({
     'somepackage.RequiredClass',
   ],
   imports: [
-    'testImport',
-    'testImport2 as testImportTwo',
+    'testImport?',
+    'testImport2? as testImportTwo',
   ],
   exports: [
     'firstName',
@@ -29,6 +29,7 @@ foam.CLASS({
       hidden: true,
       swiftExpressionArgs: ['firstName'],
       swiftExpression: 'return firstName',
+      expression: function(firstName) { return firstName },
     },
     {
       name: 'anyProp',
@@ -78,10 +79,20 @@ return newValue
 return ["Hello", "World"]
       */},
     },
+    {
+      class: 'Enum',
+      of: 'foam.u2.Visibility',
+      name: 'enumProp',
+    },
+    {
+      class: 'DateTime',
+      name: 'dateProp',
+    },
   ],
   actions: [
     {
       name: 'swapFirstAndLast',
+      code: function() {},
       swiftCode: function() {/*
 let firstName = self.firstName
 self.firstName = self.lastName
@@ -90,6 +101,7 @@ self.lastName = firstName
     },
     {
       name: 'startLogger',
+      code: function() {},
       swiftCode: function() {/*
 myListener()
       */},
@@ -105,6 +117,7 @@ myListener()
           swiftType: 'String',
         },
       ],
+      code: function() {},
       swiftCode: function() {/*
 return String(format: type(of: self).greeting, name, "LASTNAME")
       */},
@@ -115,6 +128,7 @@ return String(format: type(of: self).greeting, name, "LASTNAME")
       name: 'myListener',
       isMerged: true,
       mergeDelay: 500,
+      code: function() {},
       swiftCode: function() {/*
 NSLog("Hey")
 myListener()
