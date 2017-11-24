@@ -14,9 +14,14 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey'
     },
-    { class: 'foam.u2.ViewSpec', name: 'summaryView',
-    // TODO: remove next line when permanently fixed in ViewSpec
-    fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
+    { 
+      class: 'foam.u2.ViewSpec', 
+      name: 'summaryView', 
+      javaType: 'foam.core.FObject',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      // TODO: remove next line when permanently fixed in ViewSpec
+      fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     }
   ],
 
