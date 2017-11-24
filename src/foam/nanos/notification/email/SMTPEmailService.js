@@ -16,7 +16,7 @@ foam.CLASS({
   ],
 
   imports: [
-    'threadPool'
+    '?threadPool' // Only imported in Java
   ],
 
   javaImports: [
