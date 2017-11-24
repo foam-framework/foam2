@@ -12,12 +12,10 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.Count;
 import foam.nanos.auth.AuthService;
-
-import javax.security.auth.AuthPermission;
 import java.security.Permission;
 
 public class AuthenticatedDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   protected String name_;
 
@@ -28,14 +26,14 @@ public class AuthenticatedDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    Permission permission;
+    String permission;
     AuthService authService = (AuthService) x.get("auth");
 
     Object id = obj.getProperty("id");
     if ( id == null || getDelegate().find(id) == null ) {
-      permission = new AuthPermission(name_ + ".create");
+      permission = name_ + ".create";
     } else {
-      permission = new AuthPermission(name_ + ".update." + id);
+      permission = name_ + ".update." + id;
     }
 
     if ( ! authService.check(x, permission) ) {
@@ -48,7 +46,7 @@ public class AuthenticatedDAO
   @Override
   public FObject remove_(X x, FObject obj) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(name_ + ".remove." + obj.getProperty("id"));
+    String permission = name_ + ".remove." + obj.getProperty("id");
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
@@ -59,7 +57,7 @@ public class AuthenticatedDAO
   @Override
   public FObject find_(X x, Object id) {
     AuthService authService = (AuthService) x.get("auth");
-    Permission permission = new AuthPermission(name_ + ".read." + id);
+    String permission = name_ + ".read." + id;
     if ( ! authService.check(x, permission) ) {
       throw new RuntimeException("Insufficient permissions");
     }
