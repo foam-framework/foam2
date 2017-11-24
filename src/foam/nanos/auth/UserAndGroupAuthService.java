@@ -18,9 +18,10 @@ import foam.util.Email;
 import foam.util.LRULinkedHashMap;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-
-import javax.naming.AuthenticationException;
+import javax.security.auth.AuthPermission;
+import java.security.Permission;
 import java.util.*;
+import javax.naming.AuthenticationException;
 
 public class UserAndGroupAuthService
     extends    ContextAwareSupport
@@ -36,10 +37,10 @@ public class UserAndGroupAuthService
 
   @Override
   public void start() {
-    userDAO_      = (DAO) getX().get("localUserDAO");
-    groupDAO_     = (DAO) getX().get("groupDAO");
-    sessionDAO_   = (DAO) getX().get("sessionDAO");
-    challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
+    userDAO_     = (DAO) getX().get("localUserDAO");
+    groupDAO_    = (DAO) getX().get("groupDAO");
+    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    challengeMap = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
   public User getCurrentUser(X x) throws AuthenticationException {
@@ -182,7 +183,7 @@ public class UserAndGroupAuthService
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean check(foam.core.X x, java.security.Permission permission) {
+  public Boolean checkPermission(foam.core.X x, Permission permission) {
     if ( x == null || permission == null ) {
       return false;
     }
@@ -203,6 +204,10 @@ public class UserAndGroupAuthService
     }
 
     return group.implies(permission);
+  }
+
+  public Boolean check(foam.core.X x, String permission) {
+    return checkPermission(x, new AuthPermission(permission));
   }
 
   /**
