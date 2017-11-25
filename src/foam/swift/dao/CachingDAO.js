@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.swift.dao',
   name: 'CachingDAO',
-  extends: 'foam.dao.AbstractDAO',
+  extends: 'foam.dao.ProxyDAO',
 
   requires: [
     'foam.dao.PromisedDAO',
