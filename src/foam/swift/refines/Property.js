@@ -628,3 +628,28 @@ return Date()
     },
   ],
 })
+
+foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [
+    {
+      name: 'swiftType',
+      expression: function(of, required) {
+        return (of ? of.model_.swiftName : 'FOAM_enum') + (required ? '' : '?');
+      },
+    },
+    {
+      name: 'swiftAdapt',
+      expression: function(of, swiftType) {
+        var name = of && of.model_.swiftName
+        if (!name) return `return newValue as! ${swiftType}`;
+        return `
+if let n = newValue as? Int {
+  return ${name}.fromOrdinal(n)
+}
+return newValue as! ${swiftType}
+        `;
+      },
+    },
+  ],
+})

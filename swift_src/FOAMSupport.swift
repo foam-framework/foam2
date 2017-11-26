@@ -525,7 +525,7 @@ extension FOAM_enum {
 public class FoamError: Error {
   var obj: Any?
   init(_ obj: Any?) { self.obj = obj }
-  func toString() -> String {
+  public func toString() -> String {
     if let obj = self.obj as? FObject {
       let o = Context.GLOBAL.create(Outputter.self)!
       return o.swiftStringify(obj)
