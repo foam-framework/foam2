@@ -152,6 +152,8 @@ var classes = [
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.lib.json.OutputJSON',
+  'foam.lib.json.UnknownFObject',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
