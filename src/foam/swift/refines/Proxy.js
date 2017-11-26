@@ -9,13 +9,13 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, property, swiftReturns, swiftArgs) {
-        var args = swiftArgs.map(function(arg) {
+      getter: function() {
+        var args = this.swiftArgs.map(function(arg) {
           return arg.localName;
         });
-        return (swiftReturns ? 'return ' : '') +
+        return (this.swiftReturns ? 'return ' : '') +
           (this.swiftThrows ? 'try ' : '') + 
-          property + '.' + swiftName + '(' + args.join(', ') + ')';
+          this.property + '.' + this.swiftName + '(' + args.join(', ') + ')';
       }
     }
   ]

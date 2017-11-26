@@ -505,13 +505,23 @@ return try delegate.select_(
           this.predicate);
     },
 
-    function listen_(x, sink, predicate) {
-      return this.delegate.listen_(
-        x, sink,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
-    }
+    {
+      name: 'listen_',
+      code: function listen_(x, sink, predicate) {
+        return this.delegate.listen_(
+          x, sink,
+          predicate ?
+            this.And.create({ args: [this.predicate, predicate] }) :
+            this.predicate);
+      },
+      swiftCode: `
+return try delegate.listen_(
+  x, sink,
+  predicate != nil ?
+    And_create(["args": [self.predicate, predicate]]) :
+    predicate)
+      `,
+    },
   ]
 });
 
