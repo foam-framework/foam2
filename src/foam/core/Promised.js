@@ -133,13 +133,15 @@ foam.CLASS({
           factory: function() {
             return this[pendingState].create();
           },
+          swiftFactory: `return ${pendingState}_create(["obj": self])`,
           transient: true
         }),
         foam.core.Property.create({
           name: delegateName,
           postSet: function() {
             this[stateName] = this[fulfilledState].create();
-          }
+          },
+          swiftGetter: `return try! ${myName}.get() as! ${foam.lookup(this.of).model_.swiftName}`,
         }),
         foam.core.ProxySub.create({
           topics: this.topics,
@@ -163,10 +165,17 @@ foam.CLASS({
         foam.core.InnerClass.create({
           model: {
             name: pendingState,
+            implements: [this.of],
             axioms: [
               foam.pattern.Singleton.create()
             ],
-            methods: pendingMethods
+            methods: pendingMethods,
+            properties: [
+              {
+                swiftType: cls.model_.swiftName,
+                name: 'obj',
+              },
+            ],
           }
         }),
         foam.core.InnerClass.create({
@@ -183,7 +192,8 @@ foam.CLASS({
             ],
             axioms: [
               foam.pattern.Singleton.create()
-            ]
+            ],
+            generateSwift: false,
           }
         }));
 

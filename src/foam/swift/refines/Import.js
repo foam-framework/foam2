@@ -16,6 +16,18 @@ foam.CLASS({
       expression: function(name) { return name; },
     },
     {
+      class: 'String',
+      name: 'swiftType',
+      value: 'Any?',
+    },
+    {
+      class: 'String',
+      name: 'swiftCast',
+      expression: function(swiftType) {
+        return swiftType == 'Any?' ? '' : ' as! ' + swiftType;
+      },
+    },
+    {
       class: 'Boolean',
       name: 'swiftSupport',
       value: true,
@@ -30,7 +42,7 @@ foam.CLASS({
     function writeToSwiftClass(cls) {
       cls.fields.push(this.Field.create({
         name: this.name,
-        type: 'Any?',
+        type: this.swiftType,
         getter: this.valueGetter(),
         setter: this.valueSetter(),
         visibility: 'public',
@@ -63,7 +75,7 @@ return __context__["<%=this.key%>$"] as? Slot ?? nil
       name: 'valueGetter',
       args: [],
       template: function() {/*
-return __context__["<%=this.key%>"]
+return __context__["<%=this.key%>"]<%= this.swiftCast %>
       */},
     },
     {

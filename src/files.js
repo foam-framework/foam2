@@ -54,6 +54,7 @@ FOAM_FILES([
   { name: "foam/core/Proxy" },
   { name: "foam/core/Promised" },
   { name: "foam/core/Interface" },
+  { name: "foam/core/Axiom" },
   { name: "foam/core/Exception" },
   { name: "foam/core/ContextMethod" },
   { name: "foam/core/Window" },
@@ -128,7 +129,7 @@ FOAM_FILES([
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
   { name: "foam/java/JavaSwiftRefines", flags: ['java'] },
-
+  { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/util/Timer" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
@@ -318,7 +319,10 @@ FOAM_FILES([
   { name: "lib/boxJava", flags: ['java'] },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
+  { name: "foam/swift/refines/Promised", flags: ['swift'] },
+  { name: "foam/swift/refines/Topic", flags: ['swift'] },
   { name: "foam/swift/refines/Box", flags: ['swift'] },
+  { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
