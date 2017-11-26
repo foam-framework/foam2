@@ -3,6 +3,8 @@ import XCTest
 
 class SwiftTestsTests: XCTestCase {
 
+  let x = Context.GLOBAL
+
   override func setUp() {
     super.setUp()
   }
@@ -59,9 +61,10 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testFObjectParse() {
-    let ps = FObjectParser().parseString("{class:'Test', prevFirstName: \"MY_PREV_NAME\"}")
+    let ps = FObjectParser().parseString("{class:'Test', prevFirstName: \"MY_PREV_NAME\",\"enumProp\":1}")
     XCTAssertTrue(ps is Test)
     XCTAssertEqual((ps as! Test).prevFirstName, "MY_PREV_NAME")
+    XCTAssertEqual((ps as! Test).enumProp, Visibility.FINAL)
   }
 
   func testToJSON() {
@@ -69,8 +72,9 @@ class SwiftTestsTests: XCTestCase {
     t.prevFirstName = "MY_PREV_NAME"
     t.boolProp = false
     t.intProp = 34
+    t.enumProp = Visibility.FINAL
     XCTAssertEqual(Outputter().swiftStringify(t),
-    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\"}")
+    "{\"class\":\"Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\",\"enumProp\":1}")
   }
 
   func testExpression() {
@@ -108,19 +112,19 @@ class SwiftTestsTests: XCTestCase {
       "firstName": "Mike",
     ])
     XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t1])
+    XCTAssertEqual(dao.array as! [Test], [t1])
     XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t1])
+    XCTAssertEqual(dao.array as! [Test], [t1])
 
     let t2 = Test([
       "firstName": "Mike",
     ])
     XCTAssertEqual(t2, (try? dao.put(t2)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t2])
+    XCTAssertEqual(dao.array as! [Test], [t2])
 
     t1.firstName = "Mike2"
     XCTAssertEqual(t1, (try? dao.put(t1)) as? Test)
-    XCTAssertEqual(dao.dao as! [Test], [t2, t1])
+    XCTAssertEqual(dao.array as! [Test], [t2, t1])
 
     XCTAssertEqual(t1, (try? dao.find(t1.firstName)) as? Test)
 
@@ -133,9 +137,41 @@ class SwiftTestsTests: XCTestCase {
     XCTAssertEqual(sink.array as! [Test], [t2])
   }
 
-  func testDaoListen() {
+
+  func testDaoWhere() {
     let dao = ArrayDAO([
       "of": Test.classInfo(),
+    ])
+    let t1 = Test([
+      "firstName": "Joe1",
+      "lastName": "Bob",
+    ])
+    let t2 = Test([
+      "firstName": "Joe2",
+      "lastName": "Bob",
+    ])
+    try! _ = dao.put(t1)
+    try! _ = dao.put(t2)
+
+    do {
+      let sink = ArraySink()
+      _ = try! dao.`where`(Eq(["arg1": Test.LAST_NAME(), "arg2": Constant(["value": "Bob"])])).select(sink)
+      XCTAssertEqual(2, sink.array.count)
+    }
+
+    do {
+      let sink = ArraySink()
+      _ = try! dao.`where`(Eq(["arg1": Test.FIRST_NAME(), "arg2": Constant(["value": "Joe2"])])).select(sink)
+      XCTAssertEqual(1, sink.array.count)
+      XCTAssertTrue(t2.isEqual(sink.array[0]))
+    }
+  }
+
+  func testDaoListen() {
+    let dao = ProxyDAO([
+      "delegate": ArrayDAO([
+        "of": Test.classInfo(),
+      ])
     ])
 
     let sink = Count()
@@ -346,9 +382,13 @@ class SwiftTestsTests: XCTestCase {
         self.parser = parser
       }
       func send(_ msg: Message) throws {
+        let reply = msg.attributes["replyBox"] as? Box
+
         let str = outputter.swiftStringify(msg)
-        let obj = parser.parseString(str)
-        try registry.send(obj as! Message)
+        let obj = parser.parseString(str) as! Message
+        obj.attributes["replyBox"] = reply
+
+        try registry.send(obj)
       }
     }
 
@@ -464,5 +504,141 @@ class SwiftTestsTests: XCTestCase {
     t2.copyFrom(t1)
     XCTAssertTrue(t1.isEqual(t2))
     XCTAssertEqual(t2.firstName, "a")
+  }
+
+  func testPromisedDAO() {
+    let dao = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+    let pDao = x.create(PromisedDAO.self)!
+
+    DispatchQueue.global(qos: .background).async {
+      _ = try? dao.put(self.x.create(Test.self, args: ["firstName": "A"])!)
+      _ = try? dao.put(self.x.create(Test.self, args: ["firstName": "B"])!)
+      pDao.promise.set(dao)
+    }
+
+    let a = try? pDao.select() as! ArraySink
+    XCTAssertEqual(a?.array.count, 2)
+  }
+
+  func testCachingSlowDAO() {
+    let numItems = 50
+
+    var src: DAO = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+    for i in 0..<numItems {
+      _ = try! src.put(x.create(Test.self, args: ["firstName": i])!)
+    }
+    src = x.create(SlowDAO.self, args: [
+      "delegate": src,
+      "delayMs": 1000,
+    ])!
+
+    let dao = x.create(CachingDAO.self, args: [
+      "cache": x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!,
+      "src": src,
+    ])!
+
+    measure {
+      for i in 0..<numItems {
+        try! XCTAssertNotNil(dao.find(String(i)))
+      }
+    }
+  }
+
+  func testCachingDAO() {
+    let src = x.create(SlowDAO.self, args: [
+      "delegate": x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!,
+      "delayMs": 1000,
+    ])!
+
+    let cache = x.create(ArrayDAO.self, args: ["of": Test.classInfo()])!
+
+    let dao = x.create(CachingDAO.self, args: [
+      "cache": cache,
+      "src": src,
+    ])!
+
+    _ = try? dao.put(x.create(Test.self, args: ["firstName": "1"])!)
+
+    try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 1)
+    try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 1)
+    try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 1)
+
+    _ = try? src.put(x.create(Test.self, args: ["firstName": "2"])!)
+
+    try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 2)
+    try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 2)
+    try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 2)
+
+    _ = try? cache.put(x.create(Test.self, args: ["firstName": "3"])!)
+
+    try XCTAssertEqual((dao.select(x.create(Count.self)!) as? Count)?.value, 3)
+    try XCTAssertEqual((src.select(x.create(Count.self)!) as? Count)?.value, 2)
+    try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 3)
+  }
+
+  func testSocketWorking() {
+    // Note: For this test to work, you need to run the run_server.js script in the demo dir
+    let boxContext = Context.GLOBAL.create(BoxContext.self)!
+    let x = boxContext.__subContext__
+
+    let expect = expectation(description: "finish")
+
+    _ = x.create(NamedBox.self, args: [
+      "name": "/test",
+      "delegate": x.create(SocketBox.self, args: ["address": "localhost:7000"])!
+    ])
+
+    let dao = x.create(ClientDAO.self)!
+    dao.delegate = x.create(NamedBox.self, args: [
+      "name": "/test/TestDAO",
+    ])!
+    DispatchQueue.global(qos: .background).async {
+      let listener = x.create(FnSink.self)!
+      listener.fn = { s, o, sub in
+        XCTAssertEqual(s, "put")
+        XCTAssertTrue(o is Test)
+        sub.detach()
+        expect.fulfill()
+      }
+      try! _ = dao.listen(listener)
+
+      let t = x.create(Test.self, args: ["firstName": UUID().uuidString])!
+      let t2 = try! dao.put(t)
+      XCTAssertEqual(t.firstName, t2!.get(key: "firstName") as! String)
+    }
+
+    wait(for: [expect], timeout: 100)
+  }
+
+  func testSocketError() {
+    let boxContext = Context.GLOBAL.create(BoxContext.self)!
+    let x = boxContext.__subContext__
+
+    let expect = expectation(description: "finish")
+
+    let socket = x.create(Socket.self)!
+    _ = socket.connect.sub { (sub, _) in
+      XCTFail()
+    }
+    _ = socket.errorEvent.sub { (sub, _) in
+      sub.detach()
+      expect.fulfill()
+    }
+    socket.connectTo("localhost:7000")
+
+    wait(for: [expect], timeout: 20)
+  }
+
+  func testDateProp() {
+    let t = x.create(Test.self)!
+
+    t.set(key: "dateProp", value: 123456)
+    XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 123456))
+
+    t.set(key: "dateProp", value: "2017-11-21T01:00:00+01:00")
+    XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1511222400))
+
+    t.set(key: "dateProp", value: Date(timeIntervalSince1970: 1234))
+    XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1234))
   }
 }
