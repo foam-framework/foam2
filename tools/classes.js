@@ -160,7 +160,6 @@ var classes = [
   'foam.blob.SubBlob',
   'foam.blob.IdentifiedBlob',
   'foam.blob.BlobStore',
-  'com.google.foam.demos.olympics.Medal',
 
   'foam.nanos.geocode.GoogleMapsAddressComponent',
   'foam.nanos.geocode.GoogleMapsCoordinates',
