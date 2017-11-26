@@ -16,6 +16,6 @@ p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler
 p({"class":"foam.nanos.menu.Menu","id":"scripts","label":"Scripts","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"scriptDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"servproviders","label":"Service Providers","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cicoServiceProviderDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"sessions","label":"Sessions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sessionDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu"},"order":1000,"parent":""})
+p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.auth.ui.SignInView"}},"order":1000,"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"users","label":"Users","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"userDAO"},"order":1000,"parent":"admin"})
