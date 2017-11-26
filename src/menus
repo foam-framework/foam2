@@ -18,6 +18,7 @@ p({"class":"foam.nanos.menu.Menu","id":"servproviders","label":"Service Provider
 p({"class":"foam.nanos.menu.Menu","id":"sessions","label":"Sessions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sessionDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"users","label":"Users","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"userDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"brokers","label":"Brokers","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"brokerDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.auth.ui.SignInView"}},"order":1000,"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"dashboard","label":"Dashboard","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.invoice.ui.InvoiceDashboardView"}},"order":1000,"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"banks","label":"Banking","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.cico.ui.CicoView"}},"order":1000,"parent":""})
@@ -36,4 +37,3 @@ p({"class":"foam.nanos.menu.Menu","id":"set-bank","label":"Bank Account","handle
 p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.auth.ui.SignInView"}},"order":70,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"regular","label":"Regular","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.ui.transfer.TransferWizard","type":"regular"}},"order":1000,"parent":"transfer"})
 p({"class":"foam.nanos.menu.Menu","id":"foreign","label":"Foreign","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"net.nanopay.ui.transfer.TransferWizard","type":"foreign"}},"order":1000,"parent":"transfer"})
-p({"class":"foam.nanos.menu.Menu","id":"brokers","label":"Brokers","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"brokerDAO"},"order":1000,"parent":"admin"})
