@@ -8,8 +8,9 @@ foam.CLASS({
   package: 'foam.nanos.controller',
   name: 'ApplicationController',
   extends: 'foam.u2.Element',
+
   arequire: function() { return foam.nanos.client.ClientBuilder.create(); },
-  documentation: 'FOAM Application Controller.',
+
   implements: [
     'foam.nanos.client.Client',
   ],
@@ -23,6 +24,8 @@ foam.CLASS({
     'stack',
     'as ctrl'
   ],
+
+  documentation: 'FOAM Application Controller.',
 
   css: `
     body {
@@ -70,8 +73,6 @@ foam.CLASS({
     },
 
     function initE() {
-      var self = this;
-
       this
         .addClass(this.myClass())
         .tag({class: 'foam.nanos.menu.MenuBar'})
