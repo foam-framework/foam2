@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.lib.json',
   name: 'UnknownFObject',
+
   implements: [ 'foam.lib.json.OutputJSON' ],
 
   documentation: 'A FObject for unknown model',
