@@ -8,7 +8,10 @@ package foam.lib.json;
 import foam.lib.parse.*;
 import foam.core.X;
 
-public class UnknownFObjectParser implements Parser {
+// TODO: Fix, doesn't parse {key:"}"}, use proper JSON parser
+public class UnknownFObjectParser
+  implements Parser
+{
 
   public PStream parse(PStream ps, ParserContext x) {
     ps = ps.apply(new Whitespace(), x);
@@ -16,7 +19,7 @@ public class UnknownFObjectParser implements Parser {
 
     //TODO: use ThreadLocal
     StringBuilder sb = new StringBuilder();
-    int count = 1;
+    int  count = 1;
     char head;
 
     sb.append(ps.head());
@@ -32,7 +35,7 @@ public class UnknownFObjectParser implements Parser {
       ps = ps.tail();
     }
 
-    UnknownFObject unknownFObject = ((X)x.get("X")).create(UnknownFObject.class);
+    UnknownFObject unknownFObject = ((X) x.get("X")).create(UnknownFObject.class);
     unknownFObject.setJson(sb.toString());
     return ps.setValue(unknownFObject);
   }

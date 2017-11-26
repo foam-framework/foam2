@@ -54,7 +54,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'organization',
-      width: 170,
+      width: 175,
       tableWidth: 160
     },
     {
