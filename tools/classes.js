@@ -160,6 +160,7 @@ var classes = [
   'foam.blob.SubBlob',
   'foam.blob.IdentifiedBlob',
   'foam.blob.BlobStore',
+  'com.google.foam.demos.olympics.Medal',
 
   'foam.nanos.geocode.GoogleMapsAddressComponent',
   'foam.nanos.geocode.GoogleMapsCoordinates',
@@ -193,7 +194,7 @@ var proxies = [
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
   'foam.blob.BlobService',
-  'foam.nanos.http.WebAgent',  
+  'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];
