@@ -13,7 +13,8 @@ foam.CLASS({
     'auth',
     'user',
     'stack',
-    'loginSuccess'
+    'loginSuccess',
+    'signUpEnabled'
   ],
 
   exports: [ 'as data' ],
@@ -80,6 +81,11 @@ foam.CLASS({
         position: relative;
         top: -5px;
       }
+      ^ .link{
+        margin-left: 2px;
+        color: #59a5d5;
+        cursor: pointer;
+      }
     */}
     })
   ],
@@ -111,37 +117,39 @@ foam.CLASS({
           .start(this.PASSWORD).addClass('full-width-input').end()
           .start(this.SIGN_IN).addClass('full-width-button').end()
         .end()
-        // .start('div')
-        //   .start('p').add("Don't have an account?").end()
-        //   // .start('p').style({ 'margin-left': '2px' }).addClass('link')
-        //   //   .add("Sign up.")
-        //   //   .on('click', this.signUp)
-        //   // .end()
-        //   // .start('p').style({ 'margin-left': '150px' }).addClass('link')
-        //   //   .add("Forgot Password?")
-        //   //   .on('click', function(){ self.stack.push({ class: 'net.nanopay.ui.forgotPassword.EmailView' })})
-        //   // .end()
-        // .end()
+        .start('div')
+          .callIf(this.signUpEnabled, function(){
+            this.start('p').add("Don't have an account?").end()
+            .start('p').style({ 'margin-left': '2px' }).addClass('link')
+              .add("Sign up.")
+              .on('click', this.signUp)
+            .end()
+          })
+          // .start('p').style({ 'margin-left': '150px' }).addClass('link')
+          //   .add("Forgot Password?")
+          //   .on('click', function(){ self.stack.push({ class: 'net.nanopay.ui.forgotPassword.EmailView' })})
+          // .end()
+        .end()
       .end();
     }
   ],
 
   listeners: [
-    // function signUp(){
-    //   var self = this;
-    //   var view = foam.u2.ListCreateController.CreateController.create(
-    //     null,
-    //     this.__context__.createSubContext({
-    //       detailView: net.nanopay.auth.ui.UserRegistrationView,
-    //       back: this.stack.back.bind(this.stack),
-    //       dao: this.userDAO,
-    //       factory: function() {
-    //         return self.User.create();
-    //       },
-    //       showActions: false
-    //     }));
-    //   this.stack.push(view);
-    // }
+    function signUp(){
+      var self = this;
+      var view = foam.u2.ListCreateController.CreateController.create(
+        null,
+        this.__context__.createSubContext({
+          detailView: foam.nanos.auth.SignUpView,
+          back: this.stack.back.bind(this.stack),
+          dao: this.userDAO,
+          factory: function() {
+            return self.User.create();
+          },
+          showActions: false
+        }));
+      this.stack.push(view);
+    }
   ],
 
   actions: [

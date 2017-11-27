@@ -1,5 +1,7 @@
 # run from parent directory of foam2
-cd foam2/build/
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR/../../foam2/build/
 mvn dependency:build-classpath -Dmdep.outputFile=cp.txt;
 
 cd ../..

@@ -8,9 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.controller',
   name: 'ApplicationController',
   extends: 'foam.u2.Element',
-  arequire: function() { return foam.nanos.client.ClientBuilder.create(); },  
+
+  arequire: function() { return foam.nanos.client.ClientBuilder.create(); },
+
   documentation: 'FOAM Application Controller.',
-  
+
   implements: [
     'foam.nanos.client.Client',
   ],
@@ -43,7 +45,7 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-    
+
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
@@ -105,7 +107,6 @@ foam.CLASS({
     },
 
     function initE() {
-      var self = this;
       this
         .addClass(this.myClass())
         .tag({class: 'foam.u2.navigation.TopNavigation'})

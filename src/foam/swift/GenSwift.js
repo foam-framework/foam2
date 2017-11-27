@@ -27,6 +27,7 @@ foam.CLASS({
     {
       name: 'coreModels',
       value: [
+        'foam.core.EventProxy',
         'foam.mlang.order.Comparator',
         'foam.mlang.predicate.Predicate',
         'foam.swift.core.ConstantSlot',
