@@ -9,7 +9,8 @@ foam.CLASS({
     'stack',
     'save',
     'user',
-    'emailUserRegistration'
+    'emailUserRegistration',
+    'userDAO'
   ],
 
   exports: [
@@ -217,12 +218,11 @@ foam.CLASS({
   actions: [
     {
       name: 'signUp',
-      isEnabled: function(firstName, lastName, email, password, agreed){
-        return firstName && lastName && email && password && agreed;
+      isEnabled: function(firstName, lastName, email, password){
+        return firstName && lastName && email && password;
       },
       code: function (X, obj) {
         var self = this;
-        
         var user = self.User.create({
           firstName: self.firstName,
           lastName: self.lastName,
@@ -233,11 +233,15 @@ foam.CLASS({
           department: self.department
         });
 
-        self.emailUserRegistration.register(user).then(function (user) {
-          // Setting controller user as the one created here. May need tuning once auth & email verfication come to play.
+        this.userDAO.put(user).then(function(user){
           self.user = user;
           X.stack.push({ class: 'foam.nanos.auth.SignInView' });
         });
+        // self.emailUserRegistration.register(user).then(function (user) {
+        //   // Setting controller user as the one created here. May need tuning once auth & email verfication come to play.
+        //   self.user = user;
+        //   X.stack.push({ class: 'foam.nanos.auth.SignInView' });
+        // });
       }
     }
   ]

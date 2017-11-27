@@ -172,9 +172,9 @@ foam.CLASS({
         this.auth.loginByEmail(null, this.email, this.password).then(function(user){
           self.loginSuccess = user ? true : false;
           self.user.copyFrom(user);
-          // self.stack.push({ class: 'net.nanopay.invoice.ui.InvoiceDashboardView' });
+          self.add(self.NotificationMessage.create({ message: 'Login Successful.' }));
         }).catch(function(a) {
-          self.add(self.NotificationMessage.create({ message: a.message + '. Please try again.', type: 'error' }))
+          self.add(self.NotificationMessage.create({ message: a.message + '. Please try again.', type: 'error' }));
         });
       }
     }
