@@ -44,9 +44,7 @@ foam.CLASS({
     },
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
+  css: `
         ^ {
           width: 992px;
           margin: auto;
@@ -58,9 +56,7 @@ foam.CLASS({
         ^ .property-viewChoices{
           margin: 0 0 25px 15px;
         }
-      */}
-    })
-  ],
+  `,
 
   methods: [
     function initE() {
