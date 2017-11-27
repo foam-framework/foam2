@@ -27,6 +27,8 @@ foam.CLASS({
     'stack',
     'user',
     'logo',
+    'signUpEnabled',
+    'webApp',
     'requestLogin',
     'loginSuccess',
     'as ctrl'
@@ -68,12 +70,20 @@ foam.CLASS({
       name: 'user',
       factory: function() { return this.User.create(); }
     },
-    'logo',
+    {
+      class: 'Boolean',
+      name: 'signUpEnabled',
+      adapt: function(v) {
+        return v === 'false' ? false : true;
+      }
+    },
     {
       class: 'Boolean',
       name: 'loginSuccess',
       value: false
-    }
+    },
+    'logo',
+    'webApp'    
   ],
 
   methods: [
