@@ -9,17 +9,21 @@ package foam.blob;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 public class FileBlob
     extends AbstractBlob
 {
-  protected File file_;
   protected long size_;
+  protected File file_;
+  protected FileChannel channel_;
 
-  public FileBlob(File file) {
+  public FileBlob(File file) throws FileNotFoundException {
     this.file_ = file;
     this.size_ = file.length();
+    this.channel_ = new FileInputStream(file).getChannel();
   }
 
   public File getFile() {
@@ -29,23 +33,15 @@ public class FileBlob
   @Override
   public Buffer read(Buffer buffer, long offset) {
     try {
-      int outOffset = 0;
-
       long length = Math.min(buffer.getLength(), getSize() - offset);
       if (length < buffer.getLength()) {
         buffer = buffer.slice(0, length);
       }
 
       ByteBuffer bb = buffer.getData();
-      FileInputStream fileInputStream = new FileInputStream(file_);
-      BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
-      bufferedInputStream.skip(offset);
-
-      byte[] buf = new byte[(int) length];
-      while ( outOffset < length ) {
-        int bytesRead = bufferedInputStream.read(buf, outOffset, (int) length);
-        bb.put(buf, outOffset, bytesRead);
-        outOffset += bytesRead;
+      int bytesRead = channel_.read(bb, offset);
+      if ( bytesRead < 0 ) {
+        throw new RuntimeException("Offset greater than file's current size");
       }
 
       bb.rewind();

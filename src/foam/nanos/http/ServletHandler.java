@@ -134,6 +134,16 @@ public class ServletHandler
     public String getRemoteHost() {
       return ex.getRemoteAddress().getHostName();
     }
+
+    @Override
+    public int getContentLength() {
+      return Integer.parseInt(getHeader("Content-Length"), 10);
+    }
+
+    @Override
+    public long getContentLengthLong() {
+      return Long.parseLong(getHeader("Content-Length"), 10);
+    }
   }
 
   protected final class ResponseWrapper extends HttpServletResponseWrapper {

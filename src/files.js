@@ -54,6 +54,7 @@ FOAM_FILES([
   { name: "foam/core/Proxy" },
   { name: "foam/core/Promised" },
   { name: "foam/core/Interface" },
+  { name: "foam/core/Axiom" },
   { name: "foam/core/Exception" },
   { name: "foam/core/ContextMethod" },
   { name: "foam/core/Window" },
@@ -318,7 +319,10 @@ FOAM_FILES([
   { name: "lib/boxJava", flags: ['java'] },
 
   { name: "foam/swift/refines/Stub", flags: ['swift'] },
+  { name: "foam/swift/refines/Promised", flags: ['swift'] },
+  { name: "foam/swift/refines/Topic", flags: ['swift'] },
   { name: "foam/swift/refines/Box", flags: ['swift'] },
+  { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
@@ -422,7 +426,8 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
-  { name: "foam/nanos/auth/SignInView", flags: ['web'] },  
+  { name: "foam/nanos/auth/SignInView", flags: ['web'] },
+  { name: "foam/nanos/auth/SignUpView", flags: ['web'] },  
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
