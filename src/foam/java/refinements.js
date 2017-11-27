@@ -288,6 +288,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        static: this.isStatic(),
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
@@ -298,7 +299,8 @@ foam.CLASS({
         }),
         body: this.javaCode ? this.javaCode : ''
       });
-    }
+    },
+    function isStatic(){ return false;}
   ]
 });
 
