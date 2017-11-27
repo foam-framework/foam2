@@ -1,6 +1,6 @@
 
 foam.CLASS({
-  package: 'net.nanopay.ui.topNavigation',
+  package: 'foam.u2.navigation',
   name: 'SubMenuBar',
   extends: 'foam.u2.Element',
 
@@ -49,7 +49,7 @@ foam.CLASS({
                     .on('click', function() {
                       if(!i.selected){
                         self.selected = true;
-                        self.tag({class: 'net.nanopay.ui.topNavigation.SubMenuBar', data: menus, parent: i })
+                        self.tag({class: 'foam.u2.navigation.SubMenuBar', data: menus, parent: i })
                       }
                     })
                   .end()
