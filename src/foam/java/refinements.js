@@ -300,7 +300,7 @@ foam.CLASS({
         body: this.javaCode ? this.javaCode : ''
       });
     },
-    function isStatic(){ return false;}
+    function isStatic() { return false; }
   ]
 });
 

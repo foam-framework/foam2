@@ -1,7 +1,7 @@
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
- * http://www.apache.org/licenses/LICENSE-2.0 
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -12,9 +12,8 @@ foam.CLASS({
   documentation: 'An Axiom for defining static methods.',
 
   methods: [
-    function exportAs(obj) {
-    },
-    function isStatic(){ return true;},
+    function isStatic() { return true; },
+
     function installInClass(cls) {
       Object.defineProperty(
         cls,
@@ -24,11 +23,13 @@ foam.CLASS({
           configurable: false
         });
     },
+
     function installInProto(proto) {
       this.installInClass(proto);
     }
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Model',
