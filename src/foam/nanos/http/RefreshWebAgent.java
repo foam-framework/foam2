@@ -7,9 +7,9 @@
 package foam.nanos.http;
 
 import foam.core.*;
-import java.io.PrintWriter;
-import foam.nanos.http.WebAgent;
 import foam.nanos.http.ProxyWebAgent;
+import foam.nanos.http.WebAgent;
+import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 
 public class RefreshWebAgent
@@ -31,14 +31,14 @@ public class RefreshWebAgent
     out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\";>Set Refresh</button>");
     out.println("</form>");
     out.println("</pre>");
+    
+    getDelegate().execute(x);
 
-    if( json != null || !"".equals(json)){
+    if( json != null || !"".equals(json) ){
       int refresh = Integer.parseInt(json);
       out.println("<script>");
       out.println("setTimeout(function(){ window.location.href = window.location.href; }, "+ refresh * 1000 + "); ");
       out.println("</script>");
     }
-
-    getDelegate().execute(x);
   }
 }
