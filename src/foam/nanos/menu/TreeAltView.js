@@ -16,7 +16,10 @@ foam.CLASS({
 
   methods: [
     function init(){
-      this.views = [[ { class: 'foam.u2.view.TableView' }, 'Table' ], [ { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function(){ this.add(this.data.label); } }, 'Tree'  ]]
+      this.views = [
+        [ { class: 'foam.u2.view.TableView' }, 'Table' ],
+        [ { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }, 'Tree' ]
+      ]
     }
   ]
 });
