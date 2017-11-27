@@ -38,12 +38,14 @@ foam.CLASS({
       class: 'String',
       name: 'address1',
       //required: true
-      displayWidth: 50
+      displayWidth: 50,
+      documentation: 'for an unstructured address, use this as a main address field.'
     },
     {
       class: 'String',
       name: 'address2',
-      displayWidth: 50
+      displayWidth: 50,
+      documentation: 'for an unstructured address, use this as a sub address field.'
     },
     {
       class: 'String',
@@ -85,11 +87,13 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'streetNumber'
+      name: 'streetNumber',
+      documentation: 'for an structured address, use this field.'
     },
     {
       class: 'String',
-      name: 'streetName'
+      name: 'streetName',
+      documentation: 'for an structured address, use this field.'
     },
     {
       class: 'FObjectArray',
