@@ -29,7 +29,19 @@ foam.CLASS({
   methods: [
     function exportAs(obj) {
     },
-    function isStatic(){ return true;}
+    function isStatic(){ return true;},
+    function installInClass(cls) {
+      Object.defineProperty(
+        cls,
+        foam.String.constantize(this.name),
+        {
+          value: this.value,
+          configurable: false
+        });
+    },
+    function installInProto(proto) {
+      this.installInClass(proto);
+    }
   ]
 });
 
