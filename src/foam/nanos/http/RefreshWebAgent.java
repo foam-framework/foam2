@@ -20,22 +20,20 @@ public class RefreshWebAgent
   }
 
   public void execute(X x) {
-    final PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
-    String json = req.getParameter("refresh");
+    PrintWriter        out  = (PrintWriter) x.get(PrintWriter.class);
+    HttpServletRequest req  = (HttpServletRequest) x.get(HttpServletRequest.class);
+    String             json = req.getParameter("refresh");
+    int                refresh = json == null || "".equals(json) ? -1 : Integer.parseInt(json);
 
-    out.println("<pre>");
     out.println("<form>");
     out.println("<label>Refresh Rate (sec):</label>");
-    out.println("<input name=\"refresh\" type=\"number\" value=\"refresh\" style=\"width:150px;display:inline-block;\"></input>");
+    out.println("<input name=\"refresh\" type=\"number\" value=\"" + ( refresh == -1 ? "" : ""+refresh) + "\" style=\"width:100px;display:inline-block;\"></input>");
     out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\";>Set Refresh</button>");
     out.println("</form>");
-    out.println("</pre>");
-    
+
     getDelegate().execute(x);
 
-    if( json != null || !"".equals(json) ){
-      int refresh = Integer.parseInt(json);
+    if ( refresh != -1 ) {
       out.println("<script>");
       out.println("setTimeout(function(){ window.location.href = window.location.href; }, "+ refresh * 1000 + "); ");
       out.println("</script>");
