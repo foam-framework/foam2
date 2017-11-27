@@ -250,7 +250,7 @@ return ConstantSlot([
 
     return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
         <%=this.swiftArgs.map(function(a){
-          return (a.externalName ? a.externalName + ': ' : '') +
+          return (a.externalName != '_' ? a.externalName + ': ' : '') +
                  (isMutable(a) ? '&' : '') +
                  a.localName
         }).join(', ')%>)
