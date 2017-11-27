@@ -11,10 +11,6 @@ foam.CLASS({
 
   documentation: 'An Axiom for defining static methods.',
 
-  properties: [
-    //get prop from foam.core.AbstractMethod
-  ],
-
   methods: [
     function exportAs(obj) {
     },
@@ -22,7 +18,7 @@ foam.CLASS({
     function installInClass(cls) {
       Object.defineProperty(
         cls,
-        foam.String.constantize(this.name),
+        this.name,
         {
           value: this.value,
           configurable: false
