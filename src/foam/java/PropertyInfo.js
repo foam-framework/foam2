@@ -97,7 +97,7 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' } ],
-            body: 'return compareValues(get_(o1), get_(o2));'
+            body: 'return (o1 instanceof ' + this.sourceCls.name + ' ? compareValues(get_(o1), get_(o2)) : compareValues(cast(o1), cast(o2)));'
           },
           {
             name: 'comparePropertyToObject',
