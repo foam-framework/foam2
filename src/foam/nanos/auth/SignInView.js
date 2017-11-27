@@ -122,7 +122,7 @@ foam.CLASS({
             this.start('p').add("Don't have an account?").end()
             .start('p').style({ 'margin-left': '2px' }).addClass('link')
               .add("Sign up.")
-              .on('click', this.signUp)
+              .on('click', self.signUp)
             .end()
           })
           // .start('p').style({ 'margin-left': '150px' }).addClass('link')
