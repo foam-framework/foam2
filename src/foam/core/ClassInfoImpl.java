@@ -6,8 +6,6 @@
 
 package foam.core;
 
-import javafx.scene.chart.Axis;
-
 import java.util.*;
 
 public class ClassInfoImpl

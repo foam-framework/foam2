@@ -18,9 +18,10 @@ import foam.util.Email;
 import foam.util.LRULinkedHashMap;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-
-import javax.naming.AuthenticationException;
+import javax.security.auth.AuthPermission;
+import java.security.Permission;
 import java.util.*;
+import javax.naming.AuthenticationException;
 
 public class UserAndGroupAuthService
     extends    ContextAwareSupport
@@ -31,26 +32,28 @@ public class UserAndGroupAuthService
   protected DAO sessionDAO_;
   protected Map challengeMap; // TODO: let's store in Session Context instead
 
+  // pattern used to check if password has only alphanumeric characters
+  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
+
   @Override
   public void start() {
-    userDAO_      = (DAO) getX().get("localUserDAO");
-    groupDAO_     = (DAO) getX().get("groupDAO");
-    sessionDAO_   = (DAO) getX().get("sessionDAO");
-    challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
+    userDAO_     = (DAO) getX().get("localUserDAO");
+    groupDAO_    = (DAO) getX().get("groupDAO");
+    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    challengeMap = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
-  public User getCurrentUser(X x) {
+  public User getCurrentUser(X x) throws AuthenticationException {
     // fetch context and check if not null or user id is 0
     Session session = (Session) x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
-      // no user found
-      return null;
+      throw new AuthenticationException("User not found");
     }
 
     // get user from session id
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
-      return null;
+      throw new AuthenticationException("User not found");
     }
 
     // store user and return
@@ -180,7 +183,7 @@ public class UserAndGroupAuthService
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean check(foam.core.X x, java.security.Permission permission) {
+  public Boolean checkPermission(foam.core.X x, Permission permission) {
     if ( x == null || permission == null ) {
       return false;
     }
@@ -203,13 +206,17 @@ public class UserAndGroupAuthService
     return group.implies(permission);
   }
 
+  public Boolean check(foam.core.X x, String permission) {
+    return checkPermission(x, new AuthPermission(permission));
+  }
+
   /**
    * Given a context with a user, validate the password to be updated
    * and return a context with the updated user information
    */
   public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
     if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
-      throw new AuthenticationException("Invalid parameters");
+      throw new RuntimeException("Invalid parameters");
     }
 
     Session session = (Session) x.get(Session.class);
@@ -222,19 +229,35 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    // invalid password
-    if ( ! Password.isValid(newPassword) ) {
-      throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
+    if ( newPassword.contains(" ") ) {
+      throw new RuntimeException("Password cannot contain spaces");
+    }
+
+    int length = newPassword.length();
+    if ( length < 7 || length > 32 ) {
+      throw new RuntimeException("Password must be 7-32 characters long");
+    }
+
+    if ( newPassword.equals(newPassword.toLowerCase()) ) {
+      throw new RuntimeException("Password must have one capital letter");
+    }
+
+    if ( ! newPassword.matches(".*\\d+.*") ) {
+      throw new RuntimeException("Password must have one numeric character");
+    }
+
+    if ( alphanumeric.matcher(newPassword).matches() ) {
+      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
     }
 
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
-      throw new AuthenticationException("Old password is incorrect");
+      throw new RuntimeException("Old password is incorrect");
     }
 
     // new password is the same
     if ( Password.verify(newPassword, user.getPassword()) ) {
-      throw new AuthenticationException("New password must be different");
+      throw new RuntimeException("New password must be different");
     }
 
     // store new password in DAO and put in context
