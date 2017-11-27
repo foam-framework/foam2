@@ -33,7 +33,7 @@ public class CachedUserAndGroupAuthService
   protected Map<String, Boolean> permissionMap;
 
   @Override
-  public Boolean check(foam.core.X x, java.security.Permission permission) {
+  public Boolean checkPermission(foam.core.X x, java.security.Permission permission) {
     if ( x == null || permission == null ) return false;
 
     User user = (User) x.get("user");
