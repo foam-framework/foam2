@@ -7,7 +7,7 @@ p({"class":"foam.nanos.menu.Menu","id":"export","label":"Export Drivers","handle
 p({"class":"foam.nanos.menu.Menu","id":"groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"groupDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"languageDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"log","label":"View Logs","order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO"},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO", "summaryView": "foam.nanos.menu.TreeAltView" },"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"nspec","label":"Nano Services","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"nSpecDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"permissions","label":"Permissions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"permissionDAO"},"order":1000,"parent":"admin"})
