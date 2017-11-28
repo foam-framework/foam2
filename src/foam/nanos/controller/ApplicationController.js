@@ -11,21 +11,32 @@ foam.CLASS({
 
   arequire: function() { return foam.nanos.client.ClientBuilder.create(); },
 
+  documentation: 'FOAM Application Controller.',
+
   implements: [
     'foam.nanos.client.Client',
   ],
 
   requires: [
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView'
+    'foam.u2.stack.StackView',
+    'foam.nanos.auth.User'
   ],
 
   exports: [
     'stack',
+    'user',
+    'logo',
+    'signUpEnabled',
+    'webApp',
+    'requestLogin',
+    'loginSuccess',
     'as ctrl'
   ],
 
-  documentation: 'FOAM Application Controller.',
+  imports: [
+    'sessionSuccess'
+  ],
 
   css: `
     body {
@@ -52,13 +63,46 @@ foam.CLASS({
     {
       name: 'stack',
       factory: function() { return this.Stack.create(); }
-    }
+    },
+    {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.User',
+      name: 'user',
+      factory: function() { return this.User.create(); }
+    },
+    {
+      class: 'Boolean',
+      name: 'signUpEnabled',
+      adapt: function(v) {
+        return v === 'false' ? false : true;
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'loginSuccess',
+      value: false
+    },
+    'logo',
+    'webApp'    
   ],
 
   methods: [
     function init() {
       this.SUPER();
       var self = this;
+
+      // get current user, else show login
+      this.auth.getCurrentUser(null).then(function (result) {
+        self.loginSuccess = result ? true : false;
+        self.user.copyFrom(result);
+        return self.accountDAO.where(self.EQ(self.Account.OWNER, self.user.id)).limit(1).select();
+      })
+      .then(function (result) {
+        self.account.copyFrom(result.array[0]);
+      })
+      .catch(function (err) {
+        self.requestLogin();
+      });
 
       window.onpopstate = function(event) {
         if ( location.hash != null ) {
@@ -75,10 +119,23 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .tag({class: 'foam.nanos.menu.MenuBar'})
+        .tag({class: 'foam.u2.navigation.TopNavigation'})
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end()
+    },
+
+    function requestLogin(){
+      var self = this;
+      // don't go to log in screen if going to reset password screen
+      if ( location.hash != null && location.hash === '#reset' ) {
+        return;
+      }
+
+      return new Promise(function(resolve, reject) {
+        self.stack.push({ class: 'foam.nanos.auth.SignInView' });
+        self.loginSuccess$.sub(resolve);
+      });
     }
   ]
 });
