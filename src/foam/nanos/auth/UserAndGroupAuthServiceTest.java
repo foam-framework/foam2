@@ -133,7 +133,7 @@ public class UserAndGroupAuthServiceTest
       permissions.add(permission);
 
       AuthPermission authAdminpermission = new AuthPermission(permission.getId());
-      check(xArray.get(i), authAdminpermission);
+      checkPermission(xArray.get(i), authAdminpermission);
     }
     long endTime                = System.nanoTime();
     long durationInMilliseconds = (endTime - startTime) / 1000000;
@@ -146,7 +146,7 @@ public class UserAndGroupAuthServiceTest
 
     for ( int i = 0 ; i < xArray.size() ; i++ ) {
       AuthPermission authAdminpermission = new AuthPermission(permissions.get(i).getId());
-      check(xArray.get(i), authAdminpermission);
+      checkPermission(xArray.get(i), authAdminpermission);
     }
 
     long endTime                = System.nanoTime();
