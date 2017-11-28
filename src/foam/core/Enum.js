@@ -298,6 +298,9 @@ foam.CLASS({
   ],
 
   methods: [
+    function outputFObject(o) {
+      o.out(this.ordinal);
+    },
     function toString() { return this.name; }
   ]
 });
