@@ -9,42 +9,38 @@ foam.CLASS({
   name: 'PopupMenu',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          // align-items: center;
-          // bottom: 0;
-          // display: flex;
-          // justify-content: space-around;
-          // left: 0;
-          // position: fixed;
-          // right: 0;
-          // top: 0;
-          // z-index: 1000;
-        }
-        ^container {
-          align-items: center;
-          display: flex;
-          height: 100%;
-          justify-content: space-around;
-          position: relative;
-          width: 100%;
-        }
-        ^background {
-          bottom: 0;
-          left: 0;
-          opacity: 0.4;
-          position: absolute;
-          right: 0;
-          top: 0;
-        }
-        ^inner {
-          z-index: 3;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      // align-items: center;
+      // bottom: 0;
+      // display: flex;
+      // justify-content: space-around;
+      // left: 0;
+      // position: fixed;
+      // right: 0;
+      // top: 0;
+      // z-index: 1000;
+    }
+    ^container {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      justify-content: space-around;
+      position: relative;
+      width: 100%;
+    }
+    ^background {
+      bottom: 0;
+      left: 0;
+      opacity: 0.4;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    ^inner {
+      z-index: 3;
+    }`
+  ,
 
   properties: [
     'parent'
@@ -55,7 +51,7 @@ foam.CLASS({
       this.SUPER();
       var content;
 
-   this.addClass(this.myClass())
+      this.addClass(this.myClass())
         .start()
           .addClass(this.myClass('background'))
           .on('click', this.close)

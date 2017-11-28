@@ -61,9 +61,10 @@ class SwiftTestsTests: XCTestCase {
   }
 
   func testFObjectParse() {
-    let ps = FObjectParser().parseString("{class:'Test', prevFirstName: \"MY_PREV_NAME\"}")
+    let ps = FObjectParser().parseString("{class:'Test', prevFirstName: \"MY_PREV_NAME\",\"enumProp\":1}")
     XCTAssertTrue(ps is Test)
     XCTAssertEqual((ps as! Test).prevFirstName, "MY_PREV_NAME")
+    XCTAssertEqual((ps as! Test).enumProp, Visibility.FINAL)
   }
 
   func testToJSON() {

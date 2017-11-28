@@ -152,6 +152,8 @@ var classes = [
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.lib.json.OutputJSON',
+  'foam.lib.json.UnknownFObject',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -193,7 +195,7 @@ var proxies = [
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
   'foam.blob.BlobService',
-  'foam.nanos.http.WebAgent',  
+  'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];
