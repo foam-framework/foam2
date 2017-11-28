@@ -11,9 +11,6 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.nanos.auth.AuthService;
 
-import javax.security.auth.AuthPermission;
-import java.security.Permission;
-
 public class AuthenticatedSink
     extends ProxySink
 {
@@ -29,7 +26,7 @@ public class AuthenticatedSink
   @Override
   public void put(FObject obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    Permission permission = new AuthPermission(prefix_ + obj.getProperty("id"));
+    String permission = prefix_ + obj.getProperty("id");
     if ( authService.check(getX(), permission) ) {
       super.put(obj, sub);
     }
@@ -38,7 +35,7 @@ public class AuthenticatedSink
   @Override
   public void remove(FObject obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    Permission permission = new AuthPermission(prefix_ + obj.getProperty("id"));
+    String permission = prefix_ + obj.getProperty("id");
     if ( authService.check(getX(), permission) ) {
       super.remove(obj, sub);
     }

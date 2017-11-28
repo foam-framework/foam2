@@ -14,14 +14,13 @@ import foam.dao.ProxyDAO;
 import foam.lib.json.JSONParser;
 import foam.nanos.auth.Address;
 import foam.util.SafetyUtil;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class GoogleMapsGeocodingDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   public static String API_HOST = "https://maps.googleapis.com/maps/api/geocode/json?address=";
 
