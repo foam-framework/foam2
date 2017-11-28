@@ -39,13 +39,13 @@ public class PropertyReferenceParser extends ProxyParser {
                       new Whitespace(),
                       new Literal("}")));
   }
-                   
+
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
 
     if ( ps != null ) {
-      String forClass = (String)x.get("forClass_");
-      String classId = forClass.substring(0, forClass.lastIndexOf("."));
+      String forClass = (String) x.get("forClass_");
+      String classId  = forClass.substring(0, forClass.lastIndexOf("."));
       String propName = forClass.substring(forClass.lastIndexOf(".") + 1);
 
       Class cls;
@@ -60,12 +60,18 @@ public class PropertyReferenceParser extends ProxyParser {
 
       ClassInfo info;
       try {
-        info = (ClassInfo)cls.getMethod("getOwnClassInfo").invoke(null);
+        info = (ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null);
       } catch(Exception e) {
         throw new RuntimeException(e);
       }
 
-      return ps.setValue(info.getAxiomByName(propName));
+      Object axiom = info.getAxiomByName(propName);
+
+      if ( axiom == null ) {
+        System.err.println("Unknown Property Reference: " + classId + "." + propName);
+      }
+
+      return ps.setValue(axiom);
     }
 
     return ps;

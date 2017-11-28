@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Courier.ttc">
+            <string>Courier</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="TestDetailView" customModule="SwiftTests" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="419" height="106"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="FirstName" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uCJ-nA-3un">
+                    <rect key="frame" x="0.0" y="0.0" width="92" height="17"/>
+                    <fontDescription key="fontDescription" name="Courier" family="Courier" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LastName" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8cn-ZX-yKm">
+                    <rect key="frame" x="0.0" y="91.5" width="63" height="14.5"/>
+                    <fontDescription key="fontDescription" type="system" weight="black" pointSize="12"/>
+                    <color key="textColor" red="0.035294117649999998" green="0.12549019610000001" blue="0.52549019610000003" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ExprProp" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="txK-vA-dhC">
+                    <rect key="frame" x="342" y="42" width="77" height="23"/>
+                    <fontDescription key="fontDescription" type="system" weight="ultraLight" pointSize="19"/>
+                    <color key="textColor" red="1" green="0.034090141481453839" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="8cn-ZX-yKm" secondAttribute="bottom" id="AYy-z8-Zp1"/>
+                <constraint firstItem="uCJ-nA-3un" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Zxh-kb-Gkz"/>
+                <constraint firstItem="8cn-ZX-yKm" firstAttribute="top" relation="greaterThanOrEqual" secondItem="uCJ-nA-3un" secondAttribute="bottom" id="dea-Em-1pp"/>
+                <constraint firstItem="txK-vA-dhC" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="drI-yg-iAr"/>
+                <constraint firstItem="txK-vA-dhC" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="gME-EN-NoD"/>
+                <constraint firstItem="uCJ-nA-3un" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="psx-0I-nuf"/>
+                <constraint firstItem="8cn-ZX-yKm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="yvT-xP-1Wu"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="Test_exprProp" destination="txK-vA-dhC" id="Mrm-U9-tmH"/>
+                <outlet property="Test_firstName" destination="uCJ-nA-3un" id="QPp-dK-XUw"/>
+                <outlet property="Test_lastName" destination="8cn-ZX-yKm" id="d4D-9c-62n"/>
+            </connections>
+            <point key="canvasLocation" x="55.5" y="213"/>
+        </view>
+    </objects>
+</document>

@@ -5,7 +5,10 @@
  */
 
 var classes = [
+  'foam.core.Axiom',
   'foam.core.Serializable',
+  'foam.core.Exception',
+  'foam.core.ContextAgent',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -18,14 +21,18 @@ var classes = [
   'foam.mlang.predicate.Binary',
   'foam.mlang.predicate.ArrayBinary',
   'foam.mlang.predicate.Contains',
+  'foam.mlang.predicate.ContainsIC',
+  'foam.mlang.predicate.StartsWith',
   'foam.mlang.predicate.StartsWithIC',
   'foam.mlang.predicate.Gt',
   'foam.mlang.predicate.Gte',
   'foam.mlang.predicate.Neq',
+  'foam.mlang.predicate.Not',
   'foam.mlang.predicate.Lt',
   'foam.mlang.predicate.In',
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
+  'foam.mlang.predicate.Keyword',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
@@ -33,6 +40,7 @@ var classes = [
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
+  'foam.mlang.ArrayConstant',
   'foam.box.Box',
   'foam.box.Skeleton',
   'foam.box.ProxyBox',
@@ -45,6 +53,7 @@ var classes = [
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
+  'foam.nanos.http.WebAgent',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
@@ -62,6 +71,8 @@ var classes = [
   'foam.box.ReturnBox',
   'foam.box.BoxService',
   'foam.box.CheckAuthenticationBox',
+  'foam.box.SessionReplyBox',
+  'foam.box.SessionClientBox',
   'foam.dao.DAO',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
@@ -81,6 +92,7 @@ var classes = [
   'foam.dao.RelationshipDAO',
   'foam.dao.ManyToManyRelationshipDAO',
   'foam.dao.RelationshipPropertyValue',
+  'foam.dao.SQLStatement',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -96,11 +108,16 @@ var classes = [
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
+  'foam.nanos.auth.DayOfWeek',
+  'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
+  'foam.nanos.auth.Phone',
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
-  'foam.nanos.auth.WebAuthService',
+  'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.twofactor.authy.AuthyService',
+  'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
@@ -115,6 +132,13 @@ var classes = [
   'foam.nanos.menu.SubMenuView',
   'foam.nanos.menu.TabsMenu',
   'foam.nanos.menu.ViewMenu',
+  'foam.nanos.notification.email.EmailMessage',
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.email.EmailTemplate',
+  'foam.nanos.notification.email.SMTPEmailService',
+  'foam.nanos.notification.email.ClientEmailService',
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -127,7 +151,24 @@ var classes = [
   'foam.dao.pg.ConnectionPool',
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
-  'foam.lib.parse.PStream'
+  'foam.lib.parse.PStream',
+  'foam.lib.json.OutputJSON',
+  'foam.lib.json.UnknownFObject',
+  'foam.blob.Buffer',
+  'foam.blob.Blob',
+  'foam.blob.BlobService',
+  'foam.blob.AbstractBlob',
+  'foam.blob.AbstractBlobService',
+  'foam.blob.SubBlob',
+  'foam.blob.IdentifiedBlob',
+  'foam.blob.BlobStore',
+
+  'foam.nanos.geocode.GoogleMapsAddressComponent',
+  'foam.nanos.geocode.GoogleMapsCoordinates',
+  'foam.nanos.geocode.GoogleMapsGeocodeResponse',
+  'foam.nanos.geocode.GoogleMapsGeocodeResult',
+  'foam.nanos.geocode.GoogleMapsGeometry',
+  'foam.nanos.geocode.GoogleMapsBoundary'
 ];
 
 var abstractClasses = [
@@ -140,7 +181,9 @@ var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
-  'foam.nanos.auth.WebAuthService'
+  'foam.nanos.auth.AuthService',
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.push.PushService'
 ];
 
 var proxies = [
@@ -149,7 +192,12 @@ var proxies = [
   'com.google.foam.demos.appengine.TestService',
   'foam.mop.MOP',
   'foam.lib.parse.Parser',
-  'foam.lib.parse.PStream'
+  'foam.lib.parse.PStream',
+  'foam.blob.Blob',
+  'foam.blob.BlobService',
+  'foam.nanos.http.WebAgent',
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.push.PushService'
 ];
 
 module.exports = {

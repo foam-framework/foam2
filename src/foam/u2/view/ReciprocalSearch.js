@@ -22,16 +22,31 @@ foam.CLASS({
     'as data'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^count {
-          font-size: 14pt;
-          color: #555;
-        }
-      */}
-    })
-  ],
+  // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
+  css: `
+    ^ {
+      min-width: 180px;
+      padding-right: 28px;
+      font-size: large;
+    }
+
+    ^ input {
+      font-size: large;
+    }
+
+    ^count {
+      font-size: 14pt;
+      color: #555;
+    }
+
+    ^ .net-nanopay-ui-ActionView-clear {
+      background: #59aadd;
+      color: white;
+      margin-top: 14px;
+      padding: 12px;
+      width: auto;
+    }
+  `,
 
   properties: [
     {
@@ -50,10 +65,18 @@ foam.CLASS({
 
         if ( ! of ) return [];
 
-        return of.model_.searchColumns || of.model_.tableColumns ||
-            of.getAxiomsByClass(foam.core.Property)
-                .filter(function(p) { return ! p.hidden })
-                .map(foam.core.Property.NAME.f);
+        if ( of.model_.searchColumns )
+          return of.model_.searchColumns;
+
+        if ( of.model_.tableColumns )
+          return of.model_.tableColumns.filter(function(c) {
+            var axiom = of.getAxiomByName(c);
+            return axiom && axiom.searchView;
+          });
+
+        return of.getAxiomsByClass(foam.core.Property)
+            .filter(function(p) { return p.searchView && ! p.hidden })
+            .map(foam.core.Property.NAME.f);
       }
     },
     {
@@ -74,6 +97,7 @@ foam.CLASS({
       this.updateTotalCount();
 
       this.
+        addClass(self.myClass()).
         add(this.slot(function(filters) {
           self.show(filters.length);
 
@@ -121,7 +145,7 @@ foam.CLASS({
           .entity('nbsp')
           .add('selected')
         .end()
-        .start(this.CLEAR).style({float: 'right'}).end();
+        .tag(this.CLEAR);
     },
 
     function addFilter(key) {

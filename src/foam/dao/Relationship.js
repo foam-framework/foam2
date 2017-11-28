@@ -162,9 +162,13 @@ foam.CLASS({
       var source        = this.lookup(sourceModel);
       var target        = this.lookup(targetModel);
       var junction      = this.lookup(junctionModel, true);
+      var sourceDAOKey  = this.sourceDAOKey;
+      var targetDAOKey  = this.targetDAOKey;
 
-      var sourceDAOKey   = this.sourceDAOKey;
-      var targetDAOKey   = this.targetDAOKey;
+      // Add Relationship to axioms lists for each model, for reference
+      source.axiomMap_[this.id] = this;
+      // Could be related to itself, so avoid adding twice
+      if ( source !== target ) target.axiomMap_[this.id] = this;
 
       if ( cardinality === '1:*' ) {
         if ( ! sourceProps.length ) {
@@ -173,6 +177,7 @@ foam.CLASS({
               name: forwardName,
               cloneProperty: function(value, map) {},
               transient: true,
+              tableCellFormatter: null,
               expression: function(id) {
                 return foam.dao.RelationshipDAO.create({
                   obj: this,
@@ -218,6 +223,7 @@ foam.CLASS({
               name: forwardName,
               cloneProperty: function(value, map) {},
               transient: true,
+              tableCellFormatter: null,
               expression: function(id) {
                 return  foam.dao.RelationshipPropertyValue.create({
                   sourceId: id,
@@ -248,6 +254,7 @@ foam.CLASS({
               name: inverseName,
               cloneProperty: function(value, map) {},
               transient: true,
+              tableCellFormatter: null,
               expression: function(id) {
                 return  foam.dao.RelationshipPropertyValue.create({
                   targetId: id,

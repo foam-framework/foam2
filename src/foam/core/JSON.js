@@ -21,7 +21,6 @@
 // TODO:
 //   - don't output default classes
 */
-
 foam.CLASS({
   refines: 'foam.core.Property',
 
@@ -40,7 +39,11 @@ foam.CLASS({
 
   methods: [
     function outputJSON(o) {
-      o.output({ class: '__Property__', forClass_: this.forClass_ });
+      if ( o.passPropertiesByReference ) {
+        o.output({ class: '__Property__', forClass_: this.forClass_ });
+      } else {
+        o.outputFObject_(this);
+      }
     }
   ]
 });
@@ -126,6 +129,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'passPropertiesByReference',
+      help: 'If true, Property objects are passed as __Property__ references rather than by value.',
+      value: true
+    },
+    {
+      class: 'Boolean',
       name: 'formatDatesAsNumbers',
       value: false
     },
@@ -163,6 +172,11 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'sortObjectKeys',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'convertUnserializableToStubs',
       value: false
     },
     {
@@ -287,6 +301,9 @@ foam.CLASS({
       if ( this.outputOwnPropertiesOnly && ! o.hasOwnProperty(p.name) )
         return false;
 
+      if ( foam.Array.isInstance(v) && v.length == 0 )
+        return false;
+
       if ( includeComma ) this.out(',');
 
       this.nl().indent().outputPropertyName(p).out(':', this.postColonStr);
@@ -308,6 +325,37 @@ foam.CLASS({
       } else {
         this.out(o.toString());
       }
+    },
+
+    function outputFObject(o, opt_cls) {
+      if ( o.outputJSON ) {
+        o.outputJSON(this);
+      } else {
+        this.outputFObject_(o, opt_cls);
+      }
+    },
+
+    function outputFObject_(o, opt_cls) {
+      /** Output an FObject without checking if it implements outputJSON. **/
+      this.start('{');
+      var cls = this.getCls(opt_cls);
+      var outputClassName = this.outputClassNames && o.cls_ !== cls;
+      if ( outputClassName ) {
+        this.out(
+          this.maybeEscapeKey('class'),
+          ':',
+          this.postColonStr,
+          '"',
+          o.cls_.id,
+          '"');
+      }
+      var ps = o.cls_.getAxiomsByClass(foam.core.Property);
+      var outputComma = outputClassName;
+      for ( var i = 0 ; i < ps.length ; i++ ) {
+        outputComma = this.outputProperty(o, ps[i], outputComma) ||
+          outputComma;
+      }
+      this.end('}');
     },
 
     function outputObjectKeyValue_(key, value, first) {
@@ -348,32 +396,7 @@ foam.CLASS({
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
         Function:  function(o) { this.outputFunction(o); },
-        FObject: function(o, opt_cls) {
-          if ( o.outputJSON ) {
-            o.outputJSON(this);
-            return;
-          }
-
-          this.start('{');
-          var cls = this.getCls(opt_cls);
-          var outputClassName = this.outputClassNames && o.cls_ !== cls;
-          if ( outputClassName ) {
-            this.out(
-                this.maybeEscapeKey('class'),
-                ':',
-                this.postColonStr,
-                '"',
-                o.cls_.id,
-                '"');
-          }
-          var ps = o.cls_.getAxiomsByClass(foam.core.Property);
-          var outputComma = outputClassName;
-          for ( var i = 0 ; i < ps.length ; i++ ) {
-            outputComma = this.outputProperty(o, ps[i], outputComma) ||
-                outputComma;
-          }
-          this.nl().end('}');
-        },
+        FObject: function(o, opt_cls) { this.outputFObject(o, opt_cls); },
         Array: function(o, opt_cls) {
           this.start('[');
           var cls = this.getCls(opt_cls);
@@ -401,6 +424,10 @@ foam.CLASS({
     },
 
     function stringify(o, opt_cls) {
+      // Focibly set this.buf_ to empty string.
+      // It can be non-empty if a previous serialized threw an exception and didn't complete.
+      this.buf_ = "";
+
       this.output(o, opt_cls);
       var ret = this.buf_;
       this.reset(); // reset to avoid retaining garbage
@@ -487,15 +514,19 @@ foam.CLASS({
 
   methods: [
     function parseString(str, opt_ctx) {
+      return this.parseClassFromString(str, null, opt_ctx);
+    },
+    function parseClassFromString(str, opt_cls, opt_ctx) {
       return this.strict ?
           // JSON.parse() is faster; use it when data format allows.
-          foam.json.parse(JSON.parse(str), null,
+          foam.json.parse(JSON.parse(str), opt_cls,
                           opt_ctx || this.creationContext) :
           // Create new parser iff different context was injected; otherwise
           // use same parser bound to "creationContext" each time.
           opt_ctx ? foam.parsers.FON.create({
-            creationContext: opt_ctx
-          }).parseString(str) : this.fonParser_.parseString(str);
+            creationContext: opt_ctx || this.creationContext
+          }).parseClassFromString(str, opt_cls) :
+          this.fonParser_.parseClassFromString(str, opt_cls);
     }
   ]
 });
@@ -551,7 +582,9 @@ foam.LIB({
       // TODO: No deserialization support for shortnames yet.
       //      useShortNames: true,
       useShortNames: false,
-      strict: false,
+      // TODO: Currently faster to use strict JSON and native JSON.parse
+      strict: true,
+      convertUnserializableToStubs: true,
       propertyPredicate: function(o, p) { return ! p.networkTransient; }
     }),
 

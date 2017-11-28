@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'RemoteException',
+  implements: ['foam.core.Exception'],
   properties: [
     {
       class: 'String',
@@ -15,6 +16,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      javaReturns: 'String',
+      javaCode: 'return getMessage();'
     }
   ]
 });

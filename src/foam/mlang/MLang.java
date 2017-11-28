@@ -21,7 +21,9 @@ public class MLang
   public static final Predicate FALSE = new False();
 
   public static Expr prepare(Object o) {
-    return o instanceof Expr ? (Expr) o : new Constant(o);
+    return o instanceof Expr ? (Expr) o :
+        o instanceof Object[] ? new ArrayConstant((Object[]) o) :
+        new Constant(o);
   }
 
   public static Predicate LT(Object o1, Object o2) {
@@ -63,7 +65,11 @@ public class MLang
   public static Sink MIN(Object o1) {
     return new Min(0, MLang.prepare(o1));
   }
-  
+
+  public static Sink SUM(Object o1) {
+    return new Sum(MLang.prepare(o1), 0.0);
+  }
+
   public static Sink MAP(Object o1, foam.dao.Sink delegate) {
     return new Map(MLang.prepare(o1), delegate);
   }

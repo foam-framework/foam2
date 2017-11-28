@@ -21,7 +21,8 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   requires: [
-    'foam.dao.ProxyListener'
+    'foam.dao.NullDAO',
+    'foam.dao.ProxyListener',
   ],
 
   documentation: 'Proxy implementation for the DAO interface.',
@@ -33,16 +34,24 @@ foam.CLASS({
       name: 'delegate',
       forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      factory: function() { return foam.dao.NullDAO.create() },
+      factory: function() { return this.NullDAO.create() },
       postSet: function(old, nu) {
         if ( old ) this.on.reset.pub();
-      }
+      },
+      swiftFactory: 'return NullDAO_create()',
+      swiftPostSet: `
+if let oldValue = oldValue as? AbstractDAO {
+  _ = oldValue.on["reset"].pub()
+}
+      `,
     },
     {
       name: 'of',
       factory: function() {
         return this.delegate.of;
-      }
+      },
+      swiftExpressionArgs: ['delegate$of'],
+      swiftExpression: 'return delegate$of as! ClassInfo',
     }
   ],
 
@@ -65,6 +74,16 @@ foam.CLASS({
 
         return listener;
       },
+      swiftCode: `
+let listener = ProxyListener_create([
+  "delegate": sink,
+  "args": [ predicate ]
+])
+
+listener.onDetach(listener.dao$.follow(delegate$))
+
+return listener
+      `,
       javaCode: `
 // TODO: Support changing of delegate
 getDelegate().listen_(x, sink, predicate);
@@ -82,12 +101,18 @@ foam.CLASS({
 
   properties: [
     'args',
-    'delegate',
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Sink',
+      name: 'delegate',
+    },
     {
       name: 'innerSub',
+      swiftType: 'Detachable?',
       postSet: function(_, s) {
         if (s) this.onDetach(s);
-      }
+      },
+      swiftPostSet: 'if let s = newValue { onDetach(s) }',
     },
     {
       name: 'dao',
@@ -95,22 +120,46 @@ foam.CLASS({
         this.innerSub && this.innerSub.detach();
         this.innerSub = nu && nu.listen.apply(nu, [this].concat(this.args));
         if ( old ) this.reset();
-      }
+      },
+      swiftType: 'DAO?',
+      swiftPostSet: `
+self.innerSub?.detach()
+try? self.innerSub = newValue?.listen(self, args as? FoamPredicate)
+if oldValue != nil {
+  self.reset(Subscription(detach: {}))
+}
+      `
     }
   ],
 
   methods: [
-    function put(obj, s) {
-      this.delegate.put(obj, this);
+    {
+      name: 'put',
+      code: function put(obj, s) {
+        this.delegate.put(obj, this);
+      },
+      swiftCode: 'delegate.put(obj, self)',
     },
 
-    function remove(obj, s) {
-      this.delegate.remove(obj, this);
+    function outputJSON(outputter) {
+      outputter.output(this.delegate);
     },
 
-    function reset(s) {
-      this.delegate.reset(this);
-    }
+    {
+      name: 'remove',
+      code: function remove(obj, s) {
+        this.delegate.remove(obj, this);
+      },
+      swiftCode: 'delegate.remove(obj, self)',
+    },
+
+    {
+      name: 'reset',
+      code: function reset(s) {
+        this.delegate.reset(this);
+      },
+      swiftCode: 'delegate.reset(self)',
+    },
   ]
 });
 
@@ -142,6 +191,7 @@ foam.CLASS({
   properties: [
     {
       class: 'List',
+      swiftType: '[FObject]',
       name: 'array',
       adapt: function(old, nu) {
         if ( ! this.of ) return nu;
@@ -157,8 +207,7 @@ foam.CLASS({
     },
     {
       class: 'Class',
-      name: 'of',
-      value: null
+      name: 'of'
     },
     {
       name: 'a',
@@ -184,7 +233,9 @@ foam.CLASS({
         else
           this.array.push(cls.create(o, this.__subContext__));
       },
-      javaCode: `getArray().add(obj);`
+      swiftCode: 'array.append(obj)',
+      javaCode: 'if ( getArray() == null ) setArray(new java.util.ArrayList());\n'
+                +`getArray().add(obj);`
     },
     function outputJSON(outputter) {
       outputter.start('{');

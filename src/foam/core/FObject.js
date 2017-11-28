@@ -113,6 +113,8 @@ foam.LIB({
     },
 
     function installAxioms(axs) {
+      if ( ! axs || ! axs.length ) return;
+
       /**
        * Install Axioms into the class and prototype.
        * Invalidate the axiom-cache, used by getAxiomsByName().
@@ -130,6 +132,12 @@ foam.LIB({
       var existing = new Array(axs.length);
 
       for ( var i = 0 ; i < axs.length ; i++ ) {
+      // Convert JSON axioms to real instances as late as possible
+        if ( foam.String.isInstance(axs[i].class) ) {
+          var axsCls = foam.lookup(axs[i].class, true);
+          if ( axsCls ) axs[i] = axsCls.create(axs[i]);
+        }
+
         var a = axs[i];
 
         // Store the destination class in the Axiom. Used by describe().
@@ -330,9 +338,11 @@ foam.LIB({
            The long-form will support many options (many of which are defined
            in Method.js), but only 'name' and 'code' are mandatory.
        */
+
       if ( m.methods ) {
         for ( var i = 0 ; i < m.methods.length ; i++ ) {
           var a = m.methods[i];
+
           if ( foam.Function.isInstance(a) ) {
             var name = foam.Function.getName(a);
             m.methods[i] = a = { name: name, code: a };

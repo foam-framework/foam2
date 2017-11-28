@@ -33,8 +33,11 @@ foam.CLASS({
   requires: [
     'foam.box.Context',
     'foam.box.HTTPBox',
+    'foam.box.SessionClientBox',
     'foam.box.SocketBox',
     'foam.box.WebSocketBox',
+    'foam.box.TimeoutBox',
+    'foam.box.RetryBox',
     'foam.dao.CachingDAO',
     'foam.dao.CompoundDAODecorator',
     'foam.dao.ContextualizingDAO',
@@ -203,9 +206,13 @@ foam.CLASS({
       /** Destination address for server. */
       name: 'serverBox',
       factory: function() {
-        return this.remoteListenerSupport ?
-            this.WebSocketBox.create({of: this.model, uri: this.serviceName}) :
-            this.HTTPBox.create({of: this.model, url: this.serviceName}) ;
+        // TODO: This should come from the server via a lookup from a NamedBox.
+        return this.SessionClientBox.create({ delegate: this.RetryBox.create({ delegate:
+          this.TimeoutBox.create({ delegate:
+          this.remoteListenerSupport ?
+              this.WebSocketBox.create({ uri: this.serviceName }) :
+              this.HTTPBox.create({ url: this.serviceName })
+        })})});
       }
     },
     {
@@ -281,7 +288,7 @@ foam.CLASS({
 //           });
 //         }
         if ( this.cache ) {
-          this.mdao = this.MDAO.create(params);
+          this.mdao = this.MDAO.create({of: params.of});
           dao = this.CachingDAO.create({
             cache: this.dedup ?
               this.mdao :

@@ -39,25 +39,10 @@
       },
     },
     {
-      name: 'scrollView',
-      factory: function() {
-        var self = this;
-        return this.ScrollCView.create({
-          value$: this.skip$,
-          extent$: this.limit$,
-          height: 40*18+48, // TODO use window height.
-          width: 22,
-          handleSize: 40
-          // TODO clicking away from scroller should deselect it.
-        });
-      },
+      class: 'Int',
+      name: 'daoCount'
     },
-    {
-      name: 'tableView',
-      factory: function() {
-        return this.TableView.create({data$: this.scrolledDao$});
-      },
-    },
+    'mouseEvent'
   ],
 
   methods: [
@@ -71,8 +56,24 @@
       this.start('table').
         on('wheel', this.onWheel).
         start('tr').
-          start('td').style({ 'vertical-align': 'top' }).add(this.tableView).end().
-          start('td').style({ 'vertical-align': 'top' }).add(this.scrollView).end().
+          start('td').
+            style({ 'vertical-align': 'top' }).
+            start(this.TableView, {data$: this.scrolledDao$}).
+            end().
+          end().
+          start('td').style({ 'vertical-align': 'top' }).
+            add(this.ScrollCView.create({
+              value$: this.skip$,
+              extent$: this.limit$,
+              height: 40*18+41, // TODO use window height.
+              width: 22,
+              handleSize: 40,
+              size$: this.daoCount$,
+              mouseEvent$: this.mouseEvent$
+              // TODO clicking away from scroller should deselect it.
+            })).
+            on('mousedown', this.scrollBar).
+          end().
         end().
       end();
     }
@@ -96,9 +97,27 @@
       code: function() {
         var self = this;
         this.data$proxy.select(this.Count.create()).then(function(s) {
-          self.scrollView.size = s.value;
+          self.daoCount = s.value;
         })
       },
     },
+    {
+      name: 'scrollBar',
+      code: function(e) {
+        var self = this;
+        function onMouseMove(e) {
+          // update mouseEvent with DOM Mouse Event
+          self.mouseEvent = e;
+        }
+        function onMouseUp(e) {
+          // remove event listeners when the user releases the mouse click
+          global.window.removeEventListener('mousemove', onMouseMove);
+          global.window.removeEventListener('mouseup', onMouseUp);
+        }
+        // add event listeners to the scrollBar when the user holds down the mouse
+        global.window.addEventListener('mousemove', onMouseMove);
+        global.window.addEventListener('mouseup', onMouseUp);
+      }
+    }
   ]
 });

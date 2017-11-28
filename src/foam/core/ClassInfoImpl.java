@@ -6,13 +6,10 @@
 
 package foam.core;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class ClassInfoImpl
-  implements ClassInfo
+    implements ClassInfo
 {
   private List      axioms;
   private String    id;
@@ -56,7 +53,7 @@ public class ClassInfoImpl
         parent_ = (ClassInfo)m.invoke(null);
       } catch (NoSuchMethodException e) {
         parent_ = new EmptyClassInfo();
-      } catch (Exception e) {
+      } catch (java.lang.Exception e) {
         throw new RuntimeException(e);
       }
     }
@@ -83,7 +80,29 @@ public class ClassInfoImpl
 
   public List getAxioms() {
     if ( allAxioms_ == null ) {
-      allAxioms_ = new ArrayList();
+      allAxioms_ = new ArrayList() {
+        HashSet<String> keys = new HashSet<>();
+
+        @Override
+        public boolean add(Object o) {
+          if ( ! (o instanceof Axiom) ) {
+            return super.add(o);
+          }
+          if ( keys.add(((Axiom) o).getName()) ) {
+            return super.add(o);
+          }
+          return false;
+        }
+
+        @Override
+        public boolean addAll(Collection c) {
+          for ( Object o : c ) {
+            this.add(o);
+          }
+          return true;
+        }
+      };
+
       allAxioms_.addAll(axioms);
       allAxioms_.addAll(getParent().getAxioms());
     }
@@ -93,28 +112,46 @@ public class ClassInfoImpl
 
   public Object getAxiomByName(String name) {
     Object ret = axiomsByName_.get(name);
-
     if ( ret == null ) {
       ret = getParent().getAxiomByName(name);
     }
-
     return ret;
   }
 
-  public List getAxiomsByClass(Class cls) {
+  public List getAxiomsByClass(final Class cls) {
     if ( axiomMap_.containsKey(cls) ) {
-      return (List)axiomMap_.get(cls);
+      return (List) axiomMap_.get(cls);
     }
 
-    ArrayList ret = new ArrayList();
-    for ( Iterator i = axioms.iterator() ; i.hasNext() ; ) {
-      Object axiom = i.next();
-      if ( cls.isInstance(axiom) ) ret.add(axiom);
-    }
+    ArrayList ret = new ArrayList() {
+      HashSet<String> keys = new HashSet<>();
 
+      @Override
+      public boolean add(Object o) {
+        if ( ! cls.isInstance(o) ) {
+          return false;
+        }
+        if ( ! (o instanceof Axiom) ) {
+          return super.add(o);
+        }
+        if ( keys.add(((Axiom) o).getName()) ) {
+          return super.add(o);
+        }
+        return false;
+      }
+
+      @Override
+      public boolean addAll(Collection c) {
+        for ( Object o : c ) {
+          this.add(o);
+        }
+        return true;
+      }
+    };
+
+    ret.addAll(axioms);
     ret.addAll(getParent().getAxiomsByClass(cls));
     axiomMap_.put(cls, ret);
-
     return ret;
   }
 }

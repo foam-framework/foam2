@@ -7,8 +7,8 @@
 package foam.nanos.audit;
 
 import foam.core.FObject;
-import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.core.X;
 import foam.dao.ProxyDAO;
 import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
@@ -60,11 +60,10 @@ public class AuditDAO
   public FObject remove_(X x, FObject obj) {
     User          user     = (User) x.get("user");
     Logger        logger   = (Logger) x.get("logger");
-    StringBuilder sb       = new StringBuilder();
     Object        objectId = obj.getProperty("id");
 
-    outputter.output(sb, obj);
-    logger.info("REMOVE", objectId, user.getId(), sb);
+    outputter.output(obj);
+    logger.info("REMOVE", objectId, user.getId(), outputter.toString());
 
     return super.remove_(x, obj);
   }

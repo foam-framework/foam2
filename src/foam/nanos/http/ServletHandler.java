@@ -32,8 +32,8 @@ public class ServletHandler
     final ServletInputStream    is;
     final Map<String, Object>   attributes = new HashMap<>();
 
-    RequestWrapper(HttpServletRequest request, HttpExchange ex, Map<String, String[]> postData, ServletInputStream is) {
-      super(request);
+    RequestWrapper(HttpExchange ex, Map<String, String[]> postData, ServletInputStream is) {
+      super(createUnimplementAdapter(HttpServletRequest.class));
 
       this.ex       = ex;
       this.postData = postData;
@@ -129,6 +129,21 @@ public class ServletHandler
     public Enumeration<String> getParameterNames() {
       return new Vector<String>(postData.keySet()).elements();
     }
+
+    @Override
+    public String getRemoteHost() {
+      return ex.getRemoteAddress().getHostName();
+    }
+
+    @Override
+    public int getContentLength() {
+      return Integer.parseInt(getHeader("Content-Length"), 10);
+    }
+
+    @Override
+    public long getContentLengthLong() {
+      return Long.parseLong(getHeader("Content-Length"), 10);
+    }
   }
 
   protected final class ResponseWrapper extends HttpServletResponseWrapper {
@@ -160,8 +175,8 @@ public class ServletHandler
     protected final PrintWriter  printWriter;
     protected       int          status = HttpServletResponse.SC_OK;
 
-    protected ResponseWrapper(HttpServletResponse response, HttpExchange ex) {
-      super(response);
+    protected ResponseWrapper(HttpExchange ex) {
+      super(createUnimplementAdapter(HttpServletResponse.class));
 
       this.ex = ex;
       printWriter = new PrintWriter(servletOutputStream);
@@ -299,8 +314,8 @@ public class ServletHandler
 
     final Map<String, String[]> postData = parsePostData;
 
-    RequestWrapper  req  = new RequestWrapper(createUnimplementAdapter(HttpServletRequest.class), ex, postData, is);
-    ResponseWrapper resp = new ResponseWrapper(createUnimplementAdapter(HttpServletResponse.class), ex);
+    RequestWrapper  req  = new RequestWrapper(ex, postData, is);
+    ResponseWrapper resp = new ResponseWrapper(ex);
 
     try {
       servlet_.service(req, resp);

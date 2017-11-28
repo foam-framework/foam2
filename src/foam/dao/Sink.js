@@ -26,31 +26,44 @@ foam.INTERFACE({
       name: 'put',
       returns: '',
       args: [
-        'obj',
-        'sub'
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        },
+        {
+          name: 'sub',
+          swiftType: 'Detachable',
+        },
       ],
-      code: function() {}
     },
     {
       name: 'remove',
       returns: '',
       args: [
-        'obj',
-        'sub'
+        {
+          name: 'obj',
+          swiftType: 'FObject'
+        },
+        {
+          name: 'sub',
+          swiftType: 'Detachable',
+        },
       ],
-      code: function() {}
     },
     {
       name: 'eof',
       returns: '',
       args: [],
-      code: function() {}
     },
     {
       name: 'reset',
       returns: '',
-      args: [ 'sub' ],
-      code: function() {}
+      args: [
+        {
+          name: 'sub',
+          swiftType: 'Detachable',
+        },
+      ],
     }
   ]
 });
@@ -84,22 +97,27 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'remove',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'eof',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'reset',
-      code: function() {}
+      code: function() {},
+      swiftCode: '// NOOP',
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -116,20 +134,30 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'ResetListener',
   extends: 'foam.dao.ProxySink',
   documentation: 'Turns all sink events into a reset event.',
   methods: [
-    function put(_, sub) {
-      this.reset(sub);
+    {
+      name: 'put',
+      code: function put(_, sub) {
+        this.reset(sub);
+      },
+      swiftCode: 'reset(sub)',
     },
-    function remove(_, sub) {
-      this.reset(sub);
-    }
+    {
+      name: 'remove',
+      code: function remove(_, sub) {
+        this.reset(sub);
+      },
+      swiftCode: 'reset(sub)',
+    },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
@@ -166,6 +194,7 @@ foam.CLASS({
       value: 0
     }
   ],
+
   methods: [
     function sub(l) {
       return arguments.length === 1 ?
@@ -206,12 +235,18 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'QuickSink',
-
   extends: 'foam.dao.AbstractSink',
 
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
   properties: [
     {
       class: 'Function',
@@ -256,6 +291,13 @@ foam.CLASS({
   name: 'AnonymousSink',
   implements: [ 'foam.dao.Sink' ],
 
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
+
   properties: [ 'sink' ],
 
   methods: [
@@ -289,6 +331,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.predicate.Predicate',
+      required: true,
       name: 'predicate'
     }
   ],
@@ -298,13 +341,15 @@ foam.CLASS({
       name: 'put',
       code: function put(obj, sub) {
         if ( this.predicate.f(obj) ) this.delegate.put(obj, sub);
-      }
+      },
+      swiftCode: 'if predicate.f(obj) { delegate.put(obj, sub) }'
     },
     {
       name: 'remove',
       code: function remove(obj, sub) {
         if ( this.predicate.f(obj) ) this.delegate.remove(obj, sub);
-      }
+      },
+      swiftCode: 'if predicate.f(obj) { delegate.remove(obj, sub) }'
     }
   ]
 });
@@ -336,7 +381,13 @@ foam.CLASS({
         } else {
           this.delegate.put(obj, sub);
         }
-      }
+      },
+      swiftCode: function() {/*
+count += 1
+if count <= limit {
+  delegate.put(obj, sub)
+}
+      */}
     },
     {
       name: 'remove',
@@ -346,7 +397,13 @@ foam.CLASS({
         } else {
           this.delegate.remove(obj, sub);
         }
-      }
+      },
+      swiftCode: function() {/*
+count += 1
+if count <= limit {
+  delegate.remove(obj, sub)
+}
+      */}
     }
   ]
 });
@@ -379,20 +436,38 @@ foam.CLASS({
         }
 
         this.delegate.put(obj, sub);
-      }
+      },
+      swiftCode: function() {/*
+if count < skip {
+  count += 1
+  return
+}
+delegate.put(obj, sub)
+      */}
     },
     {
       name: 'remove',
       code: function remove(obj, sub) {
         this.reset(sub);
-      }
+      },
+      swiftCode: function() {/*
+if count < skip {
+  count += 1
+  return
+}
+delegate.remove(obj, sub)
+      */}
     },
     {
       name: 'reset',
       code: function(sub) {
         this.count = 0;
         this.delegate.reset(sub);
-      }
+      },
+      swiftCode: function() {/*
+count = 0;
+delegate.reset(sub);
+      */},
     }
   ]
 });
@@ -407,6 +482,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.mlang.order.Comparator',
+      required: true,
       name: 'comparator'
     },
     {
@@ -421,7 +497,8 @@ foam.CLASS({
       name: 'put',
       code: function put(obj, sub) {
         this.array.push(obj);
-      }
+      },
+      swiftCode: 'array.append(obj)',
     },
     {
       name: 'eof',
@@ -438,12 +515,27 @@ foam.CLASS({
           this.delegate.put(this.array[i], sub);
           if ( detached ) break;
         }
-      }
-    },
+      },
+      swiftCode: function() {/*
+array.sort(by: {
+  return comparator.compare($0, $1) == 0
+});
 
-    function remove(obj, sub) {
-      // TODO
-    }
+var detached = false
+let sub = Subscription { detached = true }
+for obj in array {
+  delegate.put(obj as! FObject, sub)
+  if detached { break }
+}
+      */}
+    },
+    {
+      name: 'remove',
+      code: function remove(obj, sub) {
+        // TODO
+      },
+      swiftCode: '// TODO',
+    },
   ]
 });
 
@@ -477,11 +569,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DescribeSink',
-  documentation: 'Calls .describe() on every object.  Useful for debugging to quickly see what items are in a DAO.',
   implements: [ 'foam.dao.Sink' ],
+
+  documentation: 'Calls .describe() on every object.  Useful for debugging to quickly see what items are in a DAO.',
+
   methods: [
     function put(o) {
       o.describe();
@@ -492,38 +587,69 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FnSink',
+  implements: [ 'foam.dao.Sink' ],
   documentation: 'Converts all sink events to call to a singular function.' +
     '  Useful for subscribing a listener method to a DAO',
-  properties: [
-    'fn'
+
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
   ],
-  methods: [
-    function put(obj, s) {
-      this.fn('put', obj, s);
+
+  properties: [
+    {
+      name: 'fn',
+      swiftType: '((String, FObject?, Detachable) -> Void)',
+      swiftRequiresEscaping: true,
     },
-    function remove(obj, s) {
-      this.fn('remove', obj, s);
+  ],
+
+  methods: [
+    {
+      name: 'put',
+      code: function(obj, s) {
+        this.fn('put', obj, s);
+      },
+      swiftCode: 'fn("put", obj, sub)',
+    },
+    {
+      name: 'remove',
+      code: function(obj, s) {
+        this.fn('remove', obj, s);
+      },
+      swiftCode: 'fn("remove", obj, sub)',
     },
     function eof() {
       this.fn('eof');
     },
-    function reset(s) {
-      this.fn('reset', s);
-    }
+    {
+      name: 'reset',
+      code: function(s) {
+        this.fn('reset', s);
+      },
+      swiftCode: 'fn("reset", nil, sub)',
+    },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'FramedSink',
   extends: 'foam.dao.ProxySink',
+
   documentation: 'A proxy that waits until the next frame to flush the calls to the delegate.',
+
   properties: [
     { class: 'Array', name: 'calls' },
   ],
+
   methods: [
     {
       name: 'put',
@@ -554,6 +680,7 @@ foam.CLASS({
       }
     }
   ],
+
   listeners: [
     {
       name: 'flushCalls',
@@ -569,35 +696,50 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'DAOSink',
-  implements: ['foam.dao.Sink'],
+
+  implements: [ 'foam.dao.Sink' ],
+
   properties: [
     { class: 'foam.dao.DAOProperty', name: 'dao' },
   ],
+
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
+
   methods: [
     {
       name: 'put',
       code: function(o) {
         this.dao.put(o);
-      }
+      },
+      swiftCode: '_ = try? dao?.put(obj)',
     },
     {
       name: 'remove',
       code: function(o) {
         this.dao.remove(o);
-      }
+      },
+      swiftCode: '_ = try? dao?.remove(obj)',
     },
     {
       name: 'eof',
       code: function() {},
+      swiftCode: '// NOOP',
     },
     {
       name: 'reset',
       code: function() {
         this.dao.removeAll();
-      }
+      },
+      swiftCode: '_ = try? dao?.removeAll()',
     }
-  ],
+  ]
 });

@@ -49,11 +49,13 @@ foam.CLASS({
         {
           class: 'FObjectProperty',
           of: 'foam.box.Box',
+          required: true,
           name: 'exportBox'
         },
         {
           class: 'FObjectProperty',
           of: 'foam.box.Box',
+          required: true,
           name: 'localBox'
         }
       ]
@@ -63,7 +65,6 @@ foam.CLASS({
   methods: [
     {
       name: 'doLookup',
-      returns: 'foam.box.Box',
       code: function doLookup(name) {
         if ( this.registry_[name] &&
              this.registry_[name].exportBox )
@@ -71,6 +72,12 @@ foam.CLASS({
 
         throw this.NoSuchNameException.create({ name: name });
       },
+      swiftCode: function() {/*
+if let exportBox = (registry_[name] as? Registration)?.exportBox {
+  return exportBox
+}
+throw NoSuchNameException_create(["name": name])
+      */},
       javaCode: `
 Object registration = getRegistry_().get(name);
 if ( registration == null ) {
@@ -81,7 +88,6 @@ return ((Registration)registration).getExportBox();
     },
     {
       name: 'register',
-      returns: 'foam.box.Box',
       code: function(name, service, localBox) {
         name = name || foam.next$UID();
 
@@ -95,6 +101,23 @@ return ((Registration)registration).getExportBox();
 
         return this.registry_[name].exportBox;
       },
+      swiftSynchronized: true,
+      swiftCode: function() {/*
+let name: String = name ?? UUID().uuidString
+
+var exportBox: Box = SubBox_create([
+  "name": name,
+  "delegate": me
+])
+exportBox = service?.clientBox(exportBox) ?? exportBox
+
+let registration = Registration_create([
+  "exportBox": exportBox,
+  "localBox": service?.serverBox(box) ?? box
+])
+registry_[name] = registration
+return registration.exportBox
+      */},
       javaCode: `
 if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
 
@@ -112,7 +135,6 @@ return exportBox;
     },
     {
       name: 'unregister',
-      returns: '',
       code: function(name) {
         if ( foam.box.Box.isInstance(name) ) {
           for ( var key in this.registry_ ) {
@@ -129,6 +151,19 @@ return exportBox;
 
         delete this.registry_[name];
       },
+      swiftSynchronized: true,
+      swiftCode: function() {/*
+if let name = name as? String {
+  registry_.removeValue(forKey: name)
+} else if let name = name as? AnyClass {
+  for key in registry_.keys {
+    if ((registry_[key] as! Registration).exportBox as? AnyClass) === name {
+      registry_.removeValue(forKey: key)
+      return
+    }
+  }
+}
+      */},
       javaCode: `
 getRegistry_().remove(name);
 `

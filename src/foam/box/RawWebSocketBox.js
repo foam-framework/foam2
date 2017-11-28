@@ -19,6 +19,21 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
+  requires: [
+    'foam.box.ReplyBox'
+  ],
+  imports: [
+    {
+      name: 'me',
+      key: 'me',
+      javaType: 'foam.box.Box'
+    },
+    {
+      key: 'registry',
+      name: 'registry',
+      javaType: 'foam.box.BoxRegistry',
+    }
+  ],
 
   properties: [
     {
@@ -28,15 +43,107 @@ foam.CLASS({
     }
   ],
 
+  classes: [
+    foam.core.InnerClass.create({
+      generateJava: false,
+      model: {
+        name: 'JSONOutputter',
+        extends: 'foam.json.Outputter',
+        requires: [
+          'foam.box.ReturnBox'
+        ],
+        imports: [
+          'me'
+        ],
+        methods: [
+          function output(o) {
+            if ( o === this.me ) {
+              return this.SUPER(this.ReturnBox.create());
+            }
+            return this.SUPER(o);
+          }
+        ]
+      }
+    })
+  ],
+
   methods: [
     {
       name: 'send',
       code: function send(msg) {
-        this.socket.send(msg);
+        var replyBox = msg.attributes.replyBox;
+        if ( replyBox ) {
+          // TODO: We should probably clone here, but often the message
+          // contains RPC arguments that don't clone properly.  So
+          // instead we will mutate replyBox and put it back after.
+
+          // Even better solution would be to move replyBox to a
+          // property on Message and have custom serialization in it to
+          // do the registration.
+
+          msg.attributes.replyBox =
+            this.__context__.registry.register(null, null, msg.attributes.replyBox);
+
+          // TODO: There should be a better way to do this.
+          replyBox = this.ReplyBox.create({
+            id: msg.attributes.replyBox.name
+          });
+        }
+
+        var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
+
+        if ( replyBox ) {
+          msg.attributes.replyBox = replyBox;
+        }
+
+        try {
+          this.socket.send(payload);
+        } catch(e) {
+          replyBox && replyBox.send(foam.box.Message.create({ object: e }));
+        }
       },
       javaCode: `
-getSocket().send(getX().create(foam.lib.json.Outputter.class).stringify(message));
+foam.lib.json.Outputter outputter = new Outputter();
+outputter.setX(getX());
+
+// TODO: Clone message or something when it clones safely.
+foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
+
+if ( replyBox != null ) {
+  foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, null, replyBox);
+
+  replyBox = new foam.box.ReplyBox(getX(), export.getName(), replyBox);
+}
+
+String payload = outputter.stringify(message);
+
+message.getAttributes().put("replyBox", replyBox);
+
+getSocket().send(payload);
 `
+    }
+  ],
+
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data: `
+protected class Outputter extends foam.lib.json.Outputter {
+  public Outputter() {
+    super(foam.lib.json.OutputterMode.NETWORK);
+  }
+
+  protected void outputFObject(foam.core.FObject o) {
+    if ( o == getMe() ) {
+      o = getX().create(foam.box.ReturnBox.class);
+    }
+    super.outputFObject(o);
+  }
+}
+`}));
+      }
     }
   ]
 });

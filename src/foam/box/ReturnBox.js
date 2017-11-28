@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.box',
   name: 'ReturnBox',
@@ -9,6 +15,7 @@ foam.CLASS({
       code: function(message) {
         this.__context__.returnBox.send(message);
       },
+      swiftCode: `try (__context__["returnBox"] as! Box).send(msg)`,
       javaCode: `
 ((foam.box.Box)getX().get("returnBox")).send(message);
 `

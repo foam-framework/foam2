@@ -12,7 +12,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableWidth: 280
     },
     {
       class: 'String',
@@ -30,12 +31,18 @@ foam.CLASS({
     }
   ],
 
+  methods: [
+    function launch_(X, e) {
+      this.handler && this.handler.launch(X, this, e);
+    }
+  ],
+
   actions: [
     {
       name: 'launch',
-      code: function(X) {
+      code: function(X, e) {
         console.log('MENU: ', this.id, this.label);
-        this.handler && this.handler.launch(X, this);
+        this.launch_(X, e);
       }
     }
   ]

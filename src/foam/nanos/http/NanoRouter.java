@@ -35,7 +35,6 @@ public class NanoRouter
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String      path       = req.getRequestURI();
-    //AuthService auth       = this.X.get("authService");
     String[]    urlParams  = path.split("/");
     String      serviceKey = urlParams[1];
     Object      service    = getX().get(serviceKey);
@@ -85,7 +84,7 @@ public class NanoRouter
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceWebAgent(service, skeleton);
+        service = new ServiceWebAgent(service, skeleton, spec.getAuthenticate());
         informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();

@@ -34,19 +34,46 @@ foam.CLASS({
           w[whitelist[i]] = true;
         }
         return w;
-      }
+      },
+      swiftType: 'Set<String>',
+      swiftExpressionArgs: ['whitelist'],
+      swiftExpression: function() {/*
+var w = Set<String>()
+for i in whitelist {
+  w.insert(i)
+}
+return w
+      */}
     }
   ],
   methods: [
     {
       class: 'ContextMethod',
       name: 'lookup',
+      swiftReturns: 'ClassInfo?',
+      swiftThrows: true,
+      args: [
+        {
+          swiftType: 'Context',
+          name: 'X',
+        },
+        {
+          swiftType: 'String',
+          name: 'id',
+        },
+      ],
       code: function(X, id) {
         if ( ! this.whitelist_[id] ) {
           throw new Error('Class "' + id + '" is not whitelisted.');
         }
         return this.__context__.lookup.call(X, id);
-      }
+      },
+      swiftCode: function() {/*
+if whitelist.contains(id) {
+  throw FoamError("Class " + id + " is not whitelisted.")
+}
+return X.lookup(id)
+      */}
     }
   ]
 });

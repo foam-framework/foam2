@@ -447,6 +447,13 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
+  implements: [ 'foam.dao.Sink' ],
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
   properties: [
     {
       class: 'Function',
@@ -606,14 +613,10 @@ foam.CLASS({
     }
   },
 
-  axioms: [
-    foam.u2.CSS.create({
-      // We hide Elements by adding this style rather than setting
-      // 'display: none' directly because then when we re-show the
-      // Element we don't need to remember it's desired 'display' value.
-      code: '.foam-u2-Element-hidden { display: none !important; }'
-    })
-  ],
+  // We hide Elements by adding this style rather than setting
+  // 'display: none' directly because then when we re-show the
+  // Element we don't need to remember it's desired 'display' value.
+  css: '.foam-u2-Element-hidden { display: none !important; }',
 
   properties: [
     {
@@ -920,10 +923,14 @@ foam.CLASS({
     },
 
     function myClass(opt_extra) {
-      var f = this.cls_.myClass_;
+      // Use hasOwnProperty so that class doesn't inherit CSS classname
+      // from ancestor FOAM class.
+      var f = this.cls_.hasOwnProperty('myClass_') && this.cls_.myClass_;
 
       if ( ! f ) {
-        var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
+        var base = this.cls_.hasOwnProperty('CSS_CLASS') ?
+          this.cls_.CSS_CLASS.split(/ +/) :
+          foam.String.cssClassize(this.cls_.id).split(/ +/) ;
 
         f = this.cls_.myClass_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
@@ -1513,16 +1520,26 @@ foam.CLASS({
 
           es = {};
         }
-      })
+      }, this);
+
+      listener = foam.dao.MergedResetSink.create({
+        delegate: listener
+      }, this);
 
       this.onDetach(dao.listen(listener));
-      listener.paint();
+      listener.delegate.paint();
 
       return this;
     },
 
     function call(f, args) {
       f.apply(this, args);
+
+      return this;
+    },
+
+    function callIf(bool, f, args) {
+      if ( bool ) f.apply(this, args);
 
       return this;
     },
@@ -1787,7 +1804,7 @@ foam.CLASS({
           var value = attr.value;
 
           out(' ', name);
-          if ( value !== false ) out('="', value, '"');
+          if ( value !== false ) out('="', foam.String.isInstance(value) ? value.replace(/"/g, '&quot;') : value, '"');
         }
       }
 
@@ -1959,12 +1976,14 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.StringArray',
   properties: [
     [ 'view', { class: 'foam.u2.view.StringArrayView' } ]
   ]
 });
+
 
 foam.CLASS({
   refines: 'foam.core.Date',
@@ -1988,6 +2007,7 @@ foam.CLASS({
   refines: 'foam.core.Float',
   requires: [ 'foam.u2.FloatView' ],
   properties: [
+    [ 'displayWidth', 12 ],
     [ 'view', { class: 'foam.u2.FloatView' } ]
   ]
 });
@@ -1997,6 +2017,7 @@ foam.CLASS({
   refines: 'foam.core.Int',
   requires: [ 'foam.u2.IntView' ],
   properties: [
+    [ 'displayWidth', 10 ],
     [ 'view', { class: 'foam.u2.IntView' } ]
   ]
 });
@@ -2006,6 +2027,7 @@ foam.CLASS({
   refines: 'foam.core.Currency',
   requires: [ 'foam.u2.CurrencyView' ],
   properties: [
+    [ 'displayWidth', 15 ],
     [ 'view', { class: 'foam.u2.CurrencyView' } ]
   ]
 });
@@ -2034,12 +2056,24 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
   properties: [
     {
       name: 'view',
       value: { class: 'foam.u2.DetailView' },
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  properties: [
+    {
+      name: 'view',
+      value: { class: 'foam.u2.view.FObjectArrayView' },
     }
   ]
 });
@@ -2238,7 +2272,15 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+
   properties: [
+    {
+      class: 'String',
+      name: 'css',
+      postSet: function(_, code) {
+        this.axioms_.push(foam.u2.CSS.create({code: code}));
+      }
+    },
     {
       // TODO: remove when all code ported
       name: 'tableProperties',

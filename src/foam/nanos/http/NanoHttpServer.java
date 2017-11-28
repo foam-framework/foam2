@@ -25,12 +25,10 @@ public class NanoHttpServer
 
     try {
       server_ = HttpServer.create(new InetSocketAddress(port_), 0);
+      server_.createContext("/", new NanoHttpHandler(getX()));
+      server_.start();
     } catch(IOException e) {
       e.printStackTrace();
     }
-
-    server_.createContext("/", new NanoHttpHandler(getX()));
-
-    server_.start();
   }
 }

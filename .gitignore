@@ -14,3 +14,4 @@ target/
 .gradle/
 local.properties
 *.iml
+tools/cp.txt

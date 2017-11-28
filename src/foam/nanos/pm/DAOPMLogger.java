@@ -13,8 +13,8 @@ public class DAOPMLogger
   extends    ContextAwareSupport
   implements PMLogger
 {
-  public final static String ServiceName = "pmLogger";
-  public final static String DAO_NAME    = "pmInfoDAO";
+  public final static String SERVICE_NAME = "pmLogger";
+  public final static String DAO_NAME     = "pmInfoDAO";
 
   @Override
   public void log(PM pm) {

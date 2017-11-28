@@ -19,6 +19,10 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
+  requires: [
+    'foam.json.Outputter',
+    'foam.box.ReplyBox'
+  ],
 
   properties: [
     {
@@ -34,19 +38,37 @@ foam.CLASS({
         //
         // Use default FOAM implementation of Outputter. Do not attempt to
         // lookup sensitive "foam.json.Outputter" class in box context.
-        return foam.lookup('foam.json.Outputter').create({
-          pretty: false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues: false,
-          strict: true,
-          propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        }, this);
+        return this.Outputter.create().copyFrom(foam.json.Network)
       }
     }
   ],
   methods: [
-    function send(m) {
-      this.port.postMessage(this.outputter.stringify((m)));
+    function send(message) {
+      var replyBox = message.attributes.replyBox;
+      if ( replyBox ) {
+        // TODO: We should probably clone here, but often the message
+        // contains RPC arguments that don't clone properly.  So
+        // instead we will mutate replyBox and put it back after.
+
+        // Even better solution would be to move replyBox to a
+        // property on Message and have custom serialization in it to
+        // do the registration.
+        message.attributes.replyBox = this.__context__.registry.register(
+            null, null, message.attributes.replyBox);
+
+        // TODO: There should be a better way to do this.
+        replyBox = this.ReplyBox.create({
+          id: message.attributes.replyBox.name
+        });
+      }
+
+      var payload = this.outputter.stringify(message);
+
+      if ( replyBox ) {
+        message.attributes.replyBox = replyBox;
+      }
+
+      this.port.postMessage(payload);
     }
   ]
 });

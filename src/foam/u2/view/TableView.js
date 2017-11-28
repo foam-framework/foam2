@@ -33,6 +33,10 @@ foam.CLASS({
       value: function(value, obj, axiom) {
         this.add(value);
       }
+    },
+    {
+      class: 'Int',
+      name: 'tableWidth'
     }
   ]
 });
@@ -76,6 +80,13 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.FObjectProperty',
+
+  properties: [ [ 'tableCellFormatter', null ] ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Currency',
 
   properties: [
@@ -84,7 +95,7 @@ foam.CLASS({
       value: function(value) {
         this.start()
           .style({'text-align': 'left', 'padding-right': '20px'})
-          .add('$' + (value*100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
+          .add('$' + (value/100).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,'))
         .end();
       }
     }
@@ -234,13 +245,14 @@ foam.CLASS({
         if ( tableColumns ) return tableColumns.columns;
 
         return of.getAxiomsByClass(foam.core.Property).
-            filter(function(p) { return ! p.hidden; }).
+            filter(function(p) { return p.tableCellFormatter && ! p.hidden; }).
             map(foam.core.Property.NAME.f);
       }
     },
     {
       class: 'Boolean',
       name: 'editColumnsEnabled',
+      value: true,
       documentation: 'Set this to true to let the user select columns.'
     },
     {
@@ -324,6 +336,9 @@ foam.CLASS({
               forEach(columns_, function(column) {
                 this.start('th').
                   addClass(view.myClass('th-' + column.name)).
+                  callIf(column.tableWidth, function() {
+                    this.style({width: column.tableWidth});
+                  }).
                   on('click', function(e) { view.sortBy(column); }).
                   call(column.tableHeaderFormatter, [column]).
                   add(' ', this.slot(function(order) {

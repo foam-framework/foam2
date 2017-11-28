@@ -66,7 +66,7 @@ try {
   javax.servlet.http.HttpServletResponse response = (javax.servlet.http.HttpServletResponse)getX().get("httpResponse");
   response.setContentType("application/json");
   java.io.PrintWriter writer = response.getWriter();
-  writer.print(new foam.lib.json.Outputter().stringify(message));
+  writer.print(new foam.lib.json.Outputter(foam.lib.json.OutputterMode.NETWORK).stringify(message));
   writer.flush();
 } catch(java.io.IOException e) {
   throw new RuntimeException(e);
@@ -98,6 +98,58 @@ try {
   throw new RuntimeException("Failed to verify token.", e);
 }
 */}
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.box.SessionReplyBox',
+
+  javaImports: [
+    'java.security.AccessControlException'
+  ],
+
+  properties: [
+    {
+      class: 'Object',
+      name: 'msg',
+      javaType: 'foam.box.Message'
+    },
+    {
+      class: 'Object',
+      name: 'clientBox',
+      javaType: 'foam.box.Box'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'send',
+      javaCode:
+`Object object = message.getObject();
+if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof AccessControlException ) {
+  // TODO: should this be wrapped in new Thread() ?
+  ((Runnable) getX().get("requestLogin")).run();
+  getClientBox().send(getMsg());
+} else {
+  getDelegate().send(message);
+}`
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.box.SessionClientBox',
+
+  methods: [
+    {
+      name: 'send',
+      javaCode:
+`message.getAttributes().put(SESSION_KEY, getSessionID());
+SessionReplyBox sessionReplyBox = new SessionReplyBox(getX(), message,
+    this, (Box) message.getAttributes().get("replyBox"));
+message.getAttributes().put("replyBox", sessionReplyBox);
+getDelegate().send(message);`
     }
   ]
 });
