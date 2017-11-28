@@ -36,6 +36,20 @@ foam.CLASS({
             }))
           });
 
+          cls.method(foam.swift.Method.create({
+            name: 'fromOrdinal',
+            args: [
+              foam.swift.Argument.create({
+                type: 'Int',
+                localName: 'ordinal',
+              })
+            ],
+            static: true,
+            returnType: this.model_.swiftName + '!',
+            body: templates.fromOrdinal(this.VALUES),
+          }))
+
+
           return cls;
         };
       }
@@ -57,6 +71,18 @@ switch self {
   <% p.value = v[p.name] %>
   case .<%=v.name%>: return <%=p.swiftValue%>
 <% }) %>
+}
+      */},
+    },
+    {
+      name: 'fromOrdinal',
+      args: ['values'],
+      template: function() {/*
+switch ordinal {
+<% values.forEach(function(v) { %>
+  case <%=v.ordinal%>: return .<%=v.name%>
+<% }) %>
+  default: return nil
 }
       */},
     },

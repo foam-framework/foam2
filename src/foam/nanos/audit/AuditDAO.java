@@ -7,8 +7,8 @@
 package foam.nanos.audit;
 
 import foam.core.FObject;
-import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.core.X;
 import foam.dao.ProxyDAO;
 import foam.lib.json.Outputter;
 import foam.nanos.auth.User;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AuditDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   protected final Outputter outputter = new Outputter();
 

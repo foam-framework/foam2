@@ -7,11 +7,12 @@
 foam.CLASS({
   package: 'foam.swift.dao',
   name: 'CachingDAO',
-  extends: 'foam.dao.AbstractDAO',
+  extends: 'foam.dao.ProxyDAO',
 
   requires: [
     'foam.dao.PromisedDAO',
     'foam.dao.DAOSink',
+    'foam.dao.FnSink',
   ],
 
   properties: [
@@ -52,7 +53,17 @@ DispatchQueue.global(qos: .background).async {
   try? cache.removeAll()
   let sink = self.DAOSink_create(["dao": cache])
   _ = try? src.select(sink)
-  _ = try? src.listen(sink, nil)
+  let listenSub = try? src.listen(sink, nil)
+
+  _ = try? src.listen(self.FnSink_create([
+    "fn": { [weak self] str, obj, sub in
+      if str != "reset" { return }
+      listenSub?.detach()
+      sub.detach()
+      self?.clearProperty("delegate")
+    } as (String, FObject?, Detachable) -> Void,
+  ]), nil)
+
   pDao.promise.set(cache)
 }
 return pDao
