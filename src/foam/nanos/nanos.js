@@ -5,6 +5,8 @@
  */
 
 FOAM_FILES([
+  { name: "foam/nanos/auth/DayOfWeek" },
+  { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/EnabledAware", flags: ['js'] },
@@ -19,8 +21,10 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Permission" },
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
+  { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
+  { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/client/ClientBuilder" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
@@ -32,6 +36,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/SubMenuView" },
   { name: "foam/nanos/menu/TabsMenu" },
   { name: "foam/nanos/menu/ViewMenu" },
+  { name: "foam/nanos/menu/TreeAltView" },
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
@@ -44,9 +49,16 @@ FOAM_FILES([
   { name: "foam/nanos/export/CSVDriver"},
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
-  { name: "foam/nanos/auth/WebAuthService" },
+  { name: "foam/nanos/auth/AuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
-  { name: "foam/nanos/pm/TemperatureCView" }
+  { name: "foam/nanos/pm/TemperatureCView" },
+  { name: 'foam/nanos/notification/email/EmailMessage' },
+  { name: 'foam/nanos/notification/email/EmailService' },
+  { name: 'foam/nanos/notification/email/EmailTemplate' },
+  { name: 'foam/nanos/notification/email/SMTPEmailService' },
+  { name: 'foam/nanos/notification/push/PushService' },
+  { name: 'foam/nanos/notification/push/FirebasePushService' },
+  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
 ]);

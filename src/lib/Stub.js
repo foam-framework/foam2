@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -34,24 +23,14 @@ foam.CLASS({
         var name            = this.name;
 
         return function() {
-          if ( returns ) {
-            var replyBox = this.ReplyBox.create({
-              delegate: this.RPCReturnBox.create()
-            });
+          var replyBox = this.RPCReturnBox.create()
 
-            var errorBox = replyBox;
+          var ret = replyBox.promise;
 
-            var ret = replyBox.delegate.promise;
-
-            replyBox = this.registry.register(
-              replyBox.id,
-              this[replyPolicyName],
-              replyBox);
-
-            // TODO: Move this into RPCReturnBox ?
-            if ( returns !== 'Promise' ) {
-              ret = this.lookup(returns).create({ delegate: ret });
-            }
+          // Automatically wrap RPCs that return a "PromisedAbc" or similar
+          // TODO: Move this into RPCReturnBox ?
+          if ( returns && returns !== 'Promise' ) {
+            ret = this.lookup(returns).create({ delegate: ret });
           }
 
           var msg = this.Message.create({
@@ -61,72 +40,13 @@ foam.CLASS({
             })
           });
 
-          if ( replyBox ) {
-            msg.attributes.replyBox = replyBox;
-            msg.attributes.errorBox = replyBox;
-          }
+          msg.attributes.replyBox = replyBox;
 
           this[boxPropName].send(msg);
 
           return ret;
         };
       }
-    }
-  ],
-  methods: [
-    function buildJavaClass(cls) {
-      if ( ! this.javaSupport ) return;
-
-      var name = this.name;
-      var args = this.args;
-      var boxPropName = foam.String.capitalize(this.boxPropName);
-      var replyPolicyName = foam.String.capitalize(this.replyPolicyName);
-
-      var code = `
-foam.box.Message message = getX().create(foam.box.Message.class);
-foam.box.RPCMessage rpc = getX().create(foam.box.RPCMessage.class);
-rpc.setName("${name}");
-Object[] args = { ${ args.map( a => a.name ).join(',') } };
-rpc.setArgs(args);
-
-message.setObject(rpc);`;
-
-      if ( this.javaReturns && this.javaReturns !== "void" ) {
-        code += `
-foam.box.ReplyBox reply = getX().create(foam.box.ReplyBox.class);
-foam.box.RPCReturnBox handler = getX().create(foam.box.RPCReturnBox.class);
-reply.setDelegate(handler);
-
-foam.box.SubBox export = (foam.box.SubBox)getRegistry().register(null, get${replyPolicyName}(), reply);
-reply.setId(export.getName());
-
-message.getAttributes().put("replyBox", export);
-message.getAttributes().put("errorBox", export);
-
-get${boxPropName}().send(message);
-
-try {
-  handler.getSemaphore().acquire();
-} catch (InterruptedException e) {
-  throw new RuntimeException(e);
-}
-
-Object result = handler.getMessage().getObject();
-if ( result instanceof foam.box.RPCReturnMessage )
-  return (${this.javaReturns})((foam.box.RPCReturnMessage)result).getData();
-
-if ( result instanceof foam.box.RPCErrorMessage )
-  throw new RuntimeException(((foam.box.RPCErrorMessage)result).getData().toString());
-
-throw new RuntimeException("Invalid repsonse type: " + result.getClass());
-`;
-      } else {
-        code += `get${boxPropName}().send(message);`;
-      }
-
-      this.javaCode = code;
-
-      this.SUPER(cls);
     }
   ]
 });
@@ -207,7 +127,30 @@ foam.CLASS({
               name: m.name,
               replyPolicyName: replyPolicyName,
               boxPropName: name,
+              swiftReturns: m.swiftReturns,
+              args: m.args,
               returns: returns
+            });
+          });
+      }
+    },
+    {
+      class: 'StringArray',
+      name: 'notifications',
+      factory: function() { return null; }
+    },
+    {
+      name: 'notifications_',
+      expression: function(of, name, notifications) {
+        var cls = this.lookup(of);
+
+        return notifications && notifications.
+          map(function(m) { return cls.getAxiomByName(m); }).
+          map(function(m) {
+            return foam.core.StubNotification.create({
+              name: m.name,
+              boxPropName: name,
+              args: m.args
             });
           });
       }
@@ -235,7 +178,7 @@ foam.CLASS({
           });
       }
     },
-    ['javaType', 'foam.box.Box'],
+    ['javaType',     'foam.box.Box'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo']
   ],
 
@@ -250,15 +193,11 @@ foam.CLASS({
         hidden: true
       }));
 
-      for ( var i = 0 ; i < this.methods_.length ; i++ ) {
-        cls.installAxiom(this.methods_[i]);
-      }
+      cls.installAxioms(this.methods_);
+      cls.installAxioms(this.notifications_);
+      cls.installAxioms(this.actions_);
 
-      for ( i = 0 ; i < this.actions_.length ; i++ ) {
-        cls.installAxiom(this.actions_[i]);
-      }
-
-      [
+      cls.installAxioms([
         'foam.box.RPCReturnBox',
         'foam.box.ReplyBox',
         'foam.box.RPCMessage',
@@ -269,9 +208,7 @@ foam.CLASS({
           path: s,
           name: path[path.length - 1]
         });
-      }).forEach(function(a) {
-        cls.installAxiom(a);
-      });
+      }));
 
       cls.installAxiom(foam.core.Import.create({
         key: 'registry',
@@ -324,6 +261,7 @@ foam.CLASS({
         return this.Model.create({
           package: this.package,
           name: this.name,
+          implements: [this.of.id],
 
           properties: [
             {
@@ -360,6 +298,36 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StubNotification',
+  documentation: "Similar to a StubMethod but doesn't register a reply box.  Useful when you don't care whether the method evaluates successfully on the target but just want to send a notification to the target.",
+  extends: 'Method',
+
+  properties: [
+    'boxPropName',
+    {
+      name: 'code',
+      factory: function() {
+        var boxPropName = this.boxPropName;
+        var name        = this.name;
+
+        return function() {
+          var msg = this.Message.create({
+            object: this.RPCMessage.create({
+              name: name,
+              args: Array.from(arguments)
+            })
+          });
+
+          this[boxPropName].send(msg);
+
+          return ret;
+        };
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',

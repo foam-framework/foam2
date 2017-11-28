@@ -8,32 +8,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"></link>
   </head>
   <body>
-    <script>
-      var heroDAO = foam.dao.EasyDAO.create({
-        of: com.google.foam.demos.heroes.Hero,
-        seqNo: true,
-        cache: true,
-        daoType: 'LOCAL',
-//      daoType: 'IDB',
-//      daoType: 'ARRAY',
-        testData: [
-          { id: 11, name: "Mr. Nice"},
-          { name: "Narco",     starred: true },
-          { name: "Bombasto",  starred: true },
-          { name: "Celeritas", starred: true },
-          { name: "Magneta",   starred: true },
-          { name: "RubberMan" },
-          { name: "StrongMan" },
-          { name: "Dynama" },
-          { name: "Dr. IQ" },
-          { name: "Dr. Bad" },
-          { name: "Magma" },
-        ]
-      });
-
-// for ( var i = 0 ; i < 1000 ; i++ ) { heroDAO.put(com.google.foam.demos.heroes.Hero.create({name: 'hero ' + i})); }
-
-      com.google.foam.demos.heroes.Controller.create({ heroDAO: heroDAO }).write();
-    </script>
+    <foam class="com.google.foam.demos.heroes.Controller"></foam>
   </body>
 </html>

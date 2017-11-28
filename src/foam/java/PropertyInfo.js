@@ -49,11 +49,14 @@ foam.CLASS({
     },
     'sourceCls',
     'propType',
+    'propValue',
     'propRequired',
     'jsonParser',
+    'csvParser',
     {
       name: 'methods',
       factory: function() {
+
         return [
           {
             name: 'getName',
@@ -101,13 +104,21 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
-            body: 'return compareValues(key, f(o));'
+            body: 'return compare(cast(key), get_(o));'
           },
           {
             name: 'jsonParser',
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
-            body: 'return new ' + this.jsonParser + '();'
+            body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
+          },
+          {
+            name: 'csvParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: ( this.csvParser ) ?
+              'return new ' + this.csvParser + '();' :
+              'return null;'
           },
           {
             name: 'getNetworkTransient',
@@ -138,6 +149,27 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.sqlType + '";'
+          },
+          {
+            name: 'createStatement',
+            visibility: 'public',
+            type: 'String',
+            body: 'return "' + this.propName.toLowerCase() + '";'
+          },
+          {
+            name: 'isSet',
+            visibility: 'public',
+            type: 'boolean',
+            args: [ { name: 'o', type: 'Object' } ],
+            body: `return ((${this.sourceCls.name}) o).${this.propName}IsSet_;`
+          },
+          {
+            name: 'isDefaultValue',
+            visibility: 'public',
+            type: 'boolean',
+            args: [ { name: 'o', type: 'Object' } ],
+            /* TODO: revise when/if expression support is added to Java */
+            body: `return compareValues(get_(o), ${this.propValue}) == 0;`
           }
         ]
       }

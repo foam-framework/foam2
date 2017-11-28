@@ -25,7 +25,7 @@ foam.CLASS({
     'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
   ],
 
-  searchColumns: [ ],
+  searchColumns: [],
 
   properties: [
     {
@@ -81,6 +81,26 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'createInterpreter',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
+      javaReturns: 'Interpreter',
+      javaCode: `
+        Interpreter shell = new Interpreter();
+
+        try {
+          shell.set("currentScript", this);
+          shell.set("x", x);
+          shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
+        } catch (EvalError e) {}
+
+        return shell;
+      `
+    },
+    {
       name: 'runScript',
       args: [
         {
@@ -91,17 +111,17 @@ foam.CLASS({
       javaCode: `
         ByteArrayOutputStream baos  = new ByteArrayOutputStream();
         PrintStream           ps    = new PrintStream(baos);
-        Interpreter           shell = new Interpreter();
+        Interpreter           shell = createInterpreter(x);
         PM                    pm    = new PM(this.getClass(), getId());
 
         // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
-          shell.set("currentScript", this);
           setOutput("");
-          shell.set("x", getX());
           shell.setOut(ps);
           shell.eval(getCode());
-        } catch (EvalError e) {
+        } catch (Throwable e) {
+          ps.println();
+          e.printStackTrace(ps);
           e.printStackTrace();
         } finally {
           pm.log(x);
@@ -109,7 +129,6 @@ foam.CLASS({
 
         setLastRun(new Date());
         ps.flush();
-      System.err.println("******************** Output: " + baos.toString());
         setOutput(baos.toString());
     `
     }
@@ -131,7 +150,7 @@ foam.CLASS({
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
 
-          with ( { log: log, print: log } ) {
+          with ( { log: log, print: log, x: self.__context__ } ) {
             var ret = eval(this.code);
             console.log('ret: ', ret);
             // TODO: if Promise returned, then wait

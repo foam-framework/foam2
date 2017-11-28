@@ -29,6 +29,7 @@ foam.CLASS({
     'com.google.foam.demos.heroes.DashboardCitationView',
     'com.google.foam.demos.heroes.Hero',
     'foam.dao.ArrayDAO',
+    'foam.dao.EasyDAO',
     'foam.u2.DAOList',
     'foam.u2.DetailView',
     'foam.u2.CheckBox'
@@ -95,6 +96,29 @@ foam.CLASS({
     },
     {
       name: 'heroDAO',
+      factory: function() {
+        return this.EasyDAO.create({
+          of: com.google.foam.demos.heroes.Hero,
+          seqNo: true,
+          cache: true,
+          daoType: 'LOCAL',
+        //      daoType: 'IDB',
+        //      daoType: 'ARRAY',
+          testData: [
+            { id: 11, name: "Mr. Nice"},
+            { name: "Narco",     starred: true },
+            { name: "Bombasto",  starred: true },
+            { name: "Celeritas", starred: true },
+            { name: "Magneta",   starred: true },
+            { name: "RubberMan" },
+            { name: "StrongMan" },
+            { name: "Dynama" },
+            { name: "Dr. IQ" },
+            { name: "Dr. Bad" },
+            { name: "Magma" },
+          ]
+        });
+      },
       view: {
         class: 'foam.u2.DAOList',
         rowView: 'com.google.foam.demos.heroes.CitationView'

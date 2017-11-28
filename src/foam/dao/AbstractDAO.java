@@ -103,7 +103,7 @@ public abstract class AbstractDAO
     public void put(FObject obj) {
       try {
         sink.put(obj, this);
-      } catch (Exception e) {
+      } catch (java.lang.Exception e) {
         detach();
       }
     }
@@ -111,7 +111,7 @@ public abstract class AbstractDAO
     public void remove(FObject obj) {
       try {
         sink.remove(obj, this);
-      } catch (Exception e) {
+      } catch (java.lang.Exception e) {
         detach();
       }
     }
@@ -119,7 +119,7 @@ public abstract class AbstractDAO
     public void reset() {
       try {
         sink.reset(this);
-      } catch (Exception e) {
+      } catch (java.lang.Exception e) {
         detach();
       }
     }
@@ -180,6 +180,7 @@ public abstract class AbstractDAO
   }
 
   public Sink select(Sink sink) {
+    if ( sink == null ) sink = new ListSink();
     return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
   }
 

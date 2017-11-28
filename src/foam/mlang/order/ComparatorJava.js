@@ -4,26 +4,28 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.INTERFACE({
-   package: 'foam.mlang.order',
-   name: 'Comparator',
+foam.INTERFACE({
+  package: 'foam.mlang.order',
+  name: 'Comparator',
 
-   javaExtends: [ 'java.util.Comparator' ],
+  implements: [ 'foam.dao.SQLStatement' ],
 
-   methods: [
-     {
-       name: 'compare',
-       javaReturns: 'int',
-       args: [
-         {
-           name: 'o1',
-           javaType: 'Object'
-         },
-         {
-           name: 'o2',
-           javaType: 'Object'
-         }
-       ]
-     },
-   ]
- });
+  javaExtends: [ 'java.util.Comparator' ],
+
+  methods: [
+    {
+      name: 'compare',
+      javaReturns: 'int',
+      args: [
+        {
+          name: 'o1',
+          javaType: 'Object'
+        },
+        {
+          name: 'o2',
+          javaType: 'Object'
+        }
+      ]
+    },
+  ]
+});

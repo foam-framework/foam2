@@ -22,7 +22,7 @@ public class StringPStream
 {
   protected Reference<String> str;
   protected int               pos;
-  protected StringPStream          tail_ = null;
+  protected StringPStream     tail_ = null;
 
   public StringPStream() {
     this(new Reference<String>());
@@ -69,7 +69,7 @@ public class StringPStream
   }
 
   public String substring(PStream end) {
-    StringPStream endps = (StringPStream)end;
+    StringPStream endps = (StringPStream) end;
 
     return str.get().substring(pos, endps.pos);
   }

@@ -22,9 +22,21 @@ foam.CLASS({
   ],
 
   methods: [
-    function put() { this.value++; },
-    function remove() { this.value--; },
-    function reset() { this.value = 0; },
+    {
+      name: 'put',
+      code: function() { this.value++ },
+      swiftCode: 'value+=1',
+    },
+    {
+      name: 'remove',
+      code: function() { this.value-- },
+      swiftCode: 'value-=1',
+    },
+    {
+      name: 'reset',
+      code: function() { this.value = 0 },
+      swiftCode: 'value = 0',
+    },
     function toString() { return 'COUNT()'; }
   ]
 });
@@ -55,7 +67,8 @@ foam.INTERFACE({
       name: 'f',
       args: [
         'obj'
-      ]
+      ],
+      swiftReturns: 'Any?',
     }
   ]
 });
@@ -67,7 +80,7 @@ foam.INTERFACE({
 foam.INTERFACE({
   package: 'foam.mlang',
   name: 'Expr',
-  implements: ['foam.mlang.F'],
+  implements: [ 'foam.mlang.F' ],
 
   documentation: 'Expr interface extends F interface: partialEval -> Expr.',
 
@@ -90,7 +103,7 @@ foam.CLASS({
     {
       name: 'adapt',
       value: function(_, o, p) { return p.adaptValue(o); }
-    }
+    },
   ],
 
   methods: [
@@ -122,17 +135,22 @@ foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
 
+  // Predicate is already a thing in Swift so avoid using that name.
+  swiftName: 'FoamPredicate',
+
   documentation: 'Predicate interface: f(obj) -> boolean.',
 
   methods: [
     {
       name: 'f',
+      swiftReturns: 'Bool',
       args: [
         'obj'
       ]
     },
     {
-      name: 'partialEval'
+      name: 'partialEval',
+      returns: 'foam.mlang.predicate.Predicate',
     },
     {
       name: 'toIndex',
@@ -141,7 +159,8 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'toDisjunctiveNormalForm'
+      name: 'toDisjunctiveNormalForm',
+      returns: 'foam.mlang.predicate.Predicate',
     }
   ]
 });
@@ -206,11 +225,23 @@ foam.CLASS({
   documentation: 'Abstract Predicate base-class.',
 
   methods: [
-    function toIndex() { },
+    {
+      name: 'toIndex',
+      code: function() { },
+      swiftCode: 'return',
+    },
 
-    function toDisjunctiveNormalForm() { return this; },
+    {
+      name: 'toDisjunctiveNormalForm',
+      code: function() { return this },
+      swiftCode: 'return self',
+    },
 
-    function partialEval() { return this; },
+    {
+      name: 'partialEval',
+      code: function() { return this },
+      swiftCode: 'return self',
+    },
 
     function reduceAnd(other) {
       return foam.util.equals(this, other) ? this : null;
@@ -250,7 +281,11 @@ foam.CLASS({
   axioms: [ foam.pattern.Singleton.create() ],
 
   methods: [
-    function f() { return true; }
+    {
+      name: 'f',
+      code: function() { return true; },
+      swiftCode: 'return true',
+    },
   ]
 });
 
@@ -405,7 +440,13 @@ foam.CLASS({
           if ( this.args[i].f(o) ) return true;
         }
         return false;
-      }
+      },
+      swiftCode: `
+for arg in args {
+  if arg.f(obj) { return true }
+}
+return false
+      `,
     },
 
     function partialEval() {
@@ -492,7 +533,13 @@ foam.CLASS({
           if ( ! this.args[i].f(o) ) return false;
         }
         return true;
-      }
+      },
+      swiftCode: function() {/*
+for arg in args {
+  if !arg.f(obj) { return false }
+}
+return true
+      */},
     },
 
     function partialEval() {
@@ -671,9 +718,14 @@ foam.CLASS({
     {
       name: 'f',
       code: function(o) {
-        var s1 = this.arg1.f(o);
-        return s1 ? s1.indexOf(this.arg2.f(o)) !== -1 : false;
-      }
+        var arg1 = this.arg1.f(o);
+        var arg2 = this.arg2.f(o);
+        if ( Array.isArray(arg1) ) {
+          return arg1.some(function(a) {
+            return a.indexOf(arg2) !== -1;
+          })
+        }
+        return arg1 ? arg1.indexOf(arg2) !== -1 : false;      }
     }
   ]
 });
@@ -689,15 +741,14 @@ foam.CLASS({
 
   methods: [
     function f(o) {
-      var s1 = this.arg1.f(o);
-      var s2 = this.arg2.f(o);
-      if ( typeof s1 !== 'string' || typeof s2 !== 'string' ) return false;
-      // TODO(braden): This is faster if we use a regex with the ignore-case
-      // option. That requires regex escaping arg2, though.
-      // TODO: port faster version from FOAM1
-      var uc1 = s1.toUpperCase();
-      var uc2 = s2.toUpperCase();
-      return uc1.indexOf(uc2) !== -1;
+      var arg1 = this.arg1.f(o);
+      var arg2 = this.arg2.f(o).toUpperCase();
+      if ( Array.isArray(arg1) ) {
+        return arg1.some(function(a) {
+          return a.toUpperCase().indexOf(arg2) !== -1;
+        })
+      }
+      return arg1 ? arg1.toUpperCase().indexOf(arg2) !== -1 : false;
     },
   ]
 });
@@ -763,6 +814,7 @@ foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'ArrayBinary',
   extends: 'foam.mlang.predicate.Binary',
+  abstract: true,
 
   documentation: 'Binary predicate that accepts an array in "arg2".',
 
@@ -844,7 +896,8 @@ foam.CLASS({
     function partialEval() {
       if ( ! this.Constant.isInstance(this.arg2) ) return this;
 
-      return this.arg2.value.length === 0 ? this.FALSE : this;
+      return ( ! this.arg2.value ) || this.arg2.value.length === 0 ?
+          this.FALSE : this;
     }
   ]
 });
@@ -901,7 +954,11 @@ foam.CLASS({
   ],
 
   methods: [
-    function f() { return this.value; },
+    {
+      name: 'f',
+      code: function() { return this.value; },
+      swiftCode: `return value`,
+    },
 
     function toString_(x) {
       return typeof x === 'number' ? '' + x :
@@ -917,6 +974,32 @@ foam.CLASS({
     function xxoutputJSON(os) {
       os.output(this.value);
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.mlang',
+  name: 'ArrayConstant',
+  extends: 'foam.mlang.AbstractExpr',
+  implements: [ 'foam.core.Serializable'],
+
+  properties: [
+    {
+      class: 'Array',
+      name: 'value'
+    }
+  ],
+
+  methods: [
+    function f() { return this.value; },
+
+    function toString_(x) {
+      return Array.isArray(x) ? '[' + x.map(this.toString_.bind(this)).join(', ') + ']' :
+        x.toString ? x.toString :
+        x;
+    },
+
+    function toString() { return this.toString_(this.value); }
   ]
 });
 
@@ -965,7 +1048,12 @@ foam.CLASS({
 
         // First check is so that EQ(Class.PROPERTY, null | undefined) works.
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
-      }
+      },
+      swiftCode: `
+let v1 = (arg1 as! Expr).f(obj)
+let v2 = (arg2 as! Expr).f(obj)
+return FOAM_utils.equals(v1, v2)
+      `,
     },
 
     function reduceAnd(other) {
@@ -1268,12 +1356,15 @@ foam.CLASS({
       name: 'arg2'
     },
     {
+      class: 'Map',
       name: 'groups',
-      factory: function() { return {}; }
+      factory: function() { return {}; },
+      javaFactory: 'return new java.util.HashMap<Object, foam.dao.Sink>();'
     },
     {
-      class: 'StringArray',
+      class: 'List',
       name: 'groupKeys',
+      javaFactory: 'return new java.util.ArrayList();',
       factory: function() { return []; }
     },
     {

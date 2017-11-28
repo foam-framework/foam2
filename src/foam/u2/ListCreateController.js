@@ -18,6 +18,7 @@ foam.CLASS({
     'detailView',
     'createDetailView',
     'factory',
+    'memento',
     'summaryView',
     'showActions'
   ],
@@ -44,7 +45,8 @@ foam.CLASS({
       class: 'String',
       name: 'createLabel'
     },
-    [ 'showActions', true ]
+    [ 'showActions', true ],
+    'memento'
   ],
 
   methods: [
@@ -75,17 +77,30 @@ foam.CLASS({
       name: 'ListController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'stack', 'summaryView', 'dao', 'createLabel' ],
+      imports: [
+        'createLabel',
+        'dao',
+        'memento',
+        'stack',
+        'summaryView'
+      ],
+
       exports: [ 'as data' ],
 
       properties: [
         {
-          name: 'selection'
+          name: 'selection',
+          postSet: function(o, n) {
+            this.memento = n ? n.id : '';
+          }
         }
       ],
 
       methods: [
         function initE() {
+          this.memento$.sub(this.onMementoChange);
+          this.onMementoChange();
+
           this
             .start(this.CREATE, this.createLabel && {label: this.createLabel}).style({float: 'right'}).end()
             .tag(this.summaryView, {data: this.dao, selection$: this.selection$});
@@ -103,6 +118,20 @@ foam.CLASS({
       actions: [
         function create(X) {
           this.stack.push(foam.u2.ListCreateController.CreateController.create(null, X));
+        }
+      ],
+
+      listeners: [
+        function onMementoChange() {
+          console.log('***** onMementoChange: ', this.memento);
+          if ( this.memento ) {
+            var self = this;
+            this.dao.find(this.memento).then(function (obj) {
+              self.selection = obj;
+            });
+          } else {
+            this.selection = null;
+          }
         }
       ]
     },
@@ -158,7 +187,7 @@ foam.CLASS({
       methods: [
         function initE() {
           this.tag(this.detailView, {data: this.obj, controllerMode: foam.u2.ControllerMode.VIEW})
-          if ( this.showActions ) this.add(this.BACK);          
+          if ( this.showActions ) this.add(this.BACK);
         }
       ],
 

@@ -31,16 +31,56 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'registrySkeleton',
       factory: function() {
         return this.SkeletonBox.create({ data: this });
-      }
+      },
+      // TODO check if this leaks.
+      swiftFactory: 'return SkeletonBox_create(["data": self])',
+      swiftPostSet: function() {/*
+if let oldValue = oldValue as? SkeletonBox {
+  oldValue.clearProperty("data")
+}
+      */},
     }
   ],
 
   methods: [
     {
+      name: 'init',
+      swiftCode: function() {/*
+self.onDetach(Subscription(detach: {
+  if self.hasOwnProperty("registrySkeleton") {
+    (self.registrySkeleton as? FObject)?.clearProperty("data")
+  }
+}))
+      */},
+      code: function() { this.SUPER() },
+    },
+    {
       name: 'send',
+      swiftCode: function() {/*
+if let object = msg.object as? SubBoxMessage {
+  let name = object.name
+
+  if let reg = registry_[name] as? Registration {
+    msg.object = object.object;
+    try reg.localBox.send(msg);
+  } else {
+    if let errorBox = msg.attributes["errorBox"] as? Box {
+      try errorBox.send(
+        Message_create([
+          "object": NoSuchNameException_create(["name": name ])
+        ]))
+    }
+  }
+} else if let _ = msg.object as? HelloMessage {
+} else {
+  try registrySkeleton!.send(msg)
+}
+      */},
       code: function(msg) {
         if ( this.SubBoxMessage.isInstance(msg.object) ) {
           var name = msg.object.name;
@@ -50,8 +90,8 @@ foam.CLASS({
             msg.object = msg.object.object;
             this.registry_[name].localBox.send(msg);
           } else {
-            if ( msg.attributes.errorBox ) {
-              msg.attributes.errorBox.send(
+            if ( msg.attributes.replyBox ) {
+              msg.attributes.replyBox.send(
                 this.Message.create({
                   object: this.NoSuchNameException.create({ name: name })
                 }));
@@ -74,12 +114,12 @@ if ( obj instanceof foam.box.SubBoxMessage ) {
   if ( dest != null ) {
     message.setObject(sbm.getObject());
     dest.getLocalBox().send(message);
-  } else if ( message.getAttributes().containsKey("errorBox") ) {
-    foam.box.Box errorBox = (foam.box.Box)message.getAttributes().get("errorBox");
+  } else if ( message.getAttributes().containsKey("replyBox") ) {
+    foam.box.Box replyBox = (foam.box.Box)message.getAttributes().get("replyBox");
     foam.box.Message errorMessage = getX().create(foam.box.Message.class);
     errorMessage.setObject(getX().create(foam.box.NoSuchNameException.class));
 
-    errorBox.send(errorMessage);
+    replyBox.send(errorMessage);
   }
 }
 `

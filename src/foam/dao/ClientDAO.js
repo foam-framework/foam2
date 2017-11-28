@@ -19,16 +19,15 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'ResetSink',
   extends: 'foam.dao.ProxySink',
-  implements: [ 'foam.core.Serializable' ],
   methods: [
     {
       name: 'put',
-      code: function(obj, sub) { this.reset(s); },
+      code: function(obj, sub) { this.reset(sub); },
       javaCode: 'reset(sub);'
     },
     {
       name: 'remove',
-      code: function(obj, sub) { this.reset(s); },
+      code: function(obj, sub) { this.reset(sub); },
       javaCode: 'reset(sub);'
     }
   ]
@@ -38,7 +37,6 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'MergedResetSink',
   extends: 'foam.dao.ResetSink',
-  implements: [ 'foam.core.Serializable' ],
   methods: [
     {
       name: 'reset',
@@ -56,9 +54,9 @@ foam.CLASS({
       },
       javaCode: `
 try {
-  getDelegate().reset((foam.core.Detachable)event);
+  getDelegate().reset(sub);
 } catch(Exception e) {
-  ((foam.core.Detachable)event).detach();
+  sub.detach();
 }
 `
     }
@@ -71,9 +69,10 @@ foam.CLASS({
   extends: 'foam.dao.BaseClientDAO',
 
   requires: [
+    'foam.box.SkeletonBox',
     'foam.core.Serializable',
+    'foam.dao.ArraySink',
     'foam.dao.ClientSink',
-    'foam.box.SkeletonBox'
   ],
 
   methods: [
@@ -84,7 +83,8 @@ foam.CLASS({
       },
       javaCode: `
 return super.put_(null, obj);
-`
+`,
+      swiftCode: 'return try super.put_(nil, obj)',
     },
     {
       name: 'remove_',
@@ -93,7 +93,8 @@ return super.put_(null, obj);
       },
       javaCode: `
 return super.remove_(null, obj);
-`
+`,
+      swiftCode: 'return try super.remove_(nil, obj)',
     },
     {
       name: 'find_',
@@ -102,7 +103,8 @@ return super.remove_(null, obj);
       },
       javaCode: `
 return super.find_(null, id);
-`
+`,
+      swiftCode: 'return try super.find_(nil, id)',
     },
     {
       name: 'select_',
@@ -139,7 +141,21 @@ return super.find_(null, id);
       },
       javaCode: `
 return super.select_(null, sink, skip, limit, order, predicate);
-`
+`,
+      swiftCode: `
+if sink is Serializable {
+  return try super.select_(nil, sink, skip, limit, order, predicate)
+}
+let result = try super.select_(nil, ArraySink_create(), skip, limit, order, predicate) as! ArraySink
+var detached = false
+let sub = Subscription { detached = true }
+for o in result.array {
+  if detached { break }
+  sink.put(o, sub)
+}
+sink.eof()
+return sink
+`,
     },
 
     {
@@ -153,33 +169,17 @@ return super.select_(null, sink, skip, limit, order, predicate);
       },
       javaCode: `
 super.removeAll_(null, skip, limit, order, predicate);
-`
+`,
+      swiftCode: 'try super.removeAll_(nil, skip, limit, order, predicate)',
     },
 
     {
       name: 'listen_',
       code: function listen_(x, sink, predicate) {
-        // TODO: This should probably just be handled automatically via a RemoteSink/Listener
-        // TODO: Unsubscribe support.
-
-        var skeleton = this.SkeletonBox.create({
-          data: sink
-        });
-
-        var clientSink = this.ClientSink.create({
-          delegate: this.__context__.registry.register(
-            null,
-            this.delegateReplyPolicy,
-            skeleton
-          )
-        });
-
-        clientSink = foam.dao.MergedResetSink.create({
-          delegate: clientSink
-        });
-
-        this.SUPER(null, clientSink, predicate);
+        this.SUPER(null, sink, predicate);
       },
+      javaCode: `super.listen_(null, sink, predicate);`,
+      swiftCode: `return try super.listen_(nil, sink, predicate)`,
     }
   ]
 });

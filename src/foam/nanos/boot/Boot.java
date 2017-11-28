@@ -8,9 +8,9 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
-import static foam.mlang.MLang.*;
 import foam.nanos.script.*;
 import java.io.IOException;
+import static foam.mlang.MLang.*;
 
 public class Boot {
   protected DAO serviceDAO_;
@@ -62,7 +62,7 @@ public class Boot {
   public X getX() { return root_; }
 
   public static void main (String[] args)
-    throws Exception
+    throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
     new Boot();

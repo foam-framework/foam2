@@ -18,6 +18,7 @@
 foam.CLASS({
   package: 'foam.box',
   name: 'Context',
+  swiftName: 'BoxContext',
 
   requires: [
     'foam.box.BoxRegistryBox',
@@ -60,7 +61,12 @@ foam.CLASS({
             delegate: this.registry
           }, this);
         }
-      }
+      },
+      swiftFactory: `
+return __context__.lookup("foam.swift.net.SocketService")!.create(args: [
+  "delegate$": registry$,
+], x: __subContext__)
+      `,
     },
     {
       name: 'webSocketService',
@@ -77,23 +83,31 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'registry',
       hidden: true,
       factory: function() {
         return this.BoxRegistryBox.create();
-      }
+      },
+      swiftFactory: 'return BoxRegistryBox_create()',
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.Box',
       name: 'root',
       hidden: true,
       postSet: function(_, root) {
         foam.box.NamedBox.create({ name: '' }).delegate = root;
-      }
+      },
+      swiftPostSet: 'NamedBox_create(["name": ""]).delegate = newValue!',
     },
     {
       class: 'String',
       name: 'myname',
       hidden: true,
+      swiftFactory:
+          'return "/com/foamdev/anonymous/" + UUID().uuidString',
       factory: function() {
         return foam.isServer ?
           '/proc/' + require('process').pid + '/' + foam.uuid.randomGUID() :
@@ -108,7 +122,12 @@ foam.CLASS({
         var me = this.NamedBox.create({ name: this.myname });
         me.delegate = this.registry;
         return me;
-      }
+      },
+      swiftFactory: function() {/*
+        let me = NamedBox_create(["name": self.myname])
+        me.delegate = self.registry!
+        return me
+      */},
     },
     {
       class: 'Boolean',
@@ -134,7 +153,12 @@ foam.CLASS({
         return this.ClassWhitelistContext.create({
           whitelist: this.classWhitelist
         }, this).__subContext__;
-      }
+      },
+      swiftFactory: `
+return ClassWhitelistContext_create([
+  "whitelist$": classWhitelist$,
+]).__subContext__
+      `,
     }
   ]
 });

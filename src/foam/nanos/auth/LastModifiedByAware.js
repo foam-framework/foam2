@@ -10,7 +10,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'DateTime',
+      class: 'String',
       name: 'lastModifiedBy'
     }
   ]

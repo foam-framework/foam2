@@ -12,7 +12,7 @@ import foam.core.*;
 public class JSONParser
   extends foam.core.ContextAwareSupport
 {
-  protected Parser   parser   = new ExprParser();
+  protected Parser        parser   = new ExprParser();
   protected StringPStream stringps = new StringPStream();
 
   public FObject parseString(String data) {
@@ -25,9 +25,7 @@ public class JSONParser
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
-    x.set("defaultClass", defaultClass);
-    ps = (StringPStream) ps.apply(parser, x);
-
+    ps = (StringPStream) ps.apply(defaultClass == null ? parser : new ExprParser(defaultClass), x);
     return ps == null ? null : (FObject) ps.value();
   }
 }

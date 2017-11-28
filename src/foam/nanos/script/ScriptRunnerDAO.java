@@ -23,7 +23,7 @@ public class ScriptRunnerDAO
 
     try {
       if ( script.getScheduled() ) {
-        script.runScript(getX());
+        script.runScript(x);
         script.setScheduled(false);
       }
     } catch (Throwable t) {

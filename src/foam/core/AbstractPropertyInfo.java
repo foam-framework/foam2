@@ -6,15 +6,15 @@
 
 package foam.core;
 
-import foam.lib.parse.Parser;
+import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
-import java.sql.PreparedStatement;
-import java.util.Map;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.sql.SQLException;
+import java.util.Map;
 
 public abstract class AbstractPropertyInfo
     implements PropertyInfo
@@ -33,8 +33,13 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public void toJSON(foam.lib.json.Outputter outputter, StringBuilder out, Object value) {
-    outputter.output(out, value);
+  public void toJSON(foam.lib.json.Outputter outputter, Object value) {
+    outputter.output(value);
+  }
+
+  @Override
+  public void toCSV(foam.lib.csv.Outputter outputter, Object value) {
+    outputter.output(value);
   }
 
   @Override
@@ -43,13 +48,7 @@ public abstract class AbstractPropertyInfo
   }
 
   @Override
-  public String createStatement() {
-    return getName();
-  }
-
-  @Override
-  public void prepareStatement(PreparedStatement stmt) {
-  }
+  public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
   public Object f(FObject o) {

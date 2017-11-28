@@ -22,34 +22,13 @@ foam.CLASS({
   requires: [
     'foam.net.web.WebSocket',
     'foam.box.Message',
-    'foam.box.RegisterSelfMessage'
+    'foam.box.RawWebSocketBox'
   ],
 
   imports: [
     'webSocketService',
     'me',
     'window'
-  ],
-
-  classes: [
-    {
-      name: 'JSONOutputter',
-      extends: 'foam.json.Outputter',
-      requires: [
-        'foam.box.ReturnBox'
-      ],
-      imports: [
-        'me'
-      ],
-      methods: [
-        function output(o) {
-          if ( o === this.me ) {
-            return this.SUPER(this.ReturnBox.create());
-          }
-          return this.SUPER(o);
-        }
-      ]
-    }
   ],
 
   axioms: [
@@ -63,17 +42,10 @@ foam.CLASS({
       name: 'uri',
     },
     {
-      name: 'socket',
+      name: 'delegate',
       factory: function() {
         var ws = this.WebSocket.create({
           uri: this.prepareURL(this.uri),
-          outputter: this.JSONOutputter.create({
-            pretty:               false,
-            formatDatesAsNumbers: true,
-            outputDefaultValues:  false,
-            strict:               true,
-            propertyPredicate: function(o, p) { return ! p.networkTransient; }
-          })
         });
 
         return ws.connect().then(function(ws) {
@@ -83,13 +55,9 @@ foam.CLASS({
             this.socket = undefined;
           }.bind(this));
 
-          ws.send(this.Message.create({
-            object: this.RegisterSelfMessage.create({ name: this.me.name })
-          }));
-
           this.webSocketService.addSocket(ws);
 
-          return ws;
+          return this.RawWebSocketBox.create({ socket: ws });
         }.bind(this));
       }
     }
@@ -99,28 +67,19 @@ foam.CLASS({
     function prepareURL(url) {
       /* Add window's origin if url is not complete. */
       if ( this.window && url.indexOf(':') == -1 ) {
-        return 'ws://' + this.window.location.hostname + ':' + ( Number.parseInt(this.window.location.port) + 1 ) + '/' + url;
+        return 'ws://' + this.window.location.hostname + ':' + ( this.window.location.port ? ( Number.parseInt(this.window.location.port) + 1 ) : 8081 ) + '/' + url;
       }
 
       return url;
     },
 
-    function send(msg) {
-      this.socket.then(function(s) {
-        try {
-          s.send(msg);
-        } catch(e) {
-          this.socket = undefined;
-          if ( msg.errorBox ) {
-            msg.errorBox.send(foam.box.SendFailedError.create());
-          }
-        }
-      }.bind(this), function(e) {
-        if ( msg.errorBox ) {
-          msg.errorBox.send(e);
-        }
-        this.socket = undefined;
-      }.bind(this));
+    {
+      name: 'send',
+      code: function send(msg) {
+        this.delegate.then(function(d) {
+          d.send(msg);
+        });
+      }
     }
   ]
 });

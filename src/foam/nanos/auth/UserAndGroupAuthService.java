@@ -1,34 +1,64 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.auth;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import foam.dao.*;
+import foam.dao.DAO;
+import foam.dao.ListSink;
+import foam.dao.Sink;
+import foam.mlang.MLang;
+import foam.nanos.NanoService;
+import foam.nanos.session.Session;
+import foam.util.Email;
 import foam.util.LRULinkedHashMap;
-
-import javax.naming.AuthenticationException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import foam.util.Password;
+import foam.util.SafetyUtil;
+import javax.security.auth.AuthPermission;
+import java.security.Permission;
 import java.util.*;
-import java.util.regex.Pattern;
+import javax.naming.AuthenticationException;
 
-/**
- * Created by marcroopchand on 2017-05-12.
- */
 public class UserAndGroupAuthService
-  extends    ContextAwareSupport
-  implements AuthService
+    extends    ContextAwareSupport
+    implements AuthService, NanoService
 {
   protected DAO userDAO_;
   protected DAO groupDAO_;
-  protected Map challengeMap;
-  public static final String HASH_METHOD = "SHA-512";
+  protected DAO sessionDAO_;
+  protected Map challengeMap; // TODO: let's store in Session Context instead
+
+  // pattern used to check if password has only alphanumeric characters
+  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
   @Override
   public void start() {
-    userDAO_      = (DAO) getX().get("localUserDAO");
-    groupDAO_     = (DAO) getX().get("groupDAO");
-    challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
+    userDAO_     = (DAO) getX().get("localUserDAO");
+    groupDAO_    = (DAO) getX().get("groupDAO");
+    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    challengeMap = new LRULinkedHashMap<Long, Challenge>(20000);
+  }
+
+  public User getCurrentUser(X x) throws AuthenticationException {
+    // fetch context and check if not null or user id is 0
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    // get user from session id
+    User user = (User) userDAO_.find(session.getUserId());
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    // store user and return
+    session.setX(getX().put("user", user));
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -58,13 +88,15 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public X challengedLogin(long userId, String challenge) throws AuthenticationException {
-    if ( userId < 1 || challenge == null  || challenge == "" ) {
+  public User challengedLogin(X x, long userId, String challenge) throws AuthenticationException {
+    if ( userId < 1 || "".equals(challenge) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) throw new AuthenticationException("Invalid userId");
+    if ( c == null ) {
+      throw new AuthenticationException("Invalid userId");
+    }
 
     if ( ! c.getChallenge().equals(challenge) ) {
       throw new AuthenticationException("Invalid Challenge");
@@ -76,108 +108,165 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new AuthenticationException("User not found");
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
 
     challengeMap.remove(userId);
-    return this.getX().put("user", user);
+
+    Session session = (Session) x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setX(getX().put("user", user));
+    sessionDAO_.put(session);
+    return (User) Password.sanitize(user);
   }
 
   /**
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public X login(long userId, String password) throws AuthenticationException {
-    if ( userId < 1 || password == null || password == "" ) {
+  public User login(X x, long userId, String password) throws AuthenticationException {
+    if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new AuthenticationException("User not found.");
-
-    String hashedPassword;
-    String storedPassword;
-    String salt;
-
-    try {
-      salt = user.getPassword().split(":")[1];
-      hashedPassword = hashPassword(password, salt);
-      storedPassword = user.getPassword().split(":")[0];
-    } catch (NoSuchAlgorithmException e) {
-      throw new AuthenticationException("Couldn't hash passwords with " + HASH_METHOD);
+    if ( user == null ) {
+      throw new AuthenticationException("User not found.");
     }
 
-    if ( ! storedPassword.equals(hashedPassword) ) {
+    if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid Password");
     }
 
-    return this.getX().put("user", user);
+    Session session = (Session) x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setX(getX().put("user", user));
+    sessionDAO_.put(session);
+    return (User) Password.sanitize(user);
+  }
+
+  public User loginByEmail(X x, String email, String password) throws AuthenticationException {
+    if ( SafetyUtil.isEmpty(email) || ! Email.isValid(email) ) {
+      throw new AuthenticationException("Invalid email");
+    }
+
+    if ( SafetyUtil.isEmpty(password) || ! Password.isValid(password) ) {
+      throw new AuthenticationException("Invalid password");
+    }
+
+    Sink sink = new ListSink();
+    sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
+
+    List data = ((ListSink) sink).getData();
+    if ( data == null || data.size() != 1 ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    User user = (User) data.get(0);
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    if ( ! Password.verify(password, user.getPassword()) ) {
+      throw new AuthenticationException("Invalid password");
+    }
+
+    Session session = (Session) x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setX(getX().put("user", user));
+    sessionDAO_.put(session);
+    return (User) Password.sanitize(user);
   }
 
   /**
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean check(foam.core.X x, java.security.Permission permission) {
-    if ( x == null || permission == null ) return false;
+  public Boolean checkPermission(foam.core.X x, Permission permission) {
+    if ( x == null || permission == null ) {
+      return false;
+    }
 
-    User user = (User) x.get("user");
-    if ( user == null ) return false;
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      return false;
+    }
+
+    User user = (User) userDAO_.find(session.getUserId());
+    if ( user == null ) {
+      return false;
+    }
 
     Group group = (Group) user.getGroup();
-    if ( group == null ) return false;
-
-    if ( userDAO_.find_(x, user.getId()) == null ) {
+    if ( group == null ) {
       return false;
     }
 
     return group.implies(permission);
   }
 
+  public Boolean check(foam.core.X x, String permission) {
+    return checkPermission(x, new AuthPermission(permission));
+  }
+
   /**
    * Given a context with a user, validate the password to be updated
    * and return a context with the updated user information
    */
-  public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
-    throws AuthenticationException {
-
-    if ( x == null || oldPassword == null || newPassword == null
-      || oldPassword == "" || newPassword == "" ) {
-      throw new AuthenticationException("Invalid Parameters");
+  public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
+    if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
+      throw new RuntimeException("Invalid parameters");
     }
 
-    User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
+    Session session = (Session) x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
 
-    String password = user.getPassword();
-    String storedPassword = password.split(":")[0];
-    String oldSalt = password.split(":")[1];
-    String hashedOldPassword;
-    String hashedNewPasswordOldSalt;
-    String hashedNewPassword;
-    String newSalt = generateRandomSalt();
-
-    try {
-      hashedOldPassword = hashPassword(oldPassword, oldSalt);
-      hashedNewPasswordOldSalt = hashPassword(newPassword, oldSalt);
-      hashedNewPassword = hashPassword(newPassword, newSalt);
-    } catch (NoSuchAlgorithmException e) {
-      throw new AuthenticationException("Failed to hash passwords using " + HASH_METHOD);
+    if ( newPassword.contains(" ") ) {
+      throw new RuntimeException("Password cannot contain spaces");
     }
 
-    if ( ! hashedOldPassword.equals(storedPassword) ) {
-      throw new AuthenticationException("Invalid Password");
+    int length = newPassword.length();
+    if ( length < 7 || length > 32 ) {
+      throw new RuntimeException("Password must be 7-32 characters long");
     }
 
-    if ( hashedOldPassword.equals(hashedNewPasswordOldSalt) ) {
-      throw new AuthenticationException("New Password must be different");
+    if ( newPassword.equals(newPassword.toLowerCase()) ) {
+      throw new RuntimeException("Password must have one capital letter");
     }
 
-    user.setPassword(hashedNewPassword + ":" + newSalt);
-    userDAO_.put(user);
+    if ( ! newPassword.matches(".*\\d+.*") ) {
+      throw new RuntimeException("Password must have one numeric character");
+    }
 
-    return this.getX().put("user", user);
+    if ( alphanumeric.matcher(newPassword).matches() ) {
+      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
+    }
+
+    // old password does not match
+    if ( ! Password.verify(oldPassword, user.getPassword()) ) {
+      throw new RuntimeException("Old password is incorrect");
+    }
+
+    // new password is the same
+    if ( Password.verify(newPassword, user.getPassword()) ) {
+      throw new RuntimeException("New password must be different");
+    }
+
+    // store new password in DAO and put in context
+    user.setPasswordLastModified(Calendar.getInstance().getTime());
+    user.setPreviousPassword(user.getPassword());
+    user.setPassword(Password.hash(newPassword));
+    user = (User) userDAO_.put(user);
+    session.setX(getX().put("user", user));
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -185,181 +274,44 @@ public class UserAndGroupAuthService
    * Will mainly be used as a veto method.
    * Users should have id, email, first name, last name, password for registration
    */
-  public void validateUser(User user) throws AuthenticationException {
+  public void validateUser(X x, User user) throws AuthenticationException {
     if ( user == null ) {
       throw new AuthenticationException("Invalid User");
     }
 
-    if ( user.getEmail() == "" ) {
+    if ( SafetyUtil.isEmpty(user.getEmail()) ) {
       throw new AuthenticationException("Email is required for creating a user");
     }
 
-    if ( ! validateEmail(user.getEmail()) ) {
+    if ( ! Email.isValid(user.getEmail()) ) {
       throw new AuthenticationException("Email format is invalid");
     }
 
-    if ( user.getFirstName() == "" ) {
+    if ( SafetyUtil.isEmpty(user.getFirstName()) ) {
       throw new AuthenticationException("First Name is required for creating a user");
     }
 
-    if ( user.getLastName() == "" ) {
+    if ( SafetyUtil.isEmpty(user.getLastName()) ) {
       throw new AuthenticationException("Last Name is required for creating a user");
     }
 
-    if ( user.getPassword() == "" ) {
+    if ( SafetyUtil.isEmpty(user.getPassword()) ) {
       throw new AuthenticationException("Password is required for creating a user");
     }
 
-    if ( ! validatePassword(user.getPassword()) ) {
+    if ( ! Password.isValid(user.getPassword()) ) {
       throw new AuthenticationException("Password needs to minimum 8 characters, contain at least one uppercase, one lowercase and a number");
     }
-  }
-
-  public static String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
-    MessageDigest messageDigest = MessageDigest.getInstance(HASH_METHOD);
-    messageDigest.update(salt.getBytes());
-    byte[] hashedBytes = messageDigest.digest(password.getBytes());
-    StringBuilder hashedPasswordBuilder = new StringBuilder();
-    for(byte b : hashedBytes) {
-      hashedPasswordBuilder.append(String.format("%02x", b & 0xFF));
-    }
-    return hashedPasswordBuilder.toString();
-  }
-
-  public static String generateRandomSalt() {
-    SecureRandom secureRandom = new SecureRandom();
-    byte bytes[] = new byte[20];
-    secureRandom.nextBytes(bytes);
-    StringBuilder saltBuilder = new StringBuilder();
-    for(byte b : bytes) {
-      saltBuilder.append(String.format("%02x", b & 0xFF));
-    }
-    return saltBuilder.toString();
-  }
-
-  /**
-   * TODO: Benchmark compile time to check feasibility.
-   * Look into Context Free Grammar alternative
-   * Used regex recommended here http://www.ex-parrot.com/pdw/Mail-RFC822-Address.html
-   * */
-  public static boolean validateEmail(String email) {
-    Pattern pattern = Pattern.compile("(?:(?:\\r\\n)?[ \\t])*(?:(?:(?:[^()<>@,;:\\\\" +
-      "\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\" +
-      "\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\" +
-      "n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\" +
-      "031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[" +
-      "^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(" +
-      "?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?" +
-      "[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*" +
-      "\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\" +
-      "[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[" +
-      "\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@," +
-      ";:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;" +
-      ":\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:" +
-      "\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] " +
-      "\\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]" +
-      "))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\" +
-      "n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t]" +
-      ")+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?" +
-      ":(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[" +
-      "\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[" +
-      "\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\" +
-      "r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\" +
-      "t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\]" +
-      "(?:(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\" +
-      "[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\" +
-      "[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[" +
-      " \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031" +
-      "]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\" +
-      "\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:" +
-      "\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[" +
-      " \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*" +
-      "\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\"." +
-      "\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\"." +
-      "\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?" +
-      ":\\r\\n)?[ \\t])*)|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n" +
-      ")?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\." +
-      "|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*:(?:(?:\\r\\n)?[ \\t])*" +
-      "(?:(?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\" +
-      "Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\" +
-      "n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()" +
-      "<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()" +
-      "<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"" +
-      "(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] " +
-      "\\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]" +
-      "))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n" +
-      ")?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t]" +
-      ")+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?" +
-      ":(?:\\r\\n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:" +
-      "\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\" +
-      "]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)" +
-      "?[ \\t])*(?:@(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ " +
-      "\\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*" +
-      "\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\"" +
-      ".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\"" +
-      ".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?" +
-      ":(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\" +
-      "n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\" +
-      "\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\" +
-      "\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\" +
-      "\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*)*:" +
-      "(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:" +
-      "\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]" +
-      "|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)" +
-      "?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+" +
-      "|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r" +
-      "\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@" +
-      ",;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@" +
-      ",;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)" +
-      "(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:" +
-      "(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\" +
-      "\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*\\>(?:(?:\\r\\n)?[ \\t])*)(?:,\\s*(" +
-      "?:(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?" +
-      "=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ " +
-      "\\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:" +
-      "\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:" +
-      "\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:" +
-      "\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-" +
-      "\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[" +
-      "([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)?[ \\" +
-      "t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(" +
-      "?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\" +
-      "n)?[ \\t])*))*|(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\" +
-      "t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:" +
-      "\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)*\\<(?:(?:\\r\\n)?[ \\t])*(?:@(?:" +
-      "[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"" +
-      "()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t" +
-      "])*)(?:\\.(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:" +
-      "(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\" +
-      "\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*))*(?:,@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;" +
-      ":\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\" +
-      "\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:" +
-      "(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ " +
-      "\\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?" +
-      ":(?:\\r\\n)?[ \\t])*))*)*:(?:(?:\\r\\n)?[ \\t])*)?(?:[^()<>@,;:\\\\\".\\[\\] \\" +
-      "000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(" +
-      "?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*)(?:\\.(" +
-      "?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[" +
-      " \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\"(?:[^\\\"\\r\\\\]|\\\\.|(?:(?:\\" +
-      "r\\n)?[ \\t]))*\"(?:(?:\\r\\n)?[ \\t])*))*@(?:(?:\\r\\n)?[ \\t])*(?:[^()<>@,;:\\" +
-      "\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?=[\\[\"()<>@,;:\\\\\".\\" +
-      "[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\t])*)(?:\\.(?:(?:\\r\\n)" +
-      "?[ \\t])*(?:[^()<>@,;:\\\\\".\\[\\] \\000-\\031]+(?:(?:(?:\\r\\n)?[ \\t])+|\\Z|(?" +
-      "=[\\[\"()<>@,;:\\\\\".\\[\\]]))|\\[([^\\[\\]\\r\\\\]|\\\\.)*\\](?:(?:\\r\\n)?[ \\" +
-      "t])*))*\\>(?:(?:\\r\\n)?[ \\t])*))*)?;\\s*)");
-
-    return pattern.matcher(email).matches();
-  }
-
-  //Min 8 characters, at least one uppercase, one lowercase, one number
-  public static boolean validatePassword(String password) {
-    Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
-    return pattern.matcher(password).matches();
   }
 
   /**
    * Just return a null user for now. Not sure how to handle the cleanup
    * of the current context
    */
-  public void logout(X x) {}
+  public void logout(X x) {
+    Session session = (Session) x.get(Session.class);
+    if ( session != null && session.getUserId() != 0 ) {
+      sessionDAO_.remove(session);
+    }
+  }
 }

@@ -9,10 +9,11 @@ package foam.nanos.http;
 import foam.box.*;
 import foam.core.*;
 import foam.core.FObject;
+import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
+import foam.lib.parse.*;
+import foam.nanos.logger.Logger;
+import java.io.*;
 import java.nio.CharBuffer;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,13 +24,14 @@ import javax.servlet.ServletException;
 public class ServiceWebAgent
   implements WebAgent
 {
-  protected Object service_;
-  protected Box    skeleton_;
-//  protected X      x_;
+  protected Object  service_;
+  protected Box     skeleton_;
+  protected boolean authenticate_;
 
-  public ServiceWebAgent(Object service, Box skeleton) {
-    service_  = service;
-    skeleton_ = skeleton;
+  public ServiceWebAgent(Object service, Box skeleton, boolean authenticate) {
+    service_      = service;
+    skeleton_     = skeleton;
+    authenticate_ = authenticate;
   }
 
 /*
@@ -50,32 +52,40 @@ public class ServiceWebAgent
   }
 */
 
-  public void execute(X x) {
+  public synchronized void execute(X x) {
     try {
       HttpServletRequest  req            = (HttpServletRequest)  x.get(HttpServletRequest.class);
       HttpServletResponse resp           = (HttpServletResponse) x.get(HttpServletResponse.class);
       PrintWriter         out            = (PrintWriter) x.get(PrintWriter.class);
       CharBuffer          buffer_        = CharBuffer.allocate(65535);
-      Reader              reader         = req.getReader();
+      BufferedReader      reader         = req.getReader();
       int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
+      Logger              logger         = (Logger) x.get("logger");
 
       resp.setHeader("Access-Control-Allow-Origin", "*");
       buffer_.rewind();
 
-      FObject result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      FObject result;
+      try {
+        result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+      } catch (Throwable t) {
+        System.err.println("Unable to parse: " + buffer_.toString());
+        throw t;
+      }
 
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        System.err.println("Failed to parse request");
-        out.print("Failed to parse request: " + buffer_.toString());
+        String message = getParsingError(x, buffer_.toString());
+        logger.error(message + ", input: " + buffer_.toString());
+        out.print(message);
         out.flush();
         return;
       }
 
       if ( ! ( result instanceof foam.box.Message ) ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        System.err.println("Expected instance of foam.box.Message");
+        logger.error("Expected instance of foam.box.Message");
         out.print("Expected instance of foam.box.Message");
         out.flush();
         return;
@@ -86,10 +96,28 @@ public class ServiceWebAgent
         ((ContextAware) service_).setX(x);
 
       foam.box.Message msg = (foam.box.Message) result;
-      skeleton_.send(msg);
+      new SessionServerBox(x, skeleton_, authenticate_).send(msg);
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
+  }
+
+  /**
+   * Gets the result of a failing parsing of a buffer
+   * @param buffer the buffer that failed to be parsed
+   * @return the error message
+   */
+  protected String getParsingError(X x, String buffer) {
+    Parser        parser = new ExprParser();
+    PStream       ps     = new StringPStream();
+    ParserContext psx    = new ParserContextImpl();
+
+    ((StringPStream) ps).setString(buffer);
+    psx.set("X", x == null ? new ProxyX() : x);
+
+    ErrorReportingPStream eps = new ErrorReportingPStream(ps);
+    ps = eps.apply(parser, psx);
+    return eps.getMessage();
   }
 
 /*
