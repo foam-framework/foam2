@@ -33,8 +33,4 @@ public abstract class AbstractDatePropertyInfo
     return date;
   }
 
-  @Override
-  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
-    stmt.setObject(this.get(o), java.sql.Types.TIMESTAMP);
-  }
 }

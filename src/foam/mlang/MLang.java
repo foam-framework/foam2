@@ -23,7 +23,6 @@ public class MLang
   public static Expr prepare(Object o) {
     return o instanceof Expr ? (Expr) o :
         o instanceof Object[] ? new ArrayConstant((Object[]) o) :
-        o instanceof java.util.Date ? new DateConstant(o) :
         new Constant(o);
   }
 
