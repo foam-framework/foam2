@@ -584,19 +584,7 @@ foam.CLASS({
     UNSELECTED_COLOR: '#FFFFCC'
   },
 
-  css: [
-    // TODO: remove '-' after ActionView when CSS naming fixed
-    foam.u2.CSS.create({
-      code: function() {
-        /*
-               ^ { width:1200px; margin: 20px; }
-               ^ canvas { border: 1px solid black; }
-               ^ .foam-u2-ActionView- { margin: 10px; }
-               ^ input[type='range'] { width: 400px; }
-               */
-      }
-    })
-  ],
+  css: ^ { width:1200px; margin: 20px; } ^ canvas { border: 1px solid black; } ^ .foam-u2-ActionView- { margin: 10px; } ^ input[type='range'] { width: 400px; },
 
   properties: [
     'feedback_',
@@ -662,14 +650,14 @@ foam.CLASS({
       this.addRelatedFrom(this.canvas.width / 2 - widthCenterBox / 2, this.canvas.height / 2 - heightCenterBox * 2);
       this.addLegend();
 
-      this.
-      addClass(this.myClass()).
-      start('center').
-      tag('br').
-      start(this.canvas).
-      on('click', this.onClick).
-      end().
-      end();
+      this
+        .addClass(this.myClass())
+        .start('center')
+        .tag('br')
+        .start(this.canvas)
+        .on('click', this.onClick)
+        .end()
+        .end();
     },
 
     function sign( ex, sx ) {
@@ -678,24 +666,6 @@ foam.CLASS({
       } if ( ex - sx < 0 )
           return -1;
         return 0;
-    },
-
-    function dashedLine( sx, sy, ex, ey ) {
-      var dashedLine, changeX = this.sign(ex, sx),
-        changeY = this.sign(ey, sy);
-		var d = Math.sqrt(Math.pow(ex-sx, 2)+Math.pow(ey-sy, 2));
-
-      for ( var i = 0; i < d - this.dashedstep; i = i + (this.dashedstep * 2) ) {
-        dashedLine = foam.graphics.Line.create({
-          startX: sx + i * (changeX) *(ex-sx)/d,
-          startY: sy - i * (changeY) *(ey-sy)/d,
-          endX: sx + (i * (changeX) + this.dashedstep)*(ex-sx)/d,
-          endY: sy - (i * (changeY) - this.dashedstep)*(ey-sy)/d,
-          color: 'black',
-          lineWidth: 2
-        });
-        this.selected = this.canvas.addChildren( dashedLine );
-      }
     },
 
     function triangle( ptX, ptY, ang ) {
@@ -757,7 +727,15 @@ foam.CLASS({
 
       this.selected = this.canvas.addChildren( legendBox, legendLabel, extendsLinkLine, triangleEnd, ExtendsNameLabel );
 
-      var dashedLine = this.dashedLine( startX, startY * 3, startX + d, startY * 3 );
+      dashedLine = foam.graphics.Line.create({
+        startX: x - 510 || startX,
+        startY: y - 570 || startY * 3,
+        endX: x + 530 || startX + d,
+        endY: y + 530 + this.triangleSize || startY * 3,
+        color: 'black',
+        lineWidth: 2,
+        lineDash: [ 10, 20 ]
+      });
 
       var triangleEndImplement = this.triangle( startX + d, startY * 3, Math.PI / 2 );
 
@@ -772,7 +750,7 @@ foam.CLASS({
         text: 'Implement'
       });
 
-      this.selected = this.canvas.addChildren( ImplementNameLabel, triangleEndImplement );
+      this.selected = this.canvas.addChildren( ImplementNameLabel, triangleEndImplement, dashedLine );
 
       requiredLine = foam.graphics.Line.create({
         startX: x - 510 || startX,
@@ -854,7 +832,7 @@ foam.CLASS({
         color: 'black',
         lineWidth: 2
       });
-      var arrowRelatedto = this.arrowEnd( RelatedToLinkLine.endX, RelatedToLinkLine.endY, 3 * Math.PI / 2 ); 
+      var arrowRelatedto = this.arrowEnd( RelatedToLinkLine.endX, RelatedToLinkLine.endY, 3 * Math.PI / 2 );
       this.selected = this.canvas.addChildren( RelatedToNameLabel, RelatedToLinkLine, arrowRelatedto );
 
       var RelatedFromNameLabel = foam.graphics.Label.create({
@@ -1060,11 +1038,19 @@ foam.CLASS({
               text: eval(a.path).name
             });
 
-            var dashedLine = this.dashedLine( x +200 , y , implementsName.x , implementsName.y  );
+            dashedLine = foam.graphics.Line.create({
+              startX: x +200,
+              startY: y,
+              endX: implementsName.x,
+              endY: implementsName.y,
+              color: 'black',
+              lineWidth: 2,
+              lineDash: [ 10, 20 ]
+            });
 
             var triangleEndImplement = this.triangle( implementsName.x, implementsName.y, 0 );
 
-            this.selected = this.canvas.addChildren( implementsName, implementsNameLabel, triangleEndImplement );
+            this.selected = this.canvas.addChildren( implementsName, implementsNameLabel, triangleEndImplement , dashedLine );
           }
         }
       }
@@ -1245,7 +1231,7 @@ foam.CLASS({
         color: 'black'
       });
     },
-	
+
     function addRelatedto( x, y, w, h ) {
       var d = 300;
       var d1 = 200;
@@ -1516,3 +1502,4 @@ foam.CLASS({
     }
   ]
 });
+
