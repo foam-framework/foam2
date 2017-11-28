@@ -30,23 +30,15 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'displayWidth'
-    },
-    'type'
+    }
   ],
 
   methods: [
-    function initE() {
-      this.SUPER();
-
-      if ( this.type         ) this.setAttribute('type', this.type);
-      if ( this.displayWidth ) this.setAttribute('size', this.displayWidth);
-    },
-
     function fromProperty(prop) {
       this.SUPER(prop);
 
       if ( ! this.displayWidth ) {
-        this.displayWidth = prop.displayWidth;
+        this.size = this.displayWidth = prop.displayWidth;
       }
 
       if ( prop.visibility ) {

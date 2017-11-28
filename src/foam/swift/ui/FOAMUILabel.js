@@ -25,12 +25,20 @@ updateLabel();
 updateLabel();
       */},
     },
+    {
+      swiftType: 'UIColor?',
+      name: 'textColor',
+      swiftPostSet: function() {/*
+updateLabel();
+      */},
+    },
   ],
   listeners: [
     {
       name: 'updateLabel',
       swiftCode: function() {/*
 view.text = data == nil ? "nil" : String(describing: data!)
+if let textColor = textColor { view.textColor = textColor }
       */},
     },
   ],

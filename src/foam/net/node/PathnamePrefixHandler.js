@@ -30,7 +30,7 @@ foam.CLASS({
       class: 'String',
       name: 'pathnamePrefix',
       expression: function(ctxPathnamePrefix) {
-        return this.ctxPathnamePrefix || '';
+        return ctxPathnamePrefix || '';
       }
     }
   ]

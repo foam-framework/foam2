@@ -16,14 +16,15 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified', 'profilePicture'
+    'id', 'enabled', 'type', 'firstName', 'lastName', 'organization', 'email'
   ],
 
   properties: [
     {
       class: 'Long',
       name: 'id',
-      max: 999
+      max: 999,
+      tableWidth: 45
     },
     {
       class: 'String',
@@ -38,7 +39,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'firstName'
+      name: 'firstName',
+      tableWidth: 160
     },
     {
       class: 'String',
@@ -46,36 +48,54 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'lastName'
+      name: 'lastName',
+      tableWidth: 160
     },
     {
       class: 'String',
-      name: 'organization'
+      name: 'organization',
+      width: 175,
+      tableWidth: 160
     },
     {
       class: 'String',
-      name: 'department'
+      name: 'department',
+      width: 50
     },
     {
       class: 'EMail',
-      name: 'email'
+      name: 'email',
+      width: 200,
+      preSet: function (_, val) {
+        return val.toLowerCase();
+      },
+      javaSetter:
+`email_ = val.toLowerCase();
+emailIsSet_ = true;`
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
-      name: 'phone'
+      name: 'phone',
+      factory: function() { return foam.nanos.auth.Phone.create(); }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
-      name: 'mobile'
+      name: 'mobile',
+      factory: function() { return foam.nanos.auth.Phone.create(); }
     },
     {
       class: 'String',
-      name: 'type'
+      name: 'type',
+      tableWidth: 91,
+      view: {
+        class: 'foam.u2.view.ChoiceView',
+        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
+      }
     },
     {
-      class: 'DateTime',
+      class: 'Date',
       name: 'birthday'
     },
     {
@@ -88,12 +108,14 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
-      name: 'address'
+      name: 'address',
+      factory: function() { return foam.nanos.auth.Address.create({}, this); }
     },
     {
       class: 'FObjectArray',
       of: 'foam.core.FObject',
-      name: 'accounts'
+      name: 'accounts',
+      hidden: true
     },
     {
       class: 'Reference',
@@ -103,7 +125,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'timeZone'
+      name: 'timeZone',
+      width: 5
       // TODO: create custom view or DAO
     },
     {
@@ -115,6 +138,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'previousPassword',
+      hidden: true,
       displayWidth: 30,
       width: 100
     },
@@ -128,35 +152,42 @@ foam.CLASS({
       class: 'String',
       name: 'note',
       displayWidth: 70,
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 100 }
     },
     // TODO: remove after demo
     {
       class: 'String',
       name: 'businessName',
-      documentation: 'Name of the business'
+      documentation: 'Name of the business',
+      width: 50
     },
     {
       class: 'String',
       name: 'businessIdentificationNumber',
+      width: 20,
       documentation: 'Business Identification Number (BIN)'
     },
     {
       class: 'String',
       name: 'bankIdentificationCode',
+      width: 20,
       documentation: 'Bank Identification Code (BIC)'
     },
     {
       class: 'String',
-      name: 'website'
+      name: 'website',
+      width: 50
     },
     {
       class: 'String',
-      name: 'businessType'
+      name: 'businessType',
+      width: 15
     },
     {
       class: 'String',
-      name: 'businessSector'
-    },
+      name: 'businessSector',
+      width: 15
+    }
   ],
 
   methods: [

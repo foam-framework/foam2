@@ -5,8 +5,10 @@
  */
 
 var classes = [
+  'foam.core.Axiom',
   'foam.core.Serializable',
   'foam.core.Exception',
+  'foam.core.ContextAgent',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -52,6 +54,7 @@ var classes = [
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
+  'foam.nanos.http.WebAgent',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
@@ -106,6 +109,8 @@ var classes = [
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.Permission',
+  'foam.nanos.auth.DayOfWeek',
+  'foam.nanos.auth.Hours',
   'foam.nanos.auth.Address',
   'foam.nanos.auth.Phone',
   'foam.nanos.auth.User',
@@ -133,9 +138,8 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
-  'foam.nanos.register.RegistrationService',
-  'foam.nanos.register.ClientRegistrationService',
-  'foam.nanos.register.UserRegistrationService',
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
@@ -149,6 +153,8 @@ var classes = [
   'foam.lib.json.OutputterMode',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
+  'foam.lib.json.OutputJSON',
+  'foam.lib.json.UnknownFObject',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -156,7 +162,14 @@ var classes = [
   'foam.blob.AbstractBlobService',
   'foam.blob.SubBlob',
   'foam.blob.IdentifiedBlob',
-  'foam.blob.BlobStore'
+  'foam.blob.BlobStore',
+
+  'foam.nanos.geocode.GoogleMapsAddressComponent',
+  'foam.nanos.geocode.GoogleMapsCoordinates',
+  'foam.nanos.geocode.GoogleMapsGeocodeResponse',
+  'foam.nanos.geocode.GoogleMapsGeocodeResult',
+  'foam.nanos.geocode.GoogleMapsGeometry',
+  'foam.nanos.geocode.GoogleMapsBoundary'
 ];
 
 var abstractClasses = [
@@ -171,7 +184,7 @@ var skeletons = [
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.register.RegistrationService'
+  'foam.nanos.notification.push.PushService'
 ];
 
 var proxies = [
@@ -183,7 +196,9 @@ var proxies = [
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
   'foam.blob.BlobService',
-  'foam.nanos.register.RegistrationService'
+  'foam.nanos.http.WebAgent',
+  'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.push.PushService'
 ];
 
 module.exports = {

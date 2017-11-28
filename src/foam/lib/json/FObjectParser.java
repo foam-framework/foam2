@@ -9,68 +9,66 @@ package foam.lib.json;
 import foam.lib.parse.*;
 import foam.core.*;
 
-public class FObjectParser extends ProxyParser {
+public class FObjectParser
+  extends ProxyParser
+{
+
   public FObjectParser(final Class defaultClass) {
     super(new Seq1(3,
-                   new Whitespace(),
-                   new Literal("{"),
-                   new Whitespace(),
-                   new Parser() {
-                     private Parser delegate = new Seq1(4,
-                                                        new KeyParser("class"),
-                                                        new Whitespace(),
-                                                        new Literal(":"),
-                                                        new Whitespace(),
-                                                        new StringParser(),
-                                                        new Optional(new Literal(",")));
-                     public PStream parse(PStream ps, ParserContext x) {
-                       PStream ps1 = ps.apply(delegate, x);
+    new Whitespace(),
+    new Literal("{"),
+    new Whitespace(),
+    new Parser() {
+      private Parser delegate = new Seq1(4,
+        new KeyParser("class"),
+        new Whitespace(),
+        new Literal(":"),
+        new Whitespace(),
+        new StringParser(),
+        new Optional(new Literal(",")));
 
-                       Class c;
+      public PStream parse(PStream ps, ParserContext x) {
+        PStream ps1 = ps.apply(delegate, x);
+        Class   c;
 
-                       try {
+        try {
+          c = ps1 != null ? Class.forName(ps1.value().toString()) : defaultClass;
 
-                         c = ps1 != null ? Class.forName(ps1.value().toString()) :
-                           x.get("defaultClass") != null ? (Class) x.get("defaultClass") :
-                           defaultClass;
+          if ( c == null ) {
+            if ( ps1 != null ) throw new RuntimeException("Can't find class: " + ps1.value().toString());
 
-                         if ( c == null ) {
-                           if ( ps1 != null ) throw new RuntimeException("Can't find class: " + ps1.value().toString());
+            throw new RuntimeException("No class specified in JSON and no defaultClass available.");
+          }
+        } catch(ClassNotFoundException e) {
+          throw new RuntimeException(e);
+        }
 
-                           throw new RuntimeException("No class specified in JSON and no defaultClass available.");
-                         }
-                       } catch(ClassNotFoundException e) {
-                         throw new RuntimeException(e);
-                       }
+        if ( ps1 != null ) ps = ps1;
 
-                       if ( ps1 != null ) {
-                         ps = ps1;
-                       }
+        ParserContext subx = x.sub();
 
-                       ParserContext subx = x.sub();
+        Parser subParser;
 
-                       Parser subParser;
+        if ( c.isEnum() ) {
+          subx.set("enum", c);
+          subParser = EnumParserFactory.getInstance(c);
+        } else {
+          Object obj = ((X) x.get("X")).create(c);
+          subx.set("obj", obj);
+          subParser = ModelParserFactory.getInstance(c);
+        }
 
-                       if ( c.isEnum() ) {
-                           subx.set("enum", c);
-                           subParser = EnumParserFactory.getInstance(c);
-                       } else {
-                           Object obj = ((X)x.get("X")).create(c);
-                           subx.set("obj", obj);
-                           subParser = ModelParserFactory.getInstance(c);
-                       }
+        ps = ps.apply(subParser, subx);
 
-                       ps = ps.apply(subParser, subx);
+        if ( ps != null ) {
+          return ps.setValue(subx.get("obj"));
+        }
 
-                       if ( ps != null ) {
-                           return ps.setValue(subx.get("obj"));
-                       }
-
-                       return null;
-                     }
-                   },
-                   new Whitespace(),
-                   new Literal("}")));
+        return null;
+      }
+    },
+    new Whitespace(),
+    new Literal("}")));
   }
 
   public FObjectParser() {

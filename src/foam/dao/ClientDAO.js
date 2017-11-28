@@ -54,9 +54,9 @@ foam.CLASS({
       },
       javaCode: `
 try {
-  getDelegate().reset((foam.core.Detachable)event);
+  getDelegate().reset(sub);
 } catch(Exception e) {
-  ((foam.core.Detachable)event).detach();
+  sub.detach();
 }
 `
     }
@@ -69,9 +69,10 @@ foam.CLASS({
   extends: 'foam.dao.BaseClientDAO',
 
   requires: [
+    'foam.box.SkeletonBox',
     'foam.core.Serializable',
+    'foam.dao.ArraySink',
     'foam.dao.ClientSink',
-    'foam.box.SkeletonBox'
   ],
 
   methods: [
@@ -141,7 +142,20 @@ return super.find_(null, id);
       javaCode: `
 return super.select_(null, sink, skip, limit, order, predicate);
 `,
-      swiftCode: 'return try super.select_(nil, sink, skip, limit, order, predicate)',
+      swiftCode: `
+if sink is Serializable {
+  return try super.select_(nil, sink, skip, limit, order, predicate)
+}
+let result = try super.select_(nil, ArraySink_create(), skip, limit, order, predicate) as! ArraySink
+var detached = false
+let sub = Subscription { detached = true }
+for o in result.array {
+  if detached { break }
+  sink.put(o, sub)
+}
+sink.eof()
+return sink
+`,
     },
 
     {
@@ -164,9 +178,8 @@ super.removeAll_(null, skip, limit, order, predicate);
       code: function listen_(x, sink, predicate) {
         this.SUPER(null, sink, predicate);
       },
-      javaCode: `
-super.listen_(null, sink, predicate);
-`
+      javaCode: `super.listen_(null, sink, predicate);`,
+      swiftCode: `return try super.listen_(nil, sink, predicate)`,
     }
   ]
 });

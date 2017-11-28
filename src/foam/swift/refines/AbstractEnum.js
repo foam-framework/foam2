@@ -16,44 +16,19 @@ foam.CLASS({
             implements: ['FOAM_enum'],
           });
 
-          cls.fields.push(
-            foam.swift.Field.create({
-              type: 'Int',
-              name: 'ordinal',
-              getter: foam.templates.TemplateUtil.create().compile(foam.String.multiline(function() {/*
-switch self {
-<% values.forEach(function(v) { %>
-  case .<%=v.name%>: return <%=v.ordinal%>  
-<% }) %>
-}
-              */}), '', ['values']).apply(this, [this.VALUES]).trim(),
-              visibility: 'public',
-            }),
-            foam.swift.Field.create({
-              type: 'String',
-              name: 'name',
-              getter: foam.templates.TemplateUtil.create().compile(foam.String.multiline(function() {/*
-switch self {
-<% values.forEach(function(v) { %>
-  case .<%=v.name%>: return "<%=v.name%>"
-<% }) %>
-}
-              */}), '', ['values']).apply(this, [this.VALUES]).trim(),
-              visibility: 'public',
-            }),
-            foam.swift.Field.create({
-              type: 'String',
-              name: 'label',
-              getter: foam.templates.TemplateUtil.create().compile(foam.String.multiline(function() {/*
-switch self {
-<% values.forEach(function(v) { %>
-  case .<%=v.name%>: return "<%=v.label%>"
-<% }) %>
-}
-              */}), '', ['values']).apply(this, [this.VALUES]).trim(),
-              visibility: 'public',
-            })
-          );
+          var templates = foam.swift.EnumTemplates.create();
+          var axioms = this.getAxiomsByClass(foam.core.Property);
+          for (var i = 0; i < axioms.length; i++) {
+            var a = axioms[i];
+            cls.fields.push(
+              foam.swift.Field.create({
+                type: a.swiftType,
+                name: a.swiftName,
+                getter: templates.propertyGetter(a, this.VALUES),
+                visibility: 'public',
+              })
+            );
+          }
 
           this.VALUES.forEach(function(v) {
             cls.values.push(foam.swift.EnumValue.create({
@@ -61,9 +36,55 @@ switch self {
             }))
           });
 
+          cls.method(foam.swift.Method.create({
+            name: 'fromOrdinal',
+            args: [
+              foam.swift.Argument.create({
+                type: 'Int',
+                localName: 'ordinal',
+              })
+            ],
+            static: true,
+            returnType: this.model_.swiftName + '!',
+            body: templates.fromOrdinal(this.VALUES),
+          }))
+
+
           return cls;
         };
       }
     }
   ],
 });
+
+foam.CLASS({
+  package: 'foam.swift',
+  name: 'EnumTemplates',
+  templates: [
+    {
+      name: 'propertyGetter',
+      args: ['property', 'values'],
+      template: function() {/*
+<% var p = property.clone() %>
+switch self {
+<% values.forEach(function(v) { %>
+  <% p.value = v[p.name] %>
+  case .<%=v.name%>: return <%=p.swiftValue%>
+<% }) %>
+}
+      */},
+    },
+    {
+      name: 'fromOrdinal',
+      args: ['values'],
+      template: function() {/*
+switch ordinal {
+<% values.forEach(function(v) { %>
+  case <%=v.ordinal%>: return .<%=v.name%>
+<% }) %>
+  default: return nil
+}
+      */},
+    },
+  ],
+})

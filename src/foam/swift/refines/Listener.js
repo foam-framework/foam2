@@ -25,6 +25,23 @@ foam.CLASS({
       name: 'swiftListenerMethodName',
       expression: function(swiftName) { return swiftName + '_method'; },
     },
+    {
+      name: 'swiftArgs',
+      factory: function() {
+        return [
+          this.SwiftArgument.create({
+            localName: 'sub',
+            defaultValue: 'Subscription(detach: {})',
+            type: 'Subscription',
+          }),
+          this.SwiftArgument.create({
+            localName: 'args',
+            defaultValue: '[]',
+            type: '[Any?]',
+          }),
+        ];
+      },
+    },
   ],
   methods: [
     function writeToSwiftClass(cls, superAxiom, parentCls) {
@@ -40,7 +57,8 @@ foam.CLASS({
       if (!override) {
         cls.method(this.Method.create({
           name: this.swiftName,
-          body: this.swiftListenerName + '(Subscription(detach: {}), [])',
+          args: this.swiftArgs,
+          body: this.swiftListenerName + '(sub, args)',
           override: !!(superAxiom && superAxiom.swiftCode),
         }));
         cls.fields.push(this.Field.create({
@@ -49,7 +67,7 @@ foam.CLASS({
           final: true,
           name: this.swiftPrivateAxiomName,
           type: 'MethodInfo',
-          initializer: this.swiftMethodInfoInit(),
+          initializer: this.swiftMethodInfoInit(parentCls),
         }));
         cls.methods.push(this.Method.create({
           visibility: 'public',
@@ -59,20 +77,17 @@ foam.CLASS({
           body: 'return ' + this.swiftPrivateAxiomName,
           override: this.getSwiftOverride(parentCls),
         }));
+        cls.fields.push(this.Field.create({
+          lazy: true,
+          name: this.swiftSlotName,
+          initializer: this.slotInit(),
+          type: 'Slot',
+        }));
       }
       cls.method(this.Method.create({
         name: this.swiftListenerMethodName,
         body: this.swiftCode,
-        args: [
-          this.SwiftArgument.create({
-            localName: 'sub',
-            type: 'Subscription',
-          }),
-          this.SwiftArgument.create({
-            localName: 'args',
-            type: '[Any?]',
-          }),
-        ],
+        args: this.swiftArgs,
         visibility: 'private',
         override: !!(superAxiom && superAxiom.swiftCode),
       }));
