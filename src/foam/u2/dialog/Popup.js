@@ -91,8 +91,6 @@ foam.CLASS({
       .end();
 
       this.content = content;
-
-      this.document.body.style.overflow = "hidden";
     },
 
     function open() {
@@ -103,7 +101,6 @@ foam.CLASS({
 
   listeners: [
     function close() {
-      this.document.body.style.overflow = "scroll";
       this.remove();
     }
   ]
