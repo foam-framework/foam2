@@ -17,16 +17,17 @@ public class AuthenticatedSink
   protected String prefix_;
   protected String method_;
 
-  public AuthenticatedSink(X x, String name, String method, Sink delegate) {
+  public AuthenticatedSink(X x, String rootPermission, Sink delegate) {
     setX(x);
     setDelegate(delegate);
-    this.prefix_ = name + "." + method + ".";
+    this.prefix_ = rootPermission + ".";
   }
 
   @Override
   public void put(FObject obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    String permission = prefix_ + obj.getProperty("id");
+    String      permission  = prefix_ + obj.getProperty("id");
+
     if ( authService.check(getX(), permission) ) {
       super.put(obj, sub);
     }
@@ -35,7 +36,8 @@ public class AuthenticatedSink
   @Override
   public void remove(FObject obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    String permission = prefix_ + obj.getProperty("id");
+    String      permission  = prefix_ + obj.getProperty("id");
+
     if ( authService.check(getX(), permission) ) {
       super.remove(obj, sub);
     }
