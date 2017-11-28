@@ -18,7 +18,7 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Expr, Comparator, SQLStatement
+    extends Expr, Comparator, SQLStatement, Axiom
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();

@@ -37,7 +37,7 @@ describe('DirTreeHandler', function() {
     server = foam.net.node.Server.create({
       port: PORT
     });
-    router = foam.net.node.PathnamePrefixRouter.create(null, server);
+    router = foam.net.node.PathnameRouter.create(null, server);
     router.addPathnamePrefix(PREFIX, foam.net.node.DirTreeHandler.create({
       dir: DIR
     }));

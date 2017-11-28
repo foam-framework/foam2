@@ -14,12 +14,14 @@ import foam.lib.json.OutputterMode;
 import foam.lib.parse.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+import foam.util.SafetyUtil;
+
 import java.io.*;
 
 public class JDAO
     extends ProxyDAO
 {
-  protected final File           file_;
+  protected final File file_;
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
@@ -47,7 +49,7 @@ public class JDAO
     BufferedReader br            = new BufferedReader(new FileReader(file_));
 
     for ( String line ; ( line = br.readLine() ) != null ; ) {
-      if ( line.isEmpty() ) continue;
+      if ( SafetyUtil.isEmpty(line) ) continue;
 
       try {
         char operation = line.charAt(0);

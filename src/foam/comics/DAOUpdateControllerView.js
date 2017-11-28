@@ -33,6 +33,17 @@ foam.CLASS({
     'data'
   ],
 
+  css: `
+    ^ .net-nanopay-ui-ActionView {
+      background: #59aadd;
+      color: white;
+      margin-right: 4px;
+    }
+    ^ .net-nanopay-ui-ActionView-delete {
+      background: #d55;
+    }
+  `,
+
   properties: [
     {
       name: 'key'
@@ -68,9 +79,23 @@ foam.CLASS({
         .add(this.data.dao.of.getAxiomsByClass(foam.core.Action))
       .endContext()
       */
-      this.add(
-        this.DAOUpdateController.OBJ,
-        this.data.cls_.getAxiomsByClass(foam.core.Action));
+      this.
+      addClass(this.myCls()).
+      start('table').
+        start('tr').
+          start('td').style({'vertical-align': 'top', 'width': '100%'}).
+            start('span').
+              style({background: 'rgba(0,0,0,0)'}).
+              show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+              start().
+                style({'padding-bottom': '4px'}).
+                add(this.data.cls_.getAxiomsByClass(foam.core.Action)).
+              end().
+            end().
+            add(this.DAOUpdateController.OBJ).
+          end().
+        end().
+      end();
     }
   ],
 

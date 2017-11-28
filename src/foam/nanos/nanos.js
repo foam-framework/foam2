@@ -5,6 +5,8 @@
  */
 
 FOAM_FILES([
+  { name: "foam/nanos/auth/DayOfWeek" },
+  { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/EnabledAware", flags: ['js'] },
@@ -34,6 +36,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/SubMenuView" },
   { name: "foam/nanos/menu/TabsMenu" },
   { name: "foam/nanos/menu/ViewMenu" },
+  { name: "foam/nanos/menu/TreeAltView" },
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
@@ -55,8 +58,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/EmailService' },
   { name: 'foam/nanos/notification/email/EmailTemplate' },
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
-  { name: 'foam/nanos/register/RegistrationService' },
-  { name: 'foam/nanos/register/ClientRegistrationService' },
-  { name: 'foam/nanos/register/UserRegistrationService' },
+  { name: 'foam/nanos/notification/push/PushService' },
+  { name: 'foam/nanos/notification/push/FirebasePushService' },
   { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
 ]);
