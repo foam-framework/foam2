@@ -40,7 +40,6 @@ var classes = [
   'foam.mlang.AbstractExpr',
   'foam.mlang.predicate.Eq',
   'foam.mlang.Constant',
-  'foam.mlang.DateConstant',
   'foam.mlang.ArrayConstant',
   'foam.box.Box',
   'foam.box.Skeleton',
