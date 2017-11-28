@@ -225,8 +225,8 @@ return LimitedDAO_create([
       },
       swiftCode: function() {/*
 let mySink = decorateListener_(sink, predicate)
-return sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
-  guard let topic = args[0] as? String else { return }
+return on.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+  guard let topic = args[1] as? String else { return }
   switch topic {
     case "put":
       mySink.put(args.last as! FObject, sub)
@@ -505,13 +505,23 @@ return try delegate.select_(
           this.predicate);
     },
 
-    function listen_(x, sink, predicate) {
-      return this.delegate.listen_(
-        x, sink,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
-    }
+    {
+      name: 'listen_',
+      code: function listen_(x, sink, predicate) {
+        return this.delegate.listen_(
+          x, sink,
+          predicate ?
+            this.And.create({ args: [this.predicate, predicate] }) :
+            this.predicate);
+      },
+      swiftCode: `
+return try delegate.listen_(
+  x, sink,
+  predicate != nil ?
+    And_create(["args": [self.predicate, predicate]]) :
+    predicate)
+      `,
+    },
   ]
 });
 

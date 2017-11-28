@@ -18,7 +18,7 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Expr, Comparator, SQLStatement
+    extends Expr, Comparator, SQLStatement, Axiom
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
@@ -42,4 +42,6 @@ public interface PropertyInfo
   public String getSQLType();
   public boolean isSet(Object obj);
   public boolean isDefaultValue(Object obj);
+  public void setStatementValue(foam.dao.pg.IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException;
 }

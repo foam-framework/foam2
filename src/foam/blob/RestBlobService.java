@@ -116,12 +116,12 @@ public class RestBlobService
       connection.connect();
 
       if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ||
-          connection.getContentLengthLong() == -1 ) {
+          connection.getContentLength() == -1 ) {
         throw new RuntimeException("Failed to find blob");
       }
 
       is = connection.getInputStream();
-      blob = new InputStreamBlob(is, connection.getContentLengthLong());
+      blob = new InputStreamBlob(is, connection.getContentLength());
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
