@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.dao.pg.IndexedPreparedStatement;
 import javax.xml.stream.XMLStreamReader;
 import java.util.Date;
 
@@ -31,4 +32,5 @@ public abstract class AbstractDatePropertyInfo
     Date date = new Date(reader.getText());
     return date;
   }
+
 }
