@@ -10,7 +10,7 @@ foam.CLASS({
 
   documentation: 'Country information.',
 
-  ids: ['code'],
+  ids: [ 'code' ],
 
   properties: [
     {
@@ -26,9 +26,9 @@ foam.CLASS({
     name: 'toString',
     returns: 'String',
     javaReturns: 'String',
-    javaCode: function () {/*
-return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
-    */
-    }
+    code: function() { return "Country: " + this.code + ", " + this.name; },
+    javaCode: `
+      return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
+    `
   }]
 });
