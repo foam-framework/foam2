@@ -168,7 +168,9 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResponse',
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
-  'foam.nanos.geocode.GoogleMapsBoundary'
+  'foam.nanos.geocode.GoogleMapsBoundary',
+
+  'foam.flinks.model.FlinksAuthRequest'
 ];
 
 var abstractClasses = [
