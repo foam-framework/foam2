@@ -584,8 +584,24 @@ foam.CLASS({
     UNSELECTED_COLOR: '#FFFFCC'
   },
 
-  css: ^ { width:1200px; margin: 20px; } ^ canvas { border: 1px solid black; } ^ .foam-u2-ActionView- { margin: 10px; } ^ input[type='range'] { width: 400px; },
+  css:`
+    ^ {
+      width: 1200px;
+      margin: 20px;
+    }
 
+    ^ canvas {
+      border: 1px solid black;
+    }
+
+    ^ .foam-u2-ActionView- {
+      margin: 10px;
+    }
+
+    ^ input[type='range'] {
+      width: 400px;
+    }
+ `,
   properties: [
     'feedback_',
     {
@@ -1171,6 +1187,7 @@ foam.CLASS({
       var d = 300;
       var boxLarge = 35;
       var endPtD = 180;
+      var l = 230;
 
       var cls = this.data;
 
@@ -1182,26 +1199,28 @@ foam.CLASS({
         }).sort(this.MODEL_COMPARATOR);
       };
 
-      var nbr = Math.trunc(req.length / 2);
-      x = x - ((nbr) * boxLarge);
+      if ( req.length === 0 ) return 0 ;
+
+      var nbr = Math.floor( req.length > 5 ? 5/2 : req.length/2 );// five sub classes by line
+      x = x - ( nbr * l );
 
       for ( var key in req ) {
         var a = req[key];
         var subClassesName = this.Box.create({
-          x: x + 210 * (key - nbr) + ((nbr) * boxLarge),
-          y: y + d,
+          x: x + l * ( key % 5 ),
+          y: y + d + ( boxLarge + 20 ) * ( Math.floor( key / 5 ) ),
           width: w || 200,
           height: h || 30,
           color: '#ffffe0', //this.UNSELECTED_COLOR
           border: 'black'
         });
 
-        this.setData(subClassesName.x, subClassesName.y, a.id);
+        this.setData( subClassesName.x, subClassesName.y, a.id );
 
         var subClassesNameLabel = foam.graphics.Label.create({
           align: 'center',
-          x: x + 210 * (key - nbr) + ((nbr) * boxLarge),
-          y: y + d - marge,
+          x: x + l * ( key % 5 ),
+          y: y + d - marge + ( boxLarge + 20 ) * ( Math.floor ( key / 5 ) ),
           color: 'black',
           font: '20px Arial',
           width: w || 200,
@@ -1209,19 +1228,61 @@ foam.CLASS({
           text: a.name
         });
 
-        subClassesLine = foam.graphics.Line.create({
-          startX: x + subClassesName.width / 2 + ((nbr) * boxLarge) || 0,
-          startY: y + endPtD + this.triangleSize || 0,
-          endX: x + subClassesName.width / 2 + ((nbr) * boxLarge) + 210 * (key - nbr) || 0,
-          endY: y + d || 0,
+        var subClassesLine = foam.graphics.Line.create({
+          startX: subClassesName.x + subClassesName.width / 2 || 0,
+          startY: subClassesName.y - 10 || 0,
+          endX: subClassesName.x + subClassesName.width / 2 || 0,
+          endY: subClassesName.y || 0,
           color: 'black',
           lineWidth: 2
         });
 
-        var triangleEndSubClasses = this.triangle(x + subClassesName.width / 2 + ((nbr) * boxLarge), y + endPtD, 0);
+        if ( req.length - 1 > 8 || ( 4 < key && key < 9) ){ //particular case, to avoid line without object
+          var subClassesLineNRow1 = foam.graphics.Line.create({
+            startX: subClassesName.x + subClassesName.width / 2 || 0,
+            startY: subClassesName.y - 10 || 0,
+            endX: subClassesName.x + subClassesName.width / 2 + ( l/2 ) || 0,
+            endY: subClassesName.y - 10 || 0,
+            color: 'black',
+            lineWidth: 2
+          });
 
-        this.selected = this.canvas.addChildren(subClassesName, subClassesNameLabel, subClassesLine, triangleEndSubClasses);
+          var subClassesLineNRow2 = foam.graphics.Line.create({
+            startX: subClassesName.x + subClassesName.width / 2 + ( l/2 ) || 0,
+            startY: subClassesName.y - 10 || 0,
+            endX: subClassesName.x + subClassesName.width / 2 + ( l/2 ) || 0,
+            endY: y + d - 10 || 0,
+            color: 'black',
+            lineWidth: 2
+          });
+
+          this.selected = this.canvas.addChildren( subClassesLine, subClassesName, subClassesNameLabel,subClassesLineNRow1, subClassesLineNRow2 );
+        }else {
+          this.selected = this.canvas.addChildren( subClassesLine, subClassesName, subClassesNameLabel );
+        }
       }
+
+      var triangleEndSubClasses = this.triangle( x + subClassesName.width / 2 + ( ( nbr ) * l ), y + endPtD, 0 );
+
+      var subClassesLineV = foam.graphics.Line.create({
+        startX: x + subClassesName.width / 2 + ( ( nbr ) * l ) || 0,
+        startY: y + endPtD + this.triangleSize || 0,
+        endX: x + subClassesName.width / 2 + ( ( nbr ) * l ) || 0,
+        endY: y + d - 10 || 0,
+        color: 'black',
+        lineWidth: 2
+      });
+
+      var subClassesLineH = foam.graphics.Line.create({
+        startX: x + subClassesName.width / 2 || 0,
+        startY: y + d - 10 || 0,
+        endX: x + subClassesName.width / 2 + (req.length < 5 && req.length % 2 == 0 ? ( nbr * l ) : ( ( 2 * nbr ) * l) ) || 0,
+        endY: y + d - 10 || 0,
+        color: 'black',
+        lineWidth: 2
+      });
+
+      this.selected = this.canvas.addChildren( triangleEndSubClasses, subClassesLineV, subClassesLineH );
     },
 
     function arrowEnd(ptX, ptY, ang) {
