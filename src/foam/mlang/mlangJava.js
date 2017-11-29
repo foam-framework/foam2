@@ -492,7 +492,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
 
@@ -528,25 +527,55 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode:
-`int length = getValue().length;
-StringBuilder builder = sb.get().append(" (");
-for ( int i = 0; i < length; i++ ){
-  builder.append("?");
-  if ( i < length - 1 ) {
-    builder.append(",");
-  }
-}
-builder.append(") ");
-return builder.toString();`
+      javaCode: 'return " ? "; '
     },
     {
       name: 'prepareStatement',
       javaReturns: 'void',
       javaCode:
-`for ( Object o : getValue() ) {
-  stmt.setObject(o);
-}`
+`Object[] obj = getValue();
+if ( obj == null ) {
+  stmt.setObject(null);
+  return;
+}
+int length = obj.length;
+if ( length == 0 ) {
+  stmt.setObject(null);
+  return;
+}
+StringBuilder builder = sb.get();
+for ( int i = 0; i < length; i++ ) {
+  if ( obj[i] == null )
+    builder.append("");
+  else 
+    escapeCommasAndAppend(builder, obj[i]);
+  if ( i < length - 1 ) {
+    builder.append(",");
+  }
+}
+stmt.setObject(builder.toString());`
+    },
+    {
+      name: 'escapeCommasAndAppend',
+      args: [
+        {
+          name: 'builder',
+          javaType: 'StringBuilder'
+        },
+        {
+          name: 'o',
+          javaType: 'Object'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: 
+`String s = o.toString();
+//replace backslash to double backslash
+s = s.replace("\\\\", "\\\\\\\\");
+//replace comma to backslash+comma
+s = s.replace(",", "\\\\,");
+builder.append(s);
+`
     }
   ]
 });
