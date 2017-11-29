@@ -97,14 +97,14 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' } ],
-            body: 'return (o1 instanceof ' + this.sourceCls.name + ' ? compareValues(get_(o1), get_(o2)) : compareValues(cast(o1), cast(o2)));'
+            body: 'return compareValues(get_(o1), get_(o2));'
           },
           {
             name: 'comparePropertyToObject',
             type: 'int',
             visibility: 'public',
-            args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
-            body: 'return compare(cast(key), get_(o));'
+            args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'Object' } ],
+            body: 'return foam.util.SafetyUtil.compare(cast(key), get_(o));'
           },
           {
             name: 'jsonParser',
