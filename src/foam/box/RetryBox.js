@@ -77,7 +77,7 @@ foam.CLASS({
         msg.attributes.replyBox = this.RetryReplyBox.create({
           delegate: replyBox,
           maxAttempts: this.maxAttempts,
-          message: msg,
+          message: msg.clone(),
           destination: this.delegate
         });
       }
