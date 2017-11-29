@@ -34,7 +34,7 @@ foam.CLASS({
       // There could be a race condition here if the socket
       // closes between our check and .send().
       if ( this.socket.readyState !== this.socket.OPEN ) {
-        throw new Error('Socket is not open');
+        throw foam.net.NotConnectedExeption.create();
       }
       this.socket.send(msg);
     },
