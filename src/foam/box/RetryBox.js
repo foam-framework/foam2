@@ -74,10 +74,16 @@ foam.CLASS({
       var replyBox = msg.attributes.replyBox;
 
       if ( replyBox ) {
+        var clone = msg.cls_.create(msg);
+        clone.attributes = {};
+        for ( var key in msg.attributes ) {
+          clone.attributes[key] = msg.attributes[key];
+        }
+
         msg.attributes.replyBox = this.RetryReplyBox.create({
           delegate: replyBox,
           maxAttempts: this.maxAttempts,
-          message: msg.clone(),
+          message: clone,
           destination: this.delegate
         });
       }
