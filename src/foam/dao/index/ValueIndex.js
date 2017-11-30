@@ -31,14 +31,16 @@ foam.CLASS({
 
     function toPrettyString(indent) {
       return '';
-    },
-
+    }
   ]
 });
+
+
 foam.CLASS({
   package: 'foam.dao.index',
   name: 'ValueIndexNode',
   extends: 'foam.dao.index.IndexNode',
+
   implements: [ 'foam.dao.index.Plan' ],
 
   properties: [
