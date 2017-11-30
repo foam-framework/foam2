@@ -13,8 +13,9 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
-  requires: [ 'foam.nanos.auth.Phone',
-              'foam.nanos.auth.Address'
+  requires: [ 
+    'foam.nanos.auth.Phone',
+    'foam.nanos.auth.Address'
   ],
 
   documentation: '',
@@ -176,6 +177,11 @@ emailIsSet_ = true;`
     },
     {
       class: 'String',
+      name: 'issuingAuthority',
+      width: 50,
+    },
+    {
+      class: 'String',
       name: 'bankIdentificationCode',
       width: 20,
       documentation: 'Bank Identification Code (BIC)'
@@ -184,16 +190,6 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'website',
       width: 50
-    },
-    {
-      class: 'String',
-      name: 'businessType',
-      width: 15
-    },
-    {
-      class: 'String',
-      name: 'businessSector',
-      width: 15
     }
   ],
 
