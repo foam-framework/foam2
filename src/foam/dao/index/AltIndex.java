@@ -61,6 +61,15 @@ public class AltIndex implements Index {
     return s;
   }
 
+  public FObject find(Object state, Object key) {
+    FindPlan plan = this.planFind(state, key);
+    Object[] s = (Object[]) state;
+    if ( s == null || s.length == 0 ) {
+      return null;
+    }
+    return plan.find(s[0], key);
+  }
+
   public FindPlan planFind(Object state, Object key) {
     Object[] s = toObjectArray(state);
     Plan bestPlan = NoPlan.instance();
