@@ -13,6 +13,10 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  requires: [ 'foam.nanos.auth.Phone',
+              'foam.nanos.auth.Address'
+  ],
+
   documentation: '',
 
   tableColumns: [
@@ -77,13 +81,15 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      factory: function() { return foam.nanos.auth.Phone.create(); }
+      factory: function() { return this.Phone.create(); },
+      view: 'foam.nanos.auth.PhoneDetailView'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
-      factory: function() { return foam.nanos.auth.Phone.create(); }
+      factory: function() { return this.Phone.create(); },
+      view: 'foam.nanos.auth.PhoneDetailView'
     },
     {
       class: 'String',
@@ -109,7 +115,8 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return foam.nanos.auth.Address.create({}, this); }
+      factory: function() { return this.Address.create(); },
+      view: 'foam.nanos.auth.AddressDetailView'
     },
     {
       class: 'FObjectArray',
