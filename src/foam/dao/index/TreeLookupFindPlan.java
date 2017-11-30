@@ -7,15 +7,18 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
+import foam.dao.index.TreeNode;
 
 public class TreeLookupFindPlan implements FindPlan {
 
   protected PropertyInfo prop_;
   protected long size_;
+  protected TreeNode state_;
 
-  public TreeLookupFindPlan(PropertyInfo prop, long size) {
+  public TreeLookupFindPlan(PropertyInfo prop, Object state, long size) {
     prop_ = prop;
     size_ = size;
+    state_ = (TreeNode) state;
   }
 
   public long cost() {
