@@ -28,7 +28,6 @@ public class FObjectParser
         new Optional(new Literal(",")));
 
       public PStream parse(PStream ps, ParserContext x) {
-        System.out.println("Hello");
         PStream ps1 = ps.apply(delegate, x);
         Class   c;
 
