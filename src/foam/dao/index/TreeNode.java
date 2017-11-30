@@ -266,10 +266,9 @@ public class TreeNode {
       return s.value;
     }
     if ( r > 0 ) {
-      return get(s.left, key, prop);
+      return get(s.right, key, prop);
     }
-    return get(s.right, key, prop);
-
+    return get(s.left, key, prop);
   }
 
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
