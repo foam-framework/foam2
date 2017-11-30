@@ -1,24 +1,28 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 foam.CLASS({
   package: 'foam.flinks.model',
-  name: 'Flinks',
+  name: 'FlinksCall',
+  documentation: 'model for Flinks Call',
+  abstract: 'true'
+});
 
-  documentation: 'model for Flinks',
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'FlinksRequest',
+  extends: 'foam.flinks.model.FlinksCall',
+  abstract: 'true',
+
+  documentation: 'model for Flinks request',
 
   properties:[
     {
       class: 'String',
       name: 'CustomerId'
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.flinks.model',
-  name: 'FlinksCall',
-  extends: 'foam.flinks.model.Flinks',
-  documentation: 'model for Flinks Call',
-
-  properties: [
+    },
     {
       class: 'String',
       name: 'RequestId'
@@ -29,7 +33,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.flinks.model',
   name: 'FlinksAuthRequest',
-  extends: 'foam.flinks.model.FlinksCall',
+  extends: 'foam.flinks.model.FlinksRequest',
 
   documentation: 'model for Flinks authorize request',
 
@@ -88,8 +92,9 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.flinks.model',
-  name: 'FlinksTransaction',
-  extends: 'foam.flinks.model.FlinksCall',
+  name: 'FlinksTransactionRequest',
+  extends: 'foam.flinks.model.FlinksRequest',
+  abstract: 'true',
 
   documentation: 'model for Flinks account request',
 
@@ -107,8 +112,9 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.flinks.model',
-  name: 'FlinksAccount',
-  extends: 'foam.flinks.model.FlinksTransaction',
+  name: 'FlinksAccountRequest',
+  extends: 'foam.flinks.model.FlinksTransactionRequest',
+  abstract: 'true',
 
   documentation: 'model for Flinks Transaction',
 
@@ -127,7 +133,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.flinks.model',
   name: 'FlinksAccountSummaryRequest',
-  extends: 'foam.flinks.model.FlinksAccount',
+  extends: 'foam.flinks.model.FlinksAccountRequest',
 
   documentation: 'model for Flinks Account Summary Request',
 
@@ -141,8 +147,26 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.flinks.model',
+  name: 'RefreshDeltaModel',
+
+  documentation: 'model for Flinks Refresh Delta',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'AccountId'
+    },
+    {
+      class: 'String',
+      name: 'TransactionId'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
   name: 'FlinksAccountDetailRequest',
-  extends: 'foam.flinks.model.FlinksAccount',
+  extends: 'foam.flinks.model.FlinksAccountRequest',
 
   documenatation: 'model for Flinks Account Detail Request',
 
@@ -165,7 +189,8 @@ foam.CLASS({
       name: 'AccountsFilter'
     },
     {
-      class: 'Map',
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.RefreshDeltaModel',
       name: 'RefreshDelta'
     },
     {
@@ -178,7 +203,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.flinks.model',
   name: 'FlinksMulAuthRequest',
-  extends: 'foam.flinks.model.Flinks',
+  extends: 'foam.flinks.model.FlinksCall',
 
   documentation: 'model for Flinks multiple authrize request',
 
@@ -190,3 +215,46 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'FlinksResponse',
+  extends: 'foam.flinks.model.FlinksCall',
+
+  documentation: 'model for Flinks Response',
+
+  properties: [
+    {
+      class: 'Int',
+      name: 'HttpStatusCode'
+    },
+    {
+      class: 'String',
+      name: 'FlinksCode'
+    },
+    {
+      class: 'String',
+      name: 'Message'
+    },
+    {
+      javaType: 'foam.lib.json.UnknownFObjectArray',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectArrayParser()',
+      name: 'Links'
+    },
+    {
+      class: 'String',
+      name: 'RequestId'
+    },
+    {
+      javaType: 'foam.lib.json.UnknownFObject',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      name: 'SecurityChallenges'
+    },
+    {
+      class: 'String',
+      name: 'Institution'
+    }
+  ]
+})

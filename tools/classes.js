@@ -154,6 +154,7 @@ var classes = [
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.UnknownFObject',
+  'foam.lib.json.UnknownFObjectArray',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -170,14 +171,16 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary',
 
-  'foam.flinks.model.Flinks',
   'foam.flinks.model.FlinksCall',
+  'foam.flinks.model.FlinksRequest',
   'foam.flinks.model.FlinksAuthRequest',
-  'foam.flinks.model.FlinksTransaction',
-  'foam.flinks.model.FlinksAccount',
+  'foam.flinks.model.FlinksTransactionRequest',
+  'foam.flinks.model.FlinksAccountRequest',
   'foam.flinks.model.FlinksAccountSummaryRequest',
+  'foam.flinks.model.RefreshDeltaModel',
   'foam.flinks.model.FlinksAccountDetailRequest',
-  'foam.flinks.model.FlinksMulAuthRequest'
+  'foam.flinks.model.FlinksMulAuthRequest',
+  'foam.flinks.model.FlinksResponse'
 
 ];
 
