@@ -30,11 +30,10 @@ public class RestFlinksService {
 
   private String address_ = "https://nanopay-api.private.fin.ag/v3/8bc4718b-3780-46d0-82fd-b217535229f1/BankingServices";
 
-  public FObject authorize(FObject request) {
+  public String authorize(FObject request) {
     String url = address_ + "/" + AUTHORIZE;
     String responseJSON = postRequest(url, request);
-    System.out.println(responseJSON);
-    return null;
+    return responseJSON;
   }
 
   public FObject authorizedMultiple(FObject request) {
