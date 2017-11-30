@@ -14,6 +14,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.box.RetryBox',
     'foam.box.HTTPBox',
     'foam.dao.RequestResponseClientDAO',
     'foam.dao.ClientDAO',
@@ -24,13 +25,19 @@ foam.CLASS({
     {
       name: 'nSpecDAO',
       factory: function() {
+        // The client completely fails if nSpecDAO fails to load, so infinitely retry
+        // requests to nSpecDAO.
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
-          delegate: this.HTTPBox.create({
-            method: 'POST',
-            url: 'nSpecDAO'
-          })});
-        }
+          delegate: this.RetryBox.create({
+            maxAttempts: -1,
+            delegate: this.HTTPBox.create({
+              method: 'POST',
+              url: 'nSpecDAO'
+            })
+          })
+        });
+      }
     }
   ],
 
