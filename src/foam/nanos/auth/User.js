@@ -184,16 +184,6 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'website',
       width: 50
-    },
-    {
-      class: 'String',
-      name: 'businessType',
-      width: 15
-    },
-    {
-      class: 'String',
-      name: 'businessSector',
-      width: 15
     }
   ],
 
