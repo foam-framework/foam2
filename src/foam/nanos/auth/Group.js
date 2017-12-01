@@ -14,6 +14,8 @@ foam.CLASS({
 
   documentation: 'A Group of Users.',
 
+  tableColumns: [ 'id', 'description' ],
+
   properties: [
     {
       class: 'String',
@@ -45,7 +47,7 @@ foam.CLASS({
     }
     */
   ],
-  
+
   methods: [
     {
       name: 'implies',
