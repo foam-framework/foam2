@@ -36,7 +36,7 @@ public class NanoRouter
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String      path       = req.getRequestURI();
     String[]    urlParams  = path.split("/");
-    String      serviceKey = urlParams[1];
+    String      serviceKey = urlParams[2];
     Object      service    = getX().get(serviceKey);
     DAO         nSpecDAO   = (DAO) getX().get("nSpecDAO");
     NSpec       spec       = (NSpec) nSpecDAO.find(serviceKey);

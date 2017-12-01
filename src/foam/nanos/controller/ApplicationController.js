@@ -31,11 +31,13 @@ foam.CLASS({
     'webApp',
     'requestLogin',
     'loginSuccess',
-    'as ctrl'
+    'as ctrl',
+    'wrapCSS as installCSS'
   ],
 
   imports: [
-    'sessionSuccess'
+    'sessionSuccess',
+    'installCSS'
   ],
 
   css: `
@@ -83,7 +85,11 @@ foam.CLASS({
       value: false
     },
     'logo',
-    'webApp'    
+    'webApp',
+    'primaryColor',
+    'secondaryColor',
+    'tableColor',
+    'accentColor'  
   ],
 
   methods: [
@@ -123,6 +129,25 @@ foam.CLASS({
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end()
+    },
+    
+    //CSS preprocessor, works on classes instantiated in subContext
+    function wrapCSS(text, id) {
+      if ( text ) {
+        if ( ! this.accentColor ) {
+          var self = this;
+          this.accentColor$.sub(function(s) {
+            self.wrapCSS(text, id);
+            s.detach();
+          });
+        }
+        this.installCSS(text.
+          replace(/%PRIMARYCOLOR%/g, this.primaryColor).
+          replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
+          replace(/%TABLECOLOR%/g, this.tableColor).
+          replace(/%ACCENTCOLOR%/g, this.accentColor),
+          id);
+      }
     },
 
     function requestLogin(){
