@@ -11,17 +11,17 @@ foam.CLASS({
 
   imports: [
     'auth',
-    'user',
-    'stack',
     'loginSuccess',
-    'signUpEnabled'
+    'signUpEnabled',
+    'stack',
+    'user'
   ],
 
   exports: [ 'as data' ],
 
   requires: [
-    'foam.nanos.auth.User',
     'foam.comics.DAOCreateControllerView',
+    'foam.nanos.auth.User',
     'foam.u2.dialog.NotificationMessage'
   ],
 
