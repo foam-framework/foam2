@@ -6,10 +6,10 @@ foam.CLASS({
   documentation: 'User Registration View',
 
   imports: [
-    'stack',
-    'save',
-    'user',
     'emailUserRegistration',
+    'save',
+    'stack',
+    'user',
     'userDAO'
   ],
 
@@ -21,9 +21,7 @@ foam.CLASS({
     'foam.nanos.auth.User'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
+  css: `
         ^{
           width: 490px;
           margin: auto;
@@ -130,9 +128,7 @@ foam.CLASS({
           -moz-text-security: disc;
           text-security: disc;
         }
-      */}
-    })
-  ],
+  `,
 
   properties: [
     {
@@ -168,7 +164,7 @@ foam.CLASS({
           .start().addClass('registration-container')
             .start().addClass('business-registration-input')
               .start().addClass('input-container')
-                .start('label').add('First Name').end()      
+                .start('label').add('First Name').end()
                   .add(this.FIRST_NAME)
               .end()
               .start().addClass('input-container-right')
@@ -184,7 +180,7 @@ foam.CLASS({
                   .add(this.DEPARTMENT)
               .end()
               .start().addClass('input-container')
-                .start('label').add('Email Address').end()           
+                .start('label').add('Email Address').end()
                   .add(this.EMAIL)
               .end()
               .start().addClass('input-container-right')
@@ -192,7 +188,7 @@ foam.CLASS({
                   .add(this.PHONE)
               .end()
               .start().addClass('input-container-full-width')
-                .start('label').add('Password').end()       
+                .start('label').add('Password').end()
                   .add(this.PASSWORD)
               .end()
             .end()
@@ -201,7 +197,7 @@ foam.CLASS({
               //   .tag({class:'foam.u2.tag.Image', data: 'images/check-mark.png'}).enableClass('show-checkmark', this.agreed$)
               // .end()
               // .start('p').add('I agree with the ').end()
-              // .start('p').addClass('link').add('terms and conditions.').end()                      
+              // .start('p').addClass('link').add('terms and conditions.').end()
               .start().add(this.SIGN_UP).end()
             .end()
           .end()
