@@ -69,17 +69,17 @@ public class TreeNode {
   public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key,
     FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
-      return new TreeNode(key, value, 1, 1, null, null);
+      return new TreeNode(key, tail.put(null, value), 1, 1, null, null);
     }
     state = maybeClone(state);
-    int r = prop.compare(state.value, value);
+    int r = prop.comparePropertyToValue(key,state.key);
 
     if ( r == 0 ) {
       state.size -= tail.size(state.value);
       state.value = tail.put(state.value, value);
       state.size += tail.size(state.value);
     } else {
-      if ( r > 0 ) {
+      if ( r < 0 ) {
         if ( state.left != null ) {
           state.size -= state.left.size;
         }
@@ -135,7 +135,7 @@ public class TreeNode {
     }
 
     state = maybeClone(state);
-    long compareValue = prop.compare(state.value, value);
+    long compareValue = prop.comparePropertyToValue(key,state.key);
 
     if ( compareValue == 0 ) {
       state.size -= tail.size(state.value);

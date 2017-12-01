@@ -39,6 +39,7 @@ public interface PropertyInfo
   public Object fromXML(X x, XMLStreamReader reader);
   public void toXML(FObject obj, Document doc, Element objElement);
   public int comparePropertyToObject(Object key, Object o);
+  public int comparePropertyToValue(Object key, Object value);
   public String getSQLType();
   public boolean isSet(Object obj);
   public boolean isDefaultValue(Object obj);
