@@ -55,6 +55,14 @@ public class Outputter
     this(new PrintWriter(file), mode, outputHeaders);
   }
 
+  public Outputter(OutputStream os, OutputterMode mode, boolean outputHeaders) {
+    this(new OutputStreamWriter(os), mode, outputHeaders);
+  }
+
+  public Outputter(Writer writer, OutputterMode mode, boolean outputHeaders) {
+    this(new PrintWriter(writer), mode, outputHeaders);
+  }
+
   public Outputter(PrintWriter writer, OutputterMode mode, boolean outputHeaders) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
