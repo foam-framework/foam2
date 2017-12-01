@@ -47,6 +47,6 @@ foam.RELATIONSHIP({
     hidden: true
   },
   targetProperty: {
-    hidden: true
+    hidden: false
   }
 });
