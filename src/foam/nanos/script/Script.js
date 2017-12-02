@@ -34,7 +34,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'description'
+      name: 'description',
+      displayWidth: 80
     },
     {
       class: 'DateTime',
