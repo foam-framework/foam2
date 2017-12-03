@@ -12,6 +12,6 @@ public class UnknownPropertyParser
   extends ProxyParser
 {
   public UnknownPropertyParser() {
-    super(new KeyValueParser0());
+    super(new UnknownKeyValueParser0());
   }
 }
