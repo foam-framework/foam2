@@ -53,7 +53,32 @@ public class XMLSupport {
     return objList;
   }
 
-  public static FObject createObj ( X x, XMLStreamReader xmlr ) {
+  public static List<FObject> fromXML(X x, XMLStreamReader xmlr, Class defaultClass) {
+    List<FObject> objList = new ArrayList<FObject>();
+    try {
+      int eventType;
+      while ( xmlr.hasNext() ) {
+        eventType = xmlr.next();
+        switch ( eventType ) {
+          case XMLStreamConstants.START_ELEMENT:
+            if ( xmlr.getLocalName().equals("object") ) {
+              FObject obj = createObj(x, xmlr, defaultClass);
+              if ( obj != null ) {
+                objList.add(obj);
+              }
+            }
+            break;
+        }
+      }
+      xmlr.close();
+    } catch (XMLStreamException ex) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("Could not read from file with existing XMLStreamReader");
+    }
+    return objList;
+  }
+
+  public static FObject createObj (X x, XMLStreamReader xmlr) {
     Object clsInstance = null;
     String objClass = null;
     try {
@@ -69,6 +94,23 @@ public class XMLSupport {
     } catch (XMLStreamException ex ) {
       Logger logger = (Logger) x.get("logger");
       logger.error("Error while reading file");
+    }
+    return (FObject) clsInstance;
+  }
+
+  public static FObject createObj (X x, XMLStreamReader xmlr, Class defaultClass) {
+    Object clsInstance = null;
+    try {
+      // Create new fObject
+      //Class cls = Class.forName(defaultClass);
+      clsInstance = x.create(defaultClass);
+      // Object properties
+      copyFromXML(x, (FObject) clsInstance, xmlr);
+    } catch (XMLStreamException ex ) {
+      Logger logger = (Logger) x.get("logger");
+      logger.error("Error while reading file");
+    } catch (Throwable t) {
+      Logger logger = (Logger) x.get("logger");
     }
     return (FObject) clsInstance;
   }
