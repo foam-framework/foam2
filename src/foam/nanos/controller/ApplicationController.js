@@ -81,8 +81,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'loginSuccess',
-      value: false
+      name: 'loginSuccess'
     },
     'logo',
     'webApp',
@@ -136,16 +135,17 @@ foam.CLASS({
       if ( text ) {
         if ( ! this.accentColor ) {
           var self = this;
+          
           this.accentColor$.sub(function(s) {
             self.wrapCSS(text, id);
             s.detach();
           });
         }
         this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g, this.primaryColor).
+          replace(/%PRIMARYCOLOR%/g,   this.primaryColor).
           replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
-          replace(/%TABLECOLOR%/g, this.tableColor).
-          replace(/%ACCENTCOLOR%/g, this.accentColor),
+          replace(/%TABLECOLOR%/g,     this.tableColor).
+          replace(/%ACCENTCOLOR%/g,    this.accentColor),
           id);
       }
     },
