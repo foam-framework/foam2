@@ -180,7 +180,8 @@ var classes = [
   'foam.flinks.model.RefreshDeltaModel',
   'foam.flinks.model.FlinksAccountDetailRequest',
   'foam.flinks.model.FlinksMulAuthRequest',
-  'foam.flinks.model.FlinksResponse'
+  'foam.flinks.model.FlinksResponse',
+  'foam.flinks.model.SecurityChallenge'
 
 ];
 

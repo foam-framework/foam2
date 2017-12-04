@@ -247,9 +247,8 @@ foam.CLASS({
       name: 'RequestId'
     },
     {
-      javaType: 'foam.lib.json.UnknownFObject',
-      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
-      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.SecurityChallenge',
       name: 'SecurityChallenges'
     },
     {
@@ -257,4 +256,22 @@ foam.CLASS({
       name: 'Institution'
     }
   ]
-})
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'SecurityChallenge',
+
+  documentation: 'model for Flinks Security Challenges',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'Type'
+    },
+    {
+      class: 'String',
+      name: 'Prompt'
+    }
+  ]
+});
