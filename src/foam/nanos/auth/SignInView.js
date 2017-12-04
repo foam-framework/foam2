@@ -131,7 +131,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function signUp(){
+    function signUp() {
       var self = this;
       var view = foam.u2.ListCreateController.CreateController.create(
         null,
@@ -152,7 +152,7 @@ foam.CLASS({
     {
       name: 'signIn',
       label: 'Sign In',
-      code: function(X){
+      code: function(X) {
         var self = this;
 
         if ( ! this.email ) {
