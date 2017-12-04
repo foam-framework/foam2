@@ -30,6 +30,8 @@
         Object[] objs = (Object[]) ps.value();
         String ret = "";
         ret = "\"" + objs[0].toString() + "\"" + ":" + objs[1].toString();
+        //use for test
+        System.out.println("Filter out property: " + ret);
         return ps.setValue(ret);
       }
       });
