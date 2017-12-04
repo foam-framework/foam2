@@ -216,6 +216,7 @@ foam.CLASS({
   ]
 });
 
+//instance create when HttpStatusCode is not 200, contain all invalid login info
 foam.CLASS({
   package: 'foam.flinks.model',
   name: 'FlinksResponse',
@@ -243,13 +244,36 @@ foam.CLASS({
       name: 'Links'
     },
     {
+      javaType: 'foam.lib.json.UnknownFObjectArray',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectArrayParser()',
+      name: 'ValidationDetails'
+    },
+    {
       class: 'String',
       name: 'RequestId'
     },
     {
       class: 'FObjectArray',
-      of: 'foam.flinks.model.SecurityChallenge',
+      of: 'foam.flinks.model.SecurityChallengeModel',
       name: 'SecurityChallenges'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'FlinksAuthResponse',
+  extends: 'foam.flinks.model.FlinksResponse',
+
+  documentation: 'model for Flinks success authorized response',
+
+  properties: [
+    {
+      javaType: 'foam.flinks.model.LoginModel',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.LoginModel.class)',
+      name: 'Login'
     },
     {
       class: 'String',
@@ -260,7 +284,70 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.flinks.model',
-  name: 'SecurityChallenge',
+  name: 'FlinksAccountsSummaryResponse',
+  extends: 'foam.flinks.model.FlinksResponse',
+
+  documentation: 'model for Flinks accounts summary response',
+
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.AccountModel',
+      name: 'Accounts'
+    },
+    {
+      class: 'String',
+      name: 'Institution'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'FlinksAccountsDetailResponse',
+  extends: 'foam.flinks.model.FlinksResponse',
+
+  documentation: 'model for Flinks accounts detail response',
+
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.AccountWithDetailModel',
+      name: 'Accounts'
+    }
+  ]
+});
+
+//instance when Http status code is 200
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'LoginModel',
+
+  documentation: 'model for Flinks Login',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'Username'
+    },
+    {
+      class: 'Boolean',
+      name: 'IsScheduledRefresh'
+    },
+    {
+      class: 'String',
+      name: 'LastRefresh'
+    },
+    {
+      class: 'String',
+      name: 'Id'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'SecurityChallengeModel',
 
   documentation: 'model for Flinks Security Challenges',
 
@@ -272,6 +359,233 @@ foam.CLASS({
     {
       class: 'String',
       name: 'Prompt'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'BalanceModel',
+
+  documentation: 'model for Flinks account balance',
+
+  properties: [
+    {
+      class: 'Double',
+      name: 'Available'
+    },
+    {
+      class: 'Double',
+      name: 'Current'
+    },
+    {
+      class: 'Double',
+      name: 'Limit'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'AddressModel',
+
+  documentation: 'model for the Flinks address mode',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'CivicAddress'
+    },
+    {
+      class: 'String',
+      name: 'City'
+    },
+    {
+      class: 'String',
+      name: 'Province'
+    },
+    {
+      class: 'String',
+      name: 'PostalCode'
+    },
+    {
+      class: 'String',
+      name: 'POBox'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'HolderModel',
+
+  documentation: 'model for Flinks account holder',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'Name'
+    },
+    {
+      javaType: 'foam.flinks.model.AddressModel',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.AddressModel.class)',
+      name: 'Address'
+    },
+    {
+      class: 'String',
+      name: 'Email'
+    },
+    {
+      class: 'String',
+      name: 'PhoneNumber'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'AccountTransactionModel',
+
+  documentation: 'model for the Flinks account transaction model',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'Date'
+    },
+    {
+      class: 'String',
+      name: 'Code'
+    },
+    {
+      class: 'String',
+      name: 'Description'
+    },
+    {
+      class: 'Double',
+      name: 'Debit'
+    },
+    {
+      class: 'Double',
+      name: 'Credit'
+    },
+    {
+      class: 'Double',
+      name: 'Balance'
+    },
+    {
+      class: 'String',
+      name: 'Id'
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'AccountModel',
+
+  documentation: 'model for Flinks account model',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'Title'
+    },
+    {
+      class: 'String',
+      name: 'AccountNumber'
+    },
+    {
+      class: 'String',
+      name: 'Category'
+    },
+    {
+      class: 'String',
+      name: 'Currency'
+    },
+    {
+      class: 'String',
+      name: 'Id'
+    },
+    //maybe dangerous if property=null or property={}
+    {
+      javaType: 'foam.flinks.model.BalanceModel',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.BalanceModel.class)',
+      name: 'BalanceModel'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'AccountWithDetailModel',
+  extends: 'foam.flinks.model.AccountModel',
+
+  documentation: 'model for the Flinks account with detail model',
+
+  properties: [
+    {
+      javaType: 'foam.flinks.model.HolderModel',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.HolderModel.class)',
+      name: 'Holder'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.AccountTransactionModel',
+      name: 'Transactions'
+    },
+    {
+      class: 'String',
+      name: 'TransitNumber'
+    },
+    {
+      class: 'String',
+      name: 'InstitutionNumber'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'AccountStatementModel',
+
+  documentation: 'model for the Flinks account statement model',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'UniqueId'
+    },
+    {
+      class: 'String',
+      name: 'FileType'
+    },
+    {
+      class: 'String',
+      name: 'Base64Bytes'
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'AccountStatementContainerModel',
+
+  documentation: 'model for the Flinks account statment container model',
+
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.AccountStatementModel',
+      name: 'Statements'
+    },
+    {
+      class: 'String',
+      name: 'AccountNumber'
     }
   ]
 });
