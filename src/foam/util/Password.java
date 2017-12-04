@@ -7,13 +7,12 @@
 package foam.util;
 
 import foam.core.FObject;
-import org.bouncycastle.crypto.PBEParametersGenerator;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.util.encoders.Base64;
-
 import java.security.SecureRandom;
 import java.util.regex.Pattern;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.util.encoders.Base64;
 
 public class Password {
 

@@ -13,8 +13,9 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
-  requires: [ 'foam.nanos.auth.Phone',
-              'foam.nanos.auth.Address'
+  requires: [
+    'foam.nanos.auth.Phone',
+    'foam.nanos.auth.Address'
   ],
 
   documentation: '',
