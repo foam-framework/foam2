@@ -18,20 +18,20 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.auth.User',
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView',
-    'foam.nanos.auth.User'
+    'foam.u2.stack.StackView'
   ],
 
   exports: [
+    'as ctrl',
+    'loginSuccess',
+    'logo',
+    'requestLogin',
+    'signUpEnabled',
     'stack',
     'user',
-    'logo',
-    'signUpEnabled',
     'webApp',
-    'requestLogin',
-    'loginSuccess',
-    'as ctrl',
     'wrapCSS as installCSS'
   ],
 
@@ -81,15 +81,14 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'loginSuccess',
-      value: false
+      name: 'loginSuccess'
     },
     'logo',
     'webApp',
     'primaryColor',
     'secondaryColor',
     'tableColor',
-    'accentColor'  
+    'accentColor'
   ],
 
   methods: [
@@ -130,22 +129,23 @@ foam.CLASS({
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end()
     },
-    
+
     //CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
       if ( text ) {
         if ( ! this.accentColor ) {
           var self = this;
+          
           this.accentColor$.sub(function(s) {
             self.wrapCSS(text, id);
             s.detach();
           });
         }
         this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g, this.primaryColor).
+          replace(/%PRIMARYCOLOR%/g,   this.primaryColor).
           replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
-          replace(/%TABLECOLOR%/g, this.tableColor).
-          replace(/%ACCENTCOLOR%/g, this.accentColor),
+          replace(/%TABLECOLOR%/g,     this.tableColor).
+          replace(/%ACCENTCOLOR%/g,    this.accentColor),
           id);
       }
     },
