@@ -179,6 +179,10 @@ public abstract class AbstractDAO
     this.select_(x, new RemoveSink(this), skip, limit, order, predicate);
   }
 
+  public Sink select() {
+    return select(null);
+  }
+
   public Sink select(Sink sink) {
     if ( sink == null ) sink = new ListSink();
     return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);

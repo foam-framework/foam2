@@ -18,14 +18,14 @@ import foam.util.Email;
 import foam.util.LRULinkedHashMap;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.*;
 import javax.naming.AuthenticationException;
+import javax.security.auth.AuthPermission;
 
 public class UserAndGroupAuthService
-    extends    ContextAwareSupport
-    implements AuthService, NanoService
+  extends    ContextAwareSupport
+  implements AuthService, NanoService
 {
   protected DAO userDAO_;
   protected DAO groupDAO_;
@@ -169,7 +169,7 @@ public class UserAndGroupAuthService
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
-      throw new AuthenticationException("Invalid password");
+      throw new AuthenticationException("Incorrect password");
     }
 
     Session session = (Session) x.get(Session.class);
