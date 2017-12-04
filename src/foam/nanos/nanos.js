@@ -22,6 +22,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
   { name: "foam/nanos/auth/Phone" },
+  { name: "foam/nanos/auth/SignOutView" },
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/session/Session" },
