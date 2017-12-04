@@ -181,7 +181,20 @@ var classes = [
   'foam.flinks.model.FlinksAccountDetailRequest',
   'foam.flinks.model.FlinksMulAuthRequest',
   'foam.flinks.model.FlinksResponse',
-  'foam.flinks.model.SecurityChallenge'
+  'foam.flinks.model.SecurityChallengeModel',
+  'foam.flinks.model.FlinksResponse',
+  'foam.flinks.model.LoginModel',
+  'foam.flinks.model.FlinksAuthResponse',
+  'foam.flinks.model.BalanceModel',
+  'foam.flinks.model.AccountModel',
+  'foam.flinks.model.AddressModel',
+  'foam.flinks.model.HolderModel',
+  'foam.flinks.model.AccountTransactionModel',
+  'foam.flinks.model.AccountWithDetailModel',
+  'foam.flinks.model.AccountStatementModel',
+  'foam.flinks.model.AccountStatementContainerModel',
+  'foam.flinks.model.FlinksAccountsDetailResponse',
+  'foam.flinks.model.FlinksAccountsSummaryResponse'
 
 ];
 
