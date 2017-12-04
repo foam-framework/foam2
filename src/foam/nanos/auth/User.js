@@ -13,7 +13,8 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
-  requires: [ 
+
+  requires: [
     'foam.nanos.auth.Phone',
     'foam.nanos.auth.Address'
   ],
@@ -21,7 +22,7 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'type', 'firstName', 'lastName', 'organization', 'email'
+    'id', 'enabled', 'type', 'group', 'firstName', 'lastName', 'organization', 'email'
   ],
 
   properties: [
