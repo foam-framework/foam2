@@ -17,27 +17,13 @@ public class UnknownFObjectArrayParser
     ps = ps.apply(new Whitespace(), x);
     if ( ps == null ) return null;
 
-    //TODO: use ThreadLocal
-    //TODO: fix for valid json ']'
-    StringBuilder sb = new StringBuilder();
-    int  count = 1;
-    char head;
-
-    sb.append(ps.head());
-    ps = ps.tail();
-    while( ps.valid() && count != 0 ) {
-      head = ps.head();
-      if ( head == '[') {
-        count++;
-      } else if ( head == ']') {
-        count--;
-      }
-      sb.append(head);
-      ps = ps.tail();
+    ps = ps.apply(new UnknownArrayParser(), x);
+    if ( ps == null ) {
+      return null;
     }
-
+    System.out.println("THIs: " + ps.value().toString());
     UnknownFObjectArray unknownFObjectArray = ((X) x.get("X")).create(UnknownFObjectArray.class);
-    unknownFObjectArray.setJson(sb.toString());
+    unknownFObjectArray.setJson(ps.value().toString());
     return ps.setValue(unknownFObjectArray);
   }
 }
