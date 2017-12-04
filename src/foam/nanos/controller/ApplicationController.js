@@ -18,20 +18,20 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.auth.User',
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView',
-    'foam.nanos.auth.User'
+    'foam.u2.stack.StackView'
   ],
 
   exports: [
+    'as ctrl',
+    'loginSuccess',
+    'logo',
+    'requestLogin',
+    'signUpEnabled',
     'stack',
     'user',
-    'logo',
-    'signUpEnabled',
     'webApp',
-    'requestLogin',
-    'loginSuccess',
-    'as ctrl',
     'wrapCSS as installCSS'
   ],
 
@@ -89,7 +89,7 @@ foam.CLASS({
     'primaryColor',
     'secondaryColor',
     'tableColor',
-    'accentColor'  
+    'accentColor'
   ],
 
   methods: [
@@ -130,7 +130,7 @@ foam.CLASS({
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end()
     },
-    
+
     //CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
       if ( text ) {
