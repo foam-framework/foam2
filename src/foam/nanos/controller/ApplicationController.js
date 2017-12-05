@@ -13,7 +13,7 @@ foam.CLASS({
   documentation: 'FOAM Application Controller.',
 
   implements: [
-    'foam.nanos.client.Client',
+    'foam.nanos.client.Client'
   ],
 
   requires: [
@@ -24,7 +24,8 @@ foam.CLASS({
 
   imports: [
     'installCSS',
-    'sessionSuccess'
+    'sessionSuccess',
+    'window'
   ],
 
   exports: [
@@ -95,14 +96,9 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      // get current user, else show login
-      this.auth.getCurrentUser(null).then(function (result) {
-        self.loginSuccess = !! result;
-        self.user.copyFrom(result);
-      })
-      .catch(function (err) {
-        self.requestLogin();
-      });
+      this.user.id$.sub(this.onUserUpdate);
+
+      this.getCurrentUser();
 
       window.onpopstate = function(event) {
         if ( location.hash != null ) {
@@ -124,6 +120,30 @@ foam.CLASS({
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end();
+    },
+
+    function setDefaultMenu() {
+      var self = this;
+      this.menuDAO.find(this.user.group).then(function (group) {
+        self.window.location.hash = group.defaultMenu || 'dashboard';
+      });
+    },
+
+    function getCurrentUser() {
+      var self = this;
+
+      // get current user, else show login
+      this.auth.getCurrentUser(null).then(function (result) {
+        self.loginSuccess = !! result;
+        if ( result ) {
+          self.user.copyFrom(result);
+        }
+      })
+      .catch(function (err) {
+        self.requestLogin().then(function() {
+          self.getCurrentUser();
+        });
+      });
     },
 
     // CSS preprocessor, works on classes instantiated in subContext
@@ -157,6 +177,16 @@ foam.CLASS({
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
         self.loginSuccess$.sub(resolve);
       });
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onUserUpdate',
+      isFramed: true,
+      code: function() {
+        this.setDefaultMenu();
+      }
     }
   ]
 });
