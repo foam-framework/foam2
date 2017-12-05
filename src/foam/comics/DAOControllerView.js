@@ -72,7 +72,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this.
-        addClass(this.myCls()).
+        addClass(this.myClass()).
         start('table').
           start('tr').
             start('td').style({display: 'block', padding: '8px'}).add(this.cls.PREDICATE).end().
