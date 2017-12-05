@@ -21,8 +21,18 @@ public class NanoHttpServer
   protected int        port_ = 8080;
 
   public void start() {
-    System.out.println("Starting HTTP Server on port " + port_);
+    try {
+      Class cls = Class.forName("org.apache.tomcat.SimpleInstanceManager");
+      System.out.println("Tomcat is running!");
+      return;
+    } catch(ClassNotFoundException ex) {
+      System.out.println(ex.toString());
+      startNanos();
+    }
+  }
 
+  public void startNanos() {
+    System.out.println("Starting HTTP Server on port " + port_);
     try {
       server_ = HttpServer.create(new InetSocketAddress(port_), 0);
       server_.createContext("/", new NanoHttpHandler(getX()));
