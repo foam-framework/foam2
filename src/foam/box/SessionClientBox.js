@@ -76,7 +76,7 @@ foam.CLASS({
         return localStorage[this.sessionName] ||
             ( localStorage[this.sessionName] = foam.uuid.randomGUID() );
       },
-      swiftExpressionArgs: ['sessionName'],
+      swiftExpressionArgs: [ 'sessionName' ],
       swiftExpression: `
 let defaults = UserDefaults.standard // TODO allow us to configure?
 if let id = defaults.string(forKey: sessionName) {
@@ -102,12 +102,12 @@ return uuid;`
       code: function send(msg) {
         msg.attributes[this.SESSION_KEY] = this.sessionID;
 
-        console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
+        // console.log('***** SEND SESSION ID: ', this.sessionID/*foam.json.stringify(msg)*/);
 
         msg.attributes.replyBox = this.SessionReplyBox.create({
-          msg: msg,
+          msg:       msg,
           clientBox: this,
-          delegate: msg.attributes.replyBox
+          delegate:  msg.attributes.replyBox
         });
 
         this.delegate.send(msg);

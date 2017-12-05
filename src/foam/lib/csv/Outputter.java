@@ -10,7 +10,6 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class Outputter
-    extends AbstractSink
+  extends AbstractSink
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
