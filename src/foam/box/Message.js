@@ -46,7 +46,7 @@ foam.CLASS({
       ],
       javaCode: `
       // TODO: log
-      t.printStackTrace();
+      // t.printStackTrace();
 
         Box replyBox = (Box) getAttributes().get("replyBox");
 
