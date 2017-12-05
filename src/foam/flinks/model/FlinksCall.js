@@ -254,9 +254,10 @@ foam.CLASS({
       name: 'RequestId'
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.flinks.model.SecurityChallengeModel',
-      name: 'SecurityChallenges'
+      javaType: 'foam.flinks.model.LoginModel',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.LoginModel.class)',
+      name: 'Login'
     }
   ]
 });
@@ -270,14 +271,13 @@ foam.CLASS({
 
   properties: [
     {
-      javaType: 'foam.flinks.model.LoginModel',
-      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
-      javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.LoginModel.class)',
-      name: 'Login'
-    },
-    {
       class: 'String',
       name: 'Institution'
+    },
+    {
+      class: 'FObjectArray',
+      of: 'foam.flinks.model.SecurityChallengeModel',
+      name: 'SecurityChallenges'
     }
   ]
 });
@@ -514,7 +514,7 @@ foam.CLASS({
       javaType: 'foam.flinks.model.BalanceModel',
       javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
       javaJSONParser: 'new foam.lib.json.FObjectParser(foam.flinks.model.BalanceModel.class)',
-      name: 'BalanceModel'
+      name: 'Balance'
     }
   ]
 });
