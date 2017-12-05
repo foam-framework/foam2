@@ -26,7 +26,6 @@ public class NanoHttpServer
       System.out.println("Tomcat is running!");
       return;
     } catch(ClassNotFoundException ex) {
-      System.out.println(ex.toString());
       startNanos();
     }
   }
