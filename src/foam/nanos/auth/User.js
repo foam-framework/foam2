@@ -98,7 +98,7 @@ emailIsSet_ = true;`
       tableWidth: 91,
       view: {
         class: 'foam.u2.view.ChoiceView',
-        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
+        choices: [ 'Personal', 'Business', 'Shopper', 'Merchant', 'Broker', 'Bank' ]
       }
     },
     {
@@ -185,16 +185,6 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'website',
       width: 50
-    },
-    {
-      class: 'String',
-      name: 'businessType',
-      width: 15
-    },
-    {
-      class: 'String',
-      name: 'businessSector',
-      width: 15
     }
   ],
 
