@@ -5,18 +5,6 @@
  */
 
 foam.CLASS({
-  refines: 'foam.dao.AbstractDAO',
-  methods: [
-    // Here to finish implementing the interface.
-    { name: 'select_' },
-    { name: 'put_' },
-    { name: 'remove_' },
-    { name: 'find_' },
-    { name: 'removeAll_' },
-  ],
-})
-
-foam.CLASS({
   refines: 'foam.dao.DAOProperty',
   properties: [
     {
@@ -24,6 +12,30 @@ foam.CLASS({
       expression: function(required) {
         return '(DAO & FObject)' + (required ? '' : '?');
       },
+    },
+  ],
+  methods: [
+    function writeToSwiftClass(cls, superAxiom, parentCls) {
+      this.SUPER(cls, superAxiom, parentCls);
+      cls.fields.push(
+        foam.swift.Field.create({
+          lazy: true,
+          visibility: 'public',
+          name: this.swiftName + '$proxy',
+          type: 'ProxyDAO',
+          initializer: `
+let d = __context__.create(ProxyDAO.self, args: ["delegate": ${this.swiftName}])!
+_ = ${this.swiftSlotName}.sub(listener: { sub, topics in
+  if let dao = topics.last as? DAO {
+    d.delegate = dao
+  } else {
+    d.clearProperty("delegate")
+  }
+})
+return d
+          `,
+        })
+      )
     },
   ],
 });

@@ -9,8 +9,8 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftCode',
-      expression: function(swiftName, swiftReturns, swiftArgs, swiftThrows) {
-        return swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
+      getter: function() {
+        return this.swiftThrows ? this.swiftCodeGenerator() : 'fatalError()';
       }
     }
   ],
@@ -19,15 +19,7 @@ foam.CLASS({
       name: 'swiftCodeGenerator',
       args: [],
       template: function() {/*
-<% if (this.swiftReturns) { %>
-let replyBox = ReplyBox_create([
-  "delegate": RPCReturnBox_create()
-])
-let registeredReplyBox = (registry as! BoxRegistry).register(
-  replyBox.id,
-  delegateReplyPolicy as? BoxService,
-  replyBox)
-<% } %>
+let replyBox = RPCReturnBox_create()
 
 let msg = Message_create([
   "object": RPCMessage_create([
@@ -36,21 +28,21 @@ let msg = Message_create([
   ]),
 ])
 
-<% if (this.swiftReturns) { %>
-msg.attributes["replyBox"] = registeredReplyBox
-msg.attributes["errorBox"] = registeredReplyBox
-<% } %>
+msg.attributes["replyBox"] = replyBox
 
-try? delegate.send(msg)
+try? <%=this.boxPropName%>.send(msg)
+replyBox.detach()
+msg.detach()
+
+let o = try replyBox.future.get()
+if let o = o as? Error {
+  throw o
+}
 
 <% if (this.swiftReturns) { %>
   <% if (this.swiftReturns == 'Any?') { %>
-return try (replyBox.delegate as? RPCReturnBox)?.future.get()
+return o
   <% } else { %>
-let o = try (replyBox.delegate as? RPCReturnBox)?.future.get()
-replyBox.detach()
-(registeredReplyBox as? Detachable)?.detach()
-msg.detach()
 if let o = o as? <%=this.swiftReturns%> {
   return o
 }
