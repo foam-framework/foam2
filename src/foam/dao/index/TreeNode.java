@@ -356,16 +356,7 @@ public class TreeNode {
     return new TreeNode(s.key, s.value, size(s) - size(s.right),
       s.level, s.left, null);
   }
-//  public String toString(){
-//    System.out.println("Node"+(Country)Key.getName());
-//    if(left!=null)
-//    left instanceof TreeNode? left.toString():System.out.println("Left:"+(Country)Key.getName());
-//    if(right !=null)
-//    left instanceof TreeNode? right.toString():System.out.println("Right:"+(Country)Key.getName());
-//  }
-//    public FObject getValue(){
-//
-//    }
+
   public Object[] getAllValues(Object s){
     Object[] nodeList = new Object[(int)((TreeNode)s).size];
     getValuesHelper((TreeNode)s,nodeList,0);
