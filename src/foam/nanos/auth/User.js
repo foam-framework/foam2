@@ -188,7 +188,7 @@ emailIsSet_ = true;`
       documentation: 'Bank Identification Code (BIC)'
     },
     {
-      class: 'String',
+      class: 'URL',
       name: 'website',
       width: 2048
     }
