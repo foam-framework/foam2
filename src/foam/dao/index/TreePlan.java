@@ -25,9 +25,6 @@ public class TreePlan implements FindPlan, SelectPlan {
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    Object[] nodeList = ((TreeNode)state).getAllValues(state);
-    for(Object obj:nodeList){
-      sink.put((FObject) obj, null);
-    }
+    ((TreeNode)state).select((TreeNode)state, sink);
   }
 }
