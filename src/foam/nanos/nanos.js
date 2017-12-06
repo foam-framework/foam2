@@ -5,6 +5,7 @@
  */
 
 FOAM_FILES([
+  { name: "foam/nanos/app/AppConfig" },
   { name: "foam/nanos/auth/DayOfWeek" },
   { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },

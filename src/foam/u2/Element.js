@@ -969,7 +969,6 @@ foam.CLASS({
       return this;
     },
 
-
     //
     // Visibility
     //
