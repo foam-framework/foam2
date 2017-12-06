@@ -64,10 +64,10 @@ public class AltIndex implements Index {
 
   public FindPlan planFind(Object state, Object key) {
     Object[] s = toObjectArray(state);
-    Plan bestPlan = NoPlan.instance();
+    FindPlan bestPlan = NoPlan.instance();
     Object bestState = null;
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      Plan plan = delegates_.get(i).planFind(s[i], key);
+      FindPlan plan = delegates_.get(i).planFind(s[i], key);
 
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
@@ -81,11 +81,11 @@ public class AltIndex implements Index {
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     Object[] s = toObjectArray(state);
-    Plan     bestPlan = NoPlan.instance();
+    SelectPlan     bestPlan = NoPlan.instance();
     Object bestState = null;
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      Plan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
+      SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
 
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
