@@ -16,12 +16,10 @@ public class MultitonInfo<T>
 
   String name;
   PropertyInfo p;
-  Class<T> type;
 
-  MultitonInfo(String name, PropertyInfo p, Class<T> type) {
+  public MultitonInfo(String name, PropertyInfo p) {
     this.name = name;
     this.p = p;
-    this.type = type;
   }
 
   public String getName() {
@@ -32,6 +30,7 @@ public class MultitonInfo<T>
     Object key = args.get(p.getName());
     if ( ! instanceMap.containsKey(key) ) {
       try {
+        Class<T> type = (Class<T>)p.getClassInfo().getObjClass();
         T obj = type.newInstance();
         ((ContextAware)obj).setX(x);
         for (Map.Entry<String, Object> entry : args.entrySet()) {
