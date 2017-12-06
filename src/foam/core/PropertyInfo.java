@@ -45,4 +45,8 @@ public interface PropertyInfo
   public boolean isDefaultValue(Object obj);
   public void setStatementValue(foam.dao.pg.IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f25d1c0c808ccff7653500b3dbe6ac5d32628f2e
