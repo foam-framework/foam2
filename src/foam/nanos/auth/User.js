@@ -13,10 +13,16 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+
+  requires: [
+    'foam.nanos.auth.Phone',
+    'foam.nanos.auth.Address'
+  ],
+
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'type', 'firstName', 'lastName', 'organization', 'email'
+    'id', 'enabled', 'type', 'group', 'firstName', 'lastName', 'organization', 'email'
   ],
 
   properties: [
@@ -77,13 +83,15 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      factory: function() { return foam.nanos.auth.Phone.create(); }
+      factory: function() { return this.Phone.create(); },
+      view: 'foam.nanos.auth.PhoneDetailView'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
-      factory: function() { return foam.nanos.auth.Phone.create(); }
+      factory: function() { return this.Phone.create(); },
+      view: 'foam.nanos.auth.PhoneDetailView'
     },
     {
       class: 'String',
@@ -109,7 +117,8 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return foam.nanos.auth.Address.create({}, this); }
+      factory: function() { return this.Address.create(); },
+      view: 'foam.nanos.auth.AddressDetailView'
     },
     {
       class: 'FObjectArray',
@@ -164,8 +173,13 @@ emailIsSet_ = true;`
     {
       class: 'String',
       name: 'businessIdentificationNumber',
-      width: 20,
+      width: 35,
       documentation: 'Business Identification Number (BIN)'
+    },
+    {
+      class: 'String',
+      name: 'issuingAuthority',
+      width: 35
     },
     {
       class: 'String',
@@ -174,19 +188,9 @@ emailIsSet_ = true;`
       documentation: 'Bank Identification Code (BIC)'
     },
     {
-      class: 'String',
+      class: 'URL',
       name: 'website',
-      width: 50
-    },
-    {
-      class: 'String',
-      name: 'businessType',
-      width: 15
-    },
-    {
-      class: 'String',
-      name: 'businessSector',
-      width: 15
+      width: 2048
     }
   ],
 
