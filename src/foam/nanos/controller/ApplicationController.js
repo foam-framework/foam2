@@ -124,8 +124,8 @@ foam.CLASS({
 
     function setDefaultMenu() {
       var self = this;
-      this.menuDAO.find(this.user.group).then(function (group) {
-        self.window.location.hash = group.defaultMenu || 'dashboard';
+      this.groupDAO.find(this.user.group).then(function (group) {
+        self.window.location.hash = group.defaultMenu;
       });
     },
 
