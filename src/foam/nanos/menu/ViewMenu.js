@@ -12,7 +12,12 @@ foam.CLASS({
   properties: [
     {
       class: 'foam.u2.ViewSpec',
-      name: 'view'
+      name: 'view',
+      javaType: 'foam.lib.json.UnknownFObject',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      // TODO: remove next line when permanently fixed in ViewSpec
+      fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     }
   ],
 

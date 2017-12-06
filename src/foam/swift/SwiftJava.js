@@ -30,3 +30,7 @@ foam.CLASS({
   refines: 'foam.core.String',
   properties: [ 'swiftThrows', 'swiftSupport', 'swiftExpression', 'swiftFactory' ]
 });
+foam.CLASS({
+  refines: 'foam.core.Constant',
+  properties: [ 'swiftValue', 'swiftType' ]
+});
