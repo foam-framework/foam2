@@ -69,12 +69,6 @@ foam.CLASS({
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country',
-      view: { 
-        class: 'foam.u2.view.ReferenceView', 
-        objToChoice: function(a) { 
-          return [a.id, a.name]; 
-        } 
-      }
     },
     {
       class: 'Reference',
