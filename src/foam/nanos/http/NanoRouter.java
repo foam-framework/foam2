@@ -16,6 +16,7 @@ import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,24 +31,29 @@ public class NanoRouter
 {
   protected X x_;
 
-  protected Map<String, HttpServlet> handlerMap_ = new ConcurrentHashMap<>();
+  protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
 
   @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected synchronized void service(HttpServletRequest req, HttpServletResponse resp)
+    throws ServletException, IOException
+  {
     String      path       = req.getRequestURI();
     String[]    urlParams  = path.split("/");
     String      serviceKey = urlParams[2];
     Object      service    = getX().get(serviceKey);
     DAO         nSpecDAO   = (DAO) getX().get("nSpecDAO");
     NSpec       spec       = (NSpec) nSpecDAO.find(serviceKey);
-    HttpServlet serv       = getServlet(spec, service);
+    WebAgent    serv       = getWebAgent(spec, service);
     PM          pm         = new PM(this.getClass(), serviceKey);
+
+    resp.setContentType("text/html");
 
     try {
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
       } else {
-        serv.service(req, resp);
+        X y = getX().put(HttpServletRequest.class, req).put(HttpServletResponse.class, resp).put(PrintWriter.class, resp.getWriter());
+        serv.execute(y);
       }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
@@ -57,17 +63,17 @@ public class NanoRouter
     }
   }
 
-  protected HttpServlet getServlet(NSpec spec, Object service) {
+  protected WebAgent getWebAgent(NSpec spec, Object service) {
     if ( spec == null ) return null;
 
     if ( ! handlerMap_.containsKey(spec.getName()) ) {
-      handlerMap_.put(spec.getName(), createServlet(spec, service));
+      handlerMap_.put(spec.getName(), createWebAgent(spec, service));
     }
 
     return handlerMap_.get(spec.getName());
   }
 
-  protected HttpServlet createServlet(NSpec spec, Object service) {
+  protected WebAgent createWebAgent(NSpec spec, Object service) {
     informService(service, spec);
 
     if ( spec.getServe() ) {
@@ -92,15 +98,17 @@ public class NanoRouter
       }
     }
 
+/*
     if ( service instanceof WebAgent ) {
       service = new WebAgentServlet((WebAgent) service);
       informService(service, spec);
     }
+    */
 
-    if ( service instanceof HttpServlet ) return (HttpServlet) service;
+    if ( service instanceof WebAgent ) return (WebAgent) service;
 
     Logger logger = (Logger) getX().get("logger");
-    logger.error(this.getClass(), spec.getName() + " does not have a HttpServlet.");
+    logger.error(this.getClass(), spec.getName() + " does not have a WebAgent.");
     return null;
   }
 

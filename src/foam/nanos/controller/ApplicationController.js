@@ -3,7 +3,6 @@
   Available on browser console as ctrl. (exports axiom)
 */
 
-
 foam.CLASS({
   package: 'foam.nanos.controller',
   name: 'ApplicationController',
@@ -14,30 +13,31 @@ foam.CLASS({
   documentation: 'FOAM Application Controller.',
 
   implements: [
-    'foam.nanos.client.Client',
+    'foam.nanos.client.Client'
   ],
 
   requires: [
+    'foam.nanos.auth.User',
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView',
-    'foam.nanos.auth.User'
-  ],
-
-  exports: [
-    'stack',
-    'user',
-    'logo',
-    'signUpEnabled',
-    'webApp',
-    'requestLogin',
-    'loginSuccess',
-    'as ctrl',
-    'wrapCSS as installCSS'
+    'foam.u2.stack.StackView'
   ],
 
   imports: [
+    'installCSS',
     'sessionSuccess',
-    'installCSS'
+    'window'
+  ],
+
+  exports: [
+    'as ctrl',
+    'loginSuccess',
+    'logo',
+    'requestLogin',
+    'signUpEnabled',
+    'stack',
+    'user',
+    'webApp',
+    'wrapCSS as installCSS'
   ],
 
   css: `
@@ -81,15 +81,14 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'loginSuccess',
-      value: false
+      name: 'loginSuccess'
     },
     'logo',
     'webApp',
     'primaryColor',
     'secondaryColor',
     'tableColor',
-    'accentColor'  
+    'accentColor'
   ],
 
   methods: [
@@ -97,28 +96,20 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      // get current user, else show login
-      this.auth.getCurrentUser(null).then(function (result) {
-        self.loginSuccess = result ? true : false;
-        self.user.copyFrom(result);
-        return self.accountDAO.where(self.EQ(self.Account.OWNER, self.user.id)).limit(1).select();
-      })
-      .then(function (result) {
-        self.account.copyFrom(result.array[0]);
-      })
-      .catch(function (err) {
-        self.requestLogin();
-      });
+      this.user.id$.sub(this.onUserUpdate);
+
+      this.getCurrentUser();
 
       window.onpopstate = function(event) {
         if ( location.hash != null ) {
           var hid = location.hash.substr(1);
 
           hid && self.menuDAO.find(hid).then(function(menu) {
-            menu && menu.launch(this,null);
-         })
+            menu && menu.launch(this, null);
+          });
         }
       };
+
       window.onpopstate();
     },
 
@@ -128,39 +119,74 @@ foam.CLASS({
         .tag({class: 'foam.u2.navigation.TopNavigation'})
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
-        .end()
+        .end();
     },
-    
-    //CSS preprocessor, works on classes instantiated in subContext
+
+    function setDefaultMenu() {
+      var self = this;
+      this.menuDAO.find(this.user.group).then(function (group) {
+        self.window.location.hash = group.defaultMenu || 'dashboard';
+      });
+    },
+
+    function getCurrentUser() {
+      var self = this;
+
+      // get current user, else show login
+      this.auth.getCurrentUser(null).then(function (result) {
+        self.loginSuccess = !! result;
+        if ( result ) {
+          self.user.copyFrom(result);
+        }
+      })
+      .catch(function (err) {
+        self.requestLogin().then(function() {
+          self.getCurrentUser();
+        });
+      });
+    },
+
+    // CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
       if ( text ) {
         if ( ! this.accentColor ) {
           var self = this;
+
           this.accentColor$.sub(function(s) {
             self.wrapCSS(text, id);
             s.detach();
           });
         }
+
         this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g, this.primaryColor).
+          replace(/%PRIMARYCOLOR%/g,   this.primaryColor).
           replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
-          replace(/%TABLECOLOR%/g, this.tableColor).
-          replace(/%ACCENTCOLOR%/g, this.accentColor),
+          replace(/%TABLECOLOR%/g,     this.tableColor).
+          replace(/%ACCENTCOLOR%/g,    this.accentColor),
           id);
       }
     },
 
-    function requestLogin(){
+    function requestLogin() {
       var self = this;
+
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset' ) {
-        return;
-      }
+      if ( location.hash != null && location.hash === '#reset' ) return;
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
         self.loginSuccess$.sub(resolve);
       });
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'onUserUpdate',
+      isFramed: true,
+      code: function() {
+        this.setDefaultMenu();
+      }
     }
   ]
 });
