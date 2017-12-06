@@ -271,6 +271,18 @@ public class TreeNode {
     return get(s.left, key, prop);
   }
 
+  protected TreeNode getLeft() {
+    return right;
+  }
+
+  protected TreeNode getRight(){
+    return left;
+  }
+
+  protected Object getValue(){
+    return value;
+  }
+
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
@@ -343,6 +355,35 @@ public class TreeNode {
 
     return new TreeNode(s.key, s.value, size(s) - size(s.right),
       s.level, s.left, null);
+  }
+//  public String toString(){
+//    System.out.println("Node"+(Country)Key.getName());
+//    if(left!=null)
+//    left instanceof TreeNode? left.toString():System.out.println("Left:"+(Country)Key.getName());
+//    if(right !=null)
+//    left instanceof TreeNode? right.toString():System.out.println("Right:"+(Country)Key.getName());
+//  }
+//    public FObject getValue(){
+//
+//    }
+  public Object[] getAllValues(Object s){
+    Object[] nodeList = new Object[(int)((TreeNode)s).size];
+    getValuesHelper((TreeNode)s,nodeList,0);
+    return nodeList;
+  }
+  public int getValuesHelper(TreeNode currentNode, Object[] nodeList, int i){
+    if(currentNode.getValue()!=null)
+      nodeList[i]=(currentNode.getValue());
+    i++;
+    TreeNode left = currentNode.getLeft();
+    TreeNode right = currentNode.getRight();
+    if(left!=null){
+      i = getValuesHelper(left,nodeList,i++);
+    }
+    if(right!=null){
+      i = getValuesHelper(right,nodeList,i++);
+    }
+    return i;
   }
 
 }
