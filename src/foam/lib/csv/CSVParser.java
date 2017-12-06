@@ -64,7 +64,11 @@ public class CSVParser
 
         Object obj = classInfo.newInstance();
         for ( int i = 0 ; i < column ; i++ ) {
-          props[i].set(obj, props[i].csvParser().parse(null, null));
+          ps = new StringPStream();;
+          ps.setString(values[i]);
+          x = new ParserContextImpl();
+          x.set("X", getX());
+          props[i].set(obj, props[i].csvParser().parse(ps, x));
         }
 
       }
