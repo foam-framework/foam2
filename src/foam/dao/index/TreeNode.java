@@ -19,7 +19,7 @@ public class TreeNode {
   protected TreeNode right;
 
   protected final static TreeNode NULL_NODE = new TreeNode(null, null,
-      0, 0, null, null);
+                                                          0, 0, null, null);
 
   public TreeNode(Object key, Object value) {
     this.key = key;
@@ -39,7 +39,7 @@ public class TreeNode {
 
   public TreeNode cloneNode() {
     return new TreeNode( this.key, this.value, this.size,
-        this.level, this.left, this.right);
+                               this.level, this.left, this.right);
 
   }
 
@@ -67,7 +67,7 @@ public class TreeNode {
   }
 
   public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key,
-                              FObject value, Index tail) {
+    FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
       return new TreeNode(key, tail.put(null, value), 1, 1, null, null);
     }
@@ -129,7 +129,7 @@ public class TreeNode {
   }
 
   public TreeNode removeKeyValue(TreeNode state, PropertyInfo prop, Object key,
-                                 FObject value, Index tail) {
+    FObject value, Index tail) {
     if ( state == null ) {
       return state;
     }
@@ -231,7 +231,7 @@ public class TreeNode {
   private TreeNode decreaseLevel(TreeNode node) {
     long expectedLevel = 1 + Math.min(
       node.left != null ? node.left.level : 0 ,
-        node.right != null ? node.right.level : 0);
+      node.right != null ? node.right.level : 0);
 
     if ( expectedLevel < node.level ) {
       node.level = expectedLevel;
@@ -292,7 +292,7 @@ public class TreeNode {
       TreeNode l = gt(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
       return new TreeNode(s.key, s.value, newSize,
-          s.level, l, s.right);
+        s.level, l, s.right);
     }
     if ( r > 0 ) {
       return gt(s.right, key, prop);
@@ -310,14 +310,14 @@ public class TreeNode {
       TreeNode l = gte(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
       return new TreeNode(s.key, s.value, newSize,
-          s.level, l, s.right);
+        s.level, l, s.right);
     }
     if ( r > 0 ) {
       return gte(s.right, key, prop);
     }
 
     return new TreeNode(s.key, s.value, size(s) - size(s.left),
-        s.level, null, s.right);
+      s.level, null, s.right);
   }
 
   public TreeNode lt(TreeNode s, Object key, PropertyInfo prop) {
@@ -329,7 +329,7 @@ public class TreeNode {
       TreeNode right = lt(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
       return new TreeNode(s.key, s.value, newSize,
-          s.level, s.left, right);
+        s.level, s.left, right);
     }
     if ( r < 0 ) {
       return lt(s.left, key, prop);
@@ -347,14 +347,14 @@ public class TreeNode {
       TreeNode right = lte(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
       return new TreeNode(s.key, s.value, newSize,
-          s.level, s.left, right);
+        s.level, s.left, right);
     }
     if ( r < 0 ) {
       return lte(s.left, key, prop);
     }
 
     return new TreeNode(s.key, s.value, size(s) - size(s.right),
-        s.level, s.left, null);
+      s.level, s.left, null);
   }
 
   public void select(TreeNode currentNode, Sink sink) {
