@@ -52,7 +52,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'suite',
-      width: 16,
+      width: 16
     },
     {
       class: 'String',
@@ -68,13 +68,13 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'countryDAO',
       name: 'countryId',
-      of: 'foam.nanos.auth.Country',
+      of: 'foam.nanos.auth.Country'
     },
     {
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
-      of: 'foam.nanos.auth.Region',
+      of: 'foam.nanos.auth.Region'
     },
     {
       class: 'Boolean',
