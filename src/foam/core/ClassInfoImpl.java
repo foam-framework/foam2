@@ -61,10 +61,14 @@ public class ClassInfoImpl
     return parent_;
   }
 
-  public ClassInfo addProperty(PropertyInfo p) {
-    p.setClassInfo(this);
-    axioms.add(p);
-    axiomsByName_.put(p.getName(), p);
+  public ClassInfo addAxiom(Axiom a) {
+    // TODO: Should all axioms have setClassInfo? If not, create an interface
+    // that has setClassInfo and make PropertyInfo implement it.
+    if (a instanceof PropertyInfo) {
+      ((PropertyInfo)a).setClassInfo(this);
+    }
+    axioms.add(a);
+    axiomsByName_.put(a.getName(), a);
     return this;
   }
 
