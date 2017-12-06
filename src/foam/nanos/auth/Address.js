@@ -69,13 +69,11 @@ foam.CLASS({
       targetDAOKey: 'countryDAO',
       name: 'countryId',
       of: 'foam.nanos.auth.Country',
-      view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({
-          dao: X.countryDAO,
-          objToChoice: function(a){
-            return [a.id, a.name];
-          }
-        })
+      view: { 
+        class: 'foam.u2.view.ReferenceView', 
+        objToChoice: function(a) { 
+          return [a.id, a.name]; 
+        } 
       }
     },
     {
@@ -83,15 +81,6 @@ foam.CLASS({
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
-      view: function(_, X) {
-        return foam.u2.view.ChoiceView.create({
-          dao: X.regionDAO,
-          objToChoice: function(a){
-            return [a.id, a.name];
-          }
-        })
-      },
-
     },
     {
       class: 'Boolean',
