@@ -270,21 +270,25 @@ try {
     {
       name: 'find_',
       javaCode:
-`this.setup();
-if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
-  throw new RuntimeException("Invalid file name");
-}
+`try {
+  this.setup();
+  if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
+    throw new RuntimeException("Invalid file name");
+  }
 
-File file = new File(getSha256() + File.separator + id);
-if ( ! file.exists() ) {
-  throw new RuntimeException("File does not exist");
-}
+  File file = new File(getSha256() + File.separator + id);
+  if ( ! file.exists() ) {
+    throw new RuntimeException("File does not exist");
+  }
 
-if ( ! file.canRead() ) {
-  throw new RuntimeException("Cannot read file");
-}
+  if ( ! file.canRead() ) {
+    throw new RuntimeException("Cannot read file");
+  }
 
-return new FileBlob(file);`
+  return new FileBlob(file);
+} catch (Throwable t) {
+  throw new RuntimeException(t);
+}`
     },
     {
       name: 'urlFor_',

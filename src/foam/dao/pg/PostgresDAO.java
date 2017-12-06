@@ -44,16 +44,18 @@ public class PostgresDAO
     connectionPool = (ConnectionPool) getX().get("connectionPool");
 
     // load columns and sql types
-    table_ = of.getObjClass().getSimpleName().toLowerCase();
-    if ( ! createTable() ) {
-      throw new SQLException("Error creating table");
-    }
-
     List<PropertyInfo> props = of.getAxiomsByClass(PropertyInfo.class);
     for ( PropertyInfo prop : props ) {
       if ( prop.getStorageTransient() )
         continue;
+      if ( "".equals(prop.getSQLType()) )
+        continue;
       props_.add(prop);
+    }
+
+    table_ = of.getObjClass().getSimpleName().toLowerCase();
+    if ( ! createTable() ) {
+      //throw new SQLException("Error creating table");
     }
   }
 
@@ -92,6 +94,11 @@ public class PostgresDAO
       }
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
+
+      if ( predicate != null ) {
+        predicate.prepareStatement(stmt);
+      }
+
       resultSet = stmt.executeQuery();
       while ( resultSet.next() ) {
         sink.put(createFObject(resultSet), null);
@@ -116,11 +123,14 @@ public class PostgresDAO
       StringBuilder builder = sb.get()
           .append("delete from ")
           .append(table_)
-          .append(" where id = ?");
+          .append(" where ")
+          .append(getPrimaryKey().createStatement())
+          .append(" = ?");
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       // TODO: add support for non-numbers
-      stmt.setLong(((Number) o.getProperty("id")).longValue());
+      //stmt.setLong(((Number) o.getProperty("id")).longValue());
+      stmt.setObject(o.getProperty(getPrimaryKey().getName()));
 
       int removed = stmt.executeUpdate();
       if ( removed == 0 ) {
@@ -147,11 +157,14 @@ public class PostgresDAO
       StringBuilder builder = sb.get()
           .append("select * from ")
           .append(table_)
-          .append(" where id = ?");
+          .append(" where ")
+          .append(getPrimaryKey().createStatement())
+          .append(" = ?");
 
       stmt = new IndexedPreparedStatement(c.prepareStatement(builder.toString()));
       // TODO: add support for non-numbers
-      stmt.setLong(((Number) o).longValue());
+      //stmt.setLong(((Number) o).longValue());
+      stmt.setObject(o);
       resultSet = stmt.executeQuery();
       if ( ! resultSet.next() ) {
         // no rows
@@ -187,7 +200,9 @@ public class PostgresDAO
       buildFormattedColumnNames(obj, builder);
       builder.append(" values");
       buildFormattedColumnPlaceholders(obj, builder);
-      builder.append(" on conflict (id) do update set");
+      builder.append(" on conflict (")
+             .append(getPrimaryKey().createStatement())
+             .append(") do update set");
       buildFormattedColumnNames(obj, builder);
       builder.append(" = ");
       buildFormattedColumnPlaceholders(obj, builder);
@@ -204,10 +219,10 @@ public class PostgresDAO
       }
 
       // get auto-generated postgres keys
-      resultSet = stmt.getGeneratedKeys();
+/*       resultSet = stmt.getGeneratedKeys();
       if ( resultSet.next() ) {
-        obj.setProperty("id", resultSet.getLong(1));
-      }
+        obj.setProperty(getPrimaryKey().getName(), resultSet.getObject(1));
+      } */
 
       return obj;
     } catch (Throwable e) {
@@ -239,15 +254,19 @@ public class PostgresDAO
       StringBuilder builder = sb.get()
           .append("CREATE TABLE ")
           .append(table_)
-          .append("(id bigserial primary key,");
+          .append("(")
+          .append(getPrimaryKey().createStatement())
+          .append(" ")
+          .append(getPrimaryKey().getSQLType())
+          .append(" primary key,");
 
       Iterator i = props_.iterator();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
-        if ( "id".equals(prop.getName()) )
+        if ( getPrimaryKey().getName().equals(prop.getName()) )
           continue;
 
-        builder.append(prop.getName())
+        builder.append(prop.createStatement())
             .append(" ")
             .append(prop.getSQLType());
 
@@ -292,7 +311,8 @@ public class PostgresDAO
         break;
       // get the property and set the value
       PropertyInfo prop = (PropertyInfo) i.next();
-      prop.set(obj, resultSet.getObject(index++));
+      prop.setFromResultSet(resultSet, index++, obj);
+//      prop.set(obj, resultSet.getObject(index++));
     }
 
     return obj;
@@ -308,10 +328,10 @@ public class PostgresDAO
     Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( "id".equals(prop.getName()) )
-        continue;
+/*       if ( "id".equals(prop.getName()) )
+        continue; */
 
-      builder.append(prop.getName().toLowerCase());
+      builder.append(prop.createStatement());
       if ( i.hasNext() ) {
         builder.append(",");
       }
@@ -329,8 +349,8 @@ public class PostgresDAO
     Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( "id".equals(prop.getName()) )
-        continue;
+/*       if ( "id".equals(prop.getName()) )
+        continue; */
 
       builder.append("?");
       if ( i.hasNext() ) {
@@ -351,9 +371,7 @@ public class PostgresDAO
     Iterator i = props_.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( prop.getName().equals("id") )
-        continue;
-      stmt.setObject(prop.get(obj));
+      prop.setStatementValue(stmt, obj);
     }
   }
 

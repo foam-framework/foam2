@@ -13,14 +13,15 @@ foam.CLASS({
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
-  requires: [ 'foam.nanos.auth.Phone',
-              'foam.nanos.auth.Address'
+  requires: [
+    'foam.nanos.auth.Phone',
+    'foam.nanos.auth.Address'
   ],
 
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'firstName', 'lastName', 'organization', 'lastModified'
+    'id', 'enabled', 'type', 'group', 'firstName', 'lastName', 'organization', 'email'
   ],
 
   properties: [
@@ -58,7 +59,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'organization',
-      width: 50,
+      width: 175,
       tableWidth: 160
     },
     {
@@ -69,7 +70,7 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
-      width: 50,
+      width: 200,
       preSet: function (_, val) {
         return val.toLowerCase();
       },
@@ -94,6 +95,7 @@ emailIsSet_ = true;`
     {
       class: 'String',
       name: 'type',
+      tableWidth: 91,
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
@@ -138,7 +140,6 @@ emailIsSet_ = true;`
     {
       class: 'Password',
       name: 'password',
-      hidden: true,
       displayWidth: 30,
       width: 100
     },

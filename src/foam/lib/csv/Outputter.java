@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class Outputter
-    extends AbstractSink
+  extends AbstractSink
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -53,6 +53,14 @@ public class Outputter
 
   public Outputter(File file, OutputterMode mode, boolean outputHeaders) throws FileNotFoundException {
     this(new PrintWriter(file), mode, outputHeaders);
+  }
+
+  public Outputter(OutputStream os, OutputterMode mode, boolean outputHeaders) {
+    this(new OutputStreamWriter(os), mode, outputHeaders);
+  }
+
+  public Outputter(Writer writer, OutputterMode mode, boolean outputHeaders) {
+    this(new PrintWriter(writer), mode, outputHeaders);
   }
 
   public Outputter(PrintWriter writer, OutputterMode mode, boolean outputHeaders) {

@@ -21,10 +21,10 @@ public class HttpServletRequestBlob
 
   public HttpServletRequestBlob(HttpServletRequest request) throws IOException {
     this.reader_ = new BufferedInputStream(request.getInputStream());
-    if ( request.getContentLengthLong() == -1 ) {
+    if ( request.getContentLength() == -1 ) {
       throw new RuntimeException("Invalid content length");
     }
-    this.size_ = request.getContentLengthLong();
+    this.size_ = request.getContentLength();
   }
 
   @Override
