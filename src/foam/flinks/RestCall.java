@@ -5,13 +5,7 @@
  */
 package foam.flinks;
 
-import foam.core.FObject;
-import foam.lib.json.Outputter;
-
 import java.net.URL;
-
-import javax.management.RuntimeErrorException;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -20,50 +14,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
-public class RestFlinksService {
+public class RestCall {
   public static final String REST_GET = "GET";
   public static final String REST_POST = "POST";
-  public static final String AUTHORIZE = "Authorize";
-  public static final String AUTHORIZE_MULTIPLE = "AuthorizeMultiple";
-  public static final String ACCOUNTS_SUMMARY = "GetAccountsSummary";
-  public static final String WAIT_SUMMARY = "WaitSummary";
-  public static final String ACCOUNTS_DETAIL = "GetAccountsDetail";
-  public static final String ACCOUNTS_STATEMENTS = "GetStatements";
-  public static final Outputter outputter = new Outputter();
 
-  private String address_;
-  private String customerId_;
-  private String url_;
-
-  public RestFlinksService() {
-    this("8bc4718b-3780-46d0-82fd-b217535229f1");
-  }
-
-  public RestFlinksService(String customerId) {
-    this("https://nanopay-api.private.fin.ag/v3", customerId);
-  }
-
-  public RestFlinksService(String address, String customerId) {
-    address_ = address;
-    customerId_ = customerId;
-    url_ = address_ + "/" + customerId_ + "/" + "BankingServices";
-  }
-
-  public String authorize(FObject request) {
-    String address = url_ + "/" + AUTHORIZE;
-    String responseJSON = request(address, REST_POST, outputter.stringify(request));
-    return responseJSON;
-  }
-
-  public String getAccountsDetail(FObject request) {
-    String address = url_ + "/" + ACCOUNTS_DETAIL;
-    String responseJSON = request(address, REST_POST, outputter.stringify(request));
-    return responseJSON;
-  }
-
-  public FObject getStatements(FObject request) {
-    return null;
-  }
+  public RestCall() {}
 
   private String request(String address, String method, String json) {
 
@@ -112,7 +67,6 @@ public class RestFlinksService {
       }
       return res.toString();
     } catch ( Throwable t ) {
-      System.out.println("This is error");
       throw new RuntimeException(t);
     } finally {
       closeSource(is, os, connection);
