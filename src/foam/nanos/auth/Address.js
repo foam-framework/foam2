@@ -38,18 +38,21 @@ foam.CLASS({
       class: 'String',
       name: 'address1',
       //required: true
+      width: 70,      
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a main address field.'
     },
     {
       class: 'String',
       name: 'address2',
+      width: 70,
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a sub address field.'
     },
     {
       class: 'String',
-      name: 'suite'
+      name: 'suite',
+      width: 16
     },
     {
       class: 'String',
@@ -88,11 +91,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'streetNumber',
+      width: 16,
       documentation: 'for an structured address, use this field.'
     },
     {
       class: 'String',
       name: 'streetName',
+      width: 70,
       documentation: 'for an structured address, use this field.'
     },
     {
