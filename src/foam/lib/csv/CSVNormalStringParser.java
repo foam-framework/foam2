@@ -34,6 +34,10 @@ public class CSVNormalStringParser implements Parser {
       ps = ps.tail();
     }
 
+    if ( ! ps.valid() && sb.toString().equals("") ) {
+      return null;
+    }
+
     return ps.setValue(sb.toString());
   }
 
