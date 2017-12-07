@@ -5,6 +5,7 @@
  */
 package foam.flinks;
 
+import foam.core.*;
 import foam.lib.json.Outputter;
 
 public class RequestMsg {
