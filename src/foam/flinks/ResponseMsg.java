@@ -5,7 +5,21 @@
  */
 package foam.flinks;
 
-public class ResponseMsg{
-  private static Outputter jsonOutputter = new Outputter();
-  
+import foam.core.*;
+
+public class ResponseMsg implements ContextAware {
+  private Parser jsonParser;
+  private String resultJson;
+  private FObject model_;
+
+  public ResponseMsg() {
+    this(null);
+  }
+  public ResponseMsg(X x) {
+    this(x, null);
+  }
+  public ResponseMsg(X x, String json){
+    resultJson = json;
+    this.setX(x);
+  }
 }
