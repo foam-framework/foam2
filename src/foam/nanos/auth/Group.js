@@ -14,6 +14,10 @@ foam.CLASS({
 
   documentation: 'A Group of Users.',
 
+  tableColumns: [ 'id', 'description', 'defaultMenu', 'parent' ],
+
+  searchColumns: [ ],
+
   properties: [
     {
       class: 'String',
@@ -34,6 +38,12 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Permission',
       name: 'permissions'
+    },
+    {
+      class: 'Reference',
+      targetDAOKey: 'menuDAO',
+      name: 'defaultMenu',
+      of: 'foam.nanos.menu.Menu'
     }
 
     /*
@@ -45,7 +55,7 @@ foam.CLASS({
     }
     */
   ],
-  
+
   methods: [
     {
       name: 'implies',

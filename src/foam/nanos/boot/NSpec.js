@@ -18,7 +18,6 @@ foam.CLASS({
 
   tableColumns: [ 'name', 'lazy', 'serve', 'authenticate', /*'serviceClass',*/ 'configure' ],
 
-
   properties: [
     {
       class: 'String',

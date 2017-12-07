@@ -18,14 +18,14 @@ import foam.util.Email;
 import foam.util.LRULinkedHashMap;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-import javax.security.auth.AuthPermission;
 import java.security.Permission;
 import java.util.*;
 import javax.naming.AuthenticationException;
+import javax.security.auth.AuthPermission;
 
 public class UserAndGroupAuthService
-    extends    ContextAwareSupport
-    implements AuthService, NanoService
+  extends    ContextAwareSupport
+  implements AuthService, NanoService
 {
   protected DAO userDAO_;
   protected DAO groupDAO_;
@@ -169,7 +169,7 @@ public class UserAndGroupAuthService
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
-      throw new AuthenticationException("Invalid password");
+      throw new AuthenticationException("Incorrect password");
     }
 
     Session session = (Session) x.get(Session.class);
@@ -198,12 +198,21 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    Group group = (Group) user.getGroup();
-    if ( group == null ) {
-      return false;
+    try {
+      String groupId = (String) user.getGroup();
+
+      while ( ! SafetyUtil.isEmpty(groupId) ) {
+        Group group = (Group) groupDAO_.find(groupId);
+
+        if ( group == null ) break;
+
+        if ( group.implies(permission) ) return true;
+        groupId = group.getParent();
+      }
+    } catch (Throwable t) {
     }
 
-    return group.implies(permission);
+    return false;
   }
 
   public Boolean check(foam.core.X x, String permission) {

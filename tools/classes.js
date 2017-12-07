@@ -53,6 +53,7 @@ var classes = [
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
+  'foam.nanos.app.AppConfig',
   'foam.nanos.http.WebAgent',
   'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',

@@ -41,7 +41,8 @@ foam.CLASS({
     {
       name: 'send',
       code: function send(msg) {
-        if ( this.Exception.isInstance(msg.object) && this.attempt < this.maxAttempts) {
+        if ( this.Exception.isInstance(msg.object) &&
+             ( this.maxAttempts == -1 || this.attempt < this.maxAttempts ) ) {
           this.attempt++;
           this.destination.send(this.message);
           return;
@@ -65,6 +66,7 @@ foam.CLASS({
     'attempts',
     {
       name: 'maxAttempts',
+      documentation: 'Set to -1 to infinitely retry.',
       value: 3
     }
   ],
@@ -74,12 +76,19 @@ foam.CLASS({
       var replyBox = msg.attributes.replyBox;
 
       if ( replyBox ) {
+        var clone = msg.cls_.create(msg);
+
         msg.attributes.replyBox = this.RetryReplyBox.create({
           delegate: replyBox,
           maxAttempts: this.maxAttempts,
-          message: msg.clone(),
+          message: clone,
           destination: this.delegate
         });
+
+        clone.attributes = {};
+        for ( var key in msg.attributes ) {
+          clone.attributes[key] = msg.attributes[key];
+        }
       }
 
       this.delegate.send(msg);

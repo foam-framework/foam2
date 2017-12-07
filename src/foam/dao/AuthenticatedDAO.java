@@ -79,8 +79,8 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    sink = new AuthenticatedSink(x, createPermission("read"), sink);
-    return super.select_(x, sink, skip, limit, order, predicate);
+    super.select_(x, new AuthenticatedSink(x, createPermission("read"), sink), skip, limit, order, predicate);
+    return sink;
   }
 
   @Override
