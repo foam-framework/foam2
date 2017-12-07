@@ -27,15 +27,31 @@ public class FlinksService {
     address_ = url + "/" + customerId + "/" + "BankingServices";
   }
 
-  public Msg service(Msg msg) {
+  public Msg service(RequestMsg msg) {
     if ( msg.getRequestCode().equals(AUTHORIZE) ) {
       return authorizeService(msg);
+    } else if ( msg.getRequesCode().equals(AUTHORIZE_MULTIPLE) ) {
+      return null;
+    } else if ( msg.getRequestCode().equals(ACCOUNTS_SUMMARY) ) {
+      return null;
+    } else if ( msg.getRequestCode().equals(ACCOUNTS_STATEMENTS) ) {
+      return null;
+    } else if ( msg.getRequestCode().equals(ACCOUNTS_DETAIL) ) {
+      return null;
+    } else if ( msg.getRequestCode().equals(WAIT_SUMMARY) ) {
+      return null;
+    } else {
+      return null;
     }
+  }
+
+  public Msg authorizeService(RequestMsg msg) {
+    String resp = call.request(address_ + "/" + msg.getRequestCode(), msg.getRequestMethod(), msg.getJson());
+
     return null;
   }
 
-  public Msg authorizeService(Msg msg) {
-    
+  public Msg accountsDetailService(Msg msg) {
     return null;
   }
 }
