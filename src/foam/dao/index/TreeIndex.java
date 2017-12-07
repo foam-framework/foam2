@@ -20,9 +20,9 @@ import foam.mlang.sink.Count;
 import java.util.Arrays;
 
 public class TreeIndex implements Index {
-  protected Index        tail_;
+  protected Index tail_;
   protected PropertyInfo prop_;
-  protected long         selectCount_;
+  protected long selectCount_;
 
   public TreeIndex(PropertyInfo prop) {
     this(prop, ValueIndex.instance());
@@ -71,7 +71,7 @@ public class TreeIndex implements Index {
 
   //TODO
   public FindPlan planFind(Object state, Object key) {
-    return new TreeLookupFindPlan(prop_, state, (state != null ? ((TreeNode) state).size : 0));
+    return new TreeLookupFindPlan(prop_, (state != null ? ((TreeNode) state).size : 0) );
   }
 
   //TODO
@@ -114,7 +114,7 @@ public class TreeIndex implements Index {
 
 //    return CustomPlan;
 
-    return (SelectPlan) ValuePlan.instance();
+    return (SelectPlan) TreePlan.instance();
   }
 
   public long size(Object state) {
