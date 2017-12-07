@@ -63,6 +63,7 @@ public class MDAO extends AbstractDAO {
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( sink == null ) sink = new ListSink();
     SelectPlan plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
     plan.select(state_, sink, skip, limit, order, predicate);
     sink.eof();
