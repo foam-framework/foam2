@@ -13,12 +13,10 @@ public class TreeLookupFindPlan implements FindPlan {
 
   protected PropertyInfo prop_;
   protected long size_;
-  protected TreeNode state_;
 
-  public TreeLookupFindPlan(PropertyInfo prop, Object state, long size) {
+  public TreeLookupFindPlan(PropertyInfo prop, long size) {
     prop_ = prop;
     size_ = size;
-    state_ = (TreeNode) state;
   }
 
   public long cost() {
