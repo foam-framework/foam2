@@ -172,7 +172,7 @@ foam.CLASS({
                 + '  if ( sub.getDetached() ) {\n'
                 + '    break;\n'
                 + '  }\n'
-                + '  getDelegate().put((foam.core.FObject)o, sub);\n'
+                + '  getDelegate().put((foam.core.FObject) o, sub);\n'
                 + '}'
     }
   ]
