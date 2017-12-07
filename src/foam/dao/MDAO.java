@@ -57,8 +57,8 @@ public class MDAO extends AbstractDAO {
     }
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
-            ? (FObject)index_.find(state_,getPrimaryKey().get(o))
-            : (FObject)index_.find(state_, o)
+            ? (FObject)index_.planFind(state_,getPrimaryKey().get(o)).find(state_,getPrimaryKey().get(o))
+            : (FObject)index_.planFind(state_, o).find(state_,o)
     );
   }
 
