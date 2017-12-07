@@ -14,15 +14,22 @@ foam.CLASS({
     'java.nio.charset.StandardCharsets'
   ],
 
-  ids: [ 'name' ],
-
-  tableColumns: [ 'name' ],
+  tableColumns: [ 'name', 'group' ],
 
   properties: [
+    {
+      class: 'Long',
+      name: 'id'
+    },
     {
       class: 'String',
       name: 'name',
       documentation: 'Template name'
+    },
+    {
+      class: 'String',
+      name: 'group',
+      value: '*'
     },
     {
       class: 'String',
