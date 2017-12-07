@@ -14,7 +14,7 @@ foam.CLASS({
 
   documentation: 'A Group of Users.',
 
-  tableColumns: [ 'id', 'description', 'defaultMenu' ],
+  tableColumns: [ 'id', 'description', 'defaultMenu', 'parent' ],
 
   searchColumns: [ ],
 
