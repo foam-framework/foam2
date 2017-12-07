@@ -13,13 +13,13 @@ import foam.flinks.model.FlinksResponse;
 public interface Msg {
   public String getHttpMethod();
   public String getJson();
-  public String getRequestCode();
-  public String setModel(FlinksRequest request);
-  public FlinksResponse getModel();
-  public boolean isValid();
-  public String getErrorMessage();
-  public int getHttpResponseCode();
-  public String getFlinksCode();
-  public void setProperty(String name, Object obj);
-  public Object getProperty(String name);
+  public String getRequest();
+  // public String setModel(FlinksRequest request);
+  // public FlinksResponse getModel();
+  // public boolean isValid();
+  // public String getErrorMessage();
+  // public int getHttpResponseCode();
+  // public String getFlinksCode();
+  // public void setProperty(String name, Object obj);
+  // public Object getProperty(String name);
 }
