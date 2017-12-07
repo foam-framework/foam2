@@ -59,8 +59,7 @@ public class CSVSupport
       Parser columnParser = new Seq(propertyParsers);
       Object[] values = null;
 
-      while ( (line = reader.readLine()) != null ) {
-        
+      while ( (line = reader.readLine()) != null ) {      
         ps = new StringPStream();
         ps.setString(line);
         x = new ParserContextImpl();
@@ -70,22 +69,10 @@ public class CSVSupport
         ps1 = ps.apply(columnParser, x);
         if ( ps1 == null ) throw new RuntimeException("CSV row format error");
 
-
         values = (Object[]) ps1.value();
         for ( int i = 0 ; i < column ; i++ ) {
           propertyInfos[i].set(obj, values[i]);
         }
-        //if ( values.length != column ) throw new RuntimeException("CSV format error3");
-
-        //Object obj = classInfo.newInstance();
-        // Object obj = new CSVModel();
-        // for ( int i = 0 ; i < column ; i++ ) {
-        //   ps = new StringPStream();;
-        //   ps.setString((String) values[i]);
-        //   x = new ParserContextImpl();
-        //   x.set("X", getX());
-        //   props[i].set(obj, props[i].csvParser().parse(ps, x).value());
-        // }
 
         sink.put((FObject) obj, null);
       }
