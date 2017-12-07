@@ -26,36 +26,34 @@ public class CSVEscapeStringParser implements Parser {
 
     while ( ps.valid() ) {
       head = ps.head();
-
       if ( head == ESCAPE ) {
         if ( delimCount == 1) {
           sb.append(ESCAPE);
           delimCount = 0;
         } else if ( delimCount == 0 ) {
           delimCount = 1;
-          ps = ps.tail();
-          continue;
-        } 
+        }
       } else if (head == ',') {
         if ( delimCount == 1 ) {
           break;
         } else {
           delimCount = 0;
+          sb.append(head);
         }
       } else {
         if ( delimCount == 1 ) {
           return null;
         } else {
           delimCount = 0;
+          sb.append(head);
         }
       }
-
-      if ( head == '"' && delimCount != 0 ) {
-        return null;
-      }
-      
-      sb.append(head);
       ps = ps.tail();
+    }
+
+    //check the last column
+    if ( ! ps.valid() && delimCount != 1 ) {
+      return null;
     }
 
     return ps.setValue(sb.toString());
