@@ -29,18 +29,30 @@ foam.CLASS({
       name: 'deleted'
     },
     {
-      class: 'Int',
-      name: 'buildingNumber',
-      documentation: 'Building number'
+      class: 'Boolean',
+      name: 'structured',
+      value: true,
+      documentation: 'Checked, shown Street Number, Street Name, Suite. Unchecked, shown Address1, Address2.'
     },
     {
       class: 'String',
-      name: 'address',
-      required: true
+      name: 'address1',
+      //required: true
+      width: 70,      
+      displayWidth: 50,
+      documentation: 'for an unstructured address, use this as a main address field.'
     },
     {
       class: 'String',
-      name: 'suite'
+      name: 'address2',
+      width: 70,
+      displayWidth: 50,
+      documentation: 'for an unstructured address, use this as a sub address field.'
+    },
+    {
+      class: 'String',
+      name: 'suite',
+      width: 16
     },
     {
       class: 'String',
@@ -77,6 +89,18 @@ foam.CLASS({
       name: 'longitude'
     },
     {
+      class: 'String',
+      name: 'streetNumber',
+      width: 16,
+      documentation: 'for an structured address, use this field.'
+    },
+    {
+      class: 'String',
+      name: 'streetName',
+      width: 70,
+      documentation: 'for an structured address, use this field.'
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
@@ -103,5 +127,14 @@ foam.CLASS({
     new Hours(DayOfWeek.SATURDAY, true, null, null)
 };`
     }
+  ],
+
+  methods: [
+    {
+      name: 'getAddress',
+      javaReturns: 'String',
+      code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
+      javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
+   }
   ]
 });

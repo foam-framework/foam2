@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.mlang.predicate.And;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
+import foam.dao.ListSink;
 import foam.dao.Sink;
 
 public class OrderedDAO
@@ -27,7 +28,8 @@ public class OrderedDAO
     return this;
   }
 
-  public Sink select_(X x,Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+  public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+    if ( s == null ) s = new ListSink();
     return super.select_(x, s, skip, limit, order_ == null ? order : order_, predicate);
   }
 

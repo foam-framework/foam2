@@ -114,7 +114,7 @@ public class TreeIndex implements Index {
 
 //    return CustomPlan;
 
-    return (SelectPlan) ValuePlan.instance();
+    return (SelectPlan) TreePlan.instance();
   }
 
   public long size(Object state) {
