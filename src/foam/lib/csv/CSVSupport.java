@@ -20,12 +20,7 @@ import foam.dao.Sink;
 public class CSVSupport 
   extends foam.core.ContextAwareSupport
 {
-  protected Parser headParser = new Parser() {
-    private Parser delegate = new Repeat(new CSVStringParser(), new Literal(","));
-    public PStream parse(PStream ps, ParserContext x) {
-      return ps.apply(delegate, x);
-    }
-  };
+  protected Parser headParser = new Repeat(new CSVStringParser(), new Literal(","));
 
   public void inputCSV(InputStream is, Sink sink, ClassInfo classInfo) {
 
