@@ -32,31 +32,30 @@ public class FlinksService {
     address_ = url + "/" + customerId + "/" + "BankingServices";
   }
 
-  public ResponseMsg service(RequestMsg msg) {
-    if ( msg.getRequestCode().equals(AUTHORIZE) ) {
+  public ResponseMsg service(RequestMsg msg, String RequestInfo) {
+    if ( RequestInfo.equals(AUTHORIZE) ) {
       return authorizeService(msg);
-    } else if ( msg.getRequestCode().equals(AUTHORIZE_MULTIPLE) ) {
+    } else if ( RequestInfo.equals(AUTHORIZE_MULTIPLE) ) {
       return null;
-    } else if ( msg.getRequestCode().equals(ACCOUNTS_SUMMARY) ) {
+    } else if ( RequestInfo.equals(ACCOUNTS_SUMMARY) ) {
       return null;
-    } else if ( msg.getRequestCode().equals(ACCOUNTS_STATEMENTS) ) {
+    } else if ( RequestInfo.equals(ACCOUNTS_STATEMENTS) ) {
       return null;
-    } else if ( msg.getRequestCode().equals(ACCOUNTS_DETAIL) ) {
+    } else if ( RequestInfo.equals(ACCOUNTS_DETAIL) ) {
       return null;
-    } else if ( msg.getRequestCode().equals(WAIT_SUMMARY) ) {
+    } else if ( RequestInfo.equals(WAIT_SUMMARY) ) {
       return null;
     } else {
       return null;
     }
   }
 
-  public Msg authorizeService(RequestMsg msg) {
-    String resp = request(msg);
-
+  public ResponseMsg authorizeService(RequestMsg msg) {
+    ResponseMsg resp = request(msg);
     return null;
   }
 
-  public Msg accountsDetailService(Msg msg) {
+  public ResponseMsg accountsDetailService(Msg msg) {
     return null;
   }
 
@@ -78,14 +77,14 @@ public class FlinksService {
       connection.setUseCaches(false);
 
       //set request method
-      connection.setRequestMethod(req.getRequestMethod());
+      connection.setRequestMethod(req.getHttpMethod());
 
       //configure http header
       connection.setRequestProperty("Connection", "keep-alive");
       connection.setRequestProperty("Content-Type", "application/json");
 
       //write to the outputStream only when POST
-      if( method.equals(REST_POST) ) {
+      if( req.getHttpMethod().equals(REST_POST) ) {
         os = connection.getOutputStream();
         PrintStream printStream = new PrintStream(os, false, "UTF-8");
         printStream.print(req.getJson());
