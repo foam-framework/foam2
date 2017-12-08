@@ -8,7 +8,17 @@ package foam.lib.csv;
 
 import foam.lib.parse.*;
 
-
+/**
+ * The class parse the CSV special case string base on the CSV rule.
+ * The whole string should be included inside the double quotation marks.
+ * The string can contain '"', '\r', '\n', and ','.
+ * The " inside the string should be replaced by ""
+ * eg:
+ *    "foo123" -> foo123            : legal
+ *    "foo\n\r,123" -> foo\n\r,123  : legal
+ *    "foo"123"                     : illegal
+ *    "foo""123" -> foo"123         : legal
+ */
 public class CSVEscapeStringParser implements Parser {
   public final static char ESCAPE = '"';
 
