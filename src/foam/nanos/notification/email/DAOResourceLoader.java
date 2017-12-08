@@ -10,7 +10,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 public class DAOResourceLoader
-    implements ResourceLoader
+  implements ResourceLoader
 {
   protected DAO dao_;
 

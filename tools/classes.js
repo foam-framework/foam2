@@ -79,6 +79,7 @@ var classes = [
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
   'foam.dao.ResetSink',
+  'foam.dao.DAOSink',
   'foam.dao.MergedResetSink',
   'foam.dao.Sink',
   'foam.dao.ArraySink',
