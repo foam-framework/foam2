@@ -21,6 +21,7 @@ import foam.lib.parse.*;
  */
 public class CSVEscapeStringParser implements Parser {
   public final static char ESCAPE = '"';
+  private static Parser newlineParser = new CSVNewlineParser();
 
   public CSVEscapeStringParser() {
   }
@@ -54,6 +55,16 @@ public class CSVEscapeStringParser implements Parser {
         if ( delimCount == 1 ) {
           return null;
         } else {
+          //check for the newline
+          if ( head == '\\') {
+            PStream ps1 = newlineParser.parse(ps, x);
+            if ( ps1 != null ) {
+              sb.append(ps1.value());
+              ps = ps1;
+              delimCount = 0;
+              continue;
+            }
+          }
           delimCount = 0;
           sb.append(head);
         }

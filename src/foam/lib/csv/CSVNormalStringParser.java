@@ -19,6 +19,7 @@ import foam.lib.parse.*;
  */
 public class CSVNormalStringParser implements Parser {
 
+  private static Parser newlineParser = new CSVNewlineParser();
   public CSVNormalStringParser() {
 
   }
@@ -33,8 +34,13 @@ public class CSVNormalStringParser implements Parser {
 
     while ( ps.valid() ) {
       head = ps.head();
-      if ( head == '\"' || head == '\r' || head == '\n') {
+      if ( head == '\"') {
         return null;
+      }
+      if ( head == '\\') {
+        if ( newlineParser.parse(ps, x) != null ) {
+          return null;
+        }
       }
       if ( head == ',' ) {
         break;
