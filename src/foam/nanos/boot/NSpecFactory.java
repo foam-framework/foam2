@@ -13,8 +13,10 @@ public class NSpecFactory
   implements XFactory
 {
   NSpec spec_;
+  X     x_;
 
-  public NSpecFactory(NSpec spec) {
+  public NSpecFactory(X x, NSpec spec) {
+    x_    = x;
     spec_ = spec;
   }
 
@@ -24,7 +26,7 @@ public class NSpecFactory
     try {
       ns = spec_.createService(x);
 
-      if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x);
+      if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_);
       if ( ns instanceof NanoService  ) ((NanoService)  ns).start();
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
