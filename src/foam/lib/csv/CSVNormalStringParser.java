@@ -8,6 +8,15 @@ package foam.lib.csv;
 
 import foam.lib.parse.*;
 
+/**
+ * The class parse the CSV normal string base on the CSV string rule
+ * The string can not contain '"', '\r', '\n' and ','
+ * eg:
+ *  abc123    : legal
+ *  ab"e123   : illegal
+ *  ab\ne123  : illegal
+ *  ab\re123  : illegal
+ */
 public class CSVNormalStringParser implements Parser {
 
   public CSVNormalStringParser() {
@@ -24,7 +33,7 @@ public class CSVNormalStringParser implements Parser {
 
     while ( ps.valid() ) {
       head = ps.head();
-      if ( head == '\"') {
+      if ( head == '\"' || head == '\r' || header == '\n') {
         return null;
       }
       if ( head == ',' ) {
