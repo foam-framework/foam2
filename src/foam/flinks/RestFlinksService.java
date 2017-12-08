@@ -77,8 +77,8 @@ public class RestFlinksService {
       connection = (HttpURLConnection) url.openConnection();
 
       //configure HttpURLConnection
-      connection.setConnectTimeout(5 * 1000);
-      connection.setReadTimeout(5 * 1000);
+      connection.setConnectTimeout(10 * 1000);
+      connection.setReadTimeout(10 * 1000);
       connection.setDoOutput(true);
       connection.setUseCaches(false);
 

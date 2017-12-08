@@ -12,7 +12,7 @@ public class RequestMsg {
   private static Outputter jsonOutputter = new Outputter();
   private FObject model_;
   private String requestCode_;
-  private String requestMethod_;
+  private String httpMethod_;
 
   public RequestMsg() {
   }
@@ -38,11 +38,11 @@ public class RequestMsg {
     return requestCode_;
   }
 
-  public void setRequestMethod(String requestMethod) {
-    requestMethod_ = requestMethod; 
+  public void setHttpMethod(String httpMethod) {
+    httpMethod_ = httpMethod; 
   }
 
-  public String getRequestMethod() {
-    return requestMethod_;
+  public String getHttpMethod() {
+    return httpMethod_;
   }
 }
