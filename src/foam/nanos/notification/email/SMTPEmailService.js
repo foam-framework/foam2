@@ -23,6 +23,7 @@ foam.CLASS({
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.dao.DAO',
+    'foam.nanos.auth.User',
     'foam.nanos.pool.FixedThreadPool',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigModel',
@@ -170,8 +171,9 @@ foam.CLASS({
     {
       name: 'sendEmailFromTemplate',
       javaCode:
-`DAOResourceLoader daoResourceLoader = new DAOResourceLoader;
-EmailTemplate emailTemplate = daoResourceLoader.load(name);
+`DAO emailTemplateDAO = (DAO) getX().get("emailTemplateDAO");
+User user = (User) getX().get("user");
+EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(emailTemplateDAO, name, user.getGroup());
 if ( emailMessage == null )
   return;
 
@@ -181,7 +183,7 @@ if ( config == null ) {
       .configuration()
       .resources()
       .resourceLoaders()
-      .add(new TypedResourceLoader("dao", emailTemplate))
+      .add(new TypedResourceLoader("dao", new DAOResourceLoader(emailTemplateDAO, user.getGroup())))
       .and().and()
       .build();
   setConfig(config);
