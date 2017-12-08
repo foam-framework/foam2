@@ -57,16 +57,20 @@ public class CSVEscapeStringParser implements Parser {
         } else {
           //check for the newline
           if ( head == '\\') {
-            PStream ps1 = newlineParser.parse(ps, x);
+            PStream ps1 = ps.apply(newlineParser, x);
             if ( ps1 != null ) {
               sb.append(ps1.value());
               ps = ps1;
               delimCount = 0;
               continue;
+            } else {
+              delimCount = 0;
+              sb.append("\\\\");
             }
+          } else {
+            delimCount = 0;
+            sb.append(head);
           }
-          delimCount = 0;
-          sb.append(head);
         }
       }
       ps = ps.tail();
