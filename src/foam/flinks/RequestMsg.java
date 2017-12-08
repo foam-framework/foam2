@@ -30,7 +30,7 @@ public class RequestMsg {
     return model_;
   }
 
-  public String setRequestCode(String requestCode) {
+  public void setRequestCode(String requestCode) {
     requestCode_ = requestCode;
   }
 
