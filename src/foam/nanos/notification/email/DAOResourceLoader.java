@@ -2,6 +2,9 @@ package foam.nanos.notification.email;
 
 import com.google.common.base.Optional;
 import foam.dao.DAO;
+import foam.dao.ListSink;
+import foam.mlang.Expressions;
+import foam.nanos.notification.email.EmailTemplate;
 import org.jtwig.resource.loader.ResourceLoader;
 
 import java.io.ByteArrayInputStream;
@@ -9,29 +12,48 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+
+
 public class DAOResourceLoader
     implements ResourceLoader
 {
-  protected static DAO dao_;
+  public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
+    ListSink list = (ListSink) dao.limit(1).where(AND(
+      EQ(EmailTemplate.NAME,       templateName),
+      EQ(EmailTemplate.GROUP_NAME, groupName))).select();
 
-  public DAOResourceLoader(DAO dao) {
-    DAOResourceLoader.dao_ = dao;
+    if ( list.toArray().size() == 0 ) {
+      list = (ListSink) dao.limit(1).where(AND(
+        EQ(EmailTemplate.NAME,       templateName),
+        EQ(EmailTemplate.GROUP_NAME, "*"))).select();
+    }
+
+    return (EmailTemplate) list.getArray().get(0);
+  }
+
+  protected DAO dao_;
+  protected String groupName_;
+
+  public DAOResourceLoader(DAO dao, String groupName) {
+    dao_ = dao;
+    groupName_ = groupName;
   }
 
   @Override
   public Optional<Charset> getCharset(String s) {
     return Optional.absent();
   }
-
+  
   @Override
-  public static InputStream load(String s) {
-    EmailTemplate template = (EmailTemplate) dao_.find(s);
-    return new ByteArrayInputStream(template.getBodyAsByteArray());
+  public InputStream load(String s) {
+    EmailTemplate template = DAOResourceLoader.findTemplate(dao_, s, groupName_);
+
+    return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
   @Override
   public boolean exists(String s) {
-    return ( dao_.find(s) != null );
+    return load(s) != null;
   }
 
   @Override
