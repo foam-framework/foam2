@@ -21,7 +21,6 @@ public class FlinksService {
   public static final String ACCOUNTS_STATEMENTS = "GetStatements";
 
   private String address_;
-  private RestCall call = new RestCall();
 
   public FlinksService() {
     this("8bc4718b-3780-46d0-82fd-b217535229f1");
@@ -33,10 +32,10 @@ public class FlinksService {
     address_ = url + "/" + customerId + "/" + "BankingServices";
   }
 
-  public Msg service(RequestMsg msg) {
+  public ResponseMsg service(RequestMsg msg) {
     if ( msg.getRequestCode().equals(AUTHORIZE) ) {
       return authorizeService(msg);
-    } else if ( msg.getRequesCode().equals(AUTHORIZE_MULTIPLE) ) {
+    } else if ( msg.getRequestCode().equals(AUTHORIZE_MULTIPLE) ) {
       return null;
     } else if ( msg.getRequestCode().equals(ACCOUNTS_SUMMARY) ) {
       return null;
@@ -52,7 +51,7 @@ public class FlinksService {
   }
 
   public Msg authorizeService(RequestMsg msg) {
-    String resp = call.request(address_ + "/" + msg.getRequestCode(), msg.getRequestMethod(), msg.getJson());
+    String resp = request(msg);
 
     return null;
   }
@@ -61,7 +60,7 @@ public class FlinksService {
     return null;
   }
 
-  private String request(String address, String method, String json) {
+  private ResponseMsg request(RequestMsg req) {
 
     HttpURLConnection connection = null;
     OutputStream os = null;
@@ -69,7 +68,7 @@ public class FlinksService {
     StringBuilder res = null;
 
     try {
-      URL url = new URL(address);
+      URL url = new URL(address_ + "/" + req.getRequestCode());
       connection = (HttpURLConnection) url.openConnection();
 
       //configure HttpURLConnection
@@ -79,7 +78,7 @@ public class FlinksService {
       connection.setUseCaches(false);
 
       //set request method
-      connection.setRequestMethod(method);
+      connection.setRequestMethod(req.getRequestMethod());
 
       //configure http header
       connection.setRequestProperty("Connection", "keep-alive");
@@ -89,12 +88,12 @@ public class FlinksService {
       if( method.equals(REST_POST) ) {
         os = connection.getOutputStream();
         PrintStream printStream = new PrintStream(os, false, "UTF-8");
-        printStream.print(json);
+        printStream.print(req.getJson());
         printStream.flush();
       }
 
-      System.out.println("Flinks response code: " + connection.getResponseCode());
-      if ( connection.getResponseCode() / 100 == 2 ) {
+      int httpCode = connection.getResponseCode();
+      if ( httpCode / 100 == 2 ) {
         is = connection.getInputStream();
       } else {
         is = connection.getErrorStream();
@@ -106,7 +105,10 @@ public class FlinksService {
       while ( (line = reader.readLine()) != null ) {
         res.append(line);
       }
-      return res.toString();
+      //remember to set X
+      ResponseMsg msg = new ResponseMsg(null, res.toString());
+      msg.setHttpStatusCode(httpCode);
+      return msg;
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
