@@ -7,7 +7,7 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
-
+import foam.dao.Sink;
 
 public class TreeNode {
 
@@ -271,6 +271,18 @@ public class TreeNode {
     return get(s.left, key, prop);
   }
 
+  protected TreeNode getLeft() {
+    return right;
+  }
+
+  protected TreeNode getRight(){
+    return left;
+  }
+
+  protected Object getValue(){
+    return value;
+  }
+
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
@@ -343,6 +355,21 @@ public class TreeNode {
 
     return new TreeNode(s.key, s.value, size(s) - size(s.right),
       s.level, s.left, null);
+  }
+
+  public void select(TreeNode currentNode, Sink sink) {
+    if (currentNode == null)
+      return;
+    TreeNode left = currentNode.getLeft();
+    if (left != null) {
+      select(left, sink);
+    }
+    if (currentNode.getValue() != null)
+      sink.put((FObject) currentNode.getValue(), null);
+    TreeNode right = currentNode.getRight();
+    if (right != null) {
+      select(right, sink);
+    }
   }
 
 }

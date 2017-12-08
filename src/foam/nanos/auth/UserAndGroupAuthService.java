@@ -198,12 +198,21 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    Group group = (Group) user.getGroup();
-    if ( group == null ) {
-      return false;
+    try {
+      String groupId = (String) user.getGroup();
+
+      while ( ! SafetyUtil.isEmpty(groupId) ) {
+        Group group = (Group) groupDAO_.find(groupId);
+
+        if ( group == null ) break;
+
+        if ( group.implies(permission) ) return true;
+        groupId = group.getParent();
+      }
+    } catch (Throwable t) {
     }
 
-    return group.implies(permission);
+    return false;
   }
 
   public Boolean check(foam.core.X x, String permission) {
