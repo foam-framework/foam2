@@ -38,7 +38,12 @@ public class CSVNormalStringParser implements Parser {
         return null;
       }
       if ( head == '\\') {
-        if ( newlineParser.parse(ps, x) != null ) {
+        PStream ps1 = ps;
+        if ( ps.apply(newlineParser, x) == null ) {
+          sb.append("\\\\");
+          ps = ps.tail();
+          continue;
+        } else {
           return null;
         }
       }

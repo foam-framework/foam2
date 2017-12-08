@@ -18,7 +18,7 @@ public class CSVNewlineParser implements Parser{
     if ( ps == null ) {
       return null;
     }
-    ps = delegate.parse(ps, x);
+    ps = ps.apply(delegate, x);
     if ( ps == null ) {
       return null;
     }
