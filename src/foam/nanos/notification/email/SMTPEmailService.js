@@ -170,8 +170,8 @@ foam.CLASS({
     {
       name: 'sendEmailFromTemplate',
       javaCode:
-`DAO emailTemplateDAO = (DAO) getX().get("emailTemplateDAO");
-EmailTemplate emailTemplate = (EmailTemplate) emailTemplateDAO.find(name);
+`DAOResourceLoader daoResourceLoader = new DAOResourceLoader;
+EmailTemplate emailTemplate = daoResourceLoader.load(name);
 if ( emailMessage == null )
   return;
 
@@ -181,7 +181,7 @@ if ( config == null ) {
       .configuration()
       .resources()
       .resourceLoaders()
-      .add(new TypedResourceLoader("dao", new DAOResourceLoader(emailTemplateDAO)))
+      .add(new TypedResourceLoader("dao", emailTemplate))
       .and().and()
       .build();
   setConfig(config);

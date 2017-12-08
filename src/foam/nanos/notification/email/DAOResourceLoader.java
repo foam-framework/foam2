@@ -12,10 +12,10 @@ import java.nio.charset.Charset;
 public class DAOResourceLoader
     implements ResourceLoader
 {
-  protected DAO dao_;
+  protected static DAO dao_;
 
   public DAOResourceLoader(DAO dao) {
-    this.dao_ = dao;
+    DAOResourceLoader.dao_ = dao;
   }
 
   @Override
@@ -24,7 +24,7 @@ public class DAOResourceLoader
   }
 
   @Override
-  public InputStream load(String s) {
+  public static InputStream load(String s) {
     EmailTemplate template = (EmailTemplate) dao_.find(s);
     return new ByteArrayInputStream(template.getBodyAsByteArray());
   }
