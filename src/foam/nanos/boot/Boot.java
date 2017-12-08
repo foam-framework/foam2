@@ -17,8 +17,6 @@ public class Boot {
   protected X   root_ = new ProxyX();
 
   public Boot() {
-    final X root = root_;
-
     try {
       // Used for all the services that will be required when Booting
       serviceDAO_ = new foam.dao.PMDAO(new JDAO(NSpec.getOwnClassInfo(), "services"));
@@ -30,7 +28,7 @@ public class Boot {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("Registering: " + sp.getName());
-        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(root, sp)));
+        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
       }
     });
 

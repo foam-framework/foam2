@@ -12,10 +12,10 @@ import foam.nanos.*;
 public class NSpecFactory
   implements XFactory
 {
-  NSpec spec_;
-  X     x_;
+  NSpec  spec_;
+  ProxyX x_;
 
-  public NSpecFactory(X x, NSpec spec) {
+  public NSpecFactory(ProxyX x, NSpec spec) {
     x_    = x;
     spec_ = spec;
   }
@@ -24,7 +24,7 @@ public class NSpecFactory
     Object ns = null;
 
     try {
-      ns = spec_.createService(x);
+      ns = spec_.createService(x_.getX());
 
       if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_);
       if ( ns instanceof NanoService  ) ((NanoService)  ns).start();
