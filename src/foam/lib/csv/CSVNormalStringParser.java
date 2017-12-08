@@ -33,7 +33,7 @@ public class CSVNormalStringParser implements Parser {
 
     while ( ps.valid() ) {
       head = ps.head();
-      if ( head == '\"' || head == '\r' || header == '\n') {
+      if ( head == '\"' || head == '\r' || head == '\n') {
         return null;
       }
       if ( head == ',' ) {
