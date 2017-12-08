@@ -374,8 +374,8 @@ public class TreeNode {
     }
   }
 
-  protected long skipTreeNode(TreeNode currentNode, Sink sink, long skip, long limit){
-    if (currentNode == null || currentNode.size <= skip || limit == 0 )
+  protected long skipTreeNode(TreeNode currentNode, Sink sink, long skip){
+    if (currentNode == null || currentNode.size <= skip)
       return 0;
     long currentSize = currentNode.size;
     TreeNode left = currentNode.getLeft();
@@ -383,7 +383,7 @@ public class TreeNode {
     if (left != null) {
       leftSize = left.size;
       if(leftSize > skip)
-        skip = skipTreeNode(left,sink,skip,limit);
+        skip = skipTreeNode(left,sink,skip);
       else if(leftSize == skip)
         skip = 0;
       else
@@ -395,7 +395,7 @@ public class TreeNode {
       skip--;
     TreeNode right = currentNode.getRight();
     if (right != null) {
-      skip = skipTreeNode(right, sink, skip, limit);
+      skip = skipTreeNode(right, sink, skip);
     }
     return skip;
   }
@@ -408,7 +408,7 @@ public class TreeNode {
       return;
     }
     if(skip !=0 ){
-      skipTreeNode(currentNode,sink,skip,limit);
+      skipTreeNode(currentNode,sink,skip);
     }
 
   }
