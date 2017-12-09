@@ -370,7 +370,7 @@ foam.CLASS({
               select(this.orderedDAO$proxy, function(obj) {
                 return this.E('tr').
                   on('mouseover', function() { view.hoverSelection = obj; }).
-                  on('dblclick', function() { view.dblclick && view.dblclick(obj); }).
+                  callIf(view.dblclick, function() { this.on('dblclick', function() { view.dblclick && view.dblclick(obj); }); }).
                   on('click', function() {
                     view.selection = obj;
                     if ( view.importSelection$ ) view.importSelection = obj;
