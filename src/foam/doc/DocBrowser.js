@@ -1564,3 +1564,498 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS( {
+  package: 'foam.doc',
+  name: 'GraphView',
+  extends: 'foam.u2.View',
+
+  requires: [
+    'foam.graphics.Box',
+    'foam.graphics.DataSource',
+    'foam.graphics.Label',
+    'foam.graphics.PieGraph',
+	'foam.graphics.CViewGraph',
+    'foam.doc.Link'
+  ],
+  /*requires: [
+   'foam.graphics.PieDiagram'
+  ]
+  	implements : [
+  		'foam.graphics.PieDiagram',
+  	],*/
+
+  //imports: [ 'createPieDiagram' ],
+
+  properties: [ {
+      name: 'canvas',
+      factory: function () {
+        return this.Box.create( {
+          width: 1960,
+          height: 1534,
+          color: '#ffffff'
+        } );
+      }
+    },
+    {
+      name: 'elementGraphMap'
+    },
+    {
+      name: 'elementSelectedInGraphMap'
+    },
+    'data'
+    /*,
+	  {name: pieGraph,
+    factory: function(){
+      return this.PieDiagram.create();
+    }
+	}*/
+  ],
+
+  methods: [
+    function initE() {
+      var data = this.data;
+      this.className = this.data.name;
+      this.elementGraphMap = new Map();
+      this.elementSelectedInGraphMap = new Map();
+
+      var widthCenterBox = 200;
+      var heightCenterBox = 30;
+
+      this.addGraphView( 957, 598.6, 'Column' );
+      this.addGraphView( 57, 598.6, 'Circle' );
+      this.addGraphView( 57, 1398.6, 'Bar' );
+      this.addGraphView( 1357, 1098.6, 'Pie' );
+
+      this.
+      addClass( this.myClass() ).
+      start( 'center' ).
+      tag( 'br' ).
+      start( this.canvas ).
+      on( 'click', this.onClick ).
+      end().
+      end();
+    },
+
+    function setData( mapDataX, mapDataY, dataElement ) {
+      this.elementGraphMap.set( {
+        x: mapDataX,
+        y: mapDataY
+      }, dataElement );
+    },
+
+
+    function createAxe( x, y, diagram, lengthX, lengthY ) {
+      var XLine, YLine;
+
+      if ( diagram === 'Column' || diagram === 'Circle' ) {
+        XLine = foam.graphics.Line.create( {
+          startX: x || 257,
+          startY: y || 598.6,
+          endX: x + lengthX || 1049,
+          endY: y || 598.6,
+          color: 'black',
+          lineWidth: 2
+        } );
+
+        YLine = foam.graphics.Line.create( {
+          startX: x || 257,
+          startY: y - lengthY || 298.6,
+          endX: x || 257,
+          endY: y || 598.6,
+          color: 'black',
+          lineWidth: 2
+        } );
+      } else if ( diagram === 'Bar' ) {
+        XLine = foam.graphics.Line.create( {
+          startX: x || 257,
+          startY: y || 598.6,
+          endX: x + lengthY || 1049,
+          endY: y || 598.6,
+          color: 'black',
+          lineWidth: 2
+        } );
+
+        YLine = foam.graphics.Line.create( {
+          startX: x || 257,
+          startY: y || 298.6,
+          endX: x || 257,
+          endY: y - lengthX || 598.6,
+          color: 'black',
+          lineWidth: 2
+        } );
+      }
+      this.selected = this.canvas.addChildren( XLine, YLine );
+    },
+
+    function axeLabels( x, y, w, h, unit ) {
+      var margeD = 30;
+      var legendBoxUnit1 = this.Box.create( {
+        x: x - ( margeD * 3 ) || 220 + 32, //( x - 30 ) - ( margeD * 2 )
+        y: -unit * 0.5 + y - ( margeD / 2 ) || -unit * 0.5 + 598,
+        width: w || 32,
+        height: h || 16,
+        color: '#ffffff' || this.UNSELECTED_COLOR,
+        border: '#ffffff'
+      } );
+
+      //TODO added those properties
+      //line-height: 1.33;
+      //letter-spacing: 0.2px;
+      var legendLabelUnit1 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x - ( margeD * 3 ) || 220,
+        y: -unit * 0.5 + y - ( margeD / 2 ) || -unit * 0.5 + 598,
+        //color: 'black',
+        font: '12px Roboto',
+        width: w || 32,
+        height: h || 14,
+        color: '#093649' || this.UNSELECTED_COLOR,
+        text: '0.5 M'
+      } );
+
+      var legendBoxUnit2 = this.Box.create( {
+        x: x - ( margeD * 3 ) || 220 + 32,
+        y: -unit * 1 + y - ( margeD / 2 ) || -unit * 1 + 598,
+        width: w || 32,
+        height: h || 14,
+        color: '#ffffff' || this.UNSELECTED_COLOR,
+        border: '#ffffff'
+      } );
+
+      //TODO added those properties
+      //line-height: 1.33;
+      //letter-spacing: 0.2px;
+      var legendLabelUnit2 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x - ( margeD * 3 ) || 220,
+        y: -unit * 1 + y - ( margeD / 2 ) || -unit * 1 + 598,
+        //color: 'black',
+        font: '12px Roboto',
+        width: w || 32,
+        height: h || 14,
+        color: '#093649' || this.UNSELECTED_COLOR,
+        text: '1.0 M'
+      } );
+
+      var legendBoxUnit3 = this.Box.create( {
+        x: x - ( margeD * 3 ) || 220 + 32,
+        y: -unit * 1.5 + y - ( margeD / 2 ) || -unit * 1.5 + 598,
+        width: w || 32,
+        height: h || 14,
+        color: '#ffffff' || this.UNSELECTED_COLOR,
+        border: '#ffffff'
+      } );
+
+      //TODO added those properties
+      //line-height: 1.33;
+      //letter-spacing: 0.2px;
+      var legendLabelUnit3 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x - ( margeD * 3 ) || 220,
+        y: -unit * 1.5 + y - ( margeD / 2 ) || -unit * 1.5 + 598,
+        //color: 'black',
+        font: '12px Roboto',
+        width: w || 32,
+        height: h || 14,
+        color: '#093649' || this.UNSELECTED_COLOR,
+        text: '1.5 M'
+      } );
+
+      var legendBoxUnit4 = this.Box.create( {
+        x: x - ( margeD * 3 ) || 220 + 32,
+        y: -unit * 2 + y - ( margeD / 2 ) || -unit * 2 + 598,
+        width: w || 32,
+        height: h || 14,
+        color: '#ffffff' || this.UNSELECTED_COLOR,
+        border: '#ffffff'
+      } );
+
+      //TODO added those properties
+      //line-height: 1.33;
+      //letter-spacing: 0.2px;
+      var legendLabelUnit4 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x - ( margeD * 3 ) || 220,
+        y: -unit * 2 + y - ( margeD / 2 ) || -unit * 2 + 598,
+        font: '12px Roboto',
+        width: w || 32,
+        height: h || 14,
+        color: '#093649' || this.UNSELECTED_COLOR,
+        text: '2 M'
+      } );
+
+      this.selected = this.canvas.addChildren( legendBoxUnit1, legendLabelUnit1, legendBoxUnit2, legendLabelUnit2, legendBoxUnit3, legendLabelUnit3, legendBoxUnit4, legendLabelUnit4 );
+
+    },
+
+    function dashedLinesIndicator( x, y, w, h, unit, lengthX ) {
+
+      var dashedLine1, dashedLine2, dashedLine3;
+      dashedLine1 = foam.graphics.Line.create( {
+        startX: x || 257,
+        startY: -unit * 0.5 + y || -unit * 0.5 + 598,
+        endX: x + lengthX || 1049,
+        endY: -unit * 0.5 + y || -unit * 0.5 + 598,
+        color: '#d81e05',
+        lineWidth: 2,
+        lineDash: [ 10, 12 ]
+      } );
+
+      var legendLabelLineSeparator1 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x || 257,
+        y: -unit * 0.5 + y - 15 || -unit * 0.5 + 598,
+        font: '12px Roboto',
+        color: '#d71c06' || this.UNSELECTED_COLOR,
+        text: 'Average Minimum'
+      } );
+
+      dashedLine2 = foam.graphics.Line.create( {
+        startX: x || 257,
+        startY: -unit * 1 + y || -unit * 1 + 598,
+        endX: x + lengthX || 1049,
+        endY: -unit * 1 + y || -unit * 1 + 598,
+        color: '#2cab70',
+        lineWidth: 2,
+        lineDash: [ 10, 12 ]
+      } );
+
+      var legendLabelLineSeparator2 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x || 257,
+        y: -unit * 1 + y - 15 || -unit * 1 + 598,
+        font: '12px Roboto',
+        color: '#2cab70' || this.UNSELECTED_COLOR,
+        text: 'Average'
+      } );
+
+      //width: 792px;
+      //height: 2px;
+      dashedLine3 = foam.graphics.Line.create( {
+        startX: x || 257,
+        startY: -unit * 1.5 + y || -unit * 1.5 + 598,
+        endX: x + lengthX || 1049,
+        endY: -unit * 1.5 + y || -unit * 1.5 + 598,
+        color: '#59a5d5',
+        lineWidth: 2,
+        lineDash: [ 10, 12 ]
+      } );
+
+      //letter-spacing: 0.2px;
+      //width: 103px;
+      //height: 14px;
+      var legendLabelLineSeparator3 = foam.graphics.Label.create( {
+        align: 'left',
+        x: x || 257,
+        y: -unit * 1.5 + y - 15 || -unit * 1.5 + 598,
+        font: '12px Roboto',
+        color: '#59a5d5' || this.UNSELECTED_COLOR,
+        text: 'Average Maximum'
+      } );
+
+      //width: 792px;
+      //height: 2px;
+      //opacity: 0.2;
+      dashedLine4 = foam.graphics.Line.create( {
+        startX: x || 257,
+        startY: -unit * 2 + y || -unit * 2 + 598,
+        endX: x + lengthX || 1049,
+        endY: -unit * 2 + y || -unit * 2 + 598,
+        color: '#232425',
+        lineWidth: 2
+      } );
+
+      this.selected = this.canvas.addChildren( dashedLine1, dashedLine2, dashedLine3, dashedLine4, legendLabelLineSeparator1, legendLabelLineSeparator2, legendLabelLineSeparator3 );
+
+    },
+
+    function addGraphView( x, y, diagram, w, h ) { //257,598.6
+	//TODO create categories of graph
+      var step = 30;
+		var color = [ '#d81e05', '#093649', '#59a5d5', '#2cab70' ];
+      var dataSource = foam.graphics.DataSource.create( {} );
+      
+      dataSource.Horizontal = [ 'Nov 07', 'NOV 08', 'NOV 09' ];
+
+      dataSource.LegendEntries[ 0 ] = foam.graphics.LegendEntries.create( {} );
+      dataSource.LegendEntries[ 0 ].seriesName = 'Day'; //also we can call it Series
+      dataSource.LegendEntries[ 0 ].seriesValues = [ 2, 2, 2, 4 ]; //[ 0.0212, 0.0964, 0.3690, 1.00 , 1.5, 1.7, 1.8]; //[ 0.8, 1.2, 0.98, 1.3, 1.7, 0.7, 0.8 ]; //[ 1, 2,3,4 ]; //[ 2.12, 9.64 , 36.90 , 100 ];  //[ 2, 2 ,4 ]; //
+
+      dataSource.LegendEntries[ 1 ] = foam.graphics.LegendEntries.create( {} );
+      dataSource.LegendEntries[ 1 ].seriesName = 'Month';
+      dataSource.LegendEntries[ 1 ].seriesValues = [ 0.0212, 0.0964, 0.3690, 1.00, 1.5, 1.7, 1.8 ]; //[ 0.5, 0.2, 1.2, 1.1, 1.5, 1.7, 1.8 ];
+
+      dataSource.LegendEntries[ 2 ] = foam.graphics.LegendEntries.create( {} );
+      dataSource.LegendEntries[ 2 ].seriesName = 'Years';
+      dataSource.LegendEntries[ 2 ].seriesValues = [ 0.5, 0.2, 1.2, 1.1, 1.5, 1.7, 1.8 ];
+
+      dataSource.LegendEntries[ 3 ] = foam.graphics.LegendEntries.create( {} );
+      dataSource.LegendEntries[ 3 ].seriesName = 'Month';
+      dataSource.LegendEntries[ 3 ].seriesValues = [ 0.5, 0.2, 1.2, 1.1, 1.5, 1.7, 1.8 ];
+
+      step = step * dataSource.LegendEntries.length;
+      if ( diagram == 'Pie' ) {
+        var radius = 200;
+        var marge = 1.3;
+        //this.createPieDiagram( x, y, dataSource.LegendEntries[ 0 ], radius, marge, color, '%' ); //support just one set of values
+
+        var presentationSelectCircle = foam.graphics.PieGraph.create({//this.createPieDiagram( {//.pieGraph 	//create
+			  x : x,
+			  y : y,
+			  border: 'black',
+              color: 'black',
+			  LegendEntrie : dataSource.LegendEntries[ 0 ].seriesValues,
+			  symbole : '%'}); //support just one set of values
+			  this.canvas.add( presentationSelectCircle.createPieGraph );
+			  this.canvas.invalidate;
+			//this.selected = this.canvas.addChildren( presentationSelectCircle );
+      }
+
+      var lengthX = 792,
+        lengthY = 300;
+      if ( diagram != 'Pie' ) {
+        this.createAxe( x, y, diagram, lengthX, lengthY ); 
+      }
+      var unit = 100; //60
+      var maxLength = 500;
+
+      if ( diagram == 'Column' ) {
+        foam.graphics.ColumnGraph.create( {// createColumnGraph
+		x : x, 
+		y : y, 
+		dataSource: dataSource, 
+		color :color, 
+		step :step, 
+		w :w, 
+		h :h , 
+		unit: unit, 
+		lengthY :lengthY });
+      }
+      if ( diagram == 'Circle' ) {
+        var radius = 4;
+        foam.graphics.CircleGraph.create({// createCircleGraph
+		x :x, 
+		y : y, 
+		dataSource :dataSource, 
+		step:step, 
+		w:w, 
+		h:h, 
+		unit:unit, 
+		radius:radius, 
+		lengthY:lengthY });
+      }
+      if ( diagram == 'Bar' ) { // Vertical
+        foam.graphics.BarGraph.create( {// createBarGraph
+		x :x, 
+		y :y, 
+		dataSource:dataSource, 
+		step:step, 
+		w:w, 
+		h:h, 
+		unit:unit, 
+		maxLength:maxLength, 
+		color:color, 
+		symbole:'%' });
+      }
+
+      //****************** not supported by graph ***************
+
+      //TODO the unit will be selected depend on the min and the max.
+
+      if ( diagram !== 'Bar' && diagram !== 'Pie' ) {
+        this.axeLabels( x, y, w, h, unit );       
+        this.dashedLinesIndicator( x, y, w, h, unit, lengthX ); //dashed line in the view
+      }
+    }
+  ],
+
+  listeners: [
+  //TODO delete empty click , without element
+    function onClick( evt ) { 
+      var x = evt.offsetX,
+        y = evt.offsetY;
+      var c = this.canvas.findFirstChildAt( x, y );
+      var xc = c.instance_.x;
+      var yc = c.instance_.y;
+      var xd, yd;
+
+	  if(  c.width == 1960 ) {//c === 'undefined' && //TODO this.canvas
+	  console.log( 'No element here' );
+		return;
+	  }
+
+      for ( var [ key, value ] of this.elementSelectedInGraphMap.entries() ) {
+        for ( var i in value ) {
+          if ( value[ i ] !== 'undefined' ) {
+           xd = value[ i ].x;
+              yd = value[ i ].y;
+            var d = this.canvas.findFirstChildAt( xd, yd );
+             if ( d != 'undefined' ) {			 
+			 this.selected = this.canvas.remove( d );
+			this.canvas.invalidate();          
+            } else {
+              console.log( 'unable to reach the element' );
+            }
+			this.elementSelectedInGraphMap.delete( {
+                x: xd,
+                y: yd
+              } );
+          } else console.log( 'No element' );
+        }
+      }
+
+      var presentationSelectCircle, BoxInfo, BoxInfoData;
+      for ( var [ key, value ] of this.elementGraphMap.entries() ) {
+        if ( key.x === xc && key.y === yc ) {
+
+          presentationSelectCircle = foam.graphics.Circle.create( {
+            x: xc, //x
+            y: yc, //y
+            radius: 8,
+            border: 'black',
+            color: '#093649'
+          } );
+
+		  //TODO add properties
+          //opacity: 0.04;
+          BoxHighlightedPoint = foam.graphics.Box.create( {
+            x: x - 50, 
+            y: y - 100, 
+            width: 99.1,
+            height: 294.1,
+            color: '#232425' || this.UNSELECTED_COLOR,
+            border: 'black'
+          } );
+
+          BoxInfo = foam.graphics.Box.create( {
+            x: x - 20 || 277,
+            y: y - 100, 
+            width: 74,
+            height: 58,
+            color: '#093649' || this.UNSELECTED_COLOR,
+            border: 'black'
+          } );
+		  
+          BoxInfoData = foam.graphics.Label.create( {
+            align: 'center',
+            x: BoxInfo.x + 1 || 0,
+            y: BoxInfo.y + 1,
+            color: '#ffffff',
+            font: '16px Roboto',
+            width: 50 || 200,
+            height: 19 || 30,
+            text: value
+          } );
+          this.selected = this.canvas.addChildren( BoxInfo, BoxInfoData );
+
+          this.selected = this.canvas.addChildren( presentationSelectCircle ); // TODO add this element BoxHighlightedPoint with opacity
+        }
+      }
+      
+      this.elementSelectedInGraphMap.set( {
+        x: xc,
+        y: yc
+      }, [ presentationSelectCircle, BoxInfo, BoxInfoData ] ); 
+    }
+  ]
+} );
