@@ -18,8 +18,8 @@ public abstract class AbstractDAO
 {
   public final static long MAX_SAFE_INTEGER = 9007199254740991l;
 
-  protected ClassInfo    of_                = null;
-  protected PropertyInfo primaryKey_        = null;
+  protected ClassInfo    of_          = null;
+  protected PropertyInfo primaryKey_  = null;
 
   public DAO where(Predicate predicate) {
     return new FilteredDAO(predicate, this);
@@ -179,12 +179,16 @@ public abstract class AbstractDAO
     this.select_(x, new RemoveSink(this), skip, limit, order, predicate);
   }
 
+  protected Sink prepareSink(Sink s) {
+    return s == null ? new ListSink() : s;
+  }
+
   public Sink select() {
     return select(null);
   }
 
   public Sink select(Sink sink) {
-    if ( sink == null ) sink = new ListSink();
+    sink = prepareSink(sink);
     return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
   }
 
