@@ -21,12 +21,12 @@ import java.io.*;
 public class JDAO
     extends ProxyDAO
 {
-  protected final File file_;
+  protected final File           file_;
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
   public JDAO(ClassInfo classInfo, String filename)
-      throws IOException
+    throws IOException
   {
     this(new MapDAO().setOf(classInfo), filename);
   }
@@ -43,7 +43,7 @@ public class JDAO
   }
 
   protected void loadJournal()
-      throws IOException
+    throws IOException
   {
     JournalParser  journalParser = new JournalParser();
     BufferedReader br            = new BufferedReader(new FileReader(file_));
@@ -89,9 +89,9 @@ public class JDAO
    * @return the error message
    */
   protected String getParsingErrorMessage(String line) {
-    Parser parser = new ExprParser();
-    PStream ps = new StringPStream();
-    ParserContext x = new ParserContextImpl();
+    Parser        parser = new ExprParser();
+    PStream       ps     = new StringPStream();
+    ParserContext x      = new ParserContextImpl();
 
     ((StringPStream) ps).setString(line);
     x.set("X", ( getX() == null ) ? new ProxyX() : getX());

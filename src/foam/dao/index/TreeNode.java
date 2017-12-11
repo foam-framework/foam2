@@ -7,7 +7,7 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
-
+import foam.dao.Sink;
 
 public class TreeNode {
 
@@ -69,17 +69,17 @@ public class TreeNode {
   public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key,
     FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
-      return new TreeNode(key, value, 1, 1, null, null);
+      return new TreeNode(key, tail.put(null, value), 1, 1, null, null);
     }
     state = maybeClone(state);
-    int r = prop.compare(state.value, value);
+    int r = prop.comparePropertyToValue(key,state.key);
 
     if ( r == 0 ) {
       state.size -= tail.size(state.value);
       state.value = tail.put(state.value, value);
       state.size += tail.size(state.value);
     } else {
-      if ( r > 0 ) {
+      if ( r < 0 ) {
         if ( state.left != null ) {
           state.size -= state.left.size;
         }
@@ -135,7 +135,7 @@ public class TreeNode {
     }
 
     state = maybeClone(state);
-    long compareValue = prop.compare(state.value, value);
+    long compareValue = prop.comparePropertyToValue(key,state.key);
 
     if ( compareValue == 0 ) {
       state.size -= tail.size(state.value);
@@ -266,10 +266,21 @@ public class TreeNode {
       return s.value;
     }
     if ( r > 0 ) {
-      return get(s.left, key, prop);
+      return get(s.right, key, prop);
     }
-    return get(s.right, key, prop);
+    return get(s.left, key, prop);
+  }
 
+  protected TreeNode getLeft() {
+    return right;
+  }
+
+  protected TreeNode getRight(){
+    return left;
+  }
+
+  protected Object getValue(){
+    return value;
   }
 
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
@@ -344,6 +355,21 @@ public class TreeNode {
 
     return new TreeNode(s.key, s.value, size(s) - size(s.right),
       s.level, s.left, null);
+  }
+
+  public void select(TreeNode currentNode, Sink sink) {
+    if (currentNode == null)
+      return;
+    TreeNode left = currentNode.getLeft();
+    if (left != null) {
+      select(left, sink);
+    }
+    if (currentNode.getValue() != null)
+      sink.put((FObject) currentNode.getValue(), null);
+    TreeNode right = currentNode.getRight();
+    if (right != null) {
+      select(right, sink);
+    }
   }
 
 }

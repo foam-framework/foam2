@@ -28,6 +28,7 @@ public class SkipDAO
   }
 
   public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+    s = prepareSink(s);
     return super.select_(x, s, skip_, limit, order, predicate);
   }
 

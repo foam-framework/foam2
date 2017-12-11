@@ -34,7 +34,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'description'
+      name: 'description',
+      displayWidth: 80
     },
     {
       class: 'DateTime',
@@ -64,18 +65,18 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80, css: {"font-family": "monospace"} }
     },
     {
       class: 'String',
       name: 'output',
       visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80, css: {"font-family": "monospace"}  }
     },
     {
       class: 'String',
       name: 'notes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 80 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 90 }
     }
   ],
 
