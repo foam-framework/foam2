@@ -6,20 +6,41 @@
 
 package foam.flinks;
 
-import foam.core.FObject;
-import foam.flinks.model.FlinksRequest;
-import foam.flinks.model.FlinksResponse;
+import foam.core.*;
+import foam.flinks.model.*;
 
-public interface Msg {
-  public String getHttpMethod();
-  public String getJson();
-  public String getRequest();
-  // public String setModel(FlinksRequest request);
-  // public FlinksResponse getModel();
-  // public boolean isValid();
-  // public String getErrorMessage();
-  // public int getHttpResponseCode();
-  // public String getFlinksCode();
-  // public void setProperty(String name, Object obj);
-  // public Object getProperty(String name);
+public abstract class Msg 
+  implements ContextAware 
+{
+  protected String json_;
+  protected FlinksCall model_;
+  protected X x_;
+  protected ClassInfo modelInfo_;
+
+  @Override
+  public void setX(X x) {
+    x_ = x;
+  }
+  @Override
+  public X getX() {
+    return x_;
+  }
+  public void setJson(String json) {
+    json_ = json;
+  }
+  public String getJson(){
+    return json_;
+  }
+  public void setModelInfo(ClassInfo modelInfo){
+    modelInfo_ = modelInfo;
+  }
+  public ClassInfo getModelInfo() {
+    return modelInfo_;
+  }
+  public void setModel(FlinksCall model) {
+    model_ = model;
+  }
+  public FlinksCall getModel() {
+    return model_;
+  }
 }

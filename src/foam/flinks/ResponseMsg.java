@@ -6,14 +6,15 @@
 package foam.flinks;
 
 import foam.core.*;
-import foam.lib.parse.Parser;
+import foam.flinks.model.*;
+import foam.lib.json.JSONParser;
 
-public class ResponseMsg implements ContextAware {
-  private String json_;
-  private FObject model_;
-  private ClassInfo modelInfo_;
-  private X x_;
+public class ResponseMsg 
+  extends Msg 
+{
   private int httpStatusCode_;
+  private JSONParser jsonParser_;
+  private boolean isModelSet_ = false;
 
   public ResponseMsg() {
     this(null);
@@ -22,31 +23,53 @@ public class ResponseMsg implements ContextAware {
     this(x, null);
   }
   public ResponseMsg(X x, String json){
-    json_ = json;
-    this.setX(x);
+    setJson(json);
+    setX(x);
+    jsonParser_ = new JSONParser();
   }
-  public void setModelInfo(ClassInfo modelInfo){
-    modelInfo_ = modelInfo;
-  }
-  public ClassInfo getModelInfo() {
-    return modelInfo_;
-  }
-  public void setX(X x) {
-    x_ = x;
-  }
-  public X getX() {
-    return x_;
-  }
-  public void setJson(String json) {
-    json_ = json;
-  }
-  public String getJson(){
-    return json_;
-  }
+  
   public void setHttpStatusCode(int httpStatusCode) {
     httpStatusCode_ = httpStatusCode;
   }
   public int getHttpStatusCode() {
     return httpStatusCode_;
+  }
+
+  @Override
+  public void setModel(FlinksCall model) {
+    isModelSet_ = true;
+    model_ = model;
+  }
+
+  @Override 
+  public FlinksCall getModel() {
+    if ( isModelSet_ == true ) {
+      return model_;
+    } else {
+      if ( getX() == null ) {
+        throw new RuntimeException("No Context Found");
+      }
+      if ( modelInfo_ == null ) {
+        throw new RuntimeException("No Model ClassInfo Found");
+      }
+      if ( getJson() == null ) {
+        throw new RuntimeException("No Json Found");
+      }
+      jsonParser_.setX(getX());
+      FObject obj = null;
+      
+      obj = jsonParser_.parseString(getJson(), modelInfo_.getObjClass());
+      if ( obj == null ) {
+        throw new RuntimeException("Json Parser Error");
+      }
+      setModel((FlinksCall) obj);
+      return (FlinksCall) obj;
+    }
+  }
+
+  @Override
+  public void setJson(String json) {
+    json_ = json;
+    isModelSet_ = false;
   }
 }
