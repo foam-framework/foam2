@@ -360,54 +360,52 @@ public class TreeNode {
   }
 
   protected void selectAllHelper(TreeNode currentNode, Sink sink){
-    if (currentNode == null)
-      return;
+    if ( currentNode == null ) return;
     TreeNode left = currentNode.getLeft();
-    if (left != null) {
+    if ( left != null ) {
       selectAllHelper(left, sink);
     }
-    if (currentNode.getValue() != null)
+    if ( currentNode.getValue() != null )
       sink.put((FObject) currentNode.getValue(), null);
     TreeNode right = currentNode.getRight();
-    if (right != null) {
+    if ( right != null ) {
       selectAllHelper(right, sink);
     }
   }
 
   protected long skipTreeNode(TreeNode currentNode, Sink sink, long skip){
-    if (currentNode == null || currentNode.size <= skip)
-      return 0;
+    if ( currentNode == null || currentNode.size <= skip ) return 0;
     long currentSize = currentNode.size;
     TreeNode left = currentNode.getLeft();
     long leftSize = 0;
-    if (left != null) {
+    if ( left != null ) {
       leftSize = left.size;
-      if(leftSize > skip)
-        skip = skipTreeNode(left,sink,skip);
-      else if(leftSize == skip)
+      if( leftSize > skip ) skip = skipTreeNode(left,sink,skip);
+      else if( leftSize == skip )
         skip = 0;
       else
         skip = skip - leftSize;
     }
-    if (currentNode.getValue() != null && skip==0)
+    if ( currentNode.getValue() != null && skip==0 ){
       sink.put((FObject) currentNode.getValue(), null);
-    else if(currentNode.getValue() != null && skip!=0)
+    }
+    else if( currentNode.getValue() != null && skip!=0 ){
       skip--;
+    }
     TreeNode right = currentNode.getRight();
-    if (right != null) {
+    if ( right != null ) {
       skip = skipTreeNode(right, sink, skip);
     }
     return skip;
   }
 
   public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if(skip>currentNode.size || limit == 0)
-      return;
-    if(skip == 0 && limit > currentNode.size){
+    if( skip >= currentNode.size || limit <= 0 ) return;
+    if( skip == 0 && limit > currentNode.size ){
       selectAllHelper(currentNode,sink);
       return;
     }
-    if(skip !=0 ){
+    if( skip != 0 ){
       skipTreeNode(currentNode,sink,skip);
     }
 
