@@ -227,6 +227,7 @@ FOAM_FILES([
   { name: "foam/blob/BlobJava", flags: ['java'] },
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
+  { name: "foam/net/NotConnectedException" },
   { name: "foam/net/web/WebSocket" },
   { name: "foam/net/web/WebSocketService" },
   // foam.net.web: No 'web' flag, because some are base classes for
