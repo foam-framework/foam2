@@ -2,33 +2,35 @@ package foam.nanos.notification.email;
 
 import com.google.common.base.Optional;
 import foam.dao.DAO;
+import foam.dao.Sink;
 import foam.dao.ListSink;
-import foam.mlang.Expressions;
+import foam.mlang.MLang;
 import foam.nanos.notification.email.EmailTemplate;
 import org.jtwig.resource.loader.ResourceLoader;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-
-
+import java.util.List;
 
 public class DAOResourceLoader
     implements ResourceLoader
 {
   public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
-    ListSink list = (ListSink) dao.limit(1).where(AND(
-      EQ(EmailTemplate.NAME,       templateName),
-      EQ(EmailTemplate.GROUP_NAME, groupName))).select();
+    Sink list = new ListSink();
+    list = dao.where(MLang.AND(
+      MLang.EQ(EmailTemplate.NAME,       templateName),
+      MLang.EQ(EmailTemplate.GROUP_NAME, groupName))).limit(1).select(list);
 
-    if ( list.toArray().size() == 0 ) {
-      list = (ListSink) dao.limit(1).where(AND(
-        EQ(EmailTemplate.NAME,       templateName),
-        EQ(EmailTemplate.GROUP_NAME, "*"))).select();
+      List data = ((ListSink) list).getData();
+
+    if ( data.size() == 0 ) {
+      list = dao.where(MLang.AND(
+        MLang.EQ(EmailTemplate.NAME,     templateName),
+        MLang.EQ(EmailTemplate.GROUP_NAME, "*"))).limit(1).select(list);
     }
 
-    return (EmailTemplate) list.getArray().get(0);
+    return (EmailTemplate) data.get(0);
   }
 
   protected DAO dao_;
