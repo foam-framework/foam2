@@ -114,6 +114,7 @@ public class FlinksService
     StringBuilder res = null;
 
     try {
+      //TODO: url for the PUT is different
       URL url = new URL(address_ + "/" + req.getRequestInfo());
       connection = (HttpURLConnection) url.openConnection();
 

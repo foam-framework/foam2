@@ -6,6 +6,8 @@
 
 package foam.flinks;
 
+import java.security.GuardedObject;
+
 import foam.core.*;
 import foam.flinks.model.*;
 
@@ -42,5 +44,34 @@ public abstract class Msg
   }
   public FlinksCall getModel() {
     return model_;
+  }
+
+  public static Object findModelValueByNames(String nameChain) {
+    if ( getModel() == null ) {
+      return null;
+    } else {
+      String[] b = nameChain.split("\\.",-1);
+      FObject obj = getModel();
+      ClassInfo of;
+      PropertyInfo prop;
+      Object ret;
+      
+      for ( int i = 0 ; i < b.length ; i++ ) {
+        if ( obj == null ) {
+          return null;
+        }
+        of = obj.getClassInfo();
+        //add support for the array and map
+        PropertyInfo prop = (PropertyInfo) of.getAxiomByName(b[i]);
+        ret = prop.get(obj);
+        if ( ret == null ) {
+          return ret;
+        }
+        if ( i < b.length - 1 ) {
+          obj = (FObject) ret;
+        }
+      }
+      return ret;
+    }
   }
 }
