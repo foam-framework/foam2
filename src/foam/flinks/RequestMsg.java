@@ -6,27 +6,54 @@
 package foam.flinks;
 
 import foam.core.*;
+import foam.flinks.model.*;
 import foam.lib.json.Outputter;
 
-public class RequestMsg {
+public class RequestMsg 
+  extends Msg
+{
   private static Outputter jsonOutputter = new Outputter();
-  private FObject model_;
   private String requestInfo_;
   private String httpMethod_;
+  private boolean isJsonSet_ = false;
 
   public RequestMsg() {
+    this(null);
+  }
+  public RequestMsg(X x) {
+    this(x, null);
+  }
+  public RequestMsg(X x, FlinksCall model){
+    setX(x);
+    setModel(model);
   }
 
+  @Override
   public String getJson() {
-    if ( model_ == null ) throw new RuntimeException("No model found in the RequestMsg");
-    return jsonOutputter.stringify(model_);
+    if ( isJsonSet_ == true) {
+      return json_;
+    } else {
+      if ( model_ == null ) throw new RuntimeException("No model found");
+      String ret = jsonOutputter.stringify(model_);
+      setJson(ret);
+      return ret;
+    }
   }
 
-  public void setModel(FObject model) {
+  @Override
+  public void setJson(String json) {
+    json_ = json;
+    isJsonSet_ = true;
+  }
+
+  @Override
+  public void setModel(FlinksCall model) {
     model_ = model;
+    isJsonSet_ = false;
   }
 
-  public FObject getModel() {
+  @Override
+  public FlinksCall getModel() {
     return model_;
   }
 
