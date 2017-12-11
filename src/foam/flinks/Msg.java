@@ -46,7 +46,7 @@ public abstract class Msg
     return model_;
   }
 
-  public static Object findModelValueByNames(String nameChain) {
+  public Object findModelValueByNames(String nameChain) {
     if ( getModel() == null ) {
       return null;
     } else {
@@ -54,7 +54,7 @@ public abstract class Msg
       FObject obj = getModel();
       ClassInfo of;
       PropertyInfo prop;
-      Object ret;
+      Object ret = null;
       
       for ( int i = 0 ; i < b.length ; i++ ) {
         if ( obj == null ) {
@@ -62,7 +62,7 @@ public abstract class Msg
         }
         of = obj.getClassInfo();
         //add support for the array and map
-        PropertyInfo prop = (PropertyInfo) of.getAxiomByName(b[i]);
+        prop = (PropertyInfo) of.getAxiomByName(b[i]);
         ret = prop.get(obj);
         if ( ret == null ) {
           return ret;
