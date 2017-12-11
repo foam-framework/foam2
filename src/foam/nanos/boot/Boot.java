@@ -28,14 +28,14 @@ public class Boot {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("Registering: " + sp.getName());
-        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
+        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
       }
     });
 
     /**
      * Revert root_ to non ProxyX to avoid letting children add new bindings.
      */
-    root_ = root_.put("firewall", "firewall");
+    root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
