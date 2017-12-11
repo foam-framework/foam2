@@ -103,8 +103,15 @@ foam.CLASS({
             name: 'comparePropertyToObject',
             type: 'int',
             visibility: 'public',
-            args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'foam.core.FObject' } ],
-            body: 'return compare(cast(key), get_(o));'
+            args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'Object' } ],
+            body: 'return foam.util.SafetyUtil.compare(cast(key), get_(o));'
+          },
+          {
+            name: 'comparePropertyToValue',
+            type: 'int',
+            visibility: 'public',
+            args: [ { name: 'key', type: 'Object' }, { name: 'value', type: 'Object' } ],
+            body: 'return foam.util.SafetyUtil.compare(cast(key), cast(value));'
           },
           {
             name: 'jsonParser',

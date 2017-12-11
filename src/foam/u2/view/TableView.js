@@ -150,6 +150,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'dblclick?',
     'editRecord?',
     'selection? as importSelection'
   ],
@@ -308,7 +309,7 @@ foam.CLASS({
      */
     function positionOverlayDropdown(columnSelectionE) {
       // Dynamic position calculation
-      var origin = this.dropdownOrigin.el();
+      var origin  = this.dropdownOrigin.el();
       var current = this.overlayOrigin.el();
 
       var boundingBox = origin.getBoundingClientRect();
@@ -369,6 +370,7 @@ foam.CLASS({
               select(this.orderedDAO$proxy, function(obj) {
                 return this.E('tr').
                   on('mouseover', function() { view.hoverSelection = obj; }).
+                  callIf(view.dblclick, function() { this.on('dblclick', function() { view.dblclick && view.dblclick(obj); }); }).
                   on('click', function() {
                     view.selection = obj;
                     if ( view.importSelection$ ) view.importSelection = obj;

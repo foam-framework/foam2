@@ -16,11 +16,10 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-
 import java.util.Calendar;
 
 public class PasswordHashingDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   public PasswordHashingDAO(X x, DAO delegate) {
     setX(x);
@@ -42,8 +41,9 @@ public class PasswordHashingDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    Object id = obj.getProperty("id");
+    Object  id     = obj.getProperty("id");
     FObject stored = getDelegate().find(id);
+
     // hash password if result does not exist or does not have password set
     if ( stored == null || SafetyUtil.isEmpty((String) stored.getProperty("password")) ) {
       obj.setProperty("password", Password.hash((String) obj.getProperty("password")));

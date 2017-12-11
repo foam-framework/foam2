@@ -969,7 +969,6 @@ foam.CLASS({
       return this;
     },
 
-
     //
     // Visibility
     //
@@ -2097,7 +2096,7 @@ foam.CLASS({
       }
     }
   ]
-})
+});
 
 
 foam.CLASS({
@@ -2106,7 +2105,7 @@ foam.CLASS({
     [ 'view',          { class: 'foam.u2.EnumView' } ],
     [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
   ]
-})
+});
 
 
 foam.CLASS({

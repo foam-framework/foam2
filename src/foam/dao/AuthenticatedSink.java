@@ -12,15 +12,14 @@ import foam.core.X;
 import foam.nanos.auth.AuthService;
 
 public class AuthenticatedSink
-    extends ProxySink
+  extends ProxySink
 {
   protected String prefix_;
   protected String method_;
 
   public AuthenticatedSink(X x, String rootPermission, Sink delegate) {
-    setX(x);
-    setDelegate(delegate);
-    this.prefix_ = rootPermission + ".";
+    super(x, delegate);
+    prefix_ = rootPermission + ".";
   }
 
   @Override
@@ -28,9 +27,7 @@ public class AuthenticatedSink
     AuthService authService = (AuthService) getX().get("auth");
     String      permission  = prefix_ + obj.getProperty("id");
 
-    if ( authService.check(getX(), permission) ) {
-      super.put(obj, sub);
-    }
+    if ( authService.check(getX(), permission) ) super.put(obj, sub);
   }
 
   @Override
@@ -38,8 +35,6 @@ public class AuthenticatedSink
     AuthService authService = (AuthService) getX().get("auth");
     String      permission  = prefix_ + obj.getProperty("id");
 
-    if ( authService.check(getX(), permission) ) {
-      super.remove(obj, sub);
-    }
+    if ( authService.check(getX(), permission) ) super.remove(obj, sub);
   }
 }
