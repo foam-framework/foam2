@@ -168,7 +168,7 @@ foam.CLASS({
   name: 'FlinksAccountDetailRequest',
   extends: 'foam.flinks.model.FlinksAccountRequest',
 
-  documenatation: 'model for Flinks Account Detail Request',
+  documentation: 'model for Flinks Account Detail Request',
 
   properties: [
     {
@@ -264,10 +264,18 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.flinks.model',
-  name: 'FlinksAuthResponse',
+  name: 'FlinksInvalidResponse',
+  extends: 'foam.flinks.model.FlinksResponse',
+  
+  documentation: 'model for Flinks Error Response'
+});
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'FlinksMFAResponse',
   extends: 'foam.flinks.model.FlinksResponse',
 
-  documentation: 'model for Flinks success authorized response',
+  documentation: 'model for Flinks MFA response',
 
   properties: [
     {
@@ -278,6 +286,22 @@ foam.CLASS({
       class: 'FObjectArray',
       of: 'foam.flinks.model.SecurityChallengeModel',
       name: 'SecurityChallenges'
+    }
+  ]
+  
+})
+
+foam.CLASS({
+  package: 'foam.flinks.model',
+  name: 'FlinksAuthResponse',
+  extends: 'foam.flinks.model.FlinksResponse',
+
+  documentation: 'model for Flinks success authorized response',
+
+  properties: [
+    {
+      class: 'String',
+      name: 'Institution'
     }
   ]
 });
