@@ -390,10 +390,34 @@ return sink
       return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
     },
 
+    function prepareSink_(sink) {
+      if ( ! sink ) return foam.dao.ArraySink.create();
+
+      if ( foam.Function.isInstance(sink) )
+        return {
+          put: sink,
+          eof: function() {}
+        };
+
+      if ( sink == console || sink == console.log )
+        return {
+          put: function(o) { console.log(o, foam.json.Pretty.stringify(o)); },
+          eof: function() {}
+        };
+
+      if ( sink == document )
+        return {
+          put: function(o) { foam.u2.DetailView.create({data: o}).write(document); },
+          eof: function() {}
+        };
+
+      return sink;
+    },
+
     {
       name: 'select',
       code: function select(sink) {
-        return this.select_(this.__context__, sink, undefined, undefined, undefined, undefined);
+        return this.select_(this.__context__, this.prepareSink_(sink), undefined, undefined, undefined, undefined);
       },
       swiftCode: 'return try select_(__context__, sink)',
     },
