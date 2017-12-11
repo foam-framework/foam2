@@ -10,7 +10,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class FlinksService {
+import foam.core.ContextAware;
+import foam.core.X;
+import foam.flinks.model.*;
+
+public class FlinksService 
+  implements ContextAware
+{
   public static final String REST_GET = "GET";
   public static final String REST_POST = "POST";
   public static final String AUTHORIZE = "Authorize";
@@ -21,15 +27,27 @@ public class FlinksService {
   public static final String ACCOUNTS_STATEMENTS = "GetStatements";
 
   private String address_;
+  private X x_;
 
   public FlinksService() {
-    this("8bc4718b-3780-46d0-82fd-b217535229f1");
+    this(null, "8bc4718b-3780-46d0-82fd-b217535229f1");
   }
-  public FlinksService(String customerId) {
-    this("https://nanopay-api.private.fin.ag/v3", customerId);
+  public FlinksService(X x, String customerId) {
+    this(x, "https://nanopay-api.private.fin.ag/v3", customerId);
   }
-  public FlinksService(String url, String customerId) {
+  public FlinksService(X x, String url, String customerId) {
     address_ = url + "/" + customerId + "/" + "BankingServices";
+    setX(x);
+  }
+
+  @Override
+  public X getX() {
+    return x_;
+  }
+
+  @Override 
+  public void setX(X x) {
+    x_ = x;
   }
 
   public ResponseMsg service(RequestMsg msg, String RequestInfo) {
@@ -38,11 +56,11 @@ public class FlinksService {
     } else if ( RequestInfo.equals(AUTHORIZE_MULTIPLE) ) {
       return null;
     } else if ( RequestInfo.equals(ACCOUNTS_SUMMARY) ) {
-      return null;
+      return accountsSummaryService(msg);
     } else if ( RequestInfo.equals(ACCOUNTS_STATEMENTS) ) {
       return null;
     } else if ( RequestInfo.equals(ACCOUNTS_DETAIL) ) {
-      return null;
+      return accountsDetailService(msg);
     } else if ( RequestInfo.equals(WAIT_SUMMARY) ) {
       return null;
     } else {
@@ -52,11 +70,40 @@ public class FlinksService {
 
   public ResponseMsg authorizeService(RequestMsg msg) {
     ResponseMsg resp = request(msg);
-    return null;
+
+    if ( resp.getHttpStatusCode() == 203 ) {
+      //success authorize
+      resp.setModelInfo(FlinksMFAResponse.getOwnClassInfo());
+    } else if ( resp.getHttpStatusCode() == 200 ) {
+      //MFA challenge
+      resp.setModelInfo(FlinksAuthResponse.getOwnClassInfo());
+    } else {
+      //Error response
+      resp.setModelInfo(FlinksInvalidResponse.getOwnClassInfo());
+    }
+    return resp;
   }
 
-  public ResponseMsg accountsDetailService(Msg msg) {
-    return null;
+  public ResponseMsg accountsDetailService(RequestMsg msg) {
+    ResponseMsg resp = request(msg);
+
+    if ( resp.getHttpStatusCode() == 200 ) {
+      resp.setModelInfo(FlinksAccountsDetailResponse.getOwnClassInfo());
+    } else {
+      resp.setModelInfo(FlinksInvalidResponse.getOwnClassInfo());
+    }
+    return resp;
+  }
+
+  public ResponseMsg accountsSummaryService(RequestMsg msg) {
+    ResponseMsg resp = request(msg);
+    
+        if ( resp.getHttpStatusCode() == 200 ) {
+          resp.setModelInfo(FlinksAccountsSummaryResponse.getOwnClassInfo());
+        } else {
+          resp.setModelInfo(FlinksInvalidResponse.getOwnClassInfo());
+        }
+        return resp;
   }
 
   private ResponseMsg request(RequestMsg req) {
@@ -67,12 +114,12 @@ public class FlinksService {
     StringBuilder res = null;
 
     try {
-      URL url = new URL(address_ + "/" + req.getRequestCode());
+      URL url = new URL(address_ + "/" + req.getRequestInfo());
       connection = (HttpURLConnection) url.openConnection();
 
       //configure HttpURLConnection
-      connection.setConnectTimeout(5 * 1000);
-      connection.setReadTimeout(5 * 1000);
+      connection.setConnectTimeout(10 * 1000);
+      connection.setReadTimeout(10 * 1000);
       connection.setDoOutput(true);
       connection.setUseCaches(false);
 
@@ -105,7 +152,7 @@ public class FlinksService {
         res.append(line);
       }
       //remember to set X
-      ResponseMsg msg = new ResponseMsg(null, res.toString());
+      ResponseMsg msg = new ResponseMsg(getX(), res.toString());
       msg.setHttpStatusCode(httpCode);
       return msg;
     } catch ( Throwable t ) {

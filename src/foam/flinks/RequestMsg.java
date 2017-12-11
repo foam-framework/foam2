@@ -11,7 +11,7 @@ import foam.lib.json.Outputter;
 public class RequestMsg {
   private static Outputter jsonOutputter = new Outputter();
   private FObject model_;
-  private String requestCode_;
+  private String requestInfo_;
   private String httpMethod_;
 
   public RequestMsg() {
@@ -30,12 +30,12 @@ public class RequestMsg {
     return model_;
   }
 
-  public void setRequestCode(String requestCode) {
-    requestCode_ = requestCode;
+  public void setRequestInfo(String requestInfo) {
+    requestInfo_ = requestInfo;
   }
 
-  public String getRequestCode() {
-    return requestCode_;
+  public String getRequestInfo() {
+    return requestInfo_;
   }
 
   public void setHttpMethod(String httpMethod) {

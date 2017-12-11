@@ -9,8 +9,9 @@ import foam.core.*;
 import foam.lib.parse.Parser;
 
 public class ResponseMsg implements ContextAware {
-  private String resultJson_;
+  private String json_;
   private FObject model_;
+  private ClassInfo modelInfo_;
   private X x_;
   private int httpStatusCode_;
 
@@ -21,8 +22,14 @@ public class ResponseMsg implements ContextAware {
     this(x, null);
   }
   public ResponseMsg(X x, String json){
-    resultJson_ = json;
+    json_ = json;
     this.setX(x);
+  }
+  public void setModelInfo(ClassInfo modelInfo){
+    modelInfo_ = modelInfo;
+  }
+  public ClassInfo getModelInfo() {
+    return modelInfo_;
   }
   public void setX(X x) {
     x_ = x;
@@ -30,11 +37,11 @@ public class ResponseMsg implements ContextAware {
   public X getX() {
     return x_;
   }
-  public void setResultJson(String resultJson) {
-    resultJson_ = resultJson;
+  public void setJson(String json) {
+    json_ = json;
   }
-  public String getResultJson(){
-    return resultJson_;
+  public String getJson(){
+    return json_;
   }
   public void setHttpStatusCode(int httpStatusCode) {
     httpStatusCode_ = httpStatusCode;
