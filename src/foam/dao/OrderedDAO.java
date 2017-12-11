@@ -29,11 +29,11 @@ public class OrderedDAO
   }
 
   public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( s == null ) s = new ListSink();
-    return super.select_(x, s, skip, limit, order_ == null ? order : order_, predicate);
+    s = prepareSink(s);
+    return super.select_(x, s, skip, limit, order == null ? order_ : order, predicate);
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    super.removeAll_(x, skip, limit, order_ == null ? order : order_, predicate);
+    super.removeAll_(x, skip, limit, order == null ? order_ : order, predicate);
   }
 }

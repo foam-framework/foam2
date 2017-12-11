@@ -22,7 +22,8 @@ foam.CLASS({
 
   exports: [
     'data.selection as selection',
-    'data.data as dao'
+    'data.data as dao',
+    'dblclick'
   ],
 
   // TODO: wrong class name, fix when ActionView fixed.
@@ -89,6 +90,10 @@ foam.CLASS({
             end().
           end().
         end();
+    },
+
+    function dblclick(obj) {
+      this.onEdit(null, null, obj.id);
     }
   ],
 
