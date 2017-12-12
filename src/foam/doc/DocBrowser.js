@@ -403,11 +403,10 @@ foam.CLASS({
       name: 'path',
       width: 80,
       factory: function() {
-        debugger;
         var path = 'foam.core.Property';
 
+        // TODO: this should be made generic and added to Window
         this.document.location.search.substring(1).split('&').forEach(function(s) {
-          console.log('**** ', s);
           s = s.split('=');
           if ( s[0] === 'path' ) path = s[1];
         });
