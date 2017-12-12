@@ -6,6 +6,7 @@
 
 package foam.core;
 
-public interface Factory<T> {
+public interface ContextFactory<T> {
   public T getInstance(java.util.Map<String, Object> args, X x);
 }
+

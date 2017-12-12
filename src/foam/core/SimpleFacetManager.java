@@ -36,12 +36,12 @@ public class SimpleFacetManager
         Object f = null;
         if ( x.get(classInfo.getId() + "_Factory") != null ) {
           f = x.get(classInfo.getId() + "_Factory");
-        } else if ( classInfo.getAxiomsByClass(Factory.class).size() == 1 ) {
-          f = classInfo.getAxiomsByClass(Factory.class).get(0);
+        } else if ( classInfo.getAxiomsByClass(ContextFactory.class).size() == 1 ) {
+          f = classInfo.getAxiomsByClass(ContextFactory.class).get(0);
         }
 
         if (f != null) {
-          return ((Factory<T>)f).getInstance(args, x);
+          return ((ContextFactory<T>)f).getInstance(args, x);
         }
 
       } catch (NoSuchMethodException e) { }
