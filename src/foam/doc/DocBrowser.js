@@ -396,7 +396,11 @@ foam.CLASS({
   },
 
   properties: [
-    'path',
+    {
+      class: 'String',
+      name: 'path',
+      width: 80
+    },
     {
       name: 'selectedClass',
       expression: function (path) {
@@ -1563,4 +1567,3 @@ foam.CLASS({
     }
   ]
 });
-
