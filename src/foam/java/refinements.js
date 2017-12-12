@@ -1144,8 +1144,8 @@ foam.CLASS({
         return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
       }
     },
-    ['javaJSONParser', 'new foam.lib.parse.Fail()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+    [ 'javaJSONParser', 'new foam.lib.parse.Fail()' ],
+    [ 'javaInfoType',   'foam.core.AbstractMultiPartIDPropertyInfo' ]
   ],
 
   methods: [
