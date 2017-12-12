@@ -36,6 +36,11 @@ var abstractClasses = externalFile.abstractClasses;
 var skeletons = externalFile.skeletons;
 var proxies = externalFile.proxies;
 
+var blacklist = {}
+externalFile.blacklist.forEach(function(cls) {
+  blacklist[cls] = true;
+});
+
 var outdir = process.argv[3];
 outdir = path_.resolve(path_.normalize(outdir));
 
@@ -173,16 +178,41 @@ function writeFileIfUpdated(outfile, buildJavaSource, opt_result) {
   }
 }
 
-classes.forEach(loadClass);
-abstractClasses.forEach(loadClass);
-skeletons.forEach(loadClass);
-proxies.forEach(loadClass);
+var X = foam.classloader.NodeJsModelExecutor.create({
+  classpaths: [__dirname + '/' + srcPath],
+}).__subContext__;
+Promise.all(classes.map(function(cls) {
+  return X.arequire(cls);
+})).then(function() {
+  var classMap = {};
+  var classQueue = classes.slice(0);
+  while (classQueue.length) {
+    var cls = classQueue.pop();
+    if ( ! classMap[cls] && ! blacklist[cls] ) {
+      classMap[cls] = true;
+      cls = foam.lookup(cls);
+      cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
+        r.javaPath && classQueue.push(r.javaPath);
+      });
+      cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
+        classQueue.push(r.path);
+      });
+      if (cls.model_.extends) classQueue.push(cls.model_.extends);
+    }
+  }
+  classes = Object.keys(classMap);
+}).then(function() {
+  classes.forEach(loadClass);
+  abstractClasses.forEach(loadClass);
+  skeletons.forEach(loadClass);
+  proxies.forEach(loadClass);
 
-classes.forEach(generateClass);
-abstractClasses.forEach(generateAbstractClass);
-skeletons.forEach(generateSkeleton);
-proxies.forEach(generateProxy);
+  classes.forEach(generateClass);
+  abstractClasses.forEach(generateAbstractClass);
+  skeletons.forEach(generateSkeleton);
+  proxies.forEach(generateProxy);
 
-var srcFolder = path_.join(__dirname, '../src/');
+  var srcFolder = path_.join(__dirname, '../src/');
 
-copyJavaClassesToBuildFolder(srcFolder);
+  copyJavaClassesToBuildFolder(srcFolder);
+});

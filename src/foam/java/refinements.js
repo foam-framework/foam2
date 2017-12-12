@@ -1266,3 +1266,21 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Requires',
+  properties: [
+    {
+      name: 'javaPath',
+      expression: function(path) {
+        return path;
+      },
+    },
+    {
+      name: 'javaReturns',
+      expression: function(javaPath) {
+        return this.lookup(javaPath).model_.name;
+      },
+    },
+  ]
+});
