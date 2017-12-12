@@ -6,11 +6,7 @@
 
 package foam.lib.json;
 
-import foam.core.AbstractObjectPropertyInfo;
-import foam.core.ClassInfo;
-import foam.core.Detachable;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
+import foam.core.*;
 import foam.dao.AbstractSink;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -215,7 +211,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( prop instanceof AbstractObjectPropertyInfo ) continue;
+      if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;
