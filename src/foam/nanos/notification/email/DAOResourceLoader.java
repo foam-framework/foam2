@@ -20,14 +20,14 @@ public class DAOResourceLoader
     Sink list = new ListSink();
     list = dao.where(MLang.AND(
       MLang.EQ(EmailTemplate.NAME,       templateName),
-      MLang.EQ(EmailTemplate.GROUP_NAME, groupName))).limit(1).select(list);
+      MLang.EQ(EmailTemplate.GROUP_NAME, groupName))).limit(1).select(null);
 
-      List data = ((ListSink) list).getData();
+    List data = ((ListSink) list).getData();
 
     if ( data.size() == 0 ) {
       list = dao.where(MLang.AND(
         MLang.EQ(EmailTemplate.NAME,     templateName),
-        MLang.EQ(EmailTemplate.GROUP_NAME, "*"))).limit(1).select(list);
+        MLang.EQ(EmailTemplate.GROUP_NAME, "*"))).limit(1).select(null);
     }
 
     return (EmailTemplate) data.get(0);
