@@ -6,12 +6,8 @@
 
 package foam.lib.json;
 
-import foam.core.ClassInfo;
-import foam.core.Detachable;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
+import foam.core.*;
 import foam.dao.AbstractSink;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -21,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Outputter
-    extends AbstractSink
+  extends AbstractSink
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -215,6 +211,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
+      if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;

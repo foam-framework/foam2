@@ -6,12 +6,12 @@
 
 package foam.dao;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -19,22 +19,20 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.logger.Logger;
 import foam.util.SafetyUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentReader;
 import org.bson.BsonType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 // FObject JSON Parsing
 // MongoDB Driver Dependencies
 
-
 public class MongoDAO
-    extends AbstractDAO
+  extends AbstractDAO
 {
-  private MongoDatabase database;
-  private String collectionName;
+  protected MongoDatabase database;
+  protected String        collectionName;
 
   public MongoDAO(String host, int port, String dbName, String collectionName, String username, String password) {
     if ( SafetyUtil.isEmpty(dbName) || SafetyUtil.isEmpty(collectionName) ) {
@@ -70,9 +68,7 @@ public class MongoDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( sink == null ) {
-      sink = new ListSink();
-    }
+    sink = prepareSink(sink);
 
     Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
     Subscription sub       = new Subscription();
@@ -198,7 +194,7 @@ public class MongoDAO
 
     ArrayList<Object> arr = new ArrayList();
 
-    while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
+    while ( reader.readBsonType() != BsonType.END_OF_DOCUMENT ) {
       arr.add(getValue(x, reader, cls, logger));
     }
 
