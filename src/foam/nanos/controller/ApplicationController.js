@@ -123,6 +123,9 @@ foam.CLASS({
     },
 
     function setDefaultMenu() {
+      // Don't select default if menu already set
+      if ( this.window.location.hash ) return;
+
       var self = this;
       this.groupDAO.find(this.user.group).then(function (group) {
         self.window.location.hash = group.defaultMenu;
