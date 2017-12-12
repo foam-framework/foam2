@@ -100,6 +100,6 @@ public abstract class AbstractPropertyInfo
 
   public String toString() {
     // TODO: generate static string in generated instances instead to avoid creating garbage.
-    return parent.getName() + "." + getName();
+    return parent.getId() + "." + getName();
   }
 }
