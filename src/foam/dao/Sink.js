@@ -720,6 +720,7 @@ foam.CLASS({
       code: function(o) {
         this.dao.put(o);
       },
+      javaCode: `getDao().put(obj);`,
       swiftCode: '_ = try? dao?.put(obj)',
     },
     {
@@ -727,11 +728,13 @@ foam.CLASS({
       code: function(o) {
         this.dao.remove(o);
       },
+      javaCode: `getDao().remove(obj);`,
       swiftCode: '_ = try? dao?.remove(obj)',
     },
     {
       name: 'eof',
       code: function() {},
+      javaCode: ``,
       swiftCode: '// NOOP',
     },
     {
@@ -739,6 +742,7 @@ foam.CLASS({
       code: function() {
         this.dao.removeAll();
       },
+      javaCode: `getDao().removeAll();`,
       swiftCode: '_ = try? dao?.removeAll()',
     }
   ]

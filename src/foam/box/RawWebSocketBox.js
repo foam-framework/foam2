@@ -39,7 +39,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'socket',
-      javaType: 'org.java_websocket.WebSocket'
+      javaType: 'foam.net.WebSocket'
     }
   ],
 
@@ -113,7 +113,13 @@ String payload = outputter.stringify(message);
 
 message.getAttributes().put("replyBox", replyBox);
 
-getSocket().send(payload);
+try {
+  getSocket().send(payload);
+} catch ( java.io.IOException e ) {
+  foam.box.Message reply = new foam.box.Message();
+  reply.setObject(e);
+  if ( replyBox != null ) replyBox.send(reply);
+}
 `
     }
   ],

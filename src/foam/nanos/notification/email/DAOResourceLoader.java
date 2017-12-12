@@ -15,7 +15,7 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class DAOResourceLoader
-    implements ResourceLoader
+  implements ResourceLoader
 {
   public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
     Sink list = new ListSink();
