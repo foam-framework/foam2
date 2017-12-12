@@ -20,15 +20,15 @@ public class DAOResourceLoader
   public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
     Sink list = new ListSink();
     list = dao.where(AND(
-      EQ(EmailTemplate.NAME,       templateName),
-      EQ(EmailTemplate.GROUP_NAME, groupName))).limit(1).select(null);
+      EQ(EmailTemplate.NAME,  templateName),
+      EQ(EmailTemplate.GROUP, groupName))).limit(1).select(null);
 
     List data = ((ListSink) list).getData();
 
     if ( data.size() == 0 ) {
       list = dao.where(AND(
-        EQ(EmailTemplate.NAME,     templateName),
-        EQ(EmailTemplate.GROUP_NAME, "*"))).limit(1).select(null);
+        EQ(EmailTemplate.NAME,  templateName),
+        EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
     }
 
     return (EmailTemplate) data.get(0);
@@ -46,7 +46,7 @@ public class DAOResourceLoader
   public Optional<Charset> getCharset(String s) {
     return Optional.absent();
   }
-  
+
   @Override
   public InputStream load(String s) {
     EmailTemplate template = DAOResourceLoader.findTemplate(dao_, s, groupName_);
