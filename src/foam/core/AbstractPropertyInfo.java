@@ -97,4 +97,9 @@ public abstract class AbstractPropertyInfo
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
     this.set(o, resultSet.getObject(index));
   }
+
+  public String toString() {
+    // TODO: generate static string in generated instances instead to avoid creating garbage.
+    return parent.getId() + "." + getName();
+  }
 }
