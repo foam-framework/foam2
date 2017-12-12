@@ -8,6 +8,7 @@ package foam.Flinks;
 
 import foam.nanos.http.WebAgent;
 import foam.core.X;
+import javax.servlet.http.HttpServletRequest;
 
 public class FlinksWebAgent
   implements WebAgent
