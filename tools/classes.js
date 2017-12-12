@@ -200,9 +200,23 @@ var proxies = [
   'foam.nanos.notification.push.PushService'
 ];
 
+var blacklist = [
+  'FObject',
+  'foam.core.AbstractEnum',
+  'foam.core.AbstractInterface',
+  'foam.core.Property',
+  'foam.core.String',
+
+  // TODO: These are missing java impls.
+  'foam.mlang.order.ThenBy',
+  'foam.blob.BlobBlob',
+  'foam.dao.FlowControl',
+];
+
 module.exports = {
     classes: classes,
     abstractClasses: abstractClasses,
     skeletons: skeletons,
-    proxies: proxies
+    proxies: proxies,
+    blacklist: blacklist,
 }
