@@ -26,14 +26,14 @@ public class MultitonInfo<T>
     return name;
   }
 
-  public T getInstance(Map<String, Object> args, X x) {
+  public synchronized T getInstance(Map<String, Object> args, X x) {
     Object key = args.get(p.getName());
     if ( ! instanceMap.containsKey(key) ) {
       try {
         Class<T> type = (Class<T>)p.getClassInfo().getObjClass();
         T obj = type.newInstance();
         ((ContextAware)obj).setX(x);
-        for (Map.Entry<String, Object> entry : args.entrySet()) {
+        for ( Map.Entry<String, Object> entry : args.entrySet() ) {
           ((FObject)obj).setProperty(entry.getKey(), entry.getValue());
         }
         instanceMap.put(key, obj);
