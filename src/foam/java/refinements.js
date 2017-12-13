@@ -1279,7 +1279,7 @@ foam.CLASS({
     {
       name: 'javaReturns',
       expression: function(javaPath) {
-        return this.lookup(javaPath).model_.name;
+        return this.lookup(javaPath).model_.id;
       },
     },
   ]
