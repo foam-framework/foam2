@@ -257,8 +257,8 @@ foam.CLASS({
               axiom: a,
               type: a.cls_,
               cls: this.Link.create({
-                path: a.sourceCls_.id,
-                label: a.sourceCls_.name
+                path: a.sourceCls_ ? a.sourceCls_.id : '',
+                label: a.sourceCls_ ? a.sourceCls_.name : ''
               }),
               name: a.name
             });
