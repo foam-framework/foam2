@@ -21,7 +21,6 @@ public class UnknownFObjectArrayParser
     if ( ps == null ) {
       return null;
     }
-    System.out.println("THIs: " + ps.value().toString());
     UnknownFObjectArray unknownFObjectArray = ((X) x.get("X")).create(UnknownFObjectArray.class);
     unknownFObjectArray.setJson(ps.value().toString());
     return ps.setValue(unknownFObjectArray);
