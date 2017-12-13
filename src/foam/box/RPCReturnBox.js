@@ -67,6 +67,14 @@ foam.CLASS({
           this.reject_(msg.object.data);
           return;
         }
+        if ( foam.core.Exception.isInstance(msg.object) ) {
+          this.reject_(msg.object);
+          return;
+        }
+        if ( msg.object instanceof Error ) {
+          this.reject_(msg.object);
+          return;
+        }
 
         this.warn('Invalid message to RPCReturnBox.');
       },
