@@ -52,7 +52,7 @@ foam.CLASS({
 
           ws.disconnected.sub(function(sub) {
             sub.detach();
-            this.socket = undefined;
+            this.delegate = undefined;
           }.bind(this));
 
           this.webSocketService.addSocket(ws);
