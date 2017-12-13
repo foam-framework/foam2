@@ -182,13 +182,12 @@ var addDepsToClasses = function() {
   var paths = {};
   paths[srcPath] = true;
   classes.forEach(function(cls) {
-    if (foam.Array.isInstance(cls)) paths[srcPath + cls[0]] = true;
+    if ( foam.Array.isInstance(cls) ) paths[srcPath + cls[0]] = true;
   });
   classes = classes.map(function(cls) {
     return foam.Array.isInstance(cls) ? cls[1] : cls;
   });
 
-  console.log(Object.keys(paths).join(','));
   var X = foam.classloader.NodeJsModelExecutor.create({
     classpaths: Object.keys(paths)
   }).__subContext__;
