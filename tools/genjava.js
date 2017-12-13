@@ -179,11 +179,17 @@ function writeFileIfUpdated(outfile, buildJavaSource, opt_result) {
 }
 
 var addDepsToClasses = function() {
+
+  // Determine all of the paths that the modelDAO should search will use when
+  // arequiring all of the classes.
   var paths = {};
   paths[srcPath] = true;
   classes.forEach(function(cls) {
     if ( foam.Array.isInstance(cls) ) paths[srcPath + cls[0]] = true;
   });
+
+  // Remove the paths from the entries in classes because the modelDAO should be
+  // able to find them now.
   classes = classes.map(function(cls) {
     return foam.Array.isInstance(cls) ? cls[1] : cls;
   });
