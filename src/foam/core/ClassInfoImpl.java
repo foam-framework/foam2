@@ -64,7 +64,7 @@ public class ClassInfoImpl
   public ClassInfo addAxiom(Axiom a) {
     // TODO: Should all axioms have setClassInfo? If not, create an interface
     // that has setClassInfo and make PropertyInfo implement it.
-    if (a instanceof PropertyInfo) {
+    if ( a instanceof PropertyInfo ) {
       ((PropertyInfo)a).setClassInfo(this);
     }
     axioms.add(a);
