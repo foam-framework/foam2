@@ -10,7 +10,7 @@ global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
 
-var srcPath = "../src/";
+var srcPath = __dirname + "/../src/";
 
 if ( ! (process.argv.length == 4 || process.argv.length == 5) ) {
   console.log("USAGE: genjava.js input-path output-path src-path(optional)");
@@ -179,8 +179,18 @@ function writeFileIfUpdated(outfile, buildJavaSource, opt_result) {
 }
 
 var addDepsToClasses = function() {
+  var paths = {};
+  paths[srcPath] = true;
+  classes.forEach(function(cls) {
+    if (foam.Array.isInstance(cls)) paths[srcPath + cls[0]] = true;
+  });
+  classes = classes.map(function(cls) {
+    return foam.Array.isInstance(cls) ? cls[1] : cls;
+  });
+
+  console.log(Object.keys(paths).join(','));
   var X = foam.classloader.NodeJsModelExecutor.create({
-    classpaths: [__dirname + '/' + srcPath],
+    classpaths: Object.keys(paths)
   }).__subContext__;
     return Promise.all(classes.map(function(cls) {
       return X.arequire(cls);
