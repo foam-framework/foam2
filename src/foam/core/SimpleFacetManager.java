@@ -33,6 +33,10 @@ public class SimpleFacetManager
         java.lang.reflect.Method method = type.getMethod("getOwnClassInfo");
         ClassInfo classInfo = (ClassInfo)method.invoke(null);
 
+        // First check the context for a custom factory for this type of object.
+        // If there's nothing in the context, check the ClassInfo for an axiom
+        // that creates instances of this type of object. Singletons and
+        // multitons are common examples of this type of axiom.
         Object f = null;
         if ( x.get(classInfo.getId() + "_Factory") != null ) {
           f = x.get(classInfo.getId() + "_Factory");
@@ -40,7 +44,7 @@ public class SimpleFacetManager
           f = classInfo.getAxiomsByClass(ContextFactory.class).get(0);
         }
 
-        if (f != null) {
+        if ( f != null ) {
           return ((ContextFactory<T>)f).getInstance(args, x);
         }
 
