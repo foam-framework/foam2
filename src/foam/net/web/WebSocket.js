@@ -9,6 +9,10 @@ foam.CLASS({
   package: 'foam.net.web',
   name: 'WebSocket',
 
+  requires: [
+    'foam.net.NotConnectedException'
+  ],
+
   topics: [
     'message',
     'connected',
@@ -34,7 +38,7 @@ foam.CLASS({
       // There could be a race condition here if the socket
       // closes between our check and .send().
       if ( this.socket.readyState !== this.socket.OPEN ) {
-        throw foam.net.NotConnectedExeption.create();
+        throw this.NotConnectedException.create();
       }
       this.socket.send(msg);
     },
