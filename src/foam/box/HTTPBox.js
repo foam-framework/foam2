@@ -33,6 +33,7 @@ foam.CLASS({
       name: 'Outputter',
       path: 'foam.json.Outputter',
       swiftPath: 'foam.swift.parse.json.output.Outputter',
+      javaPath: '',
     },
     'foam.box.HTTPReplyBox',
   ],
