@@ -78,17 +78,9 @@ foam.CLASS({
 
           msg.attributes.replyBox =
             this.__context__.registry.register(null, null, msg.attributes.replyBox);
-
-          replyBox = this.ReplyBox.create({
-            id: msg.attributes.replyBox.name
-          });
         }
 
         var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
-
-        if ( replyBox ) {
-          msg.attributes.replyBox = replyBox;
-        }
 
         try {
           this.socket.send(payload);
