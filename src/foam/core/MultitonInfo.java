@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class MultitonInfo<T>
-  implements Axiom, ContextFactory<T>
+  implements Axiom, XArgsFactory<T>
 {
   Map<Object, T> instanceMap = new HashMap<Object, T>();
 
