@@ -1200,7 +1200,7 @@ foam.CLASS({
   name: 'Canvas',
   extends: 'foam.u2.Element',
 
-  documentation: 'A Canvas U2 Element for drawing CViews in.',
+  documentation: 'A Canvas U2 Element for drawing CViews in. Don\'t create directly, use CView.toE() instead.',
 
   requires: [
     'foam.input.Pointer'
@@ -1226,7 +1226,7 @@ foam.CLASS({
         n.canvas = this;
 
         if ( this.attributeMap.width === undefined || this.attributeMap.height === undefined ) {
-          this.setAttribute('width', n.width);
+          this.setAttribute('width',  n.width);
           this.setAttribute('height', n.height);
         }
 
