@@ -19,28 +19,27 @@ public class DAOResourceLoader
     implements ResourceLoader
 {
   public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
-    Sink list;
-    List data;
+    Sink list = new ListSink();
 
     // if group is provided, query based on that
     if ( ! SafetyUtil.isEmpty(groupName) ) {
       list = dao.where(AND(
           EQ(EmailTemplate.NAME, templateName),
           EQ(EmailTemplate.GROUP, groupName))).limit(1).select(null);
-    } else {
+    }
+
+    List data = ((ListSink) list).getData();
+
+    // if data is empty use wildcard group
+    if ( data.size() == 0 ) {
       list = dao.where(AND(
           EQ(EmailTemplate.NAME,  templateName),
           EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
+      data = ((ListSink) list).getData();
     }
 
-    // if list is null, return null
-    if ( list == null ) {
-      return null;
-    }
-
-    // if list is empty, return null
-    data = ((ListSink) list).getData();
-    if ( data == null || data.size() == 0 ) {
+    // if data is still empty then return null
+    if ( data.size() == 0 ) {
       return null;
     }
 
