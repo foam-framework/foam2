@@ -10,7 +10,7 @@ global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
 require('../src/foam.js');
 require('../src/foam/nanos/nanos.js');
 
-var srcPath = "../src/";
+var srcPath = __dirname + "/../src/";
 
 if ( ! (process.argv.length == 4 || process.argv.length == 5) ) {
   console.log("USAGE: genjava.js input-path output-path src-path(optional)");
@@ -35,6 +35,11 @@ var classes = externalFile.classes;
 var abstractClasses = externalFile.abstractClasses;
 var skeletons = externalFile.skeletons;
 var proxies = externalFile.proxies;
+
+var blacklist = {}
+externalFile.blacklist.forEach(function(cls) {
+  blacklist[cls] = true;
+});
 
 var outdir = process.argv[3];
 outdir = path_.resolve(path_.normalize(outdir));
@@ -173,16 +178,60 @@ function writeFileIfUpdated(outfile, buildJavaSource, opt_result) {
   }
 }
 
-classes.forEach(loadClass);
-abstractClasses.forEach(loadClass);
-skeletons.forEach(loadClass);
-proxies.forEach(loadClass);
+var addDepsToClasses = function() {
 
-classes.forEach(generateClass);
-abstractClasses.forEach(generateAbstractClass);
-skeletons.forEach(generateSkeleton);
-proxies.forEach(generateProxy);
+  // Determine all of the paths that the modelDAO should search will use when
+  // arequiring all of the classes.
+  var paths = {};
+  paths[srcPath] = true;
+  classes.forEach(function(cls) {
+    if ( foam.Array.isInstance(cls) ) paths[srcPath + cls[0]] = true;
+  });
 
-var srcFolder = path_.join(__dirname, '../src/');
+  // Remove the paths from the entries in classes because the modelDAO should be
+  // able to find them now.
+  classes = classes.map(function(cls) {
+    return foam.Array.isInstance(cls) ? cls[1] : cls;
+  });
 
-copyJavaClassesToBuildFolder(srcFolder);
+  var X = foam.classloader.NodeJsModelExecutor.create({
+    classpaths: Object.keys(paths)
+  }).__subContext__;
+    return Promise.all(classes.map(function(cls) {
+      return X.arequire(cls);
+    })).then(function() {
+      var classMap = {};
+      var classQueue = classes.slice(0);
+      while ( classQueue.length ) {
+        var cls = classQueue.pop();
+        if ( ! classMap[cls] && ! blacklist[cls] ) {
+          classMap[cls] = true;
+          cls = foam.lookup(cls);
+          cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
+            r.javaPath && classQueue.push(r.javaPath);
+          });
+          cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
+            classQueue.push(r.path);
+          });
+          if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
+        }
+      }
+      classes = Object.keys(classMap);
+    });
+};
+
+addDepsToClasses().then(function() {
+  classes.forEach(loadClass);
+  abstractClasses.forEach(loadClass);
+  skeletons.forEach(loadClass);
+  proxies.forEach(loadClass);
+
+  classes.forEach(generateClass);
+  abstractClasses.forEach(generateAbstractClass);
+  skeletons.forEach(generateSkeleton);
+  proxies.forEach(generateProxy);
+
+  var srcFolder = path_.join(__dirname, '../src/');
+
+  copyJavaClassesToBuildFolder(srcFolder);
+});

@@ -18,7 +18,7 @@ public interface ClassInfo {
   ClassInfo setId(String id);
 
   ClassInfo getParent();
-  ClassInfo addProperty(PropertyInfo p);
+  ClassInfo addAxiom(Axiom a);
 
   boolean   isInstance(Object o);
   Object    newInstance() throws IllegalAccessException, InstantiationException;
