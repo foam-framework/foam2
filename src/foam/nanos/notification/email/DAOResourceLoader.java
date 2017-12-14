@@ -5,6 +5,7 @@ import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.dao.ListSink;
 import foam.nanos.notification.email.EmailTemplate;
+import foam.util.SafetyUtil;
 import org.jtwig.resource.loader.ResourceLoader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -15,20 +16,29 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class DAOResourceLoader
-  implements ResourceLoader
+    implements ResourceLoader
 {
   public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
-    Sink list = new ListSink();
-    list = dao.where(AND(
-      EQ(EmailTemplate.NAME,  templateName),
-      EQ(EmailTemplate.GROUP, groupName))).limit(1).select(null);
+    Sink list;
+    List data;
 
-    List data = ((ListSink) list).getData();
-
-    if ( data.size() == 0 ) {
+    if ( ! SafetyUtil.isEmpty(groupName) ) {
       list = dao.where(AND(
-        EQ(EmailTemplate.NAME,  templateName),
-        EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
+          EQ(EmailTemplate.NAME, templateName),
+          EQ(EmailTemplate.GROUP, groupName))).limit(1).select(null);
+    } else {
+      list = dao.where(AND(
+          EQ(EmailTemplate.NAME,  templateName),
+          EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
+    }
+
+    if ( list == null ) {
+      return null;
+    }
+
+    data = ((ListSink) list).getData();
+    if ( data == null || data.size() != 1 ) {
+      return null;
     }
 
     return (EmailTemplate) data.get(0);
