@@ -434,7 +434,6 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAgent" },
   { name: "foam/nanos/auth/SignInView", flags: ['web'] },
   { name: "foam/nanos/auth/SignUpView", flags: ['web'] },  
-  { name: "foam/nanos/auth/ChangePasswordView", flags: ['web'] },  
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
