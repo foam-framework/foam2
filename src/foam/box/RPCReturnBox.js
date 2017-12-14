@@ -62,7 +62,8 @@ foam.CLASS({
         if ( this.RPCReturnMessage.isInstance(msg.object) ) {
           this.resolve_(msg.object.data);
           return;
-        } else if ( this.RPCErrorMessage.isInstance(msg.object) ) {
+        }
+        if ( this.RPCErrorMessage.isInstance(msg.object) ) {
           this.reject_(msg.object.data);
           return;
         }
