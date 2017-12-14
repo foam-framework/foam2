@@ -22,6 +22,7 @@ public class DAOResourceLoader
     Sink list;
     List data;
 
+    // if group is provided, query based on that
     if ( ! SafetyUtil.isEmpty(groupName) ) {
       list = dao.where(AND(
           EQ(EmailTemplate.NAME, templateName),
@@ -32,12 +33,14 @@ public class DAOResourceLoader
           EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
     }
 
+    // if list is null, return null
     if ( list == null ) {
       return null;
     }
 
+    // if list is empty, return null
     data = ((ListSink) list).getData();
-    if ( data == null || data.size() != 1 ) {
+    if ( data == null || data.size() == 0 ) {
       return null;
     }
 
