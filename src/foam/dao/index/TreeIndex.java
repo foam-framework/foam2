@@ -10,14 +10,10 @@ import foam.core.PropertyInfo;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Binary;
-import foam.mlang.predicate.False;
-import foam.mlang.predicate.Gt;
-import foam.mlang.predicate.Gte;
-import foam.mlang.predicate.Lt;
-import foam.mlang.predicate.Lte;
-import foam.mlang.predicate.Predicate;
+import foam.mlang.predicate.*;
 import foam.mlang.sink.Count;
 import java.util.Arrays;
+import foam.mlang.order.Desc;
 
 public class TreeIndex implements Index {
   protected Index tail_;
@@ -42,12 +38,29 @@ public class TreeIndex implements Index {
   protected Binary isExprMatch(Predicate predicate, Class model) {
     if ( predicate != null && prop_ != null && model != null ) {
       if ( predicate instanceof Binary &&
-           model.equals(predicate.getClass()) &&
-           ((Binary) predicate).getArg1().equals(prop_) ) {
+          model.equals(predicate.getClass()) &&
+          ((Binary) predicate).getArg1().toString().equals(prop_.toString()) ) {
 
         Binary b = new Binary() {};
         b.setArg2(((Binary) predicate).getArg2());
         return b;
+      }
+    }
+    if ( predicate instanceof And ) {
+      int length = ((And) predicate).getArgs().length;
+      for(int i=0;i<length;i++){
+        Predicate arg = ((And) predicate).getArgs()[i];
+        if ( predicate instanceof Binary &&
+            model.equals(predicate.getClass()) &&
+            ((Binary) predicate).getArg1().toString().equals(prop_.toString()) ) {
+
+          Binary b = new Binary() {};
+          ((And) predicate).getArgs()[i]= new True();
+          predicate = predicate.partialEval();
+          if ( predicate instanceof True ) return null;
+          b.setArg2(((Binary) predicate).getArg2());
+          return b;
+        }
       }
     }
     return null;
@@ -84,8 +97,19 @@ public class TreeIndex implements Index {
       return NotFoundPlan.instance();
     }
 
-//    Binary expr = isExprMatch(predicate, In.class);
-//    Binary expr = isExprMatch(predicate, Eq.class);
+
+    Binary expr;
+    Object subTree = state;
+
+    //expr = isExprMatch(predicate, In.class);
+    //if ( expr != null && Math.log(((TreeNode)state).size)/Math.log(2) * ((In) predicate) < ((TreeNode) state).size )
+    expr = isExprMatch(predicate, Eq.class);
+    if ( expr != null) {
+      subTree = ((TreeNode) state).get((TreeNode) state,expr.getArg2().f(expr), prop_);
+      if ( subTree == null ) return new NotFoundPlan();
+      SelectPlan subPlan = this.tail_.planSelect(subTree,sink,skip,limit,order,null);
+      return new AltSelectPlan(subTree,subPlan);
+    }
 //
 //    if ( expr != null ) {
 //      Object key = expr.getArg2().f(expr);
@@ -96,25 +120,46 @@ public class TreeIndex implements Index {
 //      Plan[] subPlans = { planSelect(result, sink, skip, limit, order, predicate) };
 //      return new AltPlan(subPlans,this.prop);
 //    }
-    TreeNode subTree = ((TreeNode) state);
-
-    Binary expr = isExprMatch(predicate, Gt.class);
-    if ( expr != null ) subTree = subTree.gt(subTree, expr.getArg2().f(expr), prop_);
+//    TreeNode subTree = ((TreeNode) state);
+//
+    expr = isExprMatch(predicate, Gt.class);
+    if ( expr != null ) subTree = ((TreeNode)subTree).gt((TreeNode)subTree, expr.getArg2().f(expr), prop_);
 
     expr = isExprMatch(predicate, Gte.class);
-    if ( expr != null ) subTree = subTree.gte(subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) subTree = ((TreeNode)subTree).gte((TreeNode)subTree, expr.getArg2().f(expr), prop_);
 
     expr = isExprMatch(predicate, Lt.class);
-    if ( expr != null ) subTree = subTree.lt(subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) subTree = ((TreeNode)subTree).lt((TreeNode)subTree, expr.getArg2().f(expr), prop_);
 
     expr = isExprMatch(predicate, Lte.class);
-    if ( expr != null ) subTree = subTree.lte(subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) subTree = ((TreeNode)subTree).lte((TreeNode)subTree, expr.getArg2().f(expr), prop_);
 
-    long cost = subTree.size;
-
-//    return CustomPlan;
-
-    return (SelectPlan) TreePlan.instance();
+    long cost;
+    if ( subTree == null ) {
+      cost = 0;
+    }
+    else {
+      cost = subTree instanceof TreeNode?((TreeNode)subTree).size : 1;
+    }
+    boolean sortRequired = false;
+    boolean reverseSort = false;
+    if ( order!=null ) {
+      if ( order.getClass().toString().equals(prop_.toString()) ) {}
+      else if ( order instanceof Desc ) {
+        reverseSort = true;
+      } else {
+        sortRequired = true;
+        if ( cost !=0 ) cost *= Math.log(cost) / Math.log(2);
+      }
+    }
+    if ( !sortRequired ) {
+      if ( skip != 0 ) cost -= skip;
+      if ( limit != 0 ) cost = Math.min(cost, limit);
+    }
+    //return CustomPlan;
+    ScanPlan selectPlan = new ScanPlan();
+    selectPlan.setCost(cost);
+    return new AltSelectPlan(subTree,selectPlan);
   }
 
   public long size(Object state) {

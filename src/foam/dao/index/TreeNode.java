@@ -262,7 +262,7 @@ public class TreeNode {
       return s;
     }
 
-    int r = prop.comparePropertyToObject(key, (FObject)s.value);
+    int r = prop.comparePropertyToValue(key, s.key);
 
     if ( r == 0 ) {
       return s.value;
@@ -289,7 +289,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r < 0 ) {
       TreeNode l = gt(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
@@ -307,7 +307,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r < 0 ) {
       TreeNode l = gte(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
@@ -326,7 +326,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r > 0 ) {
       TreeNode right = lt(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
@@ -344,7 +344,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r > 0 ) {
       TreeNode right = lte(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
@@ -380,16 +380,16 @@ public class TreeNode {
     long leftSize = 0;
     if ( left != null ) {
       leftSize = left.size;
-      if( leftSize > skip ) skip = skipTreeNode(left,sink,skip);
-      else if( leftSize == skip )
+      if ( leftSize > skip ) skip = skipTreeNode(left,sink,skip);
+      else if ( leftSize == skip )
         skip = 0;
       else
         skip = skip - leftSize;
     }
-    if ( currentNode.getValue() != null && skip==0 ){
+    if ( currentNode.getValue() != null && skip==0 ) {
       sink.put((FObject) currentNode.getValue(), null);
     }
-    else if( currentNode.getValue() != null && skip!=0 ){
+    else if ( currentNode.getValue() != null && skip!=0 ) {
       skip--;
     }
     TreeNode right = currentNode.getRight();
@@ -400,12 +400,12 @@ public class TreeNode {
   }
 
   public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if( skip >= currentNode.size || limit <= 0 ) return;
-    if( skip == 0 && limit > currentNode.size ){
+    if ( skip >= currentNode.size || limit <= 0 ) return;
+    if ( skip == 0 && limit > currentNode.size ) {
       selectAllHelper(currentNode,sink);
       return;
     }
-    if( skip != 0 ){
+    if ( skip != 0 ) {
       skipTreeNode(currentNode,sink,skip);
     }
 
