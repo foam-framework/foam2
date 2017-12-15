@@ -10,6 +10,8 @@ import foam.core.PropertyInfo;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+import static foam.dao.AbstractDAO.decorateSink_;
+import foam.mlang.predicate.Binary;
 
 public class TreeNode {
 
@@ -155,7 +157,7 @@ public class TreeNode {
       TreeNode subs = isLeft ? predecessor(state) : successor(state);
       state.key = subs.key;
       state.value = subs.value;
-      if( isLeft ) {
+      if ( isLeft ) {
         state.left = removeNode(state.left, subs.value, prop);
       } else {
         state.right = removeNode(state.right, subs.value, prop);
@@ -365,50 +367,57 @@ public class TreeNode {
     if ( left != null ) {
       selectAllHelper(left, sink);
     }
-    if ( currentNode.getValue() != null )
-      sink.put((FObject) currentNode.getValue(), null);
+    Object value = currentNode.getValue();
+    if ( value != null )
+      if ( value instanceof TreeNode ) selectAllHelper((TreeNode) value, sink);
+      else {
+        sink.put((FObject) value, null);
+      }
     TreeNode right = currentNode.getRight();
     if ( right != null ) {
       selectAllHelper(right, sink);
     }
   }
 
-  protected long skipTreeNode(TreeNode currentNode, Sink sink, long skip){
-    if ( currentNode == null || currentNode.size <= skip ) return 0;
+  protected long[] skipTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size) {
+    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
     long currentSize = currentNode.size;
     TreeNode left = currentNode.getLeft();
     long leftSize = 0;
+    long[] skip_limit = new long[]{skip, limit};
     if ( left != null ) {
       leftSize = left.size;
-      if ( leftSize > skip ) skip = skipTreeNode(left,sink,skip);
-      else if ( leftSize == skip )
-        skip = 0;
-      else
-        skip = skip - leftSize;
+      if ( leftSize > skip ) {
+        skip_limit = skipTreeNode(left, sink, skip_limit[0], skip_limit[1], size);
+      } else if ( leftSize == skip ) skip_limit[0] = 0;
+      else {
+        skip_limit[0] = skip_limit[0] - leftSize;
+      }
     }
-    if ( currentNode.getValue() != null && skip==0 ) {
-      sink.put((FObject) currentNode.getValue(), null);
-    }
-    else if ( currentNode.getValue() != null && skip!=0 ) {
-      skip--;
+    Object value = currentNode.getValue();
+    if ( value instanceof TreeNode ) {
+      skip_limit = skipTreeNode((TreeNode) value, sink, skip_limit[0], skip_limit[1], size);
+    } else if ( value != null && skip_limit[0] == 0 && skip_limit[1] > 0 ) {
+      sink.put((FObject) value, null);
+      skip_limit[1] = skip_limit[1] - 1;
+    } else if ( value != null && skip != 0 ) {
+      skip_limit[0] = skip_limit[0] - 1;
     }
     TreeNode right = currentNode.getRight();
     if ( right != null ) {
-      skip = skipTreeNode(right, sink, skip);
+      skip_limit = skipTreeNode(right, sink, skip_limit[0], skip_limit[1], size);
     }
-    return skip;
+    return skip_limit;
   }
 
   public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( skip >= currentNode.size || limit <= 0 ) return;
-    if ( skip == 0 && limit > currentNode.size ) {
-      selectAllHelper(currentNode,sink);
-      return;
+    if ( ((Binary) predicate).getArg1() != null || order != null ) {
+      sink = decorateSink_(sink, skip, limit, order, predicate);
+      selectAllHelper(currentNode, sink);
+    } else {
+      skipTreeNode(currentNode, sink, skip, limit, currentNode.size);
     }
-    if ( skip != 0 ) {
-      skipTreeNode(currentNode,sink,skip);
-    }
-
   }
 
 }

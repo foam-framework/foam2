@@ -89,12 +89,11 @@ public class AltIndex implements Index {
 
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
-        bestState = s[i];
         if ( bestPlan.cost() <= GOOD_ENOUGH_PLAN_COST ) break;
       }
     }
 
-    return new AltSelectPlan(bestState, bestPlan);
+    return bestPlan;
   }
 
   public long size(Object state) {

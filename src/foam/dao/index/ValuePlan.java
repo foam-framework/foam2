@@ -1,6 +1,5 @@
 /**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * @license Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.dao.index;
@@ -25,6 +24,12 @@ public class ValuePlan implements FindPlan, SelectPlan {
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    sink.put((FObject) state, null);
+    if ( skip >= 1 || limit < 1 ) return;
+    if ( state instanceof TreeNode )
+      sink.put((FObject) ((TreeNode) state).value, null);
+    else {
+      sink.put((FObject) state, null);
+    }
+
   }
 }
