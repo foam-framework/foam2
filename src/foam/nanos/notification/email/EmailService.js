@@ -26,6 +26,11 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
+          name: 'user',
+          javaType: 'foam.nanos.auth.User',
+          documentation: 'User sending the email'
+        },
+        {
           name: 'emailMessage',
           javaType: 'foam.nanos.notification.email.EmailMessage',
           documentation: 'Email message'
