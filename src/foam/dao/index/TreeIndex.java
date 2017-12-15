@@ -1,7 +1,6 @@
 /**
- * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * @license Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 package foam.dao.index;
 
@@ -48,7 +47,7 @@ public class TreeIndex implements Index {
     }
     if ( predicate instanceof And ) {
       int length = ((And) predicate).getArgs().length;
-      for(int i=0;i<length;i++){
+      for (int i = 0; i < length; i++) {
         Predicate arg = ((And) predicate).getArgs()[i];
         if ( predicate instanceof Binary &&
             model.equals(predicate.getClass()) &&
@@ -87,6 +86,35 @@ public class TreeIndex implements Index {
     return new TreeLookupFindPlan(prop_, (state != null ? ((TreeNode) state).size : 0) );
   }
 
+  public SelectPlan SelectPlanHelper(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    long cost;
+    if ( state == null ) {
+      cost = 0;
+    } else {
+      cost = state instanceof TreeNode ? ((TreeNode) state).size : 1;
+    }
+    boolean sortRequired = false;
+    boolean reverseSort = false;
+    if ( order != null ) {
+      if ( order.getClass().toString().equals(prop_.toString()) ) order = null;
+      else if ( order instanceof Desc ) {
+        reverseSort = true;
+      } else {
+        sortRequired = true;
+        if ( cost != 0 ) cost *= Math.log(cost) / Math.log(2);
+      }
+    }
+    if ( ! sortRequired ) {
+      if ( skip != 0 ) cost -= skip;
+      //if ( limit != 0 ) cost = Math.min(cost, limit);
+    }
+    ScanPlan selectPlan = new ScanPlan();
+    selectPlan.setCost(cost);
+    if ( predicate == null )
+      return new AltSelectPlan(predicate, state, selectPlan);
+    return new AltSelectPlan(predicate, state, selectPlan);
+  }
+
   //TODO
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( predicate == null && sink instanceof Count ) {
@@ -104,11 +132,12 @@ public class TreeIndex implements Index {
     //expr = isExprMatch(predicate, In.class);
     //if ( expr != null && Math.log(((TreeNode)state).size)/Math.log(2) * ((In) predicate) < ((TreeNode) state).size )
     expr = isExprMatch(predicate, Eq.class);
-    if ( expr != null) {
-      subTree = ((TreeNode) state).get((TreeNode) state,expr.getArg2().f(expr), prop_);
+    if ( expr != null ) {
+      subTree = ((TreeNode) state).get((TreeNode) state, expr.getArg2().f(expr), prop_);
       if ( subTree == null ) return new NotFoundPlan();
-      SelectPlan subPlan = this.tail_.planSelect(subTree,sink,skip,limit,order,null);
-      return new AltSelectPlan(subTree,subPlan);
+      if ( ! (subTree instanceof TreeNode) )
+        return new AltSelectPlan(expr, subTree, this.tail_.planSelect(subTree, sink, skip, limit, order, null));
+      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
     }
 //
 //    if ( expr != null ) {
@@ -123,43 +152,32 @@ public class TreeIndex implements Index {
 //    TreeNode subTree = ((TreeNode) state);
 //
     expr = isExprMatch(predicate, Gt.class);
-    if ( expr != null ) subTree = ((TreeNode)subTree).gt((TreeNode)subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) {
+      subTree = ((TreeNode) subTree).gt((TreeNode) subTree, expr.getArg2().f(expr), prop_);
+      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+    }
 
     expr = isExprMatch(predicate, Gte.class);
-    if ( expr != null ) subTree = ((TreeNode)subTree).gte((TreeNode)subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) {
+      subTree = ((TreeNode) subTree).gte((TreeNode) subTree, expr.getArg2().f(expr), prop_);
+      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+    }
 
     expr = isExprMatch(predicate, Lt.class);
-    if ( expr != null ) subTree = ((TreeNode)subTree).lt((TreeNode)subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) {
+      subTree = ((TreeNode) subTree).lt((TreeNode) subTree, expr.getArg2().f(expr), prop_);
+      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+    }
 
     expr = isExprMatch(predicate, Lte.class);
-    if ( expr != null ) subTree = ((TreeNode)subTree).lte((TreeNode)subTree, expr.getArg2().f(expr), prop_);
+    if ( expr != null ) {
+      subTree = ((TreeNode) subTree).lte((TreeNode) subTree, expr.getArg2().f(expr), prop_);
+      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+    }
 
-    long cost;
-    if ( subTree == null ) {
-      cost = 0;
-    }
-    else {
-      cost = subTree instanceof TreeNode?((TreeNode)subTree).size : 1;
-    }
-    boolean sortRequired = false;
-    boolean reverseSort = false;
-    if ( order!=null ) {
-      if ( order.getClass().toString().equals(prop_.toString()) ) {}
-      else if ( order instanceof Desc ) {
-        reverseSort = true;
-      } else {
-        sortRequired = true;
-        if ( cost !=0 ) cost *= Math.log(cost) / Math.log(2);
-      }
-    }
-    if ( !sortRequired ) {
-      if ( skip != 0 ) cost -= skip;
-      if ( limit != 0 ) cost = Math.min(cost, limit);
-    }
-    //return CustomPlan;
-    ScanPlan selectPlan = new ScanPlan();
-    selectPlan.setCost(cost);
-    return new AltSelectPlan(subTree,selectPlan);
+    return SelectPlanHelper(subTree, sink, skip, limit, order, predicate);
+
+
   }
 
   public long size(Object state) {

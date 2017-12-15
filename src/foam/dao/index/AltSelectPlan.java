@@ -15,20 +15,20 @@ import foam.mlang.predicate.Predicate;
 public class AltSelectPlan implements SelectPlan {
   protected Object state_;
   protected SelectPlan bestPlan_ = new NotFoundPlan();
-  protected long cost_;
+  protected Predicate expr_;
 
-  public AltSelectPlan(Object state, SelectPlan bestPlan){
+  public AltSelectPlan(Predicate expr, Object state, SelectPlan bestPlan){
+    expr_ = expr;
     state_ = state;
     bestPlan_ = bestPlan;
-    cost_ = bestPlan_.cost()+1;
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate){
-      bestPlan_.select(state_,sink,skip,limit,order,predicate);
+      bestPlan_.select(state_,sink,skip,limit,order,expr_);
   }
 
   @Override
   public long cost() {
-    return cost_;
+    return bestPlan_.cost();
   }
 }
