@@ -20,11 +20,10 @@ foam.CLASS({
   name: 'TextField',
   extends: 'foam.u2.tag.Input',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
-    })
-  ],
+  css: `
+    input[type="search"] { -webkit-appearance: textfield !important; }
+    ^:read-only { border: none; background: rgba(0,0,0,0); }
+  `,
 
   properties: [
     {
