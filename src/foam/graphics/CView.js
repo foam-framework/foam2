@@ -1004,6 +1004,7 @@ foam.CLASS({
     function paintSelf(x) {
       x.beginPath();
       x.arc(0, 0, this.radius, this.start, this.end);
+	  x.lineTo(0,0);
 
       if ( this.color ) x.fill();
 
