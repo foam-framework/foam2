@@ -86,34 +86,6 @@ public class TreeIndex implements Index {
     return new TreeLookupFindPlan(prop_, (state != null ? ((TreeNode) state).size : 0) );
   }
 
-  public SelectPlan SelectPlanHelper(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    long cost;
-    if ( state == null ) {
-      cost = 0;
-    } else {
-      cost = state instanceof TreeNode ? ((TreeNode) state).size : 1;
-    }
-    boolean sortRequired = false;
-    boolean reverseSort = false;
-    if ( order != null ) {
-      if ( order.getClass().toString().equals(prop_.toString()) ) order = null;
-      else if ( order instanceof Desc ) {
-        reverseSort = true;
-      } else {
-        sortRequired = true;
-        if ( cost != 0 ) cost *= Math.log(cost) / Math.log(2);
-      }
-    }
-    if ( ! sortRequired ) {
-      if ( skip != 0 ) cost -= skip;
-      //if ( limit != 0 ) cost = Math.min(cost, limit);
-    }
-    ScanPlan selectPlan = new ScanPlan();
-    selectPlan.setCost(cost);
-    if ( predicate == null )
-      return new AltSelectPlan(predicate, state, selectPlan);
-    return new AltSelectPlan(predicate, state, selectPlan);
-  }
 
   //TODO
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
@@ -121,7 +93,7 @@ public class TreeIndex implements Index {
       return new CountPlan(((TreeNode) state).size);
     }
 
-    if ( predicate != null && predicate instanceof False ) {
+    if ( ( predicate != null && predicate instanceof False ) || state == null ) {
       return NotFoundPlan.instance();
     }
 
@@ -134,49 +106,38 @@ public class TreeIndex implements Index {
     expr = isExprMatch(predicate, Eq.class);
     if ( expr != null ) {
       subTree = ((TreeNode) state).get((TreeNode) state, expr.getArg2().f(expr), prop_);
-      if ( subTree == null ) return new NotFoundPlan();
-      if ( ! (subTree instanceof TreeNode) )
-        return new AltSelectPlan(expr, subTree, this.tail_.planSelect(subTree, sink, skip, limit, order, null));
-      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+      if ( subTree == null ) return NotFoundPlan.instance();
+      predicate = null;
     }
-//
-//    if ( expr != null ) {
-//      Object key = expr.getArg2().f(expr);
-//      Object result = this.get(key);
-//      if ( result == null) {
-//        return NotFoundPlan.instance();
-//      }
-//      Plan[] subPlans = { planSelect(result, sink, skip, limit, order, predicate) };
-//      return new AltPlan(subPlans,this.prop);
-//    }
-//    TreeNode subTree = ((TreeNode) state);
-//
+
     expr = isExprMatch(predicate, Gt.class);
     if ( expr != null ) {
       subTree = ((TreeNode) subTree).gt((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+      if ( subTree == null ) return NotFoundPlan.instance();
+      predicate = null;
     }
 
     expr = isExprMatch(predicate, Gte.class);
     if ( expr != null ) {
       subTree = ((TreeNode) subTree).gte((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+      if ( subTree == null ) return NotFoundPlan.instance();
+      predicate = null;
     }
 
     expr = isExprMatch(predicate, Lt.class);
     if ( expr != null ) {
       subTree = ((TreeNode) subTree).lt((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+      if ( subTree == null ) return NotFoundPlan.instance();
+      predicate = null;
     }
 
     expr = isExprMatch(predicate, Lte.class);
     if ( expr != null ) {
       subTree = ((TreeNode) subTree).lte((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      return SelectPlanHelper(subTree, sink, skip, limit, order, expr);
+      if ( subTree == null ) return NotFoundPlan.instance();
+      predicate = null;
     }
-
-    return SelectPlanHelper(subTree, sink, skip, limit, order, predicate);
-
+    return new ScanPlan(subTree,sink,skip,limit,order,predicate,prop_,tail_);
 
   }
 

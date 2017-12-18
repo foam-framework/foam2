@@ -24,12 +24,6 @@ public class ValuePlan implements FindPlan, SelectPlan {
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( skip >= 1 || limit < 1 ) return;
-    if ( state instanceof TreeNode )
-      sink.put((FObject) ((TreeNode) state).value, null);
-    else {
       sink.put((FObject) state, null);
-    }
-
   }
 }

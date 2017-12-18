@@ -265,9 +265,9 @@ public class TreeNode {
     }
 
     int r = prop.comparePropertyToValue(key, s.key);
-
     if ( r == 0 ) {
-      return s.value;
+      long size = s.value instanceof TreeNode?((TreeNode) s.value).size:1;
+      return new TreeNode(s.key,s.value,size,0,null,null);
     }
     if ( r > 0 ) {
       return get(s.right, key, prop);
@@ -361,25 +361,23 @@ public class TreeNode {
       s.level, s.left, null);
   }
 
-  protected void selectAllHelper(TreeNode currentNode, Sink sink){
+  protected void selectAllHelper(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail){
     if ( currentNode == null ) return;
     TreeNode left = currentNode.getLeft();
     if ( left != null ) {
-      selectAllHelper(left, sink);
+      selectAllHelper(left, sink, skip, limit, size, tail);
     }
     Object value = currentNode.getValue();
-    if ( value != null )
-      if ( value instanceof TreeNode ) selectAllHelper((TreeNode) value, sink);
-      else {
-        sink.put((FObject) value, null);
-      }
+    if ( value != null ) {
+      tail.planSelect(value, sink, skip, limit, null, null).select(value, sink, skip, limit, null, null);
+    }
     TreeNode right = currentNode.getRight();
     if ( right != null ) {
-      selectAllHelper(right, sink);
+      selectAllHelper(right, sink, skip, limit, size, tail);
     }
   }
 
-  protected long[] skipTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size) {
+  protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
     if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
     long currentSize = currentNode.size;
     TreeNode left = currentNode.getLeft();
@@ -388,35 +386,36 @@ public class TreeNode {
     if ( left != null ) {
       leftSize = left.size;
       if ( leftSize > skip ) {
-        skip_limit = skipTreeNode(left, sink, skip_limit[0], skip_limit[1], size);
+        skip_limit = skipLimitTreeNode(left, sink, skip_limit[0], skip_limit[1], size, tail);
       } else if ( leftSize == skip ) skip_limit[0] = 0;
       else {
         skip_limit[0] = skip_limit[0] - leftSize;
       }
     }
     Object value = currentNode.getValue();
-    if ( value instanceof TreeNode ) {
-      skip_limit = skipTreeNode((TreeNode) value, sink, skip_limit[0], skip_limit[1], size);
-    } else if ( value != null && skip_limit[0] == 0 && skip_limit[1] > 0 ) {
-      sink.put((FObject) value, null);
-      skip_limit[1] = skip_limit[1] - 1;
-    } else if ( value != null && skip != 0 ) {
-      skip_limit[0] = skip_limit[0] - 1;
+    if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0) {
+      tail.planSelect(value,sink,skip_limit[0],skip_limit[1],null,null).select(value,sink,skip_limit[0],skip_limit[1],null,null);
+      skip_limit[0] = 0;
+      skip_limit[1] = skip_limit[1] - (tail.size(currentNode) - skip_limit[0]);
+    } else if ( tail.size(currentNode) == skip_limit[0] ) {
+      skip_limit[0] = 0;
+    } else {
+      skip_limit[0] = skip_limit[0] - tail.size(currentNode);
     }
     TreeNode right = currentNode.getRight();
     if ( right != null ) {
-      skip_limit = skipTreeNode(right, sink, skip_limit[0], skip_limit[1], size);
+      skip_limit = skipLimitTreeNode(right, sink, skip_limit[0], skip_limit[1], size,tail);
     }
     return skip_limit;
   }
 
-  public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+  public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate, Index tail) {
     if ( skip >= currentNode.size || limit <= 0 ) return;
-    if ( ((Binary) predicate).getArg1() != null || order != null ) {
+    if ( predicate != null || order != null ) {
       sink = decorateSink_(sink, skip, limit, order, predicate);
-      selectAllHelper(currentNode, sink);
+      selectAllHelper(currentNode, sink, skip, limit, size, tail);
     } else {
-      skipTreeNode(currentNode, sink, skip, limit, currentNode.size);
+      skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
     }
   }
 
