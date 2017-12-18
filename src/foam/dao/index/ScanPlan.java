@@ -35,11 +35,8 @@ public class ScanPlan implements FindPlan, SelectPlan {
 
   public long calculateCost(PropertyInfo propertyInfo){
     long cost;
-    if ( state_ == null ) {
-      return 0;
-    } else {
-      cost = ((TreeNode) state_).size;
-    }
+    if ( state_ == null ) return 0;
+    cost = ((TreeNode) state_).size;
     boolean sortRequired = false;
     boolean reverseSort = false;
     if ( order_ != null ) {
