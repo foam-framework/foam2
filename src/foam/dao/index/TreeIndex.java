@@ -137,7 +137,7 @@ public class TreeIndex implements Index {
       if ( subTree == null ) return NotFoundPlan.instance();
       predicate = null;
     }
-    return new ScanPlan(subTree,sink,skip,limit,order,predicate,prop_,tail_);
+    return new ScanPlan(subTree, sink, skip, limit, order, predicate, prop_, tail_);
 
   }
 

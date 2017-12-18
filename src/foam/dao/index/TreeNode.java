@@ -266,8 +266,8 @@ public class TreeNode {
 
     int r = prop.comparePropertyToValue(key, s.key);
     if ( r == 0 ) {
-      long size = s.value instanceof TreeNode?((TreeNode) s.value).size:1;
-      return new TreeNode(s.key,s.value,size,0,null,null);
+      long size = s.value instanceof TreeNode ? ( (TreeNode) s.value ).size : 1;
+      return new TreeNode(s.key, s.value, size,0,null,null);
     }
     if ( r > 0 ) {
       return get(s.right, key, prop);
@@ -361,11 +361,11 @@ public class TreeNode {
       s.level, s.left, null);
   }
 
-  protected void selectAllHelper(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail){
+  protected void select_(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail){
     if ( currentNode == null ) return;
     TreeNode left = currentNode.getLeft();
     if ( left != null ) {
-      selectAllHelper(left, sink, skip, limit, size, tail);
+      select_(left, sink, skip, limit, size, tail);
     }
     Object value = currentNode.getValue();
     if ( value != null ) {
@@ -373,7 +373,7 @@ public class TreeNode {
     }
     TreeNode right = currentNode.getRight();
     if ( right != null ) {
-      selectAllHelper(right, sink, skip, limit, size, tail);
+      select_(right, sink, skip, limit, size, tail);
     }
   }
 
@@ -413,7 +413,7 @@ public class TreeNode {
     if ( skip >= currentNode.size || limit <= 0 ) return;
     if ( predicate != null || order != null ) {
       sink = decorateSink_(sink, skip, limit, order, predicate);
-      selectAllHelper(currentNode, sink, skip, limit, size, tail);
+      select_(currentNode, sink, skip, limit, size, tail);
     } else {
       skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
     }
