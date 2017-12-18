@@ -119,6 +119,10 @@ var classes = [
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
+  'foam.nanos.auth.token.Token',
+  'foam.nanos.auth.token.TokenService',
+  'foam.nanos.auth.token.ClientTokenService',
+  'foam.nanos.auth.token.AbstractTokenService',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -185,7 +189,8 @@ var skeletons = [
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
   'foam.nanos.notification.email.EmailService',
-  'foam.nanos.notification.push.PushService'
+  'foam.nanos.notification.push.PushService',
+  'foam.nanos.auth.token.TokenService'
 ];
 
 var proxies = [

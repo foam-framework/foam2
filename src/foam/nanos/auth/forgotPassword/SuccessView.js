@@ -98,7 +98,7 @@ foam.CLASS({
             .start().addClass('success-Text').add(this.Instructions).end()
             .start().addClass('Back-Button')
               .add("Back to Sign In")
-              .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
+              .on('click', function(){ window.location = "localhost:8080/dev/nanopay/src/net/nanopay/index.html"})
             .end()
           .end()
         .end()
