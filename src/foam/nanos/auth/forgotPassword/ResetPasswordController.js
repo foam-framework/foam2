@@ -2,17 +2,21 @@ foam.CLASS({
   package: 'foam.nanos.auth.forgotPassword',
   name: 'ResetPasswordController',
   extends: 'foam.u2.Controller',
-
+  implements:[
+    'foam.box.Context'
+  ],
   requires: [
     'foam.u2.stack.Stack',
-    'foam.u2.stack.StackView'
+    'foam.u2.stack.StackView',
+    'foam.box.HTTPBox',
+    'foam.nanos.auth.token.ClientTokenService'
   ],
   exports: [
     'as ctrl',
-    'stack',    
+    'stack',
     'resetPasswordToken'
   ],
-
+  
   css: `
     .stack-wrapper {
       margin-bottom: -10px;
@@ -50,8 +54,18 @@ foam.CLASS({
       name: 'stack',
       factory: function() { return this.Stack.create(); }
     },
+    {
+      name: 'resetPasswordToken'
+    }
   ],
   methods: [
+    function init() {
+      this.SUPER();
+      this.resetPasswordToken = this.ClientTokenService.create({
+        delegate: this.HTTPBox.create({url: 'service/resetPasswordToken'})
+      });
+    },
+
     function initE() {
       this
         .addClass(this.myClass())

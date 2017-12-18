@@ -181,7 +181,7 @@ foam.CLASS({
         .start('p').add("Remember your password?").end()
         .start('p').addClass('link')
           .add('Sign in.')
-          .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
+          .on('click', function(){ window.location = "localhost:8080/dev/nanopay/src/net/nanopay/index.html" })
         .end()
       .end()
     }
@@ -203,11 +203,6 @@ foam.CLASS({
       label: 'Confirm',
       code: function (X, obj) {
         var self = this;
-        this.resetPasswordToken.processToken(user, this.token).then(function (result) {
-          self.stack.push({ class: 'foam.nanos.auth.forgotPassword.SuccessView' });
-        }).catch(function (err) {
-          self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
-        });
         // check if new password entered
         if ( ! this.newPassword ) {
           this.add(this.NotificationMessage.create({ message: this.emptyPassword, type: 'error' }));
