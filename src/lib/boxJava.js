@@ -106,7 +106,7 @@ foam.CLASS({
   refines: 'foam.box.SessionReplyBox',
 
   javaImports: [
-    'java.security.AccessControlException'
+    'javax.naming.AuthenticationException'
   ],
 
   properties: [
@@ -127,7 +127,7 @@ foam.CLASS({
       name: 'send',
       javaCode:
 `Object object = message.getObject();
-if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof AccessControlException ) {
+if ( object instanceof RPCErrorMessage && ((RPCErrorMessage) object).getData() instanceof AuthenticationException ) {
   // TODO: should this be wrapped in new Thread() ?
   ((Runnable) getX().get("requestLogin")).run();
   getClientBox().send(getMsg());

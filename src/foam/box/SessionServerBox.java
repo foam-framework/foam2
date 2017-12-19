@@ -6,14 +6,19 @@
 
 package foam.box;
 
-import foam.core.*;
-import foam.dao.*;
+import foam.core.X;
+import foam.dao.DAO;
+import foam.nanos.auth.AuthService;
+import foam.nanos.boot.NSpec;
 import foam.nanos.session.Session;
-import java.util.Date;
+
+import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
+import java.security.AccessControlException;
+import java.util.Date;
 
 public class SessionServerBox
-  extends ProxyBox
+    extends ProxyBox
 {
   protected boolean authenticate_;
 
@@ -27,8 +32,10 @@ public class SessionServerBox
 
     try {
       if ( sessionID != null ) {
-        DAO     dao     = (DAO) getX().get("sessionDAO");
-        Session session = (Session) dao.find(sessionID);
+        NSpec spec = (NSpec) getX().get(NSpec.class);
+        AuthService auth = (AuthService) getX().get("auth");
+        DAO sessionDAO = (DAO) getX().get("sessionDAO");
+        Session session = (Session) sessionDAO.find(sessionID);
 
         if ( session == null ) {
           session = new Session();
@@ -42,10 +49,15 @@ public class SessionServerBox
         session.setLastUsed(new Date());
         session.setUses(session.getUses()+1);
 
-        dao.put(session);
+        sessionDAO.put(session);
 
         if ( authenticate_ && session.getUserId() == 0 ) {
-          msg.replyWithException(new java.security.AccessControlException("not logged in"));
+          msg.replyWithException(new AuthenticationException("Not logged in"));
+          return;
+        }
+
+        if ( ! auth.check(getX(), "service." + spec.getName()) ) {
+          msg.replyWithException(new AccessControlException("Invalid permissions"));
           return;
         }
 
