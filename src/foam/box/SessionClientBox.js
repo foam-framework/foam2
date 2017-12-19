@@ -32,8 +32,8 @@ foam.CLASS({
         // handler then retry once it finishes.
         // console.log('************************* REPLY: ', foam.json.stringify(msg));
         // Exception looks like this:
-        // {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"java.security.AccessControlException",message:"not logged in"}}}
-        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'java.security.AccessControlException' ) {
+        // {class:"foam.box.Message",attributes:{},object:{class:"foam.box.RPCErrorMessage",data:{class:"foam.box.RemoteException",id:"javax.naming.AuthenticationException",message:"not logged in"}}}
+        if ( this.RPCErrorMessage.isInstance(msg.object) && msg.object.data.id === 'javax.naming.AuthenticationException' ) {
           this.requestLogin().then(function() {
             self.clientBox.send(self.msg);
           });
