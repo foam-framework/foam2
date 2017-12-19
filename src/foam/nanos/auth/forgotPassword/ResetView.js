@@ -181,7 +181,9 @@ foam.CLASS({
         .start('p').add("Remember your password?").end()
         .start('p').addClass('link')
           .add('Sign in.')
-          .on('click', function(){ window.location = "localhost:8080/dev/nanopay/src/net/nanopay/index.html" })
+          .on('click', function(){ 
+            window.location.replace("./index.html");
+          })
         .end()
       .end()
     }
