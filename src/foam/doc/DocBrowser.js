@@ -224,7 +224,7 @@ foam.CLASS({
   imports: [
     'selectedAxiom',
     'showInherited',
-	  'checkBox'
+    'showOnlyProperties'
   ],
 
   methods: [
@@ -248,24 +248,24 @@ foam.CLASS({
       this.br();
       this.start(foam.u2.HTMLElement).add(data.model_.documentation).end();
 
-      this.add( this.slot( function ( showInherited, checkBox ) {
+      this.add( this.slot( function ( showInherited, showOnlyProperties ) {
         // TODO: hide 'Source Class' column if showInherited is false
         var axs = [];
         for ( var key in data.axiomMap_ ) {
           if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
             var a  = data.axiomMap_[key];
-			      if ( (!checkBox) || foam.core.Property.isInstance( a ) ) {
-              var ai = foam.doc.AxiomInfo.create({
-                axiom: a,
-                type: a.cls_,
-                cls: this.Link.create({
-                  path: a.sourceCls_ ? a.sourceCls_.id : '',
-                  label: a.sourceCls_ ? a.sourceCls_.name : ''
-                }),
+	      if ( (!showOnlyProperties) || foam.core.Property.isInstance( a ) ) {
+                var ai = foam.doc.AxiomInfo.create({
+                  axiom: a,
+                  type: a.cls_,
+                  cls: this.Link.create({
+                    path: a.sourceCls_ ? a.sourceCls_.id : '',
+                    label: a.sourceCls_ ? a.sourceCls_.name : ''
+                  }),
                 name: a.name
               });
               axs.push(ai);
-			      }
+	    }
           }
         }
 
@@ -377,7 +377,7 @@ foam.CLASS({
     'path as browserPath',
     'axiom as selectedAxiom',
     'showInherited',
-	'checkBox'
+    'showOnlyProperties'
   ],
 
   axioms: [
@@ -462,8 +462,8 @@ foam.CLASS({
     'subClassCount',
 	{
 	  class: 'Boolean',
-      name: 'checkBox',
-      value: true
+          name: 'showOnlyProperties',
+          value: true
     }
   ],
 
@@ -505,7 +505,7 @@ foam.CLASS({
             start('td').
               style({'vertical-align': 'top'}).
           start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
-				    add( 'Show just properties : ' ).tag( this.CHECK_BOX, { data$: this.checkBox$ } ).
+	      add( 'Show just properties : ' ).tag( this.SHOW_ONLY_PROPERTIES, { data$: this.showOnlyProperties$ } ).
               add(this.slot(function(selectedClass) {
                 if ( ! selectedClass ) return '';
                   return this.ClassDocView.create({data: selectedClass});
