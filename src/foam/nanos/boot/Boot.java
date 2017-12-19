@@ -39,7 +39,7 @@ public class Boot {
 
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
-        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", serviceDAO_)));
+        new foam.dao.PMDAO(/*new foam.dao.AuthenticatedDAO("service",*/ serviceDAO_/*)*/));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
