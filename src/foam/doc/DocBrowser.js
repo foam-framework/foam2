@@ -224,7 +224,7 @@ foam.CLASS({
   imports: [
     'selectedAxiom',
     'showInherited',
-	'checkBox'
+	  'checkBox'
   ],
 
   methods: [
@@ -254,8 +254,8 @@ foam.CLASS({
         for ( var key in data.axiomMap_ ) {
           if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
             var a  = data.axiomMap_[key];
-			var lCls = this.getAllExtends(a);
-			if ((!checkBox)|| ( a.cls_ != undefined && (a.cls_.id == 'foam.core.Property' || lCls.includes('foam.core.Property') ) ) ) {
+			      var lCls = this.getAllExtends(a);
+			      if ((!checkBox)|| ( a.cls_ != undefined && (a.cls_.id == 'foam.core.Property' || lCls.includes('foam.core.Property') ) ) ) {
               var ai = foam.doc.AxiomInfo.create({
                 axiom: a,
                 type: a.cls_,
@@ -266,7 +266,7 @@ foam.CLASS({
                 name: a.name
               });
               axs.push(ai);
-			}
+			      }
           }
         }
 
@@ -277,16 +277,16 @@ foam.CLASS({
         });
       }));
     },
-	function getAllExtends(cls) {
-	  var lCls= [];
-		for ( var i = 0; cls; i++ ) {
-		  if ( cls.model_ == undefined ) break;
+	  function getAllExtends(cls) {
+	    var lCls= [];
+		  for ( var i = 0; cls; i++ ) {
+		    if ( cls.model_ == undefined ) break;
           cls = this.lookup( cls.model_.extends, true );
-		  lCls[i]=cls.id;
+		      lCls[i]=cls.id;
           if ( cls === foam.core.FObject ) break;
         }
-	  return lCls;
-	}
+	    return lCls;
+	  }
   ]
 });
 
@@ -474,7 +474,7 @@ foam.CLASS({
 	{
 	  class: 'Boolean',
       name: 'checkBox',
-      value: true      
+      value: true
     }
   ],
 
@@ -516,9 +516,9 @@ foam.CLASS({
             start('td').
               style({'vertical-align': 'top'}).
           start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
-				add( 'Show just properties : ' ).tag( this.CHECK_BOX, { data$: this.checkBox$ } ).
-                add(this.slot(function(selectedClass) {
-                  if ( ! selectedClass ) return '';
+				    add( 'Show just properties : ' ).tag( this.CHECK_BOX, { data$: this.checkBox$ } ).
+              add(this.slot(function(selectedClass) {
+                if ( ! selectedClass ) return '';
                   return this.ClassDocView.create({data: selectedClass});
                 })).
               end().
