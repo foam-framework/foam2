@@ -56,8 +56,6 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    // store user and return
-    session.setX(getX().put("user", user));
     return (User) Password.sanitize(user);
   }
 
@@ -116,7 +114,7 @@ public class UserAndGroupAuthService
 
     Session session = (Session) x.get(Session.class);
     session.setUserId(user.getId());
-    session.setX(getX().put("user", user));
+    session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
     return (User) Password.sanitize(user);
   }
@@ -141,7 +139,7 @@ public class UserAndGroupAuthService
 
     Session session = (Session) x.get(Session.class);
     session.setUserId(user.getId());
-    session.setX(getX().put("user", user));
+    session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
     return (User) Password.sanitize(user);
   }
@@ -174,7 +172,7 @@ public class UserAndGroupAuthService
 
     Session session = (Session) x.get(Session.class);
     session.setUserId(user.getId());
-    session.setX(getX().put("user", user));
+    session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
     return (User) Password.sanitize(user);
   }
@@ -274,7 +272,7 @@ public class UserAndGroupAuthService
     user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
-    session.setX(getX().put("user", user));
+    session.setContext(session.getContext().put("user", user));
     return (User) Password.sanitize(user);
   }
 
