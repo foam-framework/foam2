@@ -12,7 +12,7 @@ import foam.nanos.auth.AuthService;
 import foam.nanos.boot.NSpec;
 import foam.nanos.session.Session;
 
-import javax.naming.AuthenticationException;
+import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
 import java.security.AccessControlException;
 import java.util.Date;
@@ -52,12 +52,12 @@ public class SessionServerBox
         sessionDAO.put(session);
 
         if ( authenticate_ && session.getUserId() == 0 ) {
-          msg.replyWithException(new AuthenticationException("Not logged in"));
+          msg.replyWithException(new AccessControlException("Not logged in"));
           return;
         }
 
         if ( ! auth.check(getX(), "service." + spec.getName()) ) {
-          msg.replyWithException(new AccessControlException("Invalid permissions"));
+          msg.replyWithException(new NoPermissionException("Invalid permissions"));
           return;
         }
 
