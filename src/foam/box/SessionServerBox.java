@@ -56,7 +56,7 @@ public class SessionServerBox
           return;
         }
 
-        if ( ! auth.check(getX(), "service." + spec.getName()) ) {
+        if ( authenticate_ && ! auth.check(getX(), "service." + spec.getName()) ) {
           msg.replyWithException(new NoPermissionException("No permission"));
           return;
         }
