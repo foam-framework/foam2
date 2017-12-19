@@ -98,7 +98,9 @@ foam.CLASS({
             .start().addClass('success-Text').add(this.Instructions).end()
             .start().addClass('Back-Button')
               .add("Back to Sign In")
-              .on('click', function(){ window.location = "localhost:8080/dev/nanopay/src/net/nanopay/index.html"})
+              .on('click', function(){ 
+                window.location.replace("./index.html");                
+              })
             .end()
           .end()
         .end()
