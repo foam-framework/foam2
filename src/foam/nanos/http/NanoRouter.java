@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 public class NanoRouter
-  extends HttpServlet
-  implements NanoService, ContextAware
+    extends HttpServlet
+    implements NanoService, ContextAware
 {
   protected X x_;
 
@@ -35,7 +35,7 @@ public class NanoRouter
 
   @Override
   protected synchronized void service(HttpServletRequest req, HttpServletResponse resp)
-    throws ServletException, IOException
+      throws ServletException, IOException
   {
     String      path       = req.getRequestURI();
     String[]    urlParams  = path.split("/");
@@ -52,7 +52,10 @@ public class NanoRouter
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
       } else {
-        X y = getX().put(HttpServletRequest.class, req).put(HttpServletResponse.class, resp).put(PrintWriter.class, resp.getWriter());
+        X y = getX().put(HttpServletRequest.class, req)
+            .put(HttpServletResponse.class, resp)
+            .put(PrintWriter.class, resp.getWriter())
+            .put(NSpec.class, spec);
         serv.execute(y);
       }
     } catch (Throwable t) {
@@ -90,7 +93,7 @@ public class NanoRouter
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceWebAgent(service, skeleton, spec.getAuthenticate());
+        service = new ServiceWebAgent(skeleton, spec.getAuthenticate());
         informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
