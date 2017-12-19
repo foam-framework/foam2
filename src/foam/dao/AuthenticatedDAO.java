@@ -20,10 +20,6 @@ public class AuthenticatedDAO
 {
   protected String name_;
 
-  public AuthenticatedDAO(String name) {
-    this(name, null);
-  }
-
   public AuthenticatedDAO(String name, DAO delegate) {
     this.name_ = name;
     setDelegate(delegate);

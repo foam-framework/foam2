@@ -19,7 +19,7 @@ public class Boot {
   public Boot() {
     try {
       // Used for all the services that will be required when Booting
-      serviceDAO_ = new foam.dao.PMDAO(new JDAO(NSpec.getOwnClassInfo(), "services"));
+      serviceDAO_ = new JDAO(NSpec.getOwnClassInfo(), "services");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -38,7 +38,8 @@ public class Boot {
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
-    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
+        new foam.dao.AuthenticatedDAO("service", new foam.dao.PMDAO(serviceDAO_)));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
