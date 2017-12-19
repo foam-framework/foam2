@@ -254,8 +254,7 @@ foam.CLASS({
         for ( var key in data.axiomMap_ ) {
           if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
             var a  = data.axiomMap_[key];
-			      var lCls = this.getAllExtends(a);
-			      if ((!checkBox)|| ( a.cls_ != undefined && (a.cls_.id == 'foam.core.Property' || lCls.includes('foam.core.Property') ) ) ) {
+			      if ( (!checkBox) || foam.core.Property.isInstance( a ) ) {
               var ai = foam.doc.AxiomInfo.create({
                 axiom: a,
                 type: a.cls_,
@@ -276,17 +275,7 @@ foam.CLASS({
           hoverSelection$: this.selectedAxiom$
         });
       }));
-    },
-	  function getAllExtends(cls) {
-	    var lCls= [];
-		  for ( var i = 0; cls; i++ ) {
-		    if ( cls.model_ == undefined ) break;
-          cls = this.lookup( cls.model_.extends, true );
-		      lCls[i]=cls.id;
-          if ( cls === foam.core.FObject ) break;
-        }
-	    return lCls;
-	  }
+    }
   ]
 });
 
