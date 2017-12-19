@@ -57,7 +57,7 @@ public class SessionServerBox
         }
 
         if ( ! auth.check(getX(), "service." + spec.getName()) ) {
-          msg.replyWithException(new NoPermissionException("Invalid permissions"));
+          msg.replyWithException(new NoPermissionException("No permission"));
           return;
         }
 
