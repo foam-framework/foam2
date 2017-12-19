@@ -32,10 +32,10 @@ public class SessionServerBox
 
     try {
       if ( sessionID != null ) {
-        NSpec spec = (NSpec) getX().get(NSpec.class);
-        AuthService auth = (AuthService) getX().get("auth");
-        DAO sessionDAO = (DAO) getX().get("sessionDAO");
-        Session session = (Session) sessionDAO.find(sessionID);
+        NSpec       spec       = (NSpec)       getX().get(NSpec.class);
+        AuthService auth       = (AuthService) getX().get("auth");
+        DAO         sessionDAO = (DAO)         getX().get("sessionDAO");
+        Session     session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
           session = new Session();
@@ -43,7 +43,7 @@ public class SessionServerBox
 
           HttpServletRequest req = (HttpServletRequest) getX().get(HttpServletRequest.class);
           session.setRemoteHost(req.getRemoteHost());
-          session.setContext(getX());
+          session.setContext(getX().put(Session.class, session));
         }
 
         session.setLastUsed(new Date());
@@ -56,12 +56,12 @@ public class SessionServerBox
           return;
         }
 
-        if ( authenticate_ && ! auth.check(getX().put(Session.class, session), "service." + spec.getName()) ) {
+        if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
           msg.replyWithException(new NoPermissionException("No permission"));
           return;
         }
 
-        msg.getLocalAttributes().put("x", getX().put(Session.class, session));
+        msg.getLocalAttributes().put("x", session.getContext());
       }
     } catch (Throwable t) {
       t.printStackTrace();
