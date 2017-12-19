@@ -6,30 +6,30 @@
 
 package foam.nanos.http;
 
-import foam.box.*;
-import foam.core.*;
+import foam.box.Box;
+import foam.box.SessionServerBox;
 import foam.core.FObject;
+import foam.core.ProxyX;
+import foam.core.X;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
-import java.io.*;
-import java.nio.CharBuffer;
-import javax.servlet.http.HttpServlet;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.nio.CharBuffer;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-  implements WebAgent
+    implements WebAgent
 {
-  protected Object  service_;
   protected Box     skeleton_;
   protected boolean authenticate_;
 
-  public ServiceWebAgent(Object service, Box skeleton, boolean authenticate) {
-    service_      = service;
+  public ServiceWebAgent(Box skeleton, boolean authenticate) {
     skeleton_     = skeleton;
     authenticate_ = authenticate;
   }
@@ -89,10 +89,6 @@ public class ServiceWebAgent
         out.flush();
         return;
       }
-
-      // TODO: make skeleton_.send() take x instead
-      if ( service_ instanceof ContextAware )
-        ((ContextAware) service_).setX(x);
 
       foam.box.Message msg = (foam.box.Message) result;
       new SessionServerBox(x, skeleton_, authenticate_).send(msg);
