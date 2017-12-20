@@ -90,7 +90,7 @@ public class FileWebAgent
 
         if ( files != null && files.length > 0 ) {
           for ( File file : files ) {
-            pw.write("<li>" + "<a href=\"/" + nspec_.getName() + "/" + filePath
+            pw.write("<li>" + "<a href=\"/service/" + nspec_.getName() + "/" + filePath
                 + ( ! filePath.isEmpty() && ! filePath.endsWith("/") ? "/" : "" )
                 + file.getName() + "\"?>" + file.getName() + "</a></li>");
           }
