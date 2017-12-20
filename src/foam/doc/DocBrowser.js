@@ -374,7 +374,7 @@ foam.CLASS({
     'path as browserPath',
     'axiom as selectedAxiom',
     'showInherited',
-	'conventionalUML'
+    'conventionalUML'
   ],
 
   axioms: [
@@ -457,8 +457,8 @@ foam.CLASS({
       }
     },
     'subClassCount',
-	{
-	    class: 'Boolean',
+    {
+      class: 'Boolean',
       name: 'conventionalUML',
       value: true
     }
@@ -685,10 +685,10 @@ foam.CLASS({
       var data = this.data;
       this.className = this.data.name;
       this.elementMap = new Map();
-	  this.properties = this.getAllProperties( data );
-	  if ( this.properties.length > 10 ) this.canvas.height = this.properties.length * 60 + 800;
+      this.properties = this.getAllProperties( data );
+      if ( this.properties.length > 10 ) this.canvas.height = this.properties.length * 60 + 800;
       this.widthCenterModel = this.conventionalUML ? 300 : 200;
-	  var widthCenterBox = 200;
+      var widthCenterBox = 200;
       var heightCenterBox = this.properties.length *20 ;//30;
 
       this.addModel(this.canvas.width / 2 - this.widthCenterModel / 2, this.canvas.height / 3 - heightCenterBox , this.widthCenterModel);
@@ -1010,7 +1010,7 @@ foam.CLASS({
       } else {
 
         for ( var i in this.properties ) {
-	      var methodsNameLabel = foam.graphics.Label.create({
+	  var methodsNameLabel = foam.graphics.Label.create({
             align: 'left',
             x: x - 290,
             y: y + step + step * (i) ,
@@ -1018,10 +1018,10 @@ foam.CLASS({
             font: '20px Arial',
             width: w || 200,
             height: h || 30,
-	          text: this.properties[i].name + ' : ' + this.properties[i].cls_.name
+	    text: this.properties[i].name + ' : ' + this.properties[i].cls_.name
           });
-	        this.selected = this.canvas.addChildren( methodsNameLabel );
-	    }
+	  this.selected = this.canvas.addChildren( methodsNameLabel );
+	}
       }
     },
 	  function getAllProperties( data ) {
