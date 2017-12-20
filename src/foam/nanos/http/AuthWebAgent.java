@@ -7,17 +7,17 @@
 package foam.nanos.http;
 
 import foam.core.*;
+import foam.dao.DAO;
+import foam.nanos.auth.AuthService;
+import foam.nanos.auth.User;
 import foam.nanos.http.ProxyWebAgent;
 import foam.nanos.http.WebAgent;
+import foam.nanos.session.Session;
 import java.io.PrintWriter;
-import foam.nanos.auth.AuthService;
+import java.util.Date;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import foam.nanos.session.Session;
-import foam.dao.DAO;
-import foam.nanos.auth.User;
 
 public class AuthWebAgent
   extends ProxyWebAgent
@@ -25,6 +25,8 @@ public class AuthWebAgent
   public AuthWebAgent(WebAgent delegate) {
     setDelegate(delegate);
   }
+  
+  public final static String SESSION_ID = "sessionId";
 
   public void execute(X x) {
     HttpServletRequest  req  = (HttpServletRequest) x.get(HttpServletRequest.class);
@@ -37,13 +39,12 @@ public class AuthWebAgent
     String sessionId = null;
     if( cookies != null ){
       for ( Cookie cookie : cookies ) {
-        if ( cookie.getName().toString().equals("sessionId" )){
+        if ( cookie.getName().equals(SESSION_ID) ){
           sessionId = cookie.getValue().toString();
           Session session = (Session) sessionDAO.find(sessionId);
-          Date expiry = session.getExpiry();
-          Date dateNow = new Date();
-          if ( session != null && expiry.before(dateNow) ) {
-            getDelegate().execute(x);
+
+          if ( session != null ) {
+            getDelegate().execute(session.getContext());
           } else {
             templateLogin(x);
           }
@@ -83,6 +84,7 @@ public class AuthWebAgent
     try {
       Session session = new Session();
       x = x.put(Session.class, session);
+
       User user = (User) auth.loginByEmail(x, email, password);
       if ( user != null ) {
         createCookie(session, x);
@@ -97,7 +99,7 @@ public class AuthWebAgent
   public void createCookie(Session session, X x){
     HttpServletResponse resp  = (HttpServletResponse) x.get(HttpServletResponse.class);
     PrintWriter        out  = (PrintWriter) x.get(PrintWriter.class);
-    Cookie cookie = new Cookie("sessionId", session.getId());
+    Cookie cookie = new Cookie(SESSION_ID, session.getId());
     resp.addCookie(cookie);
     out.println("<script>");
     out.println("window.location.href = window.location.href;");
