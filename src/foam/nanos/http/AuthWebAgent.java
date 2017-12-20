@@ -14,6 +14,7 @@ import foam.nanos.auth.AuthService;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import foam.nanos.session.Session;
 import foam.dao.DAO;
 import foam.nanos.auth.User;
@@ -34,13 +35,17 @@ public class AuthWebAgent
 
     Cookie[] cookies = req.getCookies();
     String sessionId = null;
-    if(cookies != null){
+    if( cookies != null ){
       for ( Cookie cookie : cookies ) {
-        if (cookie.getName().toString().equals("sessionId")){
+        if ( cookie.getName().toString().equals("sessionId" )){
           sessionId = cookie.getValue().toString();
           Session session = (Session) sessionDAO.find(sessionId);
-          if ( session != null ) {
+          Date expiry = session.getExpiry();
+          Date dateNow = new Date();
+          if ( session != null && expiry.before(dateNow) ) {
             getDelegate().execute(x);
+          } else {
+            templateLogin(x);
           }
         } else {
           templateLogin(x);
