@@ -34,35 +34,46 @@ public class TreeIndex implements Index {
     return TreeNode.getNullNode().bulkLoad(tail_, prop_, 0, a.length-1, a);
   }
 
-  protected Binary isExprMatch(Predicate predicate, Class model) {
-    if ( predicate != null && prop_ != null && model != null ) {
-      if ( predicate instanceof Binary &&
-          model.equals(predicate.getClass()) &&
-          ((Binary) predicate).getArg1().toString().equals(prop_.toString()) ) {
-
-        Binary b = new Binary() {};
-        b.setArg2(((Binary) predicate).getArg2());
-        return b;
-      }
-    }
-    if ( predicate instanceof And ) {
-      int length = ((And) predicate).getArgs().length;
-      for (int i = 0; i < length; i++) {
-        Predicate arg = ((And) predicate).getArgs()[i];
-        if ( predicate instanceof Binary &&
-            model.equals(predicate.getClass()) &&
-            ((Binary) predicate).getArg1().toString().equals(prop_.toString()) ) {
-
-          Binary b = new Binary() {};
-          ((And) predicate).getArgs()[i]= new True();
-          predicate = predicate.partialEval();
-          if ( predicate instanceof True ) return null;
-          b.setArg2(((Binary) predicate).getArg2());
-          return b;
+  protected Object[] simplifyPredicate(Object state, Predicate predicate) {
+    if ( predicate != null && prop_ != null ) {
+      if ( predicate instanceof Binary ) {
+        Binary expr = (Binary) predicate;
+        if ( predicate.getClass().equals(Eq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+          state = ( (TreeNode) state ).get((TreeNode) state, expr.getArg2().f(expr), prop_);
+          return new Object[]{state, null};
         }
+        if ( predicate.getClass().equals(Gt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+          state = ( (TreeNode) state ).gt((TreeNode) state, expr.getArg2().f(expr), prop_);
+          return new Object[]{state, null};
+        }
+        if ( predicate.getClass().equals(Gte.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+          state = ( (TreeNode) state ).gte((TreeNode) state, expr.getArg2().f(expr), prop_);
+          return new Object[]{state, null};
+        }
+        if ( predicate.getClass().equals(Lt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+          state = ( (TreeNode) state ).lt((TreeNode) state, expr.getArg2().f(expr), prop_);
+          return new Object[]{state, null};
+        }
+        if ( predicate.getClass().equals(Lte.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+          state = ( (TreeNode) state ).lte((TreeNode) state, expr.getArg2().f(expr), prop_);
+          return new Object[]{state, null};
+        }
+      } else if ( predicate instanceof And ) {
+        int length = ( (And) predicate ).getArgs().length;
+        for ( int i = 0; i < length; i++ ) {
+          Predicate arg = ( (And) predicate ).getArgs()[i];
+          Object[] statePredicate = simplifyPredicate(state, arg);
+          state = statePredicate[0];
+          arg = (Predicate) statePredicate[1];
+          if ( arg == null ) {
+            ( (And) predicate ).getArgs()[i] = new True();
+          }
+        }
+        predicate = predicate.partialEval();
+        if ( predicate instanceof True ) return new Object[]{state, null};
       }
     }
-    return null;
+    return new Object[]{state, predicate};
   }
 
   public Object put(Object state, FObject value) {
@@ -90,55 +101,16 @@ public class TreeIndex implements Index {
   //TODO
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( predicate == null && sink instanceof Count ) {
-      return new CountPlan(((TreeNode) state).size);
+      return new CountPlan(( (TreeNode) state ).size);
     }
-
     if ( ( predicate != null && predicate instanceof False ) || state == null ) {
       return NotFoundPlan.instance();
     }
-
-
-    Binary expr;
-    Object subTree = state;
-
-    //expr = isExprMatch(predicate, In.class);
-    //if ( expr != null && Math.log(((TreeNode)state).size)/Math.log(2) * ((In) predicate) < ((TreeNode) state).size )
-    expr = isExprMatch(predicate, Eq.class);
-    if ( expr != null ) {
-      subTree = ((TreeNode) state).get((TreeNode) state, expr.getArg2().f(expr), prop_);
-      if ( subTree == null ) return NotFoundPlan.instance();
-      predicate = null;
-    }
-
-    expr = isExprMatch(predicate, Gt.class);
-    if ( expr != null ) {
-      subTree = ((TreeNode) subTree).gt((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      if ( subTree == null ) return NotFoundPlan.instance();
-      predicate = null;
-    }
-
-    expr = isExprMatch(predicate, Gte.class);
-    if ( expr != null ) {
-      subTree = ((TreeNode) subTree).gte((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      if ( subTree == null ) return NotFoundPlan.instance();
-      predicate = null;
-    }
-
-    expr = isExprMatch(predicate, Lt.class);
-    if ( expr != null ) {
-      subTree = ((TreeNode) subTree).lt((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      if ( subTree == null ) return NotFoundPlan.instance();
-      predicate = null;
-    }
-
-    expr = isExprMatch(predicate, Lte.class);
-    if ( expr != null ) {
-      subTree = ((TreeNode) subTree).lte((TreeNode) subTree, expr.getArg2().f(expr), prop_);
-      if ( subTree == null ) return NotFoundPlan.instance();
-      predicate = null;
-    }
-    return new ScanPlan(subTree, sink, skip, limit, order, predicate, prop_, tail_);
-
+    if ( state == null ) return NotFoundPlan.instance();
+    Object[] statePredicate = simplifyPredicate(state, predicate);
+    state = statePredicate[0];
+    predicate = (Predicate) statePredicate[1];
+    return new ScanPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
   }
 
   public long size(Object state) {

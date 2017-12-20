@@ -24,7 +24,7 @@ public class ScanPlan implements FindPlan, SelectPlan {
   protected Index tail_;
   protected boolean reverseSort_ = false;
 
-  public ScanPlan(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate, PropertyInfo propertyInfo, Index tail){
+  public ScanPlan(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate, PropertyInfo propertyInfo, Index tail) {
     state_ = state;
     skip_ = skip;
     limit_ = limit;
@@ -34,21 +34,20 @@ public class ScanPlan implements FindPlan, SelectPlan {
     tail_ = tail;
   }
 
-  public long calculateCost(PropertyInfo propertyInfo){
+  public long calculateCost(PropertyInfo propertyInfo) {
     long cost;
     if ( state_ == null ) return 0;
-    cost = ((TreeNode) state_).size;
+    cost = ( (TreeNode) state_ ).size;
     boolean sortRequired = false;
     if ( order_ != null ) {
       if ( order_.toString().equals(propertyInfo.toString()) ) {
         order_ = null;
       } else if ( order_ instanceof Desc ) {
-        if ( ((Desc)order_).getArg1().toString().equals(propertyInfo.toString()) ) {
+        if ( ( (Desc) order_ ).getArg1().toString().equals(propertyInfo.toString()) ) {
           reverseSort_ = true;
           order_ = null;
         }
-      }
-      else {
+      } else {
         sortRequired = true;
         cost *= Math.log(cost) / Math.log(2);
       }
@@ -67,8 +66,8 @@ public class ScanPlan implements FindPlan, SelectPlan {
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if(state == null)
+    if ( state_ == null )
       return;
-    ((TreeNode)state).select((TreeNode)state_, sink, skip_, limit_, order_, predicate_, tail_, reverseSort_);
+    ( (TreeNode) state ).select((TreeNode) state_, sink, skip_, limit_, order_, predicate_, tail_, reverseSort_);
   }
 }
