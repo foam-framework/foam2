@@ -37,9 +37,9 @@ public class AuthWebAgent
 
     Cookie[] cookies = req.getCookies();
     String sessionId = null;
-    if( cookies != null ){
+    if( cookies != null ) {
       for ( Cookie cookie : cookies ) {
-        if ( cookie.getName().equals(SESSION_ID) ){
+        if ( cookie.getName().toString().equals(SESSION_ID) ){
           sessionId = cookie.getValue().toString();
           Session session = (Session) sessionDAO.find(sessionId);
 
@@ -92,6 +92,7 @@ public class AuthWebAgent
         out.println("Authentication failure.");
       }
     } catch (Throwable t) {
+      out.println("Authentication failure.");
       t.printStackTrace();
     }
   }
