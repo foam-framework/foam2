@@ -81,7 +81,7 @@ public class AuthenticatedDAO
       String permission = createPermission("read", id);
       AuthService authService = (AuthService) x.get("auth");
 
-      if (!authService.check(x, permission)) {
+      if ( ! authService.check(x, permission) ) {
         throw new RuntimeException("Insufficient permissions");
       }
     }
