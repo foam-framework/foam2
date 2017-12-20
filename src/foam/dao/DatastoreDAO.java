@@ -95,6 +95,10 @@ public class DatastoreDAO
           serialize(subEntity, (FObject) value);
           value = subEntity;
         }
+        if (value != null &&
+          value.getClass().equals(String.class)) {
+          value = new Text((String)value);
+        }
 
         target.setProperty(prop.getName(), value);
       }
@@ -129,6 +133,10 @@ public class DatastoreDAO
 
         if ( value instanceof EmbeddedEntity ) {
           value = deserialize((EmbeddedEntity) value);
+        }
+        if (value != null &&
+          value.getClass().equals(Text.class)) {
+          value = ((Text)value).getValue();
         }
 
         prop.set(obj, value);
