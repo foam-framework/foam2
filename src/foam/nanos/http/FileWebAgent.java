@@ -65,10 +65,14 @@ public class FileWebAgent
     try {
       path = req.getRequestURI().replaceFirst("/?service/" + nspec_.getName() + "/?", "") + path_;
       File src = new File(SafetyUtil.isEmpty(path) ? "./" : path);
+
       boolean pathStartsWithCwd = src.getAbsolutePath().startsWith(cwd_);
+      if ( ! pathStartsWithCwd ) {
+        throw new FileNotFoundException("File not found: " + path);
+      }
 
       // handle reading of directories
-      if ( src.isDirectory() && src.canRead() && pathStartsWithCwd ) {
+      if ( src.isDirectory() && src.canRead() ) {
         resp.setContentType(EXTS.get("html"));
         pw.write(
             "<!DOCTYPE html>\n" +
@@ -90,7 +94,7 @@ public class FileWebAgent
       }
 
       // handle reading of files
-      if ( src.isFile() && src.canRead() && pathStartsWithCwd ) {
+      if ( src.isFile() && src.canRead() ) {
         String ext = EXTS.get(FilenameUtils.getExtension(src.getName()));
         is = new BufferedInputStream(new FileInputStream(src));
 
