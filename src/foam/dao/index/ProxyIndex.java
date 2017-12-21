@@ -15,22 +15,17 @@ public class ProxyIndex
     implements Index
 {
   protected Index delegate_;
-  private boolean delegateIsSet_ = false;
 
   public ProxyIndex(Index index) {
     setDelegate(index);
   }
 
   public Index getDelegate() {
-    if ( ! delegateIsSet_ ) {
-      return null;
-    }
     return delegate_;
   }
 
   public void setDelegate(foam.dao.index.Index val) {
     delegate_ = val;
-    delegateIsSet_ = true;
   }
 
   @Override
