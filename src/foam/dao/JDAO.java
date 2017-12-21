@@ -49,7 +49,9 @@ public class JDAO
     BufferedReader br            = new BufferedReader(new FileReader(file_));
 
     for ( String line ; ( line = br.readLine() ) != null ; ) {
+      // skip empty lines & comment lines
       if ( SafetyUtil.isEmpty(line) ) continue;
+      if ( COMMENT.matcher(line).matches() ) continue;
 
       try {
         char operation = line.charAt(0);
