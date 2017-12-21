@@ -58,6 +58,10 @@ public class MLang
     return new Or(args);
   }
 
+  public static Predicate NOT(Predicate predicate) {
+    return new Not(predicate);
+  }
+
   public static Sink MAX(Object o1) {
     return new Max(0, MLang.prepare(o1));
   }
