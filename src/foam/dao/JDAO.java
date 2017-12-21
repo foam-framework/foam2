@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public class JDAO
     extends ProxyDAO
 {
-  protected Pattern COMMENT = Pattern.compile("/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/");
+  protected Pattern COMMENT = Pattern.compile("(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)");
   protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -66,10 +66,7 @@ public class JDAO
     for ( String line ; ( line = br.readLine() ) != null ; ) {
       // skip empty lines & comment lines
       if ( SafetyUtil.isEmpty(line) ) continue;
-      if ( COMMENT.matcher(line).matches() ) {
-        System.out.println("line = " + line);
-        continue;
-      }
+      if ( COMMENT.matcher(line).matches() ) continue;
 
       try {
         char operation = line.charAt(0);
@@ -122,12 +119,11 @@ public class JDAO
   }
 
   protected void writeComment(User user) throws IOException {
-    out_.write("/* Modified by ");
+    out_.write("// Modified by ");
     out_.write(user != null ?
-        user.getFirstName() + " " + user.getLastName() + " (" + user.getId() + ")" :
+        user.getFirstName() + " " + user.getLastName() + "(" + user.getId() + ")" :
         "System" );
     out_.write(" at " + sdf.get().format(Calendar.getInstance().getTime()));
-    out_.write(" */");
     out_.newLine();
   }
 
