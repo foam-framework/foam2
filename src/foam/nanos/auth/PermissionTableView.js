@@ -15,30 +15,15 @@ foam.CLASS({
       height: 40px;
       background: #59aadd;
       margin-bottom: 15px;
+      width: 200;
     }
   `,
-
-  actions: [
-    {
-      name: 'save',
-      label: 'Save',
-      code: function(X) {
-        X.dao.put(this);
-        X.stack.push({class: 'foam.nanos.auth.permissionDAO'});
-      }
-    }
-  ],
 
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
 
-      this
-        .addClass(this.myClass())
-        .start().addClass('button-row')
-          .start(this.SAVE).addClass('float-right').end()
-        .end()
       this.start('table')
         .start('tr')
           .tag('td')
@@ -50,11 +35,12 @@ foam.CLASS({
           this.start('tr')
             .start('th').add(p.id).end()
             .select(self.groupDAO, function(g) {
-              this.start('td').tag({class: 'foam.u2.CheckBox', data: self.checkPermissionForGroup(p.id, g)}).end();
+              var cb = foam.u2.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
+              cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
+              this.start('td').style({'text-align': 'center'}).tag(cb).end();
             })
           .end()
         })
-      .end()
       .end();
     },
 
@@ -66,9 +52,20 @@ foam.CLASS({
       }
     },
 
-    function SavePermissionForGroup() {
+    function updateGroup(permission, group, data) {
+      var dao = this.groupDAO;
+      dao.find(group).then(function(group) {
+        // Remove permission if found
+        var permissions = group.permissions.filter(function(p) {
+          return p.id != permission.id;
+        });
 
+        // Add if requested
+        if ( data ) permissions.push(permission);
+
+        group.permissions = permissions;
+        dao.put(group);
+      });
     }
-
   ]
 });
