@@ -9,7 +9,6 @@ package foam.nanos.http;
 import foam.core.*;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
-import java.security.Permission;
 import foam.nanos.auth.User;
 import foam.nanos.http.ProxyWebAgent;
 import foam.nanos.http.WebAgent;
@@ -41,7 +40,7 @@ public class AuthWebAgent
     Cookie[] cookies = req.getCookies();
     String sessionId = null;
 
-    if( cookies != null ) {
+    if ( cookies != null ) {
 
       for ( Cookie cookie : cookies ) {
 
@@ -50,9 +49,9 @@ public class AuthWebAgent
           Session session      = (Session) sessionDAO.find(sessionId);
           Boolean sessionCheck = null;
 
-          if( session != null ){
+          if ( session != null ){
         
-            if( session.getContext() != null ){
+            if ( session.getContext() != null ){
               sessionCheck = auth.check(session.getContext(), permission_);
               
               if ( sessionCheck == true ) {
