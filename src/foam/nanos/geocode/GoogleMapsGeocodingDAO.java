@@ -114,6 +114,7 @@ public class GoogleMapsGeocodingDAO
         try {
           URL url = new URL(builder.toString().replace(" ", "+"));
           conn = (HttpURLConnection) url.openConnection();
+          conn.setConnectTimeout(5 * 1000);
           conn.setRequestMethod("GET");
           conn.connect();
 
