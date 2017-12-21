@@ -44,8 +44,7 @@ public class FileWebAgent
   }
 
   public FileWebAgent(String path) {
-    this.path_ = path;
-    this.cwd_ = System.getProperty("user.dir");
+    this(path, System.getProperty("user.dir"));
   }
 
   public FileWebAgent(String path, String cwd) {
