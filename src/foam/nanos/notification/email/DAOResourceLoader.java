@@ -6,6 +6,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.dao.ListSink;
+import foam.nanos.auth.Group;
 import foam.nanos.notification.email.EmailTemplate;
 import foam.util.SafetyUtil;
 import org.jtwig.resource.loader.ResourceLoader;
@@ -21,41 +22,58 @@ public class DAOResourceLoader
     extends ContextAwareSupport
     implements ResourceLoader
 {
-  public static EmailTemplate findTemplate(X x, String templateName, String groupName) {
-    DAO dao = (DAO) x.get("emailTemplateDAO");
+  public static EmailTemplate findTemplate(X x, String name, String groupId) {
+    DAO groupDAO = (DAO) x.get("groupDAO");
+    DAO emailTemplateDAO = (DAO) x.get("emailTemplateDAO");
 
-    Sink list = new ListSink();
+    while ( ! SafetyUtil.isEmpty(groupId) ) {
+      Group group = (Group) groupDAO.find(groupId);
+      if ( group == null ) {
+        break;
+      }
 
-    // if group is provided, query based on that
-    if ( ! SafetyUtil.isEmpty(groupName) ) {
-      list = dao.where(AND(
-          EQ(EmailTemplate.NAME, templateName),
-          EQ(EmailTemplate.GROUP, groupName))).limit(1).select(null);
+      try {
+        Sink sink = emailTemplateDAO.where(AND(
+            EQ(EmailTemplate.NAME, name),
+            EQ(EmailTemplate.GROUP, groupId)
+        )).limit(1).select(null);
+
+        if ( sink == null ) {
+          continue;
+        }
+
+        List data = ((ListSink) sink).getData();
+        if ( data != null && data.size() == 1 ) {
+          return (EmailTemplate) data.get(0);
+        }
+      } finally {
+        groupId = group.getParent();
+      }
     }
 
-    List data = ((ListSink) list).getData();
-
-    // if data is empty use wildcard group
-    if ( data.size() == 0 ) {
-      list = dao.where(AND(
-          EQ(EmailTemplate.NAME,  templateName),
-          EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
-      data = ((ListSink) list).getData();
+    // if we reach here then we did not find a template for the given
+    // group or it's parent groups. Use a wildcard grouip
+    Sink sink = emailTemplateDAO.where(AND(
+        EQ(EmailTemplate.NAME, name),
+        EQ(EmailTemplate.GROUP, "*")
+    )).limit(1).select(null);
+    if ( sink == null ) {
+      return null;
     }
 
-    // if data is still empty then return null
-    if ( data.size() == 0 ) {
+    List data = ((ListSink) sink).getData();
+    if ( data == null || data.size() != 1 ) {
       return null;
     }
 
     return (EmailTemplate) data.get(0);
   }
 
-  protected String groupName_;
+  protected String groupId_;
 
-  public DAOResourceLoader(X x, String groupName) {
+  public DAOResourceLoader(X x, String groupId) {
     setX(x);
-    groupName_ = groupName;
+    this.groupId_ = groupId;
   }
 
   @Override
@@ -65,7 +83,7 @@ public class DAOResourceLoader
 
   @Override
   public InputStream load(String s) {
-    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, groupName_);
+    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, this.groupId_);
     return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
