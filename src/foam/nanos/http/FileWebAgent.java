@@ -78,7 +78,7 @@ public class FileWebAgent
 
         File[] files = src.listFiles();
         for ( File file : files ) {
-          pw.write("<li>" + "<a href=\"/service/" + StringEscapeUtils.escapeJava(nspec_.getName()) + "/" + path
+          pw.write("<li>" + "<a href=\"/service/" + StringEscapeUtils.escapeHtml4(nspec_.getName()) + "/" + path
               + ( ! path.isEmpty() && ! path.endsWith("/") ? "/" : "" )
               + file.getName() + "\"?>" + file.getName() + "</a></li>");
         }
@@ -95,7 +95,7 @@ public class FileWebAgent
         is = new BufferedInputStream(new FileInputStream(src));
 
         resp.setContentType(! SafetyUtil.isEmpty(ext) ? ext : DEFAULT_EXT);
-        resp.setHeader("Content-Disposition", "filename=\"" + StringEscapeUtils.escapeJava(src.getName()) + "\"");
+        resp.setHeader("Content-Disposition", "filename=\"" + StringEscapeUtils.escapeHtml4(src.getName()) + "\"");
         resp.setContentLengthLong(src.length());
 
         int read = 0;
@@ -112,7 +112,7 @@ public class FileWebAgent
       t.printStackTrace();
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
       resp.setContentType(EXTS.get("json"));
-      pw.write("{\"error\": \"File not found\"," + "\"filename\": \"" + StringEscapeUtils.escapeJava(path) + "\"}");
+      pw.write("{\"error\": \"File not found\"," + "\"filename\": \"" + StringEscapeUtils.escapeJson(path) + "\"}");
     } finally {
       IOUtils.closeQuietly(is);
     }
