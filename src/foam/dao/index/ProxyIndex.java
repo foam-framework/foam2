@@ -35,31 +35,39 @@ public class ProxyIndex
 
   @Override
   public Object put(Object state, FObject value) {
-    return getDelegate().put(state, value);
+    return wrap(getDelegate().put(unwrap(state), value));
   }
 
   @Override
   public Object remove(Object state, FObject value) {
-    return getDelegate().remove(state, value);
+    return wrap(getDelegate().remove(unwrap(state), value));
   }
 
   @Override
   public Object removeAll() {
-    return getDelegate().removeAll();
+    return wrap(getDelegate().removeAll());
   }
 
   @Override
   public FindPlan planFind(Object state, Object key) {
-    return getDelegate().planFind(state, key);
+    return wrap(getDelegate().planFind(unwrap(state), key));
   }
 
   @Override
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    return getDelegate().planSelect(state, sink, skip, limit, order, predicate);
+    return wrap(getDelegate().planSelect(unwrap(state), sink, skip, limit, order, predicate));
   }
 
   @Override
   public long size(Object state) {
-    return getDelegate().size(state);
+    return wrap(getDelegate().size(unwrap(state)));
+  }
+
+  public Object wrap(Object state) {
+    return state;
+  }
+
+  public Object unwrap(Object state) {
+    return state;
   }
 }
