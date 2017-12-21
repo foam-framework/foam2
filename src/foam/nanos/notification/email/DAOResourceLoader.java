@@ -1,6 +1,8 @@
 package foam.nanos.notification.email;
 
 import com.google.common.base.Optional;
+import foam.core.ContextAwareSupport;
+import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.dao.ListSink;
@@ -16,9 +18,12 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class DAOResourceLoader
+    extends ContextAwareSupport
     implements ResourceLoader
 {
-  public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
+  public static EmailTemplate findTemplate(X x, String templateName, String groupName) {
+    DAO dao = (DAO) x.get("emailTemplateDAO");
+
     Sink list = new ListSink();
 
     // if group is provided, query based on that
@@ -46,11 +51,10 @@ public class DAOResourceLoader
     return (EmailTemplate) data.get(0);
   }
 
-  protected DAO dao_;
   protected String groupName_;
 
-  public DAOResourceLoader(DAO dao, String groupName) {
-    dao_ = dao;
+  public DAOResourceLoader(X x, String groupName) {
+    setX(x);
     groupName_ = groupName;
   }
 
@@ -61,8 +65,7 @@ public class DAOResourceLoader
 
   @Override
   public InputStream load(String s) {
-    EmailTemplate template = DAOResourceLoader.findTemplate(dao_, s, groupName_);
-
+    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, groupName_);
     return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
