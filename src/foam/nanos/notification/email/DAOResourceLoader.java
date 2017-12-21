@@ -31,9 +31,6 @@ public class DAOResourceLoader
           EQ(EmailTemplate.NAME, name),
           EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
       )).limit(1).select(null);
-      if ( sink == null ) {
-        continue;
-      }
 
       List data = ((ListSink) sink).getData();
       if ( data != null && data.size() == 1 ) {
