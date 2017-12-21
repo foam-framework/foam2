@@ -30,7 +30,7 @@ public class JDAO
   protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
       sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
       return sdf;
     }
@@ -124,7 +124,7 @@ public class JDAO
   protected void writeComment(User user) throws IOException {
     out_.write("/* Modified by ");
     out_.write(user == null ? "System" : user.getFirstName() + " " + user.getLastName());
-    out_.write(" at " + sdf.get().format(Calendar.getInstance()));
+    out_.write(" at " + sdf.get().format(Calendar.getInstance().getTime()));
     out_.write(" */");
     out_.newLine();
   }
