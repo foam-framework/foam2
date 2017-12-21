@@ -86,7 +86,7 @@ public class AltIndex implements Index {
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
-
+      bestState = s[i];
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
         bestState = s[i];
@@ -94,7 +94,7 @@ public class AltIndex implements Index {
       }
     }
 
-    return new AltSelectPlan(bestState, bestPlan);
+    return new AltSelectPlan(bestState,bestPlan);
   }
 
   public long size(Object state) {
