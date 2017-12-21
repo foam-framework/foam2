@@ -26,47 +26,29 @@ public class DAOResourceLoader
     DAO groupDAO = (DAO) x.get("groupDAO");
     DAO emailTemplateDAO = (DAO) x.get("emailTemplateDAO");
 
-    while ( ! SafetyUtil.isEmpty(groupId) ) {
+    do {
+      Sink sink = emailTemplateDAO.where(AND(
+          EQ(EmailTemplate.NAME, name),
+          EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+      )).limit(1).select(null);
+      if ( sink == null ) {
+        continue;
+      }
+
+      List data = ((ListSink) sink).getData();
+      if ( data != null && data.size() == 1 ) {
+        return (EmailTemplate) data.get(0);
+      }
+
       Group group = (Group) groupDAO.find(groupId);
       if ( group == null ) {
-        break;
+        return null;
       }
 
-      try {
-        Sink sink = emailTemplateDAO.where(AND(
-            EQ(EmailTemplate.NAME, name),
-            EQ(EmailTemplate.GROUP, groupId)
-        )).limit(1).select(null);
+      groupId = group.getParent();
+    } while ( ! SafetyUtil.isEmpty(groupId) );
 
-        if ( sink == null ) {
-          continue;
-        }
-
-        List data = ((ListSink) sink).getData();
-        if ( data != null && data.size() == 1 ) {
-          return (EmailTemplate) data.get(0);
-        }
-      } finally {
-        groupId = group.getParent();
-      }
-    }
-
-    // if we reach here then we did not find a template for the given
-    // group or it's parent groups. Use a wildcard grouip
-    Sink sink = emailTemplateDAO.where(AND(
-        EQ(EmailTemplate.NAME, name),
-        EQ(EmailTemplate.GROUP, "*")
-    )).limit(1).select(null);
-    if ( sink == null ) {
-      return null;
-    }
-
-    List data = ((ListSink) sink).getData();
-    if ( data == null || data.size() != 1 ) {
-      return null;
-    }
-
-    return (EmailTemplate) data.get(0);
+    return null;
   }
 
   protected String groupId_;
