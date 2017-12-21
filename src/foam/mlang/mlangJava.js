@@ -281,6 +281,44 @@ for ( int i = 0 ; i < length ; i++ ) {
   }
 }
 return stmt.toString();`
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode: 'java.util.List<Predicate> args = new java.util.ArrayList<>();\n' +
+      '    boolean update = false;\n' +
+      '    True TRUE = new True();\n' +
+      '    False FALSE = new False();\n' +
+      '    for ( int i = 0; i < this.args_.length; i++ ) {\n' +
+      '      Predicate arg = this.args_[i];\n' +
+      '      Predicate newArg = this.args_[i].partialEval();\n' +
+      '      if ( newArg instanceof False ) return FALSE;\n' +
+      '      if ( arg instanceof And ) {\n' +
+      '        for ( int j = 0; j < ( ( (And) arg ).args_.length ); j++ ) {\n' +
+      '          args.add(( (And) arg ).args_[j]);\n' +
+      '        }\n' +
+      '        update = true;\n' +
+      '      } else {\n' +
+      '        if ( arg instanceof True || arg == null ) {\n' +
+      '          update = true;\n' +
+      '        } else {\n' +
+      '          args.add(arg);\n' +
+      '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
+      '        }\n' +
+      '      }\n' +
+      '    }\n' +
+      '    if ( args.size() == 0 ) return TRUE;\n' +
+      '    if ( args.size() == 1 ) return args.get(0);\n' +
+      '    if ( update ) {\n' +
+      '      And newPredicate = new And();\n' +
+      '      Predicate newArgs[] = new Predicate[args.size()];\n' +
+      '      int i = 0;\n' +
+      '      for ( Predicate predicate : args )\n' +
+      '        newArgs[i++] = predicate;\n' +
+      '      newPredicate.setArgs(newArgs);\n' +
+      '      return newPredicate;\n' +
+      '    }\n' +
+      '    return this;'
     }
   ]
 });
