@@ -9,6 +9,7 @@ package foam.nanos.http;
 import foam.core.*;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
+import java.security.Permission;
 import foam.nanos.auth.User;
 import foam.nanos.http.ProxyWebAgent;
 import foam.nanos.http.WebAgent;
@@ -22,45 +23,54 @@ import javax.servlet.http.HttpServletResponse;
 public class AuthWebAgent
   extends ProxyWebAgent
 {
-  public AuthWebAgent(WebAgent delegate) {
+  public final static String SESSION_ID = "sessionId";
+  protected String permission_;
+
+  public AuthWebAgent(String permission, WebAgent delegate) {
     setDelegate(delegate);
+    permission_ = permission;
   }
   
-  public final static String SESSION_ID = "sessionId";
-
   public void execute(X x) {
-    HttpServletRequest  req  = (HttpServletRequest) x.get(HttpServletRequest.class);
-    HttpServletResponse resp = (HttpServletResponse) x.get(HttpServletResponse.class);
-    PrintWriter         out  = (PrintWriter) x.get(PrintWriter.class);
-
+    HttpServletRequest  req        = (HttpServletRequest) x.get(HttpServletRequest.class);
+    HttpServletResponse resp       = (HttpServletResponse) x.get(HttpServletResponse.class);
+    PrintWriter         out        = (PrintWriter) x.get(PrintWriter.class);
+    AuthService         auth       = (AuthService) x.get("auth");
     DAO                 sessionDAO = (DAO) x.get("sessionDAO");
 
     Cookie[] cookies = req.getCookies();
     String sessionId = null;
-    if( cookies != null ) {
-      for ( Cookie cookie : cookies ) {
-        if ( cookie.getName().toString().equals(SESSION_ID) ){
-          sessionId = cookie.getValue().toString();
-          Session session = (Session) sessionDAO.find(sessionId);
 
-          if ( session != null ) {
-            getDelegate().execute(session.getContext());
-          } else {
-            templateLogin(x);
+    if( cookies != null ) {
+
+      for ( Cookie cookie : cookies ) {
+
+        if ( cookie.getName().toString().equals(SESSION_ID) ){
+          sessionId            = cookie.getValue().toString();
+          Session session      = (Session) sessionDAO.find(sessionId);
+          Boolean sessionCheck = null;
+
+          if( session != null ){
+        
+            if( session.getContext() != null ){
+              sessionCheck = auth.check(session.getContext(), permission_);
+              
+              if ( sessionCheck == true ) {
+                getDelegate().execute(session.getContext());
+              }
+            }
           }
-        } else {
-          templateLogin(x);
         }
       }
-    } else {
-      templateLogin(x);
     }
+
+    templateLogin(x);
   }
 
   public void templateLogin(X x) {
-    PrintWriter        out  = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletRequest req  = (HttpServletRequest) x.get(HttpServletRequest.class);
-    String             emailReq = req.getParameter("email");
+    PrintWriter        out         = (PrintWriter) x.get(PrintWriter.class);
+    HttpServletRequest req         = (HttpServletRequest) x.get(HttpServletRequest.class);
+    String             emailReq    = req.getParameter("email");
     String             passwordReq = req.getParameter("password");
 
     out.println("<form method=post>");
@@ -78,15 +88,18 @@ public class AuthWebAgent
   }
 
   public void attemptLogin(X x, String email, String password){
-    AuthService        auth = (AuthService) x.get("auth");
-    PrintWriter        out  = (PrintWriter) x.get(PrintWriter.class);
+    AuthService        auth       = (AuthService) x.get("auth");
+    PrintWriter        out        = (PrintWriter) x.get(PrintWriter.class);
+    Session            session    = new Session();
+    DAO                sessionDAO = (DAO) x.get("sessionDAO");
 
     try {
-      Session session = new Session();
       x = x.put(Session.class, session);
+      session.setContext(x);
 
       User user = (User) auth.loginByEmail(x, email, password);
       if ( user != null ) {
+        sessionDAO.put(session);
         createCookie(session, x);
       } else {
         out.println("Authentication failure.");
@@ -98,9 +111,10 @@ public class AuthWebAgent
   }
 
   public void createCookie(Session session, X x){
-    HttpServletResponse resp  = (HttpServletResponse) x.get(HttpServletResponse.class);
-    PrintWriter        out  = (PrintWriter) x.get(PrintWriter.class);
-    Cookie cookie = new Cookie(SESSION_ID, session.getId());
+    HttpServletResponse resp    = (HttpServletResponse) x.get(HttpServletResponse.class);
+    PrintWriter         out     = (PrintWriter) x.get(PrintWriter.class);
+    Cookie              cookie  = new Cookie(SESSION_ID, session.getId());
+
     resp.addCookie(cookie);
     out.println("<script>");
     out.println("window.location.href = window.location.href;");
