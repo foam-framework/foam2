@@ -25,6 +25,6 @@ public class TreePlan implements FindPlan, SelectPlan {
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    ((TreeNode)state).select((TreeNode)state, sink, skip, limit, order, predicate);
+    // ((TreeNode) state).select((TreeNode) state, sink, skip, limit, order, predicate);
   }
 }
