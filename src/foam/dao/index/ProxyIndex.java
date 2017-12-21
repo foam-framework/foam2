@@ -50,17 +50,17 @@ public class ProxyIndex
 
   @Override
   public FindPlan planFind(Object state, Object key) {
-    return wrap(getDelegate().planFind(unwrap(state), key));
+    return getDelegate().planFind(unwrap(state), key);
   }
 
   @Override
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    return wrap(getDelegate().planSelect(unwrap(state), sink, skip, limit, order, predicate));
+    return getDelegate().planSelect(unwrap(state), sink, skip, limit, order, predicate);
   }
 
   @Override
   public long size(Object state) {
-    return wrap(getDelegate().size(unwrap(state)));
+    return getDelegate().size(unwrap(state));
   }
 
   public Object wrap(Object state) {
