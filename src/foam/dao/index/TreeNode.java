@@ -190,23 +190,23 @@ public class TreeNode {
     return state;
   }
 
-  private TreeNode removeNode(TreeNode state, Object obj, PropertyInfo prop) {
+  private TreeNode removeNode(TreeNode state, Object key, PropertyInfo prop) {
     if ( state == null ) {
       return state;
     }
     state  = maybeClone(state);
-    long compareValue = prop.compare(state.value, obj);
+    long compareValue = prop.comparePropertyToValue(state.key, key);
 
     if ( compareValue == 0 ) {
       return state.left != null ? state.left : state.right;
     }
     if ( compareValue > 0 ) {
       state.size -= size(state.left);
-      state.left = removeNode(state.left, obj, prop);
+      state.left = removeNode(state.left, key, prop);
       state.size += size(state.left);
     } else {
       state.size -= size(state.right);
-      state.right = removeNode(state.right, obj, prop);
+      state.right = removeNode(state.right, key, prop);
       state.size += size(state.right);
     }
     return state;
@@ -261,7 +261,7 @@ public class TreeNode {
     return 0;
   }
 
-  public Object get(TreeNode s, Object key, PropertyInfo prop) {
+  public TreeNode get(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
     }
@@ -287,6 +287,10 @@ public class TreeNode {
 
   protected Object getValue(){
     return value;
+  }
+
+  public TreeNode neq(TreeNode s, Object key, PropertyInfo prop) {
+    return removeNode(s, key, prop);
   }
 
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
