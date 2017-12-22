@@ -34,12 +34,34 @@ public class TreeIndex implements Index {
     return TreeNode.getNullNode().bulkLoad(tail_, prop_, 0, a.length-1, a);
   }
 
+  protected Predicate simplifyPredicatePrepare(Predicate predicate) {
+    if ( predicate instanceof And ) {
+      int length = ( (And) predicate ).getArgs().length;
+      for ( int i = 0; i < length; i++ ) {
+        Predicate arg = ( (And) predicate ).getArgs()[i];
+        ( (And) predicate ).getArgs()[i] = simplifyPredicatePrepare(arg);
+      }
+      return predicate.partialEval();
+    }
+    if ( predicate instanceof Not ) {
+      if ( ( (Not) predicate ).getArg1() instanceof And )
+        return predicate;
+      predicate = predicate.partialEval();
+      predicate = simplifyPredicatePrepare(predicate);
+    }
+    return predicate;
+  }
+
   protected Object[] simplifyPredicate(Object state, Predicate predicate) {
     if ( predicate != null && prop_ != null ) {
       if ( predicate instanceof Binary ) {
         Binary expr = (Binary) predicate;
         if ( predicate.getClass().equals(Eq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
           state = ( (TreeNode) state ).get((TreeNode) state, expr.getArg2().f(expr), prop_);
+          return new Object[]{state, null};
+        }
+        if ( predicate.getClass().equals(Neq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+          state = ( (TreeNode) state ).neq((TreeNode) state, expr.getArg2().f(expr), prop_);
           return new Object[]{state, null};
         }
         if ( predicate.getClass().equals(Gt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
@@ -107,6 +129,7 @@ public class TreeIndex implements Index {
       return NotFoundPlan.instance();
     }
     if ( state == null ) return NotFoundPlan.instance();
+    predicate = simplifyPredicatePrepare(predicate);
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
