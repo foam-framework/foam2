@@ -37,11 +37,12 @@ public class PersistedIndex
   public Object wrap(Object state) {
     synchronized ( file_ ) {
       try {
+        long position = fos_.getChannel().position();
         oos_.writeObject(state);
         oos_.flush();
         bos_.writeTo(fos_);
         oos_.reset();
-        return fos_.getChannel().position();
+        return position;
       } catch (Throwable t) {
         throw new RuntimeException(t);
       }
