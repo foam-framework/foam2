@@ -15,9 +15,9 @@ import foam.mlang.MLang;
 import foam.nanos.NanoService;
 import foam.nanos.session.Session;
 import foam.util.LRULinkedHashMap;
-import java.util.Map;
+
 import javax.naming.AuthenticationException;
-import javax.security.auth.AuthPermission;
+import java.util.Map;
 
 public class WebAuthServiceAdapter
     extends    ContextAwareSupport
