@@ -731,6 +731,28 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
     {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode: 'if ( this.arg1_ instanceof Not )\n' +
+      '      return ((Not)arg1_).arg1_;\n' +
+      '    if ( arg1_.getClass().equals(Eq.class) ) {\n' +
+      '      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Gt.class) ) {\n' +
+      '      return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Gte.class) ) {\n' +
+      '      return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Lt.class) ) {\n' +
+      '      return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Lte.class) ) {\n' +
+      '      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    return this;'
+    },
+    {
       name: 'createStatement',
       javaReturns: 'String',
       javaCode: 'return " NOT (" + getArg1().createStatement() + ") ";'
