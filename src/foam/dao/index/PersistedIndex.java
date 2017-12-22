@@ -24,6 +24,8 @@ public class PersistedIndex
         throw new IOException("Unable to create file: " + filename);
       }
     }
+    // store file input stream and file output stream
+    // to avoid opening and closing streams multiple times
     this.fis_ = new FileInputStream(this.file_);
     this.fos_ = new FileOutputStream(this.file_);
     setDelegate(index);
@@ -36,11 +38,13 @@ public class PersistedIndex
 
     synchronized ( file_ ) {
       try {
+        // write object out to object output stream
         bos = new ByteArrayOutputStream();
         oos = new ObjectOutputStream(bos);
         oos.writeObject(state);
         oos.flush();
 
+        // write to file output stream and return position
         bos.writeTo(fos_);
         return fos_.getChannel().position();
       } catch (Throwable t) {
@@ -57,7 +61,9 @@ public class PersistedIndex
     synchronized ( file_ ) {
       try {
         long position = (long) state;
+        // set file input stream to state position
         fis_.getChannel().position(position);
+        // wrap file input stream in object input stream and read object
         ObjectInputStream iis = new ObjectInputStream(fis_);
         return iis.readObject();
       } catch (Throwable t) {
