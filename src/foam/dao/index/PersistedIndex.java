@@ -12,10 +12,14 @@ import java.io.*;
 
 public class PersistedIndex
     extends ProxyIndex
+    implements Closeable
 {
   protected final File file_;
   protected FileInputStream fis_;
   protected FileOutputStream fos_;
+
+  protected ByteArrayOutputStream bos_ = new ByteArrayOutputStream();
+  protected ObjectOutputStream oos_ = new ObjectOutputStream(bos_);
 
   public PersistedIndex(String filename, Index index) throws IOException {
     this.file_ = new File(filename).getAbsoluteFile();
@@ -24,8 +28,6 @@ public class PersistedIndex
         throw new IOException("Unable to create file: " + filename);
       }
     }
-    // store file input stream and file output stream
-    // to avoid opening and closing streams multiple times
     this.fis_ = new FileInputStream(this.file_);
     this.fos_ = new FileOutputStream(this.file_);
     setDelegate(index);
@@ -33,25 +35,15 @@ public class PersistedIndex
 
   @Override
   public Object wrap(Object state) {
-    ByteArrayOutputStream bos = null;
-    ObjectOutputStream oos = null;
-
     synchronized ( file_ ) {
       try {
-        // write object out to object output stream
-        bos = new ByteArrayOutputStream();
-        oos = new ObjectOutputStream(bos);
-        oos.writeObject(state);
-        oos.flush();
-
-        // write to file output stream and return position
-        bos.writeTo(fos_);
+        oos_.writeObject(state);
+        oos_.flush();
+        bos_.writeTo(fos_);
+        oos_.reset();
         return fos_.getChannel().position();
       } catch (Throwable t) {
         throw new RuntimeException(t);
-      } finally {
-        IOUtils.closeQuietly(bos);
-        IOUtils.closeQuietly(oos);
       }
     }
   }
@@ -61,14 +53,19 @@ public class PersistedIndex
     synchronized ( file_ ) {
       try {
         long position = (long) state;
-        // set file input stream to state position
         fis_.getChannel().position(position);
-        // wrap file input stream in object input stream and read object
         ObjectInputStream iis = new ObjectInputStream(fis_);
         return iis.readObject();
       } catch (Throwable t) {
         throw new RuntimeException(t);
       }
     }
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(oos_);
+    IOUtils.closeQuietly(fos_);
+    IOUtils.closeQuietly(fis_);
   }
 }
