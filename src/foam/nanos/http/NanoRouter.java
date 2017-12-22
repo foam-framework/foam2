@@ -100,11 +100,11 @@ public class NanoRouter
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
       }
     } else {
-      /*
+      
       if ( service instanceof WebAgent && spec.getAuthenticate() ) {
         service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
       }
-      */
+      
     }
 
 /*

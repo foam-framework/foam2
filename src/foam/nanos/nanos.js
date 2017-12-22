@@ -23,7 +23,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
   { name: "foam/nanos/auth/Phone" },
-  { name: "foam/nanos/auth/SignOutView" },  
+  { name: "foam/nanos/auth/SignOutView" },
   { name: "foam/nanos/auth/ChangePasswordView"},
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
@@ -64,5 +64,5 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
-  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
+  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
 ]);
