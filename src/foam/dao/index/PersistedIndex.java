@@ -19,7 +19,6 @@ public class PersistedIndex
   protected FileOutputStream fos_;
 
   protected ByteArrayOutputStream bos_ = new ByteArrayOutputStream();
-  protected ObjectOutputStream oos_ = new ObjectOutputStream(bos_);
 
   public PersistedIndex(String filename, Index index) throws IOException {
     this.file_ = new File(filename).getAbsoluteFile();
@@ -38,10 +37,14 @@ public class PersistedIndex
     synchronized ( file_ ) {
       try {
         long position = fos_.getChannel().position();
-        oos_.writeObject(state);
-        oos_.flush();
+        ObjectOutputStream oos = new ObjectOutputStream(bos_);
+        oos.writeObject(state);
+        oos.flush();
+
         bos_.writeTo(fos_);
-        oos_.reset();
+        bos_.flush();
+        bos_.reset();
+
         return position;
       } catch (Throwable t) {
         throw new RuntimeException(t);
@@ -65,7 +68,7 @@ public class PersistedIndex
 
   @Override
   public void close() throws IOException {
-    IOUtils.closeQuietly(oos_);
+    IOUtils.closeQuietly(bos_);
     IOUtils.closeQuietly(fos_);
     IOUtils.closeQuietly(fis_);
   }
