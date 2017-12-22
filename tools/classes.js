@@ -117,7 +117,6 @@ var classes = [
   'foam.nanos.auth.User',
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
-  'foam.nanos.auth.WebAuthService',
   'foam.nanos.auth.ClientAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.session.Session',
@@ -184,7 +183,6 @@ var skeletons = [
   'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
-  'foam.nanos.auth.WebAuthService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
