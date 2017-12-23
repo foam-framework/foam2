@@ -1164,7 +1164,7 @@ foam.CLASS({
         initializer: `
 new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
         `,
-        order: Number.MAX_SAFE_INTEGER - 1,
+        order: 1,
       });
     }
   ]

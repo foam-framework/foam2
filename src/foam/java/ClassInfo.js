@@ -33,7 +33,7 @@ foam.CLASS({
     },
     {
       name: 'order',
-      value: Number.MAX_SAFE_INTEGER
+      value: 2
     }
   ],
 
