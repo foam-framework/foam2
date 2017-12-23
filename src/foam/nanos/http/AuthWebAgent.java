@@ -23,13 +23,14 @@ public class AuthWebAgent
   extends ProxyWebAgent
 {
   public final static String SESSION_ID = "sessionId";
+
   protected String permission_;
 
   public AuthWebAgent(String permission, WebAgent delegate) {
     setDelegate(delegate);
     permission_ = permission;
   }
-  
+
   public void execute(X x) {
     HttpServletRequest  req        = (HttpServletRequest) x.get(HttpServletRequest.class);
     HttpServletResponse resp       = (HttpServletResponse) x.get(HttpServletResponse.class);
@@ -49,11 +50,11 @@ public class AuthWebAgent
           Session session      = (Session) sessionDAO.find(sessionId);
           Boolean sessionCheck = null;
 
-          if ( session != null ){
-        
-            if ( session.getContext() != null ){
+          if ( session != null ) {
+
+            if ( session.getContext() != null ) {
               sessionCheck = auth.check(session.getContext(), permission_);
-              
+
               if ( sessionCheck == true ) {
                 getDelegate().execute(session.getContext());
               }
