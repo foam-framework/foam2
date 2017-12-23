@@ -13,6 +13,7 @@ import foam.nanos.auth.User;
 import foam.nanos.http.ProxyWebAgent;
 import foam.nanos.http.WebAgent;
 import foam.nanos.session.Session;
+import foam.util.SafetyUtil;
 import java.io.PrintWriter;
 import java.util.Date;
 import javax.servlet.http.Cookie;
@@ -37,83 +38,85 @@ public class AuthWebAgent
     PrintWriter         out        = (PrintWriter) x.get(PrintWriter.class);
     AuthService         auth       = (AuthService) x.get("auth");
     DAO                 sessionDAO = (DAO) x.get("sessionDAO");
+    String              sessionId  = null;
+    Cookie              cookie     = getCookie(req);
 
-    Cookie[] cookies = req.getCookies();
-    String sessionId = null;
+    attemptLogin(x);
 
-    if ( cookies != null ) {
+    if ( cookie != null ) {
+      sessionId       = cookie.getValue().toString();
+      Session session = (Session) sessionDAO.find(sessionId);
 
-      for ( Cookie cookie : cookies ) {
-
-        if ( cookie.getName().toString().equals(SESSION_ID) ){
-          sessionId            = cookie.getValue().toString();
-          Session session      = (Session) sessionDAO.find(sessionId);
-          Boolean sessionCheck = null;
-
-          if ( session != null ) {
-
-            if ( session.getContext() != null ) {
-              sessionCheck = auth.check(session.getContext(), permission_);
-
-              if ( sessionCheck == true ) {
-                getDelegate().execute(session.getContext());
-              }
-            }
-          }
+      if ( session != null && session.getContext() != null ) {
+        if ( auth.check(session.getContext(), permission_) ) {
+          getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+        } else {
+          out.println("Access denied. Need permission: " + permission_);
         }
+      } else {
+        templateLogin(x);
       }
     }
+  }
 
-    templateLogin(x);
+  public Cookie getCookie(HttpServletRequest req) {
+    Cookie[] cookies = req.getCookies();
+
+    if ( cookies != null )
+      for ( Cookie cookie : cookies )
+        if ( cookie.getName().toString().equals(SESSION_ID) )
+          return cookie;
+
+    return null;
   }
 
   public void templateLogin(X x) {
-    PrintWriter        out         = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletRequest req         = (HttpServletRequest) x.get(HttpServletRequest.class);
-    String             emailReq    = req.getParameter("email");
-    String             passwordReq = req.getParameter("password");
+    PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
 
     out.println("<form method=post>");
     out.println("<h1>Login</h1>");
     out.println("<br>");
-    out.println("<label>Email:</label>");
-    out.println("<input name=\"email\" type=\"string\" style=\"width:100px;display:inline-block;\"></input>");
+    out.println("<label style=\"display:inline-block;width:70px;\">Email:</label>");
+    out.println("<input name=\"email\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
     out.println("<br>");
-    out.println("<label>Password:</label>");
-    out.println("<input name=\"password\" type=\"password\" style=\"width:100px;display:inline-block;\"></input>");
+    out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
+    out.println("<input name=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
     out.println("<br>");
     out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
     out.println("</form>");
-    attemptLogin(x, emailReq, passwordReq);
   }
 
-  public void attemptLogin(X x, String email, String password){
+  public boolean attemptLogin(X x) {
+    HttpServletRequest req        = (HttpServletRequest) x.get(HttpServletRequest.class);
+    String             email      = req.getParameter("email");
+    String             password   = req.getParameter("password");
     AuthService        auth       = (AuthService) x.get("auth");
     PrintWriter        out        = (PrintWriter) x.get(PrintWriter.class);
     Session            session    = new Session();
     DAO                sessionDAO = (DAO) x.get("sessionDAO");
 
-    try {
-      x = x.put(Session.class, session);
-      session.setContext(x);
+    if ( SafetyUtil.isEmpty(email) || SafetyUtil.isEmpty(password) ) return false;
 
-      User user = (User) auth.loginByEmail(x, email, password);
+    try {
+
+      User user = (User) auth.loginByEmail(session.getContext(), email, password);
       if ( user != null ) {
-        sessionDAO.put(session);
-        createCookie(session, x);
-      } else {
-        out.println("Authentication failure.");
+        createCookie(x, session);
+        return true;
       }
     } catch (Throwable t) {
-      out.println("Authentication failure.");
       t.printStackTrace();
     }
+
+    out.println("Authentication failure.");
+
+    return false;
   }
 
-  public void createCookie(Session session, X x){
-    HttpServletResponse resp    = (HttpServletResponse) x.get(HttpServletResponse.class);
-    PrintWriter         out     = (PrintWriter) x.get(PrintWriter.class);
-    Cookie              cookie  = new Cookie(SESSION_ID, session.getId());
+  public void createCookie(X x, Session session){
+    HttpServletResponse resp   = (HttpServletResponse) x.get(HttpServletResponse.class);
+    PrintWriter         out    = (PrintWriter)         x.get(PrintWriter.class);
+    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
 
     resp.addCookie(cookie);
     out.println("<script>");
