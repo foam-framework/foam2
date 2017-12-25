@@ -39,7 +39,7 @@ public class FObjectParser
 
             throw new RuntimeException("No class specified in JSON and no defaultClass available.");
           }
-        } catch(ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
           throw new RuntimeException(e);
         }
 
