@@ -16,6 +16,10 @@ public class ProxyIndex
 {
   protected Index delegate_;
 
+  public ProxyIndex() {
+
+  }
+
   public ProxyIndex(Index index) {
     setDelegate(index);
   }
