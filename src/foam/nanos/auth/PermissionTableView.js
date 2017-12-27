@@ -4,13 +4,13 @@ foam.CLASS({
   extends: 'foam.u2.Element',
 
   imports: [
+    'auth',
     'groupDAO',
-    'permissionDAO',
-    'auth'
+    'permissionDAO'
   ],
 
   requires: [
-    "foam.nanos.auth.Permission"
+    'foam.nanos.auth.Permission'
   ],
 
   css: `
