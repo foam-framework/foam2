@@ -73,5 +73,5 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
-  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
+  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
 ]);
