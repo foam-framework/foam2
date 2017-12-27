@@ -29,7 +29,7 @@ public class AuthWebAgent
     setDelegate(delegate);
     permission_ = permission;
   }
-  
+
   public void execute(X x) {
     HttpServletRequest  req        = (HttpServletRequest) x.get(HttpServletRequest.class);
     HttpServletResponse resp       = (HttpServletResponse) x.get(HttpServletResponse.class);
@@ -50,10 +50,10 @@ public class AuthWebAgent
           Boolean sessionCheck = null;
 
           if ( session != null ){
-        
+
             if ( session.getContext() != null ){
               sessionCheck = auth.check(session.getContext(), permission_);
-              
+
               if ( sessionCheck == true ) {
                 getDelegate().execute(session.getContext());
               }
@@ -83,7 +83,10 @@ public class AuthWebAgent
     out.println("<br>");
     out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\";>Log In</button>");
     out.println("</form>");
-    attemptLogin(x, emailReq, passwordReq);
+
+    if ( !(emailReq.equals("") && passwordReq.equals("")) ) {
+      attemptLogin(x, emailReq, passwordReq);
+    }
   }
 
   public void attemptLogin(X x, String email, String password){
