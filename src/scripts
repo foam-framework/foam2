@@ -1,2 +1,3 @@
 p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
 p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","lastRun":"2017-09-29T16:23:47.978Z","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
+p({"class":"foam.nanos.script.Script","id":"createPermissions","description":"Create missing Permissions","server":false,"scheduled":false,"code":"x.groupDAO.select(function(g) {\nfor ( var i = 0 ; i < g.permissions.length ; i++ ) {\nx.permissionDAO.put(g.permissions[i]);\n}\n});","output":"","notes":""})
