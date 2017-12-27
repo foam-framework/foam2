@@ -24,10 +24,6 @@ foam.CLASS({
     'foam.box.LookupBox',
   ],
 
-  axioms: [
-    foam.pattern.Multiton.create({ property: 'name' })
-  ],
-
   properties: [
     {
       class: 'String',
@@ -85,5 +81,13 @@ if let index = name.range(of: "/", options: .backwards)?.lowerBound {
 return ""
       */},
     },
+  ],
+
+  // TODO: Java support has a bug where it can create MultitonInfo
+  // before property is defined, moving axiom to bottom of file is a
+  // hacky fix.
+  axioms: [
+    foam.pattern.Multiton.create({ property: 'name' })
   ]
+
 });

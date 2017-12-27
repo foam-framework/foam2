@@ -1,9 +1,12 @@
 package foam.nanos.notification.email;
 
 import com.google.common.base.Optional;
+import foam.core.ContextAwareSupport;
+import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.Sink;
 import foam.dao.ListSink;
+import foam.nanos.auth.Group;
 import foam.nanos.notification.email.EmailTemplate;
 import foam.util.SafetyUtil;
 import org.jtwig.resource.loader.ResourceLoader;
@@ -16,42 +19,40 @@ import java.util.List;
 import static foam.mlang.MLang.*;
 
 public class DAOResourceLoader
+    extends ContextAwareSupport
     implements ResourceLoader
 {
-  public static EmailTemplate findTemplate(DAO dao, String templateName, String groupName) {
-    Sink list = new ListSink();
+  public static EmailTemplate findTemplate(X x, String name, String groupId) {
+    DAO groupDAO = (DAO) x.get("groupDAO");
+    DAO emailTemplateDAO = (DAO) x.get("emailTemplateDAO");
 
-    // if group is provided, query based on that
-    if ( ! SafetyUtil.isEmpty(groupName) ) {
-      list = dao.where(AND(
-          EQ(EmailTemplate.NAME, templateName),
-          EQ(EmailTemplate.GROUP, groupName))).limit(1).select(null);
-    }
+    do {
+      Sink sink = emailTemplateDAO.where(AND(
+          EQ(EmailTemplate.NAME, name),
+          EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+      )).limit(1).select(null);
 
-    List data = ((ListSink) list).getData();
+      List data = ((ListSink) sink).getData();
+      if ( data != null && data.size() == 1 ) {
+        return (EmailTemplate) data.get(0);
+      }
 
-    // if data is empty use wildcard group
-    if ( data.size() == 0 ) {
-      list = dao.where(AND(
-          EQ(EmailTemplate.NAME,  templateName),
-          EQ(EmailTemplate.GROUP, "*"))).limit(1).select(null);
-      data = ((ListSink) list).getData();
-    }
+      Group group = (Group) groupDAO.find(groupId);
+      if ( group == null ) {
+        return null;
+      }
 
-    // if data is still empty then return null
-    if ( data.size() == 0 ) {
-      return null;
-    }
+      groupId = group.getParent();
+    } while ( ! SafetyUtil.isEmpty(groupId) );
 
-    return (EmailTemplate) data.get(0);
+    return null;
   }
 
-  protected DAO dao_;
-  protected String groupName_;
+  protected String groupId_;
 
-  public DAOResourceLoader(DAO dao, String groupName) {
-    dao_ = dao;
-    groupName_ = groupName;
+  public DAOResourceLoader(X x, String groupId) {
+    setX(x);
+    this.groupId_ = groupId;
   }
 
   @Override
@@ -61,8 +62,7 @@ public class DAOResourceLoader
 
   @Override
   public InputStream load(String s) {
-    EmailTemplate template = DAOResourceLoader.findTemplate(dao_, s, groupName_);
-
+    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, this.groupId_);
     return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
