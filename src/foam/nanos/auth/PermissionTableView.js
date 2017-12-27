@@ -55,7 +55,7 @@ foam.CLASS({
             .select(self.groupDAO, function(g) {
               var cb = foam.u2.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-              this.start('td').style({'text-align': 'center', 'width': '130', 'margin-bottom': '30'}).tag(cb).end(); //style({'text-align': 'text-align', 'width': '130'})
+              this.start('td').style({'text-align': 'center', 'width': '130', 'margin-bottom': '30'}).tag(cb).end();
             })
           .end()
         })
