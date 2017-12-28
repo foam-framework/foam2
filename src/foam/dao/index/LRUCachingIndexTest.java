@@ -17,6 +17,7 @@ import static org.apache.commons.text.CharacterPredicates.LETTERS;
 public class LRUCachingIndexTest {
 
   protected static final int SAMPLE_SIZE = 1000000;
+  protected static Object[] wrapped = new Object[SAMPLE_SIZE];
   protected static String[] samples = new String[SAMPLE_SIZE];
   protected static RandomStringGenerator generator =
       new RandomStringGenerator.Builder()
@@ -25,6 +26,13 @@ public class LRUCachingIndexTest {
           .build();
 
   public static void main(String[] args) throws IOException {
+    long startTotal;
+    long endTotal;
+
+    long start;
+    long end;
+    long duration;
+
     // generate random strings of length 50
     for ( int i = 0; i < SAMPLE_SIZE; i++ ) {
       samples[i] = generator.generate(50);
@@ -32,15 +40,26 @@ public class LRUCachingIndexTest {
 
     LRUCachingIndex index = new LRUCachingIndex(1000000,
         new PersistedIndex("test", new TreeIndex(Country.CODE)));
-    long start = System.nanoTime();
+    startTotal = start = System.nanoTime();
 
     for ( int i = 0; i < SAMPLE_SIZE; i++ ) {
-      index.wrap(samples[i]);
+      wrapped[i] = index.wrap(samples[i]);
     }
 
-    long end = System.nanoTime();
-    long duration = (end - start);
-    System.out.println("Duration is " + (((double) duration) / 1000000000.0) + " seconds");
-  }
+    end = System.nanoTime();
+    duration = ( end - start );
+    System.out.println("Wrapping took " + (((double) duration) / 1000000000.0) + " seconds");
 
+    start = System.nanoTime();
+
+    for ( int i = 0; i < SAMPLE_SIZE; i++ ) {
+      index.unwrap(wrapped[i]);
+    }
+
+    endTotal = end = System.nanoTime();
+    duration = ( end - start );
+    System.out.println("Unwrapping took " + (((double) duration) / 1000000000.0) + " seconds");
+    duration = ( endTotal - startTotal );
+    System.out.println("Total duration: " + (((double) duration) / 1000000000.0) + " seconds");
+  }
 }
