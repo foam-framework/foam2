@@ -29,7 +29,6 @@ public class LRUCachingIndex
     cache.setPrev(head_);
     head_.setNext(cache);
 
-    size_ += 1;
     // remove oldest entry
     if ( size_ >= maxSize_ ) {
       LRUCachingState toRemove = tail_.getPrev();
@@ -37,7 +36,8 @@ public class LRUCachingIndex
       prev.setNext(tail_);
       tail_.setPrev(prev);
       toRemove.setValue(null);
-      size_ -= 1;
+    } else {
+      size_++;
     }
 
     return cache;
