@@ -48,7 +48,7 @@ public class LRUCachingIndexTest {
 
     end = System.nanoTime();
     duration = ( end - start );
-    System.out.println("Wrapping took " + (((double) duration) / 1000000000.0) + " seconds");
+    System.out.println("Wrapping took: " + (((double) duration) / 1000000000.0) + " seconds");
 
     start = System.nanoTime();
 
@@ -58,7 +58,7 @@ public class LRUCachingIndexTest {
 
     endTotal = end = System.nanoTime();
     duration = ( end - start );
-    System.out.println("Unwrapping took " + (((double) duration) / 1000000000.0) + " seconds");
+    System.out.println("Unwrapping took: " + (((double) duration) / 1000000000.0) + " seconds");
     duration = ( endTotal - startTotal );
     System.out.println("Total duration: " + (((double) duration) / 1000000000.0) + " seconds");
   }
