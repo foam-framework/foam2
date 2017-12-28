@@ -11,7 +11,7 @@ public class LRUCachingIndex
 {
   protected LRUCachingState head_;
   protected LRUCachingState tail_;
-  
+
   public LRUCachingIndex(Index index) {
     setDelegate(index);
   }
