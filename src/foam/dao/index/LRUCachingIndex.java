@@ -46,7 +46,7 @@ public class LRUCachingIndex
   public Object unwrap(Object state) {
     LRUCachingState cache = (LRUCachingState) state;
     if ( cache.getValue() == null ) {
-      cache.setValue(getDelegate().unwrap(state));
+      cache.setValue(getDelegate().unwrap(cache.getKey()));
     }
 
     // get previous node of cached node
