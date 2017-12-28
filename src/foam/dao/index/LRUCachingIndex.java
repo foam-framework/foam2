@@ -9,8 +9,8 @@ package foam.dao.index;
 public class LRUCachingIndex
     extends ProxyIndex
 {
-  protected LRUCachingState head_;
-  protected LRUCachingState tail_;
+  protected LRUCachingState head_ = new LRUCachingState();
+  protected LRUCachingState tail_ = new LRUCachingState();
 
   public LRUCachingIndex(Index index) {
     setDelegate(index);
@@ -18,6 +18,8 @@ public class LRUCachingIndex
 
   @Override
   public Object wrap(Object state) {
+    LRUCachingState cache = new LRUCachingState(state, getDelegate().wrap(state));
+
     return state;
   }
 
@@ -44,12 +46,8 @@ public class LRUCachingIndex
     }
 
     // set cached node to be head
-    cache.setPrev(null);
-    cache.setNext(head_);
-    if ( head_ != null ) {
-      head_.setPrev(cache);
-    }
-    head_ = cache;
+    cache.setPrev(head_);
+    head_.setNext(cache);
     return cache.getValue();
   }
 }
