@@ -60,6 +60,5 @@ public class LRUCachingState {
   public void remove() {
     if ( this.prev_ != null ) this.prev_.setNext(this.next_);
     if ( this.next_ != null ) this.next_.setPrev(this.prev_);
-    this.value_ = null;
   }
 }
