@@ -14,7 +14,10 @@ import foam.mlang.sink.Count;
 import java.util.Arrays;
 import foam.mlang.order.Desc;
 
-public class TreeIndex implements Index {
+public class TreeIndex
+  extends AbstractIndex
+{
+
   protected Index tail_;
   protected PropertyInfo prop_;
   protected long selectCount_;
