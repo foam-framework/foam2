@@ -14,13 +14,17 @@ public class LRUCachingIndex
 
   public LRUCachingIndex(Index index) {
     setDelegate(index);
+    head_.setNext(tail_);
+    tail_.setPrev(head_);
   }
 
   @Override
   public Object wrap(Object state) {
     LRUCachingState cache = new LRUCachingState(state, getDelegate().wrap(state));
-
-    return state;
+    cache.setNext(head_.getNext());
+    cache.setPrev(head_);
+    head_.setNext(cache);
+    return cache;
   }
 
   public Object unwrap(Object state) {

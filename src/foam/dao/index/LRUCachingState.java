@@ -19,14 +19,10 @@ public class LRUCachingState {
   }
 
   public LRUCachingState(Object key, Object value) {
-    this(key, value, null, null);
-  }
-
-  public LRUCachingState(Object key, Object value, LRUCachingState next, LRUCachingState prev) {
     this.key_ = key;
     this.value_ = value;
-    this.next_ = next;
-    this.prev_ = prev;
+    this.next_ = null;
+    this.prev_ = null;
   }
 
   public Object getKey() {
@@ -45,11 +41,19 @@ public class LRUCachingState {
     this.value_ = value;
   }
 
-  public void setNext(foam.dao.index.LRUCachingState next) {
+  public LRUCachingState getNext() {
+    return this.next_;
+  }
+
+  public void setNext(LRUCachingState next) {
     this.next_ = next;
   }
 
-  public void setPrev(foam.dao.index.LRUCachingState prev) {
+  public LRUCachingState getPrev() {
+    return this.prev_;
+  }
+
+  public void setPrev(LRUCachingState prev) {
     this.prev_ = prev;
   }
 }
