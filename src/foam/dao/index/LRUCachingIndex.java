@@ -63,6 +63,7 @@ public class LRUCachingIndex
 
     // set cached node to be head
     cache.setPrev(head_);
+    cache.setNext(head_.getNext());
     head_.setNext(cache);
     return cache.getValue();
   }
