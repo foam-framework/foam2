@@ -31,11 +31,7 @@ public class LRUCachingIndex
 
     // remove oldest entry
     if ( size_ >= maxSize_ ) {
-      LRUCachingState toRemove = tail_.getPrev();
-      LRUCachingState prev = toRemove.getPrev();
-      prev.setNext(tail_);
-      tail_.setPrev(prev);
-      toRemove.setValue(null);
+      tail_.getPrev().remove();
     } else {
       size_++;
     }
