@@ -9,8 +9,6 @@ package foam.dao.index;
 public class LRUCachingIndex
     extends ProxyIndex
 {
-  public static long
-
   protected int size_ = 0;
   protected final int maxSize;
 
