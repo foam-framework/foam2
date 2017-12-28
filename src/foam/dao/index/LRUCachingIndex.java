@@ -10,7 +10,7 @@ public class LRUCachingIndex
     extends ProxyIndex
 {
   protected int size_ = 0;
-  protected final int maxSize;
+  protected final int maxSize_;
 
   protected LRUCachingState head_ = new LRUCachingState();
   protected LRUCachingState tail_ = new LRUCachingState();
@@ -19,7 +19,7 @@ public class LRUCachingIndex
     setDelegate(index);
     this.head_.setNext(tail_);
     this.tail_.setPrev(head_);
-    this.maxSize = maxSize;
+    this.maxSize_ = maxSize;
   }
 
   @Override
@@ -31,9 +31,9 @@ public class LRUCachingIndex
 
     size_ += 1;
     // remove oldest entry
-    if ( size_ >= maxSize ) {
-      LRUCachingIndex toRemove = tail_.getPrev();
-      LRUCachingIndex prev = toRemove.getPrev();
+    if ( size_ >= maxSize_ ) {
+      LRUCachingState toRemove = tail_.getPrev();
+      LRUCachingState prev = toRemove.getPrev();
       prev.setNext(tail_);
       tail_.setPrev(prev);
       toRemove.setValue(null);
