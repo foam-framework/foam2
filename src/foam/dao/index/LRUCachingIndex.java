@@ -24,7 +24,7 @@ public class LRUCachingIndex
 
   @Override
   public Object wrap(Object state) {
-    LRUCachingState cache = new LRUCachingState(state, getDelegate().wrap(state));
+    LRUCachingState cache = new LRUCachingState(getDelegate().wrap(state), state);
     cache.setNext(head_.getNext());
     cache.setPrev(head_);
     head_.setNext(cache);
