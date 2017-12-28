@@ -53,17 +53,13 @@ public class LRUCachingIndex
     // set the next node of the previous node
     // to the next node of the cached node
     LRUCachingState prev = cache.getPrev();
-    if ( prev != null ) {
-      prev.setNext(cache.getNext());
-    }
+    prev.setNext(cache.getNext());
 
     // get next node of cached node
     // set the prev node of the next node
     // to the prev node of the cached node
     LRUCachingState next = cache.getNext();
-    if ( next != null ) {
-      next.setPrev(cache.getPrev());
-    }
+    next.setPrev(cache.getPrev());
 
     // set cached node to be head
     cache.setPrev(head_);
