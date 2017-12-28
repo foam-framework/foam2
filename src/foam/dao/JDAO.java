@@ -37,14 +37,8 @@ public class JDAO
   };
 
   protected final File           file_;
-  protected final Outputter      outputter_    = new Outputter(OutputterMode.STORAGE);
+  protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
-  protected final StringWriter   stringWriter_ = new StringWriter();
-  protected final PrintWriter    writer_       = new PrintWriter(stringWriter_);
-
-  public JDAO(ClassInfo classInfo) throws IOException {
-    this(new MapDAO().setOf(classInfo), null);
-  }
 
   public JDAO(ClassInfo classInfo, String filename)
       throws IOException
@@ -53,10 +47,6 @@ public class JDAO
   }
 
   public JDAO(DAO delegate, String filename) throws IOException {
-    if ( SafetyUtil.isEmpty(filename) ) {
-      filename = "jDaoTemp";
-    }
-
     file_ = new File(filename).getAbsoluteFile();
 
     if ( ! file_.exists() ) file_.createNewFile();
@@ -148,13 +138,9 @@ public class JDAO
     try {
       // TODO(drish): supress class name from output
       writeComment((User) x.get("user"));
-
       out_.write("p(" + outputter_.stringify(obj) + ")");
       out_.newLine();
       out_.flush();
-
-      writer_.append("p(" + outputter_.stringify(obj) + ")");
-      writer_.append("\n");
     } catch (Throwable e) {
       e.printStackTrace();
     }
@@ -191,10 +177,5 @@ public class JDAO
 
     getDelegate().select_(x, new RemoveSink(this), skip, limit, order, predicate);
     getDelegate().removeAll_(x, skip, limit, order, predicate);
-  }
-
-  @Override
-  public String toString() {
-    return ( stringWriter_ != null ) ? stringWriter_.toString() : null;
   }
 }
