@@ -22,6 +22,24 @@ public class LRUCachingIndex
   }
 
   public Object unwrap(Object state) {
-    return state;
+    LRUCachingState cache = (LRUCachingState) state;
+    if ( cache.getValue() == null ) {
+      cache.setValue(getDelegate().unwrap(state));
+    }
+
+    // get previous node of cached node
+    // set the next node of the previous node
+    // to the next node of the cached node
+    LRUCachingState prev = cache.getPrev();
+    if ( prev != null ) {
+      prev.setNext(cache.getNext());
+    }
+
+    // set cached node to be head
+    cache.setPrev(null);
+    cache.setNext(head_);
+    head_.setPrev(cache);
+    head_ = cache;
+    return cache.getValue();
   }
 }
