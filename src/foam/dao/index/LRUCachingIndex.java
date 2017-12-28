@@ -9,13 +9,19 @@ package foam.dao.index;
 public class LRUCachingIndex
     extends ProxyIndex
 {
+  public static long
+
+  protected int size_ = 0;
+  protected final int maxSize;
+
   protected LRUCachingState head_ = new LRUCachingState();
   protected LRUCachingState tail_ = new LRUCachingState();
 
-  public LRUCachingIndex(Index index) {
+  public LRUCachingIndex(int maxSize, Index index) {
     setDelegate(index);
-    head_.setNext(tail_);
-    tail_.setPrev(head_);
+    this.head_.setNext(tail_);
+    this.tail_.setPrev(head_);
+    this.maxSize = maxSize;
   }
 
   @Override
@@ -24,6 +30,18 @@ public class LRUCachingIndex
     cache.setNext(head_.getNext());
     cache.setPrev(head_);
     head_.setNext(cache);
+
+    size_ += 1;
+    // remove oldest entry
+    if ( size_ >= maxSize ) {
+      LRUCachingIndex toRemove = tail_.getPrev();
+      LRUCachingIndex prev = toRemove.getPrev();
+      prev.setNext(tail_);
+      tail_.setPrev(prev);
+      toRemove.setValue(null);
+      size_ -= 1;
+    }
+
     return cache;
   }
 
