@@ -37,4 +37,4 @@ p({"class":"foam.nanos.boot.NSpec", "name":"authy",                       "lazy"
 p({"class":"foam.nanos.boot.NSpec", "name":"httpBlobService",             "lazy":true,  "serve":false, "serviceClass":"foam.nanos.blob.HttpBlobService"})
 p({"class":"foam.nanos.boot.NSpec", "name":"blobService",                 "lazy":true,  "serve":true,  "serviceClass":"foam.nanos.blob.HttpBlobService", client: "{ \"class\":\"foam.blob.RestBlobService\" }"})
 p({"class":"foam.nanos.boot.NSpec", "name":"blobStore",                   "lazy":true,  "serve":false, "serviceClass":"foam.blob.BlobStore","service":{"class":"foam.blob.BlobStore","root":"","isSet":false}})
-p({"class":"foam.nanos.boot.NSpec", "name":"appConfig",                   "lazy":false, "serve":false, "service":{"class":"foam.nanos.app.AppConfig","url":"http://localhost:8080/"}})
+p({"class":"foam.nanos.boot.NSpec", "name":"appConfig",                   "lazy":false, "serve":false, "service":{"class":"foam.nanos.app.AppConfig","url":"http://localhost:8080"}})
