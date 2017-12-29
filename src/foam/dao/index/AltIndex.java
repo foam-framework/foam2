@@ -12,7 +12,9 @@ import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
-public class AltIndex implements Index {
+public class AltIndex
+  extends AbstractIndex
+{
 
   public final static int GOOD_ENOUGH_PLAN_COST = 10;
 
