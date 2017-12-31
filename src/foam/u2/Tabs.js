@@ -67,8 +67,7 @@ foam.CLASS({
       position: relative;
       top: -13px;
     }
-    `
-  ],
+  `,
 
   properties: [
     /* not used
