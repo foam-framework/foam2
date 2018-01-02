@@ -12,8 +12,8 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import static foam.dao.AbstractDAO.decorateSink_;
-import foam.mlang.predicate.Binary;
 import foam.mlang.predicate.True;
+import foam.mlang.sink.GroupBy;
 
 public class TreeNode {
 
@@ -381,6 +381,44 @@ public class TreeNode {
     if ( right != null ) {
       select_(right, sink, skip, limit, size, tail);
     }
+  }
+
+  protected long[] groupBy(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
+    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
+    long currentSize = currentNode.size;
+    TreeNode left = currentNode.getLeft();
+    long leftSize = 0;
+    long[] skip_limit = new long[]{skip, limit}; //skip_limit[0]: skip, skip_limit[1]: limit
+    if ( left != null ) {
+      leftSize = left.size;
+      if ( leftSize > skip ) {
+        skip_limit = groupBy(left, sink, skip_limit[0], skip_limit[1], size, tail);
+      } else if ( leftSize == skip ) skip_limit[0] = 0;
+      else {
+        skip_limit[0] = skip_limit[0] - leftSize;
+      }
+    }
+    Object value = currentNode.getValue();
+    if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
+      if ( sink instanceof GroupBy ) {
+        Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).fclone();
+        tail.planSelect(value, temp, skip_limit[0], skip_limit[1], null, null).select(value, temp, skip_limit[0], skip_limit[1], null, null);
+        ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);
+      } else {
+        tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
+      }
+      skip_limit[0] = 0;
+      skip_limit[1] = skip_limit[1] - ( tail.size(currentNode) - skip_limit[0] );
+    } else if ( tail.size(currentNode) == skip_limit[0] ) {
+      skip_limit[0] = 0;
+    } else {
+      skip_limit[0] = skip_limit[0] - tail.size(currentNode);
+    }
+    TreeNode right = currentNode.getRight();
+    if ( right != null ) {
+      skip_limit = groupBy(right, sink, skip_limit[0], skip_limit[1], size, tail);
+    }
+    return skip_limit;
   }
 
   protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
