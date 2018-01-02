@@ -219,9 +219,9 @@ public class Outputter
       Object value = prop.get(o);
       if ( value == null ) continue;
 
-      // if ( ! prop.isSet(o) ) {
-      //   continue;
-      // }
+      if ( ! prop.isSet(o) ) {
+        continue;
+      }
       writer_.append(",");
       outputProperty(o, prop);
     }
