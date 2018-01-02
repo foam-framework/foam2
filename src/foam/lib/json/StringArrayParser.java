@@ -22,4 +22,17 @@ public class StringArrayParser
       new Whitespace(),
       new Literal("]")));
   }
+
+  public PStream parse(PStream ps, ParserContext x) {
+    ps = super.parse(ps, x);
+    if ( ps == null ) {
+      return null;
+    }
+    Object[] objs = (Object[]) ps.value();
+    String[] str = new String[objs.length];
+    for ( int i = 0 ; i < objs.length ; i++ ) {
+      str[i] = (String) objs[i];
+    }
+    return ps.setValue(str);
+  }
 }
