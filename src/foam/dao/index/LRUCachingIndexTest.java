@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao.index;
 
 import foam.nanos.auth.Country;
@@ -8,7 +14,7 @@ import java.io.IOException;
 import static org.apache.commons.text.CharacterPredicates.DIGITS;
 import static org.apache.commons.text.CharacterPredicates.LETTERS;
 
-public class PersistedIndexTest {
+public class LRUCachingIndexTest {
 
   protected static final int SAMPLE_SIZE = 1000000;
   protected static Object[] wrapped = new Object[SAMPLE_SIZE];
@@ -32,7 +38,8 @@ public class PersistedIndexTest {
       samples[i] = generator.generate(50);
     }
 
-    PersistedIndex index = new PersistedIndex("test", new TreeIndex(Country.CODE));
+    LRUCachingIndex index = new LRUCachingIndex(1000000,
+        new PersistedIndex("test", new TreeIndex(Country.CODE)));
     startTotal = start = System.nanoTime();
 
     for ( int i = 0; i < SAMPLE_SIZE; i++ ) {
@@ -40,7 +47,7 @@ public class PersistedIndexTest {
     }
 
     end = System.nanoTime();
-    duration = (end - start);
+    duration = ( end - start );
     System.out.println("Wrapping took: " + (((double) duration) / 1000000000.0) + " seconds");
 
     start = System.nanoTime();

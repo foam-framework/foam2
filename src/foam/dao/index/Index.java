@@ -21,6 +21,8 @@ public interface Index {
   public FindPlan planFind(Object state, Object key);
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate);
   public long size(Object state);
+  public Object wrap(Object state);
+  public Object unwrap(Object state);
 
   // Future:
   // toString()
