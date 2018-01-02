@@ -58,6 +58,17 @@ public class MLang
     return new And(args);
   }
 
+  public static Sink GROUPBY(Object o1, Object o2) {
+    GroupBy groupBy = new GroupBy();
+    groupBy.setArg1((Expr) o1);
+    groupBy.setArg2((Sink) o2);
+    return groupBy;
+  }
+
+  public static Sink COUNT() {
+    return new Count();
+  }
+
   public static Predicate OR(Predicate... args) {
     return new Or(args);
   }

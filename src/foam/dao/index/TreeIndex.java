@@ -12,7 +12,7 @@ import foam.mlang.predicate.Binary;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.Count;
 import java.util.Arrays;
-import foam.mlang.order.Desc;
+import foam.mlang.sink.GroupBy;
 
 public class TreeIndex
   extends AbstractIndex
@@ -136,6 +136,8 @@ public class TreeIndex
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
+    if ( predicate == null && sink instanceof GroupBy )
+      return new GroupByPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
     return new ScanPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
   }
 
