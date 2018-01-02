@@ -24,7 +24,7 @@ public abstract class AbstractFObject
     try {
       FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-      for( PropertyInfo pi : props ) {
+      for ( PropertyInfo pi : props ) {
         pi.set(ret, pi.get(this));
       }
       return ret;
@@ -60,7 +60,7 @@ public abstract class AbstractFObject
 
     int result;
     while ( i.hasNext() ) {
-      result = ((PropertyInfo)i.next()).compare(this, o);
+      result = ((PropertyInfo) i.next()).compare(this, o);
       if ( result != 0 ) return result;
     }
 
@@ -69,7 +69,7 @@ public abstract class AbstractFObject
 
   public FObject setProperty(String prop, Object value) {
     PropertyInfo property = ((PropertyInfo) getClassInfo().getAxiomByName(prop));
-    if (property != null) property.set(this, value);
+    if ( property != null ) property.set(this, value);
     return this;
   }
 
@@ -84,8 +84,7 @@ public abstract class AbstractFObject
   }
 
   public boolean hasDefaultValue(String prop) {
-    if ( ! this.isPropertySet(prop) )
-      return true;
+    if ( ! this.isPropertySet(prop) ) return true;
     PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
     return property != null && property.isDefaultValue(this);
   }
