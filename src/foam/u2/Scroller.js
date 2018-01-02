@@ -43,6 +43,24 @@ foam.CLASS({
     'window'
   ],
 
+  css: `
+    ^ {
+      display: flex;
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    ^container {
+      flex-grow: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    ^ canvas {
+      align-self: flex-start;
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+  `,
+
   properties: [
     {
       name: 'of',
@@ -90,7 +108,7 @@ foam.CLASS({
       this.onDAOUpdate();
 
       this.scrollBar = this.createChild_(this.scrollView, {
-        value$: this.scrollValue_$,
+        value$:  this.scrollValue_$,
         extent$: this.scrollExtent_$,
         height$: this.scrollHeight_$
       });
@@ -121,6 +139,7 @@ foam.CLASS({
         self.onResize();
         self.window.addEventListener('resize', self.onResize);
       });
+
       this.onunload.sub(function() {
         self.window.removeEventListener('resize', self.onResize);
       });
@@ -150,27 +169,5 @@ foam.CLASS({
         });
       }
     }
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          display: flex;
-          flex-grow: 1;
-          overflow: hidden;
-        }
-        ^container {
-          flex-grow: 1;
-          overflow-x: auto;
-          overflow-y: hidden;
-        }
-        ^ canvas {
-          align-self: flex-start;
-          flex-grow: 0;
-          flex-shrink: 0;
-        }
-      */}
-    })
   ]
 });
