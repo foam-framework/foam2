@@ -10,7 +10,9 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-public class ValueIndex implements Index {
+public class ValueIndex
+  extends AbstractIndex
+{
 
   protected static ValueIndex instance_ = new ValueIndex();
 

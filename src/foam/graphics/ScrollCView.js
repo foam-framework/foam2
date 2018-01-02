@@ -78,8 +78,9 @@ foam.CLASS({
       class: 'Float',
       name: 'handleSize',
       expression: function(minHandleSize, size, extent, height, innerBorder) {
-        var h = height - 2 * innerBorder;
+        var h  = height - 2 * innerBorder;
         var hs = size > 0 ? extent * h / size : 0;
+
         return hs < minHandleSize ? minHandleSize : hs;
       }
     },
@@ -116,6 +117,8 @@ foam.CLASS({
   methods: [
     function initCView() {
       this.canvas.pointer.touch.sub(this.onTouch);
+
+      // mouseEvent is bound in ScrollTableView
       this.onDetach(this.mouseEvent$.sub(this.updateScrollFromEvent));
     },
 
@@ -160,7 +163,8 @@ foam.CLASS({
       name: 'updateScrollFromEvent',
       code: function(mouseEvent) {
         if ( ! mouseEvent || ! mouseEvent.src || ! mouseEvent.src.oldValue ) return;
-        var p = foam.graphics.Point.create();
+
+        var p     = foam.graphics.Point.create();
         var event = mouseEvent.src.oldValue;
 
         p.x = event.clientX;
