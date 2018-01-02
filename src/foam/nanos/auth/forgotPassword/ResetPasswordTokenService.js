@@ -83,7 +83,7 @@ HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
 args.put("link", appConfig.getUrl() + "resetPassword.html?token=" + token.getData() + "#reset");
 
-email.sendEmailFromTemplate(user, message, "reset-password-mintchip", args);
+email.sendEmailFromTemplate(user, message, "reset-password", args);
 return true;
 }catch(Exception e){
   e.printStackTrace();
