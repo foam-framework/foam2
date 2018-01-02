@@ -50,13 +50,14 @@ public class AuthWebAgent
       if ( session != null && session.getContext() != null ) {
         if ( auth.check(session.getContext(), permission_) ) {
           getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+          return;
         } else {
           out.println("Access denied. Need permission: " + permission_);
         }
-      } else {
-        templateLogin(x);
       }
     }
+
+    templateLogin(x);
   }
 
   public Cookie getCookie(HttpServletRequest req) {
