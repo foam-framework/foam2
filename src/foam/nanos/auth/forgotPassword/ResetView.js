@@ -17,8 +17,6 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.User',
     'foam.u2.dialog.NotificationMessage',
-    
-
   ],
 
   css:`
