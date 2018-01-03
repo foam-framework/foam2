@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.auth.forgotPassword',
+  package: 'foam.nanos.auth.resetPassword',
   name: 'ResetView',
   extends: 'foam.u2.View',
 
@@ -246,7 +246,7 @@ foam.CLASS({
         });
 
         this.resetPasswordToken.processToken(user, this.token).then(function (result) {
-          self.stack.push({ class: 'foam.nanos.auth.forgotPassword.SuccessView' });
+          self.stack.push({ class: 'foam.nanos.auth.resetPassword.SuccessView' });
         }).catch(function (err) {
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
         });

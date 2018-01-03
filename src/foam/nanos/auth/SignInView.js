@@ -133,7 +133,7 @@ foam.CLASS({
           })
           .start('p').style({ 'margin-left': '150px' }).addClass('link')		
             .add("Forgot Password?")		
-            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.forgotPassword.EmailView' })})		
+            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})		
           .end()
         .end()
       .end();

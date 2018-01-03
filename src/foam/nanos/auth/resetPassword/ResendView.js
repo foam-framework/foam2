@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.auth.forgotPassword',
+  package: 'foam.nanos.auth.resetPassword',
   name: 'ResendView',
   extends: 'foam.u2.View',
 

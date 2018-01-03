@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.auth.forgotPassword',
+  package: 'foam.nanos.auth.resetPassword',
   name: 'ResetPasswordController',
   extends: 'foam.u2.Controller',
   implements:[
@@ -72,7 +72,7 @@ foam.CLASS({
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end();
-        this.stack.push({ class: 'foam.nanos.auth.forgotPassword.ResetView' });
+        this.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
       },
   ]
   });
