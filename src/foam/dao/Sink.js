@@ -707,28 +707,43 @@ foam.CLASS({
     { class: 'foam.dao.DAOProperty', name: 'dao' },
   ],
 
+  axioms: [
+    {
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
+  ],
+
   methods: [
     {
       name: 'put',
       code: function(o) {
         this.dao.put(o);
-      }
+      },
+      javaCode: `getDao().put(obj);`,
+      swiftCode: '_ = try? dao?.put(obj)',
     },
     {
       name: 'remove',
       code: function(o) {
         this.dao.remove(o);
-      }
+      },
+      javaCode: `getDao().remove(obj);`,
+      swiftCode: '_ = try? dao?.remove(obj)',
     },
     {
       name: 'eof',
       code: function() {},
+      javaCode: ``,
+      swiftCode: '// NOOP',
     },
     {
       name: 'reset',
       code: function() {
         this.dao.removeAll();
-      }
+      },
+      javaCode: `getDao().removeAll();`,
+      swiftCode: '_ = try? dao?.removeAll()',
     }
   ]
 });

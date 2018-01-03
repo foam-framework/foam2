@@ -4,9 +4,9 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.http;
+package foam.core;
 
-public interface WebAgent
-  extends foam.core.ContextAgent
-{
+public interface XArgsFactory<T> {
+  public T getInstance(java.util.Map<String, Object> args, X x);
 }
+

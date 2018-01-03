@@ -5,6 +5,15 @@
  */
 foam.CLASS({
   package: 'foam.box',
+  name: 'HTTPException',
+  implements: [ 'foam.core.Exception' ],
+  properties: [
+    'response'
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'HTTPBox',
 
   implements: [ 'foam.box.Box' ],
@@ -24,6 +33,7 @@ foam.CLASS({
       name: 'Outputter',
       path: 'foam.json.Outputter',
       swiftPath: 'foam.swift.parse.json.output.Outputter',
+      javaPath: '',
     },
     'foam.box.HTTPReplyBox',
   ],
@@ -146,7 +156,9 @@ protected class ResponseThread implements Runnable {
         }).then(function(p) {
           var rmsg = this.parser.parseString(p);
           rmsg && replyBox && replyBox.send(rmsg);
-        }.bind(this));
+        }.bind(this), function(r) {
+          replyBox && replyBox.send(foam.box.Message.create({ object: foam.box.HTTPException.create({ response: r }) }));
+        });
       },
       swiftCode: function() {/*
 let replyBox = msg.attributes["replyBox"] as? Box

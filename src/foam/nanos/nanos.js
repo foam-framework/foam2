@@ -5,6 +5,9 @@
  */
 
 FOAM_FILES([
+  { name: "foam/nanos/app/AppConfig" },
+  { name: "foam/nanos/auth/DayOfWeek" },
+  { name: "foam/nanos/auth/Hours" },
   { name: "foam/nanos/auth/Address" },
   { name: "foam/nanos/auth/ChangePassword" },
   { name: "foam/nanos/auth/EnabledAware", flags: ['js'] },
@@ -20,6 +23,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Country" },
   { name: "foam/nanos/auth/Region" },
   { name: "foam/nanos/auth/Phone" },
+  { name: "foam/nanos/auth/SignOutView" },
+  { name: "foam/nanos/auth/ChangePasswordView"},
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/session/Session" },
@@ -34,6 +39,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/SubMenuView" },
   { name: "foam/nanos/menu/TabsMenu" },
   { name: "foam/nanos/menu/ViewMenu" },
+  { name: "foam/nanos/menu/TreeAltView" },
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/Script" },
   { name: "foam/nanos/test/Test" },
@@ -47,6 +53,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/Relationships" },
   { name: "foam/nanos/NanoService" },
   { name: "foam/nanos/auth/AuthService" },
+  { name: "foam/nanos/auth/ProxyAuthService" },
   { name: "foam/nanos/auth/ClientAuthService" },
   { name: "foam/nanos/pm/PMInfo" },
   { name: "foam/nanos/pm/PMTableView", flags:['web'] },
@@ -57,5 +64,5 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
-  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
+  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
 ]);

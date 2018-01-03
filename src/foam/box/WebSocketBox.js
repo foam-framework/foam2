@@ -67,7 +67,14 @@ foam.CLASS({
     function prepareURL(url) {
       /* Add window's origin if url is not complete. */
       if ( this.window && url.indexOf(':') == -1 ) {
-        return 'ws://' + this.window.location.hostname + ':' + ( Number.parseInt(this.window.location.port) + 1 ) + '/' + url;
+        var protocol = "ws://";
+        if ( this.window.location.protocol === "https:" ) {
+          protocol = "wss://";
+        }
+
+        return protocol + this.window.location.hostname +
+          ( this.window.location.port ? ':' + this.window.location.port : '' ) +
+          '/' + url;
       }
 
       return url;

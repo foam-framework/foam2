@@ -96,8 +96,15 @@ foam.CLASS({
     },
 
     function addSocket(socket) {
+      var socketBox = this.RawSocketBox.create({
+        socket: socket
+      })
+      var X = this.creationContext.createSubContext({
+        returnBox: socketBox,
+      });
+
       var s1 = socket.message.sub(function(s, _, mStr) {
-        var m = this.parser.parseString(mStr);
+        var m = this.parser.parseString(mStr, X);
 
         if ( ! this.Message.isInstance(m) ) {
           console.warn('Got non-message:', m, mStr);
@@ -108,9 +115,7 @@ foam.CLASS({
             name: m.name
           });
 
-          named.delegate = this.RawSocketBox.create({
-            socket: socket
-          });
+          named.delegate = socketBox;
           return;
         }
 

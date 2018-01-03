@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'DAOProperty',
-  extends: 'Property',
+  extends: 'FObjectProperty',
 
   documentation: 'Property for storing a reference to a DAO.',
 
@@ -28,7 +28,8 @@ foam.CLASS({
     {
       name: 'view',
       value: {class: 'foam.comics.InlineBrowserView'},
-    }
+    },
+    ['of', 'foam.dao.DAO']
   ],
 
   methods: [

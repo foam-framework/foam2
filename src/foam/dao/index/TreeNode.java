@@ -7,7 +7,13 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
-
+import foam.dao.AbstractDAO;
+import foam.dao.Sink;
+import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
+import static foam.dao.AbstractDAO.decorateSink_;
+import foam.mlang.predicate.Binary;
+import foam.mlang.predicate.True;
 
 public class TreeNode {
 
@@ -69,17 +75,17 @@ public class TreeNode {
   public TreeNode putKeyValue(TreeNode state, PropertyInfo prop, Object key,
     FObject value, Index tail) {
     if ( state == null || state.equals(TreeNode.getNullNode()) ) {
-      return new TreeNode(key, value, 1, 1, null, null);
+      return new TreeNode(key, tail.put(null, value), 1, 1, null, null);
     }
     state = maybeClone(state);
-    int r = prop.compare(state.value, value);
+    int r = prop.comparePropertyToValue(key,state.key);
 
     if ( r == 0 ) {
       state.size -= tail.size(state.value);
       state.value = tail.put(state.value, value);
       state.size += tail.size(state.value);
     } else {
-      if ( r > 0 ) {
+      if ( r < 0 ) {
         if ( state.left != null ) {
           state.size -= state.left.size;
         }
@@ -135,7 +141,7 @@ public class TreeNode {
     }
 
     state = maybeClone(state);
-    long compareValue = prop.compare(state.value, value);
+    long compareValue = prop.comparePropertyToValue(key,state.key);
 
     if ( compareValue == 0 ) {
       state.size -= tail.size(state.value);
@@ -153,7 +159,7 @@ public class TreeNode {
       TreeNode subs = isLeft ? predecessor(state) : successor(state);
       state.key = subs.key;
       state.value = subs.value;
-      if( isLeft ) {
+      if ( isLeft ) {
         state.left = removeNode(state.left, subs.value, prop);
       } else {
         state.right = removeNode(state.right, subs.value, prop);
@@ -184,23 +190,23 @@ public class TreeNode {
     return state;
   }
 
-  private TreeNode removeNode(TreeNode state, Object obj, PropertyInfo prop) {
+  private TreeNode removeNode(TreeNode state, Object key, PropertyInfo prop) {
     if ( state == null ) {
       return state;
     }
     state  = maybeClone(state);
-    long compareValue = prop.compare(state.value, obj);
+    long compareValue = prop.comparePropertyToValue(state.key, key);
 
     if ( compareValue == 0 ) {
       return state.left != null ? state.left : state.right;
     }
     if ( compareValue > 0 ) {
       state.size -= size(state.left);
-      state.left = removeNode(state.left, obj, prop);
+      state.left = removeNode(state.left, key, prop);
       state.size += size(state.left);
     } else {
       state.size -= size(state.right);
-      state.right = removeNode(state.right, obj, prop);
+      state.right = removeNode(state.right, key, prop);
       state.size += size(state.right);
     }
     return state;
@@ -255,28 +261,43 @@ public class TreeNode {
     return 0;
   }
 
-  public Object get(TreeNode s, Object key, PropertyInfo prop) {
+  public TreeNode get(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
     }
 
-    int r = prop.comparePropertyToObject(key, (FObject)s.value);
-
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r == 0 ) {
-      return s.value;
+      long size = s.value instanceof TreeNode ? ( (TreeNode) s.value ).size : 1;
+      return new TreeNode(s.key, s.value, size, 0, null, null);
     }
     if ( r > 0 ) {
-      return get(s.left, key, prop);
+      return get(s.right, key, prop);
     }
-    return get(s.right, key, prop);
+    return get(s.left, key, prop);
+  }
 
+  protected TreeNode getLeft() {
+    return left;
+  }
+
+  protected TreeNode getRight(){
+    return right;
+  }
+
+  protected Object getValue(){
+    return value;
+  }
+
+  public TreeNode neq(TreeNode s, Object key, PropertyInfo prop) {
+    return removeNode(s, key, prop);
   }
 
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r < 0 ) {
       TreeNode l = gt(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
@@ -294,7 +315,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r < 0 ) {
       TreeNode l = gte(s.left, key, prop);
       long newSize = size(s) - size(s.left) + size(l);
@@ -313,7 +334,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r > 0 ) {
       TreeNode right = lt(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
@@ -331,7 +352,7 @@ public class TreeNode {
     if ( s == null ) {
       return s;
     }
-    int r = prop.compare(s.value, key);
+    int r = prop.comparePropertyToValue(key, s.key);
     if ( r > 0 ) {
       TreeNode right = lte(s.right, key, prop);
       long newSize = size(s) - size(s.right) + size(right);
@@ -344,6 +365,111 @@ public class TreeNode {
 
     return new TreeNode(s.key, s.value, size(s) - size(s.right),
       s.level, s.left, null);
+  }
+
+  protected void select_(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
+    if ( currentNode == null ) return;
+    TreeNode left = currentNode.getLeft();
+    if ( left != null ) {
+      select_(left, sink, skip, limit, size, tail);
+    }
+    Object value = currentNode.getValue();
+    if ( value != null ) {
+      tail.planSelect(value, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null).select(value, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
+    }
+    TreeNode right = currentNode.getRight();
+    if ( right != null ) {
+      select_(right, sink, skip, limit, size, tail);
+    }
+  }
+
+  protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
+    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
+    long currentSize = currentNode.size;
+    TreeNode left = currentNode.getLeft();
+    long leftSize = 0;
+    long[] skip_limit = new long[]{skip, limit}; //skip_limit[0]: skip, skip_limit[1]: limit
+    if ( left != null ) {
+      leftSize = left.size;
+      if ( leftSize > skip ) {
+        skip_limit = skipLimitTreeNode(left, sink, skip_limit[0], skip_limit[1], size, tail);
+      } else if ( leftSize == skip ) skip_limit[0] = 0;
+      else {
+        skip_limit[0] = skip_limit[0] - leftSize;
+      }
+    }
+    Object value = currentNode.getValue();
+    if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
+      tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
+      skip_limit[0] = 0;
+      skip_limit[1] = skip_limit[1] - ( tail.size(currentNode) - skip_limit[0] );
+    } else if ( tail.size(currentNode) == skip_limit[0] ) {
+      skip_limit[0] = 0;
+    } else {
+      skip_limit[0] = skip_limit[0] - tail.size(currentNode);
+    }
+    TreeNode right = currentNode.getRight();
+    if ( right != null ) {
+      skip_limit = skipLimitTreeNode(right, sink, skip_limit[0], skip_limit[1], size, tail);
+    }
+    return skip_limit;
+  }
+
+  protected long[] reverseSortSkipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
+    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
+    long currentSize = currentNode.size;
+    TreeNode right = currentNode.getRight();
+    long rightSize = 0;
+    long[] skip_limit = new long[]{skip, limit};
+    if ( right != null ) {
+      rightSize = right.size;
+      if ( rightSize > skip ) {
+        skip_limit = reverseSortSkipLimitTreeNode(right, sink, skip_limit[0], skip_limit[1], size, tail);
+      } else if ( rightSize == skip ) skip_limit[0] = 0;
+      else {
+        skip_limit[0] = skip_limit[0] - rightSize;
+      }
+    }
+    Object value = currentNode.getValue();
+    if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
+      tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
+      skip_limit[0] = 0;
+      skip_limit[1] = skip_limit[1] - ( tail.size(currentNode) - skip_limit[0] );
+    } else if ( tail.size(currentNode) == skip_limit[0] ) {
+      skip_limit[0] = 0;
+    } else {
+      skip_limit[0] = skip_limit[0] - tail.size(currentNode);
+    }
+    TreeNode left = currentNode.getLeft();
+    if ( left != null ) {
+      skip_limit = reverseSortSkipLimitTreeNode(left, sink, skip_limit[0], skip_limit[1], size, tail);
+    }
+    return skip_limit;
+  }
+
+  public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate, Index tail, boolean reverseSort) {
+    if ( skip >= currentNode.size || limit <= 0 ) return;
+    if ( ( predicate != null && predicate.partialEval() != null && ! ( predicate instanceof True ) ) || order != null ) {
+      if ( order == null ) {
+        if ( reverseSort ) {
+          sink = decorateSink_(sink, skip, limit, null, predicate);
+          reverseSortSkipLimitTreeNode(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
+          sink.eof();
+        } else {
+          sink = decorateSink_(sink, skip, limit, null, predicate);
+          select_(currentNode, sink, skip, limit, size, tail);
+          sink.eof();
+        }
+      } else {
+        sink = decorateSink_(sink, skip, limit, order, predicate);
+        select_(currentNode, sink, skip, limit, size, tail);
+        sink.eof();
+      }
+    } else if ( ! reverseSort ) {
+      skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
+    } else {
+      reverseSortSkipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
+    }
   }
 
 }

@@ -7,6 +7,7 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
+import foam.dao.index.TreeNode;
 
 public class TreeLookupFindPlan implements FindPlan {
 

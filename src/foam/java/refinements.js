@@ -151,7 +151,7 @@ foam.CLASS({
       });
 
       var info = cls.getField('classInfo_');
-      if ( info ) info.addProperty(cls.name + '.' + constantize);
+      if ( info ) info.addAxiom(cls.name + '.' + constantize);
     }
   ]
 });
@@ -288,6 +288,7 @@ foam.CLASS({
         name: this.name,
         type: this.javaReturns || 'void',
         visibility: 'public',
+        static: this.isStatic(),
         synchronized: this.synchronized,
         throws: this.javaThrows,
         args: this.args && this.args.map(function(a) {
@@ -298,7 +299,8 @@ foam.CLASS({
         }),
         body: this.javaCode ? this.javaCode : ''
       });
-    }
+    },
+    function isStatic() { return false; }
   ]
 });
 
@@ -815,7 +817,7 @@ foam.CLASS({
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringParser()'],
-    ['javaCSVParser', 'foam.lib.json.StringParser'],
+    ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
     {
       name: 'sqlType',
       expression: function (width) {
@@ -867,7 +869,7 @@ foam.CLASS({
     ['javaType',       'String[]'],
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringArrayParser()'],
-    ['sqlType', 'TEXT[]']
+    ['sqlType', 'TEXT']
   ],
 
   methods: [
@@ -875,6 +877,12 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = this.compareTemplate();
+
+      var cast = info.getMethod('cast');
+      cast.body = 'Object[] value = (Object[])o;\n'
+                + this.javaType + ' ret = new String[value == null ? 0 : value.length];\n'
+                + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
+                + 'return ret;';
 
       // TODO: figure out what this is used for
       info.method({
@@ -975,7 +983,10 @@ foam.CLASS({
     },
     {
       name: 'javaJSONParser',
-      value: 'new foam.lib.json.FObjectArrayParser()'
+      expression: function (of) {
+        var id = of ? of.id ? of.id : of : null;
+        return 'new foam.lib.json.FObjectArrayParser(' + ( id ? id + '.class' : '') + ')';
+      }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectArrayPropertyInfo']
   ],
@@ -1124,6 +1135,42 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.pattern.Multiton',
+
+  properties: [
+    {
+      name: 'javaName',
+      value: 'Multiton',
+    },
+    {
+      name: 'javaInfoName',
+      expression: function(javaName) {
+        return foam.String.constantize(this.javaName);
+      },
+    },
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
+
+      cls.field({
+        name: this.javaInfoName,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.MultitonInfo',
+        initializer: `
+new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
+        `,
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
@@ -1133,8 +1180,8 @@ foam.CLASS({
         return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
       }
     },
-    ['javaJSONParser', 'new foam.lib.parse.Fail()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+    [ 'javaJSONParser', 'new foam.lib.parse.Fail()' ],
+    [ 'javaInfoType',   'foam.core.AbstractMultiPartIDPropertyInfo' ]
   ],
 
   methods: [
@@ -1193,7 +1240,11 @@ foam.CLASS({
         cls.method({
           name: this.name,
           type: 'void',
-          args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+          args: this.args && this.args.map(function(a) {
+            return {
+              name: a.name, type: a.javaType
+            };
+          }),
           body: this.javaCode
         });
         return;
@@ -1203,15 +1254,23 @@ foam.CLASS({
         name: this.name + '_real_',
         type: 'void',
         visibility: 'protected',
-        args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
+        args: this.args && this.args.map(function(a) {
+          return {
+            name: a.name, type: a.javaType
+          };
+        }),
         body: this.javaCode
       });
 
       cls.method({
         name: this.name,
         type: 'void',
-        args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
-        body: `${this.name + 'Listener_'}.fire(event);`
+          args: this.args && this.args.map(function(a) {
+            return {
+              name: a.name, type: a.javaType
+            };
+          }),
+        body: `${this.name + 'Listener_'}.fire(new Object[] { ${ this.args.map(function(a) { return a.name; }).join(', ') } });`
       })
 
       var listener = foam.java.Field.create({
@@ -1232,8 +1291,8 @@ foam.CLASS({
               name: 'go',
               type: 'void',
               visibility: 'public',
-              args: [ foam.java.Argument.create({ type: 'Object', name: 'event' }) ],
-              body: `${this.name + '_real_'}(event);`
+              args: [ foam.java.Argument.create({ type: 'Object[]', name: 'args' }) ],
+              body: `${this.name + '_real_'}(${ this.args && this.args.map(function(a, i) { return "(" + a.javaType + ")args[" + i + "]";}).join(', ') });`
             })
           ]
         })
@@ -1241,5 +1300,23 @@ foam.CLASS({
 
       cls.fields.push(listener);
     }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Requires',
+  properties: [
+    {
+      name: 'javaPath',
+      expression: function(path) {
+        return path;
+      },
+    },
+    {
+      name: 'javaReturns',
+      expression: function(javaPath) {
+        return this.lookup(javaPath).model_.id;
+      },
+    },
   ]
 });

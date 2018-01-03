@@ -87,4 +87,19 @@ public abstract class AbstractPropertyInfo
       objElement.appendChild(prop);
     }
   }
+
+  @Override
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
+    stmt.setObject(this.get(o));
+  }
+
+  @Override
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException{
+    this.set(o, resultSet.getObject(index));
+  }
+
+  public String toString() {
+    // TODO: generate static string in generated instances instead to avoid creating garbage.
+    return parent.getId() + "." + getName();
+  }
 }
