@@ -33,4 +33,21 @@ public class Arrays {
     return mergedArray;
   }
 
+  public static Object deepClone(Object value) {
+    if ( value == null ) return null;
+    if ( ! value.getClass().isArray() )
+      throw new RuntimeException("Tried to clone non array " + value.getClass().getName() + " with foam.util.Arrays.deepClone().");
+
+
+    int length = java.lang.reflect.Array.getLength(value);
+    Object result = java.lang.reflect.Array.newInstance(value.getClass().getComponentType(), length);
+
+    // TODO: This may be slow when dealing with primitive value arrays
+    // as it will box/unbox every element.  But maybe the JIT is smart
+    // enough to handle it.  Otherwise we should have custom implementations
+    // in every "<primitive>PropertyInfo"
+    for ( int i = 0 ; i < length ; i++ ) {
+      java.lang.reflect.Arrays.set(result, i,
+                                   foam.utils.SafetyUtil.deepClone(java.lang.reflect.Arrays.get(value, i)));
+  }
 }
