@@ -49,5 +49,8 @@ public class Arrays {
     for ( int i = 0 ; i < length ; i++ ) {
       java.lang.reflect.Arrays.set(result, i,
                                    foam.utils.SafetyUtil.deepClone(java.lang.reflect.Arrays.get(value, i)));
+    }
+
+    return result;
   }
 }
