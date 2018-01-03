@@ -58,7 +58,7 @@ public class MLang
     return new And(args);
   }
 
-  public static Sink GROUPBY(Object o1, Object o2) {
+  public static Sink GROUP_BY(Object o1, Object o2) {
     GroupBy groupBy = new GroupBy();
     groupBy.setArg1((Expr) o1);
     groupBy.setArg2((Sink) o2);

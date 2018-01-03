@@ -400,13 +400,9 @@ public class TreeNode {
     }
     Object value = currentNode.getValue();
     if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
-      if ( sink instanceof GroupBy ) {
-        Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).fclone();
-        tail.planSelect(value, temp, skip_limit[0], skip_limit[1], null, null).select(value, temp, skip_limit[0], skip_limit[1], null, null);
-        ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);
-      } else {
-        tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
-      }
+      Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).deepClone();
+      tail.planSelect(value, temp, skip_limit[0], skip_limit[1], null, null).select(value, temp, skip_limit[0], skip_limit[1], null, null);
+      ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);
       skip_limit[0] = 0;
       skip_limit[1] = skip_limit[1] - ( tail.size(currentNode) - skip_limit[0] );
     } else if ( tail.size(currentNode) == skip_limit[0] ) {
