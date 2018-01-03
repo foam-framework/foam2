@@ -66,6 +66,16 @@ foam.CLASS({
           javaType: 'java.security.Permission'
         }
       ],
+      code: function() {
+        if ( this.permissions == null ) return false;
+
+        for ( var i = 0 ; i < this.permissions.length ; i++ ) {
+          if ( Math.random() < 0.5 /*new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) */) {
+            return true;
+          }
+        }
+        return false;
+      },
       javaCode:
         `if ( getPermissions() == null ) return false;
         for ( int i = 0 ; i < permissions_.length ; i++ ) {
