@@ -24,6 +24,17 @@ public class SafetyUtil {
     return ((Comparable) o1).compareTo(o2);
   }
 
+  public static Object deepClone(Object o) {
+    if ( o == null ) return null;
+    if ( o instanceof foam.core.FObject ) return ((foam.core.FObject)o).deepClone();
+    if ( o.getClass().isArray() ) return foam.util.Arrays.deepClone(o);
+
+    // TODO: Non FObjects arn't cloneable, should we throw?
+    // Certainly not for immutable boxed types Int, String, Double, etc,
+    // but maybe we should for types we don't know about.
+    return o;
+  }
+
   public static boolean isEmpty(String s) {
     return s == null || s.isEmpty();
   }
