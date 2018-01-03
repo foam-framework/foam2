@@ -13,6 +13,8 @@ public interface FObject
 {
   ClassInfo getClassInfo();
   FObject fclone();
+  FObject deepClone();
+  FObject shallowClone();
   Map diff(FObject obj);
   Object setProperty(String prop, Object value);
   Object getProperty(String prop);
