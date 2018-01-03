@@ -20,5 +20,20 @@
        name: 'description',
        documentation: 'Description of the Group.'
      }
+   ],
+
+   methods: [
+     function implies(permission) {
+       if ( this.id.endsWith('*') ) {
+         var prefix = this.id.substring(0, this.id.length-1);
+
+         // Check that is a valid permission string (should be done as a property validator)
+         if ( prefix.length && ! prefix.endsWith('.') ) return false;
+
+         return permission.startsWith(prefix);
+       }
+
+       return permission == this.id;
+     }
    ]
  });
