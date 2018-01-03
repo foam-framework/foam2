@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 public class NanoRouter
-    extends HttpServlet
-    implements NanoService, ContextAware
+  extends HttpServlet
+  implements NanoService, ContextAware
 {
   protected X x_;
 
@@ -100,11 +100,9 @@ public class NanoRouter
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
       }
     } else {
-      
       if ( service instanceof WebAgent && spec.getAuthenticate() ) {
         service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
       }
-      
     }
 
 /*
