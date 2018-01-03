@@ -43,7 +43,7 @@ foam.CLASS({
               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
               this.start('td').style({'text-align': 'center', 'width': '300', 'margin-bottom': '30'}).tag(cb).call(function() {
-                if ( g.implies(p) ) this.add('*');
+                if ( g.implies(p.id) ) this.add('*');
               }).end();
             })
             .end()
@@ -73,6 +73,17 @@ foam.CLASS({
         group.permissions = permissions;
         dao.put(group);
       });
-    }
+    },
+
+    /*function highlightPermissions(permissionId, group, data) {
+      var permissionArry = [];
+      permissionArry = permissionId.split("*");
+
+      if ( permissionId == '*' ) { // all checked
+        alert( "dd : " + permissionArry[0] );
+      } else if ( permissionArry.legnth != 0 && permissionArry[ permissionArry.legnth - 1 ].equals("*") ) {
+        alert( "ff : " + permissionArry[0] );
+      }
+    }*/
   ]
 });
