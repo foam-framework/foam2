@@ -156,7 +156,7 @@ public class TomcatRouter
           return;
         }
 
-        foam.box.Message obj = (foam.box.Message)request;
+        foam.box.Message obj = (foam.box.Message) request;
         obj.getLocalAttributes().put("x", requestContext);
 
         getRouter().service(serviceKey, obj);
