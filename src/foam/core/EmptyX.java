@@ -128,7 +128,7 @@ class XI
   protected void setRightParent(X rightParent) { rightParent_ = rightParent; }
 
   public Object get(X x, Object key) {
-    String okey = getKey().toString();
+    String okey = key_.toString();
     String nkey = key.toString();
     if ( nkey.compareTo(okey) == 0 ) {
       return value_;
@@ -137,6 +137,11 @@ class XI
     } else {
       return getRightParent().get(x, key);
     }
+  }
+
+  @Override
+  public String toString() {
+    return getLeftParent().toString() + ( "{Key: " + key_ + ", Object: "  + value_ + "}\n" ) + getRightParent().toString();
   }
 }
 
@@ -164,7 +169,7 @@ class FactoryXI
   protected void setRightParent(X rightParent) { rightParent_ = rightParent; }
 
   public Object get(X x, Object key) {
-    String okey = getKey().toString();
+    String okey = key_.toString();
     String nkey = key.toString();
     if ( nkey.compareTo(okey) == 0 ) {
       return factory_.create(x);
@@ -173,6 +178,10 @@ class FactoryXI
     } else {
       return getRightParent().get(x, key);
     }
+  }
+  @Override
+  public String toString() {
+    return getLeftParent().toString() + ( "{Key: " + key_ + ", XFactory: "  + factory_ + "}\n" ) + getRightParent().toString();
   }
 }
 
@@ -196,6 +205,9 @@ public class EmptyX
   public X putFactory(Object key, XFactory factory) {
     return new FactoryXI(this, this, key, factory);
   }
+
+  @Override
+  public String toString() { return ""; }
 
   protected Object getKey() { throw new UnsupportedOperationException("Unsupported operation: getKey"); }
   protected X getLeftParent() { throw new UnsupportedOperationException("Unsupported operation: getLeftParent"); }
