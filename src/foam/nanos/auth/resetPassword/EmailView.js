@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.auth.forgotPassword',
+  package: 'foam.nanos.auth.resetPassword',
   name: 'EmailView',
   extends: 'foam.u2.View',
 
@@ -15,7 +15,7 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.User',
     'foam.u2.dialog.NotificationMessage',
-    'foam.nanos.auth.forgotPassword.ResendView'
+    'foam.nanos.auth.resetPassword.ResendView'
   ],
 
   axioms: [

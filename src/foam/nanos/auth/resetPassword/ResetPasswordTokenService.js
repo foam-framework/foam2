@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.auth.forgotPassword',
+  package: 'foam.nanos.auth.resetPassword',
   name: 'ResetPasswordTokenService',
   extends: 'foam.nanos.auth.token.AbstractTokenService',
 
@@ -81,7 +81,7 @@ message.setSubject("Your password reset instructions");
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
-args.put("link", appConfig.getUrl() + "resetPassword.html?token=" + token.getData() + "#reset");
+args.put("link", appConfig.getUrl() + "/nanopay/src/net/nanopay/resetPassword.html?token=" + token.getData());
 
 email.sendEmailFromTemplate(user, message, "reset-password", args);
 return true;
