@@ -289,9 +289,7 @@ foam.CLASS({
   extends: 'Property',
 
   properties: [
-    {
-      name: 'getter',
-      value: function(prop) {
+    [ 'getter', function(prop) {
         var c = this.instance_[prop.name];
 
         // Implement value and factory support.
@@ -306,16 +304,17 @@ foam.CLASS({
         // Upgrade Strings to actual classes, if available.
         if ( foam.String.isInstance(c) ) {
           c = this.lookup(c, true);
-          if ( c ) this.instance_[prop.name] = c;
+          if ( c ) {
+            this.instance_[prop.name] = c;
+          } else {
+            console.error('Unknown class: ' + c);
+          }
         }
 
         return c;
       }
-    },
-    {
-      name: 'toJSON',
-      value: function(value) { return value ? value.id : value; }
-    }
+    ],
+    ['toJSON', function(value) { return value ? value.id : value; } ]
   ],
 
   methods: [

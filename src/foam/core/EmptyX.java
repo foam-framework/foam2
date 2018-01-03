@@ -17,6 +17,9 @@
 
 package foam.core;
 
+import java.util.Collections;
+import java.util.Map;
+
 // TODO: make this a functional tree rather than a linked list. (for performance)
 
 abstract class AbstractX
@@ -53,7 +56,11 @@ abstract class AbstractX
   }
 
   public <T> T create(Class<T> type) {
-    return ((FacetManager)get("facetManager")).create(type, this);
+    return create(type, Collections.<String, Object>emptyMap());
+  }
+
+  public <T> T create(Class<T> type, Map<String, Object> args) {
+    return ((FacetManager)get("facetManager")).create(type, args, this);
   }
 }
 

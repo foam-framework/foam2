@@ -38,6 +38,10 @@ public class MLang
     return new Eq(MLang.prepare(o1), MLang.prepare(o2));
   }
 
+  public static Predicate NEQ(Object o1, Object o2) {
+    return new Neq(MLang.prepare(o1), MLang.prepare(o2));
+  }
+
   public static Predicate GTE(Object o1, Object o2) {
     return new Gte(MLang.prepare(o1), MLang.prepare(o2));
   }
@@ -56,6 +60,10 @@ public class MLang
 
   public static Predicate OR(Predicate... args) {
     return new Or(args);
+  }
+
+  public static Predicate NOT(Predicate predicate) {
+    return new Not(predicate);
   }
 
   public static Sink MAX(Object o1) {

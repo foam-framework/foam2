@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'SignInView',
@@ -110,7 +116,7 @@ foam.CLASS({
       this.addClass(this.myClass())
       .start()
         .start('h1').add("Sign In").end()
-        .start().addClass('sign-in-container')
+        .start('form').addClass('sign-in-container')
           .start().addClass('label').add("Email Address").end()
           .start(this.EMAIL).addClass('full-width-input').end()
           .start().addClass('label').add("Password").end()

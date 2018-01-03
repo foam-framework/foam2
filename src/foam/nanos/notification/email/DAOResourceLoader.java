@@ -1,21 +1,59 @@
 package foam.nanos.notification.email;
 
 import com.google.common.base.Optional;
+import foam.core.ContextAwareSupport;
+import foam.core.X;
 import foam.dao.DAO;
+import foam.dao.Sink;
+import foam.dao.ListSink;
+import foam.nanos.auth.Group;
+import foam.nanos.notification.email.EmailTemplate;
+import foam.util.SafetyUtil;
 import org.jtwig.resource.loader.ResourceLoader;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
+
+import static foam.mlang.MLang.*;
 
 public class DAOResourceLoader
-  implements ResourceLoader
+    extends ContextAwareSupport
+    implements ResourceLoader
 {
-  protected DAO dao_;
+  public static EmailTemplate findTemplate(X x, String name, String groupId) {
+    DAO groupDAO = (DAO) x.get("groupDAO");
+    DAO emailTemplateDAO = (DAO) x.get("emailTemplateDAO");
 
-  public DAOResourceLoader(DAO dao) {
-    this.dao_ = dao;
+    do {
+      Sink sink = emailTemplateDAO.where(AND(
+          EQ(EmailTemplate.NAME, name),
+          EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
+      )).limit(1).select(null);
+
+      List data = ((ListSink) sink).getData();
+      if ( data != null && data.size() == 1 ) {
+        return (EmailTemplate) data.get(0);
+      }
+
+      // exit condition, no emails even with wildcard group so return null
+      if ( "*".equals(groupId) ) {
+        return null;
+      }
+
+      Group group = (Group) groupDAO.find(groupId);
+      groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent()) ) ? group.getParent() : "*";
+    } while ( ! SafetyUtil.isEmpty(groupId) );
+
+    return null;
+  }
+
+  protected String groupId_;
+
+  public DAOResourceLoader(X x, String groupId) {
+    setX(x);
+    this.groupId_ = groupId;
   }
 
   @Override
@@ -25,13 +63,13 @@ public class DAOResourceLoader
 
   @Override
   public InputStream load(String s) {
-    EmailTemplate template = (EmailTemplate) dao_.find(s);
-    return new ByteArrayInputStream(template.getBodyAsByteArray());
+    EmailTemplate template = DAOResourceLoader.findTemplate(getX(), s, this.groupId_);
+    return template == null ? null : new ByteArrayInputStream(template.getBodyAsByteArray());
   }
 
   @Override
   public boolean exists(String s) {
-    return ( dao_.find(s) != null );
+    return load(s) != null;
   }
 
   @Override

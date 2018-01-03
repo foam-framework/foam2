@@ -257,8 +257,8 @@ foam.CLASS({
               axiom: a,
               type: a.cls_,
               cls: this.Link.create({
-                path: a.sourceCls_.id,
-                label: a.sourceCls_.name
+                path: a.sourceCls_ ? a.sourceCls_.id : '',
+                label: a.sourceCls_ ? a.sourceCls_.name : ''
               }),
               name: a.name
             });
@@ -367,6 +367,8 @@ foam.CLASS({
     'foam.doc.UMLDiagram'
   ],
 
+  imports: [ 'document' ],
+
   exports: [
     'as data',
     'path as browserPath',
@@ -396,7 +398,22 @@ foam.CLASS({
   },
 
   properties: [
-    'path',
+    {
+      class: 'String',
+      name: 'path',
+      width: 80,
+      factory: function() {
+        var path = 'foam.core.Property';
+
+        // TODO: this should be made generic and added to Window
+        this.document.location.search.substring(1).split('&').forEach(function(s) {
+          s = s.split('=');
+          if ( s[0] === 'path' ) path = s[1];
+        });
+
+        return path;
+      }
+    },
     {
       name: 'selectedClass',
       expression: function (path) {
@@ -1563,4 +1580,3 @@ foam.CLASS({
     }
   ]
 });
-
