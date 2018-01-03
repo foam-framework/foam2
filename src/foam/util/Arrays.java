@@ -47,8 +47,8 @@ public class Arrays {
     // enough to handle it.  Otherwise we should have custom implementations
     // in every "<primitive>PropertyInfo"
     for ( int i = 0 ; i < length ; i++ ) {
-      java.lang.reflect.Arrays.set(result, i,
-                                   foam.utils.SafetyUtil.deepClone(java.lang.reflect.Arrays.get(value, i)));
+      java.lang.reflect.Array.set(result, i,
+                                   foam.util.SafetyUtil.deepClone(java.lang.reflect.Array.get(value, i)));
     }
 
     return result;
