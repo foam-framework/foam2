@@ -37,12 +37,13 @@ public class DAOResourceLoader
         return (EmailTemplate) data.get(0);
       }
 
-      Group group = (Group) groupDAO.find(groupId);
-      if ( group == null ) {
+      // exit condition, no emails even with wildcard group so return null
+      if ( "*".equals(groupId) ) {
         return null;
       }
 
-      groupId = group.getParent();
+      Group group = (Group) groupDAO.find(groupId);
+      groupId = ( group != null && ! SafetyUtil.isEmpty(group.getParent()) ) ? group.getParent() : "*";
     } while ( ! SafetyUtil.isEmpty(groupId) );
 
     return null;
