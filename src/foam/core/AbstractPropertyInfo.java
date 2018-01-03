@@ -102,4 +102,9 @@ public abstract class AbstractPropertyInfo
     // TODO: generate static string in generated instances instead to avoid creating garbage.
     return parent.getId() + "." + getName();
   }
+
+  @Override
+  public void cloneProperty(FObject source, FObject dest) {
+    set(dest, foam.util.SafetyUtil.deepClone(get(source)));
+  }
 }
