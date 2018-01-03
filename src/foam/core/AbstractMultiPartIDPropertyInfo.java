@@ -6,6 +6,7 @@
 
 package foam.core;
 
-public interface ContextAgent {
-  public void execute(X x);
+public abstract class AbstractMultiPartIDPropertyInfo
+  extends AbstractObjectPropertyInfo
+{
 }

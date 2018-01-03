@@ -39,7 +39,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'socket',
-      javaType: 'org.java_websocket.WebSocket'
+      javaType: 'foam.net.WebSocket'
     }
   ],
 
@@ -73,18 +73,12 @@ foam.CLASS({
       code: function send(msg) {
         var replyBox = msg.attributes.replyBox;
         if ( replyBox ) {
-          // TODO: We should probably clone here, but often the message
-          // contains RPC arguments that don't clone properly.  So
-          // instead we will mutate replyBox and put it back after.
-
-          // Even better solution would be to move replyBox to a
-          // property on Message and have custom serialization in it to
-          // do the registration.
+        // TODO: Should replyBox just be a property on message with
+          // custom serialization?
 
           msg.attributes.replyBox =
             this.__context__.registry.register(null, null, msg.attributes.replyBox);
 
-          // TODO: There should be a better way to do this.
           replyBox = this.ReplyBox.create({
             id: msg.attributes.replyBox.name
           });
@@ -119,7 +113,13 @@ String payload = outputter.stringify(message);
 
 message.getAttributes().put("replyBox", replyBox);
 
-getSocket().send(payload);
+try {
+  getSocket().send(payload);
+} catch ( java.io.IOException e ) {
+  foam.box.Message reply = new foam.box.Message();
+  reply.setObject(e);
+  if ( replyBox != null ) replyBox.send(reply);
+}
 `
     }
   ],

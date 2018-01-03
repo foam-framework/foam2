@@ -225,8 +225,8 @@ return LimitedDAO_create([
       },
       swiftCode: function() {/*
 let mySink = decorateListener_(sink, predicate)
-return sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
-  guard let topic = args[0] as? String else { return }
+return on.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
+  guard let topic = args[1] as? String else { return }
   switch topic {
     case "put":
       mySink.put(args.last as! FObject, sub)
@@ -390,10 +390,34 @@ return sink
       return this === other ? 0 : foam.util.compare(this.$UID, other.$UID);
     },
 
+    function prepareSink_(sink) {
+      if ( ! sink ) return foam.dao.ArraySink.create();
+
+      if ( foam.Function.isInstance(sink) )
+        return {
+          put: sink,
+          eof: function() {}
+        };
+
+      if ( sink == console || sink == console.log )
+        return {
+          put: function(o) { console.log(o, foam.json.Pretty.stringify(o)); },
+          eof: function() {}
+        };
+
+      if ( sink == document )
+        return {
+          put: function(o) { foam.u2.DetailView.create({data: o}).write(document); },
+          eof: function() {}
+        };
+
+      return sink;
+    },
+
     {
       name: 'select',
       code: function select(sink) {
-        return this.select_(this.__context__, sink, undefined, undefined, undefined, undefined);
+        return this.select_(this.__context__, this.prepareSink_(sink), undefined, undefined, undefined, undefined);
       },
       swiftCode: 'return try select_(__context__, sink)',
     },
@@ -505,13 +529,23 @@ return try delegate.select_(
           this.predicate);
     },
 
-    function listen_(x, sink, predicate) {
-      return this.delegate.listen_(
-        x, sink,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
-    }
+    {
+      name: 'listen_',
+      code: function listen_(x, sink, predicate) {
+        return this.delegate.listen_(
+          x, sink,
+          predicate ?
+            this.And.create({ args: [this.predicate, predicate] }) :
+            this.predicate);
+      },
+      swiftCode: `
+return try delegate.listen_(
+  x, sink,
+  predicate != nil ?
+    And_create(["args": [self.predicate, predicate]]) :
+    predicate)
+      `,
+    },
   ]
 });
 

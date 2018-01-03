@@ -8,6 +8,8 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 import foam.core.*;
+import java.util.ArrayList;
+import java.util.*;
 
 public class JSONParser
   extends foam.core.ContextAwareSupport
@@ -25,9 +27,18 @@ public class JSONParser
     ps.setString(data);
     ParserContext x = new ParserContextImpl();
     x.set("X", getX());
-    x.set("defaultClass", defaultClass);
-    ps = (StringPStream) ps.apply(parser, x);
+    ps = (StringPStream) ps.apply(defaultClass == null ? parser : new ExprParser(defaultClass), x);
 
     return ps == null ? null : (FObject) ps.value();
+  }
+
+  public Object[] parseStringForArray(String data, Class defaultClass) {
+    StringPStream ps = new StringPStream();
+    ps.setString(data);
+    ParserContext x = new ParserContextImpl();
+    x.set("X", getX());
+
+    ps = (StringPStream) ps.apply(new FObjectArrayParser(defaultClass), x);
+    return ps == null ? null : (Object[]) ps.value();
   }
 }

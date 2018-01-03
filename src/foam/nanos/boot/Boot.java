@@ -19,7 +19,7 @@ public class Boot {
   public Boot() {
     try {
       // Used for all the services that will be required when Booting
-      serviceDAO_ = new foam.dao.PMDAO(new JDAO(NSpec.getOwnClassInfo(), "services"));
+      serviceDAO_ = new JDAO(NSpec.getOwnClassInfo(), "services");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -28,17 +28,18 @@ public class Boot {
       public void put(FObject obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("Registering: " + sp.getName());
-        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory(sp)));
+        root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
       }
     });
 
     /**
      * Revert root_ to non ProxyX to avoid letting children add new bindings.
      */
-    root_ = root_.put("firewall", "firewall");
+    root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
-    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
+        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -56,13 +57,13 @@ public class Boot {
       if ( script != null ) {
         script.runScript(root_);
       }
-     }
+    }
   }
 
   public X getX() { return root_; }
 
   public static void main (String[] args)
-    throws java.lang.Exception
+      throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
     new Boot();

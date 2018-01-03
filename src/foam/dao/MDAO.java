@@ -10,6 +10,7 @@ import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
+import foam.dao.index.Index;
 import foam.dao.index.AltIndex;
 import foam.dao.index.SelectPlan;
 import foam.dao.index.TreeIndex;
@@ -30,6 +31,8 @@ public class MDAO extends AbstractDAO {
   public void addIndex(PropertyInfo prop) {
     index_.addIndex(new TreeIndex(prop));
   }
+
+  public void addIndex(Index index) { index_.addIndex(index);}
 
   public FObject put_(X x, FObject obj) {
     FObject oldValue = find(obj);
@@ -57,8 +60,8 @@ public class MDAO extends AbstractDAO {
     }
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
-        ? (FObject)index_.planFind(state_,getPrimaryKey().get(o)).find(state_,getPrimaryKey().get(o))
-        : (FObject)index_.planFind(state_,o).find(state_, o)
+            ? (FObject)index_.planFind(state_,getPrimaryKey().get(o)).find(state_,getPrimaryKey().get(o))
+            : (FObject)index_.planFind(state_, o).find(state_,o)
     );
   }
 

@@ -24,10 +24,6 @@ foam.CLASS({
     'foam.box.LookupBox',
   ],
 
-  axioms: [
-    foam.pattern.Multiton.create({ property: 'name' })
-  ],
-
   properties: [
     {
       class: 'String',
@@ -64,8 +60,8 @@ return self.LookupBox_create([
       },
       swiftCode: function() {/*
 var name = ""
-if let index = name.range(of: ".", options: .backwards)?.lowerBound {
-  name = String(name[..<index])
+if let index = self.name.range(of: "/", options: .backwards)?.lowerBound {
+  name = String(self.name[..<index])
 }
 return ownClassInfo().create(args: [
   "name": name
@@ -79,11 +75,19 @@ return ownClassInfo().create(args: [
         return this.name.substring(this.name.lastIndexOf('/') + 1);
       },
       swiftCode: function getBaseName() {/*
-if let index = name.range(of: ".", options: .backwards)?.lowerBound {
-  return String(name[..<name.index(index, offsetBy: 1)])
+if let index = name.range(of: "/", options: .backwards)?.lowerBound {
+  return String(name[name.index(after: index)..<name.endIndex])
 }
 return ""
       */},
     },
+  ],
+
+  // TODO: Java support has a bug where it can create MultitonInfo
+  // before property is defined, moving axiom to bottom of file is a
+  // hacky fix.
+  axioms: [
+    foam.pattern.Multiton.create({ property: 'name' })
   ]
+
 });

@@ -60,6 +60,11 @@ foam.CLASS({
       name: 'icon'
     },
     {
+      class: 'Boolean',
+      name: 'confirmationRequired',
+      documentation: 'If confirmation is required. Recommended for destructive actions.'
+    },
+    {
       class: 'String',
       name: 'iconFontFamily',
       value: 'Material Icons'

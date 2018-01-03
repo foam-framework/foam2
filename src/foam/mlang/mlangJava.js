@@ -281,6 +281,44 @@ for ( int i = 0 ; i < length ; i++ ) {
   }
 }
 return stmt.toString();`
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode: 'java.util.List<Predicate> args = new java.util.ArrayList<>();\n' +
+      '    boolean update = false;\n' +
+      '    True TRUE = new True();\n' +
+      '    False FALSE = new False();\n' +
+      '    for ( int i = 0; i < this.args_.length; i++ ) {\n' +
+      '      Predicate arg = this.args_[i];\n' +
+      '      Predicate newArg = this.args_[i].partialEval();\n' +
+      '      if ( newArg instanceof False ) return FALSE;\n' +
+      '      if ( arg instanceof And ) {\n' +
+      '        for ( int j = 0; j < ( ( (And) arg ).args_.length ); j++ ) {\n' +
+      '          args.add(( (And) arg ).args_[j]);\n' +
+      '        }\n' +
+      '        update = true;\n' +
+      '      } else {\n' +
+      '        if ( arg instanceof True || arg == null ) {\n' +
+      '          update = true;\n' +
+      '        } else {\n' +
+      '          args.add(arg);\n' +
+      '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
+      '        }\n' +
+      '      }\n' +
+      '    }\n' +
+      '    if ( args.size() == 0 ) return TRUE;\n' +
+      '    if ( args.size() == 1 ) return args.get(0);\n' +
+      '    if ( update ) {\n' +
+      '      And newPredicate = new And();\n' +
+      '      Predicate newArgs[] = new Predicate[args.size()];\n' +
+      '      int i = 0;\n' +
+      '      for ( Predicate predicate : args )\n' +
+      '        newArgs[i++] = predicate;\n' +
+      '      newPredicate.setArgs(newArgs);\n' +
+      '      return newPredicate;\n' +
+      '    }\n' +
+      '    return this;'
     }
   ]
 });
@@ -492,7 +530,6 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
 
@@ -528,25 +565,55 @@ foam.CLASS({
     {
       name: 'createStatement',
       javaReturns: 'String',
-      javaCode:
-`int length = getValue().length;
-StringBuilder builder = sb.get().append(" (");
-for ( int i = 0; i < length; i++ ){
-  builder.append("?");
-  if ( i < length - 1 ) {
-    builder.append(",");
-  }
-}
-builder.append(") ");
-return builder.toString();`
+      javaCode: 'return " ? "; '
     },
     {
       name: 'prepareStatement',
       javaReturns: 'void',
       javaCode:
-`for ( Object o : getValue() ) {
-  stmt.setObject(o);
-}`
+`Object[] obj = getValue();
+if ( obj == null ) {
+  stmt.setObject(null);
+  return;
+}
+int length = obj.length;
+if ( length == 0 ) {
+  stmt.setObject(null);
+  return;
+}
+StringBuilder builder = sb.get();
+for ( int i = 0; i < length; i++ ) {
+  if ( obj[i] == null )
+    builder.append("");
+  else 
+    escapeCommasAndAppend(builder, obj[i]);
+  if ( i < length - 1 ) {
+    builder.append(",");
+  }
+}
+stmt.setObject(builder.toString());`
+    },
+    {
+      name: 'escapeCommasAndAppend',
+      args: [
+        {
+          name: 'builder',
+          javaType: 'StringBuilder'
+        },
+        {
+          name: 'o',
+          javaType: 'Object'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: 
+`String s = o.toString();
+//replace backslash to double backslash
+s = s.replace("\\\\", "\\\\\\\\");
+//replace comma to backslash+comma
+s = s.replace(",", "\\\\,");
+builder.append(s);
+`
     }
   ]
 });
@@ -662,6 +729,28 @@ foam.CLASS({
     {
       name: 'f',
       javaCode: 'return ! getArg1().f(obj);'
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode: 'if ( this.arg1_ instanceof Not )\n' +
+      '      return ((Not)arg1_).arg1_;\n' +
+      '    if ( arg1_.getClass().equals(Eq.class) ) {\n' +
+      '      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Gt.class) ) {\n' +
+      '      return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Gte.class) ) {\n' +
+      '      return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Lt.class) ) {\n' +
+      '      return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Lte.class) ) {\n' +
+      '      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    return this;'
     },
     {
       name: 'createStatement',

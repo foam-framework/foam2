@@ -14,14 +14,29 @@ import foam.lib.json.OutputterMode;
 import foam.lib.parse.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
+import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 public class JDAO
     extends ProxyDAO
 {
-  protected final File file_;
+  protected Pattern COMMENT = Pattern.compile("(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)");
+  protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+      sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+      return sdf;
+    }
+  };
+
+  protected final File           file_;
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
@@ -49,7 +64,9 @@ public class JDAO
     BufferedReader br            = new BufferedReader(new FileReader(file_));
 
     for ( String line ; ( line = br.readLine() ) != null ; ) {
+      // skip empty lines & comment lines
       if ( SafetyUtil.isEmpty(line) ) continue;
+      if ( COMMENT.matcher(line).matches() ) continue;
 
       try {
         char operation = line.charAt(0);
@@ -89,9 +106,9 @@ public class JDAO
    * @return the error message
    */
   protected String getParsingErrorMessage(String line) {
-    Parser parser = new ExprParser();
-    PStream ps = new StringPStream();
-    ParserContext x = new ParserContextImpl();
+    Parser        parser = new ExprParser();
+    PStream       ps     = new StringPStream();
+    ParserContext x      = new ParserContextImpl();
 
     ((StringPStream) ps).setString(line);
     x.set("X", ( getX() == null ) ? new ProxyX() : getX());
@@ -99,6 +116,15 @@ public class JDAO
     ErrorReportingPStream eps = new ErrorReportingPStream(ps);
     ps = eps.apply(parser, x);
     return eps.getMessage();
+  }
+
+  protected void writeComment(User user) throws IOException {
+    out_.write("// Modified by ");
+    out_.write(user != null ?
+        user.getFirstName() + " " + user.getLastName() + " (" + user.getId() + ")" :
+        "System" );
+    out_.write(" at " + sdf.get().format(Calendar.getInstance().getTime()));
+    out_.newLine();
   }
 
   /**
@@ -111,6 +137,7 @@ public class JDAO
   public FObject put_(X x, FObject obj) {
     try {
       // TODO(drish): supress class name from output
+      writeComment((User) x.get("user"));
       out_.write("p(" + outputter_.stringify(obj) + ")");
       out_.newLine();
       out_.flush();
@@ -127,6 +154,7 @@ public class JDAO
 
     try {
       // TODO: User Property toJSON() support when ready, since
+      writeComment((User) x.get("user"));
       // this code doesn't support multi-part keys or escaping "'s in the id.
       if ( id instanceof String ) {
         out_.write("r({\"id\":\"" + id + "\"})");

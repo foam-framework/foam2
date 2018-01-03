@@ -10,16 +10,16 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
 public class Outputter
-    extends AbstractSink
+  extends AbstractSink
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -53,6 +53,14 @@ public class Outputter
 
   public Outputter(File file, OutputterMode mode, boolean outputHeaders) throws FileNotFoundException {
     this(new PrintWriter(file), mode, outputHeaders);
+  }
+
+  public Outputter(OutputStream os, OutputterMode mode, boolean outputHeaders) {
+    this(new OutputStreamWriter(os), mode, outputHeaders);
+  }
+
+  public Outputter(Writer writer, OutputterMode mode, boolean outputHeaders) {
+    this(new PrintWriter(writer), mode, outputHeaders);
   }
 
   public Outputter(PrintWriter writer, OutputterMode mode, boolean outputHeaders) {
@@ -90,7 +98,10 @@ public class Outputter
     if ( of_ != null && props_ != null && obj.getClassInfo().equals(of_) )
       return props_;
 
+
     of_ = obj.getClassInfo();
+    props_ = new ArrayList<PropertyInfo>();
+
     List<PropertyInfo> props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     for ( PropertyInfo prop : props ) {
       // filter out network and storage transient values
@@ -98,9 +109,10 @@ public class Outputter
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       // filter out unsupported types
-      if ( prop instanceof AbstractArrayPropertyInfo ||
-          prop instanceof AbstractFObjectArrayPropertyInfo ||
-          prop instanceof AbstractFObjectPropertyInfo ) {
+      if ( prop instanceof AbstractMultiPartIDPropertyInfo ||
+           prop instanceof AbstractArrayPropertyInfo ||
+           prop instanceof AbstractFObjectArrayPropertyInfo ||
+           prop instanceof AbstractFObjectPropertyInfo ) {
         continue;
       }
 
@@ -162,6 +174,16 @@ public class Outputter
     writer_.append("\n");
   }
 
+  protected void outputList(java.util.List list) {
+    writer_.append("[");
+    java.util.Iterator iter = list.iterator();
+    while ( iter.hasNext() ) {
+      output(iter.next());
+      if ( iter.hasNext() ) writer_.append(",");
+    }
+    writer_.append("]");
+  }
+
   public void output(Object value) {
     if ( value instanceof String ) {
       outputString((String) value);
@@ -171,6 +193,8 @@ public class Outputter
       outputBoolean((Boolean) value);
     } else if ( value instanceof Date ) {
       outputDate((Date) value);
+    } else if ( value instanceof java.util.List ) {
+      outputList((java.util.List) value);
     }
   }
 

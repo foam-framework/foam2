@@ -928,7 +928,9 @@ foam.CLASS({
       var f = this.cls_.hasOwnProperty('myClass_') && this.cls_.myClass_;
 
       if ( ! f ) {
-        var base = foam.String.cssClassize(this.cls_.id).split(/ +/);
+        var base = this.cls_.hasOwnProperty('CSS_CLASS') ?
+          this.cls_.CSS_CLASS.split(/ +/) :
+          foam.String.cssClassize(this.cls_.id).split(/ +/) ;
 
         f = this.cls_.myClass_ = foam.Function.memoize1(function(e) {
           return base.map(function(c) { return c + (e ? '-' + e : ''); }).join(' ');
@@ -966,7 +968,6 @@ foam.CLASS({
       this.focused = false;
       return this;
     },
-
 
     //
     // Visibility
@@ -2095,7 +2096,7 @@ foam.CLASS({
       }
     }
   ]
-})
+});
 
 
 foam.CLASS({
@@ -2104,7 +2105,7 @@ foam.CLASS({
     [ 'view',          { class: 'foam.u2.EnumView' } ],
     [ 'tableCellView', function(obj) { return this.get(obj).label; } ]
   ]
-})
+});
 
 
 foam.CLASS({

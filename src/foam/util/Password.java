@@ -6,13 +6,13 @@
 
 package foam.util;
 
-import org.bouncycastle.crypto.PBEParametersGenerator;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.util.encoders.Base64;
-
+import foam.core.FObject;
 import java.security.SecureRandom;
 import java.util.regex.Pattern;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.util.encoders.Base64;
 
 public class Password {
 
@@ -104,5 +104,17 @@ public class Password {
    */
   public static boolean isValid(String password) {
     return PASSWORD_PATTERN.matcher(password).matches();
+  }
+
+  public static FObject sanitize(FObject obj) {
+    if ( obj == null ) {
+      return null;
+    }
+
+    FObject clone = obj.fclone();
+    clone.setProperty("password", null);
+    clone.setProperty("previousPassword", null);
+    clone.setProperty("passwordLastModified", null);
+    return clone;
   }
 }

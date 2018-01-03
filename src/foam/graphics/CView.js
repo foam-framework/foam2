@@ -883,12 +883,14 @@ foam.CLASS({
     { class: 'Float',  name: 'endX' },
     { class: 'Float',  name: 'endY' },
     { class: 'Float',  name: 'lineWidth', value: 1 },
-    { class: 'String', name: 'color',     value: '#000000' }
+    { class: 'String', name: 'color',     value: '#000000' },
+    { name: 'lineDash', documentation: 'An Array of numbers which specify distances to alternately draw lines and gaps. Full line if not set.' },
   ],
 
   methods: [
     function paintSelf(x) {
       x.beginPath();
+      if ( this.lineDash ) x.setLineDash(this.lineDash);
       x.moveTo(0, 0);
       x.lineTo(this.endX-this.x, this.endY-this.y);
       x.lineWidth = this.lineWidth;
@@ -1198,7 +1200,7 @@ foam.CLASS({
   name: 'Canvas',
   extends: 'foam.u2.Element',
 
-  documentation: 'A Canvas U2 Element for drawing CViews in.',
+  documentation: 'A Canvas U2 Element for drawing CViews in. Don\'t create directly, use CView.toE() instead.',
 
   requires: [
     'foam.input.Pointer'
@@ -1224,7 +1226,7 @@ foam.CLASS({
         n.canvas = this;
 
         if ( this.attributeMap.width === undefined || this.attributeMap.height === undefined ) {
-          this.setAttribute('width', n.width);
+          this.setAttribute('width',  n.width);
           this.setAttribute('height', n.height);
         }
 
