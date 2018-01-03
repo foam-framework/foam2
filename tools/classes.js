@@ -171,34 +171,7 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResponse',
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
-  'foam.nanos.geocode.GoogleMapsBoundary',
-
-  'foam.flinks.model.FlinksCall',
-  'foam.flinks.model.FlinksRequest',
-  'foam.flinks.model.FlinksAuthRequest',
-  'foam.flinks.model.FlinksTransactionRequest',
-  'foam.flinks.model.FlinksAccountRequest',
-  'foam.flinks.model.FlinksAccountSummaryRequest',
-  'foam.flinks.model.RefreshDeltaModel',
-  'foam.flinks.model.FlinksAccountDetailRequest',
-  'foam.flinks.model.FlinksMulAuthRequest',
-  'foam.flinks.model.FlinksResponse',
-  'foam.flinks.model.SecurityChallengeModel',
-  'foam.flinks.model.FlinksResponse',
-  'foam.flinks.model.LoginModel',
-  'foam.flinks.model.FlinksInvalidResponse',
-  'foam.flinks.model.FlinksAuthResponse',
-  'foam.flinks.model.FlinksMFAResponse',
-  'foam.flinks.model.BalanceModel',
-  'foam.flinks.model.AccountModel',
-  'foam.flinks.model.AddressModel',
-  'foam.flinks.model.HolderModel',
-  'foam.flinks.model.AccountTransactionModel',
-  'foam.flinks.model.AccountWithDetailModel',
-  'foam.flinks.model.AccountStatementModel',
-  'foam.flinks.model.AccountStatementContainerModel',
-  'foam.flinks.model.FlinksAccountsDetailResponse',
-  'foam.flinks.model.FlinksAccountsSummaryResponse'
+  'foam.nanos.geocode.GoogleMapsBoundary'
 
 ];
 
