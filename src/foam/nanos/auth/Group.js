@@ -80,14 +80,12 @@ foam.CLASS({
         }
         return false;
       },
-      javaCode:
-        `if ( getPermissions() == null ) return false;
-        for ( int i = 0 ; i < permissions_.length ; i++ ) {
-          if ( new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) ) {
-            return true;
-          }
-        }
-        return false;`
+      javaCode: `
+        if ( getPermissions() == null ) return false;
+        for ( int i = 0 ; i < permissions_.length ; i++ )
+          if ( permissions_[i].implies(permission) ) return true;
+        return false;
+      `
     }
   ]
 });
