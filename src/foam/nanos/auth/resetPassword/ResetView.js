@@ -4,10 +4,10 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   documentation: 'Forgot Password Reset View',
-  
+
   imports: [
-    'resetPasswordToken',
-    'stack'
+    'stack',
+    'resetPasswordToken'
   ],
 
   exports: [
@@ -16,114 +16,115 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.User',
-    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   css:`
-    ^{
-      width: 490px;
-      margin: auto;
+
+      ^{
+        width: 490px;
+        margin: auto;
+      }
+
+      ^ .Message-Container{
+        width: 490px;
+        height: 251px;
+        border-radius: 2px;
+        background-color: #ffffff;
+        padding-top: 5px;
+      }
+
+      ^ .Reset-Password{
+        width: 225;
+        height: 30px;
+        font-family: Roboto;
+        font-size: 30px;
+        font-weight: bold;
+        line-height: 1;
+        letter-spacing: 0.5px;
+        text-align: left;
+        color: #093649;
+        margin-top: 20px;
+        margin-bottom: 30px;
+      }
+
+      ^ p{
+        display: inline-block;
+      }
+
+      ^ .newPassword-Text{
+        width: 182px;
+        height: 16px;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0.2px;
+        text-align: left;
+        color: #093649;
+        margin-top: 15px;
+        margin-left: 20px;
+        margin-right: 288px;
+        margin-bottom: 5px;
+      }
+
+      ^ .confirmPassword-Text{
+        width: 182px;
+        height: 16px;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0.2px;
+        text-align: left;
+        color: #093649;
+        margin-left: 20px;
+        margin-bottom: 5px;
+        margin-top: 10px;
+      }
       
-    }
-    body{  
-      background-color: #edf0f5;
-    }
-    ^ .Message-Container{
-      width: 490px;
-      height: 251px;
-      border-radius: 2px;
-      background-color: #ffffff;
-      padding-top: 5px;
-    }
+      ^ .foam-u2-ActionView-confirm {
+        width: 450px;
+        height: 40px;
+        border-radius: 2px;
+        border: solid 1px #59a5d5;
+        margin-left: 20px;
+        margin-right: 20px;
+        background-color: #59aadd;
+        text-align: center;
+        line-height: 40px;
+        cursor: pointer;
+        color: #ffffff;
+        margin-top: 10px;
+      }
 
-    ^ .Reset-Password{
-      width: 225;
-      height: 30px;
-      font-family: Roboto;
-      font-size: 30px;
-      font-weight: bold;
-      line-height: 1;
-      letter-spacing: 0.5px;
-      text-align: left;
-      color: #093649;
-      margin-top: 20px;
-      margin-bottom: 30px;
-    }
+      ^ .foam-ui-ActionView-confirm span {
+        display: block;
+        font-size: 12px;
+        line-height: 40px;
+        letter-spacing: 0.2px;
+      }
 
-    ^ p{
-      display: inline-block;
-    }
+      ^ .foam-u2-ActionView-confirm:hover {
+        background: none;
+        cursor: pointer;
+        background-color: #20B1A7;
+      }
 
-    ^ .newPassword-Text{
-      width: 182px;
-      height: 16px;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #093649;
-      margin-top: 15px;
-      margin-left: 20px;
-      margin-right: 288px;
-      margin-bottom: 5px;
-    }
+      ^ .link{
+        margin-left: 2px;
+        color: #59a5d5;
+        cursor: pointer;
+      }
+      ^ .full-width-input{
+        width: 90%;
+        height: 40px;
+        margin-left: 5%;
+        margin-bottom: 15px;
+        outline: none;
+        padding: 10px;
+      }
+      `,
 
-    ^ .confirmPassword-Text{
-      width: 182px;
-      height: 16px;
-      font-family: Roboto;
-      font-size: 14px;
-      font-weight: 300;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #093649;
-      margin-left: 20px;
-      margin-bottom: 5px;
-      margin-top: 10px;
-    }
-    
-    ^ .foam-u2-ActionView-confirm {
-      width: 90%;
-      height: 40px;
-      border-radius: 2px;
-      border: solid 1px #FFFFFF;
-      margin: 0 auto;
-      background-color: #59aadd;
-      background: #59aadd;
-      text-align: center;
-      line-height: 35px;
-      cursor: pointer;
-      outline:none;
-      color: #ffffff;
-      margin-top: 10px;
-      margin-left: 5%;
-    }
-
-    
-
-    ^ .foam-u2-ActionView-confirm:hover {
-      background: none;
-      cursor: pointer;
-      background-color: #59aadd;
-    }
-
-    ^ .link{
-      margin-left: 2px;
-      color: #59a5d5;
-      cursor: pointer;
-    }
-    ^ .full-width-input{
-      width: 90%;
-      height: 40px;
-      margin-left: 5%;
-      margin-bottom: 15px;
-      outline: none;
-      padding: 10px;
-    }
-  `,
-  
-
+      
   properties: [
     {
       class: 'String',
@@ -165,7 +166,7 @@ foam.CLASS({
 
     this
       .addClass(this.myClass())
-      .start().addClass('Background')
+      .start()
         .start().addClass('Reset-Password').add("Reset Password").end()
         .start().addClass('Message-Container')
           .start().addClass('newPassword-Text').add("New Password").end()
@@ -179,9 +180,7 @@ foam.CLASS({
         .start('p').add("Remember your password?").end()
         .start('p').addClass('link')
           .add('Sign in.')
-          .on('click', function(){ 
-            window.location.replace("./index.html");
-          })
+          .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
         .end()
       .end()
     }
