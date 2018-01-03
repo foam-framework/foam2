@@ -70,7 +70,11 @@ foam.CLASS({
         if ( this.permissions == null ) return false;
 
         for ( var i = 0 ; i < this.permissions.length ; i++ ) {
-          if ( Math.random() < 0.5 /*new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) */) {
+          alert ("aaa : " + this.permissions[i].ID);
+
+          var strInspect  = this.permissions[i].ID.includes("*");
+
+          if ( strInspect ) {
             return true;
           }
         }
