@@ -43,9 +43,9 @@ foam.CLASS({
 
   topics: [
     'down',
-    'up',
     'move',
-    'touch'
+    'touch',
+    'up'
   ],
 
   properties: [

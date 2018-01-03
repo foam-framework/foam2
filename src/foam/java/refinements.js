@@ -151,7 +151,7 @@ foam.CLASS({
       });
 
       var info = cls.getField('classInfo_');
-      if ( info ) info.addProperty(cls.name + '.' + constantize);
+      if ( info ) info.addAxiom(cls.name + '.' + constantize);
     }
   ]
 });
@@ -1135,6 +1135,42 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.pattern.Multiton',
+
+  properties: [
+    {
+      name: 'javaName',
+      value: 'Multiton',
+    },
+    {
+      name: 'javaInfoName',
+      expression: function(javaName) {
+        return foam.String.constantize(this.javaName);
+      },
+    },
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
+
+      cls.field({
+        name: this.javaInfoName,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.MultitonInfo',
+        initializer: `
+new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
+        `,
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
@@ -1144,8 +1180,8 @@ foam.CLASS({
         return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
       }
     },
-    ['javaJSONParser', 'new foam.lib.parse.Fail()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+    [ 'javaJSONParser', 'new foam.lib.parse.Fail()' ],
+    [ 'javaInfoType',   'foam.core.AbstractMultiPartIDPropertyInfo' ]
   ],
 
   methods: [
@@ -1264,5 +1300,23 @@ foam.CLASS({
 
       cls.fields.push(listener);
     }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Requires',
+  properties: [
+    {
+      name: 'javaPath',
+      expression: function(path) {
+        return path;
+      },
+    },
+    {
+      name: 'javaReturns',
+      expression: function(javaPath) {
+        return this.lookup(javaPath).model_.id;
+      },
+    },
   ]
 });

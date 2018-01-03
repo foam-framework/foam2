@@ -199,14 +199,46 @@ var proxies = [
   'foam.lib.parse.PStream',
   'foam.blob.Blob',
   'foam.blob.BlobService',
+  'foam.nanos.auth.AuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
+];
+
+var blacklist = [
+  'FObject',
+  'foam.core.AbstractEnum',
+  'foam.core.AbstractInterface',
+  'foam.core.Property',
+  'foam.core.String',
+
+  // These have hand written java impls so we don't want to clobber them.
+  // TODO: Change gen.sh to prefer hand written java files over generated.
+  'foam.dao.AbstractDAO',
+  'foam.dao.FilteredDAO',
+  'foam.dao.LimitedDAO',
+  'foam.dao.NullDAO',
+  'foam.dao.OrderedDAO',
+  'foam.dao.SkipDAO',
+
+  // TODO: These models currently don't compile in java but could be updated to
+  // compile properly.
+  'foam.blob.BlobBlob',
+  'foam.dao.CompoundDAODecorator',
+  'foam.dao.DAODecorator',
+  'foam.dao.EasyDAO',
+  'foam.dao.FlowControl',
+  'foam.dao.PromisedDAO',
+  'foam.dao.sync.SyncRecord',
+  'foam.dao.sync.VersionedSyncRecord',
+  'foam.mlang.order.ThenBy',
+  'foam.nanos.menu.MenuBar',
 ];
 
 module.exports = {
     classes: classes,
     abstractClasses: abstractClasses,
     skeletons: skeletons,
-    proxies: proxies
+    proxies: proxies,
+    blacklist: blacklist,
 }
