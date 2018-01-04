@@ -66,26 +66,26 @@ foam.CLASS({
           javaType: 'java.security.Permission'
         }
       ],
-      code: function() {
-        if ( this.permissions == null ) return false;
-
-        for ( var i = 0 ; i < this.permissions.length ; i++ ) {
-          alert ("aaa : " + this.permissions[i].ID);
-
-          var strInspect  = this.permissions[i].ID.includes("*");
-
-          if ( strInspect ) {
-            return true;
-          }
-        }
-        return false;
-      },
       javaCode: `
         if ( getPermissions() == null ) return false;
         for ( int i = 0 ; i < permissions_.length ; i++ )
-          if ( permissions_[i].implies(permission) ) return true;
+          if ( new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) )
+            return true;
         return false;
-      `
+      `,
+      code: function(permissionId, permission, group) {
+        if ( this.permissions == null ) return false;
+
+        for ( var i = 0 ; i < this.permissions.length ; i++ ) {
+          if ( group.permissions[i].id.endsWith('*') ) {
+            var prefix = group.permissions[i].id.substring(0, group.permissions[i].id.length-1);
+            if ( permissionId.includes(prefix) ) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
     }
   ]
 });
