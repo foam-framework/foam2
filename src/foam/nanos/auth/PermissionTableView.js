@@ -37,14 +37,14 @@ foam.CLASS({
 
       this.start('table')
         .start('tr')
-          .tag('td').style({'width': '100'})
+          .tag('td').style({'text-align': 'left', 'width': '480'})
           .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-            this.start('th').style({'text-align': 'center', 'width': '100'}).add(g.id).end();
+            this.start('td').start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
           })
         .end()
         .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
           this.start('tr')
-            .start('th').style({'text-align': 'left', 'width': '100'}).add(p.id).end()
+            .start('td').style({'text-align': 'left', 'width': '480'}).add(p.id).end()
             .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
