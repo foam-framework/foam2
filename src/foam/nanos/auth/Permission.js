@@ -31,9 +31,9 @@
          if ( prefix.length && ! prefix.endsWith('.') ) return false;
 
          return permissionId.startsWith(prefix);
-       } else {
-         return false;
        }
+       
+       return false;
      }
    ]
  });
