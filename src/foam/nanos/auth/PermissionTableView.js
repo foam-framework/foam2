@@ -74,17 +74,6 @@ foam.CLASS({
         group.permissions = permissions;
         dao.put(group);
       });
-    },
-
-    /*function highlightPermissions(permissionId, group, data) {
-      var permissionArry = [];
-      permissionArry = permissionId.split("*");
-
-      if ( permissionId == '*' ) { // all checked
-        alert( "dd : " + permissionArry[0] );
-      } else if ( permissionArry.legnth != 0 && permissionArry[ permissionArry.legnth - 1 ].equals("*") ) {
-        alert( "ff : " + permissionArry[0] );
-      }
-    }*/
+    }
   ]
 });

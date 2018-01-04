@@ -66,13 +66,15 @@ foam.CLASS({
           javaType: 'java.security.Permission'
         }
       ],
-      javaCode: `
-        if ( getPermissions() == null ) return false;
-        for ( int i = 0 ; i < permissions_.length ; i++ )
-          if ( new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) )
+      javaCode:
+        `if ( getPermissions() == null ) return false;
+        for ( int i = 0 ; i < permissions_.length ; i++ ) {
+          if ( new javax.security.auth.AuthPermission(permissions_[i].getId()).implies(permission) ) {
             return true;
-        return false;
-      `,
+          }
+        }
+        return false;`
+      ,
       code: function(permissionId, permission, group) {
         if ( this.permissions == null ) return false;
 
