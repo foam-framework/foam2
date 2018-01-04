@@ -79,9 +79,7 @@ foam.CLASS({
         if ( this.permissions == null ) return false;
 
         for ( var i = 0 ; i < this.permissions.length ; i++ ) {
-          if ( group.permissions[i].id.endsWith('*') ) {
-            return group.permissions[i].implies(group.permissions[i].id, permissionId);
-          } 
+          return group.permissions[i].implies(group.permissions[i].id, permissionId);
         }
       }
     }
