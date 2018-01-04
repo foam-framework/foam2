@@ -954,10 +954,8 @@ foam.CLASS({
         }
       ],
       javaCode: function() {
-/*
-setValue(Math.min(( (Number) getArg1().f(obj) ).doubleValue(), getValue()));
-if ( obj.compareTo(this.getValue()) > 0 ) {
-  this.setObject(obj);
+/*if ( getValue() == null || ((Comparable)getArg1().f(obj)).compareTo(getValue()) < 0 ) {
+  setValue(getArg1().f(obj));
 }*/
       }
     }
