@@ -12,10 +12,10 @@ foam.CLASS({
   documentation: 'Implementation of Token Service used for reset password',
 
   imports: [
+    'appConfig',    
     'email',
     'tokenDAO',
     'localUserDAO',
-    'appConfig'
   ],
 
   javaImports: [
@@ -25,16 +25,15 @@ foam.CLASS({
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.token.Token',    
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
     'foam.util.Password',
     'foam.util.SafetyUtil',
-    'foam.nanos.auth.token.Token',
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',
     'java.util.UUID',
-    
   ],
 
   axioms: [
