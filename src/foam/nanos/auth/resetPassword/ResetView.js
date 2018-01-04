@@ -7,17 +7,13 @@
 foam.CLASS({
   package: 'foam.nanos.auth.resetPassword',
   name: 'ResetView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'Forgot Password Reset View',
 
   imports: [
-    'stack',
-    'resetPasswordToken'
-  ],
-
-  exports: [
-    'as data'
+    'resetPasswordToken',    
+    'stack'
   ],
 
   requires: [

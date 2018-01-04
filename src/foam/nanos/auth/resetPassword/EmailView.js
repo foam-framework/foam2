@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth.resetPassword',
   name: 'EmailView',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation: 'Forgot Password Email View',
 
@@ -16,12 +16,10 @@ foam.CLASS({
     'resetPasswordToken'
   ],
 
-  exports: [ 'as data' ],
-
   requires: [
     'foam.nanos.auth.User',
-    'foam.u2.dialog.NotificationMessage',
-    'foam.nanos.auth.resetPassword.ResendView'
+    'foam.nanos.auth.resetPassword.ResendView',
+    'foam.u2.dialog.NotificationMessage'    
   ],
 
   css:`

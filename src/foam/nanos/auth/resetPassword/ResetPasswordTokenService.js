@@ -14,8 +14,8 @@ foam.CLASS({
   imports: [
     'appConfig',    
     'email',
-    'tokenDAO',
-    'localUserDAO',
+    'localUserDAO',    
+    'tokenDAO'
   ],
 
   javaImports: [
@@ -24,8 +24,8 @@ foam.CLASS({
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.token.Token',    
+    'foam.nanos.auth.User',    
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
     'foam.util.Password',
