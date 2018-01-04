@@ -12,8 +12,8 @@ foam.CLASS({
   documentation: 'Forgot Password Resend View',
 
   imports: [
-    'stack',
-    'resetPasswordToken'
+    'resetPasswordToken',
+    'stack'
   ],
 
 

@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.auth.token',
   name: 'Token',
 
-  documentation: 'Represents a token',
+  documentation: 'Represents a one-time access code linked to a specific User',
 
   properties: [
     {
