@@ -10,8 +10,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.Permission',
-    'foam.nanos.auth.Group'
+    'foam.nanos.auth.Group',
+    'foam.nanos.auth.Permission'
   ],
 
   css: `
@@ -31,20 +31,21 @@ foam.CLASS({
 
       this.start('table')
         .start('tr')
-          .tag('td')
+          .tag('td').style({'width': '100'})
           .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-            this.start('th').style({'text-align': 'center', 'width': '300', 'margin-bottom': '30'}).add(g.id).end();
+            this.start('th').style({'text-align': 'center', 'width': '100'}).add(g.id).end(); //.style({'text-align': 'center', 'width': '400', 'margin-bottom': '30'})
           })
         .end()
         .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
           this.start('tr')
-            .start('th').style({'text-align': 'left'}).add(p.id).end()
-            .select(self.groupDAO, function(g) {
+            .start('th').style({'text-align': 'left', 'width': '100'}).add(p.id).end()
+            .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-              this.start('td').style({'text-align': 'center', 'width': '300', 'margin-bottom': '30'}).tag(cb).call(function() {
-                if ( g.implies(p.id) ) this.add('*');
-              }).end();
+              this.start('td').style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() { //.style({'text-align': 'center', 'width': '400', 'margin-bottom': '30'})
+              if ( g.implies(p.id, p, g)  ) { cb.style({'border-color': 'red'}) }; //this.style({'background': 'yellow'}) };
+              })
+              .end();
             })
             .end()
         })
