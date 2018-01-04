@@ -81,7 +81,7 @@ foam.CLASS({
         margin-top: 10px;
       }
       
-      ^ .foam-u2-ActionView-confirm {
+      ^ .resetButton {
         width: 450px;
         height: 40px;
         border-radius: 2px;
@@ -94,19 +94,6 @@ foam.CLASS({
         cursor: pointer;
         color: #ffffff;
         margin-top: 10px;
-      }
-
-      ^ .foam-ui-ActionView-confirm span {
-        display: block;
-        font-size: 12px;
-        line-height: 40px;
-        letter-spacing: 0.2px;
-      }
-
-      ^ .foam-u2-ActionView-confirm:hover {
-        background: none;
-        cursor: pointer;
-        background-color: #20B1A7;
       }
 
       ^ .link{
@@ -174,13 +161,13 @@ foam.CLASS({
           .start().addClass('confirmPassword-Text').add("Confirm Password").end()
           .start(this.CONFIRM_PASSWORD).addClass('full-width-input').end()
           .start('div')
-            .tag(this.CONFIRM, { showLabel: true })
+            .start(this.CONFIRM).addClass('resetButton').end()
           .end()
         .end()
         .start('p').add("Remember your password?").end()
         .start('p').addClass('link')
           .add('Sign in.')
-          .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
+          .on('click', function(){ window.location.href = '#'; self.stack.push({ class: 'foam.nanos.auth.SignInView' })})
         .end()
       .end()
     }
