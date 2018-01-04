@@ -19,73 +19,67 @@ foam.CLASS({
     'foam.u2.dialog.NotificationMessage'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
+  css:`
+    ^{
+      width: 490px;
+      margin: auto;
+    }
 
-      ^{
-        width: 490px;
-        margin: auto;
-      }
+    ^ .Message-Container{
+      width: 490px;
+      height: 121px;
+      border-radius: 2px;
+      background-color: #ffffff;
+      padding-top: 5px;
+    }
 
-      ^ .Message-Container{
-        width: 490px;
-        height: 121px;
-        border-radius: 2px;
-        background-color: #ffffff;
-        padding-top: 5px;
-      }
+    ^ .Reset-Password{
+      width: 225;
+      height: 30px;
+      font-family: Roboto;
+      font-size: 30px;
+      font-weight: bold;
+      line-height: 1;
+      letter-spacing: 0.5px;
+      text-align: left;
+      color: #093649;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
 
-      ^ .Reset-Password{
-        width: 225;
-        height: 30px;
-        font-family: Roboto;
-        font-size: 30px;
-        font-weight: bold;
-        line-height: 1;
-        letter-spacing: 0.5px;
-        text-align: left;
-        color: #093649;
-        margin-top: 20px;
-        margin-bottom: 30px;
-      }
+    ^ p{
+      display: inline-block;
+    }
 
-      ^ p{
-        display: inline-block;
-      }
-
-      ^ .success-Text{
-        width: 450px;
-        height: 16px;
-        font-family: Roboto;
-        font-size: 14px;
-        font-weight: 300;
-        letter-spacing: 0.2px;
-        text-align: left;
-        color: #093649;
-        margin-top: 15px;
-        margin-left: 20px;
-        margin-right: 288px;
-        margin-bottom: 20px;
-      }
-      
-      ^ .Back-Button{
-        width: 450px;
-        height: 40px;
-        border-radius: 2px;
-        border: solid 1px #59a5d5;
-        margin-left: 20px;
-        margin-right: 20px;
-        text-align: center;
-        line-height: 40px;
-        cursor: pointer;
-        color: #59aadd;
-        margin-top: 10px;
-      }
-
-    */}
-    })
-  ],
+    ^ .success-Text{
+      width: 450px;
+      height: 16px;
+      font-family: Roboto;
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #093649;
+      margin-top: 15px;
+      margin-left: 20px;
+      margin-right: 288px;
+      margin-bottom: 20px;
+    }
+    
+    ^ .Back-Button{
+      width: 450px;
+      height: 40px;
+      border-radius: 2px;
+      border: solid 1px #59a5d5;
+      margin-left: 20px;
+      margin-right: 20px;
+      text-align: center;
+      line-height: 40px;
+      cursor: pointer;
+      color: #59aadd;
+      margin-top: 10px;
+    }
+  `,
   
   messages: [
     { name: 'Instructions', message: "Successfully reset password!"}
@@ -108,7 +102,7 @@ foam.CLASS({
                 window.location.href = '#';
                 self.stack.push({ class: 'foam.nanos.auth.SignInView' })
               })
-            .end()
+            .end()         
           .end()
         .end()
 
