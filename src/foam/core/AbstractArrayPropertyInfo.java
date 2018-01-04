@@ -29,7 +29,7 @@ public abstract class AbstractArrayPropertyInfo
     }
     // TODO: TO REUSE THIS LIST WITH A THREADLOCAL FOR BETTER PERFORMANCE
     List<String> list = new LinkedList<String>();
-    StringBuilder sb = new StringBuilder(); 
+    StringBuilder sb = new StringBuilder();
     char prev = '$';
     char[] cs = value.toCharArray();
     for ( int i = 0 ; i < cs.length ; i++ ) {
