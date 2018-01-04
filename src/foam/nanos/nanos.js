@@ -28,7 +28,6 @@ FOAM_FILES([
   { name: "foam/nanos/auth/resetPassword/ResendView" },
   { name: "foam/nanos/auth/resetPassword/ResetView" },
   { name: "foam/nanos/auth/resetPassword/SuccessView" },
-  { name: "foam/nanos/auth/resetPassword/ResetPasswordController" },  
   { name: "foam/nanos/auth/resetPassword/ResetPasswordTokenService" },  
   { name: "foam/nanos/auth/token/TokenService" },  
   { name: "foam/nanos/auth/token/ClientTokenService" },  
