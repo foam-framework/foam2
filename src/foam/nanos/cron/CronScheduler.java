@@ -36,11 +36,11 @@ public class CronScheduler
       MLang.MIN(Cron.SCHEDULED_TIME)
     );
 
-    if ( min.getValue().equals(0) ) {
+    if ( min.getObject().equals(0) ) {
       return null;
     }
 
-    return (Date) min.getValue();
+    return (Date) min.getObject();
   }
 
   public void start() {
