@@ -99,7 +99,8 @@ foam.CLASS({
             .start().addClass('Back-Button')
               .add("Back to Sign In")
               .on('click', function(){ 
-                window.location.replace("./index.html");                
+                window.location.href = '#';
+                self.stack.push({ class: 'foam.nanos.auth.SignInView' })
               })
             .end()
           .end()

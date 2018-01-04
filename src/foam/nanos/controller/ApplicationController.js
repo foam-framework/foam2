@@ -177,8 +177,8 @@ foam.CLASS({
       if ( location.hash != null && location.hash === '#reset') 
         return new Promise(function (resolve, reject) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
-          resolve();
-      });
+          self.loginSuccess$.sub(resolve);
+        });
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
