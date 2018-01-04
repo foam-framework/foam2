@@ -82,7 +82,7 @@ public class MLang
   }
 
   public static Sink MIN(Object o1) {
-    return new Min(0, MLang.prepare(o1));
+    return new Min(Double.MAX_VALUE, null, MLang.prepare(o1));
   }
 
   public static Sink SUM(Object o1) {
