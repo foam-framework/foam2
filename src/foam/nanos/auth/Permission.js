@@ -20,5 +20,13 @@
        name: 'description',
        documentation: 'Description of the Group.'
      }
+   ],
+
+   methods: [
+     function implies(gPermissionId, permissionId) {
+         var prefix = gPermissionId.substring(0, gPermissionId.length-1);
+
+         return permissionId.startsWith(prefix);
+     }
    ]
  });

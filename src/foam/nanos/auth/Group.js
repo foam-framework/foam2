@@ -80,13 +80,9 @@ foam.CLASS({
 
         for ( var i = 0 ; i < this.permissions.length ; i++ ) {
           if ( group.permissions[i].id.endsWith('*') ) {
-            var prefix = group.permissions[i].id.substring(0, group.permissions[i].id.length-1);
-            if ( permissionId.includes(prefix) ) {
-              return true;
-            }
-          }
+            return group.permissions[i].implies(group.permissions[i].id, permissionId);
+          } 
         }
-        return false;
       }
     }
   ]
