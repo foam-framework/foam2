@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package net.nanopay.dig.model;
+package foam.nanos.dig;
 
 import foam.core.*;
 import foam.core.PropertyInfo;
