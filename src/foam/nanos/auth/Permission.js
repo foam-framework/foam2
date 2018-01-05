@@ -33,7 +33,7 @@
          return permissionId.startsWith(prefix);
        }
 
-       return false;
+       return permissionId == this.id;
      }
    ]
  });
