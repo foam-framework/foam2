@@ -23,9 +23,9 @@
    ],
 
    methods: [
-     function implies(gPermissionId, permissionId) {
-       if ( gPermissionId.id.endsWith('*') ) {
-         var prefix = gPermissionId.id.substring(0, gPermissionId.id.length-1);
+     function implies(permissionId) {
+       if ( this.id.endsWith('*') ) {
+         var prefix = this.id.substring(0, this.id.length-1);
 
          // Check that is a valid permission string (should be done as a property validator)
          if ( prefix.length && ! prefix.endsWith('.') ) return false;
