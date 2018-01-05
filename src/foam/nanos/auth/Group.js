@@ -78,9 +78,10 @@ foam.CLASS({
       code: function(permissionId) {
         if ( this.permissions == null ) return false;
 
-        for ( var i = 0 ; i < this.permissions.length ; i++ ) {
-          return this.permissions[i].implies(permissionId);
-        }
+        for ( var i = 0 ; i < this.permissions.length ; i++ )
+          if ( this.permissions[i].implies(permissionId) ) return true;
+
+        return false;
       }
     }
   ]
