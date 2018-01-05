@@ -12,14 +12,14 @@ foam.CLASS({
   documentation: 'Forgot Password Email View',
 
   imports: [
-    'stack',
-    'resetPasswordToken'
+    'resetPasswordToken',
+    'stack'
   ],
 
   requires: [
-    'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResendView',
-    'foam.u2.dialog.NotificationMessage'    
+    'foam.nanos.auth.User',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   css:`
@@ -123,9 +123,9 @@ foam.CLASS({
       line-height: 2.86;
       cursor: pointer;
     }
-    
+
   `,
-   
+
 
   properties: [
     {
@@ -166,7 +166,6 @@ foam.CLASS({
   actions: [
     {
       name: 'next',
-      label: 'Next',
       code: function (X) {
         var self = this;
         var user = this.User.create({ email: this.email });
