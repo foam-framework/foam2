@@ -140,7 +140,7 @@ public class TreeIndex
     if ( predicate == null && sink instanceof GroupBy
         && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
         && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
-      return new GroupByPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
+      return new GroupByPlan(state, sink, predicate, prop_, tail_);
     return new ScanPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
   }
 
