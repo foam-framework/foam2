@@ -14,19 +14,13 @@ import foam.mlang.sink.GroupBy;
 public class GroupByPlan implements SelectPlan {
 
   protected Object state_;
-  protected long skip_;
-  protected long limit_;
-  protected Comparator order_;
   protected long cost_;
   protected Index tail_;
   protected boolean reverseSort_ = false;
   protected boolean needGroupBy = true;
 
-  public GroupByPlan(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate, PropertyInfo propertyInfo, Index tail) {
+  public GroupByPlan(Object state, Sink sink, Predicate predicate, PropertyInfo propertyInfo, Index tail) {
     state_ = state;
-    skip_ = skip;
-    limit_ = limit;
-    order_ = order;
     cost_ = calculateCost(propertyInfo);
     tail_ = tail;
   }
