@@ -45,7 +45,7 @@ public class GroupByPlan implements SelectPlan {
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( state_ == null )
       return;
-    ( (TreeNode) state ).groupBy((TreeNode) state_, sink, skip_, limit_, ( (TreeNode) state_ ).size, tail_);
+    ( (TreeNode) state ).groupBy((TreeNode) state_, sink, tail_);
   }
 
 }

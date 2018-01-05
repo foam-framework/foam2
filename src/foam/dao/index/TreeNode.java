@@ -383,38 +383,20 @@ public class TreeNode {
     }
   }
 
-  protected long[] groupBy(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
-    if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
-    long currentSize = currentNode.size;
+  protected void groupBy(TreeNode currentNode, Sink sink, Index tail) {
+    if ( currentNode == null ) return;
     TreeNode left = currentNode.getLeft();
     long leftSize = 0;
-    long[] skip_limit = new long[]{skip, limit}; //skip_limit[0]: skip, skip_limit[1]: limit
-    if ( left != null ) {
-      leftSize = left.size;
-      if ( leftSize > skip ) {
-        skip_limit = groupBy(left, sink, skip_limit[0], skip_limit[1], size, tail);
-      } else if ( leftSize == skip ) skip_limit[0] = 0;
-      else {
-        skip_limit[0] = skip_limit[0] - leftSize;
-      }
-    }
+    if ( left != null ) groupBy(left, sink, tail);
     Object value = currentNode.getValue();
-    if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
+    if ( value != null ) {
       Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).deepClone();
-      tail.planSelect(value, temp, skip_limit[0], skip_limit[1], null, null).select(value, temp, skip_limit[0], skip_limit[1], null, null);
+      tail.planSelect(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null)
+          .select(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
       ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);
-      skip_limit[0] = 0;
-      skip_limit[1] = skip_limit[1] - ( tail.size(currentNode) - skip_limit[0] );
-    } else if ( tail.size(currentNode) == skip_limit[0] ) {
-      skip_limit[0] = 0;
-    } else {
-      skip_limit[0] = skip_limit[0] - tail.size(currentNode);
     }
     TreeNode right = currentNode.getRight();
-    if ( right != null ) {
-      skip_limit = groupBy(right, sink, skip_limit[0], skip_limit[1], size, tail);
-    }
-    return skip_limit;
+    if ( right != null ) groupBy(right, sink, tail);
   }
 
   protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {

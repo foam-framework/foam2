@@ -7,10 +7,10 @@
 package foam.dao;
 
 import foam.core.*;
-import foam.dao.*;
-import foam.mlang.*;
 import foam.mlang.predicate.*;
 import foam.mlang.order.*;
+
+import java.util.HashSet;
 
 public abstract class AbstractDAO
   extends    ContextAwareSupport
@@ -64,6 +64,10 @@ public abstract class AbstractDAO
 
     if ( predicate != null ) {
       sink = new PredicatedSink(predicate, sink);
+    }
+
+    if ( predicate instanceof Or ) {
+      sink = new DedupSink(new HashSet(), sink);
     }
 
     return sink;
