@@ -12,8 +12,8 @@ import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import static foam.dao.AbstractDAO.decorateSink_;
-import foam.mlang.predicate.Binary;
 import foam.mlang.predicate.True;
+import foam.mlang.sink.GroupBy;
 
 public class TreeNode {
 
@@ -381,6 +381,22 @@ public class TreeNode {
     if ( right != null ) {
       select_(right, sink, skip, limit, size, tail);
     }
+  }
+
+  protected void groupBy(TreeNode currentNode, Sink sink, Index tail) {
+    if ( currentNode == null ) return;
+    TreeNode left = currentNode.getLeft();
+    long leftSize = 0;
+    if ( left != null ) groupBy(left, sink, tail);
+    Object value = currentNode.getValue();
+    if ( value != null ) {
+      Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).deepClone();
+      tail.planSelect(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null)
+          .select(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
+      ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);
+    }
+    TreeNode right = currentNode.getRight();
+    if ( right != null ) groupBy(right, sink, tail);
   }
 
   protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {

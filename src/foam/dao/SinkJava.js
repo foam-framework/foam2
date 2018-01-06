@@ -177,3 +177,18 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.dao.DedupSink',
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'if ( getResults() == null ) setResults(new java.util.HashSet<>());\n' +
+      '    if ( ! getResults().contains(obj.getProperty("id")) ) {\n' +
+      '      getDelegate().put(obj, sub);\n' +
+      '      getResults().add(obj.getProperty("id"));\n' +
+      '    }'
+    }
+  ]
+});
