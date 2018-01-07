@@ -6,18 +6,15 @@
 
 package foam.nanos.blob;
 
-import foam.blob.Blob;
-import foam.blob.BlobService;
-import foam.blob.Buffer;
-import foam.blob.FileBlob;
-import foam.core.ContextAware;
+import foam.blob.*;
 import foam.core.X;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
-import foam.nanos.NanoService;
+import foam.nanos.http.WebAgent;
 import org.apache.commons.io.IOUtils;
 
-import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -27,122 +24,92 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class HttpBlobService
-    extends HttpServlet
-    implements NanoService, ContextAware, BlobService
+    extends ProxyBlobService
+    implements WebAgent
 {
   public static final int BUFFER_SIZE = 8192;
 
-  private foam.core.X x_;
-
-  private foam.blob.BlobService store_;
-
-  @Override
-  public Blob put(Blob blob) {
-    return this.put_(getX(), blob);
+  public HttpBlobService(X x, BlobService delegate) {
+    setX(x);
+    setDelegate(delegate);
   }
 
   @Override
-  public Blob put_(X x, Blob blob) {
-    return this.store_.put_(x, blob);
-  }
+  public void execute(X x) {
+    HttpServletRequest  req  = (HttpServletRequest)  x.get(HttpServletRequest.class);
+    HttpServletResponse resp = (HttpServletResponse) x.get(HttpServletResponse.class);
 
-  @Override
-  public Blob find(Object id) {
-    return this.find_(getX(), id);
-  }
-
-  @Override
-  public Blob find_(X x, Object id) {
-    return this.store_.find_(x, id);
-  }
-
-  @Override
-  public String urlFor(Blob blob) {
-    return this.urlFor_(getX(), blob);
-  }
-
-  @Override
-  public String urlFor_(X x, Blob blob) {
-    return this.store_.urlFor_(x, blob);
-  }
-
-  @Override
-  public foam.core.X getX() {
-    return x_;
-  }
-
-  @Override
-  public void setX(foam.core.X x) {
-    x_ = x;
-  }
-
-  @Override
-  public void start() {
-    store_ = (foam.blob.BlobService)getX().get("blobStore");
-  }
-
-  @Override
-  protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-      throws javax.servlet.ServletException, java.io.IOException
-  {
-    String path = req.getRequestURI();
-    String id = path.substring(path.lastIndexOf("/") + 1);
-
-    foam.blob.Blob blob = store_.find(id);
-
-    if ( blob == null ) {
-      resp.setStatus(resp.SC_NOT_FOUND);
-      return;
-    }
-
-    long chunk = 0;
-    long size = blob.getSize();
-    long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-    Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
-
-    resp.setStatus(resp.SC_OK);
-    if ( blob instanceof FileBlob ) {
-      File file = ((FileBlob) blob).getFile();
-      resp.setHeader("Content-Type", Files.probeContentType(Paths.get(file.toURI())));
-    } else {
-      resp.setHeader("Content-Type", "application/octet-stream");
-    }
-    resp.setHeader("Content-Length", Long.toString(size, 10));
-    resp.setHeader("ETag", id);
-    resp.setHeader("Cache-Control", "public");
-
-    java.io.OutputStream output = resp.getOutputStream();
-    WritableByteChannel channel = Channels.newChannel(output);
-
-    while ( chunk < chunks ) {
-      buffer = blob.read(buffer, chunk * BUFFER_SIZE);
-      if ( buffer == null ) {
-        break;
+    try {
+      if ("GET".equals(req.getMethod())) {
+        download(req, resp);
+      } else if ("PUT".equals(req.getMethod())) {
+        upload(req, resp);
       }
-      channel.write(buffer.getData());
-      buffer.getData().clear();
-      chunk++;
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new RuntimeException(t);
     }
-    output.flush();
-    output.close();
   }
 
-  @Override
-  protected void doPut(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-      throws javax.servlet.ServletException, java.io.IOException
-  {
+  protected void download(HttpServletRequest req, HttpServletResponse resp) {
+    try {
+      String path = req.getRequestURI();
+      String id = path.substring(path.lastIndexOf("/") + 1);
+
+      Blob blob = getDelegate().find(id);
+
+      if (blob == null) {
+        resp.setStatus(resp.SC_NOT_FOUND);
+        return;
+      }
+
+      long chunk = 0;
+      long size = blob.getSize();
+      long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
+      Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
+
+      resp.setStatus(resp.SC_OK);
+      if (blob instanceof FileBlob) {
+        File file = ((FileBlob) blob).getFile();
+        resp.setContentType(Files.probeContentType(Paths.get(file.toURI())));
+      } else {
+        resp.setContentType("application/octet-stream");
+      }
+      resp.setHeader("Content-Length", Long.toString(size, 10));
+      resp.setHeader("ETag", id);
+      resp.setHeader("Cache-Control", "public");
+
+      OutputStream output = resp.getOutputStream();
+      WritableByteChannel channel = Channels.newChannel(output);
+
+      while (chunk < chunks) {
+        buffer = blob.read(buffer, chunk * BUFFER_SIZE);
+        if (buffer == null) {
+          break;
+        }
+        channel.write(buffer.getData());
+        buffer.getData().clear();
+        chunk++;
+      }
+      output.flush();
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
+  }
+
+  protected void upload(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp) {
     File temp = null;
     OutputStream os = null;
-    InputStream is = null;
 
     try {
       // create a temporary file to store incoming data
       temp = File.createTempFile(UUID.randomUUID().toString(), ".tmp");
       os = new FileOutputStream(temp);
-      is = req.getInputStream();
+      InputStream is = req.getInputStream();
 
       int read = 0;
       byte[] buffer = new byte[BUFFER_SIZE];
@@ -152,13 +119,12 @@ public class HttpBlobService
 
       // create a file blob and store
       FileBlob blob = new FileBlob(temp);
-      Blob result = store_.put(blob);
+      Blob result = getDelegate().put(blob);
       new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(result);
     } catch (Throwable t) {
       throw new RuntimeException(t);
     } finally {
       IOUtils.closeQuietly(os);
-      IOUtils.closeQuietly(is);
       if ( temp != null ) {
         temp.delete();
       }
