@@ -20,12 +20,29 @@ public abstract class AbstractFObject
     return ( fo == null ? null : fo.fclone() );
   }
 
-  public FObject fclone() {
+  public FObject deepClone() {
+    return fclone();
+  }
+
+  public FObject shallowClone() {
     try {
       FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for ( PropertyInfo pi : props ) {
         pi.set(ret, pi.get(this));
+      }
+      return ret;
+    } catch (IllegalAccessException | InstantiationException e) {
+      return null;
+    }
+  }
+
+  public FObject fclone() {
+    try {
+      FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
+      List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      for( PropertyInfo pi : props ) {
+        pi.cloneProperty(this, ret);
       }
       return ret;
     } catch (IllegalAccessException | InstantiationException e) {

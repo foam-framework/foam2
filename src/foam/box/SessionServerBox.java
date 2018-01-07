@@ -18,7 +18,7 @@ import java.security.AccessControlException;
 import java.util.Date;
 
 public class SessionServerBox
-    extends ProxyBox
+  extends ProxyBox
 {
   protected boolean authenticate_;
 

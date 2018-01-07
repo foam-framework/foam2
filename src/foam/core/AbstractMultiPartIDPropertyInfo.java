@@ -9,4 +9,8 @@ package foam.core;
 public abstract class AbstractMultiPartIDPropertyInfo
   extends AbstractObjectPropertyInfo
 {
+  @Override
+  public void cloneProperty(FObject source, FObject dest) {
+    // No need to clone, not backed by any real storage.
+  }
 }

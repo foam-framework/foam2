@@ -58,6 +58,17 @@ public class MLang
     return new And(args);
   }
 
+  public static Sink GROUP_BY(Expr o1, Sink o2) {
+    GroupBy groupBy = new GroupBy();
+    groupBy.setArg1(o1);
+    groupBy.setArg2(o2);
+    return groupBy;
+  }
+
+  public static Sink COUNT() {
+    return new Count();
+  }
+
   public static Predicate OR(Predicate... args) {
     return new Or(args);
   }
@@ -71,7 +82,7 @@ public class MLang
   }
 
   public static Sink MIN(Object o1) {
-    return new Min(0, MLang.prepare(o1));
+    return new Min(null, MLang.prepare(o1));
   }
 
   public static Sink SUM(Object o1) {
