@@ -6,18 +6,28 @@
 
 package foam.nanos.blob;
 
-import foam.blob.*;
+import foam.blob.Blob;
+import foam.blob.BlobService;
+import foam.blob.Buffer;
+import foam.blob.FileBlob;
 import foam.core.ContextAware;
 import foam.core.X;
+import foam.lib.json.Outputter;
+import foam.lib.json.OutputterMode;
 import foam.nanos.NanoService;
+import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 public class HttpBlobService
     extends HttpServlet
@@ -124,8 +134,34 @@ public class HttpBlobService
   protected void doPut(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
       throws javax.servlet.ServletException, java.io.IOException
   {
-    HttpServletRequestBlob blob = new HttpServletRequestBlob(req);
-    Blob result = store_.put(blob);
-    new foam.lib.json.Outputter(resp.getWriter(), foam.lib.json.OutputterMode.NETWORK).output(result);
+    File temp = null;
+    OutputStream os = null;
+    InputStream is = null;
+
+    try {
+      // create a temporary file to store incoming data
+      temp = File.createTempFile(UUID.randomUUID().toString(), ".tmp");
+      os = new FileOutputStream(temp);
+      is = req.getInputStream();
+
+      int read = 0;
+      byte[] buffer = new byte[BUFFER_SIZE];
+      while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
+        os.write(buffer, 0, read);
+      }
+
+      // create a file blob and store
+      FileBlob blob = new FileBlob(temp);
+      Blob result = store_.put(blob);
+      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(result);
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    } finally {
+      IOUtils.closeQuietly(os);
+      IOUtils.closeQuietly(is);
+      if ( temp != null ) {
+        temp.delete();
+      }
+    }
   }
 }
