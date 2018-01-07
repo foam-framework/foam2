@@ -6,13 +6,12 @@
 
 package foam.dao.index;
 
+import java.io.*;
 import org.apache.commons.io.IOUtils;
 
-import java.io.*;
-
 public class PersistedIndex
-    extends ProxyIndex
-    implements Closeable
+  extends ProxyIndex
+  implements Closeable
 {
   protected final File file_;
   protected FileInputStream fis_;
