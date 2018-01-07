@@ -44,13 +44,12 @@ public class HttpBlobService
     HttpServletResponse resp = (HttpServletResponse) x.get(HttpServletResponse.class);
 
     try {
-      if ("GET".equals(req.getMethod())) {
+      if ( "GET".equals(req.getMethod()) ) {
         download(req, resp);
-      } else if ("PUT".equals(req.getMethod())) {
+      } else if ( "PUT".equals(req.getMethod()) ) {
         upload(req, resp);
       }
     } catch (Throwable t) {
-      t.printStackTrace();
       throw new RuntimeException(t);
     }
   }
