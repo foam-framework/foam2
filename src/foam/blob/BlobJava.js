@@ -257,7 +257,6 @@ try {
     buffer.getData().clear();
     chunk++;
   }
-  os.close();
 
   String digest = new String(Hex.encode(hash.digest()));
   File dest = new File(sha256_ + File.separator + digest);
