@@ -55,7 +55,7 @@ public class NanoRouter
       } else {
         X y = getX().put(HttpServletRequest.class, req)
             .put(HttpServletResponse.class, resp)
-            .put(PrintWriter.class, new XFactory() {
+            .putFactory(PrintWriter.class, new XFactory() {
               @Override
               public Object create(X x) {
                 try {

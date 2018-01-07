@@ -39,7 +39,7 @@ public class WebAgentServlet
     agent_.execute(getX()
       .put(HttpServletRequest.class,  req)
       .put(HttpServletResponse.class, resp)
-      .put(PrintWriter.class,         new XFactory() {
+      .putFactory(PrintWriter.class,         new XFactory() {
         public Object create(X x) { try { return resp.getWriter(); } catch (IOException e) { return null; } }
       }));
   }
