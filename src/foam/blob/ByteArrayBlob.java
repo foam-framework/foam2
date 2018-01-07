@@ -8,13 +8,13 @@ package foam.blob;
 
 import java.nio.ByteBuffer;
 
-public class BlobBlob
+public class ByteArrayBlob
     extends AbstractBlob
 {
   protected int size_;
   protected byte[] blob_;
 
-  public BlobBlob(byte[] blob) {
+  public ByteArrayBlob(byte[] blob) {
     size_ = blob.length;
     blob_ = new byte[blob.length];
     System.arraycopy(blob, 0, blob_, 0, blob.length);
@@ -33,7 +33,6 @@ public class BlobBlob
       buffer.setData(bb);
       return buffer;
     } catch (Throwable t) {
-      t.printStackTrace();
       return null;
     }
   }
