@@ -22,7 +22,7 @@ public class RestBlobService
   public static final int BUFFER_SIZE = 8192;
 
   protected String address_;
-  
+
   public RestBlobService(foam.core.X x, String address) {
     setX(x);
     this.address_ = address + "/service/httpBlobService";
@@ -121,7 +121,7 @@ public class RestBlobService
         os.write(buffer, 0, read);
       }
 
-      return new BlobBlob(os.toByteArray());
+      return new ByteArrayBlob(os.toByteArray());
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
