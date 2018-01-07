@@ -33,7 +33,7 @@ public class RestBlobService
 
   public RestBlobService(foam.core.X x, String address) {
     setX(x);
-    this.address_ = address + "/httpBlobService";
+    this.address_ = address + "/blobService";
   }
 
   public String getAddress() {
