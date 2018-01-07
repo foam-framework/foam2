@@ -61,7 +61,7 @@ public class HttpBlobService
 
       Blob blob = getDelegate().find(id);
 
-      if (blob == null) {
+      if ( blob == null ) {
         resp.setStatus(resp.SC_NOT_FOUND);
         return;
       }
@@ -72,7 +72,7 @@ public class HttpBlobService
       Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
 
       resp.setStatus(resp.SC_OK);
-      if (blob instanceof FileBlob) {
+      if ( blob instanceof FileBlob ) {
         File file = ((FileBlob) blob).getFile();
         resp.setContentType(Files.probeContentType(Paths.get(file.toURI())));
       } else {
@@ -85,7 +85,7 @@ public class HttpBlobService
       OutputStream output = resp.getOutputStream();
       WritableByteChannel channel = Channels.newChannel(output);
 
-      while (chunk < chunks) {
+      while ( chunk < chunks ) {
         buffer = blob.read(buffer, chunk * BUFFER_SIZE);
         if (buffer == null) {
           break;
