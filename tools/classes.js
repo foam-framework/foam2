@@ -89,6 +89,7 @@ var classes = [
   'foam.dao.OrderedSink',
   'foam.dao.LimitedSink',
   'foam.dao.SkipSink',
+  'foam.dao.DedupSink',
   'foam.dao.ReadOnlyDAO',
   'foam.dao.Relationship',
   'foam.dao.RelationshipDAO',

@@ -8,17 +8,13 @@ package foam.blob;
 
 import foam.core.X;
 import foam.lib.json.JSONParser;
+import org.apache.commons.io.IOUtils;
 
-import java.net.URL;
+import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.InputStreamReader;
 
 public class RestBlobService
     extends AbstractBlobService
@@ -27,13 +23,9 @@ public class RestBlobService
 
   protected String address_;
 
-  public RestBlobService(String address) {
-    this(null, address);
-  }
-
   public RestBlobService(foam.core.X x, String address) {
     setX(x);
-    this.address_ = address + "/httpBlobService";
+    address_ = address;
   }
 
   public String getAddress() {
@@ -105,8 +97,8 @@ public class RestBlobService
   @Override
   public Blob find_(X x, Object id) {
     InputStream is = null;
+    ByteArrayOutputStream os = null;
     HttpURLConnection connection = null;
-    Blob blob = null;
 
     try {
       URL url = new URL(this.address_ + "/" + id.toString());
@@ -120,13 +112,20 @@ public class RestBlobService
         throw new RuntimeException("Failed to find blob");
       }
 
-      is = connection.getInputStream();
-      blob = new InputStreamBlob(is, connection.getContentLength());
+      is = new BufferedInputStream(connection.getInputStream());
+      os = new ByteArrayOutputStream();
+
+      int read = 0;
+      byte[] buffer = new byte[BUFFER_SIZE];
+      while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
+        os.write(buffer, 0, read);
+      }
+
+      return new ByteArrayBlob(os.toByteArray());
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
-      closeSource(is, null, connection);
-      return blob;
+      closeSource(is, os, connection);
     }
   }
 
@@ -143,22 +142,8 @@ public class RestBlobService
   }
 
   private void closeSource(InputStream is, OutputStream os, HttpURLConnection connection) {
-    if ( os != null ) {
-      try {
-        os.close();
-      } catch ( IOException e ) {
-        e.printStackTrace();
-      }
-    }
-    if ( is != null ) {
-      try {
-        is.close();
-      } catch ( IOException e ) {
-        e.printStackTrace();
-      }
-    }
-    if ( connection != null ) {
-      connection.disconnect();
-    }
+    IOUtils.closeQuietly(os);
+    IOUtils.closeQuietly(is);
+    IOUtils.close(connection);
   }
 }
