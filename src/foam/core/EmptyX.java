@@ -56,24 +56,14 @@ abstract class AbstractX
   }
 }
 
-
-/** Default implementation of X interface. Stores one key-value binding. **/
-class XI
+abstract class AbstractXI
   extends AbstractX
+  implements Cloneable
 {
   protected X   leftChild_;
   protected X   rightChild_;
-  final Object  key_;
-  final Object  value_;
-
-  XI(X leftChild, X rightChild, Object key, Object value) {
-    leftChild_   = leftChild;
-    rightChild_  = rightChild;
-    key_          = key;
-    value_        = value;
-  }
-
-  protected Object getKey() { return key_; }
+  
+  protected abstract Object getKey();
   protected X getLeftChild() { return leftChild_; }
   protected X getRightChild() { return rightChild_; }
   protected void setLeftChild(X leftChild) { leftChild_ = leftChild; }
@@ -103,6 +93,41 @@ class XI
     return clone(getLeftChild(), getRightChild().putFactory(key, factory));
   }
 
+  protected X clone(X left, X right) {
+    AbstractXI result = this.clone();
+    result.setLeftChild(left);
+    result.setRightChild(right);
+    return result;
+  }
+
+  @Override 
+  protected AbstractXI clone() {
+    AbstractXI x = null;
+    try {
+      x = (AbstractXI) super.clone();
+    } catch ( CloneNotSupportedException e ) {
+      e.printStackTrace();
+    }
+    return x;
+  }
+}
+
+/** Default implementation of X interface. Stores one key-value binding. **/
+class XI
+  extends AbstractXI
+{
+  final Object  key_;
+  final Object  value_;
+
+  XI(X leftChild, X rightChild, Object key, Object value) {
+    leftChild_   = leftChild;
+    rightChild_  = rightChild;
+    key_          = key;
+    value_        = value;
+  }
+  @Override
+  protected Object getKey() { return key_; }
+
   public Object get(X x, Object key) {
     String okey = key_.toString();
     String nkey = key.toString();
@@ -115,24 +140,6 @@ class XI
     return getRightChild().get(x, key);
   }
 
-  protected X clone(X left, X right) {
-    XI result = this.clone();
-    result.setLeftChild(left);
-    result.setRightChild(right);
-    return result;
-  }
-
-  @Override 
-  protected XI clone() {
-    XI x = null;
-    try {
-      x = (XI) super.clone();
-    } catch ( CloneNotSupportedException e ) {
-      e.printStackTrace();
-    }
-    return x;
-  }
-
   @Override
   public String toString() {
     return getLeftChild().toString() + ( "{Key: " + key_ + ", Object: "  + value_ + "}\n" ) + getRightChild().toString();
@@ -142,7 +149,7 @@ class XI
 
 /** Implementation of X interface when binding a key-factory pair. **/
 class FactoryXI
-  extends XI
+  extends AbstractXI
 {
   final Object    key_;
   final XFactory  factory_;
@@ -155,6 +162,8 @@ class FactoryXI
   }
 
   @Override
+  protected Object getKey() { return key_; }
+
   public Object get(X x, Object key) {
     String okey = key_.toString();
     String nkey = key.toString();
