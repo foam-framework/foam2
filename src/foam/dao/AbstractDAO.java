@@ -66,10 +66,11 @@ public abstract class AbstractDAO
       sink = new PredicatedSink(predicate, sink);
     }
 
-    if ( predicate instanceof Or ) {
-      sink = new DedupSink(new HashSet(), sink);
-    }
+    return sink;
+  }
 
+  public static Sink decorateDedupSink_(Sink sink) {
+    sink = new DedupSink(new HashSet(), sink);
     return sink;
   }
 
