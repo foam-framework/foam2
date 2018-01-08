@@ -6,13 +6,14 @@ package foam.dao.index;
 
 import foam.core.FObject;
 import foam.core.PropertyInfo;
+import foam.dao.AbstractDAO;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Binary;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.Count;
 import java.util.Arrays;
-import foam.mlang.order.Desc;
+import foam.mlang.sink.GroupBy;
 
 public class TreeIndex
   extends AbstractIndex
@@ -136,6 +137,10 @@ public class TreeIndex
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
+    if ( predicate == null && sink instanceof GroupBy
+        && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
+        && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
+      return new GroupByPlan(state, sink, predicate, prop_, tail_);
     return new ScanPlan(state, sink, skip, limit, order, predicate, prop_, tail_);
   }
 
