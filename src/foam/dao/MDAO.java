@@ -73,14 +73,13 @@ public class MDAO extends AbstractDAO {
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {
         Predicate arg = ( (Or) predicate ).getArgs()[i];
-        planList.add(index_.planSelect(state_, sink, skip, limit, order, arg));
+        planList.add(index_.planSelect(state_, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
       plan = new OrPlan(predicate, planList);
     } else {
       plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
     }
     plan.select(state_, sink, skip, limit, order, predicate);
-    sink.eof();
     return sink;
   }
 
