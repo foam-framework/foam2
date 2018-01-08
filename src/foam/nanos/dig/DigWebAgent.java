@@ -156,6 +156,16 @@ public class DigWebAgent
           XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
           List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);
 
+          if ( objList.size() == 0 ) {
+            out.println("Parse Error : ");
+
+            String message = getParsingError(x, buffer_.toString());
+            logger.error(message + ", input: " + buffer_.toString());
+            out.println(message);
+            out.flush();
+            return;
+          }
+
           Iterator i = objList.iterator();
           while ( i.hasNext() ) {
             obj = (FObject)i.next();
@@ -176,12 +186,14 @@ public class DigWebAgent
           for ( int i = 0 ; i < list.size() ; i++ ) {
             dao.put((FObject) list.get(i));
           }
+       } else if ( "html".equals(format) || "jsonj".equals(format) ) {
+         out.println("Please pick the follwed format - CSV, JSON, XML when put.");
        }
 
 
         //obj = dao.put(obj);
 
-        out.println("Success");
+        //out.println("Success");
       } else if ( "select".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());

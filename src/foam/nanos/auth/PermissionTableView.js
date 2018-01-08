@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'PermissionTableView',
@@ -10,6 +16,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.auth.Group',
     'foam.nanos.auth.Permission'
   ],
 
@@ -21,20 +28,6 @@ foam.CLASS({
       margin-bottom: 15px;
       width: 200;
     }
-    ^ .foam-u2-view-TableView th {
-      font-family: 'Roboto';
-      padding-left: 15px;
-      font-size: 14px;
-      line-height: 1;
-      letter-spacing: 0.4px;
-      color: #093649;
-      font-style: normal;
-    }
-    ^ .foam-u2-view-TableView td {
-      width: 130;
-      text-align: center;
-      margin-bottom: 30;
-    }
   `,
 
   methods: [
@@ -44,27 +37,30 @@ foam.CLASS({
 
       this.start('table')
         .start('tr')
-          .tag('td')
-          .select(this.groupDAO, function(g) {
-            this.start('th').addClass('foam-u2-view-TableView').add(g.id).end();
+          .tag('td').style({'text-align': 'left', 'width': '480'})
+          .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
+            this.start('td').start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
           })
         .end()
         .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
           this.start('tr')
-            .start('th').add(p.id).end()
-            .select(self.groupDAO, function(g) {
-              var cb = foam.u2.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
+            .start('td').style({'text-align': 'left', 'width': '480'}).add(p.id).end()
+            .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
+              var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-              this.start('td').style({'text-align': 'center', 'width': '130', 'margin-bottom': '30'}).tag(cb).end();
+              this.start('td').style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
+                if ( g.implies(p.id, p, g)  ) { cb.style({'border-color': '#40C75B'}) };
+              })
+              .end();
             })
-          .end()
+            .end()
         })
       .end();
     },
 
-    function checkPermissionForGroup(permission, group) {
+    function checkPermissionForGroup(permissionId, group) {
       for ( i = 0 ; i < group.permissions.length ; i++ ) {
-        if ( permission == group.permissions[i].id ) {
+        if ( permissionId == group.permissions[i].id ) {
           return true;
         }
       }
