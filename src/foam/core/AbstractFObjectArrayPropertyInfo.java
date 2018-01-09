@@ -20,8 +20,9 @@ public abstract class AbstractFObjectArrayPropertyInfo
     extends AbstractArrayPropertyInfo {
 
   @Override
-  public void setFromString(Object obj, String value) {
-    // TODO
+  public Object fromString(String value) {
+    //TODO
+    return null;
   }
 
   public abstract String of();
