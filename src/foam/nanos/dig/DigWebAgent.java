@@ -183,6 +183,17 @@ public class DigWebAgent
           csvSupport.inputCSV(is, arraySink, cInfo);
 
           List list = arraySink.getArray();
+
+          if ( list.size() == 0 ) {
+            out.println("Parse Error : ");
+
+            String message = getParsingError(x, buffer_.toString());
+            logger.error(message + ", input: " + buffer_.toString());
+            out.println(message);
+            out.flush();
+            return;
+          }
+
           for ( int i = 0 ; i < list.size() ; i++ ) {
             dao.put((FObject) list.get(i));
           }
@@ -193,7 +204,7 @@ public class DigWebAgent
 
         //obj = dao.put(obj);
 
-        //out.println("Success");
+        out.println("Success");
       } else if ( "select".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
