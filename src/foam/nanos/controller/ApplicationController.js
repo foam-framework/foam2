@@ -174,7 +174,7 @@ foam.CLASS({
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset') 
+      if ( location.hash != null && location.hash === '#reset')
         return new Promise(function (resolve, reject) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
           self.loginSuccess$.sub(resolve);
@@ -188,12 +188,8 @@ foam.CLASS({
   ],
 
   listeners: [
-    {
-      name: 'onUserUpdate',
-      isFramed: true,
-      code: function() {
-        this.setDefaultMenu();
-      }
+    function onUserUpdate() {
+      this.setDefaultMenu();
     }
   ]
 });
