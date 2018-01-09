@@ -20,6 +20,11 @@ public abstract class AbstractObjectPropertyInfo
 
   public void setFromString(Object obj, String value) { }
 
+  public Object fromString(String value) {
+    //TODO
+    return "";
+  }
+
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     return "";
