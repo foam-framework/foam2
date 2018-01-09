@@ -207,7 +207,7 @@ foam.CLASS({
 
 this.setup();
 
-OutputStream os = null;
+HashingOutputStream os = null;
 
 try {
   int size = blob.getSize();
