@@ -67,10 +67,7 @@ public class HttpBlobService
         return;
       }
 
-      int chunk = 0;
       int size = blob.getSize();
-      int chunks = (int) Math.ceil((double) size / (double) BUFFER_SIZE);
-
       resp.setStatus(resp.SC_OK);
       if ( blob instanceof FileBlob ) {
         File file = ((FileBlob) blob).getFile();
@@ -83,11 +80,10 @@ public class HttpBlobService
       resp.setHeader("Cache-Control", "public");
 
       os = resp.getOutputStream();
-      while ( chunk < chunks ) {
-        blob.read(os, chunk * BUFFER_SIZE, size);
-        chunk++;
-      }
+      blob.read(os, 0, size);
+      os.close();
     } catch (Throwable t) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
       IOUtils.closeQuietly(os);
@@ -102,6 +98,7 @@ public class HttpBlobService
       blob = new InputStreamBlob(req.getInputStream(), size);
       new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(getDelegate().put(blob));
     } catch (Throwable t) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
       IOUtils.closeQuietly(blob);
