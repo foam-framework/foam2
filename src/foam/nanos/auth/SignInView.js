@@ -92,6 +92,12 @@ foam.CLASS({
         color: #59a5d5;
         cursor: pointer;
       }
+      ^ .forgot-link{
+        margin-left: 2px;
+        color: #59a5d5;
+        cursor: pointer;
+        float: right;
+      }
     */}
     })
   ],
@@ -131,7 +137,7 @@ foam.CLASS({
               .on('click', self.signUp)
             .end()
           })
-          .start('p').style({ 'margin-left': '150px' }).addClass('link')		
+          .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')		
             .add("Forgot Password?")		
             .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})		
           .end()
