@@ -17,8 +17,12 @@ public abstract class AbstractStringPropertyInfo
   
   public abstract int getWidth();
 
-  public void setFromString(Object obj, String value) {
-    this.set(obj, value);
+  // public void setFromString(Object obj, String value) {
+  //   this.set(obj, value);
+  // }
+
+  public Object fromString(String value) {
+    return value;
   }
 
   @Override
