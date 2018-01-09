@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
@@ -285,7 +286,6 @@ public class DigWebAgent
       } else if ( "help".equals(command) ) {
         out.println("Help: <br><br>" );
         /*List<PropertyInfo> props = cInfo.getAxiomsByClass(PropertyInfo.class);
-
         out.println(daoName + "<br><br>");
         out.println("<table>");
         for( PropertyInfo pi : props ) {
