@@ -203,6 +203,11 @@ public class ServletHandler
     }
 
     @Override
+    public void setContentLengthLong(long len) {
+      ex.getResponseHeaders().add("Content-Length", len + "");
+    }
+
+    @Override
     public void setStatus(int status) {
       this.status = status;
     }

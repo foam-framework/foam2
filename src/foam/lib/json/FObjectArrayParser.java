@@ -25,7 +25,6 @@ public class FObjectArrayParser extends ProxyParser {
                 new Literal(","),
                 new Whitespace())),
         new Whitespace(),
-        new Literal("]"),
-        new Whitespace()));
+        new Literal("]")));
   }
 }

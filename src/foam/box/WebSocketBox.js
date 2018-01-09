@@ -72,7 +72,9 @@ foam.CLASS({
           protocol = "wss://";
         }
 
-        return protocol + this.window.location.hostname + ':' + ( this.window.location.port ? ( Number.parseInt(this.window.location.port) + 1 ) : 8081 ) + '/' + url;
+        return protocol + this.window.location.hostname +
+          ( this.window.location.port ? ':' + this.window.location.port : '' ) +
+          '/' + url;
       }
 
       return url;

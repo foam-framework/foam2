@@ -20,23 +20,19 @@ foam.CLASS({
   name: 'PopupView',
   extends: 'foam.u2.Element',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-      ^ {
-        background: #999;
-        box-shadow: 3px 3px 6px 0 gray;
-        color: white;
-        font-size: 18px;
-        opacity: 0.9;
-        padding: 20px;
-        position: absolute;
-        box-sizing: border-box;
-        z-index: 999;
-      }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      background: #999;
+      box-shadow: 3px 3px 6px 0 gray;
+      color: white;
+      font-size: 18px;
+      opacity: 0.9;
+      padding: 20px;
+      position: absolute;
+      box-sizing: border-box;
+      z-index: 999;
+    }
+  `,
 
   properties: [
     'x',

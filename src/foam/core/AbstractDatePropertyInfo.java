@@ -33,4 +33,10 @@ public abstract class AbstractDatePropertyInfo
     return date;
   }
 
+  @Override
+  public void cloneProperty(FObject source, FObject dest) {
+    Object value = get(source);
+
+    set(dest, value == null ? null : new Date(((Date)value).getTime()));
+  }
 }

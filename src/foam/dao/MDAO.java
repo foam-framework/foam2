@@ -10,11 +10,13 @@ import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
-import foam.dao.index.AltIndex;
-import foam.dao.index.SelectPlan;
-import foam.dao.index.TreeIndex;
+import foam.dao.index.*;
 import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MDAO extends AbstractDAO {
 
@@ -30,6 +32,8 @@ public class MDAO extends AbstractDAO {
   public void addIndex(PropertyInfo prop) {
     index_.addIndex(new TreeIndex(prop));
   }
+
+  public void addIndex(Index index) { index_.addIndex(index);}
 
   public FObject put_(X x, FObject obj) {
     FObject oldValue = find(obj);
@@ -57,13 +61,24 @@ public class MDAO extends AbstractDAO {
     }
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
-            ? (FObject)index_.find(state_,getPrimaryKey().get(o))
-            : (FObject)index_.find(state_, o)
+            ? (FObject)index_.planFind(state_,getPrimaryKey().get(o)).find(state_,getPrimaryKey().get(o))
+            : (FObject)index_.planFind(state_, o).find(state_,o)
     );
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    SelectPlan plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
+    SelectPlan plan;
+    if ( predicate instanceof Or ) {
+      int length = ( (Or) predicate ).getArgs().length;
+      List<Plan> planList = new ArrayList<>();
+      for ( int i = 0; i < length; i++ ) {
+        Predicate arg = ( (Or) predicate ).getArgs()[i];
+        planList.add(index_.planSelect(state_, sink, skip, limit, order, arg));
+      }
+      plan = new OrPlan(predicate, planList);
+    } else {
+      plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
+    }
     plan.select(state_, sink, skip, limit, order, predicate);
     sink.eof();
     return sink;
