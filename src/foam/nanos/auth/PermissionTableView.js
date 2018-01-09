@@ -49,7 +49,7 @@ foam.CLASS({
               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
               this.start('td').style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                if ( g.implies(p.id, p, g)  ) { cb.style({'border-color': '#40C75B'}) };
+                if ( g.implies(p.id)  ) { cb.style({'border-color': '#40C75B'}) };
               })
               .end();
             })
