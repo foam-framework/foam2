@@ -6,6 +6,8 @@ public class InputStreamBlob
     extends AbstractBlob
     implements Closeable
 {
+  public static final int BUFFER_SIZE = 4096;
+
   protected int size_;
   protected int pos_ = 0;
   protected InputStream in_;
@@ -22,14 +24,14 @@ public class InputStreamBlob
         throw new RuntimeException("Offset does not match stream position");
       }
 
-      byte[] buffer = new byte[length];
-      int read = in_.read(buffer, 0, length);
-      if ( read == -1 ) {
-        throw new RuntimeException("Failed to read from input stream");
+      int n = 0;
+      int read = 0;
+      byte[] buffer = new byte[BUFFER_SIZE];
+      while ( (n = in_.read(buffer, 0, buffer.length)) != -1 && read <= length ) {
+        out.write(buffer, 0, n);
+        read += n;
       }
 
-      out.write(buffer, 0, length);
-      out.flush();
       pos_ += read;
       return read;
     } catch (Throwable t) {

@@ -180,10 +180,8 @@ foam.CLASS({
   javaImports: [
     'org.apache.commons.io.IOUtils',
     'org.apache.geronimo.mail.util.Hex',
-    'java.io.ByteArrayOutputStream',
     'java.io.File',
-    'java.io.FileOutputStream',
-    'java.security.MessageDigest'
+    'java.io.FileOutputStream'
   ],
 
   constants: [
@@ -209,29 +207,16 @@ foam.CLASS({
 
 this.setup();
 
-FileOutputStream fos = null;
-ByteArrayOutputStream baos = null;
+OutputStream os = null;
 
 try {
-  MessageDigest hash = MessageDigest.getInstance("SHA-256");
-
-  int read = 0;
-  int offset = 0;
   int size = blob.getSize();
-
   File tmp = allocateTmp(1);
-  fos = new FileOutputStream(tmp);
-  baos = new ByteArrayOutputStream();
+  os = new HashingOutputStream(new FileOutputStream(tmp));
+  blob.read(os, 0, size);
+  os.close();
 
-  while ( (read = blob.read(baos, offset, BUFFER_SIZE)) != -1 ) {
-    byte[] buf = baos.toByteArray();
-    hash.update(buf);
-    fos.write(buf, offset, read);
-    fos.flush();
-    offset += read;
-  }
-
-  String digest = new String(Hex.encode(hash.digest()));
+  String digest = new String(Hex.encode(os.digest()));
   File dest = new File(sha256_ + File.separator + digest);
   tmp.renameTo(dest);
 
@@ -240,11 +225,9 @@ try {
   result.setX(getX());
   return result;
 } catch (Throwable t) {
-  t.printStackTrace();
   return null;
 } finally {
-  IOUtils.closeQuietly(baos);
-  IOUtils.closeQuietly(fos);
+  IOUtils.closeQuietly(os);
 }`
     },
     {
