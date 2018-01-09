@@ -324,7 +324,7 @@ foam.CLASS({
 
     function outputString(str) {
       if ( this.useTemplateLiterals && str.indexOf('\n') != -1 ) {
-        this.out('`', str, '`'); // TODO: Escape differently than quoted.
+        this.out('`', str.replace(/`/, '\\`'), '`');
       } else {
         this.out('"', this.escape(str), '"');
       }

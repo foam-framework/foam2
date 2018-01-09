@@ -14,6 +14,7 @@ var executor = foam.classloader.NodeJsModelExecutor.create({
   modelArgs: {
     outputPath: dir + '/OUTPUT/',
     filePath: root + '/src/foam/u2/Element.js',
+    defaultPackage: 'foam.u2',
   },
 });
 executor.execute()
