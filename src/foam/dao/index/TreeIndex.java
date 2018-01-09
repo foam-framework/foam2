@@ -48,8 +48,6 @@ public class TreeIndex
       return predicate.partialEval();
     }
     if ( predicate instanceof Not ) {
-      if ( ( (Not) predicate ).getArg1() instanceof And )
-        return predicate;
       predicate = predicate.partialEval();
       predicate = simplifyPredicatePrepare(predicate);
     }
