@@ -9,6 +9,7 @@ package foam.nanos.http;
 import foam.box.Skeleton;
 import foam.core.ContextAware;
 import foam.core.X;
+import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
 import foam.nanos.boot.NSpec;
@@ -26,15 +27,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 public class NanoRouter
-  extends HttpServlet
-  implements NanoService, ContextAware
+    extends HttpServlet
+    implements NanoService, ContextAware
 {
   protected X x_;
 
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
 
   @Override
-  protected synchronized void service(HttpServletRequest req, HttpServletResponse resp)
+  protected synchronized void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
     String      path       = req.getRequestURI();
@@ -54,7 +55,16 @@ public class NanoRouter
       } else {
         X y = getX().put(HttpServletRequest.class, req)
             .put(HttpServletResponse.class, resp)
-            .put(PrintWriter.class, resp.getWriter())
+            .putFactory(PrintWriter.class, new XFactory() {
+              @Override
+              public Object create(X x) {
+                try {
+                  return resp.getWriter();
+                } catch (IOException e) {
+                  return null;
+                }
+              }
+            })
             .put(NSpec.class, spec);
         serv.execute(y);
       }
