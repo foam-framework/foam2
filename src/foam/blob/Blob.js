@@ -22,13 +22,11 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Long',
+      class: 'Int',
       name: 'length'
     },
     {
-      class: 'Object',
       name: 'data',
-      javaType: 'java.nio.ByteBuffer',
       factory: function() {
         return new ArrayBuffer(this.length);
       }
@@ -55,7 +53,7 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          class: 'Long',
+          class: 'Int',
           swiftType: 'Int',
           name: 'offset'
         }
@@ -63,7 +61,7 @@ foam.INTERFACE({
     },
     {
       name: 'getSize',
-      returns: 'Long',
+      returns: 'Int',
       swiftReturns: 'Int',
     }
   ]
@@ -275,11 +273,11 @@ foam.CLASS({
       name: 'parent',
     },
     {
-      class: 'Long',
+      class: 'Int',
       name: 'offset'
     },
     {
-      class: 'Long',
+      class: 'Int',
       name: 'size',
       assertValue: function(value) {
         foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
@@ -420,7 +418,7 @@ foam.CLASS({
       name: 'fd'
     },
     {
-      class: 'Long',
+      class: 'Int',
       name: 'size',
       expression: function(fd) {
         return require('fs').fstatSync(fd).size;

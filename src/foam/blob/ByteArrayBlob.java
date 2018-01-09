@@ -6,7 +6,7 @@
 
 package foam.blob;
 
-import java.nio.ByteBuffer;
+import java.io.OutputStream;
 
 public class ByteArrayBlob
     extends AbstractBlob
@@ -21,24 +21,18 @@ public class ByteArrayBlob
   }
 
   @Override
-  public Buffer read(Buffer buffer, long offset) {
+  public int read(OutputStream out, int offset, int length) {
     try {
-      long length = Math.min(buffer.getLength(), getSize() - offset);
-      if ( length < buffer.getLength() ) {
-        buffer = buffer.slice(0, length);
-      }
-
-      ByteBuffer bb = buffer.getData();
-      bb.put(blob_, (int) offset, (int) length);
-      buffer.setData(bb);
-      return buffer;
+      length = Math.min(length, getSize() - offset);
+      out.write(blob_, offset, length);
+      return length;
     } catch (Throwable t) {
-      return null;
+      return -1;
     }
   }
 
   @Override
-  public long getSize() {
+  public int getSize() {
     return size_;
   }
 }

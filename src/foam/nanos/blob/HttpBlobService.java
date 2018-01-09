@@ -55,21 +55,21 @@ public class HttpBlobService
   }
 
   protected void download(HttpServletRequest req, HttpServletResponse resp) {
+    OutputStream os = null;
+
     try {
       String path = req.getRequestURI();
-      String id = path.substring(path.lastIndexOf("/") + 1);
+      String id = path.replaceFirst("/service/blobService/", "");
 
       Blob blob = getDelegate().find(id);
-
       if ( blob == null ) {
         resp.setStatus(resp.SC_NOT_FOUND);
         return;
       }
 
-      long chunk = 0;
-      long size = blob.getSize();
-      long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-      Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
+      int chunk = 0;
+      int size = blob.getSize();
+      int chunks = (int) Math.ceil((double) size / (double) BUFFER_SIZE);
 
       resp.setStatus(resp.SC_OK);
       if ( blob instanceof FileBlob ) {
@@ -82,51 +82,29 @@ public class HttpBlobService
       resp.setHeader("ETag", id);
       resp.setHeader("Cache-Control", "public");
 
-      OutputStream output = resp.getOutputStream();
-      WritableByteChannel channel = Channels.newChannel(output);
-
+      os = resp.getOutputStream();
       while ( chunk < chunks ) {
-        buffer = blob.read(buffer, chunk * BUFFER_SIZE);
-        if (buffer == null) {
-          break;
-        }
-        channel.write(buffer.getData());
-        buffer.getData().clear();
+        blob.read(os, chunk * BUFFER_SIZE, size);
         chunk++;
       }
-      output.flush();
-    } catch (Throwable t) {
-      throw new RuntimeException(t);
-    }
-  }
-
-  protected void upload(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp) {
-    File temp = null;
-    OutputStream os = null;
-
-    try {
-      // create a temporary file to store incoming data
-      temp = File.createTempFile(UUID.randomUUID().toString(), ".tmp");
-      os = new FileOutputStream(temp);
-      InputStream is = req.getInputStream();
-
-      int read = 0;
-      byte[] buffer = new byte[BUFFER_SIZE];
-      while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
-        os.write(buffer, 0, read);
-      }
-
-      // create a file blob and store
-      FileBlob blob = new FileBlob(temp);
-      Blob result = getDelegate().put(blob);
-      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(result);
     } catch (Throwable t) {
       throw new RuntimeException(t);
     } finally {
       IOUtils.closeQuietly(os);
-      if ( temp != null ) {
-        temp.delete();
-      }
+    }
+  }
+
+  protected void upload(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp) {
+    InputStreamBlob blob = null;
+
+    try {
+      int size = req.getContentLength();
+      blob = new InputStreamBlob(req.getInputStream(), size);
+      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(getDelegate().put(blob));
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    } finally {
+      IOUtils.closeQuietly(blob);
     }
   }
 }

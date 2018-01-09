@@ -4,53 +4,31 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
-  refines: 'foam.blob.Buffer',
-
-  javaImports: [
-    'java.nio.ByteBuffer'
-  ],
-
-  methods: [
-    {
-      name: 'slice',
-      javaReturns: 'foam.blob.Buffer',
-      args: [
-        {
-          name: 'start',
-          javaType: 'long'
-        },
-        {
-          name: 'end',
-          javaType: 'long'
-        }
-      ],
-      javaCode: 'return new Buffer(end - start, ByteBuffer.wrap(getData().array(), (int) start, (int) (end - start)));'
-    }
-  ]
-});
-
 foam.INTERFACE({
   refines: 'foam.blob.Blob',
 
   methods: [
     {
       name: 'read',
-      javaReturns: 'foam.blob.Buffer',
+      javaReturns: 'int',
       args: [
         {
-          name: 'buffer',
-          javaType: 'foam.blob.Buffer'
+          name: 'out',
+          javaType: 'java.io.OutputStream'
         },
         {
           name: 'offset',
-          javaType: 'long'
+          javaType: 'int'
+        },
+        {
+          name: 'length',
+          javaType: 'int'
         }
       ]
     },
     {
       name: 'getSize',
-      javaReturns: 'long'
+      javaReturns: 'int'
     }
   ]
 });
@@ -148,11 +126,11 @@ foam.CLASS({
       args: [
         {
           name: 'offset',
-          javaType: 'long'
+          javaType: 'int'
         },
         {
           name: 'length',
-          javaType: 'long'
+          javaType: 'int'
         }
       ],
       javaCode: 'return new SubBlob(this, offset, length);'
@@ -186,11 +164,8 @@ foam.CLASS({
     {
       name: 'read',
       javaCode:
-`if ( buffer.getLength() > getSize() - offset ) {
-  buffer = buffer.slice(0, getSize() - offset);
-}
-
-return getParent().read(buffer, offset + getOffset());`
+`length = Math.min(length, getSize() - offset);
+return getParent().read(out, offset, length);`
     },
     {
       name: 'slice',
@@ -205,10 +180,9 @@ foam.CLASS({
   javaImports: [
     'org.apache.commons.io.IOUtils',
     'org.apache.geronimo.mail.util.Hex',
+    'java.io.ByteArrayOutputStream',
     'java.io.File',
     'java.io.FileOutputStream',
-    'java.io.OutputStream',
-    'java.nio.ByteBuffer',
     'java.security.MessageDigest'
   ],
 
@@ -235,27 +209,26 @@ foam.CLASS({
 
 this.setup();
 
-OutputStream os = null;
+FileOutputStream fos = null;
+ByteArrayOutputStream baos = null;
 
 try {
   MessageDigest hash = MessageDigest.getInstance("SHA-256");
-  Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
 
-  long chunk = 0;
-  long size = blob.getSize();
-  long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
+  int read = 0;
+  int offset = 0;
+  int size = blob.getSize();
 
   File tmp = allocateTmp(1);
-  os = new FileOutputStream(tmp);
+  fos = new FileOutputStream(tmp);
+  baos = new ByteArrayOutputStream();
 
-  while ( chunk < chunks ) {
-    buffer = blob.read(buffer, chunkOffset(chunk));
-    byte[] buf = buffer.getData().array();
+  while ( (read = blob.read(baos, offset, BUFFER_SIZE)) != -1 ) {
+    byte[] buf = baos.toByteArray();
     hash.update(buf);
-    os.write(buf, 0, buf.length);
-    os.flush();
-    buffer.getData().clear();
-    chunk++;
+    fos.write(buf, offset, read);
+    fos.flush();
+    offset += read;
   }
 
   String digest = new String(Hex.encode(hash.digest()));
@@ -270,7 +243,8 @@ try {
   t.printStackTrace();
   return null;
 } finally {
-  IOUtils.closeQuietly(os);
+  IOUtils.closeQuietly(baos);
+  IOUtils.closeQuietly(fos);
 }`
     },
     {
@@ -346,17 +320,6 @@ if ( file.exists() ) {
   return allocateTmp(name);
 }
 return file;`
-    },
-    {
-      name: 'chunkOffset',
-      javaReturns: 'long',
-      args: [
-        {
-          name: 'i',
-          javaType: 'long'
-        }
-      ],
-      javaCode: 'return i * BUFFER_SIZE;'
     }
   ]
 });
