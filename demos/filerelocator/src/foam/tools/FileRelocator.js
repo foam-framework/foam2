@@ -5,6 +5,7 @@
  */
 
 foam.CLASS({
+  package: "foam.tools",
   name: "FileRelocator",
   requires: [
     "foam.json.Outputter"
@@ -135,6 +136,5 @@ foam.CLASS(${self.outputter.stringify(m)});
         }
       }
     }
-  ],
-  package: "foam.tools"
+  ]
 });
