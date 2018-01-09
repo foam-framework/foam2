@@ -19,6 +19,9 @@ public abstract class AbstractDatePropertyInfo
   }
 
   public Object fromString(String value) {
+    //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern(getDateFormat()).withZone(ZoneOffset.UTC);		 +    return new Date(value);
+    //  LocalDateTime date = LocalDateTime.parse(value, formatter);		
+    //  this.set(obj, Date.from(date.atZone(ZoneId.of("UTC")).toInstant()));
     return new Date(value);
   }
 
