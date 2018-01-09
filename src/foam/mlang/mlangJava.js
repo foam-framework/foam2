@@ -734,7 +734,7 @@ foam.CLASS({
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate',
       javaCode: 'if ( this.arg1_ instanceof Not )\n' +
-      '      return ((Not)arg1_).arg1_;\n' +
+      '      return ( (Not) arg1_ ).arg1_;\n' +
       '    if ( arg1_.getClass().equals(Eq.class) ) {\n' +
       '      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
       '    }\n' +
@@ -749,6 +749,20 @@ foam.CLASS({
       '    }\n' +
       '    if ( arg1_.getClass().equals(Lte.class) ) {\n' +
       '      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(And.class) ) {\n' +
+      '      int len = ( (And) getArg1() ).args_.length;\n' +
+      '      for ( int i = 0; i < len; i++ ) {\n' +
+      '        ( (And) getArg1() ).args_[i] = ( new Not(( (And) getArg1() ).args_[i]) ).partialEval();\n' +
+      '      }\n' +
+      '      return new Or(( (And) getArg1() ).args_);\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Or.class) ) {\n' +
+      '      int len = ( (Or) getArg1() ).args_.length;\n' +
+      '      for ( int i = 0; i < len; i++ ) {\n' +
+      '        ( (Or) getArg1() ).args_[i] = ( new Not(( (Or) getArg1() ).args_[i]) ).partialEval();\n' +
+      '      }\n' +
+      '      return new And(( (Or) getArg1() ).args_);\n' +
       '    }\n' +
       '    return this;'
     },
