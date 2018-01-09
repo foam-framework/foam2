@@ -203,10 +203,11 @@ foam.CLASS({
   refines: 'foam.blob.BlobStore',
 
   javaImports: [
-    'foam.core.X',
+    'org.apache.commons.io.IOUtils',
     'org.apache.geronimo.mail.util.Hex',
     'java.io.File',
     'java.io.FileOutputStream',
+    'java.io.OutputStream',
     'java.nio.ByteBuffer',
     'java.security.MessageDigest'
   ],
@@ -234,6 +235,8 @@ foam.CLASS({
 
 this.setup();
 
+OutputStream os = null;
+
 try {
   MessageDigest hash = MessageDigest.getInstance("SHA-256");
   Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
@@ -243,13 +246,14 @@ try {
   long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
 
   File tmp = allocateTmp(1);
+  os = new FileOutputStream(tmp);
+
   while ( chunk < chunks ) {
     buffer = blob.read(buffer, chunkOffset(chunk));
     byte[] buf = buffer.getData().array();
     hash.update(buf);
-    FileOutputStream os = new FileOutputStream(tmp);
     os.write(buf, 0, buf.length);
-    os.close();
+    os.flush();
     buffer.getData().clear();
     chunk++;
   }
@@ -265,6 +269,8 @@ try {
 } catch (Throwable t) {
   t.printStackTrace();
   return null;
+} finally {
+  IOUtils.closeQuietly(os);
 }`
     },
     {
