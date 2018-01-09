@@ -17,6 +17,40 @@
 
 foam.CLASS({
   package: 'foam.box',
+  name: 'BackoffBox',
+  extends: 'foam.box.ProxyBox',
+  imports: [
+    'setTimeout'
+  ],
+  properties: [
+    {
+      class: 'Int',
+      name: 'delay',
+      preSet: function(_, a) {
+        return a < this.maxDelay ? a : this.maxDelay;
+      },
+      value: 1
+    },
+    {
+      class: 'Int',
+      name: 'maxDelay',
+      value: 20000
+    }
+  ],
+  methods: [
+    function send(m) {
+      var self = this;
+      this.setTimeout(function() {
+        self.delegate.send(m);
+      }, this.delay);
+
+      this.delay *= 2;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'RetryReplyBox',
   extends: 'foam.box.ProxyBox',
   requires: [
@@ -59,7 +93,8 @@ foam.CLASS({
   name: 'RetryBox',
   extends: 'foam.box.ProxyBox',
   requires: [
-    'foam.box.RetryReplyBox'
+    'foam.box.RetryReplyBox',
+    'foam.box.BackoffBox'
   ],
 
   properties: [
@@ -82,7 +117,9 @@ foam.CLASS({
           delegate: replyBox,
           maxAttempts: this.maxAttempts,
           message: clone,
-          destination: this.delegate
+          destination: this.BackoffBox.create({
+            delegate: this.delegate
+          })
         });
 
         clone.attributes = {};

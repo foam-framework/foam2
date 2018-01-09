@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.mlang.predicate.And;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
+import foam.dao.ListSink;
 import foam.dao.Sink;
 
 public class OrderedDAO
@@ -27,11 +28,12 @@ public class OrderedDAO
     return this;
   }
 
-  public Sink select_(X x,Sink s, long skip, long limit, Comparator order, Predicate predicate) {
-    return super.select_(x, s, skip, limit, order_ == null ? order : order_, predicate);
+  public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+    s = prepareSink(s);
+    return super.select_(x, s, skip, limit, order == null ? order_ : order, predicate);
   }
 
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    super.removeAll_(x, skip, limit, order_ == null ? order : order_, predicate);
+    super.removeAll_(x, skip, limit, order == null ? order_ : order, predicate);
   }
 }

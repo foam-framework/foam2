@@ -281,6 +281,44 @@ for ( int i = 0 ; i < length ; i++ ) {
   }
 }
 return stmt.toString();`
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode: 'java.util.List<Predicate> args = new java.util.ArrayList<>();\n' +
+      '    boolean update = false;\n' +
+      '    True TRUE = new True();\n' +
+      '    False FALSE = new False();\n' +
+      '    for ( int i = 0; i < this.args_.length; i++ ) {\n' +
+      '      Predicate arg = this.args_[i];\n' +
+      '      Predicate newArg = this.args_[i].partialEval();\n' +
+      '      if ( newArg instanceof False ) return FALSE;\n' +
+      '      if ( arg instanceof And ) {\n' +
+      '        for ( int j = 0; j < ( ( (And) arg ).args_.length ); j++ ) {\n' +
+      '          args.add(( (And) arg ).args_[j]);\n' +
+      '        }\n' +
+      '        update = true;\n' +
+      '      } else {\n' +
+      '        if ( arg instanceof True || arg == null ) {\n' +
+      '          update = true;\n' +
+      '        } else {\n' +
+      '          args.add(arg);\n' +
+      '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
+      '        }\n' +
+      '      }\n' +
+      '    }\n' +
+      '    if ( args.size() == 0 ) return TRUE;\n' +
+      '    if ( args.size() == 1 ) return args.get(0);\n' +
+      '    if ( update ) {\n' +
+      '      And newPredicate = new And();\n' +
+      '      Predicate newArgs[] = new Predicate[args.size()];\n' +
+      '      int i = 0;\n' +
+      '      for ( Predicate predicate : args )\n' +
+      '        newArgs[i++] = predicate;\n' +
+      '      newPredicate.setArgs(newArgs);\n' +
+      '      return newPredicate;\n' +
+      '    }\n' +
+      '    return this;'
     }
   ]
 });
@@ -693,6 +731,28 @@ foam.CLASS({
       javaCode: 'return ! getArg1().f(obj);'
     },
     {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode: 'if ( this.arg1_ instanceof Not )\n' +
+      '      return ((Not)arg1_).arg1_;\n' +
+      '    if ( arg1_.getClass().equals(Eq.class) ) {\n' +
+      '      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Gt.class) ) {\n' +
+      '      return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Gte.class) ) {\n' +
+      '      return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Lt.class) ) {\n' +
+      '      return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    if ( arg1_.getClass().equals(Lte.class) ) {\n' +
+      '      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
+      '    }\n' +
+      '    return this;'
+    },
+    {
       name: 'createStatement',
       javaReturns: 'String',
       javaCode: 'return " NOT (" + getArg1().createStatement() + ") ";'
@@ -894,8 +954,8 @@ foam.CLASS({
         }
       ],
       javaCode: function() {
-/*if (obj.compareTo(this.getValue()) > 0) {
-  this.setValue(obj);
+/*if ( getValue() == null || ((Comparable)getArg1().f(obj)).compareTo(getValue()) < 0 ) {
+  setValue(getArg1().f(obj));
 }*/
       }
     }

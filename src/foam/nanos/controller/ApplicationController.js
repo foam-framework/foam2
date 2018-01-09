@@ -123,9 +123,12 @@ foam.CLASS({
     },
 
     function setDefaultMenu() {
+      // Don't select default if menu already set
+      if ( this.window.location.hash ) return;
+
       var self = this;
-      this.menuDAO.find(this.user.group).then(function (group) {
-        self.window.location.hash = group.defaultMenu || 'dashboard';
+      this.groupDAO.find(this.user.group).then(function (group) {
+        self.window.location.hash = group.defaultMenu;
       });
     },
 
@@ -171,7 +174,11 @@ foam.CLASS({
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset' ) return;
+      if ( location.hash != null && location.hash === '#reset')
+        return new Promise(function (resolve, reject) {
+          self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
+          self.loginSuccess$.sub(resolve);
+        });
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
@@ -181,12 +188,8 @@ foam.CLASS({
   ],
 
   listeners: [
-    {
-      name: 'onUserUpdate',
-      isFramed: true,
-      code: function() {
-        this.setDefaultMenu();
-      }
+    function onUserUpdate() {
+      this.setDefaultMenu();
     }
   ]
 });
