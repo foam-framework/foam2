@@ -298,26 +298,14 @@ public class DigWebAgent
         out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
         out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl);</script>");
       } else if ( "remove".equals(command) ) {
-        ArraySink sink = (ArraySink) dao.select(new ArraySink());
-        List a = sink.getArray();
-        Object objectId = null;
-        FObject targetFobj = null;
-
-        for ( int i = 0 ; i < a.size() ; i++ ) {
-          objectId = ((PropertyInfo) cInfo.getAxiomByName("id")).get(a.get(i));
-
-          if ( (objectId.toString()).equals(id) ) {
-            targetFobj = (FObject)a.get(i);
-            break;
-          }
-        }
+        PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
+        Object       idObj      = idProp.fromString(id);
+        FObject      targetFobj = dao.find(idObj);
 
         if ( targetFobj == null ) {
-          throw new RuntimeException("Wrong ID");
-        } else if ( id == null || "".equals(id) ) {
-          throw new RuntimeException("Input ID");
+          throw new RuntimeException("Unknown ID");
         } else {
-          dao.remove_(x, targetFobj);
+          dao.remove(targetFobj);
           out.println("Success");
         }
       } else {
