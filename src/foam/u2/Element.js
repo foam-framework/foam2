@@ -1941,7 +1941,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW
+      value: 'RW'
     }
   ],
 
@@ -2152,7 +2152,7 @@ foam.CLASS({
       name: 'visibility',
       postSet: function() { this.updateMode_(this.mode); },
       attribute: true,
-      value: foam.u2.Visibility.RW
+      value: 'RW'
     },
     {
       class: 'Enum',
