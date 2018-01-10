@@ -10,7 +10,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'read',
-      javaReturns: 'int',
+      javaReturns: 'long',
       args: [
         {
           name: 'out',
@@ -18,17 +18,17 @@ foam.INTERFACE({
         },
         {
           name: 'offset',
-          javaType: 'int'
+          javaType: 'long'
         },
         {
           name: 'length',
-          javaType: 'int'
+          javaType: 'long'
         }
       ]
     },
     {
       name: 'getSize',
-      javaReturns: 'int'
+      javaReturns: 'long'
     }
   ]
 });
@@ -126,11 +126,11 @@ foam.CLASS({
       args: [
         {
           name: 'offset',
-          javaType: 'int'
+          javaType: 'long'
         },
         {
           name: 'length',
-          javaType: 'int'
+          javaType: 'long'
         }
       ],
       javaCode: 'return new SubBlob(this, offset, length);'
@@ -210,7 +210,7 @@ this.setup();
 HashingOutputStream os = null;
 
 try {
-  int size = blob.getSize();
+  long size = blob.getSize();
   File tmp = allocateTmp(1);
   os = new HashingOutputStream(new FileOutputStream(tmp));
   blob.read(os, 0, size);
