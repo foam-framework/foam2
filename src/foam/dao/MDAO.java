@@ -69,6 +69,7 @@ public class MDAO extends AbstractDAO {
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     SelectPlan plan;
     if ( predicate instanceof Or ) {
+      predicate = predicate.partialEval();
       int length = ( (Or) predicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {

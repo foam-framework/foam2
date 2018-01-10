@@ -249,6 +249,43 @@ for ( int i = 0 ; i < length ; i++ ) {
   }
 }
 return stmt.toString();`
+    },
+    {
+      name: 'partialEval',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      javaCode:'java.util.ArrayList<Predicate> list = new java.util.ArrayList<>();\n' +
+      '    Predicate tempPredicate = partialEvalHelper(list, this);\n' +
+      '    Predicate[] predicates = new Predicate[list.size()];\n' +
+      '    if ( tempPredicate instanceof True )\n' +
+      '      return null;\n' +
+      '    for ( int i = 0; i < list.size(); i++ ) {\n' +
+      '      predicates[i] = list.get(i);\n' +
+      '    }\n' +
+      '    return new Or(predicates);'
+    },
+    {
+      name: 'partialEvalHelper',
+      javaReturns: 'foam.mlang.predicate.Predicate',
+      args: [
+        {
+          name: 'list',
+          javaType: 'java.util.ArrayList'
+        },
+        {
+          name: 'current',
+          javaType: 'foam.mlang.predicate.Predicate'
+        }
+      ],
+      javaCode:'if ( current instanceof True ) return new True();\n' +
+      '    if ( current instanceof Or ) {\n' +
+      '      int len = ( (Or) current ).args_.length;\n' +
+      '      for ( int i = 0; i < len; i++ ) {\n' +
+      '        partialEvalHelper(list, ( (Or) current ).args_[i]);\n' +
+      '      }\n' +
+      '    } else {\n' +
+      '      list.add(current);\n' +
+      '    }\n' +
+      '    return null;'
     }
   ]
 });
