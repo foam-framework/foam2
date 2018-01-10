@@ -528,90 +528,140 @@ foam.CLASS({
     'onunload'
   ],
 
-  constants: {
-    // Psedo-attributes don't work consistently with setAttribute()
-    // so need to be set on the real DOM element directly.
-    PSEDO_ATTRIBUTES: {
-      value: true,
-      checked: true
+  constants: [
+    {
+      documentation: `
+        Psedo-attributes don't work consistently with setAttribute() so need to
+        be set on the real DOM element directly.
+      `,
+      name: 'PSEDO_ATTRIBUTES',
+      value: {
+        value: true,
+        checked: true
+      },
     },
 
-    DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
+    {
+      name: 'DEFAULT_VALIDATOR',
+      factory: function() { return foam.u2.DefaultValidator.create() },
+    },
 
-    // State of an Element after it has been output (to a String) but before it is loaded.
-    // This should be only a brief transitory state, as the Element should be loaded
-    // almost immediately after being output. It is an error to try and mutate the Element
-    // while in the OUTPUT state.
-    OUTPUT: foam.u2.OutputElementState.create(),
+    {
+      documentation: `
+        State of an Element after it has been output (to a String) but before it
+        is loaded. This should be only a brief transitory state, as the Element
+        should be loaded almost immediately after being output. It is an error
+        to try and mutate the Element while in the OUTPUT state.
+      `,
+      name: 'OUTPUT',
+      factory: function() { return foam.u2.OutputElementState.create() },
+    },
 
-    // State of an Element after it has been loaded.
-    // A Loaded Element should be visible in the DOM.
-    LOADED: foam.u2.LoadedElementState.create(),
+    {
+      documentation: `
+        State of an Element after it has been loaded.
+        A Loaded Element should be visible in the DOM.
+      `,
+      name: 'LOADED',
+      factory: function() { return foam.u2.LoadedElementState.create() },
+    },
 
-    // State of an Element after it has been removed from the DOM.
-    // An unloaded Element can be readded to the DOM.
-    UNLOADED: foam.u2.UnloadedElementState.create(),
+    {
+      documentation: `
+        State of an Element after it has been removed from the DOM.
+        An unloaded Element can be readded to the DOM.
+      `,
+      name: 'UNLOADED',
+      factory: function() { return foam.u2.UnloadedElementState.create() },
+    },
 
-    // Initial state of an Element before it has been added to the DOM.
-    INITIAL: foam.u2.InitialElementState.create(),
+    {
+      documentation: `
+        Initial state of an Element before it has been added to the DOM.
+      `,
+      name: 'INITIAL',
+      factory: function() {
+        return foam.u2.InitialElementState.create();
+      },
+    },
 
     // ???: Add DESTROYED State?
 
-    // TODO: Don't allow these as they lead to ambiguous markup.
-    OPTIONAL_CLOSE_TAGS: {
-      BODY: true,
-      COLGROUP: true,
-      DD: true,
-      DT: true,
-      HEAD: true,
-      HTML: true,
-      LI: true,
-      OPTION: true,
-      P: true,
-      TBODY: true,
-      TD: true,
-      TFOOT: true,
-      TH: true,
-      THEAD: true,
-      TR: true
+    {
+      documentation: `TODO: Don't allow these as they lead to ambiguous markup.`,
+      name: 'OPTIONAL_CLOSE_TAGS',
+      value: {
+        BODY: true,
+        COLGROUP: true,
+        DD: true,
+        DT: true,
+        HEAD: true,
+        HTML: true,
+        LI: true,
+        OPTION: true,
+        P: true,
+        TBODY: true,
+        TD: true,
+        TFOOT: true,
+        TH: true,
+        THEAD: true,
+        TR: true
+      }
     },
 
-    // Element nodeName's that are self-closing.
-    // Used to generate valid HTML output.
-    // Used by ElementParser for valid HTML parsing.
-    ILLEGAL_CLOSE_TAGS: {
-      AREA: true,
-      BASE: true,
-      BASEFONT: true,
-      BR: true,
-      COL: true,
-      FRAME: true,
-      HR: true,
-      IMG: true,
-      INPUT: true,
-      ISINDEX: true,
-      LINK: true,
-      META: true,
-      PARAM: true
+    {
+      documentation: `
+        Element nodeName's that are self-closing.
+        Used to generate valid HTML output.
+        Used by ElementParser for valid HTML parsing.
+      `,
+      name: 'ILLEGAL_CLOSE_TAGS',
+      value: {
+        AREA: true,
+        BASE: true,
+        BASEFONT: true,
+        BR: true,
+        COL: true,
+        FRAME: true,
+        HR: true,
+        IMG: true,
+        INPUT: true,
+        ISINDEX: true,
+        LINK: true,
+        META: true,
+        PARAM: true
+      },
     },
 
-    __ID__: [ 0 ],
-
-    NEXT_ID: function() {
-      return 'v' + this.__ID__[ 0 ]++;
+    {
+      name: '__ID__',
+      value: [ 0 ],
     },
 
-    // Keys which respond to keydown but not keypress
-    KEYPRESS_CODES: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    {
+      name: 'NEXT_ID',
+      value: function() {
+        return 'v' + this.__ID__[ 0 ]++;
+      },
+    },
 
-    NAMED_CODES: {
-      '13': 'enter',
-      '37': 'left',
-      '38': 'up',
-      '39': 'right',
-      '40': 'down'
-    }
-  },
+    {
+      documentation: `Keys which respond to keydown but not keypress`,
+      name: 'KEYPRESS_CODES',
+      value: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    },
+
+    {
+      name: 'NAMED_CODES',
+      value: {
+        '13': 'enter',
+        '37': 'left',
+        '38': 'up',
+        '39': 'right',
+        '40': 'down'
+      }
+    },
+  ],
 
   // We hide Elements by adding this style rather than setting
   // 'display: none' directly because then when we re-show the
