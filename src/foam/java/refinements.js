@@ -1185,22 +1185,49 @@ foam.CLASS({
   ],
 
   methods: [
+    function createJavaPropertyInfo_(cls) {
+      if ( this.props.length === 1 ) {
+        return foam.String.constantize(this.props[0].name);
+      }
+      var info = this.SUPER(cls);
+
+      // TODO: What is the correct behaviour here?  If none of the
+      // parts are set we could return false, and if all are set
+      // return true, but what about when only some of the parts are
+      // set?  Is this ever a situation that we have to care about?
+      info.getMethod('isSet').body = `return true;`
+    },
     function buildJavaClass(cls) {
-      this.SUPER(cls);
+      // Don't delegate to SUPER() here.  A MultiPartID is really just
+      // an alias for one or more other properties, no need for all the
+      // extra baggage that comes with a full property.
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
 
       var props = this.props;
 
-      cls.getMethod("get" + capitalized).body = foam.java.MultiPartGetter.create({
-        props: props,
-        clsName: cls.name
-      });
-      cls.getMethod("set" + capitalized).body = foam.java.MultiPartSetter.create({
-        props: props,
-        clsName: cls.name
-      });
+      cls.
+        method({
+          name: 'get' + capitalized,
+          type: this.javaType,
+          visibility: 'public',
+          body: foam.java.MultiPartGetter.create({
+            props: props,
+            clsName: cls.name
+          })
+        }).
+        method({
+          name: 'set' + capitalized,
+          type: 'void',
+          args: [
+            { type: this.javaType, name: 'val' }
+          ],
+          body: foam.java.MultiPartSetter.create({
+            props: props,
+            clsName: cls.name
+          })
+        });
     }
   ]
 });
