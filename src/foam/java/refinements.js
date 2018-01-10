@@ -1196,6 +1196,31 @@ foam.CLASS({
       // return true, but what about when only some of the parts are
       // set?  Is this ever a situation that we have to care about?
       info.getMethod('isSet').body = `return true;`
+
+      var body = `if ( value == null )
+  return null;
+
+String[] parts = foam.util.String.split(value, ',');
+
+if ( parts.length != ${this.props.length} )
+  throw new RuntimeException("MultiPartKey is invalid length, expected ${this.props.length} got " + parts.length);
+
+Object[] values = new Object[${this.props.length}];
+foam.core.PropertyInfo[] infos = new foam.core.PropertyInfo[${this.props.length}];
+`;
+      for ( var i = 0 ; i < this.props.length ; i++ ) {
+        body += `  values[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)}.fromString(parts[${i}]);
+  infos[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)};
+`;
+      }
+
+      info.method({
+        name: 'fromString',
+        type: 'Object',
+        args: [ { type: 'String', name: 'value' } ],
+        visibility: 'public',
+        body: body
+      });
     },
     function buildJavaClass(cls) {
       // Don't delegate to SUPER() here.  A MultiPartID is really just
