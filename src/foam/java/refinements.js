@@ -1197,7 +1197,7 @@ foam.CLASS({
       var body = `if ( value == null )
   return null;
 
-String[] parts = foam.util.String.split(value, ',');
+String[] parts = foam.util.StringUtil.split(value, ',');
 
 if ( parts.length != ${this.props.length} )
   throw new RuntimeException("MultiPartKey is invalid length, expected ${this.props.length} got " + parts.length);
@@ -1206,10 +1206,13 @@ Object[] values = new Object[${this.props.length}];
 foam.core.PropertyInfo[] infos = new foam.core.PropertyInfo[${this.props.length}];
 `;
       for ( var i = 0 ; i < this.props.length ; i++ ) {
-        body += `  values[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)}.fromString(parts[${i}]);
-  infos[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)};
+        body += `values[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)}.fromString(parts[${i}]);
+infos[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)};
 `;
       }
+
+      body += `
+return new foam.core.CompoundKey(values, infos);`;
 
       info.method({
         name: 'fromString',
@@ -1218,6 +1221,8 @@ foam.core.PropertyInfo[] infos = new foam.core.PropertyInfo[${this.props.length}
         visibility: 'public',
         body: body
       });
+
+      return info;
     },
     function buildJavaClass(cls) {
       // Don't delegate to SUPER() here.  A MultiPartID is really just
@@ -1236,7 +1241,8 @@ foam.core.PropertyInfo[] infos = new foam.core.PropertyInfo[${this.props.length}
           name: constantize,
           visibility: 'public',
           static: true,
-          type: 'foam.core.PropertyInfo'
+          type: 'foam.core.PropertyInfo',
+          initializer: this.createJavaPropertyInfo_(cls)
         });
       }
 
