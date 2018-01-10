@@ -562,8 +562,8 @@ foam.CLASS({
         ignore it */
       name: 'put',
       code: function put(obj, sub) {
-        if ( ! this.results_[obj.id] ) {
-          this.results_[obj.id] = true;
+        if ( ! this.results[obj.id] ) {
+          this.results[obj.id] = true;
           return this.delegate.put(obj, sub);
         }
       }

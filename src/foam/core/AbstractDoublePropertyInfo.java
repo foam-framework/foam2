@@ -15,8 +15,8 @@ public abstract class AbstractDoublePropertyInfo
     return Double.compare(d1, d2);
   }
 
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Double.parseDouble(value));
+  public Object fromString(String value) {
+    return Double.valueOf(value);
   }
 
   @Override
