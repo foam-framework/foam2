@@ -1188,39 +1188,29 @@ foam.CLASS({
     function createJavaPropertyInfo_(cls) {
       var info = this.SUPER(cls);
 
+      var body = `return new foam.core.PropertyInfo[] {
+`;
+
+      for ( var i = 0 ; i < this.props.length ; i++ ) {
+        body += `  ${cls.name}.${foam.String.constantize(this.props[i].name)}`
+        if ( i != this.props.length - 1 ) body += ',';
+        body += '\n';
+      }
+
+      body += '};';
+
+      info.method({
+        name: 'getProperties',
+        visibility: 'protected',
+        type: 'foam.core.PropertyInfo[]',
+        body: body,
+      });
+
       // TODO: What is the correct behaviour here?  If none of the
       // parts are set we could return false, and if all are set
       // return true, but what about when only some of the parts are
       // set?  Is this ever a situation that we have to care about?
       info.getMethod('isSet').body = `return true;`
-
-      var body = `if ( value == null )
-  return null;
-
-String[] parts = foam.util.StringUtil.split(value, ',');
-
-if ( parts.length != ${this.props.length} )
-  throw new RuntimeException("MultiPartKey is invalid length, expected ${this.props.length} got " + parts.length);
-
-Object[] values = new Object[${this.props.length}];
-foam.core.PropertyInfo[] infos = new foam.core.PropertyInfo[${this.props.length}];
-`;
-      for ( var i = 0 ; i < this.props.length ; i++ ) {
-        body += `values[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)}.fromString(parts[${i}]);
-infos[${i}] = ${cls.name}.${foam.String.constantize(this.props[i].name)};
-`;
-      }
-
-      body += `
-return new foam.core.CompoundKey(values, infos);`;
-
-      info.method({
-        name: 'fromString',
-        type: 'Object',
-        args: [ { type: 'String', name: 'value' } ],
-        visibility: 'public',
-        body: body
-      });
 
       return info;
     },
@@ -1234,17 +1224,13 @@ return new foam.core.CompoundKey(values, infos);`;
 
       var props = this.props;
 
-      if ( props.length == 1 ) {
-        cls.extras.push('public static foam.core.PropertyInfo ID = ' + foam.String.constantize(props[0].name) + ';');
-      } else {
-        cls.field({
-          name: constantize,
-          visibility: 'public',
-          static: true,
-          type: 'foam.core.PropertyInfo',
-          initializer: this.createJavaPropertyInfo_(cls)
-        });
-      }
+      cls.field({
+        name: constantize,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.PropertyInfo',
+        initializer: this.createJavaPropertyInfo_(cls)
+      });
 
       cls.
         method({
@@ -1267,6 +1253,9 @@ return new foam.core.CompoundKey(values, infos);`;
             clsName: cls.name
           })
         });
+
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + constantize);
     }
   ]
 });
