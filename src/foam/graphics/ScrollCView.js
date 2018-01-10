@@ -80,10 +80,8 @@ foam.CLASS({
       expression: function(minHandleSize, size, extent, height, innerBorder) {
         var h  = height - 2 * innerBorder;
         var hs = size > 0 ? extent * h / size : 0;
-        return hs < minHandleSize ? minHandleSize : hs;
-      },
-      postSet: function(extent, size) {
 
+        return hs < minHandleSize ? minHandleSize : hs;
       }
     },
     {
