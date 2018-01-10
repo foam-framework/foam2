@@ -1186,9 +1186,6 @@ foam.CLASS({
 
   methods: [
     function createJavaPropertyInfo_(cls) {
-      if ( this.props.length === 1 ) {
-        return foam.String.constantize(this.props[0].name);
-      }
       var info = this.SUPER(cls);
 
       // TODO: What is the correct behaviour here?  If none of the
@@ -1231,6 +1228,17 @@ foam.core.PropertyInfo[] infos = new foam.core.PropertyInfo[${this.props.length}
       var constantize = foam.String.constantize(this.name);
 
       var props = this.props;
+
+      if ( props.length == 1 ) {
+        cls.extras.push('public static foam.core.PropertyInfo ID = ' + foam.String.constantize(props[0].name) + ';');
+      } else {
+        cls.field({
+          name: constantize,
+          visibility: 'public',
+          static: true,
+          type: 'foam.core.PropertyInfo'
+        });
+      }
 
       cls.
         method({
