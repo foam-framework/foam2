@@ -9,6 +9,7 @@ package foam.nanos.http;
 import foam.box.Skeleton;
 import foam.core.ContextAware;
 import foam.core.X;
+import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
 import foam.nanos.boot.NSpec;
@@ -34,7 +35,7 @@ public class NanoRouter
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
 
   @Override
-  protected synchronized void service(HttpServletRequest req, HttpServletResponse resp)
+  protected synchronized void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
     String      path       = req.getRequestURI();
@@ -54,7 +55,16 @@ public class NanoRouter
       } else {
         X y = getX().put(HttpServletRequest.class, req)
             .put(HttpServletResponse.class, resp)
-            .put(PrintWriter.class, resp.getWriter())
+            .putFactory(PrintWriter.class, new XFactory() {
+              @Override
+              public Object create(X x) {
+                try {
+                  return resp.getWriter();
+                } catch (IOException e) {
+                  return null;
+                }
+              }
+            })
             .put(NSpec.class, spec);
         serv.execute(y);
       }
@@ -98,6 +108,10 @@ public class NanoRouter
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
+      }
+    } else {
+      if ( service instanceof WebAgent && spec.getAuthenticate() ) {
+        service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
       }
     }
 

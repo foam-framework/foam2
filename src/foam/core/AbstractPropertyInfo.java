@@ -63,7 +63,7 @@ public abstract class AbstractPropertyInfo
   }
 
   public void setFromString(Object obj, String value) {
-    // TODO: Need to write
+    this.set(obj, fromString(value));
   }
 
   @Override
@@ -101,5 +101,10 @@ public abstract class AbstractPropertyInfo
   public String toString() {
     // TODO: generate static string in generated instances instead to avoid creating garbage.
     return parent.getId() + "." + getName();
+  }
+
+  @Override
+  public void cloneProperty(FObject source, FObject dest) {
+    set(dest, foam.util.SafetyUtil.deepClone(get(source)));
   }
 }

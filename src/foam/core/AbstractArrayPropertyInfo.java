@@ -21,15 +21,14 @@ import org.w3c.dom.Element;
 public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo
 {
-  @Override
-  public void setFromString(Object obj, String value) {
-    if ( value == null ) {
-      this.set(obj, null);
-      return;
-    }
+
+  public Object fromString(String value) {
+    if ( value == null ) 
+      return null;
+    
     // TODO: TO REUSE THIS LIST WITH A THREADLOCAL FOR BETTER PERFORMANCE
     List<String> list = new LinkedList<String>();
-    StringBuilder sb = new StringBuilder(); 
+    StringBuilder sb = new StringBuilder();
     char prev = '$';
     char[] cs = value.toCharArray();
     for ( int i = 0 ; i < cs.length ; i++ ) {
@@ -56,7 +55,7 @@ public abstract class AbstractArrayPropertyInfo
     list.add(sb.toString());
     String[] result = new String[list.size()];
     //add support for other array types
-    this.set(obj, list.toArray(result));
+    return list.toArray(result);
   }
 
   public abstract String of();
