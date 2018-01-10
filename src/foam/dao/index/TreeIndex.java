@@ -38,22 +38,6 @@ public class TreeIndex
     return TreeNode.getNullNode().bulkLoad(tail_, prop_, 0, a.length-1, a);
   }
 
-  protected Predicate simplifyPredicatePrepare(Predicate predicate) {
-    if ( predicate instanceof And ) {
-      int length = ( (And) predicate ).getArgs().length;
-      for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (And) predicate ).getArgs()[i];
-        ( (And) predicate ).getArgs()[i] = simplifyPredicatePrepare(arg);
-      }
-      return predicate.partialEval();
-    }
-    if ( predicate instanceof Not ) {
-      predicate = predicate.partialEval();
-      predicate = simplifyPredicatePrepare(predicate);
-    }
-    return predicate;
-  }
-
   protected Object[] simplifyPredicate(Object state, Predicate predicate) {
     if ( predicate != null && prop_ != null ) {
       if ( predicate instanceof Binary ) {
@@ -131,7 +115,6 @@ public class TreeIndex
       return NotFoundPlan.instance();
     }
     if ( state == null ) return NotFoundPlan.instance();
-    predicate = simplifyPredicatePrepare(predicate);
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
