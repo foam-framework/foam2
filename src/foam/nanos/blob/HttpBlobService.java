@@ -10,28 +10,25 @@ import foam.blob.*;
 import foam.core.X;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
+import foam.nanos.boot.NSpec;
+import foam.nanos.boot.NSpecAware;
 import foam.nanos.http.WebAgent;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.UUID;
 
 public class HttpBlobService
     extends ProxyBlobService
-    implements WebAgent
+    implements NSpecAware, WebAgent
 {
   public static final int BUFFER_SIZE = 8192;
+
+  protected NSpec nspec_;
 
   public HttpBlobService(X x, BlobService delegate) {
     setX(x);
@@ -59,7 +56,7 @@ public class HttpBlobService
 
     try {
       String path = req.getRequestURI();
-      String id = path.replaceFirst("/service/blobService/", "");
+      String id = path.replaceFirst("/service/" + nspec_.getName() + "/", "");
 
       Blob blob = getDelegate().find(id);
       if ( blob == null ) {
@@ -103,5 +100,10 @@ public class HttpBlobService
     } finally {
       IOUtils.closeQuietly(blob);
     }
+  }
+
+  @Override
+  public void setNSpec(NSpec spec) {
+    nspec_ = spec;
   }
 }
