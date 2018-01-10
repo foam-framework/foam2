@@ -253,39 +253,38 @@ return stmt.toString();`
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate',
-      javaCode:'java.util.ArrayList<Predicate> list = new java.util.ArrayList<>();\n' +
-      '    Predicate tempPredicate = partialEvalHelper(list, this);\n' +
-      '    Predicate[] predicates = new Predicate[list.size()];\n' +
-      '    if ( tempPredicate instanceof True )\n' +
-      '      return null;\n' +
-      '    for ( int i = 0; i < list.size(); i++ ) {\n' +
-      '      predicates[i] = list.get(i);\n' +
-      '    }\n' +
-      '    return new Or(predicates);'
-    },
-    {
-      name: 'partialEvalHelper',
-      javaReturns: 'foam.mlang.predicate.Predicate',
-      args: [
-        {
-          name: 'list',
-          javaType: 'java.util.ArrayList'
-        },
-        {
-          name: 'current',
-          javaType: 'foam.mlang.predicate.Predicate'
-        }
-      ],
-      javaCode:'if ( current instanceof True ) return new True();\n' +
-      '    if ( current instanceof Or ) {\n' +
-      '      int len = ( (Or) current ).args_.length;\n' +
-      '      for ( int i = 0; i < len; i++ ) {\n' +
-      '        partialEvalHelper(list, ( (Or) current ).args_[i]);\n' +
+      javaCode:'java.util.List<Predicate> args = new java.util.ArrayList<>();\n' +
+      '    boolean update = false;\n' +
+      '    True TRUE = new True();\n' +
+      '    False FALSE = new False();\n' +
+      '    for ( int i = 0; i < this.args_.length; i++ ) {\n' +
+      '      Predicate arg = this.args_[i];\n' +
+      '      Predicate newArg = this.args_[i].partialEval();\n' +
+      '      if ( newArg instanceof True ) return TRUE;\n' +
+      '      if ( newArg instanceof Or ) {\n' +
+      '        for ( int j = 0; j < ( ( (Or) newArg ).args_.length ); j++ ) {\n' +
+      '          args.add(( (Or) newArg ).args_[j]);\n' +
+      '        }\n' +
+      '        update = true;\n' +
+      '      } else {\n' +
+      '        if ( newArg instanceof False || arg == null ) {\n' +
+      '          update = true;\n' +
+      '        } else {\n' +
+      '          args.add(newArg);\n' +
+      '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
+      '        }\n' +
       '      }\n' +
-      '    } else {\n' +
-      '      list.add(current);\n' +
       '    }\n' +
-      '    return null;'
+      '    if ( args.size() == 0 ) return TRUE;\n' +
+      '    if ( args.size() == 1 ) return args.get(0);\n' +
+      '    if ( update ) {\n' +
+      '      Predicate newArgs[] = new Predicate[args.size()];\n' +
+      '      int i = 0;\n' +
+      '      for ( Predicate predicate : args )\n' +
+      '        newArgs[i++] = predicate;\n' +
+      '      return new Or(newArgs);\n' +
+      '    }\n' +
+      '    return this;'
     }
   ]
 });
@@ -330,16 +329,16 @@ return stmt.toString();`
       '      Predicate arg = this.args_[i];\n' +
       '      Predicate newArg = this.args_[i].partialEval();\n' +
       '      if ( newArg instanceof False ) return FALSE;\n' +
-      '      if ( arg instanceof And ) {\n' +
-      '        for ( int j = 0; j < ( ( (And) arg ).args_.length ); j++ ) {\n' +
-      '          args.add(( (And) arg ).args_[j]);\n' +
+      '      if ( newArg instanceof And ) {\n' +
+      '        for ( int j = 0; j < ( ( (And) newArg ).args_.length ); j++ ) {\n' +
+      '          args.add(( (And) newArg ).args_[j]);\n' +
       '        }\n' +
       '        update = true;\n' +
       '      } else {\n' +
-      '        if ( arg instanceof True || arg == null ) {\n' +
+      '        if ( newArg instanceof True || newArg == null ) {\n' +
       '          update = true;\n' +
       '        } else {\n' +
-      '          args.add(arg);\n' +
+      '          args.add(newArg);\n' +
       '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
       '        }\n' +
       '      }\n' +
@@ -347,13 +346,11 @@ return stmt.toString();`
       '    if ( args.size() == 0 ) return TRUE;\n' +
       '    if ( args.size() == 1 ) return args.get(0);\n' +
       '    if ( update ) {\n' +
-      '      And newPredicate = new And();\n' +
       '      Predicate newArgs[] = new Predicate[args.size()];\n' +
       '      int i = 0;\n' +
       '      for ( Predicate predicate : args )\n' +
       '        newArgs[i++] = predicate;\n' +
-      '      newPredicate.setArgs(newArgs);\n' +
-      '      return newPredicate;\n' +
+      '      return new And(newArgs);\n' +
       '    }\n' +
       '    return this;'
     }
