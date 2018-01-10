@@ -27,7 +27,7 @@ public abstract class AbstractArrayPropertyInfo
       return null;
 
     //TODO: add support for other array types
-    return foam.util.String.split(value, ',');
+    return foam.util.StringUtil.split(value, ',');
   }
 
   public abstract String of();

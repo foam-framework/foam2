@@ -1,6 +1,6 @@
 package foam.util;
 
-public class String {
+public class StringUtil {
   /**
    * A string splitting mechanism which doesn't not split if the
    * separator has been escaped.
@@ -26,7 +26,7 @@ public class String {
     boolean escaping = false;
     char escape = '\\';
     char prev;
-    char[] cs = value.toCharArray();
+    char[] cs = s.toCharArray();
 
     for ( int i = 0 ; i < cs.length ; i++ ) {
       char c = cs[i];
@@ -46,6 +46,8 @@ public class String {
 
     list.add(sb.toString());
 
-    return list.toArray();
+    String[] result = new String[list.size()];
+
+    return list.toArray(result);
   }
 }
