@@ -274,7 +274,7 @@ public class DigWebAgent
               outputterJson.output(a.get(i));
           }
           String dataArray[] = outputterJson.toString().split("\"}");
-          for ( int k = 1 ; k < dataArray.length; k++ ) {
+          for ( int k = 0 ; k < dataArray.length; k++ ) {
             dataToString += "p(" + dataArray[k] + "\"})\n";
           }
 
