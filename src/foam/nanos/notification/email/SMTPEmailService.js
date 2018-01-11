@@ -191,6 +191,7 @@ if ( config == null ) {
 
 JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
+emailMessage.setSubject(emailTemplate.getSubject());
 emailMessage.setBody(template.render(model));
 sendEmail(emailMessage);`
     },
