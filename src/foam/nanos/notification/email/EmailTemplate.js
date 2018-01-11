@@ -33,6 +33,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'subject',
+      documentation: 'Template subject'
+    },
+    {
+      class: 'String',
       name: 'body',
       documentation: 'Template body',
       view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 150 },

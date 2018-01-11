@@ -99,7 +99,7 @@ public class AuthenticatedDAO
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink sink = new AuthenticatedSink(x, createPermission("delete"), new RemoveSink(this));
+    Sink sink = new AuthenticatedSink(x, createPermission("delete"), new RemoveSink(x, this));
     this.select_(x, sink, skip, limit, order, predicate);
   }
 

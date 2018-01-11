@@ -46,16 +46,20 @@ foam.ENUM({
 foam.CLASS({
   package: 'foam.u2',
   name: 'Entity',
-  // TODO: Make both Entity and Element extend a common base-Model (Node?)
 
-  documentation: 'Virtual-DOM Entity.',
+  documentation: `
+    Virtual-DOM Entity.
+    // TODO: Make both Entity and Element extend a common base-Model (Node?)
+  `,
 
   properties: [
     {
       name: 'name',
-      // parser: seq(alphaChar, repeat0(wordChar)),
-      // TODO(adamvy): This should be 'pattern' or 'regex', if those are ever
-      // added.
+      documentation: `
+        // parser: seq(alphaChar, repeat0(wordChar)),
+        // TODO(adamvy): This should be 'pattern' or 'regex', if those are ever
+        // added.
+      `,
       assertValue: function(nu) {
         if ( ! nu.match(/^[a-z#]\w*$/i) ) {
           throw new Error('Invalid Entity name: ' + nu);
@@ -190,14 +194,17 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ElementState',
 
-  documentation: 'Current lifecycle state of an Element.',
+  documentation: `
+    Current lifecycle state of an Element.
+    // TODO: Do we want the following method?
+    // function detach() {},
+  `,
 
   methods: [
     function output(out) {},
     function load() {},
     function unload() {},
     function onRemove() {},
-    // function detach() {},
     function onSetClass() {},
     function onFocus() {},
     function onAddListener() {},
@@ -507,7 +514,29 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
-  documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
+  documentation: `
+    Virtual-DOM Element. Root model for all U2 UI components.
+
+    // TODO: Decide if we want this or not:
+    // function XXXE(opt_nodeName /* | DIV */) {
+    //   /* Create a new Element */
+    //   var Y = this.__subContext__;
+    //
+    //   // ???: Is this needed / a good idea?
+    //   if ( this.data && ! Y.data ) Y = Y.createSubContext({ data: this.data });
+    //
+    //   // Some names have sub-Models registered for them.
+    //   // Example 'input'
+    //   var e = Y.elementForName(opt_nodeName);
+    //
+    //   if ( ! e ) {
+    //     e = foam.u2.Element.create(null, Y);
+    //     if ( opt_nodeName ) e.nodeName = opt_nodeName;
+    //   }
+    //
+    //   return e;
+    // },
+  `,
 
   requires: [
     'foam.u2.AttrSlot',
@@ -613,10 +642,14 @@ foam.CLASS({
     }
   },
 
-  // We hide Elements by adding this style rather than setting
-  // 'display: none' directly because then when we re-show the
-  // Element we don't need to remember it's desired 'display' value.
-  css: '.foam-u2-Element-hidden { display: none !important; }',
+  css: `
+    // We hide Elements by adding this style rather than setting
+    // 'display: none' directly because then when we re-show the
+    // Element we don't need to remember it's desired 'display' value.
+    .foam-u2-Element-hidden {
+      display: none !important;
+    }
+  `,
 
   properties: [
     {
@@ -685,13 +718,13 @@ foam.CLASS({
     },
     {
       name: 'attributeMap',
-      // documentation: 'Same information as "attributes", but in map form for faster lookup',
+      documentation: 'Same information as "attributes", but in map form for faster lookup',
       transient: true,
       factory: function() { return {}; }
     },
     {
       name: 'attributes',
-      // documentation: 'Array of {name: ..., value: ...} attributes.',
+      documentation: 'Array of {name: ..., value: ...} attributes.',
       factory: function() { return []; },
       postSet: function(_, attrs) {
         this.attributeMap = {};
@@ -702,27 +735,27 @@ foam.CLASS({
     },
     {
       name: 'classes',
-      // documentation: 'CSS classes assigned to this Element. Stored as a map of true values.',
+      documentation: 'CSS classes assigned to this Element. Stored as a map of true values.',
       factory: function() { return {}; }
     },
     {
       name: 'css',
-      // documentation: 'Styles added to this Element.',
+      documentation: 'Styles added to this Element.',
       factory: function() { return {}; }
     },
     {
       name: 'childNodes',
-      // documentation: 'Children of this Element.',
+      documentation: 'Children of this Element.',
       factory: function() { return []; }
     },
     {
       name: 'elListeners',
-      // documentation: 'DOM listeners of this Element. Stored as topic then listener.',
+      documentation: 'DOM listeners of this Element. Stored as topic then listener.',
       factory: function() { return []; }
     },
     {
       name: 'children',
-      // documentation: 'Virtual property of non-String childNodes.',
+      documentation: 'Virtual property of non-String childNodes.',
       transient: true,
       getter: function() {
         return this.childNodes.filter(function(c) {
@@ -888,25 +921,6 @@ foam.CLASS({
       return this.__subSubContext__.E(opt_nodeName);
     },
 
-    // function XXXE(opt_nodeName /* | DIV */) {
-    //   /* Create a new Element */
-    //   var Y = this.__subContext__;
-    //
-    //   // ???: Is this needed / a good idea?
-    //   if ( this.data && ! Y.data ) Y = Y.createSubContext({ data: this.data });
-    //
-    //   // Some names have sub-Models registered for them.
-    //   // Example 'input'
-    //   var e = Y.elementForName(opt_nodeName);
-    //
-    //   if ( ! e ) {
-    //     e = foam.u2.Element.create(null, Y);
-    //     if ( opt_nodeName ) e.nodeName = opt_nodeName;
-    //   }
-    //
-    //   return e;
-    // },
-
     function attrSlot(opt_name, opt_event) {
       /* Convenience method for creating an AttrSlot's. */
       var args = { element: this };
@@ -953,11 +967,6 @@ foam.CLASS({
       }
     },
 
-
-    //
-    // Focus
-    //
-
     function focus() {
       this.focused = true;
       this.onFocus();
@@ -968,11 +977,6 @@ foam.CLASS({
       this.focused = false;
       return this;
     },
-
-    //
-    // Visibility
-    //
-    // Fluent methods for setting 'shown' property.
 
     function show(opt_shown) {
       if ( opt_shown === undefined ) {
@@ -992,12 +996,6 @@ foam.CLASS({
           foam.core.Slot.isInstance(opt_hidden) ? opt_hidden.map(function(s) { return ! s; }) :
           ! opt_hidden);
     },
-
-
-    //
-    // DOM Compatibility
-    //
-    // Methods with the same interface as the real DOM.
 
     function setAttribute(name, value) {
       /*
@@ -1186,12 +1184,6 @@ foam.CLASS({
         }
       }
     },
-
-
-    //
-    // Fluent Methods
-    //
-    // Methods which return 'this' so they can be chained.
 
     function setNodeName(name) {
       this.nodeName = name;
@@ -1551,10 +1543,6 @@ foam.CLASS({
       return this;
     },
 
-    //
-    // Output Methods
-    //
-
     function outputInnerHTML(out) {
       var cs = this.childNodes;
       for ( var i = 0 ; i < cs.length ; i++ ) {
@@ -1618,13 +1606,9 @@ foam.CLASS({
       */
     },
 
-
-    //
-    // Internal (DO NOT USE)
-    //
-
-    // (Element[], Element, Boolean)
     function insertAt_(children, reference, before) {
+      // (Element[], Element, Boolean)
+
       var i = this.childNodes.indexOf(reference);
 
       if ( i === -1 ) {
@@ -1687,8 +1671,8 @@ foam.CLASS({
       return this;
     },
 
-    // TODO: add same context capturing behviour to other slotXXX_() methods.
     function slotE_(slot) {
+      // TODO: add same context capturing behviour to other slotXXX_() methods.
       /*
         Return an Element or an Array of Elements which are
         returned from the supplied dynamic Slot.
@@ -1941,7 +1925,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW
+      value: 'RW'
     }
   ],
 
@@ -2131,7 +2115,25 @@ foam.CLASS({
   name: 'View',
   extends: 'foam.u2.Element',
 
-  documentation: 'A View is an Element used to display data.',
+  documentation: `
+    A View is an Element used to display data.
+    // TODO: Should the following be properties?
+    /*
+    {
+      type: 'Boolean',
+      name: 'showValidation',
+      documentation: 'Set to false if you want to ignore any ' +
+          '$$DOC{ref:"Property.validate"} calls. On by default.',
+      defaultValue: true
+    },
+    {
+      type: 'String',
+      name: 'validationError_',
+      documentation: 'The actual error message. Null or the empty string ' +
+          'when there is no error.',
+    }
+    */
+  `,
 
   exports: [ 'data' ],
 
@@ -2152,7 +2154,7 @@ foam.CLASS({
       name: 'visibility',
       postSet: function() { this.updateMode_(this.mode); },
       attribute: true,
-      value: foam.u2.Visibility.RW
+      value: 'RW'
     },
     {
       class: 'Enum',
@@ -2175,21 +2177,7 @@ foam.CLASS({
           foam.u2.DisplayMode.RW ;
       },
       attribute: true
-    }/*,
-    {
-      type: 'Boolean',
-      name: 'showValidation',
-      documentation: 'Set to false if you want to ignore any ' +
-          '$$DOC{ref:"Property.validate"} calls. On by default.',
-      defaultValue: true
-    },
-    {
-      type: 'String',
-      name: 'validationError_',
-      documentation: 'The actual error message. Null or the empty string ' +
-          'when there is no error.',
     }
-    */
   ],
 
   methods: [
@@ -2241,8 +2229,6 @@ foam.CLASS({
   ]
 });
 
-// TODO: make a tableProperties property on AbstractClass
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableColumns',
@@ -2281,7 +2267,9 @@ foam.CLASS({
       }
     },
     {
-      // TODO: remove when all code ported
+      documentation: `
+        // TODO: remove when all code ported
+      `,
       name: 'tableProperties',
       setter: function(_, ps) {
         console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");
