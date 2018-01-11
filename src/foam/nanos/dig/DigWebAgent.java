@@ -267,9 +267,9 @@ public class DigWebAgent
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
-          String dataArray[] = outputterJson.toString().split("\"}");
-          for ( int k = 0 ; k < dataArray.length; k++ ) {
-            dataToString += "p(" + dataArray[k] + "\"})\n";
+          String dataArray[] = outputterJson.toString().split("\\{\"class\":");
+          for ( int k = 1 ; k < dataArray.length; k++ ) {
+            dataToString += "p({\"class\":" + dataArray[k] + ")\n";
           }
 
           if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
