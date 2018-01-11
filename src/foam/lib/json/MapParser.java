@@ -24,8 +24,9 @@ public class MapParser
                         new Whitespace(),
                         new Literal(":"),
                         new Whitespace(),
-                        new AnyParser()),
-                    new Seq0(new Whitespace(), new Literal(","))),
+                        AnyParser.instance()),
+                    new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
+                new Whitespace(),
                 new Literal("}")),
         new Whitespace())
     );

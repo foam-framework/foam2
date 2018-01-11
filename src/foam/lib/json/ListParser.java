@@ -19,7 +19,7 @@ public class ListParser
                            new Literal("["),
                            new Whitespace(),
                            new Repeat(
-                                      new AnyParser(),
+                                      AnyParser.instance(),
                                       new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
                            new Whitespace(),
                            new Literal("]"))));
