@@ -23,9 +23,9 @@ public abstract class AbstractArrayPropertyInfo
 {
 
   public Object fromString(String value) {
-    if ( value == null ) 
+    if ( value == null )
       return null;
-    
+
     // TODO: TO REUSE THIS LIST WITH A THREADLOCAL FOR BETTER PERFORMANCE
     List<String> list = new LinkedList<String>();
     StringBuilder sb = new StringBuilder();
@@ -91,10 +91,17 @@ public abstract class AbstractArrayPropertyInfo
   public void toXML (FObject obj, Document doc, Element objElement) {
     if ( this.f(obj) == null ) return;
 
+    try {
+      Object[] nestObj = (Object[]) this.f(obj);
+    } catch (Throwable t){
+      return;
+    }
+
     Element prop = doc.createElement(this.getName());
     objElement.appendChild(prop);
 
     Object[] nestObj = (Object[]) this.f(obj);
+
     for ( int k = 0; k < nestObj.length; k++ ) {
       Element nestedProp = doc.createElement("value");
       nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));

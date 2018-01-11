@@ -210,13 +210,15 @@ public class DigWebAgent
         System.err.println("objects selected: " + sink.getArray().size());
 
         if ( "json".equals(format) ) {
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter();
+          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.output(sink.getArray().toArray());
 
           if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
             output(x, outputterJson.toString());
           } else {
+            out.println("<textarea style=\"width:700;height:400;\" rows=10 cols=120>");
             out.println(outputterJson.toString());
+            out.println("</textarea>");
           }
         } else if ( "xml".equals(format) ) {
           XMLSupport xmlSupport = new XMLSupport();
@@ -229,7 +231,7 @@ public class DigWebAgent
             out.println("</textarea>");
           }
         } else if ( "csv".equals(format) ) {
-          foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter();
+          foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
           outputterCsv.output(sink.getArray().toArray());
           List a = sink.getArray();
           for ( int i = 0 ; i < a.size() ; i++ ) {
@@ -244,7 +246,7 @@ public class DigWebAgent
             out.println("</textarea>");
           }
         } else if ( "html".equals(format) ) {
-          foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter();
+          foam.lib.html.Outputter outputterHtml = new foam.lib.html.Outputter(OutputterMode.NETWORK);
 
           outputterHtml.outputStartHtml();
           outputterHtml.outputStartTable();
@@ -264,22 +266,24 @@ public class DigWebAgent
             out.println(outputterHtml.toString());
           }
         }  else if ( "jsonj".equals(format) ) {
-          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter();
+          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           List a = sink.getArray();
           String dataToString = "";
 
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
-          String dataArray[] = outputterJson.toString().split("}");
-          for ( int k = 0 ; k < dataArray.length; k++ ) {
-            dataToString += "p(" + dataArray[k] + "})\n";
+          String dataArray[] = outputterJson.toString().split("\"}");
+          for ( int k = 1 ; k < dataArray.length; k++ ) {
+            dataToString += "p(" + dataArray[k] + "\"})\n";
           }
 
           if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
             output(x, dataToString);
           } else {
+            out.println("<textarea style=\"width:700;height:400;\" rows=10 cols=120>");
             out.println(dataToString);
+            out.println("</textarea>");
           }
         }
       } else if ( "help".equals(command) ) {
