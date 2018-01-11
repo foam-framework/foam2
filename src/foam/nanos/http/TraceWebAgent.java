@@ -19,8 +19,8 @@ public class TraceWebAgent
 
   public void execute(X x) {
     try {
-      PrintWriter        out = (PrintWriter)        x.get(PrintWriter.class);
-      HttpServletRequest req = (HttpServletRequest) x.get(HttpServletRequest.class);
+      PrintWriter        out = x.get(PrintWriter.class);
+      HttpServletRequest req = x.get(HttpServletRequest.class);
 
 
       out.println("<HTML>\n" +

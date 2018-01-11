@@ -228,6 +228,7 @@ FOAM_FILES([
   { name: "lib/node/json_dao", flags: ['node'] },
   { name: "lib/utf8" },
   { name: "foam/net/NotConnectedException" },
+  { name: "foam/net/ConnectionFailedException" },
   { name: "foam/net/web/WebSocket" },
   { name: "foam/net/web/WebSocketService" },
   // foam.net.web: No 'web' flag, because some are base classes for
@@ -253,6 +254,7 @@ FOAM_FILES([
   { name: "lib/Stub" },
   { name: "lib/StubJava", flags: ['java'] },
   { name: "foam/box/Box" },
+  { name: "foam/box/AnonymousBox" },
   { name: "foam/box/RemoteException" },
   { name: "foam/box/Skeleton" },
   { name: "foam/box/PromisedBox" },
