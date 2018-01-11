@@ -175,7 +175,7 @@ public class JDAO
   public void removeAll_(final X x, long skip, final long limit, Comparator order, Predicate predicate) {
     //     file.delete();
 
-    getDelegate().select_(x, new RemoveSink(this), skip, limit, order, predicate);
+    getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 }
