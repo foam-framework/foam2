@@ -18,8 +18,8 @@ public class UptimeWebAgent
 
   @Override
   public void execute(X x) {
-    PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletResponse response = (HttpServletResponse) x.get(HttpServletResponse.class);
+    PrintWriter out = x.get(PrintWriter.class);
+    HttpServletResponse response = x.get(HttpServletResponse.class);
     response.setContentType("text/html");
     out.println("Uptime: " + ( System.currentTimeMillis() - startTime_ ) / 1000);
   }

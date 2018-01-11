@@ -25,6 +25,10 @@ import java.util.Map;
 abstract class AbstractX
   implements X
 {
+  public <T> T get(Class<T> key) {
+    return (T)get(this, key);
+  }
+
   public Object get(Object key) {
     return get(this, key);
   }
@@ -62,7 +66,7 @@ abstract class AbstractXI
 {
   protected X   leftChild_;
   protected X   rightChild_;
-  
+
   protected abstract Object getKey();
   protected X getLeftChild() { return leftChild_; }
   protected X getRightChild() { return rightChild_; }
@@ -100,7 +104,7 @@ abstract class AbstractXI
     return result;
   }
 
-  @Override 
+  @Override
   protected AbstractXI clone() {
     AbstractXI x = null;
     try {

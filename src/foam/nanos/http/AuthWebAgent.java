@@ -33,9 +33,9 @@ public class AuthWebAgent
   }
 
   public void execute(X x) {
-    HttpServletRequest  req        = (HttpServletRequest) x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = (HttpServletResponse) x.get(HttpServletResponse.class);
-    PrintWriter         out        = (PrintWriter) x.get(PrintWriter.class);
+    HttpServletRequest  req        = x.get(HttpServletRequest.class);
+    HttpServletResponse resp       = x.get(HttpServletResponse.class);
+    PrintWriter         out        = x.get(PrintWriter.class);
     AuthService         auth       = (AuthService) x.get("auth");
     DAO                 sessionDAO = (DAO) x.get("sessionDAO");
     String              sessionId  = null;
@@ -72,7 +72,7 @@ public class AuthWebAgent
   }
 
   public void templateLogin(X x) {
-    PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
+    PrintWriter out = x.get(PrintWriter.class);
 
     out.println("<form method=post>");
     out.println("<h1>Login</h1>");
@@ -88,11 +88,11 @@ public class AuthWebAgent
   }
 
   public boolean attemptLogin(X x) {
-    HttpServletRequest req        = (HttpServletRequest) x.get(HttpServletRequest.class);
+    HttpServletRequest req        = x.get(HttpServletRequest.class);
     String             email      = req.getParameter("email");
     String             password   = req.getParameter("password");
     AuthService        auth       = (AuthService) x.get("auth");
-    PrintWriter        out        = (PrintWriter) x.get(PrintWriter.class);
+    PrintWriter        out        = x.get(PrintWriter.class);
     Session            session    = new Session();
     DAO                sessionDAO = (DAO) x.get("sessionDAO");
 
@@ -115,8 +115,8 @@ public class AuthWebAgent
   }
 
   public void createCookie(X x, Session session){
-    HttpServletResponse resp   = (HttpServletResponse) x.get(HttpServletResponse.class);
-    PrintWriter         out    = (PrintWriter)         x.get(PrintWriter.class);
+    HttpServletResponse resp   = x.get(HttpServletResponse.class);
+    PrintWriter         out    = x.get(PrintWriter.class);
     Cookie              cookie = new Cookie(SESSION_ID, session.getId());
 
     resp.addCookie(cookie);

@@ -31,7 +31,7 @@ public class SessionServerBox
 
     try {
       if ( sessionID != null ) {
-        NSpec       spec       = (NSpec)       getX().get(NSpec.class);
+        NSpec       spec       = getX().get(NSpec.class);
         AuthService auth       = (AuthService) getX().get("auth");
         DAO         sessionDAO = (DAO)         getX().get("sessionDAO");
         Session     session    = (Session)     sessionDAO.find(sessionID);
@@ -40,7 +40,7 @@ public class SessionServerBox
           session = new Session();
           session.setId(sessionID);
 
-          HttpServletRequest req = (HttpServletRequest) getX().get(HttpServletRequest.class);
+          HttpServletRequest req = getX().get(HttpServletRequest.class);
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
         }
