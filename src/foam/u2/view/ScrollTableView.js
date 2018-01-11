@@ -67,7 +67,6 @@
               extent$: this.limit$,
               height: 40*18+41, // TODO use window height.
               width: 22,
-              handleSize: 40,
               size$: this.daoCount$,
               mouseEvent$: this.mouseEvent$
               // TODO clicking away from scroller should deselect it.
@@ -110,6 +109,7 @@
           self.mouseEvent = e;
         }
         function onMouseUp(e) {
+          self.mouseEvent = e;
           // remove event listeners when the user releases the mouse click
           global.window.removeEventListener('mousemove', onMouseMove);
           global.window.removeEventListener('mouseup', onMouseUp);

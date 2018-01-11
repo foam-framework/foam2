@@ -22,7 +22,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Int',
+      class: 'Long',
       name: 'length'
     },
     {
@@ -53,7 +53,7 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          class: 'Int',
+          class: 'Long',
           swiftType: 'Int',
           name: 'offset'
         }
@@ -61,7 +61,7 @@ foam.INTERFACE({
     },
     {
       name: 'getSize',
-      returns: 'Int',
+      returns: 'Long',
       swiftReturns: 'Int',
     }
   ]
@@ -273,11 +273,11 @@ foam.CLASS({
       name: 'parent',
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'offset'
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'size',
       assertValue: function(value) {
         foam.assert(this.offset + value <= this.parent.size, 'Cannot create sub blob beyond end of parent.');
@@ -418,7 +418,7 @@ foam.CLASS({
       name: 'fd'
     },
     {
-      class: 'Int',
+      class: 'Long',
       name: 'size',
       expression: function(fd) {
         return require('fs').fstatSync(fd).size;
@@ -678,7 +678,7 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + "/service/blobService";
+        return window.location.origin + "/service/httpBlobService";
       }
     }
   ],
