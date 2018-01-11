@@ -55,9 +55,9 @@ public class FileWebAgent
 
   @Override
   public void execute(X x) {
-    PrintWriter pw = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletRequest req = (HttpServletRequest) x.get(HttpServletRequest.class);
-    HttpServletResponse resp = (HttpServletResponse) x.get(HttpServletResponse.class);
+    PrintWriter pw = x.get(PrintWriter.class);
+    HttpServletRequest req = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     String path = null;
     BufferedInputStream is = null;
