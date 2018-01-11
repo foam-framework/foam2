@@ -15,7 +15,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      javaFactory: 'return java.util.UUID.randomUUID().toString();',
     },
     {
       class: 'Long',
@@ -47,6 +48,7 @@ foam.CLASS({
       class: 'Object',
       name: 'context',
       javaType: 'foam.core.X',
+      javaFactory: 'return foam.core.EmptyX.instance().put(Session.class, this);',
       hidden: true,
       transient: true
     }

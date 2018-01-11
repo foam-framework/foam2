@@ -8,6 +8,8 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
+import foam.nanos.auth.*;
+import foam.nanos.session.Session;
 import foam.nanos.script.*;
 import java.io.IOException;
 import static foam.mlang.MLang.*;
@@ -19,10 +21,12 @@ public class Boot {
   public Boot() {
     try {
       // Used for all the services that will be required when Booting
-      serviceDAO_ = new foam.dao.PMDAO(new JDAO(NSpec.getOwnClassInfo(), "services"));
+      serviceDAO_ = new JDAO(NSpec.getOwnClassInfo(), "services");
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    installSystemUser();
 
     serviceDAO_.select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -38,7 +42,8 @@ public class Boot {
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
-    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
+        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -56,13 +61,27 @@ public class Boot {
       if ( script != null ) {
         script.runScript(root_);
       }
-     }
+    }
+  }
+
+  protected void installSystemUser() {
+    User user = new User();
+    user.setId(1);
+    user.setFirstName("system");
+    user.setGroup("system");
+
+    Session session = new Session();
+    session.setUserId(user.getId());
+    session.setContext(root_);
+
+    root_.put("user", user);
+    root_.put(Session.class, session);
   }
 
   public X getX() { return root_; }
 
   public static void main (String[] args)
-    throws java.lang.Exception
+      throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
     new Boot();

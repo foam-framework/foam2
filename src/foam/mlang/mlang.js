@@ -1323,8 +1323,9 @@ foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Mul',
 
+  extends: 'foam.mlang.predicate.Binary',
+
   implements: [
-    'foam.mlang.predicate.Binary',
     'foam.core.Serializable'
   ],
 

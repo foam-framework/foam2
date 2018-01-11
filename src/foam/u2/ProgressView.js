@@ -20,17 +20,13 @@ foam.CLASS({
   name: 'ProgressView',
   extends: 'foam.u2.View',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          margin: 2px 0 0 10px;
-          height: 23px;
-          width: 183px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      margin: 2px 0 0 10px;
+      height: 23px;
+      width: 183px;
+    }
+  `,
 
   properties: [
     [ 'nodeName', 'progress' ]
@@ -40,9 +36,8 @@ foam.CLASS({
     function initE() {
       this.
         addClass(this.myClass()).
-        attrs({max: 100});
-
-      this.attrSlot().follow(this.data$);
+        attrs({max: 100}).
+        attrSlot().follow(this.data$);
     }
   ]
 });

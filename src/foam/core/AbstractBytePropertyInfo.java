@@ -15,9 +15,8 @@ public abstract class AbstractBytePropertyInfo
     return java.lang.Byte.compare(b1, b2);
   }
 
-  @Override
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Byte.valueOf(value));
+  public Object fromString(String value) {
+    return Byte.valueOf(value);
   }
 
   @Override

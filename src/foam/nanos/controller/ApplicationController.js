@@ -96,8 +96,6 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.user.id$.sub(this.onUserUpdate);
-
       this.getCurrentUser();
 
       window.onpopstate = function(event) {
@@ -124,12 +122,11 @@ foam.CLASS({
 
     function setDefaultMenu() {
       // Don't select default if menu already set
-      if ( this.window.location.hash ) return;
+      if ( this.window.location.hash || ! this.user.group ) return;
 
-      var self = this;
       this.groupDAO.find(this.user.group).then(function (group) {
-        self.window.location.hash = group.defaultMenu;
-      });
+        this.window.location.hash = group.defaultMenu;
+      }.bind(this));
     },
 
     function getCurrentUser() {
@@ -140,6 +137,7 @@ foam.CLASS({
         self.loginSuccess = !! result;
         if ( result ) {
           self.user.copyFrom(result);
+          self.onUserUpdate();
         }
       })
       .catch(function (err) {
@@ -174,7 +172,11 @@ foam.CLASS({
       var self = this;
 
       // don't go to log in screen if going to reset password screen
-      if ( location.hash != null && location.hash === '#reset' ) return;
+      if ( location.hash != null && location.hash === '#reset')
+        return new Promise(function (resolve, reject) {
+          self.stack.push({ class: 'foam.nanos.auth.resetPassword.ResetView' });
+          self.loginSuccess$.sub(resolve);
+        });
 
       return new Promise(function(resolve, reject) {
         self.stack.push({ class: 'foam.nanos.auth.SignInView' });
@@ -184,12 +186,8 @@ foam.CLASS({
   ],
 
   listeners: [
-    {
-      name: 'onUserUpdate',
-      isFramed: true,
-      code: function() {
-        this.setDefaultMenu();
-      }
+    function onUserUpdate() {
+      this.setDefaultMenu();
     }
   ]
 });
