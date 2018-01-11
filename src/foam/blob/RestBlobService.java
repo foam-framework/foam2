@@ -13,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 
 public class RestBlobService
@@ -37,6 +36,7 @@ public class RestBlobService
     if ( blob instanceof IdentifiedBlob ) {
       return blob;
     }
+
     HttpURLConnection connection = null;
     OutputStream os = null;
     InputStream is = null;
@@ -59,22 +59,11 @@ public class RestBlobService
       connection.setRequestProperty("Connection", "keep-alive");
       connection.setRequestProperty("Content-Type", "application/octet-stream");
 
-      //output blob into connection
-      long chunk = 0;
-      long size = blob.getSize();
-      long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-      Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
+      // get connection ouput stream
       os = connection.getOutputStream();
 
-      while ( chunk < chunks ) {
-        buffer = blob.read(buffer, chunkOffset(chunk));
-        byte[] buf = buffer.getData().array();
-        os.write(buf, 0, (int) buffer.getLength());
-        buffer.getData().clear();
-        chunk++;
-      }
-
-      os.flush();
+      //output blob into connection
+      blob.read(os, 0, blob.getSize());
 
       if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
         throw new RuntimeException("Upload failed");
@@ -88,9 +77,12 @@ public class RestBlobService
 
       return (Blob) getX().create(JSONParser.class).parseString(cb.toString(), IdentifiedBlob.class);
     } catch ( Throwable t ) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
-      closeSource(is, os, connection);
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(os);
+      IOUtils.close(connection);
     }
   }
 
@@ -125,7 +117,9 @@ public class RestBlobService
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
-      closeSource(is, os, connection);
+      IOUtils.closeQuietly(os);
+      IOUtils.closeQuietly(is);
+      IOUtils.close(connection);
     }
   }
 
@@ -135,15 +129,5 @@ public class RestBlobService
       return null;
     }
     return this.address_ + "/" + ((IdentifiedBlob) blob).getId();
-  }
-
-  private long chunkOffset(long i) {
-    return i * BUFFER_SIZE;
-  }
-
-  private void closeSource(InputStream is, OutputStream os, HttpURLConnection connection) {
-    IOUtils.closeQuietly(os);
-    IOUtils.closeQuietly(is);
-    IOUtils.close(connection);
   }
 }

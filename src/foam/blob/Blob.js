@@ -26,9 +26,7 @@ foam.CLASS({
       name: 'length'
     },
     {
-      class: 'Object',
       name: 'data',
-      javaType: 'java.nio.ByteBuffer',
       factory: function() {
         return new ArrayBuffer(this.length);
       }

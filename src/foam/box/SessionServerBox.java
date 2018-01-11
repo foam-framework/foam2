@@ -11,11 +11,10 @@ import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.boot.NSpec;
 import foam.nanos.session.Session;
-
-import javax.naming.NoPermissionException;
-import javax.servlet.http.HttpServletRequest;
 import java.security.AccessControlException;
 import java.util.Date;
+import javax.naming.NoPermissionException;
+import javax.servlet.http.HttpServletRequest;
 
 public class SessionServerBox
   extends ProxyBox
