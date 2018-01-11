@@ -322,7 +322,7 @@ foam.CLASS({
 
           this[boxPropName].send(msg);
 
-          return ret;
+          return;
         };
       }
     }
