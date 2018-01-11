@@ -1,5 +1,5 @@
-p({"class":"foam.nanos.auth.Country", "code":"CA", "name":"Canada"})
 p({"class":"foam.nanos.auth.Country", "code":"BR", "name":"Brazil"})
+p({"class":"foam.nanos.auth.Country", "code":"CA", "name":"Canada"})
 p({"class":"foam.nanos.auth.Country", "code":"CN", "name":"China"})
 p({"class":"foam.nanos.auth.Country", "code":"IN", "name":"India"})
 p({"class":"foam.nanos.auth.Country", "code":"JM", "name":"Jamaica"})
