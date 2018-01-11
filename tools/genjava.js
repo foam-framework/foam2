@@ -4,6 +4,11 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+process.on('unhandledRejection', function(e) {
+  console.error("ERROR: Unhandled promise rejection ", e);
+  process.exit(1);
+});
+
 // enable FOAM java support.
 global.FOAM_FLAGS = { 'java': true, 'debug': true, 'js': false };
 
