@@ -15,9 +15,8 @@ public abstract class AbstractLongPropertyInfo
     return java.lang.Long.compare(o1, o2);
   }
 
-  @Override
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Long.valueOf(value));
+  public Object fromString(String value) {
+    return Long.valueOf(value);
   }
 
   @Override

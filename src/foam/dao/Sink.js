@@ -547,8 +547,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'Object',
       /** @private */
-      name: 'results_',
+      name: 'results',
+      javaType: 'java.util.HashSet',
       hidden: true,
       factory: function() { return {}; }
     }
@@ -560,8 +562,8 @@ foam.CLASS({
         ignore it */
       name: 'put',
       code: function put(obj, sub) {
-        if ( ! this.results_[obj.id] ) {
-          this.results_[obj.id] = true;
+        if ( ! this.results[obj.id] ) {
+          this.results[obj.id] = true;
           return this.delegate.put(obj, sub);
         }
       }

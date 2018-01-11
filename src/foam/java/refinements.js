@@ -151,7 +151,7 @@ foam.CLASS({
       });
 
       var info = cls.getField('classInfo_');
-      if ( info ) info.addProperty(cls.name + '.' + constantize);
+      if ( info ) info.addAxiom(cls.name + '.' + constantize);
     }
   ]
 });
@@ -1135,6 +1135,42 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.pattern.Multiton',
+
+  properties: [
+    {
+      name: 'javaName',
+      value: 'Multiton',
+    },
+    {
+      name: 'javaInfoName',
+      expression: function(javaName) {
+        return foam.String.constantize(this.javaName);
+      },
+    },
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
+
+      cls.field({
+        name: this.javaInfoName,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.MultitonInfo',
+        initializer: `
+new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
+        `,
+      });
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
@@ -1149,22 +1185,77 @@ foam.CLASS({
   ],
 
   methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+
+      var body = `return new foam.core.PropertyInfo[] {
+`;
+
+      for ( var i = 0 ; i < this.props.length ; i++ ) {
+        body += `  ${cls.name}.${foam.String.constantize(this.props[i].name)}`
+        if ( i != this.props.length - 1 ) body += ',';
+        body += '\n';
+      }
+
+      body += '};';
+
+      info.method({
+        name: 'getProperties',
+        visibility: 'protected',
+        type: 'foam.core.PropertyInfo[]',
+        body: body,
+      });
+
+      // TODO: What is the correct behaviour here?  If none of the
+      // parts are set we could return false, and if all are set
+      // return true, but what about when only some of the parts are
+      // set?  Is this ever a situation that we have to care about?
+      info.getMethod('isSet').body = `return true;`
+
+      return info;
+    },
     function buildJavaClass(cls) {
-      this.SUPER(cls);
+      // Don't delegate to SUPER() here.  A MultiPartID is really just
+      // an alias for one or more other properties, no need for all the
+      // extra baggage that comes with a full property.
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
 
       var props = this.props;
 
-      cls.getMethod("get" + capitalized).body = foam.java.MultiPartGetter.create({
-        props: props,
-        clsName: cls.name
+      cls.field({
+        name: constantize,
+        visibility: 'public',
+        static: true,
+        type: 'foam.core.PropertyInfo',
+        initializer: this.createJavaPropertyInfo_(cls)
       });
-      cls.getMethod("set" + capitalized).body = foam.java.MultiPartSetter.create({
-        props: props,
-        clsName: cls.name
-      });
+
+      cls.
+        method({
+          name: 'get' + capitalized,
+          type: this.javaType,
+          visibility: 'public',
+          body: foam.java.MultiPartGetter.create({
+            props: props,
+            clsName: cls.name
+          })
+        }).
+        method({
+          name: 'set' + capitalized,
+          type: 'void',
+          args: [
+            { type: this.javaType, name: 'val' }
+          ],
+          body: foam.java.MultiPartSetter.create({
+            props: props,
+            clsName: cls.name
+          })
+        });
+
+      var info = cls.getField('classInfo_');
+      if ( info ) info.addAxiom(cls.name + '.' + constantize);
     }
   ]
 });
@@ -1264,5 +1355,23 @@ foam.CLASS({
 
       cls.fields.push(listener);
     }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Requires',
+  properties: [
+    {
+      name: 'javaPath',
+      expression: function(path) {
+        return path;
+      },
+    },
+    {
+      name: 'javaReturns',
+      expression: function(javaPath) {
+        return this.lookup(javaPath).model_.id;
+      },
+    },
   ]
 });

@@ -12,7 +12,9 @@ import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
-public class AltIndex implements Index {
+public class AltIndex
+  extends AbstractIndex
+{
 
   public final static int GOOD_ENOUGH_PLAN_COST = 10;
 
@@ -86,7 +88,7 @@ public class AltIndex implements Index {
 
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
-
+      bestState = s[i];
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
         bestState = s[i];
@@ -94,7 +96,7 @@ public class AltIndex implements Index {
       }
     }
 
-    return new AltSelectPlan(bestState, bestPlan);
+    return new AltSelectPlan(bestState,bestPlan);
   }
 
   public long size(Object state) {

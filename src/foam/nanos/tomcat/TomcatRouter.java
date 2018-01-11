@@ -82,7 +82,6 @@ public class TomcatRouter
 
     @OnOpen
     public void onOpen(javax.websocket.Session session) {
-      System.out.println("On open " + session.hashCode());
       returnBox_ = getX().create(foam.box.RawWebSocketBox.class);
 
       final java.util.concurrent.BlockingQueue<String> queue = new java.util.concurrent.LinkedTransferQueue<String>();
@@ -90,14 +89,12 @@ public class TomcatRouter
       final Integer id = new java.util.Random().nextInt();
       id_ = id;
 
-      System.out.println("new id" + Integer.toString(id, 16));
 
       Thread socketThread = new Thread(new Runnable() {
           public void run() {
             while ( true ) {
               try {
                 String message = queue.take();
-                System.out.println("(" + Integer.toString(id, 16) + ") send");
                 capturedEndpoint.sendText(message);
               } catch ( InterruptedException e ) {
               } catch ( java.io.IOException e) {
@@ -113,7 +110,6 @@ public class TomcatRouter
       returnBox_.setSocket(new foam.net.WebSocket() {
           @Override
           public void send(String message) throws java.io.IOException {
-            System.out.println("(" + Integer.toString(id, 16) + ") append");
             try {
               queue.put(message);
             } catch (InterruptedException e) {
@@ -156,7 +152,7 @@ public class TomcatRouter
           return;
         }
 
-        foam.box.Message obj = (foam.box.Message)request;
+        foam.box.Message obj = (foam.box.Message) request;
         obj.getLocalAttributes().put("x", requestContext);
 
         getRouter().service(serviceKey, obj);

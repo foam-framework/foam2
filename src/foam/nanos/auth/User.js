@@ -59,7 +59,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'organization',
-      width: 175,
+      displayWidth: 80,
+      width: 100,
       tableWidth: 160
     },
     {
@@ -70,7 +71,8 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
-      width: 200,
+      displayWidth: 80,
+      width: 100,
       preSet: function (_, val) {
         return val.toLowerCase();
       },
@@ -189,13 +191,14 @@ emailIsSet_ = true;`
     {
       class: 'URL',
       name: 'website',
+      displayWidth: 80,
       width: 2048
     }
   ],
 
   methods: [
     function label() {
-      return this.organization || ( this.firstName + this.lastName );
+      return this.organization || ( this.firstName + ' ' + this.lastName );
     }
   ]
 });
