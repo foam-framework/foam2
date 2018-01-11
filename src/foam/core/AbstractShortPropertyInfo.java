@@ -15,8 +15,12 @@ public abstract class AbstractShortPropertyInfo
     return Short.compare(o1, o2);
   }
 
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Short.valueOf(value));
+  // public void setFromString(Object obj, String value) {
+  //   this.set(obj, Short.valueOf(value));
+  // }
+
+  public Object fromString(String value) {
+    return Short.valueOf(value);
   }
 
   @Override

@@ -63,7 +63,7 @@ public abstract class AbstractPropertyInfo
   }
 
   public void setFromString(Object obj, String value) {
-    // TODO: Need to write
+    this.set(obj, fromString(value));
   }
 
   @Override
