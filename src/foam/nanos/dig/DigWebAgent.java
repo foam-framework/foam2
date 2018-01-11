@@ -36,9 +36,9 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    HttpServletRequest  req        = (HttpServletRequest) x.get(HttpServletRequest.class);
-    HttpServletResponse response   = (HttpServletResponse) x.get(HttpServletResponse.class);
-    final PrintWriter   out        = (PrintWriter) x.get(PrintWriter.class);
+    HttpServletRequest  req        = x.get(HttpServletRequest.class);
+    HttpServletResponse response   = x.get(HttpServletResponse.class);
+    final PrintWriter   out        = x.get(PrintWriter.class);
     CharBuffer          buffer_    = CharBuffer.allocate(65535);
     String              data       = req.getParameter("data");
     String              daoName    = req.getParameter("dao");
@@ -334,12 +334,12 @@ public class DigWebAgent
   }
 
   protected void output(X x, String data) {
-    HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
+    HttpServletRequest req     = x.get(HttpServletRequest.class);
     String []          email   = req.getParameterValues("email");
     String             subject = req.getParameter("subject");
 
     if ( email.length == 0 ) {
-      PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
+      PrintWriter out = x.get(PrintWriter.class);
 
       out.print(data);
     } else {

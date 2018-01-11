@@ -37,8 +37,8 @@ public class HttpBlobService
 
   @Override
   public void execute(X x) {
-    HttpServletRequest  req  = (HttpServletRequest)  x.get(HttpServletRequest.class);
-    HttpServletResponse resp = (HttpServletResponse) x.get(HttpServletResponse.class);
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     try {
       if ( "GET".equals(req.getMethod()) ) {
