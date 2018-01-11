@@ -253,6 +253,7 @@ FOAM_FILES([
   { name: "lib/Stub" },
   { name: "lib/StubJava", flags: ['java'] },
   { name: "foam/box/Box" },
+  { name: "foam/box/AnonymousBox" },
   { name: "foam/box/RemoteException" },
   { name: "foam/box/Skeleton" },
   { name: "foam/box/PromisedBox" },
