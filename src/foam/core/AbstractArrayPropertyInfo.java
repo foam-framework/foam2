@@ -26,36 +26,8 @@ public abstract class AbstractArrayPropertyInfo
     if ( value == null )
       return null;
 
-    // TODO: TO REUSE THIS LIST WITH A THREADLOCAL FOR BETTER PERFORMANCE
-    List<String> list = new LinkedList<String>();
-    StringBuilder sb = new StringBuilder();
-    char prev = '$';
-    char[] cs = value.toCharArray();
-    for ( int i = 0 ; i < cs.length ; i++ ) {
-      if ( cs[i] == '\\' ) {
-        if ( prev == '\\' ) {
-          sb.append("\\");
-          prev = '$';
-        } else {
-          prev = '\\';
-        }
-      } else if ( cs[i] == ',' ) {
-        if ( prev == '\\' ) {
-          sb.append(',');
-        } else {
-          list.add(sb.toString());
-          sb.setLength(0);
-        }
-        prev = '$';
-      } else {
-        sb.append(cs[i]);
-        prev = cs[i];
-      }
-    }
-    list.add(sb.toString());
-    String[] result = new String[list.size()];
-    //add support for other array types
-    return list.toArray(result);
+    //TODO: add support for other array types
+    return foam.util.StringUtil.split(value, ',');
   }
 
   public abstract String of();
