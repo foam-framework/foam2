@@ -64,7 +64,7 @@ public class HttpBlobService
         return;
       }
 
-      int size = blob.getSize();
+      long size = blob.getSize();
       resp.setStatus(resp.SC_OK);
       if ( blob instanceof FileBlob ) {
         File file = ((FileBlob) blob).getFile();

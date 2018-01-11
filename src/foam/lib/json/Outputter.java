@@ -29,8 +29,8 @@ public class Outputter
     }
   };
 
-  protected StringWriter stringWriter_ = null;
-  protected PrintWriter writer_;
+  protected StringWriter  stringWriter_ = null;
+  protected PrintWriter   writer_;
   protected OutputterMode mode_;
 
   public Outputter() {

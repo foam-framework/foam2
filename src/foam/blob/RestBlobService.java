@@ -63,14 +63,7 @@ public class RestBlobService
       os = connection.getOutputStream();
 
       //output blob into connection
-      int chunk = 0;
-      int size = blob.getSize();
-      int chunks = (int) Math.ceil((double) size / (double) BUFFER_SIZE);
-
-      while ( chunk < chunks ) {
-        blob.read(os, chunk * BUFFER_SIZE, size);
-        chunk++;
-      }
+      blob.read(os, 0, blob.getSize());
 
       if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
         throw new RuntimeException("Upload failed");
@@ -84,6 +77,7 @@ public class RestBlobService
 
       return (Blob) getX().create(JSONParser.class).parseString(cb.toString(), IdentifiedBlob.class);
     } catch ( Throwable t ) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
       IOUtils.closeQuietly(is);
