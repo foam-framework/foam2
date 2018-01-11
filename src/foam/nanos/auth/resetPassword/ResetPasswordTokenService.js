@@ -82,7 +82,6 @@ EmailMessage message = new EmailMessage();
 message.setFrom("info@nanopay.net");
 message.setReplyTo("noreply@nanopay.net");
 message.setTo(new String[] { user.getEmail() });
-message.setSubject("Your password reset instructions");
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
