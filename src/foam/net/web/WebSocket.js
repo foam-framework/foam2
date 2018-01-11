@@ -10,7 +10,8 @@ foam.CLASS({
   name: 'WebSocket',
 
   requires: [
-    'foam.net.NotConnectedException'
+    'foam.net.NotConnectedException',
+    'foam.net.ConnectionFailedException'
   ],
 
   topics: [
@@ -54,8 +55,9 @@ foam.CLASS({
         }
         function onConnectError(e) {
           socket.removeEventListener('error', onConnectError);
-          reject();
+          reject(self.ConnectionFailedException.create());
         }
+
         socket.addEventListener('open', onConnect);
         socket.addEventListener('error', onConnectError);
 
