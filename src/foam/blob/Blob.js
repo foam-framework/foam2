@@ -678,7 +678,7 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + "/service/blobService";
+        return window.location.origin + "/service/httpBlobService";
       }
     }
   ],
