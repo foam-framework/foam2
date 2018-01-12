@@ -49,14 +49,25 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'onDownTrackWindow',
+      value: true,
+    },
     'lastTouch',
     'x',
     'y',
     {
       name: 'element',
       postSet: function(old, e) {
-        if ( old ) old.removeEventListener('mousedown', this.onMouseDown);
+        if ( old ) {
+          old.removeEventListener('mousedown', this.onMouseDown);
+          old.removeEventListener('mouseup',   this.onMouseUp);
+          old.removeEventListener('mousemove', this.onMouseMove);
+        }
         e.addEventListener('mousedown', this.onMouseDown);
+        e.addEventListener('mouseup',   this.onMouseUp);
+        e.addEventListener('mousemove', this.onMouseMove);
       }
     }
   ],
@@ -90,8 +101,12 @@ foam.CLASS({
           if ( this.lastTouch && this.lastTouch.claimed ) e.preventDefault();
         }
 
-        window.addEventListener('mouseup',   this.onMouseUp);
-        window.addEventListener('mousemove', this.onMouseMove);
+        if ( this.onDownTrackWindow ) {
+          // While the mouse is down, track the movements and mouseup on the
+          // entire window so it's tracked if/when the mouse leaves the element.
+          window.addEventListener('mouseup',   this.onMouseUp);
+          window.addEventListener('mousemove', this.onMouseMove);
+        }
       }
     },
     {
@@ -104,8 +119,10 @@ foam.CLASS({
           this.lastTouch = undefined;
         }
 
-        window.removeEventListener('mouseup',   this.onMouseUp);
-        window.removeEventListener('mousemove', this.onMouseMove);
+        if ( this.onDownTrackWindow ) {
+          window.removeEventListener('mouseup',   this.onMouseUp);
+          window.removeEventListener('mousemove', this.onMouseMove);
+        }
       }
     },
     {
