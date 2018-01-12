@@ -49,11 +49,6 @@ foam.CLASS({
   ],
 
   properties: [
-    {
-      class: 'Boolean',
-      name: 'onDownTrackWindow',
-      value: true,
-    },
     'lastTouch',
     'x',
     'y',
@@ -101,12 +96,10 @@ foam.CLASS({
           if ( this.lastTouch && this.lastTouch.claimed ) e.preventDefault();
         }
 
-        if ( this.onDownTrackWindow ) {
-          // While the mouse is down, track the movements and mouseup on the
-          // entire window so it's tracked if/when the mouse leaves the element.
-          window.addEventListener('mouseup',   this.onMouseUp);
-          window.addEventListener('mousemove', this.onMouseMove);
-        }
+        // While the mouse is down, track the movements and mouseup on the
+        // entire window so it's tracked if/when the mouse leaves the element.
+        window.addEventListener('mouseup',   this.onMouseUp);
+        window.addEventListener('mousemove', this.onMouseMove);
       }
     },
     {
@@ -119,10 +112,8 @@ foam.CLASS({
           this.lastTouch = undefined;
         }
 
-        if ( this.onDownTrackWindow ) {
-          window.removeEventListener('mouseup',   this.onMouseUp);
-          window.removeEventListener('mousemove', this.onMouseMove);
-        }
+        window.removeEventListener('mouseup',   this.onMouseUp);
+        window.removeEventListener('mousemove', this.onMouseMove);
       }
     },
     {
