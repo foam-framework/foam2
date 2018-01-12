@@ -20,8 +20,8 @@ public class RefreshWebAgent
   }
 
   public void execute(X x) {
-    PrintWriter        out  = (PrintWriter) x.get(PrintWriter.class);
-    HttpServletRequest req  = (HttpServletRequest) x.get(HttpServletRequest.class);
+    PrintWriter        out  = x.get(PrintWriter.class);
+    HttpServletRequest req  = x.get(HttpServletRequest.class);
     String             json = req.getParameter("refresh");
     int                refresh = json == null || "".equals(json) ? -1 : Integer.parseInt(json);
 

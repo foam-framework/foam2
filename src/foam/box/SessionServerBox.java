@@ -11,11 +11,10 @@ import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.boot.NSpec;
 import foam.nanos.session.Session;
-
-import javax.naming.NoPermissionException;
-import javax.servlet.http.HttpServletRequest;
 import java.security.AccessControlException;
 import java.util.Date;
+import javax.naming.NoPermissionException;
+import javax.servlet.http.HttpServletRequest;
 
 public class SessionServerBox
   extends ProxyBox
@@ -32,7 +31,7 @@ public class SessionServerBox
 
     try {
       if ( sessionID != null ) {
-        NSpec       spec       = (NSpec)       getX().get(NSpec.class);
+        NSpec       spec       = getX().get(NSpec.class);
         AuthService auth       = (AuthService) getX().get("auth");
         DAO         sessionDAO = (DAO)         getX().get("sessionDAO");
         Session     session    = (Session)     sessionDAO.find(sessionID);
@@ -41,7 +40,7 @@ public class SessionServerBox
           session = new Session();
           session.setId(sessionID);
 
-          HttpServletRequest req = (HttpServletRequest) getX().get(HttpServletRequest.class);
+          HttpServletRequest req = getX().get(HttpServletRequest.class);
           session.setRemoteHost(req.getRemoteHost());
           session.setContext(getX().put(Session.class, session));
         }
