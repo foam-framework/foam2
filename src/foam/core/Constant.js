@@ -41,6 +41,7 @@ foam.CLASS({
       },
     },
     'factory',
+    'documentation',
   ],
 
   methods: [
