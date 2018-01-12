@@ -23,6 +23,10 @@ public class ProxyX
     setX(x);
   }
 
+  public <T> T get(Class<T> key) {
+    return getX().get(key);
+  }
+
   public Object get(Object name) {
     return getX().get(this, name);
   }
