@@ -12,7 +12,7 @@ public class InputStreamBlob
     extends AbstractBlob
     implements Closeable
 {
-  public static final int BUFFER_SIZE = 4096;
+  public static final int BUFFER_SIZE = 8192;
 
   protected long size_;
   protected long pos_ = 0;
