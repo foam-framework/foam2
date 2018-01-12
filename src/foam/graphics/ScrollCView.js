@@ -111,7 +111,6 @@ foam.CLASS({
         return size ? ( yMax - innerBorder ) / (size - extent) : 0;
       }
     },
-    'mouseEvent'
   ],
 
   methods: [
@@ -165,26 +164,10 @@ foam.CLASS({
       name: 'onTouch',
       code: function(_, __, touch) {
         this.value = this.yToValue(touch.y);
+
         // prevents highlighting of other elements while scrolling
         touch.claimed = true;
       }
     },
-    {
-      name: 'updateScrollFromEvent',
-      code: function(mouseEvent) {
-        debugger;
-        if ( ! mouseEvent || ! mouseEvent.src || ! mouseEvent.src.oldValue ) return;
-
-        var p     = foam.graphics.Point.create();
-        var event = mouseEvent.src.oldValue;
-
-        p.x = event.clientX;
-        p.y = event.clientY - this.canvas.el().getBoundingClientRect().top - (this.handleSize/2);
-        p.w = 1;
-
-        this.globalToLocalCoordinates(p);
-        this.value = this.yToValue(p.y);
-      }
-    }
   ]
 });
