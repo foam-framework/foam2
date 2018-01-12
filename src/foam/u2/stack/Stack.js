@@ -63,6 +63,9 @@ foam.CLASS({
     },
 
     function push(v, parent) {
+      if ( foam.u2.Element.isInstance(v) ) {
+        console.warn("Views are not recommended to be pushed to a stack. Please use a viewSpec.");
+      }
       // "parent" is the parent object for this view spec.  A view of this stack
       // should ensure that the context that "v" is rendered in extends from
       // both the u2.Element is it being rendered under, and from the "parent"
