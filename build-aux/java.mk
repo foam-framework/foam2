@@ -26,7 +26,7 @@ $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)):
 	$$(WGET) -O $(JAVA_DEP_DIR)/$(call java_dep_sha1,$(1)) $(call java_dep_sha1_url,$(1))
 	$$(WGET) -O $$@ $(call java_dep_jar_url,$(1))
 	@echo Verifying
-	@if test "$$$$(sha1sum $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)) | cut -d' ' -f1)" != "$$$$(cat $(JAVA_DEP_DIR)/$(call java_dep_sha1,$(1)))" ; then \
+	@if test "$$$$($$(SHA1SUM) $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)) | cut -d' ' -f1)" != "$$$$(cat $(JAVA_DEP_DIR)/$(call java_dep_sha1,$(1)))" ; then \
 	  echo "ERROR: Download did not match sha1 checksum." ; \
 	  exit 1 ; \
 	fi
@@ -58,7 +58,7 @@ $$($(1)_GEN_SRC_DIR):
 $$($(1)_BUILD_DIR):
 	$$(MKDIR_P) $$@
 
-$(1)_SRC_HASH:=$$($(1)_GEN_SRC_DIR)/.$$(shell cat $$($(1)_JS_SRCS) $$($(1)_CLASSES) | sha256sum | cut -d" " -f1)
+$(1)_SRC_HASH:=$$($(1)_GEN_SRC_DIR)/.$$(shell cat $$($(1)_JS_SRCS) $$($(1)_CLASSES) | $$(SHA256SUM) | cut -d" " -f1)
 
 $$($(1)_JAR): $$($(1)_SRC_HASH)
 
