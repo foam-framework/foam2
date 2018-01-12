@@ -12,6 +12,7 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.index.*;
 import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Not;
 import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
 
@@ -68,19 +69,19 @@ public class MDAO extends AbstractDAO {
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     SelectPlan plan;
+    if ( predicate != null ) predicate = predicate.partialEval();
     if ( predicate instanceof Or ) {
       int length = ( (Or) predicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {
         Predicate arg = ( (Or) predicate ).getArgs()[i];
-        planList.add(index_.planSelect(state_, sink, skip, limit, order, arg));
+        planList.add(index_.planSelect(state_, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
       plan = new OrPlan(predicate, planList);
     } else {
       plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
     }
     plan.select(state_, sink, skip, limit, order, predicate);
-    sink.eof();
     return sink;
   }
 
