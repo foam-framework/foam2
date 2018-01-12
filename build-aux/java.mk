@@ -19,7 +19,7 @@ java_dep_sha1_url = $(MAVEN_BASE_URL)/$(subst .,/,$(call java_dep_group,$(1)))/$
 
 foam_genjava = $(NODE) $(FOAM2_HOME)/tools/genjava2.js
 
-define JAVA_MAVEN_LIB_template =
+define JAVA_MAVEN_LIB_template
 $(2)_JAVA_LIBS += $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1))
 $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)):
 	@echo Downloading $(call java_dep_jar,$(1))
@@ -35,7 +35,7 @@ $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)):
 endef
 
 
-define JAVA_JAR_template =
+define JAVA_JAR_template
 $(1)_CLASSPATH = $$(subst $$(space),:,$$(foreach lib,$$($(1)_JAVA_LIBS),$$(abspath $$(lib))))
 $(1)_JAVA_SRCS ?= $$(shell find $$($(1)_SRC_DIR) -type f -iname '*.java')
 $(1)_JS_SRCS ?= $$(shell find $$($(1)_SRC_DIR) -type f -iname '*.js')
