@@ -110,12 +110,24 @@ foam.CLASS({
       expression: function(size, extent, yMax, innerBorder) {
         return size ? ( yMax - innerBorder ) / (size - extent) : 0;
       }
-    }
+    },
   ],
 
   methods: [
     function initCView() {
-      this.canvas.pointer.touch.sub(this.onTouch);
+      this.onDetach(this.canvas.pointer.touch.sub(this.onTouch));
+
+      var self = this;
+      var mouseInput = this.canvas.pointer.mouseInput;
+      this.onDetach(mouseInput.down.sub(function() {
+        var moveSub = mouseInput.move.sub(function() {
+          self.value = self.yToValue(mouseInput.y);
+        });
+        mouseInput.up.sub(function(s) {
+          moveSub.detach();
+          s.detach();
+        });
+      }));
     },
 
     function yToValue(y) {
@@ -150,25 +162,12 @@ foam.CLASS({
   listeners: [
     {
       name: 'onTouch',
-      code: function(s, _, touch) {
-        var self = this;
-        var p = foam.graphics.Point.create();
+      code: function(_, __, touch) {
+        this.value = this.yToValue(touch.y);
 
+        // prevents highlighting of other elements while scrolling
         touch.claimed = true;
-
-        function updateValue() {
-          p.x = touch.x;
-          p.y = touch.y - (self.handleSize/2);
-          p.w = 1;
-
-          self.globalToLocalCoordinates(p);
-
-          self.value = self.yToValue(p.y);
-        }
-
-        touch.onDetach(touch.sub('propertyChange', updateValue));
-        updateValue();
       }
-    }
+    },
   ]
 });
