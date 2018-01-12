@@ -19,13 +19,13 @@ public class KeyValueParser
                    new Whitespace(),
                    new Literal(":"),
                    new Whitespace(),
-                   opt_valueParser != null ? opt_valueParser : new AnyParser()) :
+                   opt_valueParser != null ? opt_valueParser : AnyParser.instance()) :
           new Seq2(1, 5,
                    new Whitespace(),
                    new AnyKeyParser(),
                    new Whitespace(),
                    new Literal(":"),
                    new Whitespace(),
-                   opt_valueParser != null ? opt_valueParser : new AnyParser()));
+                   opt_valueParser != null ? opt_valueParser : AnyParser.instance()));
   }
 }

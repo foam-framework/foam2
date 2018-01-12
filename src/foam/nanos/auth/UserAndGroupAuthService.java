@@ -45,7 +45,7 @@ public class UserAndGroupAuthService
 
   public User getCurrentUser(X x) throws AuthenticationException {
     // fetch context and check if not null or user id is 0
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
       throw new AuthenticationException("User not found");
     }
@@ -112,7 +112,7 @@ public class UserAndGroupAuthService
 
     challengeMap.remove(userId);
 
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
@@ -137,7 +137,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Password");
     }
 
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
@@ -170,7 +170,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Incorrect password");
     }
 
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
@@ -186,7 +186,7 @@ public class UserAndGroupAuthService
       return false;
     }
 
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
       return false;
     }
@@ -226,7 +226,7 @@ public class UserAndGroupAuthService
       throw new RuntimeException("Invalid parameters");
     }
 
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
       throw new AuthenticationException("User not found");
     }
@@ -316,7 +316,7 @@ public class UserAndGroupAuthService
    * of the current context
    */
   public void logout(X x) {
-    Session session = (Session) x.get(Session.class);
+    Session session = x.get(Session.class);
     if ( session != null && session.getUserId() != 0 ) {
       sessionDAO_.remove(session);
     }
