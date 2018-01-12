@@ -70,9 +70,9 @@ public class ServiceWebAgent
 
   public synchronized void execute(X x) {
     try {
-      HttpServletRequest  req            = (HttpServletRequest)  x.get(HttpServletRequest.class);
-      HttpServletResponse resp           = (HttpServletResponse) x.get(HttpServletResponse.class);
-      PrintWriter         out            = (PrintWriter) x.get(PrintWriter.class);
+      HttpServletRequest  req            = x.get(HttpServletRequest.class);
+      HttpServletResponse resp           = x.get(HttpServletResponse.class);
+      PrintWriter         out            = x.get(PrintWriter.class);
       BufferedReader      reader         = req.getReader();
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");

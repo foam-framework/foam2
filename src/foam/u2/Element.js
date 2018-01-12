@@ -693,9 +693,11 @@ foam.CLASS({
   ],
 
   css: `
-    // We hide Elements by adding this style rather than setting
-    // 'display: none' directly because then when we re-show the
-    // Element we don't need to remember it's desired 'display' value.
+    /*
+     We hide Elements by adding this style rather than setting
+     'display: none' directly because then when we re-show the
+     Element we don't need to remember it's desired 'display' value.
+    */
     .foam-u2-Element-hidden {
       display: none !important;
     }
