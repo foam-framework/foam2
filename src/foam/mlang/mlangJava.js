@@ -253,38 +253,39 @@ return stmt.toString();`
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate',
-      javaCode:'java.util.List<Predicate> args = new java.util.ArrayList<>();\n' +
-      '    boolean update = false;\n' +
-      '    True TRUE = new True();\n' +
-      '    False FALSE = new False();\n' +
-      '    for ( int i = 0; i < this.args_.length; i++ ) {\n' +
-      '      Predicate arg = this.args_[i];\n' +
-      '      Predicate newArg = this.args_[i].partialEval();\n' +
-      '      if ( newArg instanceof True ) return TRUE;\n' +
-      '      if ( newArg instanceof Or ) {\n' +
-      '        for ( int j = 0; j < ( ( (Or) newArg ).args_.length ); j++ ) {\n' +
-      '          args.add(( (Or) newArg ).args_[j]);\n' +
-      '        }\n' +
-      '        update = true;\n' +
-      '      } else {\n' +
-      '        if ( newArg instanceof False || arg == null ) {\n' +
-      '          update = true;\n' +
-      '        } else {\n' +
-      '          args.add(newArg);\n' +
-      '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
-      '        }\n' +
-      '      }\n' +
-      '    }\n' +
-      '    if ( args.size() == 0 ) return TRUE;\n' +
-      '    if ( args.size() == 1 ) return args.get(0);\n' +
-      '    if ( update ) {\n' +
-      '      Predicate newArgs[] = new Predicate[args.size()];\n' +
-      '      int i = 0;\n' +
-      '      for ( Predicate predicate : args )\n' +
-      '        newArgs[i++] = predicate;\n' +
-      '      return new Or(newArgs);\n' +
-      '    }\n' +
-      '    return this;'
+      javaCode:
+        `java.util.List<Predicate> args = new java.util.ArrayList<>();
+boolean update = false;
+True TRUE = new True();
+False FALSE = new False();
+for ( int i = 0; i < this.args_.length; i++ ) {
+  Predicate arg = this.args_[i];
+  Predicate newArg = this.args_[i].partialEval();
+  if ( newArg instanceof True ) return TRUE;
+  if ( newArg instanceof Or ) {
+    for ( int j = 0; j < ( ( (Or) newArg ).args_.length ); j++ ) {
+      args.add(( (Or) newArg ).args_[j]);
+    }
+    update = true;
+  } else {
+    if ( newArg instanceof False || arg == null ) {
+      update = true;
+    } else {
+      args.add(newArg);
+      if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;
+    }
+  }
+}
+if ( args.size() == 0 ) return TRUE;
+if ( args.size() == 1 ) return args.get(0);
+if ( update ) {
+  Predicate newArgs[] = new Predicate[args.size()];
+  int i = 0;
+  for ( Predicate predicate : args )
+    newArgs[i++] = predicate;
+  return new Or(newArgs);
+}
+return this;`
     }
   ]
 });
@@ -321,38 +322,39 @@ return stmt.toString();`
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate',
-      javaCode: 'java.util.List<Predicate> args = new java.util.ArrayList<>();\n' +
-      '    boolean update = false;\n' +
-      '    True TRUE = new True();\n' +
-      '    False FALSE = new False();\n' +
-      '    for ( int i = 0; i < this.args_.length; i++ ) {\n' +
-      '      Predicate arg = this.args_[i];\n' +
-      '      Predicate newArg = this.args_[i].partialEval();\n' +
-      '      if ( newArg instanceof False ) return FALSE;\n' +
-      '      if ( newArg instanceof And ) {\n' +
-      '        for ( int j = 0; j < ( ( (And) newArg ).args_.length ); j++ ) {\n' +
-      '          args.add(( (And) newArg ).args_[j]);\n' +
-      '        }\n' +
-      '        update = true;\n' +
-      '      } else {\n' +
-      '        if ( newArg instanceof True || newArg == null ) {\n' +
-      '          update = true;\n' +
-      '        } else {\n' +
-      '          args.add(newArg);\n' +
-      '          if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;\n' +
-      '        }\n' +
-      '      }\n' +
-      '    }\n' +
-      '    if ( args.size() == 0 ) return TRUE;\n' +
-      '    if ( args.size() == 1 ) return args.get(0);\n' +
-      '    if ( update ) {\n' +
-      '      Predicate newArgs[] = new Predicate[args.size()];\n' +
-      '      int i = 0;\n' +
-      '      for ( Predicate predicate : args )\n' +
-      '        newArgs[i++] = predicate;\n' +
-      '      return new And(newArgs);\n' +
-      '    }\n' +
-      '    return this;'
+      javaCode:
+        `java.util.List<Predicate> args = new java.util.ArrayList<>();
+boolean update = false;
+True TRUE = new True();
+False FALSE = new False();
+for ( int i = 0; i < this.args_.length; i++ ) {
+  Predicate arg = this.args_[i];
+  Predicate newArg = this.args_[i].partialEval();
+  if ( newArg instanceof False ) return FALSE;
+  if ( newArg instanceof And ) {
+    for ( int j = 0; j < ( ( (And) newArg ).args_.length ); j++ ) {
+      args.add(( (And) newArg ).args_[j]);
+    }
+    update = true;
+  } else {
+    if ( newArg instanceof True || newArg == null ) {
+      update = true;
+    } else {
+      args.add(newArg);
+      if ( ! arg.createStatement().equals(newArg.createStatement()) ) update = true;
+    }
+  }
+}
+if ( args.size() == 0 ) return TRUE;
+if ( args.size() == 1 ) return args.get(0);
+if ( update ) {
+  Predicate newArgs[] = new Predicate[args.size()];
+  int i = 0;
+  for ( Predicate predicate : args )
+    newArgs[i++] = predicate;
+  return new And(newArgs);
+}
+return this;`
     }
   ]
 });
@@ -767,38 +769,39 @@ foam.CLASS({
     {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate',
-      javaCode: 'if ( this.arg1_ instanceof Not )\n' +
-      '      return ( (Not) arg1_ ).arg1_.partialEval();\n' +
-      '    if ( arg1_.getClass().equals(Eq.class) ) {\n' +
-      '      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
-      '    }\n' +
-      '    if ( arg1_.getClass().equals(Gt.class) ) {\n' +
-      '      return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
-      '    }\n' +
-      '    if ( arg1_.getClass().equals(Gte.class) ) {\n' +
-      '      return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
-      '    }\n' +
-      '    if ( arg1_.getClass().equals(Lt.class) ) {\n' +
-      '      return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
-      '    }\n' +
-      '    if ( arg1_.getClass().equals(Lte.class) ) {\n' +
-      '      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());\n' +
-      '    }\n' +
-      '    if ( arg1_.getClass().equals(And.class) ) {\n' +
-      '      int len = ( (And) getArg1() ).args_.length;\n' +
-      '      for ( int i = 0; i < len; i++ ) {\n' +
-      '        ( (And) getArg1() ).args_[i] = ( new Not(( (And) getArg1() ).args_[i]) ).partialEval();\n' +
-      '      }\n' +
-      '      return new Or(( (And) getArg1() ).args_).partialEval();\n' +
-      '    }\n' +
-      '    if ( arg1_.getClass().equals(Or.class) ) {\n' +
-      '      int len = ( (Or) getArg1() ).args_.length;\n' +
-      '      for ( int i = 0; i < len; i++ ) {\n' +
-      '        ( (Or) getArg1() ).args_[i] = ( new Not(( (Or) getArg1() ).args_[i]) ).partialEval();\n' +
-      '      }\n' +
-      '      return new And(( (Or) getArg1() ).args_).partialEval();\n' +
-      '    }\n' +
-      '    return this;'
+      javaCode:
+      `if ( this.arg1_ instanceof Not )
+  return ( (Not) arg1_ ).arg1_.partialEval();
+if ( arg1_.getClass().equals(Eq.class) ) {
+  return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+}
+if ( arg1_.getClass().equals(Gt.class) ) {
+  return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+}
+if ( arg1_.getClass().equals(Gte.class) ) {
+  return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+}
+if ( arg1_.getClass().equals(Lt.class) ) {
+  return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+}
+if ( arg1_.getClass().equals(Lte.class) ) {
+  return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+}
+if ( arg1_.getClass().equals(And.class) ) {
+  int len = ( (And) getArg1() ).args_.length;
+  for ( int i = 0; i < len; i++ ) {
+    ( (And) getArg1() ).args_[i] = ( new Not(( (And) getArg1() ).args_[i]) ).partialEval();
+  }
+  return new Or(( (And) getArg1() ).args_).partialEval();
+}
+if ( arg1_.getClass().equals(Or.class) ) {
+  int len = ( (Or) getArg1() ).args_.length;
+  for ( int i = 0; i < len; i++ ) {
+    ( (Or) getArg1() ).args_[i] = ( new Not(( (Or) getArg1() ).args_[i]) ).partialEval();
+  }
+  return new And(( (Or) getArg1() ).args_).partialEval();
+}
+return this;`
     },
     {
       name: 'createStatement',
