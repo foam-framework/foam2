@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2017,2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -40,13 +40,21 @@ public class JDAO
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
-  public JDAO(ClassInfo classInfo, String filename)
-      throws IOException
+  public JDAO(foam.core.X x, ClassInfo classInfo)
+    throws IOException
   {
-    this(new MapDAO().setOf(classInfo), filename);
+    this(x, classInfo, classInfo.getId().replace(".", "_"));
   }
 
-  public JDAO(DAO delegate, String filename) throws IOException {
+  public JDAO(foam.core.X x, ClassInfo classInfo, String filename)
+      throws IOException
+  {
+    this(x, new MapDAO().setOf(classInfo), filename);
+  }
+
+  public JDAO(foam.core.X x, DAO delegate, String filename) throws IOException {
+    setX(x);
+
     file_ = new File(filename).getAbsoluteFile();
 
     if ( ! file_.exists() ) file_.createNewFile();
