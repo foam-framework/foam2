@@ -36,9 +36,9 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    HttpServletRequest  req        = (HttpServletRequest) x.get(HttpServletRequest.class);
-    HttpServletResponse response   = (HttpServletResponse) x.get(HttpServletResponse.class);
-    final PrintWriter   out        = (PrintWriter) x.get(PrintWriter.class);
+    HttpServletRequest  req        = x.get(HttpServletRequest.class);
+    HttpServletResponse response   = x.get(HttpServletResponse.class);
+    final PrintWriter   out        = x.get(PrintWriter.class);
     CharBuffer          buffer_    = CharBuffer.allocate(65535);
     String              data       = req.getParameter("data");
     String              daoName    = req.getParameter("dao");
@@ -78,12 +78,12 @@ public class DigWebAgent
         out.println("<br><br><span>Command:<select name=cmd id=cmd width=150 style=margin-left:5  onchange=changeCmd(this.value)><option value=put selected>PUT</option><option value=select>SELECT</option><option value=remove>REMOVE</option><option value=help>HELP</option></select></span>");
         out.println("<br><br><span id=emailSpan style=display:none;>Email:<input name=email style=margin-left:30;width:350></input></span>");
         out.println("<br><br><span id=subjectSpan style=display:none;>Subject:<input name=subject style=margin-left:20;width:350></input></span>");
-        out.println("<br><br><span id=idSpan style=display:none;>ID:<input name=id style=margin-left:52></input></span>");
+        out.println("<br><br><span id=idSpan style=display:none;>ID:<input id=id name=id style=margin-left:52></input></span>");
         out.println("<br><br><span id=dataSpan>Data:<br><textarea rows=20 cols=120 name=data></textarea></span>");
         out.println("<br><span id=urlSpan style=display:none;> URL : </span>");
         out.println("<input id=builtUrl size=120 style=margin-left:20;display:none;/ >");
         out.println("<br><br><button type=submit >Submit</button></form>");
-        out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block';} if ( cmdValue == 'select' ) {document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: inline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
+        out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block'; document.getElementById('id').value = '';} if ( cmdValue == 'select' ) {document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: inline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
 
         out.println("<script>function changeDao() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
         out.println("<script>function changeFormat() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
@@ -183,6 +183,17 @@ public class DigWebAgent
           csvSupport.inputCSV(is, arraySink, cInfo);
 
           List list = arraySink.getArray();
+
+          if ( list.size() == 0 ) {
+            out.println("Parse Error : ");
+
+            String message = getParsingError(x, buffer_.toString());
+            logger.error(message + ", input: " + buffer_.toString());
+            out.println(message);
+            out.flush();
+            return;
+          }
+
           for ( int i = 0 ; i < list.size() ; i++ ) {
             dao.put((FObject) list.get(i));
           }
@@ -193,7 +204,7 @@ public class DigWebAgent
 
         //obj = dao.put(obj);
 
-        //out.println("Success");
+        out.println("Success");
       } else if ( "select".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
@@ -274,7 +285,6 @@ public class DigWebAgent
       } else if ( "help".equals(command) ) {
         out.println("Help: <br><br>" );
         /*List<PropertyInfo> props = cInfo.getAxiomsByClass(PropertyInfo.class);
-
         out.println(daoName + "<br><br>");
         out.println("<table>");
         for( PropertyInfo pi : props ) {
@@ -287,16 +297,15 @@ public class DigWebAgent
 
         out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
         out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl);</script>");
-
       } else if ( "remove".equals(command) ) {
-        if ( dao == null ) {
-          throw new RuntimeException("Dao not found");
-        } else if ( dao.find(id) == null ) {
-          throw new RuntimeException("Wrong ID");
-        } else if ( id == null || "".equals(id) ) {
-          throw new RuntimeException("Input ID");
+        PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
+        Object       idObj      = idProp.fromString(id);
+        FObject      targetFobj = dao.find(idObj);
+
+        if ( targetFobj == null ) {
+          throw new RuntimeException("Unknown ID");
         } else {
-          dao.remove(dao.find(id));
+          dao.remove(targetFobj);
           out.println("Success");
         }
       } else {
@@ -325,12 +334,12 @@ public class DigWebAgent
   }
 
   protected void output(X x, String data) {
-    HttpServletRequest req     = (HttpServletRequest) x.get(HttpServletRequest.class);
+    HttpServletRequest req     = x.get(HttpServletRequest.class);
     String []          email   = req.getParameterValues("email");
     String             subject = req.getParameter("subject");
 
     if ( email.length == 0 ) {
-      PrintWriter out = (PrintWriter) x.get(PrintWriter.class);
+      PrintWriter out = x.get(PrintWriter.class);
 
       out.print(data);
     } else {

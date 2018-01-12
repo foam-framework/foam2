@@ -8,6 +8,8 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.dao.*;
+import foam.nanos.auth.*;
+import foam.nanos.session.Session;
 import foam.nanos.script.*;
 import java.io.IOException;
 import static foam.mlang.MLang.*;
@@ -23,6 +25,8 @@ public class Boot {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    installSystemUser();
 
     serviceDAO_.select(new AbstractSink() {
       public void put(FObject obj, Detachable sub) {
@@ -58,6 +62,20 @@ public class Boot {
         script.runScript(root_);
       }
     }
+  }
+
+  protected void installSystemUser() {
+    User user = new User();
+    user.setId(1);
+    user.setFirstName("system");
+    user.setGroup("system");
+
+    Session session = new Session();
+    session.setUserId(user.getId());
+    session.setContext(root_);
+
+    root_.put("user", user);
+    root_.put(Session.class, session);
   }
 
   public X getX() { return root_; }
