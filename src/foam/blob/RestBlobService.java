@@ -8,17 +8,12 @@ package foam.blob;
 
 import foam.core.X;
 import foam.lib.json.JSONParser;
+import org.apache.commons.io.IOUtils;
 
-import java.net.URL;
+import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.nio.ByteBuffer;
+import java.net.URL;
 import java.nio.CharBuffer;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.InputStreamReader;
 
 public class RestBlobService
     extends AbstractBlobService
@@ -27,13 +22,9 @@ public class RestBlobService
 
   protected String address_;
 
-  public RestBlobService(String address) {
-    this(null, address);
-  }
-
   public RestBlobService(foam.core.X x, String address) {
     setX(x);
-    this.address_ = address + "/httpBlobService";
+    address_ = address;
   }
 
   public String getAddress() {
@@ -45,6 +36,7 @@ public class RestBlobService
     if ( blob instanceof IdentifiedBlob ) {
       return blob;
     }
+
     HttpURLConnection connection = null;
     OutputStream os = null;
     InputStream is = null;
@@ -67,22 +59,11 @@ public class RestBlobService
       connection.setRequestProperty("Connection", "keep-alive");
       connection.setRequestProperty("Content-Type", "application/octet-stream");
 
-      //output blob into connection
-      long chunk = 0;
-      long size = blob.getSize();
-      long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-      Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
+      // get connection ouput stream
       os = connection.getOutputStream();
 
-      while ( chunk < chunks ) {
-        buffer = blob.read(buffer, chunkOffset(chunk));
-        byte[] buf = buffer.getData().array();
-        os.write(buf, 0, (int) buffer.getLength());
-        buffer.getData().clear();
-        chunk++;
-      }
-
-      os.flush();
+      //output blob into connection
+      blob.read(os, 0, blob.getSize());
 
       if ( connection.getResponseCode() != HttpURLConnection.HTTP_OK ) {
         throw new RuntimeException("Upload failed");
@@ -96,17 +77,20 @@ public class RestBlobService
 
       return (Blob) getX().create(JSONParser.class).parseString(cb.toString(), IdentifiedBlob.class);
     } catch ( Throwable t ) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
-      closeSource(is, os, connection);
+      IOUtils.closeQuietly(is);
+      IOUtils.closeQuietly(os);
+      IOUtils.close(connection);
     }
   }
 
   @Override
   public Blob find_(X x, Object id) {
     InputStream is = null;
+    ByteArrayOutputStream os = null;
     HttpURLConnection connection = null;
-    Blob blob = null;
 
     try {
       URL url = new URL(this.address_ + "/" + id.toString());
@@ -120,13 +104,22 @@ public class RestBlobService
         throw new RuntimeException("Failed to find blob");
       }
 
-      is = connection.getInputStream();
-      blob = new InputStreamBlob(is, connection.getContentLength());
+      is = new BufferedInputStream(connection.getInputStream());
+      os = new ByteArrayOutputStream();
+
+      int read = 0;
+      byte[] buffer = new byte[BUFFER_SIZE];
+      while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
+        os.write(buffer, 0, read);
+      }
+
+      return new ByteArrayBlob(os.toByteArray());
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
-      closeSource(is, null, connection);
-      return blob;
+      IOUtils.closeQuietly(os);
+      IOUtils.closeQuietly(is);
+      IOUtils.close(connection);
     }
   }
 
@@ -136,29 +129,5 @@ public class RestBlobService
       return null;
     }
     return this.address_ + "/" + ((IdentifiedBlob) blob).getId();
-  }
-
-  private long chunkOffset(long i) {
-    return i * BUFFER_SIZE;
-  }
-
-  private void closeSource(InputStream is, OutputStream os, HttpURLConnection connection) {
-    if ( os != null ) {
-      try {
-        os.close();
-      } catch ( IOException e ) {
-        e.printStackTrace();
-      }
-    }
-    if ( is != null ) {
-      try {
-        is.close();
-      } catch ( IOException e ) {
-        e.printStackTrace();
-      }
-    }
-    if ( connection != null ) {
-      connection.disconnect();
-    }
   }
 }
