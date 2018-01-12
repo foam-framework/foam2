@@ -55,14 +55,8 @@ foam.CLASS({
     {
       name: 'element',
       postSet: function(old, e) {
-        if ( old ) {
-          old.removeEventListener('mousedown', this.onMouseDown);
-          old.removeEventListener('mouseup',   this.onMouseUp);
-          old.removeEventListener('mousemove', this.onMouseMove);
-        }
+        if ( old ) old.removeEventListener('mousedown', this.onMouseDown);
         e.addEventListener('mousedown', this.onMouseDown);
-        window.addEventListener('mouseup',   this.onMouseUp);
-        window.addEventListener('mousemove', this.onMouseMove);
       }
     }
   ],
@@ -95,6 +89,9 @@ foam.CLASS({
 
           if ( this.lastTouch && this.lastTouch.claimed ) e.preventDefault();
         }
+
+        window.addEventListener('mouseup',   this.onMouseUp);
+        window.addEventListener('mousemove', this.onMouseMove);
       }
     },
     {
@@ -106,6 +103,9 @@ foam.CLASS({
           this.lastTouch.detach();
           this.lastTouch = undefined;
         }
+
+        window.removeEventListener('mouseup',   this.onMouseUp);
+        window.removeEventListener('mousemove', this.onMouseMove);
       }
     },
     {
