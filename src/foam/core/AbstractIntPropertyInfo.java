@@ -15,8 +15,8 @@ public abstract class AbstractIntPropertyInfo
     return Integer.compare(o1, o2);
   }
 
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Integer.valueOf(value));
+  public Object fromString(String value) {
+    return Integer.valueOf(value);
   }
 
   @Override

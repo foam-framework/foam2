@@ -10,28 +10,25 @@ import foam.blob.*;
 import foam.core.X;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
+import foam.nanos.boot.NSpec;
+import foam.nanos.boot.NSpecAware;
 import foam.nanos.http.WebAgent;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.UUID;
 
 public class HttpBlobService
     extends ProxyBlobService
-    implements WebAgent
+    implements NSpecAware, WebAgent
 {
   public static final int BUFFER_SIZE = 8192;
+
+  protected NSpec nspec_;
 
   public HttpBlobService(X x, BlobService delegate) {
     setX(x);
@@ -40,8 +37,8 @@ public class HttpBlobService
 
   @Override
   public void execute(X x) {
-    HttpServletRequest  req  = (HttpServletRequest)  x.get(HttpServletRequest.class);
-    HttpServletResponse resp = (HttpServletResponse) x.get(HttpServletResponse.class);
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     try {
       if ( "GET".equals(req.getMethod()) ) {
@@ -55,22 +52,19 @@ public class HttpBlobService
   }
 
   protected void download(HttpServletRequest req, HttpServletResponse resp) {
+    OutputStream os = null;
+
     try {
       String path = req.getRequestURI();
-      String id = path.substring(path.lastIndexOf("/") + 1);
+      String id = path.replaceFirst("/service/" + nspec_.getName() + "/", "");
 
       Blob blob = getDelegate().find(id);
-
       if ( blob == null ) {
         resp.setStatus(resp.SC_NOT_FOUND);
         return;
       }
 
-      long chunk = 0;
       long size = blob.getSize();
-      long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-      Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
-
       resp.setStatus(resp.SC_OK);
       if ( blob instanceof FileBlob ) {
         File file = ((FileBlob) blob).getFile();
@@ -82,51 +76,34 @@ public class HttpBlobService
       resp.setHeader("ETag", id);
       resp.setHeader("Cache-Control", "public");
 
-      OutputStream output = resp.getOutputStream();
-      WritableByteChannel channel = Channels.newChannel(output);
-
-      while ( chunk < chunks ) {
-        buffer = blob.read(buffer, chunk * BUFFER_SIZE);
-        if (buffer == null) {
-          break;
-        }
-        channel.write(buffer.getData());
-        buffer.getData().clear();
-        chunk++;
-      }
-      output.flush();
+      os = resp.getOutputStream();
+      blob.read(os, 0, size);
+      os.close();
     } catch (Throwable t) {
+      t.printStackTrace();
       throw new RuntimeException(t);
+    } finally {
+      IOUtils.closeQuietly(os);
     }
   }
 
   protected void upload(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp) {
-    File temp = null;
-    OutputStream os = null;
+    InputStreamBlob blob = null;
 
     try {
-      // create a temporary file to store incoming data
-      temp = File.createTempFile(UUID.randomUUID().toString(), ".tmp");
-      os = new FileOutputStream(temp);
-      InputStream is = req.getInputStream();
-
-      int read = 0;
-      byte[] buffer = new byte[BUFFER_SIZE];
-      while ( (read = is.read(buffer, 0, BUFFER_SIZE)) != -1 ) {
-        os.write(buffer, 0, read);
-      }
-
-      // create a file blob and store
-      FileBlob blob = new FileBlob(temp);
-      Blob result = getDelegate().put(blob);
-      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(result);
+      int size = req.getContentLength();
+      blob = new InputStreamBlob(req.getInputStream(), size);
+      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(getDelegate().put(blob));
     } catch (Throwable t) {
+      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
-      IOUtils.closeQuietly(os);
-      if ( temp != null ) {
-        temp.delete();
-      }
+      IOUtils.closeQuietly(blob);
     }
+  }
+
+  @Override
+  public void setNSpec(NSpec spec) {
+    nspec_ = spec;
   }
 }

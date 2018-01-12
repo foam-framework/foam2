@@ -26,9 +26,7 @@ foam.CLASS({
       name: 'length'
     },
     {
-      class: 'Object',
       name: 'data',
-      javaType: 'java.nio.ByteBuffer',
       factory: function() {
         return new ArrayBuffer(this.length);
       }
@@ -680,7 +678,7 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + "/service/blobService";
+        return window.location.origin + "/service/httpBlobService";
       }
     }
   ],

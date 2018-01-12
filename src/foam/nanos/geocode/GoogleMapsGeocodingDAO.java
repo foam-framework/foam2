@@ -16,6 +16,8 @@ import foam.lib.json.JSONParser;
 import foam.nanos.auth.Address;
 import foam.nanos.pool.FixedThreadPool;
 import foam.util.SafetyUtil;
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -154,16 +156,10 @@ public class GoogleMapsGeocodingDAO
           address.setLongitude(coords.getLng());
           prop_.set(result, address);
           GoogleMapsGeocodingDAO.super.put_(x, result);
-        } catch (Throwable t) {
-          t.printStackTrace();
+        } catch (Throwable ignored) {
         } finally {
-          if ( reader != null ) {
-            try { reader.close(); } catch (Throwable t) {}
-          }
-
-          if ( conn != null ) {
-            conn.disconnect();
-          }
+          IOUtils.closeQuietly(reader);
+          IOUtils.close(conn);
         }
       }
     });

@@ -15,9 +15,8 @@ public abstract class AbstractBooleanPropertyInfo
     return Boolean.compare(b1, b2);
   }
 
-  @Override
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Boolean.parseBoolean(value));
+  public Object fromString(String value) {
+    return Boolean.parseBoolean(value);
   }
 
   @Override
