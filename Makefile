@@ -36,7 +36,7 @@ java_JARS = foam2
 include build-aux/tools.mk
 include build-aux/java.mk
 
-nanos: nanos.in
+nanos: nanos.in $(foam2_JAR)
 	sed -e 's,@CLASSPATH[@],$(foam2_CLASSPATH):$(abspath $(foam2_JAR)),g' $< > $@
 	chmod +x $@
 
