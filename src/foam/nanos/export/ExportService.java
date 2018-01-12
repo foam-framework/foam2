@@ -19,7 +19,7 @@ public class ExportService
 {
   public void start() {
     try {
-      DAO dao = new JDAO(new MapDAO(), "ExportDriverRegistry");
+      DAO dao = new JDAO(getX(), new MapDAO(), "ExportDriverRegistry");
       ((JDAO) dao).setOf(ExportDriverRegistry.getOwnClassInfo());
       setDelegate(dao);
     } catch (IOException e) {

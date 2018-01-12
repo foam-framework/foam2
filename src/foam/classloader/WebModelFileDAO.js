@@ -54,7 +54,7 @@ foam.CLASS({
         var foamCLASS = foam.CLASS;
 
         foam.CLASS = function(m) {
-          if ( ( m.package + '.' + m.name ) !== lookingFor ) {
+          if ( ( ( m.package ? m.package + '.' : '' ) + m.name ) !== lookingFor ) {
             // Run unrelated models through normal foam.CLASS
             foamCLASS(m);
             return;
