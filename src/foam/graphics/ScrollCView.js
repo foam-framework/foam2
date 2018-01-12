@@ -116,10 +116,19 @@ foam.CLASS({
 
   methods: [
     function initCView() {
-      this.canvas.pointer.touch.sub(this.onTouch);
+      this.onDetach(this.canvas.pointer.touch.sub(this.onTouch));
 
-      // mouseEvent is bound in ScrollTableView
-      this.onDetach(this.mouseEvent$.sub(this.updateScrollFromEvent));
+      var self = this;
+      var mouseInput = this.canvas.pointer.mouseInput;
+      this.onDetach(mouseInput.down.sub(function() {
+        var moveSub = mouseInput.move.sub(function() {
+          self.value = self.yToValue(mouseInput.y);
+        });
+        mouseInput.up.sub(function(s) {
+          moveSub.detach();
+          s.detach();
+        });
+      }));
     },
 
     function yToValue(y) {
@@ -155,6 +164,7 @@ foam.CLASS({
     {
       name: 'onTouch',
       code: function(_, __, touch) {
+        this.value = this.yToValue(touch.y);
         // prevents highlighting of other elements while scrolling
         touch.claimed = true;
       }
@@ -162,6 +172,7 @@ foam.CLASS({
     {
       name: 'updateScrollFromEvent',
       code: function(mouseEvent) {
+        debugger;
         if ( ! mouseEvent || ! mouseEvent.src || ! mouseEvent.src.oldValue ) return;
 
         var p     = foam.graphics.Point.create();

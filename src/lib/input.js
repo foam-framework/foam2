@@ -61,8 +61,8 @@ foam.CLASS({
           old.removeEventListener('mousemove', this.onMouseMove);
         }
         e.addEventListener('mousedown', this.onMouseDown);
-        e.addEventListener('mouseup',   this.onMouseUp);
-        e.addEventListener('mousemove', this.onMouseMove);
+        window.addEventListener('mouseup',   this.onMouseUp);
+        window.addEventListener('mousemove', this.onMouseMove);
       }
     }
   ],
@@ -229,6 +229,7 @@ foam.CLASS({
         var m = this.Mouse.create();
         this.onDetach(m.element$.follow(this.element$));
         this.onDetach(m.touch.sub(this.onTouch));
+        return m;
       }
     },
     {
@@ -237,6 +238,7 @@ foam.CLASS({
         var t = this.Touch.create();
         this.onDetach(t.element$.follow(this.element$));
         this.onDetach(t.touch.sub(this.onTouch));
+        return t;
       }
     }
   ],
