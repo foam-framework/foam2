@@ -82,7 +82,7 @@ foam.CLASS({
                 style({background: 'rgba(0,0,0,0)'}).
                 show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
                 start().
-                  style({padding: '4px'}).
+                  style({padding: '4px 4px 4px 1px'}).
                   add(this.cls.getAxiomsByClass(foam.core.Action)).
                 end().
               end().
