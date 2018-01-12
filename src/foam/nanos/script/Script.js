@@ -71,12 +71,12 @@ foam.CLASS({
       class: 'String',
       name: 'output',
       visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80, css: {"font-family": "monospace"}  }
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80, css: {"font-family": "monospace"}  }
     },
     {
       class: 'String',
       name: 'notes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 90 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 80 }
     }
   ],
 
