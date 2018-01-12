@@ -146,7 +146,7 @@ foam.CLASS({
         margin: 2px 0 0px 2px;
         overflow: auto;
         padding: 4px 2px;
-        width: 98%;
+        width: 191px;
       }
       ^ select {
         border: solid 1px #aacfe4;
