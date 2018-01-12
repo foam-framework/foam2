@@ -32,7 +32,16 @@ foam.CLASS({
 
   documentation: 'An Axiom for defining class constants.',
 
-  properties: [ 'name', 'value' ],
+  properties: [
+    'name',
+    {
+      name: 'value',
+      factory: function() {
+        return this.factory();
+      },
+    },
+    'factory',
+  ],
 
   methods: [
     function installInClass(cls) {
