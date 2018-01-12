@@ -61,18 +61,15 @@ public abstract class AbstractArrayPropertyInfo
 
   @Override
   public void toXML (FObject obj, Document doc, Element objElement) {
-    if ( this.f(obj) == null ) return;
+    Object value = this.f(obj);
 
-    try {
-      Object[] nestObj = (Object[]) this.f(obj);
-    } catch (Throwable t){
-      return;
-    }
+    // Return if some kind of array other than Object[], like int[]
+    if ( value == null || ! ( value instanceof Object[]) ) return;
 
-    Element prop = doc.createElement(this.getName());
+    Object[] nestObj = (Object[]) value;
+    Element  prop    = doc.createElement(this.getName());
+
     objElement.appendChild(prop);
-
-    Object[] nestObj = (Object[]) this.f(obj);
 
     for ( int k = 0; k < nestObj.length; k++ ) {
       Element nestedProp = doc.createElement("value");
