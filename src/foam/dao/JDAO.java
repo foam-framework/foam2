@@ -55,7 +55,7 @@ public class JDAO
   public JDAO(foam.core.X x, DAO delegate, String filename) throws IOException {
     setX(x);
 
-    file_ = new File(filename).getAbsoluteFile();
+    file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
 
     if ( ! file_.exists() ) file_.createNewFile();
 
