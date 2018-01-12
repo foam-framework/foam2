@@ -111,15 +111,23 @@ foam.CLASS({
         return size ? ( yMax - innerBorder ) / (size - extent) : 0;
       }
     },
-    'mouseEvent'
   ],
 
   methods: [
     function initCView() {
-      this.canvas.pointer.touch.sub(this.onTouch);
+      this.onDetach(this.canvas.pointer.touch.sub(this.onTouch));
 
-      // mouseEvent is bound in ScrollTableView
-      this.onDetach(this.mouseEvent$.sub(this.updateScrollFromEvent));
+      var self = this;
+      var mouseInput = this.canvas.pointer.mouseInput;
+      this.onDetach(mouseInput.down.sub(function() {
+        var moveSub = mouseInput.move.sub(function() {
+          self.value = self.yToValue(mouseInput.y);
+        });
+        mouseInput.up.sub(function(s) {
+          moveSub.detach();
+          s.detach();
+        });
+      }));
     },
 
     function yToValue(y) {
@@ -155,25 +163,11 @@ foam.CLASS({
     {
       name: 'onTouch',
       code: function(_, __, touch) {
+        this.value = this.yToValue(touch.y);
+
         // prevents highlighting of other elements while scrolling
         touch.claimed = true;
       }
     },
-    {
-      name: 'updateScrollFromEvent',
-      code: function(mouseEvent) {
-        if ( ! mouseEvent || ! mouseEvent.src || ! mouseEvent.src.oldValue ) return;
-
-        var p     = foam.graphics.Point.create();
-        var event = mouseEvent.src.oldValue;
-
-        p.x = event.clientX;
-        p.y = event.clientY - this.canvas.el().getBoundingClientRect().top - (this.handleSize/2);
-        p.w = 1;
-
-        this.globalToLocalCoordinates(p);
-        this.value = this.yToValue(p.y);
-      }
-    }
   ]
 });
