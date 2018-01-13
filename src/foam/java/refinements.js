@@ -77,6 +77,7 @@ foam.CLASS({
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
+        xmlAttribute:     this.xmlAttribute,
         sqlType:          this.sqlType
       })
     },
