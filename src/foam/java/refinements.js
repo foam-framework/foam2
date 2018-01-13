@@ -78,6 +78,7 @@ foam.CLASS({
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
         xmlAttribute:     this.xmlAttribute,
+        xmlTextNode:      this.xmlTextNode,
         sqlType:          this.sqlType
       })
     },
