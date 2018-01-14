@@ -34,6 +34,13 @@ $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)):
 
 endef
 
+all:
+
+BUILD_DIR ?= build
+
+$(BUILD_DIR):
+	$(MKDIR_P) $@
+
 
 define JAVA_JAR_template
 $(1)_CLASSPATH = $$(subst $$(space),:,$$(foreach lib,$$($(1)_JAVA_LIBS),$$(abspath $$(lib))))
@@ -43,7 +50,7 @@ $(1)_ALL_SRCS = $$($(1)_JAVA_SRCS) $$($(1)_JS_SRCS)
 $(1)_GEN_SRC_DIR = .$(1)-gensrcs
 $(1)_BUILD_DIR = .$(1)-build
 $(1)_GEN_SRCS = $$(shell find $$($(1)_GEN_SRC_DIR) -type f -iname '*.java')
-$(1)_JAR = $$($(1)_BUILD_DIR)/$(1).jar
+$(1)_JAR = $$(BUILD_DIR)/$(1).jar
 
 .PHONY: $(1)-gensrcs $(1)-java-deps $(1)-list-deps
 
@@ -71,13 +78,14 @@ clean-$(1)-gensrcs:
 	-rm -rf $$($(1)_GEN_SRC_DIR)
 
 clean-$(1):
-	-rm -f $$($(1)_BUILD_DIR)/$(1).jar
+	-rm -f $$($(1)_JAR)
+	-rm -f $(1).classpath.txt
 
 clean: clean-$(1) clean-$(1)-gensrcs
 
 .PHONY: $(1)
 
-$(1): $$($(1)_BUILD_DIR)/$(1).jar $(1).classpath.txt
+$(1): $$($(1)_JAR) $(1).classpath.txt
 
 $(1).classpath.txt: $$($(1)_JAR)
 	echo $$($(1)_CLASSPATH):$$(abspath $$($(1)_JAR)) > $$@
@@ -89,7 +97,7 @@ $(1)-java-deps: $$($(1)_JAVA_LIBS)
 clean-$(1)-java-deps:
 	-rm -f $$($(1)_JAVA_LIBS)
 
-$$($(1)_JAR): $$($(1)_JAVA_SRCS) $$($(1)_JAVA_LIBS) | $$($(1)_BUILD_DIR)
+$$($(1)_JAR): $$($(1)_JAVA_SRCS) $$($(1)_JAVA_LIBS) | $$($(1)_BUILD_DIR) $$(BUILD_DIR)
 	find $$($(1)_BUILD_DIR) -type f -iname '*.class' -delete
 	@echo "Compiling..."
 	@$$(JAVAC) -d $$($(1)_BUILD_DIR) -cp $$($(1)_CLASSPATH) $$($(1)_JAVA_SRCS) $$($(1)_GEN_SRCS)

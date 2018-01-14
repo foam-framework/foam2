@@ -4,5 +4,5 @@ JAR ?= jar
 NODE ?= node
 WGET ?= wget
 MKDIR_P ?= mkdir -p
-SHA1SUM ?= sha1sum
-SHA256SUM ?= sha256sum
+SHA1SUM ?= shasum -a 1
+SHA256SUM ?= shasum -a 256
