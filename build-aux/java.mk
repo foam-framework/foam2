@@ -19,14 +19,14 @@ java_dep_sha1_url = $(MAVEN_BASE_URL)/$(subst .,/,$(call java_dep_group,$(1)))/$
 
 foam_genjava = $(NODE) $(FOAM2_HOME)/tools/genjava2.js
 
-define JAVA_MAVEN_LIB_template =
+define JAVA_MAVEN_LIB_template
 $(2)_JAVA_LIBS += $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1))
 $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)):
 	@echo Downloading $(call java_dep_jar,$(1))
 	$$(WGET) -O $(JAVA_DEP_DIR)/$(call java_dep_sha1,$(1)) $(call java_dep_sha1_url,$(1))
 	$$(WGET) -O $$@ $(call java_dep_jar_url,$(1))
 	@echo Verifying
-	@if test "$$$$(sha1sum $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)) | cut -d' ' -f1)" != "$$$$(cat $(JAVA_DEP_DIR)/$(call java_dep_sha1,$(1)))" ; then \
+	@if test "$$$$($$(SHA1SUM) $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)) | cut -d' ' -f1)" != "$$$$(cat $(JAVA_DEP_DIR)/$(call java_dep_sha1,$(1)))" ; then \
 	  echo "ERROR: Download did not match sha1 checksum." ; \
 	  exit 1 ; \
 	fi
@@ -34,8 +34,15 @@ $(JAVA_DEP_DIR)/$(call java_dep_jar,$(1)):
 
 endef
 
+all:
 
-define JAVA_JAR_template =
+BUILD_DIR ?= build
+
+$(BUILD_DIR):
+	$(MKDIR_P) $@
+
+
+define JAVA_JAR_template
 $(1)_CLASSPATH = $$(subst $$(space),:,$$(foreach lib,$$($(1)_JAVA_LIBS),$$(abspath $$(lib))))
 $(1)_JAVA_SRCS ?= $$(shell find $$($(1)_SRC_DIR) -type f -iname '*.java')
 $(1)_JS_SRCS ?= $$(shell find $$($(1)_SRC_DIR) -type f -iname '*.js')
@@ -43,7 +50,7 @@ $(1)_ALL_SRCS = $$($(1)_JAVA_SRCS) $$($(1)_JS_SRCS)
 $(1)_GEN_SRC_DIR = .$(1)-gensrcs
 $(1)_BUILD_DIR = .$(1)-build
 $(1)_GEN_SRCS = $$(shell find $$($(1)_GEN_SRC_DIR) -type f -iname '*.java')
-$(1)_JAR = $$($(1)_BUILD_DIR)/$(1).jar
+$(1)_JAR = $$(BUILD_DIR)/$(1).jar
 
 .PHONY: $(1)-gensrcs $(1)-java-deps $(1)-list-deps
 
@@ -58,7 +65,7 @@ $$($(1)_GEN_SRC_DIR):
 $$($(1)_BUILD_DIR):
 	$$(MKDIR_P) $$@
 
-$(1)_SRC_HASH:=$$($(1)_GEN_SRC_DIR)/.$$(shell cat $$($(1)_JS_SRCS) $$($(1)_CLASSES) | sha256sum | cut -d" " -f1)
+$(1)_SRC_HASH:=$$($(1)_GEN_SRC_DIR)/.$$(shell cat $$($(1)_JS_SRCS) $$($(1)_CLASSES) | $$(SHA256SUM) | cut -d" " -f1)
 
 $$($(1)_JAR): $$($(1)_SRC_HASH)
 
@@ -71,13 +78,14 @@ clean-$(1)-gensrcs:
 	-rm -rf $$($(1)_GEN_SRC_DIR)
 
 clean-$(1):
-	-rm -f $$($(1)_BUILD_DIR)/$(1).jar
+	-rm -f $$($(1)_JAR)
+	-rm -f $(1).classpath.txt
 
 clean: clean-$(1) clean-$(1)-gensrcs
 
 .PHONY: $(1)
 
-$(1): $$($(1)_BUILD_DIR)/$(1).jar $(1).classpath.txt
+$(1): $$($(1)_JAR) $(1).classpath.txt
 
 $(1).classpath.txt: $$($(1)_JAR)
 	echo $$($(1)_CLASSPATH):$$(abspath $$($(1)_JAR)) > $$@
@@ -89,7 +97,7 @@ $(1)-java-deps: $$($(1)_JAVA_LIBS)
 clean-$(1)-java-deps:
 	-rm -f $$($(1)_JAVA_LIBS)
 
-$$($(1)_JAR): $$($(1)_JAVA_SRCS) $$($(1)_JAVA_LIBS) | $$($(1)_BUILD_DIR)
+$$($(1)_JAR): $$($(1)_JAVA_SRCS) $$($(1)_JAVA_LIBS) | $$($(1)_BUILD_DIR) $$(BUILD_DIR)
 	find $$($(1)_BUILD_DIR) -type f -iname '*.class' -delete
 	@echo "Compiling..."
 	@$$(JAVAC) -d $$($(1)_BUILD_DIR) -cp $$($(1)_CLASSPATH) $$($(1)_JAVA_SRCS) $$($(1)_GEN_SRCS)
