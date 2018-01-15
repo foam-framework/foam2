@@ -174,13 +174,12 @@ foam.CLASS({
 
         ^selected {
           background: #eee;
-          outline: 1px solid #f00;
         }
 
         ^vertDots {
           font-size: 20px;
           font-weight: bold;
-          padding-right: 10px;
+          padding-right: 12px;
         }
 
         ^noselect {
