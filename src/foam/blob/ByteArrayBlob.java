@@ -9,9 +9,9 @@ package foam.blob;
 import java.io.ByteArrayInputStream;
 
 public class ByteArrayBlob
-    extends ProxyBlob
+  extends InputStreamBlob
 {
   public ByteArrayBlob(byte[] blob) {
-    setDelegate(new InputStreamBlob(new ByteArrayInputStream(blob), blob.length));
+    super(new ByteArrayInputStream(blob), blob.length);
   }
 }

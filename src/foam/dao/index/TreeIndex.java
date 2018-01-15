@@ -38,24 +38,6 @@ public class TreeIndex
     return TreeNode.getNullNode().bulkLoad(tail_, prop_, 0, a.length-1, a);
   }
 
-  protected Predicate simplifyPredicatePrepare(Predicate predicate) {
-    if ( predicate instanceof And ) {
-      int length = ( (And) predicate ).getArgs().length;
-      for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (And) predicate ).getArgs()[i];
-        ( (And) predicate ).getArgs()[i] = simplifyPredicatePrepare(arg);
-      }
-      return predicate.partialEval();
-    }
-    if ( predicate instanceof Not ) {
-      if ( ( (Not) predicate ).getArg1() instanceof And )
-        return predicate;
-      predicate = predicate.partialEval();
-      predicate = simplifyPredicatePrepare(predicate);
-    }
-    return predicate;
-  }
-
   protected Object[] simplifyPredicate(Object state, Predicate predicate) {
     if ( predicate != null && prop_ != null ) {
       if ( predicate instanceof Binary ) {
@@ -126,17 +108,16 @@ public class TreeIndex
 
   //TODO
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( predicate == null && sink instanceof Count ) {
-      return new CountPlan(( (TreeNode) state ).size);
-    }
     if ( ( predicate != null && predicate instanceof False ) || state == null ) {
       return NotFoundPlan.instance();
     }
     if ( state == null ) return NotFoundPlan.instance();
-    predicate = simplifyPredicatePrepare(predicate);
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
+    if ( predicate == null && sink instanceof Count ) {
+      return new CountPlan(( (TreeNode) state ).size);
+    }
     if ( predicate == null && sink instanceof GroupBy
         && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
         && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
