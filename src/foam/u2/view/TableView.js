@@ -169,6 +169,7 @@ foam.CLASS({
 
         ^row:hover {
           background: #eee;
+          cursor: pointer;
         }
 
         ^selected {
