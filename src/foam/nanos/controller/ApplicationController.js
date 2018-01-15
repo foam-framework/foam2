@@ -88,6 +88,7 @@ foam.CLASS({
     'primaryColor',
     'secondaryColor',
     'tableColor',
+    'tableHoverColor',
     'accentColor'
   ],
 
@@ -160,10 +161,11 @@ foam.CLASS({
         }
 
         this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g,   this.primaryColor).
-          replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
-          replace(/%TABLECOLOR%/g,     this.tableColor).
-          replace(/%ACCENTCOLOR%/g,    this.accentColor),
+          replace(/%PRIMARYCOLOR%/g,    this.primaryColor).
+          replace(/%SECONDARYCOLOR%/g,  this.secondaryColor).
+          replace(/%TABLECOLOR%/g,      this.tableColor).
+          replace(/%TABLEHOVERCOLOR%/g, this.tableHoverColor).
+          replace(/%ACCENTCOLOR%/g,     this.accentColor),
           id);
       }
     },
