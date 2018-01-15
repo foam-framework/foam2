@@ -25,6 +25,11 @@ foam.CLASS({
       class: 'String',
       name: 'url',
       value: 'http://localhost:8080/'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.app.Mode',
+      name: 'mode'
     }
   ]
 });
