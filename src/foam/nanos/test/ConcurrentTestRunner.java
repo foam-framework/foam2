@@ -23,7 +23,11 @@ public class ConcurrentTestRunner
   protected ConcurrentTest test_;
 
   // Builder pattern to avoid large constructor in the case
-  // we want to add more variables to this test runner later
+  // we want to add more variables to this test runner later.
+  // 
+  // Generics were added to support inheritance if more
+  // properties needed to be added to the builder class by
+  // an inherited class
   public static class Builder<T extends Builder<T>> {
 
     private int threadCount_ = 0;
