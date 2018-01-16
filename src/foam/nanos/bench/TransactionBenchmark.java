@@ -32,8 +32,6 @@ public class TransactionBenchmark
     accountDAO_ = (DAO) x.get("localAccountDAO");
     transactionDAO_ = (DAO) x.get("localTransactionDAO");
 
-    transactionDAO_.removeAll();
-
     Sink sink = new ListSink();
     sink = userDAO_.select(sink);
     users = ((ListSink) sink).getData();
