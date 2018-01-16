@@ -17,11 +17,12 @@ public class ConcurrentTestRunner
   extends ContextAwareSupport
   implements ContextAgent
 {
-  private int threadCount_;
-  private int invocationCount_;
-  private int timeout_;
-  private ConcurrentTest test_;
+  protected int threadCount_;
+  protected int invocationCount_;
+  protected int timeout_;
+  protected ConcurrentTest test_;
 
+  // Builder pattern to avoid
   public static class Builder<T extends Builder<T>> {
 
     private int threadCount_ = 0;
