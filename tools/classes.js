@@ -106,6 +106,7 @@ var classes = [
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
+  'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.Group',
   'foam.nanos.auth.LastModifiedAware',
