@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.test;
+package foam.nanos.bench;
 
 import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
@@ -13,14 +13,14 @@ import foam.core.X;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class ConcurrentTestRunner
+public class BenchmarkRunner
   extends ContextAwareSupport
   implements ContextAgent
 {
   protected int threadCount_;
   protected int invocationCount_;
   protected int timeout_;
-  protected ConcurrentTest test_;
+  protected Benchmark test_;
 
   // Builder pattern to avoid large constructor in the case
   // we want to add more variables to this test runner later.
@@ -35,7 +35,7 @@ public class ConcurrentTestRunner
     private int threadCount_ = 0;
     private int invocationCount_ = 0;
     private int timeout_ = 0;
-    private ConcurrentTest test_;
+    private Benchmark test_;
 
     public Builder(X x) {
       setX(x);
@@ -56,17 +56,17 @@ public class ConcurrentTestRunner
       return (T) this;
     }
 
-    public T setTest(ConcurrentTest val) {
+    public T setBenchmark(Benchmark val) {
       test_ = val;
       return (T) this;
     }
 
-    public ConcurrentTestRunner build() {
-      return new ConcurrentTestRunner(getX(),this);
+    public BenchmarkRunner build() {
+      return new BenchmarkRunner(getX(),this);
     }
   }
 
-  protected ConcurrentTestRunner(X x, Builder<?> builder) {
+  protected BenchmarkRunner(X x, Builder<?> builder) {
     setX(x);
     threadCount_ = builder.threadCount_;
     invocationCount_ = builder.invocationCount_;

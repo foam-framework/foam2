@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.nanos.test;
+package foam.nanos.bench;
 
 import foam.core.X;
 import foam.dao.DAO;
@@ -13,8 +13,8 @@ import foam.util.Password;
 import net.nanopay.model.Account;
 import net.nanopay.tx.model.Transaction;
 
-public class ConcurrentTransactionTest
-  implements ConcurrentTest
+public class TransactionBenchmark
+  implements Benchmark
 {
   protected User payee_;
   protected User payer_;
