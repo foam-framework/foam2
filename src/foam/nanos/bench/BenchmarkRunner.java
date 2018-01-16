@@ -12,6 +12,7 @@ import foam.core.X;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BenchmarkRunner
   extends ContextAwareSupport
@@ -30,7 +31,7 @@ public class BenchmarkRunner
   // properties needed to be added to the builder class by
   // an inherited class
   public static class Builder<T extends Builder<T>>
-    extends ContextAwareSupport
+      extends ContextAwareSupport
   {
     private String name_ = "foam.nanos.bench.BenchmarkRunner";
     private int threadCount_ = 0;
@@ -116,6 +117,7 @@ public class BenchmarkRunner
   @Override
   public void execute(final X x) {
     // create CountDownLatch and thread group equal
+    final AtomicInteger count = new AtomicInteger(0);
     final CountDownLatch latch = new CountDownLatch(threadCount_);
     ThreadGroup group = new ThreadGroup(name_);
 
@@ -133,6 +135,7 @@ public class BenchmarkRunner
         public void run() {
           for ( int j = 0 ; j < invocationCount_ ; j++ ) {
             test_.execute(x);
+            count.incrementAndGet();
           }
           // count down the latch when finished
           latch.countDown();
@@ -158,9 +161,11 @@ public class BenchmarkRunner
 
     // calculate length taken
     long endTime = System.currentTimeMillis();
-    long duration = endTime - startTime;
-    System.out.println(threadCount_ +
-        " thread(s) executing " + invocationCount_ +
-        " times(s) took " + duration + " milliseconds");
+
+    // get number of threads completed and duration
+    // print out transactions per second
+    float complete = (float) count.get();
+    float duration = ((float) (endTime - startTime) / 1000.0f );
+    System.out.println("Transaction per second: " + ( complete / duration ) );
   }
 }
