@@ -22,7 +22,8 @@ public class ConcurrentTestRunner
   protected int timeout_;
   protected ConcurrentTest test_;
 
-  // Builder pattern to avoid
+  // Builder pattern to avoid large constructor in the case
+  // we want to add more variables to this test runner later
   public static class Builder<T extends Builder<T>> {
 
     private int threadCount_ = 0;
@@ -66,13 +67,17 @@ public class ConcurrentTestRunner
 
   @Override
   public void execute(final X x) {
+    // create countdownlatch and threads equal to the thread joint
     final CountDownLatch latch = new CountDownLatch(threadCount_);
     Thread[] threads = new Thread[threadCount_];
 
+    // set up the test
     test_.setup(x);
 
+    // get start time
     long startTime = System.currentTimeMillis();
 
+    // execute all the threads
     for ( Thread thread : threads ) {
       thread = new Thread(new Runnable() {
         @Override
@@ -80,13 +85,16 @@ public class ConcurrentTestRunner
           for ( int i = 0 ; i < invocationCount_ ; i ++ ) {
             test_.execute(x);
           }
+          // count down the latch when finished
           latch.countDown();
         }
       });
+      // start the thread
       thread.start();
     }
 
     try {
+      // wait until latch reaches 0, or until timeout is reached
       if (timeout_ != 0) {
         latch.await(timeout_, TimeUnit.MILLISECONDS);
       } else {
@@ -94,9 +102,11 @@ public class ConcurrentTestRunner
       }
     } catch (Throwable ignored) {}
 
+    // calculate length taken
     long endTime = System.currentTimeMillis();
+    long duration = endTime - startTime
     System.out.println(threadCount_ +
         " thread(s) executing " + invocationCount_ +
-        " times(s) took " + (endTime - startTime) + " milliseconds");
+        " times(s) took " + duration + " milliseconds");
   }
 }
