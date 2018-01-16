@@ -5,8 +5,8 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.nanos.test',
-  name: 'ConcurrentTest',
+  package: 'foam.nanos.bench',
+  name: 'Benchmark',
 
   implements: [
     'foam.core.ContextAgent'
