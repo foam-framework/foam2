@@ -108,9 +108,6 @@ public class TreeIndex
 
   //TODO
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( predicate == null && sink instanceof Count ) {
-      return new CountPlan(( (TreeNode) state ).size);
-    }
     if ( ( predicate != null && predicate instanceof False ) || state == null ) {
       return NotFoundPlan.instance();
     }
@@ -118,6 +115,9 @@ public class TreeIndex
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
+    if ( predicate == null && sink instanceof Count ) {
+      return new CountPlan(( (TreeNode) state ).size);
+    }
     if ( predicate == null && sink instanceof GroupBy
         && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
         && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
