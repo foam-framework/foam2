@@ -28,14 +28,18 @@ public class ConcurrentTestRunner
   // Generics were added to support inheritance if more
   // properties needed to be added to the builder class by
   // an inherited class
-  public static class Builder<T extends Builder<T>> {
+  public static class Builder<T extends Builder<T>>
+    extends ContextAwareSupport
+  {
 
     private int threadCount_ = 0;
     private int invocationCount_ = 0;
     private int timeout_ = 0;
     private ConcurrentTest test_;
 
-    public Builder() {}
+    public Builder(X x) {
+      setX(x);
+    }
 
     public T setThreadCount(int val) {
       threadCount_ = val;
@@ -58,11 +62,12 @@ public class ConcurrentTestRunner
     }
 
     public ConcurrentTestRunner build() {
-      return new ConcurrentTestRunner(this);
+      return new ConcurrentTestRunner(getX(),this);
     }
   }
 
-  protected ConcurrentTestRunner(Builder<?> builder) {
+  protected ConcurrentTestRunner(X x, Builder<?> builder) {
+    setX(x);
     threadCount_ = builder.threadCount_;
     invocationCount_ = builder.invocationCount_;
     timeout_ = builder.timeout_;
@@ -132,7 +137,7 @@ public class ConcurrentTestRunner
 
     // calculate length taken
     long endTime = System.currentTimeMillis();
-    long duration = endTime - startTime
+    long duration = endTime - startTime;
     System.out.println(threadCount_ +
         " thread(s) executing " + invocationCount_ +
         " times(s) took " + duration + " milliseconds");
