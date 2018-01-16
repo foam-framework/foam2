@@ -115,10 +115,9 @@ public class BenchmarkRunner
 
   @Override
   public void execute(final X x) {
-    // create countdownlatch and threads equal to the thread joint
+    // create CountDownLatch and thread group equal
     final CountDownLatch latch = new CountDownLatch(threadCount_);
-    ThreadGroup threadGroup = new ThreadGroup("benchmark");
-    Thread[] threads = new Thread[threadCount_];
+    ThreadGroup group = new ThreadGroup(name_);
 
     // set up the test
     test_.setup(x);
@@ -127,17 +126,23 @@ public class BenchmarkRunner
     long startTime = System.currentTimeMillis();
 
     // execute all the threads
-    for ( Thread thread : threads ) {
-      thread = new Thread(new Runnable() {
+    for ( int i = 0 ; i < threadCount_ ; i++ ) {
+      final int tno = i;
+      Thread thread = new Thread(group, new Runnable() {
         @Override
         public void run() {
-          for ( int i = 0 ; i < invocationCount_ ; i ++ ) {
+          for ( int j = 0 ; j < invocationCount_ ; j++ ) {
             test_.execute(x);
           }
           // count down the latch when finished
           latch.countDown();
         }
-      });
+      }) {
+        @Override
+        public String toString() {
+          return getName() + "-Thread " + tno;
+        }
+      };
       // start the thread
       thread.start();
     }
