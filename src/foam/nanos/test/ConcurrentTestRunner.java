@@ -65,14 +65,26 @@ public class ConcurrentTestRunner
     test_ = builder.test_;
   }
 
+  /**
+   * GetThreadCount
+   * @return the thread count
+   */
   public int getThreadCount() {
     return threadCount_;
   }
 
+  /**
+   * GetInvocationCount
+   * @return the invocation count
+   */
   public int getInvocationCount() {
     return invocationCount_;
   }
 
+  /**
+   * GetTimeout
+   * @return the timeout in milliseconds
+   */
   public int getTimeout() {
     return timeout_;
   }
