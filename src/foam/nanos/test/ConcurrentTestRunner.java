@@ -24,7 +24,7 @@ public class ConcurrentTestRunner
 
   // Builder pattern to avoid large constructor in the case
   // we want to add more variables to this test runner later.
-  // 
+  //
   // Generics were added to support inheritance if more
   // properties needed to be added to the builder class by
   // an inherited class
