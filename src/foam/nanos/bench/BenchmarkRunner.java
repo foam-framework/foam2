@@ -17,6 +17,7 @@ public class BenchmarkRunner
   extends ContextAwareSupport
   implements ContextAgent
 {
+  protected String name_;
   protected int threadCount_;
   protected int invocationCount_;
   protected int timeout_;
@@ -31,7 +32,7 @@ public class BenchmarkRunner
   public static class Builder<T extends Builder<T>>
     extends ContextAwareSupport
   {
-
+    private String name_ = "foam.nanos.bench.BenchmarkRunner";
     private int threadCount_ = 0;
     private int invocationCount_ = 0;
     private int timeout_ = 0;
@@ -39,6 +40,11 @@ public class BenchmarkRunner
 
     public Builder(X x) {
       setX(x);
+    }
+
+    public T setName(String val) {
+      name_ = val;
+      return (T) this;
     }
 
     public T setThreadCount(int val) {
@@ -68,10 +74,19 @@ public class BenchmarkRunner
 
   protected BenchmarkRunner(X x, Builder<?> builder) {
     setX(x);
+    name_ = builder.name_;
     threadCount_ = builder.threadCount_;
     invocationCount_ = builder.invocationCount_;
     timeout_ = builder.timeout_;
     test_ = builder.test_;
+  }
+
+  /**
+   * GetName
+   * @return the name used by the ThreadGroup
+   */
+  public String getName() {
+    return name_;
   }
 
   /**
@@ -102,6 +117,7 @@ public class BenchmarkRunner
   public void execute(final X x) {
     // create countdownlatch and threads equal to the thread joint
     final CountDownLatch latch = new CountDownLatch(threadCount_);
+    ThreadGroup threadGroup = new ThreadGroup("benchmark");
     Thread[] threads = new Thread[threadCount_];
 
     // set up the test
