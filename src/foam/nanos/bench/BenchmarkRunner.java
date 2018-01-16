@@ -167,5 +167,6 @@ public class BenchmarkRunner
     float complete = (float) count.get();
     float duration = ((float) (endTime - startTime) / 1000.0f );
     System.out.println("Transaction per second: " + ( complete / duration ) );
+    System.out.println("Transaction per second per thread: " + ( ((float) ( complete / duration )) / (float) threadCount_));
   }
 }
