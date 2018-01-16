@@ -289,9 +289,9 @@ public class TreeNode {
     return value;
   }
 
-  public TreeNode neq(TreeNode s, Object key, PropertyInfo prop) {
-    return removeNode(s, key, prop);
-  }
+//  public TreeNode neq(TreeNode s, Object key, PropertyInfo prop) {
+//    return removeNode(s, key, prop);
+//  }
 
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
