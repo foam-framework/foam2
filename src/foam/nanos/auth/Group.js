@@ -8,9 +8,9 @@ foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'Group',
 
-  implements: [
-    'foam.nanos.auth.EnabledAware'
-  ],
+  implements: [ 'foam.nanos.auth.EnabledAware' ],
+
+  requires: [ 'foam.nanos.app.AppConfig' ],
 
   documentation: 'A Group of Users.',
 
@@ -44,8 +44,16 @@ foam.CLASS({
       targetDAOKey: 'menuDAO',
       name: 'defaultMenu',
       of: 'foam.nanos.menu.Menu'
+    },
+    { class: 'URL', name: 'logo' },
+/*    {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.app.AppConfig',
+      name: 'appConfig',
+      factory: function() { return this.AppConfig.create(); },
+      documentation: 'Custom application configuration for group.'
     }
-
+*/
     /*
       FUTURE
     {
