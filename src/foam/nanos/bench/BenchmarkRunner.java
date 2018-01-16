@@ -21,7 +21,6 @@ public class BenchmarkRunner
   protected String name_;
   protected int threadCount_;
   protected int invocationCount_;
-  protected int timeout_;
   protected Benchmark test_;
 
   // Builder pattern to avoid large constructor in the case
@@ -31,12 +30,11 @@ public class BenchmarkRunner
   // properties needed to be added to the builder class by
   // an inherited class
   public static class Builder<T extends Builder<T>>
-      extends ContextAwareSupport
+    extends ContextAwareSupport
   {
     private String name_ = "foam.nanos.bench.BenchmarkRunner";
     private int threadCount_ = 0;
     private int invocationCount_ = 0;
-    private int timeout_ = 0;
     private Benchmark test_;
 
     public Builder(X x) {
@@ -58,11 +56,6 @@ public class BenchmarkRunner
       return (T) this;
     }
 
-    public T setTimeout(int val) {
-      timeout_ = val;
-      return (T) this;
-    }
-
     public T setBenchmark(Benchmark val) {
       test_ = val;
       return (T) this;
@@ -78,7 +71,6 @@ public class BenchmarkRunner
     name_ = builder.name_;
     threadCount_ = builder.threadCount_;
     invocationCount_ = builder.invocationCount_;
-    timeout_ = builder.timeout_;
     test_ = builder.test_;
   }
 
@@ -106,67 +98,54 @@ public class BenchmarkRunner
     return invocationCount_;
   }
 
-  /**
-   * GetTimeout
-   * @return the timeout in milliseconds
-   */
-  public int getTimeout() {
-    return timeout_;
-  }
-
   @Override
   public void execute(final X x) {
-    // create CountDownLatch and thread group equal
-    final AtomicInteger count = new AtomicInteger(0);
-    final CountDownLatch latch = new CountDownLatch(threadCount_);
-    ThreadGroup group = new ThreadGroup(name_);
-
-    // set up the test
-    test_.setup(x);
-
-    // get start time
-    long startTime = System.currentTimeMillis();
-
-    // execute all the threads
-    for ( int i = 0 ; i < threadCount_ ; i++ ) {
-      final int tno = i;
-      Thread thread = new Thread(group, new Runnable() {
-        @Override
-        public void run() {
-          for ( int j = 0 ; j < invocationCount_ ; j++ ) {
-            test_.execute(x);
-            count.incrementAndGet();
-          }
-          // count down the latch when finished
-          latch.countDown();
-        }
-      }) {
-        @Override
-        public String toString() {
-          return getName() + "-Thread " + tno;
-        }
-      };
-      // start the thread
-      thread.start();
-    }
-
     try {
-      // wait until latch reaches 0, or until timeout is reached
-      if (timeout_ != 0) {
-        latch.await(timeout_, TimeUnit.MILLISECONDS);
-      } else {
-        latch.await();
+      // create CountDownLatch and thread group equal
+      final CountDownLatch latch = new CountDownLatch(threadCount_);
+      ThreadGroup group = new ThreadGroup(name_);
+
+      // set up the test
+      test_.setup(x);
+
+      // get start time
+      long startTime = System.currentTimeMillis();
+
+      // execute all the threads
+      for (int i = 0; i < threadCount_; i++) {
+        final int tno = i;
+        Thread thread = new Thread(group, new Runnable() {
+          @Override
+          public void run() {
+            for (int j = 0; j < invocationCount_; j++) {
+              test_.execute(x);
+            }
+            // count down the latch when finished
+            latch.countDown();
+          }
+        }) {
+          @Override
+          public String toString() {
+            return getName() + "-Thread " + tno;
+          }
+        };
+        // start the thread
+        thread.start();
       }
-    } catch (Throwable ignored) {}
 
-    // calculate length taken
-    long endTime = System.currentTimeMillis();
+      // wait until latch reaches 0
+      latch.await();
 
-    // get number of threads completed and duration
-    // print out transactions per second
-    float complete = (float) count.get();
-    float duration = ((float) (endTime - startTime) / 1000.0f );
-    System.out.println("Transaction per second: " + ( complete / duration ) );
-    System.out.println("Transaction per second per thread: " + ( ((float) ( complete / duration )) / (float) threadCount_));
+      // calculate length taken
+      // get number of threads completed and duration
+      // print out transactions per second
+      long endTime = System.currentTimeMillis();
+      float complete = (float) (threadCount_ * invocationCount_);
+      float duration = ((float) (endTime - startTime) / 1000.0f);
+      System.out.println("Operations per second: " + (complete / duration));
+      System.out.println("Operations per second per thread: " + (complete / duration / (float) threadCount_));
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
   }
 }
