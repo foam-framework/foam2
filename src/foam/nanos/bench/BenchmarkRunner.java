@@ -11,8 +11,6 @@ import foam.core.ContextAwareSupport;
 import foam.core.X;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class BenchmarkRunner
   extends ContextAwareSupport
