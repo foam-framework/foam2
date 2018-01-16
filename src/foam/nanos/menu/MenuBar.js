@@ -43,11 +43,8 @@ foam.CLASS({
       value: '' // The root menu
     },
     {
-      name: 'selected',
-      postSet: function(o, n) {
-        if ( o ) o.selected = false;
-        n.selected = true;
-      }
+      //currently selected menu
+      name: 'selected'
     }
   ],
 
@@ -63,7 +60,7 @@ foam.CLASS({
                 .call(function() {
                   var e = this;
                   if ( ! self.selected ) self.selected = menu;
-                  this.start().addClass('menuItem').enableClass('selected', menu.selected$)
+                  this.start().addClass('menuItem').enableClass('selected', self.selected$.map(function(selected) { return selected.id == menu.id; }))
                     .add(menu.label)
                     .on('click', function() {
                       menu.launch_(self.__context__, e)
