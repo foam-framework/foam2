@@ -25,17 +25,14 @@ public class TransactionBenchmark
   protected DAO userDAO_;
   protected DAO accountDAO_;
   protected DAO transactionDAO_;
-  protected DAO transactionLimitDAO_;
 
   @Override
   public void setup(X x) {
     userDAO_ = (DAO) x.get("localUserDAO");
     accountDAO_ = (DAO) x.get("localAccountDAO");
     transactionDAO_ = (DAO) x.get("localTransactionDAO");
-    transactionLimitDAO_ = (DAO) x.get("transactionLimitDAO");
 
     transactionDAO_.removeAll();
-    transactionLimitDAO_.removeAll();
 
     Sink sink = new ListSink();
     sink = userDAO_.select(sink);
