@@ -17,17 +17,17 @@ public class ConcurrentTestRunner
   extends ContextAwareSupport
   implements ContextAgent
 {
-  protected int threadCount_;
-  protected int invocationCount_;
-  protected int timeout_;
-  protected ConcurrentTest test_;
+  private int threadCount_;
+  private int invocationCount_;
+  private int timeout_;
+  private ConcurrentTest test_;
 
   public static class Builder<T extends Builder<T>> {
 
-    protected int threadCount_ = 0;
-    protected int invocationCount_ = 0;
-    protected int timeout_ = 0;
-    protected ConcurrentTest test_;
+    private int threadCount_ = 0;
+    private int invocationCount_ = 0;
+    private int timeout_ = 0;
+    private ConcurrentTest test_;
 
     public Builder() {}
 
@@ -65,32 +65,37 @@ public class ConcurrentTestRunner
 
   @Override
   public void execute(final X x) {
-    try {
-      final CountDownLatch latch = new CountDownLatch(threadCount_);
-      Thread[] threads = new Thread[threadCount_];
+    final CountDownLatch latch = new CountDownLatch(threadCount_);
+    Thread[] threads = new Thread[threadCount_];
 
-      test_.setup(x);
+    test_.setup(x);
 
-      for ( Thread thread : threads ) {
-        thread = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            for ( int i = 0 ; i < invocationCount_ ; i ++ ) {
-              test_.execute(x);
-            }
-            latch.countDown();
+    long startTime = System.currentTimeMillis();
+
+    for ( Thread thread : threads ) {
+      thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          for ( int i = 0 ; i < invocationCount_ ; i ++ ) {
+            test_.execute(x);
           }
-        });
-        thread.start();
-      }
+          latch.countDown();
+        }
+      });
+      thread.start();
+    }
 
+    try {
       if (timeout_ != 0) {
         latch.await(timeout_, TimeUnit.MILLISECONDS);
       } else {
         latch.await();
       }
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
+    } catch (Throwable ignored) {}
+
+    long endTime = System.currentTimeMillis();
+    System.out.println(threadCount_ +
+        " thread(s) executing " + invocationCount_ +
+        " times(s) took " + (endTime - startTime) + " milliseconds");
   }
 }
