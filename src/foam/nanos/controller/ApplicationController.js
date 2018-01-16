@@ -17,6 +17,7 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView'
@@ -30,6 +31,7 @@ foam.CLASS({
 
   exports: [
     'as ctrl',
+    'group',
     'loginSuccess',
     'logo',
     'requestLogin',
@@ -73,6 +75,12 @@ foam.CLASS({
       factory: function() { return this.User.create(); }
     },
     {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.Group',
+      name: 'group',
+      factory: function() { return this.Group.create(); }
+    },
+    {
       class: 'Boolean',
       name: 'signUpEnabled',
       adapt: function(v) {
@@ -83,7 +91,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginSuccess'
     },
-    'logo',
+    { class: 'URL', name: 'logo' },
     'webApp',
     'primaryColor',
     'secondaryColor',
@@ -126,6 +134,7 @@ foam.CLASS({
       if ( this.window.location.hash || ! this.user.group ) return;
 
       this.groupDAO.find(this.user.group).then(function (group) {
+        this.group.copyFrom(group);
         this.window.location.hash = group.defaultMenu;
       }.bind(this));
     },
