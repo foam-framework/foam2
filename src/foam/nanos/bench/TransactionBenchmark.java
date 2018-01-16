@@ -36,7 +36,7 @@ public class TransactionBenchmark
     payer.setLastName("Payer");
     payer.setGroup("tester");
     payer.setEmail("test1@nanopay.net");
-    payer.setPassword(Password.hash("Mintchip123"));
+    payer.setPassword("Mintchip123");
     payer_ = (User) userDAO_.put(payer);
 
     // set payer balance to $1000.00
@@ -50,7 +50,7 @@ public class TransactionBenchmark
     payee.setLastName("Payee");
     payee.setGroup("tester");
     payee.setEmail("test2@nanopay.net");
-    payee.setPassword(Password.hash("Mintchip123"));
+    payee.setPassword("Mintchip123");
     payee_ = (User) userDAO_.put(payee);
 
     // set payee balance to $1000.00
