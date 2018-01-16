@@ -149,6 +149,7 @@ var classes = [
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
+  'foam.nanos.test.ConcurrentTest',
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
