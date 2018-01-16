@@ -65,6 +65,18 @@ public class ConcurrentTestRunner
     test_ = builder.test_;
   }
 
+  public int getThreadCount() {
+    return threadCount_;
+  }
+
+  public int getInvocationCount() {
+    return invocationCount_;
+  }
+
+  public int getTimeout() {
+    return timeout_;
+  }
+
   @Override
   public void execute(final X x) {
     // create countdownlatch and threads equal to the thread joint
