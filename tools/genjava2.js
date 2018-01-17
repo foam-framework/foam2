@@ -94,7 +94,6 @@ function generateClass(cls) {
 
   ensurePath(outfile);
 
-  console.log("Generating", cls.id);
   writeFileIfUpdated(outfile, cls.buildJavaClass().toJavaSource());
 }
 
