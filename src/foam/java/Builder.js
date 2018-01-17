@@ -70,6 +70,7 @@ obj.setX(x_);
         builder.method({
           name: 'set' + capitalized,
           type: 'Builder',
+          visibility: 'public',
           args: [ { type: prop.javaType, name: 'value' } ],
           body: `${privateName} = value;
 ${isSet} = true;
