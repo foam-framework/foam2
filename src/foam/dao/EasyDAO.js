@@ -153,11 +153,6 @@ return delegate;
       name: 'journalName'
     },
     {
-      class: 'Object',
-      name: 'of',
-      javaType: 'foam.core.ClassInfo'
-    },
-    {
       class: 'FObjectProperty',
       of: 'foam.dao.Journal',
       generateJava: false,
