@@ -40,29 +40,29 @@ public class JDAO
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
-  public JDAO(foam.core.X x, ClassInfo classInfo)
-    throws IOException
-  {
+  public JDAO(foam.core.X x, ClassInfo classInfo) {
     this(x, classInfo, classInfo.getId().replace(".", "_"));
   }
 
-  public JDAO(foam.core.X x, ClassInfo classInfo, String filename)
-      throws IOException
-  {
+  public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
     this(x, new MapDAO().setOf(classInfo), filename);
   }
 
-  public JDAO(foam.core.X x, DAO delegate, String filename) throws IOException {
+  public JDAO(foam.core.X x, DAO delegate, String filename) {
     setX(x);
 
-    file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
+    try {
+      file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
 
-    if ( ! file_.exists() ) file_.createNewFile();
+      if ( ! file_.exists() ) file_.createNewFile();
 
-    setDelegate(delegate);
-    loadJournal();
+      setDelegate(delegate);
+      loadJournal();
 
-    out_ = new BufferedWriter(new FileWriter(file_, true));
+      out_ = new BufferedWriter(new FileWriter(file_, true));
+    } catch ( IOException e ) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected void loadJournal()
