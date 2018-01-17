@@ -276,7 +276,7 @@ foam.LIB({
             name: cls.name,
             type: '',
             args: [{name: 'x', type: 'foam.core.X' }].concat(props.map(function(f) { return {name: f.name, type: f.type}; })),
-            body: ['setX(x);'].concat(props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; })).join(';\n') + ';'
+            body: ['setX(x)'].concat(props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; })).join(';\n') + ';'
           });
         }
 
