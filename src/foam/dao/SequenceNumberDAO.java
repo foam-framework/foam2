@@ -31,12 +31,9 @@ public class SequenceNumberDAO
     this.property = property.getName();
   }
 
-  public AbstractDAO setOf(ClassInfo of) {
-    AbstractDAO ret = super.setOf(of);
-
+  public void setOf(ClassInfo of) {
+    super.setOf(of);
     property_ = null;
-
-    return ret;
   }
 
   public SequenceNumberDAO setProperty(String property) {
