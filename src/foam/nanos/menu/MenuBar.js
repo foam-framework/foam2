@@ -13,7 +13,7 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO' ],
+  imports: [ 'menuDAO', 'currentMenu' ],
 
   documentation: 'Navigational menu bar',
 
@@ -42,10 +42,7 @@ foam.CLASS({
       name: 'menuName',
       value: '' // The root menu
     },
-    {
-      //currently selected menu
-      name: 'selected'
-    }
+    'selected'
   ],
 
   methods: [
@@ -60,11 +57,12 @@ foam.CLASS({
                 .call(function() {
                   var e = this;
                   if ( ! self.selected ) self.selected = menu;
-                  this.start().addClass('menuItem').enableClass('selected', self.selected$.map(function(selected) { return selected.id == menu.id; }))
+                  this.start()
+                    .addClass('menuItem')
+                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) || self.selected === menu.id; }))
                     .add(menu.label)
                     .on('click', function() {
-                      menu.launch_(self.__context__, e)
-                      self.selected = menu;
+                      menu.launch_(self.__context__, e);
                     }.bind(this))
                   .end();
                 })
@@ -73,6 +71,27 @@ foam.CLASS({
           .end()
         .end()
       .end();
+    },
+
+    function isSelected(current, menu) {
+      if ( ! current ) return false;
+
+      if ( current.parent ) {
+        if ( current.parent === menu.id ) {
+          this.selected = current.parent;
+          return true;
+        }
+        return false;
+      }
+
+      // selected menu is a submenu. Do not change selection yet.
+      if ( ! current.handler.view ) return false;
+
+      if ( current.id === menu.id ) {
+        this.selected = current.id;
+        return true;
+      }
+      return false;
     }
   ]
 });
