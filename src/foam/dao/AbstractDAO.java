@@ -205,7 +205,7 @@ public abstract class AbstractDAO
   }
 
   public DAO inX(X x) {
-    ProxyDAO dao = new ProxyDAO(this);
+    ProxyDAO dao = new ProxyDAO.Builder(x).setDelegate(this).build();
     dao.setX(x);
     return dao;
   }

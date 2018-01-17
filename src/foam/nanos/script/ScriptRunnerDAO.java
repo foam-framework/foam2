@@ -15,7 +15,8 @@ public class ScriptRunnerDAO
 {
 
   public ScriptRunnerDAO(DAO delegate) {
-    super(delegate);
+    super();
+    setDelegate(delegate);
   }
 
   public FObject put_(X x, FObject obj) {

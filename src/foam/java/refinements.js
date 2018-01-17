@@ -280,7 +280,7 @@ foam.LIB({
           });
         }
 
-        if ( props.length > 2 && ! cls.abstract ) {
+        if ( ! cls.abstract ) {
           // Apply builder pattern if more than 3 properties and not abstract.
           foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(function(p) { return p.generateJava && p.javaInfoType; }) }).buildJavaClass(cls);
         }
