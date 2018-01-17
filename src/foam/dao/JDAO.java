@@ -44,9 +44,7 @@ public class JDAO
     this(x, classInfo, classInfo.getId().replace(".", "_"));
   }
 
-  public JDAO(foam.core.X x, ClassInfo classInfo, String filename)
-      throws IOException
-  {
+  public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
     this(x, new MapDAO(classInfo), filename);
   }
 
