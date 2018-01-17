@@ -69,19 +69,23 @@ public class MDAO extends AbstractDAO {
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     SelectPlan plan;
-    if ( predicate != null ) predicate = predicate.partialEval();
-    if ( predicate instanceof Or ) {
-      int length = ( (Or) predicate ).getArgs().length;
+    Predicate copyPredicate = null;
+    if ( predicate != null ) {
+      copyPredicate = (Predicate) ( (FObject) predicate ).deepClone();
+      copyPredicate = copyPredicate.partialEval();
+    }
+    if ( copyPredicate instanceof Or ) {
+      int length = ( (Or) copyPredicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (Or) predicate ).getArgs()[i];
+        Predicate arg = ( (Or) copyPredicate ).getArgs()[i];
         planList.add(index_.planSelect(state_, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
-      plan = new OrPlan(predicate, planList);
+      plan = new OrPlan(copyPredicate, planList);
     } else {
-      plan = index_.planSelect(state_, sink, skip, limit, order, predicate);
+      plan = index_.planSelect(state_, sink, skip, limit, order, copyPredicate);
     }
-    plan.select(state_, sink, skip, limit, order, predicate);
+    plan.select(state_, sink, skip, limit, order, copyPredicate);
     return sink;
   }
 
