@@ -9,7 +9,7 @@ package foam.core;
 public class ContextAwareSupport
   implements ContextAware
 {
-  protected X x_;
+  protected X x_ = EmptyX.instance();
 
   public X    getX() { return x_; }
   public void setX(X x) { x_ = x; }
