@@ -40,9 +40,9 @@ foam.CLASS({
         }
         ^inner div:hover {
           color: white;
-          background: #1cc2b7;
-          border-left: solid 1px #1cc2b7;
-          border-right: solid 1px #1cc2b7;
+          background: %ACCENTCOLOR% !important;
+          border-left: solid 1px %ACCENTCOLOR%;
+          border-right: solid 1px %ACCENTCOLOR%;
         }
       */}
     })
