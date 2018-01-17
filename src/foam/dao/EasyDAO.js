@@ -90,10 +90,6 @@ if ( getJournaled() ) {
   delegate = new foam.dao.JDAO(getX(), delegate, getJournalName());
 }
 
-if ( getPm() ) {
-  delegate = new foam.dao.PMDAO(delegate);
-}
-
 if ( getGuid() && getSeqNo() ) {
   throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
 }
@@ -104,6 +100,10 @@ if ( getGuid() ) {
 
 if ( getSeqNo() ) {
   delegate = new foam.dao.SequenceNumberDAO(delegate);
+}
+
+if ( getPm() ) {
+  delegate = new foam.dao.PMDAO(delegate);
 }
 
 return delegate;
