@@ -45,7 +45,7 @@ public class JDAO
   }
 
   public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
-    this(x, new MapDAO().setOf(classInfo), filename);
+    this(x, new MapDAO(classInfo), filename);
   }
 
   public JDAO(foam.core.X x, DAO delegate, String filename) {
