@@ -24,13 +24,6 @@ foam.INTERFACE({
       javaReturns: 'foam.core.ClassInfo'
     },
     {
-      name: 'setOf',
-      args: [
-        { name: 'of', javaType: 'foam.core.ClassInfo' }
-      ],
-      javaReturns: 'foam.dao.DAO'
-    },
-    {
       name: 'put',
       javaReturns: 'foam.core.FObject',
       args: [
