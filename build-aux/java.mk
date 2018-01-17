@@ -70,7 +70,7 @@ $(1)_SRC_HASH:=$$($(1)_GEN_SRC_DIR)/.srchash-$$(shell cat $$($(1)_JS_SRCS) $$($(
 $$($(1)_JAR): $$($(1)_SRC_HASH)
 
 $$($(1)_SRC_HASH): $$(FOAM2_HOME)/tools/genjava2.js | $$($(1)_GEN_SRC_DIR)
-	find $$($(1)_GEN_SRC_DIR) -type f -maxdepth 1 -iname '.srchash-*' -delete
+	find $$($(1)_GEN_SRC_DIR) -maxdepth 1 -type f -iname '.srchash-*' -delete
 	find $$($(1)_GEN_SRC_DIR) -type f -iname '*.java' -delete
 	$$(foam_genjava) $$($(1)_CLASSES) $$($(1)_GEN_SRC_DIR) $$($(1)_SRC_DIR)
 	touch $$@
