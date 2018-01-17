@@ -37,6 +37,8 @@ foam.CLASS({
     'requestLogin',
     'signUpEnabled',
     'stack',
+    'currentMenu',
+    'menuListener',
     'user',
     'webApp',
     'wrapCSS as installCSS'
@@ -92,10 +94,12 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     { class: 'URL', name: 'logo' },
+    'currentMenu',
     'webApp',
     'primaryColor',
     'secondaryColor',
     'tableColor',
+    'tableHoverColor',
     'accentColor'
   ],
 
@@ -169,10 +173,11 @@ foam.CLASS({
         }
 
         this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g,   this.primaryColor).
-          replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
-          replace(/%TABLECOLOR%/g,     this.tableColor).
-          replace(/%ACCENTCOLOR%/g,    this.accentColor),
+          replace(/%PRIMARYCOLOR%/g,    this.primaryColor).
+          replace(/%SECONDARYCOLOR%/g,  this.secondaryColor).
+          replace(/%TABLECOLOR%/g,      this.tableColor).
+          replace(/%TABLEHOVERCOLOR%/g, this.tableHoverColor).
+          replace(/%ACCENTCOLOR%/g,     this.accentColor),
           id);
       }
     },
@@ -197,6 +202,10 @@ foam.CLASS({
   listeners: [
     function onUserUpdate() {
       this.setDefaultMenu();
+    },
+
+    function menuListener(m) {
+      this.currentMenu = m;
     }
   ]
 });
