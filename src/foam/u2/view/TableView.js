@@ -260,14 +260,14 @@ foam.CLASS({
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
-        return this.Entity.create({ name: '#9651' });
+        return this.Entity.create({ name: '#9650' });
       }
     },
     {
       name: 'descIcon',
       documentation: 'HTML entity representing unicode Down-Pointing Triangle',
       factory: function() {
-        return this.Entity.create({ name: '#9661' });
+        return this.Entity.create({ name: '#9660' });
       }
     },
     {
