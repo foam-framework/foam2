@@ -75,6 +75,7 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
+  'foam.dao.GUIDDAO',
   'foam.dao.SequenceNumberDAO',
   'foam.dao.ClientSink',
   'foam.dao.ResetSink',
@@ -257,7 +258,6 @@ var blacklist = [
   'foam.dao.MDAO',
   'foam.dao.PromisedDAO',
   'foam.dao.RequestResponseClientDAO',
-  'foam.dao.SequenceNumberDAO',
   'foam.dao.SyncDAO',
   'foam.dao.TimingDAO'
 ];
