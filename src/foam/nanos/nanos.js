@@ -36,6 +36,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/token/AbstractTokenService" },
   { name: "foam/nanos/auth/ChangePasswordView"},
   { name: "foam/nanos/auth/User" },
+  { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/session/Session" },
   { name: "foam/nanos/client/ClientBuilder" },
@@ -75,5 +76,5 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/email/SMTPEmailService' },
   { name: 'foam/nanos/notification/push/PushService' },
   { name: 'foam/nanos/notification/push/FirebasePushService' },
-  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
+  { name: 'foam/nanos/auth/twofactor/authy/AuthyService' }
 ]);

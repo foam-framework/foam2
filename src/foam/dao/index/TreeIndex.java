@@ -46,10 +46,10 @@ public class TreeIndex
           state = ( (TreeNode) state ).get((TreeNode) state, expr.getArg2().f(expr), prop_);
           return new Object[]{state, null};
         }
-        if ( predicate.getClass().equals(Neq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
-          state = ( (TreeNode) state ).neq((TreeNode) state, expr.getArg2().f(expr), prop_);
-          return new Object[]{state, null};
-        }
+//        if ( predicate.getClass().equals(Neq.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
+//          state = ( (TreeNode) state ).neq((TreeNode) state, expr.getArg2().f(expr), prop_);
+//          return new Object[]{state, null};
+//        }
         if ( predicate.getClass().equals(Gt.class) && expr.getArg1().toString().equals(prop_.toString()) ) {
           state = ( (TreeNode) state ).gt((TreeNode) state, expr.getArg2().f(expr), prop_);
           return new Object[]{state, null};
@@ -70,9 +70,11 @@ public class TreeIndex
         int length = ( (And) predicate ).getArgs().length;
         for ( int i = 0; i < length; i++ ) {
           Predicate arg = ( (And) predicate ).getArgs()[i];
-          Object[] statePredicate = simplifyPredicate(state, arg);
-          state = statePredicate[0];
-          arg = (Predicate) statePredicate[1];
+          if ( arg != null && state != null ) {
+            Object[] statePredicate = simplifyPredicate(state, arg);
+            state = statePredicate[0];
+            arg = (Predicate) statePredicate[1];
+          }
           if ( arg == null ) {
             ( (And) predicate ).getArgs()[i] = new True();
           }
