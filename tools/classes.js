@@ -222,7 +222,6 @@ var blacklist = [
   'foam.dao.NullDAO',
   'foam.dao.OrderedDAO',
   'foam.dao.SkipDAO',
-  'foam.mlang.Expressions',
 
   // TODO: These models currently don't compile in java but could be updated to
   // compile properly.
@@ -234,6 +233,7 @@ var blacklist = [
   'foam.dao.sync.SyncRecord',
   'foam.dao.sync.VersionedSyncRecord',
   'foam.mlang.order.ThenBy',
+  'foam.mlang.Expressions',
   'foam.nanos.menu.MenuBar',
 
   'foam.box.Context',
