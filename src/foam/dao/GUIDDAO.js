@@ -42,7 +42,7 @@ foam.CLASS({
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       name: 'axiom',
       javaFactory: `
-return getOf().getAxiomByName(getProperty());
+return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
       `,
     }
   ],
@@ -60,10 +60,10 @@ return getOf().getAxiomByName(getProperty());
         return this.delegate.put_(x, obj);
       },
       javaCode: `
-Object val = obj.getProperty(property);
+Object val = obj.getProperty(getProperty());
 
 if ( "".equals(val) ) {
-  getProperty_().set(obj, UUID.randomUUID().toString());
+  getAxiom().set(obj, java.util.UUID.randomUUID().toString());
 }
 
 return getDelegate().put_(x, obj);
