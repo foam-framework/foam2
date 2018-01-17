@@ -94,8 +94,16 @@ if ( getPm() ) {
   delegate = new foam.dao.PMDAO(delegate);
 }
 
+if ( getGuid() && getSeqNo() ) {
+  throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
+}
+
 if ( getGuid() ) {
   delegate = new foam.dao.GUIDDAO(delegate);
+}
+
+if ( getSeqNo() ) {
+  delegate = new foam.dao.SequenceNumberDAO(delegate)
 }
 
 return delegate;
@@ -112,7 +120,6 @@ return delegate;
         exclusive. */
       class: 'Boolean',
       name: 'seqNo',
-      generateJava: false,
       value: false
     },
     {
