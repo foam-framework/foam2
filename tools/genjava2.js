@@ -54,7 +54,6 @@ var blacklist = {
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO': true,
   'foam.dao.FilteredDAO': true,
   'foam.dao.LimitedDAO': true,
   'foam.dao.NullDAO': true,
