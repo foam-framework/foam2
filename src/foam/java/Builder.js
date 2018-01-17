@@ -8,7 +8,7 @@ foam.CLASS({
   name: 'Builder',
   properties: [
     {
-      class: 'FObjectProperty',
+      class: 'FObjectArray',
       of: 'foam.core.Property',
       name: 'properties'
     }
@@ -18,6 +18,7 @@ foam.CLASS({
       var builder = foam.java.Class.create();
       builder.name = 'Builder';
       builder.innerClass = true;
+      builder.static = true;
 
       builder.field({
         name: 'x_',
