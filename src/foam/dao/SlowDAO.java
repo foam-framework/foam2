@@ -6,7 +6,8 @@ public class SlowDAO
   private int delayms_ = 500;
 
   public SlowDAO(DAO delegate) {
-    super(delegate);
+    super();
+    setDelegate(delegate);
   }
 
   public SlowDAO(int delayms, DAO delegate) {
