@@ -239,8 +239,8 @@ var blacklist = [
   'foam.nanos.menu.MenuBar',
 
   'foam.box.Context',
-  'foam.box.HTTPBox',
-  'foam.box.SessionClientBox',
+//  'foam.box.HTTPBox',
+//  'foam.box.SessionClientBox',
   'foam.box.SocketBox',
   'foam.box.WebSocketBox',
   'foam.box.TimeoutBox',
