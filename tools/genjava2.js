@@ -158,7 +158,7 @@ function generateAbstractClass(cls) {
 
   ensurePath(outfile);
 
-  var javaclass = cls.buildJavaClass(foam.java.Class.create({ abstract: true });
+  var javaclass = cls.buildJavaClass(foam.java.Class.create({ abstract: true }));
 
   writeFileIfUpdated(outfile, javaclass.toJavaSource());
 }
