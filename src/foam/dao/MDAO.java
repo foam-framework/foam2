@@ -12,9 +12,9 @@ import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.index.*;
 import foam.mlang.order.Comparator;
-import foam.mlang.predicate.Not;
 import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
+import foam.mlang.sink.GroupBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,11 +75,17 @@ public class MDAO extends AbstractDAO {
       copyPredicate = copyPredicate.partialEval();
     }
     if ( copyPredicate instanceof Or ) {
+      Sink dependSink;
+      if ( sink instanceof GroupBy ) {
+        dependSink = new ArraySink();
+      } else {
+        dependSink = sink;
+      }
       int length = ( (Or) copyPredicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {
         Predicate arg = ( (Or) copyPredicate ).getArgs()[i];
-        planList.add(index_.planSelect(state_, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
+        planList.add(index_.planSelect(state_, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
       plan = new OrPlan(copyPredicate, planList);
     } else {
