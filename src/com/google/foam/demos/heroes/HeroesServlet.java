@@ -39,7 +39,13 @@ public class HeroesServlet
 {
   private X x = EmptyX.instance();
 
-  private DAO dao = ((DatastoreDAO) x.create(DatastoreDAO.class)).setOf(Hero.getOwnClassInfo());
+  private DAO dao;
+  {
+    DatastoreDAO d = (DatastoreDAO) x.create(DatastoreDAO.class);
+    d.setOf(Hero.getOwnClassInfo());
+    dao = d;
+  }
+
   private foam.box.Box daoSkeleton;
   {
     daoSkeleton = x.create(DAOSkeleton.class);

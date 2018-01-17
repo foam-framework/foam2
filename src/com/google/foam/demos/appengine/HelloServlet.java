@@ -58,7 +58,13 @@ public class HelloServlet extends HttpServlet {
     ((TestServiceSkeleton) dest).setDelegate(myService);
   }
 
-  private DAO dao = ((DatastoreDAO)x.create(DatastoreDAO.class)).setOf(TestModel.getOwnClassInfo());
+  private DAO dao;
+  {
+    DatastoreDAO d = (DatastoreDAO) x.create(DatastoreDAO.class);
+    d.setOf(TestModel.getOwnClassInfo());
+    dao = d;
+  }
+
   private foam.box.Box daoSkeleton;
   {
     daoSkeleton = x.create(DAOSkeleton.class);

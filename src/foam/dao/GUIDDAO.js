@@ -36,18 +36,38 @@ foam.CLASS({
       class: 'String',
       name: 'property',
       value: 'id'
+    },
+    {
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      name: 'axiom',
+      javaFactory: `
+return getOf().getAxiomByName(getProperty());
+      `,
     }
   ],
 
   methods: [
     /** Ensures all objects put() in have a unique id set.
       @param obj the object to process. */
-    function put_(x, obj) {
-      if ( ! obj.hasOwnProperty(this.property) ) {
-        obj[this.property] = foam.uuid.randomGUID();
-      }
+    {
+      name: 'put_',
+      code: function put_(x, obj) {
+        if ( ! obj.hasOwnProperty(this.property) ) {
+          obj[this.property] = foam.uuid.randomGUID();
+        }
 
-      return this.delegate.put_(x, obj);
-    }
+        return this.delegate.put_(x, obj);
+      },
+      javaCode: `
+Object val = obj.getProperty(property);
+
+if ( "".equals(val) ) {
+  getProperty_().set(obj, UUID.randomUUID().toString());
+}
+
+return getDelegate().put_(x, obj);
+      `,
+    },
   ]
 });

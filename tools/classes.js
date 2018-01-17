@@ -77,6 +77,7 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
+  'foam.dao.SequenceNumberDAO',
   'foam.dao.ClientSink',
   'foam.dao.ResetSink',
   'foam.dao.DAOSink',
@@ -220,7 +221,6 @@ var blacklist = [
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.LimitedDAO',
   'foam.dao.NullDAO',
