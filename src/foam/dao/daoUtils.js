@@ -50,6 +50,7 @@ if let oldValue = oldValue as? AbstractDAO {
       factory: function() {
         return this.delegate.of;
       },
+      javaFactory: 'return getDelegate().getOf();',
       swiftExpressionArgs: ['delegate$of'],
       swiftExpression: 'return delegate$of as! ClassInfo',
       javaFactory: `return getDelegate().getOf();`,

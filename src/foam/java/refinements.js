@@ -229,7 +229,7 @@ foam.LIB({
       var axioms = this.getOwnAxioms();
 
       for ( var i = 0 ; i < axioms.length ; i++ ) {
-        axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
+        axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls, this);
       }
 
       // TODO: instead of doing this here, we should walk all Axioms
@@ -239,6 +239,52 @@ foam.LIB({
         .map(function(p) {
           return foam.java.Field.create({name: p.name, type: p.javaType});
         });
+
+      if ( cls.name ) {
+        var props = cls.allProperties;
+
+        // No-arg constructor
+        cls.method({
+          visibility: 'public',
+          name: cls.name,
+          type: '',
+          body: ''
+        });
+
+        // Context-oriented constructor
+        cls.method({
+          visibility: 'public',
+          name: cls.name,
+          type: '',
+          args: [ { type: 'foam.core.X', name: 'x' } ],
+          body: 'setX(x);'
+        });
+
+        if ( props.length ) {
+          // All-property constructor
+          cls.method({
+            visibility: 'public',
+            name: cls.name,
+            type: '',
+            args: props.map(function(f) { return {name: f.name, type: f.type}; }),
+            body: props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; }).join(';\n') + ';'
+          });
+
+          // Context oriented all-property constructor
+          cls.method({
+            visibility: 'public',
+            name: cls.name,
+            type: '',
+            args: [{name: 'x', type: 'foam.core.X' }].concat(props.map(function(f) { return {name: f.name, type: f.type}; })),
+            body: ['setX(x)'].concat(props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; })).join(';\n') + ';'
+          });
+        }
+
+        if ( ! cls.abstract ) {
+          // Apply builder pattern if more than 3 properties and not abstract.
+          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(function(p) { return p.generateJava && p.javaInfoType; }) }).buildJavaClass(cls);
+        }
+      }
 
       return cls;
     }
@@ -1111,6 +1157,16 @@ foam.CLASS({
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()']
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Class',
+  properties: [
+    ['javaType', 'foam.core.ClassInfo'],
+    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaJSONPaser', 'new foam.lib.parse.Fail()']
   ]
 });
 
