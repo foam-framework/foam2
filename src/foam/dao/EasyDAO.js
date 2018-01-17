@@ -103,7 +103,7 @@ if ( getGuid() ) {
 }
 
 if ( getSeqNo() ) {
-  delegate = new foam.dao.SequenceNumberDAO(delegate)
+  delegate = new foam.dao.SequenceNumberDAO(delegate);
 }
 
 return delegate;
