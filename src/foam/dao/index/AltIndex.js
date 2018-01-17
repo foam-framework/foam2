@@ -30,6 +30,7 @@ foam.CLASS({
   extends: 'foam.dao.index.Index',
 
   requires: [
+    'foam.dao.AnonymousSink',
     'foam.dao.index.NoPlan',
     'foam.mlang.sink.NullSink',
   ],
@@ -112,7 +113,7 @@ foam.CLASS({
       }
 
       var newSubInst = index.createNode();
-      var wrapped = foam.dao.DAOSink.create({ dao: newSubInst });
+      var wrapped = this.index.AnonymousSink.create({ sink: newSubInst });
       this.delegates[0].plan(wrapped).execute([], wrapped);
       this.delegates.push(newSubInst);
     },
@@ -163,7 +164,7 @@ foam.CLASS({
       // we didn't have the right delegate generated, so add and populate it
       // as per addIndex, but we skip checking the factory as we know it's stored
       var newSubInst = c.createNode();
-      var wrapped = foam.dao.DAOSink.create({ dao: newSubInst });
+      var wrapped = this.index.AnonymousSink.create({ sink: newSubInst });
       this.delegates[0].plan(wrapped).execute([], wrapped);
       this.delegates.push(newSubInst);
 
