@@ -83,11 +83,14 @@ public class AltIndex
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     Object[] s = toObjectArray(state);
-    SelectPlan     bestPlan = NoPlan.instance();
+    SelectPlan bestPlan = NoPlan.instance();
     Object bestState = null;
+    Predicate originPredicate = null;
 
-    for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
+    for ( int i = 0; i < delegates_.size(); i++ ) {
+      if ( predicate != null )
+        originPredicate = (Predicate) ( (FObject) predicate ).deepClone();
+      SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, originPredicate);
       bestState = s[i];
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
@@ -96,7 +99,7 @@ public class AltIndex
       }
     }
 
-    return new AltSelectPlan(bestState,bestPlan);
+    return new AltSelectPlan(bestState, bestPlan);
   }
 
   public long size(Object state) {
