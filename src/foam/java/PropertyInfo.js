@@ -32,6 +32,11 @@ foam.CLASS({
       name: 'storageTransient'
     },
     {
+      class: 'Boolean',
+      name: 'showDefault',
+      value: 'false'
+    },
+    {
       class: 'String',
       name: 'sqlType'
     },
@@ -138,6 +143,12 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageTransient + ';'
+          },
+          {
+            name: 'getShowDefault',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.showDefault + ';'
           },
           {
             name: 'getRequired',
