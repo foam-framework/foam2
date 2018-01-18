@@ -23,6 +23,10 @@ public class InputStreamBlob
     in_ = in;
   }
 
+  public InputStream getInputStream() {
+    return in_;
+  }
+
   @Override
   public long read(OutputStream out, long offset, long length) {
     try {

@@ -17,7 +17,8 @@ public class PMDAO
 {
 
   public PMDAO(DAO delegate) {
-    super(delegate);
+    super();
+    setDelegate(delegate);
   }
 
   @Override

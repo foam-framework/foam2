@@ -25,7 +25,7 @@ public class TreeLookupFindPlan implements FindPlan {
 
   public FObject find(Object state, Object key) {
     if ( state != null && state instanceof TreeNode ) {
-      return (FObject)((TreeNode) state).get(((TreeNode) state), key, prop_);
+      return ( (TreeNode) state ).get(( (TreeNode) state ), key, prop_) == null ? null : (FObject) ( (TreeNode) state ).get(( (TreeNode) state ), key, prop_).value;
     }
 
     return null;

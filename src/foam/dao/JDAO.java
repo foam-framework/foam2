@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2017,2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -40,21 +40,29 @@ public class JDAO
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
-  public JDAO(ClassInfo classInfo, String filename)
-      throws IOException
-  {
-    this(new MapDAO().setOf(classInfo), filename);
+  public JDAO(foam.core.X x, ClassInfo classInfo) {
+    this(x, classInfo, classInfo.getId().replace(".", "_"));
   }
 
-  public JDAO(DAO delegate, String filename) throws IOException {
-    file_ = new File(filename).getAbsoluteFile();
+  public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
+    this(x, new MapDAO(classInfo), filename);
+  }
 
-    if ( ! file_.exists() ) file_.createNewFile();
+  public JDAO(foam.core.X x, DAO delegate, String filename) {
+    setX(x);
 
-    setDelegate(delegate);
-    loadJournal();
+    try {
+      file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
 
-    out_ = new BufferedWriter(new FileWriter(file_, true));
+      if ( ! file_.exists() ) file_.createNewFile();
+
+      setDelegate(delegate);
+      loadJournal();
+
+      out_ = new BufferedWriter(new FileWriter(file_, true));
+    } catch ( IOException e ) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected void loadJournal()

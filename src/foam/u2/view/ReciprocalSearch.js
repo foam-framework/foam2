@@ -26,12 +26,11 @@ foam.CLASS({
   css: `
     ^ {
       min-width: 180px;
-      padding-right: 28px;
-      font-size: large;
+      font-size: medium;
     }
 
     ^ input {
-      font-size: large;
+      font-size: medium;
     }
 
     ^count {

@@ -66,10 +66,11 @@ public abstract class AbstractDAO
       sink = new PredicatedSink(predicate, sink);
     }
 
-    if ( predicate instanceof Or ) {
-      sink = new DedupSink(new HashSet(), sink);
-    }
+    return sink;
+  }
 
+  public static Sink decorateDedupSink_(Sink sink) {
+    sink = new DedupSink(new HashSet(), sink);
     return sink;
   }
 
@@ -77,10 +78,9 @@ public abstract class AbstractDAO
     return of_;
   }
 
-  public AbstractDAO setOf(ClassInfo of) {
+  public void setOf(ClassInfo of) {
     of_ = of;
     primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
-    return this;
   }
 
   public PropertyInfo getPrimaryKey() {
@@ -205,7 +205,7 @@ public abstract class AbstractDAO
   }
 
   public DAO inX(X x) {
-    ProxyDAO dao = new ProxyDAO(this);
+    ProxyDAO dao = new ProxyDAO.Builder(x).setDelegate(this).build();
     dao.setX(x);
     return dao;
   }

@@ -20,7 +20,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'description', 'server', 'passed', 'failed', 'lastRun', 'run'
+    'id', 'enabled', 'description', 'server', 'passed', 'failed', 'lastRun', 'lastDuration', 'run'
   ],
 
   searchColumns: [ ],
@@ -117,6 +117,7 @@ foam.CLASS({
         }
 
         setLastRun(new Date());
+        setLastDuration(pm.getTime());
         ps.flush();
         setOutput(baos.toString() + getOutput());
     `

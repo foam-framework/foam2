@@ -289,9 +289,9 @@ public class TreeNode {
     return value;
   }
 
-  public TreeNode neq(TreeNode s, Object key, PropertyInfo prop) {
-    return removeNode(s, key, prop);
-  }
+//  public TreeNode neq(TreeNode s, Object key, PropertyInfo prop) {
+//    return removeNode(s, key, prop);
+//  }
 
   public TreeNode gt(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
@@ -470,11 +470,9 @@ public class TreeNode {
         if ( reverseSort ) {
           sink = decorateSink_(sink, skip, limit, null, predicate);
           reverseSortSkipLimitTreeNode(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
-          sink.eof();
         } else {
           sink = decorateSink_(sink, skip, limit, null, predicate);
           select_(currentNode, sink, skip, limit, size, tail);
-          sink.eof();
         }
       } else {
         sink = decorateSink_(sink, skip, limit, order, predicate);

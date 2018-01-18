@@ -405,7 +405,7 @@ return sink
           eof: function() {}
         };
 
-      if ( sink == document )
+      if ( sink == global.document )
         return {
           put: function(o) { foam.u2.DetailView.create({data: o}).write(document); },
           eof: function() {}

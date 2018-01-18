@@ -22,7 +22,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'run'
   ],
 
   searchColumns: [],
@@ -40,6 +40,11 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
+      visibility: foam.u2.Visibility.RO
+    },
+    {
+      class: 'Long',
+      name: 'lastDuration',
       visibility: foam.u2.Visibility.RO
     },
     /*
@@ -129,6 +134,7 @@ foam.CLASS({
         }
 
         setLastRun(new Date());
+        setLastDuration(pm.getTime());
         ps.flush();
         setOutput(baos.toString());
     `
