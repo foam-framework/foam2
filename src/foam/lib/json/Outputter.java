@@ -32,7 +32,7 @@ public class Outputter
   protected StringWriter  stringWriter_ = null;
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
-  protected boolean       showDefault_ = false;
+  protected boolean       outputDefaultValues_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -211,7 +211,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( showDefault_ == false && ! prop.isSet(o) ) continue;
+      if ( outputDefaultValues_ == false && ! prop.isSet(o) ) continue;
       if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
@@ -262,11 +262,11 @@ public class Outputter
     writer_.append(str);
   }
 
-  public void setShowDefault(boolean showDefault) {
-    showDefault_ = showDefault;
+  public void setOutputDefaultValues(boolean outputDefaultValues) {
+    outputDefaultValues_ = outputDefaultValues;
   }
 
-  public boolean getShowDefault() {
-    return showDefault_;
+  public boolean getOutputDefaultValues() {
+    return outputDefaultValues_;
   }
 }
