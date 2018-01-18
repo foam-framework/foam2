@@ -169,17 +169,17 @@ foam.CLASS({
 
         ^row:hover {
           background: #eee;
+          cursor: pointer;
         }
 
         ^selected {
           background: #eee;
-          outline: 1px solid #f00;
         }
 
         ^vertDots {
           font-size: 20px;
           font-weight: bold;
-          padding-right: 10px;
+          padding-right: 12px;
         }
 
         ^noselect {
@@ -260,14 +260,14 @@ foam.CLASS({
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
-        return this.Entity.create({ name: '#9651' });
+        return this.Entity.create({ name: '#9650' });
       }
     },
     {
       name: 'descIcon',
       documentation: 'HTML entity representing unicode Down-Pointing Triangle',
       factory: function() {
-        return this.Entity.create({ name: '#9661' });
+        return this.Entity.create({ name: '#9660' });
       }
     },
     {

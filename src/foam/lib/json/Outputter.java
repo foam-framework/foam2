@@ -203,7 +203,6 @@ public class Outputter
     writer_.append(":");
 
     outputString(info.getId());
-
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
 

@@ -19,12 +19,15 @@ public class Boot {
   protected X   root_ = new ProxyX();
 
   public Boot() {
-    try {
-      // Used for all the services that will be required when Booting
-      serviceDAO_ = new JDAO(NSpec.getOwnClassInfo(), "services");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    this("");
+  }
+
+  public Boot(String datadir) {
+    root_.put(foam.nanos.fs.Storage.class,
+              new foam.nanos.fs.Storage(datadir));
+
+    // Used for all the services that will be required when Booting
+    serviceDAO_ = new JDAO(((foam.core.ProxyX)root_).getX(), NSpec.getOwnClassInfo(), "services");
 
     installSystemUser();
 
@@ -84,6 +87,26 @@ public class Boot {
       throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
-    new Boot();
+
+    boolean datadirFlag = false;
+
+    String datadir = "";
+    for ( int i = 0 ; i < args.length ; i++ ) {
+      String arg = args[i];
+
+      if ( datadirFlag ) {
+        datadir = arg;
+        datadirFlag = false;
+      } else if ( arg.equals("--datadir") ) {
+        datadirFlag = true;
+      } else {
+        System.err.println("Unknown argument " + arg);
+        System.exit(1);
+      }
+    }
+
+    System.out.println("Datadir is " + datadir);
+
+    new Boot(datadir);
   }
 }
