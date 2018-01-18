@@ -7,7 +7,6 @@ p({"class":"foam.nanos.menu.Menu","id":"export","label":"Export Drivers","handle
 p({"class":"foam.nanos.menu.Menu","id":"groups","label":"Groups","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"groupDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"lang","label":"Languages","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"languageDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"log","label":"View Logs","order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"alterna-eft","label":"Alterna-EFT","handler":{"class":"foam.nanos.menu.ViewMenu", "view":{"class":"net.nanopay.cico.ui.AlternaEFTDownload"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"nspec","label":"Services","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"nSpecDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"order":1000,"parent":"admin"})
