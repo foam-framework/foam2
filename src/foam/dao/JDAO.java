@@ -143,22 +143,25 @@ public class JDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
+    FObject ret = getDelegate().put_(x, obj);
+
     try {
       // TODO(drish): supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + outputter_.stringify(obj) + ")");
+      out_.write("p(" + outputter_.stringify(ret) + ")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
       e.printStackTrace();
     }
 
-    return getDelegate().put_(x, obj);
+    return ret;
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    Object id = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
+    Object id  = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
+    FObject ret = getDelegate().remove_(x, obj);
 
     try {
       // TODO: User Property toJSON() support when ready, since
@@ -176,7 +179,7 @@ public class JDAO
       e.printStackTrace();
     }
 
-    return getDelegate().remove_(x, obj);
+    return ret;
   }
 
   @Override
