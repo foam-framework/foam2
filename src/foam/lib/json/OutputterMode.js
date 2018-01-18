@@ -22,6 +22,10 @@ foam.ENUM({
     {
       name: 'FULL',
       label: 'Full'
+    },
+    {
+      name: 'SIMPLE',
+      label: 'Simple'
     }
   ]
 });
