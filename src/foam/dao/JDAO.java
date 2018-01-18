@@ -40,29 +40,29 @@ public class JDAO
   protected final Outputter      outputter_ = new Outputter(OutputterMode.STORAGE);
   protected final BufferedWriter out_;
 
-  public JDAO(foam.core.X x, ClassInfo classInfo)
-    throws IOException
-  {
+  public JDAO(foam.core.X x, ClassInfo classInfo) {
     this(x, classInfo, classInfo.getId().replace(".", "_"));
   }
 
-  public JDAO(foam.core.X x, ClassInfo classInfo, String filename)
-      throws IOException
-  {
-    this(x, new MapDAO().setOf(classInfo), filename);
+  public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
+    this(x, new MapDAO(classInfo), filename);
   }
 
-  public JDAO(foam.core.X x, DAO delegate, String filename) throws IOException {
+  public JDAO(foam.core.X x, DAO delegate, String filename) {
     setX(x);
 
-    file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
+    try {
+      file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
 
-    if ( ! file_.exists() ) file_.createNewFile();
+      if ( ! file_.exists() ) file_.createNewFile();
 
-    setDelegate(delegate);
-    loadJournal();
+      setDelegate(delegate);
+      loadJournal();
 
-    out_ = new BufferedWriter(new FileWriter(file_, true));
+      out_ = new BufferedWriter(new FileWriter(file_, true));
+    } catch ( IOException e ) {
+      throw new RuntimeException(e);
+    }
   }
 
   protected void loadJournal()
@@ -143,22 +143,25 @@ public class JDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
+    FObject ret = getDelegate().put_(x, obj);
+
     try {
       // TODO(drish): supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + outputter_.stringify(obj) + ")");
+      out_.write("p(" + outputter_.stringify(ret) + ")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
       e.printStackTrace();
     }
 
-    return getDelegate().put_(x, obj);
+    return ret;
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    Object id = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
+    Object id  = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
+    FObject ret = getDelegate().remove_(x, obj);
 
     try {
       // TODO: User Property toJSON() support when ready, since
@@ -176,7 +179,7 @@ public class JDAO
       e.printStackTrace();
     }
 
-    return getDelegate().remove_(x, obj);
+    return ret;
   }
 
   @Override

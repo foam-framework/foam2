@@ -775,6 +775,9 @@ foam.CLASS({
 if ( arg1_.getClass().equals(Eq.class) ) {
   return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
 }
+if ( arg1_.getClass().equals(Neq.class) ) {
+      return new Eq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+}
 if ( arg1_.getClass().equals(Gt.class) ) {
   return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
 }

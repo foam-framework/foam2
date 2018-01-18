@@ -36,10 +36,9 @@ public class DatastoreDAO
       return of_;
     }
 
-    public DatastoreDAO setOf(ClassInfo of) {
+    public void setOf(ClassInfo of) {
       of_ = of;
       primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
-      return this;
     }
 
     public PropertyInfo getPrimaryKey() {

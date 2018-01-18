@@ -22,7 +22,7 @@ public class ExportService
       DAO dao = new JDAO(getX(), new MapDAO(), "ExportDriverRegistry");
       ((JDAO) dao).setOf(ExportDriverRegistry.getOwnClassInfo());
       setDelegate(dao);
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

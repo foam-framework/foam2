@@ -92,9 +92,10 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RetryBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
-    'foam.box.RetryReplyBox',
-    'foam.box.BackoffBox'
+    'foam.box.BackoffBox',
+    'foam.box.RetryReplyBox'
   ],
 
   properties: [

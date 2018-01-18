@@ -50,18 +50,13 @@ if let oldValue = oldValue as? AbstractDAO {
       factory: function() {
         return this.delegate.of;
       },
+      javaFactory: 'return getDelegate().getOf();',
       swiftExpressionArgs: ['delegate$of'],
       swiftExpression: 'return delegate$of as! ClassInfo',
     }
   ],
 
   methods: [
-    {
-      name: 'getOf',
-      javaReturns: 'foam.core.ClassInfo',
-      javaCode: 'if ( of_ == null && getDelegate() != null ) return getDelegate().getOf(); return of_;'
-    },
-
     {
       name: 'listen_',
       code: function listen_(x, sink, predicate) {
