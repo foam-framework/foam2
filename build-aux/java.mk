@@ -44,6 +44,7 @@ $(BUILD_DIR):
 
 define JAVA_JAR_template
 $(1)_CLASSPATH = $$(subst $$(space),:,$$(foreach lib,$$($(1)_JAVA_LIBS),$$(abspath $$(lib))))
+$(1)_CLASSPATH_TXT = $$(BUILD_DIR)/$(1).classpath.txt
 $(1)_JAVA_SRCS ?= $$(shell find $$($(1)_SRC_DIR) -type f -iname '*.java')
 $(1)_JS_SRCS ?= $$(shell find $$($(1)_SRC_DIR) -type f -iname '*.js')
 $(1)_ALL_SRCS = $$($(1)_JAVA_SRCS) $$($(1)_JS_SRCS)
@@ -80,15 +81,15 @@ clean-$(1)-gensrcs:
 
 clean-$(1):
 	-rm -f $$($(1)_JAR)
-	-rm -f $(1).classpath.txt
+	-rm -f $$($(1)_CLASSPATH_TXT)
 
 clean: clean-$(1) clean-$(1)-gensrcs
 
 .PHONY: $(1)
 
-$(1): $$($(1)_JAR) $(1).classpath.txt
+$(1): $$($(1)_JAR) $$($(1)_CLASSPATH_TXT)
 
-$(1).classpath.txt: $$($(1)_JAR)
+$$($(1)_CLASSPATH_TXT): $$($(1)_JAR)
 	echo $$($(1)_CLASSPATH):$$(abspath $$($(1)_JAR)) > $$@
 
 $(foreach dep,$($(1)_MAVEN_DEPS),$(call JAVA_MAVEN_LIB_template,$(dep),$(1)))
