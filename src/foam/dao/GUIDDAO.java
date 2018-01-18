@@ -30,12 +30,9 @@ public class GUIDDAO
     this.property = property.getName();
   }
 
-  public AbstractDAO setOf(ClassInfo of) {
-    AbstractDAO ret = super.setOf(of);
-
+  public void setOf(ClassInfo of) {
+    super.setOf(of);
     property_ = null;
-
-    return ret;
   }
 
   public GUIDDAO setProperty(String property) {
