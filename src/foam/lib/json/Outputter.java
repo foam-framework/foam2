@@ -32,6 +32,7 @@ public class Outputter
   protected StringWriter  stringWriter_ = null;
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
+  protected boolean       showDefault_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -210,7 +211,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( ! prop.getShowDefault() && ! prop.isSet(o) ) continue;
+      if ( showDefault_ == false && ! prop.isSet(o) ) continue;
       if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
@@ -259,5 +260,13 @@ public class Outputter
 
   public void outputRawString(String str) {
     writer_.append(str);
+  }
+
+  public void setShowDefault(boolean showDefault) {
+    showDefault_ = showDefault;
+  }
+
+  public boolean getShowDefault() {
+    return showDefault_;
   }
 }
