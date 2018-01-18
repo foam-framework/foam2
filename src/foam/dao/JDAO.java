@@ -86,18 +86,26 @@ public class JDAO
             FObject object = parser.parseString(line);
             if ( object == null ) {
               System.err.println(getParsingErrorMessage(line) + ", source: " + line);
-            } else {
-              getDelegate().put(object);
+              break;
             }
+
+            getDelegate().put(object);
             break;
 
           case 'r':
             Object id = parser.parseStringForId(line);
             if ( id == null ) {
               System.err.println(getParsingErrorMessage(line));
-            } else {
-              getDelegate().remove(getDelegate().find(id));
+              break;
             }
+
+            FObject remove = getDelegate().find(id);
+            if ( remove == null ) {
+              break;
+            }
+
+            getDelegate().remove(remove);
+            break;
         }
       } catch (Throwable t) {
         System.err.println("Error reading journal line: " + line);
