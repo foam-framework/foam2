@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class DigWebAgent
   implements WebAgent
@@ -220,8 +221,7 @@ public class DigWebAgent
 
             output(x, xmlData);
           } else {
-            response.setContentType("application/xml");
-            out.println(xmlSupport.toXMLString(sink.getArray()));
+            out.println(StringEscapeUtils.escapeXml11(xmlSupport.toXMLString(sink.getArray())));
           }
         } else if ( "csv".equals(format) ) {
           foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
