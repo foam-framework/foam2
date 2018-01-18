@@ -23,6 +23,11 @@ foam.CLASS({
       value: true
     },
     {
+      class: 'Boolean',
+      name: 'showDefault',
+      value: false
+    },
+    {
       class: 'String',
       name: 'javaType',
       value: 'Object'
@@ -77,7 +82,8 @@ foam.CLASS({
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
-        sqlType:          this.sqlType
+        sqlType:          this.sqlType,
+        showDefault:      this.showDefault
       })
     },
 

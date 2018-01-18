@@ -210,7 +210,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( mode_ == OutputterMode.SIMPLE && ! prop.isSet(o) ) continue; 
+      if ( ! prop.getShowDefault() && ! prop.isSet(o) ) continue;
       if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
