@@ -8,7 +8,7 @@ package foam.dao;
 
 import foam.core.*;
 import foam.lib.json.ExprParser;
-import foam.lib.json.JournalParser;
+import foam.lib.json.JSONParser;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.lib.parse.*;
@@ -68,8 +68,8 @@ public class JDAO
   protected void loadJournal()
       throws IOException
   {
-    JournalParser  journalParser = new JournalParser();
-    BufferedReader br            = new BufferedReader(new FileReader(file_));
+    JSONParser parser = getX().create(JSONParser.class);
+    BufferedReader br = new BufferedReader(new FileReader(file_));
 
     for ( String line ; ( line = br.readLine() ) != null ; ) {
       // skip empty lines & comment lines
@@ -83,7 +83,7 @@ public class JDAO
 
         switch ( operation ) {
           case 'p':
-            FObject object = journalParser.parseObject(line);
+            FObject object = parser.parseString(line);
             if ( object == null ) {
               System.err.println(getParsingErrorMessage(line) + ", source: " + line);
             } else {
@@ -92,7 +92,7 @@ public class JDAO
             break;
 
           case 'r':
-            Object id = journalParser.parseObjectId(line);
+            Object id = parser.parseStringForId(line);
             if ( id == null ) {
               System.err.println(getParsingErrorMessage(line));
             } else {
