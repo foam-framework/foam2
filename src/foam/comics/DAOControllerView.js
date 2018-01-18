@@ -84,13 +84,11 @@ foam.CLASS({
               start('span').
                 style({background: 'rgba(0,0,0,0)'}).
                 show(self.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-                callIf(this.window.location.hash != '#allInvoices', function() {
-                  this.start().
+                  start().
                     style({padding: '4px 4px 4px 1px'}).
                     add(self.cls.getAxiomsByClass(foam.core.Action)).
-                  end()
-                })
-              .end().
+                  end().
+                end().
               tag(this.summaryView, {data$: this.data.filteredDAO$}).
             end().
           end().
