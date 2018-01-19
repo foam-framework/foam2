@@ -158,7 +158,8 @@ if oldValue != nil {
     {
       name: 'update',
       code: function() {
-        this.innerSub && this.innerSub.detach();
+        var old = this.innerSub;
+        old && old.detach();
         this.innerSub = this.dao && this.dao.listen_(this.dao.__context__, this);
         if ( old ) this.reset();
       }
