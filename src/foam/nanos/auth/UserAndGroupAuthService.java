@@ -145,14 +145,6 @@ public class UserAndGroupAuthService
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    if ( SafetyUtil.isEmpty(email) || ! Email.isValid(email) ) {
-      throw new AuthenticationException("Invalid email");
-    }
-
-    if ( SafetyUtil.isEmpty(password) || ! Password.isValid(password) ) {
-      throw new AuthenticationException("Invalid password");
-    }
-
     Sink sink = new ListSink();
     sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
