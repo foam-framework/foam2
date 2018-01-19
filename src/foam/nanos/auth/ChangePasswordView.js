@@ -89,9 +89,14 @@ foam.CLASS({
       text-align: center;
       color: #ffffff;
       cursor: pointer;
-      background-color: #59aadd;
+      border: 1px solid %SECONDARYCOLOR%;
+      background-color: %SECONDARYCOLOR%;
       margin-left: 20px;
       margin-top: 19px;
+    }
+    ^ .update-BTN:hover {
+      border: 1px solid %SECONDARYCOLOR%;
+      opacity: 0.9;
     }
     ^ h1{
       opacity: 0.6;
