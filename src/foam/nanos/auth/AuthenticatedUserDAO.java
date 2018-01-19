@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.auth;
 
 import foam.core.FObject;
@@ -6,12 +12,11 @@ import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Count;
-
 import java.security.NoSuchAlgorithmException;
 
 //TODO: Throw exception for print statements when they are ready
 public class AuthenticatedUserDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   public AuthenticatedUserDAO(DAO delegate) {
     setDelegate(delegate);

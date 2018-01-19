@@ -163,6 +163,7 @@ var classes = [
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.UnknownFObject',
+  'foam.lib.json.UnknownFObjectArray',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -241,8 +242,8 @@ var blacklist = [
   'foam.nanos.menu.MenuBar',
 
   'foam.box.Context',
-  'foam.box.HTTPBox',
-  'foam.box.SessionClientBox',
+//  'foam.box.HTTPBox',
+//  'foam.box.SessionClientBox',
   'foam.box.SocketBox',
   'foam.box.WebSocketBox',
   'foam.box.TimeoutBox',
