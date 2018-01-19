@@ -163,6 +163,7 @@ var classes = [
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.UnknownFObject',
+  'foam.lib.json.UnknownFObjectArray',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -178,6 +179,7 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary'
+
 ];
 
 var abstractClasses = [
