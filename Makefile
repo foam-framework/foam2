@@ -45,4 +45,4 @@ all: nanos
 .PHONY: run
 
 run: nanos $(foam2_JAR)
-	./$< --datadir src
+	./$< -d --datadir src
