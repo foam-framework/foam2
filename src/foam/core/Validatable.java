@@ -6,6 +6,6 @@
 
 package foam.core;
 
-public interface Validateable {
+public interface Validatable {
   public void validate() throws IllegalStateException;
 }
