@@ -45,36 +45,7 @@ var abstractClasses = externalFile.abstractClasses;
 var skeletons = externalFile.skeletons;
 var proxies = externalFile.proxies;
 
-var blacklist = {
-  'FObject': true,
-  'foam.core.AbstractEnum': true,
-  'foam.core.AbstractInterface': true,
-  'foam.core.Property': true,
-  'foam.core.String': true,
-
-  // These have hand written java impls so we don't want to clobber them.
-  // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO': true,
-  'foam.dao.FilteredDAO': true,
-  'foam.dao.LimitedDAO': true,
-  'foam.dao.NullDAO': true,
-  'foam.dao.OrderedDAO': true,
-  'foam.dao.SkipDAO': true,
-
-  // TODO: These models currently don't compile in java but could be updated to
-  // compile properly.
-  'foam.blob.BlobBlob': true,
-  'foam.dao.CompoundDAODecorator': true,
-  'foam.dao.DAODecorator': true,
-  'foam.dao.EasyDAO': true,
-  'foam.dao.FlowControl': true,
-  'foam.dao.PromisedDAO': true,
-  'foam.dao.sync.SyncRecord': true,
-  'foam.dao.sync.VersionedSyncRecord': true,
-  'foam.mlang.order.ThenBy': true,
-  'foam.mlang.Expressions': true,
-  'foam.nanos.menu.MenuBar': true
-};
+var blacklist = {};
 
 externalFile.blacklist.forEach(function(cls) {
   blacklist[cls] = true;
@@ -137,10 +108,9 @@ function generateAbstractClass(cls) {
 
   ensurePath(outfile);
 
-  var javaclass = cls.buildJavaClass();
-  javaclass.abstract = true;
+  var javaclass = cls.buildJavaClass(foam.java.Class.create({ abstract: true }));
 
-    writeFileIfUpdated(outfile, javaclass.toJavaSource());
+  writeFileIfUpdated(outfile, javaclass.toJavaSource());
 }
 
 function generateSkeleton(cls) {
