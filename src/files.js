@@ -125,7 +125,9 @@ FOAM_FILES([
   { name: "foam/java/PropertyInfo", flags: ['java'] },
   { name: "foam/java/Skeleton", flags: ['java'] },
   { name: "foam/java/JavaImport", flags: ['java'] },
+  { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
+  { name: "foam/java/Validation", flags: ['java'] },
 
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },

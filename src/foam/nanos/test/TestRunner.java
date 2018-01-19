@@ -39,7 +39,7 @@ public class TestRunner
           jTests.put(obj);
         }
       });
-    } catch (IOException e){
+    } catch (java.lang.Exception e){
       e.printStackTrace();
     }
   }
@@ -71,7 +71,7 @@ public class TestRunner
       TestRunner runner = new TestRunner();
       runner.setX(x);
       runner.start();
-    } catch (IOException e){
+    } catch (java.lang.Exception e){
       e.printStackTrace();
     }
   }

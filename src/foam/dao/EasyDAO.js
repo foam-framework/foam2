@@ -71,13 +71,48 @@ foam.CLASS({
   properties: [
     {
       /** The developer-friendly name for this EasyDAO. */
+      class: 'String',
       name: 'name',
       factory: function() { return this.of.id; }
     },
     {
       /** This is set automatically when you create an EasyDAO.
         @private */
-      name: 'delegate'
+      name: 'delegate',
+      javaFactory: `
+foam.dao.DAO delegate = getInnerDAO() == null ?
+  new foam.dao.MapDAO(getX(), getOf()) :
+  getInnerDAO();
+
+if ( delegate instanceof foam.dao.MDAO ) setMdao((foam.dao.MDAO)delegate);
+
+if ( getJournaled() ) {
+  delegate = new foam.dao.JDAO(getX(), delegate, getJournalName());
+}
+
+if ( getGuid() && getSeqNo() ) {
+  throw new RuntimeException("EasyDAO GUID and SeqNo are mutually exclusive");
+}
+
+if ( getGuid() ) {
+  delegate = new foam.dao.GUIDDAO(delegate);
+}
+
+if ( getSeqNo() ) {
+  delegate = new foam.dao.SequenceNumberDAO(delegate);
+}
+
+if ( getPm() ) {
+  delegate = new foam.dao.PMDAO(delegate);
+}
+
+return delegate;
+`
+    },
+    {
+      class: 'Object',
+      javaType: 'foam.dao.DAO',
+      name: 'innerDAO'
     },
     {
       /** Have EasyDAO use a sequence number to index items. Note that
@@ -97,24 +132,37 @@ foam.CLASS({
     {
       /** The property on your items to use to store the sequence number or guid. This is required for .seqNo or .guid mode. */
       name: 'seqProperty',
+      generateJava: false,
       class: 'Property'
     },
     {
       /** Enable local in-memory caching of the DAO. */
       class: 'Boolean',
       name: 'cache',
+      generateJava: false,
       value: false
     },
     {
       /** Enable value de-duplication to save memory when caching. */
       class: 'Boolean',
       name: 'dedup',
+      generateJava: false,
       value: false,
     },
     {
       /** Keep a history of all state changes to the DAO. */
+      class: 'Boolean',
+      name: 'journaled',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'journalName'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.dao.Journal',
+      generateJava: false,
       name: 'journal'
     },
     {
@@ -122,17 +170,25 @@ foam.CLASS({
       class: 'Boolean',
       name: 'logging',
       value: false,
+      generateJava: false
     },
     {
       /** Enable time tracking for concurrent DAO operations. */
       class: 'Boolean',
       name: 'timing',
+      generateJava: false,
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'pm',
       value: false
     },
     {
       /** Contextualize objects on .find, re-creating them with this EasyDAO's
         exports, as if they were children of this EasyDAO. */
       class: 'Boolean',
+      generateJava: false,
       name: 'contextualize',
       value: false
     },
@@ -155,11 +211,18 @@ foam.CLASS({
         </ul>
       */
       name: 'daoType',
+      generateJava: false,
       value: 'foam.dao.IDBDAO'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.dao.MDAO',
+      name: 'mdao'
     },
     {
       /** Automatically generate indexes as necessary, if using an MDAO or cache. */
       class: 'Boolean',
+      generateJava: false,
       name: 'autoIndex',
       value: false
     },
@@ -174,11 +237,13 @@ foam.CLASS({
         and syncProperty as well. */
       class: 'Boolean',
       name: 'syncWithServer',
+      generateJava: false,
       value: false
     },
     {
       /** Turn on to enable remote listener support. Only useful with daoType = CLIENT. */
       class: 'Boolean',
+      generateJava: false,
       name: 'remoteListenerSupport',
       value: false
     },
@@ -187,6 +252,7 @@ foam.CLASS({
         the server. If sockets are used, polling is optional as the server
         can push changes to this client. */
       class: 'Boolean',
+      generateJava: false,
       name: 'syncPolling',
       value: true
     },
@@ -194,17 +260,20 @@ foam.CLASS({
       /** Set to true if you are running this on a server, and clients will
         synchronize with this DAO. */
       class: 'Boolean',
+      generateJava: false,
       name: 'isServer',
       value: false
     },
     {
       /** The property to synchronize on. This is typically an integer value
         indicating the version last seen on the remote. */
-      name: 'syncProperty'
+      name: 'syncProperty',
+      generateJava: false
     },
     {
       /** Destination address for server. */
       name: 'serverBox',
+      generateJava: false,
       factory: function() {
         // TODO: This should come from the server via a lookup from a NamedBox.
         return this.SessionClientBox.create({ delegate: this.RetryBox.create({ delegate:
@@ -217,14 +286,19 @@ foam.CLASS({
     },
     {
       /** Simpler alternative than providing serverBox. */
-      name: 'serviceName'
+      name: 'serviceName',
+      generateJava: false
     },
     {
       class: 'FObjectArray',
       of: 'foam.dao.DAODecorator',
+      generateJava: false,
       name: 'decorators'
     },
-    'testData'
+    {
+      name: 'testData',
+      generateJava: false
+    }
   ],
 
   methods: [
@@ -418,9 +492,21 @@ foam.CLASS({
        for a query over all specified properties together.
        @param var_args specify any number of Properties to be indexed.
     */
-    function addPropertyIndex() {
-      this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
-      return this;
+    {
+      name: 'addPropertyIndex',
+      returns: 'foam.dao.EasyDAO',
+      javaReturns: 'foam.dao.EasyDAO',
+      args: [ { javaType: 'foam.core.PropertyInfo', name: 'prop' } ],
+      code:     function addPropertyIndex() {
+        this.mdao && this.mdao.addPropertyIndex.apply(this.mdao, arguments);
+        return this;
+      },
+      javaCode: `
+if ( getMdao() != null ) {
+  getMdao().addIndex(prop);
+}
+return this;
+`
     },
 
     /** Only relevant if cache is true or if daoType
@@ -428,9 +514,21 @@ foam.CLASS({
       to the MDAO.
       @param index The index to add.
     */
-    function addIndex(index) {
-      this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
-      return this;
+    {
+      name: 'addIndex',
+      returns: 'foam.dao.EasyDAO',
+      javaReturns: 'foam.dao.EasyDAO',
+      args: [ { javaType: 'foam.dao.index.Index', name: 'index' } ],
+      code: function addIndex(index) {
+        this.mdao && this.mdao.addIndex.apply(this.mdao, arguments);
+        return this;
+      },
+      javaCode: `
+if ( getMdao() != null ) {
+  getMdao().addIndex(index);
+}
+return this;
+`
     }
   ]
 });

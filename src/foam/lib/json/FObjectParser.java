@@ -37,13 +37,13 @@ public class FObjectParser
                 return null;
               }
 
-              if (ps1 != null) ps = ps1;
+              if ( ps1 != null ) ps = ps1;
 
               ParserContext subx = x.sub();
 
               Parser subParser;
 
-              if (c.isEnum()) {
+              if ( c.isEnum() ) {
                 subx.set("enum", c);
                 subParser = EnumParserFactory.getInstance(c);
               } else {
@@ -54,7 +54,7 @@ public class FObjectParser
 
               ps = ps.apply(subParser, subx);
 
-              if (ps != null) {
+              if ( ps != null ) {
                 return ps.setValue(subx.get("obj"));
               }
 
