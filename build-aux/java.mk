@@ -1,6 +1,7 @@
 MAVEN_BASE_URL=http://central.maven.org/maven2
 
 JAVA_DEP_DIR ?= lib
+JAVACFLAGS = -g
 
 .DELETE_ON_ERROR:
 
@@ -102,7 +103,7 @@ clean-$(1)-java-deps:
 $$($(1)_JAR): $$($(1)_JAVA_SRCS) $$($(1)_JAVA_LIBS) | $$($(1)_BUILD_DIR) $$(BUILD_DIR)
 	find $$($(1)_BUILD_DIR) -type f -iname '*.class' -delete
 	@echo "Compiling..."
-	@$$(JAVAC) -d $$($(1)_BUILD_DIR) -cp $$($(1)_CLASSPATH) $$($(1)_JAVA_SRCS) $$($(1)_GEN_SRCS)
+	@$$(JAVAC) $$(JAVACFLAGS) -d $$($(1)_BUILD_DIR) -cp $$($(1)_CLASSPATH) $$($(1)_JAVA_SRCS) $$($(1)_GEN_SRCS)
 	@echo "Packaging..."
 	$$(JAR) cvf $$@ -C $$($(1)_BUILD_DIR) .
 
