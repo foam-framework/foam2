@@ -107,4 +107,7 @@ public abstract class AbstractPropertyInfo
   public void cloneProperty(FObject source, FObject dest) {
     set(dest, foam.util.SafetyUtil.deepClone(get(source)));
   }
+
+  @Override
+  public void validate(FObject obj) throws IllegalStateException {}
 }
