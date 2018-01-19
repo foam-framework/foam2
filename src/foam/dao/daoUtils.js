@@ -32,7 +32,7 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.dao.DAO',
       name: 'delegate',
-      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_' ],
+      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_', 'listen_' ],
       topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
       factory: function() { return this.NullDAO.create() },
       postSet: function(old, nu) {
@@ -58,21 +58,24 @@ if let oldValue = oldValue as? AbstractDAO {
 
   methods: [
     {
-      name: 'listen_',
-      code: function listen_(x, sink, predicate) {
+      name: 'listen',
+      code: function listen(sink) {
+        if ( ! foam.core.FObject.isInstance(sink) ) {
+          sink = foam.dao.AnonymousSink.create({ sink: sink }, this);
+        }
+
         var listener = this.ProxyListener.create({
           delegate: sink,
-          args: [ predicate ]
+          dao: this
         });
 
-        listener.onDetach(listener.dao$.follow(this.delegate$));
+        listener.onDetach(this.sub('propertyChange', 'delegate', listener.update));
 
         return listener;
       },
       swiftCode: `
 let listener = ProxyListener_create([
-  "delegate": sink,
-  "args": [ predicate ]
+  "delegate": sink
 ])
 
 listener.onDetach(listener.dao$.follow(delegate$))
@@ -81,7 +84,7 @@ return listener
       `,
       javaCode: `
 // TODO: Support changing of delegate
-getDelegate().listen_(x, sink, predicate);
+super.listen(sink, predicate);
 `
     }
   ]
@@ -111,11 +114,6 @@ foam.CLASS({
     },
     {
       name: 'dao',
-      postSet: function(old, nu) {
-        this.innerSub && this.innerSub.detach();
-        this.innerSub = nu && nu.listen.apply(nu, [this].concat(this.args));
-        if ( old ) this.reset();
-      },
       swiftType: 'DAO?',
       swiftPostSet: `
 self.innerSub?.detach()
@@ -155,6 +153,16 @@ if oldValue != nil {
       },
       swiftCode: 'delegate.reset(self)',
     },
+  ],
+  listeners: [
+    {
+      name: 'update',
+      code: function() {
+        this.innerSub && this.innerSub.detach();
+        this.innerSub = this.dao && this.dao.listen_(this.dao.__context__, this);
+        if ( old ) this.reset();
+      }
+    }
   ]
 });
 
