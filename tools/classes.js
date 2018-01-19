@@ -163,6 +163,7 @@ var classes = [
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.UnknownFObject',
+  'foam.lib.json.UnknownFObjectArray',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -177,7 +178,9 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResponse',
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
-  'foam.nanos.geocode.GoogleMapsBoundary'
+  'foam.nanos.geocode.GoogleMapsBoundary',
+
+  'foam.nanos.demo.DemoObject'
 ];
 
 var abstractClasses = [
@@ -215,6 +218,7 @@ var blacklist = [
   'foam.core.AbstractInterface',
   'foam.core.Property',
   'foam.core.String',
+  'foam.core.Validatable',
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
