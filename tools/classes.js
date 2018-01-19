@@ -222,7 +222,6 @@ var blacklist = [
   // TODO: Change gen.sh to prefer hand written java files over generated.
   'foam.dao.FilteredDAO',
   'foam.dao.LimitedDAO',
-  'foam.dao.NullDAO',
   'foam.dao.OrderedDAO',
   'foam.dao.SkipDAO',
 
