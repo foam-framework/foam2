@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":1000,"parent":""})
+p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":100,"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"countries","label":"Countries","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"countryDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cronDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"docs","label":"Documentation","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.DocBrowser"}},"order":1000,"parent":"admin"})

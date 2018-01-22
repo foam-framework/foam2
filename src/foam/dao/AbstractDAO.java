@@ -87,7 +87,7 @@ public abstract class AbstractDAO
     return primaryKey_;
   }
 
-  protected Object getPK(FObject obj) {
+  public Object getPK(FObject obj) {
     return getPrimaryKey().get(obj);
   }
 

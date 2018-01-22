@@ -1,15 +1,14 @@
 package foam.nanos.tomcat;
 
 import foam.nanos.http.NanoRouter;
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.ServerEndpointConfig;
-import javax.websocket.server.ServerEndpointConfig;
-import javax.websocket.server.PathParam;
+import foam.nanos.logger.Logger;
+
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpointConfig;
 
 public class TomcatRouter
   extends NanoRouter
@@ -159,6 +158,12 @@ public class TomcatRouter
       } catch(java.lang.Exception e) {
         log.error("Error handling websocket request", e, message);
       }
+    }
+
+    @OnError
+    public void onError(Session session, Throwable t) {
+      Logger log = (Logger) getX().get("logger");
+      log.error("Error handling websocket request", t);
     }
   }
 }
