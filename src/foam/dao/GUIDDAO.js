@@ -69,5 +69,17 @@ if ( "".equals(val) ) {
 return getDelegate().put_(x, obj);
       `,
     },
-  ]
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+public GUIDDAO(DAO delegate) {
+  setDelegate(delegate);
+}
+        `);
+      },
+    },
+  ],
 });

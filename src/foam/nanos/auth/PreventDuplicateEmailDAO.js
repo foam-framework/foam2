@@ -51,5 +51,17 @@ if ( newUser ) {
 return super.put_(x, obj);
       `,
    }
-  ]
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+public PreventDuplicateEmailDAO(foam.core.X x, foam.dao.DAO delegate) {
+  super(x, delegate);
+}
+        `);
+      },
+    },
+  ],
 });
