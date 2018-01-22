@@ -50,7 +50,7 @@ public abstract class AbstractDAO
   }
 
   public static Sink decorateSink_(Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( ( limit > 0 ) && ( limit < AbstractDAO.MAX_SAFE_INTEGER ) ) {
+    if ( ( limit >= 0 ) && ( limit < AbstractDAO.MAX_SAFE_INTEGER ) ) {
       sink = new LimitedSink(limit, 0, sink);
     }
 
