@@ -50,11 +50,11 @@ foam.CLASS({
 
   methods: [
     // from plan
-    function execute(promise, sink, skip, limit, order, predicate) {
+    function execute(promise, sink) {
       /** Note that this will put(undefined) if you remove() the item but
         leave this ValueIndex intact. Usages of ValueIndex should clean up
         the ValueIndex itself when the value is removed. */
-      this.select(sink, skip, limit, order, predicate);
+      sink.put(this.value);
     },
 
     function toString() {
