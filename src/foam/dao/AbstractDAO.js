@@ -84,12 +84,7 @@ return getOf() == null ? null : (foam.core.PropertyInfo) getOf().getAxiomByName(
       code: function(x) {
         return this.ProxyDAO.create({delegate: this}, x);
       },
-      javaCode: `
-ProxyDAO dao = new ProxyDAO();
-dao.setDelegate(this);
-dao.setX(x);
-return dao;
-      `,
+      javaCode: `return new ProxyDAO.Builder(x).setDelegate(this).build();`,
     },
 
     {
@@ -336,7 +331,6 @@ return sink;
       name: 'decorateSink_',
       swiftReturns: 'Sink',
       javaReturns: 'foam.dao.Sink',
-      javaStatic: true,
       args: [
         {
           name: 'sink',
@@ -426,23 +420,7 @@ if predicate != nil {
 return sink
       */},
       javaCode: `
-if ( ( limit > 0 ) && ( limit < AbstractDAO.MAX_SAFE_INTEGER ) ) {
-  sink = new LimitedSink(limit, 0, sink);
-}
-
-if ( ( skip > 0 ) && ( skip < AbstractDAO.MAX_SAFE_INTEGER ) ) {
-  sink = new SkipSink(skip, 0, sink);
-}
-
-if ( order != null ) {
-  sink = new OrderedSink(order, null, sink);
-}
-
-if ( predicate != null ) {
-  sink = new PredicatedSink(predicate, sink);
-}
-
-return sink;
+return decorateSink(getX(), sink, skip, limit, order, predicate);
       `,
     },
 
@@ -559,13 +537,64 @@ this.select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
       `,
     },
   ],
+  static: [
+    {
+      name: 'decorateSink',
+      javaReturns: 'foam.dao.Sink',
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+        },
+        {
+          name: 'sink',
+          javaType: 'foam.dao.Sink',
+        },
+        {
+          name: 'skip',
+          javaType: 'long',
+        },
+        {
+          name: 'limit',
+          javaType: 'long',
+        },
+        {
+          name: 'order',
+          javaType: 'foam.mlang.order.Comparator',
+        },
+        {
+          name: 'predicate',
+          javaType: 'foam.mlang.predicate.Predicate',
+        },
+      ],
+      javaCode: `
+if ( ( limit > 0 ) && ( limit < AbstractDAO.MAX_SAFE_INTEGER ) ) {
+  sink = new LimitedSink(limit, 0, sink);
+}
+
+if ( ( skip > 0 ) && ( skip < AbstractDAO.MAX_SAFE_INTEGER ) ) {
+  sink = new SkipSink(skip, 0, sink);
+}
+
+if ( order != null ) {
+  sink = new OrderedSink(order, null, sink);
+}
+
+if ( predicate != null ) {
+  sink = new PredicatedSink(predicate, sink);
+}
+
+return sink;
+      `,
+    },
+  ],
   axioms: [
     {
       buildJavaClass: function(cls) {
         cls.extras.push(`
 public final static long MAX_SAFE_INTEGER = 9007199254740991l;
 
-protected Object getPK(foam.core.FObject obj) {
+public Object getPK(foam.core.FObject obj) {
   return getPrimaryKey().get(obj);
 }
 
