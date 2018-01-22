@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-package foam.crypto;
+package foam.crypto.sign;
 
 import foam.core.ContextAwareSupport;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
