@@ -1,4 +1,4 @@
-p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":1000,"parent":""})
+p({"class":"foam.nanos.menu.Menu","id":"admin","label":"Admin","handler":{"class":"foam.nanos.menu.SubMenu"},"order":100,"parent":""})
 p({"class":"foam.nanos.menu.Menu","id":"countries","label":"Countries","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"countryDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"cron","label":"Cron Jobs","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cronDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"docs","label":"Documentation","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.DocBrowser"}},"order":1000,"parent":"admin"})
@@ -22,3 +22,5 @@ p({"class":"foam.nanos.menu.Menu","id":"users","label":"Users","handler":{"class
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignOutView"}},"order":110,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"permissionAudit","label":"Permission Audit","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.PermissionTableView"}},"order":110,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"demos","label":"Demos","order":1000,"parent":"","handler":{"class":"foam.nanos.menu.SubMenu"}})
+p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})

@@ -17,7 +17,8 @@ foam.CLASS({
   imports: [
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData'
+    'data? as importedData',
+    'window'
   ],
 
   exports: [
@@ -72,6 +73,8 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
+
       this.
         addClass(this.myClass()).
         start('table').
@@ -80,12 +83,12 @@ foam.CLASS({
             start('td').style({'vertical-align': 'top', 'width': '100%'}).
               start('span').
                 style({background: 'rgba(0,0,0,0)'}).
-                show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-                start().
-                  style({padding: '4px 4px 4px 1px'}).
-                  add(this.cls.getAxiomsByClass(foam.core.Action)).
+                show(self.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+                  start().
+                    style({padding: '4px 4px 4px 1px'}).
+                    add(self.cls.getAxiomsByClass(foam.core.Action)).
+                  end().
                 end().
-              end().
               tag(this.summaryView, {data$: this.data.filteredDAO$}).
             end().
           end().
