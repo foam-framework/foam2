@@ -7,10 +7,10 @@
 package foam.dao;
 
 import foam.core.*;
-import foam.mlang.predicate.*;
 import foam.mlang.order.*;
-
+import foam.mlang.predicate.*;
 import java.util.HashSet;
+import java.util.List;
 
 public abstract class AbstractDAO
   extends    ContextAwareSupport
@@ -87,7 +87,7 @@ public abstract class AbstractDAO
     return primaryKey_;
   }
 
-  protected Object getPK(FObject obj) {
+  public Object getPK(FObject obj) {
     return getPrimaryKey().get(obj);
   }
 
@@ -197,6 +197,12 @@ public abstract class AbstractDAO
   }
 
   public FObject find(Object id) {
+    // Temporary until DAO supports find_(Predicate) directly
+    if ( id instanceof Predicate ) {
+      List l = ((ListSink) this.where((Predicate) id).limit(1).select(new ListSink())).getData();
+      return l.size() == 1 ? (FObject) l.get(0) : null;
+    }
+
     return this.find_(this.getX(), id);
   }
 
