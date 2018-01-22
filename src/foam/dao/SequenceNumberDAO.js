@@ -139,6 +139,7 @@ private void calcDelegateMax_() {
 }
 
 public SequenceNumberDAO(foam.dao.DAO delegate) {
+  System.err.println("Direct constructor use is deprecated. Use Builder instead.");
   setDelegate(delegate);
 }
         `);
