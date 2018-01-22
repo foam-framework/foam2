@@ -137,6 +137,10 @@ private void calcDelegateMax_() {
   sink = getDelegate().select(sink);
   setValue((long) (((foam.mlang.sink.Max) sink).getValue() + 1.0));
 }
+
+public SequenceNumberDAO(foam.dao.DAO delegate) {
+  setDelegate(delegate);
+}
         `);
       },
     },
