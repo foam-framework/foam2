@@ -40,7 +40,7 @@ public class RSASigner
     }
   }
 
-  private RSASigner(String algorithm) throws NoSuchAlgorithmException {
+  public RSASigner(String algorithm) throws NoSuchAlgorithmException {
     super(algorithm);
   }
 
