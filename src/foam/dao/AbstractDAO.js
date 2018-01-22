@@ -515,9 +515,9 @@ return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
       swiftCode: 'return try find_(__context__, id)',
       javaCode: `
 // Temporary until DAO supports find_(Predicate) directly
-if ( id instanceof Predicate ) {
-  List l = ((ListSink) this.where((Predicate) id).limit(1).select(new ListSink())).getData();
-  return l.size() == 1 ? (FObject) l.get(0) : null;
+if ( id instanceof foam.mlang.predicate.Predicate ) {
+  java.util.List l = ((ListSink) this.where((foam.mlang.predicate.Predicate) id).limit(1).select(new ListSink())).getData();
+  return l.size() == 1 ? (foam.core.FObject) l.get(0) : null;
 }
 
 return this.find_(this.getX(), id);

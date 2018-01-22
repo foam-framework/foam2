@@ -95,7 +95,8 @@ super.listen(sink, predicate);
       buildJavaClass: function(cls) {
         cls.extras.push(`
 public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
-  // TODO: Deprecated.
+  foam.nanos.logger.Logger log = (foam.nanos.logger.Logger)x.get("logger");
+  log.warning("Direct constructor use is deprecated. Use Builder instead.");
   setX(x);
   setDelegate(delegate);
 }
