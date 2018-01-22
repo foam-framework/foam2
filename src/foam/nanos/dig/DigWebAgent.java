@@ -127,10 +127,9 @@ public class DigWebAgent
             return;
           }
 
-          String dataArray[] = data.split("},");
+          String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
 
           for ( int i = 0 ; i < dataArray.length ; i++ ) {
-            data = dataArray[i] + "}";
             o = jsonParser.parseString(data, objClass);
 
             if ( o == null ) {
@@ -267,9 +266,9 @@ public class DigWebAgent
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
-          String dataArray[] = outputterJson.toString().split("\\{\"class\":");
+          String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
           for ( int k = 1 ; k < dataArray.length; k++ ) {
-            dataToString += "p({\"class\":" + dataArray[k] + ")\n";
+            dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
           }
 
           if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
