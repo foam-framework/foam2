@@ -70,6 +70,7 @@ if let oldValue = oldValue as? AbstractDAO {
         });
 
         listener.onDetach(this.sub('propertyChange', 'delegate', listener.update));
+        listener.update();
 
         return listener;
       },
