@@ -123,6 +123,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      name: 'useTemplateLiterals',
+      help: 'If true, multiline strings will be outputted using template literals (i.e. surrounded by backticks)',
+      value: false,
+    },
+    {
+      class: 'Boolean',
       name: 'alwaysQuoteKeys',
       help: 'If true, keys are always quoted, as required by the JSON standard. If false, only quote keys which aren\'tvalid JS identifiers.',
       value: true
@@ -163,6 +169,11 @@ foam.CLASS({
       class: 'Function',
       name: 'propertyPredicate',
       value: function(o, p) { return ! p.transient; }
+    },
+    {
+      class: 'Function',
+      name: 'objectKeyValuePredicate',
+      value: function(k, v) { return true; }
     },
     {
       class: 'Boolean',
@@ -311,6 +322,14 @@ foam.CLASS({
       return true;
     },
 
+    function outputString(str) {
+      if ( this.useTemplateLiterals && str.indexOf('\n') != -1 ) {
+        this.out('`', str.replace(/`/, '\\`'), '`');
+      } else {
+        this.out('"', this.escape(str), '"');
+      }
+    },
+
     function outputDate(o) {
       if ( this.formatDatesAsNumbers ) {
         this.out(o.valueOf());
@@ -359,15 +378,21 @@ foam.CLASS({
     },
 
     function outputObjectKeyValue_(key, value, first) {
-      if ( ! first ) this.out(',').nl().indent();
-      this.out(this.maybeEscapeKey(key), ':').output(value);
+      if ( this.objectKeyValuePredicate(key, value) ) {
+        if ( ! first ) this.out(',').nl().indent();
+        this.out(
+          this.maybeEscapeKey(key),
+          ':',
+          this.postColonStr).output(value);
+        return true;
+      }
+      return false;
     },
 
     function outputObjectKeyValues_(o) {
       var first = true;
       for ( var key in o ) {
-        this.outputObjectKeyValue_(key, o[key], first);
-        first = false;
+        first = !this.outputObjectKeyValue_(key, o[key], first) && first;
       }
     },
 
@@ -380,8 +405,7 @@ foam.CLASS({
       var first = true;
       for ( var i = 0 ; i < keys.length; i++ ) {
         key = keys[i];
-        this.outputObjectKeyValue_(key, o[key], first);
-        first = false;
+        first = !this.outputObjectKeyValue_(key, o[key], first) && first;
       }
     },
 
@@ -391,7 +415,7 @@ foam.CLASS({
         // JSON doesn't support sending 'undefined'
         Undefined: function(o) { this.out('null'); },
         Null:      function(o) { this.out('null'); },
-        String:    function(o) { this.out('"', this.escape(o), '"'); },
+        String:    function(o) { this.outputString(o); },
         Number:    function(o) { this.out(o); },
         Boolean:   function(o) { this.out(o); },
         Date:      function(o) { this.outputDate(o); },
