@@ -851,6 +851,29 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
+
+      foam.package.triggerClass_(cls);
+    },
+
+    function waitForClass(cls) {
+      foam.package.__pending = foam.package.__pending || {};
+      foam.package.__pending[cls] = foam.package.__pending[cls] || [];
+
+      return new Promise(function(resolve, reject) {
+        foam.package.__pending[cls].push(resolve);
+      });
+    },
+
+    function triggerClass_(cls) {
+      if ( ! foam.package.__pending || ! foam.package.__pending[cls.id] ) return;
+
+      var pending = foam.package.__pending[cls.id];
+
+      foam.package.__pending[cls.id] = undefined;
+
+      for ( var i = 0 ; i < pending.length ; i++ ) {
+        pending[i](cls);
+      }
     },
 
     /**
@@ -860,7 +883,23 @@ foam.LIB({
      */
     function registerClassFactory(m, thunk) {
       var pkg = foam.package.ensurePackage(global, m.package);
-      Object.defineProperty(pkg, m.name, {get: thunk, configurable: true});
+      var tmp;
+
+      Object.defineProperty(
+        pkg,
+        m.name, {
+          configurable: true,
+          get: function() {
+            if ( tmp ) return tmp;
+
+            tmp = thunk();
+
+            foam.package.triggerClass_(tmp);
+
+            return tmp;
+          }
+        }
+      );
     },
 
     /**
