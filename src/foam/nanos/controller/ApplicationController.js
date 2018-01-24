@@ -8,8 +8,6 @@ foam.CLASS({
   name: 'ApplicationController',
   extends: 'foam.u2.Element',
 
-  arequire: function() { return foam.nanos.client.ClientBuilder.create(); },
-
   documentation: 'FOAM Application Controller.',
 
   implements: [

@@ -15,6 +15,34 @@
  * limitations under the License.
  */
 
+foam.INTERFACE({
+  package: 'foam.u2.view',
+  name: 'Formatter',
+  methods: [
+    {
+      name: 'format',
+      args: ['e', 'value', 'obj', 'axiom']
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FnFormatter',
+  implements: [ 'foam.u2.view.Formatter' ],
+  properties: [
+    {
+      class: 'Function',
+      name: 'f'
+    }
+  ],
+  methods: [
+    function format(e, value, obj, axiom) {
+      this.f.call(e, value, obj, axiom);
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
@@ -29,9 +57,24 @@ foam.CLASS({
       }
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject',
       name: 'tableCellFormatter',
-      value: function(value, obj, axiom) {
-        this.add(value);
+      adapt: function(o, f, prop) {
+        if ( foam.Function.isInstance(f) ) {
+          return foam.u2.view.FnFormatter.create({
+            f: f
+          });
+        }
+        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
+      },
+      factory: function() {
+        return foam.u2.view.FnFormatter.create({
+          class: 'foam.u2.view.FnFormatter',
+          f: function(value, obj, axiom) {
+            this.add(value);
+          }
+        })
       }
     },
     {
@@ -47,12 +90,27 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.core.FObject',
       name: 'tableCellFormatter',
-      value: function(_, obj, axiom) {
-        this.
-          startContext({ data: obj }).
-          add(axiom).
-          endContext();
+      adapt: function(o, f, prop) {
+        if ( foam.Function.isInstance(f) ) {
+          return foam.u2.view.FnFormatter.create({
+            f: f
+          });
+        }
+        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
+      },
+      factory: function() {
+        return foam.u2.view.FnFormatter.create({
+          class: 'foam.u2.view.FnFormatter',
+          f: function(_, obj, axiom) {
+            this.
+              startContext({ data: obj }).
+              add(axiom).
+              endContext();
+          }
+        })
       }
     },
     {
@@ -384,7 +442,7 @@ foam.CLASS({
                   forEach(columns_, function(column) {
                     this.
                       start('td').
-                        call(column.tableCellFormatter, [
+                        callOn(column.tableCellFormatter, 'format', [
                           column.f ? column.f(obj) : null, obj, column
                         ]).
                       end();

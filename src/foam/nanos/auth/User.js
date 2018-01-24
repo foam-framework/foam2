@@ -202,3 +202,18 @@ emailIsSet_ = true;`
     }
   ]
 });
+
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.Group',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'group',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
+  }
+});

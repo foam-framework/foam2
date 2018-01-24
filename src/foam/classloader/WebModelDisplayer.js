@@ -30,7 +30,8 @@ foam.CLASS({
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.classloader.OrDAO',
-    'foam.classloader.WebModelFileDAO'
+    'foam.apploader.WebModelFileDAO',
+    'foam.apploader.ClassLoader'
   ],
 
   imports: [
@@ -40,6 +41,7 @@ foam.CLASS({
 
   exports: [
     'stack',
+    'classloader',
     foam.String.daoize(foam.core.Model.name)
   ],
 
@@ -67,6 +69,12 @@ foam.CLASS({
       name: 'classpath'
     },
     {
+      name: 'classloader',
+      factory: function() {
+        return this.ClassLoader.create()
+      }
+    },
+    {
       name: foam.String.daoize(foam.core.Model.name),
       expression: function(classpath) {
         var prefix   = this.window.location.protocol + '//' + this.window.location.host;
@@ -79,7 +87,7 @@ foam.CLASS({
           modelDao = this.OrDAO.create({
             delegate: modelDao,
             primary: this.WebModelFileDAO.create({
-              url: prefix + classpath
+              root: prefix + classpath
             })
           });
         }
@@ -119,13 +127,13 @@ foam.CLASS({
     function execute() {
       var self     = this;
       var X        = this.__subContext__;
-      var promises = [X.arequire(this.model)];
 
-      if (this.view) promises.push(X.arequire(this.view));
-
-      Promise.all(promises).then(function() {
-        var model = X.lookup(self.model).create(null, self);
-        window.__foam_obj__ = model;
+      Promise.all([
+        this.classloader.load(this.model),
+        this.view ? this.classloader.load(this.view) : Promise.resolve()
+      ]).then(function(cls, _) {
+        var m = cls.create(null, self);
+        window.__foam_obj__ = m;
 
         var viewSpec = self.view ? { class: self.view, data: model } : model.toE.bind(model);
 
