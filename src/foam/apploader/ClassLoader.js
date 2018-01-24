@@ -7,10 +7,10 @@
 /*
 TODO:
 
--Remove foam.classloader classes
--Remove arequire, or change it to use classloader.load
--Make GENMODEL work when running without a classloader
--
+ - Remove foam.classloader classes
+ - Remove arequire, or change it to use classloader.load
+ - Make GENMODEL work when running without a classloader
+ - Fix WebSocketBox port autodetection to work when running with tomcat and also without
 
 
 */
