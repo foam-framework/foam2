@@ -148,7 +148,6 @@ return config_;`
       javaCode:
 `try {
   MimeMessage message = new MimeMessage(session_);
-  foam.nanos.app.AppConfig config = (foam.nanos.app.AppConfig) getAppConfig();
 
   // don't send email if no sender
   String from = getFrom();
