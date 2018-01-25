@@ -104,6 +104,11 @@ protected EnvironmentConfiguration config_ = null;`
     },
     {
       class: 'String',
+      name: 'displayName',
+      value: null
+    },
+    {
+      class: 'String',
       name: 'replyTo',
       value: null
     }
@@ -149,7 +154,14 @@ return config_;`
   String from = getFrom();
   if ( SafetyUtil.isEmpty(from) )
     return null;
-  message.setFrom(new InternetAddress(from, config.getName()));
+
+  // add display name if present
+  String displayName = getDisplayName();
+  if ( SafetyUtil.isEmpty(displayName) ) {
+    message.setFrom(new InternetAddress(from));
+  } else {
+    message.setFrom(new InternetAddress(from, displayName));
+  }
 
   // attach reply to if present
   String replyTo = getReplyTo();
