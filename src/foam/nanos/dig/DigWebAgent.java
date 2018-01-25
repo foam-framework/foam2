@@ -339,9 +339,6 @@ public class DigWebAgent
     } else {
       EmailService emailService = (EmailService) x.get("email");
       EmailMessage message      = new EmailMessage();
-
-      message.setFrom("info@nanopay.net");
-      message.setReplyTo("noreply@nanopay.net");
       message.setTo(email);
       message.setSubject(subject);
 
