@@ -21,6 +21,8 @@ foam.CLASS({
 
   refines: 'foam.core.Property',
 
+  imports: [ 'window' ],
+
   properties: [
     {
       name: 'tableHeaderFormatter',
@@ -390,7 +392,16 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    if ( view.editColumnsEnabled ) return this.tag('td');
+                    if ( window.location.hash == "#set-bank" ) {
+                      this.start('td').
+                        addClass(view.myClass('th-editColumns')).
+                        add(' ', view.vertMenuIcon).
+                        addClass(view.myClass('vertDots')).
+                        addClass(view.myClass('noselect')).
+                      end();
+                    } else {
+                      return this.tag('td');
+                    }
                   })
               });
           }));
