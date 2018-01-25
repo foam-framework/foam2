@@ -22,9 +22,6 @@ foam.CLASS({
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
-    'foam.dao.DAO',
-    'foam.nanos.auth.User',
-    'foam.nanos.auth.Group',
     'foam.nanos.pool.FixedThreadPool',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigModel',
@@ -32,48 +29,96 @@ foam.CLASS({
     'org.jtwig.environment.EnvironmentConfiguration',
     'org.jtwig.environment.EnvironmentConfigurationBuilder',
     'org.jtwig.resource.loader.TypedResourceLoader',
-    'javax.mail.Message',
-    'javax.mail.MessagingException',
-    'javax.mail.Session',
-    'javax.mail.Transport',
+    'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
     'java.util.Date',
     'java.util.Properties'
   ],
 
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function (cls) {
+        cls.extras.push(foam.java.Code.create({
+          data:
+`private class SMTPAuthenticator extends javax.mail.Authenticator {
+  protected String username_;
+  protected String password_;
+
+  public SMTPAuthenticator(String username, String password) {
+    this.username_ = username;
+    this.password_ = password;
+  }
+
+  @Override
+  protected PasswordAuthentication getPasswordAuthentication() {
+    return new PasswordAuthentication(this.username_, this.password_);
+  }
+}
+
+protected Session session_ = null;
+protected EnvironmentConfiguration config_ = null;`
+        }))
+      }
+    }
+  ],
+
   properties: [
     {
-      class: 'Object',
-      name: 'session',
-      javaType: 'javax.mail.Session',
-      hidden: true
-    },
-    {
-      class: 'Object',
-      name: 'config',
-      javaType: 'org.jtwig.environment.EnvironmentConfiguration',
-      hidden: true
+      class: 'String',
+      name: 'host',
+      value: '127.0.0.1'
     },
     {
       class: 'String',
-      name: 'host'
+      name: 'port',
+      value: '25'
+    },
+    {
+      class: 'Boolean',
+      name: 'authenticate',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'starttls',
+      value: false
     },
     {
       class: 'String',
-      name: 'port'
+      name: 'username',
+      value: null
     },
     {
       class: 'String',
-      name: 'username'
-    },
-    {
-      class: 'String',
-      name: 'password'
+      name: 'password',
+      value: null
     }
   ],
 
   methods: [
+    {
+      name: 'getConfig',
+      javaReturns: 'EnvironmentConfiguration',
+      args: [
+        {
+          name: 'group',
+          javaType: 'String'
+        }
+      ],
+      javaCode:
+`if ( config_ == null ) {
+  config_ = EnvironmentConfigurationBuilder
+    .configuration()
+    .resources()
+    .resourceLoaders()
+    .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
+    .and().and()
+    .build();
+}
+return config_;`
+    },
     {
       name: 'createMimeMessage',
       javaReturns: 'MimeMessage',
@@ -85,7 +130,7 @@ foam.CLASS({
       ],
       javaCode:
 `try {
-  MimeMessage message = new MimeMessage(getSession());
+  MimeMessage message = new MimeMessage(session_);
 
   // don't send email if no sender
   String from = emailMessage.getFrom();
@@ -159,8 +204,8 @@ foam.CLASS({
       }
 
       // send message
-      Transport transport = getSession().getTransport("smtp");
-      transport.connect(getHost(), getUsername(), getPassword());
+      Transport transport = session_.getTransport("smtp");
+      transport.connect();
       transport.sendMessage(message, message.getAllRecipients());
       transport.close();
     } catch (Throwable t) {
@@ -177,18 +222,7 @@ EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group
 if ( emailMessage == null )
   return;
 
-EnvironmentConfiguration config = getConfig();
-if ( config == null ) {
-  config = EnvironmentConfigurationBuilder
-      .configuration()
-      .resources()
-      .resourceLoaders()
-      .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
-      .and().and()
-      .build();
-  setConfig(config);
-}
-
+EnvironmentConfiguration config = getConfig(group);
 JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
 JtwigModel model = JtwigModel.newModel(templateArgs);
 emailMessage.setSubject(emailTemplate.getSubject());
@@ -200,12 +234,15 @@ sendEmail(emailMessage);`
       javaReturns: 'void',
       javaCode:
 `Properties props = new Properties();
-props.put("mail.smtp.auth", "true");
-props.put("mail.smtp.starttls.enable", "true");
-props.put("mail.smtp.host", getHost());
-props.put("mail.smtp.port", getPort());
-
-setSession(Session.getInstance(props, null));`
+props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
+props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
+props.setProperty("mail.smtp.host", getHost());
+props.setProperty("mail.smtp.port", getPort());
+if ( getAuthenticate() ) {
+  session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
+} else {
+  session_ = Session.getInstance(props);
+}`
     }
   ]
 });
