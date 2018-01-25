@@ -234,11 +234,11 @@ sendEmail(emailMessage);`
       javaReturns: 'void',
       javaCode:
 `Properties props = new Properties();
-props.setProperty("mail.smtp.auth", authenticate_ ? "true" : "false");
-props.setProperty("mail.smtp.starttls.enable", starttls_ ? "true" : "false");
-props.setProperty("mail.smtp.host", host_);
-props.setProperty("mail.smtp.port", port_);
-if ( authenticate_ ) {
+props.setProperty("mail.smtp.auth", getAuthenticate() ? "true" : "false");
+props.setProperty("mail.smtp.starttls.enable", getStarttls() ? "true" : "false");
+props.setProperty("mail.smtp.host", getHost());
+props.setProperty("mail.smtp.port", getPort());
+if ( getAuthenticate() ) {
   session_ = Session.getInstance(props, new SMTPAuthenticator(getUsername(), getPassword()));
 } else {
   session_ = Session.getInstance(props);
