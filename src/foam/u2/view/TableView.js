@@ -43,6 +43,36 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'TableCellFormatter',
+  extends: 'FObjectProperty',
+  properties: [
+    {
+      name: 'of',
+      value: 'foam.u2.view.Formatter'
+    },
+    {
+      name: 'adapt',
+      value: function(o, f, prop) {
+        if ( foam.Function.isInstance(f) ) {
+          return foam.u2.view.FnFormatter.create({
+            f: f
+          });
+        }
+        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
+      }
+    },
+    {
+      name: 'value',
+      adapt: function(_, v) {
+        return this.adapt.call(this, _, v, this);
+      }
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
@@ -57,8 +87,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.FObject',
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       adapt: function(o, f, prop) {
         if ( foam.Function.isInstance(f) ) {
@@ -90,27 +119,13 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.core.FObject',
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      adapt: function(o, f, prop) {
-        if ( foam.Function.isInstance(f) ) {
-          return foam.u2.view.FnFormatter.create({
-            f: f
-          });
-        }
-        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
-      },
-      factory: function() {
-        return foam.u2.view.FnFormatter.create({
-          class: 'foam.u2.view.FnFormatter',
-          f: function(_, obj, axiom) {
-            this.
-              startContext({ data: obj }).
-              add(axiom).
-              endContext();
-          }
-        })
+      value: function(_, obj, axiom) {
+        this.
+          startContext({ data: obj }).
+          add(axiom).
+          endContext();
       }
     },
     {
@@ -128,6 +143,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
         this.add(value.label)
@@ -149,6 +165,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
         this.start()
@@ -166,6 +183,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
         if ( date ) this.add(date.toLocaleDateString());
@@ -180,6 +198,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
         if ( date ) this.add(date.toLocaleString());
