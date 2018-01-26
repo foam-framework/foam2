@@ -348,6 +348,7 @@ foam.CLASS({
   extends: 'foam.blob.ProxyBlob',
   
   imports: [
+    'blobStore?',
     'blobService'
   ],
 
@@ -362,7 +363,7 @@ foam.CLASS({
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
+      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
     }
   ],
 

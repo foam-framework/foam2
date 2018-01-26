@@ -10,9 +10,11 @@ foam.CLASS({
 
   documentation: 'Represents a file',
 
-  ids: [ 'data' ],
-
   properties: [
+    {
+      class: 'Long',
+      name: 'id'
+    },
     {
       class: 'String',
       name: 'filename',
@@ -24,8 +26,7 @@ foam.CLASS({
       documentation: 'File mime type'
     },
     {
-      class: 'Reference',
-      of: 'foam.blob.Blob',
+      class: 'Blob',
       name: 'data',
       documentation: 'File data'
     }
