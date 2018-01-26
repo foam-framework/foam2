@@ -79,8 +79,6 @@ token = (Token) tokenDAO.put(token);
 
 EmailService email = (EmailService) getEmail();
 EmailMessage message = new EmailMessage();
-message.setFrom("info@nanopay.net");
-message.setReplyTo("noreply@nanopay.net");
 message.setTo(new String[] { user.getEmail() });
 
 HashMap<String, Object> args = new HashMap<>();
