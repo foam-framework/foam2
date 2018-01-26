@@ -160,12 +160,12 @@ public class TreeNode {
       state.key = subs.key;
       state.value = subs.value;
       if ( isLeft ) {
-        state.left = removeNode(state.left, subs.value, prop);
+        state.left = removeNode(state.left, subs.key, prop);
       } else {
-        state.right = removeNode(state.right, subs.value, prop);
+        state.right = removeNode(state.right, subs.key, prop);
       }
     } else {
-      if ( compareValue > 0 ) {
+      if ( compareValue < 0 ) {
         state.size -= size(state.left);
         state.left = removeKeyValue(state.left, prop, key, value, tail);
         state.size += size(state.left);
