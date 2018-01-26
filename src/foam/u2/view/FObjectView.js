@@ -29,7 +29,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      view: 'foam.u2.DetailView',
+      view: { class: 'foam.u2.DetailView' },
       postSet: function(_, data) {
         if ( ! data ) {
           this.objectClass = '';

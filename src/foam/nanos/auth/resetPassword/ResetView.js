@@ -12,7 +12,7 @@ foam.CLASS({
   documentation: 'Forgot Password Reset View',
 
   imports: [
-    'resetPasswordToken',    
+    'resetPasswordToken',
     'stack'
   ],
 
@@ -82,7 +82,7 @@ foam.CLASS({
       margin-bottom: 5px;
       margin-top: 10px;
     }
-    
+
     ^ .resetButton {
       width: 450px;
       height: 40px;
@@ -113,7 +113,7 @@ foam.CLASS({
     }
   `,
 
-      
+
   properties: [
     {
       class: 'String',
@@ -139,12 +139,12 @@ foam.CLASS({
     {
       class: 'String',
       name: 'newPassword',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     },
     {
       class: 'String',
       name: 'confirmPassword',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     }
   ],
 

@@ -103,7 +103,7 @@ foam.CLASS({
     },
     {
       name: 'person',
-      view: 'foam.u2.DetailView',
+      view: { class: 'foam.u2.DetailView' },
       factory: function() { return this.Person.create(); }
     }
   ],
