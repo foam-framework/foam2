@@ -28,7 +28,7 @@ foam.CLASS({
       this.setNodeName('span')
         .start('input').attrs({ type: 'file' }).on('change', this.onChange).end()
         .add(this.slot(function(data) {
-          var file = data.data;
+          var file = data && data.data;
           var url = file && view.blobService.urlFor(file);
           return ! url ? this.E('span') : this.E('a').attrs({ href: url }).add('Download')
         }, this.data$));
@@ -42,7 +42,9 @@ foam.CLASS({
       this.data = this.File.create({
         filename: file.name,
         mimeType: file.type,
-        data: file
+        data: this.BlobBlob.create({
+          blob: file
+        })
       });
     }
   ]
