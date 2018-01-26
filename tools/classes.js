@@ -95,6 +95,7 @@ var classes = [
   'foam.dao.RelationshipPropertyValue',
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
+  'foam.dao.EnabledAwareDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',

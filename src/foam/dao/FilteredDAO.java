@@ -22,9 +22,8 @@ public class FilteredDAO
 
   public FilteredDAO() {}
 
-  public FilteredDAO setPredicate(Predicate predicate) {
+  public void setPredicate(Predicate predicate) {
     predicate_ = predicate;
-    return this;
   }
 
   private Predicate getPredicate(Predicate arg) {
