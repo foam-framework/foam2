@@ -256,7 +256,10 @@ foam.CLASS({
           bindings so that the only DOM operation is the row completely
           replacing its contents.`,
 
-      imports: [ 'rowFormatter' ],
+      imports: [
+        'columns?',
+        'rowFormatter'
+      ],
 
       axioms: [
         foam.u2.CSS.create({
@@ -268,9 +271,6 @@ foam.CLASS({
               padding: 5px;
               box-sizing: border-box;
             }
-            ^ * {
-              background-color: #dddddd;
-            }
         */}
         })
       ],
@@ -281,7 +281,10 @@ foam.CLASS({
           name: 'data',
           postSet: function(old, nu) {
             if ( this.state !== this.LOADED ) return;
-            this.el().innerHTML = this.rowFormatter.format(nu);
+            const htmlStr = this.rowFormatter.format(
+              nu, this.columns);
+            this.el().innerHTML = htmlStr;
+            if (htmlStr !== this.el().innerHTML) debugger;
           }
         }
       ],
