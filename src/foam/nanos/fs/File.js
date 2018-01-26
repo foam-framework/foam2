@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -29,6 +29,18 @@ foam.CLASS({
       name: 'data',
       documentation: 'File data'
     }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.core',
+  name: 'File',
+  extends: 'foam.core.FObjectProperty',
+
+  properties: [
+    [ 'of', 'foam.nanos.fs.File' ],
+    [ 'tableCellView', function () {} ],
+    [ 'view', { class: 'foam.u2.view.FileView' } ]
   ]
 });
 
