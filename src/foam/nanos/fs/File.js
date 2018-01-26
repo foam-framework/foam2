@@ -21,6 +21,11 @@ foam.CLASS({
       documentation: 'Filename'
     },
     {
+      class: 'Long',
+      name: 'filesize',
+      documentation: 'Filesize'
+    },
+    {
       class: 'String',
       name: 'mimeType',
       documentation: 'File mime type'
