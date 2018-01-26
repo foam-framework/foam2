@@ -33,7 +33,7 @@ foam.CLASS({
     },
     {
       name: 'order',
-      value: 1
+      value: 2
     }
   ],
 
