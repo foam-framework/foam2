@@ -16,13 +16,15 @@ foam.CLASS({
   ],
 
   imports: [
-    'threadPool?' // Only imported in Java
+    'threadPool?', // Only imported in Java
+    'appConfig?'
   ],
 
   javaImports: [
     'foam.core.ContextAgent',
     'foam.core.X',
     'foam.nanos.pool.FixedThreadPool',
+    'foam.util.SafetyUtil',
     'org.apache.commons.lang3.StringUtils',
     'org.jtwig.JtwigModel',
     'org.jtwig.JtwigTemplate',
@@ -94,6 +96,21 @@ protected EnvironmentConfiguration config_ = null;`
       class: 'String',
       name: 'password',
       value: null
+    },
+    {
+      class: 'String',
+      name: 'from',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'displayName',
+      value: null
+    },
+    {
+      class: 'String',
+      name: 'replyTo',
+      value: null
     }
   ],
 
@@ -133,20 +150,33 @@ return config_;`
   MimeMessage message = new MimeMessage(session_);
 
   // don't send email if no sender
-  String from = emailMessage.getFrom();
-  if ( from == null || from.isEmpty() )
+  String from = getFrom();
+  if ( SafetyUtil.isEmpty(from) )
     return null;
-  message.setFrom(new InternetAddress(from));
+
+  // add display name if present
+  String displayName = getDisplayName();
+  if ( SafetyUtil.isEmpty(displayName) ) {
+    message.setFrom(new InternetAddress(from));
+  } else {
+    message.setFrom(new InternetAddress(from, displayName));
+  }
+
+  // attach reply to if present
+  String replyTo = getReplyTo();
+  if ( ! SafetyUtil.isEmpty(replyTo) ) {
+    message.setReplyTo(InternetAddress.parse(replyTo));
+  }
 
   // don't send email if no subject
   String subject = emailMessage.getSubject();
-  if ( subject == null || subject.isEmpty() )
+  if ( SafetyUtil.isEmpty(subject) )
     return null;
   message.setSubject(subject);
 
   // don't send email if no body
   String body = emailMessage.getBody();
-  if ( body == null || body.isEmpty() )
+  if ( SafetyUtil.isEmpty(body) )
     return null;
   message.setContent(body, "text/html; charset=utf-8");
 
@@ -161,10 +191,10 @@ return config_;`
     message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(StringUtils.join(to, ",")));
   }
 
-   // send email even if no CC
-   String[] cc = emailMessage.getCc();
-   if ( cc != null && cc.length == 1 ) {
-     message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
+  // send email even if no CC
+  String[] cc = emailMessage.getCc();
+  if ( cc != null && cc.length == 1 ) {
+    message.setRecipient(Message.RecipientType.CC, new InternetAddress(cc[0], false));
   } else if ( cc != null && cc.length > 1 ) {
     message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(StringUtils.join(cc, ",")));
   }
@@ -180,8 +210,8 @@ return config_;`
   // set date
   message.setSentDate(new Date());
   return message;
-} catch (MessagingException e) {
-  e.printStackTrace();
+} catch (Throwable t) {
+  t.printStackTrace();
   return null;
 }`
     },
