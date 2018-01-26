@@ -259,7 +259,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'editRowsEnabled',
-      value: true,
+      value: false,
       documentation: 'Set this to true to let the user select options on table rows'
     },
     {
