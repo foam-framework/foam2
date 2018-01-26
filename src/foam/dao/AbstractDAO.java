@@ -80,10 +80,13 @@ public abstract class AbstractDAO
 
   public void setOf(ClassInfo of) {
     of_ = of;
-    primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
   }
 
   public PropertyInfo getPrimaryKey() {
+    if ( primaryKey_ == null ) {
+      primaryKey_ = (PropertyInfo) getOf().getAxiomByName("id");
+    }
+
     return primaryKey_;
   }
 
