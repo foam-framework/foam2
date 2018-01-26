@@ -54,7 +54,6 @@ public class ScanPlan implements FindPlan, SelectPlan {
     }
     if ( ! sortRequired ) {
       if ( skip_ != 0 ) cost = Math.max(cost - skip_, 0);
-      if ( limit_ != 0 ) cost = Math.min(cost, limit_);
     }
     return cost;
   }
