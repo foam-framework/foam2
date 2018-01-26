@@ -40,6 +40,10 @@ foam.CLASS({
       name: 'id'
     },
     {
+      class: 'Boolean',
+      name: 'enabled'
+    },
+    {
       class: 'String',
       name: 'description',
       displayWidth: 80

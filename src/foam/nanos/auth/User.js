@@ -33,6 +33,10 @@ foam.CLASS({
       tableWidth: 45
     },
     {
+      class: 'Boolean',
+      name: 'enabled'
+    },
+    {
       class: 'String',
       // class: 'SPID',
       label: 'Service Provider',
