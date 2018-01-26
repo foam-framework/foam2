@@ -21,8 +21,6 @@ foam.CLASS({
 
   refines: 'foam.core.Property',
 
-  imports: [ 'window' ],
-
   properties: [
     {
       name: 'tableHeaderFormatter',
@@ -259,6 +257,12 @@ foam.CLASS({
       documentation: 'Set this to true to let the user select columns.'
     },
     {
+      class: 'Boolean',
+      name: 'editRowsEnabled',
+      value: true,
+      documentation: 'Set this to true to let the user select options on table rows'
+    },
+    {
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
@@ -392,7 +396,7 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    if ( window.location.hash == "#set-bank" ) {
+                    if ( view.editRowsEnabled ) {
                       this.start('td').
                         addClass(view.myClass('th-editColumns')).
                         add(' ', view.vertMenuIcon).
