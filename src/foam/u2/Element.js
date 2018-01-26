@@ -92,7 +92,8 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); }
+      factory: function() { return new WeakMap(); },
+      transient: true
     }
   ],
 
@@ -109,7 +110,7 @@ foam.CLASS({
           foam.__context__;
 
         // Install our own CSS, and then all parent models as well.
-        if ( ! axiom.installedDocuments_.has(X.document) ) {
+        if ( X.document && ! axiom.installedDocuments_.has(X.document) ) {
           X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
           axiom.installedDocuments_.set(X.document, true);
         }
