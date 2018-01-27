@@ -136,10 +136,16 @@ public class JDAO
 
   protected void writeComment(User user) throws IOException {
     out_.write("// Modified by ");
-    out_.write(user != null ?
-        user.getFirstName() + " " + user.getLastName() + " (" + user.getId() + ")" :
-        "System" );
-    out_.write(" at " + sdf.get().format(Calendar.getInstance().getTime()));
+    out_.write(user.getFirstName());
+    if ( ! SafetyUtil.isEmpty(user.getLastName()) ) {
+      out_.write(" ");
+      out_.write(user.getLastName());
+    }
+    out_.write(" (");
+    out_.write(String.valueOf(user.getId()));
+    out_.write(")");
+    out_.write(" at ");
+    out_.write(sdf.get().format(Calendar.getInstance().getTime()));
     out_.newLine();
   }
 
