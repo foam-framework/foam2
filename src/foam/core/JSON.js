@@ -173,6 +173,7 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'objectKeyValuePredicate',
+      documentation: 'Called before outputting a key/value. Outputs if true.',
       value: function(k, v) { return true; }
     },
     {
