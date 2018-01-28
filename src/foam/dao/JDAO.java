@@ -46,10 +46,12 @@ public class JDAO
 
   public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
     this(x, new MapDAO(classInfo), filename);
+    setOf(classInfo);
   }
 
   public JDAO(foam.core.X x, DAO delegate, String filename) {
     setX(x);
+    setOf(delegate.getOf());
 
     try {
       file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
