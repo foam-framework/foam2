@@ -21,12 +21,28 @@ foam.CLASS({
 usleep(UInt32(delayMs * 1000))
 return try super.select_(x, sink, skip, limit, order, predicate)
       `,
+      javaCode: `
+try {
+  Thread.sleep(getDelayMs());
+} catch(InterruptedException e) {
+}
+
+return super.select_(x, sink, skip, limit, order, predicate);
+      `,
     },
     {
       name: 'put_',
       swiftCode: `
 usleep(UInt32(delayMs * 1000))
 return try super.put_(x, obj)
+      `,
+      javaCode: `
+try {
+  Thread.sleep(getDelayMs());
+} catch(InterruptedException e) {
+}
+
+return super.put_(x, obj);
       `,
     },
     {
@@ -35,12 +51,28 @@ return try super.put_(x, obj)
 usleep(UInt32(delayMs * 1000))
 return try super.remove_(x, obj)
       `,
+      javaCode: `
+try {
+  Thread.sleep(getDelayMs());
+} catch(InterruptedException e) {
+}
+
+return super.remove_(x, obj);
+      `,
     },
     {
       name: 'removeAll_',
       swiftCode: `
 usleep(UInt32(delayMs * 1000))
 return try super.removeAll_(x)
+      `,
+      javaCode: `
+try {
+  Thread.sleep(getDelayMs());
+} catch(InterruptedException e) {
+}
+
+super.removeAll_(x, skip, limit, order, predicate);
       `,
     },
     {
