@@ -33,6 +33,10 @@ foam.CLASS({
 _ = on["put"].pub([obj])
 return obj
       `,
+      javaCode: `
+onPut(obj);
+return obj;
+      `,
     },
 
     {
@@ -45,6 +49,10 @@ return obj
 _ = on["remove"].pub([obj])
 return obj
       `,
+      javaCode: `
+onRemove(obj);
+return null;
+      `,
     },
 
     {
@@ -53,6 +61,7 @@ return obj
         return Promise.resolve(null);
       },
       swiftCode: 'return nil',
+      javaCode: 'return null;',
     },
 
     {
@@ -66,6 +75,13 @@ return obj
 sink.eof()
 return sink
       `,
+      javaCode: `
+if ( sink == null ) {
+  sink = new ArraySink();
+}
+sink.eof();
+return sink;
+      `,
     },
 
     {
@@ -74,6 +90,7 @@ return sink
         return Promise.resolve();
       },
       swiftCode: 'return',
+      javaCode: '// NOOP',
     },
   ]
 });
