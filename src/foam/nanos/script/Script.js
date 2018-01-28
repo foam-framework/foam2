@@ -182,7 +182,7 @@ foam.CLASS({
             self.copyFrom(script);
           });
         } else {
-          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
+          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
 
           with ( { log: log, print: log, x: self.__context__ } ) {
             var ret = eval(this.code);
