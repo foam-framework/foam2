@@ -35,12 +35,11 @@ public class CompoundKey
   public String toString() {
     StringBuilder out = new StringBuilder();
 
-    out.append("[");
-    for ( int i = 0 ; i < getValues().length ; i++ ) {
+    int len =  getValues().length;
+    for ( int i = 0 ; i < len ; i++ ) {
+      if ( i > 0 ) out.append("||");
       out.append(getValues()[i]);
-      out.append("||");
     }
-    out.append("]");
 
     return out.toString();
   }
