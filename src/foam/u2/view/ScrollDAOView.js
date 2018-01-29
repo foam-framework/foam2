@@ -284,22 +284,22 @@ foam.CLASS({
             const htmlStr = this.rowFormatter.format(
               nu, this.columns);
             this.el().innerHTML = htmlStr;
-            if (htmlStr !== this.el().innerHTML) debugger;
           }
         }
       ],
 
       methods: [
         function init() {
-          this.onload.sub(this.renderOnLoad);
+          this.onload.sub(this.render);
         },
         function initE() {
           this.addClass(this.myClass());
+          this.columns$ && this.columns$.sub(this.render);
         }
       ],
 
       listeners: [
-        function renderOnLoad() {
+        function render() {
           this.el().innerHTML = this.rowFormatter.format(this.data,
                                                          this.columns);
         }
