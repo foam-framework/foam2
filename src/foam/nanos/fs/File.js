@@ -52,6 +52,17 @@ foam.CLASS({
 });
 
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FileArray',
+  extends: 'foam.core.FObjectArray',
+
+  properties: [
+    [ 'of', 'foam.nanos.fs.File' ],
+    [ 'tableCellView', function () {} ]
+  ]
+});
+
+foam.CLASS({
   package: 'foam.nanos.fs',
   name: 'FileDAODecorator',
   extends: 'foam.dao.AbstractDAODecorator',
@@ -83,6 +94,51 @@ foam.CLASS({
         if ( ! file ) return obj;
 
         return self.fileDAO.put(file).then(function (b) {
+          prop.set(obj, b);
+          return a();
+        });
+      });
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.nanos.fs',
+  name: 'FileArrayDAODecorator',
+  extends: 'foam.dao.AbstractDAODecorator',
+
+  imports: [
+    'fileDAO'
+  ],
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'of'
+    }
+  ],
+
+  methods: [
+    function write(X, dao, obj, existing) {
+      var self = this;
+      var i = 0;
+      var props = obj.cls_.getAxiomsByClass(foam.core.FileArray);
+
+      return Promise.resolve().then(function a() {
+        var prop = props[i++];
+
+        if ( ! prop ) return obj;
+
+        var files = prop.f(obj);
+
+        if ( ! files ) return obj;
+
+        var promiseList = [];
+        for ( var j = 0 ; j < files.length ; j++ ) {
+          promiseList.push(self.fileDAO.put(files[j]));
+        }
+
+        return Promise.all(promiseList).then(function (b) {
           prop.set(obj, b);
           return a();
         });
