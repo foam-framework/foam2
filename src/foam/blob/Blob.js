@@ -494,7 +494,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isSet',
-      value: false
+      value: false,
+      hidden: true,
+      transient: true
     }
   ],
 

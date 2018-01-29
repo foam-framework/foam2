@@ -50,9 +50,9 @@ if let oldValue = oldValue as? AbstractDAO {
       factory: function() {
         return this.delegate.of;
       },
-      javaFactory: 'return getDelegate().getOf();',
       swiftExpressionArgs: ['delegate$of'],
       swiftExpression: 'return delegate$of as! ClassInfo',
+      javaFactory: `return getDelegate().getOf();`,
     }
   ],
 
@@ -88,7 +88,22 @@ return listener
 super.listen(sink, predicate);
 `
     }
-  ]
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+public ProxyDAO(foam.core.X x, foam.dao.DAO delegate) {
+  foam.nanos.logger.Logger log = (foam.nanos.logger.Logger)x.get("logger");
+  log.warning("Direct constructor use is deprecated. Use Builder instead.");
+  setX(x);
+  setDelegate(delegate);
+}
+        `);
+      },
+    },
+  ],
 });
 
 

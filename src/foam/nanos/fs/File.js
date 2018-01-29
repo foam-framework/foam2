@@ -12,13 +12,19 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Long',
-      name: 'id'
+      class: 'String',
+      name: 'id',
+      documentation: 'GUID'
     },
     {
       class: 'String',
       name: 'filename',
       documentation: 'Filename'
+    },
+    {
+      class: 'Long',
+      name: 'filesize',
+      documentation: 'Filesize'
     },
     {
       class: 'String',
