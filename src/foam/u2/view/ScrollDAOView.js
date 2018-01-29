@@ -300,7 +300,8 @@ foam.CLASS({
 
       listeners: [
         function renderOnLoad() {
-          this.el().innerHTML = this.rowFormatter.format(this.data);
+          this.el().innerHTML = this.rowFormatter.format(this.data,
+                                                         this.columns);
         }
       ]
     },
