@@ -129,6 +129,10 @@ FOAM_FILES([
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
 
+  { name: "foam/json2/Outputter" },
+  { name: "foam/json2/Deserializer" },
+  { name: "foam/json2/Serializer" },
+
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
   { name: "foam/java/JavaSwiftRefines", flags: ['java'] },
