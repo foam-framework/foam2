@@ -1220,6 +1220,7 @@ foam.CLASS({
         initializer: `
 new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
         `,
+        order: 1,
       });
     }
   ]
@@ -1257,7 +1258,7 @@ foam.CLASS({
 
       info.method({
         name: 'getProperties',
-        visibility: 'protected',
+        visibility: 'public',
         type: 'foam.core.PropertyInfo[]',
         body: body,
       });
