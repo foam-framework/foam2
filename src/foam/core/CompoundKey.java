@@ -6,12 +6,12 @@
 
 package foam.core;
 
-// TODO: doc what this is used for
+/** A compound/multi-part comparable key. **/
 public class CompoundKey
   implements Comparable
 {
-  private PropertyInfo[] properties_;
-  private Object[]       values_;
+  protected final PropertyInfo[] properties_;
+  protected final Object[]       values_;
 
   public CompoundKey(Object[] values, PropertyInfo[] properties) {
     values_     = values;
@@ -46,7 +46,7 @@ public class CompoundKey
 
   @Override
   public boolean equals(Object o) {
-    if(o instanceof CompoundKey) {
+    if ( o instanceof CompoundKey ) {
       Object[] v1 = getValues(), v2 = ((CompoundKey) o).getValues();
       if ( v1.length != v2.length ) return false;
       for ( int i = 0 ; i < v1.length ; i++ ) {
@@ -61,9 +61,7 @@ public class CompoundKey
   public int hashCode() {
     Object[] v = getValues();
     int hash = 17;
-    for (Object aV : v) {
-      hash = 37 * hash + aV.hashCode();
-    }
+    for ( Object aV : v ) hash = 37 * hash + aV.hashCode();
     return hash;
   }
 }
