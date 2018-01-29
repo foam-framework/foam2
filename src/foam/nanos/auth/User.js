@@ -199,7 +199,7 @@ emailIsSet_ = true;`
 
   methods: [
     function label() {
-      return this.organization || ( this.firstName + ' ' + this.lastName );
+      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
     }
   ]
 });

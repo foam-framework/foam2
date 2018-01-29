@@ -1258,7 +1258,7 @@ foam.CLASS({
 
       info.method({
         name: 'getProperties',
-        visibility: 'protected',
+        visibility: 'public',
         type: 'foam.core.PropertyInfo[]',
         body: body,
       });
