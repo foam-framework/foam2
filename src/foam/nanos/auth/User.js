@@ -86,14 +86,14 @@ emailIsSet_ = true;`
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'String',
@@ -120,7 +120,7 @@ emailIsSet_ = true;`
       of: 'foam.nanos.auth.Address',
       name: 'address',
       factory: function() { return this.Address.create(); },
-      view: 'foam.nanos.auth.AddressDetailView'
+      view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
       class: 'FObjectArray',
