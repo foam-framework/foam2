@@ -634,10 +634,6 @@ foam.CLASS({
           var newCount = self.count_ = count.value;
           var endIdx = self.anchorDAOIdx_ + self.numRows;
 
-          // If the current window isn't affected by count change, nothing else
-          // to be done.
-          if ( endIdx < Math.min(oldCount, newCount) ) return;
-
           // Choose a reasonable anchor for new count.
           var anchorDAOIdx = Math.min(
             self.anchorDAOIdx_,
