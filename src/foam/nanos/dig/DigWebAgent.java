@@ -215,12 +215,13 @@ public class DigWebAgent
         } else if ( "xml".equals(format) ) {
           XMLSupport xmlSupport = new XMLSupport();
 
+          response.setContentType("application/xml");
           if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
             String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
 
             output(x, xmlData);
           } else {
-            out.println(StringEscapeUtils.escapeXml11(xmlSupport.toXMLString(sink.getArray())));
+            out.println(xmlSupport.toXMLString(sink.getArray()));
           }
         } else if ( "csv".equals(format) ) {
           foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
