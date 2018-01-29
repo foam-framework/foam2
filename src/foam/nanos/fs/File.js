@@ -133,9 +133,12 @@ foam.CLASS({
 
         if ( ! files ) return obj;
 
-        return Promise.map(files, function (file) {
-          return self.fileDAO.put(file);
-        }).then(function (b) {
+        var promiseList = [];
+        for ( var j = 0 ; j < files.length ; j++ ) {
+          promiseList.push(self.fileDAO.put(files[j]));
+        }
+
+        return Promise.all(promiseList).then(function (b) {
           prop.set(obj, b);
           return a();
         });
