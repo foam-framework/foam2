@@ -184,7 +184,6 @@ var classes = [
   'foam.nanos.demo.DemoObject',
   'foam.nanos.fs.File',
 
-  'foam.crypto.hash.Hashable',
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.AbstractHasher',
   'foam.crypto.hash.MD5Hasher',
