@@ -182,7 +182,14 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsBoundary',
 
   'foam.nanos.demo.DemoObject',
-  'foam.nanos.fs.File'
+  'foam.nanos.fs.File',
+
+  'foam.crypto.hash.Hashable',
+  'foam.crypto.hash.Hasher',
+  'foam.crypto.hash.AbstractHasher',
+  'foam.crypto.hash.MD5Hasher',
+  'foam.crypto.hash.SHA1Hasher',
+  'foam.crypto.hash.SHA256Hasher'
 ];
 
 var abstractClasses = [

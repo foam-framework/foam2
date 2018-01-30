@@ -489,4 +489,7 @@ FOAM_FILES([
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
+
+  { name: "foam/crypto/hash/Hashable" },
+  { name: "foam/crypto/hash/Hasher" },
 ]);
