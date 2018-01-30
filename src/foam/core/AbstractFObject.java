@@ -112,18 +112,21 @@ public abstract class AbstractFObject
   }
 
   public String hash() {
-    return this.hash("SHA-256");
+    return this.hash(null);
   }
 
-  public String hash(String algorithm) {
-    return this.hash(algorithm, null);
+  public String hash(String hash) {
+    return this.hash("SHA-256", hash);
   }
 
-  public String hash(String algorithm, String provider) {
+  public String hash(String algorithm, String hash) {
     try {
-      MessageDigest md = ( ! TextUtils.isEmpty(provider) ) ?
-          MessageDigest.getInstance(algorithm, provider) :
-          MessageDigest.getInstance(algorithm);
+      MessageDigest md = MessageDigest.getInstance(algorithm);
+
+      // update with previous hash
+      if ( ! SafetyUtil.isEmpty(hash) ) {
+        md.update(Hex.decode(hash));
+      }
 
       List props = getClassInfo().getAxiomsByClass(Hasher.class);
       Iterator i = props.iterator();
