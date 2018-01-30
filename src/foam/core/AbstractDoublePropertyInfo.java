@@ -36,6 +36,7 @@ public abstract class AbstractDoublePropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {
+    super.hash(obj, md);
     double val = (double) get(obj);
     md.update(bb.get().putDouble(val).array());
   }

@@ -28,6 +28,7 @@ public abstract class AbstractBooleanPropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {
+    super.hash(obj, md);
     boolean val = (boolean) get(obj);
     md.update((byte) (val ? 1 : 0));
   }

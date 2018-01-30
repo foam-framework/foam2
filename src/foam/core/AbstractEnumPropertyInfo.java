@@ -62,6 +62,7 @@ public abstract class AbstractEnumPropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {
+    super.hash(obj, md);
     int val = getOrdinal(obj);
     md.update(new byte[] {
         (byte)((val & 0xFF000000) >> 24),

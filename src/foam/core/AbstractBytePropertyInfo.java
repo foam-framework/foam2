@@ -28,6 +28,7 @@ public abstract class AbstractBytePropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {
+    super.hash(obj, md);
     byte val = (byte) get(obj);
     md.update(val);
   }

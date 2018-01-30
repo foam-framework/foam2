@@ -65,6 +65,7 @@ public abstract class AbstractFObjectPropertyInfo
       return;
     }
 
+    super.hash(obj, md);
     List props = val.getClassInfo().getAxiomsByClass(Hasher.class);
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
