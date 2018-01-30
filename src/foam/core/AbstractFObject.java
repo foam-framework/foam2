@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractFObject
-  extends    ContextAwareSupport
-  implements FObject
+    extends    ContextAwareSupport
+    implements FObject
 {
 
   public static FObject maybeClone(FObject fo) {
@@ -112,11 +112,11 @@ public abstract class AbstractFObject
   }
 
   public String hash() {
-    return this.hash("SHA-256", null);
+    return this.hash("SHA-256");
   }
 
-  public String hash(String provider) {
-    return this.hash("SHA-256", provider);
+  public String hash(String algorithm) {
+    return this.hash(algorithm, null);
   }
 
   public String hash(String algorithm, String provider) {

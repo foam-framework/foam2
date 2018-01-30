@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hasher;
 import foam.dao.SQLStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
