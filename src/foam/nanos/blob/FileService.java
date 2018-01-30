@@ -44,7 +44,7 @@ public class FileService
 
       // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
-      if ( file == null || !(file.getData() instanceof IdentifiedBlob) ) {
+      if ( file == null || file.getData() == null ) {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return;
       }
