@@ -61,6 +61,10 @@ public abstract class AbstractFObjectPropertyInfo
   @Override
   public void hash(FObject obj, MessageDigest md) {
     FObject val = (FObject) get(obj);
+    if ( val == null ) {
+      return;
+    }
+
     List props = val.getClassInfo().getAxiomsByClass(Hasher.class);
     Iterator i = props.iterator();
     while ( i.hasNext() ) {

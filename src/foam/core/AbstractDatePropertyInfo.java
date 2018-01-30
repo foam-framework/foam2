@@ -41,7 +41,12 @@ public abstract class AbstractDatePropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {
-    long val = ((Date) get(obj)).getTime();
+    Date date = (Date) get(obj);
+    if ( date == null ) {
+      return;
+    }
+
+    long val = date.getTime();
     md.update(new byte[] {
         (byte)((val & 0xFF00000000000000L) >> 56),
         (byte)((val & 0x00FF000000000000L) >> 48),

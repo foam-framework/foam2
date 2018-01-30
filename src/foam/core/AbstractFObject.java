@@ -133,6 +133,7 @@ public abstract class AbstractFObject
       }
       return Hex.toHexString(md.digest());
     } catch (Throwable t) {
+      t.printStackTrace();
       return null;
     }
   }
