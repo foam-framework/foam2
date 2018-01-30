@@ -7,6 +7,7 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
 
 public abstract class AbstractLongPropertyInfo
   extends AbstractPropertyInfo
@@ -23,5 +24,20 @@ public abstract class AbstractLongPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Long.valueOf(reader.getText());
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    long val = (long) get(obj);
+    md.update(new byte[] {
+        (byte)((val & 0xFF00000000000000L) >> 56),
+        (byte)((val & 0x00FF000000000000L) >> 48),
+        (byte)((val & 0x0000FF0000000000L) >> 40),
+        (byte)((val & 0x000000FF00000000L) >> 32),
+        (byte)((val & 0x00000000FF000000L) >> 24),
+        (byte)((val & 0x0000000000FF0000L) >> 16),
+        (byte)((val & 0x000000000000FF00L) >> 8),
+        (byte)((val & 0x00000000000000FFL))
+    });
   }
 }

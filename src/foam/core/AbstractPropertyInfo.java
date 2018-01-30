@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -110,4 +111,7 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void validate(FObject obj) throws IllegalStateException {}
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) { }
 }

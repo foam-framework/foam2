@@ -13,6 +13,8 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.security.MessageDigest;
+
 public abstract class AbstractEnumPropertyInfo
   extends AbstractObjectPropertyInfo {
 
@@ -56,6 +58,17 @@ public abstract class AbstractEnumPropertyInfo
     int ordVal = this.getOrdinal(nestObj);
     objTag.appendChild(doc.createTextNode(Integer.toString(ordVal)));
     objElement.appendChild(objTag);
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    int val = getOrdinal(obj);
+    md.update(new byte[] {
+        (byte)((val & 0xFF000000) >> 24),
+        (byte)((val & 0x00FF0000) >> 16),
+        (byte)((val & 0x0000FF00) >> 8),
+        (byte)((val & 0x000000FF))
+    });
   }
 }
 

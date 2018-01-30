@@ -6,13 +6,17 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hasher;
 import foam.nanos.logger.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.security.MessageDigest;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class AbstractFObjectPropertyInfo
   extends AbstractObjectPropertyInfo
@@ -52,5 +56,16 @@ public abstract class AbstractFObjectPropertyInfo
     Element objTag = doc.createElement(this.getName());
     objElement.appendChild(objTag);
     XMLSupport.toXML((FObject) nestObj, doc, objTag);
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    FObject val = (FObject) get(obj);
+    List props = val.getClassInfo().getAxiomsByClass(Hasher.class);
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      Hasher prop = (Hasher) i.next();
+      prop.hash(val, md);
+    }
   }
 }
