@@ -41,6 +41,8 @@ public abstract class AbstractStringPropertyInfo
     if ( SafetyUtil.isEmpty(val) ) {
       return;
     }
+
+    super.hash(obj, md);
     md.update(val.getBytes(StandardCharsets.UTF_8));
   }
 }
