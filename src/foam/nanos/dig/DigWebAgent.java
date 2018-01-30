@@ -221,7 +221,7 @@ public class DigWebAgent
             output(x, xmlData);
           } else {
             out.println(xmlSupport.toXMLString(sink.getArray()));
-          } 
+          }
         } else if ( "csv".equals(format) ) {
           foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
           outputterCsv.output(sink.getArray().toArray());
