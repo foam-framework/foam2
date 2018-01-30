@@ -8,10 +8,11 @@ foam.CLASS({
     function init() {
       var o1 = this.AllProperties.create({
         str: 'str',
-        n: 12
+        n: 12,
+        function: function(asdfasdf) { console.log("arg is:", asdfasdf); }
       });
 
-      var o2 = foam.json2.Deserializer.create().aparseString(
+      var o2 = foam.json2.Deserializer.create({ parseFunctions: true }).aparseString(
         foam.__context__,
         foam.json2.Serializer.create().stringify(
           foam.__context__,
@@ -23,9 +24,11 @@ foam.CLASS({
         console.log("Diff:", o1.diff(o2));
       }
 
+      o2.function("foo");
+
       var m1 = this.AllProperties.model_;
 
-      var m2 = foam.json2.Deserializer.create().aparseString(
+      var m2 = foam.json2.Deserializer.create({ parseFunctions: true }).aparseString(
         foam.__context__,
         foam.json2.Serializer.create().stringify(
           foam.__context__,

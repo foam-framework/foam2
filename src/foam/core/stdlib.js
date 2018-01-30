@@ -315,6 +315,73 @@ foam.LIB({
       }
     },
 
+    function breakdown(f) {
+      var ident = "([^,\\s\\)]+)";
+      var ws = "\\s*";
+      var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)";
+      var skip = "(?:" + ws + comment + "?)*";
+      var header = "(?:function" + skip + ident + "?\\(|\\()";
+      var arg = "(?:" + skip + ident + ")";
+      var nextArg = "(?:" + skip + "," + skip + ident + ")";
+      var argEnd = "\\)";
+      var headerToBody = skip + "(?:\\=\\>)?" + skip;
+      var body = "\\{((?:.|\\s)*)\\}";
+
+
+      var breakdown = {
+        name: '',
+        args: [],
+        body: ''
+      };
+
+      var source = f.toString();
+
+      var lastIndex = 0;
+      var currentRegex;
+
+      function again() {
+        var match = currentRegex.exec(source);
+        if ( match ) lastIndex = currentRegex.lastIndex;
+        return match;
+      }
+
+      function next(e) {
+        prep(e);
+        return again();
+      }
+
+      function prep(e) {
+        currentRegex = new RegExp(e, "my");
+        currentRegex.lastIndex = lastIndex;
+      }
+
+      var match = next(header);
+      if ( ! match ) return null;
+
+      if ( match[1] ) breakdown.name = match[1];
+
+      match = next(arg);
+
+      if ( match ) {
+        breakdown.args.push(match[1]);
+        prep(nextArg);
+        while ( match = again() ) {
+          breakdown.args.push(match[1]);
+        }
+        match = next(argEnd);
+
+        if ( ! match ) return null;
+      }
+
+      if ( ! next(headerToBody) ) return null;
+
+      match = next(body);
+      if ( ! match ) return null;
+      breakdown.body = match[1];
+
+      return breakdown;
+    },
+
     /**
      * Calls fn, and provides the arguments to fn by looking
      * up their names on source. The 'this' context is either
