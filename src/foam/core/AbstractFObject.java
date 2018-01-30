@@ -6,10 +6,15 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hasher;
+import org.apache.http.util.TextUtils;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractFObject
   extends    ContextAwareSupport
@@ -115,13 +120,20 @@ public abstract class AbstractFObject
   }
 
   public String hash(String algorithm, String provider) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    Iterator i = props.iterator();
-    while ( i.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) i.next();
-      // TODO: do hash
+    try {
+      MessageDigest md = ( ! TextUtils.isEmpty(provider) ) ?
+          MessageDigest.getInstance(algorithm, provider) :
+          MessageDigest.getInstance(algorithm);
+
+      List props = getClassInfo().getAxiomsByClass(Hasher.class);
+      Iterator i = props.iterator();
+      while (i.hasNext()) {
+        Hasher prop = (Hasher) i.next();
+        prop.hash(this, md);
+      }
+      return Hex.toHexString(md.digest());
+    } catch (Throwable t) {
+      return null;
     }
-    return Hex.toHexString(baos.toByteArray());
   }
 }
