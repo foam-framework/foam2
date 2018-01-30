@@ -29,6 +29,8 @@ public abstract class AbstractBytePropertyInfo
   @Override
   public void hash(FObject obj, MessageDigest md) {
     super.hash(obj, md);
+    if ( ! isSet(obj) ) return;
+    if ( isDefaultValue(obj) ) return;
     byte val = (byte) get(obj);
     md.update(val);
   }

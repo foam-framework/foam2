@@ -29,6 +29,8 @@ public abstract class AbstractIntPropertyInfo
   @Override
   public void hash(FObject obj, MessageDigest md) {
     super.hash(obj, md);
+    if ( ! isSet(obj) ) return;
+    if ( isDefaultValue(obj) ) return;
     int val = (int) get(obj);
     md.update(new byte[] {
         (byte)((val & 0xFF000000) >> 24),

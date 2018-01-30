@@ -47,6 +47,8 @@ public abstract class AbstractDatePropertyInfo
     }
 
     super.hash(obj, md);
+    if ( ! isSet(obj) ) return;
+    if ( isDefaultValue(obj) ) return;
     long val = date.getTime();
     md.update(new byte[] {
         (byte)((val & 0xFF00000000000000L) >> 56),
