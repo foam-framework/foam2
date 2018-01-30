@@ -6,8 +6,8 @@
 
 package foam.core;
 
-import foam.dao.pg.IndexedPreparedStatement;
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
 import java.util.Date;
 
 public abstract class AbstractDatePropertyInfo
@@ -37,5 +37,20 @@ public abstract class AbstractDatePropertyInfo
     Object value = get(source);
 
     set(dest, value == null ? null : new Date(((Date)value).getTime()));
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    long val = ((Date) get(obj)).getTime();
+    md.update(new byte[] {
+        (byte)((val & 0xFF00000000000000L) >> 56),
+        (byte)((val & 0x00FF000000000000L) >> 48),
+        (byte)((val & 0x0000FF0000000000L) >> 40),
+        (byte)((val & 0x000000FF00000000L) >> 32),
+        (byte)((val & 0x00000000FF000000L) >> 24),
+        (byte)((val & 0x0000000000FF0000L) >> 16),
+        (byte)((val & 0x000000000000FF00L) >> 8),
+        (byte)((val & 0x00000000000000FFL))
+    });
   }
 }

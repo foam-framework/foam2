@@ -7,6 +7,7 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
 
 public abstract class AbstractBytePropertyInfo
   extends AbstractPropertyInfo
@@ -23,5 +24,11 @@ public abstract class AbstractBytePropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Byte.valueOf(reader.getText());
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    byte val = (byte) get(obj);
+    md.update(val);
   }
 }
