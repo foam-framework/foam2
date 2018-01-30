@@ -7,6 +7,13 @@
 foam.CLASS({
   package: 'foam.json2',
   name: 'Deserializer',
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'parseFunctions',
+      value: false
+    }
+  ],
   methods: [
     function aparseString(x, str) {
       return this.aparse(x, JSON.parse(str));
@@ -25,6 +32,18 @@ foam.CLASS({
           d.setTime(v["$DATE"]);
           return d;
         }
+        if ( ! foam.Undefined.isInstance(v["$FUNC$"]) ) {
+          if ( this.parseFunctions ) {
+            var name = v.name;
+            var args = v.args;
+            var body = v.body;
+            var f = Function.apply(null, args.concat(body));
+            if ( name ) foam.Function.setName(f, name);
+            return f;
+          }
+
+          return null;
+        }
         if ( ! foam.Undefined.isInstance(v["$INST$"]) ) {
           // Is an instance of the class defined by $INST$ key
           var cls = this.parse(x, v["$INST$"]);
@@ -35,13 +54,16 @@ foam.CLASS({
         }
 
         var keys = Object.keys(v);
+        var args = {}
         for ( var i = 0 ; i < keys.length ; i++ ) {
-          v[keys[i]] = this.parse(x, v[keys[i]]);
+          if ( keys[i] == '$INST$' ) continue;
+
+          args[keys[i]] = this.parse(x, v[keys[i]]);
         }
 
         return cls ?
-          cls.create(v, x) :
-          v;
+          cls.create(args, x) :
+          args;
 
       } else if ( type == foam.Array ) {
         for ( var i = 0 ; i < v.length ; i++ ) {
