@@ -368,10 +368,10 @@ foam.LIB({
         while ( match = again() ) {
           breakdown.args.push(match[1]);
         }
-        match = next(argEnd);
-
-        if ( ! match ) return null;
       }
+
+      match = next(argEnd);
+      if ( ! match ) return null;
 
       if ( ! next(headerToBody) ) return null;
 
