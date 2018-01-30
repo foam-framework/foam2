@@ -185,11 +185,6 @@ var classes = [
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
-  'foam.crypto.hash.AbstractHasher',
-  'foam.crypto.hash.MD5Hasher',
-  'foam.crypto.hash.SHA1Hasher',
-  'foam.crypto.hash.SHA256Hasher',
-
   'foam.crypto.hash.Hashable'
 ];
 
