@@ -29,6 +29,8 @@ public abstract class AbstractLongPropertyInfo
   @Override
   public void hash(FObject obj, MessageDigest md) {
     super.hash(obj, md);
+    if ( ! isSet(obj) ) return;
+    if ( isDefaultValue(obj) ) return;
     long val = (long) get(obj);
     md.update(new byte[] {
         (byte)((val & 0xFF00000000000000L) >> 56),

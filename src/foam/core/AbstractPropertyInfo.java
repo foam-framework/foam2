@@ -115,6 +115,8 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {
+    if ( ! isSet(obj) ) return;
+    if ( isDefaultValue(obj) ) return;
     md.update(getNameAsByteArray());
   }
 

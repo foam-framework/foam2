@@ -43,6 +43,8 @@ public abstract class AbstractStringPropertyInfo
     }
 
     super.hash(obj, md);
+    if ( ! isSet(obj) ) return;
+    if ( isDefaultValue(obj) ) return;
     md.update(val.getBytes(StandardCharsets.UTF_8));
   }
 }
