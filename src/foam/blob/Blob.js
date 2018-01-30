@@ -679,9 +679,13 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'serviceName'
+    },
+    {
+      class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + "/service/httpBlobService";
+        return window.location.origin + '/' + this.serviceName
       }
     }
   ],
