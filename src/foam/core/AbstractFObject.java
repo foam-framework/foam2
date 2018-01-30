@@ -6,10 +6,10 @@
 
 package foam.core;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Iterator;
-import java.util.Map;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 
 public abstract class AbstractFObject
   extends    ContextAwareSupport
@@ -104,5 +104,24 @@ public abstract class AbstractFObject
     if ( ! this.isPropertySet(prop) ) return true;
     PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
     return property != null && property.isDefaultValue(this);
+  }
+
+  public String hash() {
+    return this.hash("SHA-256", null);
+  }
+
+  public String hash(String provider) {
+    return this.hash("SHA-256", provider);
+  }
+
+  public String hash(String algorithm, String provider) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      // TODO: do hash
+    }
+    return Hex.toHexString(baos.toByteArray());
   }
 }
