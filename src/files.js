@@ -491,4 +491,5 @@ FOAM_FILES([
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
 
   { name: "foam/crypto/hash/Hasher" },
+  { name: "foam/crypto/hash/Hashable" }
 ]);
