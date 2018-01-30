@@ -7,6 +7,8 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 public abstract class AbstractStringPropertyInfo
   extends AbstractPropertyInfo
@@ -29,5 +31,11 @@ public abstract class AbstractStringPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return reader.getText();
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    String val = (String) get(obj);
+    md.update(val.getBytes(StandardCharsets.UTF_8));
   }
 }
