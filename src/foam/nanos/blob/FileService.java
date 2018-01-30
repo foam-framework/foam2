@@ -56,6 +56,7 @@ public class FileService
       }
 
       // get blob and blob size
+      // TODO: figure out why delegate is not being set for IdentifiedBlob
       String blobId = ((IdentifiedBlob) file.getData()).getId();
       Blob blob = getDelegate().find_(x, blobId);
       long size = blob.getSize();
