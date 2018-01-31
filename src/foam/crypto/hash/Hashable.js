@@ -13,7 +13,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'hash',
-      javaReturns: 'String',
+      javaReturns: 'byte[]',
       args: [
         {
           class: 'String',
@@ -21,9 +21,9 @@ foam.INTERFACE({
           javaType: 'String'
         },
         {
-          class: 'String',
-          name: 'provider',
-          javaType: 'String'
+          class: 'Array',
+          name: 'hash',
+          javaType: 'byte[]'
         }
       ]
     }
