@@ -129,7 +129,7 @@ public class TreeIndex
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
     // To see if there have some possible to do count or groubBy select efficiently
-    if ( predicate == null && sink instanceof Count ) {
+    if ( predicate == null && sink instanceof Count && state != null ) {
       return new CountPlan(( (TreeNode) state ).size);
     }
     // We return a groupByPlan only if no order, no limit, no skip, no predicate
