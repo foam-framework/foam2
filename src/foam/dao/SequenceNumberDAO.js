@@ -38,10 +38,18 @@ foam.CLASS({
       value: 'id'
     },
     {
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      name: 'axiom',
+      javaFactory: `
+return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
+      `,
+    },
+    {
       /** The starting sequence value. This will be calclated from the
         existing contents of the delegate DAO, so it is one greater
         than the maximum existing value. */
-      class: 'Int',
+      class: 'Long',
       name: 'value',
       value: 1
     },
@@ -82,21 +90,60 @@ foam.CLASS({
     /** Sets the property on the given object and increments the next value.
       If the unique starting value has not finished calculating, the returned
       promise will not resolve until it is ready. */
-    function put_(x, obj) {
-      var self = this;
-      return this.calcDelegateMax_.then(function() {
-        var val = self.property_.f(obj);
+    {
+      name: 'put_',
+      code: function put_(x, obj) {
+        var self = this;
+        return this.calcDelegateMax_.then(function() {
+          var val = self.property_.f(obj);
 
-        if ( ! val || val == self.property_.value ) {
-          obj[self.property_.name] = self.value++;
-        } else if ( val && ( val >= self.value ) ) {
-          // if the object has a value, and it's greater than our current value,
-          // bump up the next value we try to auto-assign.
-          self.value = val + 1;
-        }
+          if ( ! val || val == self.property_.value ) {
+            obj[self.property_.name] = self.value++;
+          } else if ( val && ( val >= self.value ) ) {
+            // if the object has a value, and it's greater than our current value,
+            // bump up the next value we try to auto-assign.
+            self.value = val + 1;
+          }
 
-        return self.delegate.put_(x, obj);
-      });
-    }
-  ]
+          return self.delegate.put_(x, obj);
+        });
+      },
+      javaCode: `
+synchronized (this) {
+  if ( ! isPropertySet("value") ) calcDelegateMax_();
+
+  Number val = (Number) obj.getProperty(getProperty());
+  if ( val.longValue() < 1 ) {
+    getAxiom().set(obj, value_++);
+  } else if ( val.longValue() >= value_ ) {
+    setValue(val.longValue() + 1);
+  }
+}
+
+return getDelegate().put_(x, obj);
+      `,
+    },
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+/**
+ * Calculates the next largest value in the sequence
+ */
+private void calcDelegateMax_() {
+  Sink sink = foam.mlang.MLang.MAX(getAxiom());
+  sink = getDelegate().select(sink);
+  setValue((long) (((foam.mlang.sink.Max) sink).getValue() + 1.0));
+}
+
+public SequenceNumberDAO(foam.dao.DAO delegate) {
+  System.err.println("Direct constructor use is deprecated. Use Builder instead.");
+  setDelegate(delegate);
+}
+        `);
+      },
+    },
+  ],
 });
