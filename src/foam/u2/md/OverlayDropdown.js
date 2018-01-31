@@ -1,4 +1,4 @@
-/** 
+/**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -38,6 +38,7 @@ foam.CLASS({
 
       ^ {
         background: white;
+        box-sizing: border-box;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
         display: block;
         font-size: 13px;
@@ -126,20 +127,21 @@ foam.CLASS({
 
     function open() {
       if ( this.opened ) return;
+      this.animationComplete = false;
       this.opened = true;
       this.dropdownE_.style({ height: this.getFullHeight() + 'px' });
-      this.animationComplete = false;
     },
 
     function close() {
       if ( ! this.opened ) return;
       this.height = 0;
-      this.dropdownE_.style({ height: 0 + 'px' });
+      this.animationComplete = false;
       this.opened = false;
+      this.dropdownE_.style({ height: 0 + 'px' });
     },
 
     function getFullHeight() {
-      if ( this.state !== this.LOADED ) return;
+      if ( this.state !== this.LOADED ) return 0;
 
       var myStyle = this.window.getComputedStyle(this.dropdownE_.el());
 
@@ -149,13 +151,18 @@ foam.CLASS({
         if ( match ) border += parseInt(match[1]);
       });
 
-      var last = this.dropdownE_.children[this.dropdownE_.children.length - 1].el();
-      var margin = parseInt(this.window.getComputedStyle(last)['margin-bottom']);
-      
+      var first = this.dropdownE_.children[0].el();
+      var last = this.dropdownE_.children[this.dropdownE_.children.length - 1]
+          .el();
+      var margin = parseInt(
+          this.window.getComputedStyle(last)['margin-bottom']);
       if ( Number.isNaN(margin) ) margin = 0;
 
-      return Math.min(border + last.offsetTop + last.offsetHeight + margin,
-          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top) + this.BOTTOM_OFFSET;
+      var childHeight = border + last.offsetTop + last.offsetHeight + margin;
+      var maxHeight = this.window.innerHeight -
+          this.dropdownE_.el().getBoundingClientRect().top;
+
+      return Math.min(childHeight, maxHeight) + this.BOTTOM_OFFSET;
     },
 
     function initE() {
@@ -163,22 +170,24 @@ foam.CLASS({
       this.addClass(this.myClass('container'));
       var view = this;
 
-      this.addClass(this.slot(function(open) {
-        this.shown = open;
-      }, this.opened$));
+      this.addClass(this.slot(function(open, animationComplete) {
+        this.shown = open || ! animationComplete;
+      }, this.opened$, this.animationComplete$));
 
       this.start('dropdown-overlay')
         .addClass(this.myClass('overlay'))
         .addClass(this.slot(function(open) {
-          return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
+          return open ? view.myClass('zeroOverlay') :
+              view.myClass('initialOverlay');
         }, this.opened$))
         .on('click', this.onCancel)
       .end();
 
-      this.dropdownE_.addClass(this.myClass())
-        .addClass(this.slot(function(openComplete) {
+      this.dropdownE_.addClass(this.myClass()).style({height: '0px'})
+        .addClass(this.slot(function(opened, animationComplete) {
+          var openComplete = opened && animationComplete;
           return openComplete ? this.myClass('open') : '';
-        }, this.opened$ && this.animationComplete$))
+        }, this.opened$, this.animationComplete$))
         .on('transitionend', this.onTransitionEnd)
         .on('mouseleave', this.onMouseLeave)
         .on('click', this.onClick);
