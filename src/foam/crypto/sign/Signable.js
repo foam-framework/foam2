@@ -5,25 +5,25 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.crypto.hash',
-  name: 'Hashable',
+  package: 'foam.crypto.sign',
+  name: 'Signable',
 
-  documentation: 'Hashable interface',
+  documentation: 'Signer interface',
 
   methods: [
     {
-      name: 'hash',
+      name: 'sign',
       javaReturns: 'byte[]',
       args: [
         {
           name: 'algorithm',
           javaType: 'String',
-          documentation: 'Hashing algorithm to use'
+          documentation: 'Signing algorithm to use'
         },
         {
-          name: 'hash',
-          javaType: 'byte[]',
-          documentation: 'Previous hash (used for chaining)'
+          name: 'key',
+          javaType: 'java.security.PrivateKey',
+          documentation: 'Private key to use for signing'
         }
       ]
     }
