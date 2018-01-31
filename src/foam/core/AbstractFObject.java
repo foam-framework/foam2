@@ -6,14 +6,14 @@
 
 package foam.core;
 
-import foam.crypto.hash.Hasher;
 import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Signature;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.http.util.TextUtils;
-import org.bouncycastle.util.encoders.Hex;
 
 /** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
@@ -139,6 +139,31 @@ public abstract class AbstractFObject
       }
 
       return md.digest();
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return null;
+    }
+  }
+
+  public byte[] sign(PrivateKey key) {
+    return this.sign("SHA256withRSA", key);
+  }
+
+  public byte[] sign(String algorithm, PrivateKey key) {
+    try {
+      Signature signature = Signature.getInstance(algorithm);
+      signature.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+
+      List props= getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(this) ) continue;
+        if ( prop.isDefaultValue(this) ) continue;
+        signature.update(prop.getNameAsByteArray());
+        prop.sign(this, signature);
+      }
+      return signature.sign();
     } catch (Throwable t) {
       t.printStackTrace();
       return null;

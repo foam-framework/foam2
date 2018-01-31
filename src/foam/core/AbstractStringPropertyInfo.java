@@ -11,6 +11,8 @@ import foam.util.SafetyUtil;
 import javax.xml.stream.XMLStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractStringPropertyInfo
   extends AbstractPropertyInfo
@@ -38,10 +40,14 @@ public abstract class AbstractStringPropertyInfo
   @Override
   public void hash(FObject obj, MessageDigest md) {
     String val = (String) get(obj);
-    if ( SafetyUtil.isEmpty(val) ) {
-      return;
-    }
-
+    if ( SafetyUtil.isEmpty(val) ) return;
     md.update(val.getBytes(StandardCharsets.UTF_8));
+  }
+
+  @Override
+  public void sign(FObject obj, Signature sig) throws SignatureException {
+    String val = (String) get(obj);
+    if ( SafetyUtil.isEmpty(val) ) return;
+    sig.update(val.getBytes(StandardCharsets.UTF_8));
   }
 }
