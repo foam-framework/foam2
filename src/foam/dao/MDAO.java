@@ -96,14 +96,9 @@ public class MDAO extends AbstractDAO {
 
     //Whe did or logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
     if ( simplePredicate instanceof Or ) {
-      Sink dependSink;
+      Sink dependSink = new ArraySink();
       // When we have groupBy, order, skip, limit such requirement, we can't do it saparately so I replace a array sink to temporarily holde the whole data
       //Then after the plan wa slelect we change it to the origin sink
-      if ( sink instanceof GroupBy ) {
-        dependSink = new ArraySink();
-      } else {
-        dependSink = sink;
-      }
       int length = ( (Or) simplePredicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {
