@@ -84,9 +84,15 @@ public abstract class AbstractPropertyInfo
   public void toXML(FObject obj, Document doc, Element objElement) {
     Object value = this.f(obj);
     if ( value != null && value != "" ) {
-      Element prop = doc.createElement(this.getName());
-      prop.appendChild(doc.createTextNode(value.toString()));
-      objElement.appendChild(prop);
+      if ( this.getXmlAttribute() ) {
+        objElement.setAttribute(this.getName(), value.toString());
+      } else if ( this.getXmlTextNode() ) {
+        objElement.appendChild(doc.createTextNode(value.toString()));
+      } else {
+        Element prop = doc.createElement(this.getName());
+        prop.appendChild(doc.createTextNode(value.toString()));
+        objElement.appendChild(prop);
+      }
     }
   }
 

@@ -14,6 +14,11 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'Boolean',
+      name: 'xmlTextNode',
+      value: false
+    },
+    {
       name: 'fromXML',
       value: function fromXML(value, ctx, prop, xml) {
         return foam.xml.parse(value, null, ctx);
