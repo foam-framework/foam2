@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hasher;
 import foam.dao.SQLStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Axiom, Comparator, Expr, SQLStatement, Validator
+    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
@@ -28,6 +29,7 @@ public interface PropertyInfo
   public boolean getRequired();
   public Class getValueClass();
   public String getName();
+  public byte[] getNameAsByteArray();
   public Object get(Object obj);
   public void set(Object obj, Object value);
   public Parser jsonParser();
