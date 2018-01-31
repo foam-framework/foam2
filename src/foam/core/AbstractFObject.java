@@ -6,15 +6,15 @@
 
 package foam.core;
 
-import foam.crypto.hash.Hasher;
-import org.apache.http.util.TextUtils;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Signature;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 
 public abstract class AbstractFObject
     extends    ContextAwareSupport
@@ -130,7 +130,7 @@ public abstract class AbstractFObject
 
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
-      while (i.hasNext()) {
+      while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
@@ -138,6 +138,31 @@ public abstract class AbstractFObject
         prop.hash(this, md);
       }
       return md.digest();
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return null;
+    }
+  }
+
+  public byte[] sign(PrivateKey key) {
+    return this.sign("SHA256withRSA", key);
+  }
+
+  public byte[] sign(String algorithm, PrivateKey key) {
+    try {
+      Signature signature = Signature.getInstance(algorithm);
+      signature.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+
+      List props= getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(this) ) continue;
+        if ( prop.isDefaultValue(this) ) continue;
+        signature.update(prop.getNameAsByteArray());
+        prop.sign(this, signature);
+      }
+      return signature.sign();
     } catch (Throwable t) {
       t.printStackTrace();
       return null;

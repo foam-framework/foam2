@@ -185,7 +185,10 @@ var classes = [
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
-  'foam.crypto.hash.Hashable'
+  'foam.crypto.hash.Hashable',
+
+  'foam.crypto.sign.Signer',
+  'foam.crypto.sign.Signable'
 ];
 
 var abstractClasses = [
