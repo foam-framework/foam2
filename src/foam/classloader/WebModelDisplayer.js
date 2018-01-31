@@ -131,11 +131,12 @@ foam.CLASS({
       Promise.all([
         this.classloader.load(this.model),
         this.view ? this.classloader.load(this.view) : Promise.resolve()
-      ]).then(function(cls, _) {
+      ]).then(function(args) {
+        var cls = args[0];
         var m = cls.create(null, self);
         window.__foam_obj__ = m;
 
-        var viewSpec = self.view ? { class: self.view, data: model } : model.toE.bind(model);
+        var viewSpec = self.view ? { class: self.view, data: m } : m.toE.bind(m);
 
         self.stack.push(viewSpec);
         self.StackView.create({

@@ -14,7 +14,7 @@ foam.CLASS({
     function stringify(x, v) {
       var serializer = this.InnerSerializer.create();
       serializer.output(x, v);
-      return serializer.out.str;
+      return serializer.getString();
     }
   ],
   classes: [
@@ -26,7 +26,7 @@ foam.CLASS({
       properties: [
         {
           class: 'Map',
-          name: 'seen'
+          name: 'deps'
         },
         {
           class: 'FObjectProperty',
@@ -38,6 +38,10 @@ foam.CLASS({
         }
       ],
       methods: [
+        function getString() {
+          var deps = Object.keys(this.deps).map(function(d) { return `"${d}"` }).join(',');
+          return `{"$DEPS$":[${deps}],"$BODY$":${this.out.str}}`
+        },
         function output(x, v) {
           var out = this.out;
           var type = foam.typeOf(v);
@@ -75,6 +79,7 @@ foam.CLASS({
                 out.key("$CLS$");
                 out.s(v.id);
                 out.end();
+                this.deps[v.id] = true;
               }
             } else { // is some other JS object
               if ( v.outputJSON2 ) {
