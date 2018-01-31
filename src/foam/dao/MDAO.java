@@ -19,6 +19,28 @@ import foam.mlang.sink.GroupBy;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ The MDAO class for an ordering, fast lookup, single value,
+ index multiplexer, or any other MDAO select() assistance class.
+
+ The assitance class TreeiNdex implements the
+ data nodes that hold the indexed items and plan and execute
+ queries. For any particular operational Index, there may be
+ many IndexNode instances:
+
+ <pre>
+ 1---------> TreeIndex(id)
+ MDAO: AltIndex 2---------> TreeIndex(propA) ---> TreeIndex(id) -------------> ValueIndex
+ | 1x AltIndexNode    | 1x TreeIndexNode    | 14x TreeIndexNodes         | (DAO size)x ValueIndexNodes
+ (2 alt subindexes)     (14 nodes)             (each has 0-5 nodes)
+ </pre>
+ The base AltIndex has two complete subindexes (each holds the entire DAO).
+ The TreeIndex on property A has created one TreeIndexNode, holding one tree of 14 nodes.
+ Each tree node contains a tail instance of the next level down, thus
+ the TreeIndex on id has created 14 TreeIndexNodes. Each of those contains some number
+ of tree nodes, each holding one tail instance of the ValueIndex at the end of the chain.
+
+ */
 public class MDAO extends AbstractDAO {
 
   protected AltIndex index_;
@@ -72,10 +94,15 @@ public class MDAO extends AbstractDAO {
     Predicate copyPredicate = null;
     if ( predicate != null ) {
       copyPredicate = (Predicate) ( (FObject) predicate ).deepClone();
+      // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
       copyPredicate = copyPredicate.partialEval();
     }
+
+    //Whe did or logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
     if ( copyPredicate instanceof Or ) {
       Sink dependSink;
+      // When we have groupBy, order, skip, limit such requirement, we can't do it saparately so I replace a array sink to temporarily holde the whole data
+      //Then after the plan wa slelect we change it to the origin sink
       if ( sink instanceof GroupBy ) {
         dependSink = new ArraySink();
       } else {

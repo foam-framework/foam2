@@ -38,6 +38,12 @@ public class TreeIndex
     return TreeNode.getNullNode().bulkLoad(tail_, prop_, 0, a.length-1, a);
   }
 
+  /**
+   *This fuction help to smaller state by predicate efficiently
+   * @param state: When we could deal with predicate efficiently by index, the return sata will smaller than origin state
+   * @param predicate: If the state is kind of Binary state, when we deal with it it will become null. If it is kind of N-arry state, the part of their predicate will become True or null.
+   * @return Return an Object[] which contains two elements, first one is update state and second one is update predicate.
+   */
   protected Object[] simplifyPredicate(Object state, Predicate predicate) {
     if ( predicate != null && prop_ != null ) {
       if ( predicate instanceof Binary ) {
@@ -71,6 +77,7 @@ public class TreeIndex
         for ( int i = 0; i < length; i++ ) {
           Predicate arg = ( (And) predicate ).getArgs()[i];
           if ( arg != null && state != null ) {
+            // Each args deal with by 'simplifyPredicate()' function recursively.
             Object[] statePredicate = simplifyPredicate(state, arg);
             state = statePredicate[0];
             arg = (Predicate) statePredicate[1];
@@ -79,6 +86,7 @@ public class TreeIndex
             ( (And) predicate ).getArgs()[i] = new True();
           }
         }
+        // use partialEval to simplify predicate themselves.
         predicate = predicate.partialEval();
         if ( predicate instanceof True ) return new Object[]{state, null};
       }
@@ -108,7 +116,10 @@ public class TreeIndex
   }
 
 
-  //TODO
+  /**
+   * This function retrun plan depend on index and sink.
+   * @return return is a selectPlan
+   */
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( ( predicate != null && predicate instanceof False ) || state == null ) {
       return NotFoundPlan.instance();
@@ -117,9 +128,11 @@ public class TreeIndex
     Object[] statePredicate = simplifyPredicate(state, predicate);
     state = statePredicate[0];
     predicate = (Predicate) statePredicate[1];
+    // To see if there have some possible to do count or groubBy select efficiently
     if ( predicate == null && sink instanceof Count ) {
       return new CountPlan(( (TreeNode) state ).size);
     }
+    // We return a groupByPlan only if no order, no limit, no skip, no predicate
     if ( predicate == null && sink instanceof GroupBy
         && ( (GroupBy) sink ).getArg1().toString().equals(prop_.toString())
         && order == null && skip == 0 && limit == AbstractDAO.MAX_SAFE_INTEGER )
