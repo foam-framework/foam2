@@ -16,12 +16,11 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
 import foam.util.SafetyUtil;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
+import java.util.TimeZone;
 
 public class JDAO
     extends ProxyDAO
@@ -46,10 +45,12 @@ public class JDAO
 
   public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
     this(x, new MapDAO(classInfo), filename);
+    setOf(classInfo);
   }
 
   public JDAO(foam.core.X x, DAO delegate, String filename) {
     setX(x);
+    setOf(delegate.getOf());
 
     try {
       file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
@@ -136,10 +137,16 @@ public class JDAO
 
   protected void writeComment(User user) throws IOException {
     out_.write("// Modified by ");
-    out_.write(user != null ?
-        user.getFirstName() + " " + user.getLastName() + " (" + user.getId() + ")" :
-        "System" );
-    out_.write(" at " + sdf.get().format(Calendar.getInstance().getTime()));
+    out_.write(user.getFirstName());
+    if ( ! SafetyUtil.isEmpty(user.getLastName()) ) {
+      out_.write(" ");
+      out_.write(user.getLastName());
+    }
+    out_.write(" (");
+    out_.write(String.valueOf(user.getId()));
+    out_.write(")");
+    out_.write(" at ");
+    out_.write(sdf.get().format(Calendar.getInstance().getTime()));
     out_.newLine();
   }
 
@@ -168,7 +175,7 @@ public class JDAO
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    Object id  = ((AbstractDAO) getDelegate()).getPrimaryKey().get(obj);
+    Object  id  = getPrimaryKey().get(obj);
     FObject ret = getDelegate().remove_(x, obj);
 
     try {
