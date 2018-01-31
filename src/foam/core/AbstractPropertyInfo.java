@@ -15,6 +15,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -115,6 +117,9 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void hash(FObject obj, MessageDigest md) {}
+
+  @Override
+  public void sign(FObject obj, Signature sig) throws SignatureException {}
 
   protected byte[] nameAsByteArray_ = null;
 
