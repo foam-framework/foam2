@@ -6,11 +6,16 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hasher;
+import java.security.MessageDigest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import org.apache.http.util.TextUtils;
+import org.bouncycastle.util.encoders.Hex;
 
+/** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
   extends    ContextAwareSupport
   implements FObject
@@ -104,5 +109,39 @@ public abstract class AbstractFObject
     if ( ! this.isPropertySet(prop) ) return true;
     PropertyInfo property = (PropertyInfo) getClassInfo().getAxiomByName(prop);
     return property != null && property.isDefaultValue(this);
+  }
+
+  public byte[] hash() {
+    return this.hash(null);
+  }
+
+  public byte[] hash(byte[] hash) {
+    return this.hash("SHA-256", hash);
+  }
+
+  public byte[] hash(String algorithm, byte[] hash) {
+    try {
+      MessageDigest md = MessageDigest.getInstance(algorithm);
+
+      // update with previous hash
+      if ( hash != null && hash.length != 0 ) {
+        md.update(hash, 0, hash.length);
+      }
+
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(this) ) continue;
+        if ( prop.isDefaultValue(this) ) continue;
+        md.update(prop.getNameAsByteArray());
+        prop.hash(this, md);
+      }
+
+      return md.digest();
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return null;
+    }
   }
 }

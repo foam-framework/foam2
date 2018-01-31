@@ -126,10 +126,9 @@ public class DigWebAgent
             return;
           }
 
-          String dataArray[] = data.split("},");
+          String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
 
           for ( int i = 0 ; i < dataArray.length ; i++ ) {
-            data = dataArray[i] + "}";
             o = jsonParser.parseString(data, objClass);
 
             if ( o == null ) {
@@ -267,9 +266,9 @@ public class DigWebAgent
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
-          String dataArray[] = outputterJson.toString().split("\\{\"class\":");
+          String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
           for ( int k = 1 ; k < dataArray.length; k++ ) {
-            dataToString += "p({\"class\":" + dataArray[k] + ")\n";
+            dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
           }
 
           if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
@@ -292,7 +291,7 @@ public class DigWebAgent
         out.println("</table>");*/
 
         out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
-        out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl);</script>");
+        out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl, '_self'); </script>");
       } else if ( "remove".equals(command) ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);
@@ -339,9 +338,6 @@ public class DigWebAgent
     } else {
       EmailService emailService = (EmailService) x.get("email");
       EmailMessage message      = new EmailMessage();
-
-      message.setFrom("info@nanopay.net");
-      message.setReplyTo("noreply@nanopay.net");
       message.setTo(email);
       message.setSubject(subject);
 

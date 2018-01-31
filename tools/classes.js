@@ -126,6 +126,7 @@ var classes = [
   'foam.nanos.auth.token.ClientTokenService',
   'foam.nanos.auth.token.AbstractTokenService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
+  'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -180,7 +181,11 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary',
 
-  'foam.nanos.demo.DemoObject'
+  'foam.nanos.demo.DemoObject',
+  'foam.nanos.fs.File',
+
+  'foam.crypto.hash.Hasher',
+  'foam.crypto.hash.Hashable'
 ];
 
 var abstractClasses = [
@@ -222,10 +227,8 @@ var blacklist = [
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO',
   'foam.dao.FilteredDAO',
   'foam.dao.LimitedDAO',
-  'foam.dao.NullDAO',
   'foam.dao.OrderedDAO',
   'foam.dao.SkipDAO',
 
@@ -254,14 +257,12 @@ var blacklist = [
   'foam.dao.ContextualizingDAO',
   'foam.dao.DecoratedDAO',
   'foam.dao.DeDupDAO',
-  'foam.dao.GUIDDAO',
   'foam.dao.IDBDAO',
   'foam.dao.JDAO',
   'foam.dao.LoggingDAO',
   'foam.dao.MDAO',
   'foam.dao.PromisedDAO',
   'foam.dao.RequestResponseClientDAO',
-  'foam.dao.SequenceNumberDAO',
   'foam.dao.SyncDAO',
   'foam.dao.TimingDAO'
 ];
