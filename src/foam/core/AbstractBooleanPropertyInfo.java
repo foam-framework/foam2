@@ -7,6 +7,7 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
 
 public abstract class AbstractBooleanPropertyInfo
   extends AbstractPropertyInfo
@@ -23,5 +24,11 @@ public abstract class AbstractBooleanPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Boolean.parseBoolean(reader.getText());
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    boolean val = (boolean) get(obj);
+    md.update((byte) (val ? 1 : 0));
   }
 }
