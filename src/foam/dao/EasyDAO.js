@@ -95,11 +95,11 @@ if ( getGuid() && getSeqNo() ) {
 }
 
 if ( getGuid() ) {
-  delegate = new foam.dao.GUIDDAO(delegate);
+  delegate = new foam.dao.GUIDDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getSeqNo() ) {
-  delegate = new foam.dao.SequenceNumberDAO(delegate);
+  delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).setDelegate(delegate).build();
 }
 
 if ( getPm() ) {

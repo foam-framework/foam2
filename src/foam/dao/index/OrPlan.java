@@ -10,7 +10,7 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
 import static foam.dao.AbstractDAO.decorateDedupSink_;
-import static foam.dao.AbstractDAO.decorateSink_;
+import static foam.dao.AbstractDAO.decorateSink;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class OrPlan implements SelectPlan {
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( planList_ == null || planList_.size() == 0 )
       return;
-    sink = decorateSink_(sink, skip, limit, order, null);
+    sink = decorateSink(null, sink, skip, limit, order, null);
     sink = decorateDedupSink_(sink);
     for ( SelectPlan plan : planList_ ) {
       plan.select(state, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
