@@ -477,9 +477,7 @@ FOAM_FILES([
   { name: "foam/dao/pg/ConnectionPool" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/parse/Parser" },
-  { name: "foam/lib/parse/PStream" }
   { name: "foam/lib/parse/PStream" },
-  { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
   { name: "foam/crypto/hash/Hasher" },
   { name: "foam/crypto/hash/Hashable" }
 ]);
