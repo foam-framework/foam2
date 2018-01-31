@@ -27,18 +27,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this.setAttribute('type', 'time');
-    },
-
-    function link() {
-      this.data$.relateTo(
-          this.attrSlot(null, this.onKey ? 'input' : null),
-          function(date) {
-            return date ? date.toISOString().substring(0,16) : date;
-          },
-          function(value) {
-            return new Date(value);
-          }
-      );
     }
   ]
 });

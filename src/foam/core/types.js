@@ -118,7 +118,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.core',
   name: 'Time',
-  extends: 'Date',
+  extends: 'String',
 
   documentation: 'Describes properties of type Time.',
   label: 'Time'
