@@ -73,9 +73,9 @@ public class MDAO extends AbstractDAO {
     }
     FObject found = find(obj);
     if ( found != null ) {
-      state_ = index_.remove(state_, obj);
+      state_ = index_.remove(state_, found);
     }
-    return obj;
+    return found;
   }
 
   public FObject find_(X x, Object o) {
