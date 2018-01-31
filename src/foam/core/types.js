@@ -115,6 +115,15 @@ foam.CLASS({
   label: 'Date and time'
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'Time',
+  extends: 'Date',
+
+  documentation: 'Describes properties of type Time.',
+  label: 'Time'
+});
+
 
 foam.CLASS({
   package: 'foam.core',
