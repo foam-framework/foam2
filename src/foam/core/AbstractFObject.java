@@ -7,18 +7,18 @@
 package foam.core;
 
 import foam.crypto.hash.Hasher;
-import org.apache.http.util.TextUtils;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.http.util.TextUtils;
+import org.bouncycastle.util.encoders.Hex;
 
+/** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
-    extends    ContextAwareSupport
-    implements FObject
+  extends    ContextAwareSupport
+  implements FObject
 {
 
   public static FObject maybeClone(FObject fo) {
@@ -130,13 +130,14 @@ public abstract class AbstractFObject
 
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
-      while (i.hasNext()) {
+      while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
         md.update(prop.getNameAsByteArray());
         prop.hash(this, md);
       }
+
       return md.digest();
     } catch (Throwable t) {
       t.printStackTrace();
