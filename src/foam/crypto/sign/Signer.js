@@ -13,6 +13,9 @@ foam.INTERFACE({
   methods: [
     {
       name: 'sign',
+      javaThrows: [
+        'java.security.SignatureException'
+      ],
       args: [
         {
           name: 'obj',
