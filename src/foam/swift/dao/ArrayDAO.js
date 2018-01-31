@@ -18,16 +18,6 @@ foam.CLASS({
       name: 'array',
       swiftFactory: 'return []',
     },
-    {
-      swiftType: 'ClassInfo',
-      name: 'of',
-    },
-    {
-      swiftType: 'PropertyInfo',
-      name: 'primaryKey',
-      swiftExpressionArgs: ['of'],
-      swiftExpression: 'return of.axiom(byName: "id") as! PropertyInfo',
-    },
   ],
   methods: [
     {

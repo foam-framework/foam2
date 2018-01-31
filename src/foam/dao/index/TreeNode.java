@@ -11,7 +11,7 @@ import foam.dao.AbstractDAO;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import static foam.dao.AbstractDAO.decorateSink_;
+import static foam.dao.AbstractDAO.decorateSink;
 import foam.mlang.predicate.True;
 import foam.mlang.sink.GroupBy;
 
@@ -468,14 +468,14 @@ public class TreeNode {
     if ( ( predicate != null && predicate.partialEval() != null && ! ( predicate instanceof True ) ) || order != null ) {
       if ( order == null ) {
         if ( reverseSort ) {
-          sink = decorateSink_(sink, skip, limit, null, predicate);
+          sink = decorateSink(null, sink, skip, limit, null, predicate);
           reverseSortSkipLimitTreeNode(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
         } else {
-          sink = decorateSink_(sink, skip, limit, null, predicate);
+          sink = decorateSink(null, sink, skip, limit, null, predicate);
           select_(currentNode, sink, skip, limit, size, tail);
         }
       } else {
-        sink = decorateSink_(sink, skip, limit, order, predicate);
+        sink = decorateSink(null, sink, skip, limit, order, predicate);
         select_(currentNode, sink, skip, limit, size, tail);
         sink.eof();
       }
