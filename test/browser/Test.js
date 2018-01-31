@@ -403,6 +403,10 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'dateTime'
+    },
+    {
+      class: 'Time',
+      name: 'time'
     }
   ]
 });
