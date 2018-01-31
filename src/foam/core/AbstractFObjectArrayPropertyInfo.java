@@ -6,7 +6,6 @@
 
 package foam.core;
 
-import foam.crypto.hash.Hasher;
 import foam.nanos.logger.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,6 +14,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -80,9 +81,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
   @Override
   public void hash(FObject obj, MessageDigest md) {
     FObject[] val = (FObject[]) this.get(obj);
-    if ( val == null || val.length == 0 ) {
-      return;
-    }
+    if ( val == null || val.length == 0 ) return;
 
     List props = val[0].getClassInfo().getAxiomsByClass(PropertyInfo.class);
     for ( FObject o : val ) {
@@ -93,6 +92,24 @@ public abstract class AbstractFObjectArrayPropertyInfo
         if ( prop.isDefaultValue(o) ) continue;
         md.update(prop.getNameAsByteArray());
         prop.hash(o, md);
+      }
+    }
+  }
+
+  @Override
+  public void sign(FObject obj, Signature sig) throws SignatureException {
+    FObject[] val = (FObject[]) this.get(obj);
+    if ( val == null || val.length == 0 ) return;
+
+    List props = val[0].getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( FObject o : val ) {
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(o) ) continue;
+        if ( prop.isDefaultValue(o) ) continue;
+        sig.update(prop.getNameAsByteArray());
+        prop.sign(o, sig);
       }
     }
   }

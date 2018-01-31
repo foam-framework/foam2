@@ -1,12 +1,12 @@
 
 foam.CLASS({
-  package: 'foam.u2.navigation',
+  package: 'foam.nanos.u2.navigation',
   name: 'UserView',
   extends: 'foam.u2.Element',
 
   documentation: 'View user name and user nav settings',
 
-  imports: [ 
+  imports: [
     'user',
     'window'
   ],
@@ -32,8 +32,8 @@ foam.CLASS({
           bottom: 5;
         }
         ^carrot {
-          width: 0; 
-          height: 0; 
+          width: 0;
+          height: 0;
           border-left: 5px solid transparent;
           border-right: 5px solid transparent;
           border-top: 5px solid white;
