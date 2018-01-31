@@ -15,10 +15,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
+/** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
-    extends    ContextAwareSupport
-    implements FObject
+  extends    ContextAwareSupport
+  implements FObject
 {
 
   public static FObject maybeClone(FObject fo) {
@@ -137,6 +137,7 @@ public abstract class AbstractFObject
         md.update(prop.getNameAsByteArray());
         prop.hash(this, md);
       }
+
       return md.digest();
     } catch (Throwable t) {
       t.printStackTrace();
