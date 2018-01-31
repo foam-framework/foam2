@@ -128,10 +128,13 @@ public abstract class AbstractFObject
         md.update(hash, 0, hash.length);
       }
 
-      List props = getClassInfo().getAxiomsByClass(Hasher.class);
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
       while (i.hasNext()) {
-        Hasher prop = (Hasher) i.next();
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(this) ) continue;
+        if ( prop.isDefaultValue(this) ) continue;
+        md.update(prop.getNameAsByteArray());
         prop.hash(this, md);
       }
       return md.digest();

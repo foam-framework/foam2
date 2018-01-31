@@ -84,14 +84,14 @@ public abstract class AbstractFObjectArrayPropertyInfo
       return;
     }
 
-    super.hash(obj, md);
-    if ( ! isSet(obj) ) return;
-    if ( isDefaultValue(obj) ) return;
-    List props = val[0].getClassInfo().getAxiomsByClass(Hasher.class);
+    List props = val[0].getClassInfo().getAxiomsByClass(PropertyInfo.class);
     for ( FObject o : val ) {
       Iterator i = props.iterator();
       while ( i.hasNext() ) {
-        Hasher prop = (Hasher) i.next();
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(o) ) continue;
+        if ( prop.isDefaultValue(o) ) continue;
+        md.update(prop.getNameAsByteArray());
         prop.hash(o, md);
       }
     }

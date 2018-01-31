@@ -6,7 +6,6 @@
 
 package foam.core;
 
-import foam.crypto.hash.Hasher;
 import foam.nanos.logger.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,13 +64,13 @@ public abstract class AbstractFObjectPropertyInfo
       return;
     }
 
-    super.hash(obj, md);
-    if ( ! isSet(obj) ) return;
-    if ( isDefaultValue(obj) ) return;
-    List props = val.getClassInfo().getAxiomsByClass(Hasher.class);
+    List props = val.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
-      Hasher prop = (Hasher) i.next();
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( ! prop.isSet(val) ) continue;
+      if ( prop.isDefaultValue(val) ) continue;
+      md.update(prop.getNameAsByteArray());
       prop.hash(val, md);
     }
   }
