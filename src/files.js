@@ -132,7 +132,6 @@ FOAM_FILES([
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
   { name: "foam/java/JavaSwiftRefines", flags: ['java'] },
-  { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/util/Timer" },
   { name: "foam/log/LogLevel" },
   { name: "foam/log/Logger" },
@@ -341,7 +340,6 @@ FOAM_FILES([
   { name: "foam/box/pipeline/PipelineBuilder" },
   { name: "foam/core/async" },
   { name: "foam/dao/ClientSink" },
-  { name: "foam/nanos/menu/TreeAltView", flags: ['web'] },
   { name: "foam/u2/ViewFactory", flags: ['web'] },
   { name: "foam/u2/daos", flags: ['web'] },
   { name: "foam/u2/TableView", flags: ['web'] },
@@ -392,10 +390,6 @@ FOAM_FILES([
   { name: "foam/u2/view/ImageBlobView", flags: ['web'] },
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
   { name: "foam/u2/view/ImageView", flags: ['web'] },
-  { name: "foam/u2/navigation/TopNavigation", flags: ['web'] },
-  { name: "foam/u2/navigation/BusinessLogoView", flags: ['web'] },
-  { name: "foam/u2/navigation/UserView", flags: ['web'] },
-  { name: "foam/u2/navigation/SubMenu", flags: ['web'] },
   { name: "foam/u2/EnumView", flags: ['web'] },
   { name: "foam/u2/ClassView", flags: ['web'] },
   { name: "foam/u2/view/ReferenceView", flags: ['web'] },
@@ -425,8 +419,6 @@ FOAM_FILES([
   { name: "foam/comics/BrowserView", flags: ['web'] },
   { name: "foam/comics/InlineBrowserView", flags: ['web'] },
   { name: "foam/comics/RelationshipView", flags: ['web'] },
-  { name: "foam/nanos/auth/AddressDetailView", flags: ['web'] },
-  { name: "foam/nanos/auth/PhoneDetailView", flags: ['web'] },
   { name: "foam/u2/view/ReciprocalSearch", flags: ['web'] },
   { name: "lib/node/box", flags: ['node'] },
   { name: "foam/box/node/ForkBox", flags: ['node'] },
@@ -437,8 +429,6 @@ FOAM_FILES([
   { name: "foam/net/auth/AuthAwareHTTPRequest" },
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
-  { name: "foam/nanos/auth/SignInView", flags: ['web'] },
-  { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
@@ -488,8 +478,6 @@ FOAM_FILES([
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
-  { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
-
   { name: "foam/crypto/hash/Hasher" },
   { name: "foam/crypto/hash/Hashable" }
 ]);

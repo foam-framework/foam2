@@ -1,6 +1,6 @@
 
 foam.CLASS({
-  package: 'foam.u2.navigation',
+  package: 'foam.nanos.u2.navigation',
   name: 'SubMenuBar',
   extends: 'foam.u2.Element',
 

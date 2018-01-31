@@ -14,7 +14,6 @@ p({"class":"foam.nanos.menu.Menu","id":"permissions","label":"Permissions","hand
 p({"class":"foam.nanos.menu.Menu","id":"regions","label":"Regions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"regionDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"reset","label":"Reset Password","handler":{"class":"foam.nanos.menu.ViewMenu"},"order":1000,"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"scripts","label":"Scripts","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"scriptDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"servproviders","label":"Service Providers","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"cicoServiceProviderDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"sessions","label":"Sessions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"sessionDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"sign-in","label":"Sign in","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignInView"}},"order":1000,"parent":"hidden"})
 p({"class":"foam.nanos.menu.Menu","id":"tests","label":"Tests","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"testDAO","summaryView":{"class":"foam.nanos.test.TestBorder"}},"order":1000,"parent":"admin"})

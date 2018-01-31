@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.u2.navigation',
+  package: 'foam.nanos.u2.navigation',
   name: 'BusinessLogoView',
   extends: 'foam.u2.View',
 
