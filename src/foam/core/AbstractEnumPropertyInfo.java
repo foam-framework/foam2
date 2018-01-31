@@ -13,8 +13,25 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+
 public abstract class AbstractEnumPropertyInfo
-  extends AbstractObjectPropertyInfo {
+    extends AbstractObjectPropertyInfo
+{
+  protected static final ThreadLocal<ByteBuffer> bb = new ThreadLocal<ByteBuffer>() {
+    @Override
+    protected ByteBuffer initialValue() {
+      return ByteBuffer.wrap(new byte[4]);
+    }
+
+    @Override
+    public ByteBuffer get() {
+      ByteBuffer bb = super.get();
+      bb.clear();
+      return bb;
+    }
+  };
 
   public abstract int getOrdinal(Object o);
   public abstract java.lang.Enum forOrdinal(int ordinal);
@@ -56,6 +73,12 @@ public abstract class AbstractEnumPropertyInfo
     int ordVal = this.getOrdinal(nestObj);
     objTag.appendChild(doc.createTextNode(Integer.toString(ordVal)));
     objElement.appendChild(objTag);
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    int val = getOrdinal(get(obj));
+    md.update(bb.get().putInt(val));
   }
 }
 
