@@ -111,21 +111,21 @@ public abstract class AbstractFObject
     return property != null && property.isDefaultValue(this);
   }
 
-  public String hash() {
+  public byte[] hash() {
     return this.hash(null);
   }
 
-  public String hash(String hash) {
+  public byte[] hash(byte[] hash) {
     return this.hash("SHA-256", hash);
   }
 
-  public String hash(String algorithm, String hash) {
+  public byte[] hash(String algorithm, byte[] hash) {
     try {
       MessageDigest md = MessageDigest.getInstance(algorithm);
 
       // update with previous hash
-      if ( ! SafetyUtil.isEmpty(hash) ) {
-        md.update(Hex.decode(hash));
+      if ( hash != null && hash.length != 0 ) {
+        md.update(hash, 0, hash.length);
       }
 
       List props = getClassInfo().getAxiomsByClass(Hasher.class);
@@ -134,7 +134,7 @@ public abstract class AbstractFObject
         Hasher prop = (Hasher) i.next();
         prop.hash(this, md);
       }
-      return Hex.toHexString(md.digest());
+      return md.digest();
     } catch (Throwable t) {
       t.printStackTrace();
       return null;
