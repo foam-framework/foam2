@@ -6,13 +6,29 @@
 
 package foam.core;
 
-import foam.dao.pg.IndexedPreparedStatement;
 import javax.xml.stream.XMLStreamReader;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Date;
 
 public abstract class AbstractDatePropertyInfo
-  extends AbstractPropertyInfo
+    extends AbstractPropertyInfo
 {
+  protected static final ThreadLocal<ByteBuffer> bb = new ThreadLocal<ByteBuffer>() {
+    @Override
+    protected ByteBuffer initialValue() {
+      return ByteBuffer.wrap(new byte[8]);
+    }
+
+    @Override
+    public ByteBuffer get() {
+      ByteBuffer bb = super.get();
+      bb.clear();
+      return bb;
+    }
+  };
 
   public int compareValues(java.lang.Object o1, java.lang.Object o2) {
     return ((Date)o1).compareTo(((Date)o2));
@@ -20,7 +36,7 @@ public abstract class AbstractDatePropertyInfo
 
   public Object fromString(String value) {
     //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern(getDateFormat()).withZone(ZoneOffset.UTC);		 +    return new Date(value);
-    //  LocalDateTime date = LocalDateTime.parse(value, formatter);		
+    //  LocalDateTime date = LocalDateTime.parse(value, formatter);
     //  this.set(obj, Date.from(date.atZone(ZoneId.of("UTC")).toInstant()));
     return new Date(value);
   }
@@ -37,5 +53,23 @@ public abstract class AbstractDatePropertyInfo
     Object value = get(source);
 
     set(dest, value == null ? null : new Date(((Date)value).getTime()));
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    Date date = (Date) get(obj);
+    if ( date == null ) return;
+
+    long val = date.getTime();
+    md.update(bb.get().putLong(val));
+  }
+
+  @Override
+  public void sign(FObject obj, Signature sig) throws SignatureException {
+    Date date = (Date) get(obj);
+    if ( date == null ) return;
+
+    long val = date.getTime();
+    sig.update(bb.get().putLong(val));
   }
 }

@@ -25,6 +25,7 @@ public class AnyParser
           new StringArrayParser(),
           new StringDoubleArrayParser(),
           new PropertyReferenceParser(),
+          new ArrayParser(),
           new FObjectParser(),
           new MapParser());
       instance_.setDelegate(delegate);

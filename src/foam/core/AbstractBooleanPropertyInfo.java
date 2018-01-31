@@ -7,6 +7,9 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractBooleanPropertyInfo
   extends AbstractPropertyInfo
@@ -23,5 +26,17 @@ public abstract class AbstractBooleanPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Boolean.parseBoolean(reader.getText());
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    boolean val = (boolean) get(obj);
+    md.update((byte) (val ? 1 : 0));
+  }
+
+  @Override
+  public void sign(FObject obj, Signature sig) throws SignatureException {
+    boolean val = (boolean) get(obj);
+    sig.update((byte) (val ? 1 : 0));
   }
 }

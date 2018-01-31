@@ -390,6 +390,7 @@ FOAM_FILES([
   { name: "foam/u2/view/ScrollTableView", flags: ['web'] },
   { name: "foam/u2/view/ScrollDAOView", flags: ['web'] },
   { name: "foam/u2/view/BlobView", flags: ['web'] },
+  { name: "foam/u2/view/FileView", flags: ['web'] },
   { name: "foam/u2/view/ImageBlobView", flags: ['web'] },
   { name: "foam/u2/view/StringArrayView", flags: ['web'] },
   { name: "foam/u2/view/ImageView", flags: ['web'] },
@@ -481,5 +482,7 @@ FOAM_FILES([
   { name: "foam/dao/pg/ConnectionPool" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/parse/Parser" },
-  { name: "foam/lib/parse/PStream" }
+  { name: "foam/lib/parse/PStream" },
+  { name: "foam/crypto/hash/Hasher" },
+  { name: "foam/crypto/hash/Hashable" }
 ]);
