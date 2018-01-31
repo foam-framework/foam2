@@ -19,12 +19,16 @@ public class TreeLookupFindPlan implements FindPlan {
     size_ = size;
   }
 
+  /**
+   * The cost will claculate by the node size
+   */
   public long cost() {
     return ((Double) Math.log(Long.valueOf(size_).doubleValue())).longValue();
   }
 
   public FObject find(Object state, Object key) {
     if ( state != null && state instanceof TreeNode ) {
+      // Sometimes the object is not exist, it will return a null value.
       return ( (TreeNode) state ).get(( (TreeNode) state ), key, prop_) == null ? null : (FObject) ( (TreeNode) state ).get(( (TreeNode) state ), key, prop_).value;
     }
 
