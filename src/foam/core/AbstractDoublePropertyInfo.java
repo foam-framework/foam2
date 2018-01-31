@@ -18,6 +18,13 @@ public abstract class AbstractDoublePropertyInfo
     protected ByteBuffer initialValue() {
       return ByteBuffer.wrap(new byte[8]);
     }
+
+    @Override
+    public ByteBuffer get() {
+      ByteBuffer bb = super.get();
+      bb.clear();
+      return bb;
+    }
   };
 
   public int compareValues(double d1, double d2) {
@@ -40,6 +47,6 @@ public abstract class AbstractDoublePropertyInfo
     if ( ! isSet(obj) ) return;
     if ( isDefaultValue(obj) ) return;
     double val = (double) get(obj);
-    md.update(bb.get().putDouble(val).array());
+    md.update(bb.get().putDouble(val));
   }
 }

@@ -65,7 +65,7 @@ public abstract class AbstractEnumPropertyInfo
     super.hash(obj, md);
     if ( ! isSet(obj) ) return;
     if ( isDefaultValue(obj) ) return;
-    int val = getOrdinal(obj);
+    int val = getOrdinal(get(obj));
     md.update(new byte[] {
         (byte)((val & 0xFF000000) >> 24),
         (byte)((val & 0x00FF0000) >> 16),
