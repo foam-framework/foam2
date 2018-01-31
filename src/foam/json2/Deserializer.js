@@ -7,6 +7,9 @@
 foam.CLASS({
   package: 'foam.json2',
   name: 'Deserializer',
+  imports: [
+    'classloader',
+  ],
   properties: [
     {
       class: 'Boolean',
@@ -19,8 +22,17 @@ foam.CLASS({
       return this.aparse(x, JSON.parse(str));
     },
     function aparse(x, v) {
-      // TODO: References
-      return this.parse(x, v);
+      var self = this;
+      return new Promise(function(ret) {
+        if ( v['$DEPS$'] && v['$BODY$'] ) {
+          var load = self.classloader.load.bind(self.classloader);
+          Promise.all(v['$DEPS$'].map(load)).then(function(o) {
+            ret(self.parse(x, v));
+          });
+        } else {
+          ret(self.parse(x, v));
+        }
+      });
     },
     function parse(x, v) {
       var type = foam.typeOf(v);

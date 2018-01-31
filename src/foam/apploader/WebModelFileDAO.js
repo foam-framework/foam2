@@ -3,13 +3,19 @@ foam.CLASS({
   name: 'WebModelFileDAO',
   documentation: 'ModelDAO which reads .js files.',
   extends: 'foam.dao.AbstractDAO',
+  imports: [
+    'window',
+  ],
   requires: [
     'foam.net.HTTPRequest'
   ],
   properties: [
     {
       class: 'String',
-      name: 'root'
+      name: 'root',
+      factory: function() {
+        return this.window.location.protocol + '//' + this.window.location.host + '/src/';
+      }
     },
     {
       class: 'Map',
@@ -43,7 +49,9 @@ foam.CLASS({
           promise = this.HTTPRequest.create({
             method: 'GET',
             url: this.root + '/' + id.replace(/\./g, '/') + '.js'
-          }).send().then(function(payload) { return payload.resp.text(); })
+          }).send().then(function(payload) {
+            return payload.resp.text();
+          })
         }
 
         var self = this;
@@ -118,6 +126,8 @@ foam.CLASS({
 
             return foam.lookup(json.class || 'Model').create(json, x);
           });
+        }).catch(function() {
+          alert('errr');
         });
       }
     }
