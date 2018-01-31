@@ -348,6 +348,7 @@ foam.CLASS({
   extends: 'foam.blob.ProxyBlob',
   
   imports: [
+    'blobStore?',
     'blobService'
   ],
 
@@ -362,7 +363,7 @@ foam.CLASS({
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
+      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
     }
   ],
 
@@ -493,7 +494,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isSet',
-      value: false
+      value: false,
+      hidden: true,
+      transient: true
     }
   ],
 
@@ -676,9 +679,13 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'serviceName'
+    },
+    {
+      class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + "/service/httpBlobService";
+        return window.location.origin + '/' + this.serviceName
       }
     }
   ],
@@ -734,7 +741,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobServiceDecorator',
-  implements: ['foam.dao.DAODecorator'],
+  extends: 'foam.dao.AbstractDAODecorator',
 
   imports: [
     'blobService'
@@ -767,14 +774,6 @@ foam.CLASS({
           return a();
         });
       });
-    },
-
-    function read(X, dao, obj) {
-      return Promise.resolve(obj);
-    },
-
-    function remove(X, dao, obj) {
-      return Promise.resolve(obj);
     }
   ]
 });
