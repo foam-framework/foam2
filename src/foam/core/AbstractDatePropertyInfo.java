@@ -7,12 +7,26 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.util.Date;
 
 public abstract class AbstractDatePropertyInfo
-  extends AbstractPropertyInfo
+    extends AbstractPropertyInfo
 {
+  protected static final ThreadLocal<ByteBuffer> bb = new ThreadLocal<ByteBuffer>() {
+    @Override
+    protected ByteBuffer initialValue() {
+      return ByteBuffer.wrap(new byte[8]);
+    }
+
+    @Override
+    public ByteBuffer get() {
+      ByteBuffer bb = super.get();
+      bb.clear();
+      return bb;
+    }
+  };
 
   public int compareValues(java.lang.Object o1, java.lang.Object o2) {
     return ((Date)o1).compareTo(((Date)o2));
@@ -20,7 +34,7 @@ public abstract class AbstractDatePropertyInfo
 
   public Object fromString(String value) {
     //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern(getDateFormat()).withZone(ZoneOffset.UTC);		 +    return new Date(value);
-    //  LocalDateTime date = LocalDateTime.parse(value, formatter);		
+    //  LocalDateTime date = LocalDateTime.parse(value, formatter);
     //  this.set(obj, Date.from(date.atZone(ZoneId.of("UTC")).toInstant()));
     return new Date(value);
   }
@@ -47,15 +61,6 @@ public abstract class AbstractDatePropertyInfo
     }
 
     long val = date.getTime();
-    md.update(new byte[] {
-        (byte)((val & 0xFF00000000000000L) >> 56),
-        (byte)((val & 0x00FF000000000000L) >> 48),
-        (byte)((val & 0x0000FF0000000000L) >> 40),
-        (byte)((val & 0x000000FF00000000L) >> 32),
-        (byte)((val & 0x00000000FF000000L) >> 24),
-        (byte)((val & 0x0000000000FF0000L) >> 16),
-        (byte)((val & 0x000000000000FF00L) >> 8),
-        (byte)((val & 0x00000000000000FFL))
-    });
+    md.update(bb.get().putLong(val));
   }
 }
