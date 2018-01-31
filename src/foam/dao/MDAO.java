@@ -91,15 +91,11 @@ public class MDAO extends AbstractDAO {
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     SelectPlan plan;
-    Predicate copyPredicate = null;
-    if ( predicate != null ) {
-      copyPredicate = (Predicate) ( (FObject) predicate ).deepClone();
-      // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
-      copyPredicate = copyPredicate.partialEval();
-    }
+    // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
+    Predicate simplePredicate = predicate.partialEval();
 
     //Whe did or logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
-    if ( copyPredicate instanceof Or ) {
+    if ( simplePredicate instanceof Or ) {
       Sink dependSink;
       // When we have groupBy, order, skip, limit such requirement, we can't do it saparately so I replace a array sink to temporarily holde the whole data
       //Then after the plan wa slelect we change it to the origin sink
@@ -108,17 +104,17 @@ public class MDAO extends AbstractDAO {
       } else {
         dependSink = sink;
       }
-      int length = ( (Or) copyPredicate ).getArgs().length;
+      int length = ( (Or) simplePredicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
       for ( int i = 0; i < length; i++ ) {
-        Predicate arg = ( (Or) copyPredicate ).getArgs()[i];
+        Predicate arg = ( (Or) simplePredicate ).getArgs()[i];
         planList.add(index_.planSelect(state_, dependSink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, arg));
       }
-      plan = new OrPlan(copyPredicate, planList);
+      plan = new OrPlan(simplePredicate, planList);
     } else {
-      plan = index_.planSelect(state_, sink, skip, limit, order, copyPredicate);
+      plan = index_.planSelect(state_, sink, skip, limit, order, simplePredicate);
     }
-    plan.select(state_, sink, skip, limit, order, copyPredicate);
+    plan.select(state_, sink, skip, limit, order, simplePredicate);
     return sink;
   }
 
