@@ -7,10 +7,26 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
 
 public abstract class AbstractLongPropertyInfo
-  extends AbstractPropertyInfo
+    extends AbstractPropertyInfo
 {
+  protected static final ThreadLocal<ByteBuffer> bb = new ThreadLocal<ByteBuffer>() {
+    @Override
+    protected ByteBuffer initialValue() {
+      return ByteBuffer.wrap(new byte[8]);
+    }
+
+    @Override
+    public ByteBuffer get() {
+      ByteBuffer bb = super.get();
+      bb.clear();
+      return bb;
+    }
+  };
+
   public int compareValues(long o1, long o2) {
     return java.lang.Long.compare(o1, o2);
   }
@@ -23,5 +39,11 @@ public abstract class AbstractLongPropertyInfo
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Long.valueOf(reader.getText());
+  }
+
+  @Override
+  public void hash(FObject obj, MessageDigest md) {
+    long val = (long) get(obj);
+    md.update(bb.get().putLong(val));
   }
 }
