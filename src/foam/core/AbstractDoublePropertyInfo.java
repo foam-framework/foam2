@@ -9,6 +9,8 @@ package foam.core;
 import javax.xml.stream.XMLStreamReader;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractDoublePropertyInfo
     extends AbstractPropertyInfo
@@ -45,5 +47,11 @@ public abstract class AbstractDoublePropertyInfo
   public void hash(FObject obj, MessageDigest md) {
     double val = (double) get(obj);
     md.update(bb.get().putDouble(val));
+  }
+
+  @Override
+  public void sign(FObject obj, Signature sig) throws SignatureException {
+    double val = (double) get(obj);
+    sig.update(bb.get().putDouble(val));
   }
 }
