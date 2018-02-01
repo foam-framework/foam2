@@ -5,22 +5,25 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.crypto.hash',
-  name: 'Hasher',
+  package: 'foam.crypto.sign',
+  name: 'Signer',
 
-  documentation: 'Hasher interface',
+  documentation: 'Signer interface',
 
   methods: [
     {
-      name: 'updateDigest',
+      name: 'updateSignature',
+      javaThrows: [
+        'java.security.SignatureException'
+      ],
       args: [
         {
           name: 'obj',
           javaType: 'foam.core.FObject'
         },
         {
-          name: 'md',
-          javaType: 'java.security.MessageDigest'
+          name: 'sig',
+          javaType: 'java.security.Signature'
         }
       ]
     }

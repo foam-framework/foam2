@@ -16,14 +16,14 @@ foam.INTERFACE({
       javaReturns: 'byte[]',
       args: [
         {
-          class: 'String',
           name: 'algorithm',
-          javaType: 'String'
+          javaType: 'String',
+          documentation: 'Hashing algorithm to use'
         },
         {
-          class: 'Array',
           name: 'hash',
-          javaType: 'byte[]'
+          javaType: 'byte[]',
+          documentation: 'Previous hash (used for chaining)'
         }
       ]
     }

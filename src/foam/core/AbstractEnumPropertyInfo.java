@@ -15,6 +15,8 @@ import org.w3c.dom.Element;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractEnumPropertyInfo
     extends AbstractObjectPropertyInfo
@@ -76,9 +78,15 @@ public abstract class AbstractEnumPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     int val = getOrdinal(get(obj));
     md.update(bb.get().putInt(val));
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    int val = getOrdinal(get(obj));
+    sig.update(bb.get().putInt(val));
   }
 }
 

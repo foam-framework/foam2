@@ -9,6 +9,8 @@ package foam.core;
 import javax.xml.stream.XMLStreamReader;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractIntPropertyInfo
     extends AbstractPropertyInfo
@@ -42,8 +44,14 @@ public abstract class AbstractIntPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     int val = (int) get(obj);
     md.update(bb.get().putInt(val));
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    int val = (int) get(obj);
+    sig.update(bb.get().putInt(val));
   }
 }

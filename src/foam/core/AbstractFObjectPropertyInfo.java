@@ -14,6 +14,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,11 +60,9 @@ public abstract class AbstractFObjectPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     FObject val = (FObject) get(obj);
-    if ( val == null ) {
-      return;
-    }
+    if ( val == null ) return;
 
     List props = val.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();
@@ -71,7 +71,23 @@ public abstract class AbstractFObjectPropertyInfo
       if ( ! prop.isSet(val) ) continue;
       if ( prop.isDefaultValue(val) ) continue;
       md.update(prop.getNameAsByteArray());
-      prop.hash(val, md);
+      prop.updateDigest(val, md);
+    }
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    FObject val = (FObject) get(obj);
+    if ( val == null ) return;
+
+    List props = val.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( ! prop.isSet(val) ) continue;
+      if ( prop.isDefaultValue(val) ) continue;
+      sig.update(prop.getNameAsByteArray());
+      prop.updateSignature(val, sig);
     }
   }
 }
