@@ -84,6 +84,8 @@ foam.CLASS({
         } else if ( foam.Object.isInstance(s) ) {
           // TODO: handle nested objects
           p.class = 'FObjectProperty';
+        } else if ( foam.Array.isInstance(s) ) {
+          p.class = 'FObjectArray';
         }
 
         p.name = key;
