@@ -44,13 +44,13 @@ public abstract class AbstractDoublePropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void update(FObject obj, MessageDigest md) {
     double val = (double) get(obj);
     md.update(bb.get().putDouble(val));
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void update(FObject obj, Signature sig) throws SignatureException {
     double val = (double) get(obj);
     sig.update(bb.get().putDouble(val));
   }
