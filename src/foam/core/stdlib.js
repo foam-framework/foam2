@@ -318,11 +318,11 @@ foam.LIB({
     function breakdown(f) {
       var ident = "([^,\\s\\)]+)";
       var ws = "\\s*";
-      var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)";
-      var skip = "(?:" + ws + comment + "?)*";
+      var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
+      var skip = "(?:" + ws + comment + ws + ")*";
       var header = "(?:function" + skip + ident + "?\\(|\\()";
-      var arg = "(?:" + skip + ident + ")";
-      var nextArg = "(?:" + skip + "," + skip + ident + ")";
+      var arg = "(?:" + skip + ident + skip + ")";
+      var nextArg = "(?:," + arg + ")";
       var argEnd = "\\)";
       var headerToBody = skip + "(?:\\=\\>)?" + skip;
       var body = "\\{((?:.|\\s)*)\\}";
