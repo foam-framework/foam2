@@ -16,7 +16,7 @@ public class JDAO
   protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE);
 
   public JDAO(foam.core.X x, ClassInfo classInfo, String filename) {
-    super(x, classInfo, filename);
+    this(x, new MapDAO(classInfo), filename);
   }
 
   public JDAO(foam.core.X x, DAO delegate, String filename) {
