@@ -18,12 +18,33 @@ foam.INTERFACE({
         {
           name: 'algorithm',
           javaType: 'String',
-          documentation: 'Signing algorithm to use'
+          documentation: 'Signing algorithm'
         },
         {
           name: 'key',
           javaType: 'java.security.PrivateKey',
           documentation: 'Private key to use for signing'
+        }
+      ]
+    },
+    {
+      name: 'verify',
+      javaReturns: 'boolean',
+      args: [
+        {
+          name: 'signature',
+          javaType: 'byte[]',
+          documentation: 'Signature to verify'
+        },
+        {
+          name: 'algorithm',
+          javaType: 'String',
+          documentation: 'Signing algorithm'
+        },
+        {
+          name: 'key',
+          javaType: 'java.security.PublicKey',
+          documentation: 'Public key to use for verifying'
         }
       ]
     }

@@ -8,6 +8,8 @@ package foam.lib.json;
 
 import foam.core.*;
 import foam.dao.AbstractSink;
+import org.bouncycastle.util.encoders.Hex;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -33,6 +35,7 @@ public class Outputter
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected boolean       outputDefaultValues_ = false;
+  protected boolean       outputHash_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -221,7 +224,25 @@ public class Outputter
       outputProperty(o, prop);
     }
 
+    if ( outputHash_ ) {
+      writer_.append(",");
+      outputHash(o);
+    }
+
     writer_.append("}");
+  }
+
+  protected void outputHash(FObject o) {
+    String hash = Hex.toHexString(
+        o.hash("SHA-256", null));
+
+    writer_.append(beforeKey_())
+        .append("hash")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(hash)
+        .append("\"");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -268,5 +289,13 @@ public class Outputter
 
   public boolean getOutputDefaultValues() {
     return outputDefaultValues_;
+  }
+
+  public void setOutputHash(boolean outputHash) {
+    outputHash_ = outputHash;
+  }
+
+  public boolean getOutputHash() {
+    return outputHash_;
   }
 }
