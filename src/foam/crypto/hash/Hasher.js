@@ -12,7 +12,7 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'update',
+      name: 'updateDigest',
       args: [
         {
           name: 'obj',
