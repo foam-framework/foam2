@@ -8,6 +8,8 @@ package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractBytePropertyInfo
   extends AbstractPropertyInfo
@@ -27,8 +29,12 @@ public abstract class AbstractBytePropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
-    byte val = (byte) get(obj);
-    md.update(val);
+  public void updateDigest(FObject obj, MessageDigest md) {
+    md.update((byte) get(obj));
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    sig.update((byte) get(obj));
   }
 }

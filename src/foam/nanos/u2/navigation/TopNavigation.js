@@ -1,12 +1,18 @@
 foam.CLASS({
-  package: 'foam.u2.navigation',
+  package: 'foam.nanos.u2.navigation',
   name: 'TopNavigation',
   extends: 'foam.u2.View',
 
   documentation: 'Top navigation bar',
 
-  imports: [ 
-    'menuDAO', 
+  requires: [
+    'foam.nanos.menu.MenuBar',
+    'foam.nanos.u2.navigation.BusinessLogoView',
+    'foam.nanos.u2.navigation.UserView'
+  ],
+
+  imports: [
+    'menuDAO',
     'user',
     'logo'
   ],
@@ -58,7 +64,7 @@ foam.CLASS({
           overflow: auto;
           white-space: nowrap;
           margin-left: 60px;
-        }          
+        }
       */}
     })
   ],
@@ -77,13 +83,13 @@ foam.CLASS({
         .addClass(this.myClass())
         .start().addClass('topNavContainer')
           .callIf( this.logo, function(){
-            this.start({class: 'foam.u2.navigation.BusinessLogoView'})
+            this.start({class: 'foam.nanos.u2.navigation.BusinessLogoView'})
             .end()
           })
           .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
           .end()
           .callIf( this.user.firstName, function(){
-            this.start({class: 'foam.u2.navigation.UserView'})
+            this.start({class: 'foam.nanos.u2.navigation.UserView'})
             .end()
           })
         .end()

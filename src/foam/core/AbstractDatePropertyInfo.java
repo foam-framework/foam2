@@ -9,6 +9,8 @@ package foam.core;
 import javax.xml.stream.XMLStreamReader;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Date;
 
 public abstract class AbstractDatePropertyInfo
@@ -54,13 +56,20 @@ public abstract class AbstractDatePropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     Date date = (Date) get(obj);
-    if ( date == null ) {
-      return;
-    }
+    if ( date == null ) return;
 
     long val = date.getTime();
     md.update(bb.get().putLong(val));
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    Date date = (Date) get(obj);
+    if ( date == null ) return;
+
+    long val = date.getTime();
+    sig.update(bb.get().putLong(val));
   }
 }
