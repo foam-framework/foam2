@@ -82,6 +82,7 @@ foam.CLASS({
         } else if ( foam.Boolean.isInstance(s) ) {
           p.class = 'Boolean'
         } else if ( foam.Object.isInstance(s) ) {
+          // TODO: handle nested objects
           p.class = 'FObjectProperty';
         }
 
