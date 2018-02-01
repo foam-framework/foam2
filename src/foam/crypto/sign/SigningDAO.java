@@ -21,8 +21,19 @@ public class SigningDAO
   protected String algorithm_;
   protected DAO signatureDAO_;
 
+  private static String getDefaultAlgorithm(PrivateKey key) {
+    switch ( key.getAlgorithm() ) {
+      case "RSA":
+        return "SHA256withRSA";
+      case "EC":
+        return "SHA256withECDSA";
+      default:
+        throw new RuntimeException("Unsupported key algorithm");
+    }
+  }
+
   public SigningDAO(X x, DAO delegate, PrivateKey key) {
-    this(x, delegate, "SHA256withRSA", key);
+    this(x, delegate, getDefaultAlgorithm(key), key);
   }
 
   // TODO: come up with a better way to set the algorithm and key than this
