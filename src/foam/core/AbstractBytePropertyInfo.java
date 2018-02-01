@@ -29,12 +29,12 @@ public abstract class AbstractBytePropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     md.update((byte) get(obj));
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     sig.update((byte) get(obj));
   }
 }

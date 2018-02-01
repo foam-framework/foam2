@@ -12,7 +12,7 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'hash',
+      name: 'updateDigest',
       args: [
         {
           name: 'obj',
