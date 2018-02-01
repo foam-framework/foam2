@@ -41,7 +41,7 @@ foam.CLASS({
       ^ .sign-in-container{
         padding-top: 20px;
         width: 490px;
-        height: 240px;
+        height: 230px;
         border-radius: 2px;
         background-color: #ffffff;
       }
