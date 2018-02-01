@@ -56,7 +56,7 @@ public abstract class AbstractDatePropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void update(FObject obj, MessageDigest md) {
     Date date = (Date) get(obj);
     if ( date == null ) return;
 
@@ -65,7 +65,7 @@ public abstract class AbstractDatePropertyInfo
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void update(FObject obj, Signature sig) throws SignatureException {
     Date date = (Date) get(obj);
     if ( date == null ) return;
 

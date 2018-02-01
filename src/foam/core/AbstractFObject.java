@@ -6,10 +6,7 @@
 
 package foam.core;
 
-import java.security.MessageDigest;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.Signature;
+import java.security.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -135,7 +132,7 @@ public abstract class AbstractFObject
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
         md.update(prop.getNameAsByteArray());
-        prop.hash(this, md);
+        prop.update(this, md);
       }
 
       return md.digest();
@@ -151,22 +148,47 @@ public abstract class AbstractFObject
 
   public byte[] sign(String algorithm, PrivateKey key) {
     try {
-      Signature signature = Signature.getInstance(algorithm);
-      signature.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+      Signature signer = Signature.getInstance(algorithm);
+      signer.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
 
-      List props= getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
       while ( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
-        signature.update(prop.getNameAsByteArray());
-        prop.sign(this, signature);
+        signer.update(prop.getNameAsByteArray());
+        prop.update(this, signer);
       }
-      return signature.sign();
+      return signer.sign();
     } catch (Throwable t) {
       t.printStackTrace();
       return null;
+    }
+  }
+
+  public boolean verify(byte[] signature, PublicKey key) {
+    return this.verify(signature, "SHA256withRSA", key);
+  }
+
+  public boolean verify(byte[] signature, String algorithm, PublicKey key) {
+    try {
+      Signature verifier = Signature.getInstance(algorithm);
+      verifier.initVerify(key);
+
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(this) ) continue;
+        if ( prop.isDefaultValue(this) ) continue;
+        verifier.update(prop.getNameAsByteArray());
+        prop.update(this, verifier);
+      }
+      return verifier.verify(signature);
+    } catch (Throwable t) {
+      t.printStackTrace();
+      return false;
     }
   }
 }

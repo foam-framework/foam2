@@ -44,13 +44,13 @@ public abstract class AbstractIntPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void update(FObject obj, MessageDigest md) {
     int val = (int) get(obj);
     md.update(bb.get().putInt(val));
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void update(FObject obj, Signature sig) throws SignatureException {
     int val = (int) get(obj);
     sig.update(bb.get().putInt(val));
   }
