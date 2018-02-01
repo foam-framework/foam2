@@ -12,7 +12,7 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'update',
+      name: 'updateSignature',
       javaThrows: [
         'java.security.SignatureException'
       ],

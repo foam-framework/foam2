@@ -132,7 +132,7 @@ public abstract class AbstractFObject
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
         md.update(prop.getNameAsByteArray());
-        prop.update(this, md);
+        prop.updateDigest(this, md);
       }
 
       return md.digest();
@@ -158,7 +158,7 @@ public abstract class AbstractFObject
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
         signer.update(prop.getNameAsByteArray());
-        prop.update(this, signer);
+        prop.updateSignature(this, signer);
       }
       return signer.sign();
     } catch (Throwable t) {
@@ -183,7 +183,7 @@ public abstract class AbstractFObject
         if ( ! prop.isSet(this) ) continue;
         if ( prop.isDefaultValue(this) ) continue;
         verifier.update(prop.getNameAsByteArray());
-        prop.update(this, verifier);
+        prop.updateSignature(this, verifier);
       }
       return verifier.verify(signature);
     } catch (Throwable t) {

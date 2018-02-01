@@ -29,13 +29,13 @@ public abstract class AbstractBooleanPropertyInfo
   }
 
   @Override
-  public void update(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     boolean val = (boolean) get(obj);
     md.update((byte) (val ? 1 : 0));
   }
 
   @Override
-  public void update(FObject obj, Signature sig) throws SignatureException {
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     boolean val = (boolean) get(obj);
     sig.update((byte) (val ? 1 : 0));
   }

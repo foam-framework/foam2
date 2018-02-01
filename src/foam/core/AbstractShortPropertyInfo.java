@@ -48,13 +48,13 @@ public abstract class AbstractShortPropertyInfo
   }
 
   @Override
-  public void update(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     short val = (short) get(obj);
     md.update(bb.get().putShort(val));
   }
 
   @Override
-  public void update(FObject obj, Signature sig) throws SignatureException {
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     short val = (short) get(obj);
     sig.update(bb.get().putShort(val));
   }
