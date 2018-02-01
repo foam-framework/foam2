@@ -21,6 +21,10 @@ public class SigningDAO
   protected String algorithm_;
   protected DAO signatureDAO_;
 
+  public SigningDAO(X x, DAO delegate, PrivateKey key) {
+    this(x, delegate, "SHA256withRSA", key);
+  }
+
   // TODO: come up with a better way to set the algorithm and key than this
   public SigningDAO(X x, DAO delegate, String algorithm, PrivateKey key) {
     setX(x);
