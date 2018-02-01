@@ -91,8 +91,9 @@ public class MDAO extends AbstractDAO {
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     SelectPlan plan;
+    Predicate simplePredicate = null;
     // use partialEval to wipe out such useless predicate such as: And(EQ()) ==> EQ(), And(And(EQ()),GT()) ==> And(EQ(),GT())
-    Predicate simplePredicate = predicate.partialEval();
+    if ( predicate != null ) simplePredicate = predicate.partialEval();
 
     //Whe did or logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
     if ( simplePredicate instanceof Or ) {
