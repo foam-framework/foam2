@@ -44,13 +44,13 @@ public abstract class AbstractLongPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     long val = (long) get(obj);
     md.update(bb.get().putLong(val));
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     long val = (long) get(obj);
     sig.update(bb.get().putLong(val));
   }

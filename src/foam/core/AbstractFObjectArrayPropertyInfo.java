@@ -79,7 +79,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     FObject[] val = (FObject[]) this.get(obj);
     if ( val == null || val.length == 0 ) return;
 
@@ -91,13 +91,13 @@ public abstract class AbstractFObjectArrayPropertyInfo
         if ( ! prop.isSet(o) ) continue;
         if ( prop.isDefaultValue(o) ) continue;
         md.update(prop.getNameAsByteArray());
-        prop.hash(o, md);
+        prop.updateDigest(o, md);
       }
     }
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     FObject[] val = (FObject[]) this.get(obj);
     if ( val == null || val.length == 0 ) return;
 
@@ -109,7 +109,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
         if ( ! prop.isSet(o) ) continue;
         if ( prop.isDefaultValue(o) ) continue;
         sig.update(prop.getNameAsByteArray());
-        prop.sign(o, sig);
+        prop.updateSignature(o, sig);
       }
     }
   }
