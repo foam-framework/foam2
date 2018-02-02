@@ -1581,6 +1581,11 @@ foam.CLASS({
       return this;
     },
 
+    function callOn(obj, f, args) {
+      obj[f].apply(obj, [this].concat(args));
+      return this;
+    },
+
     function callIf(bool, f, args) {
       if ( bool ) f.apply(this, args);
 
