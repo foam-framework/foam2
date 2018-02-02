@@ -29,6 +29,10 @@ have multiple classloaders running alongside eachother`
     {
       class: 'Map',
       name: 'pending'
+    },
+    {
+      class: 'Map',
+      name: 'latched'
     }
   ],
   methods: [
@@ -41,11 +45,43 @@ have multiple classloaders running alongside eachother`
       }
     },
     {
+      name: 'maybeLoad',
+      returns: 'Promise',
+      documentation: "Like load, but don't throw if not found.",
+      args: [ { name: 'id', of: 'String' } ],
+      code: function(id) {
+        return this.load(id).catch(function() { return null; });
+      }
+    },
+    {
+      name: 'maybeLoad_',
+      returns: 'Promise',
+      args: [ { name: 'id', of: 'String' },
+              { name: 'path', of: 'Array' } ],
+      code: function(id, path) {
+        return this.load_(id, path).catch(function() { return null; });
+      }
+    },
+    {
+      name: 'latch',
+      returns: 'Promise',
+      args: [ { name: 'json' } ],
+      code: function(json) {
+        var id = json.package ?
+            json.package + '.' + json.name :
+            json.name;
+
+        this.latched[id] = json;
+      }
+    },
+    {
       name: 'load_',
       returns: 'Promise',
       args: [ { class: 'String', name: 'id' },
               { class: 'StringArray', name: 'path' } ],
       code: function(id, path) {
+        var self = this;
+
         if ( foam.String.isInstance(id) ) {
           // Prevent infinite loops, if we're loading this class as a
           // dependency to something that this class depends upon then
@@ -56,11 +92,30 @@ have multiple classloaders running alongside eachother`
 
           if ( this.pending[id] ) return this.pending[id];
 
+          // Latched models come from when someone defines a class
+          // with foam.CLASS during regular execution (like a script
+          // tag).  We hook into those so that they can still use the
+          // classloader to ensure any dependencies of that model are
+          // loaded before they use it.
+          if ( this.latched[id] ) {
+            var json = this.latched[id];
+            delete this.latched[id];
+            return this.pending[id] = Promise.all(foam.json.references(this.__context__, json)).then(function() {
+              return self.modelDeps_(foam.core.Model.create(json), path);
+            }).then(function() {
+              // Latched models will already be registered in the
+              // context via foam.CLASS as defined in EndBoot.js
+              return foam.lookup(id);
+            });
+          }
+
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
           return this.pending[id] = this.modelDAO.find(id).then(function(m) {
             return this.buildClass_(m, path);
-          }.bind(this));
+          }.bind(this), function() {
+            throw new Error("Failed to load class" + id);
+          });
         }
 
         if ( foam.core.Model.isInstance(id) ) {
@@ -68,6 +123,27 @@ have multiple classloaders running alongside eachother`
         }
 
         throw new Error("Invalid parameter to ClassLoader.load_");
+      }
+    },
+    {
+      name: 'modelDeps_',
+      args: [ { name: 'model', of: 'foam.core.Model' },
+              { name: 'path' } ],
+      code: function(model, path) {
+        var self = this;
+
+        // TODO: This can probably be a method on Model
+        var deps = model.requires ?
+            model.requires.map(function(r) { return self.maybeLoad_(r.path, path); }) :
+            [];
+
+        deps = deps.concat(model.implements ?
+                           model.implements.map((function(i) { return self.maybeLoad_(i.path, path); })) :
+                           []);
+
+        if ( model.extends ) deps.push(self.maybeLoad_(model.extends, path));
+
+        return Promise.all(deps);
       }
     },
     {
@@ -79,17 +155,9 @@ have multiple classloaders running alongside eachother`
 
         path = path.concat(model);
 
-        var deps = model.requires ?
-            model.requires.map(function(r) { return self.load_(r.path, path); }) :
-            [];
+        var deps = this.modelDeps_(model, path);
 
-        deps = deps.concat(model.implements ?
-                           model.implements.map((function(i) { return self.load_(i.path, path); })) :
-                           []);
-
-        if ( model.extends ) deps.push(self.load_(model.extends, path));
-
-        return Promise.all(deps).then(function() {
+        return deps.then(function() {
           model.validate();
           cls = model.buildClass();
           cls.validate();

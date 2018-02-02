@@ -698,14 +698,14 @@ foam.LIB({
               console.log('Constructing anonymous class', json.name);
 
               r.push(Promise.all(foam.json.references(x, json)).then(function() {
-                return x.classloader.load(foam.core.Model.create(json));
+                return x.classloader.maybeLoad(foam.core.Model.create(json));
               }));
 
               o[key] = json.name;
               continue;
             } else if ( ( key === 'of' || key === 'class' ) &&
                         foam.String.isInstance(o[key]) ) {
-              r.push(x.classloader.load(o[key]));
+              r.push(x.classloader.maybeLoad(o[key]));
               continue;
             }
 

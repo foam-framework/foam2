@@ -47,6 +47,14 @@ foam.CLASS({
   ]
 });
 
-foam.__context__ = foam.apploader.ClassLoaderContext.create({
-  root: global.FOAM_ROOT
-}, foam.__context__).__subContext__;
+(function() {
+  foam.__context__ = foam.apploader.ClassLoaderContext.create({
+    root: global.FOAM_ROOT
+  }, foam.__context__).__subContext__;
+
+  var CLASS = foam.CLASS;
+  foam.CLASS = function(m) {
+    foam.__context__.classloader.latch(m);
+    CLASS(m);
+  };
+})();

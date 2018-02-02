@@ -24,22 +24,6 @@ foam.CLASS({
   ],
   methods: [
     {
-      name: 'latch',
-      code: function(json) {
-        var id = json.package ?
-            json.package + '.' + json.name :
-            json.name;
-
-        if ( this.cache[id] ) {
-          throw new Error(id + ' is already in the cache for this DAO.');
-        }
-
-        this.cache[id] = Promise.all(foam.json.references(this.__context__, json)).then(function() {
-          return foam.lookup(json.class || 'Model').create(json);
-        });
-      }
-    },
-    {
       name: 'find_',
       code: function(x, id) {
         var promise;
@@ -126,8 +110,6 @@ foam.CLASS({
 
             return foam.lookup(json.class || 'Model').create(json, x);
           });
-        }).catch(function() {
-          alert('errr');
         });
       }
     }
