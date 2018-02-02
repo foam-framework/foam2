@@ -985,7 +985,7 @@ foam.CLASS({
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: 'if ( getValue() == null || ((Comparable)getArg1().f(obj)).compareTo(getValue()) < 0 ) {\n' +
+      javaCode: 'if ( getValue() == null || ((Comparable)getArg1().f(obj)).compareTo(getValue()) > 0 ) {\n' +
       '      setValue(getArg1().f(obj));\n' +
       '    }'
     }
