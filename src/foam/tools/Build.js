@@ -4,8 +4,6 @@ foam.CLASS({
 
   requires: [
     'foam.json2.Serializer',
-    //'foam.json.Outputter',
-    //'foam.TestRefines',
   ],
 
   imports: [
@@ -30,30 +28,18 @@ foam.CLASS({
     {
       hidden: true,
       name: 'outputter',
-      expression: function(flags) {
-        return this.Serializer.create();
-        return this.Outputter.create({
-          indentStr: '  ',
-          formatFunctionsAsStrings: false,
-          outputDefaultValues: false,
-          passPropertiesByReference: false,
-          //pretty: false,
-          strict: false,
-          propertyPredicate: function(o, p) {
-            if ( p.flags ) {
+      factory: function() {
+        var flags = this.flags;
+        return this.Serializer.create({
+          axiomPredicate: function(a) {
+            if ( a.flags ) {
               for ( var i = 0; i < flags.length; i++ ) {
                 if ( p.flags[flags[i]] ) return true;
               }
               return false;
             }
-            return !p.transient;
-          },
-          objectKeyValuePredicate: function(k, v) {
-            if ( v.prototype && v.prototype.cls_ ) {
-              return v !== v.prototype.cls_;
-            }
             return true;
-          },
+          }
         });
       },
     },
@@ -62,55 +48,8 @@ foam.CLASS({
   actions: [
     function execute() {
       var self = this;
-      return new Promise(function(ret) {
-
-        var getDeps = function(model) {
-          var deps = model.requires ?
-              model.requires.map(function(r) { return r.path }) :
-              [];
-
-          deps = deps.concat(model.implements ?
-                             model.implements.map((function(i) { return i.path })) :
-                             []);
-
-          if ( model.extends ) deps.push(model.extends);
-
-          return deps;
-        };
-
-        var loaded = {};
-        var queue = [self.modelId];
-        var next = function() {
-          if ( !queue.length ) {
-            var output = [];
-            Object.values(loaded).forEach(function(model) {
-              output.push(self.outputter.stringify(foam.__context__, model));
-            });
-            self.output = output.join('\n');
-            ret(self.output);
-            return;
-          }
-          var modelId = queue.shift();
-          if (loaded[modelId] ||
-              modelId == 'FObject') {
-            next();
-            return;
-          }
-          var enqueueDeps = function(model) {
-            loaded[modelId] = model;
-            queue = queue.concat(getDeps(model));
-            next();
-          }
-          self.modelDAO.find(modelId).then(function(model) {
-            if ( ! model ) {
-              console.error('Unable to load', modelId);
-              next();
-            } else {
-              enqueueDeps(model);
-            }
-          });
-        }
-        next();
+      self.modelDAO.find(self.modelId).then(function(m) {
+        self.output = self.outputter.stringify(self.__subContext__, m);
       });
     }
   ]

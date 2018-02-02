@@ -8,11 +8,26 @@ foam.CLASS({
   package: 'foam.json2',
   name: 'Serializer',
   requires: [
-    'foam.json2.Outputter'
+    'foam.json2.Outputter',
+    'foam.mlang.predicate.True',
+  ],
+  properties: [
+    {
+      name: 'axiomPredicate',
+      factory: function() { return this.True.create() },
+      adapt: function(_, n) {
+        if ( foam.Function.isInstance(n) ) {
+          return {f: n};
+        }
+        return n;
+      },
+    },
   ],
   methods: [
     function stringify(x, v) {
-      var serializer = this.InnerSerializer.create();
+      var serializer = this.InnerSerializer.create({
+        axiomPredicate: this.axiomPredicate
+      });
       serializer.output(x, v);
       return serializer.getString();
     }
@@ -24,6 +39,7 @@ foam.CLASS({
         'foam.json2.Outputter'
       ],
       properties: [
+        'axiomPredicate',
         {
           class: 'Map',
           name: 'deps'
@@ -94,7 +110,7 @@ foam.CLASS({
                   if ( foam.Undefined.isInstance(v[keys[i]]) ) continue;
 
                   out.key(keys[i]);
-                  this.output(x, v[i]);
+                  this.output(x, v[keys[i]]);
                 }
                 out.end();
               }
@@ -111,6 +127,9 @@ foam.CLASS({
 
               for ( var i = 0 ; i < axioms.length ; i++ ) {
                 var a = axioms[i];
+
+                if ( ! this.axiomPredicate.f(a) ) return;
+
                 if ( a.outputPropertyJSON2 ) a.outputPropertyJSON2(x, v, this, out);
               }
 

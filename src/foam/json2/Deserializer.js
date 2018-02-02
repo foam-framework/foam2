@@ -26,8 +26,8 @@ foam.CLASS({
       return new Promise(function(ret) {
         if ( v['$DEPS$'] && v['$BODY$'] ) {
           var load = self.classloader.load.bind(self.classloader);
-          Promise.all(v['$DEPS$'].map(load)).then(function(o) {
-            ret(self.parse(x, v));
+          Promise.all(v['$DEPS$'].map(load)).then(function() {
+            ret(self.parse(x, v['$BODY$']));
           });
         } else {
           ret(self.parse(x, v));
