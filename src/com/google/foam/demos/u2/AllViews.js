@@ -12,13 +12,13 @@ foam.CLASS({
       class: 'Boolean',
       name: 'defaultBoolean',
       label: 'CheckBox',
-      view: 'foam.u2.CheckBox' // default
+      view: { class: 'foam.u2.CheckBox' }// default
     },
     {
       class: 'Boolean',
       name: 'mdCheckboxBoolean',
       label: 'md.CheckBox',
-      view: 'foam.u2.md.CheckBox'
+      view: { class: 'foam.u2.md.CheckBox' }
     },
     {
       class: 'FObjectProperty',
@@ -35,7 +35,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'fObjectView',
-      view: 'foam.u2.view.FObjectView'
+      view: { class: 'foam.u2.view.FObjectView' }
     }
   ]
 })

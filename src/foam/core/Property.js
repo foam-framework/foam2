@@ -159,6 +159,12 @@ foam.CLASS({
      */
     'required',
 
+    /**
+      When set, marks the property with the given flags. This can be used for
+      things like stripping out platform specific properties when serializing.
+     */
+    'flags',
+
     [
       /**
         Called to convert a string into a value suitable for this property.
@@ -235,7 +241,7 @@ foam.CLASS({
     {
       name: 'forClass_',
       transient: true
-    }
+    },
   ],
 
   methods: [

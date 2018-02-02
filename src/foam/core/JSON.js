@@ -541,6 +541,17 @@ foam.CLASS({
     function parseString(str, opt_ctx) {
       return this.parseClassFromString(str, null, opt_ctx);
     },
+    function aparse(str, opt_ctx) {
+      var x = this.__context__;
+
+      var json = JSON.parse(str);
+
+      var references = foam.json.references(x, json);;
+
+      return Promise.all(references).then(function() {
+        return foam.json.parse(json, undefined, opt_ctx || this.creationContext);
+      }.bind(this));
+    },
     function parseClassFromString(str, opt_cls, opt_ctx) {
       return this.strict ?
           // JSON.parse() is faster; use it when data format allows.
@@ -667,6 +678,43 @@ foam.LIB({
           return json;
         }
       }, function(o) { return o; })
+    },
+
+    {
+      name: 'references',
+      code: function(x, o, r) {
+        r = r || [];
+
+        if ( foam.Array.isInstance(o) ) {
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            foam.json.references(x, o[i], r);
+          }
+        } else if ( foam.Object.isInstance(o) ) {
+          for ( var key in o ) {
+            // anonymous class support.
+            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {
+              var json = o[key];
+              json.name = 'AnonymousClass' + foam.next$UID();
+              console.log('Constructing anonymous class', json.name);
+
+              r.push(Promise.all(foam.json.references(x, json)).then(function() {
+                return x.classloader.maybeLoad(foam.core.Model.create(json));
+              }));
+
+              o[key] = json.name;
+              continue;
+            } else if ( ( key === 'of' || key === 'class' ) &&
+                        foam.String.isInstance(o[key]) ) {
+              r.push(x.classloader.maybeLoad(o[key]));
+              continue;
+            }
+
+            foam.json.references(x, o[key], r);
+          }
+
+          return r;
+        }
+      }
     },
 
     // TODO: unsafe and only used by LocalStorageDAO, so remove.
