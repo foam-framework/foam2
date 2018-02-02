@@ -38,14 +38,14 @@ public abstract class AbstractStringPropertyInfo
   }
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {
+  public void updateDigest(FObject obj, MessageDigest md) {
     String val = (String) get(obj);
     if ( SafetyUtil.isEmpty(val) ) return;
     md.update(val.getBytes(StandardCharsets.UTF_8));
   }
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     String val = (String) get(obj);
     if ( SafetyUtil.isEmpty(val) ) return;
     sig.update(val.getBytes(StandardCharsets.UTF_8));

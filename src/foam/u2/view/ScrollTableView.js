@@ -38,6 +38,7 @@
         return data.limit(limit).skip(skip);
       },
     },
+    'columns',
     {
       class: 'Int',
       name: 'daoCount'
@@ -57,7 +58,7 @@
         start('tr').
           start('td').
             style({ 'vertical-align': 'top' }).
-            start(this.TableView, {data$: this.scrolledDao$}).
+            start(this.TableView, {data$: this.scrolledDao$, columns: this.columns}).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).
