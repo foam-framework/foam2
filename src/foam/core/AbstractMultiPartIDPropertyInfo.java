@@ -9,7 +9,7 @@ package foam.core;
 public abstract class AbstractMultiPartIDPropertyInfo
   extends AbstractObjectPropertyInfo
 {
-  protected abstract foam.core.PropertyInfo[] getProperties();
+  public abstract foam.core.PropertyInfo[] getProperties();
 
   @Override
   public Object fromString(String value) {

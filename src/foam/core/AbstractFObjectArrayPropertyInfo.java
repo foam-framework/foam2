@@ -7,14 +7,18 @@
 package foam.core;
 
 import foam.nanos.logger.Logger;
-import java.lang.UnsupportedOperationException;
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class AbstractFObjectArrayPropertyInfo
     extends AbstractArrayPropertyInfo {
@@ -72,5 +76,41 @@ public abstract class AbstractFObjectArrayPropertyInfo
       XMLSupport.toXML(nestedArray[j], doc, prop);
     }
     return;
+  }
+
+  @Override
+  public void updateDigest(FObject obj, MessageDigest md) {
+    FObject[] val = (FObject[]) this.get(obj);
+    if ( val == null || val.length == 0 ) return;
+
+    List props = val[0].getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( FObject o : val ) {
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(o) ) continue;
+        if ( prop.isDefaultValue(o) ) continue;
+        md.update(prop.getNameAsByteArray());
+        prop.updateDigest(o, md);
+      }
+    }
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    FObject[] val = (FObject[]) this.get(obj);
+    if ( val == null || val.length == 0 ) return;
+
+    List props = val[0].getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( FObject o : val ) {
+      Iterator i = props.iterator();
+      while ( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if ( ! prop.isSet(o) ) continue;
+        if ( prop.isDefaultValue(o) ) continue;
+        sig.update(prop.getNameAsByteArray());
+        prop.updateSignature(o, sig);
+      }
+    }
   }
 }
