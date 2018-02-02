@@ -26,12 +26,8 @@ public class Boot {
     root_.put(foam.nanos.fs.Storage.class,
               new foam.nanos.fs.Storage(datadir));
 
-    try {
-      // Used for all the services that will be required when Booting
-      serviceDAO_ = new JDAO(((foam.core.ProxyX)root_).getX(), NSpec.getOwnClassInfo(), "services");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    // Used for all the services that will be required when Booting
+    serviceDAO_ = new JDAO(((foam.core.ProxyX)root_).getX(), NSpec.getOwnClassInfo(), "services");
 
     installSystemUser();
 

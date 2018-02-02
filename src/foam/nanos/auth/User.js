@@ -3,6 +3,7 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
@@ -198,7 +199,7 @@ emailIsSet_ = true;`
 
   methods: [
     function label() {
-      return this.organization || ( this.firstName + ' ' + this.lastName );
+      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
     }
   ]
 });

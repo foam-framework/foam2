@@ -8,6 +8,8 @@ package foam.lib.json;
 
 import foam.core.*;
 import foam.dao.AbstractSink;
+import org.bouncycastle.util.encoders.Hex;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -32,6 +34,14 @@ public class Outputter
   protected StringWriter  stringWriter_ = null;
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
+  protected boolean       outputDefaultValues_ = false;
+
+  // Hash properties
+  protected String        hashAlgo_ = "SHA-256";
+  protected boolean       outputHash_ = false;
+  protected boolean       rollHashes_ = false;
+  protected byte[]        previousHash_ = null;
+  protected final Object  hashLock_ = new Object();
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -203,7 +213,6 @@ public class Outputter
     writer_.append(":");
 
     outputString(info.getId());
-
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
 
@@ -211,6 +220,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
+      if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
       if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
@@ -220,7 +230,33 @@ public class Outputter
       outputProperty(o, prop);
     }
 
+    if ( outputHash_ ) {
+      writer_.append(",");
+      outputHash(o);
+    }
+
     writer_.append("}");
+  }
+
+  protected void outputHash(FObject o) {
+    String hash;
+    if ( rollHashes_ ) {
+      synchronized ( hashLock_ ) {
+        previousHash_ = o.hash(hashAlgo_, previousHash_);
+        hash = Hex.toHexString(previousHash_);
+      }
+    } else {
+      hash = Hex.toHexString(
+          o.hash(hashAlgo_, null));
+    }
+
+    writer_.append(beforeKey_())
+        .append("hash")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(hash)
+        .append("\"");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -259,5 +295,37 @@ public class Outputter
 
   public void outputRawString(String str) {
     writer_.append(str);
+  }
+
+  public void setOutputDefaultValues(boolean outputDefaultValues) {
+    outputDefaultValues_ = outputDefaultValues;
+  }
+
+  public boolean getOutputDefaultValues() {
+    return outputDefaultValues_;
+  }
+
+  public void setHashAlgorithm(String algorithm) {
+    hashAlgo_ = algorithm;
+  }
+
+  public String getHashAlgorithm() {
+    return hashAlgo_;
+  }
+
+  public void setOutputHash(boolean outputHash) {
+    outputHash_ = outputHash;
+  }
+
+  public boolean getOutputHash() {
+    return outputHash_;
+  }
+
+  public void setRollHashes(boolean rollHashes) {
+    rollHashes_ = rollHashes;
+  }
+
+  public boolean getRollHashes() {
+    return rollHashes_;
   }
 }

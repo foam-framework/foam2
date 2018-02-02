@@ -105,12 +105,14 @@ foam.CLASS({
         { name: 'service', javaType: 'Object' }
       ],
       javaCode: `
+      /*
         System.err.println("saveService: " + this.getName());
         if ( service instanceof FObject ) {
           setService((FObject) service);
           DAO dao = (DAO) x.get("nSpecDAO");
           dao.put(this);
         }
+        */
       `
     },
     {

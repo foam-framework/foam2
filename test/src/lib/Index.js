@@ -1464,3 +1464,33 @@ describe('MergePlan', function() {
 
 
 });
+
+describe('AND(*, CONTAINS_IC(ID, *)', function() {
+  it('should handle this case', function() {
+    foam.CLASS({
+      package: 'test',
+      name: 'Person',
+      properties:
+      [
+        {class: 'String', name: 'id'},
+        {class: 'String', name: 'f'},
+        {class: 'String', name: 'l'}
+      ]
+    });
+    var dao = foam.dao.MDAO.create({of: test.Person});
+    dao.put(test.Person.create({id: 'JSmith', f: 'James', l: 'Smith'}));
+    dao.put(test.Person.create({id: 'ACheeseman', f: 'Alice', l: 'Cheeseman'}));
+    dao.put(test.Person.create({id: 'RJamison', f: 'Rebecca', l: 'Jamison'}));
+    dao.put(test.Person.create({id: 'XMing', f: 'Xi', l: 'Ming'}));
+    var E = foam.mlang.ExpressionsSingleton.create();
+    dao.where(E.AND(E.EQ(test.Person.L, 'Jamison'),
+                    E.CONTAINS_IC(test.Person.ID, 'm')))
+        .select().then(function(arraySink) {
+          var array = arraySink.array;
+          expect(array.length).toBe(1);
+          expect(array[0].id).toBe('RJamison');
+          expect(array[0].f).toBe('Rebecca');
+          expect(array[0].l).toBe('Jamison');
+        });
+  });
+});

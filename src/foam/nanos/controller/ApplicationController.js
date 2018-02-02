@@ -19,7 +19,10 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
+    'foam.nanos.u2.navigation.TopNavigation',
+    'foam.nanos.auth.SignInView',
     'foam.u2.stack.Stack',
+    'foam.nanos.auth.resetPassword.ResetView',
     'foam.u2.stack.StackView'
   ],
 
@@ -37,6 +40,8 @@ foam.CLASS({
     'requestLogin',
     'signUpEnabled',
     'stack',
+    'currentMenu',
+    'menuListener',
     'user',
     'webApp',
     'wrapCSS as installCSS'
@@ -92,6 +97,7 @@ foam.CLASS({
       name: 'loginSuccess'
     },
     { class: 'URL', name: 'logo' },
+    'currentMenu',
     'webApp',
     'primaryColor',
     'secondaryColor',
@@ -123,7 +129,7 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .tag({class: 'foam.u2.navigation.TopNavigation'})
+        .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end();
@@ -199,6 +205,10 @@ foam.CLASS({
   listeners: [
     function onUserUpdate() {
       this.setDefaultMenu();
+    },
+
+    function menuListener(m) {
+      this.currentMenu = m;
     }
   ]
 });
