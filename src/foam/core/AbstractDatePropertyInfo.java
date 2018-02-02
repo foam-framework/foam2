@@ -61,7 +61,7 @@ public abstract class AbstractDatePropertyInfo
     if ( date == null ) return;
 
     long val = date.getTime();
-    md.update(bb.get().putLong(val));
+    md.update((ByteBuffer) bb.get().putLong(val).flip());
   }
 
   @Override
@@ -70,6 +70,6 @@ public abstract class AbstractDatePropertyInfo
     if ( date == null ) return;
 
     long val = date.getTime();
-    sig.update(bb.get().putLong(val));
+    sig.update((ByteBuffer) bb.get().putLong(val).flip());
   }
 }
