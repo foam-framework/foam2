@@ -50,12 +50,12 @@ public abstract class AbstractShortPropertyInfo
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
     short val = (short) get(obj);
-    md.update(bb.get().putShort(val));
+    md.update((ByteBuffer) bb.get().putShort(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     short val = (short) get(obj);
-    sig.update(bb.get().putShort(val));
+    sig.update((ByteBuffer) bb.get().putShort(val).flip());
   }
 }
