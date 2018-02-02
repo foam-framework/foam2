@@ -46,12 +46,12 @@ public abstract class AbstractIntPropertyInfo
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
     int val = (int) get(obj);
-    md.update(bb.get().putInt(val));
+    md.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     int val = (int) get(obj);
-    sig.update(bb.get().putInt(val));
+    sig.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 }
