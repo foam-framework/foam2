@@ -188,7 +188,8 @@ var classes = [
   'foam.crypto.hash.Hashable',
 
   'foam.crypto.sign.Signer',
-  'foam.crypto.sign.Signable'
+  'foam.crypto.sign.Signable',
+  'foam.crypto.sign.SignedFObject'
 ];
 
 var abstractClasses = [

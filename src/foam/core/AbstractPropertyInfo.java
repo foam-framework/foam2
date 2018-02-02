@@ -116,10 +116,10 @@ public abstract class AbstractPropertyInfo
   public void validate(FObject obj) throws IllegalStateException {}
 
   @Override
-  public void hash(FObject obj, MessageDigest md) {}
+  public void updateDigest(FObject obj, MessageDigest md) {}
 
   @Override
-  public void sign(FObject obj, Signature sig) throws SignatureException {}
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {}
 
   protected byte[] nameAsByteArray_ = null;
 
