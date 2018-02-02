@@ -668,7 +668,7 @@ foam.CLASS({
           return;
         }
 
-        var top = domEvt.srcElement.scrollTop;
+        var top = domEvt.target.scrollTop;
         var recordTop = Math.floor(top / this.rowHeight);
 
         // Situate anchor with 40% of rows scrolled above. This makes any lag
