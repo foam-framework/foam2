@@ -28,6 +28,10 @@ public class RollingHashingJDAO
     this(x, new MapDAO(classInfo), filename, algorithm);
   }
 
+  public RollingHashingJDAO(X x, DAO delegate, String filename) {
+    this(x, delegate, filename, "SHA-256");
+  }
+
   public RollingHashingJDAO(X x, DAO delegate, String filename, String algorithm) {
     super(x, delegate, filename);
     algorithm_ = algorithm;
