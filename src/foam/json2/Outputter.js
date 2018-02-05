@@ -9,9 +9,7 @@ foam.CLASS({
     {
       name: 'state',
       factory: function() {
-        return [
-          {}
-          ];
+        return [{}];
       }
     }
   ],
