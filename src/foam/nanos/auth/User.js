@@ -109,11 +109,8 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'Blob',
-      name: 'profilePicture',
-      tableCellFormatter: function (value) {
-        this.tag({ class: 'foam.u2.view.ImageBlobView' });
-      }
+      class: 'File',
+      name: 'profilePicture'
     },
     {
       class: 'FObjectProperty',

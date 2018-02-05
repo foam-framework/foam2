@@ -5,6 +5,7 @@
  */
 
 FOAM_FILES([
+  { name: 'foam/nanos/fs/File' },
   { name: "foam/nanos/app/AppConfig" },
   { name: "foam/nanos/controller/ApplicationController" },
   { name: "foam/nanos/app/Mode" },
@@ -41,6 +42,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/PhoneDetailView", flags: ['web'] },
   { name: "foam/nanos/auth/SignInView", flags: ['web'] },
   { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
+  { name: "foam/nanos/auth/ProfilePictureUploadView", flags: ['web'] },
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/session/Session" },
@@ -88,6 +90,5 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/push/FirebasePushService' },
   { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
   { name: 'foam/nanos/demo/DemoObject' },
-  { name: 'foam/nanos/demo/Demo' },
-  { name: 'foam/nanos/fs/File' }
+  { name: 'foam/nanos/demo/Demo' }
 ]);
