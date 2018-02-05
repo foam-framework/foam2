@@ -72,6 +72,6 @@ public class SigningOutputStream
 
   @Override
   public void close() throws IOException {
-    super.close();
+    out_.close();
   }
 }
