@@ -79,10 +79,6 @@ foam.CLASS({
     ],
     */
     [ 'adapt', function(_, spec, prop) {
-      if ( foam.String.isInstance(spec) ) {
-        console.warn('ViewSpec: Use { class: "' + spec + '" } instead of just "' + spec + '" otherwise the classloader can\'t automatically determine dependencies.');
-      }
-
       return foam.String.isInstance(spec) ? { class: spec } : spec ;
     } ]
     /*
