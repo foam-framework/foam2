@@ -4,7 +4,6 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'TimeView',
