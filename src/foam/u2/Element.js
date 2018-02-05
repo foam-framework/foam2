@@ -2047,6 +2047,15 @@ foam.CLASS({
 
 
 foam.CLASS({
+  refines: 'foam.core.Time',
+  requires: [ 'foam.u2.TimeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.TimeView' } ]
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.core.Float',
   requires: [ 'foam.u2.FloatView' ],
   properties: [
