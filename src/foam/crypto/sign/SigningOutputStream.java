@@ -74,4 +74,8 @@ public class SigningOutputStream
   public void close() throws IOException {
     out_.close();
   }
+
+  public byte[] sign() throws SignatureException {
+    return sig_.sign();
+  }
 }
