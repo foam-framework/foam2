@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Signature;
+import java.security.SignatureException;
 
 /**
  * Output stream that signs outgoing data
