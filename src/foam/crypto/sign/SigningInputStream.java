@@ -76,4 +76,8 @@ public class SigningInputStream
   public void close() throws IOException {
     in_.close();
   }
+
+  public boolean verify(byte[] signature) throws SignatureException {
+    return sig_.verify(signature);
+  }
 }
