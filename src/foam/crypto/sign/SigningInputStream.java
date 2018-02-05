@@ -8,9 +8,9 @@ package foam.crypto.sign;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.SignatureException;
 
 /**
  * Input stream that verifies incoming data
