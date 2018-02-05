@@ -117,7 +117,8 @@ have multiple classloaders running alongside eachother`
             var json = this.latched[id];
             delete this.latched[id];
             return this.pending[id] = Promise.all(foam.json.references(this.__context__, json)).then(function() {
-              return self.modelDeps_(foam.core.Model.create(json), path);
+              var cls = json.class ? foam.lookup(json.class) : foam.core.Model;
+              return self.modelDeps_(cls.create(json), path);
             }).then(function() {
               // Latched models will already be registered in the
               // context via foam.CLASS as defined in EndBoot.js
