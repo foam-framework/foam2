@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.auth',
-  name: 'ProfilePictureUploadView',
+  name: 'ProfilePictureView',
   extends: 'foam.u2.Element',
 
   requires: [
@@ -38,7 +38,6 @@ foam.CLASS({
     ^ .shopperImage {
       width: 80px;
       height: 80px;
-      margin-top: 20px;
       display: inline-block;
       border: solid 1px #a4b3b8;
       border-radius: 50%;
@@ -72,7 +71,8 @@ foam.CLASS({
     {
       class: 'File',
       name: 'data'
-    }
+    },
+    [ 'uploadHidden', false ]
   ],
 
   messages: [
@@ -101,7 +101,7 @@ foam.CLASS({
               })
             });
         }, this.data$))
-        .start().addClass('uploadButtonContainer')
+        .start().addClass('uploadButtonContainer').hide(this.uploadHidden)
           .start('input').addClass('attachment-input')
             .attrs({
               type: 'file',
