@@ -21,9 +21,9 @@ foam.CLASS({
   /* todo: [
     `Don't register classes globally, register in a subcontext so we can
 have multiple classloaders running alongside eachother`
-  ],*/
-  imports: [
-    'modelDAO'
+],*/
+  requires: [
+    'foam.classloader.OrDAO'
   ],
   properties: [
     {
@@ -33,9 +33,25 @@ have multiple classloaders running alongside eachother`
     {
       class: 'Map',
       name: 'latched'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'modelDAO'
     }
   ],
   methods: [
+    {
+      name: 'addClassPath',
+      code: function(modelDAO) {
+        if ( this.modelDAO ) {
+          modelDAO = this.OrDAO.create({
+            primary: this.modelDAO,
+            delegate: modelDAO
+          });
+        }
+        this.modelDAO = modelDAO;
+      }
+    },
     {
       name: 'load',
       returns: 'Promise',
