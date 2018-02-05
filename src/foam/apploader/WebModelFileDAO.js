@@ -110,6 +110,9 @@ foam.CLASS({
 
             return foam.lookup(json.class || 'Model').create(json, x);
           });
+        }, function(resp) {
+          if ( resp.status == 404 ) return null;
+          throw resp;
         });
       }
     }
