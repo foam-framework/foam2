@@ -8,10 +8,7 @@ package foam.crypto.sign;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.security.*;
 
 /**
  * Output stream that signs outgoing data
@@ -28,21 +25,25 @@ public class SigningOutputStream
    * @param key private key used for signing
    * @return signature initialized with algorithm and private key
    */
-  private static Signature getSignature(String algorithm, PrivateKey key) {
+  private static Signature getSignature(String algorithm, Key key) {
     try {
       Signature signature = Signature.getInstance(algorithm);
-      signature.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+      if ( key instanceof PrivateKey ) {
+        signature.initSign((PrivateKey) key, SecureRandom.getInstance("SHA1PRNG"));
+      } else if ( key instanceof PublicKey) {
+        signature.initVerify((PublicKey) key);
+      }
       return signature;
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
   }
 
-  public SigningOutputStream(PrivateKey key, OutputStream out) {
+  public SigningOutputStream(Key key, OutputStream out) {
     this("SHA256with"+key.getAlgorithm(), key, out);
   }
 
-  public SigningOutputStream(String algorithm, PrivateKey key, OutputStream out) {
+  public SigningOutputStream(String algorithm, Key key, OutputStream out) {
     this(getSignature(algorithm, key), out);
   }
 
@@ -78,5 +79,9 @@ public class SigningOutputStream
 
   public byte[] sign() throws SignatureException {
     return sig_.sign();
+  }
+
+  public boolean verify(byte[] signature) throws SignatureException {
+    return sig_.verify(signature);
   }
 }
