@@ -21,11 +21,11 @@ foam.CLASS({
       name: 'open'
     },
     {
-      class: 'DateTime',
+      class: 'Time',
       name: 'startTime'
     },
     {
-      class: 'DateTime',
+      class: 'Time',
       name: 'endTime'
     }
   ]

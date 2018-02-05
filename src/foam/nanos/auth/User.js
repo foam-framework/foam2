@@ -190,6 +190,11 @@ emailIsSet_ = true;`
       documentation: 'Bank Identification Code (BIC)'
     },
     {
+      class: 'Boolean',
+      name: 'businessHoursEnabled',
+      value: false
+    },
+    {
       class: 'URL',
       name: 'website',
       displayWidth: 80,
