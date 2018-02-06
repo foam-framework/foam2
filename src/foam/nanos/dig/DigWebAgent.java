@@ -62,7 +62,7 @@ public class DigWebAgent
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
-        //gets all ongoing nanopay services
+        // gets all ongoing nanopay services
         nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
           public void put(FObject o, Detachable d) {
             NSpec s = (NSpec) o;
@@ -206,7 +206,7 @@ public class DigWebAgent
           outputterJson.output(sink.getArray().toArray());
 
           response.setContentType("application/json");
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( email.length != 0 && ! email[0].equals("") && email[0] != null ) {
             output(x, outputterJson.toString());
           } else {
             out.println(outputterJson.toString());
@@ -214,7 +214,7 @@ public class DigWebAgent
         } else if ( "xml".equals(format) ) {
           XMLSupport xmlSupport = new XMLSupport();
 
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( email.length != 0 && ! email[0].equals("") && email[0] != null ) {
             String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
 
             output(x, xmlData);
@@ -232,7 +232,7 @@ public class DigWebAgent
           }
 
           response.setContentType("text/plain");
-          if ( email.length != 0 && !email[0].equals("")  && email[0] != null ) {
+          if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
             output(x, outputterCsv.toString());
           } else {
             out.println(outputterCsv.toString());
@@ -252,7 +252,7 @@ public class DigWebAgent
           outputterHtml.outputEndTable();
           outputterHtml.outputEndHtml();
 
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( email.length != 0 && ! email[0].equals("") && email[0] != null ) {
             output(x, outputterHtml.toString());
           } else {
             out.println(outputterHtml.toString());
@@ -271,7 +271,7 @@ public class DigWebAgent
             dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
           }
 
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( email.length != 0 && ! email[0].equals("") && email[0] != null ) {
             output(x, dataToString);
           } else {
             out.println(dataToString);
