@@ -6,10 +6,9 @@
 
 package foam.nanos.tomcat;
 
-import foam.nanos.http.NanoRouter;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,12 +18,8 @@ import java.io.IOException;
  * Used to route sub projects to a more easily accessible path
  */
 public class SubdomainRouter
-    extends NanoRouter
+    extends HttpServlet
 {
-  {
-    x_ = new foam.nanos.boot.Boot().getX();
-  }
-
   @Override
   protected synchronized void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String path = getServletConfig().getInitParameter("path");
