@@ -315,6 +315,73 @@ foam.LIB({
       }
     },
 
+    function breakdown(f) {
+      var ident = "([^,\\s\\)]+)";
+      var ws = "\\s*";
+      var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
+      var skip = "(?:" + ws + comment + ws + ")*";
+      var header = "(?:function" + skip + ident + "?\\(|\\()";
+      var arg = "(?:" + skip + ident + skip + ")";
+      var nextArg = "(?:," + arg + ")";
+      var argEnd = "\\)";
+      var headerToBody = skip + "(?:\\=\\>)?" + skip;
+      var body = "\\{((?:.|\\s)*)\\}";
+
+
+      var breakdown = {
+        name: '',
+        args: [],
+        body: ''
+      };
+
+      var source = f.toString();
+
+      var lastIndex = 0;
+      var currentRegex;
+
+      function again() {
+        var match = currentRegex.exec(source);
+        if ( match ) lastIndex = currentRegex.lastIndex;
+        return match;
+      }
+
+      function next(e) {
+        prep(e);
+        return again();
+      }
+
+      function prep(e) {
+        currentRegex = new RegExp(e, "my");
+        currentRegex.lastIndex = lastIndex;
+      }
+
+      var match = next(header);
+      if ( ! match ) return null;
+
+      if ( match[1] ) breakdown.name = match[1];
+
+      match = next(arg);
+
+      if ( match ) {
+        breakdown.args.push(match[1]);
+        prep(nextArg);
+        while ( match = again() ) {
+          breakdown.args.push(match[1]);
+        }
+      }
+
+      match = next(argEnd);
+      if ( ! match ) return null;
+
+      if ( ! next(headerToBody) ) return null;
+
+      match = next(body);
+      if ( ! match ) return null;
+      breakdown.body = match[1];
+
+      return breakdown;
+    },
+
     /**
      * Calls fn, and provides the arguments to fn by looking
      * up their names on source. The 'this' context is either
@@ -851,6 +918,29 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
+
+      foam.package.triggerClass_(cls);
+    },
+
+    function waitForClass(cls) {
+      foam.package.__pending = foam.package.__pending || {};
+      foam.package.__pending[cls] = foam.package.__pending[cls] || [];
+
+      return new Promise(function(resolve, reject) {
+        foam.package.__pending[cls].push(resolve);
+      });
+    },
+
+    function triggerClass_(cls) {
+      if ( ! foam.package.__pending || ! foam.package.__pending[cls.id] ) return;
+
+      var pending = foam.package.__pending[cls.id];
+
+      foam.package.__pending[cls.id] = undefined;
+
+      for ( var i = 0 ; i < pending.length ; i++ ) {
+        pending[i](cls);
+      }
     },
 
     /**
@@ -860,7 +950,23 @@ foam.LIB({
      */
     function registerClassFactory(m, thunk) {
       var pkg = foam.package.ensurePackage(global, m.package);
-      Object.defineProperty(pkg, m.name, {get: thunk, configurable: true});
+      var tmp;
+
+      Object.defineProperty(
+        pkg,
+        m.name, {
+          configurable: true,
+          get: function() {
+            if ( tmp ) return tmp;
+
+            tmp = thunk();
+
+            foam.package.triggerClass_(tmp);
+
+            return tmp;
+          }
+        }
+      );
     },
 
     /**

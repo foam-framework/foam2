@@ -92,7 +92,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'service',
-      view: 'foam.u2.view.FObjectView'
+      view: { class: 'foam.u2.view.FObjectView' }
     }
     // TODO: permissions, keywords, lazy, parent
   ],
@@ -105,12 +105,14 @@ foam.CLASS({
         { name: 'service', javaType: 'Object' }
       ],
       javaCode: `
+      /*
         System.err.println("saveService: " + this.getName());
         if ( service instanceof FObject ) {
           setService((FObject) service);
           DAO dao = (DAO) x.get("nSpecDAO");
           dao.put(this);
         }
+        */
       `
     },
     {

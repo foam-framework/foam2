@@ -509,13 +509,21 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
   documentation: `
     Virtual-DOM Element. Root model for all U2 UI components.
+
+    To insert a U2 Element into a regular DOM element, either:
+
+    el.innerHTML = view.outerHTML;
+    view.load();
+
+    Or use a foam tag in your markup:
+
+    <foam class="com.acme.mypackage.MyView"></foam>
 
     // TODO: Decide if we want this or not:
     // function XXXE(opt_nodeName /* | DIV */) {
@@ -1581,6 +1589,11 @@ foam.CLASS({
       return this;
     },
 
+    function callOn(obj, f, args) {
+      obj[f].apply(obj, [this].concat(args));
+      return this;
+    },
+
     function callIf(bool, f, args) {
       if ( bool ) f.apply(this, args);
 
@@ -2034,6 +2047,15 @@ foam.CLASS({
   requires: [ 'foam.u2.DateTimeView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateTimeView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Time',
+  requires: [ 'foam.u2.TimeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.TimeView' } ]
   ]
 });
 

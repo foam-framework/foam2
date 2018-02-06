@@ -45,38 +45,61 @@ var abstractClasses = externalFile.abstractClasses;
 var skeletons = externalFile.skeletons;
 var proxies = externalFile.proxies;
 
-var blacklist = {
-  'FObject': true,
-  'foam.core.AbstractEnum': true,
-  'foam.core.AbstractInterface': true,
-  'foam.core.Property': true,
-  'foam.core.String': true,
+var blacklist = {};
+
+externalFile.blacklist.forEach(function(cls) {
+  blacklist[cls] = true;
+});
+
+[
+  'FObject',
+  'foam.core.AbstractEnum',
+  'foam.core.AbstractInterface',
+  'foam.core.Property',
+  'foam.core.String',
+  'foam.core.Validatable',
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO': true,
-  'foam.dao.FilteredDAO': true,
-  'foam.dao.LimitedDAO': true,
-  'foam.dao.NullDAO': true,
-  'foam.dao.OrderedDAO': true,
-  'foam.dao.SkipDAO': true,
+  'foam.dao.FilteredDAO',
+  'foam.dao.LimitedDAO',
+  'foam.dao.OrderedDAO',
+  'foam.dao.SkipDAO',
 
   // TODO: These models currently don't compile in java but could be updated to
   // compile properly.
-  'foam.blob.BlobBlob': true,
-  'foam.dao.CompoundDAODecorator': true,
-  'foam.dao.DAODecorator': true,
-  'foam.dao.EasyDAO': true,
-  'foam.dao.FlowControl': true,
-  'foam.dao.PromisedDAO': true,
-  'foam.dao.sync.SyncRecord': true,
-  'foam.dao.sync.VersionedSyncRecord': true,
-  'foam.mlang.order.ThenBy': true,
-  'foam.mlang.Expressions': true,
-  'foam.nanos.menu.MenuBar': true
-};
+  'foam.blob.BlobBlob',
+  'foam.dao.CompoundDAODecorator',
+  'foam.dao.DAODecorator',
+  'foam.dao.FlowControl',
+  'foam.dao.PromisedDAO',
+  'foam.dao.sync.SyncRecord',
+  'foam.dao.sync.VersionedSyncRecord',
+  'foam.mlang.order.ThenBy',
+  'foam.mlang.Expressions',
+  'foam.nanos.menu.MenuBar',
 
-externalFile.blacklist.forEach(function(cls) {
+  'foam.box.Context',
+//  'foam.box.HTTPBox',
+//  'foam.box.SessionClientBox',
+  'foam.box.SocketBox',
+  'foam.box.WebSocketBox',
+  'foam.box.TimeoutBox',
+  'foam.box.RetryBox',
+  'foam.dao.CachingDAO',
+  'foam.dao.CompoundDAODecorator',
+  'foam.dao.ContextualizingDAO',
+  'foam.dao.DecoratedDAO',
+  'foam.dao.DeDupDAO',
+  'foam.dao.IDBDAO',
+  'foam.dao.JDAO',
+  'foam.dao.LoggingDAO',
+  'foam.dao.MDAO',
+  'foam.dao.PromisedDAO',
+  'foam.dao.RequestResponseClientDAO',
+  'foam.dao.SyncDAO',
+  'foam.dao.TimingDAO'
+].forEach(function(cls) {
   blacklist[cls] = true;
 });
 
@@ -137,10 +160,9 @@ function generateAbstractClass(cls) {
 
   ensurePath(outfile);
 
-  var javaclass = cls.buildJavaClass();
-  javaclass.abstract = true;
+  var javaclass = cls.buildJavaClass(foam.java.Class.create({ abstract: true }));
 
-    writeFileIfUpdated(outfile, javaclass.toJavaSource());
+  writeFileIfUpdated(outfile, javaclass.toJavaSource());
 }
 
 function generateSkeleton(cls) {

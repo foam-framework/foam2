@@ -15,14 +15,21 @@ foam.CLASS({
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.core.*',
+    'foam.dao.*',
+    'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.*',
     'foam.nanos.pm.PM',
+    'foam.nanos.session.Session',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
-    'java.util.Date'
+    'java.util.Date',
+    'java.util.List',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'run'
   ],
 
   searchColumns: [],
@@ -40,6 +47,11 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
+      visibility: foam.u2.Visibility.RO
+    },
+    {
+      class: 'Long',
+      name: 'lastDuration',
       visibility: foam.u2.Visibility.RO
     },
     /*
@@ -82,11 +94,30 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'sudo',
+      args: [
+        { name: 'userName', javaType: 'String' }
+      ],
+      javaReturns: 'X',
+      javaCode: `
+        X x = getX();
+        User user = (User) ((DAO) x.get("userDAO")).inX(x).find(EQ(User.EMAIL, userName));
+
+        if ( user == null ) throw new RuntimeException("Unknown user");
+
+        Session session = new Session();
+        x = x.put(Session.class, session);
+        x = x.put("user", user);
+        session.setUserId(user.getId());
+        session.setContext(x);
+
+        return x;
+      `
+    },
+    {
       name: 'createInterpreter',
       args: [
-        {
-          name: 'x', javaType: 'foam.core.X'
-        }
+        { name: 'x', javaType: 'foam.core.X' }
       ],
       javaReturns: 'Interpreter',
       javaCode: `
@@ -96,6 +127,7 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
+          shell.eval("sudo(String user) { currentScript.sudo(user); }");
         } catch (EvalError e) {}
 
         return shell;
@@ -129,6 +161,7 @@ foam.CLASS({
         }
 
         setLastRun(new Date());
+        setLastDuration(pm.getTime());
         ps.flush();
         setOutput(baos.toString());
     `
@@ -149,7 +182,7 @@ foam.CLASS({
             self.copyFrom(script);
           });
         } else {
-          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
+          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
 
           with ( { log: log, print: log, x: self.__context__ } ) {
             var ret = eval(this.code);

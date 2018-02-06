@@ -49,13 +49,11 @@ var classes = [
   'foam.box.RegisterSelfMessage',
   'foam.box.SubBoxMessage',
   'foam.box.SubscribeMessage',
-  'com.google.foam.demos.appengine.TestModel',
   'foam.box.NamedBox',
   'foam.box.HTTPBox',
   'foam.box.HTTPReplyBox',
   'foam.nanos.app.AppConfig',
   'foam.nanos.http.WebAgent',
-  'com.google.foam.demos.appengine.TestService',
   'com.google.foam.demos.heroes.Hero',
   'com.google.auth.TokenVerifier',
   'foam.box.RemoteException',
@@ -96,6 +94,7 @@ var classes = [
   'foam.dao.ManyToManyRelationshipDAO',
   'foam.dao.RelationshipPropertyValue',
   'foam.dao.SQLStatement',
+  'foam.dao.EasyDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -106,6 +105,8 @@ var classes = [
   'foam.nanos.actioncommand.ActionCommand',
   'foam.nanos.NanoService',
   'foam.nanos.boot.NSpec',
+  'foam.nanos.app.Mode',
+  'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.Group',
   'foam.nanos.auth.LastModifiedAware',
@@ -124,7 +125,8 @@ var classes = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.auth.token.ClientTokenService',
   'foam.nanos.auth.token.AbstractTokenService',
-  'foam.nanos.auth.resetPassword.ResetPasswordTokenService',    
+  'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
+  'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -162,6 +164,7 @@ var classes = [
   'foam.lib.parse.PStream',
   'foam.lib.json.OutputJSON',
   'foam.lib.json.UnknownFObject',
+  'foam.lib.json.UnknownFObjectArray',
   'foam.blob.Buffer',
   'foam.blob.Blob',
   'foam.blob.BlobService',
@@ -176,7 +179,17 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeocodeResponse',
   'foam.nanos.geocode.GoogleMapsGeocodeResult',
   'foam.nanos.geocode.GoogleMapsGeometry',
-  'foam.nanos.geocode.GoogleMapsBoundary'
+  'foam.nanos.geocode.GoogleMapsBoundary',
+
+  'foam.nanos.demo.DemoObject',
+  'foam.nanos.fs.File',
+
+  'foam.crypto.hash.Hasher',
+  'foam.crypto.hash.Hashable',
+
+  'foam.crypto.sign.Signer',
+  'foam.crypto.sign.Signable',
+  'foam.crypto.sign.SignedFObject'
 ];
 
 var abstractClasses = [
@@ -186,7 +199,6 @@ var abstractClasses = [
 
 
 var skeletons = [
-  'com.google.foam.demos.appengine.TestService',
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
@@ -198,7 +210,6 @@ var skeletons = [
 var proxies = [
   'foam.dao.DAO',
   'foam.dao.Sink',
-  'com.google.foam.demos.appengine.TestService',
   'foam.mop.MOP',
   'foam.lib.parse.Parser',
   'foam.lib.parse.PStream',
@@ -211,33 +222,6 @@ var proxies = [
 ];
 
 var blacklist = [
-  'FObject',
-  'foam.core.AbstractEnum',
-  'foam.core.AbstractInterface',
-  'foam.core.Property',
-  'foam.core.String',
-
-  // These have hand written java impls so we don't want to clobber them.
-  // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO',
-  'foam.dao.FilteredDAO',
-  'foam.dao.LimitedDAO',
-  'foam.dao.NullDAO',
-  'foam.dao.OrderedDAO',
-  'foam.dao.SkipDAO',
-
-  // TODO: These models currently don't compile in java but could be updated to
-  // compile properly.
-  'foam.blob.BlobBlob',
-  'foam.dao.CompoundDAODecorator',
-  'foam.dao.DAODecorator',
-  'foam.dao.EasyDAO',
-  'foam.dao.FlowControl',
-  'foam.dao.PromisedDAO',
-  'foam.dao.sync.SyncRecord',
-  'foam.dao.sync.VersionedSyncRecord',
-  'foam.mlang.order.ThenBy',
-  'foam.nanos.menu.MenuBar',
 ];
 
 module.exports = {

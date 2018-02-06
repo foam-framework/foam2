@@ -311,7 +311,7 @@ foam.CLASS({
   properties: [
     { class: 'Int', name: 'i' },
     'field1',
-    { name: 'field2', view: 'foam.u2.view.PasswordView' },
+    { name: 'field2', view: { class: 'foam.u2.view.PasswordView' } },
     {
       name: 'choices',
       view: {
@@ -565,7 +565,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'obj',
-      view: 'foam.u2.view.FObjectView',
+      view: { class: 'foam.u2.view.FObjectView' },
       value: foam.util.Timer.create()
     }
   ]
@@ -587,7 +587,7 @@ foam.CLASS({
     {
       class: 'StringArray',
       name: 'a2',
-      view: 'foam.u2.view.StringArrayRowView'
+      view: { class: 'foam.u2.view.StringArrayRowView' }
     }
   ]
 });

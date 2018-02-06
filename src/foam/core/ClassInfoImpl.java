@@ -9,7 +9,7 @@ package foam.core;
 import java.util.*;
 
 public class ClassInfoImpl
-    implements ClassInfo
+  implements ClassInfo
 {
   private List      axioms;
   private String    id;

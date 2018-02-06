@@ -3,6 +3,7 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
@@ -85,14 +86,14 @@ emailIsSet_ = true;`
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'String',
@@ -119,7 +120,7 @@ emailIsSet_ = true;`
       of: 'foam.nanos.auth.Address',
       name: 'address',
       factory: function() { return this.Address.create(); },
-      view: 'foam.nanos.auth.AddressDetailView'
+      view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
       class: 'FObjectArray',
@@ -189,6 +190,11 @@ emailIsSet_ = true;`
       documentation: 'Bank Identification Code (BIC)'
     },
     {
+      class: 'Boolean',
+      name: 'businessHoursEnabled',
+      value: false
+    },
+    {
       class: 'URL',
       name: 'website',
       displayWidth: 80,
@@ -198,7 +204,22 @@ emailIsSet_ = true;`
 
   methods: [
     function label() {
-      return this.organization || ( this.firstName + ' ' + this.lastName );
+      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
     }
   ]
+});
+
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.Group',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'group',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
+  }
 });

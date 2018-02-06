@@ -8,8 +8,6 @@ foam.CLASS({
   name: 'ApplicationController',
   extends: 'foam.u2.Element',
 
-  arequire: function() { return foam.nanos.client.ClientBuilder.create(); },
-
   documentation: 'FOAM Application Controller.',
 
   implements: [
@@ -17,8 +15,12 @@ foam.CLASS({
   ],
 
   requires: [
+    'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
+    'foam.nanos.u2.navigation.TopNavigation',
+    'foam.nanos.auth.SignInView',
     'foam.u2.stack.Stack',
+    'foam.nanos.auth.resetPassword.ResetView',
     'foam.u2.stack.StackView'
   ],
 
@@ -30,11 +32,14 @@ foam.CLASS({
 
   exports: [
     'as ctrl',
+    'group',
     'loginSuccess',
     'logo',
     'requestLogin',
     'signUpEnabled',
     'stack',
+    'currentMenu',
+    'menuListener',
     'user',
     'webApp',
     'wrapCSS as installCSS'
@@ -73,6 +78,12 @@ foam.CLASS({
       factory: function() { return this.User.create(); }
     },
     {
+      class: 'foam.core.FObjectProperty',
+      of: 'foam.nanos.auth.Group',
+      name: 'group',
+      factory: function() { return this.Group.create(); }
+    },
+    {
       class: 'Boolean',
       name: 'signUpEnabled',
       adapt: function(v) {
@@ -83,11 +94,13 @@ foam.CLASS({
       class: 'Boolean',
       name: 'loginSuccess'
     },
-    'logo',
+    { class: 'URL', name: 'logo' },
+    'currentMenu',
     'webApp',
     'primaryColor',
     'secondaryColor',
     'tableColor',
+    'tableHoverColor',
     'accentColor'
   ],
 
@@ -114,7 +127,7 @@ foam.CLASS({
     function initE() {
       this
         .addClass(this.myClass())
-        .tag({class: 'foam.u2.navigation.TopNavigation'})
+        .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
         .start('div').addClass('stack-wrapper')
           .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
         .end();
@@ -125,6 +138,7 @@ foam.CLASS({
       if ( this.window.location.hash || ! this.user.group ) return;
 
       this.groupDAO.find(this.user.group).then(function (group) {
+        this.group.copyFrom(group);
         this.window.location.hash = group.defaultMenu;
       }.bind(this));
     },
@@ -160,10 +174,11 @@ foam.CLASS({
         }
 
         this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g,   this.primaryColor).
-          replace(/%SECONDARYCOLOR%/g, this.secondaryColor).
-          replace(/%TABLECOLOR%/g,     this.tableColor).
-          replace(/%ACCENTCOLOR%/g,    this.accentColor),
+          replace(/%PRIMARYCOLOR%/g,    this.primaryColor).
+          replace(/%SECONDARYCOLOR%/g,  this.secondaryColor).
+          replace(/%TABLECOLOR%/g,      this.tableColor).
+          replace(/%TABLEHOVERCOLOR%/g, this.tableHoverColor).
+          replace(/%ACCENTCOLOR%/g,     this.accentColor),
           id);
       }
     },
@@ -188,6 +203,10 @@ foam.CLASS({
   listeners: [
     function onUserUpdate() {
       this.setDefaultMenu();
+    },
+
+    function menuListener(m) {
+      this.currentMenu = m;
     }
   ]
 });
