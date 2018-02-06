@@ -8,18 +8,21 @@ package foam.lib.json;
 
 import foam.core.*;
 import foam.dao.AbstractSink;
+import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.PrivateKey;
+import java.security.Signature;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 
 public class Outputter
-  extends AbstractSink
+    extends AbstractSink
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -42,6 +45,11 @@ public class Outputter
   protected boolean       rollHashes_ = false;
   protected byte[]        previousHash_ = null;
   protected final Object  hashLock_ = new Object();
+
+  // signing properties
+  protected String        signAlgo_ = null;
+  protected PrivateKey    signingKey_ = null;
+  protected boolean       outputSignature_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -90,9 +98,9 @@ public class Outputter
 
   public String escape(String s) {
     return s
-      .replace("\t", "\\t")
-      .replace("\n","\\n")
-      .replace("\"", "\\\"");
+        .replace("\t", "\\t")
+        .replace("\n","\\n")
+        .replace("\"", "\\\"");
   }
 
   protected void outputNumber(Number value) {
@@ -235,6 +243,11 @@ public class Outputter
       outputHash(o);
     }
 
+    if ( outputSignature_ ) {
+      writer_.append(",");
+      outputSignature(o);
+    }
+
     writer_.append("}");
   }
 
@@ -243,10 +256,10 @@ public class Outputter
     if ( rollHashes_ ) {
       synchronized ( hashLock_ ) {
         previousHash_ = o.hash(hashAlgo_, previousHash_);
-        hash = Hex.toHexString(previousHash_);
+        hash = Base64.toBase64String(previousHash_);
       }
     } else {
-      hash = Hex.toHexString(
+      hash = Base64.toBase64String(
           o.hash(hashAlgo_, null));
     }
 
@@ -256,6 +269,19 @@ public class Outputter
         .append(":")
         .append("\"")
         .append(hash)
+        .append("\"");
+  }
+
+  protected void outputSignature(FObject o) {
+    String signature = Base64.toBase64String(
+        o.sign(signAlgo_, signingKey_));
+
+    writer_.append(beforeKey_())
+        .append("signature")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(signature)
         .append("\"");
   }
 
@@ -301,31 +327,27 @@ public class Outputter
     outputDefaultValues_ = outputDefaultValues;
   }
 
-  public boolean getOutputDefaultValues() {
-    return outputDefaultValues_;
-  }
-
   public void setHashAlgorithm(String algorithm) {
     hashAlgo_ = algorithm;
-  }
-
-  public String getHashAlgorithm() {
-    return hashAlgo_;
   }
 
   public void setOutputHash(boolean outputHash) {
     outputHash_ = outputHash;
   }
 
-  public boolean getOutputHash() {
-    return outputHash_;
-  }
-
   public void setRollHashes(boolean rollHashes) {
     rollHashes_ = rollHashes;
   }
 
-  public boolean getRollHashes() {
-    return rollHashes_;
+  public void setOutputSignature(boolean outputSignature) {
+    outputSignature_ = outputSignature;
+  }
+
+  public void setSigningAlgorithm(String algorithm) {
+    signAlgo_ = algorithm;
+  }
+
+  public void setSigningKey(PrivateKey signingKey) {
+    signingKey_ = signingKey;
   }
 }
