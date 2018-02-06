@@ -17,11 +17,6 @@ foam.CLASS({
       documentation: 'GUID'
     },
     {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'ownerId'
-    },
-    {
       class: 'String',
       name: 'filename',
       documentation: 'Filename'

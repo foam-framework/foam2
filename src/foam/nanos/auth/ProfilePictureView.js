@@ -90,11 +90,11 @@ foam.CLASS({
           return this.E('img').addClass('shopperImage')
             .attrs({
               src: this.data$.map(function (data) {
-                if ( data ) {
+                if ( data && data.data ) {
                   var blob = data.data;
                   return self.BlobBlob.isInstance(blob) ?
                     URL.createObjectURL(blob.blob) :
-                    ( "/service/httpFileService/" + data/id );
+                    ( "/service/httpFileService/" + data.id );
                 } else {
                    return 'images/person.svg'
                 }
@@ -126,7 +126,7 @@ foam.CLASS({
     function onChange (e) {
       var file = e.target.files[0];
       this.data = this.File.create({
-        ownerId: this.user.id,
+        owner: this.user.id,
         filename: file.name,
         filesize: file.size,
         mimeType: file.type,
