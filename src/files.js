@@ -129,6 +129,10 @@ FOAM_FILES([
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
 
+  { name: "foam/json2/Outputter" },
+  { name: "foam/json2/Deserializer" },
+  { name: "foam/json2/Serializer" },
+
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
   { name: "foam/java/JavaSwiftRefines", flags: ['java'] },
@@ -367,6 +371,7 @@ FOAM_FILES([
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
+  { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
@@ -405,6 +410,9 @@ FOAM_FILES([
   { name: "foam/u2/search/TextSearchView", flags: ['web'] },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
+  { name: "foam/apploader/ClassLoader" },
+  { name: "foam/apploader/WebModelFileDAO" },
+  { name: "foam/apploader/ClassLoaderContext" },
   { name: "foam/u2/FoamTagLoader", flags: ['web'] },
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
@@ -459,9 +467,7 @@ FOAM_FILES([
   { name: "foam/net/node/CachedResponse", flags: ['node'] },
   { name: "foam/net/node/CachingResponse", flags: ['node'] },
   { name: "foam/net/node/Server", flags: ['node'] },
-  { name: "foam/classloader/ClassLoader", flags: ['debug'] },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
-  { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
   { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
   { name: "foam/parsers/html/lib" },

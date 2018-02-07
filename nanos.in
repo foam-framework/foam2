@@ -11,6 +11,7 @@ function usage {
     echo " -d Enable JPDA debugging"
     echo " -s When debugging is enabled, start with application suspended."
     echo " -a PORT Listen on PORT for debugger connections, default 8000"
+    echo " -j JAR1:JAR2 Additional jars to add to the classpath."
     echo ""
     echo "Nanos Options:"
     # TODO: Let nanos output these itself.
@@ -20,11 +21,12 @@ function usage {
     echo ""
 }
 
-while getopts ":da:sh" opt; do
+while getopts ":da:shj:" opt; do
     case $opt in
         d) DEBUG=y ;;
         s) SUSPEND=y ;;
         a) DEBUG_PORT=$OPTARG ;;
+        j) EXTRA_CP=":$OPTARG" ;;
         h) usage ; exit 0 ;;
         ?) break ;;
     esac
@@ -38,4 +40,4 @@ fi
 
 shift $(($OPTIND - 1))
 
-java $DEBUG_ARGS -cp @CLASSPATH@ foam.nanos.boot.Boot "$@"
+java $DEBUG_ARGS -cp @CLASSPATH@$EXTRA_CP foam.nanos.boot.Boot "$@"

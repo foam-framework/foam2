@@ -146,4 +146,4 @@ foam.LIB = function LIB(model) {
     }
   }
 };
-global.foam.__LIBS__ = Object.create(null);
+global.foam.__LIBS__ = {};
