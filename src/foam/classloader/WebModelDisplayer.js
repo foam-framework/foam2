@@ -35,14 +35,12 @@ foam.CLASS({
   ],
 
   imports: [
-    'arequire',
-    'window'
+    'classloader',
+    'window',
   ],
 
   exports: [
     'stack',
-    'classloader',
-    foam.String.daoize(foam.core.Model.name)
   ],
 
   properties: [
@@ -66,40 +64,21 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'classpath'
-    },
-    {
-      name: 'classloader',
-      factory: function() {
-        return this.ClassLoader.create()
-      }
-    },
-    {
-      name: foam.String.daoize(foam.core.Model.name),
-      expression: function(classpath) {
-        var prefix   = this.window.location.protocol + '//' + this.window.location.host;
-        var paths    = classpath.split(',');
-        var modelDao = this.WebModelFileDAO.create({
-          url: prefix + paths[0],
+      name: 'classpath',
+      postSet: function(_, n) {
+        if ( ! n ) return;
+        var self = this;
+        n.split(',').forEach(function(p) {
+          self.classloader.addClassPath(p)
         });
-
-        for ( var i = 1, classpath ; classpath = paths[i] ; i++ ) {
-          modelDao = this.OrDAO.create({
-            delegate: modelDao,
-            primary: this.WebModelFileDAO.create({
-              root: prefix + classpath
-            })
-          });
-        }
-        return modelDao;
-      }
-    }
+      },
+    },
   ],
 
   methods: [
     function fromQuery(opt_query) {
       var search = /([^&=]+)=?([^&]*)/g;
-      var query  = opt_query || window.location.search.substring(1);
+      var query  = opt_query || this.window.location.search.substring(1);
       var decode = function(s) {
         return decodeURIComponent(s.replace(/\+/g, ' '));
       };
@@ -113,7 +92,7 @@ foam.CLASS({
 
       if ( params.model ) {
         this.copyFrom({
-          classpath: params.classpath || '/src/',
+          classpath: params.classpath,
           model:     params.model,
           view:      params.view
         });
