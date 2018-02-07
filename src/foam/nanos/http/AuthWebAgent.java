@@ -33,31 +33,21 @@ public class AuthWebAgent
   }
 
   public void execute(X x) {
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
-    PrintWriter         out        = x.get(PrintWriter.class);
-    AuthService         auth       = (AuthService) x.get("auth");
-    DAO                 sessionDAO = (DAO) x.get("sessionDAO");
-    String              sessionId  = null;
-    Cookie              cookie     = getCookie(req);
+    HttpServletRequest  req     = x.get(HttpServletRequest.class);
+    HttpServletResponse resp    = x.get(HttpServletResponse.class);
+    PrintWriter         out     = x.get(PrintWriter.class);
+    AuthService         auth    = (AuthService) x.get("auth");
+    Session             session = authenticate(x);
 
-    attemptLogin(x);
-
-    if ( cookie != null ) {
-      sessionId       = cookie.getValue().toString();
-      Session session = (Session) sessionDAO.find(sessionId);
-
-      if ( session != null && session.getContext() != null ) {
-        if ( auth.check(session.getContext(), permission_) ) {
-          getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
-          return;
-        } else {
-          out.println("Access denied. Need permission: " + permission_);
-        }
+    if ( session != null && session.getContext() != null ) {
+      if ( auth.check(session.getContext(), permission_) ) {
+        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+      } else {
+        out.println("Access denied. Need permission: " + permission_);
       }
+    } else {
+      templateLogin(x);
     }
-
-    templateLogin(x);
   }
 
   public Cookie getCookie(HttpServletRequest req) {
@@ -78,7 +68,7 @@ public class AuthWebAgent
     out.println("<h1>Login</h1>");
     out.println("<br>");
     out.println("<label style=\"display:inline-block;width:70px;\">Email:</label>");
-    out.println("<input name=\"email\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
+    out.println("<input name=\"user\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
     out.println("<br>");
     out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
     out.println("<input name=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
@@ -87,31 +77,45 @@ public class AuthWebAgent
     out.println("</form>");
   }
 
-  public boolean attemptLogin(X x) {
-    HttpServletRequest req        = x.get(HttpServletRequest.class);
-    String             email      = req.getParameter("email");
-    String             password   = req.getParameter("password");
-    AuthService        auth       = (AuthService) x.get("auth");
-    PrintWriter        out        = x.get(PrintWriter.class);
-    Session            session    = new Session();
-    DAO                sessionDAO = (DAO) x.get("sessionDAO");
+  /** If provided, use user and password parameters to login and create session and cookie. **/
+  public Session authenticate(X x) {
+    HttpServletRequest req          = x.get(HttpServletRequest.class);
+    String             email        = req.getParameter("user");
+    String             password     = req.getParameter("password");
+    Cookie             cookie       = getCookie(req);
+    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
+    Session            session      = null;
+    boolean            attemptLogin = ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password);
+    AuthService        auth         = (AuthService) x.get("auth");
+    PrintWriter        out          = x.get(PrintWriter.class);
 
-    if ( SafetyUtil.isEmpty(email) || SafetyUtil.isEmpty(password) ) return false;
+
+    if ( cookie == null ) {
+      session = new Session();
+      createCookie(x, session);
+    } else {
+      String sessionId = cookie.getValue().toString();
+      session = (Session) sessionDAO.find(sessionId);
+
+      if ( session == null ) {
+        session = new Session();
+      } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
+        return session;
+      }
+    }
+
+    if ( ! attemptLogin ) return null;
 
     try {
-
       User user = (User) auth.loginByEmail(session.getContext(), email, password);
-      if ( user != null ) {
-        createCookie(x, session);
-        return true;
-      }
+      if ( user != null ) return session;
     } catch (Throwable t) {
       t.printStackTrace();
     }
 
     out.println("Authentication failure.");
 
-    return false;
+    return null;
   }
 
   public void createCookie(X x, Session session){
@@ -120,8 +124,5 @@ public class AuthWebAgent
     Cookie              cookie = new Cookie(SESSION_ID, session.getId());
 
     resp.addCookie(cookie);
-    out.println("<script>");
-    out.println("window.location.href = window.location.href;");
-    out.println("</script>");
   }
 }
