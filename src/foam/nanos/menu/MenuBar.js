@@ -13,7 +13,7 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO', 'currentMenu' ],
+  imports: [ 'menuDAO', 'currentMenu', 'window' ],
 
   documentation: 'Navigational menu bar',
 
@@ -84,7 +84,8 @@ foam.CLASS({
         return false;
       }
 
-      if ( this.selected === menu.id && this.selected.parent != 'settings' ) {
+      // only show selected menu if user settings sub menu item has not been selected
+      if ( this.selected === menu.id && !this.window.location.hash.includes('#set') ) {
         return true;
       }
 
