@@ -128,7 +128,7 @@ foam.CLASS({
               for ( var i = 0 ; i < axioms.length ; i++ ) {
                 var a = axioms[i];
 
-                if ( ! this.axiomPredicate.f(a) ) return;
+                if ( ! this.axiomPredicate.f(a) ) continue;
 
                 if ( a.outputPropertyJSON2 ) a.outputPropertyJSON2(x, v, this, out);
               }
