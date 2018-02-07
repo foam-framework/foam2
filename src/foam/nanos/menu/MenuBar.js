@@ -59,7 +59,7 @@ foam.CLASS({
                   if ( ! self.selected ) self.selected = menu;
                   this.start()
                     .addClass('menuItem')
-                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) || self.selected === menu.id; }))
+                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) }))
                     .add(menu.label)
                     .on('click', function() {
                       menu.launch_(self.__context__, e);
@@ -82,6 +82,10 @@ foam.CLASS({
           return true;
         }
         return false;
+      }
+
+      if ( this.selected === menu.id && this.selected.parent != 'settings' ) {
+        return true;
       }
 
       // selected menu is a submenu. Do not change selection yet.
