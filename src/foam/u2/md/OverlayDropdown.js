@@ -30,7 +30,7 @@ foam.CLASS({
       }
 
       ^container {
-        position: relative;
+        position: absolute;
         right: 0;
         top: 0;
         z-index: 100;
@@ -38,7 +38,6 @@ foam.CLASS({
 
       ^ {
         background: white;
-        box-sizing: border-box;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
         display: block;
         font-size: 13px;
@@ -73,12 +72,16 @@ foam.CLASS({
         left: initial;
         right: initial;
       }
+
+      ^parents {
+        z-index: 1000 !important;
+      }
     */}
     })
   ],
 
   constants: {
-    BOTTOM_OFFSET: -13
+    BOTTOM_OFFSET: -25,
   },
 
   properties: [
@@ -127,6 +130,9 @@ foam.CLASS({
 
     function open() {
       if ( this.opened ) return;
+
+      this.onOpenStart();
+
       this.animationComplete = false;
       this.opened = true;
       this.dropdownE_.style({ height: this.getFullHeight() + 'px' });
@@ -145,24 +151,21 @@ foam.CLASS({
 
       var myStyle = this.window.getComputedStyle(this.dropdownE_.el());
 
-      var border = 0;
-      ['border-top', 'border-bottom'].forEach(function(name) {
-        var match = myStyle[name].match(/^([0-9]+)px/);
-        if ( match ) border += parseInt(match[1]);
-      });
-
       var first = this.dropdownE_.children[0].el();
+      var top = first.offsetTop;
       var last = this.dropdownE_.children[this.dropdownE_.children.length - 1]
           .el();
       var margin = parseInt(
           this.window.getComputedStyle(last)['margin-bottom']);
       if ( Number.isNaN(margin) ) margin = 0;
+      var bottom = last.offsetTop + last.offsetHeight + margin;
 
-      var childHeight = border + last.offsetTop + last.offsetHeight + margin;
+      var childrenHeight = bottom - top;
       var maxHeight = this.window.innerHeight -
-          this.dropdownE_.el().getBoundingClientRect().top;
+            this.dropdownE_.el().getBoundingClientRect().top +
+            this.BOTTOM_OFFSET;
 
-      return Math.min(childHeight, maxHeight) + this.BOTTOM_OFFSET;
+      return Math.min(childrenHeight, maxHeight);
     },
 
     function initE() {
@@ -205,6 +208,7 @@ foam.CLASS({
 
     function onTransitionEnd() {
       this.animationComplete = true;
+      if (!this.opened) this.onCloseComplete();
     },
 
     function onMouseLeave(e) {
@@ -219,6 +223,24 @@ foam.CLASS({
      */
     function onClick(e) {
       e.stopPropagation();
-    }
+    },
+
+    function onOpenStart() {
+      var parent = this.el().parentElement;
+      var parentClass = this.myClass('parents');
+      while (parent) {
+        parent.classList.add(parentClass);
+        parent = parent.parentElement;
+      }
+    },
+
+    function onCloseComplete() {
+      var parent = this.el().parentElement;
+      var parentClass = this.myClass('parents');
+      while (parent) {
+        parent.classList.remove(parentClass);
+        parent = parent.parentElement;
+      }
+    },
   ]
 });
