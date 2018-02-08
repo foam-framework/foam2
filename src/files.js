@@ -107,6 +107,8 @@ FOAM_FILES([
   { name: "foam/swift/refines/IntProperty", flags: ['swift'] },
   { name: "foam/swift/refines/String", flags: ['swift'] },
   { name: "foam/swift/SwiftJava", flags: ['java'] },
+  { name: "foam/swift/Field", flags: ['swift']},
+  { name: "foam/swift/Method", flags: ['swift']},
 
 
   { name: "foam/java/Argument", flags: ['java'] },
