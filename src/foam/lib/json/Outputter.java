@@ -20,6 +20,7 @@ import java.util.List;
 
 public class Outputter
   extends AbstractSink
+  implements foam.lib.Outputter
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
