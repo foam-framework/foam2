@@ -28,7 +28,7 @@ foam.CLASS({
     { class: 'String', name: 'daoKey' },
     { class: 'String', name: 'url' },
     { class: 'Enum', of: 'foam.nanos.dig.Format', name: 'format' },
-    { class: 'Reference', of: 'foam.nanos.auth.user', name: 'owner' }
+    { class: 'Reference', of: 'foam.nanos.auth.User', name: 'owner' }
   ],
 
   methods: [
