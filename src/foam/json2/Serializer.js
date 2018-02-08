@@ -22,11 +22,22 @@ foam.CLASS({
         return n;
       },
     },
+    {
+      name: 'instancePredicate',
+      factory: function() { return this.True.create() },
+      adapt: function(_, n) {
+        if ( foam.Function.isInstance(n) ) {
+          return {f: n};
+        }
+        return n;
+      },
+    },
   ],
   methods: [
     function stringify(x, v) {
       var serializer = this.InnerSerializer.create({
-        axiomPredicate: this.axiomPredicate
+        axiomPredicate: this.axiomPredicate,
+        instancePredicate: this.instancePredicate,
       });
       serializer.output(x, v);
       return serializer.getString();
@@ -40,6 +51,7 @@ foam.CLASS({
       ],
       properties: [
         'axiomPredicate',
+        'instancePredicate',
         {
           class: 'Map',
           name: 'deps'
@@ -118,6 +130,7 @@ foam.CLASS({
           } else if ( type == foam.core.FObject ) {
             if ( v.outputJSON2 ) v.outputJSON2(x, this, out);
             else {
+              if ( ! this.instancePredicate.f(v) ) return;
               out.obj();
               var cls = v.cls_;
               var axioms = v.cls_.getAxioms();
