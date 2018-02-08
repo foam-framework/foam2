@@ -121,7 +121,9 @@ foam.CLASS({
         default: throw new RuntimeException("Method not found: " + rpc.getName());
       }
     } catch (Throwable t) {
+      t.printStackTrace();
       message.replyWithException(t);
+
       return;
     }
 
