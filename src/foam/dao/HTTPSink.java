@@ -35,11 +35,13 @@ public class HTTPSink
   @Override
   public void put(FObject obj, Detachable sub) {
     try {
+      // connect if not connected
       if ( ! connected_) {
         conn_.connect();
         connected_ = true;
       }
 
+      // create new writer if null
       if ( writer_ == null ) {
         writer_ = new BufferedWriter(
             new OutputStreamWriter(conn_.getOutputStream()));
@@ -61,6 +63,7 @@ public class HTTPSink
   @Override
   public void close() {
     IOUtils.closeQuietly(writer_);
+    writer_ = null;
     conn_.disconnect();
     connected_ = false;
   }
