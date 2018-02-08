@@ -1,18 +1,8 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2018 The FOAM Authors.  All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -21,7 +11,7 @@ foam.CLASS({
 
   documentation: 'Converts <foam> tags in document into Views.',
 
-  imports: [ 'document', 'window' ],
+  imports: [ 'document', 'window', 'classloader' ],
 
   methods: [
     function init() {
@@ -35,11 +25,12 @@ foam.CLASS({
       }
     },
 
-    function loadTag(el, modelName) {
-      var cls = this.lookup(modelName, true);
-      var id  = el.id;
+    function loadTag(el) {
+      var clsName = el.getAttribute('class');
 
-      if ( cls ) {
+      this.classloader.load(clsName).then(function(cls) {
+        var id  = el.id;
+
         var view = cls.create(null, foam.__context__);
 
         if ( view.toE ) {
@@ -59,29 +50,21 @@ foam.CLASS({
 
         // Store view in global variable if named. Useful for testing.
         if ( id ) global[id] = view;
-      } else {
-        console.error('Unknow class: ', modelName);
-      }
+
+      }.bind(this), function(e) {
+        console.error(e);
+        console.error('Failed to load class: ', clsName);
+      });
     }
   ],
 
   listeners: [
     function onLoad() {
-      var els = this.document.getElementsByTagName('foam');
+      var els = Array.from(this.document.getElementsByTagName('foam'));
       this.window.removeEventListener('load', this.onLoad);
 
       // Install last to first to avoid messing up the 'els' list.
-      for ( var i = els.length-1 ; i >= 0 ; i-- ) {
-        let el        = els[i];
-        let modelName = el.getAttribute('class');
-        var arequire  = foam.AREQUIRES[modelName];
-
-        if ( arequire ) {
-          arequire().then(function() { this.loadTag(el, modelName); }.bind(this));
-        } else {
-          this.loadTag(el, modelName);
-        }
-      }
+      els.forEach(this.loadTag.bind(this));
     }
   ]
 });
