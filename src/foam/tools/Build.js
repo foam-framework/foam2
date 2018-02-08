@@ -85,7 +85,7 @@ foam.CLASS({
         {
           class: 'StringArray',
           name: 'flags',
-          value: ['web'],
+          value: ['js', 'web'],
         },
         {
           name: 'puts',
@@ -95,15 +95,12 @@ foam.CLASS({
           hidden: true,
           name: 'outputter',
           factory: function() {
-            var flags = this.flags;
-            return this.Serializer.create({
-              axiomPredicate: function(a) {
-                if ( a.flags ) {
-                  for ( var i = 0; i < flags.length; i++ ) {
-                    if ( p.flags[flags[i]] ) return true;
-                  }
-                  return false;
-                }
+            var self = this;
+            var f = foam.util.flagFilter(self.flags);
+            return self.Serializer.create({
+              axiomPredicate: f,
+              instancePredicate: function(a) {
+                if ( foam.Array.isInstance(a.flags) ) return f(a)
                 return true;
               }
             });
@@ -117,7 +114,7 @@ foam.CLASS({
           if ( self.puts[o.id] ) return self.puts[o.id];
 
           var s = this.outputter.stringify(x, o)
-          var deps = JSON.parse(s)['$DEPS$'].concat(o.getClassDeps());
+          var deps = JSON.parse(s)['$DEPS$'].concat(o.getClassDeps(this.flags));
 
           var promises = deps.map(function(id) {
             return self.delegate.find(id).then(function(m) {
