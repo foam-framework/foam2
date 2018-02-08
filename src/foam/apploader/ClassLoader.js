@@ -150,32 +150,12 @@ have multiple classloaders running alongside eachother`
       }
     },
     {
-      name: 'classDeps',
-      args: [ { name: 'model', of: 'foam.core.Model' } ],
-      code: function(model) {
-        var self = this;
-
-        // TODO: This can probably be a method on Model
-        var deps = model.requires ?
-            model.requires.map(function(r) { return r.path }) :
-            [];
-
-        deps = deps.concat(model.implements ?
-                           model.implements.map(function(i) { return i.path }) :
-                           []);
-
-        if ( model.extends ) deps.push(model.extends);
-
-        return deps;
-      }
-    },
-    {
       name: 'modelDeps_',
       args: [ { name: 'model', of: 'foam.core.Model' },
               { name: 'path' } ],
       code: function(model, path) {
         var self = this;
-        return Promise.all(self.classDeps(model).map(function(d) {
+        return Promise.all(model.getClassDeps().map(function(d) {
           return self.maybeLoad_(d, path);
         }));
       }
