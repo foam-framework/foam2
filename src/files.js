@@ -158,6 +158,7 @@ FOAM_FILES([
   { name: "foam/u2/Element", flags: ['js'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
