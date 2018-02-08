@@ -10,6 +10,7 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.JDAO;
 import foam.dao.ProxyDAO;
+import foam.nanos.auth.User;
 
 public class DUGDAO
     extends ProxyDAO
@@ -21,6 +22,12 @@ public class DUGDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
+    User user = (User) x.get("user");
+    if ( user == null ) {
+      throw new RuntimeException("User is not logged in");
+    }
+
+    ((DUG) obj).setOwner(user.getId());
     ((DUG) obj).execute(x);
     return super.put_(x, obj);
   }
