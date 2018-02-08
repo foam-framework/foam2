@@ -109,11 +109,9 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'Blob',
+      class: 'File',
       name: 'profilePicture',
-      tableCellFormatter: function (value) {
-        this.tag({ class: 'foam.u2.view.ImageBlobView' });
-      }
+      view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
     {
       class: 'FObjectProperty',
@@ -221,5 +219,16 @@ foam.RELATIONSHIP({
   },
   targetProperty: {
     hidden: false
+  }
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.fs.File',
+  forwardName: 'files',
+  inverseName: 'owner',
+  sourceProperty: {
+    hidden: true,
+    transient: true
   }
 });
