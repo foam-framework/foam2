@@ -4,18 +4,17 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.ENUM({
-   package: 'foam.nanos.dig',
-   name: 'Format',
+foam.ENUM({
+  package: 'foam.nanos.dig',
+  name: 'Format',
 
-   documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
+  documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
 
-   values: [
-     { name: 'JSON', label: 'JSON' },
-     { name: 'XML',  label: 'XML'  }
-   ]
- });
-
+  values: [
+    { name: 'JSON', label: 'JSON' },
+    { name: 'XML',  label: 'XML'  }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.nanos.dig',
@@ -28,13 +27,18 @@ foam.CLASS({
     { class: 'String', name: 'daoKey' },
     { class: 'String', name: 'url' },
     { class: 'Enum', of: 'foam.nanos.dig.Format', name: 'format' },
-    { class: 'Reference', of: 'foam.nanos.auth.user', name: 'owner' }
+    { class: 'Reference', of: 'foam.nanos.auth.User', name: 'owner' }
   ],
 
   methods: [
     {
       name: 'execute',
-      args: [ { name: 'x', javaType: 'X'} ],
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'void',
       javaCode: `
         System.out.println("Executing" + this.getId());
