@@ -12,11 +12,11 @@ foam.CLASS({
     'userDAO'
   ],
   exports: [ 'as data' ],
-  
+
   requires: [
     'foam.u2.dialog.NotificationMessage'
   ],
-  
+
   css: `
     ^ {
       width: 1280px;
@@ -124,17 +124,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'originalPassword',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     },
     {
       class: 'String',
       name: 'newPassword',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     },
     {
       class: 'String',
       name: 'confirmPassword',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     }
   ],
   methods: [

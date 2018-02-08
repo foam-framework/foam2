@@ -28,7 +28,8 @@ foam.CLASS({
   requires: [
     'foam.comics.DAOCreateControllerView',
     'foam.nanos.auth.User',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.nanos.auth.resetPassword.EmailView'
   ],
 
   axioms: [
@@ -110,7 +111,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     }
   ],
 
@@ -137,9 +138,9 @@ foam.CLASS({
               .on('click', self.signUp)
             .end()
           })
-          .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')		
-            .add("Forgot Password?")		
-            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})		
+          .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')
+            .add("Forgot Password?")
+            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})
           .end()
         .end()
       .end();
