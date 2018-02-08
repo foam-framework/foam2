@@ -20,6 +20,13 @@ foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DUG',
 
+  javaImports: [
+    'foam.dao.DAO',
+    'foam.dao.HTTPSink',
+    'foam.lib.json.Outputter',
+    'static foam.lib.json.OutputterMode.NETWORK'
+  ],
+
   searchColumns: [],
 
   properties: [
@@ -40,9 +47,14 @@ foam.CLASS({
         }
       ],
       javaReturns: 'void',
-      javaCode: `
-        System.out.println("Executing" + this.getId());
-      `
+      javaCode:
+`try {
+  DAO dao = (DAO) x.get(getDaoKey());
+  // TODO: choose outputter based on format
+  dao.listen(new HTTPSink(getUrl(), new Outputter(NETWORK)), null);
+} catch (Throwable t) {
+  throw new RuntimeException(t);
+}`
     }
   ]
 });
