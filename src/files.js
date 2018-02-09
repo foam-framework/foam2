@@ -122,8 +122,6 @@ FOAM_FILES([
   { name: "foam/java/Method", flags: ['java'] },
   { name: "foam/java/Constant", flags: ['java'] },
   { name: "foam/java/Enum", flags: ['java'] },
-  { name: "foam/java/MultiPartGetter", flags: ['java'] },
-  { name: "foam/java/MultiPartSetter", flags: ['java'] },
   { name: "foam/java/Outputter", flags: ['java'] },
   { name: "foam/java/PropertyInfo", flags: ['java'] },
   { name: "foam/java/Skeleton", flags: ['java'] },
