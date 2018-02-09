@@ -53,6 +53,7 @@ foam.CLASS({
   // TODO: choose outputter based on format
   dao.listen(new HTTPSink(getUrl(), new Outputter(NETWORK)), null);
 } catch (Throwable t) {
+  t.printStackTrace();
   throw new RuntimeException(t);
 }`
     }
