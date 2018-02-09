@@ -1234,7 +1234,6 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      this.SUPER(cls);
       var info = cls.getField('classInfo_');
       if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
 
