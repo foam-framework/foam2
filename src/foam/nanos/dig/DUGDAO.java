@@ -14,6 +14,7 @@ import foam.dao.DAO;
 import foam.dao.JDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
+import foam.util.Auth;
 
 public class DUGDAO
     extends ProxyDAO
@@ -27,7 +28,7 @@ public class DUGDAO
     delegate.select(new AbstractSink() {
       @Override
       public void put(FObject obj, Detachable sub) {
-        ((DUG) obj).execute(x);
+        ((DUG) obj).execute(Auth.sudo(x, ((DUG) obj).getOwner()));
       }
     });
   }
