@@ -1438,3 +1438,10 @@ foam.CLASS({
     },
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.Function',
+  properties: [
+    ['javaType', 'java.util.function.Function']
+  ]
+});
