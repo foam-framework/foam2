@@ -35,7 +35,13 @@ public class Outputter
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected boolean       outputDefaultValues_ = false;
+
+  // Hash properties
+  protected String        hashAlgo_ = "SHA-256";
   protected boolean       outputHash_ = false;
+  protected boolean       rollHashes_ = false;
+  protected byte[]        previousHash_ = null;
+  protected final Object  hashLock_ = new Object();
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -233,8 +239,16 @@ public class Outputter
   }
 
   protected void outputHash(FObject o) {
-    String hash = Hex.toHexString(
-        o.hash("SHA-256", null));
+    String hash;
+    if ( rollHashes_ ) {
+      synchronized ( hashLock_ ) {
+        previousHash_ = o.hash(hashAlgo_, previousHash_);
+        hash = Hex.toHexString(previousHash_);
+      }
+    } else {
+      hash = Hex.toHexString(
+          o.hash(hashAlgo_, null));
+    }
 
     writer_.append(beforeKey_())
         .append("hash")
@@ -291,11 +305,27 @@ public class Outputter
     return outputDefaultValues_;
   }
 
+  public void setHashAlgorithm(String algorithm) {
+    hashAlgo_ = algorithm;
+  }
+
+  public String getHashAlgorithm() {
+    return hashAlgo_;
+  }
+
   public void setOutputHash(boolean outputHash) {
     outputHash_ = outputHash;
   }
 
   public boolean getOutputHash() {
     return outputHash_;
+  }
+
+  public void setRollHashes(boolean rollHashes) {
+    rollHashes_ = rollHashes;
+  }
+
+  public boolean getRollHashes() {
+    return rollHashes_;
   }
 }

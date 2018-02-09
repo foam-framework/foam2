@@ -80,13 +80,13 @@ public abstract class AbstractEnumPropertyInfo
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
     int val = getOrdinal(get(obj));
-    md.update(bb.get().putInt(val));
+    md.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
     int val = getOrdinal(get(obj));
-    sig.update(bb.get().putInt(val));
+    sig.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 }
 
