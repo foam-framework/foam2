@@ -582,7 +582,7 @@ class SwiftTestsTests: XCTestCase {
     t.set(key: "dateProp", value: 123456)
     XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 123456))
 
-    t.set(key: "dateProp", value: "2017-11-21T01:00:00.0+01:00")
+    t.set(key: "dateProp", value: "2017-11-20T19:00:00.0Z")
     XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1511222400))
 
     t.set(key: "dateProp", value: Date(timeIntervalSince1970: 1234))
