@@ -19,6 +19,7 @@ foam.CLASS({
 
   exports: [
     'log',
+    'flags',
   ],
 
   properties: [
@@ -30,6 +31,11 @@ foam.CLASS({
       class: 'String',
       name: 'output',
       view: { class: 'foam.u2.tag.TextArea', rows: 16 },
+    },
+    {
+      class: 'StringArray',
+      name: 'flags',
+      factory: function() { return ['js', 'web'] },
     },
   ],
 
@@ -75,17 +81,13 @@ foam.CLASS({
         'foam.json2.Serializer',
       ],
       imports: [
-        'log'
+        'log',
+        'flags',
       ],
       properties: [
         {
           name: 'root',
           value: 'TESTOUTPUT/',
-        },
-        {
-          class: 'StringArray',
-          name: 'flags',
-          value: ['js', 'web'],
         },
         {
           name: 'puts',
@@ -95,15 +97,7 @@ foam.CLASS({
           hidden: true,
           name: 'outputter',
           factory: function() {
-            var self = this;
-            var f = foam.util.flagFilter(self.flags);
-            return self.Serializer.create({
-              axiomPredicate: f,
-              instancePredicate: function(a) {
-                if ( foam.Array.isInstance(a.flags) ) return f(a)
-                return true;
-              }
-            });
+            return this.Serializer.create()
           },
         },
       ],
