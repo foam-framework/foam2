@@ -11,42 +11,58 @@ import foam.core.ClassInfo;
 
 public class PropertyReferenceParser extends ProxyParser {
   public PropertyReferenceParser() {
-      super(new Seq0(new Whitespace(),
-                      new Literal("{"),
-                      new Whitespace(),
-                      new KeyParser("class"),
-                      new Whitespace(),
-                      new Literal(":"),
-                      new Whitespace(),
-                      new Literal("\"__Property__\""),
-                      new Whitespace(),
-                      new Literal(","),
-                      new Whitespace(),
-                      new KeyParser("forClass_"),
-                      new Whitespace(),
-                      new Literal(":"),
-                      new Whitespace(),
-                      new Parser() {
-                          private Parser delegate = new StringParser();
-                          public PStream parse(PStream ps, ParserContext x) {
-                            ps = ps.apply(delegate, x);
-                            if ( ps != null ) {
-                              x.set("forClass_", ps.value());
-                            }
-                            return ps;
-                          }
-                        },
-                      new Whitespace(),
-                      new Literal("}")));
+    super(new Seq0(new Whitespace(),
+                   new Literal("{"),
+                   new Whitespace(),
+                   new KeyParser("class"),
+                   new Whitespace(),
+                   new Literal(":"),
+                   new Whitespace(),
+                   new Literal("\"__Property__\""),
+                   new Whitespace(),
+                   new Literal(","),
+                   new Whitespace(),
+                   new KeyParser("forClass_"),
+                   new Whitespace(),
+                   new Literal(":"),
+                   new Whitespace(),
+                   new Parser() {
+        private Parser delegate = new StringParser();
+        public PStream parse(PStream ps, ParserContext x) {
+          ps = ps.apply(delegate, x);
+          if ( ps != null ) {
+            x.set("forClass_", ps.value());
+          }
+          return ps;
+        }
+      },
+                   new Literal(","),
+                   new Whitespace(),
+                   new KeyParser("name"),
+                   new Whitespace(),
+                   new Literal(":"),
+                   new Parser() {
+                     private Parser delegate = new StringParser() ;
+                     public PStream parse(PStream ps, ParserContext x) {
+                       ps = ps.apply(delegate, x);
+                       if ( ps != null ) {
+                         x.set("name", ps.value());
+                       }
+                       return ps;
+                     }
+                   },
+                   new Whitespace(),
+                   new Literal("}")));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
 
     if ( ps != null ) {
-      String forClass = (String) x.get("forClass_");
-      String classId  = forClass.substring(0, forClass.lastIndexOf("."));
-      String propName = forClass.substring(forClass.lastIndexOf(".") + 1);
+      String classId  = (String) x.get("forClass_");
+      String propName = (String) x.get("name");
+
+      System.out.println("***" + classId + '.' + propName);
 
       Class cls;
       try {

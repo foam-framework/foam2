@@ -40,7 +40,7 @@ foam.CLASS({
   methods: [
     function outputJSON(o) {
       if ( o.passPropertiesByReference ) {
-        o.output({ class: '__Property__', forClass_: this.forClass_ });
+        o.output({ class: '__Property__', forClass_: this.forClass_, name: this.name });
       } else {
         o.outputFObject_(this);
       }
@@ -57,12 +57,12 @@ foam.CLASS({
       installInClass: function(c) {
         var oldCreate = c.create;
         c.create = function(args, X) {
-          var cls = args.forClass_.substring(0, args.forClass_.lastIndexOf('.'));
-          var name = args.forClass_.substring(args.forClass_.lastIndexOf('.') + 1);
+          var cls = args.forClass_;
+          var name = args.name;
 
           var prop = X.lookup(cls).getAxiomByName(name);
 
-          foam.assert(prop, 'Could not find property "', args.forClass_, '"');
+          foam.assert(prop, 'Could not find property "', args.forClass_ + '.' + name, '"');
 
           return prop;
         };

@@ -269,7 +269,11 @@ public class Outputter
     writer_.append(",");
     outputString("forClass_");
     writer_.append(":");
-    outputString(prop.getClassInfo().getId() + "." + prop.getName());
+    outputString(prop.getClassInfo().getId());
+    writer_.append(",");
+    outputString("name");
+    writer_.append(":");
+    outputString(prop.getName());
     writer_.append("}");
   }
 
