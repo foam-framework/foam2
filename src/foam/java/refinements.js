@@ -54,6 +54,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaCloneProperty',
+      value: null
+    },
+    {
+      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -72,6 +77,7 @@ foam.CLASS({
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,
+        cloneProperty:    this.javaCloneProperty,
         jsonParser:       this.javaJSONParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
