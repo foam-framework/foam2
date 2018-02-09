@@ -27,7 +27,7 @@ foam.CLASS({
 
   methods: [
     function outputXML(o) {
-      o.output({ class: '__Property__', forClass_: this.forClass_ });
+      o.output({ class: '__Property__', forClass_: this.forClass_, name: this.name });
     }
   ]
 });
