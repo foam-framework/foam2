@@ -8,7 +8,7 @@ foam.ENUM({
   package: 'foam.nanos.dig',
   name: 'Format',
 
-  documentation: 'CRUD controller modes: CREATE/VIEW/EDIT.',
+  documentation: 'DUG formats: JSON/XML.',
 
   values: [
     { name: 'JSON', label: 'JSON' },
