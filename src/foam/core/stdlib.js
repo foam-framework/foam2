@@ -923,6 +923,8 @@ foam.LIB({
     },
 
     function waitForClass(cls) {
+      if ( foam.lookup(cls, true) ) return Promise.resolve(foam.lookup(cls));
+
       foam.package.__pending = foam.package.__pending || {};
       foam.package.__pending[cls] = foam.package.__pending[cls] || [];
 
