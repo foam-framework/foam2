@@ -22,6 +22,6 @@ foam.INTERFACE({
   documentation: 'Base class for markup-generating row formatters.',
 
   methods: [
-    function format(data) {}
+    function format(data, opt_columns) {}
   ]
 });
