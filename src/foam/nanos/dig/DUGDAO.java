@@ -6,8 +6,11 @@
 
 package foam.nanos.dig;
 
+import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.X;
+import foam.dao.AbstractSink;
+import foam.dao.DAO;
 import foam.dao.JDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
@@ -16,17 +19,24 @@ public class DUGDAO
     extends ProxyDAO
 {
   public DUGDAO(X x) {
-    setX(x);
-    setDelegate(new JDAO(x, DUG.getOwnClassInfo(), "dugs"));
+    this(x, new JDAO(x, DUG.getOwnClassInfo(), "dugs"));
+  }
+
+  public DUGDAO(X x, DAO delegate) {
+    super(x, delegate);
+    delegate.select(new AbstractSink() {
+      @Override
+      public void put(FObject obj, Detachable sub) {
+        User user = (User) x.get("user");
+        ((DUG) obj).setOwner(user.getId());
+        ((DUG) obj).execute(x);
+      }
+    });
   }
 
   @Override
   public FObject put_(X x, FObject obj) {
     User user = (User) x.get("user");
-    if ( user == null ) {
-      throw new RuntimeException("User is not logged in");
-    }
-
     ((DUG) obj).setOwner(user.getId());
     ((DUG) obj).execute(x);
     return super.put_(x, obj);
