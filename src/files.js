@@ -107,6 +107,8 @@ FOAM_FILES([
   { name: "foam/swift/refines/IntProperty", flags: ['swift'] },
   { name: "foam/swift/refines/String", flags: ['swift'] },
   { name: "foam/swift/SwiftJava", flags: ['java'] },
+  { name: "foam/swift/Field", flags: ['swift']},
+  { name: "foam/swift/Method", flags: ['swift']},
 
 
   { name: "foam/java/Argument", flags: ['java'] },
@@ -156,6 +158,7 @@ FOAM_FILES([
   { name: "foam/u2/Element", flags: ['js'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
