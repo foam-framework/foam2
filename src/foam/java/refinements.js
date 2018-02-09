@@ -120,7 +120,7 @@ foam.CLASS({
           type: this.javaType,
           visibility: 'public',
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
-            ( this.hasOwnProperty('javaFactory') ?
+            ( this.javaFactory ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
@@ -139,7 +139,7 @@ foam.CLASS({
           body: this.javaSetter || (privateName + ' = val;\n' + isSet + ' = true;')
         });
 
-      if ( this.hasOwnProperty('javaFactory') ) {
+      if ( this.javaFactory ) {
         cls.method({
           name: factoryName,
           visibility: 'protected',
