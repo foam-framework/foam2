@@ -107,6 +107,8 @@ FOAM_FILES([
   { name: "foam/swift/refines/IntProperty", flags: ['swift'] },
   { name: "foam/swift/refines/String", flags: ['swift'] },
   { name: "foam/swift/SwiftJava", flags: ['java'] },
+  { name: "foam/swift/Field", flags: ['swift']},
+  { name: "foam/swift/Method", flags: ['swift']},
 
 
   { name: "foam/java/Argument", flags: ['java'] },
@@ -128,6 +130,10 @@ FOAM_FILES([
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
+
+  { name: "foam/json2/Outputter" },
+  { name: "foam/json2/Deserializer" },
+  { name: "foam/json2/Serializer" },
 
   // TODO: Move createChildMethod_ to core.
   { name: "foam/java/JavaSwiftRefines", flags: ['swift'] },
@@ -152,6 +158,7 @@ FOAM_FILES([
   { name: "foam/u2/Element", flags: ['js'] },
   { name: "foam/u2/MNRowFormatter", flags: ['web'] },
   { name: "foam/u2/ProgressView", flags: ['web'] },
+  { name: "foam/u2/ListCreateController", flags: ['web'] },
   { name: "foam/version/VersionTrait" },
   { name: "foam/version/VersionedClass" },
   { name: "foam/version/VersionedClassFactory" },
@@ -367,6 +374,7 @@ FOAM_FILES([
   { name: "foam/u2/HTMLElement", flags: ['web'] },
   { name: "foam/u2/tag/Select", flags: ['web'] },
   { name: "foam/u2/Tabs", flags: ['web'] },
+  { name: "foam/u2/TimeView", flags: ['web'] },
   { name: "foam/u2/history/HistoryItemView", flags: ['web'] },
   { name: "foam/u2/history/HistoryView", flags: ['web'] },
   { name: "foam/u2/view/FObjectView", flags: ['web'] },
@@ -405,6 +413,9 @@ FOAM_FILES([
   { name: "foam/u2/search/TextSearchView", flags: ['web'] },
   { name: "foam/u2/stack/Stack", flags: ['web'] },
   { name: "foam/u2/stack/StackView", flags: ['web'] },
+  { name: "foam/apploader/ClassLoader" },
+  { name: "foam/apploader/WebModelFileDAO" },
+  { name: "foam/apploader/ClassLoaderContext" },
   { name: "foam/u2/FoamTagLoader", flags: ['web'] },
   { name: "foam/graphics/CView", flags: ['web'] },
   { name: "foam/graphics/ScrollCView", flags: ['web'] },
@@ -459,9 +470,7 @@ FOAM_FILES([
   { name: "foam/net/node/CachedResponse", flags: ['node'] },
   { name: "foam/net/node/CachingResponse", flags: ['node'] },
   { name: "foam/net/node/Server", flags: ['node'] },
-  { name: "foam/classloader/ClassLoader", flags: ['debug'] },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
-  { name: "foam/classloader/WebModelFileDAO", flags: ['web', 'debug'] },
   { name: "foam/classloader/NodeModelFileDAO", flags: ['node', 'debug'] },
   { name: "foam/classloader/NodeJsModelExecutor", flags: ['node', 'debug'] },
   { name: "foam/parsers/html/lib" },
@@ -479,5 +488,8 @@ FOAM_FILES([
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
   { name: "foam/crypto/hash/Hasher" },
-  { name: "foam/crypto/hash/Hashable" }
+  { name: "foam/crypto/hash/Hashable" },
+  { name: "foam/crypto/sign/Signer" },
+  { name: "foam/crypto/sign/Signable" },
+  { name: "foam/crypto/sign/SignedFObject" }
 ]);

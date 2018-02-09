@@ -52,6 +52,7 @@ public class NanoRouter
     try {
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
+        resp.setStatus(resp.SC_NOT_FOUND);
       } else {
         X y = getX().put(HttpServletRequest.class, req)
             .put(HttpServletResponse.class, resp)
