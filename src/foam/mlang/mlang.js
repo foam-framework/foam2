@@ -1293,9 +1293,12 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Map',
   extends: 'foam.dao.ProxySink',
-
-  implements: [
-    'foam.core.Serializable'
+  axioms: [
+    {
+      // TODO: Remove this when MAP works properly on java.  github issue #1020
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
   ],
 
   documentation: 'Sink Decorator which applies a map function to put() values before passing to delegate.',
