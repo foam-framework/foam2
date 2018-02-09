@@ -91,9 +91,10 @@ public class Outputter
 
   public String escape(String s) {
     return s
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
       .replace("\t", "\\t")
-      .replace("\n","\\n")
-      .replace("\"", "\\\"");
+      .replace("\n","\\n");
   }
 
   protected void outputNumber(Number value) {
