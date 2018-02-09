@@ -41,9 +41,7 @@ foam.CLASS({
       javaType: 'foam.core.PropertyInfo',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       name: 'axiom',
-      javaFactory: `
-return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
-      `,
+      javaFactory: 'return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));'
     },
     {
       /** The starting sequence value. This will be calclated from the
@@ -95,14 +93,8 @@ return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
       code: function put_(x, obj) {
         var self = this;
         return this.calcDelegateMax_.then(function() {
-          var val = self.property_.f(obj);
-
-          if ( ! val || val == self.property_.value ) {
+          if ( ! obj.hasOwnProperty(self.property_.name) ) {
             obj[self.property_.name] = self.value++;
-          } else if ( val && ( val >= self.value ) ) {
-            // if the object has a value, and it's greater than our current value,
-            // bump up the next value we try to auto-assign.
-            self.value = val + 1;
           }
 
           return self.delegate.put_(x, obj);
@@ -112,11 +104,9 @@ return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
 synchronized (this) {
   if ( ! isPropertySet("value") ) calcDelegateMax_();
 
-  Number val = (Number) obj.getProperty(getProperty());
-  if ( val.longValue() < 1 ) {
-    getAxiom().set(obj, value_++);
-  } else if ( val.longValue() >= value_ ) {
-    setValue(val.longValue() + 1);
+  if ( ! getAxiom().isSet(obj) ) {
+    getAxiom().set(obj, getValue());
+    setValue(getValue() + 1);
   }
 }
 
