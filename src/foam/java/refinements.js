@@ -174,7 +174,7 @@ foam.CLASS({
   ],
   methods: [
     function buildJavaClass(cls) {
-      if ( this.java ) cls.implements = (cls.implements || []).concat(this.path);
+      if ( this.java ) cls.implements = cls.implements.concat(this.path);
     }
   ]
 });
