@@ -453,22 +453,24 @@ this.removeAll_(this.getX(), 0, this.MAX_SAFE_INTEGER, null, null);
       if ( ! sink ) return foam.dao.ArraySink.create();
 
       if ( foam.Function.isInstance(sink) )
-        return {
+        sink = {
           put: sink,
           eof: function() {}
         };
-
-      if ( sink == console || sink == console.log )
-        return {
+      else if ( sink == console || sink == console.log )
+        sink = {
           put: function(o) { console.log(o, foam.json.Pretty.stringify(o)); },
           eof: function() {}
         };
-
-      if ( sink == global.document )
-        return {
+      else if ( sink == global.document )
+        sink = {
           put: function(o) { foam.u2.DetailView.create({data: o}).write(document); },
           eof: function() {}
         };
+
+      if ( ! foam.core.FObject.isInstance(sink) ) {
+        sink = foam.dao.AnonymousSink.create({ sink: sink });
+      }
 
       return sink;
     },
