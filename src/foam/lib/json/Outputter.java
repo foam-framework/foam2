@@ -223,7 +223,6 @@ public class Outputter
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
       if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
-      if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;
