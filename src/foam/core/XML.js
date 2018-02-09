@@ -443,7 +443,7 @@ foam.CLASS({
           opt_class = foam.lookup(opt_class);
         return this.objectify(root, opt_class);
       }
-      
+
       throw new Error('Class not provided');
     },
 
