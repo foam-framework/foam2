@@ -27,8 +27,6 @@ public class DUGDAO
     delegate.select(new AbstractSink() {
       @Override
       public void put(FObject obj, Detachable sub) {
-        User user = (User) x.get("user");
-        ((DUG) obj).setOwner(user.getId());
         ((DUG) obj).execute(x);
       }
     });
