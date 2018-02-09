@@ -6,7 +6,6 @@ foam.CLASS({
     'foam.classloader.OrDAO',
     'foam.core.Model',
     'foam.dao.DAOSink',
-    'foam.json2.Serializer',
   ],
 
   implements: [
@@ -79,6 +78,7 @@ foam.CLASS({
       extends: 'foam.dao.ProxyDAO',
       requires: [
         'foam.json2.Serializer',
+        'foam.json2.Deserializer',
       ],
       imports: [
         'log',
@@ -100,6 +100,13 @@ foam.CLASS({
             return this.Serializer.create()
           },
         },
+        {
+          hidden: true,
+          name: 'deserializer',
+          factory: function() {
+            return this.Deserializer.create({parseFunctions: true})
+          },
+        },
       ],
       methods: [
         function put_(x, o) {
@@ -107,49 +114,42 @@ foam.CLASS({
 
           if ( self.puts[o.id] ) return self.puts[o.id];
 
-          var filter = foam.util.flagFilter(x.flags);
-          o = o.clone();
-          [
-            'implements',
-            'requires',
-          ].forEach(function(p) {
-            if ( o[p] ) o[p] = o[p].filter(filter);
-          });
-          // Model is in a weird state now because axioms_ will be way off but
-          // it shouldn't get serialized so it's ok for this.
-
-          var s = this.outputter.stringify(x, o)
-          var deps = JSON.parse(s)['$DEPS$'].concat(o.getClassDeps());
-
-          var promises = deps.map(function(id) {
-            return self.delegate.find(id).then(function(m) {
-              self.put_(x, m);
+          // Serialization strips axioms without the proper flags and
+          // deserializing that results in an object without those axioms.
+          var s = self.outputter.stringify(x, o);
+          var json = JSON.parse(s);
+          return self.deserializer.aparse(x, json).then(function(o) {
+            var deps = json['$DEPS$'].concat(o.getClassDeps());
+            var promises = deps.map(function(id) {
+              return self.delegate.find(id).then(function(m) {
+                self.put_(x, m);
+              });
             });
-          });
 
-          if ( foam.isServer ) {
-            var sep = require('path').sep;
-            var dir = this.root + o.package.replace(/\./g, sep);
-            var file = `${dir}${sep}${o.name}.json`;
+            if ( foam.isServer ) {
+              var sep = require('path').sep;
+              var dir = self.root + o.package.replace(/\./g, sep);
+              var file = `${dir}${sep}${o.name}.json`;
 
-            var fs = require('fs');
-            var dirs = dir.split(sep);
-            dir = '';
-            while ( dirs.length ) {
-              dir = dir + dirs.shift() + sep;
-              if( ! fs.existsSync(dir) ){
-                fs.mkdirSync(dir)
+              var fs = require('fs');
+              var dirs = dir.split(sep);
+              dir = '';
+              while ( dirs.length ) {
+                dir = dir + dirs.shift() + sep;
+                if( ! fs.existsSync(dir) ){
+                  fs.mkdirSync(dir)
+                }
               }
+              fs.writeFileSync(file, s, 'utf8');
+            } else {
+              self.log(o.id);
+              self.log(s);
             }
-            fs.writeFileSync(file, s, 'utf8');
-          } else {
-            this.log(o.id);
-            this.log(s);
-          }
 
-          var p = Promise.all(promises);
-          self.puts[o.id] = p
-          return p;
+            var p = Promise.all(promises);
+            self.puts[o.id] = p
+            return p;
+          });
         }
       ]
     },
