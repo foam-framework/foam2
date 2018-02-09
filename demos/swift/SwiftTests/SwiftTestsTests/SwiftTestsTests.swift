@@ -576,66 +576,13 @@ class SwiftTestsTests: XCTestCase {
     try XCTAssertEqual((cache.select(x.create(Count.self)!) as? Count)?.value, 3)
   }
 
-  func testSocketWorking() {
-    // Note: For this test to work, you need to run the run_server.js script in the demo dir
-    let boxContext = Context.GLOBAL.create(BoxContext.self)!
-    let x = boxContext.__subContext__
-
-    let expect = expectation(description: "finish")
-
-    _ = x.create(NamedBox.self, args: [
-      "name": "/test",
-      "delegate": x.create(SocketBox.self, args: ["address": "localhost:7000"])!
-    ])
-
-    let dao = x.create(ClientDAO.self)!
-    dao.delegate = x.create(NamedBox.self, args: [
-      "name": "/test/TestDAO",
-    ])!
-    DispatchQueue.global(qos: .background).async {
-      let listener = x.create(FnSink.self)!
-      listener.fn = { s, o, sub in
-        XCTAssertEqual(s, "put")
-        XCTAssertTrue(o is Test)
-        sub.detach()
-        expect.fulfill()
-      }
-      try! _ = dao.listen(listener)
-
-      let t = x.create(Test.self, args: ["firstName": UUID().uuidString])!
-      let t2 = try! dao.put(t)
-      XCTAssertEqual(t.firstName, t2!.get(key: "firstName") as! String)
-    }
-
-    wait(for: [expect], timeout: 100)
-  }
-
-  func testSocketError() {
-    let boxContext = Context.GLOBAL.create(BoxContext.self)!
-    let x = boxContext.__subContext__
-
-    let expect = expectation(description: "finish")
-
-    let socket = x.create(Socket.self)!
-    _ = socket.connect.sub { (sub, _) in
-      XCTFail()
-    }
-    _ = socket.errorEvent.sub { (sub, _) in
-      sub.detach()
-      expect.fulfill()
-    }
-    socket.connectTo("localhost:7000")
-
-    wait(for: [expect], timeout: 20)
-  }
-
   func testDateProp() {
     let t = x.create(Test.self)!
 
     t.set(key: "dateProp", value: 123456)
     XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 123456))
 
-    t.set(key: "dateProp", value: "2017-11-21T01:00:00+01:00")
+    t.set(key: "dateProp", value: "2017-11-21T01:00:00.0+01:00")
     XCTAssertEqual(t.dateProp, Date(timeIntervalSince1970: 1511222400))
 
     t.set(key: "dateProp", value: Date(timeIntervalSince1970: 1234))
