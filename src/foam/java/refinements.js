@@ -247,6 +247,13 @@ foam.LIB({
           return foam.java.Field.create({name: p.name, type: p.javaType});
         });
 
+      cls.method({
+        name: 'hashCode',
+        type: 'int',
+        visibility: 'public',
+        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return p.name + '_'; }).join(',')});`
+      });
+
       if ( cls.name ) {
         var props = cls.allProperties;
 
