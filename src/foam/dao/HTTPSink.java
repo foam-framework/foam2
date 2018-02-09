@@ -9,6 +9,8 @@ package foam.dao;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.lib.Outputter;
+import foam.lib.json.OutputterMode;
+import foam.nanos.dig.Format;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpException;
 
@@ -22,11 +24,11 @@ public class HTTPSink
     extends AbstractSink
 {
   protected String url_;
-  protected Outputter outputter_;
+  protected Format format_;
 
-  public HTTPSink(String url, Outputter outputter) throws IOException {
+  public HTTPSink(String url, Format format) throws IOException {
     url_ = url;
-    outputter_ = outputter;
+    format_ = format;
   }
 
   @Override
@@ -36,19 +38,25 @@ public class HTTPSink
     BufferedWriter writer = null;
 
     try {
+      Outputter outputter = null;
       conn = (HttpURLConnection) new URL(url_).openConnection();
       conn.setRequestMethod("POST");
       conn.setDoInput(true);
       conn.setDoOutput(true);
-      if ( outputter_ instanceof foam.lib.json.Outputter ) {
+      if ( format_ == Format.JSON ) {
+        outputter = new foam.lib.json.Outputter(OutputterMode.NETWORK);
         conn.addRequestProperty("Accept", "application/json");
         conn.addRequestProperty("Content-Type", "application/json");
+      } else if ( format_ == Format.XML ) {
+        // TODO: make XML Outputter
+        conn.addRequestProperty("Accept", "application/xml");
+        conn.addRequestProperty("Content-Type", "application/xml");
       }
       conn.connect();
 
       os = conn.getOutputStream();
       writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-      writer.write(outputter_.stringify(obj));
+      writer.write(outputter.stringify(obj));
       writer.flush();
       writer.close();
       os.close();
