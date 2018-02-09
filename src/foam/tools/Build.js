@@ -107,8 +107,19 @@ foam.CLASS({
 
           if ( self.puts[o.id] ) return self.puts[o.id];
 
+          var filter = foam.util.flagFilter(x.flags);
+          o = o.clone();
+          [
+            'implements',
+            'requires',
+          ].forEach(function(p) {
+            if ( o[p] ) o[p] = o[p].filter(filter);
+          });
+          // Model is in a weird state now because axioms_ will be way off but
+          // it shouldn't get serialized so it's ok for this.
+
           var s = this.outputter.stringify(x, o)
-          var deps = JSON.parse(s)['$DEPS$'].concat(o.getClassDeps(this.flags));
+          var deps = JSON.parse(s)['$DEPS$'].concat(o.getClassDeps());
 
           var promises = deps.map(function(id) {
             return self.delegate.find(id).then(function(m) {
