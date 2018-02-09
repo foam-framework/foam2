@@ -8,7 +8,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'javaType'
+      name: 'javaType',
+      factory: function() { return this.of; }
     }
   ]
 });
