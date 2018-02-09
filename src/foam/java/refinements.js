@@ -247,6 +247,18 @@ foam.LIB({
           return foam.java.Field.create({name: p.name, type: p.javaType});
         });
 
+
+      if ( this.hasOwnAxiom('id') ) {
+        cls.implements = cls.implements.concat('foam.core.Identifiable');
+        var getid = cls.getMethod('getId');
+        cls.method({
+          visibility: 'public',
+          type: 'Object',
+          name: 'getPrimaryKey',
+          body: 'return (Object)getId();'
+        });
+      }
+
       cls.method({
         name: 'hashCode',
         type: 'int',
