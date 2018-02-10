@@ -94,27 +94,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'sudo',
-      args: [
-        { name: 'userName', javaType: 'String' }
-      ],
-      javaReturns: 'X',
-      javaCode: `
-        X x = getX();
-        User user = (User) ((DAO) x.get("userDAO")).inX(x).find(EQ(User.EMAIL, userName));
-
-        if ( user == null ) throw new RuntimeException("Unknown user");
-
-        Session session = new Session();
-        x = x.put(Session.class, session);
-        x = x.put("user", user);
-        session.setUserId(user.getId());
-        session.setContext(x);
-
-        return x;
-      `
-    },
-    {
       name: 'createInterpreter',
       args: [
         { name: 'x', javaType: 'foam.core.X' }
@@ -127,7 +106,7 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("sudo(String user) { currentScript.sudo(user); }");
+          shell.eval("sudo(String user) { foam.util.Auth.sudo(x, user); }");
         } catch (EvalError e) {}
 
         return shell;
