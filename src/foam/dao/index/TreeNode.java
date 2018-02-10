@@ -160,12 +160,12 @@ public class TreeNode {
       state.key = subs.key;
       state.value = subs.value;
       if ( isLeft ) {
-        state.left = removeNode(state.left, subs.value, prop);
+        state.left = removeNode(state.left, subs.key, prop);
       } else {
-        state.right = removeNode(state.right, subs.value, prop);
+        state.right = removeNode(state.right, subs.key, prop);
       }
     } else {
-      if ( compareValue > 0 ) {
+      if ( compareValue < 0 ) {
         state.size -= size(state.left);
         state.left = removeKeyValue(state.left, prop, key, value, tail);
         state.size += size(state.left);
@@ -261,6 +261,7 @@ public class TreeNode {
     return 0;
   }
 
+  /** extracts the value with the given key from the index */
   public TreeNode get(TreeNode s, Object key, PropertyInfo prop) {
     if ( s == null ) {
       return s;
@@ -367,6 +368,9 @@ public class TreeNode {
       s.level, s.left, null);
   }
 
+  /**
+   * In-order traversal to reach every node of Tree, and put data into sink
+   */
   protected void select_(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
     if ( currentNode == null ) return;
     TreeNode left = currentNode.getLeft();
@@ -375,6 +379,8 @@ public class TreeNode {
     }
     Object value = currentNode.getValue();
     if ( value != null ) {
+      // Sometimes the value will be a sub-tree.
+      // If value is a sub-tree, the tail will be treeIndex, use tail to re-select the plan to reach the data. If the index is valueIndex the value will be an object.
       tail.planSelect(value, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null).select(value, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
     }
     TreeNode right = currentNode.getRight();
@@ -383,6 +389,9 @@ public class TreeNode {
     }
   }
 
+  /**
+   * This function only used for GroupByPlan. To out each data if the tree to groupBy sink.
+   */
   protected void groupBy(TreeNode currentNode, Sink sink, Index tail) {
     if ( currentNode == null ) return;
     TreeNode left = currentNode.getLeft();
@@ -390,15 +399,30 @@ public class TreeNode {
     if ( left != null ) groupBy(left, sink, tail);
     Object value = currentNode.getValue();
     if ( value != null ) {
+
+      // GroupBy sink implement by HashMap, the key is the property of groupBy and the value will be another sink(ex:MAX, MIN, SUM, MAP, GROUPBY, ARRAYSINK ...)
+      // Different sink will do different operation of Object.
+      // If we have index of the parameter which we want to grouby this parameter. Each value will be a object or a sub-tree and in they should be in the same group.
+      // Each group need a new sink, so deepclone the origin sink of groupBy's arg2.
       Sink temp = (Sink) ( (FObject) ( (GroupBy) sink ).getArg2() ).deepClone();
       tail.planSelect(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null)
           .select(value, temp, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
+
+      // After operate every node in each group, just put the sink into groupBy's HashMap.
       ( ( (GroupBy) sink ).getGroups() ).put(currentNode.key, temp);
     }
     TreeNode right = currentNode.getRight();
     if ( right != null ) groupBy(right, sink, tail);
   }
 
+  /**
+   * In-order traversal with efficient skip and limit.
+   * Each node contains a 'size' will show the amount of node under itself. When first reach the one node, check the the number of nodes under it leftchild.
+   * If amount <= skip number just skip it. If amount > skip number, gointo this branch and check the size again.
+   * When skip number achieve 0, it will reach each node as regular in-order traversal.
+   * When the limit node is 0, stop the whoe traversal.
+   * @return a long[] which contains update skip and limit number.
+   */
   protected long[] skipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
     if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
     long currentSize = currentNode.size;
@@ -408,6 +432,7 @@ public class TreeNode {
     if ( left != null ) {
       leftSize = left.size;
       if ( leftSize > skip ) {
+        //Recursively check when the skip number could be 0;
         skip_limit = skipLimitTreeNode(left, sink, skip_limit[0], skip_limit[1], size, tail);
       } else if ( leftSize == skip ) skip_limit[0] = 0;
       else {
@@ -418,6 +443,7 @@ public class TreeNode {
     if ( tail.size(currentNode) > skip_limit[0] && skip_limit[1] > 0 ) {
       tail.planSelect(value, sink, skip_limit[0], skip_limit[1], null, null).select(value, sink, skip_limit[0], skip_limit[1], null, null);
       skip_limit[0] = 0;
+      // when we add the node, we minus the tail.size. tail.size is same with node size.
       skip_limit[1] = skip_limit[1] - ( tail.size(currentNode) - skip_limit[0] );
     } else if ( tail.size(currentNode) == skip_limit[0] ) {
       skip_limit[0] = 0;
@@ -431,6 +457,9 @@ public class TreeNode {
     return skip_limit;
   }
 
+  /**
+   * Post-order traversal with efficient skip and limit. Similar implement with 'skipLimitTreeNode()' method
+   */
   protected long[] reverseSortSkipLimitTreeNode(TreeNode currentNode, Sink sink, long skip, long limit, long size, Index tail) {
     if ( currentNode == null || size <= skip || limit <= 0 ) return new long[]{- 1, - 1};
     long currentSize = currentNode.size;
@@ -463,11 +492,16 @@ public class TreeNode {
     return skip_limit;
   }
 
+  /**
+   * Select which traversal method will be efficient to get data
+   */
   public void select(TreeNode currentNode, Sink sink, long skip, long limit, Comparator order, Predicate predicate, Index tail, boolean reverseSort) {
     if ( skip >= currentNode.size || limit <= 0 ) return;
     if ( ( predicate != null && predicate.partialEval() != null && ! ( predicate instanceof True ) ) || order != null ) {
+      // predicate == null means we already deal with predicate or predicate is origin null
       if ( order == null ) {
         if ( reverseSort ) {
+          // decorateSink if it have some predicate or order can't be deal with index.
           sink = decorateSink(null, sink, skip, limit, null, predicate);
           reverseSortSkipLimitTreeNode(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
         } else {
