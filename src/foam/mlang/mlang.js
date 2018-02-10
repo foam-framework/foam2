@@ -1744,7 +1744,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Double',
+      class: 'Object',
       name: 'value'
     }
   ],
