@@ -182,6 +182,10 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsBoundary',
 
   'foam.nanos.demo.DemoObject',
+  'foam.nanos.demo.relationship.Student',
+  'foam.nanos.demo.relationship.Professor',
+  'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
