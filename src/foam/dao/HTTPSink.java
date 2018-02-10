@@ -12,7 +12,6 @@ import foam.lib.Outputter;
 import foam.lib.json.OutputterMode;
 import foam.nanos.dig.Format;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -64,7 +63,7 @@ public class HTTPSink
       // check response code
       int code = conn.getResponseCode();
       if ( code != HttpServletResponse.SC_OK ) {
-        throw new HttpException();
+        throw new RuntimeException("Http server did not return 200.");
       }
     } catch (Throwable t) {
       throw new RuntimeException(t);
