@@ -1,8 +1,9 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2017,2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
@@ -872,13 +873,6 @@ foam.CLASS({
     [ 'javaFactory',    'return new java.util.ArrayList();' ],
     [ 'javaJSONParser', 'new foam.lib.json.ListParser()' ]
   ]
-});
-
-
-foam.CLASS({
-  // Maps JS Property to Java Equivalent PropertyInfo for Java Relationships
-  refines: 'foam.core.Property',
-  javaType: 'foam.core.PropertyInfo'
 });
 
 
