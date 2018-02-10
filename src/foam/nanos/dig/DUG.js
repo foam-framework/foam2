@@ -51,7 +51,7 @@ foam.CLASS({
 `try {
   DAO dao = (DAO) x.get(getDaoKey());
   // TODO: choose outputter based on format
-  dao.listen(new HTTPSink(getUrl(), new Outputter(NETWORK)), null);
+  dao.listen(new HTTPSink(getUrl(), foam.nanos.dig.Format.JSON), null);
 } catch (Throwable t) {
   t.printStackTrace();
   throw new RuntimeException(t);
