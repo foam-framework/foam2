@@ -91,5 +91,10 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/twofactor/authy/AuthyService' },
   { name: 'foam/nanos/demo/DemoObject' },
   { name: 'foam/nanos/demo/Demo' },
-  { name: 'foam/nanos/dig/DUG' }
+  { name: 'foam/nanos/dig/DUG' },
+  { name: 'foam/nanos/demo/relationship/Course' },
+  { name: 'foam/nanos/demo/relationship/Professor' },
+  { name: 'foam/nanos/demo/relationship/Student' },
+  { name: 'foam/nanos/demo/relationship/Controller' },
+  { name: 'foam/nanos/fs/File' }
 ]);
