@@ -34,8 +34,8 @@ public class OrPlan implements SelectPlan {
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     if ( planList_ == null || planList_.size() == 0 )
       return;
-    sink = decorateDedupSink_(sink);
     sink = decorateSink(null, sink, skip, limit, order, null);
+    sink = decorateDedupSink_(sink);
     for ( SelectPlan plan : planList_ ) {
       plan.select(state, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, null, null);
     }
