@@ -8,7 +8,7 @@
    package: 'foam.nanos.app',
    name: 'Mode',
 
-   documentation: 'Represents what mode the app is running on.',
+   documentation: 'Represents mode that an application is running in.',
 
    values: [
      { name: 'DEVELOPMENT',  label: 'Development' },

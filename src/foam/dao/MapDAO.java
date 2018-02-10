@@ -71,12 +71,6 @@ public class MapDAO
       System.err.println("Attempt to " + this.getOf().getId() + ".find(null).");
     }
 
-    // TODO: better to do this in DAOSkeleton
-    // Upgrade Object[]'s' to CompoundKey's
-    if ( o instanceof Object[] ) {
-      o = new CompoundKey((Object[]) o, ((AbstractMultiPartIDPropertyInfo) getPrimaryKey()).getProperties());
-    }
-
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
           ? getData().get(getPrimaryKey().get(o))

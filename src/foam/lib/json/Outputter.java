@@ -22,7 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Outputter
-    extends AbstractSink
+  extends AbstractSink
+  implements foam.lib.Outputter
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -98,9 +99,10 @@ public class Outputter
 
   public String escape(String s) {
     return s
-        .replace("\t", "\\t")
-        .replace("\n","\\n")
-        .replace("\"", "\\\"");
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
+      .replace("\t", "\\t")
+      .replace("\n","\\n");
   }
 
   protected void outputNumber(Number value) {
@@ -229,7 +231,6 @@ public class Outputter
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
       if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
-      if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;
@@ -293,7 +294,11 @@ public class Outputter
     writer_.append(",");
     outputString("forClass_");
     writer_.append(":");
-    outputString(prop.getClassInfo().getId() + "." + prop.getName());
+    outputString(prop.getClassInfo().getId());
+    writer_.append(",");
+    outputString("name");
+    writer_.append(":");
+    outputString(prop.getName());
     writer_.append("}");
   }
 
