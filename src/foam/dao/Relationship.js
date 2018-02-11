@@ -305,19 +305,23 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'junction'
+      name: 'junction',
+      hidden: true
     },
     {
       class: 'Object',
-      name: 'sourceId'
+      name: 'sourceId',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'targetDAOKey'
+      name: 'targetDAOKey',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'junctionDAOKey'
+      name: 'junctionDAOKey',
+      hidden: true
     },
     {
       class: 'Object',
@@ -352,6 +356,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'junctionDAO',
+      hidden: true,
       factory: function() {
         return this.__context__[this.junctionDAOKey];
       },
