@@ -16,7 +16,7 @@ import java.security.Permission;
 
 /** Authenticate access to a DAO. **/
 public class AuthenticatedDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   protected String name_;
   protected boolean authenticateRead_;

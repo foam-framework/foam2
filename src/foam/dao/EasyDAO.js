@@ -99,7 +99,16 @@ if ( getGuid() ) {
 }
 
 if ( getSeqNo() ) {
-  delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).setDelegate(delegate).build();
+  delegate = new foam.dao.SequenceNumberDAO.Builder(getX()).
+    setDelegate(delegate).
+    setProperty(getSeqPropertyName()).
+    build();
+}
+
+if ( getContextualize() ) {
+  delegate = new foam.dao.ContextualizingDAO.Builder(getX()).
+    setDelegate(delegate).
+    build();
 }
 
 if ( getPm() ) {
@@ -128,6 +137,11 @@ return delegate;
       name: 'guid',
       label: 'GUID',
       value: false
+    },
+    {
+      class: 'String',
+      name: 'seqPropertyName',
+      value: 'id'
     },
     {
       /** The property on your items to use to store the sequence number or guid. This is required for .seqNo or .guid mode. */
@@ -188,7 +202,6 @@ return delegate;
       /** Contextualize objects on .find, re-creating them with this EasyDAO's
         exports, as if they were children of this EasyDAO. */
       class: 'Boolean',
-      generateJava: false,
       name: 'contextualize',
       value: false
     },

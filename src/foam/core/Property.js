@@ -278,7 +278,7 @@ foam.CLASS({
         c.axiomMap_[prop.name] = prop;
       }
 
-      prop.forClass_ = c.id + '.' + this.name;
+      prop.forClass_ = c.id;
 
       // var reinstall = foam.events.oneTime(function reinstall(_,_,_,axiom) {
       //   // We only care about Property axioms.

@@ -15,7 +15,7 @@ import java.util.Map;
 /** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
   extends    ContextAwareSupport
-  implements FObject
+  implements FObject, Comparable
 {
 
   public static FObject maybeClone(FObject fo) {
@@ -65,6 +65,7 @@ public abstract class AbstractFObject
     return result;
   }
 
+  @Override
   public int compareTo(Object o) {
     if ( o == this ) return 0;
     if ( o == null ) return 1;
@@ -84,6 +85,11 @@ public abstract class AbstractFObject
     }
 
     return 0;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return compareTo(o) == 0;
   }
 
   public FObject setProperty(String prop, Object value) {

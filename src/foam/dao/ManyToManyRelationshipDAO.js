@@ -14,6 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 foam.CLASS({
   package: 'foam.dao',
@@ -26,57 +31,37 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'foam.core.Property',
-      name: 'junctionProperty'
-    },
-    {
-      class: 'foam.core.String',
-      name: 'junctionDAOKey'
-    },
-    'junctionCls',
-    {
-      class: 'foam.core.Property',
-      name: 'sourceKey'
-    },
-    {
-      class: 'foam.core.Property',
-      name: 'targetProperty'
-    },
-    {
-      class: 'foam.core.Property',
-      name: 'sourceProperty'
-    },
-    'junctionKeyFactory',
-    {
-      class: 'foam.core.Boolean',
-      name: 'junctionFactoryPreOrder'
-    },
-    {
-      name: 'junctionDAO',
-      getter: function() {
-        return this.__context__[this.junctionDAOKey];
-      }
+      class: 'FObjectProperty',
+      of: 'foam.dao.ManyToManyRelationship',
+      name: 'relationship'
     }
   ],
 
   methods: [
-    function find_(x, key) {
-      var id = foam.core.FObject.isInstance(key) ? key.id : key;
-      var self = this;
-      return self.junctionDAO.find_(x, self.junctionKeyFactory(id)).then(function(a) {
-        return a && self.delegate.find_(x, id);
-      });
-    },
-    function select_(x, sink, skip, limit, order, predicate) {
-      var self = this;
+    {
+      name: 'find_',
+      code: function find_(x, id) {
+        var self = this;
+        var junction = this.relationship.createJunction(id)
 
-      return self.junctionDAO.
-        where(self.EQ(self.sourceProperty, self.sourceKey)).
-        select(self.MAP(self.junctionProperty)).then(function(map) {
-          return self.delegate.select_(x, sink, skip, limit, order, self.AND(
-            predicate || self.TRUE,
-            self.IN(self.targetProperty, map.delegate.array)));
+        return this.relationship.junctionDAO.find(junction.id).then(function(a) {
+          return a && self.delegate.find_(x, id);
         });
+      }
+    },
+    {
+      name: 'select_',
+      code: function select_(x, sink, skip, limit, order, predicate) {
+        var self = this;
+
+        return this.relationship.junctionDAO.
+          where(self.EQ(this.relationship.sourceProperty, this.relationship.sourceId)).
+          select(self.MAP(this.relationship.targetProperty)).then(function(map) {
+            return self.delegate.select_(x, sink, skip, limit, order, self.AND(
+              predicate || self.TRUE,
+              self.IN(self.of.ID, map.delegate.array)));
+          });
+      }
     }
   ]
 });
