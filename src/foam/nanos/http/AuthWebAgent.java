@@ -78,7 +78,6 @@ public class AuthWebAgent
     AuthService        auth         = (AuthService) x.get("auth");
     PrintWriter        out          = x.get(PrintWriter.class);
 
-
     if ( cookie == null ) {
       session = new Session();
       createCookie(x, session);
@@ -88,6 +87,7 @@ public class AuthWebAgent
 
       if ( session == null ) {
         session = new Session();
+        session.setId(sessionId);
       } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
@@ -101,7 +101,6 @@ public class AuthWebAgent
     } catch (Throwable t) {
       t.printStackTrace();
     }
-
     out.println("Authentication failure.");
 
     return null;
