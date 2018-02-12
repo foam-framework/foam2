@@ -89,10 +89,10 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.DedupSink',
   'foam.dao.ReadOnlyDAO',
-  'foam.dao.Relationship',
   'foam.dao.RelationshipDAO',
+  'foam.dao.ManyToManyRelationship',
+  'foam.dao.ManyToManyRelationshipImpl',
   'foam.dao.ManyToManyRelationshipDAO',
-  'foam.dao.RelationshipPropertyValue',
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
   'foam.mlang.order.Comparator',
@@ -182,6 +182,10 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsBoundary',
 
   'foam.nanos.demo.DemoObject',
+  'foam.nanos.demo.relationship.Student',
+  'foam.nanos.demo.relationship.Professor',
+  'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
 
   'foam.crypto.hash.Hasher',
@@ -189,7 +193,10 @@ var classes = [
 
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
-  'foam.crypto.sign.SignedFObject'
+  'foam.crypto.sign.SignedFObject',
+
+  'foam.nanos.dig.Format',
+  'foam.nanos.dig.DUG'
 ];
 
 var abstractClasses = [
