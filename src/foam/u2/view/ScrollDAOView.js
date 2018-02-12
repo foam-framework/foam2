@@ -204,6 +204,7 @@ foam.CLASS({
         return this.E('div').style({
           width: '1px',
           height: '1px',
+          'font-size': '1px',
           position: 'absolute',
           transform: this.sentinelTransform_$
         }).entity('nbsp');
