@@ -227,8 +227,9 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
+  cardinality: '1:*',
   sourceModel: 'foam.nanos.auth.ServiceProvider',
   targetModel: 'foam.nanos.auth.User',
   forwardName: 'users',
-  inverseName: 'spids'
+  inverseName: 'spid'
 });
