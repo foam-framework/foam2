@@ -71,6 +71,7 @@ public class AltIndex
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
       FindPlan plan = delegates_.get(i).planFind(s[i], key);
 
+      // only return the smallest cost plan
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
         bestState = s[i];
@@ -88,6 +89,7 @@ public class AltIndex
     Predicate originPredicate = null;
 
     for ( int i = 0; i < delegates_.size(); i++ ) {
+      // To keep the origin predicate, because in our next operate the predicate will be changed
       if ( predicate != null )
         originPredicate = (Predicate) ( (FObject) predicate ).deepClone();
       SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, originPredicate);
