@@ -33,13 +33,6 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.nanos.auth.ServiceProvider',
-      name: 'spid',
-      label: 'Service Provider',
-      documentation: 'User\'s service provider'
-    },
-    {
       class: 'DateTime',
       name: 'lastLogin'
     },
@@ -231,4 +224,11 @@ foam.RELATIONSHIP({
     hidden: true,
     transient: true
   }
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.ServiceProvider',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'spids'
 });
