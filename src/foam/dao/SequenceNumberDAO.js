@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2014 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -24,11 +13,11 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
-  documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
-
   requires: [
     'foam.dao.InternalException'
   ],
+
+  documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
 
   properties: [
     {
@@ -41,9 +30,7 @@ foam.CLASS({
       javaType: 'foam.core.PropertyInfo',
       javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
       name: 'axiom',
-      javaFactory: `
-return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
-      `,
+      javaFactory: 'return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));'
     },
     {
       /** The starting sequence value. This will be calclated from the
@@ -95,14 +82,8 @@ return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
       code: function put_(x, obj) {
         var self = this;
         return this.calcDelegateMax_.then(function() {
-          var val = self.property_.f(obj);
-
-          if ( ! val || val == self.property_.value ) {
+          if ( ! obj.hasOwnProperty(self.property_.name) ) {
             obj[self.property_.name] = self.value++;
-          } else if ( val && ( val >= self.value ) ) {
-            // if the object has a value, and it's greater than our current value,
-            // bump up the next value we try to auto-assign.
-            self.value = val + 1;
           }
 
           return self.delegate.put_(x, obj);
@@ -112,11 +93,9 @@ return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));
 synchronized (this) {
   if ( ! isPropertySet("value") ) calcDelegateMax_();
 
-  Number val = (Number) obj.getProperty(getProperty());
-  if ( val.longValue() < 1 ) {
-    getAxiom().set(obj, value_++);
-  } else if ( val.longValue() >= value_ ) {
-    setValue(val.longValue() + 1);
+  if ( ! getAxiom().isSet(obj) ) {
+    getAxiom().set(obj, getValue());
+    setValue(getValue() + 1);
   }
 }
 

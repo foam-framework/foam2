@@ -21,14 +21,26 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   documentation: 'DAO decorator that throws errors on put and remove.',
   methods: [
-    function put_(x, obj) {
+    {
+      name: 'put_',
+      javaCode: `throw new UnsupportedOperationException("Cannot put into ReadOnlyDAO");`,
+      code: function put_(x, obj) {
       return Promise.reject('Cannot put into ReadOnlyDAO');
+      }
     },
-    function remove_(x, obj) {
-      return Promise.reject('Cannot remove from ReadOnlyDAO');
+    {
+      name: 'remove_',
+      javaCode: `throw new UnsupportedOperationException("Cannot remove from ReadOnlyDAO");`,
+      code: function remove_(x, obj) {
+        return Promise.reject('Cannot remove from ReadOnlyDAO');
+      }
     },
-    function removeAll() {
-      return Promise.reject('Cannot removeAll from ReadOnlyDAO');
-    },
+    {
+      name: 'removeAll_',
+      javaCode: `throw new UnsupportedOperationException("Cannot removeAll from ReadOnlyDAO");`,
+      code: function removeAll() {
+        return Promise.reject('Cannot removeAll from ReadOnlyDAO');
+      }
+    }
   ]
 });

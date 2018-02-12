@@ -20,6 +20,7 @@ import java.util.TimeZone;
 
 public class Outputter
   extends AbstractSink
+  implements foam.lib.Outputter
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -109,8 +110,7 @@ public class Outputter
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       // filter out unsupported types
-      if ( prop instanceof AbstractMultiPartIDPropertyInfo ||
-           prop instanceof AbstractArrayPropertyInfo ||
+      if ( prop instanceof AbstractArrayPropertyInfo ||
            prop instanceof AbstractFObjectArrayPropertyInfo ||
            prop instanceof AbstractFObjectPropertyInfo ) {
         continue;

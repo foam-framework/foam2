@@ -14,48 +14,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 
 foam.CLASS({
   package: 'foam.dao',
   name: 'RelationshipDAO',
   extends: 'foam.dao.FilteredDAO',
+  requires: [
+    'foam.mlang.predicate.Eq'
+  ],
 
   documentation: 'Adapts a DAO based on a Relationship.',
 
   properties: [
     {
-      name: 'obj',
-      class: 'FObjectProperty'
+      class: 'Object',
+      name: 'sourceId'
     },
     {
-      name: 'relationship',
-      class: 'FObjectProperty',
-      of: 'foam.dao.Relationship',
-      required: true
+      class: 'String',
+      name: 'targetDAOKey'
+    },
+    {
+      class: 'Object',
+      name: 'targetProperty',
+      javaType: 'foam.core.PropertyInfo'
     },
     {
       name: 'predicate',
-      getter: function() {
-        return this.relationship.targetQueryFromSource(this.obj);
-      }
+      factory: function() {
+        return this.Eq.create({ arg1: this.targetProperty, arg2: this.sourceId });
+      },
+      javaFactory: 'throw new RuntimeException("TODO");'
     },
     {
       name: 'delegate',
       factory: function() {
-        var key      = this.relationship.targetDAOKey;
+        var key      = this.targetDAOKey;
         var delegate = this.__context__[key];
 
         foam.assert(delegate, 'Missing relationship DAO:', key);
 
         return delegate;
-      }
+      },
+      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());'
     }
   ],
 
   methods: [
-    function put_(x, obj) {
-      return this.SUPER(x, this.relationship.adaptTarget(this.obj, obj));
+    {
+      name: 'put_',
+      javaReturns: 'foam.core.FObject',
+      code: function put_(x, obj) {
+        return this.SUPER(x, this.adaptTarget(obj));
+      },
+      javaCode: `return super.put_(x, adaptTarget(obj));`
     },
+    {
+      name: 'adaptTarget',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          name: 'target',
+          javaType: 'foam.core.FObject'
+        }
+      ],
+      javaCode:`getTargetProperty().set(target, getSourceId());
+return target;`,
+      code: function(target) {
+        this.targetProperty.set(target, this.sourceId);
+        return target;
+      }
+    },
+
     function clone() {
       // Prevent cloneing
       return this;

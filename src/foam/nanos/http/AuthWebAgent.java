@@ -32,24 +32,6 @@ public class AuthWebAgent
     permission_ = permission;
   }
 
-  public void execute(X x) {
-    HttpServletRequest  req     = x.get(HttpServletRequest.class);
-    HttpServletResponse resp    = x.get(HttpServletResponse.class);
-    PrintWriter         out     = x.get(PrintWriter.class);
-    AuthService         auth    = (AuthService) x.get("auth");
-    Session             session = authenticate(x);
-
-    if ( session != null && session.getContext() != null ) {
-      if ( auth.check(session.getContext(), permission_) ) {
-        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
-      } else {
-        out.println("Access denied. Need permission: " + permission_);
-      }
-    } else {
-      templateLogin(x);
-    }
-  }
-
   public Cookie getCookie(HttpServletRequest req) {
     Cookie[] cookies = req.getCookies();
 
@@ -59,6 +41,13 @@ public class AuthWebAgent
           return cookie;
 
     return null;
+  }
+
+  public void createCookie(X x, Session session){
+    HttpServletResponse resp   = x.get(HttpServletResponse.class);
+    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
+
+    resp.addCookie(cookie);
   }
 
   public void templateLogin(X x) {
@@ -89,7 +78,6 @@ public class AuthWebAgent
     AuthService        auth         = (AuthService) x.get("auth");
     PrintWriter        out          = x.get(PrintWriter.class);
 
-
     if ( cookie == null ) {
       session = new Session();
       createCookie(x, session);
@@ -99,6 +87,7 @@ public class AuthWebAgent
 
       if ( session == null ) {
         session = new Session();
+        session.setId(sessionId);
       } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
@@ -112,17 +101,26 @@ public class AuthWebAgent
     } catch (Throwable t) {
       t.printStackTrace();
     }
-
     out.println("Authentication failure.");
 
     return null;
   }
 
-  public void createCookie(X x, Session session){
-    HttpServletResponse resp   = x.get(HttpServletResponse.class);
-    PrintWriter         out    = x.get(PrintWriter.class);
-    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
+  public void execute(X x) {
+    HttpServletRequest  req     = x.get(HttpServletRequest.class);
+    HttpServletResponse resp    = x.get(HttpServletResponse.class);
+    PrintWriter         out     = x.get(PrintWriter.class);
+    AuthService         auth    = (AuthService) x.get("auth");
+    Session             session = authenticate(x);
 
-    resp.addCookie(cookie);
+    if ( session != null && session.getContext() != null ) {
+      if ( auth.check(session.getContext(), permission_) ) {
+        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+      } else {
+        out.println("Access denied. Need permission: " + permission_);
+      }
+    } else {
+      templateLogin(x);
+    }
   }
 }
