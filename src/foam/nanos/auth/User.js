@@ -33,11 +33,11 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'String',
-      // class: 'SPID',
-      label: 'Service Provider',
+      class: 'FObjectProperty',
+      of: 'foam.nanos.auth.ServiceProvider',
       name: 'spid',
-      documentation: "User's service provider."
+      label: 'Service Provider',
+      documentation: 'User\'s service provider'
     },
     {
       class: 'DateTime',

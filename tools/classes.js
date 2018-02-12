@@ -127,6 +127,7 @@ var classes = [
   'foam.nanos.auth.token.AbstractTokenService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
+  'foam.nanos.auth.ServiceProvider',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',

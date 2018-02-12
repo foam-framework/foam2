@@ -40,6 +40,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/User" },
   { name: "foam/nanos/auth/AddressDetailView", flags: ['web'] },
   { name: "foam/nanos/auth/PhoneDetailView", flags: ['web'] },
+  { name: "foam/nanos/auth/ServiceProvider" },
   { name: "foam/nanos/auth/SignInView", flags: ['web'] },
   { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
   { name: "foam/nanos/auth/ProfilePictureView", flags: ['web'] },
