@@ -621,7 +621,7 @@ StringBuilder builder = sb.get();
 for ( int i = 0; i < length; i++ ) {
   if ( obj[i] == null )
     builder.append("");
-  else 
+  else
     escapeCommasAndAppend(builder, obj[i]);
   if ( i < length - 1 ) {
     builder.append(",");
@@ -642,7 +642,7 @@ stmt.setObject(builder.toString());`
         }
       ],
       javaReturns: 'void',
-      javaCode: 
+      javaCode:
 `String s = o.toString();
 //replace backslash to double backslash
 s = s.replace("\\\\", "\\\\\\\\");
@@ -696,7 +696,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))<0;'  
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))<0;'
     },
     {
       name: 'createStatement',
@@ -747,7 +747,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))>=0;' 
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))>=0;'
     },
     {
       name: 'createStatement',
