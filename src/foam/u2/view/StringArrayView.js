@@ -42,7 +42,7 @@ foam.CLASS({
             value.push(text.substring(start, i+1).replace(/\\(.)/, "$0"));
           } else if ( text[i] == ',' || i == text.length - 1 ) {
             value.push(text.substring(start, i).replace(/\\(.)/, "$0"));
-            start = ++i;
+            start = i + 1;
           } else if ( text[i] == '\\' ) {
             escape = true;
           }

@@ -27,7 +27,7 @@ foam.CLASS({
 
   methods: [
     function outputXML(o) {
-      o.output({ class: '__Property__', forClass_: this.forClass_ });
+      o.output({ class: '__Property__', forClass_: this.forClass_, name: this.name });
     }
   ]
 });
@@ -443,7 +443,7 @@ foam.CLASS({
           opt_class = foam.lookup(opt_class);
         return this.objectify(root, opt_class);
       }
-      
+
       throw new Error('Class not provided');
     },
 
