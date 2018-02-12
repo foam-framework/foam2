@@ -15,6 +15,64 @@
  * limitations under the License.
  */
 
+foam.INTERFACE({
+  package: 'foam.u2.view',
+  name: 'Formatter',
+  methods: [
+    {
+      name: 'format',
+      args: ['e', 'value', 'obj', 'axiom']
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'FnFormatter',
+  implements: [ 'foam.u2.view.Formatter' ],
+  properties: [
+    {
+      class: 'Function',
+      name: 'f'
+    }
+  ],
+  methods: [
+    function format(e, value, obj, axiom) {
+      this.f.call(e, value, obj, axiom);
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.u2.view',
+  name: 'TableCellFormatter',
+  extends: 'FObjectProperty',
+  properties: [
+    {
+      name: 'of',
+      value: 'foam.u2.view.Formatter'
+    },
+    {
+      name: 'adapt',
+      value: function(o, f, prop) {
+        if ( foam.Function.isInstance(f) ) {
+          return foam.u2.view.FnFormatter.create({
+            f: f
+          });
+        }
+        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
+      }
+    },
+    {
+      name: 'value',
+      adapt: function(_, v) {
+        return this.adapt.call(this, _, v, this);
+      }
+    }
+  ]
+});
+
 foam.CLASS({
   package: 'foam.u2.view',
   name: 'TableCellPropertyRefinement',
@@ -29,9 +87,23 @@ foam.CLASS({
       }
     },
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
-      value: function(value, obj, axiom) {
-        this.add(value);
+      adapt: function(o, f, prop) {
+        if ( foam.Function.isInstance(f) ) {
+          return foam.u2.view.FnFormatter.create({
+            f: f
+          });
+        }
+        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
+      },
+      factory: function() {
+        return foam.u2.view.FnFormatter.create({
+          class: 'foam.u2.view.FnFormatter',
+          f: function(value, obj, axiom) {
+            this.add(value);
+          }
+        })
       }
     },
     {
@@ -47,6 +119,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(_, obj, axiom) {
         this.
@@ -70,6 +143,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
         this.add(value.label)
@@ -91,6 +165,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(value) {
         this.start()
@@ -108,6 +183,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
         if ( date ) this.add(date.toLocaleDateString());
@@ -122,6 +198,7 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
         if ( date ) this.add(date.toLocaleString());
@@ -384,7 +461,7 @@ foam.CLASS({
                   forEach(columns_, function(column) {
                     this.
                       start('td').
-                        call(column.tableCellFormatter, [
+                        callOn(column.tableCellFormatter, 'format', [
                           column.f ? column.f(obj) : null, obj, column
                         ]).
                       end();

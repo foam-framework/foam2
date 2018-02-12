@@ -40,7 +40,7 @@ foam.CLASS({
   methods: [
     function outputJSON(o) {
       if ( o.passPropertiesByReference ) {
-        o.output({ class: '__Property__', forClass_: this.forClass_ });
+        o.output({ class: '__Property__', forClass_: this.forClass_, name: this.name });
       } else {
         o.outputFObject_(this);
       }
@@ -57,12 +57,12 @@ foam.CLASS({
       installInClass: function(c) {
         var oldCreate = c.create;
         c.create = function(args, X) {
-          var cls = args.forClass_.substring(0, args.forClass_.lastIndexOf('.'));
-          var name = args.forClass_.substring(args.forClass_.lastIndexOf('.') + 1);
+          var cls = args.forClass_;
+          var name = args.name;
 
           var prop = X.lookup(cls).getAxiomByName(name);
 
-          foam.assert(prop, 'Could not find property "', args.forClass_, '"');
+          foam.assert(prop, 'Could not find property "', args.forClass_ + '.' + name, '"');
 
           return prop;
         };
@@ -541,6 +541,17 @@ foam.CLASS({
     function parseString(str, opt_ctx) {
       return this.parseClassFromString(str, null, opt_ctx);
     },
+    function aparse(str, opt_ctx) {
+      var x = this.__context__;
+
+      var json = JSON.parse(str);
+
+      var references = foam.json.references(x, json);;
+
+      return Promise.all(references).then(function() {
+        return foam.json.parse(json, undefined, opt_ctx || this.creationContext);
+      }.bind(this));
+    },
     function parseClassFromString(str, opt_cls, opt_ctx) {
       return this.strict ?
           // JSON.parse() is faster; use it when data format allows.
@@ -667,6 +678,47 @@ foam.LIB({
           return json;
         }
       }, function(o) { return o; })
+    },
+
+    {
+      name: 'references',
+      code: function(x, o, r) {
+        r = r || [];
+
+        if ( foam.Array.isInstance(o) ) {
+          for ( var i = 0 ; i < o.length ; i++ ) {
+            foam.json.references(x, o[i], r);
+          }
+          // TODO: Should just be foam.core.FObject.isSubClass(o), but its broken #1023
+        } else if ( ( o && o.prototype && foam.core.FObject.prototype.isPrototypeOf(o.prototype) ) ||
+                    foam.core.FObject.isInstance(o) ) {
+          return r;
+        } else if ( foam.Object.isInstance(o) ) {
+          for ( var key in o ) {
+            // anonymous class support.
+            if ( key === 'class' && foam.Object.isInstance(o[key]) ) {
+              var json = o[key];
+              json.name = 'AnonymousClass' + foam.next$UID();
+              console.log('Constructing anonymous class', json.name);
+
+              r.push(Promise.all(foam.json.references(x, json, [])).then(function() {
+                return x.classloader.maybeLoad(foam.core.Model.create(json));
+              }));
+
+              o[key] = json.name;
+              continue;
+            } else if ( ( key === 'of' || key === 'class' || key == 'view' ) &&
+                        foam.String.isInstance(o[key]) ) {
+              r.push(x.classloader.maybeLoad(o[key]));
+              continue;
+            }
+
+            foam.json.references(x, o[key], r);
+          }
+
+          return r;
+        }
+      }
     },
 
     // TODO: unsafe and only used by LocalStorageDAO, so remove.

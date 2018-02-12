@@ -142,7 +142,10 @@ foam.CLASS({
         });
 
         if ( resp.success ) return resp;
-        throw resp;
+
+        // Use Promise.reject so crappy debuggers don't pause here
+        // throw resp;
+        return Promise.reject(resp);
       }.bind(this));
     },
     function addContentHeaders() {
