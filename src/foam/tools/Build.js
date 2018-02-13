@@ -120,7 +120,7 @@ foam.CLASS({
         function write(x, dao, o) {
           var sep = require('path').sep;
           var dir = this.root + o.package.replace(/\./g, sep);
-          var file = `${dir}${sep}${o.name}.json`;
+          var file = `${dir}${sep}${o.name}.js`;
 
           var fs = require('fs');
           var dirs = dir.split(sep);
