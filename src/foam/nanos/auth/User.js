@@ -231,5 +231,11 @@ foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.auth.ServiceProvider',
   targetModel: 'foam.nanos.auth.User',
   forwardName: 'users',
-  inverseName: 'spid'
+  inverseName: 'spid',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
+  }
 });
