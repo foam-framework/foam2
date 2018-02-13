@@ -13,15 +13,10 @@ import foam.dao.ProxyDAO;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.User;
+import foam.util.SafetyUtil;
+
 import java.security.AccessControlException;
 
-import foam.util.SafetyUtil;
-import net.nanopay.model.Account;
-import org.apache.http.util.TextUtils;
-
-import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
 /**
