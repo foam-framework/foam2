@@ -10,7 +10,10 @@ import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import java.security.AccessControlException;
+
+import foam.util.SafetyUtil;
 import net.nanopay.model.Account;
+import org.apache.http.util.TextUtils;
 
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
@@ -57,7 +60,12 @@ public class AuthenticatedUserDAO
       throw new RuntimeException("Unable to update user");
     }
 
-    toPut.setSpid(user.getSpid());
+    // set spid if not set
+    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
+        ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
+      toPut.setSpid(user.getSpid());
+    }
+
     return super.put_(x, toPut);
   }
 
