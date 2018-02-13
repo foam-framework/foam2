@@ -20,6 +20,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/EnabledAware", flags: ['js'] },
   { name: "foam/nanos/auth/EnabledAwareInterface", flags: ['java'] },
   { name: "foam/nanos/auth/Group" },
+  { name: "foam/nanos/auth/ServiceProvider" },
   { name: "foam/nanos/auth/Language" },
   { name: "foam/nanos/auth/LastModifiedAware", flags: ['js'] },
   { name: "foam/nanos/auth/LastModifiedAwareInterface", flags:['java']  },
