@@ -1,34 +1,26 @@
 foam.CLASS({
   package: 'foam.apploader',
   name: 'WebModelFileDAO',
-  extends: 'foam.apploader.AbstractModelFileDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.apploader.JSON2ModelFileDAO',
+    'foam.apploader.ModelFileDAO',
+    'foam.apploader.WebModelFileFetcher',
+    'foam.net.HTTPRequest',
+  ],
   imports: [
     'window',
   ],
-  requires: [
-    'foam.net.HTTPRequest'
-  ],
   properties: [
+    'root',
+    'json2',
     {
-      class: 'String',
-      name: 'root',
+      name: 'delegate',
       factory: function() {
-        return this.window.location.protocol + '//' + this.window.location.host + '/src/';
-      }
+        var cls = this.json2 ? this.JSON2ModelFileDAO : this.ModelFileDAO;
+        return cls.create({
+          fetcher: this.WebModelFileFetcher.create({root: this.root}), });
+      },
     },
   ],
-  methods: [
-    function getFile(id) {
-      return this.HTTPRequest.create({
-        method: 'GET',
-        url: this.root + '/' + id.replace(/\./g, '/') + '.js'
-      }).send().then(function(payload) {
-        return payload.resp.text();
-      })
-    },
-    function onError(resp) {
-      if ( resp.status == 404 ) return null;
-      throw resp;
-    },
-  ]
 });

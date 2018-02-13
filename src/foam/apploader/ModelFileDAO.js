@@ -1,21 +1,16 @@
 foam.CLASS({
   package: 'foam.apploader',
-  name: 'AbstractModelFileDAO',
-  documentation: 'ModelDAO which reads .js files.',
+  name: 'ModelFileDAO',
+  documentation: 'ModelDAO which reads hand written models.',
   extends: 'foam.dao.AbstractDAO',
   properties: [
     {
       class: 'Map',
       name: 'cache'
-    }
+    },
+    'fetcher',
   ],
   methods: [
-    function getFile(id) {
-      throw 'Implement getFile';
-    },
-    function onError(resp) {
-      throw 'Implement onError';
-    },
     {
       name: 'find_',
       code: function(x, id) {
@@ -23,7 +18,7 @@ foam.CLASS({
         if ( this.cache[id] ) {
           promise = Promise.resolve(this.cache[id]);
         } else {
-          promise = this.getFile(id);
+          promise = this.fetcher.getFile(id);
         }
 
         var self = this;
@@ -98,8 +93,11 @@ foam.CLASS({
 
             return foam.lookup(json.class || 'Model').create(json, x);
           });
-        }, this.onError);
+        }, function() {
+          return null;
+        });
       }
     }
   ]
 });
+
