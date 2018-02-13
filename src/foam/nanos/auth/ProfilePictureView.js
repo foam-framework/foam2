@@ -69,7 +69,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'File',
+      class: 'foam.nanos.fs.FileProperty',
       name: 'data'
     },
     [ 'uploadHidden', false ]
