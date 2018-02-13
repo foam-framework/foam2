@@ -32,12 +32,10 @@ import static foam.mlang.MLang.EQ;
 public class AuthenticatedUserDAO
     extends ProxyDAO
 {
-  public final static String GLOBAL_USER_CREATE = "user.create.x";
   public final static String GLOBAL_USER_READ   = "user.read.x";
   public final static String GLOBAL_USER_UPDATE = "user.update.x";
   public final static String GLOBAL_USER_DELETE = "user.delete.x";
 
-  public final static String GLOBAL_SPID_CREATE = "spid.create.x";
   public final static String GLOBAL_SPID_READ   = "spid.read.x";
   public final static String GLOBAL_SPID_UPDATE = "spid.update.x";
   public final static String GLOBAL_SPID_DELETE = "spid.delete.x";
@@ -53,8 +51,8 @@ public class AuthenticatedUserDAO
 
     User toPut = (User) obj;
     if ( toPut != null && toPut.getId() != user.getId() &&
-        ! auth.check(x, GLOBAL_USER_CREATE) &&
-        ! auth.check(x, GLOBAL_SPID_CREATE) &&
+        ! auth.check(x, GLOBAL_USER_UPDATE) &&
+        ! auth.check(x, GLOBAL_SPID_UPDATE) &&
         ! auth.check(x, "spid.create." + toPut.getSpid()) ) {
       throw new RuntimeException("Unable to update user");
     }
