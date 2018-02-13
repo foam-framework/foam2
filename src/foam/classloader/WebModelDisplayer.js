@@ -73,6 +73,17 @@ foam.CLASS({
         });
       },
     },
+    {
+      class: 'String',
+      name: 'json2Classpath',
+      postSet: function(_, n) {
+        if ( ! n ) return;
+        var self = this;
+        n.split(',').forEach(function(p) {
+          self.classloader.addClassPath(p, true)
+        });
+      },
+    },
   ],
 
   methods: [
@@ -92,9 +103,10 @@ foam.CLASS({
 
       if ( params.model ) {
         this.copyFrom({
-          classpath: params.classpath,
-          model:     params.model,
-          view:      params.view
+          classpath:      params.classpath,
+          json2Classpath: params.json2Classpath,
+          model:          params.model,
+          view:           params.view
         });
       } else {
         alert('Please specify model. Ex.: ?model=com.acme.MyModel');
