@@ -1,0 +1,117 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+foam.CLASS({
+  package: 'com.google.firebase',
+  name: 'FirestoreDAO',
+  extends: 'foam.dao.AbstractDAO',
+
+  documentation: `DAO that wraps a Firestore collection. Implemented against
+      Firestore 0.11.x JavaScript documentation.`,
+
+  properties: [
+    {
+      name: 'firestore',
+      documentation: `The firebase.firestore.Firestore for this DAO:
+          https://firebase.google.com/docs/reference/js/firebase.firestore.Firestore`,
+      required: true
+    },
+    {
+      name: 'collection',
+      documentation: `The firebase.firestore.CollectionReference for this DAO:
+          https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference`,
+      required: true
+    },
+    {
+      name: 'getFirestoreDocumentID',
+      documentation: `The function usedto extract a Firestore Document ID string
+      from a foam.core.FObject that is stored via this DAO.`,
+      value: function(obj) { return obj.id.toString(); }
+    },
+    {
+      name: 'getFirestoreData',
+      documentation: `The function usedto extract a Firestore data from a
+          foam.core.FObject that is stored via this DAO.`,
+      value: function(obj) { return foam.json.objectify(obj); }
+    },
+    {
+      name: 'getFObject',
+      documentation: `The function usedto extract a foam.core.FObject from
+          Firestore data that is stored via this DAO.`,
+      value: function(data) { return foam.json.parse(data); }
+    },
+  ],
+
+  methods: [
+    function put_(x, obj) {
+      return this.getDoc_(obj).set(this.getFirestoreData(obj))
+          .then(function() { return obj; });
+    },
+    function remove_(x, obj) {
+      return this.getDoc_(obj).delete();
+    },
+    function find_(x, idOrObj) {
+      return (foam.core.FObject.isInstance(idOrObj) ?
+              this.getDoc_(idOrObj) : this.collection.doc(idOrObj.toString()))
+          .get()
+          .then(function(docSnapshot) { return docSnapshot.data() || null; });
+    },
+    function select_(x, sink, skip, limit, order, predicate) {
+      var collection = this.collection;
+      if ( limit ) {
+        var firestoreLimit = limit + (skip || 0);
+        collection = collection.limit(firestoreLimit);
+        limit = undefined;
+      }
+      // TODO(markdittmer): Implement Firestore query decoration for
+      // order and predicate.
+
+      var decoratedSink = this.decorateSink_(
+          sink, skip, limit, order, predicate);
+
+      return collection.get().then(function(querySnapshot) {
+        var docs = querySnapshot.docs;
+        var sub = foam.core.FObject.create();
+        var detached = false;
+        sub.onDetach(function() { detached = true; });
+        if ( decoratedSink.put ) {
+          for ( var i = 0; i < docs.length; i++ ) {
+            var obj = this.getFObject(docs[i].data());
+            decoratedSink.put(obj, sub);
+            if ( detached ) break;
+          }
+        }
+        decoratedSink.eof && decoratedSink.eof();
+        return decoratedSink;
+      }.bind(this));
+    },
+    function removeAll_(x, skip, limit, order, predicate) {
+      return this.select_(x, undefined, skip, limit, order, predicate)
+          .then(function(arraySink) {
+            var batch = this.firestore.batch();
+            var array = arraySink.array;
+            for ( var i = 0; i < array.length; i++ ) {
+              batch.delete(
+                  this.collection.doc(this.getFirestoreDocumentID(array[i])));
+            }
+            return batch.commit();
+          }.bind(this));
+    },
+    function listen_(x, sink, predicate) {
+      // TODO(markdittmer): Implement Firestore query decoration for
+      // predicate.
+      var unsub = this.collection.onSnapshot(function(documentSnapshot) {
+        sink && sink.put && sink.put(this.getFObject(documentSnapshot.data()));
+      }.bind(this));
+      var sub = foam.core.FObject.create();
+      sub.onDetach(unsub);
+      return sub;
+    },
+    function getDoc_(obj) {
+      return this.collection.doc(this.getFirestoreDocumentID(obj));
+    },
+  ]
+});
