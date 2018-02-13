@@ -1,29 +1,22 @@
 foam.CLASS({
   package: 'foam.apploader',
   name: 'NodeModelFileDAO',
-  extends: 'foam.apploader.AbstractModelFileDAO',
+  extends: 'foam.dao.ProxyDAO',
+  requires: [
+    'foam.apploader.JSON2ModelFileDAO',
+    'foam.apploader.ModelFileDAO',
+    'foam.apploader.NodeModelFileFetcher',
+  ],
   properties: [
+    'root',
+    'json2',
     {
-      name: 'root'
+      name: 'delegate',
+      factory: function() {
+        var cls = this.json2 ? this.JSON2ModelFileDAO : this.ModelFileDAO;
+        return cls.create({
+          fetcher: this.NodeModelFileFetcher.create({root: this.root}), });
+      },
     },
   ],
-  methods: [
-    function getFile(id) {
-      var self = this;
-      return new Promise(function(ret, err) {
-        var sep = require('path').sep;
-        var path = self.root + sep + id.replace(/\./g, sep) + '.js';
-        try {
-          var fs = require('fs');
-          var js = fs.readFileSync(path, 'utf8');
-          ret(js);
-        } catch(e) {
-          err(null);
-        }
-      });
-    },
-    function onError() {
-      return null;
-    },
-  ]
 });
