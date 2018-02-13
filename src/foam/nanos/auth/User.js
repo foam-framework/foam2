@@ -109,7 +109,7 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'File',
+      class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
       view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
