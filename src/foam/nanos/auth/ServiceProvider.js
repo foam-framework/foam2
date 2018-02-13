@@ -10,6 +10,8 @@ foam.CLASS({
 
   documentation: 'Service Provider',
 
+  tableColumns: [ 'id', 'description' ],
+
   properties: [
     {
       class: 'String',
