@@ -48,11 +48,16 @@ public class AuthenticatedUserDAO
     User        user    = (User) x.get("user");
     AuthService auth    = (AuthService) x.get("auth");
 
-    // if current user doesn't have permissions to create or update, force account's owner to be current user id
-    if ( ! auth.check(x, GLOBAL_USER_CREATE) || ! auth.check(x, GLOBAL_USER_UPDATE) ) {
-      // account.setId(user.getId());
+    User toPut = (User) obj;
+    if ( toPut != null && toPut.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_CREATE) &&
+        ! auth.check(x, GLOBAL_SPID_CREATE) &&
+        ! auth.check(x, "spid.create." + toPut.getSpid()) ) {
+      throw new RuntimeException("Unable to update user");
     }
-    return super.put_(x, obj);
+
+    toPut.setSpid(user.getSpid());
+    return super.put_(x, toPut);
   }
 
   @Override
@@ -111,10 +116,10 @@ public class AuthenticatedUserDAO
     }
 
     // check if current user has permission to delete
-    User remove = (User) obj;
-    if ( remove != null && remove.getId() != user.getId() &&
+    User toRemove = (User) obj;
+    if ( toRemove != null && toRemove.getId() != user.getId() &&
         ! auth.check(x, GLOBAL_USER_DELETE) &&
-        ! auth.check(x, "spid.delete." + remove.getSpid()) ) {
+        ! auth.check(x, "spid.delete." + toRemove.getSpid()) ) {
       throw new RuntimeException("Unable to delete user");
     }
 
