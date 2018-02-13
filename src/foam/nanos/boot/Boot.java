@@ -32,7 +32,8 @@ public class Boot {
     installSystemUser();
 
     serviceDAO_.select(new AbstractSink() {
-      public void put(FObject obj, Detachable sub) {
+      @Override
+      public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("Registering: " + sp.getName());
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
@@ -49,7 +50,8 @@ public class Boot {
         new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
-      public void put(FObject obj, Detachable sub) {
+      @Override
+      public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
         System.out.println("Starting: " + sp.getName());

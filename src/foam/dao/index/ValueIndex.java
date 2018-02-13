@@ -55,7 +55,7 @@ public class ValueIndex
     if( skip-- > 0 ) return;
     if( limit <= 0 ) return;
     //We need to check whether we'll do with this detachable parameter inside this index
-    sink.put((FObject) state, null);
+    sink.put(state, null);
   }
 
 }
