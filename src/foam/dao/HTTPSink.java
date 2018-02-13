@@ -31,7 +31,7 @@ public class HTTPSink
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
+  public void put(Object obj, Detachable sub) {
     HttpURLConnection conn = null;
     OutputStream os = null;
     BufferedWriter writer = null;
@@ -55,7 +55,7 @@ public class HTTPSink
 
       os = conn.getOutputStream();
       writer = new BufferedWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
-      writer.write(outputter.stringify(obj));
+      writer.write(outputter.stringify((FObject)obj));
       writer.flush();
       writer.close();
       os.close();
