@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.auth;
 
 import foam.core.FObject;
@@ -7,10 +13,10 @@ import foam.dao.ProxyDAO;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-import foam.nanos.auth.AuthService;
-import foam.nanos.auth.User;
+import foam.util.SafetyUtil;
+
 import java.security.AccessControlException;
-import net.nanopay.model.Account;
+
 import static foam.mlang.MLang.EQ;
 
 /**
@@ -28,18 +34,18 @@ import static foam.mlang.MLang.EQ;
  *    spid property
  **/
 public class AuthenticatedUserDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
-  public final static String GLOBAL_USER_CREATE = "user.create.x";
   public final static String GLOBAL_USER_READ   = "user.read.x";
   public final static String GLOBAL_USER_UPDATE = "user.update.x";
   public final static String GLOBAL_USER_DELETE = "user.delete.x";
 
-  public final static String GLOBAL_SPID_CREATE = "spid.create.x";
+  public final static String GLOBAL_SPID_READ   = "spid.read.x";
+  public final static String GLOBAL_SPID_UPDATE = "spid.update.x";
+  public final static String GLOBAL_SPID_DELETE = "spid.delete.x";
 
   public AuthenticatedUserDAO(X x, DAO delegate) {
-    setX(x);
-    setDelegate(delegate);
+    super(x, delegate);
   }
 
   @Override
@@ -47,11 +53,21 @@ public class AuthenticatedUserDAO
     User        user    = (User) x.get("user");
     AuthService auth    = (AuthService) x.get("auth");
 
-    // if current user doesn't have permissions to create or update, force account's owner to be current user id
-    if ( ! auth.check(x, GLOBAL_USER_CREATE) || ! auth.check(x, GLOBAL_USER_UPDATE) ) {
-      // account.setId(user.getId());
+    User toPut = (User) obj;
+    if ( toPut != null && toPut.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_UPDATE) &&
+        ! auth.check(x, GLOBAL_SPID_UPDATE) &&
+        ! auth.check(x, "spid.create." + toPut.getSpid()) ) {
+      throw new RuntimeException("Unable to update user");
     }
-    return super.put_(x, obj);
+
+    // set spid if not set
+    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
+        ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
+      toPut.setSpid(user.getSpid());
+    }
+
+    return super.put_(x, toPut);
   }
 
   @Override
@@ -59,15 +75,21 @@ public class AuthenticatedUserDAO
     User        user = (User) x.get("user");
     AuthService auth = (AuthService) x.get("auth");
 
+    // check if logged in
     if ( user == null ) {
       throw new AccessControlException("User is not logged in");
     }
 
-    Account account = (Account) getDelegate().find_(x, id);
-    if ( account != null && account.getId() != user.getId() && ! auth.check(x, GLOBAL_USER_READ) ) {
+    // find user and check if current user has permission to read
+    User result = (User) super.find_(x, id);
+    if ( result != null && result.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_READ) &&
+        ! auth.check(x, GLOBAL_SPID_READ) &&
+        ! auth.check(x, "spid.read." + result.getSpid()) ) {
       return null;
     }
-    return account;
+
+    return result;
   }
 
   @Override
@@ -75,27 +97,42 @@ public class AuthenticatedUserDAO
     User        user = (User) x.get("user");
     AuthService auth = (AuthService) x.get("auth");
 
+    // check if logged in
     if ( user == null ) {
       throw new AccessControlException("User is not logged in");
     }
 
-    boolean global = auth.check(x, GLOBAL_USER_READ);
-    DAO dao = global ? getDelegate() : getDelegate().where(EQ(Account.ID, user.getId()));
+    DAO dao;
+    if ( auth.check(x, GLOBAL_USER_READ) ) {
+      // get all users in system
+      dao = getDelegate();
+    } else if ( auth.check(x, GLOBAL_SPID_READ) || auth.check(x, "spid.read." + user.getSpid()) ) {
+      // get all users under service provider
+      dao = getDelegate().where(EQ(User.SPID, user.getSpid()));
+    } else {
+      // only get authenticated user
+      dao = getDelegate().where(EQ(User.ID, user.getId()));
+    }
     return dao.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
     User        user    = (User) x.get("user");
-    Account     account = (Account) obj;
     AuthService auth    = (AuthService) x.get("auth");
 
+    // check if logged in
     if ( user == null ) {
       throw new AccessControlException("User is not logged in");
     }
 
-    if ( account != null && account.getId() != user.getId() && ! auth.check(x, GLOBAL_USER_DELETE) ) {
-      throw new RuntimeException("Unable to delete bank account");
+    // check if current user has permission to delete
+    User toRemove = (User) obj;
+    if ( toRemove != null && toRemove.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_DELETE) &&
+        ! auth.check(x, GLOBAL_SPID_DELETE) &&
+        ! auth.check(x, "spid.delete." + toRemove.getSpid()) ) {
+      throw new RuntimeException("Unable to delete user");
     }
 
     return super.remove_(x, obj);
@@ -106,12 +143,23 @@ public class AuthenticatedUserDAO
     User        user = (User) x.get("user");
     AuthService auth = (AuthService) x.get("auth");
 
+    // check if logged in
     if ( user == null ) {
       throw new AccessControlException("User is not logged in");
     }
 
-    boolean global = auth.check(x, GLOBAL_USER_DELETE);
-    DAO dao = global ? getDelegate() : getDelegate().where(EQ(Account.ID, user.getId()));
+    DAO dao;
+    if ( auth.check(x, GLOBAL_USER_DELETE) ) {
+      // delete all users in system
+      dao = getDelegate();
+    } else if ( auth.check(x, GLOBAL_SPID_DELETE) || auth.check(x, "spid.delete." + user.getSpid()) ) {
+      // delete users under service provider
+      dao = getDelegate().where(EQ(User.SPID, user.getSpid()));
+    } else {
+      // only delete authenticated user
+      dao = getDelegate().where(EQ(User.ID, user.getId()));
+    }
+
     dao.removeAll_(x, skip, limit, order, predicate);
   }
 }
