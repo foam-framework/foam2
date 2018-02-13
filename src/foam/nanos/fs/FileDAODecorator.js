@@ -24,7 +24,7 @@ foam.CLASS({
     function write(X, dao, obj, existing) {
       var self = this;
       var i = 0;
-      var props = obj.cls_.getAxiomsByClass(foam.core.File);
+      var props = obj.cls_.getAxiomsByClass(foam.nanos.fs.FileProperty);
 
       return Promise.resolve().then(function a() {
         var prop = props[i++];
