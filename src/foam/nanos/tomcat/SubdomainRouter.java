@@ -21,7 +21,7 @@ public class SubdomainRouter
     extends HttpServlet
 {
   @Override
-  protected synchronized void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String path = getServletConfig().getInitParameter("path");
     RequestDispatcher view = req.getRequestDispatcher(path);
     view.forward(req, resp);

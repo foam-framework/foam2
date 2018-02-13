@@ -78,7 +78,7 @@ public class MLang
   }
 
   public static Sink MAX(Object o1) {
-    return new Max(0, MLang.prepare(o1));
+    return new Max(null, MLang.prepare(o1));
   }
 
   public static Sink MIN(Object o1) {
