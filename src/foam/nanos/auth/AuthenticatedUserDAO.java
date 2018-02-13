@@ -38,6 +38,9 @@ public class AuthenticatedUserDAO
   public final static String GLOBAL_USER_DELETE = "user.delete.x";
 
   public final static String GLOBAL_SPID_CREATE = "spid.create.x";
+  public final static String GLOBAL_SPID_READ   = "spid.read.x";
+  public final static String GLOBAL_SPID_UPDATE = "spid.update.x";
+  public final static String GLOBAL_SPID_DELETE = "spid.delete.x";
 
   public AuthenticatedUserDAO(X x, DAO delegate) {
     super(x, delegate);
@@ -74,6 +77,7 @@ public class AuthenticatedUserDAO
     User result = (User) super.find_(x, id);
     if ( result != null && result.getId() != user.getId() &&
         ! auth.check(x, GLOBAL_USER_READ) &&
+        ! auth.check(x, GLOBAL_SPID_READ) &&
         ! auth.check(x, "spid.read." + result.getSpid()) ) {
       return null;
     }
@@ -95,7 +99,7 @@ public class AuthenticatedUserDAO
     if ( auth.check(x, GLOBAL_USER_READ) ) {
       // get all users in system
       dao = getDelegate();
-    } else if ( auth.check(x, "spid.read." + user.getSpid()) ) {
+    } else if ( auth.check(x, GLOBAL_SPID_READ) || auth.check(x, "spid.read." + user.getSpid()) ) {
       // get all users under service provider
       dao = getDelegate().where(EQ(User.SPID, user.getSpid()));
     } else {
@@ -119,6 +123,7 @@ public class AuthenticatedUserDAO
     User toRemove = (User) obj;
     if ( toRemove != null && toRemove.getId() != user.getId() &&
         ! auth.check(x, GLOBAL_USER_DELETE) &&
+        ! auth.check(x, GLOBAL_SPID_DELETE) &&
         ! auth.check(x, "spid.delete." + toRemove.getSpid()) ) {
       throw new RuntimeException("Unable to delete user");
     }
@@ -140,7 +145,7 @@ public class AuthenticatedUserDAO
     if ( auth.check(x, GLOBAL_USER_DELETE) ) {
       // delete all users in system
       dao = getDelegate();
-    } else if ( auth.check(x, "spid.delete." + user.getSpid()) ) {
+    } else if ( auth.check(x, GLOBAL_SPID_DELETE) || auth.check(x, "spid.delete." + user.getSpid()) ) {
       // delete users under service provider
       dao = getDelegate().where(EQ(User.SPID, user.getSpid()));
     } else {
