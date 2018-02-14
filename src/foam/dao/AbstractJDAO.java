@@ -95,6 +95,7 @@ public abstract class AbstractJDAO
             break;
         }
 
+        // log when object is not parsed properly
         if ( object == null ) {
           System.err.println(getParsingErrorMessage(line) + ", source: " + line);
         }
