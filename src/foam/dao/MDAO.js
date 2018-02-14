@@ -248,9 +248,9 @@ foam.CLASS({
       var subLimit = ( limit ? limit + ( skip ? skip : 0 ) : undefined );
 
       // This is an instance of OR, break up into separate queries
-      var args = predicate.args;
+      var args  = predicate.args;
       var plans = [];
-      for ( var i = 0; i < args.length; i++ ) {
+      for ( var i = 0 ; i < args.length ; i++ ) {
         // NOTE: we pass sink here, but it's not going to be the one eventually
         // used.
         plans.push(

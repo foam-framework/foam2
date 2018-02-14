@@ -25,7 +25,7 @@ public class MemoryWebAgent
   }
 
   public void execute(X x) {
-    PrintWriter out     = (PrintWriter) x.get(PrintWriter.class);
+    PrintWriter out     = x.get(PrintWriter.class);
     Runtime     runtime = Runtime.getRuntime();
 
     out.println("<HTML>");

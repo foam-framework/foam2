@@ -12,14 +12,6 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'from'
-    },
-    {
-      class: 'String',
-      name: 'replyTo'
-    },
-    {
       class: 'StringArray',
       name: 'to'
     },

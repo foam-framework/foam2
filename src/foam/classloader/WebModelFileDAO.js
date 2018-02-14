@@ -45,6 +45,7 @@ foam.CLASS({
         method: 'GET',
         url: url
       });
+      var lookingFor = id;
 
       return req.send().then(function(payload) {
         return payload.resp.text();
@@ -53,6 +54,12 @@ foam.CLASS({
         var foamCLASS = foam.CLASS;
 
         foam.CLASS = function(m) {
+          if ( ( ( m.package ? m.package + '.' : '' ) + m.name ) !== lookingFor ) {
+            // Run unrelated models through normal foam.CLASS
+            foamCLASS(m);
+            return;
+          }
+
           var cls = m.class ? foam.lookup(m.class) : foam.core.Model;
           model = cls.create(m, self);
           foam.CLASS = foamCLASS;

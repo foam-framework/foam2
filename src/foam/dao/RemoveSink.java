@@ -8,18 +8,21 @@ package foam.dao;
 
 import foam.core.Detachable;
 import foam.core.FObject;
+import foam.core.X;
 
 public class RemoveSink
-  extends AbstractSink {
+  extends AbstractSink
+{
+  protected X   x_;
+  protected DAO dao_;
 
-  protected DAO dao;
-
-  public RemoveSink(DAO dao) {
-    this.dao = dao;
+  public RemoveSink(X x, DAO dao) {
+    x_   = x;
+    dao_ = dao;
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
-    dao.remove(obj);
+  public void put(Object obj, Detachable sub) {
+    dao_.remove_(x_, (FObject)obj);
   }
 }

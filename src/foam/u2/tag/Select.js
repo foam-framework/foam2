@@ -9,20 +9,16 @@ foam.CLASS({
   name: 'Select',
   extends: 'foam.u2.View',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^:disabled {
-          appearance: none;
-          -moz-appearance:none;
-          -webkit-appearance:none;
-          border: none;
-          background: rgba(0,0,0,0);
-          color: initial;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^:disabled {
+      appearance: none;
+      -moz-appearance:none;
+      -webkit-appearance:none;
+      border: none;
+      background: rgba(0,0,0,0);
+      color: initial;
+    }
+  `,
 
   properties: [
     [ 'nodeName', 'select' ],
@@ -38,9 +34,7 @@ foam.CLASS({
         return undefined;
       }
     },
-    {
-      name: 'size'
-    }
+    'size'
   ],
 
   methods: [

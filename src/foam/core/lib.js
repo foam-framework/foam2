@@ -78,7 +78,9 @@ Object.defineProperty(
  */
 foam.assert = function assert(cond) {
   if ( ! cond ) {
+//    throw new Error(Array.from(arguments).slice(1).join(' '));
     console.assert(false, Array.from(arguments).slice(1).join(' '));
+
   }
 
   return cond;
@@ -146,4 +148,4 @@ foam.LIB = function LIB(model) {
     }
   }
 };
-global.foam.__LIBS__ = Object.create(null);
+global.foam.__LIBS__ = {};

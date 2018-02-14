@@ -1,15 +1,20 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.nanos.tomcat;
 
 import foam.nanos.http.NanoRouter;
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.ServerEndpointConfig;
-import javax.websocket.server.ServerEndpointConfig;
-import javax.websocket.server.PathParam;
+import foam.nanos.logger.Logger;
+
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpointConfig;
 
 public class TomcatRouter
   extends NanoRouter
@@ -82,7 +87,6 @@ public class TomcatRouter
 
     @OnOpen
     public void onOpen(javax.websocket.Session session) {
-      System.out.println("On open " + session.hashCode());
       returnBox_ = getX().create(foam.box.RawWebSocketBox.class);
 
       final java.util.concurrent.BlockingQueue<String> queue = new java.util.concurrent.LinkedTransferQueue<String>();
@@ -90,14 +94,12 @@ public class TomcatRouter
       final Integer id = new java.util.Random().nextInt();
       id_ = id;
 
-      System.out.println("new id" + Integer.toString(id, 16));
 
       Thread socketThread = new Thread(new Runnable() {
           public void run() {
             while ( true ) {
               try {
                 String message = queue.take();
-                System.out.println("(" + Integer.toString(id, 16) + ") send");
                 capturedEndpoint.sendText(message);
               } catch ( InterruptedException e ) {
               } catch ( java.io.IOException e) {
@@ -113,7 +115,6 @@ public class TomcatRouter
       returnBox_.setSocket(new foam.net.WebSocket() {
           @Override
           public void send(String message) throws java.io.IOException {
-            System.out.println("(" + Integer.toString(id, 16) + ") append");
             try {
               queue.put(message);
             } catch (InterruptedException e) {
@@ -156,13 +157,19 @@ public class TomcatRouter
           return;
         }
 
-        foam.box.Message obj = (foam.box.Message)request;
+        foam.box.Message obj = (foam.box.Message) request;
         obj.getLocalAttributes().put("x", requestContext);
 
         getRouter().service(serviceKey, obj);
       } catch(java.lang.Exception e) {
         log.error("Error handling websocket request", e, message);
       }
+    }
+
+    @OnError
+    public void onError(Session session, Throwable t) {
+      Logger log = (Logger) getX().get("logger");
+      log.error("Error handling websocket request", t);
     }
   }
 }
