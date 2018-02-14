@@ -79,18 +79,19 @@ public abstract class AbstractJDAO
         // remove first two characters and last character
         line = line.trim().substring(2, line.trim().length() - 1);
 
-        FObject object = parser.parseString(line);
-        if ( object == null ) {
-          System.err.println(getParsingErrorMessage(line) + ", source: " + line);
-          break;
-        }
-
+        FObject object;
         switch ( operation ) {
           case 'p':
-            getDelegate().put(object);
+            object = parser.parseString(line);
+            if ( object != null ) {
+              getDelegate().put(object);
+            }
             break;
           case 'r':
-            getDelegate().remove(object);
+            Object id = parser.parseStringForId(line);
+            if ( id != null && (object = getDelegate().find(id)) != null ) {
+              getDelegate().remove(object);
+            }
             break;
         }
       } catch (Throwable t) {
