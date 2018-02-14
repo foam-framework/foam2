@@ -51,12 +51,52 @@ foam.CLASS({
       name: 'slashReplacement',
       value: String.fromCharCode(0),
     },
+    {
+      class: 'Array',
+      name: 'putBacklog_',
+    }
   ],
 
   methods: [
     function put_(x, obj) {
-      return this.getDoc_(obj).set(this.getFirestoreData(obj))
-          .then(function() { return obj; });
+      var resolve;
+      var reject;
+      var promise = new Promise(function(res, rej) {
+        reject = res;
+        reject = rej;
+      });
+      this.putBacklog_.push({
+        obj: obj,
+        resolve: resolve,
+        reject: reject,
+        promise: promise,
+      });
+      if ( this.putBacklog_.length > 400 ) {
+        this.putBatch_();
+      }
+      this.onPut();
+      return promise;
+    },
+    function putBatch_() {
+      var batch = this.firestore.batch();
+      var backlog = this.putBacklog_;
+      for ( var i = 0; i < backlog.length; i++ ) {
+        var data = backlog[i];
+        batch.set(this.getFirestoreDocumentID(data.obj),
+                  this.getFirestoreData(data.obj));
+      }
+
+      batch.commit().then(function(backlog) {
+        for ( var i = 0; i < backlog.length; i++ ) {
+          backlog[i].resolve(backlog[i].obj);
+        }
+      }.bind(this, backlog), function(error) {
+        for ( var i = 0; i < backlog.length; i++) {
+          backlog[i].reject(error);
+        }
+      });
+
+      this.putBacklog_ = [];
     },
     function remove_(x, obj) {
       return this.getDoc_(obj).delete();
@@ -127,5 +167,16 @@ foam.CLASS({
     function getDoc_(obj) {
       return this.collection.doc(this.getFirestoreDocumentID(obj));
     },
+  ],
+
+  listeners: [
+    {
+      name: 'onPut',
+      isMerged: true,
+      mergeDelay: 10,
+      code: function() {
+        if ( this.putBacklog_.length > 0 ) this.putBatch_();
+      }
+    }
   ]
 });
