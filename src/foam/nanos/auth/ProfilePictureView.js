@@ -11,7 +11,8 @@ foam.CLASS({
 
   requires: [
     'foam.blob.BlobBlob',
-    'foam.nanos.fs.File'
+    'foam.nanos.fs.File',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
@@ -78,6 +79,7 @@ foam.CLASS({
   messages: [
     { name: 'UploadImageLabel', message: 'Upload Image' },
     { name: 'UploadDesc', message: 'JPG, GIF, JPEG, BMP or PNG' },
+    { name: 'ErrorMessage', message: 'Please upload an image less than 10MB' }
   ],
 
   methods: [
@@ -125,6 +127,11 @@ foam.CLASS({
 
     function onChange (e) {
       var file = e.target.files[0];
+      if ( file.size > ( 10 * 1024 * 1024 ) ) {
+        this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
+        return;
+      }
+
       this.data = this.File.create({
         owner: this.user.id,
         filename: file.name,
