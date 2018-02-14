@@ -54,17 +54,17 @@ public class AuthenticatedUserDAO
     AuthService auth    = (AuthService) x.get("auth");
 
     User toPut = (User) obj;
+    // set spid if not set
+    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
+        ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
+      toPut.setSpid(user.getSpid());
+    }
+
     if ( toPut != null && toPut.getId() != user.getId() &&
         ! auth.check(x, GLOBAL_USER_UPDATE) &&
         ! auth.check(x, GLOBAL_SPID_UPDATE) &&
         ! auth.check(x, "spid.update." + toPut.getSpid()) ) {
       throw new RuntimeException("Unable to update user");
-    }
-
-    // set spid if not set
-    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
-        ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
-      toPut.setSpid(user.getSpid());
     }
 
     return super.put_(x, toPut);
