@@ -33,13 +33,6 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'String',
-      // class: 'SPID',
-      label: 'Service Provider',
-      name: 'spid',
-      documentation: "User's service provider."
-    },
-    {
       class: 'DateTime',
       name: 'lastLogin'
     },
@@ -280,5 +273,19 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true,
     transient: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.ServiceProvider',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'spid',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
   }
 });
