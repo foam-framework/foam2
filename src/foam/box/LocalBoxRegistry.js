@@ -124,7 +124,8 @@ if ( name == null ) name = Integer.toString(foam.box.IdGenerator.nextId());
 foam.box.SubBox exportBox = getX().create(foam.box.SubBox.class);
 exportBox.setName(name);
 exportBox.setDelegate(getMe());
-Registration registration = getX().create(Registration.class);
+Registration registration = new Registration();
+registration.setX(getX());
 registration.setExportBox(exportBox);
 registration.setLocalBox(box);
 // TODO(adamvy): Apply service policy

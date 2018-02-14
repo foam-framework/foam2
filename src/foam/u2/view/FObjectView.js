@@ -11,11 +11,7 @@ foam.CLASS({
 
   documentation: 'View for editing FObjects.',
 
-  axioms: [
-    foam.u2.CSS.create({
-//      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
-    })
-  ],
+  // css: '^:read-only { border: none; background: rgba(0,0,0,0); }'
 
   properties: [
     {
@@ -33,7 +29,7 @@ foam.CLASS({
     },
     {
       name: 'data',
-      view: 'foam.u2.DetailView',
+      view: { class: 'foam.u2.DetailView' },
       postSet: function(_, data) {
         if ( ! data ) {
           this.objectClass = '';

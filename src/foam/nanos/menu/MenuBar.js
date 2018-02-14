@@ -13,7 +13,7 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO' ],
+  imports: [ 'menuDAO', 'currentMenu', 'window' ],
 
   documentation: 'Navigational menu bar',
 
@@ -42,13 +42,7 @@ foam.CLASS({
       name: 'menuName',
       value: '' // The root menu
     },
-    {
-      name: 'selected',
-      postSet: function(o, n) {
-        if ( o ) o.selected = false;
-        n.selected = true;
-      }
-    }
+    'selected'
   ],
 
   methods: [
@@ -63,11 +57,12 @@ foam.CLASS({
                 .call(function() {
                   var e = this;
                   if ( ! self.selected ) self.selected = menu;
-                  this.start().addClass('menuItem').enableClass('selected', menu.selected$)
+                  this.start()
+                    .addClass('menuItem')
+                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) }))
                     .add(menu.label)
                     .on('click', function() {
-                      menu.launch_(self.__context__, e)
-                      self.selected = menu;
+                      menu.launch_(self.__context__, e);
                     }.bind(this))
                   .end();
                 })
@@ -76,6 +71,32 @@ foam.CLASS({
           .end()
         .end()
       .end();
+    },
+
+    function isSelected(current, menu) {
+      if ( ! current ) return false;
+
+      if ( current.parent ) {
+        if ( current.parent === menu.id ) {
+          this.selected = current.parent;
+          return true;
+        }
+        return false;
+      }
+
+      // only show selected menu if user settings sub menu item has not been selected
+      if ( this.selected === menu.id && !this.window.location.hash.includes('#set') ) {
+        return true;
+      }
+
+      // selected menu is a submenu. Do not change selection yet.
+      if ( ! current.handler.view ) return false;
+
+      if ( current.id === menu.id ) {
+        this.selected = current.id;
+        return true;
+      }
+      return false;
     }
   ]
 });

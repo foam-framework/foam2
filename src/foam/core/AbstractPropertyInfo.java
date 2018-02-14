@@ -13,6 +13,10 @@ import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -51,7 +55,7 @@ public abstract class AbstractPropertyInfo
   public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
-  public Object f(FObject o) {
+  public Object f(Object o) {
     return get(o);
   }
 
@@ -63,7 +67,7 @@ public abstract class AbstractPropertyInfo
   }
 
   public void setFromString(Object obj, String value) {
-    // TODO: Need to write
+    this.set(obj, fromString(value));
   }
 
   @Override
@@ -101,5 +105,29 @@ public abstract class AbstractPropertyInfo
   public String toString() {
     // TODO: generate static string in generated instances instead to avoid creating garbage.
     return parent.getId() + "." + getName();
+  }
+
+  @Override
+  public void cloneProperty(FObject source, FObject dest) {
+    set(dest, foam.util.SafetyUtil.deepClone(get(source)));
+  }
+
+  @Override
+  public void validate(FObject obj) throws IllegalStateException {}
+
+  @Override
+  public void updateDigest(FObject obj, MessageDigest md) {}
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {}
+
+  protected byte[] nameAsByteArray_ = null;
+
+  @Override
+  public byte[] getNameAsByteArray() {
+    if ( nameAsByteArray_ == null ) {
+      nameAsByteArray_ = getName().getBytes(StandardCharsets.UTF_8);
+    }
+    return nameAsByteArray_;
   }
 }

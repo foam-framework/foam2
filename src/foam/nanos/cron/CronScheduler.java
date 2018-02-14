@@ -58,11 +58,11 @@ public class CronScheduler
         Date now = new Date();
         cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, now)).select(new AbstractSink() {
           @Override
-          public void put(FObject obj, Detachable sub) {
+          public void put(Object obj, Detachable sub) {
             PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
             try {
               ((Cron) obj).runScript(CronScheduler.this.getX());
-              cronDAO_.put(obj);
+              cronDAO_.put((FObject)obj);
             } catch (Throwable t) {
               logger.error(this.getClass(), t.getMessage());
             } finally {

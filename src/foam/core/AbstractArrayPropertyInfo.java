@@ -21,42 +21,13 @@ import org.w3c.dom.Element;
 public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo
 {
-  @Override
-  public void setFromString(Object obj, String value) {
-    if ( value == null ) {
-      this.set(obj, null);
-      return;
-    }
-    // TODO: TO REUSE THIS LIST WITH A THREADLOCAL FOR BETTER PERFORMANCE
-    List<String> list = new LinkedList<String>();
-    StringBuilder sb = new StringBuilder(); 
-    char prev = '$';
-    char[] cs = value.toCharArray();
-    for ( int i = 0 ; i < cs.length ; i++ ) {
-      if ( cs[i] == '\\' ) {
-        if ( prev == '\\' ) {
-          sb.append("\\");
-          prev = '$';
-        } else {
-          prev = '\\';
-        }
-      } else if ( cs[i] == ',' ) {
-        if ( prev == '\\' ) {
-          sb.append(',');
-        } else {
-          list.add(sb.toString());
-          sb.setLength(0);
-        }
-        prev = '$';
-      } else {
-        sb.append(cs[i]);
-        prev = cs[i];
-      }
-    }
-    list.add(sb.toString());
-    String[] result = new String[list.size()];
-    //add support for other array types
-    this.set(obj, list.toArray(result));
+
+  public Object fromString(String value) {
+    if ( value == null )
+      return null;
+
+    //TODO: add support for other array types
+    return foam.util.StringUtil.split(value, ',');
   }
 
   public abstract String of();
@@ -90,12 +61,16 @@ public abstract class AbstractArrayPropertyInfo
 
   @Override
   public void toXML (FObject obj, Document doc, Element objElement) {
-    if ( this.f(obj) == null ) return;
+    Object value = this.f(obj);
 
-    Element prop = doc.createElement(this.getName());
+    // Return if some kind of array other than Object[], like int[]
+    if ( value == null || ! ( value instanceof Object[]) ) return;
+
+    Object[] nestObj = (Object[]) value;
+    Element  prop    = doc.createElement(this.getName());
+
     objElement.appendChild(prop);
 
-    Object[] nestObj = (Object[]) this.f(obj);
     for ( int k = 0; k < nestObj.length; k++ ) {
       Element nestedProp = doc.createElement("value");
       nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));

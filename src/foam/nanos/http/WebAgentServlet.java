@@ -31,11 +31,16 @@ public class WebAgentServlet
   public void setX(X x) { x_ = x; }
 
   @Override
-  public void service(HttpServletRequest req, HttpServletResponse resp)
+  public void service(final HttpServletRequest req, final HttpServletResponse resp)
     throws IOException
   {
     resp.setContentType("text/html");
 
-    agent_.execute(getX().put(HttpServletRequest.class, req).put(HttpServletResponse.class, resp).put(PrintWriter.class, resp.getWriter()));
+    agent_.execute(getX()
+      .put(HttpServletRequest.class,  req)
+      .put(HttpServletResponse.class, resp)
+      .putFactory(PrintWriter.class, new XFactory() {
+        public Object create(X x) { try { return resp.getWriter(); } catch (IOException e) { return null; } }
+      }));
   }
 }

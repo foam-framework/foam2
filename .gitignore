@@ -7,7 +7,7 @@ coverage
 doc/gen/*
 **/bower_components/*
 test/third_party/google-cloud-sdk*
-build
+/build
 foam-bin.js
 target/
 .idea/
@@ -15,3 +15,7 @@ target/
 local.properties
 *.iml
 tools/cp.txt
+/nanos
+build/*
+.*-build
+.*-gensrcs

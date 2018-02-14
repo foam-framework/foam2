@@ -38,6 +38,10 @@ public class MLang
     return new Eq(MLang.prepare(o1), MLang.prepare(o2));
   }
 
+  public static Predicate NEQ(Object o1, Object o2) {
+    return new Neq(MLang.prepare(o1), MLang.prepare(o2));
+  }
+
   public static Predicate GTE(Object o1, Object o2) {
     return new Gte(MLang.prepare(o1), MLang.prepare(o2));
   }
@@ -54,16 +58,31 @@ public class MLang
     return new And(args);
   }
 
+  public static Sink GROUP_BY(Expr o1, Sink o2) {
+    GroupBy groupBy = new GroupBy();
+    groupBy.setArg1(o1);
+    groupBy.setArg2(o2);
+    return groupBy;
+  }
+
+  public static Sink COUNT() {
+    return new Count();
+  }
+
   public static Predicate OR(Predicate... args) {
     return new Or(args);
   }
 
+  public static Predicate NOT(Predicate predicate) {
+    return new Not(predicate);
+  }
+
   public static Sink MAX(Object o1) {
-    return new Max(0, MLang.prepare(o1));
+    return new Max(null, MLang.prepare(o1));
   }
 
   public static Sink MIN(Object o1) {
-    return new Min(0, MLang.prepare(o1));
+    return new Min(null, MLang.prepare(o1));
   }
 
   public static Sink SUM(Object o1) {

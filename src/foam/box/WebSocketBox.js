@@ -49,15 +49,18 @@ foam.CLASS({
         });
 
         return ws.connect().then(function(ws) {
-
           ws.disconnected.sub(function(sub) {
             sub.detach();
-            this.socket = undefined;
+            this.delegate = undefined;
           }.bind(this));
 
           this.webSocketService.addSocket(ws);
 
           return this.RawWebSocketBox.create({ socket: ws });
+        }.bind(this), function(e) {
+          // Failed to connect, clear the delegate so that the next send
+          // will reconnect.
+          this.delegate = undefined;
         }.bind(this));
       }
     }
@@ -73,7 +76,7 @@ foam.CLASS({
         }
 
         return protocol + this.window.location.hostname +
-          ( this.window.location.port ? ':' + this.window.location.port : '' ) +
+          ( this.window.location.port ? ':' + ( parseInt(this.window.location.port) + 1 ) : '' ) +
           '/' + url;
       }
 
@@ -85,6 +88,11 @@ foam.CLASS({
       code: function send(msg) {
         this.delegate.then(function(d) {
           d.send(msg);
+        }, function(e) {
+          // Failed to connect.
+          if ( msg.attributes.replyBox ) msg.attributes.replyBox.send(foam.box.Message.create({
+            object: e
+          }));
         });
       }
     }

@@ -56,12 +56,13 @@ public class SimpleFacetManager
 
       if ( obj instanceof FObject ) {
         for (Map.Entry<String, Object> entry : args.entrySet()) {
-          ((FObject)obj).setProperty(entry.getKey(), entry.getValue());
+          ((FObject) obj).setProperty(entry.getKey(), entry.getValue());
         }
       }
 
       return obj;
     } catch (java.lang.Exception e) {
+      e.printStackTrace();
       throw new RuntimeException(e);
     }
   }

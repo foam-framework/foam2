@@ -17,7 +17,7 @@ public class ClassesWebAgent
   public ClassesWebAgent() {}
 
   public void execute(X x) {
-    final PrintWriter out  = (PrintWriter) x.get(PrintWriter.class);
+    final PrintWriter out  = x.get(PrintWriter.class);
 
     out.println("<pre>");
     ClassLoader cl = ClassLoader.getSystemClassLoader();

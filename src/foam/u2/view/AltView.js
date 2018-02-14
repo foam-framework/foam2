@@ -18,7 +18,7 @@ foam.CLASS({
   "Takes a views property which should be the value of an array containing arrays that contain desired views, and label." +
   "Ex. views: [[ { class: 'foam.u2.view.TableView' }, 'Table' ]]",
 
-  requires: [    
+  requires: [
     'foam.u2.stack.Stack'
   ],
 
@@ -41,35 +41,35 @@ foam.CLASS({
           choices: X.data.views
         });
       }
-    },
+    }
   ],
 
   css: `
-        ^ {
-          width: 992px;
-          margin: auto;
-        }
-        ^ .foam-u2-tag-Select{
-          width: 100px;
-          height: 40px;
-        }
-        ^ .property-viewChoices{
-          margin: 0 0 25px 15px;
-        }
+    ^ {
+      width: 992px;
+      margin: auto;
+    }
+    ^ .foam-u2-tag-Select{
+      width: 100px;
+      height: 40px;
+    }
+    ^ .property-viewChoices{
+      margin: 0 0 25px 15px;
+    }
   `,
 
   methods: [
     function initE() {
-      this.SUPER();  
+      this.SUPER();
       var self = this;
-      this.altStack = null;      
+      this.altStack = null;
       this.altStack = this.Stack.create();
       this.viewChoices$.sub(this.changeView);
 
       this.views.forEach(function(view){
         view[0].data = view[0].data ? view[0].data : self.data;
       });
-      this.altStack.push(this.views[0][0]);  
+      this.altStack.push(this.views[0][0]);
 
       this.addClass(this.myClass())
       this.startContext({data: this})
@@ -86,6 +86,6 @@ foam.CLASS({
   listeners: [
     function changeView(){
       this.altStack.push(this.viewChoices);
-    },
+    }
   ]
 });

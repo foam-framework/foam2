@@ -15,14 +15,21 @@ foam.CLASS({
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
+    'foam.core.*',
+    'foam.dao.*',
+    'foam.mlang.predicate.Predicate',
+    'foam.nanos.auth.*',
     'foam.nanos.pm.PM',
+    'foam.nanos.session.Session',
     'java.io.ByteArrayOutputStream',
     'java.io.PrintStream',
-    'java.util.Date'
+    'java.util.Date',
+    'java.util.List',
+    'static foam.mlang.MLang.*'
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', /*'language',*/ 'description', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'run'
   ],
 
   searchColumns: [],
@@ -40,6 +47,11 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
+      visibility: foam.u2.Visibility.RO
+    },
+    {
+      class: 'Long',
+      name: 'lastDuration',
       visibility: foam.u2.Visibility.RO
     },
     /*
@@ -71,12 +83,12 @@ foam.CLASS({
       class: 'String',
       name: 'output',
       visibility: foam.u2.Visibility.RO,
-      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80, css: {"font-family": "monospace"}  }
+      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80, css: {"font-family": "monospace"}  }
     },
     {
       class: 'String',
       name: 'notes',
-      view: { class: 'foam.u2.tag.TextArea', rows: 10, cols: 90 }
+      view: { class: 'foam.u2.tag.TextArea', rows: 4, cols: 80 }
     }
   ],
 
@@ -84,9 +96,7 @@ foam.CLASS({
     {
       name: 'createInterpreter',
       args: [
-        {
-          name: 'x', javaType: 'foam.core.X'
-        }
+        { name: 'x', javaType: 'foam.core.X' }
       ],
       javaReturns: 'Interpreter',
       javaCode: `
@@ -96,6 +106,7 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
+          shell.eval("sudo(String user) { foam.util.Auth.sudo(x, user); }");
         } catch (EvalError e) {}
 
         return shell;
@@ -129,6 +140,7 @@ foam.CLASS({
         }
 
         setLastRun(new Date());
+        setLastDuration(pm.getTime());
         ps.flush();
         setOutput(baos.toString());
     `
@@ -149,7 +161,7 @@ foam.CLASS({
             self.copyFrom(script);
           });
         } else {
-          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, ''); }.bind(this);
+          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
 
           with ( { log: log, print: log, x: self.__context__ } ) {
             var ret = eval(this.code);

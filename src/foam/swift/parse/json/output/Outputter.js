@@ -227,7 +227,11 @@ outputString(&out, "__Property__");
 out.append(",");
 outputString(&out, "forClass_");
 out.append(":");
-outputString(&out, data.classInfo.id + "." + data.name)
+outputString(&out, data.classInfo.id);
+out.append(",");
+outputString(&out, "name");
+out.append(":");
+outputString(&out, data.name);
 out.append("}");
       */},
     },

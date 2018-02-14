@@ -25,6 +25,10 @@ import java.util.Map;
 abstract class AbstractX
   implements X
 {
+  public <T> T get(Class<T> key) {
+    return (T)get(this, key);
+  }
+
   public Object get(Object key) {
     return get(this, key);
   }
@@ -43,14 +47,6 @@ abstract class AbstractX
     return i == null ? defaultValue : i.intValue();
   }
 
-  public X put(Object key, Object value) {
-    return new XI(this, key, value);
-  }
-
-  public X putFactory(Object key, XFactory factory) {
-    return new FactoryXI(this, key, factory);
-  }
-
   public Object getInstanceOf(Object value, Class type) {
     return ((FacetManager) get("facetManager")).getInstanceOf(value, type, this);
   }
@@ -64,51 +60,128 @@ abstract class AbstractX
   }
 }
 
+abstract class AbstractXI
+  extends AbstractX
+  implements Cloneable
+{
+  protected X   leftChild_;
+  protected X   rightChild_;
+
+  protected abstract Object getKey();
+  protected X getLeftChild() { return leftChild_; }
+  protected X getRightChild() { return rightChild_; }
+  protected void setLeftChild(X leftChild) { leftChild_ = leftChild; }
+  protected void setRightChild(X rightChild) { rightChild_ = rightChild; }
+
+  public X put(Object key, Object value) {
+    String okey = getKey().toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
+      return new XI(getLeftChild(), getRightChild(), getKey(), value);
+    }
+    if ( nkey.compareTo(okey) < 0 ) {
+      return clone(getLeftChild().put(key, value), getRightChild());
+    }
+    return clone(getLeftChild(), getRightChild().put(key, value));
+  }
+
+  public X putFactory(Object key, XFactory factory) {
+    String okey = getKey().toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
+      return new FactoryXI(getLeftChild(), getRightChild(), getKey(), factory);
+    }
+    if ( nkey.compareTo(okey) < 0 ) {
+      return clone(getLeftChild().putFactory(key, factory), getRightChild());
+    }
+    return clone(getLeftChild(), getRightChild().putFactory(key, factory));
+  }
+
+  protected X clone(X left, X right) {
+    AbstractXI result = this.clone();
+    result.setLeftChild(left);
+    result.setRightChild(right);
+    return result;
+  }
+
+  @Override
+  protected AbstractXI clone() {
+    AbstractXI x = null;
+    try {
+      x = (AbstractXI) super.clone();
+    } catch ( CloneNotSupportedException e ) {
+      e.printStackTrace();
+    }
+    return x;
+  }
+}
 
 /** Default implementation of X interface. Stores one key-value binding. **/
 class XI
-  extends AbstractX
+  extends AbstractXI
 {
-  final X      parent_;
-  final Object key_;
-  final Object value_;
+  final Object  key_;
+  final Object  value_;
 
-  XI(X parent, Object key, Object value) {
-    parent_ = parent;
-    key_    = key;
-    value_  = value;
+  XI(X leftChild, X rightChild, Object key, Object value) {
+    leftChild_   = leftChild;
+    rightChild_  = rightChild;
+    key_          = key;
+    value_        = value;
   }
-
-  X parent() { return parent_; }
+  @Override
+  protected Object getKey() { return key_; }
 
   public Object get(X x, Object key) {
-    return key.equals(key_) ? value_ : parent().get(key);
+    String okey = key_.toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
+      return value_;
+    }
+    if ( nkey.compareTo(okey) < 0 ) {
+      return getLeftChild().get(x, key);
+    }
+    return getRightChild().get(x, key);
+  }
+
+  @Override
+  public String toString() {
+    return getLeftChild().toString() + ( "{Key: " + key_ + ", Object: "  + value_ + "}\n" ) + getRightChild().toString();
   }
 }
 
 
 /** Implementation of X interface when binding a key-factory pair. **/
 class FactoryXI
-  extends AbstractX
+  extends AbstractXI
 {
-  final X        parent_;
-  final Object   key_;
-  final XFactory factory_;
+  final Object    key_;
+  final XFactory  factory_;
 
-  FactoryXI(X parent, Object key, XFactory factory) {
-    parent_  = parent;
-    key_     = key;
-    factory_ = factory;
+  FactoryXI(X leftChild, X rightChild, Object key, XFactory factory) {
+    leftChild_   = leftChild;
+    rightChild_  = rightChild;
+    key_          = key;
+    factory_      = factory;
   }
 
-  X parent() {
-    return parent_;
-  }
+  @Override
+  protected Object getKey() { return key_; }
 
   public Object get(X x, Object key) {
-    return key.equals(key_) ?
-      factory_.create(x)    :
-      parent().get(x, key) ;
+    String okey = key_.toString();
+    String nkey = key.toString();
+    if ( nkey.compareTo(okey) == 0 ) {
+      return factory_.create(x);
+    }
+    if ( nkey.compareTo(okey) < 0 ) {
+      return getLeftChild().get(x, key);
+    }
+    return getRightChild().get(x, key);
+  }
+  @Override
+  public String toString() {
+    return getLeftChild().toString() + ( "{Key: " + key_ + ", XFactory: "  + factory_ + "}\n" ) + getRightChild().toString();
   }
 }
 
@@ -124,4 +197,15 @@ public class EmptyX
   public static X instance() { return x_; }
 
   public Object get(X x, Object key) { return null; }
+
+  public X put(Object key, Object value) {
+    return new XI(this, this, key, value);
+  }
+
+  public X putFactory(Object key, XFactory factory) {
+    return new FactoryXI(this, this, key, factory);
+  }
+
+  @Override
+  public String toString() { return ""; }
 }

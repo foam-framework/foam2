@@ -108,8 +108,10 @@ foam.CLASS({
           var self = this;
           this.selection$.sub(function() {
             if ( self.selection ) {
-              self.stack.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, self));
-              self.selection = undefined;
+              var selection = self.selection;
+              self.stack.push(function() {
+                return foam.u2.ListCreateController.ViewController.create({obj: selection}, self);
+              });        
             }
           });
         }
@@ -117,7 +119,7 @@ foam.CLASS({
 
       actions: [
         function create(X) {
-          this.stack.push(foam.u2.ListCreateController.CreateController.create(null, X));
+          this.stack.push(function() { return foam.u2.ListCreateController.CreateController.create(null, X); });
         }
       ],
 
