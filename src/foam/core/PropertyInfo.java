@@ -34,6 +34,7 @@ public interface PropertyInfo
   public Object get(Object obj);
   public void set(Object obj, Object value);
   public Parser jsonParser();
+  public Parser queryParser();
   public Parser csvParser();
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
   public void toCSV(foam.lib.csv.Outputter outputter, Object value);

@@ -54,6 +54,7 @@ foam.CLASS({
     'jsonParser',
     'csvParser',
     'cloneProperty',
+    'queryParser',
     {
       name: 'methods',
       factory: function() {
@@ -118,6 +119,12 @@ foam.CLASS({
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
             body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
+          },
+          {
+            name: 'queryParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' +  (this.queryParser ? this.queryParser : null) + ';'
           },
           {
             name: 'csvParser',

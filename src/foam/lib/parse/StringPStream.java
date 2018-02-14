@@ -65,7 +65,10 @@ public class StringPStream
   }
 
   public PStream setValue(Object value) {
-    return new StringPStream(str, pos, value);
+    if (this.operator_!= null) {
+      return new StringPStream(str, pos, value).setOperator(operator_);
+    }
+    return new StringPStream(str, pos, value).setOperator(operator_);
   }
 
   public String substring(PStream end) {
@@ -76,5 +79,23 @@ public class StringPStream
 
   public PStream apply(Parser ps, ParserContext x) {
     return ps.parse(this, x);
+  }
+
+  public foam.lib.parse.PStream setOperator( Object operator ) {
+    operator_=operator;
+    return this ;
+  }
+
+  private Object operator_ = null;
+  public void setOperator_(Object operator_) {
+    this.operator_ = operator_;
+  }
+
+  public Object operator() {
+    return operator_;
+  }
+
+  public char beforeHead() {
+    return pos == 0 ?  head() :str.get().charAt(pos-1);
   }
 }
