@@ -61,7 +61,7 @@ DispatchQueue.global(qos: .background).async {
       listenSub?.detach()
       sub.detach()
       self?.clearProperty("delegate")
-    } as (String, FObject?, Detachable) -> Void,
+    } as (String, Any?, Detachable) -> Void,
   ]), nil)
 
   pDao.promise.set(cache)
