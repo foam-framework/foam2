@@ -211,7 +211,7 @@ foam.CLASS({
   properties: [
     {
       class: 'List',
-      swiftType: '[FObject]',
+      swiftType: '[Any]',
       name: 'array',
       adapt: function(old, nu) {
         if ( ! this.of ) return nu;
