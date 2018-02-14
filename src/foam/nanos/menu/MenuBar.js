@@ -13,7 +13,7 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO', 'currentMenu', 'window' ],
+  imports: [ 'menuDAO', 'currentMenu', 'window', 'user' ],
 
   documentation: 'Navigational menu bar',
 
@@ -50,7 +50,7 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start()
+        .start().enableClass('hide', ! this.user.emailVerified$)
           .start('ul')
             .select(this.menuDAO.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
               this.start('li')
