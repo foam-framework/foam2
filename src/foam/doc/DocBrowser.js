@@ -466,11 +466,10 @@ foam.CLASS({
       name: 'conventionalUML',
       value: true
     },
-	  {
-	  class: 'Boolean',
-          name: 'showOnlyProperties',
-          value: true
-
+    {
+      class: 'Boolean',
+      name: 'showOnlyProperties',
+      value: true
     }
   ],
 
