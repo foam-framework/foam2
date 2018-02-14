@@ -48,7 +48,7 @@ daoSub = try? newValue!.listen(FnSink_create([
   "fn": { [weak self] str, obj, sub in
     if self == nil { return }
     if str == "add" {
-      if let index = findIndex(obj!) {
+      if let index = findIndex(obj as! FObject) {
         self?.daoContents[index] = obj
         self?.tableView?.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
       } else {
@@ -56,14 +56,14 @@ daoSub = try? newValue!.listen(FnSink_create([
         self?.tableView?.insertRows(at: [IndexPath(row: self!.daoContents.count - 1, section: 0)], with: .automatic)
       }
     } else if str == "remove" {
-      if let index = findIndex(obj!) {
+      if let index = findIndex(obj as! FObject) {
         self?.daoContents.remove(at: index)
         self?.tableView?.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
       }
     } else {
       self?.onDAOUpdate()
     }
-  } as (String, FObject?, Detachable) -> Void,
+  } as (String, Any?, Detachable) -> Void,
 ]), nil)
 
 onDetach(daoSub)
