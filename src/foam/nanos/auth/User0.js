@@ -86,14 +86,14 @@ emailIsSet_ = true;`
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
       factory: function() { return this.Phone.create(); },
-      view: { class: 'foam.nanos.auth.PhoneDetailView' }
+      view: 'foam.nanos.auth.PhoneDetailView'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
       factory: function() { return this.Phone.create(); },
-      view: { class: 'foam.nanos.auth.PhoneDetailView' }
+      view: 'foam.nanos.auth.PhoneDetailView'
     },
     {
       class: 'String',
@@ -102,8 +102,6 @@ emailIsSet_ = true;`
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
-
-        // TODO: remove after demo
       }
     },
     {
@@ -111,16 +109,18 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'foam.nanos.fs.FileProperty',
+      class: 'Blob',
       name: 'profilePicture',
-      view: { class: 'foam.nanos.auth.ProfilePictureView' }
+      tableCellFormatter: function (value) {
+        this.tag({ class: 'foam.u2.view.ImageBlobView' });
+      }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
       factory: function() { return this.Address.create(); },
-      view: { class: 'foam.nanos.auth.AddressDetailView' }
+      view: 'foam.nanos.auth.AddressDetailView'
     },
     {
       class: 'FObjectArray',
@@ -190,95 +190,16 @@ emailIsSet_ = true;`
       documentation: 'Bank Identification Code (BIC)'
     },
     {
-      class: 'Boolean',
-      name: 'businessHoursEnabled',
-      value: false
-    },
-    {
       class: 'URL',
       name: 'website',
       displayWidth: 80,
       width: 2048
-    },
-
-    /*Interac*/
-    {
-      class: 'String',
-      name: 'requestId'
-    },
-    {
-      class: 'String',
-      name: 'responseId'
-    },
-    {
-      class: 'String',
-      name: 'channelId',
-      value: 'NPAY'
-    },
-    {
-      class: 'Boolean',
-      name: 'isDisabled',
-      value: false
-    },
-    {
-      class: 'String',
-      name: 'BICFI'
-    },
-    {
-      class: 'String',
-      name: 'branchIdentification'
-    },
-    {
-      class: 'String',
-      name: 'memberIdentification'
-    },
-    {
-      class: 'String',
-      name: 'memberCode'
-    },
-    {
-      class: 'String',
-      name: 'uniqueUserId'
-    },
-    {
-      class: 'String',
-      name: 'refereceNumber'
-    },
-    {
-      class: 'String',
-      name: 'LinkedReferenceNumber'
     }
   ],
 
   methods: [
     function label() {
-      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+      return this.organization || ( this.firstName + ' ' + this.lastName );
     }
   ]
-});
-
-
-foam.RELATIONSHIP({
-  cardinality: '1:*',
-  sourceModel: 'foam.nanos.auth.Group',
-  targetModel: 'foam.nanos.auth.User',
-  forwardName: 'users',
-  inverseName: 'group',
-  sourceProperty: {
-    hidden: true
-  },
-  targetProperty: {
-    hidden: false
-  }
-});
-
-foam.RELATIONSHIP({
-  sourceModel: 'foam.nanos.auth.User',
-  targetModel: 'foam.nanos.fs.File',
-  forwardName: 'files',
-  inverseName: 'owner',
-  sourceProperty: {
-    hidden: true,
-    transient: true
-  }
 });
