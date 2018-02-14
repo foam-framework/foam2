@@ -94,6 +94,10 @@ public abstract class AbstractJDAO
             }
             break;
         }
+
+        if ( object == null ) {
+          System.err.println(getParsingErrorMessage(line) + ", source: " + line);
+        }
       } catch (Throwable t) {
         System.err.println("Error reading journal line: " + line);
         t.printStackTrace();
