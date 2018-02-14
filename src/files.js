@@ -446,6 +446,7 @@ FOAM_FILES([
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/DatastoreDAO", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/BatchMutationDatastoreDAO", flags: ['gcloud'] },
+  { name: "com/google/cloud/firebase/FirestoreDAO", flags: ['firebase'] },
   { name: "foam/net/node/EntityEncoding", flags: ['node'] },
   { name: "foam/net/node/Route", flags: ['node'] },
   { name: "foam/net/node/PathnamePrefixRoute", flags: ['node'] },
