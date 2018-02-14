@@ -508,6 +508,9 @@ foam.CLASS({
           var fetchBatch = function() {
             self.dao.skip(skip).limit(limit).
               select().then(function(sink) {
+                while ( ! sink.array ) {
+                  sink = sink.delegate;
+                }
                 var array = sink.array;
                 var daoStart = self.anchorDAOIdx_;
                 var daoEnd = Math.min(self.count_,
