@@ -27,11 +27,12 @@ foam.CLASS({
     {
       name: 'promise',
       factory: function() {
+        var self = this;
         return new Promise(function(resolve, reject) {
           this.firebase.auth().onAuthStateChanged(function(user) {
-            if ( user ) resolve(this.delegate);
+            if ( user ) resolve(self.delegate);
           });
-        }.bind(this));
+        });
       }
     }
   ]
