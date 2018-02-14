@@ -156,8 +156,13 @@ foam.CLASS({
     function listen_(x, sink, predicate) {
       // TODO(markdittmer): Implement Firestore query decoration for
       // predicate.
-      var unsub = this.collection.onSnapshot(function(documentSnapshot) {
-        sink && sink.put && sink.put(this.getFObject(documentSnapshot.data()));
+      var decoratedSink = this.decorateSink_(
+          sink, undefined, undefined, undefined, predicate);
+      var unsub = this.collection.onSnapshot(function(querySnapshot) {
+        var docs = querySnapshot.docs;
+        for ( var i = 0; i < docs.length; i++ ) {
+          decoratedSink.put(this.getFObject(docs[i].data()));
+        }
       }.bind(this));
       var sub = foam.core.FObject.create();
       sub.onDetach(unsub);
