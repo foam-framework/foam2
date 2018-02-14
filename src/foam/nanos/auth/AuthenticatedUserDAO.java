@@ -57,7 +57,7 @@ public class AuthenticatedUserDAO
     if ( toPut != null && toPut.getId() != user.getId() &&
         ! auth.check(x, GLOBAL_USER_UPDATE) &&
         ! auth.check(x, GLOBAL_SPID_UPDATE) &&
-        ! auth.check(x, "spid.update." + toPut.getSpid()) ) {
+        ! auth.check(x, "spid.update." + user.getSpid()) ) {
       throw new RuntimeException("Unable to update user");
     }
 
