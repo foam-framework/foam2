@@ -12,6 +12,7 @@ foam.CLASS({
   documentation: `DAO that wraps a Firestore collection. Implemented against
       Firestore 0.11.x JavaScript documentation.`,
 
+
   properties: [
     {
       name: 'firestore',
@@ -29,7 +30,9 @@ foam.CLASS({
       name: 'getFirestoreDocumentID',
       documentation: `The function usedto extract a Firestore Document ID string
       from a foam.core.FObject that is stored via this DAO.`,
-      value: function(obj) { return obj.id.toString(); }
+      value: function(obj) {
+        return obj.id.toString().replace(/[/]/g, this.slashReplacement);
+      },
     },
     {
       name: 'getFirestoreData',
@@ -42,6 +45,11 @@ foam.CLASS({
       documentation: `The function usedto extract a foam.core.FObject from
           Firestore data that is stored via this DAO.`,
       value: function(data) { return foam.json.parse(data); }
+    },
+    {
+      class: 'String',
+      name: 'slashReplacement',
+      value: String.fromCharCode(0),
     },
   ],
 
@@ -62,9 +70,15 @@ foam.CLASS({
     function select_(x, sink, skip, limit, order, predicate) {
       var collection = this.collection;
       if ( limit ) {
-        var firestoreLimit = limit + (skip || 0);
-        collection = collection.limit(firestoreLimit);
-        limit = undefined;
+        // NodeJS supports collection.offset() for skip; web does not.
+        if ( collection.offset ) {
+          collection = collection.offset(skip).limit(limit);
+          skip = limit = undefined;
+        } else {
+          var firestoreLimit = limit + (skip || 0);
+          collection = collection.limit(firestoreLimit);
+          limit = undefined;
+        }
       }
       // TODO(markdittmer): Implement Firestore query decoration for
       // order and predicate.
