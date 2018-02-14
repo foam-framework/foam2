@@ -82,8 +82,7 @@ foam.CLASS({
       var backlog = this.putBacklog_;
       for ( var i = 0; i < backlog.length; i++ ) {
         var data = backlog[i];
-        batch.set(this.getFirestoreDocumentID(data.obj),
-                  this.getFirestoreData(data.obj));
+        batch.set(this.getDoc_(data.obj), this.getFirestoreData(data.obj));
       }
 
       batch.commit().then(function(backlog) {
