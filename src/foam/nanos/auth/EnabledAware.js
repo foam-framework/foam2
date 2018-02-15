@@ -8,12 +8,23 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'EnabledAware',
 
-  properties: [
+  methods: [
     {
-      class: 'Boolean',
-      name: 'enabled',
-      value: true,
-      searchView: false
+      name: 'getEnabled',
+      returns: 'Boolean',
+      javaReturns: 'boolean',
+      swiftReturns: 'bool'
+    },
+    {
+      name: 'setEnabled',
+      args: [
+        {
+          class: 'Boolean',
+          name: 'value',
+          javaType: 'boolean',
+          swiftType: 'bool'
+        }
+      ]
     }
   ]
 });
