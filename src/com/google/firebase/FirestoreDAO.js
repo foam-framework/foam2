@@ -12,7 +12,6 @@ foam.CLASS({
   documentation: `DAO that wraps a Firestore collection. Implemented against
       Firestore 0.11.x JavaScript documentation.`,
 
-
   properties: [
     {
       name: 'firestore',
@@ -62,7 +61,7 @@ foam.CLASS({
       var resolve;
       var reject;
       var promise = new Promise(function(res, rej) {
-        reject = res;
+        resolve = res;
         reject = rej;
       });
       this.putBacklog_.push({
