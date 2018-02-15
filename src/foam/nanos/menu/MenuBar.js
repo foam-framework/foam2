@@ -13,7 +13,7 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO', 'currentMenu', 'window', 'user' ],
+  imports: [ 'menuDAO', 'currentMenu', 'window' ],
 
   documentation: 'Navigational menu bar',
 
@@ -62,9 +62,7 @@ foam.CLASS({
                     .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) }))
                     .add(menu.label)
                     .on('click', function() {
-                      if( self.user.emailVerified ) {
-                        menu.launch_(self.__context__, e);
-                      }
+                      menu.launch_(self.__context__, e);
                     }.bind(this))
                   .end();
                 })
