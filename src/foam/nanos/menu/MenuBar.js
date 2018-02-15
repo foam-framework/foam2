@@ -62,7 +62,7 @@ foam.CLASS({
                     .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) }))
                     .add(menu.label)
                     .on('click', function() {
-                      if ( self.user.emailVerified ) {
+                      if( self.user.emailVerified ) {
                         menu.launch_(self.__context__, e);
                       }
                     }.bind(this))
