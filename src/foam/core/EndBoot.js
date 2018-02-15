@@ -221,11 +221,6 @@ foam.CLASS({
   foam.USED      = {};
   foam.UNUSED    = {};
 
-  // Used to store an async. arequire() function which must be called
-  // before the class can be created. Used by FoamTagLoader, but should
-  // be extended into a more general classloader.
-  foam.AREQUIRES = {};
-
   var CLASS = foam.CLASS;
 
   foam.CLASS = function(m) {
@@ -237,15 +232,6 @@ foam.CLASS({
 
     m.id = m.package ? m.package + '.' + m.name : m.name;
     foam.UNUSED[m.id] = true;
-
-    if ( m.arequire ) {
-      foam.AREQUIRES[m.id] = m.arequire;
-
-      // arequire appears to be a property on Model, but it isn't.
-      // It should be, but Model already has a method named arequire
-      // for class-loading purposes. TODO: resolve the two features.
-      delete m['arequire'];
-    }
 
     var f = foam.Function.memoize0(function() {
       delete foam.UNUSED[m.id];

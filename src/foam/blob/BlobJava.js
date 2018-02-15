@@ -187,12 +187,13 @@ foam.CLASS({
   constants: [
     {
       name: 'BUFFER_SIZE',
-      value: 8192,
+      value: 4096,
       type: 'int'
     }
   ],
 
   properties: [
+    { class: 'String', name: 'root', javaFactory: 'return System.getProperty(\"user.dir\");'},
     { class: 'String', name: 'tmp', javaFactory: 'return getRoot() + File.separator + "tmp";' },
     { class: 'String', name: 'sha256', javaFactory: 'return getRoot() + File.separator + "sha256";' }
   ],

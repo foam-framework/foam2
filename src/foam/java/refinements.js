@@ -1,14 +1,16 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2017,2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   refines: 'foam.core.Argument',
   properties: [
     {
       class: 'String',
-      name: 'javaType'
+      name: 'javaType',
+      factory: function() { return this.of; }
     }
   ]
 });
@@ -54,6 +56,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaCloneProperty',
+      value: null
+    },
+    {
+      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -72,6 +79,7 @@ foam.CLASS({
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,
+        cloneProperty:    this.javaCloneProperty,
         jsonParser:       this.javaJSONParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
@@ -114,7 +122,7 @@ foam.CLASS({
           type: this.javaType,
           visibility: 'public',
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
-            ( this.hasOwnProperty('javaFactory') ?
+            ( this.javaFactory ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
                 ' return ' + this.javaValue  + ';\n' ) +
             '}\n' +
@@ -133,7 +141,7 @@ foam.CLASS({
           body: this.javaSetter || (privateName + ' = val;\n' + isSet + ' = true;')
         });
 
-      if ( this.hasOwnProperty('javaFactory') ) {
+      if ( this.javaFactory ) {
         cls.method({
           name: factoryName,
           visibility: 'protected',
@@ -168,7 +176,7 @@ foam.CLASS({
   ],
   methods: [
     function buildJavaClass(cls) {
-      if ( this.java ) cls.implements = (cls.implements || []).concat(this.path);
+      if ( this.java ) cls.implements = cls.implements.concat(this.path);
     }
   ]
 });
@@ -239,6 +247,25 @@ foam.LIB({
         .map(function(p) {
           return foam.java.Field.create({name: p.name, type: p.javaType});
         });
+
+
+      if ( this.hasOwnAxiom('id') ) {
+        cls.implements = cls.implements.concat('foam.core.Identifiable');
+        var getid = cls.getMethod('getId');
+        cls.method({
+          visibility: 'public',
+          type: 'Object',
+          name: 'getPrimaryKey',
+          body: 'return (Object)getId();'
+        });
+      }
+
+      cls.method({
+        name: 'hashCode',
+        type: 'int',
+        visibility: 'public',
+        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return p.name + '_'; }).join(',')});`
+      });
 
       if ( cls.name ) {
         var props = cls.allProperties;
@@ -850,13 +877,6 @@ foam.CLASS({
 
 
 foam.CLASS({
-  // Maps JS Property to Java Equivalent PropertyInfo for Java Relationships
-  refines: 'foam.core.Property',
-  javaType: 'foam.core.PropertyInfo'
-});
-
-
-foam.CLASS({
   refines: 'foam.core.String',
 
   properties: [
@@ -1208,7 +1228,6 @@ foam.CLASS({
 
   methods: [
     function buildJavaClass(cls) {
-      this.SUPER(cls);
       var info = cls.getField('classInfo_');
       if ( info ) info.addAxiom(cls.name + '.' + this.javaInfoName);
 
@@ -1220,98 +1239,65 @@ foam.CLASS({
         initializer: `
 new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constantize(this.property)});
         `,
+        order: 1,
       });
     }
   ]
 });
 
+foam.CLASS({
+  refines: 'foam.core.IDAlias',
+  properties: [
+    {
+      name: 'javaGetter',
+      factory: function() {
+        return `return get${foam.String.capitalize(this.propName)}();`;
+      }
+    },
+    {
+      name: 'javaSetter',
+      factory: function() {
+        return `set${foam.String.capitalize(this.targetProperty.name)}((${this.targetProperty.javaType})val);`;
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   refines: 'foam.core.MultiPartID',
 
   properties: [
-    {
-      name: 'javaType',
-      expression: function(props) {
-        return props.length === 1 ? 'Object' : 'foam.core.CompoundKey';
-      }
-    },
+    // No point parsing it, multi part id is always transient.
     [ 'javaJSONParser', 'new foam.lib.parse.Fail()' ],
-    [ 'javaInfoType',   'foam.core.AbstractMultiPartIDPropertyInfo' ]
-  ],
-
-  methods: [
-    function createJavaPropertyInfo_(cls) {
-      var info = this.SUPER(cls);
-
-      var body = `return new foam.core.PropertyInfo[] {
+    {
+      name: 'javaGetter',
+      factory: function() {
+        var str = `return new ${this.of.id}.Builder(getX()).
 `;
+        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+          var name = foam.String.capitalize(this.propNames[i]);
 
-      for ( var i = 0 ; i < this.props.length ; i++ ) {
-        body += `  ${cls.name}.${foam.String.constantize(this.props[i].name)}`
-        if ( i != this.props.length - 1 ) body += ',';
-        body += '\n';
+          str += `  set${name}(get${name}()).
+`;
+        }
+
+        return str += '  build();';
       }
-
-      body += '};';
-
-      info.method({
-        name: 'getProperties',
-        visibility: 'protected',
-        type: 'foam.core.PropertyInfo[]',
-        body: body,
-      });
-
-      // TODO: What is the correct behaviour here?  If none of the
-      // parts are set we could return false, and if all are set
-      // return true, but what about when only some of the parts are
-      // set?  Is this ever a situation that we have to care about?
-      info.getMethod('isSet').body = `return true;`
-
-      return info;
     },
-    function buildJavaClass(cls) {
-      // Don't delegate to SUPER() here.  A MultiPartID is really just
-      // an alias for one or more other properties, no need for all the
-      // extra baggage that comes with a full property.
-      var privateName = this.name + '_';
-      var capitalized = foam.String.capitalize(this.name);
-      var constantize = foam.String.constantize(this.name);
+    {
+      name: 'javaSetter',
+      factory: function() {
+        var str = '';
 
-      var props = this.props;
+        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+          var name = foam.String.capitalize(this.propNames[i]);
 
-      cls.field({
-        name: constantize,
-        visibility: 'public',
-        static: true,
-        type: 'foam.core.PropertyInfo',
-        initializer: this.createJavaPropertyInfo_(cls)
-      });
+          str += `set${name}(val.get${name}());
+`;
+        }
 
-      cls.
-        method({
-          name: 'get' + capitalized,
-          type: this.javaType,
-          visibility: 'public',
-          body: foam.java.MultiPartGetter.create({
-            props: props,
-            clsName: cls.name
-          })
-        }).
-        method({
-          name: 'set' + capitalized,
-          type: 'void',
-          args: [
-            { type: this.javaType, name: 'val' }
-          ],
-          body: foam.java.MultiPartSetter.create({
-            props: props,
-            clsName: cls.name
-          })
-        });
-
-      var info = cls.getField('classInfo_');
-      if ( info ) info.addAxiom(cls.name + '.' + constantize);
+        return str;
+      }
     }
   ]
 });
@@ -1429,5 +1415,12 @@ foam.CLASS({
         return this.lookup(javaPath).model_.id;
       },
     },
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.core.Function',
+  properties: [
+    ['javaType', 'java.util.function.Function']
   ]
 });

@@ -6,10 +6,13 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hashable;
+import foam.crypto.sign.Signable;
+
 import java.util.Map;
 
 public interface FObject
-  extends ContextAware, Comparable
+    extends ContextAware, Comparable, Hashable, Signable
 {
   ClassInfo getClassInfo();
   FObject fclone();
