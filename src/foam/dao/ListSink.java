@@ -18,7 +18,8 @@ public class ListSink
     return data_;
   }
 
-  public void put(foam.core.FObject obj, foam.core.Detachable sub) {
+  @Override
+  public void put(Object obj, foam.core.Detachable sub) {
     getData().add(obj);
   }
 
