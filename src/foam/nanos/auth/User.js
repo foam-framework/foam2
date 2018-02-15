@@ -95,6 +95,8 @@ emailIsSet_ = true;`
       view: {
         class: 'foam.u2.view.ChoiceView',
         choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
+
+        // TODO: remove after demo
       }
     },
     {
@@ -190,6 +192,54 @@ emailIsSet_ = true;`
       name: 'website',
       displayWidth: 80,
       width: 2048
+    },
+
+    /*Interac*/
+    {
+      class: 'String',
+      name: 'requestId'
+    },
+    {
+      class: 'String',
+      name: 'responseId'
+    },
+    {
+      class: 'String',
+      name: 'channelId',
+      value: 'NPAY'
+    },
+    {
+      class: 'Boolean',
+      name: 'isDisabled',
+      value: false
+    },
+    {
+      class: 'String',
+      name: 'BICFI'
+    },
+    {
+      class: 'String',
+      name: 'branchIdentification'
+    },
+    {
+      class: 'String',
+      name: 'memberIdentification'
+    },
+    {
+      class: 'String',
+      name: 'memberCode'
+    },
+    {
+      class: 'String',
+      name: 'uniqueUserId'
+    },
+    {
+      class: 'String',
+      name: 'refereceNumber'
+    },
+    {
+      class: 'String',
+      name: 'LinkedReferenceNumber'
     }
   ],
 
