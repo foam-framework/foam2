@@ -22,7 +22,7 @@ public class RemoveSink
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
-    dao_.remove_(x_, obj);
+  public void put(Object obj, Detachable sub) {
+    dao_.remove_(x_, (FObject)obj);
   }
 }

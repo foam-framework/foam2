@@ -111,7 +111,7 @@ foam.CLASS({
     {
       name: 'dao',
        view: { class: 'foam.u2.TableView', of: com.google.foam.demos.grid.Resource }
-//       view: { class: 'foam.u2.DAOList', of: com.google.foam.demos.grid.Resource, rowView: 'com.google.foam.demos.grid.ResourceView' }
+//       view: { class: 'foam.u2.DAOList', of: com.google.foam.demos.grid.Resource, rowView: { class: 'com.google.foam.demos.grid.ResourceView' } }
     },
     {
       name: 'person',

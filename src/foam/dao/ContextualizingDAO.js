@@ -30,13 +30,18 @@ foam.CLASS({
 
   methods: [
     /** Found objects are cloned into the same context as this DAO */
-    function find_(x, id) {
-      var self = this;
-      return self.delegate.find_(x, id).then(function(obj) {
-        if ( obj ) return obj.clone(self);
-        return null;
-      });
+    {
+      name: 'find_',
+      code: function(x, id) {
+        var self = this;
+        return self.delegate.find_(x, id).then(function(obj) {
+          if ( obj ) return obj.clone(self);
+          return null;
+        });
+      },
+      javaCode: `foam.core.FObject ret = super.find_(x, id);
+if ( ret != null ) ret.setX(x);
+return ret;`
     }
-    // TODO: select() too?
   ]
 });
