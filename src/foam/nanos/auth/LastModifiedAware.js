@@ -8,11 +8,23 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'LastModifiedAware',
 
-  properties: [
+  methods: [
     {
-      class: 'Date',
-      name: 'lastModified',
-      factory: function() { new Date(); }
+      name: 'getLastModified',
+      returns: 'Date',
+      javaReturns: 'java.util.Date',
+      swiftReturns: 'Date'
+    },
+    {
+      name: 'setLastModified',
+      args: [
+        {
+          class: 'Date',
+          name: 'value',
+          javaType: 'java.util.Date',
+          swiftType: 'Date'
+        }
+      ]
     }
   ]
 });
