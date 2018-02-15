@@ -4,7 +4,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'EnabledAware',
 
@@ -17,5 +17,3 @@ foam.CLASS({
     }
   ]
 });
-
-// TODO: create an EnabledAwareDAO
