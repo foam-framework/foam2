@@ -25,6 +25,10 @@ foam.CLASS({
       documentation: 'Unique name of the Group.'
     },
     {
+      class: 'Boolean',
+      name: 'enabled'
+    },
+    {
       class: 'String',
       name: 'description',
       documentation: 'Description of the Group.'
