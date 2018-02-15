@@ -13,7 +13,7 @@ foam.INTERFACE({
       name: 'getEnabled',
       returns: 'Boolean',
       javaReturns: 'boolean',
-      swiftReturns: 'bool'
+      swiftReturns: 'Bool'
     },
     {
       name: 'setEnabled',
@@ -22,7 +22,7 @@ foam.INTERFACE({
           class: 'Boolean',
           name: 'value',
           javaType: 'boolean',
-          swiftType: 'bool'
+          swiftType: 'Bool'
         }
       ]
     }
