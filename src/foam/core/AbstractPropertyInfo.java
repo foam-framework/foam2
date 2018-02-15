@@ -55,7 +55,7 @@ public abstract class AbstractPropertyInfo
   public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
-  public Object f(FObject o) {
+  public Object f(Object o) {
     return get(o);
   }
 

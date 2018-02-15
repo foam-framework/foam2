@@ -4,18 +4,27 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
+foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'EnabledAware',
 
-  properties: [
+  methods: [
     {
-      class: 'Boolean',
-      name: 'enabled',
-      value: true,
-      searchView: false
+      name: 'getEnabled',
+      returns: 'Boolean',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool'
+    },
+    {
+      name: 'setEnabled',
+      args: [
+        {
+          class: 'Boolean',
+          name: 'value',
+          javaType: 'boolean',
+          swiftType: 'Bool'
+        }
+      ]
     }
   ]
 });
-
-// TODO: create an EnabledAwareDAO

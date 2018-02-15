@@ -13,7 +13,7 @@ import java.util.Date;
 
 public interface EnabledAware {
   public final static Predicate ENABLED = new Predicate() {
-    public boolean f(foam.core.FObject obj) { return true; }
+    public boolean f(Object obj) { return true; }
     public String createStatement() { return "enabled = 't'"; }
     public void prepareStatement(IndexedPreparedStatement stmt) { }
     public foam.mlang.predicate.Predicate partialEval() { return this; }

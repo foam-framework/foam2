@@ -32,7 +32,7 @@ foam.CLASS({
   properties: [
     {
       class: 'FObjectProperty',
-      of: 'foam.dao.ManyToManyRelationship',
+      of: 'foam.dao.ManyToManyRelationshipImpl',
       name: 'relationship'
     }
   ],
@@ -61,7 +61,13 @@ foam.CLASS({
               predicate || self.TRUE,
               self.IN(self.of.ID, map.delegate.array)));
           });
-      }
+      },
+      javaCode: `foam.mlang.sink.Map junction = (foam.mlang.sink.Map)getRelationship().getJunctionDAO().where(
+    foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId())).
+  select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ListSink()));
+
+  return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ListSink)(junction.getDelegate())).getData().toArray())).select_(
+    x, sink, skip, limit, order, predicate);`
     }
   ]
 });
