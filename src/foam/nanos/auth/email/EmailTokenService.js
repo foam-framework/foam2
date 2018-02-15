@@ -53,12 +53,12 @@ if (user.getType().equals("Personal")){
     args.put("playlink", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=https://play.google.com/store?hl=en");
   }
   args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=null" );
-  user.setPortalAdminCreated(false);
-  user.setInitialEmailedAmount("$0.00");
-  userDAO.put(user);
 }
-
-email.sendEmailFromTemplate(user, message, "welcome-email", args);
+email.sendEmailFromTemplate(user, message, (user.getWelcomeEmailSent())?"verifyEmail":"welcome-email", args);
+user.setPortalAdminCreated(false);
+user.setInitialEmailedAmount("$0.00");
+user.setWelcomeEmailSent(true);
+userDAO.put(user);
 return true;
 } catch(Throwable t) {
   t.printStackTrace();
