@@ -54,7 +54,8 @@ if (user.getType().equals("Personal")){
   }
   args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=null" );
 }
-email.sendEmailFromTemplate(user, message, (user.getWelcomeEmailSent())?"verifyEmail":"welcome-email", args);
+String template = (user.getWelcomeEmailSent())? "verifyEmail"; : "welcome-email";
+email.sendEmailFromTemplate(user, message, template, args);
 user.setPortalAdminCreated(false);
 user.setInitialEmailedAmount("$0.00");
 user.setWelcomeEmailSent(true);
