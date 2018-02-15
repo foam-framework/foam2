@@ -204,11 +204,11 @@ public class Outputter
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
+  public void put(Object obj, Detachable sub) {
     if ( outputHeaders_ && ! isHeadersOutput_ ) {
-      outputHeaders(obj);
+      outputHeaders((FObject)obj);
       isHeadersOutput_ = true;
     }
-    outputFObject(obj);
+    outputFObject((FObject)obj);
   }
 }

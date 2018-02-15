@@ -305,19 +305,23 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'junction'
+      name: 'junction',
+      hidden: true
     },
     {
       class: 'Object',
-      name: 'sourceId'
+      name: 'sourceId',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'targetDAOKey'
+      name: 'targetDAOKey',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'junctionDAOKey'
+      name: 'junctionDAOKey',
+      hidden: true
     },
     {
       class: 'Object',
@@ -334,6 +338,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
+      label: '',
       factory: function() {
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
@@ -352,6 +357,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'junctionDAO',
+      hidden: true,
       factory: function() {
         return this.__context__[this.junctionDAOKey];
       },
@@ -400,6 +406,54 @@ return junction;
       returns: 'foam.dao.DAO',
       javaCode: 'return getDao();',
       code: function getDAO() { return this.dao; }
+    }
+  ],
+  actions: [
+    {
+      name: 'addItem',
+      label: 'Add',
+      code: function(x) {
+        var self = this;
+        var dao = x[self.targetDAOKey];
+
+        var controller = foam.comics.DAOController.create({
+          createEnabled: false,
+          editEnabled: false,
+          selectEnabled: true,
+          addEnabled: false,
+          relationship: this,
+          data: dao
+        }, x);
+
+        controller.sub('select', function(s, _, id) {
+          dao.find(id).then(function(obj) { self.add(obj); });
+        });
+
+        x.stack.push({ class: 'foam.comics.DAOControllerView', data: controller });
+      }
+    },
+    {
+      name: 'removeItem',
+      label: 'Remove',
+      code: function(x) {
+        var self = this;
+        var dao = self.dao;
+
+        var controller = foam.comics.DAOController.create({
+          createEnabled: false,
+          editEnabled: false,
+          selectEnabled: true,
+          addEnabled: false,
+          relationship: this,
+          data: dao
+        }, x);
+
+        controller.sub('select', function(s, _, id) {
+          dao.find(id).then(function(obj) { self.remove(obj); });
+        });
+
+        x.stack.push({ class: 'foam.comics.DAOControllerView', data: controller });
+      }
     }
   ]
 });
@@ -468,6 +522,7 @@ foam.CLASS({
     ['tableCellFormatter', null],
     ['cloneProperty', function(value, map) {}],
     ['javaCloneProperty', '//noop'],
+    ['view', { class: 'foam.u2.DetailView', showActions: true } ],
     {
       class: 'Class',
       name: 'junction'

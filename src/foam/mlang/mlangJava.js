@@ -13,7 +13,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'Object'
@@ -66,7 +66,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'boolean'
@@ -127,7 +127,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaCode: 'return false;',
@@ -408,11 +408,11 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
-      javaReturns: 'foam.core.FObject',
-      javaCode: `return (foam.core.FObject) getArg1().f(obj);`
+      javaReturns: 'Object',
+      javaCode: `return getArg1().f(obj);`
     },
     {
       name: 'put',
@@ -420,7 +420,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -955,7 +955,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -978,7 +978,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1003,7 +1003,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1030,7 +1030,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1125,7 +1125,7 @@ if ( ! ( getArg1().f(obj) instanceof String) )
   return false;
 
 String arg1 = ((String) getArg1().f(obj)).toUpperCase();
-List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+List props = ((foam.core.FObject)obj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
 Iterator i = props.iterator();
 while ( i.hasNext() ) {
   PropertyInfo prop = (PropertyInfo) i.next();
@@ -1165,7 +1165,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1197,13 +1197,13 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaCode:
 `foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
  if ( group == null ) {
-   group = (foam.dao.Sink) ((foam.core.FObject) getArg2()).fclone();
+   group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
    getGroupKeys().add(key);
  }
