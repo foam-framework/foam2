@@ -50,7 +50,7 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start().enableClass('hide', ! this.user.emailVerified$)
+        .start()
           .start('ul')
             .select(this.menuDAO.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
               this.start('li')
@@ -62,7 +62,9 @@ foam.CLASS({
                     .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) }))
                     .add(menu.label)
                     .on('click', function() {
-                      menu.launch_(self.__context__, e);
+                      if ( self.user.emailVerified ) {
+                        menu.launch_(self.__context__, e);
+                      }
                     }.bind(this))
                   .end();
                 })
