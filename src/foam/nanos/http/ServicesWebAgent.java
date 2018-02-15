@@ -24,7 +24,8 @@ public class ServicesWebAgent
 
     out.println("<pre>");
     dao.orderBy(NSpec.NAME).select(new AbstractSink() {
-      public void put(FObject o, Detachable d) {
+      @Override
+      public void put(Object o, Detachable d) {
         NSpec s = (NSpec) o;
         out.println(s.getName() + (s.getServe() ? " (S)" : ""));
         if ( s.getServe() ) count[1]++;
