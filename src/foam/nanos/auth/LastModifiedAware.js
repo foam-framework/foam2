@@ -4,17 +4,15 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- foam.CLASS({
-   package: 'foam.nanos.auth',
-   name: 'LastModifiedAware',
+foam.INTERFACE({
+  package: 'foam.nanos.auth',
+  name: 'LastModifiedAware',
 
-   properties: [
-     {
-       class: 'DateTime',
-       name: 'lastModified',
-       factory: function() { new Date(); }
-     }
-   ]
- });
-
- // TODO: create a LastModifiedAwareDAO
+  properties: [
+    {
+      class: 'Date',
+      name: 'lastModified',
+      factory: function() { new Date(); }
+    }
+  ]
+});
