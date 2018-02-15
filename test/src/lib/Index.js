@@ -860,12 +860,15 @@ describe('AutoIndex', function() {
   var fakeRoot;
 
   beforeEach(function() {
+    // The base autoindex definition. ID is the INT property
     idx = foam.dao.index.AutoIndex.create({
       idIndex: test.Indexable.ID.toIndex(foam.dao.index.ValueIndex.create())
     });
 
+    // The instance to self-build by calling .plan(...) in each test
     idxInstance = idx.createNode();
 
+    // the ID index will start populated, and populate each newly added index
     idxInstance.bulkLoad(createData2(1000));
 
     fakeRoot = {
@@ -899,9 +902,8 @@ describe('AutoIndex', function() {
       .plan(sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined, fakeRoot)
       .execute([], sink, undefined, undefined, m.DESC(test.Indexable.INT), undefined);
 
-    expect(idxInstance.delegate.delegates.length).toEqual(3);
+    expect(idxInstance.delegate.delegates.length).toEqual(2);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
-    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
 
   });
 
@@ -943,18 +945,26 @@ describe('AutoIndex', function() {
       )
     );
 
+    // Note: changes to the order of predicates produced by this function may
+    // require the test to be revised.
     pred = pred.toDisjunctiveNormalForm();
 
-    // the results end up small enough that the first index is good enough
-    // for all subpred cases
+    // Expect that the index will:
+    // 0. start with an ID index covering property INT
+    // 1. add an index for FLOAT(ID:INT)
+    // 2. add an index for DATE(String(ID:INT))
+    // The standalone string predicate is satisifed by the 
+    //   DATE+STRING index, leaving three indexes at the root level
     for ( var i = 0; i < pred.args.length; i++ ) {
       var subpred = pred.args[i];
-      idxInstance
+      var plan = idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-        .execute([], sink, undefined, undefined, undefined, subpred);
+      plan.execute([], sink, undefined, undefined, undefined, subpred);
     }
-    expect(idxInstance.delegate.delegates.length).toEqual(2);
+
+    expect(idxInstance.delegate.delegates.length).toEqual(3);
     expect(idxInstance.delegate.delegates[1].size()).toEqual(1000);
+    expect(idxInstance.delegate.delegates[2].size()).toEqual(1000);
   });
 
   it('dnf works with NOT', function() {
@@ -980,16 +990,15 @@ describe('AutoIndex', function() {
       m.LT(test.Indexable.DATE, 8)
     ];
 
-    // the results end up small enough that the first index is good enough
-    // for all subpred cases
+    // In this test every subpredicate should produce a new index
     for ( var i = 0; i < preds.length; i++ ) {
       var subpred = preds[i];
-      idxInstance
+      var plan = idxInstance
         .plan(sink, undefined, undefined, undefined, subpred, fakeRoot)
-        .execute([], sink, undefined, undefined, undefined, subpred);
+      plan.execute([], sink, undefined, undefined, undefined, subpred);
 
-      expect(idxInstance.delegate.delegates.length).toEqual(i+2);
-      expect(idxInstance.delegate.delegates[i+1].size()).toEqual(1000);
+      expect(idxInstance.delegate.delegates.length).toEqual(i+1);
+      expect(idxInstance.delegate.delegates[i].size()).toEqual(1000);
     }
   });
 
