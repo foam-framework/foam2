@@ -685,7 +685,7 @@ foam.CLASS({
     {
       documentation: `Keys which respond to keydown but not keypress`,
       name: 'KEYPRESS_CODES',
-      value: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
     },
 
     {

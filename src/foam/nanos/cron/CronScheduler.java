@@ -56,6 +56,7 @@ public class CronScheduler
     try {
       while ( true ) {
         Date now = new Date();
+
         cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, now)).select(new AbstractSink() {
           @Override
           public void put(Object obj, Detachable sub) {
@@ -74,7 +75,8 @@ public class CronScheduler
         Date minScheduledTime = getMinScheduledTime();
 
         if ( minScheduledTime != null ) {
-          Thread.sleep(minScheduledTime.getTime() - now.getTime());
+          // Check for new cronjobs every minute
+          Thread.sleep(1000 * 60);
         }
       }
     } catch (Throwable t) {
