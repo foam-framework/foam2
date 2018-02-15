@@ -36,7 +36,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.auth.SignInView',
-    'foam.nanos.auth.ResendVerificationEmail',
     'foam.u2.stack.Stack',
     'foam.nanos.auth.resetPassword.ResetView',
     'foam.u2.stack.StackView'
@@ -170,7 +169,7 @@ foam.CLASS({
         if ( result ) {
           self.user.copyFrom(result);
           if ( ! self.user.emailVerified ) {
-            self.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
+            self.stack.push({ class: 'net.nanopay.auth.email.ResendVerificationEmail' });
             return;
           }
           self.onUserUpdate();
