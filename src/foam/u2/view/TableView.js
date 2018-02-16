@@ -334,6 +334,12 @@ foam.CLASS({
       documentation: 'Set this to true to let the user select columns.'
     },
     {
+      class: 'Boolean',
+      name: 'editRowsEnabled',
+      value: true,
+      documentation: 'Set this to true to let the user select table row options.'
+    },
+    {
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
@@ -438,6 +444,8 @@ foam.CLASS({
                     addClass(view.myClass('noselect')).
                     tag('div', null, view.dropdownOrigin$)
                   .end();
+                } else if ( view.editRowsEnabled ) {
+                  return this.tag('th');
                 }
               })
           })).
@@ -467,7 +475,16 @@ foam.CLASS({
                       end();
                   }).
                   call(function() {
-                    if ( view.editColumnsEnabled ) return this.tag('td');
+                    if ( view.editRowsEnabled ) {
+                      this.start('td').
+                        addClass(view.myClass('th-editColumns')).
+                        add(' ', view.vertMenuIcon).
+                        addClass(view.myClass('vertDots')).
+                        addClass(view.myClass('noselect')).
+                      end();
+                    } else if ( view.editColumnsEnabled ) {
+                      return this.tag('td');
+                    }
                   })
               });
           }));
