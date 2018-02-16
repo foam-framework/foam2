@@ -22,7 +22,7 @@ public class FixedThreadPool
   protected Object          executedLock_  = new Object();
 
   class ContextAgentRunnable
-      implements Runnable
+    implements Runnable
   {
     final X            x_;
     final ContextAgent agent_;

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'SignInView',
@@ -22,7 +28,8 @@ foam.CLASS({
   requires: [
     'foam.comics.DAOCreateControllerView',
     'foam.nanos.auth.User',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.dialog.NotificationMessage',
+    'foam.nanos.auth.resetPassword.EmailView'
   ],
 
   axioms: [
@@ -35,7 +42,7 @@ foam.CLASS({
       ^ .sign-in-container{
         padding-top: 20px;
         width: 490px;
-        height: 240px;
+        height: 230px;
         border-radius: 2px;
         background-color: #ffffff;
       }
@@ -86,6 +93,12 @@ foam.CLASS({
         color: #59a5d5;
         cursor: pointer;
       }
+      ^ .forgot-link{
+        margin-left: 2px;
+        color: #59a5d5;
+        cursor: pointer;
+        float: right;
+      }
     */}
     })
   ],
@@ -98,7 +111,7 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password',
-      view: 'foam.u2.view.PasswordView'
+      view: { class: 'foam.u2.view.PasswordView' }
     }
   ],
 
@@ -110,7 +123,7 @@ foam.CLASS({
       this.addClass(this.myClass())
       .start()
         .start('h1').add("Sign In").end()
-        .start().addClass('sign-in-container')
+        .start('form').addClass('sign-in-container')
           .start().addClass('label').add("Email Address").end()
           .start(this.EMAIL).addClass('full-width-input').end()
           .start().addClass('label').add("Password").end()
@@ -125,6 +138,10 @@ foam.CLASS({
               .on('click', self.signUp)
             .end()
           })
+          .start('p').style({ 'margin-left': '150px' }).addClass('forgot-link')
+            .add("Forgot Password?")
+            .on('click', function(){ self.stack.push({ class: 'foam.nanos.auth.resetPassword.EmailView' })})
+          .end()
         .end()
       .end();
     }

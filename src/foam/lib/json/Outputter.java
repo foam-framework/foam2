@@ -6,22 +6,24 @@
 
 package foam.lib.json;
 
-import foam.core.ClassInfo;
-import foam.core.Detachable;
-import foam.core.FObject;
-import foam.core.PropertyInfo;
+import foam.core.*;
 import foam.dao.AbstractSink;
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.PrivateKey;
+import java.security.Signature;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 
 public class Outputter
-    extends AbstractSink
+  extends AbstractSink
+  implements foam.lib.Outputter
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -33,9 +35,22 @@ public class Outputter
     }
   };
 
-  protected StringWriter stringWriter_ = null;
-  protected PrintWriter writer_;
+  protected StringWriter  stringWriter_ = null;
+  protected PrintWriter   writer_;
   protected OutputterMode mode_;
+  protected boolean       outputDefaultValues_ = false;
+
+  // Hash properties
+  protected String        hashAlgo_ = "SHA-256";
+  protected boolean       outputHash_ = false;
+  protected boolean       rollHashes_ = false;
+  protected byte[]        previousHash_ = null;
+  protected final Object  hashLock_ = new Object();
+
+  // signing properties
+  protected String        signAlgo_ = null;
+  protected PrivateKey    signingKey_ = null;
+  protected boolean       outputSignature_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -84,9 +99,10 @@ public class Outputter
 
   public String escape(String s) {
     return s
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
       .replace("\t", "\\t")
-      .replace("\n","\\n")
-      .replace("\"", "\\\"");
+      .replace("\n","\\n");
   }
 
   protected void outputNumber(Number value) {
@@ -207,7 +223,6 @@ public class Outputter
     writer_.append(":");
 
     outputString(info.getId());
-
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
 
@@ -215,6 +230,7 @@ public class Outputter
       PropertyInfo prop = (PropertyInfo) i.next();
       if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
+      if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
 
       Object value = prop.get(o);
       if ( value == null ) continue;
@@ -223,7 +239,51 @@ public class Outputter
       outputProperty(o, prop);
     }
 
+    if ( outputHash_ ) {
+      writer_.append(",");
+      outputHash(o);
+    }
+
+    if ( outputSignature_ ) {
+      writer_.append(",");
+      outputSignature(o);
+    }
+
     writer_.append("}");
+  }
+
+  protected void outputHash(FObject o) {
+    String hash;
+    if ( rollHashes_ ) {
+      synchronized ( hashLock_ ) {
+        previousHash_ = o.hash(hashAlgo_, previousHash_);
+        hash = Base64.toBase64String(previousHash_);
+      }
+    } else {
+      hash = Base64.toBase64String(
+          o.hash(hashAlgo_, null));
+    }
+
+    writer_.append(beforeKey_())
+        .append("hash")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(hash)
+        .append("\"");
+  }
+
+  protected void outputSignature(FObject o) {
+    String signature = Base64.toBase64String(
+        o.sign(signAlgo_, signingKey_));
+
+    writer_.append(beforeKey_())
+        .append("signature")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(signature)
+        .append("\"");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -234,7 +294,11 @@ public class Outputter
     writer_.append(",");
     outputString("forClass_");
     writer_.append(":");
-    outputString(prop.getClassInfo().getId() + "." + prop.getName());
+    outputString(prop.getClassInfo().getId());
+    writer_.append(",");
+    outputString("name");
+    writer_.append(":");
+    outputString(prop.getName());
     writer_.append("}");
   }
 
@@ -256,11 +320,39 @@ public class Outputter
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
-    outputFObject(obj);
+  public void put(Object obj, Detachable sub) {
+    outputFObject((FObject)obj);
   }
 
   public void outputRawString(String str) {
     writer_.append(str);
+  }
+
+  public void setOutputDefaultValues(boolean outputDefaultValues) {
+    outputDefaultValues_ = outputDefaultValues;
+  }
+
+  public void setHashAlgorithm(String algorithm) {
+    hashAlgo_ = algorithm;
+  }
+
+  public void setOutputHash(boolean outputHash) {
+    outputHash_ = outputHash;
+  }
+
+  public void setRollHashes(boolean rollHashes) {
+    rollHashes_ = rollHashes;
+  }
+
+  public void setOutputSignature(boolean outputSignature) {
+    outputSignature_ = outputSignature;
+  }
+
+  public void setSigningAlgorithm(String algorithm) {
+    signAlgo_ = algorithm;
+  }
+
+  public void setSigningKey(PrivateKey signingKey) {
+    signingKey_ = signingKey;
   }
 }

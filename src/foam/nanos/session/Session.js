@@ -15,11 +15,18 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      javaFactory: 'return java.util.UUID.randomUUID().toString();',
     },
     {
       class: 'Long',
-      name: 'userId'
+      name: 'userId',
+      tableCellFormatter: function(value, obj) {
+        this.add(value);
+        this.__context__.userDAO.find(value).then(function(user) {
+          this.add(' ', user.label());
+        }.bind(this));
+      }
     },
     {
       class: 'DateTime',
@@ -47,6 +54,7 @@ foam.CLASS({
       class: 'Object',
       name: 'context',
       javaType: 'foam.core.X',
+      javaFactory: 'return foam.core.EmptyX.instance().put(Session.class, this);',
       hidden: true,
       transient: true
     }

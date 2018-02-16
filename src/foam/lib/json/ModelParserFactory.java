@@ -37,9 +37,9 @@ public class ModelParserFactory {
   public static Parser buildInstance_(ClassInfo info) {
     List     properties      = info.getAxiomsByClass(PropertyInfo.class);
     Parser[] propertyParsers = new Parser[properties.size() + 1];
+    Iterator iter            = properties.iterator();
+    int      i               = 0;
 
-    Iterator iter = properties.iterator();
-    int i = 0;
     while ( iter.hasNext() ) {
       propertyParsers[i] = new PropertyParser((PropertyInfo) iter.next());
       i++;

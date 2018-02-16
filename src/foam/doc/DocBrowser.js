@@ -214,16 +214,17 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.doc.Link',
-    'foam.doc.ClassLink',
+    'foam.dao.ArrayDAO',
     'foam.doc.AxiomInfo',
-    'foam.u2.view.TableView',
-    'foam.dao.ArrayDAO'
+    'foam.doc.ClassLink',
+    'foam.doc.Link',
+    'foam.u2.view.TableView'
   ],
 
   imports: [
     'selectedAxiom',
-    'showInherited'
+    'showInherited',
+    'showOnlyProperties'
   ],
 
   methods: [
@@ -247,22 +248,24 @@ foam.CLASS({
       this.br();
       this.start(foam.u2.HTMLElement).add(data.model_.documentation).end();
 
-      this.add(this.slot(function (showInherited) {
+      this.add( this.slot(function (showInherited, showOnlyProperties) {
         // TODO: hide 'Source Class' column if showInherited is false
         var axs = [];
         for ( var key in data.axiomMap_ ) {
           if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
             var a  = data.axiomMap_[key];
-            var ai = foam.doc.AxiomInfo.create({
-              axiom: a,
-              type: a.cls_,
-              cls: this.Link.create({
-                path: a.sourceCls_.id,
-                label: a.sourceCls_.name
-              }),
-              name: a.name
-            });
-            axs.push(ai);
+	            if ( ( ! showOnlyProperties ) || foam.core.Property.isInstance(a) ) {
+                var ai = foam.doc.AxiomInfo.create({
+                  axiom: a,
+                  type: a.cls_,
+                  cls: this.Link.create({
+                    path:  a.sourceCls_ ? a.sourceCls_.id   : '',
+                    label: a.sourceCls_ ? a.sourceCls_.name : ''
+                  }),
+                name: a.name
+              });
+              axs.push(ai);
+	          }
           }
         }
 
@@ -367,11 +370,14 @@ foam.CLASS({
     'foam.doc.UMLDiagram'
   ],
 
+  imports: [ 'document' ],
+
   exports: [
     'as data',
     'path as browserPath',
     'axiom as selectedAxiom',
-    'showInherited'
+    'showInherited',
+    'showOnlyProperties'
   ],
 
   axioms: [
@@ -396,7 +402,22 @@ foam.CLASS({
   },
 
   properties: [
-    'path',
+    {
+      class: 'String',
+      name: 'path',
+      width: 80,
+      factory: function() {
+        var path = 'foam.core.Property';
+
+        // TODO: this should be made generic and added to Window
+        this.document.location.search.substring(1).split('&').forEach(function(s) {
+          s = s.split('=');
+          if ( s[0] === 'path' ) path = s[1];
+        });
+
+        return path;
+      }
+    },
     {
       name: 'selectedClass',
       expression: function (path) {
@@ -438,7 +459,12 @@ foam.CLASS({
         return [];
       }
     },
-    'subClassCount'
+    'subClassCount',
+	{
+	  class: 'Boolean',
+          name: 'showOnlyProperties',
+          value: true
+    }
   ],
 
   methods: [
@@ -479,8 +505,9 @@ foam.CLASS({
             start('td').
               style({'vertical-align': 'top'}).
           start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
-                add(this.slot(function(selectedClass) {
-                  if ( ! selectedClass ) return '';
+	      add( 'Show just properties : ' ).tag( this.SHOW_ONLY_PROPERTIES, { data$: this.showOnlyProperties$ } ).
+              add(this.slot(function(selectedClass) {
+                if ( ! selectedClass ) return '';
                   return this.ClassDocView.create({data: selectedClass});
                 })).
               end().
@@ -1563,4 +1590,3 @@ foam.CLASS({
     }
   ]
 });
-

@@ -11,14 +11,26 @@ import foam.lib.parse.*;
 public class AnyParser
   extends ProxyParser
 {
-  public AnyParser() {
-    super(new Alt(
-        new NullParser(),
-        new StringParser(),
-        new BooleanParser(),
-        new LongParser(),
-        new DoubleParser(),
-        new PropertyReferenceParser(),
-        new FObjectParser()));
+
+  private static AnyParser instance_ = null;
+  public static AnyParser instance() {
+    if ( instance_ == null ) {
+      instance_ = new AnyParser();
+      Alt delegate = new Alt(
+          new NullParser(),
+          new StringParser(),
+          new BooleanParser(),
+          new LongParser(),
+          new DoubleParser(),
+          new StringArrayParser(),
+          new StringDoubleArrayParser(),
+          new PropertyReferenceParser(),
+          new ArrayParser(),
+          new FObjectParser(),
+          new MapParser());
+      instance_.setDelegate(delegate);
+    }
+    return instance_;
   }
+  private AnyParser() {}
 }

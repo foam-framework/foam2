@@ -18,13 +18,14 @@ public class ServicesWebAgent
   public ServicesWebAgent() {}
 
   public void execute(X x) {
-    final PrintWriter out   = (PrintWriter) x.get(PrintWriter.class);
+    final PrintWriter out   = x.get(PrintWriter.class);
           DAO         dao   = (DAO)         x.get("nSpecDAO");
     final int[]       count = { 0, 0 };
 
     out.println("<pre>");
     dao.orderBy(NSpec.NAME).select(new AbstractSink() {
-      public void put(FObject o, Detachable d) {
+      @Override
+      public void put(Object o, Detachable d) {
         NSpec s = (NSpec) o;
         out.println(s.getName() + (s.getServe() ? " (S)" : ""));
         if ( s.getServe() ) count[1]++;

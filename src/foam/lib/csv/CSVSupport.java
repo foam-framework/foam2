@@ -17,7 +17,7 @@ import foam.lib.parse.*;
 import foam.dao.Sink;
 
 
-public class CSVSupport 
+public class CSVSupport
   extends foam.core.ContextAwareSupport
 {
   protected Parser headParser = new Repeat(new CSVStringParser(), new Literal(","));
@@ -54,7 +54,7 @@ public class CSVSupport
       Parser columnParser = new Seq(propertyParsers);
       Object[] values = null;
 
-      while ( (line = reader.readLine()) != null ) {      
+      while ( (line = reader.readLine()) != null ) {
         ps = new StringPStream();
         ps.setString(line);
         x = new ParserContextImpl();
@@ -69,7 +69,7 @@ public class CSVSupport
           propertyInfos[i].set(obj, values[i]);
         }
 
-        sink.put((FObject) obj, null);
+        sink.put(obj, null);
       }
     } catch ( Throwable t ) {
       throw new RuntimeException(t);

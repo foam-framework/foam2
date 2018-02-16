@@ -121,7 +121,7 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: 'com.google.foam.demos.heroes.CitationView'
+        rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
       }
     },
     {
@@ -141,14 +141,14 @@ foam.CLASS({
       },
       view: {
         class: 'foam.u2.DAOList',
-        rowView: 'com.google.foam.demos.heroes.CitationView'
+        rowView: { class: 'com.google.foam.demos.heroes.CitationView' }
       }
     },
     {
       name: 'starredHeroDAO',
       view: {
         class: 'foam.u2.DAOList',
-        rowView: 'com.google.foam.demos.heroes.DashboardCitationView'
+        rowView: { class: 'com.google.foam.demos.heroes.DashboardCitationView' }
       },
       expression: function(filteredDAO) { return filteredDAO.where(this.EQ(this.Hero.STARRED, true)); }
     },

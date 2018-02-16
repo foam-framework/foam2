@@ -1293,9 +1293,12 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Map',
   extends: 'foam.dao.ProxySink',
-
-  implements: [
-    'foam.core.Serializable'
+  axioms: [
+    {
+      // TODO: Remove this when MAP works properly on java.  github issue #1020
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
   ],
 
   documentation: 'Sink Decorator which applies a map function to put() values before passing to delegate.',
@@ -1323,8 +1326,9 @@ foam.CLASS({
   package: 'foam.mlang.expr',
   name: 'Mul',
 
+  extends: 'foam.mlang.predicate.Binary',
+
   implements: [
-    'foam.mlang.predicate.Binary',
     'foam.core.Serializable'
   ],
 
@@ -1455,7 +1459,7 @@ foam.CLASS({
       group.put(obj);
     },
 
-    function put(sub, obj) {
+    function put(obj, sub) {
       var value = this.expr.f(obj);
       if ( Array.isArray(value) ) {
         throw 'Unique doesn\'t Array values.';
@@ -1740,7 +1744,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Double',
+      class: 'Object',
       name: 'value'
     }
   ],

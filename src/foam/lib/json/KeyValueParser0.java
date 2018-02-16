@@ -16,6 +16,6 @@ public class KeyValueParser0
                    new AnyKeyParser(),
                    new Whitespace(),
                    new Literal(":"),
-                   new AnyParser()));
+                   AnyParser.instance()));
   }
 }

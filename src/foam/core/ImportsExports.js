@@ -111,6 +111,7 @@ foam.CLASS({
       var name     = this.name;
       var key      = foam.String.toSlotName(this.key);
       var slotName = this.slotName_;
+      var required = this.required;
 
       Object.defineProperty(proto, slotName, {
         get: function importsSlotGetter() {
@@ -124,7 +125,7 @@ foam.CLASS({
         get: function importsGetter()  {
           var slot = this[slotName];
           if ( slot ) return slot.get();
-          console.warn('Access missing import:', name);
+          if ( required ) console.warn('Access missing import:', name);
           return undefined;
         },
         set: function importsSetter(v) {

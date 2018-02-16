@@ -1,4 +1,5 @@
 package foam.mlang;
-public interface Expressions{
+
+public interface Expressions {
 
 }

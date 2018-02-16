@@ -9,7 +9,12 @@ foam.CLASS({
   name: 'TabsMenu',
   extends: 'foam.nanos.menu.AbstractMenu',
 
-  requires: [ 'foam.u2.Tabs' ],
+  requires: [
+    {
+      path: 'foam.u2.Tabs',
+      javaPath: '',
+    },
+  ],
 
   methods: [
     function createView(X, menu) {

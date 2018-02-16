@@ -9,6 +9,7 @@ package foam.nanos.http;
 import foam.box.Skeleton;
 import foam.core.ContextAware;
 import foam.core.X;
+import foam.core.XFactory;
 import foam.dao.DAO;
 import foam.dao.DAOSkeleton;
 import foam.nanos.boot.NSpec;
@@ -26,16 +27,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
 public class NanoRouter
-  extends HttpServlet
-  implements NanoService, ContextAware
+    extends HttpServlet
+    implements NanoService, ContextAware
 {
   protected X x_;
 
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
 
   @Override
-  protected synchronized void service(HttpServletRequest req, HttpServletResponse resp)
-    throws ServletException, IOException
+  protected void service(final HttpServletRequest req, final HttpServletResponse resp)
+      throws ServletException, IOException
   {
     String      path       = req.getRequestURI();
     String[]    urlParams  = path.split("/");
@@ -51,8 +52,21 @@ public class NanoRouter
     try {
       if ( serv == null ) {
         System.err.println("No service found for: " + serviceKey);
+        resp.setStatus(resp.SC_NOT_FOUND);
       } else {
-        X y = getX().put(HttpServletRequest.class, req).put(HttpServletResponse.class, resp).put(PrintWriter.class, resp.getWriter());
+        X y = getX().put(HttpServletRequest.class, req)
+            .put(HttpServletResponse.class, resp)
+            .putFactory(PrintWriter.class, new XFactory() {
+              @Override
+              public Object create(X x) {
+                try {
+                  return resp.getWriter();
+                } catch (IOException e) {
+                  return null;
+                }
+              }
+            })
+            .put(NSpec.class, spec);
         serv.execute(y);
       }
     } catch (Throwable t) {
@@ -90,11 +104,15 @@ public class NanoRouter
 
         skeleton.setDelegateObject(service);
 
-        service = new ServiceWebAgent(service, skeleton, spec.getAuthenticate());
+        service = new ServiceWebAgent(skeleton, spec.getAuthenticate());
         informService(service, spec);
       } catch (IllegalAccessException | InstantiationException | ClassNotFoundException ex) {
         ex.printStackTrace();
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
+      }
+    } else {
+      if ( service instanceof WebAgent && spec.getAuthenticate() ) {
+        service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
       }
     }
 

@@ -7,6 +7,9 @@
 package foam.core;
 
 import javax.xml.stream.XMLStreamReader;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractBytePropertyInfo
   extends AbstractPropertyInfo
@@ -15,14 +18,23 @@ public abstract class AbstractBytePropertyInfo
     return java.lang.Byte.compare(b1, b2);
   }
 
-  @Override
-  public void setFromString(Object obj, String value) {
-    this.set(obj, Byte.valueOf(value));
+  public Object fromString(String value) {
+    return Byte.valueOf(value);
   }
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return Byte.valueOf(reader.getText());
+  }
+
+  @Override
+  public void updateDigest(FObject obj, MessageDigest md) {
+    md.update((byte) get(obj));
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    sig.update((byte) get(obj));
   }
 }
