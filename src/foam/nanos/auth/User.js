@@ -33,11 +33,8 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'String',
-      // class: 'SPID',
-      label: 'Service Provider',
-      name: 'spid',
-      documentation: "User's service provider."
+      class: 'Boolean',
+      name: 'enabled'
     },
     {
       class: 'DateTime',
@@ -109,11 +106,9 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'Blob',
+      class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
-      tableCellFormatter: function (value) {
-        this.tag({ class: 'foam.u2.view.ImageBlobView' });
-      }
+      view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
     {
       class: 'FObjectProperty',
@@ -199,6 +194,11 @@ emailIsSet_ = true;`
       name: 'website',
       displayWidth: 80,
       width: 2048
+    },
+    {
+      class: 'Date',
+      name: 'lastModified',
+      documentation: 'Last modified date'
     }
   ],
 
@@ -216,6 +216,31 @@ foam.RELATIONSHIP({
   targetModel: 'foam.nanos.auth.User',
   forwardName: 'users',
   inverseName: 'group',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
+  }
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.fs.File',
+  forwardName: 'files',
+  inverseName: 'owner',
+  sourceProperty: {
+    hidden: true,
+    transient: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.ServiceProvider',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'spid',
   sourceProperty: {
     hidden: true
   },

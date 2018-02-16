@@ -50,7 +50,7 @@ public class FileService
       }
 
       // check to see if current user has access to file owner
-      if ( userDAO_.find_(x, file.getOwnerId()) == null ) {
+      if ( userDAO_.find_(x, file.getOwner()) == null ) {
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;
       }

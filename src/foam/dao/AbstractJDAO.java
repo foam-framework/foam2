@@ -79,30 +79,18 @@ public abstract class AbstractJDAO
         // remove first two characters and last character
         line = line.trim().substring(2, line.trim().length() - 1);
 
+        FObject object = parser.parseString(line);
+        if ( object == null ) {
+          System.err.println(getParsingErrorMessage(line) + ", source: " + line);
+          continue;
+        }
+
         switch ( operation ) {
           case 'p':
-            FObject object = parser.parseString(line);
-            if ( object == null ) {
-              System.err.println(getParsingErrorMessage(line) + ", source: " + line);
-              break;
-            }
-
             getDelegate().put(object);
             break;
-
           case 'r':
-            Object id = parser.parseStringForId(line);
-            if ( id == null ) {
-              System.err.println(getParsingErrorMessage(line));
-              break;
-            }
-
-            FObject remove = getDelegate().find(id);
-            if ( remove == null ) {
-              break;
-            }
-
-            getDelegate().remove(remove);
+            getDelegate().remove(object);
             break;
         }
       } catch (Throwable t) {
@@ -176,15 +164,11 @@ public abstract class AbstractJDAO
     FObject ret = getDelegate().remove_(x, obj);
 
     try {
-      // TODO: User Property toJSON() support when ready, since
       writeComment((User) x.get("user"));
-      // this code doesn't support multi-part keys or escaping "'s in the id.
-      if ( id instanceof String ) {
-        out_.write("r({\"id\":\"" + id + "\"})");
-      } else {
-        out_.write("r({\"id\":" + id + "})");
-      }
-
+      // TODO: Would be more efficient to output the ID portion of the object.  But
+      // if ID is an alias or multi part id we should only output the
+      // true properties that ID/MultiPartID maps too.
+      out_.write("r(" + getOutputter().stringify(ret) + ")");
       out_.newLine();
       out_.flush();
     } catch (IOException e) {
