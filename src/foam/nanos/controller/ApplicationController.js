@@ -34,6 +34,7 @@ foam.CLASS({
   requires: [
     'foam.nanos.auth.Group',
     'foam.nanos.auth.User',
+    'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.auth.SignInView',
     'foam.u2.stack.Stack',
@@ -168,6 +169,10 @@ foam.CLASS({
         self.loginSuccess = !! result;
         if ( result ) {
           self.user.copyFrom(result);
+          if ( ! self.user.emailVerified ) {
+            self.stack.push({ class: 'foam.nanos.auth.ResendVerificationEmail' });
+            return;
+          }
           self.onUserUpdate();
         }
       })
