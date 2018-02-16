@@ -57,13 +57,9 @@ foam.CLASS({
     'placeholder'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^:read-only { border: none; background: rgba(0,0,0,0); }
-      */}
-    })
-  ],
+  css: `
+    ^:read-only { border: none; background: rgba(0,0,0,0); }
+  `,
 
   methods: [
     function initE() {

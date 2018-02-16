@@ -26,7 +26,8 @@ public class NoPlan implements FindPlan, SelectPlan
   }
 
   public void select(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    throw new UnsupportedOperationException();
+    //throw new UnsupportedOperationException();
+    return;
   }
 
 }

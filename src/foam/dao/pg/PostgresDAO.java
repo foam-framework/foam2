@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.dao.pg;
 
 import foam.core.ClassInfo;
@@ -9,14 +15,13 @@ import foam.dao.ListSink;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class PostgresDAO
-    extends AbstractDAO
+  extends AbstractDAO
 {
   protected ConnectionPool connectionPool = new ConnectionPool();
   protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
@@ -60,13 +65,11 @@ public class PostgresDAO
   }
 
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( sink == null ) {
-      sink = new ListSink();
-    }
+    sink = prepareSink(sink);
 
-    Connection c = null;
-    IndexedPreparedStatement stmt = null;
-    ResultSet resultSet = null;
+    Connection               c         = null;
+    IndexedPreparedStatement stmt      = null;
+    ResultSet                resultSet = null;
 
     try {
       c = connectionPool.getConnection();

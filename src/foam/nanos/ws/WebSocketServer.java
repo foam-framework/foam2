@@ -70,7 +70,18 @@ public class WebSocketServer
       }
 
       foam.box.RawWebSocketBox returnBox = getX().create(foam.box.RawWebSocketBox.class);
-      returnBox.setSocket(conn);
+      final WebSocket capturedConnection = conn;
+      returnBox.setSocket(new foam.net.WebSocket() {
+            @Override
+            public void send(String message) throws java.io.IOException {
+              try {
+                capturedConnection.send(message);
+              } catch (org.java_websocket.exceptions.WebsocketNotConnectedException e) {
+                e.printStackTrace();
+                throw new java.io.IOException(e);
+              }
+            }
+        });
 
       X requestContext = getX().put("returnBox", returnBox);
 
@@ -86,7 +97,10 @@ public class WebSocketServer
         return;
       }
 
-      getRouter().service(serviceKey, (foam.box.Message) request);
+      foam.box.Message obj = (foam.box.Message)request;
+      obj.getLocalAttributes().put("x", requestContext);
+
+      getRouter().service(serviceKey, obj);
     } catch(java.lang.Exception e) {
       log.error("Error handling websocket request", e, message);
     }

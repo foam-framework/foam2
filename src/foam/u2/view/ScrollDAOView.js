@@ -256,7 +256,10 @@ foam.CLASS({
           bindings so that the only DOM operation is the row completely
           replacing its contents.`,
 
-      imports: [ 'rowFormatter' ],
+      imports: [
+        'columns?',
+        'rowFormatter'
+      ],
 
       axioms: [
         foam.u2.CSS.create({
@@ -268,9 +271,6 @@ foam.CLASS({
               padding: 5px;
               box-sizing: border-box;
             }
-            ^ * {
-              background-color: #dddddd;
-            }
         */}
         })
       ],
@@ -281,23 +281,27 @@ foam.CLASS({
           name: 'data',
           postSet: function(old, nu) {
             if ( this.state !== this.LOADED ) return;
-            this.el().innerHTML = this.rowFormatter.format(nu);
+            const htmlStr = this.rowFormatter.format(
+              nu, this.columns);
+            this.el().innerHTML = htmlStr;
           }
         }
       ],
 
       methods: [
         function init() {
-          this.onload.sub(this.renderOnLoad);
+          this.onload.sub(this.render);
         },
         function initE() {
           this.addClass(this.myClass());
+          this.columns$ && this.columns$.sub(this.render);
         }
       ],
 
       listeners: [
-        function renderOnLoad() {
-          this.el().innerHTML = this.rowFormatter.format(this.data);
+        function render() {
+          this.el().innerHTML = this.rowFormatter.format(this.data,
+                                                         this.columns);
         }
       ]
     },
@@ -630,10 +634,6 @@ foam.CLASS({
           var newCount = self.count_ = count.value;
           var endIdx = self.anchorDAOIdx_ + self.numRows;
 
-          // If the current window isn't affected by count change, nothing else
-          // to be done.
-          if ( endIdx < Math.min(oldCount, newCount) ) return;
-
           // Choose a reasonable anchor for new count.
           var anchorDAOIdx = Math.min(
             self.anchorDAOIdx_,
@@ -668,7 +668,7 @@ foam.CLASS({
           return;
         }
 
-        var top = domEvt.srcElement.scrollTop;
+        var top = domEvt.target.scrollTop;
         var recordTop = Math.floor(top / this.rowHeight);
 
         // Situate anchor with 40% of rows scrolled above. This makes any lag

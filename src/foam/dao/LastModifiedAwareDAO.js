@@ -11,13 +11,22 @@ foam.CLASS({
 
   documentation: 'Sets lastModified timestamp on put() of LastModifiedAware objects.',
 
+  javaImports: [
+    'foam.nanos.auth.LastModifiedAware',
+    'java.util.Calendar',
+    'java.util.TimeZone'
+  ],
+
   methods: [
     {
       name: 'put_',
       code: function(value) {
         value.lastModified = new Date();
         return SUPER(value);
-      }
+      },
+      javaCode:
+`((LastModifiedAware) obj).setLastModified(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
+return super.put_(x, obj);`
     }
   ]
 });

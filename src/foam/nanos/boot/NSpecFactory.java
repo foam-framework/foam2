@@ -26,14 +26,11 @@ public class NSpecFactory
     try {
       ns = spec_.createService(x_.getX());
 
-      if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_);
+      if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_.getX());
       if ( ns instanceof NanoService  ) ((NanoService)  ns).start();
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    } catch (Throwable t) {
+      // TODO: LOG
+      t.printStackTrace();
     }
 
     return ns;

@@ -17,8 +17,11 @@
 
 package foam.core;
 
+import java.util.Map;
+
 public interface X
 {
+  public <T> T get(Class<T> key);
   public Object get(Object key);
   public Object get(X x, Object key);
   public int getInt(Object key);
@@ -30,4 +33,5 @@ public interface X
   // Facet Manager
   public Object getInstanceOf(Object value, Class type);
   public <T> T create(Class<T> type);
+  public <T> T create(Class<T> type, Map<String, Object> args);
 }

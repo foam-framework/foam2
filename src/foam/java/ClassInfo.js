@@ -28,18 +28,18 @@ foam.CLASS({
       name: 'id'
     },
     {
-      name: 'properties',
+      name: 'axioms',
       factory: function() { return []; }
     },
     {
       name: 'order',
-      value: 1
+      value: 2
     }
   ],
 
   methods: [
-    function addProperty(id) {
-      this.properties.push(id);
+    function addAxiom(id) {
+      this.axioms.push(id);
     },
 
     function outputJava(o) {
@@ -49,10 +49,10 @@ foam.CLASS({
       o.indent();
       o.out('.setId("', this.id, '")');
       o.out('.setObjClass(', this.id, '.class)');
-      for ( var i = 0 ; i < this.properties.length ; i++ ) {
+      for ( var i = 0 ; i < this.axioms.length ; i++ ) {
         o.out('\n');
         o.indent();
-        o.out('.addProperty(', this.properties[i], ')');
+        o.out('.addAxiom(', this.axioms[i], ')');
       }
       o.decreaseIndent()
       o.out(';');

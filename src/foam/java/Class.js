@@ -25,9 +25,18 @@ foam.CLASS({
   ],
 
   properties: [
-    'name',
-    'package',
-    'implements',
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'package'
+    },
+    {
+      class: 'Array',
+      name: 'implements'
+    },
     {
       class: 'String',
       name: 'visibility',
@@ -182,38 +191,6 @@ foam.CLASS({
       this.fields.sort(function(o1, o2) {
         return o2.order < o1.order
       }).forEach(function(f) { o.out(f, '\n'); });
-
-      if ( this.name && ! this.isEnum ) {
-        var props = this.allProperties;
-
-        // No-arg constructor
-        this.method(this.Method.create({
-          visibility: 'public',
-          name: this.name,
-          type: '',
-          body: ''
-        }));
-
-        if ( props.length ) {
-          // All-property constructor
-          this.method(this.Method.create({
-            visibility: 'public',
-            name: this.name,
-            type: '',
-            args: props.map(function(f) { return self.Argument.create({name: f.name, type: f.type}); }),
-            body: props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; }).join(';\n') + ';'
-          }));
-
-          // Context oriented all-property constructor
-          this.method(this.Method.create({
-            visibility: 'public',
-            name: this.name,
-            type: '',
-            args: [self.Argument.create({name: 'x', type: 'foam.core.X' })].concat(props.map(function(f) { return self.Argument.create({name: f.name, type: f.type}); })),
-            body: ['setX(x);'].concat(props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; })).join(';\n') + ';'
-          }));
-        }
-      }
 
       this.methods.forEach(function(f) { o.out(f, '\n'); });
       this.classes.forEach(function(c) { o.out(c, '\n'); });

@@ -6,7 +6,8 @@ public class UnreliableDAO
   private double errorRate_ = 0.5;
 
   public UnreliableDAO(DAO delegate) {
-    super(delegate);
+    super();
+    setDelegate(delegate);
   }
 
   public UnreliableDAO(double errorRate, DAO delegate) {

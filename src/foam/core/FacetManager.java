@@ -6,7 +6,10 @@
 
 package foam.core;
 
+import java.util.Map;
+
 public interface FacetManager {
   public Object getInstanceOf(Object value, Class type, X x);
   public <T> T create(Class<T> type, X x);
+  public <T> T create(Class<T> type, Map<String, Object> args, X x);
 }

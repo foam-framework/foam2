@@ -17,26 +17,12 @@ public class UnknownFObjectParser
     ps = ps.apply(new Whitespace(), x);
     if ( ps == null ) return null;
 
-    //TODO: use ThreadLocal
-    StringBuilder sb = new StringBuilder();
-    int  count = 1;
-    char head;
-
-    sb.append(ps.head());
-    ps = ps.tail();
-    while( ps.valid() && count != 0 ) {
-      head = ps.head();
-      if ( head == '{') {
-        count++;
-      } else if ( head == '}') {
-        count--;
-      }
-      sb.append(head);
-      ps = ps.tail();
+    ps = ps.apply(new UnknownObjectParser(), x);
+    if ( ps == null ) {
+      return null;
     }
-
     UnknownFObject unknownFObject = ((X) x.get("X")).create(UnknownFObject.class);
-    unknownFObject.setJson(sb.toString());
+    unknownFObject.setJson(ps.value().toString());
     return ps.setValue(unknownFObject);
   }
 }

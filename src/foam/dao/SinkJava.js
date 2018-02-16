@@ -25,7 +25,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -39,7 +39,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -172,8 +172,23 @@ foam.CLASS({
                 + '  if ( sub.getDetached() ) {\n'
                 + '    break;\n'
                 + '  }\n'
-                + '  getDelegate().put((foam.core.FObject) o, sub);\n'
+                + '  getDelegate().put(o, sub);\n'
                 + '}'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.DedupSink',
+
+  methods: [
+    {
+      name: 'put',
+      javaCode: 'if ( getResults() == null ) setResults(new java.util.HashSet<>());\n' +
+      '    if ( ! getResults().contains(((foam.core.FObject)obj).getProperty("id")) ) {\n' +
+      '      getDelegate().put(obj, sub);\n' +
+      '      getResults().add(((foam.core.FObject)obj).getProperty("id"));\n' +
+      '    }'
     }
   ]
 });

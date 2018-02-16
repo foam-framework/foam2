@@ -18,15 +18,15 @@
 package foam.lib.parse;
 
 public class Alt implements Parser {
-  private Parser[] parsers;
+  private Parser[] parsers_;
 
   public Alt(Parser... args) {
-    parsers = args;
+    parsers_ = args;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    for ( int i = 0 ; i < parsers.length ; i++ ) {
-      PStream ret = ps.apply(parsers[i], x);
+    for ( int i = 0 ; i < parsers_.length ; i++ ) {
+      PStream ret = ps.apply(parsers_[i], x);
       if ( ret != null ) return ret;
     }
     return null;

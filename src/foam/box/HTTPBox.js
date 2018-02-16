@@ -33,6 +33,7 @@ foam.CLASS({
       name: 'Outputter',
       path: 'foam.json.Outputter',
       swiftPath: 'foam.swift.parse.json.output.Outputter',
+      javaPath: '',
     },
     'foam.box.HTTPReplyBox',
   ],
@@ -153,7 +154,8 @@ protected class ResponseThread implements Runnable {
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var rmsg = this.parser.parseString(p);
+          return this.parser.aparse(p);
+        }.bind(this)).then(function(rmsg) {
           rmsg && replyBox && replyBox.send(rmsg);
         }.bind(this), function(r) {
           replyBox && replyBox.send(foam.box.Message.create({ object: foam.box.HTTPException.create({ response: r }) }));

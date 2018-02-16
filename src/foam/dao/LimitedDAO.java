@@ -28,6 +28,7 @@ public class LimitedDAO
   }
 
   public Sink select_(X x, Sink s, long skip, long limit, Comparator order, Predicate predicate) {
+    s = prepareSink(s);
     return super.select_(x, s, skip, limit_, order, predicate);
   }
 
