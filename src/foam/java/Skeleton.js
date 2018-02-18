@@ -121,7 +121,7 @@ foam.CLASS({
         default: throw new RuntimeException("Method not found: " + rpc.getName());
       }
     } catch (Throwable t) {
-      getMessageX(message).get(foam.nanos.logger.Logger.class).debug("returning skeleton exception", t);
+      ((Logger) getMessageX(message).get("logger")).debug("returning skeleton exception", t);
       message.replyWithException(t);
 
       return;
