@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.boot.NSpec;
+import foam.nanos.logger.*;
 import foam.nanos.session.Session;
 import java.security.AccessControlException;
 import java.util.Date;
@@ -63,7 +64,10 @@ public class SessionServerBox
         }
         */
 
-        msg.getLocalAttributes().put("x", session.getContext());
+        X x = session.getContext().put(
+          "logger",
+          new PrefixLogger(new Object[] { "[Service]", spec.getName() }, (Logger) session.getContext().get("logger")));
+        msg.getLocalAttributes().put("x", x);
       }
     } catch (Throwable t) {
       t.printStackTrace();
