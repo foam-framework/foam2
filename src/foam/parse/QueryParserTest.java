@@ -7,6 +7,7 @@
 package foam.parse;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -32,16 +33,33 @@ public class QueryParserTest {
     DAO dao = new foam.dao.MapDAO(User.getOwnClassInfo());
 
     // add some data test
-    User u = new User();
-    u.setId(6);
-    u.setFirstName("Simon");
-    u.setLastName("Keogh");
-    u.setOrganization("nanopay");
-    u.setBusinessName("programmer");
-    u.setLanguage("en");
-    Date date = new GregorianCalendar(2010, 8, 10).getTime();
-    u.setBirthday(date);
-    dao.put(u);
+    User u1 = new User();
+    u1.setId(6);
+    u1.setFirstName("Simon");
+    u1.setLastName("Keogh");
+    u1.setOrganization("nanopay");
+    u1.setBusinessName("programmer");
+    u1.setLanguage("en");
+    Date date = new GregorianCalendar(2010, 8, 10).getTime();//September
+    u1.setBirthday(date);
+    int yyyy,mm,d;
+    Calendar clend = new java.util.GregorianCalendar().getInstance();
+    yyyy = clend.get(Calendar.YEAR);
+    mm   = clend.get(Calendar.MONTH) ;
+    d    = clend.get(Calendar.DAY_OF_MONTH);
+    date = new GregorianCalendar(yyyy, mm, d).getTime();
+    u1.setLastLogin(date);
+    dao.put(u1);
+
+    User u2 = new User();
+    u2.setId(7);
+    u2.setFirstName("Wassim");
+    dao.put(u2);
+
+    User u3 = new User();
+    u3.setId(8);
+    u3.setFirstName("Hassene");
+    dao.put(u3);
 
     //UseCaseJsonParserTest(dao);
 
@@ -74,22 +92,30 @@ public class QueryParserTest {
       e.printStackTrace();
     }
     //Json date = "LogDate":"2009-02-15T00:00:00Z"
-   int result[] = {1,0,1,1,1,0,0,0,1,1
-                  ,0,0,0,0,0,1,1,0,0,1
-                  ,1,1,1,1,0,1,1,1,1};
+   int result[] = 
+     {0,3,1,2,3,1,
+      1,0,0,0,1,
+      1,1,1,0,0,
+      2,3,1,0,0,
+      1,1,3,1,1,
+      0,1,1,1,1,
+      3,1,1,1
+      };
     String[] testData ={//"id=6 *",
+        "birthday>=2020-09-10",
+        "birthday<2020-09-10",
         "id=6",
         "id!=6",
         "id!=6 or firstName=Simon",
         "firstName=Simon",
         "firstName:Sim",
         "firstName:Azerty",
-        "birthday:201",//not correct
+        "birthday:201",
         "birthday=2011",
         "birthday=2010/09/10",
         "birthday>=2010-09-10",
-        "birthday=2010-09-10T00:00:00Z",//not correct
-        "birthday=2010-09-10T00:00Z",//not correct
+        "birthday=2010-09-10T00:00:00Z",// correct
+        "birthday=2010-09-10T00:00Z",// correct
         "id=6 AND NOT firstName=Simon",
         "id=6 AND -firstName=Simon",
         "id!=6 | firstName!=Simon",
@@ -100,13 +126,17 @@ public class QueryParserTest {
         "id=6 and firstName=Simon",
         "id=6 or firstName=Simon",
         "id!=6 or firstName=Simon or lastName=Keogh",
-        "birthday>=2010-09-10T00:00:00Z",
+        "birthday>=2000-09-10T00:00:00Z",
         "birthday:2010",
         "birthday:2010-5",
         "birthday:2010-9",
         "birthday:2010/9",
         "birthday:2010-9-10",
         "birthday>=2010-09-10",
+        "id>5",
+        "lastLogin:today",
+        "lastLogin:today-2",//that birthday data is not included
+        "lastLogin:2010-9-10..2020-9-10"
         };
 
     for (int i = 0; i < testData.length; i++) {
@@ -117,7 +147,7 @@ public class QueryParserTest {
       // show data
       System.out.println("queryParser "+testData[i] +" -> number of result " + listDao.getData().size());
       if (result[i]!= listDao.getData().size()) {
-        throw new NullPointerException();
+        throw new IllegalStateException("This result does't conform");
       }
     }
 

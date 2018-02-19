@@ -85,16 +85,16 @@ public class PropertyParser extends ProxyParser {
     case "!=":
       p = MLang.NOT(MLang.AND(MLang.GT(property, date1),MLang.LT(property, date2)));
       break;
-    case ">":
+    case "<":
       p = MLang.LT(property, date1);
       break;
-    case ">=":
+    case "<=":
       p = MLang.LTE(property, date1);
       break;
-    case "<":
+    case ">":
       p = MLang.GT(property, date1);
       break;
-    case "<=":
+    case ">=":
       p = MLang.GTE(property, date1);
       break;
     default:
@@ -113,16 +113,16 @@ public class PropertyParser extends ProxyParser {
     case "!=":
       p = MLang.NOT(MLang.EQ(property, property.get(x.get("obj"))));
       break;
-    case ">":
+    case "<":
       p = MLang.LT(property, property.get(x.get("obj")));
       break;
-    case ">=":
+    case "<=":
       p = MLang.LTE(property, property.get(x.get("obj")));
       break;
-    case "<":
+    case ">":
       p = MLang.GT(property, property.get(x.get("obj")));
       break;
-    case "<=":
+    case ">=":
       p = MLang.GTE(property, property.get(x.get("obj")));
       break;
     case ":":
