@@ -20,11 +20,7 @@ foam.CLASS({
   name: 'SocketBox',
   extends: 'foam.box.ProxyBox',
 
-  requires: [
-    'foam.box.BoxJsonOutputter',
-    'foam.box.SocketConnectBox'
-  ],
-  exports: ['outputter'],
+  requires: [ 'foam.box.SocketConnectBox' ],
 
   axioms: [
     foam.pattern.Multiton.create({
@@ -54,14 +50,6 @@ return SocketConnectBox_create([
   "address$": address$,
 ])
       `
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
     }
   ]
 });
