@@ -43,6 +43,18 @@
       class: 'Int',
       name: 'daoCount'
     },
+    {
+      class: 'Boolean',
+      name: 'editRowsEnabled',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'editColumnsEnabled',
+      value: false
+    },
+    'editRowsPopup',
+    'selection'
   ],
 
   methods: [
@@ -58,7 +70,15 @@
         start('tr').
           start('td').
             style({ 'vertical-align': 'top' }).
-            start(this.TableView, {data$: this.scrolledDao$, columns: this.columns}).
+            start(this.TableView, 
+              {
+                data$: this.scrolledDao$, 
+                columns: this.columns, 
+                editColumnsEnabled: this.editColumnsEnabled, 
+                editRowsEnabled: this.editRowsEnabled,
+                editRowsPopup: this.editRowsPopup,
+                selection$: this.selection$
+              }).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).
