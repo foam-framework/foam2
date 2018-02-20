@@ -9,46 +9,82 @@ foam.CLASS({
   name: 'FirestoreDAO',
   extends: 'foam.dao.AbstractDAO',
 
+  requires: [
+    'com.google.firebase.DefaultFObject',
+    'com.google.firebase.DefaultFirestoreData',
+    'com.google.firebase.DefaultFirestoreDocumentID'
+  ],
+  imports: [
+    'gcloudProjectId?',
+    'gcloudCredentialsPath?',
+    'window?',
+  ],
+
   documentation: `DAO that wraps a Firestore collection. Implemented against
       Firestore 0.11.x JavaScript documentation.`,
 
   properties: [
     {
+      class: 'String',
+      documentation: 'The collection/document path to the Firestore collection',
+      name: 'collectionPath',
+    },
+    {
+      name: 'firestoreModule',
+      documentation: 'The Google Cloud Firestore NodeJS module',
+      transient: true,
+      factory: function() { return require('@google-cloud/firestore'); },
+    },
+    {
       name: 'firestore',
       documentation: `The firebase.firestore.Firestore for this DAO:
           https://firebase.google.com/docs/reference/js/firebase.firestore.Firestore`,
-      required: true
+      transient: true,
+      factory: function() {
+        // Browser:
+        if ( this.window && this.window.firebase && this.window.firebase.firestore ) {
+          return this.window.firebase.firestore();
+        }
+
+        // NodeJS:
+        const config = {projectId: this.gcloudProjectId};
+        if ( this.gcloudCredentialsPath )
+          config.keyFilename = this.gcloudCredentialsPath;
+        return new this.firestoreModule(config);
+      },
     },
     {
       name: 'collection',
       documentation: `The firebase.firestore.CollectionReference for this DAO:
           https://firebase.google.com/docs/reference/js/firebase.firestore.CollectionReference`,
-      required: true
-    },
-    {
-      name: 'getFirestoreDocumentID',
-      documentation: `The function usedto extract a Firestore Document ID string
-      from a foam.core.FObject that is stored via this DAO.`,
-      value: function(obj) {
-        return obj.id.toString().replace(/[/]/g, this.slashReplacement);
+      transient: true,
+      factory: function() {
+        return this.firestore.collection(this.collectionPath);
       },
     },
     {
-      name: 'getFirestoreData',
-      documentation: `The function usedto extract a Firestore data from a
+      // class: 'FObjectProperty',
+      // of: 'foam.mlang.F',
+      name: 'firestoreDocumentID',
+      documentation: `The function used to extract a Firestore Document ID string
+          from a foam.core.FObject that is stored via this DAO.`,
+      factory: function() { return this.DefaultFirestoreDocumentID.create(); }
+    },
+    {
+      // class: 'FObjectProperty',
+      // of: 'foam.mlang.F',
+      name: 'firestoreData',
+      documentation: `The function used to extract a Firestore data from a
           foam.core.FObject that is stored via this DAO.`,
-      value: function(obj) { return foam.json.objectify(obj); }
+      factory: function() { return this.DefaultFirestoreData.create(); }
     },
     {
-      name: 'getFObject',
-      documentation: `The function usedto extract a foam.core.FObject from
+      // class: 'FObjectProperty',
+      // of: 'foam.mlang.F',
+      name: 'fobject',
+      documentation: `The function used to extract a foam.core.FObject from
           Firestore data that is stored via this DAO.`,
-      value: function(data) { return foam.json.parse(data); }
-    },
-    {
-      class: 'String',
-      name: 'slashReplacement',
-      value: String.fromCharCode(0),
+      factory: function() { return this.DefaultFObject.create(); }
     },
     {
       class: 'Array',
@@ -81,7 +117,7 @@ foam.CLASS({
       var backlog = this.putBacklog_;
       for ( var i = 0; i < backlog.length; i++ ) {
         var data = backlog[i];
-        batch.set(this.getDoc_(data.obj), this.getFirestoreData(data.obj));
+        batch.set(this.getDoc_(data.obj), this.firestoreData.f(data.obj));
       }
 
       batch.commit().then(function(backlog) {
@@ -131,7 +167,7 @@ foam.CLASS({
         sub.onDetach(function() { detached = true; });
         if ( decoratedSink.put ) {
           for ( var i = 0; i < docs.length; i++ ) {
-            var obj = this.getFObject(docs[i].data());
+            var obj = this.fobject.f(docs[i].data());
             decoratedSink.put(obj, sub);
             if ( detached ) break;
           }
@@ -147,7 +183,7 @@ foam.CLASS({
             var array = arraySink.array;
             for ( var i = 0; i < array.length; i++ ) {
               batch.delete(
-                  this.collection.doc(this.getFirestoreDocumentID(array[i])));
+                  this.collection.doc(this.firestoreDocumentID.f(array[i])));
             }
             return batch.commit();
           }.bind(this));
@@ -160,7 +196,7 @@ foam.CLASS({
       var unsub = this.collection.onSnapshot(function(querySnapshot) {
         var docs = querySnapshot.docs;
         for ( var i = 0; i < docs.length; i++ ) {
-          decoratedSink.put(this.getFObject(docs[i].data()));
+          decoratedSink.put(this.fobject.f(docs[i].data()));
         }
       }.bind(this));
       var sub = foam.core.FObject.create();
@@ -168,7 +204,7 @@ foam.CLASS({
       return sub;
     },
     function getDoc_(obj) {
-      return this.collection.doc(this.getFirestoreDocumentID(obj));
+      return this.collection.doc(this.firestoreDocumentID.f(obj));
     },
   ],
 
