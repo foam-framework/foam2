@@ -68,32 +68,15 @@ foam.CLASS({
       class: 'Int',
       name: 'nextSize',
       value: 0
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Outputter',
-      name: 'outputter',
-      factory: function() {
-        // Use default FOAM implementation of Outputter. Do not attempt to
-        // lookup sensitive "foam.json.Outputter" class in box context.
-        return foam.lookup('foam.json.Outputter').create({
-          pretty: false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues: false,
-          strict: true,
-          propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        }, this);
-      }
     }
   ],
 
   methods: [
     function write(msg) {
-      var serialized = this.outputter.stringify(msg);
-      var size = Buffer.byteLength(serialized);
+      var size = Buffer.byteLength(msg);
       var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
-      packet.write(serialized, 4);
+      packet.write(msg, 4);
       this.socket_.write(packet);
     },
 
