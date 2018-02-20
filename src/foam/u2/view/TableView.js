@@ -363,7 +363,8 @@ foam.CLASS({
     'hoverSelection',
     'dropdownOrigin',
     'overlayOrigin',
-    'rowPopupOrigin'
+    'rowPopupOrigin',
+    'editRowsPopup'
   ],
 
   methods: [
@@ -381,10 +382,6 @@ foam.CLASS({
       });
 
       return this.OverlayDropdown.create().add(editor);
-    },
-
-    function createRowOptionsPopUp(popup) {
-
     },
 
     /** Adds offset for edit columns overlay dropdown
@@ -482,20 +479,8 @@ foam.CLASS({
                         add(' ', view.vertMenuIcon).
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
-                        
                         on('click', function(e) {
-                          var p = foam.u2.PopupView.create({
-                            width: 152,
-                            x: -130,
-                            y: -7
-                          })
-                          p.start('div').add('Set As Default')
-                            .end()
-                            .start('div').add('Verify Account')
-                            .end()
-                            .start('div').add('Delete Account')
-                            .end()
-                          view.rowPopupOrigin.add(p)
+                          view.rowPopupOrigin.add(view.editRowsPopup)
                         }).
                         tag('div', null, view.rowPopupOrigin$).
                       end();
@@ -506,9 +491,5 @@ foam.CLASS({
               });
           }));
     }
-  ],
-
-  listeners: [
-
   ]
 });
