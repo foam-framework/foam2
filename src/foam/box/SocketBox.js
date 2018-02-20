@@ -42,14 +42,6 @@ foam.CLASS({
       name: 'address'
     },
     {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
-    }
-    {
       name: 'delegate',
       transient: true,
       factory: function() {
@@ -62,6 +54,14 @@ return SocketConnectBox_create([
   "address$": address$,
 ])
       `
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
+      }
     }
   ]
 });
