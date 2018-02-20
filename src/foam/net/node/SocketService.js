@@ -30,7 +30,8 @@ foam.CLASS({
   imports: [
     'creationContext',
     'error',
-    'info'
+    'info',
+    'parser'
   ],
 
   properties: [
@@ -53,17 +54,6 @@ foam.CLASS({
     },
     {
       name: 'delegate'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Parser',
-      name: 'parser',
-      factory: function() {
-        return this.Parser.create({
-          strict: true,
-          creationContext: this.creationContext
-        });
-      }
     }
   ],
 
