@@ -25,6 +25,7 @@ foam.CLASS({
   ],
 
   requires: [ 'foam.box.RegisterSelfMessage' ],
+  imports: [ 'outputter' ],
 
   topics: [
     'message',
@@ -93,9 +94,8 @@ foam.CLASS({
           });
           socket.once('connect', function() {
             this.socket_ = socket;
-            this.write(this.RegisterSelfMessage.create({
-              name: this.me.name
-            }));
+            this.write(this.outputter.stringify(
+              this.RegisterSelfMessage.create({name: this.me.name})));
             this.socketService.addSocket(this);
             this.connect.pub();
             resolve(this);

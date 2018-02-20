@@ -20,13 +20,11 @@ foam.CLASS({
   name: 'RawSocketBox',
   implements: [ 'foam.box.Box' ],
 
-  requires: [
-    'foam.box.BoxJsonOutputter',
-    'foam.box.ReplyBox'
-  ],
+  requires: [ 'foam.box.ReplyBox' ],
   imports: [
     'me',
-    'registry',
+    'outputter',
+    'registry'
   ],
 
   properties: [
@@ -34,14 +32,6 @@ foam.CLASS({
       class: 'Object',
       name: 'socket',
       javaType: 'org.java_websocket.WebSocket'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
     }
   ],
 

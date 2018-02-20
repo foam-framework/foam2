@@ -19,10 +19,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
-  requires: [
-    'foam.box.BoxJsonOutputter',
-    'foam.box.ReplyBox'
-  ],
+  requires: [ 'foam.box.ReplyBox' ],
   imports: [
     {
       name: 'me',
@@ -33,7 +30,8 @@ foam.CLASS({
       key: 'registry',
       name: 'registry',
       javaType: 'foam.box.BoxRegistry',
-    }
+    },
+    'outputter'
   ],
 
   properties: [
@@ -41,39 +39,7 @@ foam.CLASS({
       class: 'Object',
       name: 'socket',
       javaType: 'foam.net.WebSocket'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
     }
-  ],
-
-  classes: [
-    foam.core.InnerClass.create({
-      generateJava: false,
-      model: {
-        name: 'JSONOutputter',
-        extends: 'foam.json.Outputter',
-        requires: [
-          'foam.box.ReturnBox'
-        ],
-        imports: [
-          'me'
-        ],
-        methods: [
-          function output(o) {
-            if ( o === this.me ) {
-              return this.SUPER(this.ReturnBox.create());
-            }
-            return this.SUPER(o);
-          }
-        ]
-      }
-    })
   ],
 
   methods: [

@@ -25,9 +25,8 @@ foam.CLASS({
     'foam.box.RegisterSelfMessage',
     'foam.json.Parser'
   ],
-  imports: [
-    'creationContext'
-  ],
+  imports: [ 'creationContext' ],
+  exports: [ 'outputter' ],
 
   topics: [ 'connect' ],
 
@@ -54,6 +53,14 @@ foam.CLASS({
           strict: true,
           creationContext: this.creationContext
         });
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ],

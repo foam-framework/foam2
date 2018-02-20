@@ -22,9 +22,10 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   requires: [
+    'foam.box.BoxJsonOutputter',
+    'foam.box.Message',
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage',
-    'foam.box.Message',
     'foam.json.Outputter'
   ],
 
@@ -32,6 +33,7 @@ foam.CLASS({
     'me',
     'messagePortService'
   ],
+  exports: [ 'outputter' ],
 
   properties: [
     {
@@ -55,15 +57,12 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.json.Outputter',
+      of: 'foam.box.BoxJsonOutputter',
       name: 'outputter',
       factory: function() {
         // NOTE: Configuration must be consistent with parser in
         // foam.messageport.MessagePortService.
-        //
-        // Use default FOAM implementation of Outputter. Do not attempt to
-        // lookup sensitive "foam.json.Outputter" class in box context.
-        return this.Outputter.create().copyFrom(foam.json.Network)
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ]

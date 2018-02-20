@@ -20,9 +20,10 @@ foam.CLASS({
   name: 'WebSocketBox',
 
   requires: [
-    'foam.net.web.WebSocket',
+    'foam.box.BoxJsonOutputter',
     'foam.box.Message',
-    'foam.box.RawWebSocketBox'
+    'foam.box.RawWebSocketBox',
+    'foam.net.web.WebSocket'
   ],
 
   imports: [
@@ -30,6 +31,7 @@ foam.CLASS({
     'me',
     'window'
   ],
+  exports: [ 'outputter' ],
 
   axioms: [
     foam.pattern.Multiton.create({
@@ -62,6 +64,14 @@ foam.CLASS({
           // will reconnect.
           this.delegate = undefined;
         }.bind(this));
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ],

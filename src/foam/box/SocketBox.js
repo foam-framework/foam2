@@ -21,8 +21,10 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   requires: [
+    'foam.box.BoxJsonOutputter',
     'foam.box.SocketConnectBox'
   ],
+  exports: ['outputter'],
 
   axioms: [
     foam.pattern.Multiton.create({
@@ -40,12 +42,20 @@ foam.CLASS({
       name: 'address'
     },
     {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
+      }
+    }
+    {
       name: 'delegate',
       transient: true,
       factory: function() {
-        return foam.box.SocketConnectBox.create({
+        return this.SocketConnectBox.create({
           address: this.address
-        }, this);
+        });
       },
       swiftFactory: `
 return SocketConnectBox_create([

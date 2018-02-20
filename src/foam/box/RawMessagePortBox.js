@@ -19,27 +19,13 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
-  requires: [
-    'foam.json.BoxJsonOutputter',
-    'foam.box.ReplyBox'
-  ],
+
+  requires: [ 'foam.box.ReplyBox' ],
+  imports: [ 'outputter' ],
 
   properties: [
     {
       name: 'port'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        // NOTE: Configuration must be consistent with parser in
-        // foam.messageport.MessagePortService.
-        //
-        // Use default FOAM implementation of Outputter. Do not attempt to
-        // lookup sensitive "foam.json.Outputter" class in box context.
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
     }
   ],
 
