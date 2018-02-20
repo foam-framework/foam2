@@ -19,13 +19,13 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'Socket',
 
-  imports: [
-    'me',
-    'socketService'
-  ],
 
   requires: [ 'foam.box.RegisterSelfMessage' ],
-  imports: [ 'outputter' ],
+  imports: [
+    'me',
+    'outputter',
+    'socketService'
+  ],
 
   topics: [
     'message',

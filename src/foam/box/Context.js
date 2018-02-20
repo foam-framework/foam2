@@ -21,10 +21,12 @@ foam.CLASS({
   swiftName: 'BoxContext',
 
   requires: [
+    'foam.box.BoxJsonOutputter',
     'foam.box.BoxRegistryBox',
-    'foam.box.NamedBox',
     'foam.box.ClassWhitelistContext',
     'foam.box.LoggedLookupContext',
+    'foam.box.NamedBox',
+    'foam.json.Parser'
   ],
 
   exports: [
