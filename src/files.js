@@ -298,7 +298,7 @@ FOAM_FILES([
   { name: "foam/box/EventDispatchBox" },
   { name: "foam/box/SkeletonBox" },
   { name: "foam/box/NullBox" },
-  { name: "foam/box/BoxJsonOutputter.js" },
+  { name: "foam/box/BoxJsonOutputter" },
   { name: "foam/box/SocketBox" },
   { name: "foam/box/SocketBox2" },
   { name: "foam/box/SocketConnectBox" },
