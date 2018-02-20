@@ -23,10 +23,11 @@ foam.CLASS({
     'foam.box.NamedBox',
     'foam.box.RawMessagePortBox',
     'foam.box.RegisterSelfMessage',
-    'foam.json.Parser'
   ],
-  imports: [ 'creationContext' ],
-  exports: [ 'outputter' ],
+  imports: [
+    'creationContext',
+    'parser',
+  ],
 
   topics: [ 'connect' ],
 
@@ -41,27 +42,6 @@ foam.CLASS({
     {
       name: 'delegate',
       required: true
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Parser',
-      name: 'parser',
-      factory: function() {
-        // NOTE: Configuration must be consistent with outputters in
-        // foam.box.MessagePortBox and foam.box.RawMesagePortBox.
-        return this.Parser.create({
-          strict: true,
-          creationContext: this.creationContext
-        });
-      }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
     }
   ],
 

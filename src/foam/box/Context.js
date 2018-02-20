@@ -31,6 +31,8 @@ foam.CLASS({
     'creationContext',
     'me',
     'messagePortService',
+    'outputter',
+    'parser',
     'registry',
     'root',
     'socketService',
@@ -159,6 +161,25 @@ return ClassWhitelistContext_create([
   "whitelist$": classWhitelist$,
 ]).__subContext__
       `,
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
+      }
     }
   ]
 });

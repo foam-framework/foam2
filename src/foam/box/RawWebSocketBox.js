@@ -19,10 +19,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
-  requires: [
-    'foam.box.BoxJsonOutputter',
-    'foam.box.ReplyBox'
-  ],
+  requires: [ 'foam.box.ReplyBox' ],
   imports: [
     {
       name: 'me',
@@ -33,9 +30,9 @@ foam.CLASS({
       key: 'registry',
       name: 'registry',
       javaType: 'foam.box.BoxRegistry',
-    }
+    },
+    'outputter'
   ],
-  exports: [ 'outputter' ],
 
   properties: [
     {
