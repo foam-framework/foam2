@@ -217,7 +217,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.view.EditColumnsView',
-    'foam.u2.md.OverlayDropdown'
+    'foam.u2.md.OverlayDropdown',
+    'foam.u2.PopupView'
   ],
 
   exports: [
@@ -238,27 +239,22 @@ foam.CLASS({
         ^ {
           border-spacing: 14px 8px;
         }
-
         ^ th {
           text-align: left;
           white-space: nowrap;
         }
-
         ^row:hover {
           background: #eee;
-          cursor: pointer;
         }
-
         ^selected {
           background: #eee;
         }
-
         ^vertDots {
           font-size: 20px;
           font-weight: bold;
           padding-right: 12px;
+          cursor: pointer;
         }
-
         ^noselect {
           -webkit-touch-callout: none;
           -webkit-user-select: none;
@@ -336,7 +332,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'editRowsEnabled',
-      value: true,
+      value: false,
       documentation: 'Set this to true to let the user select table row options.'
     },
     {
@@ -366,7 +362,8 @@ foam.CLASS({
     },
     'hoverSelection',
     'dropdownOrigin',
-    'overlayOrigin'
+    'overlayOrigin',
+    'rowPopupOrigin'
   ],
 
   methods: [
@@ -384,6 +381,10 @@ foam.CLASS({
       });
 
       return this.OverlayDropdown.create().add(editor);
+    },
+
+    function createRowOptionsPopUp(popup) {
+
     },
 
     /** Adds offset for edit columns overlay dropdown
@@ -481,6 +482,22 @@ foam.CLASS({
                         add(' ', view.vertMenuIcon).
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
+                        
+                        on('click', function(e) {
+                          var p = foam.u2.PopupView.create({
+                            width: 152,
+                            x: -130,
+                            y: -7
+                          })
+                          p.start('div').add('Set As Default')
+                            .end()
+                            .start('div').add('Verify Account')
+                            .end()
+                            .start('div').add('Delete Account')
+                            .end()
+                          view.rowPopupOrigin.add(p)
+                        }).
+                        tag('div', null, view.rowPopupOrigin$).
                       end();
                     } else if ( view.editColumnsEnabled ) {
                       return this.tag('td');
@@ -489,5 +506,9 @@ foam.CLASS({
               });
           }));
     }
+  ],
+
+  listeners: [
+
   ]
 });
