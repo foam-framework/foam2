@@ -10,8 +10,8 @@ import foam.nanos.logger.FileLogger;
 import foam.nanos.logger.StdoutLogger;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
-import java.util.ArrayList; 
-import java.util.List; 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.*;
 import java.io.IOException;
 
@@ -39,7 +39,7 @@ public class CompositeLogger
 
   public void log(Object... args) {
     for ( Logger logger : childLoggers ) {
-      logger.info(args);
+      logger.log(args);
     };
   }
 
