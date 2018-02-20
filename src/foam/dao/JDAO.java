@@ -11,7 +11,7 @@ import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
 
 public class JDAO
-    extends AbstractJDAO
+  extends AbstractJDAO
 {
   protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE);
 

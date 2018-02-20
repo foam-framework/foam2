@@ -127,6 +127,7 @@ var classes = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.auth.token.ClientTokenService',
   'foam.nanos.auth.token.AbstractTokenService',
+  'foam.nanos.auth.email.EmailTokenService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.ServiceProvider',
@@ -136,6 +137,7 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.logger.Logger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.ListMenu',
@@ -227,6 +229,7 @@ var proxies = [
   'foam.blob.BlobService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.http.WebAgent',
+  'foam.nanos.logger.Logger',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];
@@ -239,5 +242,5 @@ module.exports = {
     abstractClasses: abstractClasses,
     skeletons: skeletons,
     proxies: proxies,
-    blacklist: blacklist,
+    blacklist: blacklist
 }
