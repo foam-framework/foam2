@@ -20,7 +20,7 @@ foam.CLASS({
   name: 'RawMessagePortBox',
   implements: [ 'foam.box.Box' ],
   requires: [
-    'foam.json.Outputter',
+    'foam.json.BoxJsonOutputter',
     'foam.box.ReplyBox'
   ],
 
@@ -30,7 +30,7 @@ foam.CLASS({
     },
     {
       class: 'FObjectProperty',
-      of: 'foam.json.Outputter',
+      of: 'foam.box.BoxJsonOutputter',
       name: 'outputter',
       factory: function() {
         // NOTE: Configuration must be consistent with parser in
@@ -38,10 +38,11 @@ foam.CLASS({
         //
         // Use default FOAM implementation of Outputter. Do not attempt to
         // lookup sensitive "foam.json.Outputter" class in box context.
-        return this.Outputter.create().copyFrom(foam.json.Network)
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ],
+
   methods: [
     function send(message) {
       var replyBox = message.attributes.replyBox;

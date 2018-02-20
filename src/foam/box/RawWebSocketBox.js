@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
   requires: [
+    'foam.box.BoxJsonOutputter',
     'foam.box.ReplyBox'
   ],
   imports: [
@@ -40,6 +41,14 @@ foam.CLASS({
       class: 'Object',
       name: 'socket',
       javaType: 'foam.net.WebSocket'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
+      }
     }
   ],
 
@@ -78,12 +87,11 @@ foam.CLASS({
 
           // TODO: Add one-time service policy
 
-          msg.attributes.replyBox =
-            this.__context__.registry.register(null, null, msg.attributes.replyBox);
+          msg.attributes.replyBox = this.__context__.registry.
+              register(null, null, msg.attributes.replyBox);
         }
 
-        var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
-
+        var payload = this.outputter.stringify(msg);
         try {
           this.socket.send(payload);
         } catch(e) {
