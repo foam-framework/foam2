@@ -24,6 +24,7 @@ foam.CLASS({
       name) and date string`,
 
   requires: [ 'foam.log.LogLevel' ],
+
   imports: [
     'debug as debug_',
     'log as log_',
