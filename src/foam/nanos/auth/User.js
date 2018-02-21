@@ -79,6 +79,11 @@ foam.CLASS({
 emailIsSet_ = true;`
     },
     {
+      class: 'Boolean',
+      name: 'emailVerified',
+      documentation: 'Email verified flag'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
