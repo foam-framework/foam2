@@ -363,8 +363,8 @@ foam.CLASS({
     'hoverSelection',
     'dropdownOrigin',
     'overlayOrigin',
-    'rowPopupOrigin',
-    'editRowsPopup'
+    'editRowsPopup',
+    'editRowsPopupOrigin'
   ],
 
   methods: [
@@ -474,15 +474,14 @@ foam.CLASS({
                   }).
                   call(function() {
                     if ( view.editRowsEnabled ) {
-                      this.start('td').
+                      this.start('td', null, view.editRowsPopupOrigin$).
                         addClass(view.myClass('th-editColumns')).
-                        add(' ', view.vertMenuIcon).
+                        add(view.vertMenuIcon).
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
                         on('click', function(e) {
-                          view.rowPopupOrigin.add(view.editRowsPopup)
+                          view.editRowsPopupOrigin.add(view.editRowsPopup)
                         }).
-                        tag('div', null, view.rowPopupOrigin$).
                       end();
                     } else if ( view.editColumnsEnabled ) {
                       return this.tag('td');

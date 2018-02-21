@@ -45,13 +45,7 @@
     },
     {
       class: 'Boolean',
-      name: 'editRowsEnabled',
-      value: false
-    },
-    {
-      class: 'Boolean',
-      name: 'editColumnsEnabled',
-      value: false
+      name: 'editRowsEnabled'
     },
     'editRowsPopup',
     'selection'
@@ -73,8 +67,7 @@
             start(this.TableView, 
               {
                 data$: this.scrolledDao$, 
-                columns: this.columns, 
-                editColumnsEnabled: this.editColumnsEnabled, 
+                columns: this.columns,
                 editRowsEnabled: this.editRowsEnabled,
                 editRowsPopup: this.editRowsPopup,
                 selection$: this.selection$
