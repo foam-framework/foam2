@@ -33,10 +33,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
+      documentation: 'define a property is a XML attribute. eg <foo id="XMLAttribute"></foo>',
       name: 'xmlAttribute'
     },
     {
       class: 'Boolean',
+      documentation: 'define a property is a XML textNode. eg <foo id="1">textNode</foo>',
       name: 'xmlTextNode'
     },
     {
