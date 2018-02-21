@@ -150,13 +150,13 @@ foam.CLASS({
             body: 'return ' + this.storageTransient + ';'
           },
           {
-            name: 'getXmlAttribute',
+            name: 'getXMLAttribute',
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.xmlAttribute + ';'
           },
           {
-            name: 'getXmlTextNode',
+            name: 'getXMLTextNode',
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.xmlTextNode + ';'
