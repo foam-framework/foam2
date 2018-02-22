@@ -816,7 +816,7 @@ describe('NullDAO', function() {
 
     var nDAO = foam.dao.NullDAO.create();
 
-    nDAO.select(sink).then(function(sink) {
+    nDAO.select(sink).then(function() {
       expect(sink.eofCalled).toEqual(1);
       expect(sink.putCalled).toEqual(0);
       done();
