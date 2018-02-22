@@ -114,7 +114,13 @@ foam.CLASS({
       if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
       if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
       if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
-      if ( foam.core.FObject.isInstance(o) )      return o;
+      if ( foam.core.FObject.isInstance(o) ) {
+           // TODO: Not all mlang expressions actually implement Expr
+           // so we're just going to check for o.f
+           //  ! foam.mlang.Expr.isInstance(o) )
+        if ( ! foam.Function.isInstance(o.f) )      return foam.mlang.Constant.create({ value: o });
+        return o;
+      }
 
       console.error('Invalid expression value: ', o);
     }
@@ -875,6 +881,22 @@ foam.CLASS({
     function f(o) {
       var lhs = this.arg1.f(o);
       var rhs = this.arg2.f(o);
+
+      if ( ! rhs ) return false;
+
+      for ( var i = 0 ; i < rhs.length ; i++ ) {
+        var v = rhs[i];
+
+        if ( foam.String.isInstance(v) && this.upperCase_ ) v = v.toUpperCase();
+        if ( foam.util.equals(lhs, v) ) return true;
+      }
+      return false;
+
+      // TODO: This is not a sufficient enough check for valueSet_.
+      // We can have constants that contain other FObjects, in
+      // particular with multi part id support.So this code path is
+      // disabled for now.
+
 
       // If arg2 is a constant array, we use valueSet for it.
       if ( this.Constant.isInstance(this.arg2) ) {
