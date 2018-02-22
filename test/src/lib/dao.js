@@ -256,27 +256,6 @@ describe('SequenceNumberDAO', function() {
     });
   });
 
-  it('does not reuse sequence numbers from objects with an existing value', function(done) {
-    var a = test.CompA.create({ id: 1, a: 4 }, foam.__context__);
-    sDAO.put(a).then(function() {
-      return mDAO.select().then(function (sink) {
-        expect(sink.array.length).toEqual(1);
-        expect(sink.array[0].id).toEqual(1);
-        a = test.CompA.create({ a: 6 }, foam.__context__); // id not set
-        return sDAO.put(a).then(function() {
-          return mDAO.select().then(function (sink) {
-            expect(sink.array.length).toEqual(2);
-            expect(sink.array[0].id).toEqual(1);
-            expect(sink.array[0].a).toEqual(4);
-            expect(sink.array[1].id).toEqual(2);
-            expect(sink.array[1].a).toEqual(6);
-            done();
-          });
-        });
-      });
-    });
-  });
-
   it('starts from the existing max value', function(done) {
 
     mDAO.put(test.CompA.create({ id: 568, a: 4 }, foam.__context__));
