@@ -13,7 +13,11 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO', 'currentMenu', 'window' ],
+  imports: [
+    'currentMenu',
+    'menuDAO',
+    'window'
+  ],
 
   documentation: 'Navigational menu bar',
 
@@ -48,18 +52,19 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
+
       this
         .addClass(this.myClass())
         .start()
           .start('ul')
-            .select(this.menuDAO.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
+            .select(this.menuDAO.orderBy(this.Menu.ORDER).where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
               this.start('li')
                 .call(function() {
                   var e = this;
                   if ( ! self.selected ) self.selected = menu;
                   this.start()
                     .addClass('menuItem')
-                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu) }))
+                    .enableClass('selected', self.currentMenu$.map(function (value) { return self.isSelected(value, menu); }))
                     .add(menu.label)
                     .on('click', function() {
                       menu.launch_(self.__context__, e);
@@ -85,7 +90,7 @@ foam.CLASS({
       }
 
       // only show selected menu if user settings sub menu item has not been selected
-      if ( this.selected === menu.id && !this.window.location.hash.includes('#set') ) {
+      if ( this.selected === menu.id && ! this.window.location.hash.includes('#set') ) {
         return true;
       }
 
@@ -96,6 +101,7 @@ foam.CLASS({
         this.selected = current.id;
         return true;
       }
+
       return false;
     }
   ]

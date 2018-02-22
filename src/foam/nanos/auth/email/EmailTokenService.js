@@ -40,25 +40,8 @@ message.setTo(new String[]{user.getEmail()});
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", user.getFirstName());
-args.put("email", user.getEmail());
-if (!user.getInitialEmailedAmount().equals("$0.00")){
-  args.put("amount", user.getInitialEmailedAmount());
-}
-if (user.getType().equals("Business") || user.getType().equals("Merchant")){
-  args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=/");
-}
-if (user.getType().equals("Personal")){
-  if (user.getPortalAdminCreated()) {
-    args.put("applink", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=https://www.apple.com/lae/ios/app-store/");
-    args.put("playlink", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=https://play.google.com/store?hl=en");
-  }
-  args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=null" );
-  user.setPortalAdminCreated(false);
-  user.setInitialEmailedAmount("$0.00");
-  userDAO.put(user);
-}
-
-email.sendEmailFromTemplate(user, message, "welcome-email", args);
+args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=null" );
+email.sendEmailFromTemplate(user, message, "verifyEmail", args);
 return true;
 } catch(Throwable t) {
   t.printStackTrace();
