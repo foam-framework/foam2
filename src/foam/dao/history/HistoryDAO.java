@@ -79,7 +79,9 @@ public class HistoryDAO
     historyRecord.setObjectId(objectId);
     historyRecord.setUser(formatUserName(user));
     historyRecord.setTimestamp(new Date());
-    historyRecord.setUpdates(getUpdatedProperties(current, obj));
+    if ( current != null ) {
+      historyRecord.setUpdates(getUpdatedProperties(current, obj));
+    }
     historyDAO_.put_(x, historyRecord);
 
     return super.put_(x, obj);
