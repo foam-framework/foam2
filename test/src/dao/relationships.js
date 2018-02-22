@@ -36,7 +36,6 @@ describe('relationships', function() {
     var temptation;
     function mkJunction(artist, album) {
       return ArtistAlbumJunction.create({
-        id: [artist.id, album.id],
         sourceId: artist.id,
         targetId: album.id
       }, testCtx);
