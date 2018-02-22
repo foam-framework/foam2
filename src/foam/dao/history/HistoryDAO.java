@@ -9,6 +9,7 @@ package foam.dao.history;
 import foam.core.FObject;
 import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.dao.SequenceNumberDAO;
 import foam.nanos.auth.User;
@@ -22,6 +23,16 @@ import static foam.mlang.MLang.EQ;
 public class HistoryDAO
     extends ProxyDAO
 {
+  protected DAO historyDAO_;
+
+  public HistoryDAO(X x, String historyDAO, DAO delegate) {
+    this(x, (DAO) x.get(historyDAO), delegate);
+  }
+
+  public HistoryDAO(X x, DAO historyDAO, DAO delegate) {
+    super(x, delegate);
+    historyDAO_ = historyDAO;
+  }
 
   /**
    * Formats a User record to the following string
@@ -35,7 +46,7 @@ public class HistoryDAO
         "(" + user.getId() + ")";
   }
 
-  /**
+  /**git
    * Returns an array of updated properties
    *
    * @param currentValue current value
@@ -59,9 +70,7 @@ public class HistoryDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    // TODO: use context-oriented context when available.
-    User user = (User) getX().get("user");
-    SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
+    User user = (User) x.get("user");
     FObject current = this.find_(x, obj);
 
     // add new history record
@@ -71,17 +80,15 @@ public class HistoryDAO
     historyRecord.setUser(formatUserName(user));
     historyRecord.setTimestamp(new Date());
     historyRecord.setUpdates(getUpdatedProperties(current, obj));
-    historyDAO.put_(x, historyRecord);
+    historyDAO_.put_(x, historyRecord);
 
     return super.put_(x, obj);
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    // TODO: use context-oriented context when available.
     Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-    SequenceNumberDAO historyDAO = (SequenceNumberDAO) getX().get("historyDAO");
-    historyDAO.where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
+    historyDAO_.where(EQ(HistoryRecord.OBJECT_ID, objectId)).removeAll();
     return super.remove_(x, obj);
   }
 }
