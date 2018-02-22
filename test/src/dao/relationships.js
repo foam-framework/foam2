@@ -36,7 +36,6 @@ describe('relationships', function() {
     var temptation;
     function mkJunction(artist, album) {
       return ArtistAlbumJunction.create({
-        id: [artist.id, album.id],
         sourceId: artist.id,
         targetId: album.id
       }, testCtx);
@@ -178,24 +177,6 @@ describe('relationships', function() {
           temptation = found;
         }),
       ]).then(done);
-    });
-
-    it('should define forward relationship property', function() {
-      var RPV = foam.lookup('foam.dao.RelationshipPropertyValue');
-      var DAO = foam.lookup('foam.dao.DAO');
-      expect(RPV.isInstance(adam.albums)).toBe(true);
-      expect(DAO.isInstance(adam.albums.dao)).toBe(true);
-      expect(DAO.isInstance(adam.albums.junctionDAO)).toBe(true);
-      expect(DAO.isInstance(adam.albums.targetDAO)).toBe(true);
-    });
-
-    it('should define forward relationship property', function() {
-      var RPV = foam.lookup('foam.dao.RelationshipPropertyValue');
-      var DAO = foam.lookup('foam.dao.DAO');
-      expect(RPV.isInstance(eden.artists)).toBe(true);
-      expect(DAO.isInstance(eden.artists.dao)).toBe(true);
-      expect(DAO.isInstance(eden.artists.junctionDAO)).toBe(true);
-      expect(DAO.isInstance(eden.artists.targetDAO)).toBe(true);
     });
 
     it('should expose all items in .junctionDAO', function(done) {
