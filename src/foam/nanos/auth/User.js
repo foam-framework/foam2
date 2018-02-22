@@ -33,11 +33,8 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'String',
-      // class: 'SPID',
-      label: 'Service Provider',
-      name: 'spid',
-      documentation: "User's service provider."
+      class: 'Boolean',
+      name: 'enabled'
     },
     {
       class: 'DateTime',
@@ -82,6 +79,11 @@ foam.CLASS({
 emailIsSet_ = true;`
     },
     {
+      class: 'Boolean',
+      name: 'emailVerified',
+      documentation: 'Email verified flag'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
@@ -109,7 +111,7 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'File',
+      class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
       view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
@@ -197,6 +199,11 @@ emailIsSet_ = true;`
       name: 'website',
       displayWidth: 80,
       width: 2048
+    },
+    {
+      class: 'Date',
+      name: 'lastModified',
+      documentation: 'Last modified date'
     }
   ],
 
@@ -230,5 +237,19 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true,
     transient: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.ServiceProvider',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'spid',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
   }
 });

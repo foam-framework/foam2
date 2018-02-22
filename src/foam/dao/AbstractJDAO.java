@@ -82,7 +82,7 @@ public abstract class AbstractJDAO
         FObject object = parser.parseString(line);
         if ( object == null ) {
           System.err.println(getParsingErrorMessage(line) + ", source: " + line);
-          break;
+          continue;
         }
 
         switch ( operation ) {

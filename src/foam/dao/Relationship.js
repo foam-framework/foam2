@@ -294,7 +294,12 @@ foam.INTERFACE({
       name: 'getJunctionDAO',
       returns: 'foam.dao.DAO',
       javaReturns: 'foam.dao.DAO'
-    }
+    },
+    {
+      name: 'getTargetDAO',
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO'
+    },
   ]
 });
 
@@ -305,19 +310,23 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'junction'
+      name: 'junction',
+      hidden: true
     },
     {
       class: 'Object',
-      name: 'sourceId'
+      name: 'sourceId',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'targetDAOKey'
+      name: 'targetDAOKey',
+      hidden: true
     },
     {
       class: 'String',
-      name: 'junctionDAOKey'
+      name: 'junctionDAOKey',
+      hidden: true
     },
     {
       class: 'Object',
@@ -334,6 +343,7 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao',
+      label: '',
       factory: function() {
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
@@ -352,10 +362,20 @@ foam.CLASS({
     {
       class: 'foam.dao.DAOProperty',
       name: 'junctionDAO',
+      hidden: true,
       factory: function() {
         return this.__context__[this.junctionDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'targetDAO',
+      hidden: true,
+      factory: function() {
+        return this.__context__[this.targetDAOKey];
+      },
+      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());'
     }
   ],
   methods: [
@@ -396,10 +416,72 @@ return junction;
     },
     {
       // TODO: Should we remove this, or maybe just the java portion?
+      name: 'getJunctionDAO',
+      returns: 'foam.dao.DAO',
+      javaCode: 'return getJunctionDao();',
+      code: function() { return this.junctionDAO; }
+    },
+    {
+      // TODO: Should we remove this, or maybe just the java portion?
       name: 'getDAO',
       returns: 'foam.dao.DAO',
       javaCode: 'return getDao();',
       code: function getDAO() { return this.dao; }
+    },
+    {
+      // TODO: Should we remove this, or maybe just the java portion?
+      name: 'getTargetDAO',
+      returns: 'foam.dao.DAO',
+      javaCode: 'return getTargetDao();',
+      code: function getTargetDao() { return this.targetDAO; }
+    }
+  ],
+  actions: [
+    {
+      name: 'addItem',
+      label: 'Add',
+      code: function(x) {
+        var self = this;
+        var dao = x[self.targetDAOKey];
+
+        var controller = foam.comics.DAOController.create({
+          createEnabled: false,
+          editEnabled: false,
+          selectEnabled: true,
+          addEnabled: false,
+          relationship: this,
+          data: dao
+        }, x);
+
+        controller.sub('select', function(s, _, id) {
+          dao.find(id).then(function(obj) { self.add(obj); });
+        });
+
+        x.stack.push({ class: 'foam.comics.DAOControllerView', data: controller });
+      }
+    },
+    {
+      name: 'removeItem',
+      label: 'Remove',
+      code: function(x) {
+        var self = this;
+        var dao = self.dao;
+
+        var controller = foam.comics.DAOController.create({
+          createEnabled: false,
+          editEnabled: false,
+          selectEnabled: true,
+          addEnabled: false,
+          relationship: this,
+          data: dao
+        }, x);
+
+        controller.sub('select', function(s, _, id) {
+          dao.find(id).then(function(obj) { self.remove(obj); });
+        });
+
+        x.stack.push({ class: 'foam.comics.DAOControllerView', data: controller });
+      }
     }
   ]
 });
@@ -468,6 +550,7 @@ foam.CLASS({
     ['tableCellFormatter', null],
     ['cloneProperty', function(value, map) {}],
     ['javaCloneProperty', '//noop'],
+    ['view', { class: 'foam.u2.DetailView', showActions: true } ],
     {
       class: 'Class',
       name: 'junction'
