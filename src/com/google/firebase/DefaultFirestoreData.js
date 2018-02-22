@@ -5,6 +5,7 @@
  */
 
 foam.CLASS({
+  package: 'com.google.firebase',
   name: 'DefaultFirestoreData',
   implements: [ 'foam.mlang.F' ],
 
