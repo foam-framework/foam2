@@ -125,13 +125,13 @@ foam.CLASS({
   listeners: [
     /** Keeps the cache in sync with changes from the source.
       @private */
-    function onSrcPut(s, on, put, obj) {
+    function onSrcPut(obj) {
       this.delegate.put(obj);
     },
 
     /** Keeps the cache in sync with changes from the source.
       @private */
-    function onSrcRemove(s, on, remove, obj) {
+    function onSrcRemove(obj) {
       this.delegate.remove(obj);
     },
 
