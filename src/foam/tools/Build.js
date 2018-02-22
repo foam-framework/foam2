@@ -28,6 +28,10 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'root',
+      value: 'TESTOUTPUT/',
+    },
+    {
       name: 'modelId',
       value: 'foam.tools.Build',
     },
@@ -86,7 +90,12 @@ foam.CLASS({
           code: function(x, id) {
             return new Promise(function(ret) {
               var cls = foam.lookup(id, true);
-              ret(cls ? cls.model_ : undefined);
+              var m = cls && cls.model_;
+
+              ret(
+                ( m ) &&
+                ( m.id == id || ( m.name == id && m.package == 'foam.core' ) ) ?
+                  m : undefined);
             });
           }
         }
@@ -113,7 +122,6 @@ foam.CLASS({
       properties: [
         {
           name: 'root',
-          value: 'TESTOUTPUT/',
         },
       ],
       methods: [
@@ -197,7 +205,7 @@ foam.CLASS({
       var destDAO = this.DepPutModelDAO.create({
         modelDAO: srcDAO,
         delegate: foam.isServer ?
-            this.DecoratedDAO.create({decorator: this.JSON2FileWriteDAODecorator.create()}) :
+            this.DecoratedDAO.create({decorator: this.JSON2FileWriteDAODecorator.create({root: this.root})}) :
             this.LoggingDAO.create({logger: this.log.bind(this)}),
       })
 
