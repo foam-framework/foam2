@@ -25,9 +25,13 @@ public class HistoryDAO
 {
   protected DAO historyDAO_;
 
-  public HistoryDAO(X x, DAO delegate) {
+  public HistoryDAO(X x, DAO delegate, String historyDAO) {
+    this(x, delegate, (DAO) x.get(historyDAO));
+  }
+
+  public HistoryDAO(X x, DAO delegate, DAO historyDAO) {
     super(x, delegate);
-    historyDAO_ = (DAO) x.get("historyDAO");
+    historyDAO_ = historyDAO;
   }
 
   /**
@@ -42,7 +46,7 @@ public class HistoryDAO
         "(" + user.getId() + ")";
   }
 
-  /**
+  /**git
    * Returns an array of updated properties
    *
    * @param currentValue current value
