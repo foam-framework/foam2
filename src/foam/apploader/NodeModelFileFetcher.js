@@ -15,7 +15,7 @@ foam.CLASS({
           var js = fs.readFileSync(path, 'utf8');
           ret(js);
         } catch(e) {
-          err(null);
+          ret(null);
         }
       });
     },

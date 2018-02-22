@@ -24,6 +24,7 @@ foam.CLASS({
         var self = this;
 
         return promise.then(function(text) {
+          if ( ! text ) return null;
           var json;
           var genmodel = false;
           var relationship = false;
