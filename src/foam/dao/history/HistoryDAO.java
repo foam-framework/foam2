@@ -25,11 +25,11 @@ public class HistoryDAO
 {
   protected DAO historyDAO_;
 
-  public HistoryDAO(X x, DAO delegate, String historyDAO) {
-    this(x, delegate, (DAO) x.get(historyDAO));
+  public HistoryDAO(X x, String historyDAO, DAO delegate) {
+    this(x, (DAO) x.get(historyDAO), delegate);
   }
 
-  public HistoryDAO(X x, DAO delegate, DAO historyDAO) {
+  public HistoryDAO(X x, DAO historyDAO, DAO delegate) {
     super(x, delegate);
     historyDAO_ = historyDAO;
   }
