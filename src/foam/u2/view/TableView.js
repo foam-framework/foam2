@@ -217,8 +217,7 @@ foam.CLASS({
 
   requires: [
     'foam.u2.view.EditColumnsView',
-    'foam.u2.md.OverlayDropdown',
-    'foam.u2.PopupView'
+    'foam.u2.md.OverlayDropdown'
   ],
 
   exports: [
@@ -362,9 +361,7 @@ foam.CLASS({
     },
     'hoverSelection',
     'dropdownOrigin',
-    'overlayOrigin',
-    'editRowsPopup',
-    'editRowsPopupOrigin'
+    'overlayOrigin'
   ],
 
   methods: [
