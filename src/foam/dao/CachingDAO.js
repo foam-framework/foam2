@@ -32,8 +32,9 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   requires: [
-    'foam.dao.PromisedDAO',
     'foam.dao.DAOSink',
+    'foam.dao.PromisedDAO',
+    'foam.dao.QuickSink',
   ],
 
   properties: [
@@ -86,9 +87,11 @@ foam.CLASS({
       this.SUPER();
 
       var proxy = this.src$proxy;
-      proxy.sub('on', 'put',    this.onSrcPut);
-      proxy.sub('on', 'remove', this.onSrcRemove);
-      proxy.sub('on', 'reset',  this.onSrcReset);
+      proxy.listen(this.QuickSink.create({
+        putFn: this.onSrcPut,
+        removeFn: this.onSrcRemove,
+        resetFn: this.onSrcReset,
+      }));
     },
 
     /** Puts are sent to the cache and to the source, ensuring both
