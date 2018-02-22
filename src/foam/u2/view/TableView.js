@@ -474,14 +474,11 @@ foam.CLASS({
                   }).
                   call(function() {
                     if ( view.editRowsEnabled ) {
-                      this.start('td', null, view.editRowsPopupOrigin$).
+                      this.start('td').
                         addClass(view.myClass('th-editColumns')).
                         add(view.vertMenuIcon).
                         addClass(view.myClass('vertDots')).
                         addClass(view.myClass('noselect')).
-                        on('click', function(e) {
-                          view.editRowsPopupOrigin.add(view.editRowsPopup)
-                        }).
                       end();
                     } else if ( view.editColumnsEnabled ) {
                       return this.tag('td');
