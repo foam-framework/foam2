@@ -47,7 +47,6 @@
       class: 'Boolean',
       name: 'editRowsEnabled'
     },
-    'editRowsPopup',
     'selection'
   ],
 
@@ -69,7 +68,6 @@
                 data$: this.scrolledDao$, 
                 columns: this.columns,
                 editRowsEnabled: this.editRowsEnabled,
-                editRowsPopup: this.editRowsPopup,
                 selection$: this.selection$
               }).
             end().

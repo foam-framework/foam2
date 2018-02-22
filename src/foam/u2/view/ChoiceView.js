@@ -157,6 +157,7 @@ foam.CLASS({
     function init() {
       this.onDetach(this.choices$.sub(this.onChoicesUpdate));
     },
+
     function initE() {
       // If no item is selected, and data has not been provided, select the 0th
       // entry.
