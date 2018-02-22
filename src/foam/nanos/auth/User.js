@@ -46,6 +46,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
+      shortName:'f',
+      aliases:['fname','fn','first'],
       tableWidth: 160
     },
     {

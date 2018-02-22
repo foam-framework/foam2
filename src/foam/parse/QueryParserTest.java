@@ -99,8 +99,8 @@ public class QueryParserTest {
       2,3,1,0,0,
       1,1,3,1,1,
       0,1,1,1,1,
-      3,1,1,1
-      };
+      3,1,1,1,1,
+      1};
     String[] testData ={//"id=6 *",
         "birthday>=2020-09-10",
         "birthday<2020-09-10",
@@ -136,7 +136,9 @@ public class QueryParserTest {
         "id>5",
         "lastLogin:today",
         "lastLogin:today-2",//that birthday data is not included
-        "lastLogin:2010-9-10..2020-9-10"
+        "lastLogin:2010-9-10..2020-9-10",
+        "f=Simon",
+        "fname=Simon",
         };
 
     for (int i = 0; i < testData.length; i++) {

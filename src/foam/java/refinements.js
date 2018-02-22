@@ -57,6 +57,14 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'shortName'
+    },
+    {
+      class:'StringArray',
+      name: 'aliases'
+    },
+    {
+      class: 'String',
       name: 'javaSetter'
     },
     {
@@ -81,6 +89,8 @@ foam.CLASS({
       return foam.java.PropertyInfo.create({
         sourceCls:        cls,
         propName:         this.name,
+        propShortName:    this.shortName,
+        propAliases:      this.aliases,
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,

@@ -23,6 +23,18 @@ foam.CLASS({
   properties: [
     ['anonymous', true],
     'propName',
+    'propShortName',
+    'propAliases',
+    {
+      name: 'buildBody',
+      expression: function() {
+      var b = 'new String[] {';
+        for (var i = 0; i < this.propAliases.length; i++) {
+          b+= '"'+ this.propAliases[i]+'"' + (i < this.propAliases.length-1 ? ', ' : '');
+        }
+        return b+'};';
+      }
+    },
     {
       class: 'Boolean',
       name: 'networkTransient'
@@ -64,6 +76,18 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.propName + '";'
+          },
+          {
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body:  this.propShortName ? 'return "' +this.propShortName+'";' : 'return null;'
+          },
+          {
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.buildBody
           },
           {
             name: 'get',

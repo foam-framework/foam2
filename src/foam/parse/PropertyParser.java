@@ -26,8 +26,13 @@ public class PropertyParser extends ProxyParser {
   public PropertyParser(PropertyInfo p) {
     super(new Seq3(4, 3,
         new Whitespace(),
-        new KeyParser(
-          p.getName()),
+        new Alt(
+          new KeyParser(
+            p.getName()),
+          new KeyArrayParser(
+            p.getAliases()),
+          new KeyParser(
+            p.getShortName())),
         new Whitespace(),
         new Alt(
           new Literal(":"),
