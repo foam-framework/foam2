@@ -294,7 +294,12 @@ foam.INTERFACE({
       name: 'getJunctionDAO',
       returns: 'foam.dao.DAO',
       javaReturns: 'foam.dao.DAO'
-    }
+    },
+    {
+      name: 'getTargetDAO',
+      returns: 'foam.dao.DAO',
+      javaReturns: 'foam.dao.DAO'
+    },
   ]
 });
 
@@ -362,6 +367,15 @@ foam.CLASS({
         return this.__context__[this.junctionDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'targetDAO',
+      hidden: true,
+      factory: function() {
+        return this.__context__[this.targetDAOKey];
+      },
+      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());'
     }
   ],
   methods: [
@@ -402,10 +416,24 @@ return junction;
     },
     {
       // TODO: Should we remove this, or maybe just the java portion?
+      name: 'getJunctionDAO',
+      returns: 'foam.dao.DAO',
+      javaCode: 'return getJunctionDao();',
+      code: function() { return this.junctionDAO; }
+    },
+    {
+      // TODO: Should we remove this, or maybe just the java portion?
       name: 'getDAO',
       returns: 'foam.dao.DAO',
       javaCode: 'return getDao();',
       code: function getDAO() { return this.dao; }
+    },
+    {
+      // TODO: Should we remove this, or maybe just the java portion?
+      name: 'getTargetDAO',
+      returns: 'foam.dao.DAO',
+      javaCode: 'return getTargetDao();',
+      code: function getTargetDao() { return this.targetDAO; }
     }
   ],
   actions: [
