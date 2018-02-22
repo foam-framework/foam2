@@ -212,6 +212,7 @@ FOAM_FILES([
   { name: "foam/dao/NullDAO" },
   { name: "foam/dao/TimingDAO" },
   { name: "foam/dao/LoggingDAO" },
+  { name: "foam/dao/IDBInternalException", flags: ['web'] },
   { name: "foam/dao/IDBDAO", flags: ['web'] },
   { name: "foam/dao/BatchMutationIDBDAO", flags: ['web'] },
   { name: "foam/dao/RestDAO" },
