@@ -35,7 +35,7 @@ public class NanoRouter
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
 
   @Override
-  protected synchronized void service(final HttpServletRequest req, final HttpServletResponse resp)
+  protected void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
     String      path       = req.getRequestURI();

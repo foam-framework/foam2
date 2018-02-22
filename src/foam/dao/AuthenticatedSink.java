@@ -23,17 +23,17 @@ public class AuthenticatedSink
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
+  public void put(Object obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    String      permission  = prefix_ + obj.getProperty("id");
+    String      permission  = prefix_ + ((FObject)obj).getProperty("id");
 
     if ( authService.check(getX(), permission) ) super.put(obj, sub);
   }
 
   @Override
-  public void remove(FObject obj, Detachable sub) {
+  public void remove(Object obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    String      permission  = prefix_ + obj.getProperty("id");
+    String      permission  = prefix_ + ((FObject)obj).getProperty("id");
 
     if ( authService.check(getX(), permission) ) super.remove(obj, sub);
   }

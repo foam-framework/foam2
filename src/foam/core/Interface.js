@@ -35,7 +35,13 @@ foam.CLASS({
   ],
 
   methods: [
-    function installInProto() { }
+    function installInProto() { },
+    function installInClass(cls, superMethod, existingMethod) {
+      // This is required to avoid inheritance from regular methods,
+      // which would prevent methods from being named the same as methods
+      // defined on FObject, like: log, warn, error.
+      cls.axiomMap_[this.name] = this;
+    }
   ]
 });
 

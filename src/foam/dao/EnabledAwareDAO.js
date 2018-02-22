@@ -11,12 +11,23 @@ foam.CLASS({
 
   documentation: 'Filter out disabled EnabledAware objects.',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
+  requires: [
+    'foam.nanos.auth.EnabledAware'
+  ],
+
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.mlang.predicate.Predicate',
       name: 'predicate',
       factory: function() {
         return this.EQ(this.EnabledAware.ENABLED, true);
-      }
+      },
+      javaFactory: 'return foam.mlang.MLang.EQ(EnabledAware.ENABLED, true);'
     }
   ]
 });

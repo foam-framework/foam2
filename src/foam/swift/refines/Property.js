@@ -175,6 +175,12 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
   methods: [
     function writeToSwiftClass(cls, superAxiom, parentCls) {
       if ( ! this.swiftSupport ) return;
+
+      if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
+        // TODO: Should we add vars to the protocol?
+        return;
+      }
+
       var isOverride = !!superAxiom;
       cls.fields.push(this.Field.create({
         visibility: 'public',

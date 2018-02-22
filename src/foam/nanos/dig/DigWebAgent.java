@@ -66,7 +66,8 @@ public class DigWebAgent
 
         // gets all ongoing nanopay services
         nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
-          public void put(FObject o, Detachable d) {
+          @Override
+          public void put(Object o, Detachable d) {
             NSpec s = (NSpec) o;
             if ( s.getServe() && s.getName().endsWith("DAO") ) {
               out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");

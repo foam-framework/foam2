@@ -689,6 +689,10 @@ foam.LIB({
           for ( var i = 0 ; i < o.length ; i++ ) {
             foam.json.references(x, o[i], r);
           }
+          // TODO: Should just be foam.core.FObject.isSubClass(o), but its broken #1023
+        } else if ( ( o && o.prototype && foam.core.FObject.prototype.isPrototypeOf(o.prototype) ) ||
+                    foam.core.FObject.isInstance(o) ) {
+          return r;
         } else if ( foam.Object.isInstance(o) ) {
           for ( var key in o ) {
             // anonymous class support.
@@ -697,7 +701,7 @@ foam.LIB({
               json.name = 'AnonymousClass' + foam.next$UID();
               console.log('Constructing anonymous class', json.name);
 
-              r.push(Promise.all(foam.json.references(x, json)).then(function() {
+              r.push(Promise.all(foam.json.references(x, json, [])).then(function() {
                 return x.classloader.maybeLoad(foam.core.Model.create(json));
               }));
 
