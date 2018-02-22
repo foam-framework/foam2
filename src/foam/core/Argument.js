@@ -29,7 +29,7 @@ foam.LIB({
         if ( typeStr.substring(typeStr.length - 2) === '[]' ) {
           return foam.Array;
         }
-        if ( typeStr === 'any' ) {
+        if ( typeStr === 'any' || typeStr == '``' ) {
           return undefined;
         }
 
