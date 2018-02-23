@@ -128,7 +128,7 @@ foam.CLASS({
               var selection = self.selection;
               self.stack.push(function() {
                 return foam.u2.ListCreateController.ViewController.create({obj: selection}, self);
-              });        
+              });
             }
           });
         }
@@ -142,7 +142,6 @@ foam.CLASS({
 
       listeners: [
         function onMementoChange() {
-          console.log('***** onMementoChange: ', this.memento);
           if ( this.memento ) {
             var self = this;
             this.dao.find(this.memento).then(function (obj) {

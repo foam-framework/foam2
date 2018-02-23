@@ -19,3 +19,4 @@ tools/cp.txt
 build/*
 .*-build
 .*-gensrcs
+nano.log*
