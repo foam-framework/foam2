@@ -11,18 +11,24 @@ import foam.blob.BlobService;
 import foam.blob.IdentifiedBlob;
 import foam.core.X;
 import foam.dao.DAO;
+import foam.nanos.auth.User;
 import foam.nanos.fs.File;
+import foam.nanos.session.Session;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileService
     extends HttpBlobService
 {
   protected DAO fileDAO_;
   protected DAO userDAO_;
+  protected DAO sessionDAO_;
 
   public FileService(X x, BlobService delegate) {
     super(x, delegate);
@@ -30,6 +36,7 @@ public class FileService
     // use the user dao instead of local user dao
     // so that we get the authentication decoration
     userDAO_ = (DAO) x.get("userDAO");
+    sessionDAO_ = (DAO) x.get("sessionDAO");
   }
 
   @Override
@@ -49,8 +56,33 @@ public class FileService
         return;
       }
 
+      // parse query parameters
+      Map<String, String> params = new HashMap<String, String>();
+      String query = req.getQueryString();
+      String[] pairs = query.split("&");
+      for ( String pair : pairs ) {
+        int index = pair.indexOf("=");
+        params.put(URLDecoder.decode(pair.substring(0, index), "UTF-8"),
+            URLDecoder.decode(pair.substring(index + 1), "UTF-8"));
+      }
+
+      // get session
+      String sessionId = params.get("sessionId");
+      Session session = (Session) sessionDAO_.find(sessionId);
+      if ( session == null ) {
+        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+      }
+
+      // get user from session
+      User user = (User) userDAO_.find_(x, session.getUserId());
+      if ( user == null ) {
+        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+      }
+
       // check to see if current user has access to file owner
-      if ( userDAO_.find_(x, file.getOwner()) == null ) {
+      if ( userDAO_.find_(x.put("user", user), file.getOwner()) == null ) {
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return;
       }
