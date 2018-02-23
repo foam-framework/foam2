@@ -92,11 +92,16 @@ foam.CLASS({
           return this.E('img').addClass('shopperImage')
             .attrs({
               src: this.data$.map(function (data) {
+                console.log(data);
                 if ( data && data.data ) {
                   var blob = data.data;
-                  return self.BlobBlob.isInstance(blob) ?
-                    URL.createObjectURL(blob.blob) :
-                    ( "/service/httpFileService/" + data.id );
+                  var sessionId = localStorage['defaultSession'];
+                  if ( self.BlobBlob.isInstance(blob) ) {
+                    return URL.createObjectURL(blob.blob);
+                  } else {
+                    return '/service/httpFileService/' +
+                      data.id + '?sessionId=' + sessionId;
+                  }
                 } else {
                    return 'images/person.svg'
                 }
