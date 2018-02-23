@@ -9,7 +9,7 @@ package foam.box;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
-import foam.nanos.auth.Group;
+import foam.nanos.auth.*;
 import foam.nanos.boot.NSpec;
 import foam.nanos.logger.*;
 import foam.nanos.session.Session;
@@ -64,8 +64,11 @@ public class SessionServerBox
         }
 
         if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-          Group group = x.get(Group.class);
-          ((Logger) x.get("logger")).debug("missing permission", group.getId(), "service." + spec.getName());
+          User   user     = (User) x.get("user");
+          DAO    groupDAO = (DAO) x.get("groupDAO");
+          Group  group    = (Group) groupDAO.find(user.getGroup());
+          Logger logger   = (Logger) x.get("logger");
+          logger.debug("missing permission", group.getId(), "service." + spec.getName());
           // msg.replyWithException(new NoPermissionException("No permission"));
           // return;
         }

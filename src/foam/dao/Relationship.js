@@ -285,16 +285,19 @@ foam.INTERFACE({
         { name: 'target', of: 'foam.core.FObject' }
       ]
     },
+    // TODO: These should really be properties.
     {
       name: 'getDAO',
-      returns: 'foam.dao.DAO',
       javaReturns: 'foam.dao.DAO'
     },
     {
       name: 'getJunctionDAO',
-      returns: 'foam.dao.DAO',
       javaReturns: 'foam.dao.DAO'
-    }
+    },
+    {
+      name: 'getTargetDAO',
+      javaReturns: 'foam.dao.DAO'
+    },
   ]
 });
 
@@ -362,6 +365,15 @@ foam.CLASS({
         return this.__context__[this.junctionDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());'
+    },
+    {
+      class: 'foam.dao.DAOProperty',
+      name: 'targetDAO',
+      hidden: true,
+      factory: function() {
+        return this.__context__[this.targetDAOKey];
+      },
+      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());'
     }
   ],
   methods: [

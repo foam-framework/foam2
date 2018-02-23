@@ -31,6 +31,7 @@ FOAM_FILES([
   { name: 'foam/nanos/auth/ResendVerificationEmail', flags: ['web'] },
   { name: "foam/nanos/auth/Phone" },
   { name: "foam/nanos/auth/SignOutView" },
+  { name: 'foam/nanos/auth/email/EmailTokenService'},    
   { name: "foam/nanos/auth/resetPassword/EmailView" },
   { name: "foam/nanos/auth/resetPassword/ResendView" },
   { name: "foam/nanos/auth/resetPassword/ResetView" },
