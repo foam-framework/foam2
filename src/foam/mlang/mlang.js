@@ -973,7 +973,11 @@ foam.CLASS({
   properties: [
     {
       class: 'Object',
-      name: 'value'
+      name: 'value',
+      adapt: function(_, nu) {
+        // Deal with empty arrays that serialize as undefined.
+        return foam.Undefined.isInstance(nu) ? [] : nu;
+      },
     }
   ],
 
