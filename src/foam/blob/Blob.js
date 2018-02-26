@@ -685,7 +685,13 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + '/' + this.serviceName
+        var sessionId = localStorage['defaultSession'];
+        var url = window.location.origin + '/' + this.serviceName
+        // attach session id if available
+        if ( sessionId ) {
+          url += '?sessionId=' + sessionId;
+        }
+        return url;
       }
     }
   ],
