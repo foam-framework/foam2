@@ -77,6 +77,20 @@ foam.CLASS({
       hidden: true
     },
     {
+      name: 'documentation',
+      label: 'Documentation',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(value);
+      }
+    },
+    {
+      name: 'required',
+      label: 'Required',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(value);
+      }
+    },
+    {
       name: 'cls',
       label: 'Source',
       tableCellView: function(o, e) {
