@@ -88,7 +88,6 @@ foam.CLASS({
           }
         });
       });
-
       this.start().addClass(this.myClass())
         .start('h2').add("Model Browser").end()
         .start().add(this.PRINT_PAGE).end()
@@ -105,7 +104,7 @@ foam.CLASS({
             .end()
           })
         }))
-      .end()
+      .end();
     }
   ],
 
@@ -181,7 +180,6 @@ foam.CLASS({
 	          }
           }
         }
-
         return this.TableView.create({
           of: this.PropertyInfo,
           data: this.ArrayDAO.create({array: axs})

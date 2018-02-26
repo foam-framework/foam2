@@ -330,10 +330,6 @@ FOAM_FILES([
   { name: "foam/swift/refines/Box", flags: ['swift'] },
   { name: "foam/swift/refines/Remote", flags: ['swift'] },
 
-  { name: "foam/support/Ticket" },
-  { name: "foam/support/Message" },
-  { name: "foam/support/SupportEmail" },
-
   { name: "foam/box/Runnable" },
   { name: "foam/box/LogBox" },
   { name: "foam/box/MultiDelegateBox" },
@@ -444,7 +440,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/SignInView", flags: ['web'] },
   { name: "foam/nanos/auth/SignUpView", flags: ['web'] },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
-  { name: "foam/doc/ModelView", flags:  ['web'] },
+  { name: "foam/doc/ModelBrowser", flags:  ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
