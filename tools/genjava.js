@@ -252,7 +252,9 @@ var addDepsToClasses = function() {
   var flagFilter = foam.util.flagFilter(['java']);
 
   var classloader = foam.__context__.classloader;
-  Object.keys(paths).forEach(classloader.addClassPath.bind(classloader));
+  Object.keys(paths).forEach(function(p) {
+    classloader.addClassPath(p);
+  });
 
   return Promise.all(classes.map(function(cls) {
     return foam.__context__.arequire(cls);
