@@ -47,7 +47,7 @@ foam.CLASS({
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
-  imports: ['selection as importedSelection'],
+  imports: [ 'selection as importedSelection' ],
   // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',
@@ -61,7 +61,7 @@ foam.CLASS({
     'positiveRunway',
     'rows_',
     'rowFormatter',
-    'selection',
+    'selection'
   ],
 
   properties: [
@@ -141,7 +141,7 @@ foam.CLASS({
       class: 'Array',
       name: 'selection',
       adapt: function(_, nu) {
-        if (foam.Null.isInstance(nu) || foam.Undefined.isInstance(nu))
+        if ( foam.Null.isInstance(nu) || foam.Undefined.isInstance(nu) )
           return [];
 
         return foam.Array.isInstance(nu) ? nu : [nu];
@@ -275,7 +275,7 @@ foam.CLASS({
       imports: [
         'columns?',
         'rowFormatter',
-        'selection',
+        'selection'
       ],
 
       axioms: [
@@ -321,21 +321,26 @@ foam.CLASS({
           this.onload.sub(this.render);
         },
         function initE() {
+          var self = this;
           this.addClass(this.myClass());
           this.enableClass(
               this.myClass('selected'),
               this.slot(function(data, selection) {
-                if (!data || selection.length === 0) return false;
-                return selection.some(d => d.id === data.id);
+                if ( ! data || selection.length === 0 ) return false;
+                return selection.some(function(d) {
+                  return d.id === data.id;
+                });
               }, this.data$, this.selection$));
-          this.on('click', evt => {
-            if ( ! this.data ) return;
-            if (this.selection.some(d => d.id === this.data.id)) {
-              foam.Array.remove(this.selection, this.data);
+          this.on('click', function(evt) {
+            if ( ! self.data ) return;
+            if ( self.selection.some(function(d) {
+                   return d.id === self.data.id;
+                 }) ) {
+              foam.Array.remove(self.selection, self.data);
             } else {
-              this.selection.push(this.data);
+              self.selection.push(self.data);
             }
-            this.selection = Array.from(this.selection);
+            self.selection = Array.from(self.selection);
           });
           this.columns$ && this.columns$.sub(this.render);
         }
