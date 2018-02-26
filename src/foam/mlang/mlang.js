@@ -1236,6 +1236,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
+  swiftName: 'NotPred',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
@@ -1287,7 +1288,11 @@ foam.CLASS({
   documentation: 'Unary Predicate for generic keyword search (searching all String properties for argument substring).',
 
   requires: [
-    'foam.core.String'
+    {
+      name: 'String',
+      path: 'foam.core.String',
+      swiftPath: null,
+    },
   ],
 
   methods: [
@@ -1618,6 +1623,7 @@ foam.CLASS({
     },
     {
       name: 'compare',
+      swiftSupport: false,
       transient: true,
       documentation: 'Is a property so that it can be bound to "this" so that it works with Array.sort().',
       factory: function() { return this.compare_.bind(this); }
