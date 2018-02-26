@@ -58,7 +58,6 @@ foam.CLASS({
 
   methods: [
     function initE() {
-      debugger;
       this.add(this.properties$);
     }
   ]
