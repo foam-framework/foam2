@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'top',
       hidden: true,
       expression: function(pos) {
-        return this.stack_[pos];
+        return this.stack_[pos] || null;
       }
     }
   ],
@@ -83,11 +83,13 @@ foam.CLASS({
   actions: [
     {
       name: 'back',
+      icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
       code: function() { this.pos--; }
     },
     {
       name: 'forward',
+      icon: 'arrow_forward',
       isEnabled: function(pos, depth) { return pos < depth - 1; },
       code: function() { this.pos++; }
     }

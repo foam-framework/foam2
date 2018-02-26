@@ -14,10 +14,10 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.box.RetryBox',
     'foam.box.HTTPBox',
-    'foam.dao.RequestResponseClientDAO',
+    'foam.box.RetryBox',
     'foam.dao.ClientDAO',
+    'foam.dao.RequestResponseClientDAO',
     'foam.nanos.boot.NSpec'
   ],
 
@@ -75,6 +75,22 @@ foam.CLASS({
       };
 
       var references = [];
+
+      // Force hard reload when app version updates
+      self.nSpecDAO.find("appConfig").then(function(spec) {
+        var appConfig = spec.service;
+        var version   = appConfig.version;
+
+        if ( "CLIENT_VERSION" in localStorage ) {
+          var oldVersion = localStorage.CLIENT_VERSION;
+          if ( version != oldVersion ) {
+            localStorage.CLIENT_VERSION = version;
+            location.reload(true);
+          }
+        } else {
+          localStorage.CLIENT_VERSION = version;
+        }
+      });
 
       self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
         put: function(spec) {

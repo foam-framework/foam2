@@ -184,7 +184,7 @@ public class Outputter
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
-    outputFObject(obj);
+  public void put(Object obj, Detachable sub) {
+    outputFObject((FObject)obj);
   }
 }
