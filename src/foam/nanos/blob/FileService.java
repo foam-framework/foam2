@@ -23,6 +23,7 @@ public class FileService
 {
   protected DAO fileDAO_;
   protected DAO userDAO_;
+  protected DAO sessionDAO_;
 
   public FileService(X x, BlobService delegate) {
     super(x, delegate);
@@ -30,6 +31,7 @@ public class FileService
     // use the user dao instead of local user dao
     // so that we get the authentication decoration
     userDAO_ = (DAO) x.get("userDAO");
+    sessionDAO_ = (DAO) x.get("sessionDAO");
   }
 
   @Override
