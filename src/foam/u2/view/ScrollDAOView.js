@@ -47,7 +47,10 @@ foam.CLASS({
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
-  imports: [ 'selection as importedSelection' ],
+  imports: [
+    'selection as importedSelection',
+    'selectionEnabled as importedSelectionEnabled'
+  ],
   // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',
@@ -61,7 +64,8 @@ foam.CLASS({
     'positiveRunway',
     'rows_',
     'rowFormatter',
-    'selection'
+    'selection',
+    'selectionEnabled'
   ],
 
   properties: [
@@ -136,6 +140,13 @@ foam.CLASS({
           batches limits the number of rows to be processed per animation
           frame.`,
       value: 25
+    },
+    {
+      class: 'Boolean',
+      name: 'selectionEnabled',
+      factory: function() {
+        return !! this.importedSelectionEnabled;
+      }
     },
     {
       class: 'Array',
@@ -275,7 +286,8 @@ foam.CLASS({
       imports: [
         'columns?',
         'rowFormatter',
-        'selection'
+        'selection',
+        'selectionEnabled'
       ],
 
       axioms: [
@@ -292,7 +304,7 @@ foam.CLASS({
               -ms-user-select: none;
               user-select: none;
             }
-            ^:hover {
+            ^selectable:hover {
               filter: opacity(0.8);
               cursor: pointer;
             }
@@ -323,14 +335,19 @@ foam.CLASS({
         function initE() {
           var self = this;
           this.addClass(this.myClass());
+          this.enableClass(this.myClass('selectable'), this.selectionEnabled$);
           this.enableClass(
               this.myClass('selected'),
-              this.slot(function(data, selection) {
-                if ( ! data || selection.length === 0 ) return false;
+              this.slot(function(selectionEnabled, data, selection) {
+                if ( ! data || ! selectionEnabled ||
+                     selection.length === 0 ) {
+                  return false;
+                }
+
                 return selection.some(function(d) {
                   return d.id === data.id;
                 });
-              }, this.data$, this.selection$));
+              }, this.selectionEnabled$, this.data$, this.selection$));
           this.on('click', function(evt) {
             if ( ! self.data ) return;
             if ( self.selection.some(function(d) {
