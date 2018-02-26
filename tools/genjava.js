@@ -251,11 +251,11 @@ var addDepsToClasses = function() {
 
   var flagFilter = foam.util.flagFilter(['java']);
 
-  var X = foam.classloader.NodeJsModelExecutor.create({
-    classpaths: Object.keys(paths)
-  }).__subContext__;
+  var classloader = foam.__context__.classloader;
+  Object.keys(paths).forEach(classloader.addClassPath.bind(classloader));
+
     return Promise.all(classes.map(function(cls) {
-      return X.arequire(cls);
+      return foam.__context__.arequire(cls);
     })).then(function() {
       var classMap = {};
       var classQueue = classes.slice(0);
