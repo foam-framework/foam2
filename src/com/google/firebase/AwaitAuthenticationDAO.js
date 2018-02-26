@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'com.google.firebase',
-  name: 'AuthenticatedDAO',
+  name: 'AwaitAuthenticationDAO',
   extends: 'foam.dao.PromisedDAO',
 
   documentation: `A PromiseDAO that will wait to deliver its delegate until
