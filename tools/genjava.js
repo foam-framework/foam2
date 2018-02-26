@@ -254,27 +254,27 @@ var addDepsToClasses = function() {
   var classloader = foam.__context__.classloader;
   Object.keys(paths).forEach(classloader.addClassPath.bind(classloader));
 
-    return Promise.all(classes.map(function(cls) {
-      return foam.__context__.arequire(cls);
-    })).then(function() {
-      var classMap = {};
-      var classQueue = classes.slice(0);
-      while ( classQueue.length ) {
-        var cls = classQueue.pop();
-        if ( ! classMap[cls] && ! blacklist[cls] ) {
-          classMap[cls] = true;
-          cls = foam.lookup(cls);
-          cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
-            r.javaPath && classQueue.push(r.javaPath);
-          });
-          cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
-            classQueue.push(r.path);
-          });
-          if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
-        }
+  return Promise.all(classes.map(function(cls) {
+    return foam.__context__.arequire(cls);
+  })).then(function() {
+    var classMap = {};
+    var classQueue = classes.slice(0);
+    while ( classQueue.length ) {
+      var cls = classQueue.pop();
+      if ( ! classMap[cls] && ! blacklist[cls] ) {
+        classMap[cls] = true;
+        cls = foam.lookup(cls);
+        cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
+          r.javaPath && classQueue.push(r.javaPath);
+        });
+        cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
+          classQueue.push(r.path);
+        });
+        if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
       }
-      classes = Object.keys(classMap);
-    });
+    }
+    classes = Object.keys(classMap);
+  });
 };
 
 addDepsToClasses().then(function() {
