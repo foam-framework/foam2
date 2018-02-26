@@ -13,6 +13,10 @@ import org.w3c.dom.Element;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -51,13 +55,13 @@ public abstract class AbstractPropertyInfo
   public void prepareStatement(IndexedPreparedStatement stmt) throws SQLException {}
 
   @Override
-  public Object f(FObject o) {
+  public Object f(Object o) {
     return get(o);
   }
 
   @Override
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop) {
-    if ( ! prop.f(o1).equals(prop.f(o2)) ) {
+    if ( prop.f(o1) == null || ! prop.f(o1).equals(prop.f(o2)) ) {
       diff.put(prop.getName(), prop.f(o2));
     }
   }
@@ -110,4 +114,20 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public void validate(FObject obj) throws IllegalStateException {}
+
+  @Override
+  public void updateDigest(FObject obj, MessageDigest md) {}
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {}
+
+  protected byte[] nameAsByteArray_ = null;
+
+  @Override
+  public byte[] getNameAsByteArray() {
+    if ( nameAsByteArray_ == null ) {
+      nameAsByteArray_ = getName().getBytes(StandardCharsets.UTF_8);
+    }
+    return nameAsByteArray_;
+  }
 }

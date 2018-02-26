@@ -46,6 +46,57 @@ externalFile.blacklist.forEach(function(cls) {
   blacklist[cls] = true;
 });
 
+[
+  'FObject',
+  'foam.core.AbstractEnum',
+  'foam.core.AbstractInterface',
+  'foam.core.Property',
+  'foam.core.String',
+  'foam.core.Validatable',
+
+  // These have hand written java impls so we don't want to clobber them.
+  // TODO: Change gen.sh to prefer hand written java files over generated.
+  'foam.dao.FilteredDAO',
+  'foam.dao.LimitedDAO',
+  'foam.dao.OrderedDAO',
+  'foam.dao.SkipDAO',
+
+  // TODO: These models currently don't compile in java but could be updated to
+  // compile properly.
+  'foam.blob.BlobBlob',
+  'foam.dao.CompoundDAODecorator',
+  'foam.dao.DAODecorator',
+  'foam.dao.FlowControl',
+  'foam.dao.PromisedDAO',
+  'foam.dao.sync.SyncRecord',
+  'foam.dao.sync.VersionedSyncRecord',
+  'foam.mlang.order.ThenBy',
+  'foam.mlang.Expressions',
+  'foam.nanos.menu.MenuBar',
+
+  'foam.box.Context',
+//  'foam.box.HTTPBox',
+//  'foam.box.SessionClientBox',
+  'foam.box.SocketBox',
+  'foam.box.WebSocketBox',
+  'foam.box.TimeoutBox',
+  'foam.box.RetryBox',
+  'foam.dao.CachingDAO',
+  'foam.dao.CompoundDAODecorator',
+  'foam.dao.DecoratedDAO',
+  'foam.dao.DeDupDAO',
+  'foam.dao.IDBDAO',
+  'foam.dao.JDAO',
+  'foam.dao.LoggingDAO',
+  'foam.dao.MDAO',
+  'foam.dao.PromisedDAO',
+  'foam.dao.RequestResponseClientDAO',
+  'foam.dao.SyncDAO',
+  'foam.dao.TimingDAO'
+].forEach(function(cls) {
+  blacklist[cls] = true;
+});
+
 var outdir = process.argv[3];
 outdir = path_.resolve(path_.normalize(outdir));
 

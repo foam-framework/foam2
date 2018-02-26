@@ -28,7 +28,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          swiftType: 'FObject'
+          swiftType: 'Any'
         },
         {
           name: 'sub',
@@ -42,7 +42,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          swiftType: 'FObject'
+          swiftType: 'Any'
         },
         {
           name: 'sub',
@@ -613,7 +613,7 @@ foam.CLASS({
   properties: [
     {
       name: 'fn',
-      swiftType: '((String, FObject?, Detachable) -> Void)',
+      swiftType: '((String, Any?, Detachable) -> Void)',
       swiftRequiresEscaping: true,
     },
   ],
@@ -728,16 +728,16 @@ foam.CLASS({
       code: function(o) {
         this.dao.put(o);
       },
-      javaCode: `getDao().put(obj);`,
-      swiftCode: '_ = try? dao?.put(obj)',
+      javaCode: `getDao().put((foam.core.FObject)obj);`,
+      swiftCode: '_ = try? dao?.put(obj as! FObject)',
     },
     {
       name: 'remove',
       code: function(o) {
         this.dao.remove(o);
       },
-      javaCode: `getDao().remove(obj);`,
-      swiftCode: '_ = try? dao?.remove(obj)',
+      javaCode: `getDao().remove((foam.core.FObject)obj);`,
+      swiftCode: '_ = try? dao?.remove(obj as! FObject)',
     },
     {
       name: 'eof',

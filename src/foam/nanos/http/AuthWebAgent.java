@@ -6,22 +6,20 @@
 
 package foam.nanos.http;
 
-import foam.core.*;
+import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
-import foam.nanos.http.ProxyWebAgent;
-import foam.nanos.http.WebAgent;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-import java.io.PrintWriter;
-import java.util.Date;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 public class AuthWebAgent
-  extends ProxyWebAgent
+    extends ProxyWebAgent
 {
   public final static String SESSION_ID = "sessionId";
 
@@ -30,34 +28,6 @@ public class AuthWebAgent
   public AuthWebAgent(String permission, WebAgent delegate) {
     setDelegate(delegate);
     permission_ = permission;
-  }
-
-  public void execute(X x) {
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
-    PrintWriter         out        = x.get(PrintWriter.class);
-    AuthService         auth       = (AuthService) x.get("auth");
-    DAO                 sessionDAO = (DAO) x.get("sessionDAO");
-    String              sessionId  = null;
-    Cookie              cookie     = getCookie(req);
-
-    attemptLogin(x);
-
-    if ( cookie != null ) {
-      sessionId       = cookie.getValue().toString();
-      Session session = (Session) sessionDAO.find(sessionId);
-
-      if ( session != null && session.getContext() != null ) {
-        if ( auth.check(session.getContext(), permission_) ) {
-          getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
-          return;
-        } else {
-          out.println("Access denied. Need permission: " + permission_);
-        }
-      }
-    }
-
-    templateLogin(x);
   }
 
   public Cookie getCookie(HttpServletRequest req) {
@@ -71,6 +41,13 @@ public class AuthWebAgent
     return null;
   }
 
+  public void createCookie(X x, Session session){
+    HttpServletResponse resp   = x.get(HttpServletResponse.class);
+    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
+
+    resp.addCookie(cookie);
+  }
+
   public void templateLogin(X x) {
     PrintWriter out = x.get(PrintWriter.class);
 
@@ -78,7 +55,7 @@ public class AuthWebAgent
     out.println("<h1>Login</h1>");
     out.println("<br>");
     out.println("<label style=\"display:inline-block;width:70px;\">Email:</label>");
-    out.println("<input name=\"email\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
+    out.println("<input name=\"user\" type=\"string\" size=\"30\" style=\"display:inline-block;\"></input>");
     out.println("<br>");
     out.println("<label style=\"display:inline-block;width:70px;\">Password:</label>");
     out.println("<input name=\"password\" type=\"password\" size=\"30\" style=\"display:inline-block;\"></input>");
@@ -87,41 +64,72 @@ public class AuthWebAgent
     out.println("</form>");
   }
 
-  public boolean attemptLogin(X x) {
-    HttpServletRequest req        = x.get(HttpServletRequest.class);
-    String             email      = req.getParameter("email");
-    String             password   = req.getParameter("password");
-    AuthService        auth       = (AuthService) x.get("auth");
-    PrintWriter        out        = x.get(PrintWriter.class);
-    Session            session    = new Session();
-    DAO                sessionDAO = (DAO) x.get("sessionDAO");
+  /** If provided, use user and password parameters to login and create session and cookie. **/
+  public Session authenticate(X x) {
+    // context parameters
+    HttpServletRequest req          = x.get(HttpServletRequest.class);
+    AuthService        auth         = (AuthService) x.get("auth");
+    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
 
-    if ( SafetyUtil.isEmpty(email) || SafetyUtil.isEmpty(password) ) return false;
+    // query parameters
+    String             email        = req.getParameter("user");
+    String             password     = req.getParameter("password");
+
+    // instance parameters
+    Session            session      = null;
+    Cookie             cookie       = getCookie(req);
+    boolean            attemptLogin = ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password);
+
+    // get session id from either query parameters or cookie
+    String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
+        req.getParameter("sessionId") : ( cookie != null ) ?
+        cookie.getValue().toString() : null;
+
+    if ( ! SafetyUtil.isEmpty(sessionId) ) {
+      session = (Session) sessionDAO.find(sessionId);
+      if ( session == null ) {
+        session = new Session();
+        session.setId(sessionId);
+      } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
+        return session;
+      }
+    } else {
+      // create new cookie
+      session = new Session();
+      createCookie(x, session);
+    }
+
+    if ( ! attemptLogin ) {
+      return null;
+    }
 
     try {
-
-      User user = (User) auth.loginByEmail(session.getContext(), email, password);
+      User user = auth.loginByEmail(session.getContext(), email, password);
       if ( user != null ) {
-        createCookie(x, session);
-        return true;
+        return session;
       }
     } catch (Throwable t) {
       t.printStackTrace();
     }
 
+    PrintWriter out = x.get(PrintWriter.class);
     out.println("Authentication failure.");
-
-    return false;
+    return null;
   }
 
-  public void createCookie(X x, Session session){
-    HttpServletResponse resp   = x.get(HttpServletResponse.class);
-    PrintWriter         out    = x.get(PrintWriter.class);
-    Cookie              cookie = new Cookie(SESSION_ID, session.getId());
+  public void execute(X x) {
+    AuthService         auth    = (AuthService) x.get("auth");
+    Session             session = authenticate(x);
 
-    resp.addCookie(cookie);
-    out.println("<script>");
-    out.println("window.location.href = window.location.href;");
-    out.println("</script>");
+    if ( session != null && session.getContext() != null ) {
+      if ( auth.check(session.getContext(), permission_) ) {
+        getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
+      } else {
+        PrintWriter out = x.get(PrintWriter.class);
+        out.println("Access denied. Need permission: " + permission_);
+      }
+    } else {
+      templateLogin(x);
+    }
   }
 }

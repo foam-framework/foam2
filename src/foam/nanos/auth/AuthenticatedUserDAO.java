@@ -10,49 +10,156 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
-import foam.mlang.MLang;
-import foam.mlang.sink.Count;
-import java.security.NoSuchAlgorithmException;
+import foam.dao.Sink;
+import foam.mlang.order.Comparator;
+import foam.mlang.predicate.Predicate;
+import foam.util.SafetyUtil;
 
-//TODO: Throw exception for print statements when they are ready
+import java.security.AccessControlException;
+
+import static foam.mlang.MLang.EQ;
+
+/**
+ * Authenticate UserDAO
+ *
+ * Features:
+ *  - restrict creation/updating of users
+ *  - restrict group of users created/updated
+ *  - restrict deletion of users
+ *  - restrict selection of users
+ *    - can only see self by default
+ *    - can see users belonging to groups you can create
+ *  - grant access to based on SPID
+ *  - set SPID to same as user creating new user if they don't have the global
+ *    spid property
+ **/
 public class AuthenticatedUserDAO
-  extends ProxyDAO
+    extends ProxyDAO
 {
-  public AuthenticatedUserDAO(DAO delegate) {
-    setDelegate(delegate);
+  public final static String GLOBAL_USER_READ   = "user.read.x";
+  public final static String GLOBAL_USER_UPDATE = "user.update.x";
+  public final static String GLOBAL_USER_DELETE = "user.delete.x";
+
+  public final static String GLOBAL_SPID_READ   = "spid.read.x";
+  public final static String GLOBAL_SPID_UPDATE = "spid.update.x";
+  public final static String GLOBAL_SPID_DELETE = "spid.delete.x";
+
+  public AuthenticatedUserDAO(X x, DAO delegate) {
+    super(x, delegate);
   }
 
   @Override
-  public FObject put_(X x, FObject fObject) {
-    User user = (User) fObject;
+  public FObject put_(X x, FObject obj) {
+    User        user    = (User) x.get("user");
+    AuthService auth    = (AuthService) x.get("auth");
 
-    if ( super.find_(x, user.getId()) != null ) {
-      System.out.println("A user has already been registered with this account");
+    User toPut = (User) obj;
+    if ( toPut != null && toPut.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_UPDATE) &&
+        ! auth.check(x, GLOBAL_SPID_UPDATE) &&
+        ! auth.check(x, "spid.update." + user.getSpid()) ) {
+      throw new RuntimeException("Unable to update user");
+    }
+
+    // set spid if not set
+    if ( SafetyUtil.isEmpty((String) toPut.getSpid()) &&
+        ! SafetyUtil.isEmpty((String) user.getSpid()) ) {
+      toPut.setSpid(user.getSpid());
+    }
+
+    return super.put_(x, toPut);
+  }
+
+  @Override
+  public FObject find_(X x, Object id) {
+    User        user = (User) x.get("user");
+    AuthService auth = (AuthService) x.get("auth");
+
+    // check if logged in
+    if ( user == null ) {
+      throw new AccessControlException("User is not logged in");
+    }
+
+    // find user and check if current user has permission to read
+    User result = (User) super.find_(x, id);
+    if ( result != null && result.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_READ) &&
+        ! auth.check(x, GLOBAL_SPID_READ) &&
+        ! auth.check(x, "spid.read." + result.getSpid()) ) {
       return null;
     }
 
-    AuthService service = (AuthService) x.get("auth");
-    if ( service == null ) {
-      System.out.println("Auth Service not started");
-      return null;
+    return result;
+  }
+
+  @Override
+  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
+    User        user = (User) x.get("user");
+    AuthService auth = (AuthService) x.get("auth");
+
+    // check if logged in
+    if ( user == null ) {
+      throw new AccessControlException("User is not logged in");
     }
 
-    try {
-//      service.validateUser(user);
-      Count count = (Count) this.limit(1).where(MLang.EQ(User.EMAIL, user.getEmail())).select(new Count());
-
-      if ( count.getValue() > 0 ) {
-        System.out.println("An account is already registered with this email address");
-        return null;
-      }
-
-//      String salt = UserAndGroupAuthService.generateRandomSalt();
-//      user.setPassword(UserAndGroupAuthService.hashPassword(user.getPassword(), salt) + ":" + salt);
-      return getDelegate().put_(x, user);
+    DAO dao;
+    if ( auth.check(x, GLOBAL_USER_READ) ) {
+      // get all users in system
+      dao = getDelegate();
+    } else if ( auth.check(x, GLOBAL_SPID_READ) || auth.check(x, "spid.read." + user.getSpid()) ) {
+      // get all users under service provider
+      dao = getDelegate().where(EQ(User.SPID, user.getSpid()));
+    } else {
+      // only get authenticated user
+      dao = getDelegate().where(EQ(User.ID, user.getId()));
     }
-    catch (RuntimeException e) {
-      e.printStackTrace();
-      return null;
+    return dao.select_(x, sink, skip, limit, order, predicate);
+  }
+
+  @Override
+  public FObject remove_(X x, FObject obj) {
+    User        user    = (User) x.get("user");
+    AuthService auth    = (AuthService) x.get("auth");
+
+    // check if logged in
+    if ( user == null ) {
+      throw new AccessControlException("User is not logged in");
     }
+
+    // check if current user has permission to delete
+    User toRemove = (User) obj;
+    if ( toRemove != null && toRemove.getId() != user.getId() &&
+        ! auth.check(x, GLOBAL_USER_DELETE) &&
+        ! auth.check(x, GLOBAL_SPID_DELETE) &&
+        ! auth.check(x, "spid.delete." + toRemove.getSpid()) ) {
+      throw new RuntimeException("Unable to delete user");
+    }
+
+    return super.remove_(x, obj);
+  }
+
+  @Override
+  public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
+    User        user = (User) x.get("user");
+    AuthService auth = (AuthService) x.get("auth");
+
+    // check if logged in
+    if ( user == null ) {
+      throw new AccessControlException("User is not logged in");
+    }
+
+    DAO dao;
+    if ( auth.check(x, GLOBAL_USER_DELETE) ) {
+      // delete all users in system
+      dao = getDelegate();
+    } else if ( auth.check(x, GLOBAL_SPID_DELETE) || auth.check(x, "spid.delete." + user.getSpid()) ) {
+      // delete users under service provider
+      dao = getDelegate().where(EQ(User.SPID, user.getSpid()));
+    } else {
+      // only delete authenticated user
+      dao = getDelegate().where(EQ(User.ID, user.getId()));
+    }
+
+    dao.removeAll_(x, skip, limit, order, predicate);
   }
 }

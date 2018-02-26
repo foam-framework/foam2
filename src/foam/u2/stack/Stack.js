@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'top',
       hidden: true,
       expression: function(pos) {
-        return this.stack_[pos];
+        return this.stack_[pos] || null;
       }
     }
   ],

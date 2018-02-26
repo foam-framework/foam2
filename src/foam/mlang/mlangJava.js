@@ -13,7 +13,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'Object'
@@ -66,7 +66,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'boolean'
@@ -127,7 +127,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaCode: 'return false;',
@@ -408,11 +408,11 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
-      javaReturns: 'foam.core.FObject',
-      javaCode: `return (foam.core.FObject) getArg1().f(obj);`
+      javaReturns: 'Object',
+      javaCode: `return getArg1().f(obj);`
     },
     {
       name: 'put',
@@ -420,7 +420,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -621,7 +621,7 @@ StringBuilder builder = sb.get();
 for ( int i = 0; i < length; i++ ) {
   if ( obj[i] == null )
     builder.append("");
-  else 
+  else
     escapeCommasAndAppend(builder, obj[i]);
   if ( i < length - 1 ) {
     builder.append(",");
@@ -642,7 +642,7 @@ stmt.setObject(builder.toString());`
         }
       ],
       javaReturns: 'void',
-      javaCode: 
+      javaCode:
 `String s = o.toString();
 //replace backslash to double backslash
 s = s.replace("\\\\", "\\\\\\\\");
@@ -696,7 +696,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))<0;'  
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))<0;'
     },
     {
       name: 'createStatement',
@@ -747,7 +747,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))>=0;' 
+      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))>=0;'
     },
     {
       name: 'createStatement',
@@ -770,41 +770,42 @@ foam.CLASS({
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate',
       javaCode:
-      `if ( this.arg1_ instanceof Not )
-  return ( (Not) arg1_ ).arg1_.partialEval();
-if ( arg1_.getClass().equals(Eq.class) ) {
-  return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
-}
-if ( arg1_.getClass().equals(Neq.class) ) {
+      `Not predicate = (Not) this.fclone();
+    if ( this.arg1_ instanceof Not )
+      return ( (Not) arg1_ ).arg1_.partialEval();
+    if ( arg1_.getClass().equals(Eq.class) ) {
+      return new Neq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+    }
+    if ( arg1_.getClass().equals(Neq.class) ) {
       return new Eq(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
-}
-if ( arg1_.getClass().equals(Gt.class) ) {
-  return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
-}
-if ( arg1_.getClass().equals(Gte.class) ) {
-  return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
-}
-if ( arg1_.getClass().equals(Lt.class) ) {
-  return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
-}
-if ( arg1_.getClass().equals(Lte.class) ) {
-  return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
-}
-if ( arg1_.getClass().equals(And.class) ) {
-  int len = ( (And) getArg1() ).args_.length;
-  for ( int i = 0; i < len; i++ ) {
-    ( (And) getArg1() ).args_[i] = ( new Not(( (And) getArg1() ).args_[i]) ).partialEval();
-  }
-  return new Or(( (And) getArg1() ).args_).partialEval();
-}
-if ( arg1_.getClass().equals(Or.class) ) {
-  int len = ( (Or) getArg1() ).args_.length;
-  for ( int i = 0; i < len; i++ ) {
-    ( (Or) getArg1() ).args_[i] = ( new Not(( (Or) getArg1() ).args_[i]) ).partialEval();
-  }
-  return new And(( (Or) getArg1() ).args_).partialEval();
-}
-return this;`
+    }
+    if ( arg1_.getClass().equals(Gt.class) ) {
+      return new Lte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+    }
+    if ( arg1_.getClass().equals(Gte.class) ) {
+      return new Lt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+    }
+    if ( arg1_.getClass().equals(Lt.class) ) {
+      return new Gte(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+    }
+    if ( arg1_.getClass().equals(Lte.class) ) {
+      return new Gt(( (Binary) arg1_ ).getArg1(), ( (Binary) arg1_ ).getArg2());
+    }
+    if ( predicate.arg1_.getClass().equals(And.class) ) {
+      int len = ( (And) predicate.getArg1() ).args_.length;
+      for ( int i = 0; i < len; i++ ) {
+        ( (And) predicate.getArg1() ).args_[i] = ( new Not(( (And) predicate.getArg1() ).args_[i]) ).partialEval();
+      }
+      return new Or(( (And) predicate.getArg1() ).args_).partialEval();
+    }
+    if ( predicate.arg1_.getClass().equals(Or.class) ) {
+      int len = ( (Or) predicate.getArg1() ).args_.length;
+      for ( int i = 0; i < len; i++ ) {
+        ( (Or) predicate.getArg1() ).args_[i] = ( new Not(( (Or) predicate.getArg1() ).args_[i]) ).partialEval();
+      }
+      return new And(( (Or) predicate.getArg1() ).args_).partialEval();
+    }
+    return this;`
     },
     {
       name: 'createStatement',
@@ -954,7 +955,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -977,14 +978,16 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
           javaType: 'foam.core.Detachable'
         }
       ],
-      javaCode: 'setValue(Math.max(((Number) getArg1().f(obj)).doubleValue(), getValue()));'
+      javaCode: 'if ( getValue() == null || ((Comparable)getArg1().f(obj)).compareTo(getValue()) > 0 ) {\n' +
+      '      setValue(getArg1().f(obj));\n' +
+      '    }'
     }
   ]
 });
@@ -1000,7 +1003,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1027,7 +1030,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1122,7 +1125,7 @@ if ( ! ( getArg1().f(obj) instanceof String) )
   return false;
 
 String arg1 = ((String) getArg1().f(obj)).toUpperCase();
-List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+List props = ((foam.core.FObject)obj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
 Iterator i = props.iterator();
 while ( i.hasNext() ) {
   PropertyInfo prop = (PropertyInfo) i.next();
@@ -1162,7 +1165,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1194,13 +1197,13 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaCode:
 `foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
  if ( group == null ) {
-   group = (foam.dao.Sink) ((foam.core.FObject) getArg2()).fclone();
+   group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
    getGroupKeys().add(key);
  }

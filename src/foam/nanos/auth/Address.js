@@ -10,9 +10,14 @@ foam.CLASS({
 
   documentation: 'Postal address.',
 
+  implements: [
+    'foam.mlang.Expressions',
+  ],
+
   requires: [
+    'foam.nanos.auth.DayOfWeek',
     'foam.nanos.auth.Hours',
-    'foam.nanos.auth.DayOfWeek'
+    'foam.nanos.auth.Region'
   ],
 
   properties: [
@@ -38,7 +43,7 @@ foam.CLASS({
       class: 'String',
       name: 'address1',
       //required: true
-      width: 70,      
+      width: 70,
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a main address field.'
     },
@@ -74,7 +79,18 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
-      of: 'foam.nanos.auth.Region'
+      of: 'foam.nanos.auth.Region',
+      view: function (_, X) {
+        var choices = X.data.slot(function (countryId) {
+          return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
+        });
+        return foam.u2.view.ChoiceView.create({
+          objToChoice: function(region) {
+            return [region.id, region.name];
+          },
+          dao$: choices
+        });
+      }
     },
     {
       class: 'Boolean',
@@ -105,27 +121,8 @@ foam.CLASS({
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
       documentation: 'Opening and closing hours for this address',
-      factory: function () {
-        return [
-          this.Hours.create({ day: this.DayOfWeek.SUNDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.MONDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.TUESDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.WEDNESDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.THURSDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.FRIDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.SATURDAY, open: true }),
-        ];
-      },
-      javaFactory:
-`return new Hours[] {
-    new Hours(DayOfWeek.SUNDAY, true, null, null),
-    new Hours(DayOfWeek.MONDAY, true, null, null),
-    new Hours(DayOfWeek.TUESDAY, true, null, null),
-    new Hours(DayOfWeek.WEDNESDAY, true, null, null),
-    new Hours(DayOfWeek.THURSDAY, true, null, null),
-    new Hours(DayOfWeek.FRIDAY, true, null, null),
-    new Hours(DayOfWeek.SATURDAY, true, null, null)
-};`
+      factory: function () { return []; },
+      javaFactory: 'return new Hours[] {};'
     }
   ],
 

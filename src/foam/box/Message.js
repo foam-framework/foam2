@@ -45,9 +45,6 @@ foam.CLASS({
         { name: 't', javaType: 'Throwable' }
       ],
       javaCode: `
-      // TODO: log
-      // t.printStackTrace();
-
         Box replyBox = (Box) getAttributes().get("replyBox");
 
         if ( replyBox == null ) return;

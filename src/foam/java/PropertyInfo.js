@@ -32,6 +32,16 @@ foam.CLASS({
       name: 'storageTransient'
     },
     {
+      class: 'Boolean',
+      documentation: 'define a property is a XML attribute. eg <foo id="XMLAttribute"></foo>',
+      name: 'xmlAttribute'
+    },
+    {
+      class: 'Boolean',
+      documentation: 'define a property is a XML textNode. eg <foo id="1">textNode</foo>',
+      name: 'xmlTextNode'
+    },
+    {
       class: 'String',
       name: 'sqlType'
     },
@@ -53,11 +63,11 @@ foam.CLASS({
     'propRequired',
     'jsonParser',
     'csvParser',
+    'cloneProperty',
     {
       name: 'methods',
       factory: function() {
-
-        return [
+        var m = [
           {
             name: 'getName',
             visibility: 'public',
@@ -97,7 +107,7 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' } ],
-            body: 'return compareValues(get_(o1), get_(o2));'
+            body: 'return foam.util.SafetyUtil.compare(get_(o1), get_(o2));'
           },
           {
             name: 'comparePropertyToObject',
@@ -140,6 +150,18 @@ foam.CLASS({
             body: 'return ' + this.storageTransient + ';'
           },
           {
+            name: 'getXMLAttribute',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlAttribute + ';'
+          },
+          {
+            name: 'getXMLTextNode',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlTextNode + ';'
+          },
+          {
             name: 'getRequired',
             visibility: 'public',
             type: 'boolean',
@@ -176,9 +198,21 @@ foam.CLASS({
             type: 'boolean',
             args: [ { name: 'o', type: 'Object' } ],
             /* TODO: revise when/if expression support is added to Java */
-            body: `return compareValues(get_(o), ${this.propValue}) == 0;`
+            body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           }
-        ]
+        ];
+
+        if ( this.cloneProperty != null ) {
+          m.push({
+            name: 'cloneProperty',
+            visibility: 'public',
+            type: 'void',
+            args: [ { type: 'foam.core.FObject', name: 'source' },
+                    { type: 'foam.core.FObject', name: 'dest' } ],
+            body: this.cloneProperty
+          });
+        }
+        return m;
       }
     }
   ]

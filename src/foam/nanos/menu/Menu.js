@@ -25,7 +25,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'handler',
-      view: 'foam.u2.view.FObjectView'
+      view: { class: 'foam.u2.view.FObjectView' }
     },
     {
       class: 'Int',
@@ -52,7 +52,7 @@ foam.CLASS({
 });
 
 
-var MenuRelationship = foam.RELATIONSHIP({
+foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.menu.Menu',
   targetModel: 'foam.nanos.menu.Menu',
   forwardName: 'children',
