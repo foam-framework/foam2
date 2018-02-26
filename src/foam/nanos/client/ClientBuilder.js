@@ -76,9 +76,6 @@ foam.CLASS({
 
       var references = [];
 
-      /*
-        Doesn't currently work because it only forces reload of index.html, not
-        foam/nanos/app libraries. Uncomment when libraries contain version #'s.
       // Force hard reload when app version updates
       self.nSpecDAO.find("appConfig").then(function(spec) {
         var appConfig = spec.service;
@@ -94,7 +91,6 @@ foam.CLASS({
           localStorage.CLIENT_VERSION = version;
         }
       });
-      */
 
       self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
         put: function(spec) {
