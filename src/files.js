@@ -447,7 +447,7 @@ FOAM_FILES([
   { name: "com/google/firebase/DefaultFirestoreDocumentID", flags: ['firebase'] },
   { name: "com/google/firebase/DefaultFirestoreData", flags: ['firebase'] },
   { name: "com/google/firebase/DefaultFObject", flags: ['firebase'] },
-  { name: "com/google/firebase/AuthenticatedDAO", flags: ['firebase'] },
+  { name: "com/google/firebase/AwaitAuthenticationDAO", flags: ['firebase'] },
   { name: "com/google/firebase/FirestoreDAO", flags: ['firebase'] },
   { name: "foam/net/node/EntityEncoding", flags: ['node'] },
   { name: "foam/net/node/Route", flags: ['node'] },
