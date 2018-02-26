@@ -83,11 +83,13 @@ foam.CLASS({
   actions: [
     {
       name: 'back',
+      icon: 'arrow_back',
       isEnabled: function(pos) { return pos > 0; },
       code: function() { this.pos--; }
     },
     {
       name: 'forward',
+      icon: 'arrow_forward',
       isEnabled: function(pos, depth) { return pos < depth - 1; },
       code: function() { this.pos++; }
     }
