@@ -46,7 +46,6 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   requires: [
-    'foam.dao.FlowControl',
     'foam.dao.ArraySink',
     'foam.dao.IDBInternalException',
     'foam.mlang.predicate.True',
