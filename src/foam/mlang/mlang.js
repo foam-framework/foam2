@@ -873,6 +873,24 @@ foam.CLASS({
       }
     },
     {
+      name: 'arg2',
+      preSet: function(old, nu) {
+        if ( ! ( this.Constant.isInstance(nu) &&
+                 Array.isArray(nu.value) ) ) {
+          return nu;
+        }
+
+        // Convert enum value arg2 values to strings for uppercase comparison.
+        var array = nu.value;
+        for ( var i = 0; i < array.length; i++ ) {
+          if ( foam.core.AbstractEnum.isInstance(array[i]) )
+            array[i] = array[i].name.toUpperCase();
+        }
+
+        return nu;
+      }
+    },
+    {
       name: 'upperCase_',
     }
   ],
