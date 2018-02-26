@@ -62,8 +62,6 @@ public class PropertyReferenceParser extends ProxyParser {
       String classId  = (String) x.get("forClass_");
       String propName = (String) x.get("name");
 
-      System.out.println("***" + classId + '.' + propName);
-
       Class cls;
       try {
         cls = Class.forName(classId);

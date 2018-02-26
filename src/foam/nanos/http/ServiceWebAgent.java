@@ -68,7 +68,7 @@ public class ServiceWebAgent
   }
 */
 
-  public synchronized void execute(X x) {
+  public void execute(X x) {
     try {
       HttpServletRequest  req            = x.get(HttpServletRequest.class);
       HttpServletResponse resp           = x.get(HttpServletResponse.class);

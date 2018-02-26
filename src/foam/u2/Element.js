@@ -92,7 +92,8 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); }
+      factory: function() { return new WeakMap(); },
+      transient: true
     }
   ],
 
@@ -109,7 +110,7 @@ foam.CLASS({
           foam.__context__;
 
         // Install our own CSS, and then all parent models as well.
-        if ( ! axiom.installedDocuments_.has(X.document) ) {
+        if ( X.document && ! axiom.installedDocuments_.has(X.document) ) {
           X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
           axiom.installedDocuments_.set(X.document, true);
         }
@@ -685,7 +686,7 @@ foam.CLASS({
     {
       documentation: `Keys which respond to keydown but not keypress`,
       name: 'KEYPRESS_CODES',
-      value: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
     },
 
     {
