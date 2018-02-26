@@ -249,6 +249,8 @@ var addDepsToClasses = function() {
     return foam.Array.isInstance(cls) ? cls[1] : cls;
   });
 
+  var flagFilter = foam.util.flagFilter(['java']);
+
   var X = foam.classloader.NodeJsModelExecutor.create({
     classpaths: Object.keys(paths)
   }).__subContext__;
@@ -262,10 +264,10 @@ var addDepsToClasses = function() {
         if ( ! classMap[cls] && ! blacklist[cls] ) {
           classMap[cls] = true;
           cls = foam.lookup(cls);
-          cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
+          cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
             r.javaPath && classQueue.push(r.javaPath);
           });
-          cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
+          cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
             classQueue.push(r.path);
           });
           if ( cls.model_.extends ) classQueue.push(cls.model_.extends);

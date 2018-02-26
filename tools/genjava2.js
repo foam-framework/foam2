@@ -255,11 +255,13 @@ var addDepsToClasses = function() {
 
   console.log(Object.keys(paths));
 
+  var flagFilter = foam.util.flagFilter(['java']);
+
   var X = foam.classloader.NodeJsModelExecutor.create({
     classpaths: Object.keys(paths)
   }).__subContext__;
     return Promise.all(classes.map(function(cls) {
-      return X.arequire(cls);
+      return X.classloader.load(cls);
     })).then(function() {
       var classMap = {};
       var classQueue = classes.slice(0);
@@ -268,10 +270,10 @@ var addDepsToClasses = function() {
         if ( ! classMap[cls] && ! blacklist[cls] ) {
           classMap[cls] = true;
           cls = foam.lookup(cls);
-          cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
+          cls.getAxiomsByClass(foam.core.Requires).filter(flagFilter).forEach(function(r) {
             r.javaPath && classQueue.push(r.javaPath);
           });
-          cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
+          cls.getAxiomsByClass(foam.core.Implements).filter(flagFilter).forEach(function(r) {
             classQueue.push(r.path);
           });
           if ( cls.model_.extends ) classQueue.push(cls.model_.extends);
