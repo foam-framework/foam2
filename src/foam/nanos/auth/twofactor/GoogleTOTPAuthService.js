@@ -72,7 +72,7 @@ String url = String.format(URI, config.getName(), user.getEmail(), key, config.g
 return QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
     },
     {
-      name: 'verify',
+      name: 'verifyToken',
       javaCode:
 `long code = Long.parseLong(token, 10);
 User user = (User) x.get("user");

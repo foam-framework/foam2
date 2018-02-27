@@ -31,7 +31,7 @@ foam.INTERFACE({
       ]
     },
     {
-      name: 'verify',
+      name: 'verifyToken',
       returns: 'Promise',
       javaReturns: 'boolean',
       swiftReturns: 'Bool',
