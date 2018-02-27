@@ -14,10 +14,6 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'io.nayuki.qrcodegen.QrCode',
     'org.apache.commons.codec.binary.Base32',
-    'javax.crypto.Mac',
-    'javax.crypto.spec.SecretKeySpec',
-    'java.util.Date',
-    'java.util.concurrent.TimeUnit'
   ],
 
   constants: [
