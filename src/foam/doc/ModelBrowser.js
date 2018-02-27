@@ -6,10 +6,11 @@ foam.CLASS({
 
   requires: [
     'foam.doc.DocBorder',
+    'foam.dao.QuickSink',
     'foam.doc.ClassList',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
-    'foam.nanos.boot.NSpec'
+    'foam.nanos.boot.NSpec',
   ],
 
   imports: [
@@ -67,6 +68,9 @@ foam.CLASS({
       ^ .net-nanopay-ui-ActionView-printPage{
         display: none;
       }
+      .net-nanopay-ui-topNavigation-TopNav{
+        display: none;
+      }
     }
   `,
 
@@ -75,19 +79,12 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.nSpecDAO.select().then(function(d){
-        d.array.forEach(function(n){
-          var cls = JSON.parse(n.client);
-          if ( cls.of ){
-            self.models.push(cls.of)
-            self.models = Array.from(self.models)
-          }
-          if ( cls.class ) {
-            self.models.push(cls.class)
-            self.models = Array.from(self.models)
-          }
-        });
-      });
+      this.nSpecDAO.select(this.QuickSink.create({
+        putFn: function(o){
+          self.modelArray(o);
+        }
+      }));
+
       this.start().addClass(this.myClass())
         .start('h2').add("Model Browser").end()
         .start().add(this.PRINT_PAGE).end()
@@ -105,6 +102,16 @@ foam.CLASS({
           })
         }))
       .end();
+    },
+
+    function modelArray(m){
+      var cls = JSON.parse(m.client);
+      cls.of ? this.pushArray(cls.of) : this.pushArray(cls.class);
+    },
+
+    function pushArray(cls){
+      this.models.push(cls);
+      this.models = Array.from(this.models);
     }
   ],
 
@@ -212,7 +219,6 @@ foam.CLASS({
     },
     {
       name: 'required',
-      label: 'Required',
       tableCellFormatter: function(value, obj, axiom) {
         this.add(value);
       }
@@ -229,7 +235,6 @@ foam.CLASS({
     },
     {
       name: 'documentation',
-      label: 'Documentation',
       tableCellFormatter: function(value, obj, axiom) {
         this.add(value);
       }
