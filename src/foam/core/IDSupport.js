@@ -97,7 +97,18 @@ foam.CLASS({
       return this.cls_.ID.of.create(this);
     }],
     [ 'setter', function multiPartSetter(a) {
-      this.copyFrom(a);
+      if ( ! foam.Array.isInstance(a) ) {
+        this.copyFrom(a);
+        return;
+      }
+
+      // TODO(markdittmer): Should not assume this property is named "id".
+      var names = this.cls_.ID.propNames;
+      foam.assert(names.length === a.length,
+                  `Improperly sized array for ${this.cls_.id} array value`);
+      for ( var i = 0; i < names.length; i++ ) {
+        this[names[i]] = a[i];
+      }
     }]
   ],
 
