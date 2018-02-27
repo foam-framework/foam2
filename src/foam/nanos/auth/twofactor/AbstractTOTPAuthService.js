@@ -13,7 +13,6 @@ foam.CLASS({
   documentation: 'Abstract time-based one-time password auth service',
 
   javaImports: [
-    'org.apache.commons.codec.binary.Base32',
     'java.util.Date'
   ],
 
@@ -23,8 +22,8 @@ foam.CLASS({
       javaReturns: 'boolean',
       args: [
         {
-          name: 'secret',
-          javaType: 'String'
+          name: 'key',
+          javaType: 'byte[]'
         },
         {
           name: 'code',
@@ -41,7 +40,6 @@ foam.CLASS({
       ],
       javaCode:
 `try {
-  byte[] key = new Base32().decode(secret);
   long t = new Date().getTime() / stepsize;
 
   for (int i = -window; i <= window; ++i) {
