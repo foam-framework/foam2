@@ -5,8 +5,8 @@ foam.CLASS({
   documentation: 'Show UML & properties for passed in models',
 
   requires: [
-    'foam.doc.DocBorder',
     'foam.doc.ClassList',
+    'foam.doc.DocBorder',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
     'foam.nanos.boot.NSpec',
@@ -131,10 +131,9 @@ foam.CLASS({
 
   requires: [
     'foam.dao.ArrayDAO',
-    'foam.doc.AxiomInfo',
-    'foam.doc.PropertyInfo',
     'foam.doc.ClassLink',
     'foam.doc.Link',
+    'foam.doc.PropertyInfo',
     'foam.u2.view.TableView'
   ],
 
