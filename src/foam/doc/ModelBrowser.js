@@ -82,6 +82,8 @@ foam.CLASS({
         put: function(o){
           self.modelArray(o);
         }
+      }, function(a){
+        console.log(a);
       });
 
       this.start().addClass(this.myClass())
