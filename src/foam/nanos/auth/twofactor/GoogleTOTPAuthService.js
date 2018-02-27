@@ -43,6 +43,10 @@ foam.CLASS({
     }
   ],
 
+  properties: [
+    ['algorithm', 'SHA1' ]
+  ],
+
   methods: [
     {
       name: 'generateKey',
