@@ -32,4 +32,19 @@ describe('IDSupport', function() {
   it('ID string representation should be compact FON', function() {
     expect(circle.id.toString()).toBe('{r:1,color:"red"}');
   });
+  fit('should support old-style array assignment', function() {
+    var idValues = [ 10, 'blue' ];
+    circle.id = idValues;
+    for ( var i = 0; i < ids.length; i++ ) {
+      var propName = ids[i];
+      var propValue = idValues[i];
+      expect(circle[propName]).toBe(propValue);
+      expect(circle.id[propName]).toBe(propValue);
+    }
+  });
+  fit('should throw on bad array assignment', function() {
+    expect(function() {
+      circle.id = [ 100 ];
+    }).toThrow();
+  });
 });
