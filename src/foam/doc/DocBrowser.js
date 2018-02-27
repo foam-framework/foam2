@@ -78,7 +78,6 @@ foam.CLASS({
     },
     {
       name: 'documentation',
-      label: 'Documentation',
       tableCellFormatter: function(value, obj, axiom) {
         this.add(value);
       }
