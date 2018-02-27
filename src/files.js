@@ -436,6 +436,7 @@ FOAM_FILES([
   { name: "foam/net/auth/TokenBearerHTTPRequest" },
   { name: "foam/net/auth/AuthAgent" },
   { name: "foam/doc/DocBrowser", flags: ['debug', 'web'] },
+  { name: "foam/doc/ModelBrowser", flags:  ['debug', 'web'] },
   { name: "com/google/net/node/Google2LOAuthAgent", flags: ['node', 'gcloud'] },
   { name: "com/google/cloud/datastore/types", flags: ['gcloud'] },
   { name: "com/google/cloud/datastore/mlang", flags: ['gcloud'] },
