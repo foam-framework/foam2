@@ -111,7 +111,6 @@ return QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
       javaCode:
 `byte[] data = new byte[8];
 long value = time;
-System.out.println("value = " + value);
 for ( int i = 8 ; i-- > 0; value >>>= 8 ) {
   data[i] = (byte) value;
 }
