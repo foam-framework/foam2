@@ -78,39 +78,24 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.nSpecDAO.select({
-        put: function(o){
-          self.modelArray(o);
-        }
-      }, function(a){
-        console.log(a);
-      });
-
       this.start().addClass(this.myClass())
         .start('h2').add("Model Browser").end()
         .start().add(this.PRINT_PAGE).end()
-        .add(this.slot(function(models) {
-          return self.E().forEach(models, function(m) {
-            model = foam.lookup(m, true);
-            if( !model ) {
-              return;
-            }
-            this.start().style({ 'font-size' : '20px', 'margin-top' : '20px'}).add("Model " + a).end()
-            this.tag(self.UMLDiagram.create({ data: model }))
-            this.tag(self.SimpleClassView.create({data: model }))
-          })
-        }))
+        .select(this.nSpecDAO, function(n) {
+          var model = self.parseClientModel(n);
+          if( ! model ) return;
+          this.start().style({ 'font-size' : '20px', 'margin-top' : '20px'}).add("Model " + model).end()
+          this.tag(self.UMLDiagram.create({ data: model }))
+          this.tag(self.SimpleClassView.create({data: model }))
+
+        })
       .end();
     },
 
-    function modelArray(m){
-      var cls = JSON.parse(m.client);
-      cls.of ? this.pushArray(cls.of) : this.pushArray(cls.class);
-    },
-
-    function pushArray(cls){
-      this.models.push(cls);
-      this.models = Array.from(this.models);
+    function parseClientModel(n){
+      var cls = JSON.parse(n.client);
+      var clsName = cls.of ? cls.of : cls.class;
+      return foam.lookup(clsName, true);
     }
   ],
 
