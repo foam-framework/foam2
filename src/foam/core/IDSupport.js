@@ -70,8 +70,10 @@ foam.CLASS({
   });
 
   > var p = Person.create({firstName: 'Kevin', lastName: 'Greer'});
-  > p.id;
-  ["Kevin", "Greer"]
+  > p.id.cls_.id;
+  "PersonId"
+  > p.id.toString();
+  "{firstName:\"Kevin\",lastName:\"Greer\"}"
   </pre>
   */},
 
@@ -113,7 +115,12 @@ foam.CLASS({
           foam.assert(prop, 'Unknown ids property:', c.id + '.' + n);
           foam.assert(foam.core.Property.isInstance(prop), 'Ids property:', c.id + '.' + n, 'is not a Property.');
           return prop.clone();
-        })
+        }),
+        methods: [
+          function toString() {
+            return foam.json.Compact.stringify(this, this.cls_);
+          }
+        ]
       });
 
       c.installAxiom(foam.core.Requires.create({
