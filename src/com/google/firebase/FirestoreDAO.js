@@ -139,7 +139,10 @@ foam.CLASS({
       return (foam.core.FObject.isInstance(idOrObj) ?
               this.getDoc_(idOrObj) : this.collection.doc(idOrObj.toString()))
           .get()
-          .then(function(docSnapshot) { return docSnapshot.data() || null; });
+          .then(function(docSnapshot) {
+            var data = docSnapshot.data();
+            return data ? this.fobject.f(data) : null;
+          }.bind(this));
     },
     function select_(x, sink, skip, limit, order, predicate) {
       var collection = this.collection;

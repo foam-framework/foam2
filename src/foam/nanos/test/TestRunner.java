@@ -34,9 +34,10 @@ public class TestRunner
     try {
       final JDAO jTests = new JDAO(getX(), tests,"TestFile.jrl");
       tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE)).select(new AbstractSink() {
-        public void put(FObject obj, Detachable sub) {
+        @Override
+        public void put(Object obj, Detachable sub) {
           ((Test) obj).runScript(getX());
-          jTests.put(obj);
+          jTests.put((Test)obj);
         }
       });
     } catch (java.lang.Exception e){

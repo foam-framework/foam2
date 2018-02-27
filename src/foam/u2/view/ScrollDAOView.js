@@ -47,7 +47,10 @@ foam.CLASS({
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
-  imports: ['selection as importedSelection'],
+  imports: [
+    'selection as importedSelection',
+    'selectionEnabled as importedSelectionEnabled'
+  ],
   // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',
@@ -62,6 +65,7 @@ foam.CLASS({
     'rows_',
     'rowFormatter',
     'selection',
+    'selectionEnabled'
   ],
 
   properties: [
@@ -138,10 +142,17 @@ foam.CLASS({
       value: 25
     },
     {
+      class: 'Boolean',
+      name: 'selectionEnabled',
+      factory: function() {
+        return !! this.importedSelectionEnabled;
+      }
+    },
+    {
       class: 'Array',
       name: 'selection',
       adapt: function(_, nu) {
-        if (foam.Null.isInstance(nu) || foam.Undefined.isInstance(nu))
+        if ( foam.Null.isInstance(nu) || foam.Undefined.isInstance(nu) )
           return [];
 
         return foam.Array.isInstance(nu) ? nu : [nu];
@@ -276,6 +287,7 @@ foam.CLASS({
         'columns?',
         'rowFormatter',
         'selection',
+        'selectionEnabled'
       ],
 
       axioms: [
@@ -292,7 +304,7 @@ foam.CLASS({
               -ms-user-select: none;
               user-select: none;
             }
-            ^:hover {
+            ^selectable:hover {
               filter: opacity(0.8);
               cursor: pointer;
             }
@@ -321,21 +333,31 @@ foam.CLASS({
           this.onload.sub(this.render);
         },
         function initE() {
+          var self = this;
           this.addClass(this.myClass());
+          this.enableClass(this.myClass('selectable'), this.selectionEnabled$);
           this.enableClass(
               this.myClass('selected'),
-              this.slot(function(data, selection) {
-                if (!data || selection.length === 0) return false;
-                return selection.some(d => d.id === data.id);
-              }, this.data$, this.selection$));
-          this.on('click', evt => {
-            if ( ! this.data ) return;
-            if (this.selection.some(d => d.id === this.data.id)) {
-              foam.Array.remove(this.selection, this.data);
+              this.slot(function(selectionEnabled, data, selection) {
+                if ( ! data || ! selectionEnabled ||
+                     selection.length === 0 ) {
+                  return false;
+                }
+
+                return selection.some(function(d) {
+                  return d.id === data.id;
+                });
+              }, this.selectionEnabled$, this.data$, this.selection$));
+          this.on('click', function(evt) {
+            if ( ! self.data ) return;
+            if ( self.selection.some(function(d) {
+                   return d.id === self.data.id;
+                 }) ) {
+              foam.Array.remove(self.selection, self.data);
             } else {
-              this.selection.push(this.data);
+              self.selection.push(self.data);
             }
-            this.selection = Array.from(this.selection);
+            self.selection = Array.from(self.selection);
           });
           this.columns$ && this.columns$.sub(this.render);
         }

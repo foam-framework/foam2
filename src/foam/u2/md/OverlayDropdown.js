@@ -241,6 +241,6 @@ foam.CLASS({
         parent.classList.remove(parentClass);
         parent = parent.parentElement;
       }
-    },
+    }
   ]
 });

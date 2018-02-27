@@ -52,7 +52,6 @@ foam.CLASS({
           (this.data.visibility === foam.u2.Visibility.RW ||
            this.controllerMode === foam.u2.ControllerMode.CREATE) ?
           this.controllerMode : foam.u2.ControllerMode.VIEW;
-      debugger;
       this.add(this.ADD_ITEM).add(this.slot(function(data) {
         return this.E().forEach(data, function(o, index) {
           var tag = this.tag({

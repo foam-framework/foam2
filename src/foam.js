@@ -44,6 +44,9 @@
 
     path = path.substring(0, path.lastIndexOf('src/')+4);
 
+    if ( typeof global !== 'undefined' ) global.FOAM_ROOT = path;
+    if ( typeof window !== 'undefined' ) window.FOAM_ROOT = path;
+
     return function(filename) {
       document.writeln(
         '<script type="text/javascript" src="' + path + filename + '.js"></script>\n');

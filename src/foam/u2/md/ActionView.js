@@ -15,58 +15,49 @@
  * limitations under the License.
  */
 foam.CLASS({
-  package: 'org.mozilla.mdn',
-  name: 'ActionButton',
+  package: 'foam.u2.md',
+  name: 'ActionView',
   extends: 'foam.u2.Element',
 
   axioms: [
     foam.u2.CSS.create({
-      code: `
-^ {
-  position: relative;
-}
-
-^label {
-  color: inherit;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  display: inline-block;
-  padding: 1rem;
-}
-
-^label:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-`
-    }),
+      code: function CSS() {/*
+        ^unavailable {
+          display: none;
+        }
+      */}
+    })
   ],
 
   properties: [
     'data',
     'action',
     {
-      name: 'icon',
-      expression: function(action) { return action.icon; }
+      class: 'Boolean',
+      name: 'raised',
+      documentation: 'Controls the "raised" attribute in Polymer. Defaults ' +
+          'to false; set this to true for a raised, bordered button.'
+    },
+    {
+      name: 'label',
+      expression: function(action) { return action.label; }
     }
   ],
 
   methods: [
     function initE() {
-      this.nodeName = 'span';
+      this.nodeName = 'paper-button';
       this.addClass(this.myClass())
-          .start('i').addClass('material-icons').addClass(this.myClass('label'))
-          .add(this.icon)
-          .end()
-          .on('click', this.onClick);
+          .attrs({ raised: this.raised$ })
+          .on('click', this.click)
+          .add(this.label$);
 
-      if (this.action.isAvailable) {
+      if ( this.action.isAvailable ) {
         this.enableClass(this.myClass('unavailable'),
               this.action.createIsAvailable$(this.data$), true /* negate */);
       }
 
-      if (this.action.isEnabled) {
+      if ( this.action.isEnabled ) {
         this.attrs({
           disabled: this.action.createIsEnabled$(this.data$).map(function(e) {
             return e ? false : 'disabled';
@@ -77,7 +68,7 @@ foam.CLASS({
   ],
 
   listeners: [
-    function onClick() {
+    function click() {
       this.action.maybeCall(this.__subContext__, this.data);
     }
   ]

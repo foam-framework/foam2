@@ -3,6 +3,7 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'User',
@@ -32,11 +33,8 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'String',
-      // class: 'SPID',
-      label: 'Service Provider',
-      name: 'spid',
-      documentation: "User's service provider."
+      class: 'Boolean',
+      name: 'enabled'
     },
     {
       class: 'DateTime',
@@ -81,18 +79,23 @@ foam.CLASS({
 emailIsSet_ = true;`
     },
     {
+      class: 'Boolean',
+      name: 'emailVerified',
+      documentation: 'Email verified flag'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
       factory: function() { return this.Phone.create(); },
-      view: 'foam.nanos.auth.PhoneDetailView'
+      view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'String',
@@ -108,18 +111,16 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'Blob',
+      class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
-      tableCellFormatter: function (value) {
-        this.tag({ class: 'foam.u2.view.ImageBlobView' });
-      }
+      view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
       factory: function() { return this.Address.create(); },
-      view: 'foam.nanos.auth.AddressDetailView'
+      view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
       class: 'FObjectArray',
@@ -189,16 +190,66 @@ emailIsSet_ = true;`
       documentation: 'Bank Identification Code (BIC)'
     },
     {
+      class: 'Boolean',
+      name: 'businessHoursEnabled',
+      value: false
+    },
+    {
       class: 'URL',
       name: 'website',
       displayWidth: 80,
       width: 2048
+    },
+    {
+      class: 'Date',
+      name: 'lastModified',
+      documentation: 'Last modified date'
     }
   ],
 
   methods: [
     function label() {
-      return this.organization || ( this.firstName + ' ' + this.lastName );
+      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
     }
   ]
+});
+
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.Group',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'group',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
+  }
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.nanos.fs.File',
+  forwardName: 'files',
+  inverseName: 'owner',
+  sourceProperty: {
+    hidden: true,
+    transient: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.ServiceProvider',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'spid',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false
+  }
 });

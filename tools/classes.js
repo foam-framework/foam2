@@ -89,12 +89,14 @@ var classes = [
   'foam.dao.SkipSink',
   'foam.dao.DedupSink',
   'foam.dao.ReadOnlyDAO',
-  'foam.dao.Relationship',
   'foam.dao.RelationshipDAO',
+  'foam.dao.ManyToManyRelationship',
+  'foam.dao.ManyToManyRelationshipImpl',
   'foam.dao.ManyToManyRelationshipDAO',
-  'foam.dao.RelationshipPropertyValue',
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
+  'foam.dao.EnabledAwareDAO',
+  'foam.dao.LastModifiedAwareDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -125,13 +127,17 @@ var classes = [
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.auth.token.ClientTokenService',
   'foam.nanos.auth.token.AbstractTokenService',
+  'foam.nanos.auth.email.EmailTokenService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
+  'foam.nanos.auth.PreventDuplicateEmailDAO',
+  'foam.nanos.auth.ServiceProvider',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.logger.Logger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.ListMenu',
@@ -180,7 +186,22 @@ var classes = [
   'foam.nanos.geocode.GoogleMapsGeometry',
   'foam.nanos.geocode.GoogleMapsBoundary',
 
-  'foam.nanos.demo.DemoObject'
+  'foam.nanos.demo.DemoObject',
+  'foam.nanos.demo.relationship.Student',
+  'foam.nanos.demo.relationship.Professor',
+  'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.StudentCourseJunction',
+  'foam.nanos.fs.File',
+
+  'foam.crypto.hash.Hasher',
+  'foam.crypto.hash.Hashable',
+
+  'foam.crypto.sign.Signer',
+  'foam.crypto.sign.Signable',
+  'foam.crypto.sign.SignedFObject',
+
+  'foam.nanos.dig.Format',
+  'foam.nanos.dig.DUG'
 ];
 
 var abstractClasses = [
@@ -208,62 +229,12 @@ var proxies = [
   'foam.blob.BlobService',
   'foam.nanos.auth.AuthService',
   'foam.nanos.http.WebAgent',
+  'foam.nanos.logger.Logger',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];
 
 var blacklist = [
-  'FObject',
-  'foam.core.AbstractEnum',
-  'foam.core.AbstractInterface',
-  'foam.core.Property',
-  'foam.core.String',
-  'foam.core.Validatable',
-
-  // These have hand written java impls so we don't want to clobber them.
-  // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.AbstractDAO',
-  'foam.dao.FilteredDAO',
-  'foam.dao.LimitedDAO',
-  'foam.dao.NullDAO',
-  'foam.dao.OrderedDAO',
-  'foam.dao.SkipDAO',
-
-  // TODO: These models currently don't compile in java but could be updated to
-  // compile properly.
-  'foam.blob.BlobBlob',
-  'foam.dao.CompoundDAODecorator',
-  'foam.dao.DAODecorator',
-  'foam.dao.FlowControl',
-  'foam.dao.PromisedDAO',
-  'foam.dao.sync.SyncRecord',
-  'foam.dao.sync.VersionedSyncRecord',
-  'foam.mlang.order.ThenBy',
-  'foam.mlang.Expressions',
-  'foam.nanos.menu.MenuBar',
-
-  'foam.box.Context',
-//  'foam.box.HTTPBox',
-//  'foam.box.SessionClientBox',
-  'foam.box.SocketBox',
-  'foam.box.WebSocketBox',
-  'foam.box.TimeoutBox',
-  'foam.box.RetryBox',
-  'foam.dao.CachingDAO',
-  'foam.dao.CompoundDAODecorator',
-  'foam.dao.ContextualizingDAO',
-  'foam.dao.DecoratedDAO',
-  'foam.dao.DeDupDAO',
-  'foam.dao.GUIDDAO',
-  'foam.dao.IDBDAO',
-  'foam.dao.JDAO',
-  'foam.dao.LoggingDAO',
-  'foam.dao.MDAO',
-  'foam.dao.PromisedDAO',
-  'foam.dao.RequestResponseClientDAO',
-  'foam.dao.SequenceNumberDAO',
-  'foam.dao.SyncDAO',
-  'foam.dao.TimingDAO'
 ];
 
 module.exports = {
@@ -271,5 +242,5 @@ module.exports = {
     abstractClasses: abstractClasses,
     skeletons: skeletons,
     proxies: proxies,
-    blacklist: blacklist,
+    blacklist: blacklist
 }
