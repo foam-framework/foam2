@@ -90,14 +90,12 @@ foam.CLASS({
         .add(this.slot(function(models) {
           return self.E().forEach(models, function(m) {
             model = foam.lookup(m, true);
-            this.start()
             if( !model ) {
               return;
             }
             this.start().style({ 'font-size' : '20px', 'margin-top' : '20px'}).add("Model " + a).end()
             this.tag(self.UMLDiagram.create({ data: model }))
             this.tag(self.SimpleClassView.create({data: model }))
-            .end()
           })
         }))
       .end();
