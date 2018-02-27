@@ -6,13 +6,19 @@
 
 package foam.nanos.boot;
 
-import foam.core.*;
-import foam.dao.*;
-import foam.nanos.auth.*;
+import foam.core.Detachable;
+import foam.core.ProxyX;
+import foam.core.SingletonFactory;
+import foam.core.X;
+import foam.dao.AbstractSink;
+import foam.dao.DAO;
+import foam.dao.JDAO;
+import foam.dao.ProxyDAO;
+import foam.nanos.auth.User;
+import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-import foam.nanos.script.*;
-import java.io.IOException;
-import static foam.mlang.MLang.*;
+
+import static foam.mlang.MLang.EQ;
 
 public class Boot {
   protected DAO serviceDAO_;
@@ -24,7 +30,7 @@ public class Boot {
 
   public Boot(String datadir) {
     root_.put(foam.nanos.fs.Storage.class,
-              new foam.nanos.fs.Storage(datadir));
+        new foam.nanos.fs.Storage(datadir));
 
     // Used for all the services that will be required when Booting
     serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
