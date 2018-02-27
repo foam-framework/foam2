@@ -15,11 +15,11 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'com.google.common.io.BaseEncoding',
     'foam.dao.DAO',
     'foam.nanos.app.AppConfig',
     'foam.nanos.auth.User',
-    'io.nayuki.qrcodegen.QrCode',
-    'org.apache.commons.codec.binary.Base32',
+    'io.nayuki.qrcodegen.QrCode'
   ],
 
   constants: [
@@ -57,7 +57,7 @@ foam.CLASS({
 DAO userDAO = (DAO) getLocalUserDAO();
 
 // generate secret key, encode as base32 and store
-String key = new Base32().encodeAsString(generateSecret(KEY_SIZE));
+String key = BaseEncoding.base32().encode(generateSecret(KEY_SIZE));
 key = key.replaceFirst("[=]*$", "");
 user.setTwoFactorSecret(key);
 user.setTwoFactorEnabled(true);
@@ -80,7 +80,7 @@ DAO userDAO = (DAO) getLocalUserDAO();
 
 // fetch from user dao to get secret key
 user = (User) userDAO.find(user.getId());
-return checkCode(user.getTwoFactorSecret(), code, STEP_SIZE, WINDOW);`
+return checkCode(BaseEncoding.base32().decode(user.getTwoFactorSecret()), code, STEP_SIZE, WINDOW);`
     }
   ]
 })
