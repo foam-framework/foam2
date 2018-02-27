@@ -257,7 +257,7 @@ var addDepsToClasses = function() {
   });
 
   return Promise.all(classes.map(function(cls) {
-    return foam.__context__.arequire(cls);
+    return classloader.load(cls);
   })).then(function() {
     var classMap = {};
     var classQueue = classes.slice(0);
