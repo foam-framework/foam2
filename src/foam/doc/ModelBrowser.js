@@ -6,7 +6,6 @@ foam.CLASS({
 
   requires: [
     'foam.doc.DocBorder',
-    'foam.dao.QuickSink',
     'foam.doc.ClassList',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
@@ -79,18 +78,18 @@ foam.CLASS({
       this.SUPER();
       var self = this;
 
-      this.nSpecDAO.select(this.QuickSink.create({
-        putFn: function(o){
+      this.nSpecDAO.select({
+        put: function(o){
           self.modelArray(o);
         }
-      }));
+      });
 
       this.start().addClass(this.myClass())
         .start('h2').add("Model Browser").end()
         .start().add(this.PRINT_PAGE).end()
         .add(this.slot(function(models) {
-          return self.E().forEach(models, function(a) {
-            model = foam.lookup(a, true);
+          return self.E().forEach(models, function(m) {
+            model = foam.lookup(m, true);
             this.start()
             if( !model ) {
               return;
@@ -155,7 +154,6 @@ foam.CLASS({
 
       this.
           start('b').add(data.id).end().br().
-          // start('span').style({float:'right','font-size':'smaller'}).add(data.count_, ' created').end().br().
           add('Extends: ');
 
       var cls = data;
@@ -169,7 +167,6 @@ foam.CLASS({
       this.start(foam.u2.HTMLElement).style({ 'margin-top' : '10px'}).add('Documentation: ', data.model_.documentation).end();
 
       this.add( this.slot(function (showInherited, showOnlyProperties) {
-        // TODO: hide 'Source Class' column if showInherited is false
         var axs = [];
         for ( var key in data.axiomMap_ ) {
           if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
