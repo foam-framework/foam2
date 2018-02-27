@@ -23,7 +23,7 @@ foam.CLASS({
   constants: [
     {
       name: 'URI',
-      value: 'otpauth://totp/%s:%s?secret=%s&issuer=%s',
+      value: 'otpauth://totp/%s:%s?secret=%s&issuer=%s&algorithm=%s',
       type: 'String'
     },
     {
@@ -66,7 +66,7 @@ if ( ! generateQrCode ) {
 }
 
 AppConfig config = (AppConfig) x.get("appConfig");
-String url = String.format(URI, config.getName(), user.getEmail(), key, config.getName());
+String url = String.format(URI, config.getName(), user.getEmail(), key, config.getName(), getAlgorithm());
 return QrCode.encodeText(url, QrCode.Ecc.MEDIUM).toSvgString(2);`
     },
     {
