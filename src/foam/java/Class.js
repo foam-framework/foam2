@@ -25,9 +25,18 @@ foam.CLASS({
   ],
 
   properties: [
-    'name',
-    'package',
-    'implements',
+    {
+      class: 'String',
+      name: 'name'
+    },
+    {
+      class: 'String',
+      name: 'package'
+    },
+    {
+      class: 'Array',
+      name: 'implements'
+    },
     {
       class: 'String',
       name: 'visibility',

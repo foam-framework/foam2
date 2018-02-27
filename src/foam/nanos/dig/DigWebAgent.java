@@ -19,6 +19,7 @@ import foam.nanos.http.WebAgent;
 import foam.nanos.logger.Logger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
+import foam.util.SafetyUtil;
 import java.io.*;
 import java.nio.CharBuffer;
 import java.util.*;
@@ -47,7 +48,8 @@ public class DigWebAgent
     String              id         = req.getParameter("id");
     Logger              logger     = (Logger) x.get("logger");
     DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
-    String []           email      = req.getParameterValues("email");
+    String[]            email      = req.getParameterValues("email");
+    boolean             emailSet   = email != null && email.length > 0 && ! "".equals(email[0]);
     String              subject    = req.getParameter("subject");
 
     response.setContentType("text/html");
@@ -62,9 +64,10 @@ public class DigWebAgent
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
-        //gets all ongoing nanopay services
+        // gets all ongoing nanopay services
         nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
-          public void put(FObject o, Detachable d) {
+          @Override
+          public void put(Object o, Detachable d) {
             NSpec s = (NSpec) o;
             if ( s.getServe() && s.getName().endsWith("DAO") ) {
               out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
@@ -126,10 +129,9 @@ public class DigWebAgent
             return;
           }
 
-          String dataArray[] = data.split("},");
+          String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
 
           for ( int i = 0 ; i < dataArray.length ; i++ ) {
-            data = dataArray[i] + "}";
             o = jsonParser.parseString(data, objClass);
 
             if ( o == null ) {
@@ -204,10 +206,11 @@ public class DigWebAgent
 
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          outputterJson.setOutputDefaultValues(true);
           outputterJson.output(sink.getArray().toArray());
 
           response.setContentType("application/json");
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( emailSet ) {
             output(x, outputterJson.toString());
           } else {
             out.println(outputterJson.toString());
@@ -215,7 +218,7 @@ public class DigWebAgent
         } else if ( "xml".equals(format) ) {
           XMLSupport xmlSupport = new XMLSupport();
 
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( emailSet ) {
             String xmlData = "<textarea style=\"width:700;height:400;\" rows=10 cols=120>" + xmlSupport.toXMLString(sink.getArray()) + "</textarea>";
 
             output(x, xmlData);
@@ -233,7 +236,7 @@ public class DigWebAgent
           }
 
           response.setContentType("text/plain");
-          if ( email.length != 0 && !email[0].equals("")  && email[0] != null ) {
+          if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
             output(x, outputterCsv.toString());
           } else {
             out.println(outputterCsv.toString());
@@ -253,7 +256,7 @@ public class DigWebAgent
           outputterHtml.outputEndTable();
           outputterHtml.outputEndHtml();
 
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( emailSet ) {
             output(x, outputterHtml.toString());
           } else {
             out.println(outputterHtml.toString());
@@ -267,12 +270,12 @@ public class DigWebAgent
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
-          String dataArray[] = outputterJson.toString().split("\\{\"class\":");
+          String dataArray[] = outputterJson.toString().split("\\{\"class\":\"" + cInfo.getId());
           for ( int k = 1 ; k < dataArray.length; k++ ) {
-            dataToString += "p({\"class\":" + dataArray[k] + ")\n";
+            dataToString += "p({\"class\":\"" + cInfo.getId() + dataArray[k] + ")\n";
           }
 
-          if ( email.length != 0 && !email[0].equals("") && email[0] != null ) {
+          if ( emailSet ) {
             output(x, dataToString);
           } else {
             out.println(dataToString);
@@ -292,7 +295,7 @@ public class DigWebAgent
         out.println("</table>");*/
 
         out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
-        out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl);</script>");
+        out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl, '_self'); </script>");
       } else if ( "remove".equals(command) ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);

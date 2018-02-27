@@ -10,9 +10,14 @@ foam.CLASS({
 
   documentation: 'Postal address.',
 
+  implements: [
+    'foam.mlang.Expressions',
+  ],
+
   requires: [
+    'foam.nanos.auth.DayOfWeek',
     'foam.nanos.auth.Hours',
-    'foam.nanos.auth.DayOfWeek'
+    'foam.nanos.auth.Region'
   ],
 
   properties: [
@@ -38,7 +43,7 @@ foam.CLASS({
       class: 'String',
       name: 'address1',
       //required: true
-      width: 70,      
+      width: 70,
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a main address field.'
     },
@@ -74,7 +79,18 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
-      of: 'foam.nanos.auth.Region'
+      of: 'foam.nanos.auth.Region',
+      view: function (_, X) {
+        var choices = X.data.slot(function (countryId) {
+          return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
+        });
+        return foam.u2.view.ChoiceView.create({
+          objToChoice: function(region) {
+            return [region.id, region.name];
+          },
+          dao$: choices
+        });
+      }
     },
     {
       class: 'Boolean',

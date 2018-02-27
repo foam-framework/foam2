@@ -38,21 +38,22 @@ public class HttpBlobService
   @Override
   public void execute(X x) {
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
-    HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     try {
       if ( "GET".equals(req.getMethod()) ) {
-        download(req, resp);
+        download(x);
       } else if ( "PUT".equals(req.getMethod()) ) {
-        upload(req, resp);
+        upload(x);
       }
     } catch (Throwable t) {
       throw new RuntimeException(t);
     }
   }
 
-  protected void download(HttpServletRequest req, HttpServletResponse resp) {
+  protected void download(X x) {
     OutputStream os = null;
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     try {
       String path = req.getRequestURI();
@@ -87,8 +88,10 @@ public class HttpBlobService
     }
   }
 
-  protected void upload(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp) {
+  protected void upload(X x) {
     InputStreamBlob blob = null;
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     try {
       int size = req.getContentLength();

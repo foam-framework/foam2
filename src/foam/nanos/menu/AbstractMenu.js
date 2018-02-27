@@ -7,11 +7,12 @@
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'AbstractMenu',
+  abstract: true,
 
   methods: [
     function setMenuId(id) {
-      if ( window.location.hash.substr(1) != id ){    
-        window.location.hash = id; 
+      if ( window.location.hash.substr(1) != id ){
+        window.location.hash = id;
       }
     },
     function launch(X, menu) {

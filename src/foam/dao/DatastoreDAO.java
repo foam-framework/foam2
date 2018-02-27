@@ -24,25 +24,10 @@ import java.util.List;
 public class DatastoreDAO
   extends AbstractDAO
 {
-    protected ClassInfo        of_         = null;
-    protected PropertyInfo     primaryKey_ = null;
     protected DatastoreService datastore_  = DatastoreServiceFactory.getDatastoreService();
 
     protected DatastoreService getData() {
       return datastore_;
-    }
-
-    public ClassInfo getOf() {
-      return of_;
-    }
-
-    public void setOf(ClassInfo of) {
-      of_ = of;
-      primaryKey_ = (PropertyInfo) of.getAxiomByName("id");
-    }
-
-    public PropertyInfo getPrimaryKey() {
-      return primaryKey_;
     }
 
     protected List<PropertyInfo> getProperties(ClassInfo c) {

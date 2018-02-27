@@ -48,7 +48,7 @@ foam.CLASS({
       expression: function(duration, elapsedTime) {
         return this.duration ? 100 * Math.min(1, 1000 * this.elapsedTime / this.duration) : 100;
       },
-      view: 'foam.u2.ProgressView'
+      view: { class: 'foam.u2.ProgressView' }
     },
     {
       name: 'elapsedTime',

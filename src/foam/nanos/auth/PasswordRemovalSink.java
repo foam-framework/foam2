@@ -22,7 +22,7 @@ public class PasswordRemovalSink
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
-    super.put(Password.sanitize(obj), sub);
+  public void put(Object obj, Detachable sub) {
+    super.put(Password.sanitize((FObject)obj), sub);
   }
 }
