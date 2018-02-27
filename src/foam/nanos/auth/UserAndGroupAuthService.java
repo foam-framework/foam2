@@ -47,13 +47,13 @@ public class UserAndGroupAuthService
     // fetch context and check if not null or user id is 0
     Session session = x.get(Session.class);
     if ( session == null || session.getUserId() == 0 ) {
-      throw new AuthenticationException("User not found");
+      throw new AuthenticationException("Not logged in");
     }
 
     // get user from session id
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
-      throw new AuthenticationException("User not found");
+      throw new AuthenticationException("User not found: " + session.getUserId());
     }
 
     return (User) Password.sanitize(user);

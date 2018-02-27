@@ -114,7 +114,13 @@ foam.CLASS({
       if ( o instanceof Date )                    return foam.mlang.Constant.create({ value: o });
       if ( Array.isArray(o) )                     return foam.mlang.Constant.create({ value: o });
       if ( foam.core.AbstractEnum.isInstance(o) ) return foam.mlang.Constant.create({ value: o });
-      if ( foam.core.FObject.isInstance(o) )      return o;
+      if ( foam.core.FObject.isInstance(o) ) {
+           // TODO: Not all mlang expressions actually implement Expr
+           // so we're just going to check for o.f
+           //  ! foam.mlang.Expr.isInstance(o) )
+        if ( ! foam.Function.isInstance(o.f) )      return foam.mlang.Constant.create({ value: o });
+        return o;
+      }
 
       console.error('Invalid expression value: ', o);
     }
@@ -827,7 +833,13 @@ foam.CLASS({
       adapt: function(old, nu, prop) {
         var value = prop.adaptValue(nu);
         var arg1 = this.arg1;
-        if ( foam.mlang.Constant.isInstance(value) && arg1 && arg1.adapt ) {
+
+        // Adapt constant array elements when:
+        // (1) Value is a constant (array);
+        // (2) Value is truthy (empty arrays can be serialized as undefined);
+        // (3) Arg1 has an adapt().
+        if ( foam.mlang.Constant.isInstance(value) && value.value &&
+             arg1 && arg1.adapt ) {
           var arrayValue = value.value;
           for ( var i = 0; i < arrayValue.length; i++ ) {
             arrayValue[i] = arg1.adapt.call(null, old && old[i], arrayValue[i], arg1);
@@ -875,6 +887,22 @@ foam.CLASS({
     function f(o) {
       var lhs = this.arg1.f(o);
       var rhs = this.arg2.f(o);
+
+      if ( ! rhs ) return false;
+
+      for ( var i = 0 ; i < rhs.length ; i++ ) {
+        var v = rhs[i];
+
+        if ( foam.String.isInstance(v) && this.upperCase_ ) v = v.toUpperCase();
+        if ( foam.util.equals(lhs, v) ) return true;
+      }
+      return false;
+
+      // TODO: This is not a sufficient enough check for valueSet_.
+      // We can have constants that contain other FObjects, in
+      // particular with multi part id support.So this code path is
+      // disabled for now.
+
 
       // If arg2 is a constant array, we use valueSet for it.
       if ( this.Constant.isInstance(this.arg2) ) {
@@ -1214,6 +1242,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
+  swiftName: 'NotPred',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
@@ -1265,7 +1294,11 @@ foam.CLASS({
   documentation: 'Unary Predicate for generic keyword search (searching all String properties for argument substring).',
 
   requires: [
-    'foam.core.String'
+    {
+      name: 'String',
+      path: 'foam.core.String',
+      swiftPath: null,
+    },
   ],
 
   methods: [
@@ -1293,9 +1326,12 @@ foam.CLASS({
   package: 'foam.mlang.sink',
   name: 'Map',
   extends: 'foam.dao.ProxySink',
-
-  implements: [
-    'foam.core.Serializable'
+  axioms: [
+    {
+      // TODO: Remove this when MAP works properly on java.  github issue #1020
+      class: 'foam.box.Remote',
+      clientClass: 'foam.dao.ClientSink'
+    }
   ],
 
   documentation: 'Sink Decorator which applies a map function to put() values before passing to delegate.',
@@ -1456,7 +1492,7 @@ foam.CLASS({
       group.put(obj);
     },
 
-    function put(sub, obj) {
+    function put(obj, sub) {
       var value = this.expr.f(obj);
       if ( Array.isArray(value) ) {
         throw 'Unique doesn\'t Array values.';
@@ -1593,6 +1629,7 @@ foam.CLASS({
     },
     {
       name: 'compare',
+      swiftSupport: false,
       transient: true,
       documentation: 'Is a property so that it can be bound to "this" so that it works with Array.sort().',
       factory: function() { return this.compare_.bind(this); }
@@ -1741,7 +1778,7 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'Double',
+      class: 'Object',
       name: 'value'
     }
   ],

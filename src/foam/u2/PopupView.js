@@ -27,7 +27,6 @@ foam.CLASS({
       color: white;
       font-size: 18px;
       opacity: 0.9;
-      padding: 20px;
       position: absolute;
       box-sizing: border-box;
       z-index: 999;
@@ -40,7 +39,8 @@ foam.CLASS({
     'width',
     'height',
     'maxWidth',
-    'maxHeight'
+    'maxHeight',
+    'padding'
   ],
 
   methods: [
@@ -52,6 +52,7 @@ foam.CLASS({
         bg.remove();
       };
 
+      if ( ! this.padding ) this.padding = 20;
       if ( ! this.y       ) this.y = (parent.el().clientHeight - this.height)/2;
       if ( ! this.x       ) this.x = (parent.el().clientWidth  - this.width )/2;
       if ( this.width     ) this.style({width    : this.width     + 'px'});
@@ -76,8 +77,9 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         style({
-          left: this.x + 'px',
-          top:  this.y + 'px'
+          padding: this.padding + 'px',
+          left:    this.x + 'px',
+          top:     this.y + 'px'
         }).
         onunload.sub(close);
 

@@ -265,7 +265,7 @@ foam.LIB({
       var str = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'');
-      var isArrowFunction = str.indexOf('function') !== 0;
+      var isArrowFunction = !/(async )?function/.test(str);
 
       var match = isArrowFunction ?
           // (...args...) => ...
@@ -273,14 +273,14 @@ foam.LIB({
           // arg => ...
           match = str.match(/^(\(([^)]*)\)[^=]*|([^=]+))=>/) :
           // function (...args...) { ...body... }
-          match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+          match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return isArrowFunction ? (match[2] || match[1] || '') : (match[2] || '');
+      return isArrowFunction ? (match[2] || match[1] || '') : (match[3] || '');
     },
 
     function argNames(f) {
@@ -313,6 +313,72 @@ foam.LIB({
       } else {
         return match[2] && match[2].replace(/_#_%_%_/g, '\n') || '';
       }
+    },
+
+    function breakdown(f) {
+      var ident = "([^,\\s\\)]+)";
+      var ws = "\\s*";
+      var comment = "(?:\\/\\*(?:.|\\s)*?\\*\\/)?";
+      var skip = "(?:" + ws + comment + ws + ")*";
+      var header = "(?:function" + skip + ident + "?\\(|\\()" + skip;
+      var arg = "(?:" + ident + skip + ")";
+      var nextArg = "(?:," + skip + arg + ")";
+      var argEnd = "\\)";
+      var headerToBody = skip + "(?:\\=\\>)?" + skip;
+      var body = "\\{((?:.|\\s)*)\\}";
+
+      var breakdown = {
+        name: '',
+        args: [],
+        body: ''
+      };
+
+      var source = f.toString();
+
+      var lastIndex = 0;
+      var currentRegex;
+
+      function again() {
+        var match = currentRegex.exec(source);
+        if ( match ) lastIndex = currentRegex.lastIndex;
+        return match;
+      }
+
+      function next(e) {
+        prep(e);
+        return again();
+      }
+
+      function prep(e) {
+        currentRegex = new RegExp(e, "my");
+        currentRegex.lastIndex = lastIndex;
+      }
+
+      var match = next(header);
+      if ( ! match ) return null;
+
+      if ( match[1] ) breakdown.name = match[1];
+
+      match = next(arg);
+
+      if ( match ) {
+        breakdown.args.push(match[1]);
+        prep(nextArg);
+        while ( match = again() ) {
+          breakdown.args.push(match[1]);
+        }
+      }
+
+      match = next(argEnd);
+      if ( ! match ) return null;
+
+      if ( ! next(headerToBody) ) return null;
+
+      match = next(body);
+      if ( ! match ) return null;
+      breakdown.body = match[1];
+
+      return breakdown;
     },
 
     /**
@@ -851,6 +917,31 @@ foam.LIB({
 
       var pkg = foam.package.ensurePackage(global, cls.package);
       pkg[cls.name] = cls;
+
+      foam.package.triggerClass_(cls);
+    },
+
+    function waitForClass(cls) {
+      if ( foam.lookup(cls, true) ) return Promise.resolve(foam.lookup(cls));
+
+      foam.package.__pending = foam.package.__pending || {};
+      foam.package.__pending[cls] = foam.package.__pending[cls] || [];
+
+      return new Promise(function(resolve, reject) {
+        foam.package.__pending[cls].push(resolve);
+      });
+    },
+
+    function triggerClass_(cls) {
+      if ( ! foam.package.__pending || ! foam.package.__pending[cls.id] ) return;
+
+      var pending = foam.package.__pending[cls.id];
+
+      foam.package.__pending[cls.id] = undefined;
+
+      for ( var i = 0 ; i < pending.length ; i++ ) {
+        pending[i](cls);
+      }
     },
 
     /**
@@ -860,7 +951,23 @@ foam.LIB({
      */
     function registerClassFactory(m, thunk) {
       var pkg = foam.package.ensurePackage(global, m.package);
-      Object.defineProperty(pkg, m.name, {get: thunk, configurable: true});
+      var tmp;
+
+      Object.defineProperty(
+        pkg,
+        m.name, {
+          configurable: true,
+          get: function() {
+            if ( tmp ) return tmp;
+
+            tmp = thunk();
+
+            foam.package.triggerClass_(tmp);
+
+            return tmp;
+          }
+        }
+      );
     },
 
     /**

@@ -14,11 +14,15 @@ foam.CLASS({
   name: 'TreeAltView',
   extends: 'foam.u2.view.AltView',
 
+  requires: [
+    'foam.nanos.menu.Menu'
+  ],
+
   methods: [
     function init(){
       this.views = [
         [ { class: 'foam.u2.view.TableView' }, 'Table' ],
-        [ { class: 'foam.u2.view.TreeView', relationship: MenuRelationship, formatter: function() { this.add(this.data.label); } }, 'Tree' ]
+        [ { class: 'foam.u2.view.TreeView', relationship: foam.nanos.menu.MenuMenuRelationship, formatter: function() { this.add(this.data.label); } }, 'Tree' ]
       ]
     }
   ]
