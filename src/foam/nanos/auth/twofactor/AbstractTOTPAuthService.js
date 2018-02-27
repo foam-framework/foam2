@@ -8,8 +8,6 @@ foam.CLASS({
 
   javaImports: [
     'org.apache.commons.codec.binary.Base32',
-    'javax.crypto.Mac',
-    'javax.crypto.spec.SecretKeySpec',
     'java.util.Date'
   ],
 
