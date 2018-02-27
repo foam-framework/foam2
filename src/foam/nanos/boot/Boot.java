@@ -27,7 +27,7 @@ public class Boot {
               new foam.nanos.fs.Storage(datadir));
 
     // Used for all the services that will be required when Booting
-    serviceDAO_ = new JDAO(((foam.core.ProxyX)root_).getX(), NSpec.getOwnClassInfo(), "services");
+    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
 
     installSystemUser();
 
@@ -86,7 +86,7 @@ public class Boot {
   public X getX() { return root_; }
 
   public static void main (String[] args)
-      throws java.lang.Exception
+    throws Exception
   {
     System.out.println("Starting Nanos Server");
 
