@@ -50,6 +50,7 @@ FOAM_FILES([
   { name: "foam/nanos/auth/ProfilePictureView", flags: ['web'] },
   { name: "foam/nanos/auth/twofactor/OTPAuthService" },
   { name: "foam/nanos/auth/twofactor/AbstractOTPAuthService" },
+  { name: "foam/nanos/auth/twofactor/AbstractTOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/ClientOTPAuthService" },
   { name: "foam/nanos/auth/twofactor/refinements" },
   { name: "foam/nanos/bench/Benchmark" },
