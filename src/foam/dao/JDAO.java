@@ -9,7 +9,7 @@ package foam.dao;
 import foam.core.ClassInfo;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
-import java.io.*;
+import java.io.IOException;
 
 public class JDAO
   extends AbstractJDAO
@@ -21,16 +21,9 @@ public class JDAO
   }
 
   public JDAO(foam.core.X x, DAO delegate, String filename) {
-    super(x, delegate, filename + ".1");
+    super(x, delegate, filename);
     try {
-      int index = 0;
-      File file = null;
-      while ( true ) {
-        file = getX().get(foam.nanos.fs.Storage.class).get(filename + "." + index);
-        if ( ! file.exists() ) break;
-        loadJournal(file);
-        index++;
-      } 
+      loadJournal(getX().get(foam.nanos.fs.Storage.class).get(filename));
     } catch ( IOException e ) {
       logger_.error(e);
       throw new RuntimeException(e);
