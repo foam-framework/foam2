@@ -57,10 +57,21 @@ foam.CLASS({
       installInClass: function(c) {
         var oldCreate = c.create;
         c.create = function(args, X) {
-          var cls = args.forClass_;
+          var clsName = args.forClass_;
           var name = args.name;
 
-          var prop = X.lookup(cls).getAxiomByName(name);
+          var cls = X.lookup(clsName, true);
+
+          // If we failed to find the class, try to deserialize the old format
+          // where forClass_ contains the full path to the property: foo.bar.Pereson.lastName
+          if ( ! cls ) {
+            clsName = args.forClass_.substring(0, args.forClass_.lastIndexOf('.'));
+            name = args.forClass_.substring(args.forClass_.lastIndexOf('.') + 1);
+
+            cls = X.lookup(clsName);
+          }
+
+          var prop = cls.getAxiomByName(name);
 
           foam.assert(prop, 'Could not find property "', args.forClass_ + '.' + name, '"');
 
