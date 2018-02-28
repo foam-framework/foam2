@@ -44,6 +44,8 @@ foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
 
+  javaExtends: [ 'java.io.Closeable' ],
+
   methods: [
     {
       name: 'read',
