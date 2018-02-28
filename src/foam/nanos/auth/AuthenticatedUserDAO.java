@@ -29,12 +29,12 @@ import static foam.mlang.MLang.EQ;
  *  - restrict selection of users
  *    - can only see self by default
  *    - can see users belonging to groups you can create
- *  - grant access to based on SPID
+ *  - grant access based on SPID
  *  - set SPID to same as user creating new user if they don't have the global
  *    spid property
  **/
 public class AuthenticatedUserDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   public final static String GLOBAL_USER_READ   = "user.read.x";
   public final static String GLOBAL_USER_UPDATE = "user.update.x";
