@@ -16,7 +16,7 @@ opacity:0.0;
 ^.label{
     display:inline-block;
     opacity:0.0;
-    
+    font-style: oblique;
     }
 `,
 properties:[

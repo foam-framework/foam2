@@ -82,7 +82,7 @@ FOAM_FILES([
   { name: "foam/java/Validation" },
   //anubhav
   { name: "foam/support/model/Ticket" ,flags: ['web'] },
-
+  { name: "foam/support/view/SummaryCard" ,flags: ['web'] },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/Protocol", flags: ['swift'] },
   { name: "foam/swift/Argument", flags: ['swift'] },

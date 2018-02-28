@@ -13,7 +13,7 @@ foam.CLASS({
       {
         class: 'Long',
         name: 'id'
-      },
+      }, 
       {
         class: 'Long',
         name: 'requestorId'
