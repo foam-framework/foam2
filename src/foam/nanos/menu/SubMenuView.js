@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'SubMenuView',
   extends: 'foam.nanos.menu.PopupMenu',
 
+  requires: [ 'foam.nanos.menu.Menu' ],
+
   properties: [ 'X', 'menu' ],
 
   css: `
@@ -49,9 +51,11 @@ foam.CLASS({
       this.addClass(this.myClass());
       var self = this;
       var menu = this.menu;
-      var X = this.X;
+      var X    = this.X;
 
-      menu.children.select({
+      // TODO: should be orderBy(this.Menu.ORDER, this.Menu.LABEL) when
+      // multi-key sorting supported.
+      menu.children.orderBy(this.Menu.ORDER).select({
         put: function(menu) {
           if ( ! menu.handler ) return;
           self.start('div')
