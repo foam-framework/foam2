@@ -8,21 +8,58 @@ foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DUG',
 
+  documentation: 'Data Update Gateway - DAO subscription notifcation service',
+
   javaImports: [
     'foam.dao.DAO',
     'foam.dao.HTTPSink',
     'foam.lib.json.Outputter',
+    'foam.nanos.logger.Logger',
     'static foam.lib.json.OutputterMode.NETWORK'
+  ],
+
+  tableColumns: [
+    'id',
+    'daoKey',
+    'format',
+    'owner',
+    'url'
   ],
 
   searchColumns: [],
 
   properties: [
-    { class: 'String', name: 'id' },
-    { class: 'String', name: 'daoKey' },
-    { class: 'String', name: 'url' },
-    { class: 'Enum', of: 'foam.nanos.dig.Format', name: 'format' },
-    { class: 'Reference', of: 'foam.nanos.auth.User', name: 'owner' }
+    {
+        class: 'String',
+        name: 'id',
+        displayWidth: 40
+    },
+    {
+      class: 'String',
+      name: 'daoKey',
+      label: 'DAO'
+      // TODO: make keyView
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.dig.Format',
+      name: 'format',
+      // format hidden until implemented
+      hidden: true
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'owner',
+      hidden: true
+      // TODO: set tableCellRenderer
+    },
+    {
+      class: 'URL',
+      name: 'url',
+      label: 'URL',
+      displayWidth: 100
+    }
   ],
 
   methods: [
@@ -35,15 +72,15 @@ foam.CLASS({
         }
       ],
       javaReturns: 'void',
-      javaCode:
-`try {
-  DAO dao = (DAO) x.get(getDaoKey());
-  // TODO: choose outputter based on format
-  dao.listen(new HTTPSink(getUrl(), foam.nanos.dig.Format.JSON), null);
-} catch (Throwable t) {
-  t.printStackTrace();
-  throw new RuntimeException(t);
-}`
+      javaCode: `
+        try {
+          DAO dao = (DAO) x.get(getDaoKey());
+          // TODO: choose outputter based on format
+          dao.listen(new HTTPSink(getUrl(), foam.nanos.dig.Format.JSON), null);
+        } catch (Throwable t) {
+          ((Logger) x.get("logger")).error("DUG", "error executing DUG", t);
+        }
+      `
     }
   ]
 });
