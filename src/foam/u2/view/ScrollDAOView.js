@@ -616,6 +616,8 @@ foam.CLASS({
             width: '100%'
           });
         });
+
+      this.SUPER();
     },
     {
       name: 'moveAnchor_',
@@ -730,6 +732,15 @@ foam.CLASS({
           }
         });
       }
+    }
+  ],
+
+  actions: [
+    {
+      name: 'clearSelection',
+      isEnabled: function(selectionEnabled) { return selectionEnabled; },
+      keyboardShortcuts: [27], // Escape.
+      code: function() { this.selection = []; }
     }
   ],
 
