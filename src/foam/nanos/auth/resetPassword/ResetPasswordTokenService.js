@@ -57,7 +57,7 @@ AppConfig appConfig = (AppConfig) getAppConfig();
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 String url = appConfig.getUrl()
-    .replaceAll("/?", "");
+    .replaceAll("/$", "");
 
 Sink sink = new ListSink();
 sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))/**/
