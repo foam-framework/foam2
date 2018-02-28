@@ -31,8 +31,6 @@ AppConfig appConfig = (AppConfig) getX().get("appConfig");
 String url = appConfig.getUrl()
     .replaceAll("/$", "");
 
-System.out.println("url = " + url);
-
 Token token = new Token();
 token.setUserId(user.getId());
 token.setExpiry(generateExpiryDate());
