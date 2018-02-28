@@ -92,7 +92,8 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); }
+      factory: function() { return new WeakMap(); },
+      transient: true
     }
   ],
 
@@ -109,7 +110,7 @@ foam.CLASS({
           foam.__context__;
 
         // Install our own CSS, and then all parent models as well.
-        if ( ! axiom.installedDocuments_.has(X.document) ) {
+        if ( X.document && ! axiom.installedDocuments_.has(X.document) ) {
           X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
           axiom.installedDocuments_.set(X.document, true);
         }
@@ -294,6 +295,7 @@ foam.CLASS({
 
       this.visitChildren('load');
       this.state = this.LOADED;
+      if ( this.tabIndex ) this.setAttribute('tabindex', this.tabIndex);
       if ( this.focused ) this.el().focus();
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
@@ -847,6 +849,10 @@ foam.CLASS({
       name: 'scrollHeight',
     },
     {
+      class: 'Int',
+      name: 'tabIndex',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -862,11 +868,11 @@ foam.CLASS({
     },
 
     function initE() {
-      this.initKeyboardShortcuts();
       /*
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initKeyboardShortcuts();
     },
 
     function observeScrollHeight() {
@@ -945,7 +951,7 @@ foam.CLASS({
 
         // Ensure that target is focusable, and therefore will capture keydown
         // and keypress events.
-        target.setAttribute('tabindex', target.tabIndex || 1);
+        target.tabIndex = target.tabIndex || 1;
 
         target.on('keydown',  this.onKeyboardShortcut);
         target.on('keypress', this.onKeyboardShortcut);
@@ -1070,6 +1076,8 @@ foam.CLASS({
       */
 
       // TODO: type checking
+
+      if ( name === 'tabindex' ) this.tabIndex = parseInt(value);
 
       // handle slot binding, ex.: data$: ...,
       // Remove if we add a props() method
