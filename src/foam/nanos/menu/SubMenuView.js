@@ -53,7 +53,7 @@ foam.CLASS({
       var menu = this.menu;
       var X = this.X;
 
-      menu.children.orderBy(this.Menu.LABEL).select({
+      menu.children.orderBy(this.Menu.ORDER).select({
         put: function(menu) {
           if ( ! menu.handler ) return;
           self.start('div')
