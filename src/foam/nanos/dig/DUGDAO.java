@@ -16,8 +16,9 @@ import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
 import foam.util.Auth;
 
+/** Execute DUGs on startup or when first put(). Set DUG.owner to creator. **/
 public class DUGDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   public DUGDAO(X x) {
     this(x, new JDAO(x, DUG.getOwnClassInfo(), "dugs"));

@@ -15,6 +15,7 @@ import foam.lib.parse.*;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
+import foam.nanos.logger.*;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -23,7 +24,7 @@ import java.util.regex.Pattern;
 import java.util.TimeZone;
 
 public abstract class AbstractJDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   protected Pattern COMMENT = Pattern.compile("(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)");
   protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -37,6 +38,7 @@ public abstract class AbstractJDAO
 
   protected final File           file_;
   protected final BufferedWriter out_;
+  protected       Logger         logger_ = new StdoutLogger();
 
   public AbstractJDAO(foam.core.X x, ClassInfo classInfo, String filename) {
     this(x, new MapDAO(classInfo), filename);
@@ -46,6 +48,16 @@ public abstract class AbstractJDAO
   public AbstractJDAO(foam.core.X x, DAO delegate, String filename) {
     setX(x);
     setOf(delegate.getOf());
+
+    Logger logger = logger_;
+
+    if ( x != null ) {
+      logger = (Logger) x.get("logger");
+
+      if ( logger == null ) logger = logger_;
+    }
+
+    logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
 
     try {
       file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
@@ -57,6 +69,7 @@ public abstract class AbstractJDAO
 
       out_ = new BufferedWriter(new FileWriter(file_, true));
     } catch ( IOException e ) {
+      logger_.error(e);
       throw new RuntimeException(e);
     }
   }
@@ -81,7 +94,7 @@ public abstract class AbstractJDAO
 
         FObject object = parser.parseString(line);
         if ( object == null ) {
-          System.err.println(getParsingErrorMessage(line) + ", source: " + line);
+          logger_.error("parse error", getParsingErrorMessage(line), "line:", line);
           continue;
         }
 
@@ -94,8 +107,7 @@ public abstract class AbstractJDAO
             break;
         }
       } catch (Throwable t) {
-        System.err.println("Error reading journal line: " + line);
-        t.printStackTrace();
+        logger_.error("error replaying journal line:", line, t);
       }
     }
 
@@ -152,7 +164,7 @@ public abstract class AbstractJDAO
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
-      e.printStackTrace();
+      logger_.error("put", e);
     }
 
     return ret;
@@ -172,7 +184,7 @@ public abstract class AbstractJDAO
       out_.newLine();
       out_.flush();
     } catch (IOException e) {
-      e.printStackTrace();
+      logger_.error("remove", e);
     }
 
     return ret;
