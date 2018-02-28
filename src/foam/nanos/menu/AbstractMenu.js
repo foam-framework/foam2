@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'AbstractMenu',
   abstract: true,
 
+  imports: [ 'menuListener?' ],
+
   methods: [
     function setMenuId(id) {
       if ( window.location.hash.substr(1) != id ){
@@ -17,6 +19,7 @@ foam.CLASS({
     },
     function launch(X, menu) {
       this.setMenuId(menu.id);
+      this.menuListener && this.menuListener(menu);
       X.stack.push(this.createView(X, menu));
     }
   ]

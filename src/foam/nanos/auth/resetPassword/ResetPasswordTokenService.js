@@ -56,9 +56,11 @@ try{
 AppConfig appConfig = (AppConfig) getAppConfig();
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
+String url = appConfig.getUrl()
+    .replaceAll("/$", "");
 
 Sink sink = new ListSink();
-sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))
+sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))/**/
    .limit(1).select(sink);
 
 List list = ((ListSink) sink).getData();
@@ -83,7 +85,7 @@ message.setTo(new String[] { user.getEmail() });
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName()));
-args.put("link", appConfig.getUrl() +"?token=" + token.getData() + "#reset");
+args.put("link", url +"?token=" + token.getData() + "#reset");
 
 email.sendEmailFromTemplate(user, message, "reset-password", args);
 return true;
