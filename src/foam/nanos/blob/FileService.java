@@ -36,6 +36,7 @@ public class FileService
 
   @Override
   protected void download(X x) {
+    Blob blob = null;
     OutputStream os = null;
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
@@ -60,7 +61,7 @@ public class FileService
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob
       String blobId = ((IdentifiedBlob) file.getData()).getId();
-      Blob blob = getDelegate().find_(x, blobId);
+      blob = getDelegate().find_(x, blobId);
       long size = blob.getSize();
 
       // set response status, content type, content length
@@ -77,6 +78,7 @@ public class FileService
       t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
+      IOUtils.closeQuietly(blob);
       IOUtils.closeQuietly(os);
     }
   }
