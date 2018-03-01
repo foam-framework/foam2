@@ -8,14 +8,14 @@ package foam.crypto.hash;
 
 import foam.core.ClassInfo;
 import foam.core.X;
-import foam.dao.JDAO;
+import foam.dao.AbstractJDAO;
 import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
 
 public class HashingJDAO
-    extends JDAO
+    extends AbstractJDAO
 {
   protected String algorithm_ = null;
   protected Outputter outputter_ = null;
