@@ -8,7 +8,7 @@ package foam.crypto.sign;
 
 import foam.core.ClassInfo;
 import foam.core.X;
-import foam.dao.AbstractJDAO;
+import foam.dao.JDAO;
 import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.lib.json.Outputter;
@@ -17,7 +17,7 @@ import foam.lib.json.OutputterMode;
 import java.security.PrivateKey;
 
 public class SigningJDAO
-    extends AbstractJDAO
+    extends JDAO
 {
   protected Outputter outputter_ = null;
   protected String algorithm_ = null;
