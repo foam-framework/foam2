@@ -9,7 +9,6 @@ package foam.dao;
 import foam.core.ClassInfo;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
-import java.io.IOException;
 
 public class JDAO
   extends AbstractJDAO
@@ -22,12 +21,6 @@ public class JDAO
 
   public JDAO(foam.core.X x, DAO delegate, String filename) {
     super(x, delegate, filename);
-    try {
-      loadJournal(getX().get(foam.nanos.fs.Storage.class).get(filename));
-    } catch ( IOException e ) {
-      logger_.error(e);
-      throw new RuntimeException(e);
-    }
   }
 
   @Override
