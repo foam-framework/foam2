@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
 public class UptimeWebAgent
-    implements WebAgent
+        implements WebAgent
 {
   protected long startTime_ = System.currentTimeMillis();
 
@@ -21,6 +21,12 @@ public class UptimeWebAgent
     PrintWriter out = x.get(PrintWriter.class);
     HttpServletResponse response = x.get(HttpServletResponse.class);
     response.setContentType("text/html");
-    out.println("Uptime: " + ( System.currentTimeMillis() - startTime_ ) / 1000);
+    long gap = System.currentTimeMillis()-startTime_;
+    String s = "Uptime: \n" +
+            "Days: " + gap / (1000*60*60*24)+"\n" +
+            "Hours: "+(gap % (1000*60*60*24)) / (1000*60*60)+"\n" +
+            "Minutes: "+ (gap % (1000*60*60)) /(1000*60)+"\n" +
+            "Seconds: "+ (gap % (1000*60))/ 1000;
+    out.println(s);
   }
 }
