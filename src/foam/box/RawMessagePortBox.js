@@ -41,7 +41,7 @@ foam.CLASS({
         // property on Message and have custom serialization in it to
         // do the registration.
         message.attributes.replyBox = this.__context__.registry.register(
-            null, null, message.attributes.replyBox);
+            message.attributes.replyBox.id, null, message.attributes.replyBox);
 
         // TODO: There should be a better way to do this.
         replyBox = this.ReplyBox.create({
