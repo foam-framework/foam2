@@ -59,10 +59,21 @@ public abstract class AbstractJDAO
 
     logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
     try {
-      //create output journal file
+      //get repo entries in filename.0 journal first
+      File infile = getX().get(foam.nanos.fs.Storage.class).get(filename + ".0");
+      //load repo entries into DAO
+      if ( infile.exists() ) loadJournal(infile);
+
+      //get output journal
       writeFile_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
       //if output file does not existing, create one
-      if ( ! writeFile_.exists() ) writeFile_.createNewFile();
+      if ( ! writeFile_.exists() ) {
+        //if file do not exist, create one
+        writeFile_.createNewFile();
+      } else {
+        //if output file exist, load entries into DAO
+        loadJournal(writeFile_);
+      }
       //link output journal file to BufferedWriter
       out_ = new BufferedWriter(new FileWriter(writeFile_, true));
     } catch ( IOException e ) {
