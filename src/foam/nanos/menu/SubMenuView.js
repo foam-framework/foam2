@@ -51,9 +51,11 @@ foam.CLASS({
       this.addClass(this.myClass());
       var self = this;
       var menu = this.menu;
-      var X = this.X;
+      var X    = this.X;
 
-      menu.children.orderBy(this.Menu.LABEL).select({
+      // TODO: should be orderBy(this.Menu.ORDER, this.Menu.LABEL) when
+      // multi-key sorting supported.
+      menu.children.orderBy(this.Menu.ORDER).select({
         put: function(menu) {
           if ( ! menu.handler ) return;
           self.start('div')
