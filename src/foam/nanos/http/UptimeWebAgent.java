@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 
 public class UptimeWebAgent
-        implements WebAgent
+  implements WebAgent
 {
   protected long startTime_ = System.currentTimeMillis();
 
