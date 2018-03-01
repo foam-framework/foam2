@@ -18,15 +18,19 @@ public class UptimeWebAgent
 
   @Override
   public void execute(X x) {
-    PrintWriter out = x.get(PrintWriter.class);
+    PrintWriter         out      = x.get(PrintWriter.class);
     HttpServletResponse response = x.get(HttpServletResponse.class);
-    response.setContentType("text/html");
-    long gap = System.currentTimeMillis()-startTime_;
-    String s = "Uptime: \n" +
-            "Days: " + gap / (1000*60*60*24)+"\n" +
-            "Hours: "+(gap % (1000*60*60*24)) / (1000*60*60)+"\n" +
-            "Minutes: "+ (gap % (1000*60*60)) /(1000*60)+"\n" +
-            "Seconds: "+ (gap % (1000*60))/ 1000;
-    out.println(s);
+    long                gap      = System.currentTimeMillis()-startTime_;
+
+    response.setContentType("text/plain");
+
+    out.println(
+      gap + "\n\n" +
+      "Uptime: \n" +
+      "  Days: " + gap / (1000*60*60*24) + "\n" +
+      "  Hours: " + (gap % (1000*60*60*24)) / (1000*60*60) + "\n" +
+      "  Minutes: "+ (gap % (1000*60*60)) /(1000*60) + "\n" +
+      "  Seconds: "+ (gap % (1000*60))/ 1000
+    );
   }
 }
