@@ -75,7 +75,6 @@ public class FileService
       blob.read(os, 0, size);
       os.close();
     } catch (Throwable t) {
-      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
       IOUtils.closeQuietly(blob);
