@@ -68,10 +68,10 @@ public abstract class AbstractJDAO
       writeFile_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
       //if output journal does not existing, create one
       if ( ! writeFile_.exists() ) {
-        //if output journal do not exist, create one
+        //if output journal does not exist, create one
         writeFile_.createNewFile();
       } else {
-        //if output journal file exist, load entries into DAO
+        //if output journal file exists, load entries into DAO
         loadJournal(writeFile_);
       }
       //link output journal file to BufferedWriter
