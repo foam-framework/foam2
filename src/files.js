@@ -495,6 +495,13 @@ FOAM_FILES([
   { name: "foam/crypto/sign/SignedFObject" },
 
 //help desk support 
+<<<<<<< Updated upstream
   { name: "foam/support/model/SupportEmail" }
+=======
+{ name: "foam/support/model/emailSupporttrial/emailSupport" },
+{ name: "foam/support/view/modal/CreateEmailModal" },
+
+{ name: "foam/support/reference/EmailSupport" }
+>>>>>>> Stashed changes
 
 ]);
