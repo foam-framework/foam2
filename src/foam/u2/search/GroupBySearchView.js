@@ -123,7 +123,14 @@ foam.CLASS({
           } catch(x) {}
         })
         .on('mouseout', function(e) {
+          self.view.data = self.hardData;
           if ( e.relatedTarget && e.relatedTarget.nodeName === 'OPTION' ) return;
+          if ( e.relatedTarget && e.relatedTarget.nodeName === 'DIV' || !self.hardData ){
+            self.view.data = '';
+            self.hardData = undefined;
+            self.previewMode = false;
+            return;
+          }
           self.view.data   = self.hardData;
           self.hardData    = undefined;
           self.previewMode = false;
