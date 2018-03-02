@@ -131,9 +131,7 @@ foam.CLASS({
             self.previewMode = false;
             return;
           }
-          self.view.data   = self.hardData;
-          self.hardData    = undefined;
-          self.previewMode = false;
+
         })
         .onDetach(
           this.dao$proxy.listen(
