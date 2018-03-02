@@ -131,6 +131,11 @@ var classes = [
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.ServiceProvider',
+  'foam.nanos.auth.twofactor.OTPAuthService',
+  'foam.nanos.auth.twofactor.AbstractOTPAuthService',
+  'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
+  'foam.nanos.auth.twofactor.ClientOTPAuthService',
+  'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -214,9 +219,10 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.twofactor.OTPAuthService',
+  'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.auth.token.TokenService'
 ];
 
 var proxies = [
@@ -228,6 +234,7 @@ var proxies = [
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.logger.Logger',
   'foam.nanos.notification.email.EmailService',
