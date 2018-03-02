@@ -43,7 +43,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
-      tableWidth: 160
+      tableWidth: 160,
+      validateObj: function(firstName) {
+        var firstNameRegex = /^[a-zA-Z]{1,70}$/;
+
+        if ( ! firstNameRegex.test(firstName) ) {
+          return 'Invalid first name.';
+        }
+      }
     },
     {
       class: 'String',
@@ -52,14 +59,26 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
-      tableWidth: 160
+      tableWidth: 160,
+      validateObj: function (lastName) {
+        var lastNameRegex = /^[a-zA-Z]{1,70}$/;
+
+        if ( ! lastNameRegex.test(lastName) ) {
+          return 'Invalid last name.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'organization',
       displayWidth: 80,
       width: 100,
-      tableWidth: 160
+      tableWidth: 160,
+      validateObj: function (organization) {
+        if ( organization.length > 35 ) {
+          return 'Organization name must be less than 35 characters';
+        }
+      }
     },
     {
       class: 'String',
@@ -75,8 +94,15 @@ foam.CLASS({
         return val.toLowerCase();
       },
       javaSetter:
-`email_ = val.toLowerCase();
-emailIsSet_ = true;`
+      `email_ = val.toLowerCase();
+       emailIsSet_ = true;`,
+      validateObj: function (email) {
+        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        if ( ! emailRegex.test(email) ) {
+          return 'Invalid email address.';
+        }
+      } 
     },
     {
       class: 'Boolean',
@@ -87,14 +113,14 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      factory: function() { return this.Phone.create(); },
+      factory: function () { return this.Phone.create(); },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
-      factory: function() { return this.Phone.create(); },
+      factory: function () { return this.Phone.create(); },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
@@ -119,7 +145,7 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return this.Address.create(); },
+      factory: function () { return this.Address.create(); },
       view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
@@ -144,7 +170,14 @@ emailIsSet_ = true;`
       class: 'Password',
       name: 'password',
       displayWidth: 30,
-      width: 100
+      width: 100,
+      validateObj: function (password) {
+        var passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
+
+        if ( ! passwordRegex.test(password) ) {
+          return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
+        }
+      }
     },
     {
       class: 'Password',
@@ -170,7 +203,12 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'businessName',
       documentation: 'Name of the business',
-      width: 50
+      width: 50,
+      validateObj: function (businessName) {
+        if ( businessName.length > 35 ) {
+          return 'Business name must be less than 35 characters.';
+        }
+      }
     },
     {
       class: 'String',
@@ -198,7 +236,14 @@ emailIsSet_ = true;`
       class: 'URL',
       name: 'website',
       displayWidth: 80,
-      width: 2048
+      width: 2048,
+      validateObj: function (website) {
+        var websiteRegex = /@^(http\:\/\/|https\:\/\/)?([a-z0-9][a-z0-9\-]*\.)+[a-z0-9][a-z0-9\-]*$@i/
+
+        if ( ! websiteRegex.test(website) ) {
+          return this.WebsiteError;
+        }
+      }
     },
     {
       class: 'Date',
