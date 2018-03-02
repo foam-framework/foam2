@@ -79,7 +79,6 @@ foam.CLASS({
       var self = this;
 
       this.start().addClass(this.myClass())
-        .add(this.TEST_MODAL)
         .start('h2').add("Model Browser").end()
         .start().add(this.PRINT_PAGE).end()
         .select(this.nSpecDAO, function(n) {
@@ -106,12 +105,6 @@ foam.CLASS({
       label: 'Print',
       code: function(){
         window.print();
-      }
-    },
-    {
-      name: 'testModal',
-      code: function(X){
-
       }
     }
   ],
