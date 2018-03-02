@@ -495,7 +495,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/SignedFObject" },
 
 //help desk support 
-{ name: "foam/support/model/emailSupporttrial/emailSupport" }
-
+  { name: "foam/support/SupportEmail" }
 
 ]);
