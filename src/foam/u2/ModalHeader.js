@@ -1,6 +1,6 @@
 
 foam.CLASS({
-  package: 'foam.gui',
+  package: 'foam.u2',
   name: 'ModalHeader',
   extends: 'foam.u2.View',
 
@@ -69,9 +69,9 @@ foam.CLASS({
         .start()
           .start().addClass('container')
             .start().addClass('title').add(this.title).end()
-            .start({class:'foam.u2.tag.Image', data: '../../gui/images/ic-cancelwhite.svg'}).addClass('close')
+            .start({class:'foam.u2.tag.Image', data: 'ic-cancelwhite.svg'}).addClass('close')
               .add(this.CLOSE_MODAL)
-            .end()
+            // .end()
           .end()
         .end()
       .end()

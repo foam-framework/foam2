@@ -1,6 +1,6 @@
 
 foam.CLASS({
-  package: 'foam.gui',
+  package: 'foam.nanos.controller',
   name: 'AppStyles',
   extends: 'foam.u2.View',
 
@@ -39,19 +39,6 @@ foam.CLASS({
       color: #093649;
       padding-left: 15px;
       height: 60px;
-    }
-    .foam-u2-DetailView {
-      background: #fafafa;
-      border: 1px solid grey;
-    }
-    .foam-u2-DetailView .foam-u2-DetailView {
-      width: auto;
-      margin: inherit;
-    }
-    .foam-u2-DetailView-title {
-      background: #ddd;
-      color: gray;
-      padding: 6px;
     }
     .foam-u2-view-TableView th {
       font-family: 'Roboto';

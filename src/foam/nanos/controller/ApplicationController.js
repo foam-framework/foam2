@@ -29,7 +29,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.client.Client',
-    'foam.gui.AppStyles'
+    'foam.nanos.controller.AppStyles'
   ],
 
   requires: [
@@ -195,7 +195,7 @@ foam.CLASS({
             s.detach();
           });
         }
-        
+
         this.installCSS(text.
           replace(/%PRIMARYCOLOR%/g,    this.primaryColor).
           replace(/%SECONDARYCOLOR%/g,  this.secondaryColor).
