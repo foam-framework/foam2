@@ -1297,7 +1297,7 @@ foam.CLASS({
     {
       name: 'String',
       path: 'foam.core.String',
-      swiftPath: null,
+      flags: ['js'],
     },
   ],
 

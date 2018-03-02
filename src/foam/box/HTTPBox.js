@@ -20,20 +20,25 @@ foam.CLASS({
 
   requires: [
     {
-      name: 'Parser',
       path: 'foam.json.Parser',
-      swiftPath: 'foam.swift.parse.json.FObjectParser',
+      flags: ['js'],
     },
     {
-      name: 'HTTPRequest',
       path: 'foam.net.web.HTTPRequest',
-      swiftPath: '',
+      flags: ['js'],
     },
     {
-      name: 'Outputter',
       path: 'foam.json.Outputter',
-      swiftPath: 'foam.swift.parse.json.output.Outputter',
-      javaPath: '',
+      flags: ['js'],
+    },
+    {
+      path: 'foam.swift.parse.json.FObjectParser',
+      flags: ['swift'],
+    },
+    {
+      name: 'SwiftOutputter',
+      path: 'foam.swift.parse.json.output.Outputter',
+      flags: ['swift'],
     },
     'foam.box.HTTPReplyBox',
   ],
@@ -74,14 +79,14 @@ foam.CLASS({
             this.creationContext
         });
       },
-      swiftFactory: 'return Parser_create()',
+      swiftFactory: 'return FObjectParser_create()',
     },
     {
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
       name: 'outputter',
       generateJava: false,
-      swiftFactory: 'return Outputter_create()',
+      swiftFactory: 'return SwiftOutputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
       }

@@ -20,22 +20,26 @@ foam.CLASS({
   name: 'NodeJsModelExecutor',
 
   requires: [
+    'foam.apploader.ClassLoader',
+    'foam.apploader.ModelLookupDAO',
+    'foam.apploader.NodeModelFileDAO',
     'foam.classloader.OrDAO',
-    'foam.classloader.NodeModelFileDAO'
   ],
 
   imports: [
-    'arequire'
-  ],
-
-  exports: [
-    foam.String.daoize(foam.core.Model.name)
+    'classloader',
   ],
 
   properties: [
     {
       class: 'StringArray',
-      name: 'classpaths'
+      name: 'classpaths',
+      postSet: function(_, n) {
+        var classloader = this.classloader;
+        n.forEach(function(p) {
+          classloader.addClassPath(p);
+        });
+      }
     },
     {
       name: 'modelId'
@@ -43,24 +47,6 @@ foam.CLASS({
     {
       name: 'modelArgs'
     },
-    {
-      name: foam.String.daoize(foam.core.Model.name),
-      expression: function(classpaths) {
-        var modelDao = this.NodeModelFileDAO.create({
-          classpath: classpaths[0],
-        });
-        for ( var i = 1, classpath ; classpath = classpaths[i] ; i++ ) {
-          modelDao = this.OrDAO.create({
-            delegate: modelDao,
-            primary: this.NodeModelFileDAO.create({
-              suppressWarning: true,
-              classpath: classpath,
-            })
-          });
-        }
-        return modelDao;
-      }
-    }
   ],
 
   methods: [
@@ -79,14 +65,10 @@ foam.CLASS({
 
     function execute() {
       var self = this;
-      var modelArgs = this.modelArgs;
-      var X = this.__subContext__;
-      var modelId = this.modelId;
-
-      return X.arequire(modelId)
+      return this.classloader.load(self.modelId)
         .catch(console.log)
         .then(function() {
-          return X.lookup(modelId).create(modelArgs, self).execute();
+          return self.__subContext__.lookup(self.modelId).create(self.modelArgs, self).execute();
         })
         .catch(console.log);
     }
