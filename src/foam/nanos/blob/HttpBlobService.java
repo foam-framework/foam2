@@ -24,15 +24,20 @@ import java.nio.file.Paths;
 
 public class HttpBlobService
     extends ProxyBlobService
-    implements NSpecAware, WebAgent
+    implements WebAgent
 {
   public static final int BUFFER_SIZE = 8192;
 
-  protected NSpec nspec_;
+  protected String name_;
 
   public HttpBlobService(X x, BlobService delegate) {
+    this(x, "httpBlobService", delegate);
+  }
+
+  public HttpBlobService(X x, String name, BlobService delegate) {
     setX(x);
     setDelegate(delegate);
+    name_ = name;
   }
 
   @Override
@@ -57,7 +62,7 @@ public class HttpBlobService
 
     try {
       String path = req.getRequestURI();
-      String id = path.replaceFirst("/service/" + nspec_.getName() + "/", "");
+      String id = path.replaceFirst("/service/" + name_ + "/", "");
 
       Blob blob = getDelegate().find(id);
       if ( blob == null ) {
@@ -103,10 +108,5 @@ public class HttpBlobService
     } finally {
       IOUtils.closeQuietly(blob);
     }
-  }
-
-  @Override
-  public void setNSpec(NSpec spec) {
-    nspec_ = spec;
   }
 }

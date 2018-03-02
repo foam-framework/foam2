@@ -36,7 +36,7 @@ public abstract class AbstractJDAO
     }
   };
 
-  protected final File           file_;
+  protected final File           outFile_;
   protected final BufferedWriter out_;
   protected       Logger         logger_ = new StdoutLogger();
 
@@ -45,10 +45,10 @@ public abstract class AbstractJDAO
     setOf(classInfo);
   }
 
-  public AbstractJDAO(foam.core.X x, DAO delegate, String filename) {
+  public AbstractJDAO(foam.core.X x, DAO delegate, String filename){
     setX(x);
     setOf(delegate.getOf());
-
+    setDelegate(delegate);
     Logger logger = logger_;
 
     if ( x != null ) {
@@ -58,16 +58,24 @@ public abstract class AbstractJDAO
     }
 
     logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
-
     try {
-      file_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
+      //get repo entries in filename.0 journal first
+      File inFile = getX().get(foam.nanos.fs.Storage.class).get(filename + ".0");
+      //load repo entries into DAO
+      if ( inFile.exists() ) loadJournal(inFile);
 
-      if ( ! file_.exists() ) file_.createNewFile();
-
-      setDelegate(delegate);
-      loadJournal();
-
-      out_ = new BufferedWriter(new FileWriter(file_, true));
+      //get output journal
+      outFile_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
+      //if output journal does not existing, create one
+      if ( ! outFile_.exists() ) {
+        //if output journal does not exist, create one
+        outFile_.createNewFile();
+      } else {
+        //if output journal file exists, load entries into DAO
+        loadJournal(outFile_);
+      }
+      //link output journal file to BufferedWriter
+      out_ = new BufferedWriter(new FileWriter(outFile_, true));
     } catch ( IOException e ) {
       logger_.error(e);
       throw new RuntimeException(e);
@@ -76,11 +84,11 @@ public abstract class AbstractJDAO
 
   protected abstract Outputter getOutputter();
 
-  protected void loadJournal()
+  protected void loadJournal(File file)
       throws IOException
   {
     JSONParser parser = getX().create(JSONParser.class);
-    BufferedReader br = new BufferedReader(new FileReader(file_));
+    BufferedReader br = new BufferedReader(new FileReader(file));
 
     for ( String line ; ( line = br.readLine() ) != null ; ) {
       // skip empty lines & comment lines
