@@ -44,10 +44,6 @@ foam.CLASS({
   properties: [ 'swiftFactory', 'swiftPostSet' ]
 });
 foam.CLASS({
-  refines: 'foam.core.Requires',
-  properties: [ 'swiftPath' ]
-});
-foam.CLASS({
   refines: 'foam.core.String',
   properties: [ 'swiftFactory' ]
 });
