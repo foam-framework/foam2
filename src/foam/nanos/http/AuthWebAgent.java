@@ -6,17 +6,19 @@
 
 package foam.nanos.http;
 
-import foam.core.X;
+import foam.core.*;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
+import foam.nanos.http.ProxyWebAgent;
+import foam.nanos.http.WebAgent;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-
+import java.io.PrintWriter;
+import java.util.Date;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
 
 public class AuthWebAgent
     extends ProxyWebAgent
@@ -66,58 +68,48 @@ public class AuthWebAgent
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
   public Session authenticate(X x) {
-    // context parameters
     HttpServletRequest req          = x.get(HttpServletRequest.class);
-    AuthService        auth         = (AuthService) x.get("auth");
-    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
-
-    // query parameters
     String             email        = req.getParameter("user");
     String             password     = req.getParameter("password");
-
-    // instance parameters
-    Session            session      = null;
     Cookie             cookie       = getCookie(req);
+    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
+    Session            session      = null;
     boolean            attemptLogin = ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password);
+    AuthService        auth         = (AuthService) x.get("auth");
+    PrintWriter        out          = x.get(PrintWriter.class);
 
-    // get session id from either query parameters or cookie
-    String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
-        req.getParameter("sessionId") : ( cookie != null ) ?
-        cookie.getValue().toString() : null;
-
-    if ( ! SafetyUtil.isEmpty(sessionId) ) {
+    if ( cookie == null ) {
+      session = new Session();
+      createCookie(x, session);
+    } else {
+      String sessionId = cookie.getValue().toString();
       session = (Session) sessionDAO.find(sessionId);
+
       if ( session == null ) {
         session = new Session();
         session.setId(sessionId);
       } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
-    } else {
-      // create new cookie
-      session = new Session();
-      createCookie(x, session);
     }
 
-    if ( ! attemptLogin ) {
-      return null;
-    }
+    if ( ! attemptLogin ) return null;
 
     try {
-      User user = auth.loginByEmail(session.getContext(), email, password);
-      if ( user != null ) {
-        return session;
-      }
+      User user = (User) auth.loginByEmail(session.getContext(), email, password);
+      if ( user != null ) return session;
     } catch (Throwable t) {
       t.printStackTrace();
     }
-
-    PrintWriter out = x.get(PrintWriter.class);
     out.println("Authentication failure.");
+
     return null;
   }
 
   public void execute(X x) {
+    HttpServletRequest  req     = x.get(HttpServletRequest.class);
+    HttpServletResponse resp    = x.get(HttpServletResponse.class);
+    PrintWriter         out     = x.get(PrintWriter.class);
     AuthService         auth    = (AuthService) x.get("auth");
     Session             session = authenticate(x);
 
@@ -125,7 +117,6 @@ public class AuthWebAgent
       if ( auth.check(session.getContext(), permission_) ) {
         getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
       } else {
-        PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
       }
     } else {
