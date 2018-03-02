@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.support',
+  package: 'foam.support.model',
   name: 'SupportEmail',
 
   properties:[
