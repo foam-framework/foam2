@@ -17,7 +17,14 @@ foam.CLASS({
     {
       class: 'PhoneNumber',
       name: 'number',
-      required: true
+      required: true,
+      validateObj: function (number) {
+        var numberRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+        
+        if ( ! numberRegex.test(number) ) {
+          return 'Invalid phone number.';
+        }
+      }
     }
   ]
 });

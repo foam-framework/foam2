@@ -45,29 +45,59 @@ foam.CLASS({
       //required: true
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a main address field.'
+      documentation: 'for an unstructured address, use this as a main address field.',
+      validateObj: function(address1) {
+        if ( ! address1 || address1 > 70 ) {
+          return 'Street address is invalid.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a sub address field.'
+      documentation: 'for an unstructured address, use this as a sub address field.',
+      validateObj: function(address2) {
+        if ( ! address2 || address2 > 70 ) {
+          return 'Street address is invalid.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'suite',
-      width: 16
+      width: 16,
+      validateObj: function (suite) {
+        var suiteRegex = /^[0-9]{1,70}$/;
+
+        if ( ! suiteRegex.test(suite) ) {
+          return 'Invalid suite number';
+        }
+      }
     },
     {
       class: 'String',
       name: 'city',
-      required: true
+      required: true,
+      validateObj: function (city) {
+        var cityRegex = /^[a-zA-Z]{1,35}$/;
+
+        if ( ! cityRegex.test(city) ) {
+          return 'Invalid city name.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'postalCode',
-      required: true
+      required: true,
+      validateObj: function (postalCode) {
+        var postalCodeRegex = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
+        if ( ! postalCodeRegex.test(postalCode) ) {
+          return 'Invalid postal code.';
+        }
+      }
     },
     {
       class: 'Reference',
@@ -108,13 +138,25 @@ foam.CLASS({
       class: 'String',
       name: 'streetNumber',
       width: 16,
-      documentation: 'for an structured address, use this field.'
+      documentation: 'for an structured address, use this field.',
+      validateObj: function (streetNumber) {
+        var streetNumberRegex = /^[0-9]{1,16}$/;
+
+        if ( ! streetNumberRegex.test(streetNumber) ) {
+          return 'Invalid street number';
+        }
+      }
     },
     {
       class: 'String',
       name: 'streetName',
       width: 70,
-      documentation: 'for an structured address, use this field.'
+      documentation: 'for an structured address, use this field.',
+      validateObj: function (streetName) {
+        if ( streetName.length > 70 ) {
+          return 'Invalid street name.';
+        }
+      }
     },
     {
       class: 'FObjectArray',
