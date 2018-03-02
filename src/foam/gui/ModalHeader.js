@@ -19,9 +19,7 @@ foam.CLASS({
     'title'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
+  css: `
       ^{
         width: 448px;
         margin: auto;
@@ -58,9 +56,7 @@ foam.CLASS({
         height: 40px;
         opacity: 0.01;
       }
-    */}
-    })
-  ],
+  `,
   
   methods: [
     function initE(){
@@ -73,7 +69,7 @@ foam.CLASS({
         .start()
           .start().addClass('container')
             .start().addClass('title').add(this.title).end()
-            .start({class:'foam.u2.tag.Image', data: 'images/ic-cancelwhite.svg'}).addClass('close')
+            .start({class:'foam.u2.tag.Image', data: '../../gui/images/ic-cancelwhite.svg'}).addClass('close')
               .add(this.CLOSE_MODAL)
             .end()
           .end()
