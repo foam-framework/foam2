@@ -10,6 +10,7 @@ import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
+import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 
@@ -35,6 +36,7 @@ public class SessionWebAgent
 
   @Override
   public void execute(X x) {
+    Logger logger = (Logger) x.get("logger");
     DAO userDAO = (DAO) x.get("localUserDAO");
     DAO sessionDAO = (DAO) x.get("sessionDAO");
     AuthService auth = (AuthService) x.get("auth");
@@ -61,6 +63,7 @@ public class SessionWebAgent
       }
 
       // check permissions
+      session.setContext(session.getContext().put("user", user));
       if ( ! auth.check(session.getContext(), permission_) ) {
         throw new AccessControlException("Access denied");
       }
@@ -68,6 +71,7 @@ public class SessionWebAgent
       // execute delegate
       getDelegate().execute(x.put(Session.class, session).put("user", user));
     } catch ( Throwable t ) {
+      logger.error(t);
       // throw unauthorized on error
       resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
