@@ -833,7 +833,13 @@ foam.CLASS({
       adapt: function(old, nu, prop) {
         var value = prop.adaptValue(nu);
         var arg1 = this.arg1;
-        if ( foam.mlang.Constant.isInstance(value) && arg1 && arg1.adapt ) {
+
+        // Adapt constant array elements when:
+        // (1) Value is a constant (array);
+        // (2) Value is truthy (empty arrays can be serialized as undefined);
+        // (3) Arg1 has an adapt().
+        if ( foam.mlang.Constant.isInstance(value) && value.value &&
+             arg1 && arg1.adapt ) {
           var arrayValue = value.value;
           for ( var i = 0; i < arrayValue.length; i++ ) {
             arrayValue[i] = arg1.adapt.call(null, old && old[i], arrayValue[i], arg1);
@@ -1236,6 +1242,7 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
+  swiftName: 'NotPred',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
@@ -1287,7 +1294,11 @@ foam.CLASS({
   documentation: 'Unary Predicate for generic keyword search (searching all String properties for argument substring).',
 
   requires: [
-    'foam.core.String'
+    {
+      name: 'String',
+      path: 'foam.core.String',
+      swiftPath: null,
+    },
   ],
 
   methods: [
@@ -1618,6 +1629,7 @@ foam.CLASS({
     },
     {
       name: 'compare',
+      swiftSupport: false,
       transient: true,
       documentation: 'Is a property so that it can be bound to "this" so that it works with Array.sort().',
       factory: function() { return this.compare_.bind(this); }

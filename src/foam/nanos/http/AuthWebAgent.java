@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class AuthWebAgent
-  extends ProxyWebAgent
+    extends ProxyWebAgent
 {
   public final static String SESSION_ID = "sessionId";
 
