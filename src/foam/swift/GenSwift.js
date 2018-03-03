@@ -17,7 +17,7 @@ foam.CLASS({
     'foam.swift.Method',
   ],
   imports: [
-    'arequire',
+    'classloader',
   ],
   properties: [
     {
@@ -90,6 +90,9 @@ foam.CLASS({
   methods: [
     function execute() {
       var self = this;
+
+      var axiomFilter = foam.util.flagFilter(['swift']);
+
       if ( !this.outdir ) {
         console.log('ERROR: outdir not specified');
         process.exit(1);
@@ -97,7 +100,7 @@ foam.CLASS({
       self.fs.mkdirSync(this.outdir);
       var promises = [];
       this.coreModels.concat(this.models).forEach(function(m) {
-        promises.push(self.arequire(m));
+        promises.push(self.classloader.load(m));
       })
       return Promise.all(promises).then(function() {
         var sep = require('path').sep;
@@ -108,10 +111,10 @@ foam.CLASS({
           if (!models[model]) {
             models[model] = 1;
             var cls = self.lookup(model);
-            cls.getAxiomsByClass(foam.core.Requires).forEach(function(r) {
-              r.swiftPath && queue.push(r.swiftPath);
+            cls.getAxiomsByClass(foam.core.Requires).filter(axiomFilter).forEach(function(r) {
+              queue.push(r.path);
             });
-            cls.getAxiomsByClass(foam.core.Implements).forEach(function(r) {
+            cls.getAxiomsByClass(foam.core.Implements).filter(axiomFilter).forEach(function(r) {
               queue.push(r.path);
             });
             if (cls.model_.extends) queue.push(cls.model_.extends);

@@ -28,7 +28,8 @@ foam.CLASS({
   documentation: 'FOAM Application Controller.',
 
   implements: [
-    'foam.nanos.client.Client'
+    'foam.nanos.client.Client',
+    'foam.nanos.controller.AppStyles'
   ],
 
   requires: [

@@ -29,7 +29,7 @@ foam.LIB({
         if ( typeStr.substring(typeStr.length - 2) === '[]' ) {
           return foam.Array;
         }
-        if ( typeStr === 'any' ) {
+        if ( typeStr === 'any' || typeStr == '``' ) {
           return undefined;
         }
 
@@ -69,7 +69,7 @@ foam.LIB({
       // optional commented return type
       // ws [/* ws package.type? ws */] ws argname ws [/* ws retType ws */]
       var argIdx = 0;
-      var argMatcher = /(\s*\/\*\s*(\.\.\.)?([\w._$\[\]]+)(\=)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*(\.\.\.)?([\w_$]+)\s*(\/\*\s*([\w._$\[\]]+)(\?)?\s*\*\/)?\s*\,+/g;
+      var argMatcher = /(\s*\/\*\s*(\.\.\.)?([\w._$\[\]]+)(\=)?\s*(\/\/\s*(.*?))?\s*\*\/)?\s*(\.\.\.)?([\w_$]+)\s*(\/\*\s*([\w._$\[\]`]*)(\?)?\s*\*\/)?\s*\,+/g;
       var typeMatch;
 
       while ( typeMatch = argMatcher.exec(args) ) {
