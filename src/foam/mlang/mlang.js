@@ -1628,8 +1628,8 @@ foam.CLASS({
   name: 'ThenBy',
 
   implements: [
-    'foam.mlang.order.Comparator',
-    'foam.core.Serializable'
+    'foam.core.Serializable',
+    'foam.mlang.order.Comparator'
   ],
 
   documentation: 'Binary Comparator, which sorts for first Comparator, then second.',
@@ -1643,7 +1643,7 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
-      name: 'arg1'
+      name: 'head'
     },
     {
       class: 'FObjectProperty',
@@ -1653,7 +1653,7 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
-      name: 'arg2'
+      name: 'tail'
     },
     {
       name: 'compare',
@@ -1667,23 +1667,23 @@ foam.CLASS({
   methods: [
     function compare_(o1, o2) {
       // an equals of arg1.compare is falsy, which will then hit arg2
-      return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
+      return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
     },
 
     function toString() {
-      return 'THEN_BY(' + this.arg1.toString() + ', ' +
-        this.arg2.toString() + ')';
+      return 'THEN_BY(' + this.head.toString() + ', ' +
+        this.tail.toString() + ')';
     },
 
     function toIndex(tail) {
-      return this.arg1 && this.arg2 && this.arg1.toIndex(this.arg2.toIndex(tail));
+      return this.head && this.tail && this.head.toIndex(this.tail.toIndex(tail));
     },
 
-    function orderTail() { return this.arg2; },
+    function orderTail() { return this.tail; },
 
-    function orderPrimaryProperty() { return this.arg1.orderPrimaryProperty(); },
+    function orderPrimaryProperty() { return this.head.orderPrimaryProperty(); },
 
-    function orderDirection() { return this.arg1.orderDirection(); }
+    function orderDirection() { return this.head.orderDirection(); }
   ]
 });
 
@@ -1748,6 +1748,7 @@ foam.LIB({
         c ;
     },
 
+    // TODO: fix bug if combining ThenBy comparators
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
@@ -1758,7 +1759,7 @@ foam.LIB({
       var ThenBy = foam.mlang.order.ThenBy;
       var ret, tail;
 
-      ret = tail = ThenBy.create({arg1: cs[0], arg2: cs[1]});
+      ret = tail = ThenBy.create({head: cs[0], tail: cs[1]});
 
       for ( var i = 2 ; i < cs.length ; i++ ) {
         tail = tail.arg2 = ThenBy.create({arg1: tail.arg2, arg2: cs[i]});
