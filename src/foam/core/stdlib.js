@@ -1036,6 +1036,7 @@ foam.LIB({
              c ;
     },
 
+    // Gets replaced in mlang.js
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
