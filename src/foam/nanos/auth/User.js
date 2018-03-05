@@ -238,7 +238,7 @@ foam.CLASS({
       displayWidth: 80,
       width: 2048,
       validateObj: function (website) {
-        var websiteRegex = /@^(http\:\/\/|https\:\/\/)?([a-z0-9][a-z0-9\-]*\.)+[a-z0-9][a-z0-9\-]*$@i/
+        var websiteRegex = /@^(http\:\/\/|https\:\/\/)?([a-z0-9][a-z0-9\-]*\.)+[a-z0-9][a-z0-9\-]*$@i/;
 
         if ( ! websiteRegex.test(website) ) {
           return this.WebsiteError;
