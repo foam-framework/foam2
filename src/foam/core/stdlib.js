@@ -894,7 +894,17 @@ foam.LIB({
       function diff(a, b)    {
         var t = typeOf(a);
         return t.diff ? t.diff(a, b) : undefined;
-      }
+      },
+      function flagFilter(flags) {
+        return function(a) {
+          if ( ! flags ) return true;
+          if ( ! a.flags ) return true;
+          for ( var i = 0, f; f = flags[i]; i++ ) {
+            if ( a.flags.indexOf(f) != -1 ) return true;
+          }
+          return false;
+        }
+      },
     ]
   });
 })();
@@ -1026,6 +1036,7 @@ foam.LIB({
              c ;
     },
 
+    // Gets replaced in mlang.js
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
