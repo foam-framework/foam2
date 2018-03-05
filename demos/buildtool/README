@@ -1,0 +1,15 @@
+A simple demo for using and consuming the foam.tools.Build tool. To use, start
+by running:
+
+  node demos/buildtool/build.js
+
+Then start a simple http server:
+
+  python -m SimpleHTTPServer
+
+And access a detail view of the build model via the following URL:
+
+  http://localhost:8000/demos/buildtool/
+
+NOTE: This is all super experimental and will be changing frequently so if you
+depend on any of this behavior, be prepared to get broken as time goes on.

@@ -44,7 +44,16 @@ foam.CLASS({
   package: 'foam.core',
   name: 'Requires',
 
-  properties: [ 'name', 'path' ],
+  properties: [
+    {
+      name: 'name',
+      factory: function() {
+        return this.path.split('.').pop();
+      },
+    },
+    'path',
+    'flags',
+  ],
 
   methods: [
     function installInProto(proto) {
@@ -84,14 +93,12 @@ foam.CLASS({
       name: 'requires',
       adaptArrayElement: function(o) {
         if ( typeof o === 'string' ) {
-          var a     = o.split(' as ');
-          var path  = a[0];
-          var parts = path.split('.');
-          var name  = a[1] || parts[parts.length-1];
-          return foam.core.Requires.create(
-              {name: name, path: path}, this);
+          var a    = o.split(' as ');
+          var path = a[0];
+          var r = foam.core.Requires.create({path: path}, this);
+          if ( a[1] ) r.name = a[1];
+          return r;
         }
-
         return foam.core.Requires.create(o, this);
       }
     }

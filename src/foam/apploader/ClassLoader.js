@@ -42,7 +42,12 @@ have multiple classloaders running alongside eachother`
   methods: [
     {
       name: 'addClassPath',
-      code: function(modelDAO) {
+      code: function(path, json2) {
+        var cls = foam.lookup(foam.isServer ?
+            'foam.apploader.NodeModelFileDAO' :
+            'foam.apploader.WebModelFileDAO');
+        var modelDAO = cls.create({root: path, json2: json2}, this);
+
         if ( this.modelDAO ) {
           modelDAO = this.OrDAO.create({
             primary: this.modelDAO,
@@ -150,19 +155,9 @@ have multiple classloaders running alongside eachother`
               { name: 'path' } ],
       code: function(model, path) {
         var self = this;
-
-        // TODO: This can probably be a method on Model
-        var deps = model.requires ?
-            model.requires.map(function(r) { return self.maybeLoad_(r.path, path); }) :
-            [];
-
-        deps = deps.concat(model.implements ?
-                           model.implements.map((function(i) { return self.maybeLoad_(i.path, path); })) :
-                           []);
-
-        if ( model.extends ) deps.push(self.maybeLoad_(model.extends, path));
-
-        return Promise.all(deps);
+        return Promise.all(model.getClassDeps().map(function(d) {
+          return self.maybeLoad_(d, path);
+        }));
       }
     },
     {
