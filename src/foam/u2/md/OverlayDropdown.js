@@ -21,64 +21,60 @@ foam.CLASS({
       'its container. Useful for e.g. "..." overflow menus in action bars. ' +
       'Just $$DOC{ref:".add"} things to this container.',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-      ^overlay {
-        position: fixed;
-        z-index: 1009;
-      }
+  css: `
+    ^overlay {
+      position: fixed;
+      z-index: 1009;
+    }
 
-      ^container {
-        position: absolute;
-        right: 0;
-        top: 0;
-        z-index: 100;
-      }
+    ^container {
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 100;
+    }
 
-      ^ {
-        background: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
-        display: block;
-        font-size: 13px;
-        font-weight: 400;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        position: absolute;
-        width: 125px;
-        padding: 10px;
-        padding-bottom: -20px;
-        margin-bottom: -20px;
-        right: 3px;
-        top: 4px;
-        transition: height 0.25s cubic-bezier(0, .3, .8, 1);
-        z-index: 1010;
-      }
+    ^ {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      position: absolute;
+      width: 125px;
+      padding: 10px;
+      padding-bottom: -20px;
+      margin-bottom: -20px;
+      right: 3px;
+      top: 4px;
+      transition: height 0.25s cubic-bezier(0, .3, .8, 1);
+      z-index: 1010;
+    }
 
-      ^open {
-        overflow-y: auto;
-      }
+    ^open {
+      overflow-y: auto;
+    }
 
-      ^zeroOverlay {
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
+    ^zeroOverlay {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
 
-      ^initialOverlay {
-        top: initial;
-        bottom: initial;
-        left: initial;
-        right: initial;
-      }
+    ^initialOverlay {
+      top: initial;
+      bottom: initial;
+      left: initial;
+      right: initial;
+    }
 
-      ^parents {
-        z-index: 1000 !important;
-      }
-    */}
-    })
-  ],
+    ^parents {
+      z-index: 1000 !important;
+    }
+  `,
 
   constants: {
     BOTTOM_OFFSET: -25,

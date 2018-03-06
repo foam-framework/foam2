@@ -37,8 +37,18 @@ foam.CLASS({
     {
       class: 'String',
       name: 'daoKey',
-      label: 'DAO'
-      // TODO: make keyView
+      label: 'DAO',
+      view: function(_, X) {
+        var E = foam.mlang.Expressions.create();
+        return foam.u2.view.ChoiceView.create({
+          dao: X.nSpecDAO
+            .where(E.ENDS_WITH(foam.nanos.boot.NSpec.ID, 'DAO'))
+            .orderBy(foam.nanos.boot.NSpec.ID),
+          objToChoice: function(nspec) {
+            return [nspec.id, nspec.id];
+          }
+        });
+      }
     },
     {
       class: 'Enum',

@@ -29,11 +29,7 @@ foam.CLASS({
     'foam.u2.view.ChoiceView'
   ],
 
-  css: `
-    ^ select {
-      min-width: 220px;
-    }
-  `,
+  css: "^ select { min-width: 220px; }",
 
   properties: [
     {
@@ -123,10 +119,15 @@ foam.CLASS({
           } catch(x) {}
         })
         .on('mouseout', function(e) {
+          self.view.data = self.hardData;
           if ( e.relatedTarget && e.relatedTarget.nodeName === 'OPTION' ) return;
-          self.view.data   = self.hardData;
-          self.hardData    = undefined;
-          self.previewMode = false;
+          if ( e.relatedTarget && e.relatedTarget.nodeName === 'DIV' || ! self.hardData ) {
+            self.view.data   = '';
+            self.hardData    = undefined;
+            self.previewMode = false;
+            return;
+          }
+
         })
         .onDetach(
           this.dao$proxy.listen(

@@ -10,7 +10,6 @@ import java.io.*;
 
 public class InputStreamBlob
     extends AbstractBlob
-    implements Closeable
 {
   public static final int BUFFER_SIZE = 4096;
 
