@@ -45,7 +45,7 @@ foam.CLASS({
       name: 'firstName',
       tableWidth: 160,
       validateObj: function(firstName) {
-        var firstNameRegex = /^[a-zA-Z]{1,70}$/;
+        var firstNameRegex = /^[a-zA-Z ]{1,70}$/;
 
         if ( ! firstNameRegex.test(firstName) ) {
           return 'Invalid first name.';
@@ -61,7 +61,7 @@ foam.CLASS({
       name: 'lastName',
       tableWidth: 160,
       validateObj: function (lastName) {
-        var lastNameRegex = /^[a-zA-Z]{1,70}$/;
+        var lastNameRegex = /^[a-zA-Z ]{1,70}$/;
 
         if ( ! lastNameRegex.test(lastName) ) {
           return 'Invalid last name.';
@@ -172,10 +172,10 @@ foam.CLASS({
       displayWidth: 30,
       width: 100,
       validateObj: function (password) {
-        var passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
+        var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
 
-        if ( ! passwordRegex.test(password) ) {
-          return 'Password must contain at least one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
+        if ( ! re.test(password) ) {
+          return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       }
     },
@@ -206,7 +206,7 @@ foam.CLASS({
       width: 50,
       validateObj: function (businessName) {
         if ( businessName.length > 35 ) {
-          return 'Business name must be less than 35 characters.';
+          return 'Business name cannot be greater than 35 characters.';
         }
       }
     },
@@ -214,12 +214,24 @@ foam.CLASS({
       class: 'String',
       name: 'businessIdentificationNumber',
       width: 35,
-      documentation: 'Business Identification Number (BIN)'
+      documentation: 'Business Identification Number (BIN)',
+      validateObj: function (businessIdentificationNumber) {
+        var re = /^[a-zA-Z0-9 ]{1,35}$/;
+        if (  businessIdentificationNumber.length > 0 && ! re.test(businessIdentificationNumber) ) {
+          return 'Invalid registration number.'
+        }
+      }
     },
     {
       class: 'String',
       name: 'issuingAuthority',
-      width: 35
+      width: 35,
+      validateObj: function (issuingAuthority) {
+        var re = /^[a-zA-Z0-9 ]{1,35}$/;
+        if ( issuingAuthority.length > 0 && ! re.test(issuingAuthority) ) {
+          return 'Invalid issuing authority.';
+        }
+      }
     },
     {
       class: 'String',
@@ -238,10 +250,10 @@ foam.CLASS({
       displayWidth: 80,
       width: 2048,
       validateObj: function (website) {
-        var websiteRegex = /@^(http\:\/\/|https\:\/\/)?([a-z0-9][a-z0-9\-]*\.)+[a-z0-9][a-z0-9\-]*$@i/;
+        var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
 
-        if ( ! websiteRegex.test(website) ) {
-          return this.WebsiteError;
+        if ( website.length > 0 && ! websiteRegex.test(website) ) {
+          return 'Invalid website';
         }
       }
     },
