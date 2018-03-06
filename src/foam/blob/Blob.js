@@ -240,7 +240,8 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.blob.Blob',
       name: 'delegate',
-      forwards: [ 'read', 'getSize' ]
+      forwards: [ 'read', 'getSize' ],
+      javaInfoType: 'foam.blob.AbstractBlobPropertyInfo'
     }
   ]
 });
