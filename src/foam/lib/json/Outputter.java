@@ -39,6 +39,7 @@ public class Outputter
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected boolean       outputDefaultValues_ = false;
+  protected boolean       outputClassNames_ = true;
 
   // Hash properties
   protected String        hashAlgo_ = "SHA-256";
@@ -214,29 +215,34 @@ public class Outputter
     outputString(sdf.get().format(date));
   }
 
+  protected Boolean outputEnableProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+    if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
+
+    Object value = prop.get(fo);
+    if ( value == null ) return false;
+    if ( includeComma ) writer_.append(",");
+    outputProperty(fo, prop);
+    return true;
+  }
+
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
     writer_.append("{");
-    writer_.append(beforeKey_());
-    writer_.append("class");
-    writer_.append(afterKey_());
-    writer_.append(":");
-
-    outputString(info.getId());
+    if ( outputClassNames_ ) {
+      writer_.append(beforeKey_());
+      writer_.append("class");
+      writer_.append(afterKey_());
+      writer_.append(":");
+      outputString(info.getId());
+    }
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
-
+    boolean outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
-
-      Object value = prop.get(o);
-      if ( value == null ) continue;
-
-      writer_.append(",");
-      outputProperty(o, prop);
+      outputComma = outputEnableProperty(o, prop, outputComma) || outputComma;
     }
 
     if ( outputHash_ ) {
@@ -330,6 +336,10 @@ public class Outputter
 
   public void setOutputDefaultValues(boolean outputDefaultValues) {
     outputDefaultValues_ = outputDefaultValues;
+  }
+
+  public void setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
   }
 
   public void setHashAlgorithm(String algorithm) {
