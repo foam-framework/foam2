@@ -6,17 +6,16 @@
 
 package foam.lib.json;
 
-import foam.core.*;
+import foam.core.ClassInfo;
+import foam.core.Detachable;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.security.PrivateKey;
-import java.security.Signature;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -354,5 +353,17 @@ public class Outputter
 
   public void setSigningKey(PrivateKey signingKey) {
     signingKey_ = signingKey;
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(stringWriter_);
+    IOUtils.closeQuietly(writer_);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    if ( stringWriter_ != null ) stringWriter_.flush();
+    if ( writer_ != null ) writer_.flush();
   }
 }
