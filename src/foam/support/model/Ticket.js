@@ -7,7 +7,6 @@
 foam.CLASS({
     package: 'foam.support.model',
     name: 'Ticket',
-  
     documentation: 'First Ticket Modal',
     properties: [
       {
@@ -19,7 +18,7 @@ foam.CLASS({
         name: 'requestorId'
       },
       {
-        class: 'EMail',
+        class: 'String',
         name: 'supportEmail'
       },
       {

@@ -311,6 +311,7 @@ FOAM_FILES([
   { name: "foam/box/ReturnBox" },
   { name: "foam/box/RawMessagePortBox" },
   { name: "foam/box/WebSocketBox" },
+  { name: "foam/support/ticketlistcontroller/TicketListCreateController"},
   { name: "foam/box/ClassWhitelistContext" },
   { name: "foam/box/LoggedLookupContext" },
   { name: "foam/box/Context" },
