@@ -10,6 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -210,5 +212,17 @@ public class Outputter
       isHeadersOutput_ = true;
     }
     outputFObject((FObject)obj);
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(stringWriter_);
+    IOUtils.closeQuietly(writer_);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    if ( stringWriter_ != null ) stringWriter_.flush();
+    if ( writer_ != null ) writer_.flush();
   }
 }
