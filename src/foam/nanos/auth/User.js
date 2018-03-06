@@ -22,7 +22,7 @@ foam.CLASS({
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'type', 'group', 'firstName', 'lastName', 'organization', 'email'
+    'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
   ],
 
   properties: [
@@ -34,7 +34,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      value: true
     },
     {
       class: 'DateTime',
@@ -307,6 +308,7 @@ foam.RELATIONSHIP({
     hidden: true
   },
   targetProperty: {
-    hidden: false
+    hidden: false,
+    tableWidth: 120
   }
 });
