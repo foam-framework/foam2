@@ -47,8 +47,10 @@ foam.CLASS({
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a main address field.',
       validateObj: function(address1) {
-        if ( ! address1 || address1 > 70 ) {
-          return 'Street address is invalid.';
+        var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( address1.length > 0 && ! address1Regex.test(address1) ) {
+          return 'Invalid address line.';
         }
       }
     },
@@ -59,8 +61,10 @@ foam.CLASS({
       displayWidth: 50,
       documentation: 'for an unstructured address, use this as a sub address field.',
       validateObj: function(address2) {
-        if ( ! address2 || address2 > 70 ) {
-          return 'Street address is invalid.';
+        var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( address2.length > 0 && ! address2Regex.test(address2) ) {
+          return 'Invalid address line.';
         }
       }
     },
@@ -69,10 +73,10 @@ foam.CLASS({
       name: 'suite',
       width: 16,
       validateObj: function (suite) {
-        var suiteRegex = /^[0-9]{1,70}$/;
+        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
 
-        if ( ! suiteRegex.test(suite) ) {
-          return 'Invalid suite number';
+        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
+          return 'Invalid address line.';
         }
       }
     },
@@ -81,7 +85,7 @@ foam.CLASS({
       name: 'city',
       required: true,
       validateObj: function (city) {
-        var cityRegex = /^[a-zA-Z]{1,35}$/;
+        var cityRegex = /^[a-zA-Z ]{1,35}$/;
 
         if ( ! cityRegex.test(city) ) {
           return 'Invalid city name.';
@@ -143,7 +147,7 @@ foam.CLASS({
         var streetNumberRegex = /^[0-9]{1,16}$/;
 
         if ( ! streetNumberRegex.test(streetNumber) ) {
-          return 'Invalid street number';
+          return 'Invalid street number.';
         }
       }
     },
@@ -153,8 +157,10 @@ foam.CLASS({
       width: 70,
       documentation: 'for an structured address, use this field.',
       validateObj: function (streetName) {
-        if ( streetName.length > 70 ) {
-          return 'Invalid street name.';
+        var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( ! streetNameRegex.test(streetName) ) {
+          return 'Invalid street name.'
         }
       }
     },
@@ -174,6 +180,6 @@ foam.CLASS({
       javaReturns: 'String',
       code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
       javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
-   }
+    }
   ]
 });
