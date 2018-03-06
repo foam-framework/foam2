@@ -28,7 +28,7 @@ foam.CLASS({
     }
 
     ^container {
-      position: absolute;
+      position: relative;
       right: 0;
       top: 0;
       z-index: 100;
@@ -47,8 +47,8 @@ foam.CLASS({
       padding: 10px;
       padding-bottom: -20px;
       margin-bottom: -20px;
-      right: 3px;
-      top: 4px;
+      right: 0;
+      top: 8px;
       transition: height 0.25s cubic-bezier(0, .3, .8, 1);
       z-index: 1010;
     }
