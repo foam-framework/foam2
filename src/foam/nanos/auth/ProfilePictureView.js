@@ -79,6 +79,8 @@ foam.CLASS({
   messages: [
     { name: 'UploadImageLabel', message: 'Upload Image' },
     { name: 'UploadDesc', message: 'JPG, GIF, JPEG, BMP or PNG' },
+    { name: 'FileError', message: 'File required' },    
+    { name: 'FormatError', message: 'JPG, GIF, JPEG, BMP, PNG and PDF only accepted' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 10MB' }
   ],
 
@@ -111,6 +113,10 @@ foam.CLASS({
               })
             });
         }, this.data$))
+        .on('dragstart', this.onDragStart)
+        .on('dragenter', this.onDragOver)
+        .on('dragover', this.onDragOver)
+        .on('drop', this.onDrop)
         .start().addClass('uploadButtonContainer').hide(this.uploadHidden)
           .start('input').addClass('attachment-input')
             .attrs({
@@ -129,17 +135,35 @@ foam.CLASS({
   ],
 
   listeners: [
+    function onDragOver(e) {
+      console.log("2");         
+      e.preventDefault();    
+    },
+    function onDrop(e) {
+      e.preventDefault();  
+      if (e.dataTransfer.items[0].kind === 'file') {
+      }        
+      var file = e.dataTransfer.items[0].getAsFile();
+      
+      if(file.type === "application/pdf" || file.type === "image/jpg" || file.type === "image/gif"|| file.type === "image/jpeg" || file.type === "image/bmp"||file.type === "image/png"){
+      }              
+      this.addFile(file);
+    },
     function onAddAttachmentClicked (e) {
       this.document.querySelector('.attachment-input').click();
     },
 
     function onChange (e) {
       var file = e.target.files[0];
+      this.addFile(file);
+      
+      
+    },
+    function addFile (file) {
       if ( file.size > ( 10 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
         return;
       }
-
       this.data = this.File.create({
         owner: this.user.id,
         filename: file.name,
