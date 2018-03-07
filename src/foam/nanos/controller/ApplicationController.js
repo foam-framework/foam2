@@ -58,10 +58,9 @@ foam.CLASS({
     'signUpEnabled',
     'stack',
     'currentMenu',
-    'lastMenuSelected',
+    'lastMenuLaunched',
     'menuListener',
-    'lastMenuListener',
-    'removeLastMenuListener',
+    'lastMenuLaunchedListener',
     'user',
     'webApp',
     'wrapCSS as installCSS'
@@ -118,7 +117,7 @@ foam.CLASS({
     },
     { class: 'URL', name: 'logo' },
     'currentMenu',
-    'lastMenuSelected',
+    'lastMenuLaunched',
     'webApp',
     'primaryColor',
     'secondaryColor',
@@ -232,16 +231,16 @@ foam.CLASS({
       this.setDefaultMenu();
     },
 
+    // This listener should be triggered when a Menu item has been launched AND
+    // navigates to a new screen.
     function menuListener(m) {
       this.currentMenu = m;
     },
 
-    function lastMenuListener(m) {
-      this.lastMenuSelected = m;
-    },
-
-    function removeLastMenuListener() {
-      this.lastMenuSelected = '';
+    // This listener should be triggered when a Menu has been launched but does
+    // not navigate to a new screen. Typically for SubMenus
+    function lastMenuLaunchedListener(m) {
+      this.lastMenuLaunched = m;
     }
   ]
 });

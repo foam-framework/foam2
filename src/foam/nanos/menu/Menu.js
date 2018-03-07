@@ -11,7 +11,7 @@ foam.CLASS({
   tableColumns: [ 'id', 'parent', 'label', 'order' ],
 
   imports: [
-    'lastMenuListener?'
+    'lastMenuLaunchedListener?'
   ],
 
   properties: [
@@ -38,7 +38,7 @@ foam.CLASS({
 
   methods: [
     function launch_(X, e) {
-      this.lastMenuListener && this.lastMenuListener(this);
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener(this);
       this.handler && this.handler.launch(X, this, e);
     }
   ],
