@@ -64,6 +64,7 @@ foam.CLASS({
           padding: 20px 0 5px 0px;
           cursor: pointer;
           border-bottom: 1px solid transparent;
+          transition: all 0.15s ease-in-out;
         }
         ^ .menuItem:hover, ^ .menuItem.hovered {
           border-bottom: 1px solid white;
