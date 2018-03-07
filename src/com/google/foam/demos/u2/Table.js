@@ -48,7 +48,7 @@ foam.CLASS({
   name: 'Main',
 
   requires: [
-    'foam.u2.TableView',
+    'foam.u2.view.TableView',
     'foam.dao.EasyDAO'
   ],
 
