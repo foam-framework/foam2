@@ -16,28 +16,24 @@
  */
 
 foam.CLASS({
-  refines: 'foam.core.Method',
-  properties: [ 'javaCode' ]
+  refines: 'foam.core.AbstractMethod',
+  properties: [ 'javaCode', 'javaReturns', 'javaThrows' ]
+});
+foam.CLASS({
+  refines: 'foam.core.Argument',
+  properties: [ 'javaType' ]
+});
+foam.CLASS({
+  refines: 'foam.core.Currency',
+  properties: [ 'javaGetter' , 'precision' ]
 });
 foam.CLASS({
   refines: 'foam.core.EMail',
   properties: [ 'javaSetter' ]
 });
 foam.CLASS({
-  refines: 'foam.core.String',
-  properties: [ 'javaGetter' ]
-});
-foam.CLASS({
-  refines: 'foam.core.Listener',
-  properties: [ 'javaCode' ]
-});
-foam.CLASS({
-  refines: 'foam.core.Property',
-  properties: [ 'javaType', 'generateJava', 'javaFactory' ]
-});
-foam.CLASS({
-  refines: 'foam.core.Argument',
-  properties: [ 'javaType' ]
+  refines: 'foam.core.Implements',
+  properties: [ 'java' ]
 });
 foam.CLASS({
   refines: 'foam.core.Import',
@@ -48,19 +44,30 @@ foam.CLASS({
   properties: [ 'generateJava' ]
 });
 foam.CLASS({
+  refines: 'foam.core.Listener',
+  properties: [ 'javaCode' ]
+});
+foam.CLASS({
+  refines: 'foam.core.Long',
+  properties: [ 'javaGetter' ]
+});
+foam.CLASS({
+  refines: 'foam.core.Method',
+  properties: [ 'javaCode' ]
+});
+foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [ 'javaImports', 'generateJava' ]
+  properties: [ 'javaImports', 'generateJava', 'arequire', 'import' ]
 });
 foam.CLASS({
-  refines: 'foam.core.AbstractMethod',
-  properties: [ 'javaCode', 'javaReturns', 'javaThrows' ]
+  refines: 'foam.core.Property',
+  properties: [ 'javaType', 'generateJava', 'javaFactory','javaInfoType' ]
 });
 foam.CLASS({
-  refines: 'foam.core.Implements',
-  properties: [ 'java' ]
+  refines: 'foam.core.String',
+  properties: [ 'javaGetter', 'javaSetter' ]
 });
 foam.CLASS({
   refines: 'foam.u2.ViewSpec',
   properties: [ 'javaInfoType', 'javaJSONParser' ]
 });
-
