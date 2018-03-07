@@ -58,7 +58,10 @@ foam.CLASS({
     'signUpEnabled',
     'stack',
     'currentMenu',
+    'lastMenuSelected',
     'menuListener',
+    'lastMenuListener',
+    'removeLastMenuListener',
     'user',
     'webApp',
     'wrapCSS as installCSS'
@@ -115,6 +118,7 @@ foam.CLASS({
     },
     { class: 'URL', name: 'logo' },
     'currentMenu',
+    'lastMenuSelected',
     'webApp',
     'primaryColor',
     'secondaryColor',
@@ -230,6 +234,14 @@ foam.CLASS({
 
     function menuListener(m) {
       this.currentMenu = m;
+    },
+
+    function lastMenuListener(m) {
+      this.lastMenuSelected = m;
+    },
+
+    function removeLastMenuListener() {
+      this.lastMenuSelected = '';
     }
   ]
 });
