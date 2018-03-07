@@ -46,7 +46,7 @@ foam.CLASS({
       name: 'firstName',
       tableWidth: 160,
       validateObj: function(firstName) {
-        var firstNameRegex = /^[a-zA-Z ]{1,70}$/;
+        var firstNameRegex = /^[a-zA-Z- ]{1,70}$/;
 
         if ( ! firstNameRegex.test(firstName) ) {
           return 'Invalid first name.';
@@ -62,7 +62,7 @@ foam.CLASS({
       name: 'lastName',
       tableWidth: 160,
       validateObj: function (lastName) {
-        var lastNameRegex = /^[a-zA-Z ]{1,70}$/;
+        var lastNameRegex = /^[a-zA-Z- ]{1,70}$/;
 
         if ( ! lastNameRegex.test(lastName) ) {
           return 'Invalid last name.';
