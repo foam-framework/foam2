@@ -61,9 +61,9 @@ foam.CLASS({
         }
         ^ .menuItem{
           display: inline-block;
-          padding: 20px 0 10px 0px;
+          padding: 20px 0 5px 0px;
           cursor: pointer;
-          border-bottom: 4px solid transparent;
+          border-bottom: 1px solid transparent;
         }
         ^ .menuItem:hover, ^ .menuItem.hovered {
           border-bottom: 1px solid white;
@@ -71,7 +71,7 @@ foam.CLASS({
           text-shadow: 0 0 0px white, 0 0 0px white;
         }
         ^ .selected {
-          border-bottom: 4px solid #1cc2b7 !important;
+          border-bottom: 1px solid #1cc2b7 !important;
           padding-bottom: 5px;
           text-shadow: 0 0 0px white, 0 0 0px white;
         }
