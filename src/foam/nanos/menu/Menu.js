@@ -10,6 +10,10 @@ foam.CLASS({
 
   tableColumns: [ 'id', 'parent', 'label', 'order' ],
 
+  imports: [
+    'lastMenuListener?'
+  ],
+
   properties: [
     {
       class: 'String',
@@ -34,6 +38,7 @@ foam.CLASS({
 
   methods: [
     function launch_(X, e) {
+      this.lastMenuListener && this.lastMenuListener(this);
       this.handler && this.handler.launch(X, this, e);
     }
   ],
