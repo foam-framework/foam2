@@ -46,10 +46,8 @@ foam.CLASS({
       name: 'firstName',
       tableWidth: 160,
       validateObj: function(firstName) {
-        var firstNameRegex = /^[a-zA-Z- ]{1,70}$/;
-
-        if ( ! firstNameRegex.test(firstName) ) {
-          return 'Invalid first name.';
+        if ( firstName.length > 70 ) {
+          return 'First name cannot exceed 70 characters.';
         }
       }
     },
@@ -62,10 +60,8 @@ foam.CLASS({
       name: 'lastName',
       tableWidth: 160,
       validateObj: function (lastName) {
-        var lastNameRegex = /^[a-zA-Z- ]{1,70}$/;
-
-        if ( ! lastNameRegex.test(lastName) ) {
-          return 'Invalid last name.';
+        if ( lastName.length > 70 ) {
+          return 'Last name cannot exceed 70 characters.';
         }
       }
     },
@@ -77,7 +73,7 @@ foam.CLASS({
       tableWidth: 160,
       validateObj: function (organization) {
         if ( organization.length > 35 ) {
-          return 'Organization name must be less than 35 characters';
+          return 'Organization name cannot exceed 35 characters.';
         }
       }
     },
