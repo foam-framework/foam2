@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'SubMenuView',
   extends: 'foam.nanos.menu.PopupMenu',
 
-  imports: [ 'removeLastMenuListener?' ],
+  imports: [ 'lastMenuLaunchedListener?' ],
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
@@ -70,7 +70,7 @@ foam.CLASS({
 
   listeners: [
     function close() {
-      this.removeLastMenuListener && this.removeLastMenuListener();
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener('');
       this.SUPER();
     }
   ]
