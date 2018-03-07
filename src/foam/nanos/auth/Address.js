@@ -97,7 +97,7 @@ foam.CLASS({
       name: 'postalCode',
       required: true,
       validateObj: function (postalCode) {
-        var postalCodeRegex = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
+        var postalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
         if ( ! postalCodeRegex.test(postalCode) ) {
           return 'Invalid postal code.';
         }
