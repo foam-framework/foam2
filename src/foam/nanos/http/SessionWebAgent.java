@@ -36,12 +36,12 @@ public class SessionWebAgent
 
   @Override
   public void execute(X x) {
-    Logger logger = (Logger) x.get("logger");
-    DAO userDAO = (DAO) x.get("localUserDAO");
-    DAO sessionDAO = (DAO) x.get("sessionDAO");
-    AuthService auth = (AuthService) x.get("auth");
-    HttpServletRequest req = x.get(HttpServletRequest.class);
-    HttpServletResponse resp = x.get(HttpServletResponse.class);
+    Logger              logger     = (Logger) x.get("logger");
+    DAO                 userDAO    = (DAO) x.get("localUserDAO");
+    DAO                 sessionDAO = (DAO) x.get("sessionDAO");
+    AuthService         auth       = (AuthService) x.get("auth");
+    HttpServletRequest  req        = x.get(HttpServletRequest.class);
+    HttpServletResponse resp       = x.get(HttpServletResponse.class);
 
     try {
       // check session id

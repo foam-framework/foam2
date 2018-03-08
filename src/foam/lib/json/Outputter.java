@@ -6,17 +6,16 @@
 
 package foam.lib.json;
 
-import foam.core.*;
+import foam.core.ClassInfo;
+import foam.core.Detachable;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import org.apache.commons.io.IOUtils;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.security.PrivateKey;
-import java.security.Signature;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +38,7 @@ public class Outputter
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
   protected boolean       outputDefaultValues_ = false;
+  protected boolean       outputClassNames_ = true;
 
   // Hash properties
   protected String        hashAlgo_ = "SHA-256";
@@ -214,29 +214,34 @@ public class Outputter
     outputString(sdf.get().format(date));
   }
 
+  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+    if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
+
+    Object value = prop.get(fo);
+    if ( value == null ) return false;
+    if ( includeComma ) writer_.append(",");
+    outputProperty(fo, prop);
+    return true;
+  }
+
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
     writer_.append("{");
-    writer_.append(beforeKey_());
-    writer_.append("class");
-    writer_.append(afterKey_());
-    writer_.append(":");
-
-    outputString(info.getId());
+    if ( outputClassNames_ ) {
+      writer_.append(beforeKey_());
+      writer_.append("class");
+      writer_.append(afterKey_());
+      writer_.append(":");
+      outputString(info.getId());
+    }
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
-
+    boolean outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
-
-      Object value = prop.get(o);
-      if ( value == null ) continue;
-
-      writer_.append(",");
-      outputProperty(o, prop);
+      outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
 
     if ( outputHash_ ) {
@@ -332,6 +337,10 @@ public class Outputter
     outputDefaultValues_ = outputDefaultValues;
   }
 
+  public void setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
+  }
+
   public void setHashAlgorithm(String algorithm) {
     hashAlgo_ = algorithm;
   }
@@ -354,5 +363,17 @@ public class Outputter
 
   public void setSigningKey(PrivateKey signingKey) {
     signingKey_ = signingKey;
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(stringWriter_);
+    IOUtils.closeQuietly(writer_);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    if ( stringWriter_ != null ) stringWriter_.flush();
+    if ( writer_ != null ) writer_.flush();
   }
 }
