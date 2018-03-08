@@ -8,6 +8,8 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     function toSwiftClass() {
+      var axiomFilter = foam.util.flagFilter(['swift']);
+
       if ( !this.model_.generateSwift ) return foam.swift.EmptyClass.create()
       var templates = foam.swift.FObjectTemplates.create();
 
@@ -36,22 +38,22 @@ foam.LIB({
         visibility: 'public',
         code: this.model_.swiftCode,
       });
-      this.getOwnAxioms().forEach(function(axiom) {
+      this.getOwnAxioms().filter(axiomFilter).forEach(function(axiom) {
         if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name), this);
       }.bind(this));
 
-      var properties = this.getOwnAxiomsByClass(foam.core.Property)
+      var properties = this.getOwnAxiomsByClass(foam.core.Property).filter(axiomFilter)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
-      var methods = this.getOwnAxiomsByClass(foam.core.Method)
+      var methods = this.getOwnAxiomsByClass(foam.core.Method).filter(axiomFilter)
           .filter(function(p) {
             return p.name != 'init';
           }.bind(this))
           .filter(function(p) {
             return !!p.getSwiftSupport(this);
           }.bind(this));
-      var actions = this.getOwnAxiomsByClass(foam.core.Action)
+      var actions = this.getOwnAxiomsByClass(foam.core.Action).filter(axiomFilter)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
@@ -103,6 +105,7 @@ foam.LIB({
             type: '[Axiom]',
             defaultValue: '[' +
               this.getOwnAxioms()
+                .filter(axiomFilter)
                 .filter(function(a) {
                   return a.getSwiftSupport ?
                       a.getSwiftSupport(this) : a.swiftSupport
