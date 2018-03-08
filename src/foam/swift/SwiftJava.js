@@ -24,10 +24,6 @@ foam.CLASS({
   properties: [ 'swiftCode', 'swiftReturns', 'swiftSynchronized' ]
 });
 foam.CLASS({
-  refines: 'foam.core.Requires',
-  properties: [ 'swiftPath' ]
-});
-foam.CLASS({
   refines: 'foam.core.FObjectProperty',
   properties: [ 'swiftType', 'swiftFactory', 'swiftPostSet' ]
 });

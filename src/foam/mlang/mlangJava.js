@@ -546,6 +546,33 @@ return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2
 
 
 foam.CLASS({
+  refines: 'foam.mlang.predicate.EndsWith',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Object arg1 = getArg1().f(obj);
+        String arg2 = (String) getArg2().f(obj);
+        if ( arg1 instanceof String[] ) {
+          for ( String s : (String[]) arg1 ) {
+            if ( s.endsWith(arg2) )
+              return true;
+          }
+        }
+        return ( arg1 instanceof String && ((String) arg1).endsWith(arg2) );
+      `
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: `return " '" + getArg1().createStatement() + "' like '%" + getArg2().createStatement() + "' ";`
+    }
+  ]
+});
+
+
+foam.CLASS({
   refines: 'foam.mlang.Constant',
 
   methods: [

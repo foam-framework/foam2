@@ -12,14 +12,13 @@ import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
-
+import java.io.PrintWriter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
 
 public class AuthWebAgent
-    extends ProxyWebAgent
+  extends ProxyWebAgent
 {
   public final static String SESSION_ID = "sessionId";
 
@@ -118,8 +117,8 @@ public class AuthWebAgent
   }
 
   public void execute(X x) {
-    AuthService         auth    = (AuthService) x.get("auth");
-    Session             session = authenticate(x);
+    AuthService auth    = (AuthService) x.get("auth");
+    Session     session = authenticate(x);
 
     if ( session != null && session.getContext() != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
