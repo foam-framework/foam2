@@ -15,8 +15,8 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.Phone',
-    'foam.nanos.auth.Address'
+    'foam.nanos.auth.Address',
+    'foam.nanos.auth.Phone'
   ],
 
   documentation: '',
@@ -99,7 +99,7 @@ foam.CLASS({
         if ( ! emailRegex.test(email) ) {
           return 'Invalid email address.';
         }
-      } 
+      }
     },
     {
       class: 'Boolean',
