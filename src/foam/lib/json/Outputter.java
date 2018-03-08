@@ -214,7 +214,7 @@ public class Outputter
     outputString(sdf.get().format(date));
   }
 
-  protected Boolean outputEnableProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
     if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
@@ -241,7 +241,7 @@ public class Outputter
     boolean outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      outputComma = outputEnableProperty(o, prop, outputComma) || outputComma;
+      outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
 
     if ( outputHash_ ) {
