@@ -22,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.regex.Pattern;
 import java.util.TimeZone;
+import java.util.List;
+import java.util.Iterator;
 
 public abstract class AbstractJDAO
   extends ProxyDAO
@@ -207,22 +209,63 @@ public abstract class AbstractJDAO
   }
 
   protected FObject difference(FObject o, FObject n) {
+    FObject diff = diffFObject(o, n);
+    //no difference, then return null
+    if ( diff == null ) return null;
+    //get the PropertyInfo for the id
+    PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
+    //set id property to new instance
+    idInfo.set(diff, idInfo.get(o));
+    return diff;
+  }
 
+  protected FObject diffFObject(FObject o, FObject n) {
+    // if either new or old is null, return new instance.
+    if ( o == null && n == null ) return n;
+    // if two instances are same, return new instance because cannot check the difference;
+    if ( o == n ) return n;
+    FObject ret = null;
+    List list = getOf().getAxiomsByClass(PropertyInfo.class);
+    Iterator e = list.iterator();
+    while( e.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) e.next();
+      if ( prop instanceof AbstractFObjectPropertyInfo ) {
+        FObject diff = diffFObject((FObject) prop.get(o), (FObject) prop.get(n));
+        //if there is difference, set difference
+        if ( diff != null ) {
+          //create only when there is difference
+          if ( ret == null ) ret = generateFObject(o);
+          //set diff
+          prop.set(ret, diff);
+        }
+      } else if ( prop instanceof AbstractFObjectArrayPropertyInfo ) {
+        //TODO: if instances are same, can not check array
+        //create only when there is array
+        if ( ret == null ) ret = generateFObject(o);
+        prop.set(ret, prop.get(n));
+      } else {
+        //handle primitive value and enum
+        int same = prop.comparePropertyToObject(o, prop.get(n));
+        if ( same != 0 ) {
+          //create only when there is difference
+          if ( ret == null ) ret = generateFObject(o);
+          prop.set(ret, prop.get(n));
+        } 
+      }
+    }
+    return ret;
   }
 
   protected FObject mergeChange(FObject o, FObject n) {
-
+    return null;
   }
 
-  //return a FObject with same primary key
-  protected FObject generateIdenticalFObject(FObject o) {
+  //return a new Fobject
+  protected FObject generateFObject(FObject o) {
     try {
+      ClassInfo classInfo = o.getClassInfo();
       //create a new Instance
-      FObject ret = (FObject) getOf().getObjClass().newInstance();
-      //get the PropertyInfo for the id
-      PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
-      //set id property to new instance
-      idInfo.set(ret, idInfo.get(o));
+      FObject ret = (FObject) classInfo.getObjClass().newInstance();
       return ret;
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
