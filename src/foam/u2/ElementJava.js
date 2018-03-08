@@ -47,7 +47,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter', 'css', 'import' ]
+  properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter', 'css', 'import', 'description' ]
 });
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -59,7 +59,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.String',
-  properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility', 'tableWidth' ]
+  properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility', 'tableWidth', 'description' ]
 });
 foam.CLASS({
   package: 'foam.nanos.auth',
