@@ -12,24 +12,18 @@ foam.CLASS({
   ],
   properties: [
     {
-      name: 'swiftPath',
-      expression: function(path) {
-        return path;
-      },
-    },
-    {
       name: 'swiftReturns',
-      expression: function(swiftPath) {
-        return this.lookup(swiftPath).model_.swiftName;
+      expression: function(path) {
+        return this.lookup(path).model_.swiftName;
       },
     },
   ],
   methods: [
     function writeToSwiftClass(cls) {
-      if (!this.swiftPath) return;
-      if (foam.core.InterfaceModel.isInstance(this.lookup(this.swiftPath).model_)) {
+      if (foam.core.InterfaceModel.isInstance(this.lookup(this.path).model_)) {
         return;
       }
+      // TODO skip refines.
       cls.methods.push(this.Method.create({
         name: this.name + '_create',
         returnType: this.swiftReturns,
@@ -54,16 +48,4 @@ return __subContext__.create(<%=this.swiftReturns%>.self, args: args)!
       */},
     },
   ],
-});
-
-foam.CLASS({
-  package: 'foam.classloader',
-  name: 'RequiresARequireExtension',
-  refines: 'foam.core.Requires',
-
-  methods: [
-    function arequire(opt_deps) {
-      return this.__context__.arequire(this.swiftPath, opt_deps);
-    }
-  ]
 });

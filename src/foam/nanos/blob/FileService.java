@@ -25,8 +25,13 @@ public class FileService
   protected DAO userDAO_;
   protected DAO sessionDAO_;
 
+
   public FileService(X x, BlobService delegate) {
-    super(x, delegate);
+    this(x, "httpFileService", delegate);
+  }
+
+  public FileService(X x, String name, BlobService delegate) {
+    super(x, name, delegate);
     fileDAO_ = (DAO) x.get("fileDAO");
     // use the user dao instead of local user dao
     // so that we get the authentication decoration
@@ -43,7 +48,7 @@ public class FileService
 
     try {
       String path = req.getRequestURI();
-      String id = path.replaceFirst("/service/" + nspec_.getName() + "/", "");
+      String id = path.replaceFirst("/service/" + name_ + "/", "");
 
       // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
