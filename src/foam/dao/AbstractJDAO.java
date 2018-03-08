@@ -205,4 +205,27 @@ public abstract class AbstractJDAO
     getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
+
+  protected FObject difference(FObject o, FObject n) {
+
+  }
+
+  protected FObject mergeChange(FObject o, FObject n) {
+
+  }
+
+  //return a FObject with same primary key
+  protected FObject generateIdenticalFObject(FObject o) {
+    try {
+      //create a new Instance
+      FObject ret = (FObject) getOf().getObjClass().newInstance();
+      //get the PropertyInfo for the id
+      PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
+      //set id property to new instance
+      idInfo.set(ret, idInfo.get(o));
+      return ret;
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
+    }
+  }
 }
