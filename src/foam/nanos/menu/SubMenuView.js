@@ -9,6 +9,8 @@ foam.CLASS({
   name: 'SubMenuView',
   extends: 'foam.nanos.menu.PopupMenu',
 
+  imports: [ 'lastMenuLaunchedListener?' ],
+
   requires: [ 'foam.nanos.menu.Menu' ],
 
   properties: [ 'X', 'menu' ],
@@ -63,6 +65,13 @@ foam.CLASS({
         },
         eof: function() {}
       });
+    }
+  ],
+
+  listeners: [
+    function close() {
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener('');
+      this.SUPER();
     }
   ]
 });
