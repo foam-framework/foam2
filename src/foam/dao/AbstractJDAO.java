@@ -110,6 +110,7 @@ public abstract class AbstractJDAO
 
         switch ( operation ) {
           case 'p':
+            //TODO: merge change
             getDelegate().put(object);
             break;
           case 'r':
@@ -165,18 +166,34 @@ public abstract class AbstractJDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
-    FObject ret = getDelegate().put_(x, obj);
-
+    FObject o = getDelegate().find_(x, obj);
+    FObject ret = null;
+    String record = null;
+    if ( o == null ) {
+      //data does not exist
+      ret = getDelegate().put_(x, obj);
+      //stringify to json string
+      record = getOutputter().stringify(ret);
+    } else {
+      //compare with old data if old data exists
+      //get difference FObject
+      ret = difference(o, obj);
+      //if no difference, then return
+      if ( ret == null ) return obj;
+      //stringify difference FObject into json string
+      record = getOutputter().stringify(ret);
+      //put new data into memory
+      ret = getDelegate().put_(x, obj);
+    }
     try {
       // TODO(drish): supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + getOutputter().stringify(ret) + ")");
+      out_.write("p(" + record + ")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
       logger_.error("put", e);
     }
-
     return ret;
   }
 
@@ -209,7 +226,7 @@ public abstract class AbstractJDAO
   }
 
   protected FObject difference(FObject o, FObject n) {
-    FObject diff = diffFObject(o, n);
+    FObject diff = hasDiff(o, n);
     //no difference, then return null
     if ( diff == null ) return null;
     //get the PropertyInfo for the id
@@ -219,18 +236,18 @@ public abstract class AbstractJDAO
     return diff;
   }
 
-  protected FObject diffFObject(FObject o, FObject n) {
+  protected FObject hasDiff(FObject o, FObject n) {
     // if either new or old is null, return new instance.
-    if ( o == null && n == null ) return n;
+    if ( o == null || n == null ) return n;
     // if two instances are same, return new instance because cannot check the difference;
     if ( o == n ) return n;
     FObject ret = null;
-    List list = getOf().getAxiomsByClass(PropertyInfo.class);
+    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator e = list.iterator();
     while( e.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) e.next();
       if ( prop instanceof AbstractFObjectPropertyInfo ) {
-        FObject diff = diffFObject((FObject) prop.get(o), (FObject) prop.get(n));
+        FObject diff = hasDiff((FObject) prop.get(o), (FObject) prop.get(n));
         //if there is difference, set difference
         if ( diff != null ) {
           //create only when there is difference
@@ -241,6 +258,10 @@ public abstract class AbstractJDAO
       } else if ( prop instanceof AbstractFObjectArrayPropertyInfo ) {
         //TODO: if instances are same, can not check array
         //create only when there is array
+        if ( ret == null ) ret = generateFObject(o);
+        prop.set(ret, prop.get(n));
+      } else if ( ! (prop instanceof AbstractEnumPropertyInfo) && (prop instanceof AbstractObjectPropertyInfo || prop instanceof AbstractArrayPropertyInfo) ) {
+        //can not handle reference type except enum
         if ( ret == null ) ret = generateFObject(o);
         prop.set(ret, prop.get(n));
       } else {
@@ -256,8 +277,33 @@ public abstract class AbstractJDAO
     return ret;
   }
 
-  protected FObject mergeChange(FObject o, FObject n) {
-    return null;
+  protected FObject mergeChange(FObject o, FObject c) {
+    //if no change to merge, return FObject;
+    if ( c == null ) return o;
+    //merge change
+    return maybeMerge(o, c);
+  }
+
+  protected FObject maybeMerge(FObject o, FObject c) {
+    if ( o == null ) return o = c;
+    //get PropertyInfos
+    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator e = list.iterator();
+    while ( e.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) e.next();
+      if ( prop instanceof AbstractFObjectPropertyInfo ) {
+        //do nested merge
+        //check if change
+        if ( ! prop.isSet(c) ) continue;
+        maybeMerge((FObject) prop.get(o), (FObject) prop.get(c));
+      } else {
+        //check if change
+        if ( ! prop.isSet(c) ) continue;
+        //set new value
+        prop.set(o, prop.get(c));
+      }
+    }
+    return o;
   }
 
   //return a new Fobject
