@@ -8,9 +8,14 @@ package foam.lib;
 
 import foam.core.FObject;
 
+import java.io.Closeable;
+import java.io.Flushable;
+
 // not modelled because method with
 // name stringify is not generated
-public interface Outputter {
+public interface Outputter
+  extends Closeable, Flushable
+{
   String stringify(FObject obj);
   void output(Object value);
 }
