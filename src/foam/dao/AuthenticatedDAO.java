@@ -18,7 +18,7 @@ import java.security.Permission;
 public class AuthenticatedDAO
   extends ProxyDAO
 {
-  protected String name_;
+  protected String  name_;
   protected boolean authenticateRead_;
 
   public AuthenticatedDAO(String name, DAO delegate) {
@@ -26,7 +26,7 @@ public class AuthenticatedDAO
   }
 
   public AuthenticatedDAO(String name, boolean authenticateRead, DAO delegate) {
-    this.name_ = name;
+    this.name_             = name;
     this.authenticateRead_ = authenticateRead;
     setDelegate(delegate);
   }
@@ -85,6 +85,7 @@ public class AuthenticatedDAO
         throw new RuntimeException("Insufficient permissions");
       }
     }
+
     return super.find_(x, id);
   }
 
