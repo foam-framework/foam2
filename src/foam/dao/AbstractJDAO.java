@@ -110,7 +110,13 @@ public abstract class AbstractJDAO
 
         switch ( operation ) {
           case 'p':
-            //TODO: merge change
+            if ( getDelegate().find(object) != null ) {
+              //If data exists, merge difference
+              //get old date
+              FObject old = getDelegate().find(object);
+              //merge difference
+              object = mergeChange(old, object);
+            }
             getDelegate().put(object);
             break;
           case 'r':
@@ -207,7 +213,10 @@ public abstract class AbstractJDAO
       // TODO: Would be more efficient to output the ID portion of the object.  But
       // if ID is an alias or multi part id we should only output the
       // true properties that ID/MultiPartID maps too.
-      out_.write("r(" + getOutputter().stringify(ret) + ")");
+      FObject r = generateFObject(ret);
+      PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
+      idInfo.set(r, idInfo.get(ret));
+      out_.write("r(" + getOutputter().stringify(r) + ")");
       out_.newLine();
       out_.flush();
     } catch (IOException e) {
