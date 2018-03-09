@@ -504,7 +504,6 @@ FOAM_FILES([
 
 //help desk support 
 { name: "foam/support/model/SupportEmail" },
-{ name: "foam/support/reference/EmailSupport" },
 
 { name: "foam/support/supportlistcontroller/supportlistCreateController"}
 
