@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.support.model',
-  name: 'Message',
+  name: 'TicketMessage',
 
   documentation: 'Message Model Class and Properties',
 
