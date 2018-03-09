@@ -15,7 +15,7 @@ foam.CLASS({
   axioms: [
     foam.u2.CSS.create({
       code: `
-        ^ {
+        ^{
           width: 905px;
           height: 370px;
           background: white;
@@ -31,7 +31,7 @@ foam.CLASS({
           margin-bottom: 20px;
           z-index: 0;
         }
-        ^ h2 {
+        ^h2 {
           width: 128px;
           height: 20px;
           opacity: 0.6;
@@ -45,10 +45,10 @@ foam.CLASS({
           text-align: left;
           color: #093649;
         }
-        ^ timelineRecord {
+        ^timelineRecord {
           position: relative;
         }
-        ^ timeline {
+        ^timeline {
           width: 2px;
           height: 100%;
           background: rgba(164, 179, 184, 0.3);
