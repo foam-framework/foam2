@@ -111,7 +111,7 @@ if ( getContextualize() ) {
     build();
 }
 
-if ( getAuthenticate() || getAuthenticateRead() ) {
+if ( getAuthenticate() ) {
   delegate = new foam.dao.AuthenticatedDAO(
     getName(),
     getAuthenticateRead(),
