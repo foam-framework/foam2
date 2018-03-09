@@ -502,8 +502,5 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignedFObject" },
 
-//help desk support 
-{ name: "foam/support/model/SupportEmail" },
-{ name: "foam/support/supportlistcontroller/supportlistCreateController"}
 
 ]);
