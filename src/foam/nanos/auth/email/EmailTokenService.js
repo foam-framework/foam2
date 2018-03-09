@@ -26,8 +26,11 @@ foam.CLASS({
       javaCode:
 `try {
 DAO tokenDAO = (DAO) getX().get("tokenDAO");
-DAO userDAO = (DAO) getX().get("userDAO");
+DAO userDAO = (DAO) getX().get("localUserDAO");
 AppConfig appConfig = (AppConfig) getX().get("appConfig");
+String url = appConfig.getUrl()
+    .replaceAll("/$", "");
+
 Token token = new Token();
 token.setUserId(user.getId());
 token.setExpiry(generateExpiryDate());
@@ -40,7 +43,7 @@ message.setTo(new String[]{user.getEmail()});
 
 HashMap<String, Object> args = new HashMap<>();
 args.put("name", user.getFirstName());
-args.put("link", appConfig.getUrl() + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=null" );
+args.put("link", url + "/service/verifyEmail?userId=" + user.getId() + "&token=" + token.getData() + "&redirect=/" );
 email.sendEmailFromTemplate(user, message, "verifyEmail", args);
 return true;
 } catch(Throwable t) {
@@ -51,7 +54,7 @@ return true;
     {
       name: 'processToken',
       javaCode:
-`DAO userDAO = (DAO) getX().get("userDAO");
+`DAO userDAO = (DAO) getX().get("localUserDAO");
 DAO tokenDAO = (DAO) getX().get("tokenDAO");
 Calendar calendar = Calendar.getInstance();
 

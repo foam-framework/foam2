@@ -16,25 +16,16 @@ foam.CLASS({
   ],
   properties: [
     {
-      class: 'String',
-      name: 'root'
-    },
-    {
       name: "classloader",
-      factory: function() {
-        return this.ClassLoader.create({
-          modelDAO: this.WebModelFileDAO.create({
-            root: this.root
-          })
-        });
-      }
+      factory: function() { return this.ClassLoader.create() },
     }
   ]
 });
 (function() {
-  foam.__context__ = foam.apploader.ClassLoaderContext.create({
-    root: global.FOAM_ROOT
-  }, foam.__context__).__subContext__;
+  var classLoaderContext = foam.apploader.ClassLoaderContext.create(
+      null, foam.__context__);
+  classLoaderContext.classloader.addClassPath(global.FOAM_ROOT);
+  foam.__context__ = classLoaderContext.__subContext__;
 
   var CLASS = foam.CLASS;
   foam.CLASS = function(m) {

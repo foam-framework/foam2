@@ -6,19 +6,20 @@
 
 package foam.nanos.http;
 
-import foam.core.*;
+import foam.core.X;
 import foam.dao.DAO;
 import foam.nanos.auth.AuthService;
 import foam.nanos.auth.User;
-import foam.nanos.http.ProxyWebAgent;
-import foam.nanos.http.WebAgent;
+import foam.nanos.logger.Logger;
 import foam.nanos.session.Session;
 import foam.util.SafetyUtil;
 import java.io.PrintWriter;
-import java.util.Date;
+import java.io.UnsupportedEncodingException;
+import java.util.StringTokenizer;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.bouncycastle.util.encoders.Base64;
 
 public class AuthWebAgent
   extends ProxyWebAgent
@@ -68,55 +69,103 @@ public class AuthWebAgent
 
   /** If provided, use user and password parameters to login and create session and cookie. **/
   public Session authenticate(X x) {
+    Logger             logger       = (Logger) x.get("logger");
+
+    // context parameters
     HttpServletRequest req          = x.get(HttpServletRequest.class);
+    AuthService        auth         = (AuthService) x.get("auth");
+    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
+
+    // query parameters
     String             email        = req.getParameter("user");
     String             password     = req.getParameter("password");
-    Cookie             cookie       = getCookie(req);
-    DAO                sessionDAO   = (DAO) x.get("sessionDAO");
+    String             authHeader   = req.getHeader("Authorization");
+
+    // instance parameters
     Session            session      = null;
-    boolean            attemptLogin = ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password);
-    AuthService        auth         = (AuthService) x.get("auth");
-    PrintWriter        out          = x.get(PrintWriter.class);
+    Cookie             cookie       = getCookie(req);
+    boolean            attemptLogin = ! SafetyUtil.isEmpty(authHeader) || ( ! SafetyUtil.isEmpty(email) && ! SafetyUtil.isEmpty(password) );
 
-    if ( cookie == null ) {
-      session = new Session();
-      createCookie(x, session);
-    } else {
-      String sessionId = cookie.getValue().toString();
+    // get session id from either query parameters or cookie
+    String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
+        req.getParameter("sessionId") : ( cookie != null ) ?
+        cookie.getValue().toString() : null;
+
+    if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
-
       if ( session == null ) {
         session = new Session();
         session.setId(sessionId);
       } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
+    } else {
+      // create new cookie
+      session = new Session();
+      createCookie(x, session);
     }
 
-    if ( ! attemptLogin ) return null;
+    if ( ! attemptLogin ) {
+      return null;
+    }
+
+    //
+    // Support for Basic HTTP Authentication
+    // Redimentary testing: curl --user username:password http://localhost:8080/service/dig
+    //   visually inspect results, on failure you'll see the dig login page.
+    //
+    if ( ! SafetyUtil.isEmpty(authHeader) ) {
+      StringTokenizer st = new StringTokenizer(authHeader);
+      if ( st.hasMoreTokens() ) {
+        String basic = st.nextToken();
+        if ( basic.equalsIgnoreCase("basic") ) {
+          try {
+            String credentials = new String(Base64.decode(st.nextToken()), "UTF-8");
+            int index = credentials.indexOf(":");
+            if ( index > 0 ) {
+              String username = credentials.substring(0, index).trim();
+              if ( ! username.isEmpty() ) {
+                email = username;
+              }
+              String passwd = credentials.substring(index + 1).trim();
+              if ( ! passwd.isEmpty() ) {
+                password = passwd;
+              }
+            } else {
+              logger.debug("Invalid authorization token.");
+            }
+          } catch (UnsupportedEncodingException e) {
+            logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
+          }
+        } else {
+          logger.warning("Unsupported authorization type, expecting Basic, received: "+basic);
+        }
+      }
+    }
 
     try {
-      User user = (User) auth.loginByEmail(session.getContext(), email, password);
-      if ( user != null ) return session;
+      User user = auth.loginByEmail(session.getContext(), email, password);
+      if ( user != null ) {
+        return session;
+      }
     } catch (Throwable t) {
       t.printStackTrace();
     }
-    out.println("Authentication failure.");
 
+    PrintWriter out = x.get(PrintWriter.class);
+    out.println("Authentication failure.");
     return null;
   }
 
   public void execute(X x) {
-    HttpServletRequest  req     = x.get(HttpServletRequest.class);
-    HttpServletResponse resp    = x.get(HttpServletResponse.class);
-    PrintWriter         out     = x.get(PrintWriter.class);
-    AuthService         auth    = (AuthService) x.get("auth");
-    Session             session = authenticate(x);
+    AuthService auth    = (AuthService) x.get("auth");
+    Session     session = authenticate(x);
 
     if ( session != null && session.getContext() != null ) {
       if ( auth.check(session.getContext(), permission_) ) {
         getDelegate().execute(x.put(Session.class, session).put("user", session.getContext().get("user")));
       } else {
+        PrintWriter out = x.get(PrintWriter.class);
         out.println("Access denied. Need permission: " + permission_);
       }
     } else {

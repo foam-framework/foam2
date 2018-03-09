@@ -15,27 +15,6 @@
  * limitations under the License.
  */
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'IDBInternalException',
-  extends: 'foam.dao.InternalException',
-
-  // TODO: Which errors are internal (system problems) vs. external
-  // (i.e. invalid data for clone, but you can try again with different data)
-  properties: [
-    'id',
-    'error',
-    {
-      name: 'message',
-      expression: function(id, error) {
-        return "IndexedDB Error for " + id +
-          ( error ? ": " + error.toString() : "" );
-      }
-    }
-  ]
-});
-
-
 /*
 TODO:
 -verify that multi part keys work properly
@@ -46,7 +25,6 @@ foam.CLASS({
   extends: 'foam.dao.AbstractDAO',
 
   requires: [
-    'foam.dao.FlowControl',
     'foam.dao.ArraySink',
     'foam.dao.IDBInternalException',
     'foam.mlang.predicate.True',
