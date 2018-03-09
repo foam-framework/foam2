@@ -78,6 +78,7 @@ public abstract class AbstractJDAO
       }
       //link output journal file to BufferedWriter
       out_ = new BufferedWriter(new FileWriter(outFile_, true));
+      out_.newLine();
     } catch ( IOException e ) {
       logger_.error(e);
       throw new RuntimeException(e);
@@ -110,7 +111,7 @@ public abstract class AbstractJDAO
 
         switch ( operation ) {
           case 'p':
-            PropertyInfo id = getOf().getPrimaryKey("id");
+            PropertyInfo id = (PropertyInfo) getOf().getAxiomByName("id");
             if ( getDelegate().find(id.get(object)) != null ) {
               //If data exists, merge difference
               //get old date
@@ -173,7 +174,7 @@ public abstract class AbstractJDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
-    PropertyInfo id = getOf().getPrimaryKey("id");
+    PropertyInfo id = (PropertyInfo) getOf().getAxiomByName("id");
     FObject o = getDelegate().find_(x, id.get(obj));
     FObject ret = null;
     String record = null;
@@ -277,7 +278,7 @@ public abstract class AbstractJDAO
         prop.set(ret, prop.get(n));
       } else {
         //handle primitive value and enum
-        int same = prop.comparePropertyToObject(o, prop.get(n));
+        int same = prop.comparePropertyToValue(prop.get(o), prop.get(n));
         if ( same != 0 ) {
           //create only when there is difference
           if ( ret == null ) ret = generateFObject(o);
