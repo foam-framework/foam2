@@ -61,18 +61,22 @@ foam.CLASS({
         }
         ^ .menuItem{
           display: inline-block;
-          padding: 20px 0 10px 0px;
+          padding: 20px 0 5px 0px;
           cursor: pointer;
-          border-bottom: 4px solid transparent;
-          transition: text-shadow;
+          border-bottom: 1px solid transparent;
+          -webkit-transition: all .15s ease-in-out;
+          -moz-transition: all .15s ease-in-out;
+          -ms-transition: all .15s ease-in-out;
+          -o-transition: all .15s ease-in-out;
+          transition: all .15s ease-in-out;
         }
-        ^ .menuItem:hover {
-          border-bottom: 4px solid #1cc2b7;
+        ^ .menuItem:hover, ^ .menuItem.hovered {
+          border-bottom: 1px solid white;
           padding-bottom: 5px;
           text-shadow: 0 0 0px white, 0 0 0px white;
         }
         ^ .selected {
-          border-bottom: 4px solid #1cc2b7;
+          border-bottom: 1px solid #1cc2b7 !important;
           padding-bottom: 5px;
           text-shadow: 0 0 0px white, 0 0 0px white;
         }
