@@ -116,13 +116,13 @@ public class AuthWebAgent
     //
     if ( ! SafetyUtil.isEmpty(authHeader) ) {
       StringTokenizer st = new StringTokenizer(authHeader);
-      if (st.hasMoreTokens()) {
+      if ( st.hasMoreTokens() ) {
         String basic = st.nextToken();
-        if (basic.equalsIgnoreCase("basic")) {
+        if ( basic.equalsIgnoreCase("basic") ) {
           try {
             String credentials = new String(Base64.decode(st.nextToken()), "UTF-8");
             int index = credentials.indexOf(":");
-            if (index > 0) {
+            if ( index > 0 ) {
               String username = credentials.substring(0, index).trim();
               if ( ! username.isEmpty() ) {
                 email = username;
