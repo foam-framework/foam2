@@ -35,11 +35,6 @@ foam.CLASS({
         ^timelineRecord {
           position: relative;
         }
-
-        ^timelineRecord:last-child ^timeline {
-          display: none;
-        }
-
         ^timeline {
           width: 2px;
           height: 100%;
@@ -56,13 +51,10 @@ foam.CLASS({
 
   properties: [
     'data',
-    'historyItemView'
+    'historyItemView',
+    { class: 'String', name: 'title', value: 'History' }
   ],
   
-  messages: [
-    { name: 'title', message: 'History' }
-  ],
-
   methods: [
     function initE() {
       var view = this;
