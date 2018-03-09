@@ -110,10 +110,11 @@ public abstract class AbstractJDAO
 
         switch ( operation ) {
           case 'p':
-            if ( getDelegate().find(object) != null ) {
+            PropertyInfo id = getOf().getPrimaryKey("id");
+            if ( getDelegate().find(id.get(object)) != null ) {
               //If data exists, merge difference
               //get old date
-              FObject old = getDelegate().find(object);
+              FObject old = getDelegate().find(id.get(object));
               //merge difference
               object = mergeChange(old, object);
             }
@@ -172,7 +173,8 @@ public abstract class AbstractJDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
-    FObject o = getDelegate().find_(x, obj);
+    PropertyInfo id = getOf().getPrimaryKey("id");
+    FObject o = getDelegate().find_(x, id.get(obj));
     FObject ret = null;
     String record = null;
     if ( o == null ) {
