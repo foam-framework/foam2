@@ -11,7 +11,7 @@ foam.GENMODEL({
   requires: [
     // TODO This is just for the build part. Without it, there's no way of
     // knowing that this class uses ClientBuilder so it won't get built by build
-    // tool without explicitly listing it.
+    // tool without explicitly listing it. Think of a better place for this.
     'foam.nanos.client.ClientBuilder',
 
     'foam.box.HTTPBox',
