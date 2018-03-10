@@ -136,7 +136,15 @@ have multiple classloaders running alongside eachother`
           return this.pending[id] = this.modelDAO.find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Class Not Found: ' + id));
 
-            return this.buildClass_(m, path);
+            var cls = this.buildClass_(m, path);
+
+            if ( foam.core.GenModel.isInstance(m) ) {
+              return m.build(this.__context__).then(function(m) {
+                return this.buildClass_(m, path);
+              }.bind(this));
+            }
+
+            return cls;
           }.bind(this), function() {
             throw new Error("Failed to load class " + id);
           });

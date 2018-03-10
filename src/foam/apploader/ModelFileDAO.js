@@ -26,7 +26,6 @@ foam.CLASS({
         return promise.then(function(text) {
           if ( ! text ) return null;
           var json;
-          var genmodel = false;
           var relationship = false;
 
           var context = {
@@ -34,8 +33,8 @@ foam.CLASS({
           };
 
           context.foam.GENMODEL = function(m) {
+            m.class = 'foam.core.GenModel';
             json = m;
-            genmodel = true;
           };
 
           context.foam.CLASS = function(m) {
@@ -83,15 +82,7 @@ foam.CLASS({
 
           var references = foam.json.references(x, json);
 
-          if ( genmodel ) {
-            references = references.concat(json.requires.map(x.classloader.load.bind(x.classloader)));
-          }
-
           return Promise.all(references).then(function() {
-            if ( genmodel ) {
-              return json.build(x);
-            }
-
             return foam.lookup(json.class || 'Model').create(json, x);
           });
         }, function() {
