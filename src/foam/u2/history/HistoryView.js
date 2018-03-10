@@ -31,15 +31,23 @@ foam.CLASS({
           margin-bottom: 20px;
           z-index: 0;
         }
-
+        ^h2 {
+          width: 128px;
+          height: 20px;
+          opacity: 0.6;
+          font-family: Roboto;
+          font-size: 20px;
+          font-weight: 300;
+          font-style: normal;
+          font-stretch: normal;
+          line-height: 1;
+          letter-spacing: 0.3px;
+          text-align: left;
+          color: #093649;
+        }
         ^timelineRecord {
           position: relative;
         }
-
-        ^timelineRecord:last-child ^timeline {
-          display: none;
-        }
-
         ^timeline {
           width: 2px;
           height: 100%;
@@ -56,13 +64,10 @@ foam.CLASS({
 
   properties: [
     'data',
-    'historyItemView'
+    'historyItemView',
+    { class: 'String', name: 'title', value: 'History' }
   ],
   
-  messages: [
-    { name: 'title', message: 'History' }
-  ],
-
   methods: [
     function initE() {
       var view = this;
