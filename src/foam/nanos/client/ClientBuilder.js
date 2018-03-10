@@ -46,24 +46,9 @@ foam.CLASS({
       var self = this;
 
       var client = {
-        package: 'foam.nanos.client',
-        name: 'Client',
-
-        implements: [ 'foam.box.Context' ],
-
-        requires: [
-          'foam.box.HTTPBox',
-          'foam.dao.RequestResponseClientDAO',
-          'foam.dao.ClientDAO',
-          'foam.dao.EasyDAO'
-        ],
-
-        exports: [
-        ],
-
-        properties: [
-        ],
-
+        refines: 'foam.nanos.client.Client',
+        exports: [],
+        properties: [],
         methods: [
           function createDAO(config) {
             config.daoType = 'MDAO'; // 'IDB';
