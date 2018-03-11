@@ -13,6 +13,7 @@ foam.CLASS({
   tableColumns: [
     'id',
     'daoKey',
+    'cmd',
     'format',
     'owner'
   ],
@@ -43,8 +44,25 @@ foam.CLASS({
     },
     {
       class: 'Enum',
+      of: 'foam.nanos.dig.Command',
+      name: 'cmd'
+    },
+    {
+      class: 'Enum',
       of: 'foam.nanos.dig.Format',
       name: 'format'
+    },
+    {
+        class: 'String',
+        name: 'key'
+    },
+    {
+      class: 'EMail',
+      name: 'email'
+    },
+    {
+      class: 'String',
+      name: 'data'
     },
     {
       class: 'Reference',
