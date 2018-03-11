@@ -38,7 +38,7 @@ public class DigWebAgent
 
   public void execute(X x) {
     HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse response   = x.get(HttpServletResponse.class);
+    HttpServletResponse resp       = x.get(HttpServletResponse.class);
     final PrintWriter   out        = x.get(PrintWriter.class);
     CharBuffer          buffer_    = CharBuffer.allocate(65535);
     String              accept     = req.getHeader("Accept");
@@ -53,12 +53,12 @@ public class DigWebAgent
     Logger              logger     = (Logger) x.get("logger");
     DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
     String[]            email      = req.getParameterValues("email");
-    boolean             emailSet   = email != null && email.length > 0 && ! "".equals(email[0]);
+    boolean             emailSet   = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject    = req.getParameter("subject");
 
-    response.setContentType("text/html");
+    resp.setContentType("text/html");
 
-    if ( command == null || "".equals(command) ) {
+    if ( SafetyUtil.isEmpty(command) && ! SafetyUtil.isEmpty(methodName) ) {
       command = methodName.toLowerCase();
     }
 
@@ -70,20 +70,29 @@ public class DigWebAgent
           String f = formats[i].trim();
           if ( "application/json".equals(f) ) {
             format = "json";
+            resp.setContentType("application/json");
             break;
           }
           if ( "application/xml".equals(f) ) {
             format = "xml";
+            resp.setContentType("application/xml");
             break;
           }
         }
       }
     }
 
-    // TODO: Refactor entire class and merge this PUT|POST processing with the 'GET cmd=put' logic below.
+    //
+    // When content-type is other than application/x-www-form-urlencoded, the
+    // HttpServletRequest.reader stream must be processes manually to extract
+    // parameters from the body.
+    //
+    // Future considerations for partial parameters in the POST URI
+    // see examples: https://technologyconversations.com/2014/08/12/rest-api-with-json/
+    //
     if ( "put".equals(command) || "post".equals(command) ) {
-      if ( "application/json".equals(contentType) ) {
-        try {
+      try {
+        if ( "application/json".equals(contentType) ) {
           StringBuffer buffer = new StringBuffer();
           BufferedReader reader = req.getReader();
           String line;
@@ -96,34 +105,67 @@ public class DigWebAgent
           DigPostParameters parameters = (DigPostParameters) parser.parseString(buffer.toString(), DigPostParameters.class);
           if ( parameters != null ) {
             daoName = parameters.getDao();
+            DAO dao = (DAO) x.get(daoName);
+            // FIXME: this test for null is apparently not working. On an invalid
+            // daoName we get a 'something went wrong response', even with the
+            // catch Throwable below
+            logger.debug("daoName", daoName, "dao", dao);
+            if ( dao == null ) {
+              resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown DAO: "+daoName);
+              return;
+            }
+            dao = dao.inX(x);
             dataObj = parameters.getData();
+            if ( dataObj != null ) {
+              if ( dataObj instanceof Object[] ) {
+                Object[] objs = (Object[]) dataObj;
+                for ( int i = 0; i < objs.length; i++ ) {
+                  FObject obj = (FObject) objs[i];
+                  dao.put(obj);
+                }
+              } else {
+                FObject obj = (FObject) dataObj;
+                dao.put(obj);
+              }
+              resp.setStatus(HttpServletResponse.SC_OK);
+              out.println("Success");
+              return;
+            }
           }
-        } catch (java.io.IOException e) {
-          logger.warning(e);
+          // fallthrough to URI parameter validation
+          logger.debug("fallthrough");
+        } else {
+          // TODO: XML, CSV - copy from below.
+          logger.debug("unsupported content-type", contentType);
+          resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Content-Types: application/json");
+          return;
         }
-      } else {
-        // TODO: XML, CSV - copy from below.
-        logger.debug("unsupported content-type", contentType);
+      } catch (java.io.IOException | IllegalStateException e) { // thrown by HttpServletResponse.sendError
+        logger.error(e);
+        return;
+      } catch (Throwable t) {
+        logger.error(t);
+        return;
       }
     }
 
-    logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data, "dataObj", dataObj);
+    logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data);
 
     try {
-        if ( ( "put".equals(command) || "post".equals(command) ) && ( dataObj == null && ( data == null || "".equals(data) ) ) ) {
+      if ( ( "put".equals(command) || "post".equals(command) ) && SafetyUtil.isEmpty(data) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
         // gets all ongoing nanopay services
         nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
-          @Override
-          public void put(Object o, Detachable d) {
-            NSpec s = (NSpec) o;
-            if ( s.getServe() && s.getName().endsWith("DAO") ) {
-              out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
+            @Override
+            public void put(Object o, Detachable d) {
+              NSpec s = (NSpec) o;
+              if ( s.getServe() && s.getName().endsWith("DAO") ) {
+                out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
+              }
             }
-          }
-        });
+          });
 
         out.println("</select></span>");
         out.println("<br><br><span id=formatSpan>Format:<select name=format id=format onchange=changeFormat() style=margin-left:25><option value=csv>CSV</option><option value=xml>XML</option><option value=json selected>JSON</option><option value=html>HTML</option><option value=jsonj>JSON/J</option></select></span>");
@@ -162,104 +204,91 @@ public class DigWebAgent
       Class     objClass = cInfo.getObjClass();
 
       if ( "put".equals(command) || "post".equals(command) ) {
-        if ( dataObj != null ) {
-          if ( dataObj instanceof Object[] ) {
-            Object[] objs = (Object[]) dataObj;
-            for ( int i = 0; i < objs.length; i++ ) {
-              obj = (FObject) objs[i];
+        if ( "json".equals(format) ) {
+          JSONParser jsonParser = new JSONParser();
+          jsonParser.setX(x);
+
+          //let FObjectArray parse first
+          Object o = null;
+          o = jsonParser.parseStringForArray(data, objClass);
+          if ( o != null ) {
+            Object[] objs = (Object[]) o;
+            for ( int j = 0 ; j < objs.length ; j++ ) {
+              obj = (FObject) objs[j];
               dao.put(obj);
             }
-          } else {
-            obj = (FObject) dataObj;
+            out.println("Success");
+            return;
+          }
+
+          String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
+
+          for ( int i = 0 ; i < dataArray.length ; i++ ) {
+            o = jsonParser.parseString(data, objClass);
+
+            if ( o == null ) {
+              out.println("Parse Error : ");
+
+              String message = getParsingError(x, buffer_.toString());
+              logger.error(message + ", input: " + buffer_.toString());
+              out.println(message);
+              out.flush();
+              return;
+            }
+            obj = (FObject) o;
             dao.put(obj);
           }
-        } else {
-          if ( "json".equals(format) ) {
-            JSONParser jsonParser = new JSONParser();
-            jsonParser.setX(x);
 
-            //let FObjectArray parse first
-            Object o = null;
-            o = jsonParser.parseStringForArray(data, objClass);
-            if ( o != null ) {
-              Object[] objs = (Object[]) o;
-              for ( int j = 0 ; j < objs.length ; j++ ) {
-                obj = (FObject) objs[j];
-                dao.put(obj);
-              }
-              out.println("Success");
-              return;
-            }
+        } else if ( "xml".equals(format) ) {
+          XMLSupport      xmlSupport = new XMLSupport();
+          XMLInputFactory factory    = XMLInputFactory.newInstance();
+          StringReader    reader     = new StringReader(data);
+          XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
+          List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);
 
-            String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
+          if ( objList.size() == 0 ) {
+            out.println("Parse Error : ");
 
-            for ( int i = 0 ; i < dataArray.length ; i++ ) {
-              o = jsonParser.parseString(data, objClass);
-
-              if ( o == null ) {
-                out.println("Parse Error : ");
-
-                String message = getParsingError(x, buffer_.toString());
-                logger.error(message + ", input: " + buffer_.toString());
-                out.println(message);
-                out.flush();
-                return;
-              }
-              obj = (FObject) o;
-              dao.put(obj);
-            }
-
-          } else if ( "xml".equals(format) ) {
-            XMLSupport      xmlSupport = new XMLSupport();
-            XMLInputFactory factory    = XMLInputFactory.newInstance();
-            StringReader    reader     = new StringReader(data);
-            XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
-            List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);
-
-            if ( objList.size() == 0 ) {
-              out.println("Parse Error : ");
-
-              String message = getParsingError(x, buffer_.toString());
-              logger.error(message + ", input: " + buffer_.toString());
-              out.println(message);
-              out.flush();
-              return;
-            }
-
-            Iterator i = objList.iterator();
-            while ( i.hasNext() ) {
-              obj = (FObject)i.next();
-              obj = dao.put(obj);
-            }
-          } else if ( "csv".equals(format) ) {
-            CSVSupport csvSupport = new CSVSupport();
-            csvSupport.setX(x);
-
-            // convert String into InputStream
-            InputStream is = new ByteArrayInputStream(data.getBytes());
-
-            ArraySink arraySink = new ArraySink();
-
-            csvSupport.inputCSV(is, arraySink, cInfo);
-
-            List list = arraySink.getArray();
-
-            if ( list.size() == 0 ) {
-              out.println("Parse Error : ");
-
-              String message = getParsingError(x, buffer_.toString());
-              logger.error(message + ", input: " + buffer_.toString());
-              out.println(message);
-              out.flush();
-              return;
-            }
-
-            for ( int i = 0 ; i < list.size() ; i++ ) {
-              dao.put((FObject) list.get(i));
-            }
-          } else if ( "html".equals(format) || "jsonj".equals(format) ) {
-            out.println("Please pick the follwed format - CSV, JSON, XML when put.");
+            String message = getParsingError(x, buffer_.toString());
+            logger.error(message + ", input: " + buffer_.toString());
+            out.println(message);
+            out.flush();
+            return;
           }
+
+          Iterator i = objList.iterator();
+          while ( i.hasNext() ) {
+            obj = (FObject)i.next();
+            obj = dao.put(obj);
+          }
+        } else if ( "csv".equals(format) ) {
+          CSVSupport csvSupport = new CSVSupport();
+          csvSupport.setX(x);
+
+          // convert String into InputStream
+          InputStream is = new ByteArrayInputStream(data.getBytes());
+
+          ArraySink arraySink = new ArraySink();
+
+          csvSupport.inputCSV(is, arraySink, cInfo);
+
+          List list = arraySink.getArray();
+
+          if ( list.size() == 0 ) {
+            out.println("Parse Error : ");
+
+            String message = getParsingError(x, buffer_.toString());
+            logger.error(message + ", input: " + buffer_.toString());
+            out.println(message);
+            out.flush();
+            return;
+          }
+
+          for ( int i = 0 ; i < list.size() ; i++ ) {
+            dao.put((FObject) list.get(i));
+          }
+        } else if ( "html".equals(format) || "jsonj".equals(format) ) {
+          out.println("Please pick the follwed format - CSV, JSON, XML when put.");
         }
         out.println("Success");
         // TODO
@@ -274,7 +303,7 @@ public class DigWebAgent
           outputterJson.setOutputDefaultValues(true);
           outputterJson.output(sink.getArray().toArray());
 
-          response.setContentType("application/json");
+          resp.setContentType("application/json");
           if ( emailSet ) {
             output(x, outputterJson.toString());
           } else {
@@ -288,7 +317,7 @@ public class DigWebAgent
 
             output(x, xmlData);
           } else {
-            response.setContentType("application/xml");
+            resp.setContentType("application/xml");
             out.println(xmlSupport.toXMLString(sink.getArray()));
           }
         } else if ( "csv".equals(format) ) {
@@ -300,7 +329,7 @@ public class DigWebAgent
             outputterCsv.put((FObject) a.get(i), null);
           }
 
-          response.setContentType("text/plain");
+          resp.setContentType("text/plain");
           //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
           if (emailSet) {
             output(x, outputterCsv.toString());
@@ -332,7 +361,7 @@ public class DigWebAgent
           List a = sink.getArray();
           String dataToString = "";
 
-          response.setContentType("application/json");
+          resp.setContentType("application/json");
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
