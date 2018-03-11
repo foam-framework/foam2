@@ -41,11 +41,15 @@ public class DigWebAgent
     HttpServletResponse response   = x.get(HttpServletResponse.class);
     final PrintWriter   out        = x.get(PrintWriter.class);
     CharBuffer          buffer_    = CharBuffer.allocate(65535);
+    String              accept     = req.getHeader("Accept");
+    String              contentType = req.getHeader("Content-Type");
     String              data       = req.getParameter("data");
+    Object              dataObj    = null;
     String              daoName    = req.getParameter("dao");
     String              command    = req.getParameter("cmd");
     String              format     = req.getParameter("format");
     String              id         = req.getParameter("id");
+    String              methodName = req.getMethod();
     Logger              logger     = (Logger) x.get("logger");
     DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
     String[]            email      = req.getParameterValues("email");
@@ -54,13 +58,59 @@ public class DigWebAgent
 
     response.setContentType("text/html");
 
-    if ( command == null || "".equals(command) ) command = "put";
+    if ( command == null || "".equals(command) ) {
+      command = methodName.toLowerCase();
+    }
 
-    if ( format == null  ) format = "json";
+    if ( format == null ) {
+      format = "json";
+      if ( accept != null ) {
+        String[] formats = accept.split(";");
+        for ( int i = 0; i < formats.length; i++ ) {
+          String f = formats[i].trim();
+          if ( "application/json".equals(f) ) {
+            format = "json";
+            break;
+          }
+          if ( "application/xml".equals(f) ) {
+            format = "xml";
+            break;
+          }
+        }
+      }
+    }
+
+    // TODO: Refactor entire class and merge this PUT|POST processing with the 'GET cmd=put' logic below.
+    if ( "put".equals(command) || "post".equals(command) ) {
+      if ( "application/json".equals(contentType) ) {
+        try {
+          StringBuffer buffer = new StringBuffer();
+          BufferedReader reader = req.getReader();
+          String line;
+          while ( ( line = reader.readLine() ) != null ) {
+            buffer.append(line);
+          }
+          logger.debug("reader data:", buffer.toString());
+          JSONParser parser = new JSONParser();
+          parser.setX(x);
+          DigPostParameters parameters = (DigPostParameters) parser.parseString(buffer.toString(), DigPostParameters.class);
+          if ( parameters != null ) {
+            daoName = parameters.getDao();
+            dataObj = parameters.getData();
+          }
+        } catch (java.io.IOException e) {
+          logger.warning(e);
+        }
+      } else {
+        // TODO: XML, CSV - copy from below.
+        logger.debug("unsupported content-type", contentType);
+      }
+    }
+
+    logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data, "dataObj", dataObj);
 
     try {
-
-      if ( "put".equals(command) && ( data == null || "".equals(data) ) ) {
+        if ( ( "put".equals(command) || "post".equals(command) ) && ( dataObj == null && ( data == null || "".equals(data) ) ) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
@@ -85,7 +135,7 @@ public class DigWebAgent
         out.println("<br><span id=urlSpan style=display:none;> URL : </span>");
         out.println("<input id=builtUrl size=120 style=margin-left:20;display:none;/ >");
         out.println("<br><br><button type=submit >Submit</button></form>");
-        out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block'; document.getElementById('id').value = '';} if ( cmdValue == 'select' ) {document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: inline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
+        out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block'; document.getElementById('id').value = '';} if ( cmdValue == 'select' ) {document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: in≈ßline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
 
         out.println("<script>function changeDao() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
         out.println("<script>function changeFormat() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
@@ -111,30 +161,62 @@ public class DigWebAgent
       ClassInfo cInfo    = dao.getOf();
       Class     objClass = cInfo.getObjClass();
 
-      if ( "put".equals(command) ) {
-        if ( "json".equals(format) ) {
-          JSONParser jsonParser = new JSONParser();
-          jsonParser.setX(x);
-
-          //let FObjectArray parse first
-          Object o = null;
-          o = jsonParser.parseStringForArray(data, objClass);
-          if ( o != null ) {
-            Object[] objs = (Object[]) o;
-            for ( int j = 0 ; j < objs.length ; j++ ) {
-              obj = (FObject) objs[j];
+      if ( "put".equals(command) || "post".equals(command) ) {
+        if ( dataObj != null ) {
+          if ( dataObj instanceof Object[] ) {
+            Object[] objs = (Object[]) dataObj;
+            for ( int i = 0; i < objs.length; i++ ) {
+              obj = (FObject) objs[i];
               dao.put(obj);
             }
-            out.println("Success");
-            return;
+          } else {
+            obj = (FObject) dataObj;
+            dao.put(obj);
           }
+        } else {
+          if ( "json".equals(format) ) {
+            JSONParser jsonParser = new JSONParser();
+            jsonParser.setX(x);
 
-          String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
+            //let FObjectArray parse first
+            Object o = null;
+            o = jsonParser.parseStringForArray(data, objClass);
+            if ( o != null ) {
+              Object[] objs = (Object[]) o;
+              for ( int j = 0 ; j < objs.length ; j++ ) {
+                obj = (FObject) objs[j];
+                dao.put(obj);
+              }
+              out.println("Success");
+              return;
+            }
 
-          for ( int i = 0 ; i < dataArray.length ; i++ ) {
-            o = jsonParser.parseString(data, objClass);
+            String dataArray[] = data.split("\\{\"class\":\"" + cInfo.getId());
 
-            if ( o == null ) {
+            for ( int i = 0 ; i < dataArray.length ; i++ ) {
+              o = jsonParser.parseString(data, objClass);
+
+              if ( o == null ) {
+                out.println("Parse Error : ");
+
+                String message = getParsingError(x, buffer_.toString());
+                logger.error(message + ", input: " + buffer_.toString());
+                out.println(message);
+                out.flush();
+                return;
+              }
+              obj = (FObject) o;
+              dao.put(obj);
+            }
+
+          } else if ( "xml".equals(format) ) {
+            XMLSupport      xmlSupport = new XMLSupport();
+            XMLInputFactory factory    = XMLInputFactory.newInstance();
+            StringReader    reader     = new StringReader(data);
+            XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
+            List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);
+
+            if ( objList.size() == 0 ) {
               out.println("Parse Error : ");
 
               String message = getParsingError(x, buffer_.toString());
@@ -143,64 +225,47 @@ public class DigWebAgent
               out.flush();
               return;
             }
-            obj = (FObject) o;
-            dao.put(obj);
+
+            Iterator i = objList.iterator();
+            while ( i.hasNext() ) {
+              obj = (FObject)i.next();
+              obj = dao.put(obj);
+            }
+          } else if ( "csv".equals(format) ) {
+            CSVSupport csvSupport = new CSVSupport();
+            csvSupport.setX(x);
+
+            // convert String into InputStream
+            InputStream is = new ByteArrayInputStream(data.getBytes());
+
+            ArraySink arraySink = new ArraySink();
+
+            csvSupport.inputCSV(is, arraySink, cInfo);
+
+            List list = arraySink.getArray();
+
+            if ( list.size() == 0 ) {
+              out.println("Parse Error : ");
+
+              String message = getParsingError(x, buffer_.toString());
+              logger.error(message + ", input: " + buffer_.toString());
+              out.println(message);
+              out.flush();
+              return;
+            }
+
+            for ( int i = 0 ; i < list.size() ; i++ ) {
+              dao.put((FObject) list.get(i));
+            }
+          } else if ( "html".equals(format) || "jsonj".equals(format) ) {
+            out.println("Please pick the follwed format - CSV, JSON, XML when put.");
           }
-
-        } else if ( "xml".equals(format) ) {
-          XMLSupport      xmlSupport = new XMLSupport();
-          XMLInputFactory factory    = XMLInputFactory.newInstance();
-          StringReader    reader     = new StringReader(data);
-          XMLStreamReader xmlReader  = factory.createXMLStreamReader(reader);
-          List<FObject>   objList    = xmlSupport.fromXML(x, xmlReader, objClass);
-
-          if ( objList.size() == 0 ) {
-            out.println("Parse Error : ");
-
-            String message = getParsingError(x, buffer_.toString());
-            logger.error(message + ", input: " + buffer_.toString());
-            out.println(message);
-            out.flush();
-            return;
-          }
-
-          Iterator i = objList.iterator();
-          while ( i.hasNext() ) {
-            obj = (FObject)i.next();
-            obj = dao.put(obj);
-          }
-        } else if ( "csv".equals(format) ) {
-          CSVSupport csvSupport = new CSVSupport();
-          csvSupport.setX(x);
-
-          // convert String into InputStream
-	        InputStream is = new ByteArrayInputStream(data.getBytes());
-
-          ArraySink arraySink = new ArraySink();
-
-          csvSupport.inputCSV(is, arraySink, cInfo);
-
-          List list = arraySink.getArray();
-
-          if ( list.size() == 0 ) {
-            out.println("Parse Error : ");
-
-            String message = getParsingError(x, buffer_.toString());
-            logger.error(message + ", input: " + buffer_.toString());
-            out.println(message);
-            out.flush();
-            return;
-          }
-
-          for ( int i = 0 ; i < list.size() ; i++ ) {
-            dao.put((FObject) list.get(i));
-          }
-       } else if ( "html".equals(format) || "jsonj".equals(format) ) {
-         out.println("Please pick the follwed format - CSV, JSON, XML when put.");
-       }
-
+        }
         out.println("Success");
-      } else if ( "select".equals(command) ) {
+        // TODO
+        //} else if ( "get".equals(command) && id != null ** ! "".equals(id) ) {
+        // find
+      } else if ( "select".equals(command) || "get".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
 
@@ -236,7 +301,8 @@ public class DigWebAgent
           }
 
           response.setContentType("text/plain");
-          if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
+          //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
+          if (emailSet) {
             output(x, outputterCsv.toString());
           } else {
             out.println(outputterCsv.toString());
@@ -296,7 +362,7 @@ public class DigWebAgent
 
         out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
         out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl, '_self'); </script>");
-      } else if ( "remove".equals(command) ) {
+      } else if ( "remove".equals(command) || "delete".equals(command) ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);
         FObject      targetFobj = dao.find(idObj);
@@ -311,11 +377,11 @@ public class DigWebAgent
         out.println("Unknown command: " + command);
       }
 
-      if ( ! "put".equals(command) ) {
+      if ( ! "put".equals(command) || ! "post".equals(command) ) {
         data = "";
       }
 
-      if ( ! "remove".equals(command) ) {
+      if ( ! "remove".equals(command) || ! "delete".equals(command) ) {
         id = "";
       }
 
