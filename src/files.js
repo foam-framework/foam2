@@ -141,7 +141,7 @@ FOAM_FILES([
   { name: "foam/log/Logger" },
   { name: "foam/log/ConsoleLogger" },
   { name: "foam/memento/MementoMgr" },
-  { name: "foam/web/DetachedURLState", flags: ['web'] },
+  { name: "foam/web/DetachedURLState" },
   { name: "foam/web/URLState", flags: ['web'] },
   { name: "lib/input", flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
