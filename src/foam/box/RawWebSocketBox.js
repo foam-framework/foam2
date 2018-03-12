@@ -54,7 +54,8 @@ foam.CLASS({
           // TODO: Add one-time service policy
 
           msg.attributes.replyBox = this.__context__.registry.
-              register(null, null, msg.attributes.replyBox);
+              register(msg.attributes.replyBox.id, null,
+                       msg.attributes.replyBox);
         }
 
         var payload = this.outputter.stringify(msg);

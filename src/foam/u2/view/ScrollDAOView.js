@@ -350,14 +350,19 @@ foam.CLASS({
               }, this.selectionEnabled$, this.data$, this.selection$));
           this.on('click', function(evt) {
             if ( ! self.data ) return;
-            if ( self.selection.some(function(d) {
-                   return d.id === self.data.id;
-                 }) ) {
-              foam.Array.remove(self.selection, self.data);
-            } else {
-              self.selection.push(self.data);
+
+            var oldNum = self.selection.length;
+            var newSelection = self.selection.filter(function(d) {
+              return ! foam.util.equals(d.id, self.data.id);
+            });
+
+            // If length didn't change, add to selection. Otherwise, filter()
+            // already committed removal action.
+            if ( newSelection.length === oldNum ) {
+              newSelection.push(self.data);
             }
-            self.selection = Array.from(self.selection);
+
+            self.selection = newSelection;
           });
           this.columns$ && this.columns$.sub(this.render);
         }
@@ -611,6 +616,8 @@ foam.CLASS({
             width: '100%'
           });
         });
+
+      this.SUPER();
     },
     {
       name: 'moveAnchor_',
@@ -725,6 +732,15 @@ foam.CLASS({
           }
         });
       }
+    }
+  ],
+
+  actions: [
+    {
+      name: 'clearSelection',
+      isEnabled: function(selectionEnabled) { return selectionEnabled; },
+      keyboardShortcuts: [27], // Escape.
+      code: function() { this.selection = []; }
     }
   ],
 
