@@ -73,6 +73,7 @@ public class AuthWebAgent
 
     // context parameters
     HttpServletRequest req          = x.get(HttpServletRequest.class);
+    HttpServletResponse resp        = x.get(HttpServletResponse.class);
     AuthService        auth         = (AuthService) x.get("auth");
     DAO                sessionDAO   = (DAO) x.get("sessionDAO");
 
@@ -114,46 +115,71 @@ public class AuthWebAgent
     // Redimentary testing: curl --user username:password http://localhost:8080/service/dig
     //   visually inspect results, on failure you'll see the dig login page.
     //
-    if ( ! SafetyUtil.isEmpty(authHeader) ) {
-      StringTokenizer st = new StringTokenizer(authHeader);
-      if ( st.hasMoreTokens() ) {
-        String basic = st.nextToken();
-        if ( basic.equalsIgnoreCase("basic") ) {
-          try {
-            String credentials = new String(Base64.decode(st.nextToken()), "UTF-8");
-            int index = credentials.indexOf(":");
-            if ( index > 0 ) {
-              String username = credentials.substring(0, index).trim();
-              if ( ! username.isEmpty() ) {
-                email = username;
+    try {
+      if ( ! SafetyUtil.isEmpty(authHeader) ) {
+        StringTokenizer st = new StringTokenizer(authHeader);
+        if ( st.hasMoreTokens() ) {
+          String basic = st.nextToken();
+          if ( basic.equalsIgnoreCase("basic") ) {
+            try {
+              String credentials = new String(Base64.decode(st.nextToken()), "UTF-8");
+              int index = credentials.indexOf(":");
+              if ( index > 0 ) {
+                String username = credentials.substring(0, index).trim();
+                if ( ! username.isEmpty() ) {
+                  email = username;
+                }
+                String passwd = credentials.substring(index + 1).trim();
+                if ( ! passwd.isEmpty() ) {
+                  password = passwd;
+                }
+              } else {
+                logger.debug("Invalid authorization token.");
               }
-              String passwd = credentials.substring(index + 1).trim();
-              if ( ! passwd.isEmpty() ) {
-                password = passwd;
+            } catch (UnsupportedEncodingException e) {
+              logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
+              if ( ! SafetyUtil.isEmpty(authHeader) ) {
+                resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authentication Encodings: Base64");
+                return null;
               }
-            } else {
-              logger.debug("Invalid authorization token.");
             }
-          } catch (UnsupportedEncodingException e) {
-            logger.warning(e, "Unsupported authentication encoding, expecting Base64.");
+          } else {
+            logger.warning("Unsupported authorization type, expecting Basic, received: "+basic);
+            if ( ! SafetyUtil.isEmpty(authHeader) ) {
+              resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Authorizations: Basic");
+              return null;
+            }
           }
-        } else {
-          logger.warning("Unsupported authorization type, expecting Basic, received: "+basic);
         }
       }
-    }
 
-    try {
-      User user = auth.loginByEmail(session.getContext(), email, password);
-      if ( user != null ) {
-        return session;
+      try {
+        User user = auth.loginByEmail(session.getContext(), email, password);
+        if ( user != null ) {
+          return session;
+        } else {
+          // user should not be null, any login failure should throw an Exception
+          logger.error("AuthService.loginByEmail returned null user and did not throw AuthenticationException.");
+          // TODO: generate stack trace.
+          if ( ! SafetyUtil.isEmpty(authHeader) ) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          } else {
+            PrintWriter out = x.get(PrintWriter.class);
+            out.println("Authentication failure.");
+          }
+        }
+      } catch (javax.naming.AuthenticationException e) {
+        if ( ! SafetyUtil.isEmpty(authHeader) ) {
+          resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+        } else {
+          PrintWriter out = x.get(PrintWriter.class);
+          out.println("Authentication failure.");
+        }
       }
-    } catch (Throwable t) {
-      t.printStackTrace();
+    } catch (java.io.IOException | IllegalStateException e) { // thrown by HttpServletResponse.sendError
+      logger.error(e);
     }
 
-    PrintWriter out = x.get(PrintWriter.class);
-    out.println("Authentication failure.");
     return null;
   }
 
