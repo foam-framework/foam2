@@ -92,7 +92,9 @@ public class DigWebAgent
     //
     if ( "put".equals(command) || "post".equals(command) ) {
       try {
-        if ( "application/json".equals(contentType) ) {
+        if ( "application/x-www-form-urlencoded".equals(contentType) ) {
+          // fallthrough - this is the dig website.
+        } else if ( "application/json".equals(contentType) ) {
           StringBuffer buffer = new StringBuffer();
           BufferedReader reader = req.getReader();
           String line;
