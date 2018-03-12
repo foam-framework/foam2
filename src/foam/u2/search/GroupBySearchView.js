@@ -120,14 +120,7 @@ foam.CLASS({
         })
         .on('mouseout', function(e) {
           self.view.data = self.hardData;
-          if ( e.relatedTarget && e.relatedTarget.nodeName === 'OPTION' ) return;
-          if ( e.relatedTarget && e.relatedTarget.nodeName === 'DIV' || ! self.hardData ) {
-            self.view.data   = '';
-            self.hardData    = undefined;
-            self.previewMode = false;
-            return;
-          }
-
+          if ( ! self.hardData ) self.view.data = '';
         })
         .onDetach(
           this.dao$proxy.listen(

@@ -15,6 +15,7 @@ foam.CLASS({
 
   imports: [
     'currentMenu',
+    'lastMenuLaunched',
     'menuDAO',
     'window'
   ],
@@ -62,6 +63,7 @@ foam.CLASS({
                   var e = this;
                   this.start()
                     .addClass('menuItem')
+                    .enableClass('hovered', self.lastMenuLaunched$.map(function (value) { return value.id === menu.id; }))
                     .enableClass('selected', self.currentMenu$.map(function (value) {
                       // only show selected menu if user settings sub menu item has not been selected
                       if ( self.window.location.hash.includes('#set') ) return false;
