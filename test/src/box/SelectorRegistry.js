@@ -197,6 +197,25 @@ describe('selector registry', function() {
   });
 
   it('should forward messages to appropriate NamedBox', function(done) {
+    // Usually a network boundary box (usually of class Raw*Box) is responsible
+    // for registering any msg.attributes.replyBox in the local
+    // foam.box.Context. This allows vanilla foam.box.ReplyBoxes to be decorated
+    // before being stored in msg.attributes. In this simple case, no decoration
+    // is required, but there is also no network boundary. Refine
+    // foam.box.ReplyBox to auto-register itself.
+    foam.CLASS({
+      package: 'foam.box.test',
+      name: 'AutoRegisterReplyBox',
+      refines: 'foam.box.ReplyBox',
+
+      methods: [
+        function init() {
+          this.SUPER();
+          this.__context__.registry.register(this.id, null, this);
+        }
+      ]
+    });
+
     var ctx = Context.create();
     var selector = ClsRegistrySelector.create(null, ctx);
     var registry = SelectorRegistry.create({
