@@ -25,6 +25,11 @@ foam.CLASS({
       tableWidth: 460
     },
     {
+      class: 'String',
+      name: 'description',
+      width: 80
+    },
+    {
       class: 'Boolean',
       name: 'lazy',
       tableWidth: 60,
