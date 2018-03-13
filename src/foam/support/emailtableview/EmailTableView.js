@@ -8,12 +8,21 @@ foam.CLASS({
   height: 40px;
   border-radius: 2px;
   background-color: #59a5d5;
-  margin-left: 413px;
   margin-top: 30px;
-  position: relative;
-  top: 350px;
-  margin-right: 412px;
+  margin-right: 620px;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 2.86;
+  letter-spacing: 0.2px;
+  text-align: center;
+  color: #ffffff;
   
+    }
+    ^ .table{
+      position: absolute;
     }
     `,
     requires:['foam.u2.ListCreateController',
