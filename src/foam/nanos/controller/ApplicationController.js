@@ -28,18 +28,23 @@ foam.CLASS({
   documentation: 'FOAM Application Controller.',
 
   implements: [
+    'foam.box.Context',
     'foam.nanos.controller.AppStyles',
     'foam.nanos.controller.ApplicationConfig',
   ],
 
   requires: [
+    'foam.box.HTTPBox',
+    'foam.dao.ClientDAO',
+    'foam.dao.EasyDAO',
+    'foam.dao.RequestResponseClientDAO',
     'foam.nanos.auth.Group',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.ResendVerificationEmail',
-    'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.auth.SignInView',
-    'foam.u2.stack.Stack',
+    'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResetView',
+    'foam.nanos.u2.navigation.TopNavigation',
+    'foam.u2.stack.Stack',
     'foam.u2.stack.StackView'
   ],
 

@@ -8,8 +8,8 @@ foam.INTERFACE({
     {
       class: 'Boolean',
       name: 'signUpEnabled',
-      adapt: function(v) {
-        return v === 'false' ? false : true;
+      adapt: function(_, v) {
+        return foam.String.isInstance(v) ? v !== 'false' : v;
       }
     },
     'primaryColor',
