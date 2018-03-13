@@ -21,7 +21,6 @@ foam.CLASS({
   properties: [
     {
       name: 'view',
-      value: 'Loading...',
     },
     {
       name: 'controller',
