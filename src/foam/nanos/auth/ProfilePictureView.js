@@ -50,6 +50,12 @@ foam.CLASS({
       vertical-align: text-bottom;
       margin-left: 40px;
     }
+    ^ .removeButtonContainer {
+      height: 80px;
+      display: inline-block;
+      vertical-align: text-bottom;
+      margin-left: 20px;
+    }
     ^ .net-nanopay-ui-ActionView-uploadImage {
       width: 136px;
       height: 40px;
@@ -152,7 +158,7 @@ foam.CLASS({
               .on('click', this.onAddAttachmentClicked)
             .end()
           .end()
-          .start().addClass('uploadButtonContainer')
+          .start().addClass('removeButtonContainer')
             .start().addClass('attachment-btn grey-button btn')
               .add(this.RemoveImageLabel)
               .on('click', this.onRemoveClicked)
