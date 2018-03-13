@@ -2,15 +2,13 @@ foam.CLASS({
     name: 'EmailSupport',
     package: 'foam.support.reference',
     extends: 'foam.u2.View',
+    requires: 'foam.support.model.SupportEmail',
   
     
     documentation:'EMAIL SUPPORT VIEW',
 
     css:`
-    ^{
-    
-    }
-    ^ .box{
+    ^ .box { 
         width: 400px;
         height: 300px;
         border-radius: 2px;
@@ -19,21 +17,24 @@ foam.CLASS({
         border-width: medium;
       }
 
-      ^ .title{
-        width: 400px;
-        height: 40px;
-        background-color: #093649;
-        color: white;
-        font-size: 15px;
-        margin:0;
-        padding:1px;
-        display: inline-block; 
-        text-align: left;
+      ^ .title {
+        margin-left: 20px;
+        width: 198px;
+  height: 40px;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 2.86;
+  letter-spacing: 0.2px;
+  text-align: left;
+  color: #ffffff;
       }
     
   
     
-    ^ .label1{
+    ^ .label1 {
       width: 338px;
       height: 16px;
       font-family: Roboto;
@@ -45,9 +46,13 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #093649;
-      padding:20px;
-      padding-left:10px;
       
+    }
+    ^ .Mask {
+      width: 448px;
+      height: 231px;
+      border-radius: 2px;
+      background-color: #ffffff;
     }
     
 ^ .textbox{
@@ -73,7 +78,7 @@ foam.CLASS({
   border-width: medium;
 }
 
-^ .button2{
+^ .button2 {
   
   width: 135px;
   height: 40px;
@@ -93,6 +98,57 @@ foam.CLASS({
   border-style: solid;
   border-width: medium;
   padding-left: 100px;
+}
+^ .Rectangle-13 {
+  
+  width: 448px;
+  height: 40px;
+  background-color: #093649;
+}
+^ .input {
+  margin-top: 15px;
+  width: 408px;
+  height: 40px;
+  background-color: #ffffff;
+  border: solid 1px rgba(164, 179, 184, 0.5);
+}
+^ .Rectangle-7 {
+  float: left;
+  width: 135px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: rgba(164, 179, 184, 0.1);
+  box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 2.86;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+^ .Rectangle-8 {
+  width: 135px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: #59a5d5;
+  float: right;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 2.86;
+  letter-spacing: 0.2px;
+  text-align: center;
+  color: #ffffff;
+}
+^ .div {
+  margin-top: 40px; 
+}
+^ .div2 {
+  padding: 20px;
 }
 
 
@@ -116,24 +172,26 @@ foam.CLASS({
         this.
         addClass(this.myClass())
 
-        .start().addClass('email-modal')
-        .start()
-        .start().add(this.box).addClass('box')
-
+        .start().addClass('Mask')
+        
+        .start().addClass('Rectangle-13')
         .start('h1').add(this.title).addClass('title').end()
-        .start().add(this.titlelabel).addClass('label1')
-        .start().add(this.textbox).addClass('textbox')
-        .br()
-        .br()
-        .br()
-        .add(this.CANCEL_BUTTON).addClass('button2') 
-        .add(this.NEXT_BUTTON).addClass('button1') 
+
         .end()
-        .end()
-        .end()
-        .end()
-        .end()
-        .end()
+
+        .start('div').addClass('div2')
+        
+       .start().add(this.titlelabel).addClass('label1') 
+       
+       .end()
+       .start(this.EMAIL).addClass('input').end()
+       .start('div').addClass('div')
+       .start('button').add(this.cancelButton).addClass('Rectangle-7').end()
+       .start('button').add(this.nextButton).addClass('Rectangle-8').end()
+       .end()
+       .end()
+      .end();
+        
         
        
         
