@@ -66,7 +66,6 @@ FOAM_FILES([
   { name: "foam/pattern/Singleton" },
   { name: "foam/pattern/Multiton" },
   { name: "foam/core/Enum" },
-  { name: "foam/core/GenModel" },
   { name: "foam/core/JSON" },
   { name: "foam/core/XML" },
   { name: "foam/lib/csv/CSV" },
