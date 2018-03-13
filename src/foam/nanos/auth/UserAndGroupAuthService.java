@@ -37,7 +37,6 @@ public class UserAndGroupAuthService
 
   public UserAndGroupAuthService(X x) {
     setX(x);
-    start();
   }
 
   @Override
