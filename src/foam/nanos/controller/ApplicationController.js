@@ -34,10 +34,6 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.box.HTTPBox',
-    'foam.dao.ClientDAO',
-    'foam.dao.EasyDAO',
-    'foam.dao.RequestResponseClientDAO',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.SignInView',
