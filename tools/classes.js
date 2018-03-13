@@ -208,11 +208,7 @@ var classes = [
 
   'foam.nanos.dig.Format',
   'foam.nanos.dig.DUG',
-<<<<<<< HEAD
   'foam.support.model.TicketMessage'
-=======
-  'foam.nanos.dig.DigPostParameters',
->>>>>>> 6d13589c3391da71b9f2151d38bee8782bce62c9
 ];
 
 var abstractClasses = [
