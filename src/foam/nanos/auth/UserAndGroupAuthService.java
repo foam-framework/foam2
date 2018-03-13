@@ -35,6 +35,13 @@ public class UserAndGroupAuthService
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
 
+  public UserAndGroupAuthService(X x) {
+    setX(x);
+    userDAO_     = (DAO) getX().get("localUserDAO");
+    groupDAO_    = (DAO) getX().get("groupDAO");
+    sessionDAO_  = (DAO) getX().get("sessionDAO");
+  }
+
   @Override
   public void start() {
     userDAO_     = (DAO) getX().get("localUserDAO");
