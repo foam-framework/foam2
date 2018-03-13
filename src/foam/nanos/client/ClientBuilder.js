@@ -46,9 +46,23 @@ foam.CLASS({
       var self = this;
 
       var client = {
-        refines: 'foam.nanos.client.Client',
-        exports: [],
-        properties: [],
+        refines: 'foam.nanos.controller.ApplicationController',
+
+        implements: [ 'foam.box.Context' ],
+
+        requires: [
+          'foam.box.HTTPBox',
+          'foam.dao.RequestResponseClientDAO',
+          'foam.dao.ClientDAO',
+          'foam.dao.EasyDAO'
+        ],
+
+        exports: [
+        ],
+
+        properties: [
+        ],
+
         methods: [
           function createDAO(config) {
             config.daoType = 'MDAO'; // 'IDB';
@@ -63,6 +77,7 @@ foam.CLASS({
 
       // Force hard reload when app version updates
       self.nSpecDAO.find("appConfig").then(function(spec) {
+        if ( ! spec ) return;
         var appConfig = spec.service;
         var version   = appConfig.version;
 
@@ -100,7 +115,8 @@ foam.CLASS({
         },
         eof: function() {
           Promise.all(references).then(function() {
-            resolve(foam.core.Model.create(client));
+            foam.core.Model.create(client).buildClass();
+            resolve();
           });
 //          resolve(foam.core.Model.create(client));
 //          foam.CLASS(client);

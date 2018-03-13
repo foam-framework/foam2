@@ -28,8 +28,8 @@ foam.CLASS({
   documentation: 'FOAM Application Controller.',
 
   implements: [
-    'foam.nanos.client.Client',
-    'foam.nanos.controller.AppStyles'
+    'foam.nanos.controller.AppStyles',
+    'foam.nanos.controller.ApplicationConfig',
   ],
 
   requires: [
@@ -106,24 +106,10 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'signUpEnabled',
-      adapt: function(v) {
-        return v === 'false' ? false : true;
-      }
-    },
-    {
-      class: 'Boolean',
       name: 'loginSuccess'
     },
-    { class: 'URL', name: 'logo' },
     'currentMenu',
     'lastMenuLaunched',
-    'webApp',
-    'primaryColor',
-    'secondaryColor',
-    'tableColor',
-    'tableHoverColor',
-    'accentColor'
   ],
 
   methods: [
