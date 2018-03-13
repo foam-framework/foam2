@@ -10,16 +10,16 @@ foam.CLASS({
       ^ .title {
         margin-left: 20px;
         width: 198px;
-  height: 40px;
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 2.86;
-  letter-spacing: 0.2px;
-  text-align: left;
-  color: #ffffff;
+        height: 40px;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 2.86;
+        letter-spacing: 0.2px;
+        text-align: left;
+        color: #ffffff;
       }
     
   
