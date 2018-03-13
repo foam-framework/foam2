@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ProxyAuthService',
-z
+
   implements: [
     'foam.nanos.auth.AuthService'
   ],
