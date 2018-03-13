@@ -135,6 +135,7 @@ have multiple classloaders running alongside eachother`
 
           return this.pending[id] = this.modelDAO.find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Class Not Found: ' + id));
+
             return this.buildClass_(m, path);
           }.bind(this), function() {
             throw new Error("Failed to load class " + id);
