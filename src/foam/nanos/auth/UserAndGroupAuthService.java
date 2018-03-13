@@ -37,9 +37,7 @@ public class UserAndGroupAuthService
 
   public UserAndGroupAuthService(X x) {
     setX(x);
-    userDAO_     = (DAO) getX().get("localUserDAO");
-    groupDAO_    = (DAO) getX().get("groupDAO");
-    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    start();
   }
 
   @Override
