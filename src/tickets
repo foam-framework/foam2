@@ -1,0 +1,6 @@
+// Modified by system (1) at 2018-03-05T21:54:05Z
+p({"class":"foam.support.model.Ticket","subject":"some subject"})
+// Modified by system (1) at 2018-03-05T22:05:30Z
+p({"class":"foam.support.model.Ticket","supportEmail":"myemail@gmail.com","subject":"subject is good","publicMessage":"here is my message","status":"good"})
+// Modified by system (1) at 2018-03-05T22:05:48Z
+p({"class":"foam.support.model.Ticket","supportEmail":"sgdlksdh","subject":"sdlgkh","publicMessage":"slekfh"})
