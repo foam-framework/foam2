@@ -2,10 +2,24 @@ foam.CLASS({
     package:'foam.support.emailtableview',
     name:'EmailTableView',
     extends:'foam.u2.View',
+    css:`
+    ^ .foam-u2-UnstyledActionView-create {
+      width: 135px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: #59a5d5;
+  margin-left: 413px;
+  margin-top: 30px;
+  position: relative;
+  top: 350px;
+  margin-right: 412px;
+  
+    }
+    `,
     requires:['foam.u2.ListCreateController',
   'foam.support.emailtableview.EmailSupportTableView'],
 
-  imports:['supportEmailDAO'],
+  imports:['supportEmailDAO','createLabel'],
     methods:[
             function initE(){
                 this.addClass(this.myClass())
@@ -13,6 +27,8 @@ foam.CLASS({
                   class: 'foam.u2.ListCreateController',
                   dao: this.supportEmailDAO,
                   summaryView: this.EmailSupportTableView,
+                  createLabel:'New Email',
+                  showActions:true
                 })
               }
     ]
