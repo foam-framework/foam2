@@ -6,15 +6,7 @@ foam.CLASS({
     documentation:'EMAIL SUPPORT VIEW',
 
     css:`
-    ^ .box { 
-        width: 400px;
-        height: 300px;
-        border-radius: 2px;
-        background-color: #ffffff;
-        border-style: solid;
-        border-width: medium;
-      }
-
+    
       ^ .title {
         margin-left: 20px;
         width: 198px;
@@ -116,7 +108,6 @@ foam.CLASS({
 ^ .div2 {
   padding: 20px;
 }
-
 
     `,
   

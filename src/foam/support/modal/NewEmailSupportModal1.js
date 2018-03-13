@@ -6,15 +6,7 @@ foam.CLASS({
     documentation:'EMAIL SUPPORT VIEW',
 
     css:`
-    ^ .box { 
-        width: 400px;
-        height: 300px;
-        border-radius: 2px;
-        background-color: #ffffff;
-        border-style: solid;
-        border-width: medium;
-      }
-
+    
       ^ .title {
         margin-left: 20px;
         width: 198px;
@@ -44,6 +36,8 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #093649;
+      margin-top:20px;
+      margin-left:20px;
       
     }
     ^ .Mask {
@@ -53,17 +47,6 @@ foam.CLASS({
       background-color: #ffffff;
     }
     
-^ .textbox{
-  
-  width: 408px;
-  height: 100px;
-  background-color: #ffffff;
-  border: solid 1px rgba(164, 179, 184, 0.5);
-    border-style: solid;
-    border-width: medium;
-
-    
-}
 
 ^ .Rectangle-13 {
   
@@ -94,6 +77,7 @@ foam.CLASS({
   text-align: center;
   color: #ffffff;
   margin-left: 157px;
+  margin-top:50px;
  
 }
 ^ .div {
@@ -126,20 +110,17 @@ foam.CLASS({
         .start().addClass('Mask')
         
         .start().addClass('Rectangle-13')
-        .start('h1').add(this.title).addClass('title').end()
+            .start('h1').add(this.title).addClass('title').end()
 
         .end()
 
-        .start('div').addClass('div2')
+       // .start('div').addClass('div2')
         
-       .start().add(this.titlelabel).addClass('label1') 
-       
-       .end()
-      //  .start(this.SupportEmail.EMAIL).addClass('input').end()
-       .start('div').addClass('div')
+              .start().add(this.titlelabel).addClass('label1').end()
+      
+     
        .start('button').add(this.OKButton).addClass('Rectangle-8').end()
-       .end()
-       .end()
+     //  .end(
       .end();
         
         
