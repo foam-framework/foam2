@@ -32,11 +32,6 @@ foam.CLASS({
             foam: Object.create(foam)
           };
 
-          context.foam.GENMODEL = function(m) {
-            m.class = 'foam.core.GenModel';
-            json = m;
-          };
-
           context.foam.CLASS = function(m) {
             var jsonId = m.package ?
                 m.package + '.' + m.name :
