@@ -165,6 +165,7 @@ var classes = [
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
   'foam.dao.history.HistoryRecord',
+   'foam.support.model.Ticket',
   'foam.mop.MOP',
   'foam.u2.Element',
   'foam.u2.Visibility',

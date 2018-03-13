@@ -2,3 +2,563 @@ p({"class":"foam.nanos.auth.Permission", "id":"*",         "description":"Do any
 p({"class":"foam.nanos.auth.Permission", "id":"menu.auth", "description":"Perform authentication related configuration" })
 p({"class":"foam.nanos.auth.Permission", "id":"service.*", "description":"Global permission for reading of services"})
 p({"class":"foam.nanos.auth.Permission", "id":"service.read.*", "description":"Global permission for reading of services from a DAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"*","description":"All Access"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dig"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronScheduler"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.auth"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.logger"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.exportDriverRegistryDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.sessionDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.regionDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.testDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.demoObjectDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.menuDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.export"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.historyDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.scriptDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threadPool"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.images"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.static"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ticketDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.courseDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httprouter"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobService"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.http"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmInfoDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpBlobService"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.serviceProviderDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailToken"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.localUserDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.memory"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.groupDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobStore"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.countryDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.nSpecDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ping"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.classes"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.verifyEmail"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentCourseJunctionDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.authy"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.websockets"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.trace"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.permissionDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.email"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpFileService"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threads"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.professorDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.signatureDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmLogger"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.services"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailTemplateDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.uptime"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.userDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.fileDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dugDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.languageDAO"})
+// Modified by system (1) at 2018-03-05T20:40:49Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.resetPasswordToken"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"*","description":"All Access"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dig"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.auth"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronScheduler"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.logger"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.regionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.demoObjectDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.testDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.menuDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threadPool"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.exportDriverRegistryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.historyDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.scriptDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.images"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.export"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.sessionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.serviceProviderDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.courseDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.static"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httprouter"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ticketDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpBlobService"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.http"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.localUserDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailToken"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobService"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmInfoDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.groupDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.countryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ping"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.classes"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.memory"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.verifyEmail"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.nSpecDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentCourseJunctionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobStore"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.trace"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.email"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.professorDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpFileService"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.authy"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.websockets"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.permissionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.services"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threads"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmLogger"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailTemplateDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.signatureDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.uptime"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dugDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.resetPasswordToken"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.userDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.languageDAO"})
+// Modified by system (1) at 2018-03-05T20:41:20Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.fileDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"*","description":"All Access"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dig"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.logger"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronScheduler"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.auth"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.regionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.demoObjectDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.exportDriverRegistryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.testDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.sessionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.menuDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.historyDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.export"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threadPool"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.scriptDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.images"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.courseDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httprouter"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ticketDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.serviceProviderDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.static"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpBlobService"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobService"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.groupDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmInfoDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.http"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.localUserDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailToken"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ping"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.memory"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.classes"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.countryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.verifyEmail"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.nSpecDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobStore"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.websockets"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentCourseJunctionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.trace"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.authy"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.email"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.permissionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpFileService"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailTemplateDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmLogger"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threads"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.professorDAO"})
+// Modified by system (1) at 2018-03-05T20:41:26Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.uptime"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.languageDAO"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.signatureDAO"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.services"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.resetPasswordToken"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dugDAO"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.fileDAO"})
+// Modified by system (1) at 2018-03-05T20:41:27Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.userDAO"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"*","description":"All Access"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dig"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.auth"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronScheduler"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.logger"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.demoObjectDAO"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.sessionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:28Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.testDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.regionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.exportDriverRegistryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.menuDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.historyDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threadPool"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.export"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.scriptDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.static"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ticketDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httprouter"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.images"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.courseDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpBlobService"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.http"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.serviceProviderDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmInfoDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.localUserDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.groupDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailToken"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobService"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.memory"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ping"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.nSpecDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.countryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.classes"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.verifyEmail"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobStore"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.authy"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentCourseJunctionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.trace"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.email"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.professorDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpFileService"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.websockets"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threads"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.permissionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.uptime"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailTemplateDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.services"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.signatureDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmLogger"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dugDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.languageDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.resetPasswordToken"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.fileDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.userDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"*","description":"All Access"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dig"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.logger"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronScheduler"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.auth"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.regionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.sessionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.demoObjectDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.exportDriverRegistryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.testDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.historyDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.menuDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threadPool"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.export"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.static"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.scriptDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ticketDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.images"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.serviceProviderDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpBlobService"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.courseDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httprouter"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.http"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.localUserDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailToken"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmInfoDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.groupDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobService"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.memory"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.cronDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.ping"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.classes"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.countryDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.trace"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.nSpecDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.blobStore"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.verifyEmail"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.studentCourseJunctionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.professorDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.email"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.websockets"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.authy"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.permissionDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.httpFileService"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.emailTemplateDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.pmLogger"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.threads"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.signatureDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.languageDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.resetPasswordToken"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.services"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.uptime"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.fileDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.dugDAO"})
+// Modified by system (1) at 2018-03-05T20:41:29Z
+p({"class":"foam.nanos.auth.Permission","id":"service.execute.userDAO"})
