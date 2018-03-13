@@ -59,12 +59,30 @@ foam.CLASS({
       margin: 0;
       outline: none;
     }
+    ^ .uploadDescContainer{
+      display: inline-block;
+      vertical-align: text-top;
+      margin-left: -315px;
+    }
     ^ .uploadDescription {
+      margin-top: 9px;
+      font-size: 14px;
+      font-weight: 300;
+      letter-spacing: 0.2px;
+      color: %SECONDARYCOLOR%;
+    }
+    ^ .uploadRestriction {
       margin-top: 9px;
       font-size: 10px;
       font-weight: 300;
       letter-spacing: 0.2px;
       color: #093649;
+    }
+    ^ .box-for-drag-drop {
+      border: dashed 4px #edf0f5;
+      width: 90%;
+      height: 110px;
+      padding: 10px 10px;
     }
   `,
 
@@ -77,11 +95,14 @@ foam.CLASS({
   ],
 
   messages: [
-    { name: 'UploadImageLabel', message: 'Upload Image' },
-    { name: 'UploadDesc', message: 'JPG, GIF, JPEG, BMP or PNG' },
+    { name: 'UploadImageLabel', message: 'Choose File' },
+    { name: 'RemoveImageLabel', message: 'Remove File' },
+
+    { name: 'UploadDesc', message: 'Or drag and drop an image here' },
+    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
     { name: 'FileError', message: 'File required' },    
     { name: 'FormatError', message: 'JPG, GIF, JPEG, BMP, PNG and PDF only accepted' },
-    { name: 'ErrorMessage', message: 'Please upload an image less than 10MB' }
+    { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }
   ],
 
   methods: [
@@ -90,53 +111,63 @@ foam.CLASS({
 
       this
         .addClass(this.myClass())
-        .add(this.slot(function (data) {
-          return this.E('img').addClass('shopperImage')
-            .attrs({
-              src: this.data$.map(function (data) {
-                if ( data && data.data ) {
-                  var blob = data.data;
-                  var sessionId = localStorage['defaultSession'];
-                  if ( self.BlobBlob.isInstance(blob) ) {
-                    return URL.createObjectURL(blob.blob);
-                  } else {
-                    var url = '/service/httpFileService/' + data.id;
-                    // attach session id if available
-                    if ( sessionId ) {
-                      url += '?sessionId=' + sessionId;
+        .start('div').addClass('box-for-drag-drop')
+          .add(this.slot(function (data) {
+            return this.E('img').addClass('shopperImage')
+              .attrs({
+                src: this.data$.map(function (data) {
+                  if ( data && data.data ) {
+                    var blob = data.data;
+                    var sessionId = localStorage['defaultSession'];
+                    if ( self.BlobBlob.isInstance(blob) ) {
+                      return URL.createObjectURL(blob.blob);
+                    } else {
+                      var url = '/service/httpFileService/' + data.id;
+                      // attach session id if available
+                      if ( sessionId ) {
+                        url += '?sessionId=' + sessionId;
+                      }
+                      return url;
                     }
-                    return url;
+                  } else {
+                    return 'images/person.svg'
                   }
-                } else {
-                   return 'images/person.svg'
-                }
+                })
+              });
+          }, this.data$))
+          .on('dragstart', this.onDragStart)
+          .on('dragenter', this.onDragOver)
+          .on('dragover', this.onDragOver)
+          .on('drop', this.onDrop)
+          .start().addClass('uploadButtonContainer')
+            .start('input').addClass('attachment-input')
+              .attrs({
+                type: 'file',
+                accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png'
               })
-            });
-        }, this.data$))
-        .on('dragstart', this.onDragStart)
-        .on('dragenter', this.onDragOver)
-        .on('dragover', this.onDragOver)
-        .on('drop', this.onDrop)
-        .start().addClass('uploadButtonContainer').hide(this.uploadHidden)
-          .start('input').addClass('attachment-input')
-            .attrs({
-              type: 'file',
-              accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png'
-            })
-            .on('change', this.onChange)
+              .on('change', this.onChange)
+            .end()
+            .start().addClass('attachment-btn white-blue-button btn')
+              .add(this.UploadImageLabel)
+              .on('click', this.onAddAttachmentClicked)
+            .end()
           .end()
-          .start().addClass('attachment-btn white-blue-button btn')
-            .add(this.UploadImageLabel)
-            .on('click', this.onAddAttachmentClicked)
+          .start().addClass('uploadButtonContainer')
+            .start().addClass('attachment-btn grey-button btn')
+              .add(this.RemoveImageLabel)
+              .on('click', this.onRemoveClicked)
+            .end()
           .end()
-          .start().add(this.UploadDesc).addClass('uploadDescription').end()
+          .start().addClass('uploadDescContainer')
+            .start().add(this.UploadDesc).addClass('uploadDescription').end()
+            .start().add(this.UploadRestrict).addClass('uploadRestriction').end()
+          .end()
         .end()
     }
   ],
 
   listeners: [
     function onDragOver(e) {
-      console.log("2");         
       e.preventDefault();    
     },
     function onDrop(e) {
@@ -145,14 +176,16 @@ foam.CLASS({
       }        
       var file = e.dataTransfer.items[0].getAsFile();
       
-      if(file.type === "application/pdf" || file.type === "image/jpg" || file.type === "image/gif"|| file.type === "image/jpeg" || file.type === "image/bmp"||file.type === "image/png"){
+      if(file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png"){
       }              
       this.addFile(file);
     },
     function onAddAttachmentClicked (e) {
       this.document.querySelector('.attachment-input').click();
     },
-
+    function onRemoveClicked (e) {
+      //TODO:  Remove the profile picture
+    },
     function onChange (e) {
       var file = e.target.files[0];
       this.addFile(file);
@@ -160,7 +193,7 @@ foam.CLASS({
       
     },
     function addFile (file) {
-      if ( file.size > ( 10 * 1024 * 1024 ) ) {
+      if ( file.size > ( 2 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
         return;
       }
