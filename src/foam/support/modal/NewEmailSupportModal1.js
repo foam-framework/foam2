@@ -80,13 +80,6 @@ foam.CLASS({
   margin-top:50px;
  
 }
-^ .div {
-  margin-top: 40px; 
-}
-^ .div2 {
-  padding: 20px;
-}
-
 
     `,
   
@@ -113,14 +106,11 @@ foam.CLASS({
             .start('h1').add(this.title).addClass('title').end()
 
         .end()
-
-       // .start('div').addClass('div2')
         
               .start().add(this.titlelabel).addClass('label1').end()
       
      
        .start('button').add(this.OKButton).addClass('Rectangle-8').end()
-     //  .end(
       .end();
         
         
