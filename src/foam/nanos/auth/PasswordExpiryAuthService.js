@@ -17,8 +17,6 @@ foam.CLASS({
 
   javaImports: [
     'javax.naming.AuthenticationException',
-    'java.util.Calendar',
-    'java.util.TimeZone'
   ],
 
   methods: [
