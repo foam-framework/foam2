@@ -500,12 +500,5 @@ FOAM_FILES([
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
-  { name: "foam/crypto/sign/SignedFObject" },
-
-//help desk support 
-{ name: "foam/support/model/SupportEmail" },
-{ name: "foam/support/reference/EmailSupport" },
-
-{ name: "foam/support/supportlistcontroller/supportlistCreateController"}
-
+  { name: "foam/crypto/sign/SignedFObject" }
 ]);

@@ -20,5 +20,4 @@ foam.CLASS({
       name: 'connectedTime'
     }
   ]
-
 });

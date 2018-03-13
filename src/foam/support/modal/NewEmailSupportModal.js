@@ -1,10 +1,8 @@
 foam.CLASS({
-    name: 'EmailSupport',
-    package: 'foam.support.reference',
+    package: 'foam.support.modal',
+    name: 'NewEmailSupportModal',
     extends: 'foam.u2.View',
-    requires: 'foam.support.model.SupportEmail',
   
-    
     documentation:'EMAIL SUPPORT VIEW',
 
     css:`
@@ -50,7 +48,7 @@ foam.CLASS({
     }
     ^ .Mask {
       width: 448px;
-      height: 231px;
+      height: 180px;
       border-radius: 2px;
       background-color: #ffffff;
     }
@@ -67,38 +65,6 @@ foam.CLASS({
     
 }
 
-^ .button1{
-
-  width: 135px;
-  height: 40px;
-  border-radius: 2px;
-  background-color: rgba(164, 179, 184, 0.1);
-  box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
-  border-style: solid;
-  border-width: medium;
-}
-
-^ .button2 {
-  
-  width: 135px;
-  height: 40px;
-  border-radius: 2px;
-  background-color: #59a5d5;
-  width: 56px;
-  height: 40px;
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 2.86;
-  letter-spacing: 0.2px;
-  text-align: center;
-  color: #ffffff;
-  border-style: solid;
-  border-width: medium;
-  padding-left: 100px;
-}
 ^ .Rectangle-13 {
   
   width: 448px;
@@ -158,7 +124,7 @@ foam.CLASS({
         messages:[
             {name:'box', message:''},
             {name:'title', message:'New Email'},
-            {name:'titlelabel', message:'Input the address you want to input on the help desk'},
+            {name:'titlelabel', message:'Input the address you want to input on the help desk.'},
             {name:'textbox', message:''},
             {name:'nextButton', message:'Next'},
             {name:'cancelButton', message:'Cancel'},
@@ -184,7 +150,7 @@ foam.CLASS({
        .start().add(this.titlelabel).addClass('label1') 
        
        .end()
-       .start(this.EMAIL).addClass('input').end()
+      //  .start(this.SupportEmail.EMAIL).addClass('input').end()
        .start('div').addClass('div')
        .start('button').add(this.cancelButton).addClass('Rectangle-7').end()
        .start('button').add(this.nextButton).addClass('Rectangle-8').end()
