@@ -14,8 +14,11 @@ foam.INTERFACE({
     },
     'primaryColor',
     'secondaryColor',
+    'accentColor',
     'tableColor',
     'tableHoverColor',
-    'accentColor'
+    'privacyUrl',
+    'termsUrl',
+    'copyright',
   ],
 });
