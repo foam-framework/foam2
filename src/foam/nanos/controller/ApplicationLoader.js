@@ -11,9 +11,9 @@ foam.CLASS({
     'foam.nanos.controller.ApplicationController',
     'foam.box.HTTPBox',
     'foam.box.RetryBox',
-    'foam.dao.ClientDAO',
     'foam.dao.RequestResponseClientDAO',
-    'foam.nanos.boot.NSpec'
+    'foam.nanos.boot.NSpec',
+    'foam.dao.EasyDAO',
   ],
   properties: [
     {
@@ -45,7 +45,9 @@ foam.CLASS({
 
           var client = {
             refines: 'foam.nanos.controller.ApplicationController',
-            requires: [],
+            requires: [
+              'foam.dao.EasyDAO',
+            ],
             exports: [],
             properties: [],
             methods: [
@@ -100,11 +102,13 @@ foam.CLASS({
             eof: function() {
               Promise.all(references).then(function() {
                 foam.core.Model.create(client).buildClass();
-                resolve();
+
+                var args = {};
+                foam.nanos.controller.ApplicationConfig.getAxiomsByClass(foam.core.Property).forEach(function(p) {
+                  args[p.name] = self[p.name]
+                })
+                resolve(self.ApplicationController.create(args));
               });
-    //          resolve(foam.core.Model.create(client));
-    //          foam.CLASS(client);
-    //          resolve(foam.nanos.client.Client);
             }
           });
         })
@@ -113,18 +117,9 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-      this.buildClient();
-      this.add(this.view$);
-    },
-    function buildClient() {
       var self = this;
-      self.promise.then(function() {
-        var args = {};
-        foam.nanos.controller.ApplicationConfig.getAxiomsByClass(foam.core.Property).forEach(function(p) {
-          args[p.name] = self[p.name]
-        })
-        self.view = self.ApplicationController.create(args);
-      });
+      self.add(self.view$);
+      self.promise.then(function(v) { self.view = v });
     },
   ],
 });
