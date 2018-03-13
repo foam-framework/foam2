@@ -303,6 +303,7 @@ public class DigWebAgent
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
+          outputterJson.setOutputClassNames(false);
           outputterJson.output(sink.getArray().toArray());
 
           resp.setContentType("application/json");
