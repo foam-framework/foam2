@@ -7,7 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.auth',
   name: 'ProxyAuthService',
-z
+
   implements: [
     'foam.nanos.auth.AuthService'
   ],
@@ -17,13 +17,6 @@ z
       class: 'Proxy',
       of: 'foam.nanos.auth.AuthService',
       name: 'delegate'
-    }
-  ],
-
-  methods: [
-    {
-      name: 'start',
-      javaCode: `getDelegate().start();`
     }
   ]
 });
