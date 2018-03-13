@@ -80,9 +80,6 @@ FOAM_FILES([
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
   { name: "foam/java/Validation" },
-  //anubhav
-  { name: "foam/support/model/Ticket" ,flags: ['web'] },
-  { name: "foam/support/view/SummaryCard" ,flags: ['web'] },
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/Protocol", flags: ['swift'] },
   { name: "foam/swift/Argument", flags: ['swift'] },
@@ -130,7 +127,6 @@ FOAM_FILES([
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
-  
   { name: "foam/json2/Outputter" },
   { name: "foam/json2/Deserializer" },
   { name: "foam/json2/Serializer" },
