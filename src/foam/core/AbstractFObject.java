@@ -211,9 +211,16 @@ public abstract class AbstractFObject
     try {
       while (i.hasNext()) {
         PropertyInfo prop = (PropertyInfo) i.next();
-        if (!(prop.get(this) instanceof Appendable)) {
-          sb.append(prop.getName() + " " + prop.get(this) );
+
+        sb.append(prop.getName());
+        sb.append(" ");
+        Object value = prop.get(this);
+        if (value instanceof Appendable) {
+          sb.append("-");
+        } else {
+          sb.append(String.valueOf(value));
         }
+        sb.append(" ");
       }
     } catch (Throwable t) {
       t.printStackTrace();
