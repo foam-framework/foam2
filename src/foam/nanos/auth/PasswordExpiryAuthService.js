@@ -11,17 +11,29 @@ foam.CLASS({
 
   documentation: 'Checks password expiry',
 
+  implements: [
+    'foam.nanos.NanoService'
+  ],
+
   imports: [
     'localUserDAO'
   ],
 
   javaImports: [
     'foam.dao.DAO',
+    'foam.nanos.NanoService',
     'static foam.mlang.MLang.EQ',
     'javax.naming.AuthenticationException',
   ],
 
   methods: [
+    {
+      name: 'start',
+      javaCode:
+`if ( getDelegate() instanceof NanoService ) {
+  ((NanoService) getDelegate()).start();
+}`
+    },
     {
       name: 'login',
       javaCode:
