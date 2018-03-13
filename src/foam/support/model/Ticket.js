@@ -8,6 +8,9 @@ foam.CLASS({
     package: 'foam.support.model',
     name: 'Ticket',
     documentation: 'First Ticket Modal',
+    javaImports: [
+      'java.util.Date'
+    ],
     properties: [
       {
         class: 'Long',
@@ -31,12 +34,14 @@ foam.CLASS({
       },
       {
         class: 'DateTime',
-        name: 'time'
+        name: 'time',
+        javaFactory: 'return new Date();'
         
       },
       {
         class: 'DateTime',
-        name: 'createdAt'
+        name: 'createdAt',
+        javaFactory: 'return new Date();'
       },
       {
         class: 'String',
@@ -48,9 +53,7 @@ foam.CLASS({
       }
     ],
   
-    methods: [
-     
-    ]
+   
   });
   
   
