@@ -92,7 +92,9 @@ public class DigWebAgent
     //
     if ( "put".equals(command) || "post".equals(command) ) {
       try {
-        if ( "application/json".equals(contentType) ) {
+        if ( "application/x-www-form-urlencoded".equals(contentType) ) {
+          // fallthrough - this is the dig website.
+        } else if ( "application/json".equals(contentType) ) {
           StringBuffer buffer = new StringBuffer();
           BufferedReader reader = req.getReader();
           String line;
@@ -152,7 +154,7 @@ public class DigWebAgent
     logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data);
 
     try {
-      if ( ( "put".equals(command) || "post".equals(command) ) && SafetyUtil.isEmpty(data) ) {
+      if ( "post".equals(command) && SafetyUtil.isEmpty(daoName) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
@@ -187,7 +189,7 @@ public class DigWebAgent
         return;
       }
 
-      if ( daoName == null || "".equals(daoName) ) {
+      if ( SafetyUtil.isEmpty(daoName) ) {
         throw new RuntimeException("Input DaoName");
       }
 
@@ -301,6 +303,7 @@ public class DigWebAgent
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
+          outputterJson.setOutputClassNames(false);
           outputterJson.output(sink.getArray().toArray());
 
           resp.setContentType("application/json");
