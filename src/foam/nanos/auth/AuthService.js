@@ -8,6 +8,10 @@ foam.INTERFACE({
   package: 'foam.nanos.auth',
   name: 'AuthService',
 
+  implements: [
+    'foam.nanos.NanoService'
+  ],
+
   methods: [
     {
       name: 'getCurrentUser',
