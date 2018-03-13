@@ -18,6 +18,10 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'connectedTime'
+    },
+    {
+      class: 'Long',
+      name: 'userId'
     }
   ]
 });
