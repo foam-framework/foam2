@@ -55,10 +55,7 @@ return user;`
 if ( user.getPasswordExpiry() == null ) return false;
 
 // if we are after the expiry date then prevent login
-Calendar expiry = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-expiry.setTime(user.getPasswordExpiry());
-return now.after(expiry);`
+return user.getPasswordExpiry().getTime() < System.currentTimeMillis();`
     }
   ]
 });
