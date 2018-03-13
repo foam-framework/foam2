@@ -5,56 +5,52 @@
  */
 
 foam.CLASS({
-    package: 'foam.support.model',
-    name: 'Ticket',
-    documentation: 'First Ticket Modal',
-    javaImports: [
-      'java.util.Date'
-    ],
-    properties: [
-      {
-        class: 'Long',
-        name: 'id'
-      }, 
-      {
-        class: 'Long',
-        name: 'requestorId'
-      },
-      {
-        class: 'String',
-        name: 'supportEmail'
-      },
-      {
-        class: 'String',
-        name: 'subject'
-      },
-      {
-        class: 'String',
-        name: 'publicMessage'
-      },
-      {
-        class: 'DateTime',
-        name: 'time',
-        javaFactory: 'return new Date();'
-        
-      },
-      {
-        class: 'DateTime',
-        name: 'createdAt',
-        javaFactory: 'return new Date();'
-      },
-      {
-        class: 'String',
-        name: 'internalNote'
-      },
-      {
-        class: 'String',
-        name: 'status'
+  package: 'foam.support.model',
+  name: 'Ticket',
+  documentation: 'Ticket Model',
+
+  properties: [
+    {
+      class: 'Long',
+      name: 'id'
+    }, 
+    {
+      class: 'Long',
+      name: 'requestorId'
+    },
+    {
+      class: 'String',
+      name: 'supportEmail'
+    },
+    {
+      class: 'String',
+      name: 'subject'
+    },
+    {
+      class: 'String',
+      name: 'publicMessage'
+    },
+    {
+      class: 'DateTime',
+      name: 'time'
+    },
+    {
+      class: 'DateTime',
+      name: 'createdAt',
+      factory: function(){
+        return new Date();
       }
-    ],
-  
-   
-  });
+    },
+    {
+      class: 'String',
+      name: 'internalNote'
+    },
+    {
+      class: 'String',
+      name: 'status'
+    }
+  ]
+});
   
   
   
