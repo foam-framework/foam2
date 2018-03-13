@@ -16,6 +16,8 @@ foam.CLASS({
   ],
 
   javaImports: [
+    'foam.dao.DAO',
+    'static foam.mlang.MLang.EQ',
     'javax.naming.AuthenticationException',
   ],
 
@@ -23,20 +25,20 @@ foam.CLASS({
     {
       name: 'login',
       javaCode:
-`User user = getDelegate().login(x, userId, password);
- if ( isPasswordExpired(user) ) {
-   throw new AuthenticationException("Password expired");
- }
- return user;`
+`User user = (User) ((DAO) getLocalUserDAO()).find(userId);
+if ( isPasswordExpired(user) ) {
+  throw new AuthenticationException("Password expired");
+}
+return getDelegate().login(x, userId, password);`
     },
     {
       name: 'loginByEmail',
       javaCode:
-`User user = getDelegate().loginByEmail(x, email, password);
+`User user = (User) ((DAO) getLocalUserDAO()).inX(x).find(EQ(User.EMAIL, email.toLowerCase()));
 if ( isPasswordExpired(user) ) {
   throw new AuthenticationException("Password expired");
 }
-return user;`
+return getDelegate().loginByEmail(x, email, password);`
     },
     {
       name: 'isPasswordExpired',
