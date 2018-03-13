@@ -15,7 +15,7 @@ import java.util.Map;
 /** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
   extends    ContextAwareSupport
-  implements FObject, Comparable
+  implements FObject, Comparable, Appendable
 {
 
   public static FObject maybeClone(FObject fo) {
@@ -195,6 +195,28 @@ public abstract class AbstractFObject
     } catch (Throwable t) {
       t.printStackTrace();
       return false;
+    }
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    append(sb);
+    return sb.toString();
+  }
+
+  public void append(StringBuilder sb)  {
+    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+
+    try {
+      while (i.hasNext()) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        if (!(prop.get(this) instanceof Appendable)) {
+          sb.append(prop.getName() + " " + prop.get(this) );
+        }
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
   }
 }
