@@ -56,7 +56,6 @@ FOAM_FILES([
   { name: "foam/nanos/bench/Benchmark" },
   { name: "foam/nanos/boot/NSpec" },
   { name: "foam/nanos/session/Session" },
-  { name: "foam/nanos/client/ClientBuilder" },
   { name: "foam/nanos/menu/AbstractMenu" },
   { name: "foam/nanos/menu/DAOMenu" },
   { name: "foam/nanos/menu/ListMenu" },
