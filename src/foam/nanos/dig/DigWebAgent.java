@@ -129,12 +129,12 @@ public class DigWebAgent
                   dao.put(obj);
                 }
                 outputterJson.output(objs);
-                out.println(outputterJson.toString());
+                out.println(outputterJson);
               } else {
                 FObject obj = (FObject) dataObj;
                 dao.put(obj);
                 outputterJson.output(obj);
-                out.println(outputterJson.toString());
+                out.println(outputterJson);
               }
               resp.setStatus(HttpServletResponse.SC_OK);
               return;
