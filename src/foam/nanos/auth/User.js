@@ -187,6 +187,10 @@ foam.CLASS({
       class: 'DateTime',
       name: 'passwordLastModified'
     },
+    {
+      class: 'DateTime',
+      name: 'passwordExpiry'
+    },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
     {
