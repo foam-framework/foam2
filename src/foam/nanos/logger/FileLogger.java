@@ -6,6 +6,9 @@
 
 package foam.nanos.logger;
 
+import foam.core.EmptyX;
+import foam.core.X;
+import foam.nanos.auth.User;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import java.util.logging.*;
@@ -48,6 +51,12 @@ public class FileLogger
       }
 
       str.append(prevTimestamp);
+      str.append(',');
+
+      X x = EmptyX.instance();
+      User user = (User) x.get("user");
+      if (user != null) 
+        str.append(user.getId());
       str.append(',');
 
       // debug special case, fine level == 500
