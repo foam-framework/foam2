@@ -5,6 +5,6 @@ FOAM_FILES([
   { name: "foam/support/model/SupportEmail" },
   { name: "foam/support/modal/NewEmailSupportModal"},
   { name: "foam/support/modal/NewEmailSupportModal1"},
-  { name: "foam/support/modal/NewEmailSupportModal2"}
+
 
 ]);
