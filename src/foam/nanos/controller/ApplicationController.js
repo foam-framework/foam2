@@ -93,8 +93,8 @@ foam.CLASS({
       name: 'clientPromise',
       factory: function() {
         var self = this;
-        return self.ClientBuilder.create().createModel().then(function(m) {
-          var c = m.buildClass().create(null, self);
+        return self.ClientBuilder.create().promise.then(function(cls) {
+          var c = cls.create(null, self);
           self.clientContext = c.__subContext__;
           return c;
         });
@@ -102,6 +102,7 @@ foam.CLASS({
     },
     {
       name: 'clientContext',
+      postSet: function(_, n) { this.__subSubContext__ = n },
     },
     {
       name: 'stack',
@@ -166,7 +167,6 @@ foam.CLASS({
     function initE() {
       var self = this;
       self.clientPromise.then(function() {
-        self.__subSubContext__ = self.clientContext;
         self
           .addClass(self.myClass())
           .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
