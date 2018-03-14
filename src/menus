@@ -10,7 +10,6 @@ p({"class":"foam.nanos.menu.Menu","id":"log","label":"View Logs","order":1000,"p
 p({"class":"foam.nanos.menu.Menu","id":"model-doc","label":"Model Documentation","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"menus","label":"Menus","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"menuDAO","summaryView":{"class":"foam.nanos.menu.TreeAltView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"nspec","label":"Services","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"nSpecDAO"},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu", "view": {"class":"foam.support.view.TicketView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"p","label":"Performance","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"pmInfoDAO","summaryView":{"class":"foam.nanos.pm.PMTableView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"permissions","label":"Permissions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"permissionDAO"},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"regions","label":"Regions","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"regionDAO"},"order":1000,"parent":"admin"})
