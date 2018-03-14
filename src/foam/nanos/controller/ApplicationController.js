@@ -130,7 +130,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
       var self = this;
-
+      foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
       this.getCurrentUser();
 
       window.onpopstate = function(event) {

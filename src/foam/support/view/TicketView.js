@@ -10,11 +10,15 @@ foam.CLASS({
 
   imports: [ 'ticketDAO' ,'createLabel'],
   css:`
-  ^ .foam-u2-ActionView-create{
-    width: 135px;
-    height: 40px;
-    background: #59a5d5;
-  }`,
+  
+ ^ .foam-u2-UnstyledActionView-create
+ {
+  width: 135px;
+  height: 40px;
+  background-color: #59a5d5;
+  margin-bottom: 20px;
+ }
+  `,
   methods: [
     function initE(){
       this.addClass(this.myClass())
