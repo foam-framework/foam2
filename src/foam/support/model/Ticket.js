@@ -11,7 +11,11 @@ foam.CLASS({
     javaImports: [
       'java.util.Date'
     ],
+    tableColumns: [
+      'id','supportEmail', 'subject', 'createdAt', 'status'
+    ],
     properties: [
+    
       {
         class: 'Long',
         name: 'id'
@@ -32,12 +36,7 @@ foam.CLASS({
         class: 'String',
         name: 'publicMessage'
       },
-      {
-        class: 'DateTime',
-        name: 'time',
-        javaFactory: 'return new Date();'
-        
-      },
+  
       {
         class: 'DateTime',
         name: 'createdAt',
