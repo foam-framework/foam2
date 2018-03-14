@@ -20,6 +20,8 @@ foam.CLASS({
     'foam.nanos.boot.NSpec',
   ],
 
+  axioms: [ foam.pattern.Singleton.create() ],
+
   properties: [
     {
       name: 'nSpecDAO',
@@ -90,7 +92,7 @@ foam.CLASS({
             },
             eof: function() {
               Promise.all(references).then(function() {
-                resolve(foam.core.Model.create(client));
+                resolve(foam.core.Model.create(client).buildClass());
               });
             }
           });
@@ -98,10 +100,4 @@ foam.CLASS({
       },
     },
   ],
-
-  methods: [
-    function createModel() {
-      return this.promise;
-    }
-  ]
 });
