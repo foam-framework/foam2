@@ -30,10 +30,10 @@ foam.CLASS({
   implements: [
     'foam.box.Context',
     'foam.nanos.controller.AppStyles',
-    'foam.nanos.controller.ApplicationConfig',
   ],
 
   requires: [
+    'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
     'foam.nanos.auth.ResendVerificationEmail',
     'foam.nanos.auth.SignInView',
@@ -90,63 +90,97 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'clientPromise',
+      factory: function() {
+        var self = this;
+        return self.ClientBuilder.create().createModel().then(function(m) {
+          var c = m.buildClass().create(null, self);
+          self.clientContext = c.__subContext__;
+          return c;
+        });
+      },
+    },
+    {
+      name: 'clientContext',
+    },
+    {
       name: 'stack',
-      factory: function() { return this.Stack.create(); }
+      factory: function() { return this.Stack.create(null, this.clientContext); }
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.User',
       name: 'user',
-      factory: function() { return this.User.create(); }
+      factory: function() { return this.User.create(null, this.clientContext); }
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group',
-      factory: function() { return this.Group.create(); }
+      factory: function() { return this.Group.create(null, this.clientContext); }
+    },
+    {
+      class: 'Boolean',
+      name: 'signUpEnabled',
+      adapt: function(_, v) {
+        return foam.String.isInstance(v) ? v !== 'false' : v;
+      }
     },
     {
       class: 'Boolean',
       name: 'loginSuccess'
     },
+    { class: 'URL', name: 'logo' },
     'currentMenu',
     'lastMenuLaunched',
+    'webApp',
+    'primaryColor',
+    'secondaryColor',
+    'tableColor',
+    'tableHoverColor',
+    'accentColor'
   ],
 
   methods: [
     function init() {
       this.SUPER();
+
       var self = this;
+      self.clientPromise.then(function() {
+        self.getCurrentUser();
 
-      this.getCurrentUser();
+        window.onpopstate = function(event) {
+          if ( location.hash != null ) {
+            var hid = location.hash.substr(1);
 
-      window.onpopstate = function(event) {
-        if ( location.hash != null ) {
-          var hid = location.hash.substr(1);
+            hid && self.clientContext.menuDAO.find(hid).then(function(menu) {
+              menu && menu.launch(this, null);
+            });
+          }
+        };
 
-          hid && self.menuDAO.find(hid).then(function(menu) {
-            menu && menu.launch(this, null);
-          });
-        }
-      };
-
-      window.onpopstate();
+        window.onpopstate();
+      });
     },
 
     function initE() {
-      this
-        .addClass(this.myClass())
-        .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
-        .start('div').addClass('stack-wrapper')
-          .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
-        .end();
+      var self = this;
+      self.clientPromise.then(function() {
+        self.__subSubContext__ = self.clientContext;
+        self
+          .addClass(self.myClass())
+          .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
+          .start('div').addClass('stack-wrapper')
+            .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
+          .end();
+      });
     },
 
     function setDefaultMenu() {
       // Don't select default if menu already set
       if ( this.window.location.hash || ! this.user.group ) return;
 
-      this.groupDAO.find(this.user.group).then(function (group) {
+      this.clientContext.groupDAO.find(this.user.group).then(function (group) {
         this.group.copyFrom(group);
         this.window.location.hash = group.defaultMenu;
       }.bind(this));
@@ -156,7 +190,7 @@ foam.CLASS({
       var self = this;
 
       // get current user, else show login
-      this.auth.getCurrentUser(null).then(function (result) {
+      this.clientContext.auth.getCurrentUser(null).then(function (result) {
         self.loginSuccess = !! result;
         if ( result ) {
           self.user.copyFrom(result);
