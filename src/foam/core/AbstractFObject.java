@@ -205,25 +205,28 @@ public abstract class AbstractFObject
   }
 
   public void append(StringBuilder sb)  {
-    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    Iterator i = props.iterator();
+    List     props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i     = props.iterator();
 
-    try {
-      while (i.hasNext()) {
-        PropertyInfo prop = (PropertyInfo) i.next();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
 
-        sb.append(prop.getName());
-        sb.append(" ");
+      sb.append(prop.getName());
+      sb.append(" ");
+
+      try {
         Object value = prop.get(this);
-        if (value instanceof Appendable) {
-          sb.append("-");
+
+        if ( value instanceof Appendable ) {
+          ((Appendable) value).append(sb);
         } else {
-          sb.append(String.valueOf(value));
+          sb.append(value);
         }
-        sb.append(" ");
+      } catch (Throwable t) {
+        sb.append("-");
       }
-    } catch (Throwable t) {
-      t.printStackTrace();
+
+      if ( i.hasNext() ) sb.append(" ");
     }
   }
 }
