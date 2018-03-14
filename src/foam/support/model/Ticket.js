@@ -8,7 +8,9 @@ foam.CLASS({
   package: 'foam.support.model',
   name: 'Ticket',
   documentation: 'Ticket Model',
-
+  tableColumns: [
+    'id', 'supportEmail', 'subject', 'createdAt', 'status'
+  ],
   properties: [
     {
       class: 'Long',
@@ -30,10 +32,7 @@ foam.CLASS({
       class: 'String',
       name: 'publicMessage'
     },
-    {
-      class: 'DateTime',
-      name: 'time'
-    },
+
     {
       class: 'DateTime',
       name: 'createdAt',
