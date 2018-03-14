@@ -38,42 +38,136 @@ public class DigWebAgent
 
   public void execute(X x) {
     HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse response   = x.get(HttpServletResponse.class);
+    HttpServletResponse resp       = x.get(HttpServletResponse.class);
     final PrintWriter   out        = x.get(PrintWriter.class);
     CharBuffer          buffer_    = CharBuffer.allocate(65535);
+    String              accept     = req.getHeader("Accept");
+    String              contentType = req.getHeader("Content-Type");
     String              data       = req.getParameter("data");
+    Object              dataObj    = null;
     String              daoName    = req.getParameter("dao");
     String              command    = req.getParameter("cmd");
     String              format     = req.getParameter("format");
     String              id         = req.getParameter("id");
+    String              methodName = req.getMethod();
     Logger              logger     = (Logger) x.get("logger");
     DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
     String[]            email      = req.getParameterValues("email");
-    boolean             emailSet   = email != null && email.length > 0 && ! "".equals(email[0]);
+    boolean             emailSet   = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject    = req.getParameter("subject");
 
-    response.setContentType("text/html");
+    resp.setContentType("text/html");
 
-    if ( command == null || "".equals(command) ) command = "put";
+    if ( SafetyUtil.isEmpty(command) && ! SafetyUtil.isEmpty(methodName) ) {
+      command = methodName.toLowerCase();
+    }
 
-    if ( format == null  ) format = "json";
+    if ( format == null ) {
+      format = "json";
+      if ( accept != null ) {
+        String[] formats = accept.split(";");
+        for ( int i = 0; i < formats.length; i++ ) {
+          String f = formats[i].trim();
+          if ( "application/json".equals(f) ) {
+            format = "json";
+            resp.setContentType("application/json");
+            break;
+          }
+          if ( "application/xml".equals(f) ) {
+            format = "xml";
+            resp.setContentType("application/xml");
+            break;
+          }
+        }
+      }
+    }
+
+    //
+    // When content-type is other than application/x-www-form-urlencoded, the
+    // HttpServletRequest.reader stream must be processes manually to extract
+    // parameters from the body.
+    //
+    // Future considerations for partial parameters in the POST URI
+    // see examples: https://technologyconversations.com/2014/08/12/rest-api-with-json/
+    //
+    if ( "put".equals(command) || "post".equals(command) ) {
+      try {
+        if ( "application/x-www-form-urlencoded".equals(contentType) ) {
+          // fallthrough - this is the dig website.
+        } else if ( "application/json".equals(contentType) ) {
+          StringBuffer buffer = new StringBuffer();
+          BufferedReader reader = req.getReader();
+          String line;
+          while ( ( line = reader.readLine() ) != null ) {
+            buffer.append(line);
+          }
+          logger.debug("reader data:", buffer.toString());
+          JSONParser parser = new JSONParser();
+          parser.setX(x);
+          DigPostParameters parameters = (DigPostParameters) parser.parseString(buffer.toString(), DigPostParameters.class);
+          if ( parameters != null ) {
+            daoName = parameters.getDao();
+            DAO dao = (DAO) x.get(daoName);
+            // FIXME: this test for null is apparently not working. On an invalid
+            // daoName we get a 'something went wrong response', even with the
+            // catch Throwable below
+            logger.debug("daoName", daoName, "dao", dao);
+            if ( dao == null ) {
+              resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown DAO: "+daoName);
+              return;
+            }
+            dao = dao.inX(x);
+            dataObj = parameters.getData();
+            if ( dataObj != null ) {
+              if ( dataObj instanceof Object[] ) {
+                Object[] objs = (Object[]) dataObj;
+                for ( int i = 0; i < objs.length; i++ ) {
+                  FObject obj = (FObject) objs[i];
+                  dao.put(obj);
+                }
+              } else {
+                FObject obj = (FObject) dataObj;
+                dao.put(obj);
+              }
+              resp.setStatus(HttpServletResponse.SC_OK);
+              out.println("Success");
+              return;
+            }
+          }
+          // fallthrough to URI parameter validation
+          logger.debug("fallthrough");
+        } else {
+          // TODO: XML, CSV - copy from below.
+          logger.debug("unsupported content-type", contentType);
+          resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Supported Content-Types: application/json");
+          return;
+        }
+      } catch (java.io.IOException | IllegalStateException e) { // thrown by HttpServletResponse.sendError
+        logger.error(e);
+        return;
+      } catch (Throwable t) {
+        logger.error(t);
+        return;
+      }
+    }
+
+    logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data);
 
     try {
-
-      if ( "put".equals(command) && ( data == null || "".equals(data) ) ) {
+      if ( "post".equals(command) && SafetyUtil.isEmpty(daoName) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
         // gets all ongoing nanopay services
         nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
-          @Override
-          public void put(Object o, Detachable d) {
-            NSpec s = (NSpec) o;
-            if ( s.getServe() && s.getName().endsWith("DAO") ) {
-              out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
+            @Override
+            public void put(Object o, Detachable d) {
+              NSpec s = (NSpec) o;
+              if ( s.getServe() && s.getName().endsWith("DAO") ) {
+                out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
+              }
             }
-          }
-        });
+          });
 
         out.println("</select></span>");
         out.println("<br><br><span id=formatSpan>Format:<select name=format id=format onchange=changeFormat() style=margin-left:25><option value=csv>CSV</option><option value=xml>XML</option><option value=json selected>JSON</option><option value=html>HTML</option><option value=jsonj>JSON/J</option></select></span>");
@@ -85,7 +179,7 @@ public class DigWebAgent
         out.println("<br><span id=urlSpan style=display:none;> URL : </span>");
         out.println("<input id=builtUrl size=120 style=margin-left:20;display:none;/ >");
         out.println("<br><br><button type=submit >Submit</button></form>");
-        out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block'; document.getElementById('id').value = '';} if ( cmdValue == 'select' ) {document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: inline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
+        out.println("<script>function changeCmd(cmdValue) { if ( cmdValue != 'put' ) {document.getElementById('dataSpan').style.cssText = 'display: none'; } else { document.getElementById('dataSpan').style.cssText = 'display: inline-block'; } if ( cmdValue == 'remove' ) { document.getElementById('idSpan').style.cssText = 'display: inline-block'; document.getElementById('formatSpan').style.cssText = 'display:none';} else { document.getElementById('idSpan').style.cssText = 'display: none'; document.getElementById('formatSpan').style.cssText = 'display: inline-block'; document.getElementById('id').value = '';} if ( cmdValue == 'select' ) {document.getElementById('emailSpan').style.cssText = 'display: inline-block'; document.getElementById('subjectSpan').style.cssText = 'display: inline-block'; document.getElementById('urlSpan').style.cssText = 'display: in≈ßline-block';document.getElementById('builtUrl').style.cssText = 'display: inline-block'; var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}else {document.getElementById('emailSpan').style.cssText = 'display:none'; document.getElementById('subjectSpan').style.cssText ='display:none';document.getElementById('urlSpan').style.cssText = 'display:none';document.getElementById('builtUrl').style.cssText = 'display:none';}}</script>");
 
         out.println("<script>function changeDao() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
         out.println("<script>function changeFormat() {var vbuiltUrl = document.location.protocol + '//' + document.location.host + '/service/dig?dao=' + document.getElementById('dao').value + '&format=' + document.getElementById('format').options[document.getElementById('format').selectedIndex].value + '&cmd=' + document.getElementById('cmd').options[document.getElementById('cmd').selectedIndex].value + '&email='; document.getElementById('builtUrl').value=vbuiltUrl;}</script>");
@@ -95,7 +189,7 @@ public class DigWebAgent
         return;
       }
 
-      if ( daoName == null || "".equals(daoName) ) {
+      if ( SafetyUtil.isEmpty(daoName) ) {
         throw new RuntimeException("Input DaoName");
       }
 
@@ -111,7 +205,7 @@ public class DigWebAgent
       ClassInfo cInfo    = dao.getOf();
       Class     objClass = cInfo.getObjClass();
 
-      if ( "put".equals(command) ) {
+      if ( "put".equals(command) || "post".equals(command) ) {
         if ( "json".equals(format) ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
@@ -174,7 +268,7 @@ public class DigWebAgent
           csvSupport.setX(x);
 
           // convert String into InputStream
-	        InputStream is = new ByteArrayInputStream(data.getBytes());
+          InputStream is = new ByteArrayInputStream(data.getBytes());
 
           ArraySink arraySink = new ArraySink();
 
@@ -195,21 +289,24 @@ public class DigWebAgent
           for ( int i = 0 ; i < list.size() ; i++ ) {
             dao.put((FObject) list.get(i));
           }
-       } else if ( "html".equals(format) || "jsonj".equals(format) ) {
-         out.println("Please pick the follwed format - CSV, JSON, XML when put.");
-       }
-
+        } else if ( "html".equals(format) || "jsonj".equals(format) ) {
+          out.println("Please pick the follwed format - CSV, JSON, XML when put.");
+        }
         out.println("Success");
-      } else if ( "select".equals(command) ) {
+        // TODO
+        //} else if ( "get".equals(command) && id != null ** ! "".equals(id) ) {
+        // find
+      } else if ( "select".equals(command) || "get".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
 
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
+          outputterJson.setOutputClassNames(false);
           outputterJson.output(sink.getArray().toArray());
 
-          response.setContentType("application/json");
+          resp.setContentType("application/json");
           if ( emailSet ) {
             output(x, outputterJson.toString());
           } else {
@@ -223,7 +320,7 @@ public class DigWebAgent
 
             output(x, xmlData);
           } else {
-            response.setContentType("application/xml");
+            resp.setContentType("application/xml");
             out.println(xmlSupport.toXMLString(sink.getArray()));
           }
         } else if ( "csv".equals(format) ) {
@@ -235,8 +332,9 @@ public class DigWebAgent
             outputterCsv.put((FObject) a.get(i), null);
           }
 
-          response.setContentType("text/plain");
-          if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
+          resp.setContentType("text/plain");
+          //if ( email.length != 0 && ! email[0].equals("")  && email[0] != null ) {
+          if (emailSet) {
             output(x, outputterCsv.toString());
           } else {
             out.println(outputterCsv.toString());
@@ -266,7 +364,7 @@ public class DigWebAgent
           List a = sink.getArray();
           String dataToString = "";
 
-          response.setContentType("application/json");
+          resp.setContentType("application/json");
           for ( int i = 0 ; i < a.size() ; i++ ) {
               outputterJson.output(a.get(i));
           }
@@ -296,7 +394,7 @@ public class DigWebAgent
 
         out.println("<input type=hidden id=classInfo style=margin-left:30;width:350 value=" + cInfo.getId() + "></input>");
         out.println("<script>var vurl = document.location.protocol + '//' + document.location.host + '/?path=' + document.getElementById('classInfo').value + '#docs'; window.open(vurl, '_self'); </script>");
-      } else if ( "remove".equals(command) ) {
+      } else if ( "remove".equals(command) || "delete".equals(command) ) {
         PropertyInfo idProp     = (PropertyInfo) cInfo.getAxiomByName("id");
         Object       idObj      = idProp.fromString(id);
         FObject      targetFobj = dao.find(idObj);
@@ -311,11 +409,11 @@ public class DigWebAgent
         out.println("Unknown command: " + command);
       }
 
-      if ( ! "put".equals(command) ) {
+      if ( ! "put".equals(command) || ! "post".equals(command) ) {
         data = "";
       }
 
-      if ( ! "remove".equals(command) ) {
+      if ( ! "remove".equals(command) || ! "delete".equals(command) ) {
         id = "";
       }
 
