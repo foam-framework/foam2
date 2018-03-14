@@ -119,18 +119,24 @@ public class DigWebAgent
             dao = dao.inX(x);
             dataObj = parameters.getData();
             if ( dataObj != null ) {
+              foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+              outputterJson.setOutputDefaultValues(true);
+              outputterJson.setOutputClassNames(false);
               if ( dataObj instanceof Object[] ) {
                 Object[] objs = (Object[]) dataObj;
                 for ( int i = 0; i < objs.length; i++ ) {
                   FObject obj = (FObject) objs[i];
                   dao.put(obj);
                 }
+                outputterJson.output(objs);
+                out.println(outputterJson.toString());
               } else {
                 FObject obj = (FObject) dataObj;
                 dao.put(obj);
+                outputterJson.output(obj);
+                out.println(outputterJson.toString());
               }
               resp.setStatus(HttpServletResponse.SC_OK);
-              out.println("Success");
               return;
             }
           }
