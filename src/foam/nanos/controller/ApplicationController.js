@@ -75,7 +75,117 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
+    ^ .Ticket-Status-New
+    {
+      width: 45px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #eedb5f;
+    }
+    ^ .Ticket-Status-Updated
+    {
+      width: 67px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #093649;
+    }
+    ^ .Ticket-Status-Open
+    {
+      width: 49px;
+      height: 20px;
+      border-radius: 100px;
+      background-color: #ee5f71;
+    }
+    ^ .Ticket-Status-Pending
+    {
+      width: 65px;
+  height: 20px;
+  border-radius: 100px;
+  background-color: #59a5d5;
+    }
+    ^ .Ticket-Status-Solved
+    {
+      width: 57px;
+  height: 20px;
+  border-radius: 100px;
+  background-color: #a4b3b8;
+    }
 
+    ^ .Ticket-Label-New
+    {
+      
+      width: 25px;
+      height: 20px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #ffffff;
+      padding-left:10px;
+    }
+    ^ .Ticket-Label-Updated
+    {
+      width: 47px;
+      height: 20px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #ffffff;
+      padding-left:10px;
+    }
+    ^ .Ticket-Label-Open
+    {
+      
+      width: 29px;
+  height: 20px;
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.67;
+  letter-spacing: 0.2px;
+  text-align: left;
+  color: #ffffff;
+  padding-left:10px;
+    }
+    ^ .Ticket-Label-Pending
+    {  width: 45px;
+      height: 20px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #ffffff;
+      padding-left:10px;
+    }
+    ^ .Ticket-Label-Solved
+    {width: 37px;
+      height: 20px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #ffffff;
+      padding-left:10px;
+    }
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);

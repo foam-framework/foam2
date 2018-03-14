@@ -18,7 +18,8 @@ foam.CLASS({
     
       {
         class: 'Long',
-        name: 'id'
+        name: 'id',
+        label:'Ticket ID'
       }, 
       {
         class: 'Long',
@@ -26,11 +27,14 @@ foam.CLASS({
       },
       {
         class: 'String',
-        name: 'supportEmail'
+        name: 'supportEmail',
+        label:'Requestor'
       },
       {
         class: 'String',
-        name: 'subject'
+        name: 'subject',
+        label:'Subject',
+      
       },
       {
         class: 'String',
@@ -40,7 +44,18 @@ foam.CLASS({
       {
         class: 'DateTime',
         name: 'createdAt',
-        javaFactory: 'return new Date();'
+        label: 'Time',
+        tableCellFormatter: function(state, obj, rel){
+          //var d=new Date('d-M-Y');
+          var d = new Date();
+          var locale = "en-us";
+          var month = d.toLocaleString(locale, {month: "short"});
+          var date=d.getDate();
+          var year=d.getFullYear();
+          console.log(month);
+          this.start().add(month+" "+date+", "+year);
+        
+        }
       },
       {
         class: 'String',
@@ -48,12 +63,16 @@ foam.CLASS({
       },
       {
         class: 'String',
-        name: 'status'
+        name: 'status',
+        label:'Status',
+        tableCellFormatter: function(state, obj, rel) {
+
+          this.
+          start().addClass('generic-status Ticket-Status-'+ state)
+              .start().add(state).addClass('generic-status Ticket-Label-'+ state).end()
+          .end()
+        
       }
-    ],
-  
-   
+    }
+    ]
   });
-  
-  
-  
