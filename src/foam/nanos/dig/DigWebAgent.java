@@ -215,7 +215,9 @@ public class DigWebAgent
         if ( "json".equals(format) ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
-
+          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          outputterJson.setOutputDefaultValues(true);
+          outputterJson.setOutputClassNames(false);
           //let FObjectArray parse first
           Object o = null;
           o = jsonParser.parseStringForArray(data, objClass);
