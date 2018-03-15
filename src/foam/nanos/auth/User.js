@@ -97,6 +97,7 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
+      label: 'Email Address',
       displayWidth: 80,
       width: 100,
       preSet: function (_, val) {
