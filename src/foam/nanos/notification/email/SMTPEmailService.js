@@ -34,6 +34,7 @@ foam.CLASS({
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
+    'java.nio.charset.StandardCharsets',
     'java.util.Date',
     'java.util.Properties'
   ],
@@ -129,10 +130,11 @@ protected EnvironmentConfiguration config_ = null;`
   config_ = EnvironmentConfigurationBuilder
     .configuration()
     .resources()
-    .resourceLoaders()
-    .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
-    .and().and()
-    .build();
+      .resourceLoaders()
+        .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
+      .and()
+    .and()
+  .build();
 }
 return config_;`
     },
@@ -251,6 +253,14 @@ return config_;`
 EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
 if ( emailMessage == null )
   return;
+
+for ( String key : templateArgs.keySet() ) {
+  Object value = templateArgs.get(key);
+  if ( value instanceof String ) {
+    String s = (String) value;
+    templateArgs.put(key, new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+  }
+}
 
 EnvironmentConfiguration config = getConfig(group);
 JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
