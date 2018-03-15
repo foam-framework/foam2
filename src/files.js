@@ -80,7 +80,6 @@ FOAM_FILES([
   { name: "foam/core/Reaction" },
   { name: "foam/core/Serializable" },
   { name: "foam/java/Validation" },
-
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
   { name: "foam/swift/Protocol", flags: ['swift'] },
   { name: "foam/swift/Argument", flags: ['swift'] },
@@ -128,7 +127,6 @@ FOAM_FILES([
   { name: "foam/java/JavaImport", flags: ['java'] },
   { name: "foam/java/Builder", flags: ['java'] },
   { name: "foam/java/refinements", flags: ['java'] },
-
   { name: "foam/json2/Outputter" },
   { name: "foam/json2/Deserializer" },
   { name: "foam/json2/Serializer" },
@@ -500,5 +498,8 @@ FOAM_FILES([
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
-  { name: "foam/crypto/sign/SignedFObject" }
+  { name: "foam/crypto/sign/SignedFObject" },
+
+  //Support
+  { name: "foam/support/model/Ticket" }
 ]);
