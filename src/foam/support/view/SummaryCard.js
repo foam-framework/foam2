@@ -66,7 +66,7 @@ foam.CLASS({
 			.addClass(this.myClass())
 			.start()
 				.start().addClass('firstdiv')
-					.start().add('100').addClass('label').end()
+					.start().add('1001').addClass('label').end()
 					.start().addClass('ticketCount')
 						.start().add('Status').addClass('statuslabel').end()
 					.end() 
