@@ -209,7 +209,6 @@ var classes = [
   'foam.nanos.dig.Format',
   'foam.nanos.dig.DUG',
   'foam.nanos.dig.DigPostParameters',
-
   'foam.support.model.Ticket'
 ];
 
