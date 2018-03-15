@@ -2,18 +2,20 @@ foam.CLASS({
   package: 'foam.support.view',
   name: 'TicketView',
   extends: 'foam.u2.View',
+
   requires: [
     'foam.u2.ListCreateController',
     'foam.support.view.TicketTableView'
   ],
+
   imports: [ 'ticketDAO' ,'createLabel'],
+
   css:`
   ^ .foam-u2-view-TableView-foam-support-model-Ticket
   {
     margin-top:30px;
-  }
-  
- ^ .foam-u2-UnstyledActionView-create
+  } 
+  ^ .foam-u2-UnstyledActionView-create
   {
     width: 135px;
     height: 40px;
@@ -24,7 +26,7 @@ foam.CLASS({
     top:0;
     right:0;
   }
- ^ #v36
+  ^ #v36
   {
     width: 56px;
     height: 40px;
@@ -39,6 +41,7 @@ foam.CLASS({
     color: #ffffff;
   }
   `,
+
   methods: [
     function initE(){
       this.addClass(this.myClass())
@@ -54,23 +57,27 @@ foam.CLASS({
 })
 
 foam.CLASS({
-    package:'foam.support.view',
-    name: 'TicketTableView',
-    extends: 'foam.u2.View',
-    requires: [
-      'foam.u2.TableView',
-      'foam.support.model.Ticket',
-    ],
-    exports: [ 'as data' ],
-    imports: [ 'ticketDAO'],
-    methods: [
-      function initE() {
-        this
-            .start({
-            selection: this.selection$,
-            class: 'foam.u2.view.TableView',
-            data: this.ticketDAO,
-          }).addClass(this.myClass('table')).end();
-      }
-    ],
-  })
+  package:'foam.support.view',
+  name: 'TicketTableView',
+  extends: 'foam.u2.View',
+
+  requires: [
+    'foam.u2.TableView',
+    'foam.support.model.Ticket',
+  ],
+
+  exports: [ 'as data' ],
+
+  imports: [ 'ticketDAO'],
+
+  methods: [
+    function initE() {
+      this
+        .start({
+          selection: this.selection$,
+          class: 'foam.u2.view.TableView',
+          data: this.ticketDAO,
+        }).addClass(this.myClass('table')).end();
+    }
+  ],
+})

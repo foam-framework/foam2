@@ -67,7 +67,8 @@ foam.CLASS({
   ],
 
   css: `
-       body 
+     
+    body 
     {
       font-family: 'Roboto', sans-serif;
       font-size: 14px;

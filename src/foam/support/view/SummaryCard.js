@@ -3,21 +3,22 @@ foam.CLASS({
     name:'SummaryCard',
     extends: 'foam.u2.View',
     css:`
-^  {
+^  
+  {
     width: 228px;
     height: 92px;
     display:inline-block;
-    }
+  }
 ^ .firstdiv 
-   {       
+  {       
     width: 223px;
     height: 92px;
     border-radius: 2px;
     margin-left:0px;
     margin-bottom:140px;
-    }
+  }
 ^ .label
-    {
+  {
     width: 15px;
     height: 30px;
     font-family: Roboto;
@@ -31,10 +32,9 @@ foam.CLASS({
     color: #093649;
     padding-top:15px;
     margin-left:5px;
-    }
-
-^ .statuslabel 
-    {
+  }
+		^ .statuslabel 
+  {
 		width: 37px;
 		height: 20px;
 		font-family: Roboto;
@@ -47,18 +47,18 @@ foam.CLASS({
 		text-align: left;
 		color: #ffffff;
 		padding-left:10px;
-    }
+  }
 ^ .ticketCount 
-    {
+  {
 		width: 57px;
 		height: 20px;
 		border-radius: 100px;
 		background-color: #a4b3b8;
 		margin-left:5px;
 		margin-top:7px; 	         
-    }
+  }
     `,
-    methods:
+		methods:
     [
     function initE(){
         this

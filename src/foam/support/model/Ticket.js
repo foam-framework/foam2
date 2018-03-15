@@ -7,13 +7,17 @@
 foam.CLASS({
     package: 'foam.support.model',
     name: 'Ticket',
+
     documentation: 'First Ticket Modal',
+
     javaImports: [
       'java.util.Date'
     ],
+
     tableColumns: [
       'id','supportEmail', 'subject', 'createdAt', 'status'
     ],
+
     properties: [
       {
         class: 'Long',
@@ -44,7 +48,6 @@ foam.CLASS({
         name: 'createdAt',
         label: 'Time',
         tableCellFormatter: function(state, obj, rel){
-          //var d=new Date('d-M-Y');
           var d = new Date();
           var locale = "en-us";
           var month = d.toLocaleString(locale, {month: "short"});
@@ -68,5 +71,5 @@ foam.CLASS({
           .end()
       }
     }
-    ]
-  });
+  ]
+});
