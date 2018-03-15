@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Input',
   extends: 'foam.u2.View',
 
+  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+
   properties: [
     [ 'nodeName', 'input' ],
     {
@@ -56,10 +58,6 @@ foam.CLASS({
     'type',
     'placeholder'
   ],
-
-  css: `
-    ^:read-only { border: none; background: rgba(0,0,0,0); }
-  `,
 
   methods: [
     function initE() {

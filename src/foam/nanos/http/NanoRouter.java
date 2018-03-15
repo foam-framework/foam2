@@ -26,9 +26,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
+/**
+ * Top-Level Router Servlet.
+ * Routes servlet requests based on NSpecDAO configuration.
+ * Services can be exported as either Box Skeletons or as WebAgents/Servlets.
+ * WebAgents require the service.run.<nspecname> permission.
+ */
 public class NanoRouter
-    extends HttpServlet
-    implements NanoService, ContextAware
+  extends HttpServlet
+  implements NanoService, ContextAware
 {
   protected X x_;
 
@@ -38,14 +44,14 @@ public class NanoRouter
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
-    String      path       = req.getRequestURI();
-    String[]    urlParams  = path.split("/");
-    String      serviceKey = urlParams[2];
-    Object      service    = getX().get(serviceKey);
-    DAO         nSpecDAO   = (DAO) getX().get("nSpecDAO");
-    NSpec       spec       = (NSpec) nSpecDAO.find(serviceKey);
-    WebAgent    serv       = getWebAgent(spec, service);
-    PM          pm         = new PM(this.getClass(), serviceKey);
+    String   path       = req.getRequestURI();
+    String[] urlParams  = path.split("/");
+    String   serviceKey = urlParams[2];
+    Object   service    = getX().get(serviceKey);
+    DAO      nSpecDAO   = (DAO) getX().get("nSpecDAO");
+    NSpec    spec       = (NSpec) nSpecDAO.find(serviceKey);
+    WebAgent serv       = getWebAgent(spec, service);
+    PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
 

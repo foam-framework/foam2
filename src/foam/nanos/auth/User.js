@@ -15,14 +15,14 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.nanos.auth.Phone',
-    'foam.nanos.auth.Address'
+    'foam.nanos.auth.Address',
+    'foam.nanos.auth.Phone'
   ],
 
   documentation: '',
 
   tableColumns: [
-    'id', 'enabled', 'type', 'group', 'firstName', 'lastName', 'organization', 'email'
+    'id', 'enabled', 'type', 'group', 'spid', 'firstName', 'lastName', 'organization', 'email'
   ],
 
   properties: [
@@ -33,11 +33,9 @@ foam.CLASS({
       tableWidth: 45
     },
     {
-      class: 'String',
-      // class: 'SPID',
-      label: 'Service Provider',
-      name: 'spid',
-      documentation: "User's service provider."
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     },
     {
       class: 'DateTime',
@@ -48,7 +46,12 @@ foam.CLASS({
       name: 'firstName',
       shortName:'f',
       aliases:['fname','fn','first'],
-      tableWidth: 160
+      tableWidth: 160,
+      validateObj: function(firstName) {
+        if ( firstName.length > 70 ) {
+          return 'First name cannot exceed 70 characters.';
+        }
+      }
     },
     {
       class: 'String',
@@ -57,14 +60,24 @@ foam.CLASS({
     {
       class: 'String',
       name: 'lastName',
-      tableWidth: 160
+      tableWidth: 160,
+      validateObj: function (lastName) {
+        if ( lastName.length > 70 ) {
+          return 'Last name cannot exceed 70 characters.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'organization',
       displayWidth: 80,
       width: 100,
-      tableWidth: 160
+      tableWidth: 160,
+      validateObj: function (organization) {
+        if ( organization.length > 35 ) {
+          return 'Organization name cannot exceed 35 characters.';
+        }
+      }
     },
     {
       class: 'String',
@@ -80,21 +93,33 @@ foam.CLASS({
         return val.toLowerCase();
       },
       javaSetter:
-`email_ = val.toLowerCase();
-emailIsSet_ = true;`
+      `email_ = val.toLowerCase();
+       emailIsSet_ = true;`,
+      validateObj: function (email) {
+        var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        if ( ! emailRegex.test(email) ) {
+          return 'Invalid email address.';
+        }
+      }
+    },
+    {
+      class: 'Boolean',
+      name: 'emailVerified',
+      documentation: 'Email verified flag'
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'phone',
-      factory: function() { return this.Phone.create(); },
+      factory: function () { return this.Phone.create(); },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Phone',
       name: 'mobile',
-      factory: function() { return this.Phone.create(); },
+      factory: function () { return this.Phone.create(); },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
     },
     {
@@ -111,7 +136,7 @@ emailIsSet_ = true;`
       name: 'birthday'
     },
     {
-      class: 'File',
+      class: 'foam.nanos.fs.FileProperty',
       name: 'profilePicture',
       view: { class: 'foam.nanos.auth.ProfilePictureView' }
     },
@@ -119,7 +144,7 @@ emailIsSet_ = true;`
       class: 'FObjectProperty',
       of: 'foam.nanos.auth.Address',
       name: 'address',
-      factory: function() { return this.Address.create(); },
+      factory: function () { return this.Address.create(); },
       view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
@@ -144,7 +169,14 @@ emailIsSet_ = true;`
       class: 'Password',
       name: 'password',
       displayWidth: 30,
-      width: 100
+      width: 100,
+      validateObj: function (password) {
+        var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
+
+        if ( ! re.test(password) ) {
+          return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
+        }
+      }
     },
     {
       class: 'Password',
@@ -156,6 +188,10 @@ emailIsSet_ = true;`
     {
       class: 'DateTime',
       name: 'passwordLastModified'
+    },
+    {
+      class: 'DateTime',
+      name: 'passwordExpiry'
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
@@ -170,18 +206,35 @@ emailIsSet_ = true;`
       class: 'String',
       name: 'businessName',
       documentation: 'Name of the business',
-      width: 50
+      width: 50,
+      validateObj: function (businessName) {
+        if ( businessName.length > 35 ) {
+          return 'Business name cannot be greater than 35 characters.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'businessIdentificationNumber',
       width: 35,
-      documentation: 'Business Identification Number (BIN)'
+      documentation: 'Business Identification Number (BIN)',
+      validateObj: function (businessIdentificationNumber) {
+        var re = /^[a-zA-Z0-9 ]{1,35}$/;
+        if (  businessIdentificationNumber.length > 0 && ! re.test(businessIdentificationNumber) ) {
+          return 'Invalid registration number.'
+        }
+      }
     },
     {
       class: 'String',
       name: 'issuingAuthority',
-      width: 35
+      width: 35,
+      validateObj: function (issuingAuthority) {
+        var re = /^[a-zA-Z0-9 ]{1,35}$/;
+        if ( issuingAuthority.length > 0 && ! re.test(issuingAuthority) ) {
+          return 'Invalid issuing authority.';
+        }
+      }
     },
     {
       class: 'String',
@@ -198,7 +251,19 @@ emailIsSet_ = true;`
       class: 'URL',
       name: 'website',
       displayWidth: 80,
-      width: 2048
+      width: 2048,
+      validateObj: function (website) {
+        var websiteRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9]\.[^\s]{2,})/;
+
+        if ( website.length > 0 && ! websiteRegex.test(website) ) {
+          return 'Invalid website';
+        }
+      }
+    },
+    {
+      class: 'Date',
+      name: 'lastModified',
+      documentation: 'Last modified date'
     }
   ],
 
@@ -232,5 +297,20 @@ foam.RELATIONSHIP({
   sourceProperty: {
     hidden: true,
     transient: true
+  }
+});
+
+foam.RELATIONSHIP({
+  cardinality: '1:*',
+  sourceModel: 'foam.nanos.auth.ServiceProvider',
+  targetModel: 'foam.nanos.auth.User',
+  forwardName: 'users',
+  inverseName: 'spid',
+  sourceProperty: {
+    hidden: true
+  },
+  targetProperty: {
+    hidden: false,
+    tableWidth: 120
   }
 });

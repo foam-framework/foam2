@@ -44,6 +44,16 @@ foam.CLASS({
       name: 'storageTransient'
     },
     {
+      class: 'Boolean',
+      documentation: 'define a property is a XML attribute. eg <foo id="XMLAttribute"></foo>',
+      name: 'xmlAttribute'
+    },
+    {
+      class: 'Boolean',
+      documentation: 'define a property is a XML textNode. eg <foo id="1">textNode</foo>',
+      name: 'xmlTextNode'
+    },
+    {
       class: 'String',
       name: 'sqlType'
     },
@@ -169,6 +179,18 @@ foam.CLASS({
             type: 'boolean',
             visibility: 'public',
             body: 'return ' + this.storageTransient + ';'
+          },
+          {
+            name: 'getXMLAttribute',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlAttribute + ';'
+          },
+          {
+            name: 'getXMLTextNode',
+            type: 'boolean',
+            visibility: 'public',
+            body: 'return ' + this.xmlTextNode + ';'
           },
           {
             name: 'getRequired',

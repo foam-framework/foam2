@@ -27,6 +27,8 @@ public interface PropertyInfo
 
   public boolean getNetworkTransient();
   public boolean getStorageTransient();
+  public boolean getXMLAttribute();
+  public boolean getXMLTextNode();
   public boolean getRequired();
   public Class getValueClass();
   public String getName();

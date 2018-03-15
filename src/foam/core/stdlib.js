@@ -265,7 +265,7 @@ foam.LIB({
       var str = f.
           toString().
           replace(/(\r\n|\n|\r)/gm,'');
-      var isArrowFunction = str.indexOf('function') !== 0;
+      var isArrowFunction = !/(async )?function/.test(str);
 
       var match = isArrowFunction ?
           // (...args...) => ...
@@ -273,14 +273,14 @@ foam.LIB({
           // arg => ...
           match = str.match(/^(\(([^)]*)\)[^=]*|([^=]+))=>/) :
           // function (...args...) { ...body... }
-          match = str.match(/^function(\s+[_$\w]+|\s*)\((.*?)\)/);
+          match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
         /* istanbul ignore next */
         throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
-      return isArrowFunction ? (match[2] || match[1] || '') : (match[2] || '');
+      return isArrowFunction ? (match[2] || match[1] || '') : (match[3] || '');
     },
 
     function argNames(f) {
@@ -894,7 +894,17 @@ foam.LIB({
       function diff(a, b)    {
         var t = typeOf(a);
         return t.diff ? t.diff(a, b) : undefined;
-      }
+      },
+      function flagFilter(flags) {
+        return function(a) {
+          if ( ! flags ) return true;
+          if ( ! a.flags ) return true;
+          for ( var i = 0, f; f = flags[i]; i++ ) {
+            if ( a.flags.indexOf(f) != -1 ) return true;
+          }
+          return false;
+        }
+      },
     ]
   });
 })();
@@ -1026,6 +1036,7 @@ foam.LIB({
              c ;
     },
 
+    // Gets replaced in mlang.js
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);

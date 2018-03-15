@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class UserAndGroupAuthServiceTest
-    extends CachedUserAndGroupAuthService
+  extends CachedUserAndGroupAuthService
 {
 
   protected int numUsers        = 10;
@@ -21,6 +21,10 @@ public class UserAndGroupAuthServiceTest
   protected ArrayList<X> xArray               = new ArrayList<>();
   protected ArrayList<User> userArray         = new ArrayList<>();
   protected ArrayList<Permission> permissions = new ArrayList<>();
+
+  public UserAndGroupAuthServiceTest(X x) {
+    super(x);
+  }
 
   @Override
   public void start() {

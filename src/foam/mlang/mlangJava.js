@@ -13,7 +13,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'Object'
@@ -66,7 +66,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'boolean'
@@ -127,7 +127,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaCode: 'return false;',
@@ -408,11 +408,11 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
-      javaReturns: 'foam.core.FObject',
-      javaCode: `return (foam.core.FObject) getArg1().f(obj);`
+      javaReturns: 'Object',
+      javaCode: `return getArg1().f(obj);`
     },
     {
       name: 'put',
@@ -420,7 +420,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -540,6 +540,33 @@ return ( arg1 instanceof String && ((String) arg1).toUpperCase().startsWith(arg2
       name: 'createStatement',
       javaReturns: 'String',
       javaCode: `return " '" + getArg1().createStatement() + "' ilike '" + getArg2().createStatement() + "%' ";`
+    }
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.mlang.predicate.EndsWith',
+
+  methods: [
+    {
+      name: 'f',
+      javaCode: `
+        Object arg1 = getArg1().f(obj);
+        String arg2 = (String) getArg2().f(obj);
+        if ( arg1 instanceof String[] ) {
+          for ( String s : (String[]) arg1 ) {
+            if ( s.endsWith(arg2) )
+              return true;
+          }
+        }
+        return ( arg1 instanceof String && ((String) arg1).endsWith(arg2) );
+      `
+    },
+    {
+      name: 'createStatement',
+      javaReturns: 'String',
+      javaCode: `return " '" + getArg1().createStatement() + "' like '%" + getArg2().createStatement() + "' ";`
     }
   ]
 });
@@ -955,7 +982,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -978,7 +1005,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1003,7 +1030,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1030,7 +1057,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1125,7 +1152,7 @@ if ( ! ( getArg1().f(obj) instanceof String) )
   return false;
 
 String arg1 = ((String) getArg1().f(obj)).toUpperCase();
-List props = obj.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+List props = ((foam.core.FObject)obj).getClassInfo().getAxiomsByClass(PropertyInfo.class);
 Iterator i = props.iterator();
 while ( i.hasNext() ) {
   PropertyInfo prop = (PropertyInfo) i.next();
@@ -1165,7 +1192,7 @@ foam.CLASS({
       args: [
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         },
         {
           name: 'sub',
@@ -1197,13 +1224,13 @@ if ( getProcessArrayValuesIndividually() && arg1 instanceof Object[] ) {
         },
         {
           name: 'obj',
-          javaType: 'foam.core.FObject'
+          javaType: 'Object'
         }
       ],
       javaCode:
 `foam.dao.Sink group = (foam.dao.Sink) getGroups().get(key);
  if ( group == null ) {
-   group = (foam.dao.Sink) ((foam.core.FObject) getArg2()).fclone();
+   group = (foam.dao.Sink) (((foam.core.FObject)getArg2()).fclone());
    getGroups().put(key, group);
    getGroupKeys().add(key);
  }

@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 foam.CLASS({
   package: 'foam.nanos.u2.navigation',
   name: 'TopNavigation',
@@ -44,18 +61,22 @@ foam.CLASS({
         }
         ^ .menuItem{
           display: inline-block;
-          padding: 20px 0 10px 0px;
+          padding: 20px 0 5px 0px;
           cursor: pointer;
-          border-bottom: 4px solid transparent;
-          transition: text-shadow;
+          border-bottom: 1px solid transparent;
+          -webkit-transition: all .15s ease-in-out;
+          -moz-transition: all .15s ease-in-out;
+          -ms-transition: all .15s ease-in-out;
+          -o-transition: all .15s ease-in-out;
+          transition: all .15s ease-in-out;
         }
-        ^ .menuItem:hover {
-          border-bottom: 4px solid #1cc2b7;
+        ^ .menuItem:hover, ^ .menuItem.hovered {
+          border-bottom: 1px solid white;
           padding-bottom: 5px;
           text-shadow: 0 0 0px white, 0 0 0px white;
         }
         ^ .selected {
-          border-bottom: 4px solid #1cc2b7;
+          border-bottom: 1px solid #1cc2b7 !important;
           padding-bottom: 5px;
           text-shadow: 0 0 0px white, 0 0 0px white;
         }
