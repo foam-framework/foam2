@@ -77,7 +77,7 @@ foam.CLASS({
       label: 'URL',
       displayWidth: 100
     }
-  ]
+  ],
 
   methods: [
   ]
