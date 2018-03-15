@@ -22,6 +22,7 @@ foam.CLASS({
       {
         class: 'Long',
         name: 'id',
+        visibility: foam.u2.Visibility.RO,
         label:'Ticket ID'
       }, 
       {
@@ -46,6 +47,7 @@ foam.CLASS({
       {
         class: 'DateTime',
         name: 'createdAt',
+        visibility: foam.u2.Visibility.RO,
         label: 'Time',
         tableCellFormatter: function(state, obj, rel){
           var d = new Date();
