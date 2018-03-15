@@ -70,7 +70,6 @@ foam.CLASS({
           start().addClass('generic-status Ticket-Status-'+ state)
               .start().add(state).addClass('generic-status Ticket-Label-'+ state).end()
           .end()
-        
       }
     }
     ]
