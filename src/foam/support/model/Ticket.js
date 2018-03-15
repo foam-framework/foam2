@@ -15,7 +15,6 @@ foam.CLASS({
       'id','supportEmail', 'subject', 'createdAt', 'status'
     ],
     properties: [
-    
       {
         class: 'Long',
         name: 'id',
@@ -34,7 +33,6 @@ foam.CLASS({
         class: 'String',
         name: 'subject',
         label:'Subject',
-      
       },
       {
         class: 'String',
@@ -52,9 +50,7 @@ foam.CLASS({
           var month = d.toLocaleString(locale, {month: "short"});
           var date=d.getDate();
           var year=d.getFullYear();
-          console.log(month);
           this.start().add(month+" "+date+", "+year);
-        
         }
       },
       {
@@ -73,5 +69,4 @@ foam.CLASS({
       }
     }
     ]
-  
   });
