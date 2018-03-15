@@ -501,5 +501,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/SignedFObject" },
 
   //Support
-  { name: "foam/support/model/Ticket" }
+  { name: "foam/support/model/Ticket" },
+  { name: "foam/support/view/TicketView"}
 ]);
