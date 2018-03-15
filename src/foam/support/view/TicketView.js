@@ -11,34 +11,21 @@ foam.CLASS({
   imports: [ 'ticketDAO' ,'createLabel'],
 
   css:`
-  ^ .foam-u2-view-TableView-foam-support-model-Ticket
-  {
+  ^ {
+    width: 992px;
+    margin: auto;
+  }
+  ^ .foam-u2-view-TableView-foam-support-model-Ticket {
     margin-top:30px;
   } 
-  ^ .foam-u2-UnstyledActionView-create
-  {
+  ^ .foam-u2-UnstyledActionView-create {
+    float: right;
     width: 135px;
     height: 40px;
+    color: white;
     background-color: #59a5d5;
-    margin-top: 70px;
-    margin-right: 150px;
-    position:absolute;
-    top:0;
-    right:0;
-  }
-  ^ #v36
-  {
-    width: 56px;
-    height: 40px;
-    font-family: Roboto;
-    font-size: 14px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 2.86;
-    letter-spacing: 0.2px;
-    text-align: center;
-    color: #ffffff;
+    border: none;
+    margin: 0 20px 20px;
   }
   `,
 
