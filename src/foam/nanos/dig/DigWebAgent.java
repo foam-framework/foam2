@@ -225,7 +225,8 @@ public class DigWebAgent
               obj = (FObject) objs[j];
               dao.put(obj);
             }
-            out.println("Success");
+            outputterJson.output(objs);
+            out.println(outputterJson);
             return;
           }
 
