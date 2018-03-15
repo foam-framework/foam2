@@ -26,9 +26,7 @@ foam.CLASS({
       name: 'length'
     },
     {
-      class: 'Object',
       name: 'data',
-      javaType: 'java.nio.ByteBuffer',
       factory: function() {
         return new ArrayBuffer(this.length);
       }
@@ -45,6 +43,8 @@ foam.CLASS({
 foam.INTERFACE({
   package: 'foam.blob',
   name: 'Blob',
+
+  javaExtends: [ 'java.io.Closeable' ],
 
   methods: [
     {
@@ -151,20 +151,21 @@ foam.INTERFACE({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'AbstractBlob',
   abstract: true,
 
-  implements: ['foam.blob.Blob'],
+  implements: [ 'foam.blob.Blob' ],
 
   methods: [
     function pipe(writeFn) {
       var self = this;
 
       var offset = 0;
-      var buf = Buffer.alloc(8192 * 4);
-      var limit = self.size;
+      var buf    = Buffer.alloc(8192 * 4);
+      var limit  = self.size;
 
       function a() {
         if ( offset > limit ) {
@@ -181,6 +182,7 @@ foam.CLASS({
 
       return a();
     },
+
     function slice(offset, length) {
       return foam.blob.SubBlob.create({
         parent: this,
@@ -191,12 +193,13 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'AbstractBlobService',
   abstract: true,
 
-  implements: ['foam.blob.BlobService'],
+  implements: [ 'foam.blob.BlobService' ],
 
   requires: [
     'foam.blob.ProxyBlobService'
@@ -209,6 +212,7 @@ foam.CLASS({
         return this.ProxyBlobService.create({ delegate: this }, x);
       }
     },
+
     function put(blob) {
       return this.put_(this.__context__, blob);
     },
@@ -222,6 +226,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.blob',
@@ -240,6 +245,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'ProxyBlobService',
@@ -257,10 +263,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'SubBlob',
   extends: 'foam.blob.AbstractBlob',
+
   properties: [
     {
       class: 'Blob',
@@ -278,6 +286,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function read(buffer, offset) {
       if ( buffer.length > this.size - offset) {
@@ -301,6 +310,7 @@ foam.CLASS({
   package: 'foam.blob',
   name: 'BlobBlob',
   extends: 'foam.blob.AbstractBlob',
+
   properties: [
     'blob',
     {
@@ -310,6 +320,7 @@ foam.CLASS({
       }
     }
   ],
+
   methods: [
     function read(buffer, offset) {
       var self = this;
@@ -332,13 +343,17 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'IdentifiedBlob',
   extends: 'foam.blob.ProxyBlob',
+
   imports: [
+    'blobStore?',
     'blobService'
   ],
+
   properties: [
     {
       class: 'String',
@@ -347,16 +362,20 @@ foam.CLASS({
     {
       name: 'delegate',
       transient: true,
+      cloneProperty: function(){},
+      javaCloneProperty: '//nop',
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobService()).find(getId());'
+      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
     }
   ],
+
   methods: [
     function compareTo(other) {
       return foam.blob.IdentifiedBlob.isInstance(other) && other.id == this.id;
     },
+
     function read(buffer, offset) {
       return this.delegate.then(function(d) {
         return d.read(buffer, offset);
@@ -364,6 +383,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.core',
@@ -391,6 +411,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.blob',
@@ -443,6 +464,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobStore',
@@ -476,7 +498,9 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'isSet',
-      value: false
+      value: false,
+      hidden: true,
+      transient: true
     }
   ],
 
@@ -642,6 +666,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'RestBlobService',
@@ -658,9 +683,19 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
+      name: 'serviceName'
+    },
+    {
+      class: 'String',
       name: 'address',
       factory: function() {
-        return window.location.origin + "/httpBlobService";
+        var sessionId = localStorage['defaultSession'];
+        var url = window.location.origin + '/' + this.serviceName
+        // attach session id if available
+        if ( sessionId ) {
+          url += '?sessionId=' + sessionId;
+        }
+        return url;
       }
     }
   ],
@@ -712,19 +747,23 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.blob',
   name: 'BlobServiceDecorator',
-  implements: ['foam.dao.DAODecorator'],
+  extends: 'foam.dao.AbstractDAODecorator',
+
   imports: [
     'blobService'
   ],
+
   properties: [
     {
       class: 'Class',
       name: 'of'
     }
   ],
+
   methods: [
     function write(X, dao, obj, existing) {
       var i = 0;
@@ -745,12 +784,6 @@ foam.CLASS({
           return a();
         });
       });
-    },
-    function read(X, dao, obj) {
-      return Promise.resolve(obj);
-    },
-    function remove(X, dao, obj) {
-      return Promise.resolve(obj);
     }
   ]
 });
@@ -765,6 +798,7 @@ foam.CLASS({
     'foam.blob.IdentifiedBlob',
     'foam.blob.BlobBlob'
   ],
+
   properties: [
     {
       class: 'Map',
@@ -776,17 +810,20 @@ foam.CLASS({
       value: 1
     }
   ],
+
   methods: [
     function put_(x, file) {
       var id = this.nextId++;
       this.blobs[id] = file;
       return Promise.resolve(this.IdentifiedBlob.create({ id: id }));
     },
+
     function find_(x, id) {
       return Promise.resolve(this.blobs[id] ?
                              this.BlobBlob.create({ blob: this.blobs[id] }) :
                              null);
     },
+
     function urlFor_(x, blob) {
       if ( this.IdentifiedBlob.isInstance(blob) ) {
         return URL.createObjectURL(this.blobs[blob.id]);

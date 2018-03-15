@@ -10,6 +10,8 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +22,7 @@ import java.util.TimeZone;
 
 public class Outputter
   extends AbstractSink
+  implements foam.lib.Outputter
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -109,8 +112,7 @@ public class Outputter
       if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
 
       // filter out unsupported types
-      if ( prop instanceof AbstractMultiPartIDPropertyInfo ||
-           prop instanceof AbstractArrayPropertyInfo ||
+      if ( prop instanceof AbstractArrayPropertyInfo ||
            prop instanceof AbstractFObjectArrayPropertyInfo ||
            prop instanceof AbstractFObjectPropertyInfo ) {
         continue;
@@ -204,11 +206,23 @@ public class Outputter
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
+  public void put(Object obj, Detachable sub) {
     if ( outputHeaders_ && ! isHeadersOutput_ ) {
-      outputHeaders(obj);
+      outputHeaders((FObject)obj);
       isHeadersOutput_ = true;
     }
-    outputFObject(obj);
+    outputFObject((FObject)obj);
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(stringWriter_);
+    IOUtils.closeQuietly(writer_);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    if ( stringWriter_ != null ) stringWriter_.flush();
+    if ( writer_ != null ) writer_.flush();
   }
 }

@@ -7,125 +7,106 @@
 package foam.nanos.blob;
 
 import foam.blob.*;
-import foam.core.ContextAware;
 import foam.core.X;
-import foam.nanos.NanoService;
+import foam.lib.json.Outputter;
+import foam.lib.json.OutputterMode;
+import foam.nanos.boot.NSpec;
+import foam.nanos.boot.NSpecAware;
+import foam.nanos.http.WebAgent;
+import org.apache.commons.io.IOUtils;
 
-import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.WritableByteChannel;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class HttpBlobService
-    extends HttpServlet
-    implements NanoService, ContextAware, BlobService
+    extends ProxyBlobService
+    implements WebAgent
 {
   public static final int BUFFER_SIZE = 8192;
 
-  private foam.core.X x_;
+  protected String name_;
 
-  private foam.blob.BlobService store_;
+  public HttpBlobService(X x, BlobService delegate) {
+    this(x, "httpBlobService", delegate);
+  }
 
-  @Override
-  public Blob put(Blob blob) {
-    return this.put_(getX(), blob);
+  public HttpBlobService(X x, String name, BlobService delegate) {
+    setX(x);
+    setDelegate(delegate);
+    name_ = name;
   }
 
   @Override
-  public Blob put_(X x, Blob blob) {
-    return this.store_.put_(x, blob);
-  }
+  public void execute(X x) {
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
 
-  @Override
-  public Blob find(Object id) {
-    return this.find_(getX(), id);
-  }
-
-  @Override
-  public Blob find_(X x, Object id) {
-    return this.store_.find_(x, id);
-  }
-
-  @Override
-  public String urlFor(Blob blob) {
-    return this.urlFor_(getX(), blob);
-  }
-
-  @Override
-  public String urlFor_(X x, Blob blob) {
-    return this.store_.urlFor_(x, blob);
-  }
-
-  @Override
-  public foam.core.X getX() {
-    return x_;
-  }
-
-  @Override
-  public void setX(foam.core.X x) {
-    x_ = x;
-  }
-
-  @Override
-  public void start() {
-    store_ = (foam.blob.BlobService)getX().get("blobStore");
-  }
-
-  @Override
-  protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-      throws javax.servlet.ServletException, java.io.IOException
-  {
-    String path = req.getRequestURI();
-    String id = path.substring(path.lastIndexOf("/") + 1);
-
-    foam.blob.Blob blob = store_.find(id);
-
-    if ( blob == null ) {
-      resp.setStatus(resp.SC_NOT_FOUND);
-      return;
-    }
-
-    long chunk = 0;
-    long size = blob.getSize();
-    long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-    Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
-
-    resp.setStatus(resp.SC_OK);
-    if ( blob instanceof FileBlob ) {
-      File file = ((FileBlob) blob).getFile();
-      resp.setHeader("Content-Type", Files.probeContentType(Paths.get(file.toURI())));
-    } else {
-      resp.setHeader("Content-Type", "application/octet-stream");
-    }
-    resp.setHeader("Content-Length", Long.toString(size, 10));
-    resp.setHeader("ETag", id);
-    resp.setHeader("Cache-Control", "public");
-
-    java.io.OutputStream output = resp.getOutputStream();
-    WritableByteChannel channel = Channels.newChannel(output);
-
-    while ( chunk < chunks ) {
-      buffer = blob.read(buffer, chunk * BUFFER_SIZE);
-      if ( buffer == null ) {
-        break;
+    try {
+      if ( "GET".equals(req.getMethod()) ) {
+        download(x);
+      } else if ( "PUT".equals(req.getMethod()) ) {
+        upload(x);
       }
-      channel.write(buffer.getData());
-      buffer.getData().clear();
-      chunk++;
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
     }
-    output.flush();
-    output.close();
   }
 
-  @Override
-  protected void doPut(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
-      throws javax.servlet.ServletException, java.io.IOException
-  {
-    HttpServletRequestBlob blob = new HttpServletRequestBlob(req);
-    Blob result = store_.put(blob);
-    new foam.lib.json.Outputter(resp.getWriter(), foam.lib.json.OutputterMode.NETWORK).output(result);
+  protected void download(X x) {
+    OutputStream os = null;
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+
+    try {
+      String path = req.getRequestURI();
+      String id = path.replaceFirst("/service/" + name_ + "/", "");
+
+      Blob blob = getDelegate().find(id);
+      if ( blob == null ) {
+        resp.setStatus(resp.SC_NOT_FOUND);
+        return;
+      }
+
+      long size = blob.getSize();
+      resp.setStatus(resp.SC_OK);
+      if ( blob instanceof FileBlob ) {
+        File file = ((FileBlob) blob).getFile();
+        resp.setContentType(Files.probeContentType(Paths.get(file.toURI())));
+      } else {
+        resp.setContentType("application/octet-stream");
+      }
+      resp.setHeader("Content-Length", Long.toString(size, 10));
+      resp.setHeader("ETag", id);
+      resp.setHeader("Cache-Control", "public");
+
+      os = resp.getOutputStream();
+      blob.read(os, 0, size);
+      os.close();
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new RuntimeException(t);
+    } finally {
+      IOUtils.closeQuietly(os);
+    }
+  }
+
+  protected void upload(X x) {
+    InputStreamBlob blob = null;
+    HttpServletRequest  req  = x.get(HttpServletRequest.class);
+    HttpServletResponse resp = x.get(HttpServletResponse.class);
+
+    try {
+      int size = req.getContentLength();
+      blob = new InputStreamBlob(req.getInputStream(), size);
+      new Outputter(resp.getWriter(), OutputterMode.NETWORK).output(getDelegate().put(blob));
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new RuntimeException(t);
+    } finally {
+      IOUtils.closeQuietly(blob);
+    }
   }
 }

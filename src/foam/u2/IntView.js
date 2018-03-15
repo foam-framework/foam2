@@ -20,11 +20,7 @@ foam.CLASS({
   name: 'IntView',
   extends: 'foam.u2.TextField',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: '^:read-only { border: none; background: rgba(0,0,0,0); }'
-    })
-  ],
+  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
 
   properties: [
     [ 'type', 'number' ],

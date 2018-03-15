@@ -6,6 +6,8 @@
 
 package foam.core;
 
+import foam.crypto.hash.Hasher;
+import foam.crypto.sign.Signer;
 import foam.dao.SQLStatement;
 import foam.lib.parse.Parser;
 import foam.mlang.Expr;
@@ -18,16 +20,19 @@ import java.util.Map;
 
 // ???: Why is this interface mutable?
 public interface PropertyInfo
-    extends Expr, Comparator, SQLStatement, Axiom
+    extends Axiom, Comparator, Expr, SQLStatement, Validator, Hasher, Signer
 {
   public PropertyInfo setClassInfo(ClassInfo p);
   public ClassInfo getClassInfo();
 
   public boolean getNetworkTransient();
   public boolean getStorageTransient();
+  public boolean getXMLAttribute();
+  public boolean getXMLTextNode();
   public boolean getRequired();
   public Class getValueClass();
   public String getName();
+  public byte[] getNameAsByteArray();
   public Object get(Object obj);
   public void set(Object obj, Object value);
   public Parser jsonParser();
@@ -35,6 +40,7 @@ public interface PropertyInfo
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
   public void toCSV(foam.lib.csv.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
+  public Object fromString(String value);
   public void setFromString(Object obj, String value);
   public Object fromXML(X x, XMLStreamReader reader);
   public void toXML(FObject obj, Document doc, Element objElement);
@@ -45,4 +51,5 @@ public interface PropertyInfo
   public boolean isDefaultValue(Object obj);
   public void setStatementValue(foam.dao.pg.IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException;
   public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException;
+  public void cloneProperty(FObject source, FObject dest);
 }

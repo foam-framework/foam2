@@ -6,18 +6,23 @@
 
 package foam.lib.json;
 
-import foam.core.*;
+import foam.core.ClassInfo;
+import foam.core.Detachable;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.util.encoders.Base64;
+
+import java.io.*;
+import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 
 public class Outputter
   extends AbstractSink
+  implements foam.lib.Outputter
 {
 
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
@@ -29,9 +34,23 @@ public class Outputter
     }
   };
 
-  protected StringWriter stringWriter_ = null;
-  protected PrintWriter writer_;
+  protected StringWriter  stringWriter_ = null;
+  protected PrintWriter   writer_;
   protected OutputterMode mode_;
+  protected boolean       outputDefaultValues_ = false;
+  protected boolean       outputClassNames_ = true;
+
+  // Hash properties
+  protected String        hashAlgo_ = "SHA-256";
+  protected boolean       outputHash_ = false;
+  protected boolean       rollHashes_ = false;
+  protected byte[]        previousHash_ = null;
+  protected final Object  hashLock_ = new Object();
+
+  // signing properties
+  protected String        signAlgo_ = null;
+  protected PrivateKey    signingKey_ = null;
+  protected boolean       outputSignature_ = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -80,9 +99,10 @@ public class Outputter
 
   public String escape(String s) {
     return s
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
       .replace("\t", "\\t")
-      .replace("\n","\\n")
-      .replace("\"", "\\\"");
+      .replace("\n","\\n");
   }
 
   protected void outputNumber(Number value) {
@@ -194,33 +214,81 @@ public class Outputter
     outputString(sdf.get().format(date));
   }
 
+  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+    if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
+
+    Object value = prop.get(fo);
+    if ( value == null ) return false;
+    if ( includeComma ) writer_.append(",");
+    outputProperty(fo, prop);
+    return true;
+  }
+
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
     writer_.append("{");
-    writer_.append(beforeKey_());
-    writer_.append("class");
-    writer_.append(afterKey_());
-    writer_.append(":");
-
-    outputString(info.getId());
-
+    if ( outputClassNames_ ) {
+      writer_.append(beforeKey_());
+      writer_.append("class");
+      writer_.append(afterKey_());
+      writer_.append(":");
+      outputString(info.getId());
+    }
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
-
+    boolean outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( prop instanceof AbstractMultiPartIDPropertyInfo ) continue;
+      outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
+    }
 
-      Object value = prop.get(o);
-      if ( value == null ) continue;
-
+    if ( outputHash_ ) {
       writer_.append(",");
-      outputProperty(o, prop);
+      outputHash(o);
+    }
+
+    if ( outputSignature_ ) {
+      writer_.append(",");
+      outputSignature(o);
     }
 
     writer_.append("}");
+  }
+
+  protected void outputHash(FObject o) {
+    String hash;
+    if ( rollHashes_ ) {
+      synchronized ( hashLock_ ) {
+        previousHash_ = o.hash(hashAlgo_, previousHash_);
+        hash = Base64.toBase64String(previousHash_);
+      }
+    } else {
+      hash = Base64.toBase64String(
+          o.hash(hashAlgo_, null));
+    }
+
+    writer_.append(beforeKey_())
+        .append("hash")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(hash)
+        .append("\"");
+  }
+
+  protected void outputSignature(FObject o) {
+    String signature = Base64.toBase64String(
+        o.sign(signAlgo_, signingKey_));
+
+    writer_.append(beforeKey_())
+        .append("signature")
+        .append(afterKey_())
+        .append(":")
+        .append("\"")
+        .append(signature)
+        .append("\"");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -231,7 +299,11 @@ public class Outputter
     writer_.append(",");
     outputString("forClass_");
     writer_.append(":");
-    outputString(prop.getClassInfo().getId() + "." + prop.getName());
+    outputString(prop.getClassInfo().getId());
+    writer_.append(",");
+    outputString("name");
+    writer_.append(":");
+    outputString(prop.getName());
     writer_.append("}");
   }
 
@@ -253,11 +325,55 @@ public class Outputter
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
-    outputFObject(obj);
+  public void put(Object obj, Detachable sub) {
+    outputFObject((FObject)obj);
   }
 
   public void outputRawString(String str) {
     writer_.append(str);
+  }
+
+  public void setOutputDefaultValues(boolean outputDefaultValues) {
+    outputDefaultValues_ = outputDefaultValues;
+  }
+
+  public void setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
+  }
+
+  public void setHashAlgorithm(String algorithm) {
+    hashAlgo_ = algorithm;
+  }
+
+  public void setOutputHash(boolean outputHash) {
+    outputHash_ = outputHash;
+  }
+
+  public void setRollHashes(boolean rollHashes) {
+    rollHashes_ = rollHashes;
+  }
+
+  public void setOutputSignature(boolean outputSignature) {
+    outputSignature_ = outputSignature;
+  }
+
+  public void setSigningAlgorithm(String algorithm) {
+    signAlgo_ = algorithm;
+  }
+
+  public void setSigningKey(PrivateKey signingKey) {
+    signingKey_ = signingKey;
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(stringWriter_);
+    IOUtils.closeQuietly(writer_);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    if ( stringWriter_ != null ) stringWriter_.flush();
+    if ( writer_ != null ) writer_.flush();
   }
 }

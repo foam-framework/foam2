@@ -6,26 +6,40 @@
 
 package foam.nanos.boot;
 
-import foam.core.*;
-import foam.dao.*;
-import foam.nanos.script.*;
-import java.io.IOException;
-import static foam.mlang.MLang.*;
+import foam.core.Detachable;
+import foam.core.ProxyX;
+import foam.core.SingletonFactory;
+import foam.core.X;
+import foam.dao.AbstractSink;
+import foam.dao.DAO;
+import foam.dao.JDAO;
+import foam.dao.ProxyDAO;
+import foam.nanos.auth.User;
+import foam.nanos.script.Script;
+import foam.nanos.session.Session;
+
+import static foam.mlang.MLang.EQ;
 
 public class Boot {
   protected DAO serviceDAO_;
   protected X   root_ = new ProxyX();
 
   public Boot() {
-    try {
-      // Used for all the services that will be required when Booting
-      serviceDAO_ = new foam.dao.PMDAO(new JDAO(NSpec.getOwnClassInfo(), "services"));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    this("");
+  }
+
+  public Boot(String datadir) {
+    root_.put(foam.nanos.fs.Storage.class,
+        new foam.nanos.fs.Storage(datadir));
+
+    // Used for all the services that will be required when Booting
+    serviceDAO_ = new JDAO(((foam.core.ProxyX) root_).getX(), NSpec.getOwnClassInfo(), "services");
+
+    installSystemUser();
 
     serviceDAO_.select(new AbstractSink() {
-      public void put(FObject obj, Detachable sub) {
+      @Override
+      public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
         System.out.println("Registering: " + sp.getName());
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
@@ -38,10 +52,12 @@ public class Boot {
     root_ = ((ProxyX) root_).getX();
 
     // Export the ServiceDAO
-    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(serviceDAO_);
+    ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
+        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
-      public void put(FObject obj, Detachable sub) {
+      @Override
+      public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
         System.out.println("Starting: " + sp.getName());
@@ -56,7 +72,21 @@ public class Boot {
       if ( script != null ) {
         script.runScript(root_);
       }
-     }
+    }
+  }
+
+  protected void installSystemUser() {
+    User user = new User();
+    user.setId(1);
+    user.setFirstName("system");
+    user.setGroup("system");
+
+    Session session = new Session();
+    session.setUserId(user.getId());
+    session.setContext(root_);
+
+    root_.put("user", user);
+    root_.put(Session.class, session);
   }
 
   public X getX() { return root_; }
@@ -65,6 +95,26 @@ public class Boot {
     throws java.lang.Exception
   {
     System.out.println("Starting Nanos Server");
-    new Boot();
+
+    boolean datadirFlag = false;
+
+    String datadir = "";
+    for ( int i = 0 ; i < args.length ; i++ ) {
+      String arg = args[i];
+
+      if ( datadirFlag ) {
+        datadir = arg;
+        datadirFlag = false;
+      } else if ( arg.equals("--datadir") ) {
+        datadirFlag = true;
+      } else {
+        System.err.println("Unknown argument " + arg);
+        System.exit(1);
+      }
+    }
+
+    System.out.println("Datadir is " + datadir);
+
+    new Boot(datadir);
   }
 }

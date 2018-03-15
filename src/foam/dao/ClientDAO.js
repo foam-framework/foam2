@@ -116,7 +116,7 @@ return super.find_(null, id);
         if ( ! this.Serializable.isInstance(sink) ) {
           var self = this;
 
-          return this.SUPER(null, null, skip, limit, order, predicate).then(function(result) {
+          return this.SUPER(null, foam.dao.ArraySink.create(), skip, limit, order, predicate).then(function(result) {
             var items = result.array;
 
             if ( ! sink ) return result;
@@ -177,6 +177,7 @@ super.removeAll_(null, skip, limit, order, predicate);
       name: 'listen_',
       code: function listen_(x, sink, predicate) {
         this.SUPER(null, sink, predicate);
+        return foam.core.FObject.create();
       },
       javaCode: `super.listen_(null, sink, predicate);`,
       swiftCode: `return try super.listen_(nil, sink, predicate)`,

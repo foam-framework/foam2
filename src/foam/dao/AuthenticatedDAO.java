@@ -18,11 +18,21 @@ import java.security.Permission;
 public class AuthenticatedDAO
   extends ProxyDAO
 {
-  protected String name_;
+  protected String  name_;
+  protected boolean authenticateRead_;
 
   public AuthenticatedDAO(String name, DAO delegate) {
-    this.name_ = name;
+    this(name, true, delegate);
+  }
+
+  public AuthenticatedDAO(String name, boolean authenticateRead, DAO delegate) {
+    this.name_             = name;
+    this.authenticateRead_ = authenticateRead;
     setDelegate(delegate);
+  }
+
+  public void setAuthenticateRead(boolean authenticateRead) {
+    this.authenticateRead_ = authenticateRead;
   }
 
   public String createPermission(String op) {
@@ -67,11 +77,13 @@ public class AuthenticatedDAO
 
   @Override
   public FObject find_(X x, Object id) {
-    String      permission = createPermission("read", id);
-    AuthService authService = (AuthService) x.get("auth");
+    if ( authenticateRead_ ) {
+      String permission = createPermission("read", id);
+      AuthService authService = (AuthService) x.get("auth");
 
-    if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
+      if ( ! authService.check(x, permission) ) {
+        throw new RuntimeException("Insufficient permissions");
+      }
     }
 
     return super.find_(x, id);
@@ -79,13 +91,16 @@ public class AuthenticatedDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    super.select_(x, new AuthenticatedSink(x, createPermission("read"), sink), skip, limit, order, predicate);
-    return sink;
+    if ( authenticateRead_ ) {
+      super.select_(x, new AuthenticatedSink(x, createPermission("read"), sink), skip, limit, order, predicate);
+      return sink;
+    }
+    return super.select_(x, sink, skip, limit, order, predicate);
   }
 
   @Override
   public void removeAll_(X x, long skip, long limit, Comparator order, Predicate predicate) {
-    Sink sink = new AuthenticatedSink(x, createPermission("delete"), new RemoveSink(this));
+    Sink sink = new AuthenticatedSink(x, createPermission("delete"), new RemoveSink(x, this));
     this.select_(x, sink, skip, limit, order, predicate);
   }
 

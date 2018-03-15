@@ -13,7 +13,12 @@ foam.CLASS({
 
   requires: [ 'foam.nanos.menu.Menu' ],
 
-  imports: [ 'menuDAO' ],
+  imports: [
+    'currentMenu',
+    'lastMenuLaunched',
+    'menuDAO',
+    'window'
+  ],
 
   documentation: 'Navigational menu bar',
 
@@ -41,33 +46,32 @@ foam.CLASS({
     {
       name: 'menuName',
       value: '' // The root menu
-    },
-    {
-      name: 'selected',
-      postSet: function(o, n) {
-        if ( o ) o.selected = false;
-        n.selected = true;
-      }
     }
   ],
 
   methods: [
     function initE() {
       var self = this;
+
       this
         .addClass(this.myClass())
         .start()
           .start('ul')
-            .select(this.menuDAO.where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
+            .select(this.menuDAO.orderBy(this.Menu.ORDER).where(this.EQ(this.Menu.PARENT, this.menuName)), function(menu) {
               this.start('li')
                 .call(function() {
                   var e = this;
-                  if ( ! self.selected ) self.selected = menu;
-                  this.start().addClass('menuItem').enableClass('selected', menu.selected$)
+                  this.start()
+                    .addClass('menuItem')
+                    .enableClass('hovered', self.lastMenuLaunched$.map(function (value) { return value ? value.id === menu.id : false; }))
+                    .enableClass('selected', self.currentMenu$.map(function (value) {
+                      // only show selected menu if user settings sub menu item has not been selected
+                      if ( self.window.location.hash.includes('#set') ) return false;
+                      return self.isSelected(value, menu);
+                    }))
                     .add(menu.label)
                     .on('click', function() {
-                      menu.launch_(self.__context__, e)
-                      self.selected = menu;
+                      menu.launch_(self.__context__, e);
                     }.bind(this))
                   .end();
                 })
@@ -76,6 +80,22 @@ foam.CLASS({
           .end()
         .end()
       .end();
+    },
+
+    function isSelected(current, menu) {
+      if ( ! current ) return false;
+
+      if ( this.window.location.hash.includes('#' + menu.id) ) {
+        return true;
+      }
+
+      if ( current.parent ) {
+        if ( current.parent === menu.id ) {
+          return true;
+        }
+      }
+
+      return false;
     }
   ]
 });

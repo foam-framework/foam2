@@ -30,17 +30,17 @@ foam.CLASS({
     'foam.u2.stack.Stack',
     'foam.u2.stack.StackView',
     'foam.classloader.OrDAO',
-    'foam.classloader.WebModelFileDAO'
+    'foam.apploader.WebModelFileDAO',
+    'foam.apploader.ClassLoader'
   ],
 
   imports: [
-    'arequire',
-    'window'
+    'classloader',
+    'window',
   ],
 
   exports: [
     'stack',
-    foam.String.daoize(foam.core.Model.name)
   ],
 
   properties: [
@@ -64,34 +64,32 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'classpath'
+      name: 'classpath',
+      postSet: function(_, n) {
+        if ( ! n ) return;
+        var self = this;
+        n.split(',').forEach(function(p) {
+          self.classloader.addClassPath(p)
+        });
+      },
     },
     {
-      name: foam.String.daoize(foam.core.Model.name),
-      expression: function(classpath) {
-        var prefix   = this.window.location.protocol + '//' + this.window.location.host;
-        var paths    = classpath.split(',');
-        var modelDao = this.WebModelFileDAO.create({
-          url: prefix + paths[0],
+      class: 'String',
+      name: 'json2Classpath',
+      postSet: function(_, n) {
+        if ( ! n ) return;
+        var self = this;
+        n.split(',').forEach(function(p) {
+          self.classloader.addClassPath(p, true)
         });
-
-        for ( var i = 1, classpath ; classpath = paths[i] ; i++ ) {
-          modelDao = this.OrDAO.create({
-            delegate: modelDao,
-            primary: this.WebModelFileDAO.create({
-              url: prefix + classpath
-            })
-          });
-        }
-        return modelDao;
-      }
-    }
+      },
+    },
   ],
 
   methods: [
     function fromQuery(opt_query) {
       var search = /([^&=]+)=?([^&]*)/g;
-      var query  = opt_query || window.location.search.substring(1);
+      var query  = opt_query || this.window.location.search.substring(1);
       var decode = function(s) {
         return decodeURIComponent(s.replace(/\+/g, ' '));
       };
@@ -105,9 +103,10 @@ foam.CLASS({
 
       if ( params.model ) {
         this.copyFrom({
-          classpath: params.classpath || '/src/',
-          model:     params.model,
-          view:      params.view
+          classpath:      params.classpath,
+          json2Classpath: params.json2Classpath,
+          model:          params.model,
+          view:           params.view
         });
       } else {
         alert('Please specify model. Ex.: ?model=com.acme.MyModel');
@@ -119,15 +118,16 @@ foam.CLASS({
     function execute() {
       var self     = this;
       var X        = this.__subContext__;
-      var promises = [X.arequire(this.model)];
 
-      if (this.view) promises.push(X.arequire(this.view));
+      Promise.all([
+        this.classloader.load(this.model),
+        this.view ? this.classloader.load(this.view) : Promise.resolve()
+      ]).then(function(args) {
+        var cls = args[0];
+        var m = cls.create(null, self);
+        window.__foam_obj__ = m;
 
-      Promise.all(promises).then(function() {
-        var model = X.lookup(self.model).create(null, self);
-        window.__foam_obj__ = model;
-
-        var viewSpec = self.view ? { class: self.view, data: model } : model.toE.bind(model);
+        var viewSpec = self.view ? { class: self.view, data: m } : m.toE.bind(m);
 
         self.stack.push(viewSpec);
         self.StackView.create({

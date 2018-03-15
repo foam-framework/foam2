@@ -1,4 +1,4 @@
-/** 
+/**
  * @license
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
@@ -21,63 +21,63 @@ foam.CLASS({
       'its container. Useful for e.g. "..." overflow menus in action bars. ' +
       'Just $$DOC{ref:".add"} things to this container.',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-      ^overlay {
-        position: fixed;
-        z-index: 1009;
-      }
+  css: `
+    ^overlay {
+      position: fixed;
+      z-index: 1009;
+    }
 
-      ^container {
-        position: relative;
-        right: 0;
-        top: 0;
-        z-index: 100;
-      }
+    ^container {
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 100;
+    }
 
-      ^ {
-        background: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
-        display: block;
-        font-size: 13px;
-        font-weight: 400;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        position: absolute;
-        width: 125px;
-        padding: 10px;
-        padding-bottom: -20px;
-        margin-bottom: -20px;
-        right: 3px;
-        top: 4px;
-        transition: height 0.25s cubic-bezier(0, .3, .8, 1);
-        z-index: 1010;
-      }
+    ^ {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      overflow-x: hidden;
+      overflow-y: hidden;
+      position: absolute;
+      width: 125px;
+      padding: 10px;
+      padding-bottom: -20px;
+      margin-bottom: -20px;
+      right: 3px;
+      top: 4px;
+      transition: height 0.25s cubic-bezier(0, .3, .8, 1);
+      z-index: 1010;
+    }
 
-      ^open {
-        overflow-y: auto;
-      }
+    ^open {
+      overflow-y: auto;
+    }
 
-      ^zeroOverlay {
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
+    ^zeroOverlay {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
 
-      ^initialOverlay {
-        top: initial;
-        bottom: initial;
-        left: initial;
-        right: initial;
-      }
-    */}
-    })
-  ],
+    ^initialOverlay {
+      top: initial;
+      bottom: initial;
+      left: initial;
+      right: initial;
+    }
+
+    ^parents {
+      z-index: 1000 !important;
+    }
+  `,
 
   constants: {
-    BOTTOM_OFFSET: -13
+    BOTTOM_OFFSET: -25,
   },
 
   properties: [
@@ -126,36 +126,42 @@ foam.CLASS({
 
     function open() {
       if ( this.opened ) return;
+
+      this.onOpenStart();
+
+      this.animationComplete = false;
       this.opened = true;
       this.dropdownE_.style({ height: this.getFullHeight() + 'px' });
-      this.animationComplete = false;
     },
 
     function close() {
       if ( ! this.opened ) return;
       this.height = 0;
-      this.dropdownE_.style({ height: 0 + 'px' });
+      this.animationComplete = false;
       this.opened = false;
+      this.dropdownE_.style({ height: 0 + 'px' });
     },
 
     function getFullHeight() {
-      if ( this.state !== this.LOADED ) return;
+      if ( this.state !== this.LOADED ) return 0;
 
       var myStyle = this.window.getComputedStyle(this.dropdownE_.el());
 
-      var border = 0;
-      ['border-top', 'border-bottom'].forEach(function(name) {
-        var match = myStyle[name].match(/^([0-9]+)px/);
-        if ( match ) border += parseInt(match[1]);
-      });
-
-      var last = this.dropdownE_.children[this.dropdownE_.children.length - 1].el();
-      var margin = parseInt(this.window.getComputedStyle(last)['margin-bottom']);
-      
+      var first = this.dropdownE_.children[0].el();
+      var top = first.offsetTop;
+      var last = this.dropdownE_.children[this.dropdownE_.children.length - 1]
+          .el();
+      var margin = parseInt(
+          this.window.getComputedStyle(last)['margin-bottom']);
       if ( Number.isNaN(margin) ) margin = 0;
+      var bottom = last.offsetTop + last.offsetHeight + margin;
 
-      return Math.min(border + last.offsetTop + last.offsetHeight + margin,
-          this.window.innerHeight - this.dropdownE_.el().getBoundingClientRect().top) + this.BOTTOM_OFFSET;
+      var childrenHeight = bottom - top;
+      var maxHeight = this.window.innerHeight -
+            this.dropdownE_.el().getBoundingClientRect().top +
+            this.BOTTOM_OFFSET;
+
+      return Math.min(childrenHeight, maxHeight);
     },
 
     function initE() {
@@ -163,22 +169,24 @@ foam.CLASS({
       this.addClass(this.myClass('container'));
       var view = this;
 
-      this.addClass(this.slot(function(open) {
-        this.shown = open;
-      }, this.opened$));
+      this.addClass(this.slot(function(open, animationComplete) {
+        this.shown = open || ! animationComplete;
+      }, this.opened$, this.animationComplete$));
 
       this.start('dropdown-overlay')
         .addClass(this.myClass('overlay'))
         .addClass(this.slot(function(open) {
-          return ( open ) ? view.myClass('zeroOverlay') : view.myClass('initialOverlay')
+          return open ? view.myClass('zeroOverlay') :
+              view.myClass('initialOverlay');
         }, this.opened$))
         .on('click', this.onCancel)
       .end();
 
-      this.dropdownE_.addClass(this.myClass())
-        .addClass(this.slot(function(openComplete) {
+      this.dropdownE_.addClass(this.myClass()).style({height: '0px'})
+        .addClass(this.slot(function(opened, animationComplete) {
+          var openComplete = opened && animationComplete;
           return openComplete ? this.myClass('open') : '';
-        }, this.opened$ && this.animationComplete$))
+        }, this.opened$, this.animationComplete$))
         .on('transitionend', this.onTransitionEnd)
         .on('mouseleave', this.onMouseLeave)
         .on('click', this.onClick);
@@ -196,6 +204,7 @@ foam.CLASS({
 
     function onTransitionEnd() {
       this.animationComplete = true;
+      if (!this.opened) this.onCloseComplete();
     },
 
     function onMouseLeave(e) {
@@ -210,6 +219,24 @@ foam.CLASS({
      */
     function onClick(e) {
       e.stopPropagation();
+    },
+
+    function onOpenStart() {
+      var parent = this.el().parentElement;
+      var parentClass = this.myClass('parents');
+      while (parent) {
+        parent.classList.add(parentClass);
+        parent = parent.parentElement;
+      }
+    },
+
+    function onCloseComplete() {
+      var parent = this.el().parentElement;
+      var parentClass = this.myClass('parents');
+      while (parent) {
+        parent.classList.remove(parentClass);
+        parent = parent.parentElement;
+      }
     }
   ]
 });

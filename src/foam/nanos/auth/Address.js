@@ -10,9 +10,14 @@ foam.CLASS({
 
   documentation: 'Postal address.',
 
+  implements: [
+    'foam.mlang.Expressions',
+  ],
+
   requires: [
+    'foam.nanos.auth.DayOfWeek',
     'foam.nanos.auth.Hours',
-    'foam.nanos.auth.DayOfWeek'
+    'foam.nanos.auth.Region'
   ],
 
   properties: [
@@ -38,31 +43,65 @@ foam.CLASS({
       class: 'String',
       name: 'address1',
       //required: true
-      width: 70,      
+      width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a main address field.'
+      documentation: 'for an unstructured address, use this as a main address field.',
+      validateObj: function(address1) {
+        var address1Regex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( address1.length > 0 && ! address1Regex.test(address1) ) {
+          return 'Invalid address line.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'address2',
       width: 70,
       displayWidth: 50,
-      documentation: 'for an unstructured address, use this as a sub address field.'
+      documentation: 'for an unstructured address, use this as a sub address field.',
+      validateObj: function(address2) {
+        var address2Regex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( address2.length > 0 && ! address2Regex.test(address2) ) {
+          return 'Invalid address line.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'suite',
-      width: 16
+      width: 16,
+      validateObj: function (suite) {
+        var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( suite.length > 0 && ! suiteRegex.test(suite) ) {
+          return 'Invalid address line.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'city',
-      required: true
+      required: true,
+      validateObj: function (city) {
+        var cityRegex = /^[a-zA-Z ]{1,35}$/;
+
+        if ( ! cityRegex.test(city) ) {
+          return 'Invalid city name.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'postalCode',
-      required: true
+      required: true,
+      validateObj: function (postalCode) {
+        var postalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
+        if ( ! postalCodeRegex.test(postalCode) ) {
+          return 'Invalid postal code.';
+        }
+      }
     },
     {
       class: 'Reference',
@@ -74,7 +113,18 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
-      of: 'foam.nanos.auth.Region'
+      of: 'foam.nanos.auth.Region',
+      view: function (_, X) {
+        var choices = X.data.slot(function (countryId) {
+          return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
+        });
+        return foam.u2.view.ChoiceView.create({
+          objToChoice: function(region) {
+            return [region.id, region.name];
+          },
+          dao$: choices
+        });
+      }
     },
     {
       class: 'Boolean',
@@ -92,40 +142,35 @@ foam.CLASS({
       class: 'String',
       name: 'streetNumber',
       width: 16,
-      documentation: 'for an structured address, use this field.'
+      documentation: 'for an structured address, use this field.',
+      validateObj: function (streetNumber) {
+        var streetNumberRegex = /^[0-9]{1,16}$/;
+
+        if ( ! streetNumberRegex.test(streetNumber) ) {
+          return 'Invalid street number.';
+        }
+      }
     },
     {
       class: 'String',
       name: 'streetName',
       width: 70,
-      documentation: 'for an structured address, use this field.'
+      documentation: 'for an structured address, use this field.',
+      validateObj: function (streetName) {
+        var streetNameRegex = /^[a-zA-Z0-9 ]{1,70}$/;
+
+        if ( ! streetNameRegex.test(streetName) ) {
+          return 'Invalid street name.'
+        }
+      }
     },
     {
       class: 'FObjectArray',
       of: 'foam.nanos.auth.Hours',
       name: 'hours',
       documentation: 'Opening and closing hours for this address',
-      factory: function () {
-        return [
-          this.Hours.create({ day: this.DayOfWeek.SUNDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.MONDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.TUESDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.WEDNESDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.THURSDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.FRIDAY, open: true }),
-          this.Hours.create({ day: this.DayOfWeek.SATURDAY, open: true }),
-        ];
-      },
-      javaFactory:
-`return new Hours[] {
-    new Hours(DayOfWeek.SUNDAY, true, null, null),
-    new Hours(DayOfWeek.MONDAY, true, null, null),
-    new Hours(DayOfWeek.TUESDAY, true, null, null),
-    new Hours(DayOfWeek.WEDNESDAY, true, null, null),
-    new Hours(DayOfWeek.THURSDAY, true, null, null),
-    new Hours(DayOfWeek.FRIDAY, true, null, null),
-    new Hours(DayOfWeek.SATURDAY, true, null, null)
-};`
+      factory: function () { return []; },
+      javaFactory: 'return new Hours[] {};'
     }
   ],
 
@@ -135,6 +180,6 @@ foam.CLASS({
       javaReturns: 'String',
       code: function() { return this.structured ? this.streetNumber + ' ' + this.streetName : this.address1; },
       javaCode: `return getStructured() ? getStreetNumber() + " " + getStreetName() : getAddress1();`
-   }
+    }
   ]
 });

@@ -46,16 +46,20 @@ foam.ENUM({
 foam.CLASS({
   package: 'foam.u2',
   name: 'Entity',
-  // TODO: Make both Entity and Element extend a common base-Model (Node?)
 
-  documentation: 'Virtual-DOM Entity.',
+  documentation: `
+    Virtual-DOM Entity.
+    // TODO: Make both Entity and Element extend a common base-Model (Node?)
+  `,
 
   properties: [
     {
       name: 'name',
-      // parser: seq(alphaChar, repeat0(wordChar)),
-      // TODO(adamvy): This should be 'pattern' or 'regex', if those are ever
-      // added.
+      documentation: `
+        // parser: seq(alphaChar, repeat0(wordChar)),
+        // TODO(adamvy): This should be 'pattern' or 'regex', if those are ever
+        // added.
+      `,
       assertValue: function(nu) {
         if ( ! nu.match(/^[a-z#]\w*$/i) ) {
           throw new Error('Invalid Entity name: ' + nu);
@@ -88,7 +92,8 @@ foam.CLASS({
     },
     {
       name: 'installedDocuments_',
-      factory: function() { return new WeakMap(); }
+      factory: function() { return new WeakMap(); },
+      transient: true
     }
   ],
 
@@ -105,7 +110,7 @@ foam.CLASS({
           foam.__context__;
 
         // Install our own CSS, and then all parent models as well.
-        if ( ! axiom.installedDocuments_.has(X.document) ) {
+        if ( X.document && ! axiom.installedDocuments_.has(X.document) ) {
           X.installCSS(axiom.expandCSS(this, axiom.code), cls.id);
           axiom.installedDocuments_.set(X.document, true);
         }
@@ -190,14 +195,17 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'ElementState',
 
-  documentation: 'Current lifecycle state of an Element.',
+  documentation: `
+    Current lifecycle state of an Element.
+    // TODO: Do we want the following method?
+    // function detach() {},
+  `,
 
   methods: [
     function output(out) {},
     function load() {},
     function unload() {},
     function onRemove() {},
-    // function detach() {},
     function onSetClass() {},
     function onFocus() {},
     function onAddListener() {},
@@ -287,6 +295,7 @@ foam.CLASS({
 
       this.visitChildren('load');
       this.state = this.LOADED;
+      if ( this.tabIndex ) this.setAttribute('tabindex', this.tabIndex);
       if ( this.focused ) this.el().focus();
       // Allows you to take the DOM element and map it back to a
       // foam.u2.Element object.  This is expensive when building
@@ -502,12 +511,42 @@ foam.CLASS({
   ]
 });
 
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'Element',
 
-  documentation: 'Virtual-DOM Element. Root model for all U2 UI components.',
+  documentation: `
+    Virtual-DOM Element. Root model for all U2 UI components.
+
+    To insert a U2 Element into a regular DOM element, either:
+
+    el.innerHTML = view.outerHTML;
+    view.load();
+
+    Or use a foam tag in your markup:
+
+    <foam class="com.acme.mypackage.MyView"></foam>
+
+    // TODO: Decide if we want this or not:
+    // function XXXE(opt_nodeName /* | DIV */) {
+    //   /* Create a new Element */
+    //   var Y = this.__subContext__;
+    //
+    //   // ???: Is this needed / a good idea?
+    //   if ( this.data && ! Y.data ) Y = Y.createSubContext({ data: this.data });
+    //
+    //   // Some names have sub-Models registered for them.
+    //   // Example 'input'
+    //   var e = Y.elementForName(opt_nodeName);
+    //
+    //   if ( ! e ) {
+    //     e = foam.u2.Element.create(null, Y);
+    //     if ( opt_nodeName ) e.nodeName = opt_nodeName;
+    //   }
+    //
+    //   return e;
+    // },
+  `,
 
   requires: [
     'foam.u2.AttrSlot',
@@ -528,95 +567,151 @@ foam.CLASS({
     'onunload'
   ],
 
-  constants: {
-    // Psedo-attributes don't work consistently with setAttribute()
-    // so need to be set on the real DOM element directly.
-    PSEDO_ATTRIBUTES: {
-      value: true,
-      checked: true
+  constants: [
+    {
+      documentation: `
+        Psedo-attributes don't work consistently with setAttribute() so need to
+        be set on the real DOM element directly.
+      `,
+      name: 'PSEDO_ATTRIBUTES',
+      value: {
+        value: true,
+        checked: true
+      },
     },
 
-    DEFAULT_VALIDATOR: foam.u2.DefaultValidator.create(),
+    {
+      name: 'DEFAULT_VALIDATOR',
+      factory: function() { return foam.u2.DefaultValidator.create() },
+    },
 
-    // State of an Element after it has been output (to a String) but before it is loaded.
-    // This should be only a brief transitory state, as the Element should be loaded
-    // almost immediately after being output. It is an error to try and mutate the Element
-    // while in the OUTPUT state.
-    OUTPUT: foam.u2.OutputElementState.create(),
+    {
+      documentation: `
+        State of an Element after it has been output (to a String) but before it
+        is loaded. This should be only a brief transitory state, as the Element
+        should be loaded almost immediately after being output. It is an error
+        to try and mutate the Element while in the OUTPUT state.
+      `,
+      name: 'OUTPUT',
+      factory: function() { return foam.u2.OutputElementState.create() },
+    },
 
-    // State of an Element after it has been loaded.
-    // A Loaded Element should be visible in the DOM.
-    LOADED: foam.u2.LoadedElementState.create(),
+    {
+      documentation: `
+        State of an Element after it has been loaded.
+        A Loaded Element should be visible in the DOM.
+      `,
+      name: 'LOADED',
+      factory: function() { return foam.u2.LoadedElementState.create() },
+    },
 
-    // State of an Element after it has been removed from the DOM.
-    // An unloaded Element can be readded to the DOM.
-    UNLOADED: foam.u2.UnloadedElementState.create(),
+    {
+      documentation: `
+        State of an Element after it has been removed from the DOM.
+        An unloaded Element can be readded to the DOM.
+      `,
+      name: 'UNLOADED',
+      factory: function() { return foam.u2.UnloadedElementState.create() },
+    },
 
-    // Initial state of an Element before it has been added to the DOM.
-    INITIAL: foam.u2.InitialElementState.create(),
+    {
+      documentation: `
+        Initial state of an Element before it has been added to the DOM.
+      `,
+      name: 'INITIAL',
+      factory: function() {
+        return foam.u2.InitialElementState.create();
+      },
+    },
 
     // ???: Add DESTROYED State?
 
-    // TODO: Don't allow these as they lead to ambiguous markup.
-    OPTIONAL_CLOSE_TAGS: {
-      BODY: true,
-      COLGROUP: true,
-      DD: true,
-      DT: true,
-      HEAD: true,
-      HTML: true,
-      LI: true,
-      OPTION: true,
-      P: true,
-      TBODY: true,
-      TD: true,
-      TFOOT: true,
-      TH: true,
-      THEAD: true,
-      TR: true
+    {
+      documentation: `TODO: Don't allow these as they lead to ambiguous markup.`,
+      name: 'OPTIONAL_CLOSE_TAGS',
+      value: {
+        BODY: true,
+        COLGROUP: true,
+        DD: true,
+        DT: true,
+        HEAD: true,
+        HTML: true,
+        LI: true,
+        OPTION: true,
+        P: true,
+        TBODY: true,
+        TD: true,
+        TFOOT: true,
+        TH: true,
+        THEAD: true,
+        TR: true
+      }
     },
 
-    // Element nodeName's that are self-closing.
-    // Used to generate valid HTML output.
-    // Used by ElementParser for valid HTML parsing.
-    ILLEGAL_CLOSE_TAGS: {
-      AREA: true,
-      BASE: true,
-      BASEFONT: true,
-      BR: true,
-      COL: true,
-      FRAME: true,
-      HR: true,
-      IMG: true,
-      INPUT: true,
-      ISINDEX: true,
-      LINK: true,
-      META: true,
-      PARAM: true
+    {
+      documentation: `
+        Element nodeName's that are self-closing.
+        Used to generate valid HTML output.
+        Used by ElementParser for valid HTML parsing.
+      `,
+      name: 'ILLEGAL_CLOSE_TAGS',
+      value: {
+        AREA: true,
+        BASE: true,
+        BASEFONT: true,
+        BR: true,
+        COL: true,
+        FRAME: true,
+        HR: true,
+        IMG: true,
+        INPUT: true,
+        ISINDEX: true,
+        LINK: true,
+        META: true,
+        PARAM: true
+      },
     },
 
-    __ID__: [ 0 ],
-
-    NEXT_ID: function() {
-      return 'v' + this.__ID__[ 0 ]++;
+    {
+      name: '__ID__',
+      value: [ 0 ],
     },
 
-    // Keys which respond to keydown but not keypress
-    KEYPRESS_CODES: { 8: true, 13: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    {
+      name: 'NEXT_ID',
+      value: function() {
+        return 'v' + this.__ID__[ 0 ]++;
+      },
+    },
 
-    NAMED_CODES: {
-      '13': 'enter',
-      '37': 'left',
-      '38': 'up',
-      '39': 'right',
-      '40': 'down'
+    {
+      documentation: `Keys which respond to keydown but not keypress`,
+      name: 'KEYPRESS_CODES',
+      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+    },
+
+    {
+      name: 'NAMED_CODES',
+      value: {
+        '13': 'enter',
+        '37': 'left',
+        '38': 'up',
+        '39': 'right',
+        '40': 'down'
+      }
+    },
+  ],
+
+  css: `
+    /*
+     We hide Elements by adding this style rather than setting
+     'display: none' directly because then when we re-show the
+     Element we don't need to remember it's desired 'display' value.
+    */
+    .foam-u2-Element-hidden {
+      display: none !important;
     }
-  },
-
-  // We hide Elements by adding this style rather than setting
-  // 'display: none' directly because then when we re-show the
-  // Element we don't need to remember it's desired 'display' value.
-  css: '.foam-u2-Element-hidden { display: none !important; }',
+  `,
 
   properties: [
     {
@@ -685,13 +780,13 @@ foam.CLASS({
     },
     {
       name: 'attributeMap',
-      // documentation: 'Same information as "attributes", but in map form for faster lookup',
+      documentation: 'Same information as "attributes", but in map form for faster lookup',
       transient: true,
       factory: function() { return {}; }
     },
     {
       name: 'attributes',
-      // documentation: 'Array of {name: ..., value: ...} attributes.',
+      documentation: 'Array of {name: ..., value: ...} attributes.',
       factory: function() { return []; },
       postSet: function(_, attrs) {
         this.attributeMap = {};
@@ -702,27 +797,27 @@ foam.CLASS({
     },
     {
       name: 'classes',
-      // documentation: 'CSS classes assigned to this Element. Stored as a map of true values.',
+      documentation: 'CSS classes assigned to this Element. Stored as a map of true values.',
       factory: function() { return {}; }
     },
     {
       name: 'css',
-      // documentation: 'Styles added to this Element.',
+      documentation: 'Styles added to this Element.',
       factory: function() { return {}; }
     },
     {
       name: 'childNodes',
-      // documentation: 'Children of this Element.',
+      documentation: 'Children of this Element.',
       factory: function() { return []; }
     },
     {
       name: 'elListeners',
-      // documentation: 'DOM listeners of this Element. Stored as topic then listener.',
+      documentation: 'DOM listeners of this Element. Stored as topic then listener.',
       factory: function() { return []; }
     },
     {
       name: 'children',
-      // documentation: 'Virtual property of non-String childNodes.',
+      documentation: 'Virtual property of non-String childNodes.',
       transient: true,
       getter: function() {
         return this.childNodes.filter(function(c) {
@@ -754,6 +849,10 @@ foam.CLASS({
       name: 'scrollHeight',
     },
     {
+      class: 'Int',
+      name: 'tabIndex',
+    },
+    {
       name: 'clickTarget_'
     },
     {
@@ -769,11 +868,11 @@ foam.CLASS({
     },
 
     function initE() {
-      this.initKeyboardShortcuts();
       /*
         Template method for adding addtion element initialization
         just before Element is output().
       */
+      this.initKeyboardShortcuts();
     },
 
     function observeScrollHeight() {
@@ -852,7 +951,7 @@ foam.CLASS({
 
         // Ensure that target is focusable, and therefore will capture keydown
         // and keypress events.
-        target.setAttribute('tabindex', target.tabIndex || 1);
+        target.tabIndex = target.tabIndex || 1;
 
         target.on('keydown',  this.onKeyboardShortcut);
         target.on('keypress', this.onKeyboardShortcut);
@@ -887,25 +986,6 @@ foam.CLASS({
     function E(opt_nodeName) {
       return this.__subSubContext__.E(opt_nodeName);
     },
-
-    // function XXXE(opt_nodeName /* | DIV */) {
-    //   /* Create a new Element */
-    //   var Y = this.__subContext__;
-    //
-    //   // ???: Is this needed / a good idea?
-    //   if ( this.data && ! Y.data ) Y = Y.createSubContext({ data: this.data });
-    //
-    //   // Some names have sub-Models registered for them.
-    //   // Example 'input'
-    //   var e = Y.elementForName(opt_nodeName);
-    //
-    //   if ( ! e ) {
-    //     e = foam.u2.Element.create(null, Y);
-    //     if ( opt_nodeName ) e.nodeName = opt_nodeName;
-    //   }
-    //
-    //   return e;
-    // },
 
     function attrSlot(opt_name, opt_event) {
       /* Convenience method for creating an AttrSlot's. */
@@ -953,11 +1033,6 @@ foam.CLASS({
       }
     },
 
-
-    //
-    // Focus
-    //
-
     function focus() {
       this.focused = true;
       this.onFocus();
@@ -968,11 +1043,6 @@ foam.CLASS({
       this.focused = false;
       return this;
     },
-
-    //
-    // Visibility
-    //
-    // Fluent methods for setting 'shown' property.
 
     function show(opt_shown) {
       if ( opt_shown === undefined ) {
@@ -993,12 +1063,6 @@ foam.CLASS({
           ! opt_hidden);
     },
 
-
-    //
-    // DOM Compatibility
-    //
-    // Methods with the same interface as the real DOM.
-
     function setAttribute(name, value) {
       /*
         Set an Element attribute or property.
@@ -1012,6 +1076,8 @@ foam.CLASS({
       */
 
       // TODO: type checking
+
+      if ( name === 'tabindex' ) this.tabIndex = parseInt(value);
 
       // handle slot binding, ex.: data$: ...,
       // Remove if we add a props() method
@@ -1186,12 +1252,6 @@ foam.CLASS({
         }
       }
     },
-
-
-    //
-    // Fluent Methods
-    //
-    // Methods which return 'this' so they can be chained.
 
     function setNodeName(name) {
       this.nodeName = name;
@@ -1537,6 +1597,11 @@ foam.CLASS({
       return this;
     },
 
+    function callOn(obj, f, args) {
+      obj[f].apply(obj, [this].concat(args));
+      return this;
+    },
+
     function callIf(bool, f, args) {
       if ( bool ) f.apply(this, args);
 
@@ -1550,10 +1615,6 @@ foam.CLASS({
 
       return this;
     },
-
-    //
-    // Output Methods
-    //
 
     function outputInnerHTML(out) {
       var cs = this.childNodes;
@@ -1618,13 +1679,9 @@ foam.CLASS({
       */
     },
 
-
-    //
-    // Internal (DO NOT USE)
-    //
-
-    // (Element[], Element, Boolean)
     function insertAt_(children, reference, before) {
+      // (Element[], Element, Boolean)
+
       var i = this.childNodes.indexOf(reference);
 
       if ( i === -1 ) {
@@ -1687,8 +1744,8 @@ foam.CLASS({
       return this;
     },
 
-    // TODO: add same context capturing behviour to other slotXXX_() methods.
     function slotE_(slot) {
+      // TODO: add same context capturing behviour to other slotXXX_() methods.
       /*
         Return an Element or an Array of Elements which are
         returned from the supplied dynamic Slot.
@@ -1941,7 +1998,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.u2.Visibility',
       name: 'visibility',
-      value: foam.u2.Visibility.RW
+      value: 'RW'
     }
   ],
 
@@ -1998,6 +2055,15 @@ foam.CLASS({
   requires: [ 'foam.u2.DateTimeView' ],
   properties: [
     [ 'view', { class: 'foam.u2.DateTimeView' } ]
+  ]
+});
+
+
+foam.CLASS({
+  refines: 'foam.core.Time',
+  requires: [ 'foam.u2.TimeView' ],
+  properties: [
+    [ 'view', { class: 'foam.u2.TimeView' } ]
   ]
 });
 
@@ -2131,7 +2197,25 @@ foam.CLASS({
   name: 'View',
   extends: 'foam.u2.Element',
 
-  documentation: 'A View is an Element used to display data.',
+  documentation: `
+    A View is an Element used to display data.
+    // TODO: Should the following be properties?
+    /*
+    {
+      type: 'Boolean',
+      name: 'showValidation',
+      documentation: 'Set to false if you want to ignore any ' +
+          '$$DOC{ref:"Property.validate"} calls. On by default.',
+      defaultValue: true
+    },
+    {
+      type: 'String',
+      name: 'validationError_',
+      documentation: 'The actual error message. Null or the empty string ' +
+          'when there is no error.',
+    }
+    */
+  `,
 
   exports: [ 'data' ],
 
@@ -2152,7 +2236,7 @@ foam.CLASS({
       name: 'visibility',
       postSet: function() { this.updateMode_(this.mode); },
       attribute: true,
-      value: foam.u2.Visibility.RW
+      value: 'RW'
     },
     {
       class: 'Enum',
@@ -2175,21 +2259,7 @@ foam.CLASS({
           foam.u2.DisplayMode.RW ;
       },
       attribute: true
-    }/*,
-    {
-      type: 'Boolean',
-      name: 'showValidation',
-      documentation: 'Set to false if you want to ignore any ' +
-          '$$DOC{ref:"Property.validate"} calls. On by default.',
-      defaultValue: true
-    },
-    {
-      type: 'String',
-      name: 'validationError_',
-      documentation: 'The actual error message. Null or the empty string ' +
-          'when there is no error.',
     }
-    */
   ],
 
   methods: [
@@ -2241,8 +2311,6 @@ foam.CLASS({
   ]
 });
 
-// TODO: make a tableProperties property on AbstractClass
-
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableColumns',
@@ -2281,7 +2349,9 @@ foam.CLASS({
       }
     },
     {
-      // TODO: remove when all code ported
+      documentation: `
+        // TODO: remove when all code ported
+      `,
       name: 'tableProperties',
       setter: function(_, ps) {
         console.warn("Deprecated use of tableProperties. Use 'tableColumns' instead.");

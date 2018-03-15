@@ -1,26 +1,25 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 package foam.blob;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
+import java.io.*;
 
 public class InputStreamBlob
-    extends foam.blob.AbstractBlob
+    extends AbstractBlob
 {
+  public static final int BUFFER_SIZE = 4096;
+
   protected long size_;
   protected long pos_ = 0;
   protected InputStream in_;
 
-  public InputStreamBlob(java.io.InputStream in, long size) throws IOException {
-    this.size_ = size;
-    this.in_ = new BufferedInputStream(in);
+  public InputStreamBlob(InputStream in, long size) {
+    size_ = size;
+    in_ = in;
   }
 
   public InputStream getInputStream() {
@@ -28,38 +27,34 @@ public class InputStreamBlob
   }
 
   @Override
-  public Buffer read(Buffer buffer, long offset) {
+  public long read(OutputStream out, long offset, long length) {
     try {
       if ( offset != pos_ ) {
         throw new RuntimeException("Offset does not match stream position");
       }
 
-      int outOffset = 0;
-      long length = Math.min(buffer.getLength(), getSize() - offset);
-      if ( length < buffer.getLength() ) {
-        buffer = buffer.slice(0, length);
+      int n = 0;
+      long read = 0;
+      byte[] buffer = new byte[BUFFER_SIZE];
+      while ( (n = in_.read(buffer, 0, buffer.length)) != -1 && read <= length ) {
+        out.write(buffer, 0, n);
+        read += n;
       }
 
-      ByteBuffer bb = buffer.getData();
-      byte[] buf = new byte[(int) length];
-      while ( outOffset < length ) {
-        int bytesRead = in_.read(buf, outOffset, (int) length);
-        bb.put(buf, outOffset, bytesRead);
-        outOffset += bytesRead;
-        pos_ += bytesRead;
-      }
-
-      bb.rewind();
-      buffer.setData(bb);
-      return buffer;
+      pos_ += read;
+      return read;
     } catch (Throwable t) {
-      t.printStackTrace();
-      return null;
+      return -1;
     }
   }
 
   @Override
   public long getSize() {
-    return this.size_;
+    return size_;
+  }
+
+  @Override
+  public void close() throws IOException {
+    in_.close();
   }
 }

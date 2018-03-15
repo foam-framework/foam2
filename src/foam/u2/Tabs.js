@@ -36,42 +36,38 @@ foam.CLASS({
 
   requires: [ 'foam.u2.Tab' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          display: block;
-        }
-        ^tabRow { height: 37px; }
-        ^tab {
-          background: lightgray;
-          border-bottom: none;
-          border-top: 1px solid black;
-          border-left: 1px solid black;
-          border-right: 1px solid black;
-          border-top-right-radius: 4px;
-          border-top-left-radius: 4px;
-          float: left;
-          padding: 6px;
-        }
-        ^tab.selected {
-          background: white;
-          position: relative;
-          z-index: 1;
-        }
-        ^content {
-          background: white;
-          border: 1px solid black;
-          box-shadow: 3px 3px 6px 0 gray;
-          left: -4px;
-          margin: 4px;
-          padding: 0;
-          position: relative;
-          top: -13px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      display: block;
+    }
+    ^tabRow { height: 37px; }
+    ^tab {
+      background: lightgray;
+      border-bottom: none;
+      border-top: 1px solid black;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
+      border-top-right-radius: 4px;
+      border-top-left-radius: 4px;
+      float: left;
+      padding: 6px;
+    }
+    ^tab.selected {
+      background: white;
+      position: relative;
+      z-index: 1;
+    }
+    ^content {
+      background: white;
+      border: 1px solid black;
+      box-shadow: 3px 3px 6px 0 gray;
+      left: -4px;
+      margin: 4px;
+      padding: 0;
+      position: relative;
+      top: -13px;
+    }
+  `,
 
   properties: [
     /* not used

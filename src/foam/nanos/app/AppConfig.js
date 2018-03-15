@@ -25,6 +25,21 @@ foam.CLASS({
       class: 'String',
       name: 'url',
       value: 'http://localhost:8080/'
+    },
+    {
+      class: 'Enum',
+      of: 'foam.nanos.app.Mode',
+      name: 'mode'
+    },
+    {
+      class: 'String',
+      name: 'appLink',
+      value: 'https://www.apple.com/lae/ios/app-store/'
+    },
+    {
+      class: 'String',
+      name: 'playLink',
+      value: 'https://play.google.com/store?hl=en'
     }
   ]
 });

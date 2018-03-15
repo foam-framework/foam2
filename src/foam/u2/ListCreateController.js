@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /** @license Copyright 2017 The FOAM Authors, All Rights Reserved. */
 
 foam.CLASS({
@@ -108,8 +125,10 @@ foam.CLASS({
           var self = this;
           this.selection$.sub(function() {
             if ( self.selection ) {
-              self.stack.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, self));
-              self.selection = undefined;
+              var selection = self.selection;
+              self.stack.push(function() {
+                return foam.u2.ListCreateController.ViewController.create({obj: selection}, self);
+              });
             }
           });
         }
@@ -117,13 +136,12 @@ foam.CLASS({
 
       actions: [
         function create(X) {
-          this.stack.push(foam.u2.ListCreateController.CreateController.create(null, X));
+          this.stack.push(function() { return foam.u2.ListCreateController.CreateController.create(null, X); });
         }
       ],
 
       listeners: [
         function onMementoChange() {
-          console.log('***** onMementoChange: ', this.memento);
           if ( this.memento ) {
             var self = this;
             this.dao.find(this.memento).then(function (obj) {

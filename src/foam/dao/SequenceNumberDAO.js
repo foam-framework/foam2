@@ -1,18 +1,7 @@
 /**
  * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2014 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
@@ -24,11 +13,11 @@ foam.CLASS({
     'foam.mlang.Expressions'
   ],
 
-  documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
-
   requires: [
     'foam.dao.InternalException'
   ],
+
+  documentation: 'DAO Decorator which sets a specified property\'s value with an auto-increment sequence number on DAO.put() if the value is set to the default value.',
 
   properties: [
     {
@@ -38,10 +27,16 @@ foam.CLASS({
       value: 'id'
     },
     {
+      javaType: 'foam.core.PropertyInfo',
+      javaInfoType: 'foam.core.AbstractObjectPropertyInfo',
+      name: 'axiom',
+      javaFactory: 'return (foam.core.PropertyInfo)(getOf().getAxiomByName(getProperty()));'
+    },
+    {
       /** The starting sequence value. This will be calclated from the
         existing contents of the delegate DAO, so it is one greater
         than the maximum existing value. */
-      class: 'Int',
+      class: 'Long',
       name: 'value',
       value: 1
     },
@@ -82,21 +77,52 @@ foam.CLASS({
     /** Sets the property on the given object and increments the next value.
       If the unique starting value has not finished calculating, the returned
       promise will not resolve until it is ready. */
-    function put_(x, obj) {
-      var self = this;
-      return this.calcDelegateMax_.then(function() {
-        var val = self.property_.f(obj);
+    {
+      name: 'put_',
+      code: function put_(x, obj) {
+        var self = this;
+        return this.calcDelegateMax_.then(function() {
+          if ( ! obj.hasOwnProperty(self.property_.name) ) {
+            obj[self.property_.name] = self.value++;
+          }
 
-        if ( ! val || val == self.property_.value ) {
-          obj[self.property_.name] = self.value++;
-        } else if ( val && ( val >= self.value ) ) {
-          // if the object has a value, and it's greater than our current value,
-          // bump up the next value we try to auto-assign.
-          self.value = val + 1;
-        }
+          return self.delegate.put_(x, obj);
+        });
+      },
+      javaCode: `
+synchronized (this) {
+  if ( ! isPropertySet("value") ) calcDelegateMax_();
 
-        return self.delegate.put_(x, obj);
-      });
-    }
-  ]
+  if ( ! getAxiom().isSet(obj) ) {
+    getAxiom().set(obj, getValue());
+    setValue(getValue() + 1);
+  }
+}
+
+return getDelegate().put_(x, obj);
+      `,
+    },
+  ],
+
+  axioms: [
+    {
+      buildJavaClass: function(cls) {
+        cls.extras.push(`
+/**
+ * Calculates the next largest value in the sequence
+ */
+private void calcDelegateMax_() {
+  Sink sink = foam.mlang.MLang.MAX(getAxiom());
+  sink = getDelegate().select(sink);
+  setValue((long) ( ( (foam.mlang.sink.Max) sink ).getValue() == null ? 1 : ( (Number) ( (foam.mlang.sink.Max) sink ).getValue() ).longValue() + 1.0 ));
+}
+
+public SequenceNumberDAO(foam.dao.DAO delegate) {
+  System.err.println("Direct constructor use is deprecated. Use Builder instead.");
+  setDelegate(delegate);
+}
+        `);
+      },
+    },
+  ],
 });

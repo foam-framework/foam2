@@ -75,7 +75,7 @@ var createDateTestProperties = function createDateTestProperties() {
         {
           class: 'DateTime',
           name: 'dateTime',
-        },
+        }
       ]
     });
   }

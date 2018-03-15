@@ -6,7 +6,13 @@
 
 package foam.core;
 
+import foam.util.SafetyUtil;
+
 import javax.xml.stream.XMLStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public abstract class AbstractStringPropertyInfo
   extends AbstractPropertyInfo
@@ -17,13 +23,31 @@ public abstract class AbstractStringPropertyInfo
   
   public abstract int getWidth();
 
-  public void setFromString(Object obj, String value) {
-    this.set(obj, value);
+  // public void setFromString(Object obj, String value) {
+  //   this.set(obj, value);
+  // }
+
+  public Object fromString(String value) {
+    return value;
   }
 
   @Override
   public Object fromXML(X x, XMLStreamReader reader) {
     super.fromXML(x, reader);
     return reader.getText();
+  }
+
+  @Override
+  public void updateDigest(FObject obj, MessageDigest md) {
+    String val = (String) get(obj);
+    if ( SafetyUtil.isEmpty(val) ) return;
+    md.update(val.getBytes(StandardCharsets.UTF_8));
+  }
+
+  @Override
+  public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    String val = (String) get(obj);
+    if ( SafetyUtil.isEmpty(val) ) return;
+    sig.update(val.getBytes(StandardCharsets.UTF_8));
   }
 }

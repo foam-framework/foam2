@@ -68,8 +68,9 @@ public class MapDAO
 
   public FObject find_(X x, Object o) {
     if ( o == null ) {
-      System.err.println("Attempt to " + this.getOf().getId() + ".find(null).");
+      return null;
     }
+
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
           ? getData().get(getPrimaryKey().get(o))
@@ -86,7 +87,7 @@ public class MapDAO
     for ( FObject obj : getData().values() ) {
       if ( sub.getDetached() ) break;
 
-      if ( predicate == null || predicate.f(obj) ) decorated.put(obj, sub);
+      decorated.put(obj, sub);
     }
 
     decorated.eof();
