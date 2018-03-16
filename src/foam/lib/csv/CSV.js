@@ -106,14 +106,23 @@ foam.CLASS({
       name: 'outputPropertyName',
       code: foam.mmethod({
         FObject:   function(o, prefix, first) {
-          // Gets and recurses through object properties
+          // Get and recurse through object properties
           var ps = o.cls_.getAxiomsByClass(foam.core.Property);
 
           for ( var i = 0 ; i < ps.length ; i++ ) {
             this.outputPropertyName_(o, ps[i], prefix, (i == 0 && first));
           }
         },
-        Array: function(o) { /* Ignore arrays in CSV */ },
+        Array: function(o, prefix, first) {
+          if ( ! o || o.length === 0 ) return;
+
+          // Get and recurse through object properties
+          var ps = o[0].cls_.getAxiomsByClass(foam.core.Property);
+
+          for ( var i = 0 ; i < ps.length ; i++ ) {
+            this.outputPropertyName_(o, ps[i], prefix, (i == 0 && first));
+          }
+        },
         Function: function(o) { /* Ignore functions in CSV */ },
         Object: function(o) { /* Ignore generic objects in CSV */ }
       }, function(o, prefix, first) { this.outputHeaderTitle(o, prefix, first); })
