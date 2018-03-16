@@ -197,6 +197,7 @@ foam.CLASS({
       this.data = null;
     },
     function onDragOver(e) {
+      this.isDrag = true;
       e.preventDefault();    
     },
     function onDrop(e) {
