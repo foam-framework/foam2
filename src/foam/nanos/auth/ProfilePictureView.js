@@ -51,10 +51,11 @@ foam.CLASS({
       margin-left: 40px;
     }
     ^ .removeButtonContainer {
-      height: 80px;
       display: inline-block;
       vertical-align: text-bottom;
       margin-left: 20px;
+      vertical-align: top;
+      margin-top: 5px;
     }
     ^ .net-nanopay-ui-ActionView-uploadImage {
       width: 136px;
@@ -66,9 +67,9 @@ foam.CLASS({
       outline: none;
     }
     ^ .uploadDescContainer{
-      display: inline-block;
-      vertical-align: text-top;
-      margin-left: -315px;
+      position: absolute;
+      left: 132px;
+      bottom: 9px;
     }
     ^ .uploadDescription {
       margin-top: 9px;
@@ -89,6 +90,14 @@ foam.CLASS({
       width: 90%;
       height: 110px;
       padding: 10px 10px;
+      position: relative;
+    }
+    ^ .boxless-for-drag-drop {
+      border: solid 4px white;
+      width: 90%;
+      height: 110px;
+      padding: 10px 10px;
+      position: relative;
     }
   `,
 
@@ -97,55 +106,60 @@ foam.CLASS({
       class: 'foam.nanos.fs.FileProperty',
       name: 'data'
     },
+    {
+      class: 'Boolean',
+      name: 'isDrag',
+      value: false
+    },
     [ 'uploadHidden', false ]
   ],
 
   messages: [
     { name: 'UploadImageLabel', message: 'Choose File' },
     { name: 'RemoveImageLabel', message: 'Remove File' },
-
     { name: 'UploadDesc', message: 'Or drag and drop an image here' },
     { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
     { name: 'FileError', message: 'File required' },    
-    { name: 'FormatError', message: 'JPG, GIF, JPEG, BMP, PNG and PDF only accepted' },
+    { name: 'FileTypeError', message: 'Wrong file format' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }
   ],
 
   methods: [
     function initE() {
       var self = this;
-
       this
         .addClass(this.myClass())
-        .start('div').addClass('box-for-drag-drop')
+        .start('div').addClass(this.isDrag$.map(function (drag) {
+          return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
+        }))
           .add(this.slot(function (data) {
             return this.E('img').addClass('shopperImage')
-              .attrs({
-                src: this.data$.map(function (data) {
-                  if ( data && data.data ) {
-                    var blob = data.data;
-                    var sessionId = localStorage['defaultSession'];
-                    if ( self.BlobBlob.isInstance(blob) ) {
-                      return URL.createObjectURL(blob.blob);
-                    } else {
-                      var url = '/service/httpFileService/' + data.id;
-                      // attach session id if available
-                      if ( sessionId ) {
-                        url += '?sessionId=' + sessionId;
-                      }
-                      return url;
-                    }
+            .attrs({
+              src: this.data$.map(function (data) {
+                if ( data && data.data ) {
+                  var blob = data.data;
+                  var sessionId = localStorage['defaultSession'];
+                  if ( self.BlobBlob.isInstance(blob) ) {
+                    return URL.createObjectURL(blob.blob);
                   } else {
-                    return 'images/person.svg'
+                    var url = '/service/httpFileService/' + data.id;
+                    // attach session id if available
+                    if ( sessionId ) {
+                      url += '?sessionId=' + sessionId;
+                    }
+                    return url;
                   }
-                })
-              });
+                } else {
+                  return 'images/person.svg'
+                }
+              })
+            });
           }, this.data$))
           .on('dragstart', this.onDragStart)
-          .on('dragenter', this.onDragOver)
+          .on('dragenter', this.onDragEnter)
           .on('dragover', this.onDragOver)
           .on('drop', this.onDrop)
-          .start().addClass('uploadButtonContainer')
+          .start().addClass('uploadButtonContainer').hide(this.uploadHidden)
             .start('input').addClass('attachment-input')
               .attrs({
                 type: 'file',
@@ -158,13 +172,15 @@ foam.CLASS({
               .on('click', this.onAddAttachmentClicked)
             .end()
           .end()
-          .start().addClass('removeButtonContainer')
+          .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.data$.map(function (data) {
+              return data;
+            }))
             .start().addClass('attachment-btn grey-button btn')
               .add(this.RemoveImageLabel)
               .on('click', this.onRemoveClicked)
             .end()
           .end()
-          .start().addClass('uploadDescContainer')
+          .start().addClass('uploadDescContainer').hide(this.uploadHidden)
             .start().add(this.UploadDesc).addClass('uploadDescription').end()
             .start().add(this.UploadRestrict).addClass('uploadRestriction').end()
           .end()
@@ -173,30 +189,58 @@ foam.CLASS({
   ],
 
   listeners: [
+    function onAddAttachmentClicked (e) {
+      this.document.querySelector('.attachment-input').click();
+    },
+    function onRemoveClicked (e) {
+      this.isDrag = false;
+      this.data = null;
+    },
     function onDragOver(e) {
       e.preventDefault();    
     },
     function onDrop(e) {
       e.preventDefault();  
-      if (e.dataTransfer.items[0].kind === 'file') {
-      }        
-      var file = e.dataTransfer.items[0].getAsFile();
-      
-      if(file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png"){
-      }              
-      this.addFile(file);
+      this.isDrag = false;
+      if(this.uploadHidden){
+        return;
+      }
+      else{
+        var inputFile;
+        if (e.dataTransfer.items) {
+          inputFile = e.dataTransfer.items[0]
+          if (inputFile.kind === 'file') {     
+            var file = inputFile.getAsFile();
+            if(this.isRightType(file)){
+              this.addFile(file);
+            }
+            else{
+              this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+            } 
+          }
+        }else if(e.dataTransfer.files){
+          var file = e.dataTransfer.files[0];
+          if(this.isRightType(file)) 
+            this.addFile(file);
+          else{
+            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+          }  
+        }
+      }
     },
-    function onAddAttachmentClicked (e) {
-      this.document.querySelector('.attachment-input').click();
-    },
-    function onRemoveClicked (e) {
-      //TODO:  Remove the profile picture
+    function isRightType(file){
+      if(file.type === "image/jpg" 
+      || file.type === "image/jpeg" 
+      || file.type === "image/png") {
+        return true;
+      }
+      return false;
     },
     function onChange (e) {
+      this.isDrag = false;
+
       var file = e.target.files[0];
       this.addFile(file);
-      
-      
     },
     function addFile (file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
