@@ -5,7 +5,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ListCreateController',
-    'foam.support.view.TicketDetailView'
+    'foam.support.view.TicketDetailView',
+    'foam.support.view.CreateTicketView'
   ],
 
   imports: [ 'ticketDAO' ,'createLabel'],
@@ -37,6 +38,7 @@ foam.CLASS({
         dao: this.ticketDAO,
         detailView: this.TicketDetailView,
         summaryView: this.TicketTableView,
+        createDetailView: this.CreateTicketView,
         createLabel:'New Ticket',
         showActions: false
       })
