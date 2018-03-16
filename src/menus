@@ -23,10 +23,14 @@ p({"class":"foam.nanos.menu.Menu","id":"dug","label":"DUG","handler":{"class":"f
 p({"class":"foam.nanos.menu.Menu","id":"set-password","label":"Change Password","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.ChangePasswordView"}},"order":100,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.SignOutView"}},"order":110,"parent":"settings"})
 p({"class":"foam.nanos.menu.Menu","id":"permissions","label":"Permission Matrix","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.PermissionTableView"}},"order":1000,"parent":"admin"})
+<<<<<<< HEAD
 
 p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.SupportEmailView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"support1","label":"Support1","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.modal.NewEmailSupportModal1"}},"order":1000,"parent":"admin"})
 
+=======
+p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketView"}},"order":1000,"parent":"admin"})
+>>>>>>> 0afe7b5ae1d5e6740bef860c043f17ca5721ad4e
 // p({"class":"foam.nanos.menu.Menu","id":"demos","label":"Demos","order":1000,"parent":"","handler":{"class":"foam.nanos.menu.SubMenu"}})
 // p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})
 // p({"class":"foam.nanos.menu.Menu","id":"relationshipDemo","label":"Relationship Demo","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.relationship.Controller"}}})

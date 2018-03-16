@@ -23,7 +23,7 @@ foam.CLASS({
   css: `
     ^ table > tbody:nth-child(odd) {
       background: #f6f9f9;
-    } 
+    }
   `,
 
   methods: [
@@ -41,7 +41,7 @@ foam.CLASS({
 
         .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
           this.start('tr')
-            .start('td').style({'text-align': 'center', 'width': '480'}).add(p.id).end()
+            .start('td').style({'text-align': 'left', 'width': '480', 'padding-left': '8px'}).add(p.id).end()
             .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
                 var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
                 cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });

@@ -122,6 +122,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
   'foam.nanos.auth.token.TokenService',
@@ -204,14 +205,18 @@ var classes = [
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignedFObject',
-
   'foam.nanos.dig.Format',
   'foam.nanos.dig.DUG',
+<<<<<<< HEAD
 
   
 
   //Support files
   'foam.support.model.SupportEmail'
+=======
+  'foam.nanos.dig.DigPostParameters',
+  'foam.support.model.Ticket'
+>>>>>>> 0afe7b5ae1d5e6740bef860c043f17ca5721ad4e
 ];
 
 var abstractClasses = [

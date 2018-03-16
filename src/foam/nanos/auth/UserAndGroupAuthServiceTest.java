@@ -22,6 +22,10 @@ public class UserAndGroupAuthServiceTest
   protected ArrayList<User> userArray         = new ArrayList<>();
   protected ArrayList<Permission> permissions = new ArrayList<>();
 
+  public UserAndGroupAuthServiceTest(X x) {
+    super(x);
+  }
+
   @Override
   public void start() {
     System.out.println("Starting");
