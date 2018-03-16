@@ -205,14 +205,14 @@ var classes = [
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignedFObject',
-
   'foam.nanos.dig.Format',
   'foam.nanos.dig.DUG',
   'foam.nanos.dig.DigPostParameters',
 
   //Support Files
-  'foam.support.model.TicketMessage'
-  
+  'foam.support.model.TicketMessage',
+  'foam.support.model.SupportEmail',
+  'foam.support.model.Ticket'
 ];
 
 var abstractClasses = [
