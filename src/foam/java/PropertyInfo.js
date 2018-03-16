@@ -64,6 +64,7 @@ foam.CLASS({
     'jsonParser',
     'csvParser',
     'cloneProperty',
+    'diffProperty',
     {
       name: 'methods',
       factory: function() {
@@ -212,6 +213,20 @@ foam.CLASS({
             body: this.cloneProperty
           });
         }
+
+        if ( this.diffProperty != null ) {
+          m.push({
+            name: 'diff',
+            visibility: 'public',
+            type: 'void',
+            args: [ { type: 'foam.core.FObject',      name: 'o1'   },
+                    { type: 'foam.core.FObject',      name: 'o2'   },
+                    { type: 'java.util.Map',          name: 'diff' },
+                    { type: 'foam.core.PropertyInfo', name: 'prop' }],
+            body: this.diffProperty
+          });
+        }
+
         return m;
       }
     }
