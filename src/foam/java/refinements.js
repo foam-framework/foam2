@@ -61,6 +61,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaDiffProperty',
+      value: null
+    },
+    {
+      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -80,6 +85,7 @@ foam.CLASS({
         propValue:        this.javaValue,
         propRequired:     this.required,
         cloneProperty:    this.javaCloneProperty,
+        diffProperty:     this.javaDiffProperty,
         jsonParser:       this.javaJSONParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
