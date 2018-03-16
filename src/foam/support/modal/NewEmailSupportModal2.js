@@ -113,13 +113,10 @@ foam.CLASS({
     `,
     
     messages:[
-      { name:'box', message:'' },
       { name:'title', message:'New Email' },
       { name:'titlelabel', message:'Do you want to delete the email xx@xx.com?' },
-      { name:'textbox', message:'' },
       { name:'deleteButton', message:'Delete' },
-      { name:'cancelButton', message:'Cancel' },
-      { name:'notification', message:'  has been added successfully!!!' }  
+
     ],
 
     methods:[

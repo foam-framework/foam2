@@ -1,16 +1,19 @@
 foam.CLASS({
   package: 'foam.support.modal',
   name: 'NewEmailSupportModal',
-  extends: 'foam.u2.View',
+  extends: 'foam.u2.Controller',
 
   documentation:'EMAIL SUPPORT VIEW',
 
   requires: [
     'foam.u2.ModalHeader',
+    'foam.support.model.SupportEmail'
   ],
 
   imports: [
-    'closeDialog'
+    'closeDialog',
+    'supportEmailDAO',
+    'user'
   ],
 
   exports:[
@@ -124,17 +127,16 @@ foam.CLASS({
       {
         class: 'String',
         name: 'email'
+      },
+      {
+        class: 'Long',
+        name: 'id'
       }
     ],
 
     messages:[
-      { name:'box', message:'' },
       { name:'title', message:'New Email' },
       { name:'titlelabel', message:'Input the address you want to input on the help desk.' },
-      { name:'textbox', message:'' },
-      { name:'nextButton', message:'Next' },
-      { name:'cancelButton', message:'Cancel' },
-      { name:'notification', message:'  has been added successfully!!!' }  
     ],
 
     methods:[
@@ -146,32 +148,38 @@ foam.CLASS({
           title: 'New Email'
         }))
         .start().addClass('div2')
-          .start().addClass('label1') 
+        .start().addClass('label1') 
             .add(this.titlelabel)
-          .end()
-          .start(this.EMAIL).addClass('input-wide').end()
-          .start().addClass('div')
-        
-            //.add(this.cancelButton).addClass('Rectangle-7')
-            .start(this.CLOSE_MODAL).addClass('Rectangle-7').end()
-      
-          .start(this.NEXT_BUTTON).addClass('Rectangle-8').end()
         .end()
-      },
+        .start(this.EMAIL).addClass('input-wide').end()
+        .start().addClass('div')
         
-      function alert(){
-        console.log('Your email has been added successfully...');
+        .start(this.CLOSE_MODAL).addClass('Rectangle-7').end()
+          .startContext({ data : this })
+        .start(this.NEXT_BUTTON).addClass('Rectangle-8').end()
+          .endContext()
+        .end()
       }
-    ],
+    ], 
 
     actions: [
       {
         name: 'nextButton',
         label: 'Next',
-        code: function(){
-          console.log(this.email)
+        code: function(X){
+         // console.log(this.user.id)
+          var email = this.SupportEmail.create({
+            email: this.email,
+            userId:this.user.id
+          })
+
+          this.supportEmailDAO.put(email);
         }
       },
+       // code: function(){
+         // console.log(this.email)
+        //}
+      
       {
         name: 'closeModal',
         label: 'Close',

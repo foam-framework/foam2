@@ -8,6 +8,11 @@ foam.CLASS({
     requires: [
       'foam.u2.ModalHeader',
     ],
+
+    imports: [
+      'ctrl',
+      'closeDialog'
+    ],
   
 
     css:`
@@ -90,12 +95,8 @@ foam.CLASS({
 
     `,
     messages:[
-          {name:'box', message:''},
           {name:'title', message:'New Email'},
           {name:'titlelabel', message:'Please go to the email box to validate the email address before you can connect to the help desk.'},
-          {name:'textbox', message:''},
-          {name:'OKButton', message:'OK'},
-          {name:'notification', message:'  has been added successfully!!!'}
           
         ],
         
@@ -108,53 +109,21 @@ foam.CLASS({
             }))
             .start().add(this.titlelabel).addClass('label1')
               .end()
-            .start('button').add(this.OKButton).addClass('Rectangle-8')
-              .end()
+            //.start('button').add(this.OKButton).addClass('Rectangle-8')
+              //.end()
+              .start(this.CLOSE_MODAL).addClass('Rectangle-8').end()
           .end();
           
-            },
-        
-        function alert(){
-            console.log('Your email has been added successfully...')
-        }
-        ]
-        
-       /* actions:[
-        {
-            name: 'nextButton',
-            label: 'Next',
-            code: function(){
-               this.alert();
-               this.add(this.NotificationMessage.create({
-                  message: 'You can move forward now...',
-                    type:'error'
-               }));
             }
-        },
-        {
-          name: 'cancelButton',
-          label: 'Cancel',
-          code: function(){
-             this.alert();
-             this.add(this.NotificationMessage.create({
-                message: 'Your information will not be processed!!!',
-                type:'error'
-             }));
-          }
-      },
-        {
-          name: 'createEmailModal',
-          label: 'open modal',
-          code: function(){
-            this.add(
-              foam.u2.dialog.Popup.create(null, this)
-              .tag({
-                class: 'foam.support.view.modal.CreateEmailModal'
-              })
-            );
-          }
-        }
-        ]*/
+          ],
         
-
-  });
+        actions: [
+          {
+            name: 'closeModal',
+            label: 'OK',
+            code: function(X){
+              X.closeDialog()
+            }
+          }
+        ]
+      });

@@ -6,11 +6,15 @@ foam.CLASS({
   documentation:'SUPPORT VIEW',
 
   requires:[
-    'foam.u2.dialog.PopUp'
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'ctrl'
+  ],
+
+  exports: [
+    'as data'
   ],
 
   methods:[
@@ -25,7 +29,7 @@ foam.CLASS({
     {
       name: 'testModal',
       code: function(){
-        this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal'}));
+        this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal'}));
       }
     },
     {
