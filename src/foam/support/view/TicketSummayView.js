@@ -1,4 +1,4 @@
-foam.CLASS({
+/*foam.CLASS({
   package: 'foam.support.view',
   name: 'TicketSummaryView',
   extends: 'foam.u2.View',
@@ -19,7 +19,7 @@ foam.CLASS({
         ^{
           margin-bottom: 20px;
         }
-      */}
+      }
     })
   ],
   messages: [
@@ -113,8 +113,9 @@ foam.CLASS({
         var solvedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Solved'));
         solvedDAO.select(this.COUNT()).then(function(count) {
           self.solvedCount = count.value;
-        });*/
+        });
       }
     }
   ]
 });
+*/
