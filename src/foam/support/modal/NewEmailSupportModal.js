@@ -114,8 +114,8 @@ foam.CLASS({
       padding: 20px;
     }
     ^ .input-wide{
-      width: 100%;
-      padding-top: 50%;
+      width: 60%;
+      margin-top: 10px;
     }
 
     `,
