@@ -93,7 +93,7 @@ foam.CLASS({
         var newDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "New"));
         newDAO.select(this.COUNT()).then(function(count) {
           self.newCount = count.value;
-        });
+        });/*
         //Grab updated tickets
         var updatedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Updated"));
         updatedDAO.select(this.COUNT()).then(function(count) {
@@ -113,7 +113,7 @@ foam.CLASS({
         var solvedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Solved'));
         solvedDAO.select(this.COUNT()).then(function(count) {
           self.solvedCount = count.value;
-        });
+        });*/
       }
     }
   ]
