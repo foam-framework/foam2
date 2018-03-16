@@ -209,7 +209,8 @@ var classes = [
   'foam.nanos.dig.DUG',
   'foam.nanos.dig.DigPostParameters',
 
-  //Support files
+  //Support Files
+  'foam.support.model.TicketMessage',
   'foam.support.model.SupportEmail',
   'foam.support.model.Ticket'
 ];

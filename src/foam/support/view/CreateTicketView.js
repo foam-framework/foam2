@@ -8,7 +8,8 @@ foam.CLASS({
   ],
 
   imports:[
-    'ticketDAO'
+    'ticketDAO',
+    'user'
   ],
 
   exports: [
@@ -72,7 +73,7 @@ foam.CLASS({
     {
       name: 'saveTicket',
       code: function(){
-
+        
         var ticket = this.Ticket.create({
           publicMessage: this.message,
           requestorId: this.requestor,
