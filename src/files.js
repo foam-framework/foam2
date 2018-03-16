@@ -503,5 +503,6 @@ FOAM_FILES([
   //Support
   { name: "foam/support/model/Ticket" },
   { name: "foam/support/view/TicketView"},
+  { name: "foam/support/view/TicketDetailView"},
   { name: "foam/support/model/SupportEmail" }
 ]);
