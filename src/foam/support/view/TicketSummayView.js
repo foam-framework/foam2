@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.support.view',
-  name: 'SummaryTicketView',
+  name: 'TicketSummaryView',
   extends: 'foam.u2.View',
   documentation: 'Top-level ticket summary view.',
   implements: [
