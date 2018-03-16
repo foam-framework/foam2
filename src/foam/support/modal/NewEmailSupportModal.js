@@ -9,9 +9,17 @@ foam.CLASS({
     'foam.u2.ModalHeader',
   ],
 
+  imports: [
+    'closeDialog'
+  ],
+
+  exports:[
+    'as data'
+  ],
+
   css:`
     ^ {
-      height: 200px;
+      height: 220px;
     }
     ^ .title {
       margin-left: 20px;
@@ -105,8 +113,20 @@ foam.CLASS({
     ^ .div2 {
       padding: 20px;
     }
+    ^ .input-wide{
+      width: 100%;
+      padding-top: 50%;
+    }
+
     `,
-    
+
+    properties: [
+      {
+        class: 'String',
+        name: 'email'
+      }
+    ],
+
     messages:[
       { name:'box', message:'' },
       { name:'title', message:'New Email' },
@@ -129,55 +149,35 @@ foam.CLASS({
           .start().addClass('label1') 
             .add(this.titlelabel)
           .end()
+          .start(this.EMAIL).addClass('input-wide').end()
           .start().addClass('div')
-          .start('button')
-            .add(this.cancelButton).addClass('Rectangle-7')
-          .end()
-          .start('button')
-            .add(this.nextButton).addClass('Rectangle-8')
-          .end()
+        
+            //.add(this.cancelButton).addClass('Rectangle-7')
+            .start(this.CLOSE_MODAL).addClass('Rectangle-7').end()
+      
+          .start(this.NEXT_BUTTON).addClass('Rectangle-8').end()
         .end()
       },
         
       function alert(){
         console.log('Your email has been added successfully...');
       }
-    ]
-        
-       /* actions:[
-        {
-            name: 'nextButton',
-            label: 'Next',
-            code: function(){
-               this.alert();
-               this.add(this.NotificationMessage.create({
-                  message: 'You can move forward now...',
-                    type:'error'
-               }));
-            }
-        },
-        {
-          name: 'cancelButton',
-          label: 'Cancel',
-          code: function(){
-             this.alert();
-             this.add(this.NotificationMessage.create({
-                message: 'Your information will not be processed!!!',
-                type:'error'
-             }));
-          }
-      },
-        {
-          name: 'createEmailModal',
-          label: 'open modal',
-          code: function(){
-            this.add(
-              foam.u2.dialog.Popup.create(null, this)
-              .tag({
-                class: 'foam.support.view.modal.CreateEmailModal'
-              })
-            );
-          }
+    ],
+
+    actions: [
+      {
+        name: 'nextButton',
+        label: 'Next',
+        code: function(){
+          console.log(this.email)
         }
-        ]*/
+      },
+      {
+        name: 'closeModal',
+        label: 'Close',
+        code: function(X){
+          X.closeDialog()
+        }
+      }
+    ]
 });
