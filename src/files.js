@@ -500,5 +500,11 @@ FOAM_FILES([
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
-  { name: "foam/crypto/sign/SignedFObject" }
+  { name: "foam/crypto/sign/SignedFObject" },
+
+
+  { name: "foam/support/model/SupportEmail" },
+  { name: "foam/support/modal/NewEmailSupportModal"},
+  { name: "foam/support/modal/NewEmailSupportModal1"},
+  { name: "foam/support/view/SupportEmailView"}
 ]);
