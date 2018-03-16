@@ -2249,6 +2249,10 @@ foam.CLASS({
           return foam.u2.DisplayMode.RO;
         }
 
+        if ( visibility === foam.u2.Visibility.DISABLED ) {
+          return foam.u2.DisplayMode.DISABLED;
+        }
+
         if ( visibility === foam.u2.Visibility.FINAL &&
              controllerMode !== foam.u2.ControllerMode.CREATE ) {
           return foam.u2.DisplayMode.RO;
