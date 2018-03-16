@@ -17,6 +17,40 @@
 
 foam.CLASS({
   package: 'foam.box',
+  name: 'BackoffBox',
+  extends: 'foam.box.ProxyBox',
+  imports: [
+    'setTimeout'
+  ],
+  properties: [
+    {
+      class: 'Int',
+      name: 'delay',
+      preSet: function(_, a) {
+        return a < this.maxDelay ? a : this.maxDelay;
+      },
+      value: 1
+    },
+    {
+      class: 'Int',
+      name: 'maxDelay',
+      value: 20000
+    }
+  ],
+  methods: [
+    function send(m) {
+      var self = this;
+      this.setTimeout(function() {
+        self.delegate.send(m);
+      }, this.delay);
+
+      this.delay *= 2;
+    }
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'RetryReplyBox',
   extends: 'foam.box.ProxyBox',
   requires: [
@@ -41,7 +75,8 @@ foam.CLASS({
     {
       name: 'send',
       code: function send(msg) {
-        if ( this.Exception.isInstance(msg.object) && this.attempt < this.maxAttempts) {
+        if ( this.Exception.isInstance(msg.object) &&
+             ( this.maxAttempts == -1 || this.attempt < this.maxAttempts ) ) {
           this.attempt++;
           this.destination.send(this.message);
           return;
@@ -57,7 +92,9 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RetryBox',
   extends: 'foam.box.ProxyBox',
+
   requires: [
+    'foam.box.BackoffBox',
     'foam.box.RetryReplyBox'
   ],
 
@@ -65,6 +102,7 @@ foam.CLASS({
     'attempts',
     {
       name: 'maxAttempts',
+      documentation: 'Set to -1 to infinitely retry.',
       value: 3
     }
   ],
@@ -74,12 +112,21 @@ foam.CLASS({
       var replyBox = msg.attributes.replyBox;
 
       if ( replyBox ) {
+        var clone = msg.cls_.create(msg);
+
         msg.attributes.replyBox = this.RetryReplyBox.create({
           delegate: replyBox,
           maxAttempts: this.maxAttempts,
-          message: msg,
-          destination: this.delegate
+          message: clone,
+          destination: this.BackoffBox.create({
+            delegate: this.delegate
+          })
         });
+
+        clone.attributes = {};
+        for ( var key in msg.attributes ) {
+          clone.attributes[key] = msg.attributes[key];
+        }
       }
 
       this.delegate.send(msg);

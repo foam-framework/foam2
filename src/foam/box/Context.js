@@ -21,16 +21,20 @@ foam.CLASS({
   swiftName: 'BoxContext',
 
   requires: [
+    'foam.box.BoxJsonOutputter',
     'foam.box.BoxRegistryBox',
-    'foam.box.NamedBox',
     'foam.box.ClassWhitelistContext',
     'foam.box.LoggedLookupContext',
+    'foam.box.NamedBox',
+    'foam.json.Parser'
   ],
 
   exports: [
     'creationContext',
     'me',
     'messagePortService',
+    'outputter',
+    'parser',
     'registry',
     'root',
     'socketService',
@@ -61,7 +65,12 @@ foam.CLASS({
             delegate: this.registry
           }, this);
         }
-      }
+      },
+      swiftFactory: `
+return __context__.lookup("foam.swift.net.SocketService")!.create(args: [
+  "delegate$": registry$,
+], x: __subContext__)
+      `,
     },
     {
       name: 'webSocketService',
@@ -102,7 +111,7 @@ foam.CLASS({
       name: 'myname',
       hidden: true,
       swiftFactory:
-          'return "/com/foamdev/anonymous/" + String(FOAM_utils.next$UID())',
+          'return "/com/foamdev/anonymous/" + UUID().uuidString',
       factory: function() {
         return foam.isServer ?
           '/proc/' + require('process').pid + '/' + foam.uuid.randomGUID() :
@@ -148,6 +157,30 @@ foam.CLASS({
         return this.ClassWhitelistContext.create({
           whitelist: this.classWhitelist
         }, this).__subContext__;
+      },
+      swiftFactory: `
+return ClassWhitelistContext_create([
+  "whitelist$": classWhitelist$,
+]).__subContext__
+      `,
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.box.BoxJsonOutputter',
+      name: 'outputter',
+      factory: function() {
+        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
       }
     }
   ]

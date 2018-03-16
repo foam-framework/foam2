@@ -6,9 +6,11 @@
 
 package foam.core;
 
+import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
 import java.lang.UnsupportedOperationException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -19,9 +21,13 @@ import org.w3c.dom.Element;
 public abstract class AbstractArrayPropertyInfo
   extends AbstractPropertyInfo
 {
-  @Override
-  public void setFromString(Object obj, String value) {
-    // TODO
+
+  public Object fromString(String value) {
+    if ( value == null )
+      return null;
+
+    //TODO: add support for other array types
+    return foam.util.StringUtil.split(value, ',');
   }
 
   public abstract String of();
@@ -55,16 +61,62 @@ public abstract class AbstractArrayPropertyInfo
 
   @Override
   public void toXML (FObject obj, Document doc, Element objElement) {
-    if ( this.f(obj) == null ) return;
+    Object value = this.f(obj);
 
-    Element prop = doc.createElement(this.getName());
+    // Return if some kind of array other than Object[], like int[]
+    if ( value == null || ! ( value instanceof Object[]) ) return;
+
+    Object[] nestObj = (Object[]) value;
+    Element  prop    = doc.createElement(this.getName());
+
     objElement.appendChild(prop);
 
-    Object[] nestObj = (Object[]) this.f(obj);
     for ( int k = 0; k < nestObj.length; k++ ) {
       Element nestedProp = doc.createElement("value");
       nestedProp.appendChild(doc.createTextNode(nestObj[k].toString()));
       prop.appendChild(nestedProp);
     }
+  }
+
+  @Override
+  public void setStatementValue(IndexedPreparedStatement stmt, FObject o) throws java.sql.SQLException {
+    Object obj = this.get(o);
+    if ( obj == null ) {
+      stmt.setObject(null);
+      return;
+    }
+    Object[] os = (Object[]) obj;
+    StringBuilder sb = new StringBuilder();
+    int length = os.length;
+    if ( length == 0 ) {
+      stmt.setObject(null);
+      return;
+    }
+    for ( int i = 0 ; i < length ; i++ ) {
+      if ( os[i] == null ) {
+        sb.append("");
+      } else {
+        escapeCommasAndAppend(sb, os[i]);
+      }
+      if ( i < length - 1 ) {
+        sb.append(",");
+      }
+    }
+    stmt.setObject(sb.toString());
+  }
+
+  @Override
+  public void setFromResultSet(java.sql.ResultSet resultSet, int index, FObject o) throws java.sql.SQLException {
+    String value = (String) resultSet.getObject(index);
+    setFromString(o, value);
+  }
+
+  private void escapeCommasAndAppend(StringBuilder builder, Object o) {
+    String s = o.toString();
+    //replace backslash to double backslash
+    s = s.replace("\\", "\\\\");
+    //replace comma to backslash+comma
+    s = s.replace(",", "\\,");
+    builder.append(s);
   }
 }

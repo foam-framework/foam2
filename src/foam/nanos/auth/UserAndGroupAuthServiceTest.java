@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class UserAndGroupAuthServiceTest
-    extends CachedUserAndGroupAuthService
+  extends CachedUserAndGroupAuthService
 {
 
   protected int numUsers        = 10;
@@ -104,7 +104,7 @@ public class UserAndGroupAuthServiceTest
      * */
     for ( int i = 0; i < numUsers; i++ ) {
       try {
-        userArray.add(login(i, "marc" + i));
+        userArray.add(login(xArray.get(i), i, "marc" + i));
       } catch (AuthenticationException e) {
         e.printStackTrace();
       }
@@ -133,7 +133,7 @@ public class UserAndGroupAuthServiceTest
       permissions.add(permission);
 
       AuthPermission authAdminpermission = new AuthPermission(permission.getId());
-      check(xArray.get(i), authAdminpermission);
+      checkPermission(xArray.get(i), authAdminpermission);
     }
     long endTime                = System.nanoTime();
     long durationInMilliseconds = (endTime - startTime) / 1000000;
@@ -146,7 +146,7 @@ public class UserAndGroupAuthServiceTest
 
     for ( int i = 0 ; i < xArray.size() ; i++ ) {
       AuthPermission authAdminpermission = new AuthPermission(permissions.get(i).getId());
-      check(xArray.get(i), authAdminpermission);
+      checkPermission(xArray.get(i), authAdminpermission);
     }
 
     long endTime                = System.nanoTime();
@@ -160,7 +160,7 @@ public class UserAndGroupAuthServiceTest
 
     for ( int i = 0 ; i < numUsers ; i++ ) {
       try {
-        challengedLogin(i, generateChallenge(i));
+        challengedLogin(xArray.get(i), i, generateChallenge(i));
       } catch (AuthenticationException e) {
         e.printStackTrace();
       }
@@ -175,7 +175,7 @@ public class UserAndGroupAuthServiceTest
     try {
       String challenge = generateChallenge(0);
       TimeUnit.SECONDS.sleep(6);
-      challengedLogin(0, challenge);
+      challengedLogin(xArray.get(0),0, challenge);
     } catch (AuthenticationException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {

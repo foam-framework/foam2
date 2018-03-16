@@ -4,46 +4,24 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-foam.CLASS({
-  refines: 'foam.blob.Buffer',
-
-  javaImports: [
-    'java.nio.ByteBuffer'
-  ],
-
-  methods: [
-    {
-      name: 'slice',
-      javaReturns: 'foam.blob.Buffer',
-      args: [
-        {
-          name: 'start',
-          javaType: 'long'
-        },
-        {
-          name: 'end',
-          javaType: 'long'
-        }
-      ],
-      javaCode: 'return new Buffer(end - start, ByteBuffer.wrap(getData().array(), (int) start, (int) (end - start)));'
-    }
-  ]
-});
-
 foam.INTERFACE({
   refines: 'foam.blob.Blob',
 
   methods: [
     {
       name: 'read',
-      javaReturns: 'foam.blob.Buffer',
+      javaReturns: 'long',
       args: [
         {
-          name: 'buffer',
-          javaType: 'foam.blob.Buffer'
+          name: 'out',
+          javaType: 'java.io.OutputStream'
         },
         {
           name: 'offset',
+          javaType: 'long'
+        },
+        {
+          name: 'length',
           javaType: 'long'
         }
       ]
@@ -186,11 +164,8 @@ foam.CLASS({
     {
       name: 'read',
       javaCode:
-`if ( buffer.getLength() > getSize() - offset ) {
-  buffer = buffer.slice(0, getSize() - offset);
-}
-
-return getParent().read(buffer, offset + getOffset());`
+`length = Math.min(length, getSize() - offset);
+return getParent().read(out, offset, length);`
     },
     {
       name: 'slice',
@@ -203,23 +178,22 @@ foam.CLASS({
   refines: 'foam.blob.BlobStore',
 
   javaImports: [
-    'foam.core.X',
+    'org.apache.commons.io.IOUtils',
     'org.apache.geronimo.mail.util.Hex',
     'java.io.File',
-    'java.io.FileOutputStream',
-    'java.nio.ByteBuffer',
-    'java.security.MessageDigest'
+    'java.io.FileOutputStream'
   ],
 
   constants: [
     {
       name: 'BUFFER_SIZE',
-      value: 8192,
+      value: 4096,
       type: 'int'
     }
   ],
 
   properties: [
+    { class: 'String', name: 'root', javaFactory: 'return System.getProperty(\"user.dir\");'},
     { class: 'String', name: 'tmp', javaFactory: 'return getRoot() + File.separator + "tmp";' },
     { class: 'String', name: 'sha256', javaFactory: 'return getRoot() + File.separator + "sha256";' }
   ],
@@ -234,27 +208,16 @@ foam.CLASS({
 
 this.setup();
 
+HashingOutputStream os = null;
+
 try {
-  MessageDigest hash = MessageDigest.getInstance("SHA-256");
-  Buffer buffer = new Buffer(BUFFER_SIZE, ByteBuffer.allocate(BUFFER_SIZE));
-
-  long chunk = 0;
   long size = blob.getSize();
-  long chunks = (long) Math.ceil((double) size / (double) BUFFER_SIZE);
-
   File tmp = allocateTmp(1);
-  while ( chunk < chunks ) {
-    buffer = blob.read(buffer, chunkOffset(chunk));
-    byte[] buf = buffer.getData().array();
-    hash.update(buf);
-    FileOutputStream os = new FileOutputStream(tmp);
-    os.write(buf, 0, buf.length);
-    os.close();
-    buffer.getData().clear();
-    chunk++;
-  }
+  os = new HashingOutputStream(new FileOutputStream(tmp));
+  blob.read(os, 0, size);
+  os.close();
 
-  String digest = new String(Hex.encode(hash.digest()));
+  String digest = new String(Hex.encode(os.digest()));
   File dest = new File(sha256_ + File.separator + digest);
   tmp.renameTo(dest);
 
@@ -263,28 +226,33 @@ try {
   result.setX(getX());
   return result;
 } catch (Throwable t) {
-  t.printStackTrace();
   return null;
+} finally {
+  IOUtils.closeQuietly(os);
 }`
     },
     {
       name: 'find_',
       javaCode:
-`this.setup();
-if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
-  throw new RuntimeException("Invalid file name");
-}
+`try {
+  this.setup();
+  if ( ((String) id).indexOf(File.separatorChar) != -1 ) {
+    throw new RuntimeException("Invalid file name");
+  }
 
-File file = new File(getSha256() + File.separator + id);
-if ( ! file.exists() ) {
-  throw new RuntimeException("File does not exist");
-}
+  File file = new File(getSha256() + File.separator + id);
+  if ( ! file.exists() ) {
+    throw new RuntimeException("File does not exist");
+  }
 
-if ( ! file.canRead() ) {
-  throw new RuntimeException("Cannot read file");
-}
+  if ( ! file.canRead() ) {
+    throw new RuntimeException("Cannot read file");
+  }
 
-return new FileBlob(file);`
+  return new FileBlob(file);
+} catch (Throwable t) {
+  throw new RuntimeException(t);
+}`
     },
     {
       name: 'urlFor_',
@@ -336,17 +304,6 @@ if ( file.exists() ) {
   return allocateTmp(name);
 }
 return file;`
-    },
-    {
-      name: 'chunkOffset',
-      javaReturns: 'long',
-      args: [
-        {
-          name: 'i',
-          javaType: 'long'
-        }
-      ],
-      javaCode: 'return i * BUFFER_SIZE;'
     }
   ]
 });

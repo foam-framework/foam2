@@ -23,4 +23,55 @@ public class SafetyUtil {
 
     return ((Comparable) o1).compareTo(o2);
   }
+
+  public static Object deepClone(Object o) {
+    if ( o == null ) return null;
+    if ( o instanceof foam.core.FObject ) return ((foam.core.FObject)o).deepClone();
+    if ( o.getClass().isArray() ) return foam.util.Arrays.deepClone(o);
+    if ( o instanceof java.util.Map ) return deepCloneMap((java.util.Map)o);
+    if ( o instanceof java.util.Collection ) return deepCloneCollection((java.util.Collection)o);
+
+    // TODO: Non FObjects arn't cloneable, should we throw?
+    // Certainly not for immutable boxed types Int, String, Double, etc,
+    // but maybe we should for types we don't know about.
+    return o;
+  }
+
+  public static java.util.Map deepCloneMap(java.util.Map o) {
+    try {
+      java.util.Map result = (java.util.Map)o.getClass().newInstance();
+
+      java.util.Iterator<java.util.Map.Entry> entries = o.entrySet().iterator();
+
+      while ( entries.hasNext() ) {
+        java.util.Map.Entry entry = entries.next();
+        Object value = deepClone(entry.getValue());
+        result.put(entry.getKey(), value);
+      }
+
+      return result;
+    } catch(InstantiationException | IllegalAccessException e) {
+      return null;
+    }
+  }
+
+  public static java.util.Collection deepCloneCollection(java.util.Collection o) {
+    try {
+      java.util.Collection result = (java.util.Collection)o.getClass().newInstance();
+
+      java.util.Iterator iter = o.iterator();
+
+      while ( iter.hasNext() ) {
+        result.add(deepClone(iter.next()));
+      }
+
+      return result;
+    } catch(InstantiationException | IllegalAccessException e) {
+      return null;
+    }
+  }
+
+  public static boolean isEmpty(String s) {
+    return s == null || s.isEmpty();
+  }
 }

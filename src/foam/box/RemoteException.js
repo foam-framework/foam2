@@ -17,5 +17,13 @@ foam.CLASS({
       class: 'String',
       name: 'message'
     }
+  ],
+
+  methods: [
+    {
+      name: 'toString',
+      javaReturns: 'String',
+      javaCode: 'return getMessage();'
+    }
   ]
 });

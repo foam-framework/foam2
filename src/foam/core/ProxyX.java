@@ -6,6 +6,9 @@
 
 package foam.core;
 
+import java.util.Collections;
+import java.util.Map;
+
 /** Proxy for X interface. **/
 public class ProxyX
   extends    ContextAwareSupport
@@ -18,6 +21,10 @@ public class ProxyX
 
   public ProxyX(X x) {
     setX(x);
+  }
+
+  public <T> T get(Class<T> key) {
+    return getX().get(key);
   }
 
   public Object get(Object name) {
@@ -57,6 +64,10 @@ public class ProxyX
   }
 
   public <T> T create(Class<T> type) {
-    return ((FacetManager) getX().get("facetManager")).create(type, this);
+    return create(type, Collections.<String, Object>emptyMap());
+  }
+
+  public <T> T create(Class<T> type, Map<String, Object> args) {
+    return ((FacetManager) getX().get("facetManager")).create(type, args, this);
   }
 }

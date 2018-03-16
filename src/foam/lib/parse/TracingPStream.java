@@ -40,7 +40,8 @@ public class TracingPStream
 
   @Override
   public PStream apply(Parser ps, ParserContext x) {
-    String indentation = String.format("%" + (depth*2) + "s", "");
+    String format = ( depth * 2 == 0 ) ? "%s" : "%" + (depth*2) + "s";
+    String indentation = String.format(format, "");
 
     char char1 = ( this.valid() ) ? this.head() : ' ';
     writer.println(indentation + "Parsing '" + char1 + "' at position: " + pos + " using " + ps.getClass().getSimpleName());

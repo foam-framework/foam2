@@ -19,7 +19,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter' ]
+  properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter', 'css' ]
 });
 foam.CLASS({
   refines: 'foam.core.Currency',
@@ -31,7 +31,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Long',
-  properties: [ 'tableCellFormatter', 'visibility' ]
+  properties: [ 'tableCellFormatter', 'visibility', 'tableWidth' ]
 });
 foam.CLASS({
   refines: 'foam.core.Date',
@@ -51,11 +51,11 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Boolean',
-  properties: [ 'tableCellFormatter', 'tableCellView' ]
+  properties: [ 'tableCellFormatter', 'tableCellView', 'tableWidth' ]
 });
 foam.CLASS({
   refines: 'foam.core.String',
-  properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility' ]
+  properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility', 'tableWidth' ]
 });
 foam.CLASS({
   refines: 'foam.core.Method',

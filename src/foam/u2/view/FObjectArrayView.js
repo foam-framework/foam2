@@ -8,31 +8,26 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectArrayView',
   extends: 'foam.u2.View',
+
   documentation: 'View for editing FObjects inside of FObjectArrays.',
-  
+
   requires: [
     'foam.core.Property',
     'foam.u2.DetailPropertyView'
   ],
-
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function(){/*
-        .rmv-button{
-          background: rgba(216, 30, 5, 0.3);
-          width: 125px;
-          text-align: center;
-          color: indianred;
-          padding: 10px;
-          font-size: 12px;
-          border-radius: 3px;
-        }
-      */
-      }
-    })
-  ],
+  css: `
+    .rmv-button{
+      background: rgba(216, 30, 5, 0.3);
+      width: 125px;
+      text-align: center;
+      color: indianred;
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+  `,
 
   properties: [
     {
@@ -53,15 +48,26 @@ foam.CLASS({
     function initE() {
       var self = this;
 
+      var controllerMode = this.mode === foam.u2.DisplayMode.RW &&
+          (this.data.visibility === foam.u2.Visibility.RW ||
+           this.controllerMode === foam.u2.ControllerMode.CREATE) ?
+          this.controllerMode : foam.u2.ControllerMode.VIEW;
       this.add(this.ADD_ITEM).add(this.slot(function(data) {
         return this.E().forEach(data, function(o, index) {
-          this.tag({class: self.detailView}, {data: o})
-          .start().add('Remove').addClass('rmv-button').on('click', function(){ self.removeIt(index) }).end()
-        })
+          var tag = this.tag({
+            class: self.detailView,
+            controllerMode: controllerMode,
+          }, {data: o});
+          if ( this.mode === foam.u2.DisplayMode.RW ) {
+            tag.start().add('Remove').addClass('rmv-button')
+                .on('click', function(){ self.removeIt(index) }).end();
+          }
+        });
       }));
     },
 
     function fromProperty(p) {
+      this.SUPER(p);
       console.assert(p.of, 'Property "of" required for FObjectArrayView.');
       this.of = p.of;
     }
@@ -78,6 +84,9 @@ foam.CLASS({
   actions: [
     {
       name: 'addItem',
+      isAvailable: function(mode) {
+        return mode === foam.u2.DisplayMode.RW;
+      },
       code: function() {
         var data = foam.Array.clone(this.data);
         data.push(this.of.create(null, this));

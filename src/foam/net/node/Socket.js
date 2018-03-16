@@ -19,12 +19,13 @@ foam.CLASS({
   package: 'foam.net.node',
   name: 'Socket',
 
-  imports: [
-    'me',
-    'socketService'
-  ],
 
   requires: [ 'foam.box.RegisterSelfMessage' ],
+  imports: [
+    'me',
+    'outputter',
+    'socketService'
+  ],
 
   topics: [
     'message',
@@ -68,32 +69,15 @@ foam.CLASS({
       class: 'Int',
       name: 'nextSize',
       value: 0
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Outputter',
-      name: 'outputter',
-      factory: function() {
-        // Use default FOAM implementation of Outputter. Do not attempt to
-        // lookup sensitive "foam.json.Outputter" class in box context.
-        return foam.lookup('foam.json.Outputter').create({
-          pretty: false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues: false,
-          strict: true,
-          propertyPredicate: function(o, p) { return ! p.networkTransient; }
-        }, this);
-      }
     }
   ],
 
   methods: [
     function write(msg) {
-      var serialized = this.outputter.stringify(msg);
-      var size = Buffer.byteLength(serialized);
+      var size = Buffer.byteLength(msg);
       var packet = Buffer.alloc(size + 4);
       packet.writeInt32LE(size);
-      packet.write(serialized, 4);
+      packet.write(msg, 4);
       this.socket_.write(packet);
     },
 
@@ -110,9 +94,8 @@ foam.CLASS({
           });
           socket.once('connect', function() {
             this.socket_ = socket;
-            this.write(this.RegisterSelfMessage.create({
-              name: this.me.name
-            }));
+            this.write(this.outputter.stringify(
+              this.RegisterSelfMessage.create({name: this.me.name})));
             this.socketService.addSocket(this);
             this.connect.pub();
             resolve(this);

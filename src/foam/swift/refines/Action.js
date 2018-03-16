@@ -47,7 +47,7 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, _, parentCls) {
       if ( !this.swiftCode ) return;
       cls.fields.push(this.Field.create({
         lazy: true,
@@ -66,7 +66,7 @@ foam.CLASS({
         final: true,
         name: this.swiftPrivateAxiomName,
         type: 'ActionInfo',
-        initializer: this.swiftAxiomInit(),
+        initializer: this.swiftAxiomInit(parentCls),
       }));
       cls.methods.push(this.Method.create({
         visibility: 'public',
@@ -80,12 +80,16 @@ foam.CLASS({
   templates: [
     {
       name: 'swiftAxiomInit',
-      args: [],
+      args: ['parentCls'],
       template: function() {/*
 class ActionInfo_: ActionInfo {
   let args: [MethodArg] = []
   let label = "<%=this.label%>" // TODO localize
   let name = "<%=this.swiftName%>"
+  public func getSlot(_ obj: FObject) -> Slot {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftSlotName%>
+  }
 }
 return ActionInfo_()
       */},

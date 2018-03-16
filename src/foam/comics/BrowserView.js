@@ -32,7 +32,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'data',
+      name: 'data'
     },
     {
       name: 'title',

@@ -6,17 +6,21 @@
 
 package foam.box;
 
-import foam.core.*;
-import foam.dao.*;
+import foam.core.X;
+import foam.dao.DAO;
+import foam.nanos.auth.AuthService;
+import foam.nanos.auth.*;
+import foam.nanos.boot.NSpec;
+import foam.nanos.logger.*;
 import foam.nanos.session.Session;
+import java.security.AccessControlException;
 import java.util.Date;
+import javax.naming.NoPermissionException;
 import javax.servlet.http.HttpServletRequest;
-
 
 public class SessionServerBox
   extends ProxyBox
 {
-
   protected boolean authenticate_;
 
   public SessionServerBox(X x, Box delegate, boolean authenticate) {
@@ -28,37 +32,48 @@ public class SessionServerBox
     String sessionID = (String) msg.getAttributes().get("sessionId");
 
     try {
-      System.err.println("**** SESSIONID: " + sessionID);
-
       if ( sessionID != null ) {
-        DAO     dao     = (DAO) getX().get("sessionDAO");
-        Session session = (Session) dao.find(sessionID);
+        NSpec       spec       = getX().get(NSpec.class);
+        AuthService auth       = (AuthService) getX().get("auth");
+        DAO         sessionDAO = (DAO)         getX().get("sessionDAO");
+        Session     session    = (Session)     sessionDAO.find(sessionID);
 
         if ( session == null ) {
           session = new Session();
           session.setId(sessionID);
 
-          HttpServletRequest req = (HttpServletRequest) getX().get(HttpServletRequest.class);
+          HttpServletRequest req = getX().get(HttpServletRequest.class);
           session.setRemoteHost(req.getRemoteHost());
-          session.setContext(getX());
+          session.setContext(getX().put(Session.class, session));
         }
+
+        X x = session.getContext().put(
+            "logger",
+            new PrefixLogger(
+                new Object[] { "[Service]", spec.getName() },
+                (Logger) session.getContext().get("logger")));
 
         session.setLastUsed(new Date());
         session.setUses(session.getUses()+1);
 
-        dao.put(session);
+        sessionDAO.put(session);
 
-        /*
-        TODO: uncomment to activate
         if ( authenticate_ && session.getUserId() == 0 ) {
-          System.err.println("*************** NOT LOGGED IN");
-          msg.replyWithException(new java.security.AccessControlException("not logged in"));
+          msg.replyWithException(new AccessControlException("Not logged in"));
           return;
         }
-        */
 
-        System.err.println("**************************SETTING SESSION*********");
-        msg.getLocalAttributes().put("x", getX().put("Session.class", session));
+        if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
+          User   user     = (User) x.get("user");
+          DAO    groupDAO = (DAO) x.get("groupDAO");
+          Group  group    = (Group) groupDAO.find(user.getGroup());
+          Logger logger   = (Logger) x.get("logger");
+          logger.debug("missing permission", group.getId(), "service." + spec.getName());
+          // msg.replyWithException(new NoPermissionException("No permission"));
+          // return;
+        }
+
+        msg.getLocalAttributes().put("x", x);
       }
     } catch (Throwable t) {
       t.printStackTrace();

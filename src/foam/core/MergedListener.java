@@ -3,7 +3,7 @@ package foam.core;
 public abstract class MergedListener {
   protected Thread thread_ = null;
 
-  protected volatile Object lastEvent_ = null;
+  protected volatile Object[] lastArgs_ = null;
 
   protected synchronized void clear() {
     thread_ = null;
@@ -16,13 +16,13 @@ public abstract class MergedListener {
       } catch (InterruptedException e) {}
 
       clear();
-      go(lastEvent_);
+      go(lastArgs_);
     }
   }
 
   // Public Interface
-  public synchronized void fire(Object event) {
-    lastEvent_ = event;
+  public synchronized void fire(Object[] args) {
+    lastArgs_ = args;
 
     if ( thread_ == null ) {
       thread_ = new Thread(new ListenerThread());
@@ -31,5 +31,5 @@ public abstract class MergedListener {
   }
 
   public abstract int getDelay();
-  public abstract void go(Object event);
+  public abstract void go(Object[] args);
 }

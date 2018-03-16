@@ -19,9 +19,7 @@ foam.CLASS({
   package: 'foam.box',
   name: 'RawWebSocketBox',
   implements: ['foam.box.Box'],
-  requires: [
-    'foam.box.ReplyBox'
-  ],
+  requires: [ 'foam.box.ReplyBox' ],
   imports: [
     {
       name: 'me',
@@ -32,39 +30,16 @@ foam.CLASS({
       key: 'registry',
       name: 'registry',
       javaType: 'foam.box.BoxRegistry',
-    }
+    },
+    'outputter'
   ],
 
   properties: [
     {
       class: 'Object',
       name: 'socket',
-      javaType: 'org.java_websocket.WebSocket'
+      javaType: 'foam.net.WebSocket'
     }
-  ],
-
-  classes: [
-    foam.core.InnerClass.create({
-      generateJava: false,
-      model: {
-        name: 'JSONOutputter',
-        extends: 'foam.json.Outputter',
-        requires: [
-          'foam.box.ReturnBox'
-        ],
-        imports: [
-          'me'
-        ],
-        methods: [
-          function output(o) {
-            if ( o === this.me ) {
-              return this.SUPER(this.ReturnBox.create());
-            }
-            return this.SUPER(o);
-          }
-        ]
-      }
-    })
   ],
 
   methods: [
@@ -73,29 +48,17 @@ foam.CLASS({
       code: function send(msg) {
         var replyBox = msg.attributes.replyBox;
         if ( replyBox ) {
-          // TODO: We should probably clone here, but often the message
-          // contains RPC arguments that don't clone properly.  So
-          // instead we will mutate replyBox and put it back after.
+          // TODO: Should replyBox just be a property on message with
+          // custom serialization?
 
-          // Even better solution would be to move replyBox to a
-          // property on Message and have custom serialization in it to
-          // do the registration.
+          // TODO: Add one-time service policy
 
-          msg.attributes.replyBox =
-            this.__context__.registry.register(null, null, msg.attributes.replyBox);
-
-          // TODO: There should be a better way to do this.
-          replyBox = this.ReplyBox.create({
-            id: msg.attributes.replyBox.name
-          });
+          msg.attributes.replyBox = this.__context__.registry.
+              register(msg.attributes.replyBox.id, null,
+                       msg.attributes.replyBox);
         }
 
-        var payload = this.JSONOutputter.create().copyFrom(foam.json.Network).stringify(msg);
-
-        if ( replyBox ) {
-          msg.attributes.replyBox = replyBox;
-        }
-
+        var payload = this.outputter.stringify(msg);
         try {
           this.socket.send(payload);
         } catch(e) {
@@ -119,7 +82,13 @@ String payload = outputter.stringify(message);
 
 message.getAttributes().put("replyBox", replyBox);
 
-getSocket().send(payload);
+try {
+  getSocket().send(payload);
+} catch ( java.io.IOException e ) {
+  foam.box.Message reply = new foam.box.Message();
+  reply.setObject(e);
+  if ( replyBox != null ) replyBox.send(reply);
+}
 `
     }
   ],

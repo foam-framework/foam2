@@ -20,6 +20,10 @@ foam.CLASS({
   properties: [ 'javaCode' ]
 });
 foam.CLASS({
+  refines: 'foam.core.EMail',
+  properties: [ 'javaSetter' ]
+});
+foam.CLASS({
   refines: 'foam.core.String',
   properties: [ 'javaGetter' ]
 });
@@ -55,3 +59,8 @@ foam.CLASS({
   refines: 'foam.core.Implements',
   properties: [ 'java' ]
 });
+foam.CLASS({
+  refines: 'foam.u2.ViewSpec',
+  properties: [ 'javaInfoType', 'javaJSONParser' ]
+});
+

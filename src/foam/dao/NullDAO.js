@@ -22,34 +22,75 @@ foam.CLASS({
 
   documentation: 'A Null pattern (do-nothing) DAO implementation.',
 
-  requires: [
-    'foam.dao.ExternalException',
-    'foam.dao.ObjectNotFoundException'
-  ],
-
   methods: [
-    function put_(x, obj) {
-      this.pub('on', 'put', obj);
-      return Promise.resolve(obj);
+    {
+      name: 'put_',
+      code: function put_(x, obj) {
+        this.pub('on', 'put', obj);
+        return Promise.resolve(obj);
+      },
+      swiftCode: `
+_ = on["put"].pub([obj])
+return obj
+      `,
+      javaCode: `
+onPut(obj);
+return obj;
+      `,
     },
 
-    function remove_(x, obj) {
-      this.pub('on', 'remove', obj);
-      return Promise.resolve();
+    {
+      name: 'remove_',
+      code: function remove_(x, obj) {
+        this.pub('on', 'remove', obj);
+        return Promise.resolve();
+      },
+      swiftCode: `
+_ = on["remove"].pub([obj])
+return obj
+      `,
+      javaCode: `
+onRemove(obj);
+return null;
+      `,
     },
 
-    function find_(x, id) {
-      return Promise.resolve(null);
+    {
+      name: 'find_',
+      code: function find_(x, id) {
+        return Promise.resolve(null);
+      },
+      swiftCode: 'return nil',
+      javaCode: 'return null;',
     },
 
-    function select_(x, sink, skip, limit, order, predicate) {
-      sink = sink || foam.dao.ArraySink.create();
-      sink.eof();
-      return Promise.resolve(sink);
+    {
+      name: 'select_',
+      code: function select_(x, sink, skip, limit, order, predicate) {
+        sink = sink || foam.dao.ArraySink.create();
+        sink.eof();
+        return Promise.resolve(sink);
+      },
+      swiftCode: `
+sink.eof()
+return sink
+      `,
+      javaCode: `
+if ( sink == null ) {
+  sink = new ArraySink();
+}
+sink.eof();
+return sink;
+      `,
     },
 
-    function removeAll_(x, skip, limit, order, predicate) {
-      return Promise.resolve();
-    }
+    {
+      name: 'removeAll_',
+      code: function removeAll_(x, skip, limit, order, predicate) {
+        return Promise.resolve();
+      },
+      swiftCode: 'return',
+      javaCode: '// NOOP',
+    },
   ]
 });

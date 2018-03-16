@@ -6,30 +6,46 @@
 
 package foam.nanos.http;
 
-import foam.box.*;
-import foam.core.*;
+import foam.box.Box;
+import foam.box.SessionServerBox;
 import foam.core.FObject;
+import foam.core.ProxyX;
+import foam.core.X;
 import foam.lib.json.ExprParser;
 import foam.lib.json.JSONParser;
 import foam.lib.parse.*;
 import foam.nanos.logger.Logger;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.nio.CharBuffer;
-import javax.servlet.http.HttpServlet;
+import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
 
 @SuppressWarnings("serial")
 public class ServiceWebAgent
-  implements WebAgent
+    implements WebAgent
 {
-  protected Object  service_;
+  public static final int BUFFER_SIZE = 4096;
+
+  protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
+
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
+
   protected Box     skeleton_;
   protected boolean authenticate_;
 
-  public ServiceWebAgent(Object service, Box skeleton, boolean authenticate) {
-    service_      = service;
+  public ServiceWebAgent(Box skeleton, boolean authenticate) {
     skeleton_     = skeleton;
     authenticate_ = authenticate;
   }
@@ -52,33 +68,40 @@ public class ServiceWebAgent
   }
 */
 
-  public synchronized void execute(X x) {
+  public void execute(X x) {
     try {
-      HttpServletRequest  req            = (HttpServletRequest)  x.get(HttpServletRequest.class);
-      HttpServletResponse resp           = (HttpServletResponse) x.get(HttpServletResponse.class);
-      PrintWriter         out            = (PrintWriter) x.get(PrintWriter.class);
-      CharBuffer          buffer_        = CharBuffer.allocate(65535);
+      HttpServletRequest  req            = x.get(HttpServletRequest.class);
+      HttpServletResponse resp           = x.get(HttpServletResponse.class);
+      PrintWriter         out            = x.get(PrintWriter.class);
       BufferedReader      reader         = req.getReader();
-      int                 count          = reader.read(buffer_);
       X                   requestContext = x.put("httpRequest", req).put("httpResponse", resp);
       Logger              logger         = (Logger) x.get("logger");
 
       resp.setHeader("Access-Control-Allow-Origin", "*");
-      buffer_.rewind();
+
+      int read = 0;
+      int count = 0;
+      int length = req.getContentLength();
+
+      StringBuilder builder = sb.get();
+      char[] cbuffer = new char[BUFFER_SIZE];
+      while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
+        builder.append(cbuffer, 0, read);
+        count += read;
+      }
 
       FObject result;
       try {
-        result = requestContext.create(JSONParser.class).parseString(buffer_.toString());
+        result = requestContext.create(JSONParser.class).parseString(builder.toString());
       } catch (Throwable t) {
-        System.err.println("Unable to parse: " + buffer_.toString());
+        System.err.println("Unable to parse: " + builder.toString());
         throw t;
       }
 
       if ( result == null ) {
         resp.setStatus(resp.SC_BAD_REQUEST);
-        String message = getParsingError(x, buffer_.toString());
-        logger.error(message + ", input: " + buffer_.toString());
-        out.print(message);
+        String message = getParsingError(x, builder.toString());
+        logger.error("JSON parse error: " + message + ", input: " + builder.toString());
         out.flush();
         return;
       }
@@ -90,10 +113,6 @@ public class ServiceWebAgent
         out.flush();
         return;
       }
-
-      // TODO: make skeleton_.send() take x instead
-      if ( service_ instanceof ContextAware )
-        ((ContextAware) service_).setX(x);
 
       foam.box.Message msg = (foam.box.Message) result;
       new SessionServerBox(x, skeleton_, authenticate_).send(msg);

@@ -43,7 +43,7 @@ public class AuthMOP
 
     java.security.Permission permission = new AuthPermission(permissionString);
 
-    return authService.check(x, permission);
+    return authService.checkPermission(x, permission);
   }
 
   @Override

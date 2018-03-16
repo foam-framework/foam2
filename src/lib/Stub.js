@@ -23,9 +23,10 @@ foam.CLASS({
         var name            = this.name;
 
         return function() {
-          var replyBox = this.RPCReturnBox.create()
+          var returnBox = this.RPCReturnBox.create();
+          var replyBox = this.ReplyBox.create({delegate: returnBox});
 
-          var ret = replyBox.promise;
+          var ret = returnBox.promise;
 
           // Automatically wrap RPCs that return a "PromisedAbc" or similar
           // TODO: Move this into RPCReturnBox ?
@@ -136,6 +137,27 @@ foam.CLASS({
     },
     {
       class: 'StringArray',
+      name: 'notifications',
+      factory: function() { return null; }
+    },
+    {
+      name: 'notifications_',
+      expression: function(of, name, notifications) {
+        var cls = this.lookup(of);
+
+        return notifications && notifications.
+          map(function(m) { return cls.getAxiomByName(m); }).
+          map(function(m) {
+            return foam.core.StubNotification.create({
+              name: m.name,
+              boxPropName: name,
+              args: m.args
+            });
+          });
+      }
+    },
+    {
+      class: 'StringArray',
       name: 'actions',
       factory: function() { return null; }
     },
@@ -157,7 +179,7 @@ foam.CLASS({
           });
       }
     },
-    ['javaType', 'foam.box.Box'],
+    ['javaType',     'foam.box.Box'],
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo']
   ],
 
@@ -172,15 +194,11 @@ foam.CLASS({
         hidden: true
       }));
 
-      for ( var i = 0 ; i < this.methods_.length ; i++ ) {
-        cls.installAxiom(this.methods_[i]);
-      }
+      cls.installAxioms(this.methods_);
+      cls.installAxioms(this.notifications_);
+      cls.installAxioms(this.actions_);
 
-      for ( i = 0 ; i < this.actions_.length ; i++ ) {
-        cls.installAxiom(this.actions_[i]);
-      }
-
-      [
+      cls.installAxioms([
         'foam.box.RPCReturnBox',
         'foam.box.ReplyBox',
         'foam.box.RPCMessage',
@@ -191,9 +209,7 @@ foam.CLASS({
           path: s,
           name: path[path.length - 1]
         });
-      }).forEach(function(a) {
-        cls.installAxiom(a);
-      });
+      }));
 
       cls.installAxiom(foam.core.Import.create({
         key: 'registry',
@@ -283,6 +299,36 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.core',
+  name: 'StubNotification',
+  documentation: "Similar to a StubMethod but doesn't register a reply box.  Useful when you don't care whether the method evaluates successfully on the target but just want to send a notification to the target.",
+  extends: 'Method',
+
+  properties: [
+    'boxPropName',
+    {
+      name: 'code',
+      factory: function() {
+        var boxPropName = this.boxPropName;
+        var name        = this.name;
+
+        return function() {
+          var msg = this.Message.create({
+            object: this.RPCMessage.create({
+              name: name,
+              args: Array.from(arguments)
+            })
+          });
+
+          this[boxPropName].send(msg);
+
+          return;
+        };
+      }
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.core',

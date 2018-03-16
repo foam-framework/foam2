@@ -52,7 +52,13 @@ foam.CLASS({
   properties: [
     { class: 'Boolean', name: 'isFramed',   value: false },
     { class: 'Boolean', name: 'isMerged',   value: false },
-    { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' }
+    { class: 'Int',     name: 'mergeDelay', value: 16, units: 'ms' },
+    {
+      name: 'args',
+      factory: function() {
+        return [ { name: 'sub', javaType: 'foam.core.Detachable' } ];
+      }
+    }
   ],
 
   methods: [

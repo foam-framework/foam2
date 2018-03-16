@@ -21,5 +21,14 @@ foam.CLASS({
       class: 'String',
       name: 'name'
     }
-  ]
+  ],
+  methods: [{
+    name: 'toString',
+    returns: 'String',
+    javaReturns: 'String',
+    code: function() { return "Country: " + this.code + ", " + this.name; },
+    javaCode: `
+      return "{ code:" + this.getCode() + ", name:" + this.getName() + " }";
+    `
+  }]
 });

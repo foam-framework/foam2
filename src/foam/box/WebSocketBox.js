@@ -20,9 +20,9 @@ foam.CLASS({
   name: 'WebSocketBox',
 
   requires: [
-    'foam.net.web.WebSocket',
     'foam.box.Message',
-    'foam.box.RawWebSocketBox'
+    'foam.box.RawWebSocketBox',
+    'foam.net.web.WebSocket'
   ],
 
   imports: [
@@ -49,15 +49,18 @@ foam.CLASS({
         });
 
         return ws.connect().then(function(ws) {
-
           ws.disconnected.sub(function(sub) {
             sub.detach();
-            this.socket = undefined;
+            this.delegate = undefined;
           }.bind(this));
 
           this.webSocketService.addSocket(ws);
 
           return this.RawWebSocketBox.create({ socket: ws });
+        }.bind(this), function(e) {
+          // Failed to connect, clear the delegate so that the next send
+          // will reconnect.
+          this.delegate = undefined;
         }.bind(this));
       }
     }
@@ -67,7 +70,14 @@ foam.CLASS({
     function prepareURL(url) {
       /* Add window's origin if url is not complete. */
       if ( this.window && url.indexOf(':') == -1 ) {
-        return 'ws://' + this.window.location.hostname + ':' + ( Number.parseInt(this.window.location.port) + 1 ) + '/' + url;
+        var protocol = "ws://";
+        if ( this.window.location.protocol === "https:" ) {
+          protocol = "wss://";
+        }
+
+        return protocol + this.window.location.hostname +
+          ( this.window.location.port ? ':' + ( parseInt(this.window.location.port) + 1 ) : '' ) +
+          '/' + url;
       }
 
       return url;
@@ -78,6 +88,11 @@ foam.CLASS({
       code: function send(msg) {
         this.delegate.then(function(d) {
           d.send(msg);
+        }, function(e) {
+          // Failed to connect.
+          if ( msg.attributes.replyBox ) msg.attributes.replyBox.send(foam.box.Message.create({
+            object: e
+          }));
         });
       }
     }

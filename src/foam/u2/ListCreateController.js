@@ -1,3 +1,20 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /** @license Copyright 2017 The FOAM Authors, All Rights Reserved. */
 
 foam.CLASS({
@@ -18,6 +35,7 @@ foam.CLASS({
     'detailView',
     'createDetailView',
     'factory',
+    'memento',
     'summaryView',
     'showActions'
   ],
@@ -44,7 +62,8 @@ foam.CLASS({
       class: 'String',
       name: 'createLabel'
     },
-    [ 'showActions', true ]
+    [ 'showActions', true ],
+    'memento'
   ],
 
   methods: [
@@ -75,17 +94,30 @@ foam.CLASS({
       name: 'ListController',
       extends: 'foam.u2.Element',
 
-      imports: [ 'stack', 'summaryView', 'dao', 'createLabel' ],
+      imports: [
+        'createLabel',
+        'dao',
+        'memento',
+        'stack',
+        'summaryView'
+      ],
+
       exports: [ 'as data' ],
 
       properties: [
         {
-          name: 'selection'
+          name: 'selection',
+          postSet: function(o, n) {
+            this.memento = n ? n.id : '';
+          }
         }
       ],
 
       methods: [
         function initE() {
+          this.memento$.sub(this.onMementoChange);
+          this.onMementoChange();
+
           this
             .start(this.CREATE, this.createLabel && {label: this.createLabel}).style({float: 'right'}).end()
             .tag(this.summaryView, {data: this.dao, selection$: this.selection$});
@@ -93,8 +125,10 @@ foam.CLASS({
           var self = this;
           this.selection$.sub(function() {
             if ( self.selection ) {
-              self.stack.push(foam.u2.ListCreateController.ViewController.create({obj: self.selection}, self));
-              self.selection = undefined;
+              var selection = self.selection;
+              self.stack.push(function() {
+                return foam.u2.ListCreateController.ViewController.create({obj: selection}, self);
+              });
             }
           });
         }
@@ -102,7 +136,20 @@ foam.CLASS({
 
       actions: [
         function create(X) {
-          this.stack.push(foam.u2.ListCreateController.CreateController.create(null, X));
+          this.stack.push(function() { return foam.u2.ListCreateController.CreateController.create(null, X); });
+        }
+      ],
+
+      listeners: [
+        function onMementoChange() {
+          if ( this.memento ) {
+            var self = this;
+            this.dao.find(this.memento).then(function (obj) {
+              self.selection = obj;
+            });
+          } else {
+            this.selection = null;
+          }
         }
       ]
     },
@@ -158,7 +205,7 @@ foam.CLASS({
       methods: [
         function initE() {
           this.tag(this.detailView, {data: this.obj, controllerMode: foam.u2.ControllerMode.VIEW})
-          if ( this.showActions ) this.add(this.BACK);          
+          if ( this.showActions ) this.add(this.BACK);
         }
       ],
 

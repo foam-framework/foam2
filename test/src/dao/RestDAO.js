@@ -93,7 +93,7 @@ describe('RestDAO', function() {
           } else if ( this.method === 'DELETE' &&
                       this.url.indexOf(this.baseURL) === 0 ) {
             // remove()
-            id = JSON.parse(decodeURIComponent(this.url.substr(
+            id = this.parser.parseString(decodeURIComponent(this.url.substr(
               this.baseURL.length + 1)));
             return dao.find(id).then(function(o) {
               payload = jsonify(o);
@@ -105,7 +105,7 @@ describe('RestDAO', function() {
                       this.url.indexOf(this.baseURL) === 0 &&
                       this.url.charAt(this.baseURL.length) === '/' ) {
             // find()
-            id = JSON.parse(decodeURIComponent(this.url.substr(
+            id = this.parser.parseString(decodeURIComponent(this.url.substr(
               this.baseURL.length + 1)));
             return dao.find(id).then(function(o) {
               return createResponse({ status: 200, payload: jsonify(o) });

@@ -14,14 +14,23 @@ foam.CLASS({
       class: 'String',
       name: 'daoKey'
     },
-    { class: 'foam.u2.ViewSpec', name: 'summaryView',
-    // TODO: remove next line when permanently fixed in ViewSpec
-    fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
+    {
+      class: 'foam.u2.ViewSpec',
+      name: 'summaryView',
+      javaType: 'foam.lib.json.UnknownFObject',
+      javaInfoType: 'foam.core.AbstractFObjectPropertyInfo',
+      javaJSONParser: 'new foam.lib.json.UnknownFObjectParser()',
+      // TODO: remove next line when permanently fixed in ViewSpec
+      fromJSON: function fromJSON(value, ctx, prop, json) { return value; }
     }
   ],
 
   methods: [
     function createView(X) {
+      if ( ! X[this.daoKey] ) {
+        throw new Error("No dao found for " + this.daoKey);
+      }
+
       var view = { class: 'foam.comics.BrowserView', data: X[this.daoKey] };
 
       if ( this.summaryView ) view.summaryView = this.summaryView;

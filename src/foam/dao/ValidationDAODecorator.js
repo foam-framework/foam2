@@ -18,7 +18,7 @@
 foam.CLASS({
   package: 'foam.dao',
   name: 'ValidationDAODecorator',
-  implements: ['foam.dao.DAODecorator'],
+  extends: 'foam.dao.AbstractDAODecorator',
   documentation: 'DAO decorator that rejects puts of objects that are invalid.',
   methods: [
     function write(X, dao, obj, existing) {

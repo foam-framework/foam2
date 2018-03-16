@@ -5,6 +5,44 @@
  */
 
 foam.CLASS({
+  name: 'AddressDetailView',
+  extends: 'foam.u2.View',
+
+  requires: [ 'foam.nanos.auth.Address' ],
+
+  css: `
+    ^ {
+      background: white;
+      width: 200px;
+      border: 2px solid gray;
+    }
+  `,
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      this.
+        addClass(this.myClass()).
+        add('My Custom Address View').
+        add(this.data.SUITE.label, this.data.SUITE).
+        add(this.data.CITY.label, this.data.CITY).
+        add(this.data.POSTAL_CODE.label, this.data.POSTAL_CODE).
+        add(this.data.COUNTRY_ID.label, this.data.COUNTRY_ID).
+        add(this.data.REGION_ID.label, this.data.REGION_ID);
+//        add(this.data.ADDRESS.label, this.data.ADDRESS);
+    }
+  ]
+});
+
+var address = foam.nanos.auth.Address.create();
+var dv1 = foam.u2.DetailView.create({data: address});
+var dv2 = AddressDetailView.create({data: address});
+
+dv1.write(document);
+dv2.write(document);
+
+foam.CLASS({
   name: 'Something',
 
   requires: [
@@ -273,7 +311,7 @@ foam.CLASS({
   properties: [
     { class: 'Int', name: 'i' },
     'field1',
-    { name: 'field2', view: 'foam.u2.view.PasswordView' },
+    { name: 'field2', view: { class: 'foam.u2.view.PasswordView' } },
     {
       name: 'choices',
       view: {
@@ -527,7 +565,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'obj',
-      view: 'foam.u2.view.FObjectView',
+      view: { class: 'foam.u2.view.FObjectView' },
       value: foam.util.Timer.create()
     }
   ]
@@ -536,3 +574,71 @@ foam.CLASS({
 var fovt = FObjectViewTest.create();
 foam.u2.DetailView.create({data:fovt}).write();
 foam.u2.DetailView.create({data:fovt}).write();
+
+
+foam.CLASS({
+  name: 'StringArrayTest',
+  properties: [
+    {
+      class: 'StringArray',
+      name: 'a1',
+      value: [ 'abc', 'def', 'xyz' ]
+    },
+    {
+      class: 'StringArray',
+      name: 'a2',
+      view: { class: 'foam.u2.view.StringArrayRowView' }
+    }
+  ]
+});
+
+foam.CLASS({
+  name: 'StringArrayTestDetailView',
+  extends: 'foam.u2.View',
+
+  properties: [
+    { class: 'Boolean', name: 'showMe' }
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+
+      this.tick();
+
+      this.start('blockquote')
+        .show(this.showMe$)
+        .forEach(this.data.a1, function(d) {
+          console.log('*******', d);
+          this.add('(', d, ')');
+        })
+      .end();
+
+      this.tag('br');
+      this.add(this.data.a1.map(function(d) { return '[' + d + ']'; }));
+    }
+  ],
+
+  listeners: [
+    {
+      name: 'tick',
+      isMerged: true,
+      mergeDelay: 1000,
+      code: function() {
+        this.showMe = ! this.showMe;
+        this.tick();
+      }
+    }
+  ]
+});
+
+
+
+var sat = StringArrayTest.create({a1:['abc','def','ghi']});
+// sat.a1$ = sat.a2$;
+
+// foam.u2.DetailView.create({data: sat}).write(document);
+
+document.write("*********************");
+
+StringArrayTestDetailView.create({data: sat}).write(document);

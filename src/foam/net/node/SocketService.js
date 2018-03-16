@@ -30,7 +30,8 @@ foam.CLASS({
   imports: [
     'creationContext',
     'error',
-    'info'
+    'info',
+    'parser'
   ],
 
   properties: [
@@ -53,17 +54,6 @@ foam.CLASS({
     },
     {
       name: 'delegate'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Parser',
-      name: 'parser',
-      factory: function() {
-        return this.Parser.create({
-          strict: true,
-          creationContext: this.creationContext
-        });
-      }
     }
   ],
 
@@ -96,8 +86,25 @@ foam.CLASS({
     },
 
     function addSocket(socket) {
+      var socketBox = this.RawSocketBox.create({
+        socket: socket
+      });
+
+      // Dynamic class loaders may register classes after a socket is opened.
+      // Point to a context that updates when creationContext changes to allow
+      // for this.
+      var X;
+      var self = this;
+      function bindX() {
+        X = self.creationContext.createSubContext({
+          returnBox: socketBox
+        });
+      }
+      this.creationContext$.sub(bindX);
+      bindX();
+
       var s1 = socket.message.sub(function(s, _, mStr) {
-        var m = this.parser.parseString(mStr);
+        var m = this.parser.parseString(mStr, X);
 
         if ( ! this.Message.isInstance(m) ) {
           console.warn('Got non-message:', m, mStr);
@@ -108,9 +115,7 @@ foam.CLASS({
             name: m.name
           });
 
-          named.delegate = this.RawSocketBox.create({
-            socket: socket
-          });
+          named.delegate = socketBox;
           return;
         }
 

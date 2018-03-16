@@ -39,12 +39,15 @@ foam.CLASS({
   ],
 
   methods: [
-    // TODO: Why is this init() instead of initE()? Investigate and maybe fix.
-    function init() {
+    function initE() {
       this.setNodeName('div');
+      this.addClass(this.myClass());
 
-      if ( this.showActions )
-        this.add(this.Stack.BACK, this.Stack.FORWARD);
+      if ( this.showActions ) {
+        this.start('actions')
+            .add(this.data.cls_.getAxiomsByClass(foam.core.Action))
+            .end();
+      }
 
       this.add(this.slot(function(s) {
         if ( ! s ) return this.E('span');

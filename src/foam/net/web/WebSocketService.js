@@ -15,22 +15,15 @@ foam.CLASS({
     'foam.net.web.WebSocket',
     'foam.box.RawWebSocketBox'
   ],
-  imports: [ 'creationContext' ],
+
+  imports: [
+    'creationContext',
+    'parser'
+  ],
 
   properties: [
     {
       name: 'delegate'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Parser',
-      name: 'parser',
-      factory: function() {
-        return this.Parser.create({
-          strict: true,
-          creationContext: this.creationContext
-        });
-      }
     }
   ],
 
@@ -41,15 +34,19 @@ foam.CLASS({
       });
 
       var sub1 = socket.message.sub(function onMessage(s, _, msgStr) {
-        var msg = this.parser.parseString(msgStr, X);
+        try {
+          var msg = this.parser.parseString(msgStr, X);
 
-        if ( ! this.Message.isInstance(msg) ) {
-          console.warn('Got non-message', msg.cls_.id);
-          console.warn('  payload was: ', msgStr);
-          return;
+          if ( ! this.Message.isInstance(msg) ) {
+            console.warn('Got non-message', msg.cls_.id);
+            console.warn('  payload was: ', msgStr);
+            return;
+          }
+
+          this.delegate.send(msg);
+        } catch (e) {
+          console.error("WSS Error:", e);
         }
-
-        this.delegate.send(msg);
       }.bind(this));
 
       socket.disconnected.sub(function(s) {

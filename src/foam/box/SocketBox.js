@@ -20,9 +20,7 @@ foam.CLASS({
   name: 'SocketBox',
   extends: 'foam.box.ProxyBox',
 
-  requires: [
-    'foam.box.SocketConnectBox'
-  ],
+  requires: [ 'foam.box.SocketConnectBox' ],
 
   axioms: [
     foam.pattern.Multiton.create({
@@ -36,16 +34,22 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'String',
       name: 'address'
     },
     {
       name: 'delegate',
       transient: true,
       factory: function() {
-        return foam.box.SocketConnectBox.create({
+        return this.SocketConnectBox.create({
           address: this.address
-        }, this);
-      }
+        });
+      },
+      swiftFactory: `
+return SocketConnectBox_create([
+  "address$": address$,
+])
+      `
     }
   ]
 });
