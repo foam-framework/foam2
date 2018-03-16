@@ -22,6 +22,18 @@ foam.CLASS({
 			top: 35;
 			left: 10;
 			font-size: 12px;
+			width: 65px;
+			height: 20px;
+			border-radius: 100px;
+			background-color: #59a5d5;
+			font-family: Roboto;
+			font-weight: normal;
+			font-style: normal;
+			font-stretch: normal;
+			line-height: 1.67;
+			letter-spacing: 0.2px;
+			text-align: center;
+			color: #ffffff;
 		}
 		^ .count{
 			font-size: 30px;
