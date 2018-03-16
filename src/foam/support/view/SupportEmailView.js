@@ -17,6 +17,7 @@ foam.CLASS({
     function initE(){    
       this.start(this.TEST_MODAL).end()
       this.start(this.SUPPORT_VIEW).end()
+      this.start(this.DELETE_VIEW).end()
     }
   ],
 
@@ -31,6 +32,12 @@ foam.CLASS({
       name: 'supportView',
       code: function(){
         this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal1'}));
+      }
+    },
+    {
+      name: 'deleteView',
+      code: function(){
+        this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal2'}));
       }
     }
   ]
