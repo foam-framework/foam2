@@ -8,52 +8,59 @@ package foam.nanos.auth;
 
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-import foam.dao.*;
+import foam.dao.DAO;
+import foam.dao.ListSink;
+import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
+import foam.nanos.session.Session;
 import foam.util.Email;
-import foam.util.Password;
 import foam.util.LRULinkedHashMap;
-
-import javax.naming.AuthenticationException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import foam.util.Password;
+import foam.util.SafetyUtil;
+import java.security.Permission;
 import java.util.*;
-import java.util.regex.Pattern;
+import javax.naming.AuthenticationException;
+import javax.security.auth.AuthPermission;
 
 public class UserAndGroupAuthService
-    extends    ContextAwareSupport
-    implements AuthService, NanoService
+  extends    ContextAwareSupport
+  implements AuthService, NanoService
 {
-  protected static final ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
-
   protected DAO userDAO_;
   protected DAO groupDAO_;
-  protected Map challengeMap;
-  public static final String HASH_METHOD = "SHA-512";
+  protected DAO sessionDAO_;
+  protected Map challengeMap; // TODO: let's store in Session Context instead
+
+  // pattern used to check if password has only alphanumeric characters
+  java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
+
+  public UserAndGroupAuthService(X x) {
+    setX(x);
+  }
 
   @Override
   public void start() {
-    userDAO_      = (DAO) getX().get("localUserDAO");
-    groupDAO_     = (DAO) getX().get("groupDAO");
-    challengeMap  = new LRULinkedHashMap<Long, Challenge>(20000);
+    userDAO_     = (DAO) getX().get("localUserDAO");
+    groupDAO_    = (DAO) getX().get("groupDAO");
+    sessionDAO_  = (DAO) getX().get("sessionDAO");
+    challengeMap = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
-  public User getCurrentUser(X x) {
-    return (User) x.get("user");
+  public User getCurrentUser(X x) throws AuthenticationException {
+    // fetch context and check if not null or user id is 0
+    Session session = x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      throw new AuthenticationException("Not logged in");
+    }
+
+    // get user from session id
+    User user = (User) userDAO_.find(session.getUserId());
+    if ( user == null ) {
+      throw new AuthenticationException("User not found: " + session.getUserId());
+    }
+
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -83,13 +90,15 @@ public class UserAndGroupAuthService
    *
    * How often should we purge this map for challenges that have expired?
    */
-  public User challengedLogin(long userId, String challenge) throws AuthenticationException {
+  public User challengedLogin(X x, long userId, String challenge) throws AuthenticationException {
     if ( userId < 1 || "".equals(challenge) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
     Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) throw new AuthenticationException("Invalid userId");
+    if ( c == null ) {
+      throw new AuthenticationException("Invalid userId");
+    }
 
     if ( ! c.getChallenge().equals(challenge) ) {
       throw new AuthenticationException("Invalid Challenge");
@@ -101,19 +110,25 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(userId);
-    if ( user == null ) throw new AuthenticationException("User not found");
+    if ( user == null ) {
+      throw new AuthenticationException("User not found");
+    }
 
     challengeMap.remove(userId);
-    getX().put("user", user);
-    return user;
+
+    Session session = x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setContext(session.getContext().put("user", user));
+    sessionDAO_.put(session);
+    return (User) Password.sanitize(user);
   }
 
   /**
    * Login a user by the id provided, validate the password
    * and return the user in the context.
    */
-  public User login(long userId, String password) throws AuthenticationException {
-    if ( userId < 1 || "".equals(password) ) {
+  public User login(X x, long userId, String password) throws AuthenticationException {
+    if ( userId < 1 || SafetyUtil.isEmpty(password) ) {
       throw new AuthenticationException("Invalid Parameters");
     }
 
@@ -126,19 +141,14 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid Password");
     }
 
-    getX().put("user", user);
-    return user;
+    Session session = x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setContext(session.getContext().put("user", user));
+    sessionDAO_.put(session);
+    return (User) Password.sanitize(user);
   }
 
-  public User loginByEmail(String email, String password) throws AuthenticationException {
-    if ( "".equals(email) || ! Email.isValid(email) ) {
-      throw new AuthenticationException("Invalid email");
-    }
-
-    if ( "".equals(password) || Password.isValid(password) ) {
-      throw new AuthenticationException("Invalid password");
-    }
-    
+  public User loginByEmail(X x, String email, String password) throws AuthenticationException {
     Sink sink = new ListSink();
     sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
@@ -153,64 +163,113 @@ public class UserAndGroupAuthService
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
-      throw new AuthenticationException("Invalid password");
+      throw new AuthenticationException("Incorrect password");
     }
 
-    getX().put("user", user);
-    return user;
+    Session session = x.get(Session.class);
+    session.setUserId(user.getId());
+    session.setContext(session.getContext().put("user", user));
+    sessionDAO_.put(session);
+    return (User) Password.sanitize(user);
   }
 
   /**
    * Check if the user in the context supplied has the right permission
    * Return Boolean for this
    */
-  public Boolean check(foam.core.X x, java.security.Permission permission) {
-    if ( x == null || permission == null ) return false;
-
-    User user = (User) x.get("user");
-    if ( user == null ) return false;
-
-    Group group = (Group) user.getGroup();
-    if ( group == null ) return false;
-
-    if ( userDAO_.find_(x, user.getId()) == null ) {
+  public Boolean checkPermission(foam.core.X x, Permission permission) {
+    if ( x == null || permission == null ) {
       return false;
     }
 
-    return group.implies(permission);
+    Session session = x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      return false;
+    }
+
+    User user = (User) userDAO_.find(session.getUserId());
+    if ( user == null ) {
+      return false;
+    }
+
+    try {
+      String groupId = (String) user.getGroup();
+
+      while ( ! SafetyUtil.isEmpty(groupId) ) {
+        Group group = (Group) groupDAO_.find(groupId);
+
+        if ( group == null ) break;
+
+        if ( group.implies(permission) ) return true;
+        groupId = group.getParent();
+      }
+    } catch (Throwable t) {
+    }
+
+    return false;
+  }
+
+  public Boolean check(foam.core.X x, String permission) {
+    return checkPermission(x, new AuthPermission(permission));
   }
 
   /**
    * Given a context with a user, validate the password to be updated
    * and return a context with the updated user information
    */
-  public X updatePassword(foam.core.X x, String oldPassword, String newPassword)
-      throws AuthenticationException {
-
-    if ( x == null || "".equals(oldPassword) || "".equals(newPassword) ) {
-      throw new AuthenticationException("Invalid Parameters");
+  public User updatePassword(foam.core.X x, String oldPassword, String newPassword) throws AuthenticationException {
+    if ( x == null || SafetyUtil.isEmpty(oldPassword) || SafetyUtil.isEmpty(newPassword) ) {
+      throw new RuntimeException("Invalid parameters");
     }
 
-    User user = (User) userDAO_.find_(x, ((User) x.get("user")).getId());
+    Session session = x.get(Session.class);
+    if ( session == null || session.getUserId() == 0 ) {
+      throw new AuthenticationException("User not found");
+    }
+
+    User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
 
+    if ( newPassword.contains(" ") ) {
+      throw new RuntimeException("Password cannot contain spaces");
+    }
+
+    int length = newPassword.length();
+    if ( length < 7 || length > 32 ) {
+      throw new RuntimeException("Password must be 7-32 characters long");
+    }
+
+    if ( newPassword.equals(newPassword.toLowerCase()) ) {
+      throw new RuntimeException("Password must have one capital letter");
+    }
+
+    if ( ! newPassword.matches(".*\\d+.*") ) {
+      throw new RuntimeException("Password must have one numeric character");
+    }
+
+    if ( alphanumeric.matcher(newPassword).matches() ) {
+      throw new RuntimeException("Password must not contain: !@#$%^&*()_+");
+    }
+
     // old password does not match
     if ( ! Password.verify(oldPassword, user.getPassword()) ) {
-      throw new AuthenticationException("Invalid password");
+      throw new RuntimeException("Old password is incorrect");
     }
 
     // new password is the same
     if ( Password.verify(newPassword, user.getPassword()) ) {
-      throw new AuthenticationException("New password must be different");
+      throw new RuntimeException("New password must be different");
     }
 
     // store new password in DAO and put in context
-    String hash = Password.hash(newPassword);
-    user.setPassword(newPassword);
+    user.setPasswordLastModified(Calendar.getInstance().getTime());
+    user.setPreviousPassword(user.getPassword());
+    user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
-    return this.getX().put("user", user);
+    session.setContext(session.getContext().put("user", user));
+    return (User) Password.sanitize(user);
   }
 
   /**
@@ -218,12 +277,12 @@ public class UserAndGroupAuthService
    * Will mainly be used as a veto method.
    * Users should have id, email, first name, last name, password for registration
    */
-  public void validateUser(User user) throws AuthenticationException {
+  public void validateUser(X x, User user) throws AuthenticationException {
     if ( user == null ) {
       throw new AuthenticationException("Invalid User");
     }
 
-    if ( "".equals(user.getEmail()) ) {
+    if ( SafetyUtil.isEmpty(user.getEmail()) ) {
       throw new AuthenticationException("Email is required for creating a user");
     }
 
@@ -231,15 +290,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Email format is invalid");
     }
 
-    if ( "".equals(user.getFirstName()) ) {
+    if ( SafetyUtil.isEmpty(user.getFirstName()) ) {
       throw new AuthenticationException("First Name is required for creating a user");
     }
 
-    if ( "".equals(user.getLastName()) ) {
+    if ( SafetyUtil.isEmpty(user.getLastName()) ) {
       throw new AuthenticationException("Last Name is required for creating a user");
     }
 
-    if ( "".equals(user.getPassword()) ) {
+    if ( SafetyUtil.isEmpty(user.getPassword()) ) {
       throw new AuthenticationException("Password is required for creating a user");
     }
 
@@ -252,5 +311,10 @@ public class UserAndGroupAuthService
    * Just return a null user for now. Not sure how to handle the cleanup
    * of the current context
    */
-  public void logout(X x) {}
+  public void logout(X x) {
+    Session session = x.get(Session.class);
+    if ( session != null && session.getUserId() != 0 ) {
+      sessionDAO_.remove(session);
+    }
+  }
 }

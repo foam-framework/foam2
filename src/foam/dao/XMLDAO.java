@@ -17,7 +17,6 @@ import org.w3c.dom.Document;
 public class XMLDAO
   extends MapDAO
 {
-
   protected String fileName;
 
   public void setFileName(String filename) {
@@ -35,13 +34,13 @@ public class XMLDAO
     List<FObject> objList;
 
     try {
-      objList = XMLSupport.fromXML(this.getX(), fileName);
+      objList = XMLSupport.fromXML(getX(), fileName);
       Iterator i = objList.iterator();
       while ( i.hasNext() ) {
         FObject currentObj = (FObject)i.next();
         ClassInfo clsInfo = currentObj.getClassInfo();
-        this.setOf(clsInfo);
-        this.putOnly(currentObj);
+        setOf(clsInfo);
+        putOnly(currentObj);
       }
     } catch ( FileNotFoundException ex) {
     }
@@ -49,7 +48,7 @@ public class XMLDAO
 
   // Rewrites file when new object is put into DAO
   public FObject put(FObject obj) {
-    this.setOf(obj.getClassInfo());
+    setOf(obj.getClassInfo());
     FObject s = super.put(obj);
     saveToXML();
     return s;
@@ -57,7 +56,7 @@ public class XMLDAO
 
   // Used for xml to FObject conversion where re-write is not required
   public FObject putOnly(FObject obj) {
-    this.setOf(obj.getClassInfo());
+    setOf(obj.getClassInfo());
     return super.put(obj);
   }
 
@@ -73,13 +72,13 @@ public class XMLDAO
   }
 
   public synchronized void saveToXML () {
-    ListSink ls = new ListSink();
-    this.select(ls);
+    ListSink ls = (ListSink) select(new ListSink());
 
     try {
       DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-      Document doc = dBuilder.newDocument();
+      DocumentBuilder        dBuilder  = dbFactory.newDocumentBuilder();
+      Document               doc       = dBuilder.newDocument();
+
       XMLSupport.toXML(ls.getData(), doc, null);
       XMLSupport.toXMLFile(doc, fileName);
     } catch (ParserConfigurationException ex) {

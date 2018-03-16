@@ -184,8 +184,8 @@ out.append(data.stringValue)
         },
       ],
       swiftCode: function() {/*
-if let data = data as? FObject {
-  outputFObject(&out, data)
+if let data = data as? JSONOutputter {
+  data.toJSON(outputter: self, out: &out)
 } else if let data = data as? PropertyInfo {
   outputPropertyInfo(&out, data)
 } else if let data = data as? String {
@@ -227,8 +227,29 @@ outputString(&out, "__Property__");
 out.append(",");
 outputString(&out, "forClass_");
 out.append(":");
-outputString(&out, data.classInfo.id + "." + data.name)
+outputString(&out, data.classInfo.id);
+out.append(",");
+outputString(&out, "name");
+out.append(":");
+outputString(&out, data.name);
 out.append("}");
+      */},
+    },
+    {
+      name: 'outputEnum',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out',
+        },
+        {
+          swiftType: 'FOAM_enum',
+          name: 'data',
+        },
+      ],
+      swiftCode: function() {/*
+outputNumber(&out, data.ordinal as NSNumber)
       */},
     },
     {

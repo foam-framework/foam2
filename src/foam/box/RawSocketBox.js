@@ -68,11 +68,6 @@ foam.CLASS({
 
           msg.attributes.replyBox =
             this.__context__.registry.register(null, null, msg.attributes.replyBox);
-
-          // TODO: There should be a better way to do this.
-          replyBox = this.ReplyBox.create({
-            id: msg.attributes.replyBox.name
-          });
         }
 
         try {

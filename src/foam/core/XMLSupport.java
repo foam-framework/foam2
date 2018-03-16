@@ -29,6 +29,10 @@ import org.w3c.dom.Element;
 public class XMLSupport {
 
   public static List<FObject> fromXML(X x, XMLStreamReader xmlr) {
+    return fromXML(x, xmlr, null);
+  }
+
+  public static List<FObject> fromXML(X x, XMLStreamReader xmlr, Class defaultClass) {
     List<FObject> objList = new ArrayList<FObject>();
     try {
       int eventType;
@@ -37,7 +41,7 @@ public class XMLSupport {
         switch ( eventType ) {
           case XMLStreamConstants.START_ELEMENT:
             if ( xmlr.getLocalName().equals("object") ) {
-              FObject obj = createObj(x, xmlr);
+              FObject obj = createObj(x, xmlr, defaultClass);
               if ( obj != null ) {
                 objList.add(obj);
               }
@@ -53,22 +57,33 @@ public class XMLSupport {
     return objList;
   }
 
-  public static FObject createObj ( X x, XMLStreamReader xmlr ) {
+  public static FObject createObj (X x, XMLStreamReader xmlr) {
+    return createObj(x, xmlr, null);
+  }
+
+  public static FObject createObj (X x, XMLStreamReader xmlr, Class defaultClass) {
     Object clsInstance = null;
-    String objClass = null;
+    String objClass;
     try {
-      // Create new fObject
-      objClass = xmlr.getAttributeValue(null, "class");
-      Class cls = Class.forName(objClass);
-      clsInstance = x.create(cls);
-      // Object properties
+      //objClass = xmlr.getAttributeValue(null, "class");
+
+      if ( defaultClass == null ) {
+        objClass = xmlr.getAttributeValue(null, "class");
+        Class cls = Class.forName(objClass);
+        clsInstance = x.create(cls);
+
+        //x.create(defaultClass);
+      } else {
+        //x.create(Class.forName(objClass));
+        clsInstance = x.create(defaultClass);
+      }
+
       copyFromXML(x, (FObject) clsInstance, xmlr);
-    } catch (ClassNotFoundException ex) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error("Could not find class: ", objClass);
     } catch (XMLStreamException ex ) {
       Logger logger = (Logger) x.get("logger");
       logger.error("Error while reading file");
+    } catch (Throwable t) {
+      Logger logger = (Logger) x.get("logger");
     }
     return (FObject) clsInstance;
   }

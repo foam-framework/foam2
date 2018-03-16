@@ -44,6 +44,9 @@
 
     path = path.substring(0, path.lastIndexOf('src/')+4);
 
+    if ( typeof global !== 'undefined' ) global.FOAM_ROOT = path;
+    if ( typeof window !== 'undefined' ) window.FOAM_ROOT = path;
+
     return function(filename) {
       document.writeln(
         '<script type="text/javascript" src="' + path + filename + '.js"></script>\n');
@@ -53,6 +56,8 @@
   function loadServer() {
     var caller = flags.src || __filename;
     var path = caller.substring(0, caller.lastIndexOf('src/')+4);
+
+    if ( typeof global !== 'undefined' ) global.FOAM_ROOT = path;
 
     return function (filename) {
       require(path + filename + '.js');

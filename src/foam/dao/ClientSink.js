@@ -12,7 +12,8 @@ foam.CLASS({
     {
       class: 'Stub',
       of: 'foam.dao.Sink',
-      name: 'delegate'
+      name: 'delegate',
+      notifications: [ 'put', 'remove', 'eof', 'error', 'reset' ]
     }
   ]
 });

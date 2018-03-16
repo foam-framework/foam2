@@ -184,9 +184,8 @@ foam.CLASS({
   requires: [
     'foam.dao.DedupSink',
     'foam.dao.LimitedSink',
-    'foam.dao.SkipSink',
     'foam.dao.OrderedSink',
-    'foam.dao.FlowControl'
+    'foam.dao.SkipSink'
   ],
 
   properties: [

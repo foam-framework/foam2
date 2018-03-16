@@ -19,6 +19,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TableCellPropertyRefinement',
   refines: 'foam.core.Property',
+
   properties: [
     {
       name: 'columnLabel',
@@ -40,6 +41,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'TableCellActionRefinement',
   refines: 'foam.core.Action',
+
   properties: [
     {
       class: 'String',
@@ -273,23 +275,19 @@ foam.CLASS({
     'as tableView'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^sorting {
-          font-weight: bold;
-        }
+  css: `
+    ^sorting {
+      font-weight: bold;
+    }
 
-        ^sort-direction {
-          display: none;
-          margin-right: 8px;
-        }
-        ^sorting ^sort-direction {
-          display: initial;
-        }
-      */}
-    })
-  ],
+    ^sort-direction {
+      display: none;
+      margin-right: 8px;
+    }
+    ^sorting ^sort-direction {
+      display: initial;
+    }
+  `,
 
   properties: [
     {

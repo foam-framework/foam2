@@ -9,40 +9,20 @@ package foam.nanos.logger;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import java.util.logging.*;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.io.IOException;
 
 public class FileLogger
-  implements Logger, NanoService
+  extends AbstractLogger
+  implements NanoService
 {
   protected java.util.logging.Logger logger;
-
-  protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
-    @Override
-    protected SimpleDateFormat initialValue() {
-      return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-    }
-  };
-
-  protected ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-    @Override
-    protected StringBuilder initialValue() {
-      return new StringBuilder();
-    }
-
-    @Override
-    public StringBuilder get() {
-      StringBuilder b = super.get();
-      b.setLength(0);
-      return b;
-    }
-  };
 
   public void start() {
     logger = java.util.logging.Logger.getAnonymousLogger();
     logger.setUseParentHandlers(false);
     logger.setLevel(Level.ALL);
+
     try {
       Handler handler = new FileHandler("nano.log");
       handler.setFormatter(new CustomFormatter());
@@ -64,7 +44,7 @@ public class FileLogger
 
       if ( prevTime / 1000 != System.currentTimeMillis() / 1000 ) {
         prevTime = System.currentTimeMillis();
-        prevTimestamp = sdf.get().format(new Timestamp(prevTime));
+        prevTimestamp = sdf.get().format(prevTime);
       }
 
       str.append(prevTimestamp);
@@ -87,7 +67,7 @@ public class FileLogger
     StringBuilder str = sb.get();
     for ( Object n : args ) {
       str.append(',');
-      str.append(n.toString());
+      str.append(formatArg(n));
     }
     return str.toString();
   }

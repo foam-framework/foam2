@@ -8,8 +8,9 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'FObjectArrayView',
   extends: 'foam.u2.View',
+
   documentation: 'View for editing FObjects inside of FObjectArrays.',
-  
+
   requires: [
     'foam.core.Property',
     'foam.u2.DetailPropertyView'
@@ -17,22 +18,17 @@ foam.CLASS({
 
   exports: [ 'as data' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function(){/*
-        .rmv-button{
-          background: rgba(216, 30, 5, 0.3);
-          width: 125px;
-          text-align: center;
-          color: indianred;
-          padding: 10px;
-          font-size: 12px;
-          border-radius: 3px;
-        }
-      */
-      }
-    })
-  ],
+  css: `
+    .rmv-button{
+      background: rgba(216, 30, 5, 0.3);
+      width: 125px;
+      text-align: center;
+      color: indianred;
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+  `,
 
   properties: [
     {

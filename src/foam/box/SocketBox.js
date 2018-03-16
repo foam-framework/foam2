@@ -36,6 +36,7 @@ foam.CLASS({
       name: 'name'
     },
     {
+      class: 'String',
       name: 'address'
     },
     {
@@ -45,7 +46,12 @@ foam.CLASS({
         return foam.box.SocketConnectBox.create({
           address: this.address
         }, this);
-      }
+      },
+      swiftFactory: `
+return SocketConnectBox_create([
+  "address$": address$,
+])
+      `
     }
   ]
 });

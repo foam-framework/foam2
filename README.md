@@ -27,7 +27,7 @@ for any language or platform, including Android Java and iOS Swift.
 
 ## Building Java
 
-_cd src; ./gen.sh; cd ../build; mvn compile; mvn package_
+cd src; ./gen.sh; cd ../build; cp ../tools/pom.xml .; mvn compile; mvn package
 
 ## Installing Dependencies
 
@@ -39,6 +39,18 @@ tools by doing the following.
 
 * Run 'npm install' in the root of the FOAM repository, where
   package.json is found.
+
+## Running Application Controller
+
+The FOAM Application Controller allows you to access components of your foam 
+app by using the browser & displaying it as a GUI. 
+To access, run the following in the parent directory of foam2:
+
+* Build java (see above)
+
+* Run foam2/./tools/nanos.sh
+
+* Visit http://localhost:8080/static/foam2/src/foam/nanos/controller/index.html
 
 ## Style Guide
 

@@ -17,17 +17,19 @@ foam.CLASS({
   imports: [
     'stack',
     'summaryView? as importedSummaryView',
-    'data? as importedData'
+    'data? as importedData',
+    'window'
   ],
 
   exports: [
     'data.selection as selection',
-    'data.data as dao'
+    'data.data as dao',
+    'dblclick'
   ],
 
   // TODO: wrong class name, fix when ActionView fixed.
   css: `
-    .net-nanopay-ui-ActionView {
+    ^ .net-nanopay-ui-ActionView {
       background: #59aadd;
       color: white;
       margin-right: 4px;
@@ -71,23 +73,30 @@ foam.CLASS({
 
   methods: [
     function initE() {
+      var self = this;
+
       this.
+        addClass(this.myClass()).
         start('table').
           start('tr').
             start('td').style({display: 'block', padding: '8px'}).add(this.cls.PREDICATE).end().
             start('td').style({'vertical-align': 'top', 'width': '100%'}).
               start('span').
                 style({background: 'rgba(0,0,0,0)'}).
-                show(this.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
-                start().
-                  style({padding: '4px'}).
-                  add(this.cls.getAxiomsByClass(foam.core.Action)).
+                show(self.mode$.map(function(m) { return m == foam.u2.DisplayMode.RW; })).
+                  start().
+                    style({padding: '4px 4px 4px 1px'}).
+                    add(self.cls.getAxiomsByClass(foam.core.Action)).
+                  end().
                 end().
-              end().
               tag(this.summaryView, {data$: this.data.filteredDAO$}).
             end().
           end().
         end();
+    },
+
+    function dblclick(obj) {
+      this.onEdit(null, null, obj.id);
     }
   ],
 

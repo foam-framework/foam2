@@ -219,9 +219,11 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'dest'
+      name: 'dest',
+      swiftType: 'Topic',
     },
     {
+      class: 'StringArray',
       name: 'topic',
       factory: function() { return []; }
     },
@@ -241,16 +243,32 @@ foam.CLASS({
             this.doUnsub();
           }
         }
-      }
+      },
+      swiftPostSet: `
+for child in children.values {
+  child.active = !newValue
+}
+
+if (oldValue as? Bool ?? false) != newValue {
+  if newValue {
+    self.doSub()
+  } else {
+    self.doUnsub()
+  }
+}
+      `
     },
     {
-      name: 'parent'
+      name: 'parent',
+      swiftType: 'EventProxy?',
     },
     {
       name: 'children',
       factory: function() {
         return {};
-      }
+      },
+      swiftType: '[String:EventProxy]',
+      swiftFactory: 'return [:]',
     },
     {
       name: 'src',
@@ -262,77 +280,169 @@ foam.CLASS({
       }
     },
     {
-      name: 'subscription'
+      swiftType: 'Subscription?',
+      name: 'subscription',
     }
   ],
 
   methods: [
-    function init() {
-      this.onDetach(foam.Function.bind(function() {
-        this.subscription && this.subscription.detach();
+    {
+      name: 'init',
+      code: function() {
+        this.onDetach(foam.Function.bind(function() {
+          this.subscription && this.subscription.detach();
 
-        if ( this.parent ) {
-          this.parent.removeChild(this);
-          this.parent.active = true;
+          if ( this.parent ) {
+            this.parent.removeChild(this);
+            this.parent.active = true;
+          }
+        }, this));
+      },
+      swiftCode: `
+onDetach(Subscription(detach: { [weak self] in
+  self?.subscription?.detach()
+  if let parent = self?.parent {
+    parent.removeChild(self!)
+    parent.active = true
+  }
+}))
+      `,
+    },
+
+    {
+      name: 'doSub',
+      code: function doSub() {
+        if ( this.subscription ) this.subscription.detach();
+
+        if ( ! this.src ) return;
+
+        var args = this.topic.slice()
+        args.push(this.onEvent);
+        this.subscription = this.src.sub.apply(this.src, args);
+      },
+      swiftCode: `
+subscription?.detach()
+if let src = src as? Topic {
+  subscription = src.sub(topics: topic, listener: onEvent_listener)
+}
+      `,
+    },
+
+    {
+      name: 'doUnsub',
+      code: function doUnsub() {
+        if ( this.subscription ) this.subscription.detach();
+      },
+      swiftCode: 'subscription?.detach()',
+    },
+
+    {
+      name: 'removeChild',
+      args: [
+        {
+          name: 'c',
+          swiftType: 'EventProxy',
+        },
+      ],
+      code: function removeChild(c) {
+        for ( var key in this.children ) {
+          if ( this.children[key] === c ) {
+            delete this.children[key];
+            return;
+          }
         }
-      }, this));
+      },
+      swiftCode: `
+for (key, child) in children {
+  if child === c {
+    children.removeValue(forKey: key)
+    return
+  }
+}
+      `,
     },
 
-    function doSub() {
-      if ( this.subscription ) this.subscription.detach();
-
-      if ( ! this.src ) return;
-
-      var args = this.topic.slice()
-      args.push(this.onEvent);
-      this.subscription = this.src.sub.apply(this.src, args);
-    },
-
-    function doUnsub() {
-      if ( this.subscription ) this.subscription.detach();
-    },
-
-    function removeChild(c) {
-      for ( var key in this.children ) {
-        if ( this.children[key] === c ) {
-          delete this.children[key];
-          return;
+    {
+      name: 'getChild',
+      args: [
+        {
+          name: 'key',
+          swiftType: 'String',
+        },
+      ],
+      swiftReturns: 'EventProxy',
+      code: function getChild(key) {
+        if ( ! this.children[key] ) {
+          this.children[key] = this.cls_.create({
+            parent: this,
+            dest: this.dest,
+            src: this.src,
+            topic: this.topic.slice().concat(key)
+          });
         }
-      }
+        return this.children[key];
+      },
+      swiftCode: `
+if children[key] == nil {
+  children[key] = __context__.create(EventProxy.self, args: [
+    "parent": self,
+    "dest": dest,
+    "src": src,
+    "topic": topic + [key],
+  ])!
+}
+return children[key]!
+      `,
     },
 
-    function getChild(key) {
-      if ( ! this.children[key] ) {
-        this.children[key] = this.cls_.create({
-          parent: this,
-          dest: this.dest,
-          src: this.src,
-          topic: this.topic.slice().concat(key)
-        });
-      }
-      return this.children[key];
+    {
+      name: 'addProxy',
+      args: [
+        {
+          name: 'topics',
+          swiftType: '[String]',
+        },
+      ],
+      code: function addProxy(topic) {
+        var c = this;
+        var active = true;
+        for ( var i = 0 ; i < topic.length ; i++ ) {
+          active = active && ! c.active;
+          c = c.getChild(topic[i]);
+        }
+
+        c.active = active;
+      },
+      swiftCode: `
+var c = self
+var active = true
+for t in topics {
+  active = active && !c.active
+  c = c.getChild(t)
+}
+
+c.active = active;
+      `,
     },
-
-    function addProxy(topic) {
-      var c = this;
-      var active = true;
-      for ( var i = 0 ; i < topic.length ; i++ ) {
-        active = active && ! c.active;
-        c = c.getChild(topic[i]);
-      }
-
-      c.active = active;
-    }
   ],
 
   listeners: [
-    function onEvent(s) {
-      if ( this.active ) {
-        var args = foam.Function.appendArguments([], arguments, 1);
-        var c = this.dest.pub.apply(this.dest, args);
-        if ( ! c ) this.detach();
-      }
-    }
+    {
+      name: 'onEvent',
+      code: function() {
+        if ( this.active ) {
+          var args = foam.Function.appendArguments([], arguments, 1);
+          var c = this.dest.pub.apply(this.dest, args);
+          if ( ! c ) this.detach();
+        }
+      },
+      swiftCode: `
+if active {
+  let c = dest.pub(args);
+  if c == 0 { detach() }
+}
+      `,
+    },
   ]
 });
 

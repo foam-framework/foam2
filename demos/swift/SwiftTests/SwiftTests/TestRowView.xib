@@ -53,9 +53,9 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
-                <outlet property="exprProp_Test" destination="txK-vA-dhC" id="p6c-4z-1Uw"/>
-                <outlet property="firstName_Test" destination="uCJ-nA-3un" id="rTL-Ht-psd"/>
-                <outlet property="lastName_Test" destination="8cn-ZX-yKm" id="O5C-0S-nrm"/>
+                <outlet property="Test_exprProp" destination="txK-vA-dhC" id="Mrm-U9-tmH"/>
+                <outlet property="Test_firstName" destination="uCJ-nA-3un" id="QPp-dK-XUw"/>
+                <outlet property="Test_lastName" destination="8cn-ZX-yKm" id="d4D-9c-62n"/>
             </connections>
             <point key="canvasLocation" x="55.5" y="213"/>
         </view>

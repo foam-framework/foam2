@@ -22,7 +22,7 @@ public class FixedThreadPool
   protected Object          executedLock_  = new Object();
 
   class ContextAgentRunnable
-      implements Runnable
+    implements Runnable
   {
     final X            x_;
     final ContextAgent agent_;
@@ -35,7 +35,7 @@ public class FixedThreadPool
     public void run() {
       incrExecuting(1);
 
-      Logger logger = (Logger) getX().get("logger");
+      Logger logger = (Logger) x_.get("logger");
       PM pm = new PM(this.getClass(), agent_.getClass().getName());
 
       try {

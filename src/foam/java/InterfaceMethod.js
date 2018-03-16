@@ -46,7 +46,13 @@ foam.CLASS({
       setter: function() {},
       getter: function() {}
     },
-    { class: 'StringArray', name: 'throws' }
+    { class: 'StringArray', name: 'throws' },
+    {
+      name: 'static',
+      documentation: 'Dummy property to silence warnings',
+      setter: function() {},
+      getter: function() {}
+    },
   ],
 
   methods: [

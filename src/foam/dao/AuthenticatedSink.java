@@ -11,36 +11,30 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.nanos.auth.AuthService;
 
-import javax.security.auth.AuthPermission;
-import java.security.Permission;
-
 public class AuthenticatedSink
-    extends ProxySink
+  extends ProxySink
 {
   protected String prefix_;
   protected String method_;
 
-  public AuthenticatedSink(X x, String name, String method, Sink delegate) {
-    setX(x);
-    setDelegate(delegate);
-    this.prefix_ = name + "." + method + ".";
+  public AuthenticatedSink(X x, String rootPermission, Sink delegate) {
+    super(x, delegate);
+    prefix_ = rootPermission + ".";
   }
 
   @Override
-  public void put(FObject obj, Detachable sub) {
+  public void put(Object obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    Permission permission = new AuthPermission(prefix_ + obj.getProperty("id"));
-    if ( authService.check(getX(), permission) ) {
-      super.put(obj, sub);
-    }
+    String      permission  = prefix_ + ((FObject)obj).getProperty("id");
+
+    if ( authService.check(getX(), permission) ) super.put(obj, sub);
   }
 
   @Override
-  public void remove(FObject obj, Detachable sub) {
+  public void remove(Object obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
-    Permission permission = new AuthPermission(prefix_ + obj.getProperty("id"));
-    if ( authService.check(getX(), permission) ) {
-      super.remove(obj, sub);
-    }
+    String      permission  = prefix_ + ((FObject)obj).getProperty("id");
+
+    if ( authService.check(getX(), permission) ) super.remove(obj, sub);
   }
 }

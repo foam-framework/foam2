@@ -38,11 +38,12 @@
         return data.limit(limit).skip(skip);
       },
     },
+    'columns',
     {
       class: 'Int',
       name: 'daoCount'
     },
-    'mouseEvent'
+    'selection'
   ],
 
   methods: [
@@ -58,21 +59,17 @@
         start('tr').
           start('td').
             style({ 'vertical-align': 'top' }).
-            start(this.TableView, {data$: this.scrolledDao$}).
+            start(this.TableView, {data$: this.scrolledDao$, columns: this.columns, selection$: this.selection$}).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).
             add(this.ScrollCView.create({
               value$: this.skip$,
               extent$: this.limit$,
-              height: 40*18+48, // TODO use window height.
-              width: 22,
-              handleSize: 40,
+              height: 40*18+41, // TODO use window height.
+              width: 15,
               size$: this.daoCount$,
-              mouseEvent$: this.mouseEvent$
-              // TODO clicking away from scroller should deselect it.
             })).
-            on('mousedown', this.scrollBar).
           end().
         end().
       end();
@@ -101,23 +98,5 @@
         })
       },
     },
-    {
-      name: 'scrollBar',
-      code: function(e) {
-        var self = this;
-        function onMouseMove(e) {
-          // update mouseEvent with DOM Mouse Event
-          self.mouseEvent = e;
-        }
-        function onMouseUp(e) {
-          // remove event listeners when the user releases the mouse click
-          global.window.removeEventListener('mousemove', onMouseMove);
-          global.window.removeEventListener('mouseup', onMouseUp);
-        }
-        // add event listeners to the scrollBar when the user holds down the mouse
-        global.window.addEventListener('mousemove', onMouseMove);
-        global.window.addEventListener('mouseup', onMouseUp);
-      }
-    }
   ]
 });

@@ -13,6 +13,7 @@ foam.CLASS({
   actions: [
     {
       name: 'sayHi',
+      code: function() {},
       swiftCode: 'NSLog("HELLO %@", firstName as? String ?? "FAILED")',
     },
   ],

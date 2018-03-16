@@ -5,25 +5,40 @@
  */
 foam.CLASS({
   package: 'foam.box',
+  name: 'HTTPException',
+  implements: [ 'foam.core.Exception' ],
+  properties: [
+    'response'
+  ]
+});
+
+foam.CLASS({
+  package: 'foam.box',
   name: 'HTTPBox',
 
   implements: [ 'foam.box.Box' ],
 
   requires: [
     {
-      name: 'Parser',
       path: 'foam.json.Parser',
-      swiftPath: 'foam.swift.parse.json.FObjectParser',
+      flags: ['js'],
     },
     {
-      name: 'HTTPRequest',
       path: 'foam.net.web.HTTPRequest',
-      swiftPath: '',
+      flags: ['js'],
     },
     {
-      name: 'Outputter',
       path: 'foam.json.Outputter',
-      swiftPath: 'foam.swift.parse.json.output.Outputter',
+      flags: ['js'],
+    },
+    {
+      path: 'foam.swift.parse.json.FObjectParser',
+      flags: ['swift'],
+    },
+    {
+      name: 'SwiftOutputter',
+      path: 'foam.swift.parse.json.output.Outputter',
+      flags: ['swift'],
     },
     'foam.box.HTTPReplyBox',
   ],
@@ -64,14 +79,14 @@ foam.CLASS({
             this.creationContext
         });
       },
-      swiftFactory: 'return Parser_create()',
+      swiftFactory: 'return FObjectParser_create()',
     },
     {
       class: 'FObjectProperty',
       of: 'foam.json.Outputter',
       name: 'outputter',
       generateJava: false,
-      swiftFactory: 'return Outputter_create()',
+      swiftFactory: 'return SwiftOutputter_create()',
       factory: function() {
         return this.Outputter.create().copyFrom(foam.json.Network);
       }
@@ -144,9 +159,12 @@ protected class ResponseThread implements Runnable {
         req.then(function(resp) {
           return resp.payload;
         }).then(function(p) {
-          var rmsg = this.parser.parseString(p);
+          return this.parser.aparse(p);
+        }.bind(this)).then(function(rmsg) {
           rmsg && replyBox && replyBox.send(rmsg);
-        }.bind(this));
+        }.bind(this), function(r) {
+          replyBox && replyBox.send(foam.box.Message.create({ object: foam.box.HTTPException.create({ response: r }) }));
+        });
       },
       swiftCode: function() {/*
 let replyBox = msg.attributes["replyBox"] as? Box

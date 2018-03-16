@@ -101,6 +101,8 @@ foam.CLASS({
     for ( var j = 0 ; j < m.args.length ; j++ ) {
       if ( m.args[j].javaType == 'foam.core.X' ) {
         %>getMessageX(message)<%
+      } else if ( foam.core.AbstractEnum.isSubClass(this.lookup(m.args[j].javaType, true)) ) {
+        %><%= m.args[j].javaType%>.forOrdinal(toint(rpc.getArgs() != null && rpc.getArgs().length > <%= j %> ? rpc.getArgs()[<%= j %>] : null))<%
       } else {
         if ( {byte: 1, double: 1, float: 1, int: 1, long: 1, short: 1 }[m.args[j].javaType] ) {
           %>to<%= m.args[j].javaType %><%
@@ -119,6 +121,7 @@ foam.CLASS({
         default: throw new RuntimeException("Method not found: " + rpc.getName());
       }
     } catch (Throwable t) {
+      ((foam.nanos.logger.Logger) getMessageX(message).get("logger")).debug("returning skeleton exception", t);
       message.replyWithException(t);
 
       return;

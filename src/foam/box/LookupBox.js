@@ -21,7 +21,8 @@ foam.CLASS({
   extends: 'foam.box.ProxyBox',
 
   requires: [
-    'foam.box.ClientBoxRegistry'
+    'foam.box.ClientBoxRegistry',
+    'foam.box.AnonymousBox'
   ],
 
   properties: [
@@ -55,6 +56,23 @@ return ClientBoxRegistry_create([
         return this.registry.doLookup(this.name);
       },
       swiftFactory: 'return try! registry!.doLookup(name)',
+    }
+  ],
+  methods: [
+    function send(msg) {
+      var self = this;
+      var replyBox = msg.attributes.replyBox;
+
+      msg.attributes.replyBox = this.AnonymousBox.create({
+        f: function(m) {
+          if ( foam.core.Exception.isInstance(m.object) ) {
+            self.delegate = undefined;
+          }
+          replyBox && replyBox.send(m);
+        }
+      });
+
+      this.delegate.send(msg);
     }
   ]
 });

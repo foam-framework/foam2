@@ -3,16 +3,22 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
 
   tableColumns: [ 'id', 'parent', 'label', 'order' ],
 
+  imports: [
+    'lastMenuLaunchedListener?'
+  ],
+
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableWidth: 280
     },
     {
       class: 'String',
@@ -21,7 +27,7 @@ foam.CLASS({
     {
       class: 'FObjectProperty',
       name: 'handler',
-      view: 'foam.u2.view.FObjectView'
+      view: { class: 'foam.u2.view.FObjectView' }
     },
     {
       class: 'Int',
@@ -32,6 +38,7 @@ foam.CLASS({
 
   methods: [
     function launch_(X, e) {
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener(this);
       this.handler && this.handler.launch(X, this, e);
     }
   ],
@@ -40,7 +47,6 @@ foam.CLASS({
     {
       name: 'launch',
       code: function(X, e) {
-        console.log('MENU: ', this.id, this.label);
         this.launch_(X, e);
       }
     }
@@ -48,7 +54,7 @@ foam.CLASS({
 });
 
 
-var MenuRelationship = foam.RELATIONSHIP({
+foam.RELATIONSHIP({
   sourceModel: 'foam.nanos.menu.Menu',
   targetModel: 'foam.nanos.menu.Menu',
   forwardName: 'children',

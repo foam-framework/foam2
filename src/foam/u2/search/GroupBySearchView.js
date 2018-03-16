@@ -29,15 +29,7 @@ foam.CLASS({
     'foam.u2.view.ChoiceView'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ select {
-          min-width: 220px;
-        }
-      */}
-    })
-  ],
+  css: "^ select { min-width: 220px; }",
 
   properties: [
     {
@@ -59,9 +51,7 @@ foam.CLASS({
     },
     {
       name: 'name',
-      expression: function(property) {
-        return property.name;
-      }
+      expression: function(property) { return property.name; }
     },
     {
       class: 'Class',
@@ -129,10 +119,8 @@ foam.CLASS({
           } catch(x) {}
         })
         .on('mouseout', function(e) {
-          if ( e.relatedTarget && e.relatedTarget.nodeName === 'OPTION' ) return;
-          self.view.data   = self.hardData;
-          self.hardData    = undefined;
-          self.previewMode = false;
+          self.view.data = self.hardData;
+          if ( ! self.hardData ) self.view.data = '';
         })
         .onDetach(
           this.dao$proxy.listen(

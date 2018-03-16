@@ -134,7 +134,7 @@ foam.CLASS({
         final: true,
         name: this.swiftPrivateAxiomName,
         type: 'MethodInfo',
-        initializer: this.swiftMethodInfoInit(),
+        initializer: this.swiftMethodInfoInit(parentCls),
       }));
       if (this.name != 'init') {
         cls.methods.push(this.Method.create({
@@ -203,18 +203,33 @@ foam.CLASS({
     },
     function getSwiftOverride(parentCls) {
       if (this.hasOwnProperty('swiftOverride')) return this.swiftOverride;
+      if (this.name == 'init') return true;
+
       var parentMethod = parentCls.getSuperAxiomByName(this.name);
-      var parentMethodParentCls = parentCls.getSuperClass();
-      while (
-          (parentMethodParentCls != parentMethodParentCls.getSuperClass()) &&
-          ! parentMethodParentCls.hasOwnAxiom(this.name) ) {
-        parentMethodParentCls = parentMethodParentCls.getSuperClass();
+      if (!parentMethod) return false;
+
+      var InterfaceMethod = foam.core.internal.InterfaceMethod;
+
+      if (InterfaceMethod.isInstance(parentMethod)) {
+        // Find the interface that the method belongs to and determine if a
+        // parent implements this interface.
+        var methodInterface = parentCls.getAxiomsByClass(foam.core.Implements).find(function(i) {
+          return foam.lookup(i.path).getAxiomsByClass(InterfaceMethod).find(function(m) {
+            return m === parentMethod;
+          })
+        });
+        return ! methodInterface ||
+            !! parentCls.getSuperClass().getAxiomByName(methodInterface.name);
       }
-      return this.name == 'init' ||
-        !!( parentMethod &&
-            parentMethodParentCls &&
-            parentMethod.getSwiftSupport(parentMethodParentCls) &&
-            !foam.core.internal.InterfaceMethod.isInstance(parentMethod))
+
+      // Determine if anything that's extended implements this interface.
+      var pCl = parentCls
+      while (true) {
+        pCl = pCl.getSuperClass();
+        // Stop when we reach 'FObject' since we generate our own FObject.
+        if (pCl === pCl.getSuperClass()) return false;
+        if (pCl.hasOwnAxiom(this.name)) return true;
+      }
     },
   ],
   templates: [
@@ -232,10 +247,10 @@ return ConstantSlot([
     <%=isMutable(a) ? 'var' : 'let' %> <%
   %><%=a.localName%> = args[<%=i%>]<%if(a.type!='Any?'){%> as! <%=a.type%><%}%>
 <% }) %>
-    
+
     return <%=this.swiftThrows ? 'try ' : ''%>self!.`<%=this.swiftName%>`(
         <%=this.swiftArgs.map(function(a){
-          return (a.externalName ? a.externalName + ': ' : '') +
+          return (a.externalName != '_' ? a.externalName + ': ' : '') +
                  (isMutable(a) ? '&' : '') +
                  a.localName
         }).join(', ')%>)
@@ -257,13 +272,17 @@ return ConstantSlot([
     },
     {
       name: 'swiftMethodInfoInit',
-      args: [],
+      args: ['parentCls'],
       template: function() {/*
 class MInfo: MethodInfo {
   let name = "<%=this.swiftName%>"
   let args: [MethodArg] = [] //TODO
   let classInfo: ClassInfo
   init(_ ci: ClassInfo) { classInfo = ci }
+  public func getSlot(_ obj: FObject) -> Slot {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftSlotName%>
+  }
 }
 return MInfo(classInfo())
       */},

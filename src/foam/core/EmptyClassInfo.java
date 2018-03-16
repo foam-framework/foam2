@@ -25,7 +25,7 @@ public class EmptyClassInfo
     return this;
   }
 
-  public ClassInfo addProperty(PropertyInfo p) {
+  public ClassInfo addAxiom(Axiom a) {
     return this;
   }
 

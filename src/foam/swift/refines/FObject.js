@@ -8,6 +8,8 @@ foam.LIB({
   name: 'foam.core.FObject',
   methods: [
     function toSwiftClass() {
+      var axiomFilter = foam.util.flagFilter(['swift']);
+
       if ( !this.model_.generateSwift ) return foam.swift.EmptyClass.create()
       var templates = foam.swift.FObjectTemplates.create();
 
@@ -36,22 +38,22 @@ foam.LIB({
         visibility: 'public',
         code: this.model_.swiftCode,
       });
-      this.getOwnAxioms().forEach(function(axiom) {
+      this.getOwnAxioms().filter(axiomFilter).forEach(function(axiom) {
         if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name), this);
       }.bind(this));
 
-      var properties = this.getOwnAxiomsByClass(foam.core.Property)
+      var properties = this.getOwnAxiomsByClass(foam.core.Property).filter(axiomFilter)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
-      var methods = this.getOwnAxiomsByClass(foam.core.Method)
+      var methods = this.getOwnAxiomsByClass(foam.core.Method).filter(axiomFilter)
           .filter(function(p) {
             return p.name != 'init';
           }.bind(this))
           .filter(function(p) {
             return !!p.getSwiftSupport(this);
           }.bind(this));
-      var actions = this.getOwnAxiomsByClass(foam.core.Action)
+      var actions = this.getOwnAxiomsByClass(foam.core.Action).filter(axiomFilter)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
           }.bind(this));
@@ -74,6 +76,18 @@ foam.LIB({
           }),
           foam.swift.Field.create({
             lazy: true,
+            name: 'axioms',
+            type: '[Axiom]',
+            initializer: templates.axiomsInitializer(),
+          }),
+          foam.swift.Field.create({
+            lazy: true,
+            name: 'nameAxiomMap_',
+            type: '[String:Axiom]',
+            initializer: templates.nameAxiomMapInitializer(),
+          }),
+          foam.swift.Field.create({
+            lazy: true,
             name: 'label',
             type: 'String',
             defaultValue: '"' + this.model_.label + '"',
@@ -91,6 +105,7 @@ foam.LIB({
             type: '[Axiom]',
             defaultValue: '[' +
               this.getOwnAxioms()
+                .filter(axiomFilter)
                 .filter(function(a) {
                   return a.getSwiftSupport ?
                       a.getSwiftSupport(this) : a.swiftSupport
@@ -123,6 +138,18 @@ foam.LIB({
               }),
             ],
             body: templates.classInfoCreate(this.model_.swiftName, multiton, singleton),
+          }),
+          foam.swift.Method.create({
+            name: 'axiom',
+            returnType: 'Axiom?',
+            args: [
+              foam.swift.Argument.create({
+                externalName: 'byName',
+                localName: 'name',
+                type: 'String',
+              }),
+            ],
+            body: 'return nameAxiomMap_[name]',
           }),
         ],
       });
@@ -170,82 +197,6 @@ foam.LIB({
         body: 'return ' + this.model_.swiftName + '.classInfo_',
       }));
 
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'clearProperty',
-        visibility: 'public',
-	args: [
-          {
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        body: templates.clearPropertyBody(properties),
-      }));
-
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'hasOwnProperty',
-        visibility: 'public',
-	args: [
-          {
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        returnType: 'Bool',
-        body: templates.hasOwnPropertyBody(properties),
-      }));
-
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'get',
-        visibility: 'public',
-	args: [
-          {
-            externalName: 'key',
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        returnType: 'Any?',
-        body: templates.getterBody(properties),
-      }));
-
-      cls.methods.push(foam.swift.Method.create({
-        override: true,
-        name: 'getSlot',
-        visibility: 'public',
-	args: [
-          {
-            externalName: 'key',
-            localName: 'key',
-            type: 'String',
-          },
-	],
-        returnType: 'Slot?',
-        body: templates.slotGetterBody(properties, methods, actions),
-      }));
-
-      cls.methods.push(foam.swift.Method.create({
-        visibility: 'public',
-        override: true,
-        name: 'set',
-	args: [
-          {
-            externalName: 'key',
-            localName: 'key',
-            type: 'String',
-          },
-          {
-            externalName: 'value',
-            localName: 'value',
-            type: 'Any?',
-          },
-	],
-        body: templates.setterBody(properties),
-      }));
-
       var exports = this.getOwnAxiomsByClass(foam.core.Export)
           .filter(function(p) {
             return !this.getSuperAxiomByName(p.name);
@@ -280,108 +231,6 @@ return args
       */},
     },
     {
-      name: 'setterBody',
-      args: ['properties'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftSlotName%>":
-    <%=p.swiftSlotName%> = value as! Slot
-    return
-  case "<%=p.swiftName%>":
-  <% if ( p.swiftExpression ) { %>
-    if <%= p.swiftExpressionSubscriptionName %> != nil {
-      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
-    }
-  <% } %>
-    let oldValue: Any? = <%=p.swiftInitedName%> ? self.`<%=p.swiftName%>` : nil
-    <%=p.swiftValueName%> = <%=p.swiftPreSetFuncName%>(oldValue, <%=p.swiftAdaptFuncName%>(oldValue, value))
-    <%=p.swiftInitedName%> = true
-    <%=p.swiftPostSetFuncName%>(oldValue, <%=p.swiftValueName%>)
-    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) && !FOAM_utils.equals(oldValue, <%=p.swiftValueName%>) {
-      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
-    }
-    return
-<% } %>
-  default: break
-}
-super.set(key: key, value: value)
-      */}
-    },
-    {
-      name: 'slotGetterBody',
-      args: ['properties', 'methods', 'actions'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
-<% } %>
-<% for (var i = 0, p; p = methods[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
-<% } %>
-<% for (var i = 0, p; p = actions[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftSlotName%>`
-<% } %>
-  default:
-    return super.getSlot(key: key)
-}
-      */}
-    },
-    {
-      name: 'getterBody',
-      args: ['properties'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return self.`<%=p.swiftName%>`
-<% } %>
-  default:
-    return super.get(key: key)
-}
-      */},
-    },
-    {
-      name: 'hasOwnPropertyBody',
-      args: ['properties'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>": return `<%=p.swiftInitedName%>`
-<% } %>
-  default:
-    return super.hasOwnProperty(key)
-}
-      */},
-    },
-    {
-      name: 'clearPropertyBody',
-      args: ['properties'],
-      template: function() {/*
-switch key {
-<% for (var i = 0, p; p = properties[i]; i++) { %>
-  case "<%=p.swiftName%>":
-    <%= p.swiftInitedName %> = false
-    <%= p.swiftValueName %> = nil
-
-  <% if ( p.swiftExpression ) { %>
-    if <%= p.swiftExpressionSubscriptionName %> != nil {
-      for s in self.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
-    }
-    <%= p.swiftExpressionSubscriptionName %> = nil
-  <% } %>
-
-    // Only pub if there are listeners.
-    if hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
-      _ = pub(["propertyChange", "<%=p.swiftName%>", <%=p.swiftSlotName%>])
-    }
-    break
-<% } %>
-  default:
-    super.clearProperty(key)
-}
-      */},
-    },
-    {
       name: 'classInfoCreate',
       args: ['swiftName', 'multiton', 'singleton',],
       template: function() {/*
@@ -404,6 +253,33 @@ return instance!
 <% } else { %>
 return <%=swiftName%>(args, x)
 <% } %>
+      */}
+    },
+    {
+      name: 'axiomsInitializer',
+      template: function() {/*
+var curCls: ClassInfo? = self
+var axioms: [Axiom] = []
+var seen = Set<String>()
+while curCls != nil {
+  for a in curCls!.ownAxioms {
+    if seen.contains(a.name) { continue }
+    axioms.append(a)
+    seen.insert(a.name)
+  }
+  curCls = curCls!.parent
+}
+return axioms
+      */}
+    },
+    {
+      name: 'nameAxiomMapInitializer',
+      template: function() {/*
+var map: [String:Axiom] = [:]
+for axiom in axioms {
+  map[axiom.name] = axiom
+}
+return map
       */}
     },
   ],

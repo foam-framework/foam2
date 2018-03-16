@@ -24,6 +24,15 @@ foam.CLASS({
 
   // TODO: CSS classname shouldn't be .net-nanopay-ui-ActionView, fix.
   css: `
+    ^ {
+      min-width: 180px;
+      font-size: medium;
+    }
+
+    ^ input {
+      font-size: medium;
+    }
+
     ^count {
       font-size: 14pt;
       color: #555;
@@ -32,8 +41,7 @@ foam.CLASS({
     ^ .net-nanopay-ui-ActionView-clear {
       background: #59aadd;
       color: white;
-      float: right;
-      margin-top: 10px;
+      margin-top: 14px;
       padding: 12px;
       width: auto;
     }

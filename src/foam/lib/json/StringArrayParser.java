@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -21,5 +21,18 @@ public class StringArrayParser
         new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
       new Whitespace(),
       new Literal("]")));
+  }
+
+  public PStream parse(PStream ps, ParserContext x) {
+    ps = super.parse(ps, x);
+    if ( ps == null ) {
+      return null;
+    }
+    Object[] objs = (Object[]) ps.value();
+    String[] str = new String[objs.length];
+    for ( int i = 0 ; i < objs.length ; i++ ) {
+      str[i] = (String) objs[i];
+    }
+    return ps.setValue(str);
   }
 }

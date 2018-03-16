@@ -12,7 +12,9 @@ import foam.mlang.predicate.Predicate;
 import java.util.ArrayList;
 
 /** Note this class is not thread safe because ArrayList isn't thread-safe. Needs to be made safe by containment. **/
-public class AltIndex implements Index {
+public class AltIndex
+  extends AbstractIndex
+{
 
   public final static int GOOD_ENOUGH_PLAN_COST = 10;
 
@@ -61,36 +63,45 @@ public class AltIndex implements Index {
     return s;
   }
 
+
   public FindPlan planFind(Object state, Object key) {
     Object[] s = toObjectArray(state);
-    Plan bestPlan = NoPlan.instance();
-
+    FindPlan bestPlan = NoPlan.instance();
+    Object bestState = null;
     for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      Plan plan = delegates_.get(i).planFind(s[i], key);
+      FindPlan plan = delegates_.get(i).planFind(s[i], key);
 
+      // only return the smallest cost plan
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
+        bestState = s[i];
         if ( bestPlan.cost() <= GOOD_ENOUGH_PLAN_COST ) break;
       }
     }
 
-    return (FindPlan) bestPlan;
+    return new AltFindPlan(bestState, bestPlan);
   }
 
   public SelectPlan planSelect(Object state, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
     Object[] s = toObjectArray(state);
-    Plan     bestPlan = NoPlan.instance();
+    SelectPlan bestPlan = NoPlan.instance();
+    Object bestState = null;
+    Predicate originPredicate = null;
 
-    for ( int i = 0 ; i < delegates_.size() ; i++ ) {
-      Plan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, predicate);
-
+    for ( int i = 0; i < delegates_.size(); i++ ) {
+      // To keep the origin predicate, because in our next operate the predicate will be changed
+      if ( predicate != null )
+        originPredicate = (Predicate) ( (FObject) predicate ).deepClone();
+      SelectPlan plan = delegates_.get(i).planSelect(s[i], sink, skip, limit, order, originPredicate);
+      bestState = s[i];
       if ( plan.cost() < bestPlan.cost() ) {
         bestPlan = plan;
+        bestState = s[i];
         if ( bestPlan.cost() <= GOOD_ENOUGH_PLAN_COST ) break;
       }
     }
 
-    return (SelectPlan) bestPlan;
+    return new AltSelectPlan(bestState, bestPlan);
   }
 
   public long size(Object state) {

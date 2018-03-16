@@ -52,7 +52,7 @@ describe('FileHandler', function() {
     shutdownPromise = server.shutdown();
   });
 
-  fit('should serve file based on pathname', function(done) {
+  it('should serve file based on path prefix', function(done) {
     serverPromise.then(function() {
       return foam.net.node.HTTPRequest.create({
         url: `http://0.0.0.0:${PORT}${PATHNAME1}`

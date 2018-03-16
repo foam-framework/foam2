@@ -78,6 +78,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'swiftGetter',
+    },
+    {
+      class: 'String',
       name: 'swiftPreSet',
       expression: function() {
         return 'return newValue';
@@ -169,14 +173,21 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom) {
+    function writeToSwiftClass(cls, superAxiom, parentCls) {
+      if ( ! this.swiftSupport ) return;
+
+      if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
+        // TODO: Should we add vars to the protocol?
+        return;
+      }
+
       var isOverride = !!superAxiom;
       cls.fields.push(this.Field.create({
         visibility: 'public',
         override: isOverride,
         name: this.swiftName,
         type: this.swiftType,
-        getter: this.swiftGetter(),
+        getter: this.swiftGetter || this.swiftGetterTemplate(),
         setter: this.swiftSetter(),
       }));
       cls.fields.push(this.Field.create({
@@ -185,7 +196,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         final: true,
         name: this.swiftPrivateAxiomName,
         type: 'PropertyInfo',
-        initializer: this.swiftPropertyInfoInit(),
+        initializer: this.swiftPropertyInfoInit(parentCls),
       }));
       cls.methods.push(this.Method.create({
         visibility: 'public',
@@ -320,7 +331,7 @@ self.set(key: "<%=this.swiftName%>", value: value)
       */},
     },
     {
-      name: 'swiftGetter',
+      name: 'swiftGetterTemplate',
       template: function() {/*
 if <%=this.swiftInitedName%> {
   return <%=this.swiftValueName%><% if ( this.swiftType != this.swiftValueType ) { %>!<% } %>
@@ -373,6 +384,7 @@ self.onDetach(self.<%=this.swiftSlotLinkSubName%>!)
     },
     {
       name: 'swiftPropertyInfoInit',
+      args: ['parentCls'],
       template: function() {/*
 class PInfo: PropertyInfo {
   let name = "<%=this.swiftName%>"
@@ -382,10 +394,53 @@ class PInfo: PropertyInfo {
   let visibility = Visibility.<%=this.visibility.name%>
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
   public func set(_ obj: FObject, value: Any?) {
-    obj.set(key: name, value: value)
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+<% var p = this %>
+<% if ( p.swiftExpression ) { %>
+    if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+<% } %>
+    let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.swiftName%>` : nil
+    obj.<%=p.swiftValueName%> = obj.<%=p.swiftPreSetFuncName%>(oldValue, obj.<%=p.swiftAdaptFuncName%>(oldValue, value))
+    obj.<%=p.swiftInitedName%> = true
+    obj.<%=p.swiftPostSetFuncName%>(oldValue, obj.<%=p.swiftValueName%>)
+    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) && !FOAM_utils.equals(oldValue, obj.<%=p.swiftValueName%>) {
+      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    }
   }
   public func get(_ obj: FObject) -> Any? {
-    return obj.get(key: name)
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftName%>
+  }
+  public func getSlot(_ obj: FObject) -> Slot {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.<%=this.swiftSlotName%>
+  }
+  public func setSlot(_ obj: FObject, value: Slot) {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    obj.<%=this.swiftSlotName%> = value
+  }
+  public func hasOwnProperty(_ obj: FObject) -> Bool {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    return obj.`<%=p.swiftInitedName%>`
+  }
+  public func clearProperty(_ obj: FObject) {
+    let obj = obj as! <%=parentCls.model_.swiftName%>
+    obj.<%= p.swiftInitedName %> = false
+    obj.<%= p.swiftValueName %> = nil
+
+<% if ( p.swiftExpression ) { %>
+    if obj.<%= p.swiftExpressionSubscriptionName %> != nil {
+      for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
+    }
+    obj.<%= p.swiftExpressionSubscriptionName %> = nil
+<% } %>
+
+    // Only pub if there are listeners.
+    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
+      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    }
   }
   public func compareValues(_ v1: Any?, _ v2: Any?) -> Int {
     <%=this.swiftCompareValues%>
@@ -520,12 +575,11 @@ foam.CLASS({
           });
 
           this.model_.classes.map(function(c) { return foam.lookup(c) }).forEach(function(c) {
-            var suf = '_' + c.model_.swiftName;
-            var dvName = 'dv' + suf;
+            var dvName = 'dv_' + c.model_.swiftName;
 
             var didSets = [];
             var addViewAxioms = function(a) {
-              var pName = a.name + suf;
+              var pName = c.model_.swiftName + '_' + a.name;
               var didSet = `if ${pName} != nil { self.${dvName}?["${a.name}"]?.set(key: "view", value: self.${pName}) }`;
               cls.fields.push(foam.swift.Field.create({
                 visibility: 'public',
@@ -552,3 +606,56 @@ foam.CLASS({
     }
   ]
 });
+
+foam.CLASS({
+  refines: 'foam.core.DateTime',
+  properties: [
+    {
+      name: 'swiftType',
+      expression: function(required) {
+        return 'Date' + (required ? '' : '?')
+      },
+    },
+    {
+      name: 'swiftAdapt',
+      value: `
+if let n = newValue as? Date {
+  return n
+} else if let n = newValue as? String {
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.S'Z'"
+  return dateFormatter.date(from: n)
+} else if let n = newValue as? NSNumber {
+  return Date(timeIntervalSince1970: n.doubleValue)
+}
+
+return Date()
+      `,
+    },
+  ],
+})
+
+foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [
+    {
+      name: 'swiftType',
+      expression: function(of, required) {
+        return (of ? of.model_.swiftName : 'FOAM_enum') + (required ? '' : '?');
+      },
+    },
+    {
+      name: 'swiftAdapt',
+      expression: function(of, swiftType) {
+        var name = of && of.model_.swiftName
+        if (!name) return `return newValue as! ${swiftType}`;
+        return `
+if let n = newValue as? Int {
+  return ${name}.fromOrdinal(n)
+}
+return newValue as! ${swiftType}
+        `;
+      },
+    },
+  ],
+})

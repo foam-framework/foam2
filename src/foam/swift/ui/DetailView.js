@@ -195,7 +195,7 @@ return a.viewFactory(x: __context__)
     },
   ],
   swiftCode: function() {/*
-subscript(key: String) -> FObject? {
+public subscript(key: String) -> FObject? {
   guard let of = self.of else { return nil }
   if let v = self.propertyViews[key] ?? self.actionViews[key] {
     return v

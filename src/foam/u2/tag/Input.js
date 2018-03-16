@@ -20,6 +20,8 @@ foam.CLASS({
   name: 'Input',
   extends: 'foam.u2.View',
 
+  css: '^:read-only { border: none; background: rgba(0,0,0,0); }',
+
   properties: [
     [ 'nodeName', 'input' ],
     {
@@ -45,26 +47,27 @@ foam.CLASS({
     },
     {
       class: 'Int',
+      name: 'size'
+    },
+    {
+      class: 'Int',
       name: 'maxLength',
       attribute: true,
       // documentation: 'When set, will limit the length of the input to a certain number'
     },
-    'type'
-  ],
-
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^:read-only { border: none; background: rgba(0,0,0,0); }
-      */}
-    })
+    'type',
+    'placeholder'
   ],
 
   methods: [
     function initE() {
       this.SUPER();
-      if ( this.type ) this.attrs({ type: this.type });
-      if ( this.maxLength > 0 ) this.setAttribute('maxlength', this.maxLength);
+
+      if ( this.size          ) this.setAttribute('size',        this.size);
+      if ( this.type          ) this.setAttribute('type',        this.type);
+      if ( this.placeholder   ) this.setAttribute('placeholder', this.placeholder);
+      if ( this.maxLength > 0 ) this.setAttribute('maxlength',   this.maxLength);
+
       this.initCls();
       this.link();
     },

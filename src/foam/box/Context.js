@@ -61,7 +61,12 @@ foam.CLASS({
             delegate: this.registry
           }, this);
         }
-      }
+      },
+      swiftFactory: `
+return __context__.lookup("foam.swift.net.SocketService")!.create(args: [
+  "delegate$": registry$,
+], x: __subContext__)
+      `,
     },
     {
       name: 'webSocketService',
@@ -102,7 +107,7 @@ foam.CLASS({
       name: 'myname',
       hidden: true,
       swiftFactory:
-          'return "/com/foamdev/anonymous/" + String(FOAM_utils.next$UID())',
+          'return "/com/foamdev/anonymous/" + UUID().uuidString',
       factory: function() {
         return foam.isServer ?
           '/proc/' + require('process').pid + '/' + foam.uuid.randomGUID() :
@@ -148,7 +153,12 @@ foam.CLASS({
         return this.ClassWhitelistContext.create({
           whitelist: this.classWhitelist
         }, this).__subContext__;
-      }
+      },
+      swiftFactory: `
+return ClassWhitelistContext_create([
+  "whitelist$": classWhitelist$,
+]).__subContext__
+      `,
     }
   ]
 });

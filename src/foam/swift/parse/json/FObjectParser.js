@@ -43,12 +43,17 @@ return
           swiftType: 'String',
           name: 'str',
         },
+        {
+          swiftType: 'Context?',
+          swiftDefaultValue: 'nil',
+          name: 'x',
+        },
       ],
       swiftCode: function() {/*
 let ps = StringPStream_create(["str": str])
-let x = ParserContext()
-x.set("X", __subContext__)
-return parse(ps, x)?.value() as? FObject
+let parserContext = ParserContext()
+parserContext.set("X", x ?? __subContext__)
+return parse(ps, parserContext)?.value() as? FObject
       */},
     },
   ],

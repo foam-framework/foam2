@@ -21,11 +21,15 @@ foam.CLASS({
   extends: 'foam.box.PromisedBox',
 
   requires: [
-    'foam.box.RawSocketBox'
+    {
+      flags: ['js'],
+      path: 'foam.box.RawSocketBox',
+    },
   ],
 
   properties: [
     {
+      class: 'String',
       name: 'address'
     },
     {
@@ -37,7 +41,11 @@ foam.CLASS({
             connectTo(this.address).then(function(s) {
               return this.RawSocketBox.create({ socket: s });
             }.bind(this));
-      }
+      },
+      swiftFactory: `
+let socketService = __context__["socketService"] as! SocketService // TODO import
+return socketService.getSocketBoxFuture(address)
+      `
     }
   ]
 });
