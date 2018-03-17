@@ -342,6 +342,9 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'dao',
       label: '',
+      // Exclude DAOs (which use object identity for comparison) from comparison
+      // of relationship impls.
+      comparePropertyValues: function() { return 0; },
       factory: function() {
         return foam.dao.ReadOnlyDAO.create({
           delegate: foam.dao.ManyToManyRelationshipDAO.create({
@@ -361,6 +364,9 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'junctionDAO',
       hidden: true,
+      // Exclude DAOs (which use object identity for comparison) from comparison
+      // of relationship impls.
+      comparePropertyValues: function() { return 0; },
       factory: function() {
         return this.__context__[this.junctionDAOKey];
       },
@@ -370,6 +376,9 @@ foam.CLASS({
       class: 'foam.dao.DAOProperty',
       name: 'targetDAO',
       hidden: true,
+      // Exclude DAOs (which use object identity for comparison) from comparison
+      // of relationship impls.
+      comparePropertyValues: function() { return 0; },
       factory: function() {
         return this.__context__[this.targetDAOKey];
       },
