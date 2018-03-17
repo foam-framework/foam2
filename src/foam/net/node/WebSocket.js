@@ -20,6 +20,7 @@ foam.CLASS({
   name: 'WebSocket',
 
   requires: [
+    'foam.json.Outputter',
     'foam.net.node.Frame'
   ],
 
@@ -45,11 +46,29 @@ foam.CLASS({
     },
     'opcode',
     'parts',
-    'currentFrame'
+    'currentFrame',
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Outputter',
+      name: 'outputter',
+      factory: function() {
+        return this.Outputter.create({
+          pretty: false,
+          formatDatesAsNumbers: true,
+          outputDefaultValues: false,
+          strict: true,
+          propertyPredicate: function(o, p) { return ! p.networkTransient; }
+        });
+      }
+    }
   ],
 
   methods: [
     function send(data) {
+      if ( foam.box.Message.isInstance(data) ) {
+        data = this.outputter.stringify(data);
+      }
+
       if ( typeof data == "string" ) {
         var opcode = 1;
         data = Buffer.from(data);

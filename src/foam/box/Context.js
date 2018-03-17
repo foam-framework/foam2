@@ -21,20 +21,16 @@ foam.CLASS({
   swiftName: 'BoxContext',
 
   requires: [
-    'foam.box.BoxJsonOutputter',
     'foam.box.BoxRegistryBox',
+    'foam.box.NamedBox',
     'foam.box.ClassWhitelistContext',
     'foam.box.LoggedLookupContext',
-    'foam.box.NamedBox',
-    'foam.json.Parser'
   ],
 
   exports: [
     'creationContext',
     'me',
     'messagePortService',
-    'outputter',
-    'parser',
     'registry',
     'root',
     'socketService',
@@ -163,25 +159,6 @@ return ClassWhitelistContext_create([
   "whitelist$": classWhitelist$,
 ]).__subContext__
       `,
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Parser',
-      name: 'parser',
-      factory: function() {
-        return this.Parser.create({
-          strict: true,
-          creationContext: this.creationContext
-        });
-      }
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.box.BoxJsonOutputter',
-      name: 'outputter',
-      factory: function() {
-        return this.BoxJsonOutputter.create().copyFrom(foam.json.Network);
-      }
     }
   ]
 });

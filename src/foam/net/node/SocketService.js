@@ -30,8 +30,7 @@ foam.CLASS({
   imports: [
     'creationContext',
     'error',
-    'info',
-    'parser'
+    'info'
   ],
 
   properties: [
@@ -54,6 +53,17 @@ foam.CLASS({
     },
     {
       name: 'delegate'
+    },
+    {
+      class: 'FObjectProperty',
+      of: 'foam.json.Parser',
+      name: 'parser',
+      factory: function() {
+        return this.Parser.create({
+          strict: true,
+          creationContext: this.creationContext
+        });
+      }
     }
   ],
 
@@ -88,20 +98,10 @@ foam.CLASS({
     function addSocket(socket) {
       var socketBox = this.RawSocketBox.create({
         socket: socket
+      })
+      var X = this.creationContext.createSubContext({
+        returnBox: socketBox,
       });
-
-      // Dynamic class loaders may register classes after a socket is opened.
-      // Point to a context that updates when creationContext changes to allow
-      // for this.
-      var X;
-      var self = this;
-      function bindX() {
-        X = self.creationContext.createSubContext({
-          returnBox: socketBox
-        });
-      }
-      this.creationContext$.sub(bindX);
-      bindX();
 
       var s1 = socket.message.sub(function(s, _, mStr) {
         var m = this.parser.parseString(mStr, X);
