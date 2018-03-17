@@ -45,7 +45,7 @@ suppressWarnings([ `Skipping constant PARSE_JSON with unknown type.`,
   `Unknown property foam.nanos.menu.DAOMenu.XXXsummaryView: [object Object]`,
   `Import "scriptDAO" already exists in ancestor class of foam.nanos.test.Test.`,
   `Unknown property foam.core.Model.javaType: foam.core.PropertyInfo`,
-  `Property foam.dao.index.Index.nodeClass "factory" hidden by "getter"`,
+  `Property foam.dao.index.Index.nodeClass "factory" hidden by "getter"`
 ]);
 
 Object.defineProperty(

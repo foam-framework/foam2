@@ -818,6 +818,34 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
+  name: 'EndsWith',
+  extends: 'foam.mlang.predicate.Binary',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Predicate returns true iff arg1 ends with arg2 or if arg1 is an array, if an element starts with arg2.',
+
+  methods: [
+    {
+      name: 'f',
+      code: function(o) {
+        var arg1 = this.arg1.f(o);
+        var arg2 = this.arg2.f(o);
+
+        if ( Array.isArray(arg1) ) {
+          return arg1.some(function(arg) {
+            return arg.endsWith(arg2);
+          });
+        }
+
+        return arg1.endsWith(arg2);
+      }
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
   name: 'ArrayBinary',
   extends: 'foam.mlang.predicate.Binary',
   abstract: true,
@@ -1301,7 +1329,7 @@ foam.CLASS({
     {
       name: 'String',
       path: 'foam.core.String',
-      swiftPath: null,
+      flags: ['js'],
     },
   ],
 
@@ -1604,8 +1632,8 @@ foam.CLASS({
   name: 'ThenBy',
 
   implements: [
-    'foam.mlang.order.Comparator',
-    'foam.core.Serializable'
+    'foam.core.Serializable',
+    'foam.mlang.order.Comparator'
   ],
 
   documentation: 'Binary Comparator, which sorts for first Comparator, then second.',
@@ -1619,7 +1647,7 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
-      name: 'arg1'
+      name: 'head'
     },
     {
       class: 'FObjectProperty',
@@ -1629,7 +1657,7 @@ foam.CLASS({
         // of parameter is an interface rather than a class.
         return a;
       },
-      name: 'arg2'
+      name: 'tail'
     },
     {
       name: 'compare',
@@ -1643,23 +1671,23 @@ foam.CLASS({
   methods: [
     function compare_(o1, o2) {
       // an equals of arg1.compare is falsy, which will then hit arg2
-      return this.arg1.compare(o1, o2) || this.arg2.compare(o1, o2);
+      return this.head.compare(o1, o2) || this.tail.compare(o1, o2);
     },
 
     function toString() {
-      return 'THEN_BY(' + this.arg1.toString() + ', ' +
-        this.arg2.toString() + ')';
+      return 'THEN_BY(' + this.head.toString() + ', ' +
+        this.tail.toString() + ')';
     },
 
     function toIndex(tail) {
-      return this.arg1 && this.arg2 && this.arg1.toIndex(this.arg2.toIndex(tail));
+      return this.head && this.tail && this.head.toIndex(this.tail.toIndex(tail));
     },
 
-    function orderTail() { return this.arg2; },
+    function orderTail() { return this.tail; },
 
-    function orderPrimaryProperty() { return this.arg1.orderPrimaryProperty(); },
+    function orderPrimaryProperty() { return this.head.orderPrimaryProperty(); },
 
-    function orderDirection() { return this.arg1.orderDirection(); }
+    function orderDirection() { return this.head.orderDirection(); }
   ]
 });
 
@@ -1724,6 +1752,7 @@ foam.LIB({
         c ;
     },
 
+    // TODO: fix bug if combining ThenBy comparators
     function compound(args) {
       /* Create a compound comparator from an array of comparators. */
       var cs = args.map(foam.compare.toCompare);
@@ -1734,7 +1763,7 @@ foam.LIB({
       var ThenBy = foam.mlang.order.ThenBy;
       var ret, tail;
 
-      ret = tail = ThenBy.create({arg1: cs[0], arg2: cs[1]});
+      ret = tail = ThenBy.create({head: cs[0], tail: cs[1]});
 
       for ( var i = 2 ; i < cs.length ; i++ ) {
         tail = tail.arg2 = ThenBy.create({arg1: tail.arg2, arg2: cs[i]});
@@ -1900,6 +1929,7 @@ foam.CLASS({
     'foam.mlang.predicate.Or',
     'foam.mlang.predicate.StartsWith',
     'foam.mlang.predicate.StartsWithIC',
+    'foam.mlang.predicate.EndsWith',
     'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.Explain',
@@ -1945,6 +1975,7 @@ foam.CLASS({
     function KEYWORD(a) { return this._unary_("Keyword", a); },
     function STARTS_WITH(a, b) { return this._binary_("StartsWith", a, b); },
     function STARTS_WITH_IC(a, b) { return this._binary_("StartsWithIC", a, b); },
+    function ENDS_WITH(a, b) { return this._binary_("EndsWith", a, b); },
     function FUNC(fn) { return this.Func.create({ fn: fn }); },
     function DOT(a, b) { return this._binary_("Dot", a, b); },
     function MUL(a, b) { return this._binary_("Mul", a, b); },

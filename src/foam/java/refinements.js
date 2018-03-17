@@ -61,6 +61,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaDiffProperty',
+      value: null
+    },
+    {
+      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -80,6 +85,7 @@ foam.CLASS({
         propValue:        this.javaValue,
         propRequired:     this.required,
         cloneProperty:    this.javaCloneProperty,
+        diffProperty:     this.javaDiffProperty,
         jsonParser:       this.javaJSONParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
@@ -970,9 +976,12 @@ foam.CLASS({
   templates: [
     {
         name: 'compareTemplate',
-        template: function() {/*
-<%= this.javaType %> values1 = get_(o1);
+        template: function() {
+/*<%= this.javaType %> values1 = get_(o1);
 <%= this.javaType %> values2 = get_(o2);
+if ( values1 == null && values2 == null ) return 0;
+if ( values2 == null ) return 1;
+if ( values1 == null ) return -1;
 
 if ( values1.length > values2.length ) return 1;
 if ( values1.length < values2.length ) return -1;
@@ -982,7 +991,8 @@ for ( int i = 0 ; i < values1.length ; i++ ) {
   result = ((Comparable)values1[i]).compareTo(values2[i]);
   if ( result != 0 ) return result;
 }
-return 0;*/}
+return 0;*/
+      }
     }
   ]
 });
@@ -1021,9 +1031,12 @@ foam.CLASS({
   templates: [
     {
       name: 'compareTemplate',
-      template: function() {/*
-<%= this.javaType %> values1 = get_(o1);
+      template: function() {
+/*<%= this.javaType %> values1 = get_(o1);
 <%= this.javaType %> values2 = get_(o2);
+if ( values1 == null && values2 == null ) return 0;
+if ( values2 == null ) return 1;
+if ( values1 == null ) return -1;
 
 if ( values1.length > values2.length ) return 1;
 if ( values1.length < values2.length ) return -1;
@@ -1033,7 +1046,8 @@ for ( int i = 0 ; i < values1.length ; i++ ) {
   result = ((Comparable)values1[i]).compareTo(values2[i]);
   if ( result != 0 ) return result;
 }
-return 0;*/}
+return 0;*/
+      }
     }
   ]
 });
@@ -1088,20 +1102,24 @@ foam.CLASS({
   templates: [
     {
       name: 'compareTemplate',
-      template: function() {/*
-  <%= this.javaType %> values1 = get_(o1);
-  <%= this.javaType %> values2 = get_(o2);
-  if ( values1.length > values2.length ) return 1;
-  if ( values1.length < values2.length ) return -1;
+      template: function() {
+/*<%= this.javaType %> values1 = get_(o1);
+<%= this.javaType %> values2 = get_(o2);
+if ( values1 == null && values2 == null ) return 0;
+if ( values2 == null ) return 1;
+if ( values1 == null ) return -1;
 
-  int result;
-  for ( int i = 0 ; i < values1.length ; i++ ) {
+if ( values1.length > values2.length ) return 1;
+if ( values1.length < values2.length ) return -1;
+
+int result;
+for ( int i = 0 ; i < values1.length ; i++ ) {
   result = ((Comparable)values1[i]).compareTo(values2[i]);
   if ( result != 0 ) return result;
-  }
-  return 0;
-  */}
+}
+return 0;*/
       }
+    }
   ]
 });
 

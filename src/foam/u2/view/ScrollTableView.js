@@ -43,6 +43,7 @@
       class: 'Int',
       name: 'daoCount'
     },
+    'selection'
   ],
 
   methods: [
@@ -58,7 +59,7 @@
         start('tr').
           start('td').
             style({ 'vertical-align': 'top' }).
-            start(this.TableView, {data$: this.scrolledDao$, columns: this.columns}).
+            start(this.TableView, {data$: this.scrolledDao$, columns: this.columns, selection$: this.selection$}).
             end().
           end().
           start('td').style({ 'vertical-align': 'top' }).

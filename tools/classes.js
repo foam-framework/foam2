@@ -122,6 +122,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
   'foam.nanos.auth.token.TokenService',
@@ -131,6 +132,11 @@ var classes = [
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.ServiceProvider',
+  'foam.nanos.auth.twofactor.OTPAuthService',
+  'foam.nanos.auth.twofactor.AbstractOTPAuthService',
+  'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
+  'foam.nanos.auth.twofactor.ClientOTPAuthService',
+  'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -201,7 +207,8 @@ var classes = [
   'foam.crypto.sign.SignedFObject',
 
   'foam.nanos.dig.Format',
-  'foam.nanos.dig.DUG'
+  'foam.nanos.dig.DUG',
+  'foam.nanos.dig.DigPostParameters',
 ];
 
 var abstractClasses = [
@@ -214,9 +221,10 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.twofactor.OTPAuthService',
+  'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
-  'foam.nanos.auth.token.TokenService'
 ];
 
 var proxies = [
@@ -228,6 +236,7 @@ var proxies = [
   'foam.blob.Blob',
   'foam.blob.BlobService',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
   'foam.nanos.logger.Logger',
   'foam.nanos.notification.email.EmailService',

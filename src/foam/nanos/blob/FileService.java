@@ -25,8 +25,13 @@ public class FileService
   protected DAO userDAO_;
   protected DAO sessionDAO_;
 
+
   public FileService(X x, BlobService delegate) {
-    super(x, delegate);
+    this(x, "httpFileService", delegate);
+  }
+
+  public FileService(X x, String name, BlobService delegate) {
+    super(x, name, delegate);
     fileDAO_ = (DAO) x.get("fileDAO");
     // use the user dao instead of local user dao
     // so that we get the authentication decoration
@@ -36,13 +41,14 @@ public class FileService
 
   @Override
   protected void download(X x) {
+    Blob blob = null;
     OutputStream os = null;
     HttpServletRequest  req  = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
 
     try {
       String path = req.getRequestURI();
-      String id = path.replaceFirst("/service/" + nspec_.getName() + "/", "");
+      String id = path.replaceFirst("/service/" + name_ + "/", "");
 
       // find file from file dao
       File file = (File) fileDAO_.find_(x, id);
@@ -60,7 +66,7 @@ public class FileService
       // get blob and blob size
       // TODO: figure out why delegate is not being set for IdentifiedBlob
       String blobId = ((IdentifiedBlob) file.getData()).getId();
-      Blob blob = getDelegate().find_(x, blobId);
+      blob = getDelegate().find_(x, blobId);
       long size = blob.getSize();
 
       // set response status, content type, content length
@@ -74,9 +80,9 @@ public class FileService
       blob.read(os, 0, size);
       os.close();
     } catch (Throwable t) {
-      t.printStackTrace();
       throw new RuntimeException(t);
     } finally {
+      IOUtils.closeQuietly(blob);
       IOUtils.closeQuietly(os);
     }
   }
