@@ -312,7 +312,6 @@ FOAM_FILES([
   { name: "foam/box/ReturnBox" },
   { name: "foam/box/RawMessagePortBox" },
   { name: "foam/box/WebSocketBox" },
-  { name: "foam/box/BoxJsonOutputter" },
   { name: "foam/box/ClassWhitelistContext" },
   { name: "foam/box/LoggedLookupContext" },
   { name: "foam/box/Context" },
