@@ -17,7 +17,7 @@ foam.CLASS({
 
     css:`
     ^ {
-      height: 190px;
+      height: 180px;
     }
         ^ .title {
         margin-left: 20px;
@@ -32,10 +32,7 @@ foam.CLASS({
         letter-spacing: 0.2px;
         text-align: left;
         color: #ffffff;
-        }
-    
-  
-    
+      }
         ^ .label1 {
           width: 338px;
           height: 16px;
@@ -50,7 +47,6 @@ foam.CLASS({
           color: #093649;
           margin-top:20px;
           margin-left:20px;
-          
         }
         ^ .Mask {
           width: 600px;
@@ -58,10 +54,7 @@ foam.CLASS({
           border-radius: 2px;
           background-color: #ffffff;
         }
-        
-
         ^ .Rectangle-13 {
-          
           width: 448px;
           height: 40px;
           background-color: #093649;
@@ -73,7 +66,6 @@ foam.CLASS({
           background-color: #ffffff;
           border: solid 1px rgba(164, 179, 184, 0.5);
         }
-
         ^ .Rectangle-8 {
           width: 135px;
           height: 40px;
@@ -90,9 +82,7 @@ foam.CLASS({
           color: #ffffff;
           margin-left: 157px;
           margin-top:50px;
-        
         }
-
     `,
     messages:[
           {name:'title', message:'New Email'},
@@ -109,8 +99,6 @@ foam.CLASS({
             }))
             .start().add(this.titlelabel).addClass('label1')
               .end()
-            //.start('button').add(this.OKButton).addClass('Rectangle-8')
-              //.end()
               .start(this.CLOSE_MODAL).addClass('Rectangle-8').end()
           .end();
           

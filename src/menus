@@ -25,9 +25,6 @@ p({"class":"foam.nanos.menu.Menu","id":"set-security","label":"Log Out","handler
 p({"class":"foam.nanos.menu.Menu","id":"permissions","label":"Permission Matrix","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.auth.PermissionTableView"}},"order":1000,"parent":"admin"})
 
 p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.SupportEmailView"}},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"support1","label":"Support1","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.modal.NewEmailSupportModal1"}},"order":1000,"parent":"admin"})
-p({"class":"foam.nanos.menu.Menu","id":"support3","label":"Support3","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.modal.NewEmailSupportModal2"}},"order":1000,"parent":"admin"})
-
 p({"class":"foam.nanos.menu.Menu","id":"support2","label":"Support2","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketView"}},"order":1000,"parent":"admin"})
 // p({"class":"foam.nanos.menu.Menu","id":"demos","label":"Demos","order":1000,"parent":"","handler":{"class":"foam.nanos.menu.SubMenu"}})
 // p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})
