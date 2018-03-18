@@ -61,6 +61,7 @@ foam.CLASS({
         }
         ^ .input {
           margin-top: 15px;
+          margin-bottom: 79px;
           width: 408px;
           height: 40px;
           background-color: #ffffff;

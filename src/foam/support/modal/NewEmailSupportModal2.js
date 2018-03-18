@@ -28,8 +28,11 @@ foam.CLASS({
       font-stretch: normal;
       line-height: 1.33;
       letter-spacing: 0.2px;
-      text-align: left;
+      text-align: center;
       color: #093649;
+    }
+    ^ .titlelabel{
+      margin-left: 101px;
     }
     ^ .Mask {
       width: 448px;
@@ -46,6 +49,7 @@ foam.CLASS({
     }
     ^ .input {
       margin-top: 15px;
+      margin-bottomm: 95px;
       width: 408px;
       height: 40px;
       background-color: #ffffff;
@@ -74,7 +78,7 @@ foam.CLASS({
       background-color: #59a5d5;
       float: right;
       font-family: Roboto;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
@@ -82,6 +86,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: center;
       color: #ffffff;
+      margin-left: 200px;
     }
     ^ .div {
       margin-top: 40px; 

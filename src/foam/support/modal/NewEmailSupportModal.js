@@ -43,7 +43,7 @@ foam.CLASS({
     }
     ^ .Mask {
       width: 448px;
-      height: 1000px;
+      height: 231px;
       border-radius: 2px;
       background-color: #ffffff;
     }
