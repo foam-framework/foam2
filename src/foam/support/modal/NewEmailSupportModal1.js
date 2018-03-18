@@ -17,7 +17,7 @@ foam.CLASS({
 
     css:`
     ^ {
-      height: 180px;
+      height: 263px;
     }
         ^ .title {
         margin-left: 20px;
@@ -47,6 +47,7 @@ foam.CLASS({
           color: #093649;
           margin-top:20px;
           margin-left:20px;
+          margin-bottom: 79px;
         }
         ^ .Mask {
           width: 600px;

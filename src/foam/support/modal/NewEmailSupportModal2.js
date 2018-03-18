@@ -32,8 +32,7 @@ foam.CLASS({
       color: #093649;
       margin-left: 47px;
       margin-bottom: 75px;
-      margin-top: 20px;
-
+      padding-top: 0.1px;
     }
     
     ^ .Mask {
