@@ -38,6 +38,9 @@ foam.CLASS({
       text-align: left;
       color: #ffffff;
     }
+    ^ .titlelabel {
+      margin-top: 20px;
+    }
     ^ .Mask {
       width: 448px;
       height: 1000px;
