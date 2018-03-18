@@ -22,7 +22,7 @@ foam.CLASS({
 
   css:`
     ^ {
-      height: 220px;
+      height: 240px;
     }
     ^ .title {
       margin-left: 20px;
@@ -38,38 +38,11 @@ foam.CLASS({
       text-align: left;
       color: #ffffff;
     }
-    ^ .label1 {
-      width: 338px;
-      height: 16px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.33;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #093649;
-    }
     ^ .Mask {
       width: 448px;
       height: 1000px;
       border-radius: 2px;
       background-color: #ffffff;
-    }
-    ^ .textbox{
-      width: 408px;
-      height: 100px;
-      background-color: #ffffff;
-      border: solid 1px rgba(164, 179, 184, 0.5);
-      border-style: solid;
-      border-width: medium;   
-    }
-    ^ .Rectangle-13 {  
-      width: 448px;
-      height: 40px;
-      padding-bottom: 10px;
-      background-color: #093649;
     }
     ^ .input {
       margin-top: 15px;
@@ -137,7 +110,7 @@ foam.CLASS({
 
     messages:[
       { name:'title', message:'New Email' },
-      { name:'titlelabel', message:'Input the address you want to input on the help desk.' },
+      { name:'titlelabel', message:'Input the email address you want to connect to the help desk.' },
     ],
 
     methods:[
@@ -168,7 +141,6 @@ foam.CLASS({
         name: 'nextButton',
         label: 'Next',
         code: function(X){
-         // console.log(this.user.id)
           var email = this.SupportEmail.create({
             email: this.email,
             userId:this.user.id

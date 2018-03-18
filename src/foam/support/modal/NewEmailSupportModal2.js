@@ -29,7 +29,7 @@ foam.CLASS({
       font-stretch: normal;
       line-height: 2.86;
       letter-spacing: 0.2px;
-      text-align: center;
+      text-align: left;
       color: #ffffff;
     }
     ^ .label1 {
@@ -106,7 +106,6 @@ foam.CLASS({
     `,
     
     messages:[
-      { name:'title', message:'Delete Email' },
       { name:'titlelabel', message:'Do you want to delete the email xx@xx.com?' },
       { name:'deleteButton', message:'Delete' },
 
