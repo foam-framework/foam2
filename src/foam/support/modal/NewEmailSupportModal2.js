@@ -30,9 +30,8 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: center;
       color: #093649;
-    }
-    ^ .titlelabel{
-      margin-left: 101px;
+      margin-left: 95px;
+
     }
     ^ .Mask {
       width: 448px;
@@ -78,7 +77,7 @@ foam.CLASS({
       background-color: #59a5d5;
       float: right;
       font-family: Roboto;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
@@ -86,7 +85,6 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: center;
       color: #ffffff;
-      margin-left: 200px;
     }
     ^ .div {
       margin-top: 40px; 
