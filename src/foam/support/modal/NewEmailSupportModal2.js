@@ -42,7 +42,7 @@ foam.CLASS({
       font-stretch: normal;
       line-height: 1.33;
       letter-spacing: 0.2px;
-      text-align: center;
+      text-align: left;
       color: #093649;
     }
     ^ .Mask {
@@ -51,14 +51,7 @@ foam.CLASS({
       border-radius: 2px;
       background-color: #ffffff;
     }
-    ^ .textbox{
-      width: 408px;
-      height: 100px;
-      background-color: #ffffff;
-      border: solid 1px rgba(164, 179, 184, 0.5);
-      border-style: solid;
-      border-width: medium;   
-    }
+
     ^ .Rectangle-13 {  
       width: 448px;
       height: 40px;
@@ -113,7 +106,7 @@ foam.CLASS({
     `,
     
     messages:[
-      { name:'title', message:'New Email' },
+      { name:'title', message:'Delete Email' },
       { name:'titlelabel', message:'Do you want to delete the email xx@xx.com?' },
       { name:'deleteButton', message:'Delete' },
 
