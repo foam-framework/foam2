@@ -73,6 +73,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'legalName',
+      transient: true,
       expression: function ( firstName, middleName, lastName ) {
         return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
       }
