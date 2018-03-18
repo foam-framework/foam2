@@ -16,7 +16,7 @@ foam.CLASS({
 
   css:`
     ^ {
-      height: 225px;
+      height: 200px;
     }
     ^ .title {
       margin-left: 20px;
