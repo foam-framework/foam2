@@ -16,7 +16,7 @@ foam.CLASS({
 
   css:`
     ^ {
-      height: 200px;
+      height: 230px;
     }
     ^ .label1 {
       width: 338px;
@@ -31,13 +31,11 @@ foam.CLASS({
       text-align: center;
       color: #093649;
       margin-left: 47px;
-      margin-bottom: 85px;
-
+      margin-bottom: 75px;
+      margin-top: 20px;
 
     }
-    ^ .titlelabel{
-      margin-left: 101px;
-    }
+    
     ^ .Mask {
       width: 448px;
       height: 1000px;
