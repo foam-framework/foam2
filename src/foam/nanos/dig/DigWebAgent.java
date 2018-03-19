@@ -37,24 +37,24 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
-    final PrintWriter   out        = x.get(PrintWriter.class);
-    CharBuffer          buffer_    = CharBuffer.allocate(65535);
-    String              accept     = req.getHeader("Accept");
+    HttpServletRequest  req         = x.get(HttpServletRequest.class);
+    HttpServletResponse resp        = x.get(HttpServletResponse.class);
+    final PrintWriter   out         = x.get(PrintWriter.class);
+    CharBuffer          buffer_     = CharBuffer.allocate(65535);
+    String              accept      = req.getHeader("Accept");
     String              contentType = req.getHeader("Content-Type");
-    String              data       = req.getParameter("data");
-    Object              dataObj    = null;
-    String              daoName    = req.getParameter("dao");
-    String              command    = req.getParameter("cmd");
-    String              format     = req.getParameter("format");
-    String              id         = req.getParameter("id");
-    String              methodName = req.getMethod();
-    Logger              logger     = (Logger) x.get("logger");
-    DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
-    String[]            email      = req.getParameterValues("email");
-    boolean             emailSet   = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
-    String              subject    = req.getParameter("subject");
+    String              data        = req.getParameter("data");
+    Object              dataObj     = null;
+    String              daoName     = req.getParameter("dao");
+    String              command     = req.getParameter("cmd");
+    String              format      = req.getParameter("format");
+    String              id          = req.getParameter("id");
+    String              methodName  = req.getMethod();
+    Logger              logger      = (Logger) x.get("logger");
+    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    String[]            email       = req.getParameterValues("email");
+    boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
+    String              subject     = req.getParameter("subject");
 
     resp.setContentType("text/html");
 
@@ -119,18 +119,24 @@ public class DigWebAgent
             dao = dao.inX(x);
             dataObj = parameters.getData();
             if ( dataObj != null ) {
+              foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+              outputterJson.setOutputDefaultValues(true);
+              outputterJson.setOutputClassNames(false);
               if ( dataObj instanceof Object[] ) {
                 Object[] objs = (Object[]) dataObj;
                 for ( int i = 0; i < objs.length; i++ ) {
                   FObject obj = (FObject) objs[i];
                   dao.put(obj);
                 }
+                outputterJson.output(objs);
+                out.println(outputterJson);
               } else {
                 FObject obj = (FObject) dataObj;
                 dao.put(obj);
+                outputterJson.output(obj);
+                out.println(outputterJson);
               }
               resp.setStatus(HttpServletResponse.SC_OK);
-              out.println("Success");
               return;
             }
           }
@@ -209,7 +215,9 @@ public class DigWebAgent
         if ( "json".equals(format) ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
-
+          foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
+          outputterJson.setOutputDefaultValues(true);
+          outputterJson.setOutputClassNames(false);
           //let FObjectArray parse first
           Object o = null;
           o = jsonParser.parseStringForArray(data, objClass);
@@ -219,7 +227,8 @@ public class DigWebAgent
               obj = (FObject) objs[j];
               dao.put(obj);
             }
-            out.println("Success");
+            outputterJson.output(objs);
+            out.println(outputterJson);
             return;
           }
 
