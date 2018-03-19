@@ -259,13 +259,17 @@ public abstract class AbstractJDAO
     while( e.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) e.next();
       if ( prop instanceof AbstractFObjectPropertyInfo ) {
-        FObject diff = hasDiff((FObject) prop.get(o), (FObject) prop.get(n));
-        //if there is difference, set difference
-        if ( diff != null ) {
-          //create only when there is difference
-          if ( ret == null ) ret = generateFObject(o);
-          //set diff
-          prop.set(ret, diff);
+        if (prop.getNetworkTransient() || prop.getStorageTransient()) {
+          //filter out one-to-many and many-to-many relationship, which will cause infinite looping
+        } else {
+          FObject diff = hasDiff((FObject) prop.get(o), (FObject) prop.get(n));
+          //if there is difference, set difference
+          if ( diff != null ) {
+            //create only when there is difference
+            if ( ret == null ) ret = generateFObject(o);
+            //set diff
+            prop.set(ret, diff);
+          }
         }
       } else if ( prop instanceof AbstractFObjectArrayPropertyInfo ) {
         //TODO: if instances are same, can not check array
