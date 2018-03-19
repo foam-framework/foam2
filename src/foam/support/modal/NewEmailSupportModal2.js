@@ -7,10 +7,13 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ModalHeader',
+    'foam.support.model.SupportEmail'
   ],
 
   imports: [
-    'closeDialog'
+    'closeDialog',
+    'user',
+    'supportEmailDAO'
   ],
 
 
@@ -32,29 +35,12 @@ foam.CLASS({
       color: #093649;
       margin-left: 47px;
       margin-bottom: 75px;
-      padding-top: 0.1px;
     }
-    
     ^ .Mask {
       width: 448px;
       height: 1000px;
       border-radius: 2px;
       background-color: #ffffff;
-    }
-
-    ^ .Rectangle-13 {  
-      width: 448px;
-      height: 40px;
-      padding-bottom: 10px;
-      background-color: #093649;
-    }
-    ^ .input {
-      margin-top: 15px;
-      margin-bottomm: 95px;
-      width: 408px;
-      height: 40px;
-      background-color: #ffffff;
-      border: solid 1px rgba(164, 179, 184, 0.5);
     }
     ^ .Rectangle-7 {
       float: left;
@@ -93,13 +79,23 @@ foam.CLASS({
     }
     ^ .div2 {
       padding: 20px;
+      margin-top: 10px;
     }
     `,
+
+    properties: [
+      {
+        class: 'String',
+        name: 'email'
+      },
+      {
+        class: 'Long',
+        name: 'id'
+      }
+    ],
     
     messages:[
       { name:'titlelabel', message:'Do you want to delete the email xx@xx.com?' },
-      { name:'deleteButton', message:'Delete' },
-
     ],
 
     methods:[
@@ -115,19 +111,28 @@ foam.CLASS({
             .add(this.titlelabel)
           .end()
           .start().addClass('div')
-          .start(this.CLOSE_MODAL).addClass('Rectangle-7').end()
-          .start('button')
-            .add(this.deleteButton).addClass('Rectangle-8')
+          .start(this.CLOSE_MODAL).addClass('Rectangle-7')
+          .end()
+          .start(this.DELETE_BUTTON).addClass('Rectangle-8')
           .end()
         .end()
-      },
-        
-      function alert(){
-        console.log('Your email has been added successfully...');
       }
     ],
         
     actions: [
+      {
+        name: 'deleteButton',
+        label: 'Delete',
+        code: function() {
+          this.supportEmailDAO.remove(this.email).then(function() {
+          }.bind(this));
+
+          this.supportEmailDAO.put(email);
+        }
+      },
+       // code: function(){
+         // console.log(this.email)
+        //}
       {
         name: 'closeModal',
         label: 'Close',

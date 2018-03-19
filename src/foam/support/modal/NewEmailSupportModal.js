@@ -38,21 +38,11 @@ foam.CLASS({
       text-align: left;
       color: #ffffff;
     }
-    ^ .titlelabel {
-      margin-top: 20px;
-    }
     ^ .Mask {
       width: 448px;
       height: 231px;
       border-radius: 2px;
       background-color: #ffffff;
-    }
-    ^ .input {
-      margin-top: 15px;
-      width: 408px;
-      height: 40px;
-      background-color: #ffffff;
-      border: solid 1px rgba(164, 179, 184, 0.5);
     }
     ^ .Rectangle-7 {
       float: left;
@@ -62,7 +52,7 @@ foam.CLASS({
       background-color: rgba(164, 179, 184, 0.1);
       box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
       font-family: Roboto;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
@@ -130,10 +120,11 @@ foam.CLASS({
         .end()
         .start(this.EMAIL).addClass('input-wide').end()
         .start().addClass('div')
-        
-        .start(this.CLOSE_MODAL).addClass('Rectangle-7').end()
+        .start(this.CLOSE_MODAL).addClass('Rectangle-7')
+        .end()
           .startContext({ data : this })
-        .start(this.NEXT_BUTTON).addClass('Rectangle-8').end()
+        .start(this.NEXT_BUTTON).addClass('Rectangle-8')
+        .end()
           .endContext()
         .end()
       }
@@ -146,7 +137,7 @@ foam.CLASS({
         code: function(X){
           var email = this.SupportEmail.create({
             email: this.email,
-            userId:this.user.id
+            userId: this.user.id
           })
 
           this.supportEmailDAO.put(email);
@@ -155,7 +146,6 @@ foam.CLASS({
        // code: function(){
          // console.log(this.email)
         //}
-      
       {
         name: 'closeModal',
         label: 'Close',

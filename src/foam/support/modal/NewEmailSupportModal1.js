@@ -18,8 +18,8 @@ foam.CLASS({
     css:`
     ^ {
       height: 263px;
-    }
-        ^ .title {
+       }
+       ^ .title {
         margin-left: 20px;
         width: 198px;
         height: 40px;
@@ -32,9 +32,9 @@ foam.CLASS({
         letter-spacing: 0.2px;
         text-align: left;
         color: #ffffff;
-      }
+        }
         ^ .label1 {
-          width: 338px;
+          width: 395px;
           height: 16px;
           font-family: Roboto;
           font-size: 12px;
@@ -88,8 +88,7 @@ foam.CLASS({
     `,
     messages:[
           {name:'title', message:'New Email'},
-          {name:'titlelabel', message:'Please go to the email box to validate the email address before you can connect to the help desk.'},
-          
+          {name:'titlelabel', message:'Please go to the email box to validate the email address before you can connect to the help desk.'},  
         ],
         
     methods:[
@@ -101,8 +100,9 @@ foam.CLASS({
             }))
             .start().add(this.titlelabel).addClass('label1')
               .end()
-              .start(this.CLOSE_MODAL).addClass('Rectangle-8').end()
-          .end();
+              .start(this.CLOSE_MODAL).addClass('Rectangle-8')
+              .end()
+            .end();
           
             }
           ],

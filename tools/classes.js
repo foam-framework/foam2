@@ -208,8 +208,6 @@ var classes = [
   'foam.nanos.dig.Format',
   'foam.nanos.dig.DUG',
 
-  
-
   //Support files
   'foam.support.model.SupportEmail',
   'foam.nanos.dig.DigPostParameters',
