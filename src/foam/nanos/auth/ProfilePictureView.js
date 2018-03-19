@@ -70,6 +70,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'placeholderImage'
+    },
+    {
       class: 'foam.nanos.fs.FileProperty',
       name: 'data'
     },
@@ -106,7 +110,7 @@ foam.CLASS({
                     return url;
                   }
                 } else {
-                   return 'images/person.svg'
+                   return self.placeholderImage;
                 }
               })
             });
