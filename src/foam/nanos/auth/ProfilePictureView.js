@@ -148,7 +148,8 @@ foam.CLASS({
                       url += '?sessionId=' + sessionId;
                     return url;
                   }
-                } else return 'images/person.svg'
+                } else 
+                  return 'images/person.svg'
               })
             });
           }, this.data$))
@@ -203,20 +204,21 @@ foam.CLASS({
     function onDrop(e) {
       e.preventDefault();  
       this.dragActive = false;
-      if( this.uploadHidden ) return;
+      if ( this.uploadHidden ) 
+        return;
       else {
         var inputFile;
         if ( e.dataTransfer.items ) {
           inputFile = e.dataTransfer.items[0]
           if ( inputFile.kind === 'file' ) {     
             var file = inputFile.getAsFile();
-            if(this.isImageType(file)) this.addFile(file);
+            if ( this.isImageType(file) ) this.addFile(file);
             else 
               this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
           }
         } else if( e.dataTransfer.files ) {
           var file = e.dataTransfer.files[0];
-          if( this.isImageType(file) ) this.addFile(file);
+          if ( this.isImageType(file) ) this.addFile(file);
           else 
             this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' })); 
         }
@@ -224,9 +226,10 @@ foam.CLASS({
     },
 
     function isImageType(file) {
-      if( file.type === "image/jpg"  || 
-          file.type === "image/jpeg" || 
-          file.type === "image/png" ) return true;
+      if ( file.type === "image/jpg"  || 
+           file.type === "image/jpeg" || 
+           file.type === "image/png" ) 
+        return true;
       return false;
     },
 
