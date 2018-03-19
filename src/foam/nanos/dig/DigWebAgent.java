@@ -37,24 +37,24 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
-    final PrintWriter   out        = x.get(PrintWriter.class);
-    CharBuffer          buffer_    = CharBuffer.allocate(65535);
-    String              accept     = req.getHeader("Accept");
+    HttpServletRequest  req         = x.get(HttpServletRequest.class);
+    HttpServletResponse resp        = x.get(HttpServletResponse.class);
+    final PrintWriter   out         = x.get(PrintWriter.class);
+    CharBuffer          buffer_     = CharBuffer.allocate(65535);
+    String              accept      = req.getHeader("Accept");
     String              contentType = req.getHeader("Content-Type");
-    String              data       = req.getParameter("data");
-    Object              dataObj    = null;
-    String              daoName    = req.getParameter("dao");
-    String              command    = req.getParameter("cmd");
-    String              format     = req.getParameter("format");
-    String              id         = req.getParameter("id");
-    String              methodName = req.getMethod();
-    Logger              logger     = (Logger) x.get("logger");
-    DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
-    String[]            email      = req.getParameterValues("email");
-    boolean             emailSet   = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
-    String              subject    = req.getParameter("subject");
+    String              data        = req.getParameter("data");
+    Object              dataObj     = null;
+    String              daoName     = req.getParameter("dao");
+    String              command     = req.getParameter("cmd");
+    String              format      = req.getParameter("format");
+    String              id          = req.getParameter("id");
+    String              methodName  = req.getMethod();
+    Logger              logger      = (Logger) x.get("logger");
+    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    String[]            email       = req.getParameterValues("email");
+    boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
+    String              subject     = req.getParameter("subject");
 
     resp.setContentType("text/html");
 
