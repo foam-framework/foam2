@@ -47,7 +47,7 @@ foam.CLASS({
       extends: 'foam.u2.View',
 
       requires: [
-        'foam.u2.TableView',
+        'foam.u2.view.ScrollableTableView',
         'foam.support.model.Ticket',
       ],
       
