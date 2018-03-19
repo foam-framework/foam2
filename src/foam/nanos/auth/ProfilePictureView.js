@@ -108,7 +108,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'isDrag',
+      name: 'dragActive',
       value: false
     },
     [ 'uploadHidden', false ]
@@ -129,7 +129,7 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start('div').addClass(this.isDrag$.map(function (drag) {
+        .start('div').addClass(this.dragActive$.map(function (drag) {
           return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
         }))
           .add(this.slot(function (data) {
@@ -139,19 +139,16 @@ foam.CLASS({
                 if ( data && data.data ) {
                   var blob = data.data;
                   var sessionId = localStorage['defaultSession'];
-                  if ( self.BlobBlob.isInstance(blob) ) {
+                  if ( self.BlobBlob.isInstance(blob) ) 
                     return URL.createObjectURL(blob.blob);
-                  } else {
+                  else {
                     var url = '/service/httpFileService/' + data.id;
                     // attach session id if available
-                    if ( sessionId ) {
+                    if ( sessionId ) 
                       url += '?sessionId=' + sessionId;
-                    }
                     return url;
                   }
-                } else {
-                  return 'images/person.svg'
-                }
+                } else return 'images/person.svg'
               })
             });
           }, this.data$))
@@ -192,57 +189,53 @@ foam.CLASS({
     function onAddAttachmentClicked (e) {
       this.document.querySelector('.attachment-input').click();
     },
+
     function onRemoveClicked (e) {
-      this.isDrag = false;
+      this.dragActive = false;
       this.data = null;
     },
+
     function onDragOver(e) {
-      this.isDrag = true;
+      this.dragActive = true;
       e.preventDefault();    
     },
+
     function onDrop(e) {
       e.preventDefault();  
-      this.isDrag = false;
-      if(this.uploadHidden){
-        return;
-      }
-      else{
+      this.dragActive = false;
+      if( this.uploadHidden ) return;
+      else {
         var inputFile;
-        if (e.dataTransfer.items) {
+        if ( e.dataTransfer.items ) {
           inputFile = e.dataTransfer.items[0]
-          if (inputFile.kind === 'file') {     
+          if ( inputFile.kind === 'file' ) {     
             var file = inputFile.getAsFile();
-            if(this.isRightType(file)){
-              this.addFile(file);
-            }
-            else{
+            if(this.isImageType(file)) this.addFile(file);
+            else 
               this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
-            } 
           }
-        }else if(e.dataTransfer.files){
+        } else if( e.dataTransfer.files ) {
           var file = e.dataTransfer.files[0];
-          if(this.isRightType(file)) 
-            this.addFile(file);
-          else{
-            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
-          }  
+          if( this.isImageType(file) ) this.addFile(file);
+          else 
+            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' })); 
         }
       }
     },
-    function isRightType(file){
-      if(file.type === "image/jpg" 
-      || file.type === "image/jpeg" 
-      || file.type === "image/png") {
-        return true;
-      }
+
+    function isImageType(file) {
+      if( file.type === "image/jpg"  || 
+          file.type === "image/jpeg" || 
+          file.type === "image/png" ) return true;
       return false;
     },
-    function onChange (e) {
-      this.isDrag = false;
 
+    function onChange (e) {
+      this.dragActive = false;
       var file = e.target.files[0];
       this.addFile(file);
     },
+    
     function addFile (file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
