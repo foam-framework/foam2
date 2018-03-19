@@ -21,8 +21,13 @@ foam.CLASS({
   color: #ffffff;
   
     }
-    ^ .table{
-      position: absolute;
+    ^ .foam-support-emailtableview-EmailSupportTableView-table {
+      height:400px
+      overflow: Scroll;
+    }
+    ^ .foam-u2-view-TableView{
+      height:400px
+      overflow: Scroll;
     }
     `,
     requires:['foam.u2.ListCreateController',
