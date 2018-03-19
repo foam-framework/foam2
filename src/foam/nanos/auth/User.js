@@ -73,6 +73,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'legalName',
+      transient: true,
       expression: function ( firstName, middleName, lastName ) {
         return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
       }
@@ -129,6 +130,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'phoneNumber',
+      transient: true,
       expression: function (phone) {
         return phone.number;
       }
