@@ -502,5 +502,9 @@ FOAM_FILES([
 
   //Support
   { name: "foam/support/model/Ticket" },
-  { name: "foam/support/view/TicketView"}
+  { name: "foam/support/view/TicketView"},
+  { name: "foam/support/model/SupportEmail" },
+  { name: "foam/support/model/TicketMessage" },
+  { name: "foam/support/view/TicketDetailView" },
+  { name: "foam/support/view/CreateTicketView" }
 ]);
