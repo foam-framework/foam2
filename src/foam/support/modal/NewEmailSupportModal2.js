@@ -131,9 +131,9 @@ foam.CLASS({
       {
         name: 'deleteButton',
         label: 'Delete',
-        code: function() {
-          this.supportEmailDAO.put(this.email).then(function() {
-          }.bind(this));
+        code: function(X) {
+          //this.supportEmailDAO.put(this.email);
+            console.log(this.email)
         }
       },
        // code: function(){
