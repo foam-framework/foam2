@@ -309,6 +309,11 @@ public class DigWebAgent
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
 
+        if ( sink.getArray().size() == 0 ) {
+          out.println("No data");
+          return;
+        }
+
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
@@ -329,12 +334,8 @@ public class DigWebAgent
 
             output(x, xmlData);
           } else {
-            if ( sink.getArray().size() != 0 ) {
-              resp.setContentType("application/xml");
-              out.println(xmlSupport.toXMLString(sink.getArray()));
-            } else {
-              out.println("No data");
-            }
+            resp.setContentType("application/xml");
+            out.println(xmlSupport.toXMLString(sink.getArray()));
           }
         } else if ( "csv".equals(format) ) {
           foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
