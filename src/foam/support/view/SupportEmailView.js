@@ -42,7 +42,6 @@ foam.CLASS({
       name: 'deleteView',
       code: function(){
         this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal2'}));
-      
       }
     }
   ]
