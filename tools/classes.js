@@ -205,7 +205,10 @@ var classes = [
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignedFObject',
+
+  'foam.nanos.dig.Command',
   'foam.nanos.dig.Format',
+  'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
 
   //Support Files

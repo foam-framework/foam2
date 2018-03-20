@@ -59,20 +59,31 @@ public abstract class AbstractJDAO
 
     logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
     try {
+      //logging file name.0
+      logger_.log("Loading file: " + System.getProperty("user.dir") + File.separator  + filename + ".0");
       //get repo entries in filename.0 journal first
       File inFile = getX().get(foam.nanos.fs.Storage.class).get(filename + ".0");
       //load repo entries into DAO
-      if ( inFile.exists() ) loadJournal(inFile);
-
+      if ( inFile.exists() ) {
+       int validEntries = loadJournal(inFile);
+       logger_.log("Success reading " + validEntries + " entries from file: " + System.getProperty("user.dir") + File.separator  + filename + ".0");
+      } else {
+        logger_.warning("Can not find file: " + System.getProperty("user.dir") + File.separator + filename + ".0");
+      }
+      //logging file name
+      logger_.log("Loading file: " + System.getProperty("user.dir") + File.separator  + filename);
       //get output journal
       outFile_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
       //if output journal does not existing, create one
       if ( ! outFile_.exists() ) {
+        logger_.warning("Can not find file: " + System.getProperty("user.dir") + File.separator  + filename);
+        logger_.log("Create file: " + System.getProperty("user.dir") + File.separator  + filename);
         //if output journal does not exist, create one
         outFile_.createNewFile();
       } else {
         //if output journal file exists, load entries into DAO
-        loadJournal(outFile_);
+        int validEntries = loadJournal(outFile_);
+        logger_.log("Success reading " + validEntries + " entries from file: " + System.getProperty("user.dir") + File.separator  + filename);
       }
       //link output journal file to BufferedWriter
       out_ = new BufferedWriter(new FileWriter(outFile_, true));
@@ -84,9 +95,11 @@ public abstract class AbstractJDAO
 
   protected abstract Outputter getOutputter();
 
-  protected void loadJournal(File file)
+  protected int loadJournal(File file)
       throws IOException
   {
+    //recoding success reading entries
+    int successReading = 0;
     JSONParser parser = getX().create(JSONParser.class);
     BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -114,12 +127,13 @@ public abstract class AbstractJDAO
             getDelegate().remove(object);
             break;
         }
+        successReading++;
       } catch (Throwable t) {
         logger_.error("error replaying journal line:", line, t);
       }
     }
-
     br.close();
+    return successReading;
   }
 
   /**
