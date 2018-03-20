@@ -17,7 +17,6 @@ foam.CLASS({
       factory: function(){
         return 'Pending'
       }
-
     },
     {
       class: 'Date',
