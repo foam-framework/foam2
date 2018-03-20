@@ -13,12 +13,18 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'status'
+      name: 'status',
+      factory: function(){
+        return 'Pending'
+      }
     },
     {
       class: 'Date',
       name: 'connectedTime'
+    },
+    {
+      class: 'Long',
+      name: 'userId'
     }
   ]
-
 });
