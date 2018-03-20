@@ -19,18 +19,6 @@ foam.CLASS({
             class:'String',
             name:'description'
         },
-       {
-            name: 'submitNew',
-            view: {
-              class: 'foam.u2.view.ChoiceView',
-              choices: [
-                'Submit as',
-                'Submit as',
-                'Submit as',
-                'Submit as'
-              ]
-            }
-        }
 
     ],
     css:`
@@ -173,25 +161,18 @@ foam.CLASS({
       ^ .foam-u2-PopupView{
         width: 170px;
         height: 35px;
-        background-color: #ffffff;  
+        background-color: #59a5d5;  
       }
 
-      ^ .net-nanopay-ui-ActionView-voidDropDown {
+      ^ .foam-u2-ActionView-voidDropDown {
         width: 30px;
         height: 40px;
-        background-color: #59A5D5;
-        border: solid 1px #59A5D5;
+        background-color: #59a5d5;
+        background: #59a5d5;
+        border: solid 1px #59a5d5;
         float: right;
       }
-      ^ .net-nanopay-ui-ActionView-voidDropDown::after {
-        content: ' ';
-        position: absolute;
-        height: 0;
-        width: 0;
-        border: 6px solid transparent;
-        border-top-color: white;
-        transform: translate(-6.5px, -1px);
-      }
+     
       ^ .popUpDropDown {
         padding: 0 !important;
         z-index: 100;
@@ -212,8 +193,28 @@ foam.CLASS({
       }
       ^ .popUpDropDown > div:hover {
         background-color: #59a5d5;
-        color: white;
+        color: #59a5d5;
         cursor: pointer;
+      }
+      ^ button.foam-u2-ActionView{
+          margin:0px;
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 2.86;
+        letter-spacing: 0.2px;
+        text-align: center;
+        color: #ffffff;
+          float: right;
+          width: 30px;
+          height: 40px;
+          border-radius: 2px;
+          background-color: #59a5d5;
+      }
+      ^ .foam-u2-ActionView:hover{
+        background: #59a5d5;
       }
     `,
     messages:[
@@ -247,7 +248,7 @@ foam.CLASS({
             .start().addClass('bg')
             .start('div').addClass('div')
                 .start('button').add(this.deleteDraftLabel).addClass('Rectangle-7').end()
-                .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).end()
+                .start(this.VOID_DROP_DOWN,null,this.voidMenuBtn_$).end()
                 //.start('button').add(this.dropDownLabel).addClass('Rectangle-9').end()
                 .start('button').add(this.submitNewLabel).addClass('Rectangle-8').end()
               
@@ -284,17 +285,9 @@ foam.CLASS({
       label: '',
       code: function(X) {
          var self = this;
-
-         self.voidPopUp_ = self.PopupView.create({
-           width: 165,
-           x: -137,
-           y: 40,
-         })
          self.voidPopUp_.addClass('popUpDropDown')
-          .start('div').add('Void')
-            .on('click', this.voidPopUp)
-          .end()
-        self.voidMenuBtn_.add(self.voidPopUp_)
+         
+        self.voidMenuBtn_.add()
       }
     },
       /* {
