@@ -19,7 +19,7 @@ foam.CLASS({
 
   css:`
     ^ {
-      height: 230px;
+      height: 235px;
     }
     ^ .label1 {
       width: 338px;
@@ -35,6 +35,7 @@ foam.CLASS({
       color: #093649;
       margin-left: 47px;
       margin-bottom: 75px;
+      margin-top: 10px;
     }
     ^ .Mask {
       width: 448px;
@@ -91,7 +92,14 @@ foam.CLASS({
       {
         class: 'Long',
         name: 'id'
+      },
+      {
+        class: 'String',
+        name: 'status',
+        factory: function(){
+          return 'Disable'
       }
+    }
     ],
     
     messages:[
@@ -124,10 +132,8 @@ foam.CLASS({
         name: 'deleteButton',
         label: 'Delete',
         code: function() {
-          this.supportEmailDAO.remove(this.email).then(function() {
+          this.supportEmailDAO.put(this.email).then(function() {
           }.bind(this));
-
-          this.supportEmailDAO.put(email);
         }
       },
        // code: function(){

@@ -29,7 +29,7 @@ foam.CLASS({
       width: 198px;
       height: 40px;
       font-family: Roboto;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
