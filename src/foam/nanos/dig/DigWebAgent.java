@@ -160,7 +160,7 @@ public class DigWebAgent
     logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data);
 
     try {
-      if ( "post".equals(command) && SafetyUtil.isEmpty(daoName) ) {
+      if ( "post".equals(command) && (daoName == null || "".equals(daoName)) ) {//SafetyUtil.isEmpty(daoName) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
@@ -329,8 +329,12 @@ public class DigWebAgent
 
             output(x, xmlData);
           } else {
-            resp.setContentType("application/xml");
-            out.println(xmlSupport.toXMLString(sink.getArray()));
+            if ( sink.getArray().size() != 0 ) {
+              resp.setContentType("application/xml");
+              out.println(xmlSupport.toXMLString(sink.getArray()));
+            } else {
+              out.println("No data");
+            }
           }
         } else if ( "csv".equals(format) ) {
           foam.lib.csv.Outputter outputterCsv = new foam.lib.csv.Outputter(OutputterMode.NETWORK);
