@@ -75,38 +75,37 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-    ^ .Ticket-Status-New {
+    .Ticket-Status-New {
       width: 45px;
       height: 20px;
       border-radius: 100px;
       background-color: #eedb5f;
     }
-    ^ .Ticket-Status-Updated {
+    .Ticket-Status-Updated {
       width: 67px;
       height: 20px;
       border-radius: 100px;
       background-color: #093649;
     }
-    ^ .Ticket-Status-Open {
+    .Ticket-Status-Open {
       width: 49px;
       height: 20px;
       border-radius: 100px;
       background-color: #ee5f71;
     }
-    ^ .Ticket-Status-Pending {
+    .Ticket-Status-Pending {
       width: 65px;
       height: 20px;
       border-radius: 100px;
       background-color: #59a5d5;
     }
-    ^ .Ticket-Status-Solved {
+    .Ticket-Status-Solved {
       width: 57px;
       height: 20px;
       border-radius: 100px;
       background-color: #a4b3b8;
     }
-
-    ^ .Ticket-Label-New {
+    .Ticket-Label-New {
       width: 25px;
       height: 20px;
       font-family: Roboto;
@@ -120,7 +119,7 @@ foam.CLASS({
       color: #ffffff;
       padding-left:10px;
     }
-    ^ .Ticket-Label-Updated {
+    .Ticket-Label-Updated {
       width: 47px;
       height: 20px;
       font-family: Roboto;
@@ -134,7 +133,7 @@ foam.CLASS({
       color: #ffffff;
       padding-left:10px;
     }
-    ^ .Ticket-Label-Open {
+    .Ticket-Label-Open {
       width: 29px;
       height: 20px;
       font-family: Roboto;
@@ -148,7 +147,7 @@ foam.CLASS({
       color: #ffffff;
       padding-left:10px;
     }
-    ^ .Ticket-Label-Pending {  
+    .Ticket-Label-Pending {  
       width: 45px;
       height: 20px;
       font-family: Roboto;
@@ -162,7 +161,7 @@ foam.CLASS({
       color: #ffffff;
       padding-left:10px;
     }
-    ^ .Ticket-Label-Solved {
+    .Ticket-Label-Solved {
       width: 37px;
       height: 20px;
       font-family: Roboto;
