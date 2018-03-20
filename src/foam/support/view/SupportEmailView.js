@@ -41,7 +41,8 @@ foam.CLASS({
     {
       name: 'deleteView',
       code: function(){
-        this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal2'}));
+        this.ctrl.add(this.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportModal2'}));
+      
       }
     }
   ]

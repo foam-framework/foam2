@@ -7,6 +7,7 @@ foam.CLASS({
 
     requires: [
       'foam.u2.ModalHeader',
+      'foam.u2.dialog.Popup'
     ],
 
     imports: [

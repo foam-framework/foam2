@@ -7,7 +7,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ModalHeader',
-    'foam.support.model.SupportEmail'
+    'foam.support.model.SupportEmail',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
@@ -89,7 +90,7 @@ foam.CLASS({
         name: 'email',
         factory: function(){
           return 'Disable'
-        }
+      }
       },
       {
         class: 'Long',
@@ -97,7 +98,7 @@ foam.CLASS({
       },
       {
         class: 'String',
-        name: 'status', 
+        name: 'status',     
     }
     ],
     
@@ -130,23 +131,14 @@ foam.CLASS({
       {
         name: 'deleteButton',
         label: 'Delete',
-        //code: function() {
-          //this.supportEmailDAO.put(this.email).then(function() {
-          //}.bind(this));
-       // }
-      //},
+        code: function() {
+          this.supportEmailDAO.put(this.email).then(function() {
+          }.bind(this));
+        }
+      },
        // code: function(){
          // console.log(this.email)
         //}
-        code: function(X){
-          var email = this.SupportEmail.create({
-            email: this.email,
-            //userId: this.user.id
-          })
-
-          this.supportEmailDAO.put(email);
-        }
-      },
       {
         name: 'closeModal',
         label: 'Close',

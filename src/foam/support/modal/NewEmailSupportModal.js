@@ -7,7 +7,8 @@ foam.CLASS({
 
   requires: [
     'foam.u2.ModalHeader',
-    'foam.support.model.SupportEmail'
+    'foam.support.model.SupportEmail',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
