@@ -309,6 +309,11 @@ public class DigWebAgent
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
 
+        if ( sink.getArray().size() == 0 ) {
+          out.println("No data");
+          return;
+        }
+
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
