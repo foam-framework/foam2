@@ -210,6 +210,8 @@ var classes = [
   'foam.nanos.dig.Format',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
+  'foam.nanos.dig.DigPostParameters',
+  'foam.lib.query.TestModel',
 
   //Support Files
   'foam.support.model.TicketMessage',
