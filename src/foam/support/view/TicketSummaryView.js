@@ -26,9 +26,10 @@ foam.CLASS({
   css: `
   ^ .blue-card-title{
       width: 100px;
-      height: 92px;
+      height: 100px;
       border-radius: 2px;
       background-color: #59a5d5;
+      //margin: 25px 1160px 583px 20px;
   }
   ^ .Mentions { 
       font-family: Roboto;
@@ -55,6 +56,14 @@ foam.CLASS({
     color: #ffffff;
     //padding: 5px; 
   }
+  ^ .ticketdiv{
+       margin: 30px 20px;
+      }
+^ .foam-support-view-SummaryCard {
+  width:220px;
+}
+
+ ^ #v28 {float: left;}
   `,
   messages: [
     { name: 'title',          message: 'Tickets' },
@@ -102,21 +111,26 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-    //  this.dao.on.sub(this.onDAOUpdate);
-     // this.onDAOUpdate();
+   // this.dao.on.sub(this.onDAOUpdate);
+    //this.onDAOUpdate();
       this
         .addClass(this.myClass())
-        .start().addClass('blue-card-title')
+       
+        .start('div')
+        .start().addClass('ticketdiv')
+          .start().addClass('blue-card-title')
           .add(this.title).addClass('Mentions')
           .start().addClass('M').add(this.ticketCount$).end()
-        .end()
+          .end()
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.newCount$, status: this.newLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.updatedCount$, status: this.updatedLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
+        .end()
+        .end()
     },
-  ]/*
+  ],
   listeners: [
     {
       name: 'onDAOUpdate',
@@ -150,5 +164,5 @@ foam.CLASS({
         });
       }
     }
-  ]*/
+  ]
 });
