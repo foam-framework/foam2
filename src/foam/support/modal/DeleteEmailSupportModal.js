@@ -17,7 +17,6 @@ foam.CLASS({
     'supportEmailDAO'
   ],
 
-
   css:`
     ^ {
       height: 230px;
@@ -132,13 +131,9 @@ foam.CLASS({
         name: 'deleteButton',
         label: 'Delete',
         code: function(X) {
-          //this.supportEmailDAO.put(this.email);
-            console.log(this.email)
+          this.supportEmailDAO.put(this.email);
         }
       },
-       // code: function(){
-         // console.log(this.email)
-        //}
       {
         name: 'closeModal',
         label: 'Close',

@@ -140,13 +140,9 @@ foam.CLASS({
             email: this.email,
             userId: this.user.id
           })
-
           this.supportEmailDAO.put(email);
         }
       },
-       // code: function(){
-         // console.log(this.email)
-        //}
       {
         name: 'closeModal',
         label: 'Close',
