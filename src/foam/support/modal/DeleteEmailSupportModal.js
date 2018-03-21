@@ -8,7 +8,8 @@ foam.CLASS({
   requires: [
     'foam.u2.ModalHeader',
     'foam.support.model.SupportEmail',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
@@ -86,10 +87,7 @@ foam.CLASS({
     properties: [
       {
         class: 'String',
-        name: 'email',
-        factory: function(){
-          return 'Disable'
-      }
+        name: 'email'    
       },
       {
         class: 'Long',
@@ -131,7 +129,10 @@ foam.CLASS({
         name: 'deleteButton',
         label: 'Delete',
         code: function(X) {
-          this.supportEmailDAO.put(this.email);
+          this.data.status = "Disabled"
+          this.supportEmailDAO.put(this.data);
+          this.add(this.NotificationMessage.create({ message: 'Your email adddress has been disabled and you need to update it ' })); 
+          X.closeDialog()
         }
       },
       {
