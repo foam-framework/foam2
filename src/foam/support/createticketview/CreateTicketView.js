@@ -40,14 +40,14 @@ foam.CLASS({
         background-color: rgba(164, 179, 184, 0.1);
         box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
         font-family: Roboto;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 2.86;
-  letter-spacing: 0.2px;
-  text-align: center;
-  color: #093649;
+        font-size: 14px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 2.86;
+        letter-spacing: 0.2px;
+        text-align: center;
+        color: #093649;
       }
       ^ .Rectangle-8 {
         font-family: Roboto;
@@ -248,7 +248,7 @@ foam.CLASS({
             .start().addClass('bg')
             .start('div').addClass('div')
                 .start('button').add(this.deleteDraftLabel).addClass('Rectangle-7').end()
-                .start(this.VOID_DROP_DOWN,null,this.voidMenuBtn_$).end()
+              .start(this.VOID_DROP_DOWN,null,this.voidMenuBtn_$).end()
                 //.start('button').add(this.dropDownLabel).addClass('Rectangle-9').end()
                 .start('button').add(this.submitNewLabel).addClass('Rectangle-8').end()
               
