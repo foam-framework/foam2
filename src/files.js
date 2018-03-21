@@ -503,7 +503,7 @@ FOAM_FILES([
   //Support
   { name: "foam/support/model/SupportEmail" },
   { name: "foam/support/modal/NewEmailSupportModal"},
-  { name: "foam/support/modal/NewEmailSupportConfimationModal"},
+  { name: "foam/support/modal/NewEmailSupportConfirmationModal"},
   { name: "foam/support/modal/DeleteEmailSupportModal"},
   { name: "foam/support/view/SupportEmailView"},
   { name: "foam/support/model/Ticket" },
