@@ -1,6 +1,6 @@
 foam.CLASS({
     package: 'foam.support.modal',
-    name: 'NewEmailSupportConfirmationModel',
+    name: 'NewEmailSupportConfirmationModal',
     extends: 'foam.u2.View',
   
     documentation:'EMAIL SUPPORT VIEW',
