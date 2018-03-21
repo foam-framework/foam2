@@ -141,10 +141,10 @@ foam.CLASS({
           if(!this.email) return;
           var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           if (emailRegex.test(this.email)){
-            this.add(this.NotificationMessage.create({ message: 'Your email adddress has been entered properly... ' })); 
+            this.add(this.NotificationMessage.create({ message: 'Your email address has been entered properly... ' })); 
           }
           else{
-            this.add(this.NotificationMessage.create({ message: 'Your email adddress needs to be checked... ' })); 
+            this.add(this.NotificationMessage.create({ message: 'Your email address needs to be checked... ' })); 
           }
           var email = this.SupportEmail.create({
             email: this.email,
