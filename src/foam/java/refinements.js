@@ -56,15 +56,18 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaCloneProperty'
+      name: 'javaCloneProperty',
+      value: null
     },
     {
       class: 'String',
-      name: 'javaDiffProperty'
+      name: 'javaDiffProperty',
+      value: null
     },
     {
       class: 'String',
-      name: 'javaAssertValue'
+      name: 'javaAssertValue',
+      value: null
     },
     {
       class: 'String',
