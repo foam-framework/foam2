@@ -33,8 +33,8 @@ public class NanoServiceRouter
   protected Map<String, foam.box.Box> serviceMap_ = new ConcurrentHashMap<>();
 
   public void service(String serviceKey, foam.box.Message message) {
-    PM          pm       = new PM(this.getClass(), serviceKey);
-    Logger      logger   = (Logger)getX().get("logger");
+    PM            pm       = new PM(this.getClass(), serviceKey);
+    Logger        logger   = (Logger)getX().get("logger");
 
     try {
       Object      service  = getX().get(serviceKey);

@@ -206,10 +206,21 @@ var classes = [
   'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignedFObject',
 
+  'foam.nanos.dig.Command',
   'foam.nanos.dig.Format',
+  'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
   'foam.nanos.dig.DigPostParameters',
+<<<<<<< HEAD
   'foam.support.model.SupportEmail',
+=======
+  'foam.lib.query.TestModel',
+
+  //Support Files
+  'foam.support.model.TicketMessage',
+  'foam.support.model.SupportEmail',
+  'foam.support.model.Ticket'
+>>>>>>> 913a1f5143181c3a61e075618f8e40e2b4793f4c
 ];
 
 var abstractClasses = [

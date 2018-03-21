@@ -45,7 +45,7 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       tableWidth: 160,
-      validateObj: function(firstName) {
+      validateObj: function (firstName) {
         if ( firstName.length > 70 ) {
           return 'First name cannot exceed 70 characters.';
         }
@@ -53,7 +53,12 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'middleName'
+      name: 'middleName',
+      validateObj: function (middleName) {
+        if ( middleName.length > 70 ) {
+          return 'Middle name cannot exceed 70 characters.';
+        }
+      }
     },
     {
       class: 'String',
@@ -63,6 +68,14 @@ foam.CLASS({
         if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
         }
+      }
+    },
+    {
+      class: 'String',
+      name: 'legalName',
+      transient: true,
+      expression: function ( firstName, middleName, lastName ) {
+        return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
       }
     },
     {
@@ -85,6 +98,7 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
+      label: 'Email Address',
       displayWidth: 80,
       width: 100,
       preSet: function (_, val) {
@@ -112,6 +126,14 @@ foam.CLASS({
       name: 'phone',
       factory: function () { return this.Phone.create(); },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
+    },
+    {
+      class: 'String',
+      name: 'phoneNumber',
+      transient: true,
+      expression: function (phone) {
+        return phone.number;
+      }
     },
     {
       class: 'FObjectProperty',
@@ -171,7 +193,7 @@ foam.CLASS({
       validateObj: function (password) {
         var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
 
-        if ( ! re.test(password) ) {
+        if ( password.length > 0 && ! re.test(password) ) {
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       }
