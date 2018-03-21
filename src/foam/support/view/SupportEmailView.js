@@ -35,7 +35,7 @@ foam.CLASS({
     {
       name: 'supportView',
       code: function(){
-        this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfimationModal'}));
+        this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal'}));
       }
     },
     {
