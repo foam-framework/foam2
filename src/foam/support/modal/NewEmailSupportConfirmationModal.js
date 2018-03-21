@@ -3,7 +3,7 @@ foam.CLASS({
   name: 'NewEmailSupportConfirmationModal',
   extends: 'foam.u2.View',
 
-  documentation:'EMAIL SUPPORT VIEW',
+  documentation:'EMAIL SUPPORT CONFIRMATION MODAL',
 
   requires: [
     'foam.u2.ModalHeader',
