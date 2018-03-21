@@ -1,37 +1,38 @@
 foam.CLASS({
-    package: 'foam.support.modal',
-    name: 'NewEmailSupportConfirmationModal',
-    extends: 'foam.u2.View',
-  
-    documentation:'EMAIL SUPPORT VIEW',
+  package: 'foam.support.modal',
+  name: 'NewEmailSupportConfirmationModal',
+  extends: 'foam.u2.View',
 
-    requires: [
-      'foam.u2.ModalHeader',
-      'foam.u2.dialog.Popup'
-    ],
-    imports: [
-      'ctrl',
-      'closeDialog'
-    ],
+  documentation:'EMAIL SUPPORT VIEW',
+
+  requires: [
+    'foam.u2.ModalHeader',
+    'foam.u2.dialog.Popup'
+  ],
   
-    css:`
-   ^ {
-    height: 260px;
-    }
-    ^ .title {
-    margin-left: 20px;
-    width: 198px;
-    height: 40px;
-    font-family: Roboto;
-    font-size: 14px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 2.86;
-    letter-spacing: 0.2px;
-    text-align: left;
-    color: #ffffff;
-    }
+  imports: [
+    'ctrl',
+    'closeDialog'
+  ],
+
+  css:`
+      ^ {
+      height: 260px;
+      }
+      ^ .title {
+      margin-left: 20px;
+      width: 198px;
+      height: 40px;
+      font-family: Roboto;
+      font-size: 14px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 2.86;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #ffffff;
+      }
     ^ .label1 {
       width: 395px;
       height: 16px;

@@ -88,7 +88,6 @@ foam.CLASS({
       height: 40px;
       margin-top: 10px;
     }
-
     `,
 
     properties: [
