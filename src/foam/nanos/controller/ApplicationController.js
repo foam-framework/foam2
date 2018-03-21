@@ -75,7 +75,9 @@ foam.CLASS({
       background: #edf0f5;
       margin: 0;
     }
-
+    .foam-u2-UnstyledActionView-signIn {
+      margin-left: 25px !important;
+    }
     .stack-wrapper {
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
@@ -130,7 +132,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
       var self = this;
-
+      foam.__context__.register(foam.u2.UnstyledActionView, 'foam.u2.ActionView');
       this.getCurrentUser();
 
       window.onpopstate = function(event) {
