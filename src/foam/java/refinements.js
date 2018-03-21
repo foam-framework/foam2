@@ -56,13 +56,15 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'javaCloneProperty',
-      value: null
+      name: 'javaCloneProperty'
     },
     {
       class: 'String',
-      name: 'javaDiffProperty',
-      value: null
+      name: 'javaDiffProperty'
+    },
+    {
+      class: 'String',
+      name: 'javaAssertValue'
     },
     {
       class: 'String',
@@ -112,6 +114,7 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
+      var assertName  = capitalized + 'Assert_';
 
       cls.
         field({
@@ -146,7 +149,9 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: this.javaSetter || (privateName + ' = val;\n' + isSet + ' = true;')
+          body: this.javaSetter ||
+            ( this.javaAssertValue ? assertName + '(val);\n' : '' ) +
+            (privateName + ' = val;\n' + isSet + ' = true;')
         });
 
       if ( this.javaFactory ) {
@@ -155,6 +160,21 @@ foam.CLASS({
           visibility: 'protected',
           type: this.javaType,
           body: this.javaFactory
+        });
+      }
+
+      if ( this.javaAssertValue ) {
+        cls.method({
+          name: assertName,
+          visibility: 'protected',
+          args: [
+            {
+              type: this.javaType,
+              name: 'val'
+            }
+          ],
+          type: 'void',
+          body: this.javaAssertValue
         });
       }
 
