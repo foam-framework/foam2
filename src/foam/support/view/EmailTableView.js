@@ -10,7 +10,7 @@ foam.CLASS({
       border-radius: 2px;
       background-color: #59a5d5;
       margin-top: 30px;
-      margin-right: 620px;
+      margin-right: 600px;
       font-family: Roboto;
       font-size: 14px;
       font-weight: normal;
@@ -20,14 +20,18 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: center;
       color: #ffffff;
+      position: relative;
+      top: 520px;
     }
-    ^ .foam-support-view-EmailSupportTableView-table {
-      height:400px
-      overflow: Scroll;
+    ^ .foam-u2-view-TableView {
+      display:block;
+      max-height:450px;
+      overflow-y:scroll;
     }
-    ^ .foam-u2-view-TableView{
-      height:400px
-      overflow: Scroll;
+    ^ .foam-u2-view-TableView thead,tbody {
+      display:table;
+      width:100%;
+      table-layout:fixed;
     }
     `,
     requires: [ 'foam.u2.ListCreateController' ,
@@ -71,6 +75,6 @@ foam.CLASS({
             class: 'foam.u2.view.TableView',
             data: this.supportEmailDAO,
           }).addClass(this.myClass('table')).end();
-      }
-    ],
-  })
+    }
+  ],
+});

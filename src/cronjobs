@@ -8,3 +8,5 @@ p({"class":"foam.nanos.cron.Cron","minute":1,"hour":-1,"dayOfMonth":-1,"month":-
 >>>>>>> 913a1f5143181c3a61e075618f8e40e2b4793f4c
 // Modified by system (1) at 2018-03-21T17:28:06Z
 p({"class":"foam.nanos.cron.Cron","minute":1,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"scheduledTime":"2018-03-21T18:01:00.0Z","id":"sessionExpiry","description":"Remove expired sessions.","lastRun":"2018-03-21T17:28:06.154Z","lastDuration":46,"server":true,"scheduled":false,"code":"dao = x.get(\"sessionDAO\");\ndao.where(foam.mlang.MLang.LT(foam.nanos.session.Session.EXPIRY, new Date())).removeAll();","output":"","notes":""})
+// Modified by system (1) at 2018-03-21T18:01:02Z
+p({"class":"foam.nanos.cron.Cron","minute":1,"hour":-1,"dayOfMonth":-1,"month":-1,"dayOfWeek":-1,"scheduledTime":"2018-03-21T19:01:00.0Z","id":"sessionExpiry","description":"Remove expired sessions.","lastRun":"2018-03-21T18:01:02.38Z","lastDuration":16,"server":true,"scheduled":false,"code":"dao = x.get(\"sessionDAO\");\ndao.where(foam.mlang.MLang.LT(foam.nanos.session.Session.EXPIRY, new Date())).removeAll();","output":"","notes":""})
