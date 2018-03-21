@@ -16,10 +16,10 @@ foam.CLASS({
   ],
 
   css:`
-      ^ {
+    ^ {
       height: 260px;
-      }
-      ^ .title {
+    }
+    ^ .title {
       margin-left: 20px;
       width: 198px;
       height: 40px;
@@ -32,7 +32,7 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #ffffff;
-      }
+    }
     ^ .label1 {
       width: 395px;
       height: 16px;
@@ -85,7 +85,8 @@ foam.CLASS({
       margin-left: 157px;
       margin-top:50px;
     }
-      `,
+    `,
+
     messages:[
       {name:'title', message:'New Email'},
       {name:'titlelabel', message:'Please go to the email box to validate the email address before you can connect to the help desk.'},  

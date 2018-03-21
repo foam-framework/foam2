@@ -131,7 +131,7 @@ foam.CLASS({
         code: function(X) {
           this.data.status = "Disabled"
           this.supportEmailDAO.put(this.data);
-          this.add(this.NotificationMessage.create({ message: 'Your email adddress has been disabled and you need to update it ' })); 
+          this.add(this.NotificationMessage.create({ message: 'Your email adddress is disabled and you need to update it ' })); 
           X.closeDialog()
         }
       },
