@@ -3,7 +3,7 @@ foam.CLASS({
   name: 'DeleteEmailSupportModal',
   extends: 'foam.u2.View',
 
-  documentation:'EMAIL SUPPORT VIEW',
+  documentation:'EMAIL DELETE MODAL',
 
   requires: [
     'foam.u2.ModalHeader',
