@@ -1,6 +1,6 @@
 foam.CLASS({
   package: 'foam.support.modal',
-  name: 'NewEmailSupportModal2',
+  name: 'DeleteEmailSupportModal',
   extends: 'foam.u2.View',
 
   documentation:'EMAIL SUPPORT VIEW',
