@@ -2,24 +2,24 @@ foam.CLASS({
     package:'foam.support.emailtableview',
     name:'EmailTableView',
     extends:'foam.u2.View',
+
     css:`
     ^ .foam-u2-UnstyledActionView-create {
       width: 135px;
-  height: 40px;
-  border-radius: 2px;
-  background-color: #59a5d5;
-  margin-top: 30px;
-  margin-right: 620px;
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 2.86;
-  letter-spacing: 0.2px;
-  text-align: center;
-  color: #ffffff;
-  
+      height: 40px;
+      border-radius: 2px;
+      background-color: #59a5d5;
+      margin-top: 30px;
+      margin-right: 620px;
+      font-family: Roboto;
+      font-size: 14px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 2.86;
+      letter-spacing: 0.2px;
+      text-align: center;
+      color: #ffffff;
     }
     ^ .foam-support-emailtableview-EmailSupportTableView-table {
       height:400px
@@ -30,31 +30,32 @@ foam.CLASS({
       overflow: Scroll;
     }
     `,
-    requires:['foam.u2.ListCreateController',
-  'foam.support.emailtableview.EmailSupportTableView'],
+    requires: [ 'foam.u2.ListCreateController' ,
+              'foam.support.emailtableview.EmailSupportTableView' ],
 
-  imports:['supportEmailDAO','createLabel'],
-    methods:[
-            function initE(){
-                this.addClass(this.myClass())
-                .tag({
-                  class: 'foam.u2.ListCreateController',
-                  dao: this.supportEmailDAO,
-                  summaryView: this.EmailSupportTableView,
-                  createLabel:'New Email',
-                  showActions:true
-                })
-              }
-    ]
+    imports: [ 'supportEmailDAO' , 'createLabel' ],
+
+    methods: [
+      function initE(){
+        this.addClass(this.myClass())
+          .tag({
+            class: 'foam.u2.ListCreateController' ,
+            dao: this.supportEmailDAO,
+            summaryView: this.EmailSupportTableView,
+            createLabel: 'New Email' ,
+            showActions:true
+      })
+    }
+  ]
 })
 
 foam.CLASS({
-    package:'foam.support.emailtableview',
+    package: 'foam.support.emailtableview',
     name: 'EmailSupportTableView',
     extends: 'foam.u2.View',
     requires: [
       'foam.u2.TableView',
-      'foam.support.model.SupportEmail',
+      'foam.support.model.SupportEmail'
     ],
     
     exports: [ 'as data' ],
