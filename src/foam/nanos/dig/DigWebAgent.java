@@ -160,7 +160,7 @@ public class DigWebAgent
     logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data);
 
     try {
-      if ( "post".equals(command) && SafetyUtil.isEmpty(daoName) ) {
+      if ( SafetyUtil.isEmpty(daoName) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
