@@ -258,19 +258,15 @@ foam.CLASS({
         'rowFormatter'
       ],
 
-      axioms: [
-        foam.u2.CSS.create({
-          code: function CSS() {/*
-            ^ {
-              display: block;
-              contain: layout;
-              will-change: transform;
-              padding: 5px;
-              box-sizing: border-box;
-            }
-        */}
-        })
-      ],
+      css: `
+        ^ {
+          display: block;
+          contain: layout;
+          will-change: transform;
+          padding: 5px;
+          box-sizing: border-box;
+        }
+      `,
 
       properties: [
         [ 'nodeName', 'li' ],
