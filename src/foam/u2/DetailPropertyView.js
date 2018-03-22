@@ -27,29 +27,27 @@ foam.CLASS({
     [ 'nodeName', 'tr' ]
   ],
 
-  axioms: [
-    foam.u2.CSS.create({code: `
-      .foam-u2-PropertyView-label {
-        color: #444;
-        display: block;
-        float: left;
-        font-size: 13px;
-        padding: 4px 8px 4px 8px;
-        text-align: left;
-        vertical-align: top;
-        white-space: nowrap;
-      }
-      .foam-u2-PropertyView-view {
-        padding: 2px 8px 2px 6px;
-      }
-      .foam-u2-PropertyView-units  {
-        color: #444;
-        font-size: 12px;
-        padding: 4px;
-        text-align: right;
-      }
-    `})
-  ],
+  css: `
+    .foam-u2-PropertyView-label {
+      color: #444;
+      display: block;
+      float: left;
+      font-size: 13px;
+      padding: 4px 8px 4px 8px;
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+    .foam-u2-PropertyView-view {
+      padding: 2px 8px 2px 6px;
+    }
+    .foam-u2-PropertyView-units  {
+      color: #444;
+      font-size: 12px;
+      padding: 4px;
+      text-align: right;
+    }
+  `,
 
   methods: [
     function initE() {
