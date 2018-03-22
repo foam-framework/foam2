@@ -44,7 +44,7 @@ foam.CLASS({
       })
     }
   ],
-
+  
   classes: [
     {
       name: 'TicketTableView',

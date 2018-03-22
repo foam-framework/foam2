@@ -80,6 +80,7 @@ foam.CLASS({
       height: 20px;
       border-radius: 100px;
       background-color: #eedb5f;
+     
     }
     .Ticket-Status-Updated {
       width: 67px;
@@ -92,6 +93,7 @@ foam.CLASS({
       height: 20px;
       border-radius: 100px;
       background-color: #ee5f71;
+     
     }
     .Ticket-Status-Pending {
       width: 65px;

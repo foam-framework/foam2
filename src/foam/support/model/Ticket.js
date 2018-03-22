@@ -49,13 +49,17 @@ foam.CLASS({
         name: 'createdAt',
         visibility: foam.u2.Visibility.RO,
         label: 'Time',
+        factory: function(){
+          return new Date();
+        },
+        javaFactory: 'return new Date();',
         tableCellFormatter: function(state, obj, rel){
-          var d = new Date();
+          if(!state) return;
           var locale = "en-us";
-          var month = d.toLocaleString(locale, {month: "short"});
-          var date=d.getDate();
-          var year=d.getFullYear();
-          this.start().add(month+" "+date+", "+year);
+          var month = state.toLocaleString(locale, {month: "short"});
+          var date=state.getDate();
+          var year=state.getFullYear();
+          this.start().add(month+" "+date+", "+year).end();
         }
       },
       {
