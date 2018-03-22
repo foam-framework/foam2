@@ -74,113 +74,6 @@ foam.CLASS({
       text-align: left;
       color: #093649; 
   }
-    ^ .Foam-Ticket-Status-New {
-      width: 45px;
-      height: 20px;
-      border-radius: 100px;
-      background-color: #eedb5f;
-      float:right;
-  }
-    ^ .Foam-Ticket-Status-Updated {
-      width: 67px;
-      height: 20px;
-      border-radius: 100px;
-      background-color: #093649;
-      float:right;
-  }
-    ^ .Foam-Ticket-Status-Open {
-      width: 49px;
-      height: 20px;
-      border-radius: 100px;
-      background-color: #ee5f71;
-      float:right;
-      margin-right:600px;
-  
-  }
-    ^ .Foam-Ticket-Status-Pending {
-      width: 65px;
-      height: 20px;
-      border-radius: 100px;
-      background-color: #59a5d5;
-      float:right;
-  }
-    ^ .Foam-Ticket-Status-Solved {
-      width: 57px;
-      height: 20px;
-      border-radius: 100px;
-      background-color: #a4b3b8;
-      float:right;
-  }
-    ^ .Foam-Ticket-Label-New {
-      width: 25px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-  }
-    ^ .Foam-Ticket-Label-Updated {
-      width: 47px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-  }
-    ^ .Foam-Ticket-Label-Open {
-      width: 29px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-  }
-    ^ .Foam-Ticket-Label-Pending {  
-      width: 45px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-  }
-    ^ .Foam-Ticket-Label-Solved {
-      width: 37px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-  }
     ^ .main {
       width: 488px;
       height: 16px;
@@ -216,7 +109,7 @@ foam.CLASS({
        .start("br").end()
        .start().addClass('primarydiv')
             .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-            .start().addClass('generic-status Foam-Ticket-Status-'+this.data.status)
+            .start().addClass(this.data.status)
                 .start().add(this.data.status).addClass('Foam-generic-status Ticket-Label-'+ this.data.status).end()
            .end()
       .end()
