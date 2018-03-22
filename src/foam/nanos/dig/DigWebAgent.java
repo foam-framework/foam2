@@ -160,7 +160,7 @@ public class DigWebAgent
     logger.debug("method", methodName, "cmd", command, "accept", accept, "format", format, "dao", daoName, "id", id, "data", data);
 
     try {
-      if ( "post".equals(command) && SafetyUtil.isEmpty(daoName) ) {
+      if ( SafetyUtil.isEmpty(daoName) ) {
         out.println("<form method=post><span>DAO:</span>");
         out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeDao()>");
 
@@ -308,6 +308,11 @@ public class DigWebAgent
       } else if ( "select".equals(command) || "get".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
+
+        if ( sink.getArray().size() == 0 ) {
+          out.println("No data");
+          return;
+        }
 
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
