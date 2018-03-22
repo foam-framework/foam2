@@ -8,10 +8,13 @@ foam.ENUM({
   package: 'foam.nanos.dig',
   name: 'Format',
 
-  documentation: 'DUG formats: JSON/XML.',
+  documentation: 'DIG/DUG formats.',
 
   values: [
-    { name: 'JSON', label: 'JSON' },
-    { name: 'XML',  label: 'XML'  }
+    { name: 'CSV',   label: 'CSV' },
+    { name: 'HTML',  label: 'HTML' },
+    { name: 'JSON',  label: 'JSON' },
+    { name: 'JSONJ', label: 'JSON/J' },
+    { name: 'XML',   label: 'XML'  }
   ]
 });
