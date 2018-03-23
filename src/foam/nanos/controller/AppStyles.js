@@ -94,7 +94,8 @@ foam.CLASS({
       border-radius: 100px;
       background-color: #a4b3b8;
     }
-    .generic-status{
+    ^ .generic-status {
+      display: inline-block;
       font-family: Roboto;
       font-size: 12px;
       font-weight: normal;
@@ -104,7 +105,6 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #ffffff;
-      padding-left:10px;
     }
   `
 });
