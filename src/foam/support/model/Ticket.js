@@ -78,3 +78,10 @@ foam.CLASS({
     }
   ]
 });
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.support.model.Ticket',
+  targetModel: 'foam.support.model.TicketMessage',
+  forwardName: 'messages',
+  inverseName: 'ticketId'
+});
