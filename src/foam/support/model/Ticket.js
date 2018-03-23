@@ -43,19 +43,22 @@ foam.CLASS({
         class: 'String',
         name: 'publicMessage'
       },
-  
       {
-        class: 'DateTime',
+        class: 'Date',
         name: 'createdAt',
         visibility: foam.u2.Visibility.RO,
         label: 'Time',
+        factory: function(){
+           return new Date();
+        },
+        javaFactory: 'return new Date();',
         tableCellFormatter: function(state, obj, rel){
-          var d = new Date();
+          if(!state) return;
           var locale = "en-us";
-          var month = d.toLocaleString(locale, {month: "short"});
-          var date=d.getDate();
-          var year=d.getFullYear();
-          this.start().add(month+" "+date+", "+year);
+          var month = state.toLocaleString(locale, {month: "short"});
+          var date=state.getDate();
+          var year=state.getFullYear();
+          this.start().add(month+" "+date+", "+year).end();
         }
       },
       {
@@ -67,10 +70,10 @@ foam.CLASS({
         name: 'status',
         label:'Status',
         tableCellFormatter: function(state, obj, rel) {
-          this.
-          start().addClass('generic-status Ticket-Status-'+ state)
-              .start().add(state).addClass('generic-status Ticket-Label-'+ state).end()
-          .end()
+           this.
+           start().addClass()
+              .start().add(state).addClass('generic-status '+ state).end()
+           .end()
       }
     }
   ]

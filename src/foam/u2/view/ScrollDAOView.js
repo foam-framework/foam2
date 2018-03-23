@@ -23,30 +23,27 @@ foam.CLASS({
 
   documentation: 'A DOM-based native scrolling view over for a DAO.',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-          overflow-y: scroll;
-          -webkit-overflow-scrolling: touch;
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          box-sizing: border-box;
-          contain: layout;
-          will-change: transform;
-        }
-    */}
-    })
-  ],
+  css: `
+    ^ {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      box-sizing: border-box;
+      contain: layout;
+      will-change: transform;
+    }
+  `,
 
   requires: [
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
+
   // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',
@@ -261,19 +258,15 @@ foam.CLASS({
         'rowFormatter'
       ],
 
-      axioms: [
-        foam.u2.CSS.create({
-          code: function CSS() {/*
-            ^ {
-              display: block;
-              contain: layout;
-              will-change: transform;
-              padding: 5px;
-              box-sizing: border-box;
-            }
-        */}
-        })
-      ],
+      css: `
+        ^ {
+          display: block;
+          contain: layout;
+          will-change: transform;
+          padding: 5px;
+          box-sizing: border-box;
+        }
+      `,
 
       properties: [
         [ 'nodeName', 'li' ],
@@ -382,6 +375,7 @@ foam.CLASS({
           this.onMove();
           this.SUPER();
         },
+
         function missingData_(start, end) {
           var ranges = this.ranges;
           var iterAfterRange = true;
@@ -404,6 +398,7 @@ foam.CLASS({
           }
           return foundGaps;
         },
+
         function fetchData_(start, end, gaps) {
           var viewStart = this.anchorDAOIdx_;
           var viewEnd = viewStart + this.numRows;
@@ -452,16 +447,19 @@ foam.CLASS({
 
           this.ranges = a;
         },
+
         function fetchChunks_(chunks) {
           for ( var i = 0; i < chunks.length; i++ ) {
             this.fetchBatches_(chunks[i][0], chunks[i][1]);
           }
         },
+
         function fetchBatches_(start, end) {
-          var self = this;
+          var self      = this;
           var batchSize = self.batchSize;
-          var skip = start;
-          var limit = Math.min(start + self.batchSize, end);
+          var skip      = start;
+          var limit     = Math.min(start + self.batchSize, end);
+
           var fetchBatch = function() {
             self.dao.skip(skip).limit(limit).
               select().then(function(sink) {
@@ -518,6 +516,7 @@ foam.CLASS({
       if ( this.data ) this.countRecords_();
       this.SUPER();
     },
+
     function initE() {
       this.addEventListener('scroll', this.onScroll);
       this.
@@ -541,6 +540,7 @@ foam.CLASS({
           });
         });
     },
+
     {
       name: 'moveAnchor_',
       documentation: `Layout rows according to new anchor "DAO idx" (i.e.,
