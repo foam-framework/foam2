@@ -71,10 +71,10 @@ foam.CLASS({
         name: 'status',
         label:'Status',
         tableCellFormatter: function(state, obj, rel) {
-          this.
-          start().addClass('generic-status '+ state)
+           this.
+           start().addClass('generic-status '+ state)
               .start().add(state).addClass('generic-label-'+ state).end()
-          .end()
+           .end()
       }
     }
   ]
