@@ -8,28 +8,20 @@ foam.CLASS({
   ],
   requires: [
     'foam.support.model.Ticket',
-    'foam.support.view.SummaryCard'
+    'foam.support.view.SummaryCard',
+    'foam.support.view.TicketView'
   ],
   imports: [
-    'user'
+    'user', 'ticketDAO'
   ],
   exports: [ 'as data' ],
- /* axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {
-        ^{
-          margin-bottom: 20px;
-        }
-      }
-    })
-  ],*/
+ 
   css: `
   ^ .blue-card-title{
       width: 100px;
       height: 100px;
       border-radius: 2px;
       background-color: #59a5d5;
-      //margin: 25px 1160px 583px 20px;
   }
   ^ .Mentions { 
       font-family: Roboto;
@@ -41,10 +33,9 @@ foam.CLASS({
       letter-spacing: 0.3px;
       text-align: center;
       color: #ffffff;
-      //padding: 30px; 
+      margin-top: 30px;
   }
   ^ .M {
-    
     font-family: Roboto;
     font-size: 14px;
     font-weight: normal;
@@ -54,16 +45,21 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: center;
     color: #ffffff;
-    //padding: 5px; 
   }
   ^ .ticketdiv{
-       margin: 30px 20px;
-      }
-^ .foam-support-view-SummaryCard {
-  width:220px;
-}
+    margin: 30px 20px;
+  }
+  ^ .foam-support-view-SummaryCard {
+    width:220px;
+  }
+  ^ #v28 {
+    float: left;
+  }
+  .foam-u2-view-TableView-foam-support-model-Ticket{
+    margin-top:40px;
+    width:100%;
+  }
 
- ^ #v28 {float: left;}
   `,
   messages: [
     { name: 'title',          message: 'Tickets' },
@@ -81,7 +77,8 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'newCount',
-      value: "..."
+      value: "...",
+   
     },
     {
       class: 'Int',
@@ -107,28 +104,35 @@ foam.CLASS({
       class: 'Int',
       name: 'ticketCount',
       value: '...'
-    }
+    },
+    
   ],
   methods: [
     function initE() {
-   // this.dao.on.sub(this.onDAOUpdate);
-    //this.onDAOUpdate();
+    this.dao.on.sub(this.onDAOUpdate);
+    
+    this.onDAOUpdate();
       this
         .addClass(this.myClass())
-       
         .start('div')
         .start().addClass('ticketdiv')
           .start().addClass('blue-card-title')
-          .add(this.title).addClass('Mentions')
-          .start().addClass('M').add(this.ticketCount$).end()
+          .start().add(this.title).addClass('Mentions').end()
+          .start().add(this.ticketCount$).addClass('M').end()           
           .end()
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.newCount$, status: this.newLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.updatedCount$, status: this.updatedLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
         .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
+        .start({
+          selection: this.selection$,
+          class: 'foam.u2.view.TableView',
+          data: this.ticketDAO,
+        }).addClass(this.myClass('table')).end()
         .end()
         .end()
+        
     },
   ],
   listeners: [
@@ -161,6 +165,11 @@ foam.CLASS({
         var solvedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Solved'));
         solvedDAO.select(this.COUNT()).then(function(count) {
           self.solvedCount = count.value;
+        });
+
+        //Grab total tickets
+        this.dao.select(this.COUNT()).then(function(count) {
+          self.ticketCount = count.value;
         });
       }
     }
