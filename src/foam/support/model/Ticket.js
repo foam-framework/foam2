@@ -69,6 +69,9 @@ foam.CLASS({
         class: 'String',
         name: 'status',
         label:'Status',
+        factory: function(){
+          return 'New'
+        },
         tableCellFormatter: function(state, obj, rel) {
            this.start()
               .start().add(state).addClass('generic-status '+ state).end()

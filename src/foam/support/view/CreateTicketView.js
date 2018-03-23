@@ -9,7 +9,8 @@ foam.CLASS({
 
   imports:[
     'ticketDAO',
-    'user'
+    'user',
+    'hideSummary'
   ],
 
   exports: [
@@ -42,6 +43,9 @@ foam.CLASS({
 
   methods: [
     function initE(){
+      this.SUPER();
+      this.hideSummary = true;
+
       this.addClass(this.myClass())
       .start().addClass('label')
         .add('Requestor')

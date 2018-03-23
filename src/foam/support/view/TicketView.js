@@ -11,6 +11,8 @@ foam.CLASS({
 
   imports: [ 'ticketDAO' ,'createLabel'],
 
+  exports: [ 'hideSummary' ],
+
   css:`
   ^ {
     width: 992px;
@@ -33,10 +35,20 @@ foam.CLASS({
   }
   `,
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'hideSummary',
+      value: false
+    }
+  ],
+
   methods: [
     function initE(){
       this.addClass(this.myClass())
-      .tag({ class: 'foam.support.view.TicketSummaryView' })
+      .start().hide(this.hideSummary$)
+        .tag({ class: 'foam.support.view.TicketSummaryView' })
+      .end()
       .tag({
         class: 'foam.u2.ListCreateController',
         dao: this.ticketDAO,
