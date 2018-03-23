@@ -5,7 +5,10 @@ foam.CLASS({
     extends: 'foam.u2.View',
   
     documentation: 'Internal note for ticket detail view',
-  
+    
+    properties:[
+    
+    ],
       css: `
     .bg {
         width: 1240px;
@@ -57,9 +60,9 @@ foam.CLASS({
             .addClass(this.myClass())
                 .start().addClass('bg')
                      .start().addClass('firstdiv')
-                     .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
-                     .start()
-
+                            .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
+                            .start(this.PUBLIC_REPLY).addClass('Public-Reply').end()
+                            .start(this.INTERNAL_NOTE).addClass('Internal-Note').end()
                      .end() 
                 .end()
            .end()
