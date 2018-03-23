@@ -28,11 +28,15 @@ foam.CLASS({
     border: none;
     margin: 0 20px 20px;
   }
+  ^ .foam-support-view-SummaryCard{
+    width: 164px;
+  }
   `,
 
   methods: [
     function initE(){
       this.addClass(this.myClass())
+      .tag({ class: 'foam.support.view.TicketSummaryView' })
       .tag({
         class: 'foam.u2.ListCreateController',
         dao: this.ticketDAO,

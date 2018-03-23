@@ -18,22 +18,24 @@ foam.CLASS({
  
   css: `
   ^ .blue-card-title{
-      width: 100px;
-      height: 100px;
-      border-radius: 2px;
-      background-color: #59a5d5;
+    width: 100px;
+    height: 100px;
+    border-radius: 2px;
+    background-color: #59a5d5;
+    display: inline-block;
   }
   ^ .Mentions { 
-      font-family: Roboto;
-      font-size: 16px;
-      font-weight: bold;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.25;
-      letter-spacing: 0.3px;
-      text-align: center;
-      color: #ffffff;
-      margin-top: 30px;
+    font-family: Roboto;
+    font-size: 16px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.25;
+    letter-spacing: 0.3px;
+    text-align: center;
+    color: #ffffff;
+    margin-top: 30px;
+    margin-bottom: 5px;
   }
   ^ .M {
     font-family: Roboto;
@@ -47,13 +49,10 @@ foam.CLASS({
     color: #ffffff;
   }
   ^ .ticketdiv{
-    margin: 30px 20px;
+    margin: 30px 0px;
   }
   ^ .foam-support-view-SummaryCard {
-    width:222px;
-  }
-  ^ #v28 {
-    float: left;
+    width: 170px;
   }
   .foam-u2-view-TableView-foam-support-model-Ticket{
     margin-top:40px;
@@ -123,7 +122,6 @@ foam.CLASS({
             .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
             .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
             .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
-            .tag({ selection: this.selection$, class: 'foam.u2.view.TableView', data: this.ticketDAO,}).addClass(this.myClass('table'))
           .end()
         .end()
     },
