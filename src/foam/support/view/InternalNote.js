@@ -7,7 +7,14 @@ foam.CLASS({
     documentation: 'Internal note for ticket detail view',
     
     properties:[
-    
+      {
+        name:'publicReply',
+        label:'Public Reply',
+      },
+      {
+        name:'internalNote',
+        label:'Internal Note',
+      },
     ],
       css: `
     .bg {
@@ -39,7 +46,7 @@ foam.CLASS({
       color: #093649;
     }
     .Internal-Note {
-      width: 72px;
+      width: 70px;
       height: 16px;
       font-family: Roboto;
       font-size: 12px;
