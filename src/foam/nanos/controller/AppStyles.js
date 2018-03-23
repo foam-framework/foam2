@@ -65,7 +65,7 @@ foam.CLASS({
       background: #f6f9f9;
     }
     .New {
-      width: 45px;
+      width: 35px;
       height: 20px;
       border-radius: 100px;
       background-color: #eedb5f;
@@ -89,7 +89,7 @@ foam.CLASS({
       background-color: #59a5d5;
     }
     .Solved {
-      width: 57px;
+      width: 50px;
       height: 20px;
       border-radius: 100px;
       background-color: #a4b3b8;
@@ -105,6 +105,10 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #ffffff;
+<<<<<<< HEAD
+=======
+      padding-left:10px;
+>>>>>>> c41ac6b1fe7bd02b221553504736f6ad39e18265
     }
   `
 });
