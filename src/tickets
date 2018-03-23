@@ -1,8 +1,0 @@
-// Modified by admin admin (1) at 2018-03-15T19:39:53Z
-p({"class":"foam.support.model.Ticket","id":1,"requestorId":1,"supportEmail":"admnin","subject":"some subject","publicMessage":"this is a message","status":"New"}),
-// Modified by admin admin (1) at 2018-03-15T19:40:08Z
-p({"class":"foam.support.model.Ticket","id":2,"requestorId":1,"supportEmail":"ro","subject":"asfj","publicMessage":"aslfkj","internalNote":"asf","status":"Solved"},
-p({"class":"foam.support.model.Ticket","id":3,"requestorId":1,"supportEmail":"rsdfo","subject":"asfsdfj","publicMessage":"asdsslfkj","internalNote":"asf","status":"Pending"},
-p({"class":"foam.support.model.Ticket","id":4,"requestorId":1,"supportEmail":"rsddgfo","subject":"asfsddfj","publicMessage":"asdssslfkj","internalNote":"asghf","status":"Pending"})
-p({"class":"foam.support.model.Ticket","id":5,"requestorId":1,"supportEmail":"rsghdfo","subject":"asfsdtgfj","publicMessage":"asdsssxflfkj","internalNote":"ahsf","status":"Updated"})
-p({"class":"foam.support.model.Ticket","id":6,"requestorId":1,"supportEmail":"rsdrtrfo","subject":"asfsdhrdfj","publicMessage":"asdssshdlfkj","internalNote":"asfhff","status":"Open"})
