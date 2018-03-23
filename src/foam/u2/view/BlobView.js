@@ -19,12 +19,15 @@ foam.CLASS({
   package: 'foam.u2.view',
   name: 'BlobView',
   extends: 'foam.u2.Element',
+  
   requires: [
     'foam.blob.BlobBlob'
   ],
+
   imports: [
     'blobService'
   ],
+
   properties: [
     'data',
     {
@@ -40,6 +43,7 @@ foam.CLASS({
       name: 'timestamp'
     }
   ],
+
   methods: [
     function initE() {
       var view = this;
@@ -53,6 +57,7 @@ foam.CLASS({
         }, this.data$));
     }
   ],
+
   listeners: [
     function onChange(e) {
       var file = e.target.files[0];
