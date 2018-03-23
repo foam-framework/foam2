@@ -21,6 +21,32 @@ foam.CLASS({
       width: 40px;
       height: 40px;
       object-fit: contain;
+    }
+    .Public-Reply {
+      width: 70px;
+      height: 16px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.33;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #093649;
+    }
+    .Internal-Note {
+      width: 72px;
+      height: 16px;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.33;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #093649;
     } 
       `,
   
@@ -31,7 +57,9 @@ foam.CLASS({
             .addClass(this.myClass())
                 .start().addClass('bg')
                      .start().addClass('firstdiv')
-                     .start({class:'foam.u2.tag.Image',data:'../../../person.svg'}).addClass('person').end() 
+                     .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
+                     .start()
+
                      .end() 
                 .end()
            .end()
