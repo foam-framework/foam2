@@ -50,7 +50,7 @@ foam.CLASS({
     margin: 30px 20px;
   }
   ^ .foam-support-view-SummaryCard {
-    width:220px;
+    width:222px;
   }
   ^ #v28 {
     float: left;
@@ -123,7 +123,7 @@ foam.CLASS({
             .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
             .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
             .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
-            .start({selection: this.selection$, class: 'foam.u2.view.TableView', data: this.ticketDAO,}).addClass(this.myClass('table')).end()
+            .tag({ selection: this.selection$, class: 'foam.u2.view.TableView', data: this.ticketDAO,}).addClass(this.myClass('table'))
           .end()
         .end()
     },
