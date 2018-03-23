@@ -94,78 +94,17 @@ foam.CLASS({
       border-radius: 100px;
       background-color: #a4b3b8;
     }
-    .generic-label-New {
-      width: 25px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-    }
-    .generic-label-Open {
-      width: 29px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-    }
-    .generic-label-Updated {
-      width: 47px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-    }
-    .generic-label-Pending {
-      width: 45px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-    }
-    .generic-label-Solved {
-      width: 37px;
-      height: 20px;
-      font-family: Roboto;
-      font-size: 12px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.67;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #ffffff;
-      padding-left:10px;
-    }
     ^ .generic-status {
       display: inline-block;
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #ffffff;
     }
   `
 });

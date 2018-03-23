@@ -43,14 +43,13 @@ foam.CLASS({
         class: 'String',
         name: 'publicMessage'
       },
-  
       {
-        class: 'DateTime',
+        class: 'Date',
         name: 'createdAt',
         visibility: foam.u2.Visibility.RO,
         label: 'Time',
         factory: function(){
-          return new Date();
+           return new Date();
         },
         javaFactory: 'return new Date();',
         tableCellFormatter: function(state, obj, rel){
@@ -72,8 +71,8 @@ foam.CLASS({
         label:'Status',
         tableCellFormatter: function(state, obj, rel) {
            this.
-           start().addClass('generic-status '+ state)
-              .start().add(state).addClass('generic-label-'+ state).end()
+           start().addClass()
+              .start().add(state).addClass('generic-status '+ state).end()
            .end()
       }
     }
