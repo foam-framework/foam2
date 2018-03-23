@@ -59,7 +59,6 @@ foam.CLASS({
     margin-top:40px;
     width:100%;
   }
-
   `,
   messages: [
     { name: 'title',          message: 'Tickets' },
@@ -109,30 +108,24 @@ foam.CLASS({
   ],
   methods: [
     function initE() {
-    this.dao.on.sub(this.onDAOUpdate);
-    
+    this.dao.on.sub(this.onDAOUpdate);    
     this.onDAOUpdate();
       this
         .addClass(this.myClass())
         .start('div')
-        .start().addClass('ticketdiv')
-          .start().addClass('blue-card-title')
-          .start().add(this.title).addClass('Mentions').end()
-          .start().add(this.ticketCount$).addClass('M').end()           
+          .start().addClass('ticketdiv')
+            .start().addClass('blue-card-title')
+              .start().add(this.title).addClass('Mentions').end()
+                .start().add(this.ticketCount$).addClass('M').end()           
+            .end()
+            .tag({ class: 'foam.support.view.SummaryCard', count$: this.newCount$, status: this.newLabel })
+            .tag({ class: 'foam.support.view.SummaryCard', count$: this.updatedCount$, status: this.updatedLabel })
+            .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
+            .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
+            .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
+            .start({selection: this.selection$, class: 'foam.u2.view.TableView', data: this.ticketDAO,}).addClass(this.myClass('table')).end()
           .end()
-        .tag({ class: 'foam.support.view.SummaryCard', count$: this.newCount$, status: this.newLabel })
-        .tag({ class: 'foam.support.view.SummaryCard', count$: this.updatedCount$, status: this.updatedLabel })
-        .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
-        .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
-        .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
-        .start({
-          selection: this.selection$,
-          class: 'foam.u2.view.TableView',
-          data: this.ticketDAO,
-        }).addClass(this.myClass('table')).end()
         .end()
-        .end()
-        
     },
   ],
   listeners: [
@@ -141,33 +134,26 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var self = this;
-        //Grab new tickets
         var newDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "New"));
         newDAO.select(this.COUNT()).then(function(count) {
           self.newCount = count.value;
         });
-        //Grab updated tickets
         var updatedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Updated"));
         updatedDAO.select(this.COUNT()).then(function(count) {
           self.updatedCount = count.value;
         });
-        //Grab open tickets
         var openDAO = this.dao.where(this.EQ(this.Ticket.STATUS, "Open"));
         openDAO.select(this.COUNT()).then(function(count) {
           self.openCount = count.value;
         });
-        //Grab pending tickets
         var pendingDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Pending'));
         pendingDAO.select(this.COUNT()).then(function(count) {
           self.pendingCount = count.value;
         });
-        //Grab solved tickets
         var solvedDAO = this.dao.where(this.EQ(this.Ticket.STATUS, 'Solved'));
         solvedDAO.select(this.COUNT()).then(function(count) {
           self.solvedCount = count.value;
         });
-
-        //Grab total tickets
         this.dao.select(this.COUNT()).then(function(count) {
           self.ticketCount = count.value;
         });
