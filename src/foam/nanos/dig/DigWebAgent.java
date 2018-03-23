@@ -37,24 +37,24 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
-    final PrintWriter   out        = x.get(PrintWriter.class);
-    CharBuffer          buffer_    = CharBuffer.allocate(65535);
-    String              accept     = req.getHeader("Accept");
+    HttpServletRequest  req         = x.get(HttpServletRequest.class);
+    HttpServletResponse resp        = x.get(HttpServletResponse.class);
+    final PrintWriter   out         = x.get(PrintWriter.class);
+    CharBuffer          buffer_     = CharBuffer.allocate(65535);
+    String              accept      = req.getHeader("Accept");
     String              contentType = req.getHeader("Content-Type");
-    String              data       = req.getParameter("data");
-    Object              dataObj    = null;
-    String              daoName    = req.getParameter("dao");
-    String              command    = req.getParameter("cmd");
-    String              format     = req.getParameter("format");
-    String              id         = req.getParameter("id");
-    String              methodName = req.getMethod();
-    Logger              logger     = (Logger) x.get("logger");
-    DAO                 nSpecDAO   = (DAO) x.get("nSpecDAO");
-    String[]            email      = req.getParameterValues("email");
-    boolean             emailSet   = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
-    String              subject    = req.getParameter("subject");
+    String              data        = req.getParameter("data");
+    Object              dataObj     = null;
+    String              daoName     = req.getParameter("dao");
+    String              command     = req.getParameter("cmd");
+    String              format      = req.getParameter("format");
+    String              id          = req.getParameter("id");
+    String              methodName  = req.getMethod();
+    Logger              logger      = (Logger) x.get("logger");
+    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    String[]            email       = req.getParameterValues("email");
+    boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
+    String              subject     = req.getParameter("subject");
 
     resp.setContentType("text/html");
 
@@ -308,6 +308,11 @@ public class DigWebAgent
       } else if ( "select".equals(command) || "get".equals(command) ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         System.err.println("objects selected: " + sink.getArray().size());
+
+        if ( sink.getArray().size() == 0 ) {
+          out.println("No data");
+          return;
+        }
 
         if ( "json".equals(format) ) {
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
