@@ -6,15 +6,19 @@
 
 package foam.lib.html;
 
-import foam.core.*;
+import foam.core.ClassInfo;
+import foam.core.Detachable;
+import foam.core.FObject;
+import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -186,5 +190,17 @@ public class Outputter
   @Override
   public void put(Object obj, Detachable sub) {
     outputFObject((FObject)obj);
+  }
+
+  @Override
+  public void close() throws IOException {
+    IOUtils.closeQuietly(stringWriter_);
+    IOUtils.closeQuietly(writer_);
+  }
+
+  @Override
+  public void flush() throws IOException {
+    if ( stringWriter_ != null ) stringWriter_.flush();
+    if ( writer_ != null ) writer_.flush();
   }
 }

@@ -9,14 +9,14 @@ package foam.nanos.cron;
 import foam.core.ContextAwareSupport;
 import foam.core.Detachable;
 import foam.core.FObject;
-import foam.dao.DAO;
 import foam.dao.AbstractDAO;
 import foam.dao.AbstractSink;
+import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.mlang.MLang;
 import foam.mlang.sink.Min;
-import foam.nanos.NanoService;
 import foam.nanos.logger.Logger;
+import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
 import java.util.Date;
 
@@ -60,12 +60,13 @@ public class CronScheduler
         cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, now)).select(new AbstractSink() {
           @Override
           public void put(Object obj, Detachable sub) {
+            Cron cron = (Cron) obj;
             PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
             try {
-              ((Cron) obj).runScript(CronScheduler.this.getX());
+              cron.runScript(CronScheduler.this.getX());
               cronDAO_.put((FObject)obj);
             } catch (Throwable t) {
-              logger.error(this.getClass(), t.getMessage());
+              logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage());
             } finally {
               pm.log(getX());
             }

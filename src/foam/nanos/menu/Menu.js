@@ -8,9 +8,11 @@ foam.CLASS({
   package: 'foam.nanos.menu',
   name: 'Menu',
 
-  imports: [ 'menuListener?' ],
-
   tableColumns: [ 'id', 'parent', 'label', 'order' ],
+
+  imports: [
+    'lastMenuLaunchedListener?'
+  ],
 
   properties: [
     {
@@ -36,8 +38,8 @@ foam.CLASS({
 
   methods: [
     function launch_(X, e) {
+      this.lastMenuLaunchedListener && this.lastMenuLaunchedListener(this);
       this.handler && this.handler.launch(X, this, e);
-      this.menuListener && this.menuListener(this);
     }
   ],
 

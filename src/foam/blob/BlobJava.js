@@ -29,6 +29,11 @@ foam.INTERFACE({
     {
       name: 'getSize',
       javaReturns: 'long'
+    },
+    {
+      name: 'close',
+      javaReturns: 'void',
+      javaThrows: [ 'java.io.IOException' ]
     }
   ]
 });
@@ -134,6 +139,10 @@ foam.CLASS({
         }
       ],
       javaCode: 'return new SubBlob(this, offset, length);'
+    },
+    {
+      name: 'close',
+      javaCode: 'return;'
     }
   ]
 });

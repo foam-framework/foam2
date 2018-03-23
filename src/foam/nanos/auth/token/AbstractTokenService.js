@@ -16,13 +16,7 @@ foam.CLASS({
   ],
 
   javaImports: [
-     'foam.dao.DAO',
-     'foam.dao.ListSink',
-     'foam.dao.Sink',
-     'foam.mlang.MLang',
      'java.util.Calendar',
-     'java.util.List',
-     'java.util.UUID'
   ],
 
   methods: [
