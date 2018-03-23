@@ -9,7 +9,7 @@ foam.CLASS({
   requires: [
     'foam.support.model.Ticket',
     'foam.support.view.SummaryCard',
-    'foam.support.view.TicketView'
+    'foam.support.view.TicketView',
   ],
   imports: [
     'user', 'ticketDAO'
