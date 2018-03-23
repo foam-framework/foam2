@@ -37,7 +37,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message'
-    }
+    },
   ],
 
   methods: [
@@ -77,7 +77,7 @@ foam.CLASS({
         var ticket = this.Ticket.create({
           publicMessage: this.message,
           requestorId: this.requestor,
-          subject: this.subject
+          subject: this.subject,
         })
 
         this.ticketDAO.put(ticket);
