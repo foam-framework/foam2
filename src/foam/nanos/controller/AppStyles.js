@@ -105,10 +105,6 @@ foam.CLASS({
       letter-spacing: 0.2px;
       text-align: left;
       color: #ffffff;
-<<<<<<< HEAD
-=======
-      padding-left:10px;
->>>>>>> c41ac6b1fe7bd02b221553504736f6ad39e18265
     }
   `
 });
