@@ -59,8 +59,9 @@ foam.CLASS({
         letter-spacing: 0.3px;
         text-align: left;
         color: #093649;
-        float:left
-  }
+        float:left;
+        display: inline-block;
+    }
     ^ .primarydiv{
       width: 1000px;
       height: 20px;
@@ -104,19 +105,18 @@ foam.CLASS({
      var mins= this.data.createdAt.getMinutes()
        this.addClass(this.myClass())
        .start(this.BACK_ACTION).end()
-       .start("br").end()
-       .start("br").end()
-       .start("br").end()
+       .br()
+       .br()
+       .br()
        .start().addClass('primarydiv')
             .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-            .start().addClass(this.data.status)
-                .start().add(this.data.status).addClass('Foam-generic-status Ticket-Label-'+ this.data.status).end()
+            .start().addClass('generic-status '+this.data.status)
+                .start().add(this.data.status).addClass('generic-label-'+ this.data.status).end()
            .end()
       .end()
-      .start("br").end()
+      .br()
       .start().addClass('main').add("#",this.data.id,"  ","    |     ",month," ",date," ",hours,":",mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
       .end()
-
     }
   ],
   actions: [

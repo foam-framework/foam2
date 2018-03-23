@@ -72,8 +72,8 @@ foam.CLASS({
         label:'Status',
         tableCellFormatter: function(state, obj, rel) {
           this.
-          start().addClass('generic-status Ticket-Status-'+ state)
-              .start().add(state).addClass('generic-status Ticket-Label-'+ state).end()
+          start().addClass('generic-status '+ state)
+              .start().add(state).addClass('generic-label-'+ state).end()
           .end()
       }
     }
