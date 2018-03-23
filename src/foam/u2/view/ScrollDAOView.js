@@ -43,7 +43,10 @@ foam.CLASS({
     'foam.dao.QuickSink',
     'foam.u2.ViewSpec'
   ],
-
+  imports: [
+    'selection as importedSelection',
+    'selectionEnabled as importedSelectionEnabled'
+  ],
   // Provide most state to inner controller and views.
   exports: [
     'anchorDAOIdx_',
@@ -56,7 +59,9 @@ foam.CLASS({
     'numRows',
     'positiveRunway',
     'rows_',
-    'rowFormatter'
+    'rowFormatter',
+    'selection',
+    'selectionEnabled'
   ],
 
   properties: [
@@ -85,6 +90,9 @@ foam.CLASS({
       documentation: `data => HTML-markup-string formatter for individual rows.
           This strategy is used instead of Elements to maximize scroll
           performance.`,
+      preSet: function(_, nu) {
+        return nu && nu.clone ? nu.clone(this) : nu;
+      },
       required: true
     },
     {
@@ -128,6 +136,23 @@ foam.CLASS({
           batches limits the number of rows to be processed per animation
           frame.`,
       value: 25
+    },
+    {
+      class: 'Boolean',
+      name: 'selectionEnabled',
+      factory: function() {
+        return !! this.importedSelectionEnabled;
+      }
+    },
+    {
+      class: 'Array',
+      name: 'selection',
+      adapt: function(_, nu) {
+        if ( foam.Null.isInstance(nu) || foam.Undefined.isInstance(nu) )
+          return [];
+
+        return foam.Array.isInstance(nu) ? nu : [nu];
+      },
     },
     {
       class: 'FObjectProperty',
@@ -186,9 +211,10 @@ foam.CLASS({
         return this.E('div').style({
           width: '1px',
           height: '1px',
+          'font-size': '1px',
           position: 'absolute',
           transform: this.sentinelTransform_$
-        });
+        }).entity('nbsp');
       },
       transient: true
     },
@@ -255,7 +281,9 @@ foam.CLASS({
 
       imports: [
         'columns?',
-        'rowFormatter'
+        'rowFormatter',
+        'selection',
+        'selectionEnabled'
       ],
 
       css: `
@@ -265,6 +293,17 @@ foam.CLASS({
           will-change: transform;
           padding: 5px;
           box-sizing: border-box;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+        ^selectable:hover {
+          filter: opacity(0.8);
+          cursor: pointer;
+        }
+        ^selected {
+          filter: opacity(0.7) !important;
         }
       `,
 
@@ -286,7 +325,32 @@ foam.CLASS({
           this.onload.sub(this.render);
         },
         function initE() {
+          var self = this;
           this.addClass(this.myClass());
+          this.enableClass(this.myClass('selectable'), this.selectionEnabled$);
+          this.enableClass(
+              this.myClass('selected'),
+              this.slot(function(selectionEnabled, data, selection) {
+                if ( ! data || ! selectionEnabled ||
+                     selection.length === 0 ) {
+                  return false;
+                }
+
+                return selection.some(function(d) {
+                  return d.id === data.id;
+                });
+              }, this.selectionEnabled$, this.data$, this.selection$));
+          this.on('click', function(evt) {
+            if ( ! self.data ) return;
+            if ( self.selection.some(function(d) {
+                   return d.id === self.data.id;
+                 }) ) {
+              foam.Array.remove(self.selection, self.data);
+            } else {
+              self.selection.push(self.data);
+            }
+            self.selection = Array.from(self.selection);
+          });
           this.columns$ && this.columns$.sub(this.render);
         }
       ],
@@ -463,6 +527,9 @@ foam.CLASS({
           var fetchBatch = function() {
             self.dao.skip(skip).limit(limit).
               select().then(function(sink) {
+                while ( ! sink.array ) {
+                  sink = sink.delegate;
+                }
                 var array = sink.array;
                 var daoStart = self.anchorDAOIdx_;
                 var daoEnd = Math.min(self.count_,
@@ -513,6 +580,9 @@ foam.CLASS({
 
   methods: [
     function init() {
+      if ( this.importedSelection$ ) {
+        this.selection$.linkFrom(this.importedSelection$);
+      }
       if ( this.data ) this.countRecords_();
       this.SUPER();
     },
