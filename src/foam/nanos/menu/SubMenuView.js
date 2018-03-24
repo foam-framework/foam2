@@ -56,9 +56,16 @@ foam.CLASS({
       menu.children.orderBy(this.Menu.ORDER, this.Menu.LABEL).select({
         put: function(menu) {
           if ( ! menu.handler ) return;
-          self.start('div')
-            .on('click', function() { self.close(); menu.launch(X); })
-            .add(menu.label)
+          self.start('div').call(function() {
+            var e = this;
+            this
+              .on('click', function() {
+                // TODO: if a submenu, don't close until child closed
+                self.close();
+                menu.launch_(X, e);
+              })
+              .add(menu.label);
+            })
           .end();
         },
         eof: function() {}
