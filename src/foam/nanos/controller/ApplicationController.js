@@ -82,7 +82,6 @@ foam.CLASS({
       margin-bottom: -10px;
       min-height: calc(80% - 60px);
     }
-
     .stack-wrapper:after {
       content: "";
       display: block;

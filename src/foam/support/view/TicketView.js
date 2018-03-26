@@ -11,14 +11,13 @@ foam.CLASS({
 
   imports: [ 'ticketDAO' ,'createLabel'],
 
+  exports: [ 'hideSummary' ],
+
   css:`
   ^ {
     width: 992px;
     margin: auto;
   }
-  ^ .foam-u2-view-TableView-foam-support-model-Ticket {
-    margin-top:30px;
-  } 
   ^ .foam-u2-UnstyledActionView-create {
     float: right;
     width: 135px;
@@ -28,36 +27,61 @@ foam.CLASS({
     border: none;
     margin: 0 20px 20px;
   }
+  ^ .foam-support-view-SummaryCard{
+    width: 164px;
+  }
+  ^ .foam-u2-view-TableView-row:hover {
+    cursor: pointer;
+    background: %TABLEHOVERCOLOR%;
+  }
+  ^ .foam-u2-view-TableView-row {
+    height: 40px;
+  }
+  ^ .button-div{
+    height: 40px;
+  }
+  ^ .foam-u2-view-TableView td{
+    width: 8px;
+  }
   `,
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'hideSummary',
+      value: false
+    }
+  ],
 
   methods: [
     function initE(){
       this.addClass(this.myClass())
+      .start().hide(this.hideSummary$)
+        .tag({ class: 'foam.support.view.TicketSummaryView' })
+      .end()
       .tag({
         class: 'foam.u2.ListCreateController',
         dao: this.ticketDAO,
         detailView: this.TicketDetailView,
-        summaryView: this.TicketTableView,
+        summaryView: this.TicketTableView.create(),
         createDetailView: this.CreateTicketView,
         createLabel:'New Ticket',
         showActions: false
       })
     }
   ],
-
+  
   classes: [
     {
       name: 'TicketTableView',
       extends: 'foam.u2.View',
 
       requires: [
-        'foam.u2.TableView',
+        'foam.u2.view.ScrollableTableView',
         'foam.support.model.Ticket',
       ],
       
       imports: [ 'ticketDAO'],
-
-      exports: [ 'selection' ],
 
       properties: [
         'selection'
@@ -67,8 +91,8 @@ foam.CLASS({
         function initE() {
           this
             .start({
-              selection: this.selection$,
-              class: 'foam.u2.view.TableView',
+              selection$: this.selection$,
+              class: 'foam.u2.view.ScrollTableView',
               data: this.ticketDAO,
             }).addClass(this.myClass('table')).end();
         }
