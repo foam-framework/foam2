@@ -44,6 +44,17 @@ foam.CLASS({
       right: 20px;
       float: right;
     }
+    ^ .foam-u2-UnstyledActionView-closeModal{
+      position: relative;
+      right: 0px;
+      width: 50px;
+      height: 40px;
+      background: transparent;
+      margin-top: 0;
+      top: 0;
+      right: 0;
+      border: none;
+    }
     ^ .foam-u2-ActionView-closeModal{
       position: relative;
       right: 0px;

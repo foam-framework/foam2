@@ -141,7 +141,7 @@ foam.CLASS({
           if(!this.email) return;
           var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           if (!emailRegex.test(this.email)){
-            this.add(this.NotificationMessage.create({ message: 'The email you have entered is invalid, try again.' })); 
+            this.add(this.NotificationMessage.create({ message: 'The email you have entered is invalid, try again.', type: 'error' })); 
             return;
           }
           var email = this.SupportEmail.create({
