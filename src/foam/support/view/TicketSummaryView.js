@@ -54,10 +54,6 @@ foam.CLASS({
   ^ .foam-support-view-SummaryCard {
     width: 170px;
   }
-  .foam-u2-view-TableView-foam-support-model-Ticket{
-    margin-top:40px;
-    width:100%;
-  }
   `,
   messages: [
     { name: 'title',          message: 'Tickets' },

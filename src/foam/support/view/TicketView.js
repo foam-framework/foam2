@@ -18,9 +18,6 @@ foam.CLASS({
     width: 992px;
     margin: auto;
   }
-  ^ .foam-u2-view-TableView-foam-support-model-Ticket {
-    margin-top:30px;
-  } 
   ^ .foam-u2-UnstyledActionView-create {
     float: right;
     width: 135px;
@@ -32,6 +29,19 @@ foam.CLASS({
   }
   ^ .foam-support-view-SummaryCard{
     width: 164px;
+  }
+  ^ .foam-u2-view-TableView-row:hover {
+    cursor: pointer;
+    background: %TABLEHOVERCOLOR%;
+  }
+  ^ .foam-u2-view-TableView-row {
+    height: 40px;
+  }
+  ^ .button-div{
+    height: 40px;
+  }
+  ^ .foam-u2-view-TableView td{
+    width: 8px;
   }
   `,
 
@@ -53,7 +63,7 @@ foam.CLASS({
         class: 'foam.u2.ListCreateController',
         dao: this.ticketDAO,
         detailView: this.TicketDetailView,
-        summaryView: this.TicketTableView,
+        summaryView: this.TicketTableView.create(),
         createDetailView: this.CreateTicketView,
         createLabel:'New Ticket',
         showActions: false
@@ -73,8 +83,6 @@ foam.CLASS({
       
       imports: [ 'ticketDAO'],
 
-      exports: [ 'selection' ],
-
       properties: [
         'selection'
       ],
@@ -83,8 +91,8 @@ foam.CLASS({
         function initE() {
           this
             .start({
-              selection: this.selection$,
-              class: 'foam.u2.view.TableView',
+              selection$: this.selection$,
+              class: 'foam.u2.view.ScrollTableView',
               data: this.ticketDAO,
             }).addClass(this.myClass('table')).end();
         }
