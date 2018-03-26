@@ -20,8 +20,6 @@ foam.CLASS({
     'foam.nanos.boot.NSpec',
   ],
 
-  axioms: [ foam.pattern.Singleton.create() ],
-
   properties: [
     {
       name: 'nSpecDAO',
