@@ -45,6 +45,11 @@ foam.CLASS({
       factory: function() {
         var self = this;
         return new Promise(function(resolve) {
+          // TODO: Instead of generating a model, generate and return a context.
+          // We're not currently doing this because building a model with
+          // properties that have factories allow those properties to get
+          // instantiated lazily but there's no reason we can't give contexts
+          // the ability to do this too.
           var client = {
             package: 'foam.nanos.client',
             name: 'Client',
