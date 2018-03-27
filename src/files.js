@@ -167,6 +167,7 @@ FOAM_FILES([
   { name: "foam/dao/DAO" },
   { name: "foam/dao/DAOJava", flags: ['java'] },
   { name: "foam/dao/daoUtils" },
+  { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAODecorator" },
   { name: "foam/dao/AbstractDAO" },
   { name: "foam/dao/DAOProperty" },
