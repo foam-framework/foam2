@@ -65,6 +65,29 @@ public abstract class AbstractFObject
     return result;
   }
 
+  public FObject hardDiff(FObject obj) {
+    FObject ret = null;
+    try {
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      PropertyInfo prop = null;
+      Object diff = null;
+      while ( i.hasNext() ) {
+        if ( prop.hardDiff(this, obj, diff) ) {
+          //create instance only when there is difference
+          if ( ret == null ) {
+            ret = (FObject) this.getClassInfo().getObjClass().newInstance();
+          }
+          prop.set(ret, diff);
+        }
+      }
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
+    } finally {
+      return ret;
+    }
+  }
+
   @Override
   public int compareTo(Object o) {
     if ( o == this ) return 0;

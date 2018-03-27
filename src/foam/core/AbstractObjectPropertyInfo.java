@@ -32,4 +32,28 @@ public abstract class AbstractObjectPropertyInfo
 
   @Override
   public void toXML(FObject obj, Document dom, Element objElement) { }
+
+  @Override
+  public boolean hardDiff(FObject o1, FObject o2, Object diff) {
+    //if both this.get(o1) and this.get(o2) are null, then no difference
+    //if one is null and the other one is not null, then difference
+    if ( this.get(o1) == null ) {
+      if ( this.get(o2) == null ) {
+        diff = null;
+        return false;
+      } else {
+        //shadow copy, since we only use to print out diff entry in journal
+        diff = this.get(o2);
+        return true;
+      }
+    }
+    //Both this.get(o1) and thid.get(o2) are not null
+    //The propertyInfo is instance of AbstractObjectProperty, so that there is no way to do nested propertyInfo check
+    //No matter if there are point to same instance or not, treat them as difference
+    //if there are point to different instance, indeed there are different
+    //if there are point to same instance, we can not guarantee if there are no difference.
+    //shodow copy
+    diff = this.get(o2);
+    return true;
+  }
 }

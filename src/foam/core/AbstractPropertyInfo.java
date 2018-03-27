@@ -66,6 +66,21 @@ public abstract class AbstractPropertyInfo
     }
   }
 
+  @Override
+  public boolean hardDiff(FObject o1, FObject o2, Object diff){
+    int same = this.comparePropertyToValue(this.get(o1), this.get(o2));
+    //return the value of o2 if o1 and o2 are different
+    if ( same != 0 ) {
+      //set o2 prop into diff
+      diff = this.get(o2);
+      return true;
+    } else {
+      //return null if o1 and o2 are same
+      diff = null;
+      return false;
+    }
+  }
+
   public void setFromString(Object obj, String value) {
     this.set(obj, fromString(value));
   }

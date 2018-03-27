@@ -90,4 +90,22 @@ public abstract class AbstractFObjectPropertyInfo
       prop.updateSignature(val, sig);
     }
   }
+
+  @Override
+  public boolean hardDiff(FObject o1, FObject o2, Object diff) {
+    boolean check = super.hardDiff(o1, o2, diff);
+    //check for null on both;
+    if ( ! check ) return false;
+    
+    //if there are point to the same instance, can not guarantee if there are changed
+    if ( (this.get(o1) == this.get(o2)) ) {
+      //shadow copy
+      diff = this.get(o2);
+      return true;
+    }
+
+    diff = ((FObject) this.get(o1)).hardDiff((FObject)this.get(o2));
+    if ( diff == null ) return false;
+    return true;
+  }
 }
