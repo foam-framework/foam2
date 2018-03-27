@@ -52,7 +52,7 @@ foam.CLASS({
       margin-bottom: 10px;
     }
     ^ .Rectangle-11-Copy {
-      width: 1020px;
+      width: 980px;
       border-radius: 2px;
       background-color: #ffffff;
       margin: auto;
@@ -138,7 +138,7 @@ foam.CLASS({
             class: 'foam.u2.view.ScrollTableView',
             height: 20,
             data: this.supportEmailDAO,
-            //columns: ['Id', 'Email', 'Status','Connected Time']
+            columns: ['id', 'email', 'status', 'connectedTime']
           }).addClass(this.myClass('table')).end();
           }
         ] 
