@@ -83,7 +83,27 @@ foam.CLASS({
       margin-right: 10px;
       margin-bottom: 30px;
     }
+    ^ .input-container-half{
+      width: 960px;
+      height: 206px;
+      border-radius: 2px;
+      background-color: #ffffff;
+    }
   `,
+
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'showVerified',
+      value: true,
+    },
+    {
+      class: 'Boolean',
+      name: 'show',
+      value: true,
+    },
+
+  ],
 
   methods: [
     function initE(){
@@ -99,6 +119,15 @@ foam.CLASS({
           dao: this.supportEmailDAO,
           summaryView: this.EmailSupportTableView.create(),
           showActions: false
+        })
+        .callIf(this.showVerified, function(){
+          this.start().addClass('input-container-half')
+            .start('label').add('No Email Support Connected').end()
+            .start().addClass('btn-mid')
+          .start(this.NEW_EMAIL).end()
+  
+        .end()
+          .end()
         })
         .start().addClass('btn-mid')
           .start(this.NEW_EMAIL).end()
