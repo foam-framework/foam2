@@ -65,7 +65,7 @@ public class AuthWebAgent
     out.println("<br>");
     out.println("<button type=submit style=\"display:inline-block;margin-top:10px;\"; onclick=\"checkEmpty()\">Log In</button>");
     out.println("</form>");
-    out.println("<script>function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Please Input the Email'); } else if ( document.getElementById('password').value == '') { alert('Please Input the Password'); } }</script>");
+    out.println("<script>function checkEmpty() { if ( document.getElementById('user').value == '') { alert('Email Required'); } else if ( document.getElementById('password').value == '') { alert('Password Required'); } }</script>");
 
   }
 
