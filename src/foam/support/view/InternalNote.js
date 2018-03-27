@@ -5,18 +5,8 @@ foam.CLASS({
     extends: 'foam.u2.View',
   
     documentation: 'Internal note for ticket detail view',
-    
-    properties:[
-      {
-        name:'publicReply',
-        label:'Public Reply',
-      },
-      {
-        name:'internalNote',
-        label:'Internal Note',
-      },
-    ],
-      css: `
+  
+    css: `
     .bg {
         width: 1240px;
         height: 476px;
@@ -74,5 +64,17 @@ foam.CLASS({
                 .end()
            .end()
       },
-    ]
+    ],
+    actions:
+[
+
+    {
+       name:'publicReply',
+       label:'Public Reply',             
+    },
+    {
+      name:'internalNote',
+      label:'Internal note',             
+   }
+]
   });
