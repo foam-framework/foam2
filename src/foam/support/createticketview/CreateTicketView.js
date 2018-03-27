@@ -2,8 +2,8 @@ foam.CLASS({
     package:'foam.support.createticketview',
     name:'CreateTicketView',
     extends:'foam.u2.Controller',
-    requires:['foam.u2.PopupView',
-    'foam.u2.dialog.Popup',],
+    requires:['foam.u2.PopupView','foam.u2.dialog.Popup',
+    'foam.u2.dialog.NotificationMessage','foam.support.createticketview.dynamicButton'],
     properties:[
         'voidMenuBtn_',
     'voidPopUp_',
@@ -21,12 +21,17 @@ foam.CLASS({
         },
 
     ],
+    imports:['ctrl'],
     css:`
+    * {
+    box-sizing: border-box;
+    }
     ^ .bg{
         padding:20px;
         width: 1280px;
         height: 765px;
         background-color: #edf0f5;
+      
        
     }
     ^ .div{
@@ -107,7 +112,6 @@ foam.CLASS({
         background-color: #ffffff;
       }
       ^ .Change-name {
-        margin-top:20px;
         width: 484px;
         height: 16px;
         font-family: Roboto;
@@ -121,6 +125,7 @@ foam.CLASS({
         color: #093649;
       }
       ^ .inputreq {
+        margin-bottom:20px;
           margin-top:8px;
         width: 300px;
         height: 40px;
@@ -128,6 +133,7 @@ foam.CLASS({
         border: solid 1px rgba(164, 179, 184, 0.5);
       }
       ^ .inputsub {
+        margin-bottom:20px;
         margin-top:8px;
         width: 1200px;
         height: 40px;
@@ -142,80 +148,154 @@ foam.CLASS({
         border: solid 1px rgba(164, 179, 184, 0.5);
       }
       ^ .foam-u2-ActionView-voidDropDown{
-        font-family: Roboto;
-        font-size: 14px;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: 2.86;
-        letter-spacing: 0.2px;
-        text-align: center;
-        color: #ffffff;
           float: right;
           width: 30px;
           height: 40px;
-          border-radius: 2px;
-          background-color: #59a5d5;
+          background: #59a5d5;
+         // border-radius: 2px;
+          
 
       }
       ^ .foam-u2-PopupView{
-        width: 170px;
-        height: 35px;
-        background-color: #59a5d5;  
+        background-color: #ffffff; 
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0.2px;
+        color: #093649;
+        line-height: 30px;
+        position: absolute; 
       }
-
-      ^ .foam-u2-ActionView-voidDropDown {
-        width: 30px;
-        height: 40px;
-        background-color: #59a5d5;
-        background: #59a5d5;
-        border: solid 1px #59a5d5;
-        float: right;
+      ^ .foam-u2-PopupView:hover{
+       // background-color: green; 
       }
      
       ^ .popUpDropDown {
         padding: 0 !important;
-        z-index: 100;
-        width: 165px;
-        background: white;
-        opacity: 1;
-        box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
-        position: absolute;
-      }
-      ^ .popUpDropDown > div {
-        width: 165px;
+      //  z-index: 100;
+       // width: 165px;
+      //  background: white;
+      //  opacity: 1;
+       // box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
+       width: 165px;
         height: 30px;
         font-size: 14px;
         font-weight: 300;
         letter-spacing: 0.2px;
         color: #093649;
         line-height: 30px;
+        position: absolute;
       }
-      ^ .popUpDropDown > div:hover {
-        background-color: #59a5d5;
-        color: #59a5d5;
-        cursor: pointer;
-      }
+      
+    
       ^ button.foam-u2-ActionView{
           margin:0px;
+          box-shadow:none;
+          border: solid 0.5px #59a5d5;
+          background-color: #59a5d5;
+      }
+     ^ .foam-u2-ActionView:hover{
+        background: #59a5d5;
+      }
+      ^ .popUpDropDown {
+        z-index: 1;
+        width: 170px;
+        height: 140px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.19);
+        
+      }
+      ^ .popUpDropDown > div {
+          
+          overflow:hidden;
+        box-sizing:border-box;
+        width: 170px;
+        height: 35px;  
+       padding: 9px 0 0 11px;
         font-family: Roboto;
-        font-size: 14px;
+        font-size: 12px;
         font-weight: normal;
         font-style: normal;
         font-stretch: normal;
-        line-height: 2.86;
+        line-height: 1.33;
         letter-spacing: 0.2px;
-        text-align: center;
+        text-align: left;
+        color: #093649;
+      }
+      ^ .popUpDropDown > div:hover {
+        background-color: rgba(89, 165, 213, 0.3);
+      }
+      .Pending{
+        width: 65px;
+        height: 20px;
+        text-align:center;
+        font-family: Roboto;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: 0.2px;
         color: #ffffff;
-          float: right;
-          width: 30px;
-          height: 40px;
-          border-radius: 2px;
-          background-color: #59a5d5;
+        border-radius: 100px;
+        overflow:hidden;
+        background-color: #59a5d5;
       }
-      ^ .foam-u2-ActionView:hover{
-        background: #59a5d5;
+      .Open {
+        width: 49px;
+        height: 20px;
+        border-radius: 100px;
+        background-color: #ee5f71;
+        text-align:center;
+        font-family: Roboto;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: 0.2px;
+        color: #ffffff;
+        overflow:hidden;
       }
+      .Updated {
+        width: 67px;
+        height: 20px;
+        border-radius: 100px;
+        background-color: #093649;
+        text-align:center;
+        font-family: Roboto;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: 0.2px;
+        color: #ffffff;
+        overflow:hidden;
+      }
+      .Solved {
+        width: 57px;
+        height: 20px;
+        border-radius: 100px;
+        background-color: #a4b3b8;
+        text-align:center;
+        font-family: Roboto;
+        font-size: 12px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: 0.2px;
+        color: #ffffff;
+        overflow:hidden;
+      }
+
+      .Submit-as{
+          float: left;
+          margin-top:4px;
+          margin-right:10px;
+        }
+       
+   
     `,
     messages:[
         {
@@ -246,10 +326,11 @@ foam.CLASS({
           
 
             .start().addClass('bg')
+           // .tag({CLASS:foam.support.createticketview.dynamicButton.create()})
             .start('div').addClass('div')
                 .start('button').add(this.deleteDraftLabel).addClass('Rectangle-7').end()
-              .start(this.VOID_DROP_DOWN,null,this.voidMenuBtn_$).end()
-                //.start('button').add(this.dropDownLabel).addClass('Rectangle-9').end()
+             .start(this.VOID_DROP_DOWN,null,this.voidMenuBtn_$).end()
+                .start('button').add(this.POOP).addClass('Rectangle-9').end()
                 .start('button').add(this.submitNewLabel).addClass('Rectangle-8').end()
               
             .end()
@@ -268,6 +349,14 @@ foam.CLASS({
     ],
    actions:[
        {
+           name:'poop',
+           label:'trial',
+           code:function(){
+               this.ctrl.add(this.PopupView.create().tag({class:'foam.support.createticketview.dynamicButton'}));
+           }
+
+       },
+       {
         name:'deleteDraft',
         label:'Delete Draft',
         code:function()
@@ -283,13 +372,40 @@ foam.CLASS({
        {
       name: 'voidDropDown',
       label: '',
-      code: function(X) {
+      code: function() {
          var self = this;
-         self.voidPopUp_.addClass('popUpDropDown')
          
-        self.voidMenuBtn_.add()
-      }
-    },
+         self.voidPopUp_ = self.PopupView.create({
+            x: -140,
+            y: 40,
+            height:140,
+            width: 170,
+            padding: 5
+          })
+          self.voidPopUp_.addClass('popUpDropDown')
+        
+          .start('div').on('click',this.onClick)//on click will change according to conditions
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Pending').addClass('Pending').end()
+          .end()
+
+          .start('div').on('click',this.onClick)
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Open').addClass('Open').end()
+          .end()
+
+          .start('div').on('click',this.onClick)
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Updated').addClass('Updated').end()
+          .end()
+
+          .start('div').on('click',this.onClick)
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Solved').addClass('Solved').end()
+          .end()
+
+        self.voidMenuBtn_.add(self.voidPopUp_)
+      }}
       /* {
         name:'submitNew',
         label:'Submit as New',
@@ -312,5 +428,15 @@ foam.CLASS({
  
         }
        }*/
-   ]
+   ],
+   listeners: [
+    function voidPopUp() {
+      var self = this;
+      self.voidPopUp_.remove();
+     
+      
+   //   this.ctrl.add(this.Popup.create().tag({class: 'net.nanopay.invoice.ui.modal.DisputeModal', invoice: this.data }));
+    },
+    function OnClick(){}
+  ]
 });

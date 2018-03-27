@@ -20,11 +20,9 @@ foam.CLASS({
 		position: relative;
 		top: 35;
 		left: 10;
-		font-size: 12px;
-		width: 65px;
+		font-size: 12px;		
 		height: 20px;
 		border-radius: 100px;
-		background-color: #59a5d5;
 		font-family: Roboto;
 		font-weight: normal;
 		font-style: normal;
