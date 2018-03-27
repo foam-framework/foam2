@@ -121,7 +121,7 @@ foam.CLASS({
     border-radius: 2px;
     background-color: #ffffff;
   }
-  .foam-u2-ActionView-voidDropDown{
+  .foam-u2-UnstyledActionView-voidDropDown{
     float: right;
     width: 30px;
     height: 40px;
@@ -153,7 +153,7 @@ foam.CLASS({
 }
 
 
- .foam-u2-ActionView > button {
+ .foam-u2-UnstyledActionView > button {
     margin:0px;
     box-shadow:none;
     border: solid 0.5px #59a5d5;
