@@ -58,11 +58,11 @@ foam.CLASS({
                 .start().addClass('bg')
                      .start().addClass('firstdiv')
                             .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
-                            .start(this.PUBLIC_REPLY).addClass('Public-Reply').end()
-                            .start(this.INTERNAL_NOTE).addClass('Internal-Note').end()
+                            .start(this.PUBLIC_REPLY).end()
+                            .start(this.INTERNAL_NOTE).end()
                      .end() 
                 .end()
-           .end()
+           .end() 
       },
     ],
     actions:
