@@ -138,7 +138,7 @@ foam.CLASS({
             class: 'foam.u2.view.ScrollTableView',
             height: 20,
             data: this.supportEmailDAO,
-            columns: ['Id', 'Email', 'Status','Connected Time']
+            //columns: ['Id', 'Email', 'Status','Connected Time']
           }).addClass(this.myClass('table')).end();
           }
         ] 
