@@ -48,11 +48,11 @@ foam.CLASS({
     ^ .btn-mid{
       width: 100%;
       text-align: center;
-      margin-top: 10px;
-      margin-bottom: 10px;
+      margin-top: 20px;
+      margin-bottom: 23px;
     }
     ^ .Rectangle-11-Copy {
-      width: 980px;
+      width: 1027px;
       border-radius: 2px;
       background-color: #ffffff;
       margin: auto;
@@ -85,53 +85,63 @@ foam.CLASS({
     }
     ^ .input-container-half{
       width: 960px;
-      height: 206px;
+      height: 35px;
       border-radius: 2px;
       background-color: #ffffff;
+    }
+    ^ .No-support-email-con{
+      width: 183px;
+      height: 16px;
+      font-family: Roboto;
+      font-size: 14px;
+      font-weight: 300;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: normal;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #093649;
+      margin-left: 389px;
+      margin-right: 388px
+    }
+    ^ .foam-u2-view-TableView-th-connectedTime{
+      width: 140px;
     }
   `,
 
   properties: [
     {
       class: 'Boolean',
-      name: 'showVerified',
-      value: true,
-    },
-    {
-      class: 'Boolean',
-      name: 'show',
-      value: true,
-    },
-
+      name: 'emptyDAO',
+    }
   ],
 
   methods: [
     function initE(){
+      var self = this;
+      this.supportEmailDAO.limit(1).select().then(function(a){ 
+        self.emptyDAO = a.array.length == 0;
+      });
+
       this
       .addClass(this.myClass())
       .start().addClass('Rectangle-11-Copy')
         .start().addClass('title1')
           .start().add('Support Email Management').addClass('title').end()
-            .start().addClass('align')
-        .end()
-        .tag({
-          class: 'foam.u2.ListCreateController',
-          dao: this.supportEmailDAO,
-          summaryView: this.EmailSupportTableView.create(),
-          showActions: false
-        })
-        .callIf(this.showVerified, function(){
-          this.start().addClass('input-container-half')
-            .start('label').add('No Email Support Connected').end()
-            .start().addClass('btn-mid')
-          .start(this.NEW_EMAIL).end()
-  
-        .end()
+          .start().addClass('align').end() 
+          .start({
+            class: 'foam.u2.ListCreateController',
+            dao: this.supportEmailDAO,
+            summaryView: this.EmailSupportTableView.create(),
+            showActions: false
+          }).hide(this.emptyDAO$).end()
+          .start().addClass('input-container-half').show(this.emptyDAO$)
+            .start().add('No Email Support Connected').addClass('No-support-email-con').end()
           .end()
-        })
-        .start().addClass('btn-mid')
-          .start(this.NEW_EMAIL).end()
-        .end()
+          .start().addClass('btn-mid')
+            .start(this.NEW_EMAIL).end()
+          .end()
+        .end()   
       .end()
     }
   ],
