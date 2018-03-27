@@ -19,6 +19,7 @@ public interface FObject
   FObject deepClone();
   FObject shallowClone();
   Map diff(FObject obj);
+  FObject hardDiff(FObject obj);
   Object setProperty(String prop, Object value);
   Object getProperty(String prop);
   boolean isPropertySet(String prop);

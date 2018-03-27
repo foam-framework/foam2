@@ -40,6 +40,7 @@ public interface PropertyInfo
   public void toJSON(foam.lib.json.Outputter outputter, Object value);
   public void toCSV(foam.lib.csv.Outputter outputter, Object value);
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
+  public boolean hardDiff(FObject o1, FObject o2, Object diff);
   public Object fromString(String value);
   public void setFromString(Object obj, String value);
   public Object fromXML(X x, XMLStreamReader reader);
