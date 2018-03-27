@@ -58,32 +58,44 @@ public abstract class AbstractJDAO
     }
 
     logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
+    String path = System.getProperty("JOURNAL_HOME");
+    if ( path == null ) {
+      logger_.warning("System.property JOURNAL_HOME not set, defaulting to user.dir.");
+      path = System.getProperty("user.dir");
+    }
+
     try {
-      //logging file name.0
-      logger_.log("Loading file: " + System.getProperty("user.dir") + File.separator  + filename + ".0");
+      String file = path + File.separator + filename + ".0";
+      logger_.log("Loading file: " + file);
       //get repo entries in filename.0 journal first
-      File inFile = getX().get(foam.nanos.fs.Storage.class).get(filename + ".0");
+      File inFile = new File(file);
       //load repo entries into DAO
       if ( inFile.exists() ) {
-       int validEntries = loadJournal(inFile);
-       logger_.log("Success reading " + validEntries + " entries from file: " + System.getProperty("user.dir") + File.separator  + filename + ".0");
+        int validEntries = loadJournal(inFile);
+        logger_.log("Success reading " + validEntries + " entries from file: " + file);
       } else {
-        logger_.warning("Can not find file: " + System.getProperty("user.dir") + File.separator + filename + ".0");
+        logger_.warning("Can not find file: " + file);
       }
-      //logging file name
-      logger_.log("Loading file: " + System.getProperty("user.dir") + File.separator  + filename);
+      //get runtime journal
+      file = path + File.separator + filename;
+      logger_.log("Loading file: " + file);
       //get output journal
-      outFile_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
+      outFile_ = new File(file);
       //if output journal does not existing, create one
       if ( ! outFile_.exists() ) {
-        logger_.warning("Can not find file: " + System.getProperty("user.dir") + File.separator  + filename);
-        logger_.log("Create file: " + System.getProperty("user.dir") + File.separator  + filename);
+        logger_.warning("Can not find file: " + file);
         //if output journal does not exist, create one
-        outFile_.createNewFile();
+        File dir = outFile_.getAbsoluteFile().getParentFile();
+        if ( !dir.exists() ) {
+          logger_.log("Create dir: " + dir.getAbsolutePath());
+          dir.mkdirs();
+        }
+        logger_.log("Create file: " + file);
+        outFile_.getAbsoluteFile().createNewFile();
       } else {
         //if output journal file exists, load entries into DAO
         int validEntries = loadJournal(outFile_);
-        logger_.log("Success reading " + validEntries + " entries from file: " + System.getProperty("user.dir") + File.separator  + filename);
+        logger_.log("Success reading " + validEntries + " entries from file: " + file);
       }
       //link output journal file to BufferedWriter
       out_ = new BufferedWriter(new FileWriter(outFile_, true));
