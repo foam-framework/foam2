@@ -66,6 +66,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaAssertValue'
+    },
+    {
+      class: 'String',
       name: 'javaValue',
       expression: function(value) {
         // TODO: Escape string value reliably.
@@ -112,6 +116,7 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
+      var assertName = 'assert' + capitalized;
 
       cls.
         field({
@@ -146,7 +151,8 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: this.javaSetter || (privateName + ' = val;\n' + isSet + ' = true;')
+          body: assertName + '(val);\n' +
+            ( this.javaSetter || ( privateName + ' = val;\n' + isSet + ' = true;' ) )
         });
 
       if ( this.javaFactory ) {
@@ -157,6 +163,19 @@ foam.CLASS({
           body: this.javaFactory
         });
       }
+
+      cls.method({
+        name: assertName,
+        visibility: 'public',
+        args: [
+          {
+            type: this.javaType,
+            name: 'val'
+          }
+        ],
+        type: 'void',
+        body: this.javaAssertValue
+      });
 
       cls.field({
         name: constantize,
