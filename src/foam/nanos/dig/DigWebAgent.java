@@ -209,14 +209,7 @@ public class DigWebAgent
 
       FObject   obj      = null;
       ClassInfo cInfo    = dao.getOf();
-      Class     objClass = null;
-
-      if ( cInfo != null ) {
-        objClass = cInfo.getObjClass();
-      } else {
-         out.println("Can't find DAO");
-         return;
-      }
+      Class     objClass = cInfo.getObjClass();
 
       if ( "put".equals(command) || "post".equals(command) ) {
         if ( "json".equals(format) ) {
