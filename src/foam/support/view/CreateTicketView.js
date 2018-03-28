@@ -84,6 +84,7 @@ foam.CLASS({
   .property-message{
     width: 940px;
     height: 240px;
+    border: 1px solid lightgrey;
   }
   .property-subject{
     width: 940px;
@@ -161,70 +162,12 @@ foam.CLASS({
   .popUpDropDown > div:hover {
     background-color: rgba(89, 165, 213, 0.3);
   }
-  .Pending{
-    width: 65px;
-    height: 20px;
-    text-align:center;
-    font-family: Roboto;
-    font-size: 12px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.67;
-    letter-spacing: 0.2px;
-    color: #ffffff;
-    border-radius: 100px;
-    overflow:hidden;
-    background-color: #59a5d5;
+  ^ .status{
+    color: white;
+    display: inline-block;
+    padding-top: 3px;
+    text-align: center;
   }
-  .Open {
-    width: 49px;
-    height: 20px;
-    border-radius: 100px;
-    background-color: #ee5f71;
-    text-align:center;
-    font-family: Roboto;
-    font-size: 12px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.67;
-    letter-spacing: 0.2px;
-    color: #ffffff;
-    overflow:hidden;
-  }
-  .Updated {
-    width: 67px;
-    height: 20px;
-    border-radius: 100px;
-    background-color: #093649;
-    text-align:center;
-    font-family: Roboto;
-    font-size: 12px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.67;
-    letter-spacing: 0.2px;
-    color: #ffffff;
-    overflow:hidden;
-  }
-  .Solved {
-    width: 57px;
-    height: 20px;
-    border-radius: 100px;
-    background-color: #a4b3b8;
-    text-align:center;
-    font-family: Roboto;
-    font-size: 12px;
-    font-weight: normal;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: 1.67;
-    letter-spacing: 0.2px;
-    color: #ffffff;
-    overflow:hidden;
-  } 
   .Submit-as{
     float: left;
     margin-top:4px;
@@ -243,7 +186,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'message'
+      name: 'message',
+      view: 'foam.u2.tag.TextArea'
     },
     'voidMenuBtn_',
     'voidPopUp_',
@@ -305,8 +249,8 @@ foam.CLASS({
     },
     {
       name: 'deleteDraft',
-      code: function(){
-
+      code: function(X){
+        X.stack.push({ class: 'foam.support.view.TicketView'});
       }
     },
     {
@@ -325,22 +269,22 @@ foam.CLASS({
         
           .start('div').on('click',this.onClick)//on click will change according to conditions
              .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Pending').addClass('Pending').end()
+             .start().add('Pending').addClass('Pending status').end()
           .end()
 
           .start('div').on('click',this.onClick)
              .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Open').addClass('Open').end()
+             .start().add('Open').addClass('Open status').end()
           .end()
 
           .start('div').on('click',this.onClick)
              .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Updated').addClass('Updated').end()
+             .start().add('Updated').addClass('Updated status').end()
           .end()
 
           .start('div').on('click',this.onClick)
              .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Solved').addClass('Solved').end()
+             .start().add('Solved').addClass('Solved status').end()
           .end()
 
         self.voidMenuBtn_.add(self.voidPopUp_)
