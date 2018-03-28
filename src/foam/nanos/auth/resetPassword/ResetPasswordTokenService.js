@@ -12,20 +12,20 @@ foam.CLASS({
   documentation: 'Implementation of Token Service used for reset password',
 
   imports: [
-    'appConfig',    
+    'appConfig',
     'email',
-    'localUserDAO',    
+    'localUserDAO',
     'tokenDAO'
   ],
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.dao.ListSink',
+    'foam.dao.ArraySink',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.token.Token',    
-    'foam.nanos.auth.User',    
+    'foam.nanos.auth.token.Token',
+    'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
     'foam.util.Password',
@@ -33,7 +33,7 @@ foam.CLASS({
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.UUID',
+    'java.util.UUID'
   ],
 
   axioms: [
@@ -59,11 +59,11 @@ DAO tokenDAO = (DAO) getTokenDAO();
 String url = appConfig.getUrl()
     .replaceAll("/$", "");
 
-Sink sink = new ListSink();
+Sink sink = new ArraySink();
 sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))/**/
    .limit(1).select(sink);
 
-List list = ((ListSink) sink).getData();
+List list = ((ArraySink) sink).getArray();
 if ( list == null || list.size() == 0 ) {
   throw new RuntimeException("User not found");
 }
@@ -127,14 +127,14 @@ DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 Calendar calendar = Calendar.getInstance();
 
-Sink sink = new ListSink();
+Sink sink = new ArraySink();
 sink = tokenDAO.where(MLang.AND(
   MLang.EQ(Token.PROCESSED, false),
   MLang.GT(Token.EXPIRY, calendar.getTime()),
   MLang.EQ(Token.DATA, token)
 )).limit(1).select(sink);
 
-List data = ((ListSink) sink).getData();
+List data = ((ArraySink) sink).getArray();
 if ( data == null || data.size() == 0 ) {
   throw new RuntimeException("Token not found");
 }
