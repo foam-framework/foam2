@@ -264,7 +264,7 @@ public abstract class AbstractJDAO
   }
 
   protected FObject difference(FObject o, FObject n) {
-    FObject diff = hasDiff(o, n);
+    FObject diff = o.hardDiff(n);
     //no difference, then return null
     if ( diff == null ) return null;
     //get the PropertyInfo for the id
@@ -272,51 +272,6 @@ public abstract class AbstractJDAO
     //set id property to new instance
     idInfo.set(diff, idInfo.get(o));
     return diff;
-  }
-
-  protected FObject hasDiff(FObject o, FObject n) {
-    // if either new or old is null, return new instance.
-    if ( o == null || n == null ) return n;
-    // if two instances are same, return new instance because cannot check the difference;
-    if ( o == n ) return n;
-    FObject ret = null;
-    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    Iterator e = list.iterator();
-    while( e.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) e.next();
-      if ( prop instanceof AbstractFObjectPropertyInfo ) {
-        if (prop.getNetworkTransient() || prop.getStorageTransient()) {
-          //filter out one-to-many and many-to-many relationship, which will cause infinite looping
-        } else {
-          FObject diff = hasDiff((FObject) prop.get(o), (FObject) prop.get(n));
-          //if there is difference, set difference
-          if ( diff != null ) {
-            //create only when there is difference
-            if ( ret == null ) ret = generateFObject(o);
-            //set diff
-            prop.set(ret, diff);
-          }
-        }
-      } else if ( prop instanceof AbstractFObjectArrayPropertyInfo ) {
-        //TODO: if instances are same, can not check array
-        //create only when there is array
-        if ( ret == null ) ret = generateFObject(o);
-        prop.set(ret, prop.get(n));
-      } else if ( ! (prop instanceof AbstractEnumPropertyInfo) && (prop instanceof AbstractObjectPropertyInfo || prop instanceof AbstractArrayPropertyInfo) ) {
-        //can not handle reference type except enum
-        if ( ret == null ) ret = generateFObject(o);
-        prop.set(ret, prop.get(n));
-      } else {
-        //handle primitive value and enum
-        int same = prop.comparePropertyToValue(prop.get(o), prop.get(n));
-        if ( same != 0 ) {
-          //create only when there is difference
-          if ( ret == null ) ret = generateFObject(o);
-          prop.set(ret, prop.get(n));
-        } 
-      }
-    }
-    return ret;
   }
 
   protected FObject mergeChange(FObject o, FObject c) {
