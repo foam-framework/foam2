@@ -34,16 +34,15 @@ public abstract class AbstractObjectPropertyInfo
   public void toXML(FObject obj, Document dom, Element objElement) { }
 
   @Override
-  public boolean hardDiff(FObject o1, FObject o2, Object diff) {
+  public boolean hardDiff(FObject o1, FObject o2, FObject diff) {
     //if both this.get(o1) and this.get(o2) are null, then no difference
     //if one is null and the other one is not null, then difference
     if ( this.get(o1) == null ) {
       if ( this.get(o2) == null ) {
-        diff = null;
         return false;
       } else {
         //shadow copy, since we only use to print out diff entry in journal
-        diff = this.get(o2);
+        this.set(diff, this.get(o2));
         return true;
       }
     }
@@ -53,7 +52,7 @@ public abstract class AbstractObjectPropertyInfo
     //if there are point to different instance, indeed there are different
     //if there are point to same instance, we can not guarantee if there are no difference comparing with record in the journal.
     //shodow copy
-    diff = this.get(o2);
+    this.set(diff, this.get(o2));
     return true;
   }
 }

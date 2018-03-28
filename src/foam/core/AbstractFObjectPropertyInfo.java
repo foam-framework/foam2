@@ -92,7 +92,7 @@ public abstract class AbstractFObjectPropertyInfo
   }
 
   @Override
-  public boolean hardDiff(FObject o1, FObject o2, Object diff) {
+  public boolean hardDiff(FObject o1, FObject o2, FObject diff) {
     boolean check = super.hardDiff(o1, o2, diff);
     //check is false only when both the.get(o1) and this.get(o2) are null;
     if ( ! check ) return false;
@@ -107,13 +107,14 @@ public abstract class AbstractFObjectPropertyInfo
      */
     if ( (this.get(o1) == this.get(o2)) ) {
       //shadow copy, since we only use to print to journal
-      diff = this.get(o2);
+      this.set(diff, this.get(o2));
       return true;
     }
 
     //compare the diff
-    diff = ((FObject) this.get(o1)).hardDiff((FObject)this.get(o2));
-    if ( diff == null ) return false;
+    Object d = ((FObject) this.get(o1)).hardDiff((FObject)this.get(o2));
+    this.set(diff, d);
+    if ( d == null ) return false;
     return true;
   }
 }

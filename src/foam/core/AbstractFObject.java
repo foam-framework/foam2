@@ -67,25 +67,24 @@ public abstract class AbstractFObject
 
   public FObject hardDiff(FObject obj) {
     FObject ret = null;
+    boolean isDiff = false;
     try {
+      ret = (FObject) this.getClassInfo().getObjClass().newInstance();
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
       PropertyInfo prop = null;
-      Object diff = null;
       while ( i.hasNext() ) {
-        if ( prop.hardDiff(this, obj, diff) ) {
-          //create instance only when there is difference
-          if ( ret == null ) {
-            ret = (FObject) this.getClassInfo().getObjClass().newInstance();
-          }
-          //set diff field into return FObject
-          prop.set(ret, diff);
+        prop = (PropertyInfo) i.next();
+        if ( prop.getNetworkTransient() || prop.getStorageTransient() ) continue;
+        if ( prop.hardDiff(this, obj, ret) ) {
+          isDiff = true;
         }
       }
     } catch ( Throwable t ) {
       throw new RuntimeException(t);
     } finally {
-      return ret;
+      if ( isDiff ) return ret;
+      return null;
     }
   }
 
