@@ -5,7 +5,7 @@ import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.Sink;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.nanos.auth.Group;
 import foam.nanos.notification.email.EmailTemplate;
 import foam.util.SafetyUtil;
@@ -32,7 +32,7 @@ public class DAOResourceLoader
           EQ(EmailTemplate.GROUP, ! SafetyUtil.isEmpty(groupId) ? groupId : "*")
       )).limit(1).select(null);
 
-      List data = ((ListSink) sink).getData();
+      List data = ((ArraySink) sink).getArray();
       if ( data != null && data.size() == 1 ) {
         return (EmailTemplate) data.get(0);
       }
