@@ -64,9 +64,9 @@ foam.CLASS({
       },
       javaCode: `foam.mlang.sink.Map junction = (foam.mlang.sink.Map)getRelationship().getJunctionDAO().where(
     foam.mlang.MLang.EQ(getRelationship().getSourceProperty(), getRelationship().getSourceId())).
-  select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ListSink()));
+  select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
 
-  return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ListSink)(junction.getDelegate())).getData().toArray())).select_(
+  return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink)(junction.getDelegate())).getArray().toArray())).select_(
     x, sink, skip, limit, order, predicate);`
     }
   ]
