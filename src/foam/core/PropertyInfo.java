@@ -42,7 +42,7 @@ public interface PropertyInfo
   public void diff(FObject o1, FObject o2, Map diff, PropertyInfo prop);
   //return true if there are difference, then the field from o2 will set to diff
   //return false if there is no differnce, then null will set to diff
-  public boolean hardDiff(FObject o1, FObject o2, Object diff);
+  public boolean hardDiff(FObject o1, FObject o2, FObject diff);
   public Object fromString(String value);
   public void setFromString(Object obj, String value);
   public Object fromXML(X x, XMLStreamReader reader);
