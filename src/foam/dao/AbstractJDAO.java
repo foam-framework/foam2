@@ -58,17 +58,12 @@ public abstract class AbstractJDAO
     }
 
     logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
-    String path = System.getProperty("JOURNAL_HOME");
-    if ( path == null ) {
-      logger_.warning("System.property JOURNAL_HOME not set, defaulting to user.dir.");
-      path = System.getProperty("user.dir");
-    }
 
     try {
-      String file = path + File.separator + filename + ".0";
+      String file = filename + ".0";
       logger_.log("Loading file: " + file);
       //get repo entries in filename.0 journal first
-      File inFile = new File(file);
+      File inFile = getX().get(foam.nanos.fs.Storage.class).get(file);
       //load repo entries into DAO
       if ( inFile.exists() ) {
         int validEntries = loadJournal(inFile);
@@ -77,10 +72,10 @@ public abstract class AbstractJDAO
         logger_.warning("Can not find file: " + file);
       }
       //get runtime journal
-      file = path + File.separator + filename;
+      file = filename;
       logger_.log("Loading file: " + file);
       //get output journal
-      outFile_ = new File(file);
+      outFile_ = getX().get(foam.nanos.fs.Storage.class).get(file);
       //if output journal does not existing, create one
       if ( ! outFile_.exists() ) {
         logger_.warning("Can not find file: " + file);
