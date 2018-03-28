@@ -45,12 +45,14 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.nanos.dig.Command',
-      name: 'cmd'
+      name: 'cmd',
+      value: foam.nanos.dig.Command.SELECT
     },
     {
       class: 'Enum',
       of: 'foam.nanos.dig.Format',
-      name: 'format'
+      name: 'format',
+      value: foam.nanos.dig.Format.JSON
     },
     {
         class: 'String',
@@ -58,11 +60,18 @@ foam.CLASS({
     },
     {
       class: 'EMail',
+      displayWidth: 100,
       name: 'email'
     },
     {
+      class: 'EMail',
+      displayWidth: 100,
+      name: 'subject'
+    },
+    {
       class: 'String',
-      name: 'data'
+      name: 'data',
+      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120 }
     },
     {
       class: 'Reference',
@@ -73,11 +82,23 @@ foam.CLASS({
     },
     {
       class: 'URL',
-      name: 'url',
+      // TODO: appears not to work if named 'url', find out why.
+      name: 'digURL',
       label: 'URL',
-      displayWidth: 100
+      displayWidth: 120,
+      view: 'foam.nanos.dig.LinkView',
+      expression: function(key, data, email, subject, daoKey, cmd, format) {
+        var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd + "&format=" + format.name.toLowerCase();
+
+        if ( key )     url += "?id=" + key;
+        if ( data )    url += "?data=" + data;
+        if ( email )   url += "?email=" + email;
+        if ( subject ) url += "?subject=" + subject;
+
+        return url;
+      }
     }
-  ]
+  ],
 
   methods: [
   ]

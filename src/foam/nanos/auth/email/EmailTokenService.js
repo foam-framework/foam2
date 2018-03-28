@@ -7,7 +7,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.dao.ListSink',
+    'foam.dao.ArraySink',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
@@ -58,7 +58,7 @@ return true;
 DAO tokenDAO = (DAO) getX().get("tokenDAO");
 Calendar calendar = Calendar.getInstance();
 
-Sink sink = new ListSink();
+Sink sink = new ArraySink();
 sink = tokenDAO.where(MLang.AND(
   MLang.EQ(Token.USER_ID, user.getId()),
   MLang.EQ(Token.PROCESSED, false),
@@ -66,7 +66,7 @@ sink = tokenDAO.where(MLang.AND(
   MLang.EQ(Token.DATA, token)
 )).limit(1).select(sink);
 
-List list = ((ListSink) sink).getData();
+List list = ((ArraySink) sink).getArray();
 if ( list == null || list.size() == 0 ) {
   // token not found
   throw new RuntimeException("Token not found");

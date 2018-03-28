@@ -9,7 +9,7 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
@@ -149,10 +149,10 @@ public class UserAndGroupAuthService
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    Sink sink = new ListSink();
+    Sink sink = new ArraySink();
     sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
-    List data = ((ListSink) sink).getData();
+    List data = ((ArraySink) sink).getArray();
     if ( data == null || data.size() != 1 ) {
       throw new AuthenticationException("User not found");
     }

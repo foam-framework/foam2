@@ -11,7 +11,7 @@ import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
 import foam.dao.AbstractDAO;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
