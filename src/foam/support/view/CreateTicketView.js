@@ -58,7 +58,7 @@ foam.CLASS({
     border-radius: 2px;
     background: #59a5d5; 
   }
-  .label{
+  ^ .label{
     width: 484px;
     height: 16px;
     font-family: Roboto;
