@@ -78,6 +78,7 @@ public abstract class AbstractFObject
           if ( ret == null ) {
             ret = (FObject) this.getClassInfo().getObjClass().newInstance();
           }
+          //set diff field into return FObject
           prop.set(ret, diff);
         }
       }

@@ -68,6 +68,9 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean hardDiff(FObject o1, FObject o2, Object diff){
+    //compare the property value of o1 and o2
+    //If value is Object reference, only compare reference. (AbstractObjectPropertyInfo will override hardDiff method)
+    //use to compare String and primitive type
     int same = this.comparePropertyToValue(this.get(o1), this.get(o2));
     //return the value of o2 if o1 and o2 are different
     if ( same != 0 ) {
