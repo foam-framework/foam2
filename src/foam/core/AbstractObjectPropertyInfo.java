@@ -51,7 +51,7 @@ public abstract class AbstractObjectPropertyInfo
     //The propertyInfo is instance of AbstractObjectProperty, so that there is no way to do nested propertyInfo check
     //No matter if there are point to same instance or not, treat them as difference
     //if there are point to different instance, indeed there are different
-    //if there are point to same instance, we can not guarantee if there are no difference.
+    //if there are point to same instance, we can not guarantee if there are no difference comparing with record in the journal.
     //shodow copy
     diff = this.get(o2);
     return true;
