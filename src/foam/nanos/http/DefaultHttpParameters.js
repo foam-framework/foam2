@@ -46,7 +46,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      //javaType: 'Object',
       name: 'data',
       view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120 }
     },
