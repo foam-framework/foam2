@@ -17,25 +17,5 @@ foam.CLASS({
       of: 'foam.nanos.http.WebAgent',
       name: 'delegate'
     }
-  ],
-
-  // methods: [
-  //   {
-  //     name: 'execute',
-  //     code: function execute(x) {
-  //       this.delegate.execute(x);
-  //     },
-  //     javaCode: 'if ( this.delegate != null ) this.delegate.execute(x);'
-  //   }
-  // ],
-
-//   axioms: [
-//     {
-//       buildJavaClass: function(cls) {
-//         cls.extras.push(`
-// public ProxyWebAgent() {}
-// `);
-//       }
-//     }
-//   ]
+  ]
 });
