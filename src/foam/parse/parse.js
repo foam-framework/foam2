@@ -992,14 +992,18 @@ foam.CLASS({
 
   methods: [
     function parseString(str, opt_name) {
+      var result = this.getParse(str, opt_name);
+      return result && result.value;
+    },
+
+    function getParse(str, opt_name) {
       opt_name = opt_name || 'START';
 
       this.ps.setString(str);
       var start = this.getSymbol(opt_name);
       foam.assert(start, 'No symbol found for', opt_name);
 
-      var result = this.ps.apply(start, this);
-      return result && result.value;
+      return this.ps.apply(start, this);
     },
 
     function getSymbol(name) {
