@@ -41,6 +41,7 @@ foam.CLASS({
     color: #093649;
   }
   ^ .Rectangle-8 {
+    padding: 8px 10px;
     border: solid 0.5px #59a5d5 !important;
     margin: 0px 2px !important;
     -webkit-box-shadow: none;
@@ -53,7 +54,6 @@ foam.CLASS({
     text-align: center;
     color: #ffffff;
     float: right;
-    width: 140px;
     height: 40px;
     border-radius: 2px;
     background: #59a5d5; 
@@ -76,6 +76,9 @@ foam.CLASS({
     margin-top:8px;
     background-color: #ffffff;
     border: solid 1px rgba(164, 179, 184, 0.5);
+  }
+  .foam-u2-tag-TextArea {
+    margin-top:8px;
   }
   .property-requestor{
     width: 300px;
@@ -139,7 +142,7 @@ foam.CLASS({
     z-index: 1;
     padding: 0 !important;
     width: 170px;
-    height: 140px;
+    height: 175px;
     background: #ffffff;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.19);
   }
@@ -173,6 +176,18 @@ foam.CLASS({
     margin-top:4px;
     margin-right:10px;
   }
+  .SubmitButton{
+    margin-top:2px;
+    float: left;
+  }
+  .SubmitLabel {
+    float:right;
+  }
+  .Sb{
+    colour: #fffff;
+    padding-top: 2px;
+    margin-left:10px !important;
+  }
   `,
 
   properties: [
@@ -183,6 +198,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'subject'
+    },
+    {
+      class: 'String',
+      name: 'status',
+      value: 'New'
     },
     {
       class: 'String',
@@ -202,8 +222,14 @@ foam.CLASS({
       .start('div').addClass('div')
         .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
         .start(this.VOID_DROP_DOWN,null,this.voidMenuBtn_$).end()
-        .start(this.SUBMIT_TICKET).addClass('Rectangle-8').end()
+        .start().addClass('Rectangle-8').on('click',this.onSubmitTicket())
+            .start().add('Submit as').addClass('SubmitButton').end()
+            .start().addClass('SubmitLabel')
+              .start().addClass(this.status + ' Sb').add(this.status).end()
+            .end()
+        .end()
       .end()
+
 
       .start().add(this.title).addClass('New-Ticket').end()
 
@@ -230,23 +256,22 @@ foam.CLASS({
         .end()
         .tag(this.SAVE_TICKET)
       .end()
+    },
+    function onClick(status){
+      this.status = status;
+    },
+    function onSubmitTicket(){
+      var ticket = this.Ticket.create({
+        publicMessage: this.message,
+        requestorId: this.requestor,
+        subject: this.subject
+      })
+
+      this.ticketDAO.put(ticket);
     }
   ],
 
   actions: [
-    {
-      name: 'submitTicket',
-      code: function(){
-        
-        var ticket = this.Ticket.create({
-          publicMessage: this.message,
-          requestorId: this.requestor,
-          subject: this.subject
-        })
-
-        this.ticketDAO.put(ticket);
-      }
-    },
     {
       name: 'deleteDraft',
       code: function(X){
@@ -258,31 +283,36 @@ foam.CLASS({
       label: '',
       code: function() {
          var self = this;
-         
+  
          self.voidPopUp_ = self.PopupView.create({
             x: -140,
             y: 40,
-            height:140,
+            height:175,
             width: 170,
           })
           self.voidPopUp_.addClass('popUpDropDown')
         
-          .start('div').on('click',this.onClick)//on click will change according to conditions
+          .start('div').on('click',this.onClick('Pending'))//on click will change according to conditions
              .start().add('Submit as').addClass('Submit-as').end()
              .start().add('Pending').addClass('Pending status').end()
           .end()
 
-          .start('div').on('click',this.onClick)
+          .start('div').on('click',this.onClick('New'))
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('New').addClass('New status').end()
+          .end()
+
+          .start('div').on('click',this.onClick('Open'))
              .start().add('Submit as').addClass('Submit-as').end()
              .start().add('Open').addClass('Open status').end()
           .end()
 
-          .start('div').on('click',this.onClick)
+          .start('div').on('click',this.onClick('Updated'))
              .start().add('Submit as').addClass('Submit-as').end()
              .start().add('Updated').addClass('Updated status').end()
           .end()
 
-          .start('div').on('click',this.onClick)
+          .start('div').on('click',this.onClick('Solved'))
              .start().add('Submit as').addClass('Submit-as').end()
              .start().add('Solved').addClass('Solved status').end()
           .end()
@@ -290,5 +320,9 @@ foam.CLASS({
         self.voidMenuBtn_.add(self.voidPopUp_)
       }
     }
+  ],
+
+  listners: [
+
   ]
 });
