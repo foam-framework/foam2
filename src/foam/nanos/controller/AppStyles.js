@@ -1,4 +1,3 @@
-
 foam.CLASS({
   package: 'foam.nanos.controller',
   name: 'AppStyles',
@@ -83,7 +82,7 @@ foam.CLASS({
       background-color: #ee5f71;
     }
     .Pending {
-      width: 65px;
+      width: 55px;
       height: 20px;
       border-radius: 100px;
       background-color: #59a5d5;
@@ -103,7 +102,7 @@ foam.CLASS({
       font-stretch: normal;
       line-height: 1.67;
       letter-spacing: 0.2px;
-      text-align: left;
+      text-align: center;
       color: #ffffff;
     }
   `

@@ -101,26 +101,6 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start('div')
-          .start().addClass('ticketdiv')
-            .start().addClass('bg')
-            .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.png'}).addClass('person')
-              .start().add(this.nameLabel).addClass('company-name').end()
-                .start().add(this.currentDate$).addClass('date').end()           
-            .end()
-            .end()
-            /*
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.newCount$, status: this.newLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.updatedCount$, status: this.updatedLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.openCount$, status: this.openLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.pendingCount$, status: this.pendingLabel })
-            .tag({ class: 'foam.support.view.SummaryCard', count$: this.solvedCount$, status: this.solvedLabel })
-            .tag({ selection: this.selection$, class: 'foam.u2.view.TableView', data: this.ticketDAO,}).addClass(this.myClass('table'))*/
-          .end()
-        .end()
-      /*
-      this
-        .addClass(this.myClass())
           .start().addClass('bg')
             .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.png'}).addClass('person')
               .start().addClass('company-name')
@@ -133,7 +113,7 @@ foam.CLASS({
                   .start().add(this.textLabel).addClass('text').end()
           .end()
         .end()
-       */
+       
     },
   ]
 });
