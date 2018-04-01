@@ -44,7 +44,6 @@ import java.util.List;
 public class MDAO
   extends AbstractDAO
 {
-
   protected AltIndex index_;
   protected Object   state_;
 
