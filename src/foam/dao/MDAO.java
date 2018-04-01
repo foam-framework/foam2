@@ -40,6 +40,7 @@ import java.util.List;
  of tree nodes, each holding one tail instance of the ValueIndex at the end of the chain.
 
  */
+ // TODO: clone and freeze objects stored in memory
 public class MDAO
   extends AbstractDAO
 {
