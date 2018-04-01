@@ -18,7 +18,6 @@ import java.util.Arrays;
 public class TreeIndex
   extends AbstractIndex
 {
-
   protected Index        tail_;
   protected PropertyInfo prop_;
   protected long         selectCount_;
