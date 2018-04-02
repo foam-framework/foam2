@@ -5,10 +5,10 @@
  */
 
 foam.ENUM({
-  package: 'foam.nanos.dig',
+  package: 'foam.nanos.http',
   name: 'Format',
 
-  documentation: 'DIG/DUG formats.',
+  documentation: 'HTTP response formats.',
 
   values: [
     { name: 'CSV',   label: 'CSV' },
