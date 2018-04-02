@@ -17,8 +17,7 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.Group',
-    'foam.nanos.auth.Permission',
-    'foam.u2.search.SearchManager'
+    'foam.nanos.auth.Permission'
   ],
 
   css: `
