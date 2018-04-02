@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DIG',
+  extends: 'foam.nanos.http.DefaultHttpParameters',
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
@@ -21,11 +22,6 @@ foam.CLASS({
   searchColumns: [],
 
   properties: [
-    {
-        class: 'String',
-        name: 'id',
-        displayWidth: 40
-    },
     {
       class: 'String',
       name: 'daoKey',
@@ -43,16 +39,13 @@ foam.CLASS({
       }
     },
     {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Command',
-      name: 'cmd',
-      value: foam.nanos.dig.Command.SELECT
-    },
-    {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Format',
-      name: 'format',
-      value: foam.nanos.dig.Format.JSON
+      class: 'String',
+      name: 'dao',
+      hidden: true,
+      transient: true,
+      postSet: function(old, nu) {
+        this.daoKey = nu;
+      }
     },
     {
         class: 'String',
@@ -67,18 +60,6 @@ foam.CLASS({
       class: 'EMail',
       displayWidth: 100,
       name: 'subject'
-    },
-    {
-      class: 'String',
-      name: 'data',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120 }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'owner',
-      hidden: true
-      // TODO: set tableCellRenderer
     },
     {
       class: 'URL',
