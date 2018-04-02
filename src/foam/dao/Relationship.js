@@ -288,15 +288,18 @@ foam.INTERFACE({
     // TODO: These should really be properties.
     {
       name: 'getDAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'DAO'
     },
     {
       name: 'getJunctionDAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'DAO'
     },
     {
       name: 'getTargetDAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'DAO'
     },
   ]
 });
