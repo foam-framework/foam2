@@ -212,7 +212,9 @@ var classes = [
   'foam.nanos.dig.DUG',
   'foam.nanos.dig.DigPostParameters',
 
-  'foam.lib.query.TestModel'
+  'foam.lib.query.TestModel',
+  //logger
+  'foam.nanos.logger.Log'
 ];
 
 var abstractClasses = [
