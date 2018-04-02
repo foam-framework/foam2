@@ -33,21 +33,22 @@ foam.CLASS({
       view: {
         class: 'foam.u2.TextField',
         type: 'search',
-        placeholder: 'Search',
+        placeholder: 'Permission Search',
         onKey: true
       }
     },
     {
-      name: 'selected'
+      name: 'selectedGroup',
+      documentation: 'Array for managing checkbox value on groups filter'
     },
     {
-      name: 'columns_'
+      name: 'columns_',
+      documentation: 'Array for managing checked groups'
     },
     {
-      name: 'rows_'
-    },
-    {
-      name: 'table'
+      name: 'textData',
+      documentation: 'input text value by user'
+
     }
   ],
 
@@ -55,7 +56,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-      this.selected = []
+      this.selectedGroup = []
       this.columns_ = []
 
       this.query$.sub(function() {
@@ -76,7 +77,7 @@ foam.CLASS({
                 this.tag(cbGroup).tag('br')
 
                 self.columns_.push(g.id);
-                self.selected.push(cbGroup.data$);
+                self.selectedGroup.push(cbGroup.data$);
                 cbGroup.data$.sub(function() { self.filterGroup(g, self); });
               }).end()
 
@@ -175,20 +176,21 @@ foam.CLASS({
     function filterGroup(group, self) {
       this.columns_ = []
 
-      for ( var i = 0 ; i < this.selected.length ; i++ ) {
-        var cbGroupData = this.selected[i].obj.data;
-        var curProp = this.selected[i].obj.label;
+      for ( var i = 0 ; i < this.selectedGroup.length ; i++ ) {
+        var cbGroupData = this.selectedGroup[i].obj.data;
+        var curProp = this.selectedGroup[i].obj.label;
 
         if ( cbGroupData ) {
           this.columns_.push(curProp);
         }
       }
 
-      this.showTable(self, this.columns_, this.rows_);
+      this.showTable(self, this.columns_, this.textData);
     },
 
     function filterPermission(self, rows) {
-      this.rows_ = rows;
+      this.textData = rows;
+
       this.showTable(self, this.columns_, rows);
     }
   ]
