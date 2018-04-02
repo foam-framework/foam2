@@ -65,6 +65,41 @@ public class HttpParametersWebAgent
       throw new RuntimeException(exception);
     }
 
+    // Capture 'data' on all requests
+    if ( !SafetyUtil.isEmpty(req.getParameter("data")) ) {
+      logger.debug("data", req.getParameter("data"));
+      parameters.set("data", req.getParameter("data"));
+    } else {
+      //
+      // When content-type is other than application/x-www-form-urlencoded, the
+      // HttpServletRequest.reader stream must be processes manually to extract
+      // parameters from the body.
+      //
+      // Future considerations for partial parameters in the POST URI
+      // see examples: https://technologyconversations.com/2014/08/12/rest-api-with-json/
+      //
+      try {
+        StringBuffer buffer = new StringBuffer();
+        BufferedReader reader = req.getReader();
+        String line;
+        while ( ( line = reader.readLine() ) != null ) {
+          buffer.append(line.trim());
+        }
+        logger.debug("reader data:", buffer.toString());
+        if ( !SafetyUtil.isEmpty(buffer.toString()) ) {
+          parameters.set("data", buffer.toString());
+        }
+      } catch (IOException e) {
+        logger.error(e);
+        try {
+          resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to parse.");
+        } catch ( java.io.IOException ioe ) {
+          logger.error("Failed to send HttppServletResponse", ioe);
+        }
+        return;
+      }
+    }
+
     if ( ! "application/x-www-form-urlencoded".equals(contentType) ) {
       switch ( methodName.toUpperCase() ) {
       case "POST":
@@ -77,35 +112,6 @@ public class HttpParametersWebAgent
         command = Command.remove;
         break;
         // defauts to SELECT
-      }
-
-      if ( command == Command.put ) {
-        //
-        // When content-type is other than application/x-www-form-urlencoded, the
-        // HttpServletRequest.reader stream must be processes manually to extract
-        // parameters from the body.
-        //
-        // Future considerations for partial parameters in the POST URI
-        // see examples: https://technologyconversations.com/2014/08/12/rest-api-with-json/
-        //
-        try {
-          StringBuffer buffer = new StringBuffer();
-          BufferedReader reader = req.getReader();
-          String line;
-          while ( ( line = reader.readLine() ) != null ) {
-            buffer.append(line.trim());
-          }
-          logger.debug("reader data:", buffer.toString());
-          parameters.set("data", buffer.toString());
-        } catch (IOException e) {
-          logger.error(e);
-          try {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to parse.");
-          } catch ( java.io.IOException ioe ) {
-            logger.error("Failed to send HttppServletResponse", ioe);
-          }
-          return;
-        }
       }
     } else {
       String cmd = req.getParameter("cmd");
@@ -123,10 +129,6 @@ public class HttpParametersWebAgent
           break;
           // defaults to SELECT
         }
-        if ( command == Command.put ) {
-          logger.debug("data", req.getParameter("data"));
-          parameters.set("data", req.getParameter("data"));
-        }
       } else {
         logger.warning("cmd/method could not be determined, defaulting to SELECT.");
       }
@@ -134,7 +136,7 @@ public class HttpParametersWebAgent
     parameters.set("cmd", command);
 
     Format format = Format.JSON;
-    resp.setContentType("text/plain");
+    resp.setContentType("text/html");
     if ( ! SafetyUtil.isEmpty(accept) && ! "application/x-www-form-urlencoded".equals(contentType) ) {
       logger.debug("accept", accept);
       String[] formats = accept.split(";");
@@ -172,6 +174,7 @@ public class HttpParametersWebAgent
           break;
         case "CSV":
           format = Format.CSV;
+          resp.setContentType("text/plain");
           break;
         case "HTML":
           format = Format.HTML;
