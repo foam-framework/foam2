@@ -19,11 +19,15 @@ public class StringParser implements Parser {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    
+
+    if ( !ps.valid() )  return null; 
     char delim = ps.beforeHead();
-    delim = (delim == '=' || delim == ':' )  ? ' ' : delim;
-    
-    if ( delim != '"' && delim != '\'' && delim != ' '  && delim != ':' ) return null;
+
+    delim = ( delim == '=' || delim == ':' || delim == '(' ) ? ' ' : delim;
+
+    if ( Character.isLetter(delim) ) {
+      delim = ' ';
+    }
 
     char lastc = delim;
 
@@ -32,13 +36,22 @@ public class StringParser implements Parser {
 
     while ( ps.valid() ) {
       char c = ps.head();
+      if ( c == ')' ) {
+        ps.decrement(); 
+        break;
+      }
 
       if ( c == delim && lastc != ESCAPE ) break;
-      
+
+      if ( c == '=' || c == '<' || c == '>' || c == '-' || c == ':' || c == ',' || c == ' ' ) {
+        ps.decrement();
+        break;
+      }
+
       PStream tail = ps.tail();
-      
+
       if ( c == ESCAPE ) {
-        char   nextChar        = ps.tail().head();
+        char nextChar = ps.tail().head();
         Parser escapeSeqParser = null;
 
         if ( nextChar == 'u' ) {
@@ -54,18 +67,17 @@ public class StringParser implements Parser {
           if ( escapePS != null ) {
             sb.append(escapePS.value());
             tail = escapePS;
-
-            c = ((Character) escapePS.value()).charValue();
+            c = ( (Character) escapePS.value() ).charValue();
           }
         }
       } else {
         sb.append(c);
       }
-      
+
       ps = tail;
       lastc = c;
     }
-    
+
     return ps.tail().setValue(sb.toString());
-  }  
+  }
 }

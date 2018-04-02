@@ -68,4 +68,9 @@ public class InvalidPStream
   public PStream apply(Parser ps, ParserContext x) {
     return null;
   }
+  
+  @Override
+  public int decrement() {
+    return 0;
+  }
 }

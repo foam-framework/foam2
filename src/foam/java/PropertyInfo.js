@@ -26,7 +26,7 @@ foam.CLASS({
     'propShortName',
     'propAliases',
     {
-      name: 'buildBody',
+      name: 'getAliasesBody',
       expression: function() {
       var b = 'new String[] {';
         for (var i = 0; i < this.propAliases.length; i++) {
@@ -98,7 +98,7 @@ foam.CLASS({
             name: 'getAliases',
             visibility: 'public',
             type: 'String[]',
-            body: 'return ' + this.buildBody
+            body: 'return ' + this.getAliasesBody
           },
           {
             name: 'get',

@@ -78,4 +78,9 @@ public class TrapPStream
   public PStream apply(Parser parser, ParserContext x) {
     return parser.parse(this, x);
   }
+  
+  @Override
+  public int decrement() {
+    return 0;
+  }
 }

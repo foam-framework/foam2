@@ -1,33 +1,43 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package foam.lib.query;
 
-import foam.lib.parse.*;
+import foam.lib.parse.Alt;
+import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContext;
 
 public class ExpressionParser
   extends foam.lib.parse.ProxyParser {
-
-  public ExpressionParser() {
-    setDelegate(new Seq(new foam.lib.json.Whitespace(),
-                        new PropertyNameParser(),
-                        new Alt(new LtExpression(),
-                                new EqExpression(),
-                                new GtExpression()),
-                        new ValueParser()));
+  private static ExpressionParser instance_ = null;
+  public static ExpressionParser instance() {
+    
+    if ( instance_ == null ) {
+      instance_ = new ExpressionParser();
+      Alt delegate = new Alt(
+            new ParenParser(),
+            new NegateParser(),
+            new HasParser(),
+            new IsParser(),
+            new EqualsParser(),
+            new BeforeParser(),
+            new AfterParser(),
+            new IdParser()
+          );
+      instance_.setDelegate(delegate);
+    }
+    return instance_;
   }
+  
+  private ExpressionParser() {}
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
-    if ( ps == null ) return ps;
-
-    Object[] values = (Object[])ps.value();
-    foam.mlang.predicate.Binary predicate = (foam.mlang.predicate.Binary)values[2];
-
-    foam.mlang.Expr arg1 = (foam.mlang.Expr)values[1];
-    foam.mlang.Expr arg2 = (foam.mlang.Expr)values[3];
-
-    predicate.setArg1(arg1);
-    predicate.setArg2(arg2);
-
-    return ps.setValue(predicate);
+    if ( ps == null || ps.value() == null ) return null;
+    return ps.setValue(ps.value());
   }
 }

@@ -36,6 +36,10 @@ foam.INTERFACE({
       javaReturns: 'Object'
     },
     {
+      name: 'decrement',
+      javaReturns: 'int'
+    },
+    {
       name: 'setValue',
       javaReturns: 'foam.lib.parse.PStream',
       args: [
