@@ -48,6 +48,18 @@ public class LRU<K, V> {
     return node.getValue();
   }
 
+  public V remove(K key) {
+    Node<K, V> node = map_.get(key);
+    if ( node == null ) return null;
+    //remove from list
+    removeNode(node);
+    //remove from map
+    map_.remove(key);
+    //reduce size
+    currentSize_--;
+    return node.getValue();
+  }
+
   //add node to the head of the list
   private void addToHead(Node<K, V> node) {
     //if the list is empty, assign node to both head and tail
@@ -108,6 +120,31 @@ public class LRU<K, V> {
     head_ = node;
   }
 
+  private Node<K, V> removeNode(Node<K, V> node) {
+    //assert node is in the list
+    if ( head_ == tail_ ) {
+      //set both head_ and tail_ to null
+      head_ = null;
+      tail_ = null;
+    } else if ( head_ == node ) {
+      //set node->post->pre to null
+      node.getPost().setPre(null);
+      //set node->post to head
+      head_ = node.getPost();
+    } else if ( tail_ == node ) {
+      //set node->pre->post to null
+      node.getPre().setPost(null);
+      //set node->pre to tail
+      tail_ = node.getPre();
+    } else {
+      //set node->post to node->pre->post
+      node.getPre().setPost(node.getPost());
+      //set node->pre to node->post->pre
+      node.getPost().setPre(node.getPre());
+    }
+    return node;
+  }
+
   //print node list from most recent used to least recent used
   public String toString() {
     Node<K, V> cur = head_;
@@ -128,6 +165,14 @@ public class LRU<K, V> {
       cur = cur.getPre();
     }
     return ret;
+  }
+  
+  public Set<Map.Entry<K,V>> entrySet() {
+    Map<K, V> map = new HashMap<K, V>();
+    for ( Map.Entry<K, Node<K, V>> e : map_.entrySet() ) {
+      map.put(e.getKey(), e.getValue().getValue());
+    } 
+    return map.entrySet();
   }
 
   //Node
