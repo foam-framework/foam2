@@ -43,14 +43,13 @@ foam.CLASS({
         class: 'String',
         name: 'publicMessage'
       },
-  
       {
-        class: 'DateTime',
+        class: 'Date',
         name: 'createdAt',
         visibility: foam.u2.Visibility.RO,
         label: 'Time',
         factory: function(){
-          return new Date();
+           return new Date();
         },
         javaFactory: 'return new Date();',
         tableCellFormatter: function(state, obj, rel){
@@ -70,12 +69,21 @@ foam.CLASS({
         class: 'String',
         name: 'status',
         label:'Status',
+        factory: function(){
+          return 'New'
+        },
         tableCellFormatter: function(state, obj, rel) {
-          this.
-          start().addClass('generic-status Ticket-Status-'+ state)
-              .start().add(state).addClass('generic-status Ticket-Label-'+ state).end()
-          .end()
+           this.start()
+              .start().add(state).addClass('generic-status '+ state).end()
+           .end()
       }
     }
   ]
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.support.model.Ticket',
+  targetModel: 'foam.support.model.TicketMessage',
+  forwardName: 'messages',
+  inverseName: 'ticketId'
 });
