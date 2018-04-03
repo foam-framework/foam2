@@ -362,7 +362,15 @@ foam.CLASS({
     setRelationship(this).
     setDelegate((foam.dao.DAO)getX().get(getTargetDAOKey())).
     build()).
-  build();`
+  build();`,
+
+      swiftFactory:
+`return __context__.create(ReadOnlyDAO.self, args: [
+  "delegate": __context__.create(ManyToManyRelationshipDAO.self, args: [
+    "relationship": self,
+    "delegate": __context__[targetDAOKey]
+  ])
+])`
     },
     {
       class: 'foam.dao.DAOProperty',
