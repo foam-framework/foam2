@@ -9,6 +9,10 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'age'
+    },
+    {
+      class: 'DateTime',
+      name: 'birthdate'
     }
   ]
 });
