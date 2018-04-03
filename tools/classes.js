@@ -9,6 +9,7 @@ var classes = [
   'foam.core.Serializable',
   'foam.core.Exception',
   'foam.core.ContextAgent',
+  'foam.core.Identifiable',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
