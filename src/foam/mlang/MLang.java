@@ -92,4 +92,8 @@ public class MLang
   public static Sink MAP(Object o1, foam.dao.Sink delegate) {
     return new Map(MLang.prepare(o1), delegate);
   }
+  
+  public static Predicate CONTAINS(Object o1, Object o2) {
+    return new Contains(MLang.prepare(o1), MLang.prepare(o2));
+  }
 }

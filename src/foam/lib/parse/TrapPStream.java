@@ -28,6 +28,11 @@ public class TrapPStream
   public char head() {
     return this.head;
   }
+    
+  @Override
+  public char beforeHead() {
+    return 0;
+  }
 
   public void setHead(char head) {
     this.head = head;
@@ -48,9 +53,19 @@ public class TrapPStream
   public Object value() {
     return null;
   }
+  
+  @Override
+  public Object operator() {
+    return null;
+  }
 
   @Override
   public PStream setValue(Object value) {
+    return this;
+  }
+    
+  @Override
+  public PStream setOperator(Object value) {
     return this;
   }
 
@@ -62,5 +77,10 @@ public class TrapPStream
   @Override
   public PStream apply(Parser parser, ParserContext x) {
     return parser.parse(this, x);
+  }
+  
+  @Override
+  public int decrement() {
+    return 0;
   }
 }

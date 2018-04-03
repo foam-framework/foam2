@@ -23,6 +23,11 @@ public class InvalidPStream
   public char head() {
     return 0;
   }
+    
+  @Override
+  public char beforeHead() {
+    return 0;
+  }
 
   @Override
   public boolean valid() {
@@ -38,9 +43,19 @@ public class InvalidPStream
   public Object value() {
     return null;
   }
+    
+  @Override
+  public Object operator() {
+    return null;
+  }
 
   @Override
   public PStream setValue(Object value) {
+    return null;
+  }
+    
+  @Override
+  public PStream setOperator(Object value) {
     return null;
   }
 
@@ -52,5 +67,10 @@ public class InvalidPStream
   @Override
   public PStream apply(Parser ps, ParserContext x) {
     return null;
+  }
+  
+  @Override
+  public int decrement() {
+    return 0;
   }
 }

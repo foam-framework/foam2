@@ -44,6 +44,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'firstName',
+      shortName:'f',
+      aliases:['fname','fn','first'],
       tableWidth: 160,
       validateObj: function (firstName) {
         if ( firstName.length > 70 ) {

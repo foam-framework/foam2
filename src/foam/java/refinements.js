@@ -36,6 +36,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaQueryParser',
+      expression: function(javaJSONParser) { return javaJSONParser; }
+    },
+    {
+      class: 'String',
       name: 'javaCSVParser'
     },
     {
@@ -49,6 +54,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaGetter'
+    },
+    {
+      class: 'String',
+      name: 'shortName'
+    },
+    {
+      class:'StringArray',
+      name: 'aliases'
     },
     {
       class: 'String',
@@ -85,12 +98,15 @@ foam.CLASS({
       return foam.java.PropertyInfo.create({
         sourceCls:        cls,
         propName:         this.name,
+        propShortName:    this.shortName,
+        propAliases:      this.aliases,
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,
         cloneProperty:    this.javaCloneProperty,
         diffProperty:     this.javaDiffProperty,
         jsonParser:       this.javaJSONParser,
+        queryParser:      this.javaQueryParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
@@ -833,6 +849,7 @@ foam.CLASS({
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+    ['javaQueryParser', 'new foam.parse.DateParser()'],
     ['javaCSVParser', 'foam.lib.json.DateParser'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
@@ -860,6 +877,7 @@ foam.CLASS({
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+       ['javaQueryParser', 'new foam.parse.DateParser()'],
        ['javaCSVParser', 'foam.lib.json.DateParser'],
        ['sqlType', 'DATE']
    ],
@@ -898,7 +916,7 @@ foam.CLASS({
   properties: [
     [ 'javaType',       'java.util.List' ],
     [ 'javaFactory',    'return new java.util.ArrayList();' ],
-    [ 'javaJSONParser', 'new foam.lib.json.ListParser()' ]
+    [ 'javaJSONParser', 'new foam.lib.json.ListParser()' ],
   ]
 });
 
@@ -910,6 +928,7 @@ foam.CLASS({
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringParser()'],
+    ['javaQueryParser', 'new foam.parse.StringParser()'],
     ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
     {
       name: 'sqlType',
@@ -949,6 +968,12 @@ foam.CLASS({
       name: 'javaJSONParser',
       expression: function(of) {
         return 'new foam.lib.json.FObjectParser(' + (of ? of.id + '.class' : '') + ')';
+      }
+    },
+    {
+      name: 'javaQueryParser',
+      expression: function(of) {
+        return 'new foam.parse.FObjectParser(' + (of ? of.id + '.class' : '') + ')';
       }
     }
   ]
@@ -1023,7 +1048,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object[]'],
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
+    ['javaJSONParser', 'new foam.lib.json.ArrayParser()'],
   ],
 
   methods: [
@@ -1089,6 +1114,13 @@ foam.CLASS({
         return 'new foam.lib.json.FObjectArrayParser(' + ( id ? id + '.class' : '') + ')';
       }
     },
+    {
+      name: 'javaQueryParser',
+      expression: function (of) {
+        var id = of ? of.id ? of.id : of : null;
+        return 'new foam.parse.FObjectArrayParser(' + ( id ? id + '.class' : '') + ')';
+      }
+    },
     ['javaInfoType', 'foam.core.AbstractFObjectArrayPropertyInfo']
   ],
 
@@ -1151,7 +1183,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'ArrayList'],
     ['javaInfoType', 'foam.core.AbstractPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.ArrayParser()']
+    ['javaJSONParser', 'new foam.lib.json.ArrayParser()'],
   ],
 
   methods: [
@@ -1211,7 +1243,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()']
+    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.parse.AnyParser.instance()']
   ]
 });
 
@@ -1234,7 +1267,8 @@ foam.CLASS({
       expression: function(of) { return of ? of : 'Object'; }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
+    ['javaJSONParser', 'new foam.lib.json.FObjectParser()'],
+    ['javaQueryParser', 'new foam.parse.FObjectParser()']
   ]
 });
 
@@ -1244,6 +1278,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.parse.AnyParser.instance()'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });

@@ -16,6 +16,10 @@ foam.INTERFACE({
       javaReturns: 'char',
     },
     {
+      name: 'beforeHead',
+      javaReturns: 'char',
+    },
+    {
       name: 'valid',
       javaReturns: 'boolean'
     },
@@ -28,11 +32,29 @@ foam.INTERFACE({
       javaReturns: 'Object'
     },
     {
+      name: 'operator',
+      javaReturns: 'Object'
+    },
+    {
+      name: 'decrement',
+      javaReturns: 'int'
+    },
+    {
       name: 'setValue',
       javaReturns: 'foam.lib.parse.PStream',
       args: [
         {
           name: 'value',
+          javaType: 'Object'
+        }
+      ]
+    },
+    {
+      name: 'setOperator',
+      javaReturns: 'foam.lib.parse.PStream',
+      args: [
+        {
+          name: 'operator',
           javaType: 'Object'
         }
       ]
