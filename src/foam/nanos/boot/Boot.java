@@ -29,6 +29,10 @@ public class Boot {
   }
 
   public Boot(String datadir) {
+    if ( datadir == null || datadir == "" ) {
+      datadir = System.getProperty("JOURNAL_HOME");
+    }
+
     root_.put(foam.nanos.fs.Storage.class,
         new foam.nanos.fs.Storage(datadir));
 
