@@ -187,7 +187,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'message'
+      name: 'message',
+      view: 'foam.u2.tag.TextArea'
     },
   ],
 
