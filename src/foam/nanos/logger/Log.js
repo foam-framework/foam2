@@ -2,7 +2,7 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'Log',
 
-  tableColumns: ['time', 'from', 'type', 'description'],
+  tableColumns: ['time', 'from', 'belong', 'type', 'description'],
 
   properties: [
     {
@@ -19,6 +19,11 @@ foam.CLASS({
     {
       class: 'String',
       name: 'from'
+    },
+    {
+      class: 'String',
+      name: 'belong',
+      label: 'User ID'
     },
     {
       class: 'String',
