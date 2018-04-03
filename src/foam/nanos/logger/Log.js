@@ -2,14 +2,14 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'Log',
 
-  tableColumns: ['time', 'from', 'description'],
+  tableColumns: ['time', 'from', 'type', 'description'],
 
   properties: [
     {
-      class: 'Long',
+      class: 'String',
       name: 'id',
       factory: function() {
-        return Math.floor(Math.random() * 1000000000);
+        return '' + new Date().getTime() + '-' + Math.floor(Math.random() * 100000);;
       }
     },
     {
@@ -22,11 +22,16 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'type'
+    },
+    {
+      class: 'String',
       name: 'description'
     },
     {
       class: 'String',
-      name: 'detail'
+      name: 'detail',
+      view: { class: 'foam.u2.tag.TextArea', rows: 20 }
     }
   ]
 })
