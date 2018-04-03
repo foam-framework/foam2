@@ -390,7 +390,7 @@ foam.CLASS({
     },
     {
       name: 'remove',
-      javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      javaCode: 'getJunctionDAO().remove(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
       code: function remove(target) {
         return this.junctionDAO.remove(this.createJunction(target.id));
       }
