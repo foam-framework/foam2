@@ -32,8 +32,8 @@ foam.CLASS({
       name: 'query',
       view: {
         class: 'foam.u2.TextField',
-        type: 'search',
-        placeholder: 'Permission Search',
+        type: 'Permission Search',
+        placeholder: 'Permission',
         onKey: true
       }
     },
@@ -63,7 +63,7 @@ foam.CLASS({
         self.filterPermission(self, self.query);
       });
 
-      this.start('table')
+      this.start('table').style({'table-layout': 'fixed', 'margin-left': '100'})
         .start('tbody')
           .start('tr')
             .start('td').style({'display': 'block', 'padding': '30'})
@@ -83,7 +83,7 @@ foam.CLASS({
 
               .start('td').style({'padding-top': '50'}).call(function() { self.td = this; })
                 .addClass(this.myClass())
-                  .start('table').call(function() { self.table = this; })
+                  .start('table').style({'table-layout': 'fixed', 'width': 'auto'}).call(function() { self.table = this; })
                     .start('thead')
                       .start('tr').style({'background': '#D4E3EB'})
                         .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
@@ -139,7 +139,7 @@ foam.CLASS({
       this.table.remove();
 
       this.td.addClass(this.myClass())
-      .start('table').call(function() { self.table = this; })
+      .start('table').style({'table-layout': 'fixed', 'width': 'auto'}).call(function() { self.table = this; })
         .start('thead')
           .start('tr').style({'background': '#D4E3EB'})
             .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
