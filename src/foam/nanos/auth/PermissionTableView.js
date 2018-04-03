@@ -66,7 +66,7 @@ foam.CLASS({
       this.start('table').style({'table-layout': 'fixed', 'margin-left': '100'})
         .start('tbody')
           .start('tr')
-            .start('td').style({'display': 'block', 'padding': '30'})
+            .start('td').style({'display': 'block', 'padding': '10'})
               .start('h2').add('Permission').end()
               .add('Search: ').start(this.QUERY).end()
               .tag('br').tag('br').tag('br')
@@ -88,19 +88,19 @@ foam.CLASS({
                       .start('tr').style({'background': '#D4E3EB'})
                         .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
                         .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-                          this.start('td').call(function() { self.groupHead = this; }).addClass(g.id).start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
+                          this.start('td').addClass(g.id).start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
                         }).end()
                       .end()
                       .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
                         this.start('tr')
                           .start('td').style({'text-align': 'left', 'width': '480', 'padding-left': '8px'}).add(p.id).end()
-                          .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
-                              var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
-                              cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-                              this.start('td').call(function() { self.groupBody = this; }).style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                if ( g.implies(p.id) ) { cb.style({'border-color': '#40C75B'}) };
-                              }).end()
-                          })
+                            .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
+                                var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
+                                cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
+                                this.start('td').style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
+                                  if ( g.implies(p.id) ) { cb.style({'border-color': '#40C75B'}) };
+                                }).end()
+                            })
                         .end()
                       })
                     .end()
@@ -144,29 +144,28 @@ foam.CLASS({
           .start('tr').style({'background': '#D4E3EB'})
             .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
             .forEach(columns_, function(g) {
-                this.start('td').start().style({'text-align': 'center', 'width': '140'}).add(g).end();
+                this.start('td').start().style({'text-align': 'center', 'width': '100'}).add(g).end().end();
             })
-            .end()
            .end()
+        .end()
 
         .select(this.permissionDAO.orderBy(this.Permission.ID), function(p) {
           if ( rows_ == null || p.id.indexOf(rows_) != -1 ) {
             this.start('tr')
               .start('td').style({'text-align': 'left', 'width': '480', 'padding-left': '8px'}).add(p.id).end()
-
-              .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
-                    for ( var j = 0 ; j < columns_.length ; j++ ) {
-                      if ( ( columns_[j] == g.id ) ) {
-                        var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
-                        cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-                            this.start('td').style({'text-align': 'center', 'width': '120'}).tag(cb).call(function() {
-                              if ( g.implies(p.id) ) { cb.style({'border-color': '#40C75B'}) };
-                            }).end()
-                      }
-                   }
-              })
-          .end()
-        }
+                .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
+                  for ( var j = 0 ; j < columns_.length ; j++ ) {
+                    if ( ( columns_[j] == g.id ) ) {
+                      var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
+                      cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
+                          this.start('td').style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
+                            if ( g.implies(p.id) ) { cb.style({'border-color': '#40C75B'}) };
+                          }).end()
+                    }
+                  }
+                })
+            .end()
+          }
         })
       .end();
      }
