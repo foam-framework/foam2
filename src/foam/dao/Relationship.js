@@ -273,6 +273,8 @@ foam.INTERFACE({
       name: 'add',
       returns: 'Promise',
       javaReturns: 'void',
+      swiftReturns: 'Void',
+      swiftThrows: true,
       args: [
         { name: 'target', of: 'foam.core.FObject' }
       ]
@@ -281,6 +283,8 @@ foam.INTERFACE({
       name: 'remove',
       returns: 'Promise',
       javaReturns: 'void',
+      swiftReturns: 'Void',
+      swiftThrows: true,
       args: [
         { name: 'target', of: 'foam.core.FObject' }
       ]
@@ -386,13 +390,15 @@ foam.CLASS({
       name: 'add',
       args: [ { name: 'target', of: 'foam.core.FObject' } ],
       javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      swiftCode: 'try junctionDAO!.put(createJunction((target as? Identifiable)?.getPrimaryKey()))',
       code: function add(target) {
         return this.junctionDAO.put(this.createJunction(target.id));
       }
     },
     {
       name: 'remove',
-      javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      javaCode: 'getJunctionDAO().remove(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      swiftCode: 'try junctionDAO!.remove(createJunction((target as? Identifiable)?.getPrimaryKey()))',
       code: function remove(target) {
         return this.junctionDAO.remove(this.createJunction(target.id));
       }
@@ -426,6 +432,7 @@ return junction`
       name: 'getDAO',
       returns: 'foam.dao.DAO',
       javaCode: 'return getDao();',
+      swiftCode: 'return dao!',
       code: function getDAO() { return this.dao; }
     }
   ],
