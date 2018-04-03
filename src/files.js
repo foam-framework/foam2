@@ -502,5 +502,6 @@ FOAM_FILES([
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/crypto/sign/SignedFObject" },
-  { name: 'foam/nanos/logger/Log', flags: ['web']}
+  { name: 'foam/nanos/logger/Log', flags: ['web']},
+  { name: 'foam/nanos/logger/GUIDLogger'}
 ]);
