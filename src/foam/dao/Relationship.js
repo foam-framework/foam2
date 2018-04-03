@@ -617,7 +617,7 @@ foam.CLASS({
     {
       name: 'swiftFactory',
       factory: function () {
-        return `return __context__.create(ManyToManyRelationshipImpl.self, args: [
+        return `return __subContext__.create(ManyToManyRelationshipImpl.self, args: [
       "sourceId": id,
       "sourceProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.sourceProperty.name)}(),
       "targetProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.targetProperty.name)}(),
