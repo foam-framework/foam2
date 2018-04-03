@@ -15,10 +15,10 @@ foam.CLASS({
     height: 200px;
     border-radius: 2px;
     background-color: #ffffff;
-    margin: 20px;
+    margin: 10px;
   }
   ^ .company-name {
-    width: 77px;
+    width: 60px;
     height: 16px;
     font-family: Roboto;
     font-size: 12px;
@@ -29,7 +29,9 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    padding-left: 80px;
+    padding-left: 20px;
+    padding-top: 25px;
+    padding-right: 0px;
   }
   ^ .date {
     width: 200px;
@@ -43,7 +45,7 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #a4b3b8;
-    padding-left: 162px;
+    padding-left: 0px;
     padding-right: 890px;
   }
   ^ .text {
@@ -58,25 +60,26 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    padding: 46px 928px 324px 200px;
+    padding: 60px 928px 324px 80px;
   }
   ^ .person {
     width: 40px;
     height: 40px;
     object-fit: contain;
-    padding: 20px 1180px 0px 20px;
+    padding: 20px 0px 0px 20px;
   }
  ^ #v27 {
-  display: block;
-  
- }
- ^ #v28 {
-  display: block;
+  display: inline-block;
   float: left;
+ 
  }
  ^ #v29 {
-  display: block;
-  float: right;
+  display: inline-block;
+  float: left;
+ }
+ ^ #v31 {
+  padding-top: 28px;
+  padding-right: 50px;
  }
   `,
   
@@ -100,16 +103,18 @@ foam.CLASS({
     function initE(){
       var self = this;
       this
-      .addClass(this.myClass())
-      .start('div')
-        .start().addClass('bg')
-          .start().addClass('div1')
-            .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.png'}).addClass('person').end()
-              .start().add(this.nameLabel).addClass('company-name').end()
-              .start().add(this.currentDate$).addClass('date').end()                       
-          .end()           
-        .end()
-      .end()
+        .addClass(this.myClass())
+        .start('div').addClass('bg')
+            .start('table')
+              .start('tr')
+                .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
+                .start('td').add(this.nameLabel).addClass('company-name').end() 
+                .start('td').add(this.currentDate$).addClass('date').end() 
+                .end()
+              .end()
+            .end()
+            .start().add(this.textLabel).addClass('text').end()                  
+        .end()              
     },
   ]
 });
