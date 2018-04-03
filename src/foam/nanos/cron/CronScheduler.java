@@ -61,6 +61,11 @@ public class CronScheduler
           @Override
           public void put(Object obj, Detachable sub) {
             Cron cron = (Cron) obj;
+
+            if (!cron.getEnabled()) {
+              return;
+            }
+
             PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
             try {
               cron.runScript(CronScheduler.this.getX());
