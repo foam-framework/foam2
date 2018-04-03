@@ -367,7 +367,8 @@ foam.CLASS({
       factory: function() {
         return this.__context__[this.junctionDAOKey];
       },
-      javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());'
+      javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());',
+      swiftFactory: 'return __context__[junctionDAOKey] as? (DAO & FObject)'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -376,7 +377,8 @@ foam.CLASS({
       factory: function() {
         return this.__context__[this.targetDAOKey];
       },
-      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());'
+      javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());',
+      swiftFactory: 'return __context__[targetDAOKey] as? (DAO & FObject)'
     }
   ],
   methods: [
@@ -412,8 +414,12 @@ foam.CLASS({
       javaCode: `foam.core.FObject junction = (foam.core.FObject)getX().create(getJunction().getObjClass());
 getTargetProperty().set(junction, targetId);
 getSourceProperty().set(junction, getSourceId());
-return junction;
-`
+return junction;`,
+
+      swiftCode: `let junction: FObject = self.junction.create(x: __context__) as! FObject
+(targetProperty as? PropertyInfo)?.set(junction, value: targetId)
+(sourceProperty as? PropertyInfo)?.set(junction, value: sourceId)
+return junction`
     },
     {
       // TODO: Should we remove this, or maybe just the java portion?
