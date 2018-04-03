@@ -137,6 +137,8 @@ var classes = [
   'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
   'foam.nanos.auth.twofactor.ClientOTPAuthService',
   'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
+  'foam.nanos.http.HttpParameters',
+  'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -206,11 +208,12 @@ var classes = [
   'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignedFObject',
 
-  'foam.nanos.dig.Command',
-  'foam.nanos.dig.Format',
+  'foam.nanos.http.Command',
+  'foam.nanos.http.Format',
+  'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
-  'foam.nanos.dig.DigPostParameters',
 
   'foam.lib.query.TestModel'
 ];
