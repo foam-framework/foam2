@@ -6,7 +6,6 @@ foam.CLASS({
   requires: [
     'foam.support.model.Ticket', 
     'foam.u2.PopupView',
-    'foam.u2.dialog.Popup'
   ],
 
   imports:[
@@ -22,6 +21,9 @@ foam.CLASS({
   css: `
   * {
     box-sizing: border-box;
+  }
+  .foam-support-view-CreateTicketView {
+    margin-top:20px;
   }
   .div{
     margin-top: 40px;
@@ -111,6 +113,7 @@ foam.CLASS({
     color: #093649;
   } 
   .bg2 {
+    margin-top:20px;
     border-radius: 2px;
     background-color: #ffffff;
     padding: 20px;
@@ -148,11 +151,11 @@ foam.CLASS({
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.19);
   }
   .popUpDropDown > div {     
+    padding: 8px 0 0 11px;
     box-sizing:border-box;
     width: 170px;
     height: 35px;  
     z-index: 10000
-    padding: 9px 0 0 11px;
     font-family: Roboto;
     font-size: 12px;
     font-weight: normal;
@@ -227,9 +230,14 @@ foam.CLASS({
         .addClass(this.myClass())
         .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
         .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).end()
-        .start(this.SUBMIT_TICKET).addClass('Rectangle-8').end()
+        .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
+            .start().add('Submit as').addClass('SubmitButton').end()
+            .start().addClass('SubmitLabel')
+              .start().addClass('Sb ' + this.status$).add(this.status$).end()
+            .end()
+        .end()
 
-        .start().add(this.title).addClass('New-Ticket').end()
+        .start().add('New Ticket').addClass('New-Ticket').end()
 
         .start().addClass('bg2')
           .start().addClass('label')
@@ -259,7 +267,7 @@ foam.CLASS({
   actions: [
     {
       name: 'submitTicket',
-      label: 'Submit Ticket ' + this.status,
+      label: '',
       code: function(){
         
         var ticket = this.Ticket.create({
@@ -294,9 +302,46 @@ foam.CLASS({
           width: 170,
         })
         self.voidPopUp_.addClass('popUpDropDown')
-        .start('div').add('Submit as')
-          .on('click', this.voidPopUp)//on click will change according to conditions
+        .start('div').on('click', function(){
+          self.status = 'Pending'
+          self.voidPopUp()
+        })
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Pending').addClass('Pending status').end()
         .end()
+
+        .start('div').on('click', function(){
+          self.status = 'New'
+          self.voidPopUp()
+        })
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('New').addClass('New status').end()
+        .end()
+
+        .start('div').on('click', function(){
+          self.status = 'Solved'
+          self.voidPopUp()
+        })
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Solved').addClass('Solved status').end()
+        .end()
+
+        .start('div').on('click', function(){
+          self.status = 'Updated'
+          self.voidPopUp()
+        })
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Updated').addClass('Updated status').end()
+        .end()
+
+        .start('div').on('click', function(){
+          self.status = 'Open'
+          self.voidPopUp()
+        })
+             .start().add('Submit as').addClass('Submit-as').end()
+             .start().add('Open').addClass('Open status').end()
+        .end()
+                 
         self.voidMenuBtn_.add(self.voidPopUp_)
       }
     }
@@ -307,7 +352,8 @@ foam.CLASS({
     function voidPopUp(){
       var self = this;
       self.voidPopUp_.close();
-      self.status = status;
+     // console.log(this.status)
+      
     }
   ]
 });
