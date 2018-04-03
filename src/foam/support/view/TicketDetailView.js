@@ -95,35 +95,6 @@ foam.CLASS({
   methods: [
     function initE(){
     var self = this;
-<<<<<<< HEAD
-    var email=this.data.supportEmail;
-    this.userDAO.where(this.EQ(this.User.EMAIL, email)).select().then(function(a){
-      self.name=a.a[0].firstName;
-     })
-     var locale = "en-us";
-     var month = this.data.createdAt.toLocaleString(locale, {month: "short"});
-     var date=this.data.createdAt.getDate();
-     var hours=this.data.createdAt.getHours(); 
-     var mins= this.data.createdAt.getMinutes()
-       this.addClass(this.myClass())
-       .start(this.BACK_ACTION).end()
-       .start("br").end()
-       .start("br").end()
-       .start("br").end()
-       .start().addClass('primarydiv')
-            .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-            .start().addClass('generic-status Foam-Ticket-Status-'+this.data.status)
-                .start().add(this.data.status).addClass('Foam-generic-status Ticket-Label-'+ this.data.status).end()
-           .end()
-      .end()
-      .start("br").end()
-      .start().addClass('main').add("#",this.data.id,"  ","    |     ",month," ",date," ",hours,":",mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
-      .br().br()
-      .tag({ class: 'foam.support.view.InternalNote' ,})
-      .end()
-
-
-=======
     this.hideSummary = true;
     var email = this.data.supportEmail;
 
@@ -148,7 +119,6 @@ foam.CLASS({
     .br()
     .start().addClass('main').add("#",this.data.id,"  ","    |     ",month," ",date," ",hours,":",mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
     .end()
->>>>>>> 80eb86c6571a9aa45e2e81591c5ba20f6dc0aa0c
     }
   ],
   actions: [

@@ -17,11 +17,11 @@ foam.CLASS({
       },
       {
         name: 'publicUnderline',
-        value:true
+        value: true
       },
       {
         name: 'noteUnderline',
-        value:false
+        value: false
       },
    ],
 
@@ -62,7 +62,6 @@ foam.CLASS({
       background: none;
       position: relative;
       top: -25;
-      
     }
     ^ .Internal-Note {
       font-family: Roboto;
@@ -96,6 +95,7 @@ foam.CLASS({
     }
     ^ .background-color{
       background: #093649;
+      color:white 
     }
     ^ .border{ 
       border-bottom: 3px solid #1cc2b7;
@@ -132,11 +132,9 @@ foam.CLASS({
        code:function(X)
        {
         this.variant = false;
-        this.publicUnderline=true;
-        this.noteUnderline=false;
-        this.message="";
-        var txt= document.getElementsByClassName("foam-u2-tag-TextArea")[0];
-        txt.style.color = "black"; 
+        this.publicUnderline = true;
+        this.noteUnderline = false;
+        this.message = "";
        }             
     },
     {
@@ -145,11 +143,9 @@ foam.CLASS({
       code:function(X)
       {
         this.variant = true;
-        this.publicUnderline= false;
-        this.noteUnderline= true;
-        this.message="";
-        var txt= document.getElementsByClassName("foam-u2-tag-TextArea")[0];
-        txt.style.color = "white"; 
+        this.publicUnderline = false;
+        this.noteUnderline = true;
+        this.message = "";
       }              
    }
 ]

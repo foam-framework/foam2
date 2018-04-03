@@ -187,21 +187,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-<<<<<<< HEAD
       name: 'message'
     },
-=======
-      name: 'message',
-      view: 'foam.u2.tag.TextArea'
-    },
-    {
-      class: 'String',
-      name: 'status',
-      value: 'New'
-    },
-    'voidMenuBtn_',
-    'voidPopUp_',
->>>>>>> 80eb86c6571a9aa45e2e81591c5ba20f6dc0aa0c
   ],
 
   methods: [
@@ -251,12 +238,8 @@ foam.CLASS({
           publicMessage: this.message,
           requestorId: this.requestor,
           subject: this.subject,
-<<<<<<< HEAD
-        })
-=======
           status: this.status
         });
->>>>>>> 80eb86c6571a9aa45e2e81591c5ba20f6dc0aa0c
 
         this.ticketDAO.put(ticket);
       }
