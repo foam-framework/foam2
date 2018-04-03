@@ -222,7 +222,10 @@ foam.CLASS({
       .end()
       .start("br").end()
       .start().addClass('main').add("#",this.data.id,"  ","    |     ",month," ",date," ",hours,":",mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
+      .br().br()
+      .tag({ class: 'foam.support.view.InternalNote' ,})
       .end()
+
 
     }
   ],

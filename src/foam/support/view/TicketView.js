@@ -32,6 +32,7 @@ foam.CLASS({
 
   methods: [
     function initE(){
+
       this.addClass(this.myClass())
       .tag({
         class: 'foam.u2.ListCreateController',
