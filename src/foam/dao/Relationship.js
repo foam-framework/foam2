@@ -613,6 +613,20 @@ foam.CLASS({
   build();
 `;
       }
+    },
+    {
+      name: 'swiftFactory',
+      factory: function () {
+        return `return __context__.create(ManyToManyRelationshipImpl.self, args: [
+      "sourceId": id,
+      "sourceProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.sourceProperty.name)}(),
+      "targetProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.targetProperty.name)}(),
+      "targetDAOKey": "${this.targetDAOKey}",
+      "junctionDAOKey": "${this.junctionDAOKey}",
+      "junction": self.ownClassInfo()
+    ]);
+`;
+      }
     }
   ]
 });
