@@ -2,6 +2,9 @@ foam.CLASS({
   package: 'foam.support.view',
   name: 'CreateTicketView',
   extends: 'foam.u2.View',
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   requires: [
     'foam.support.model.Ticket', 
@@ -45,7 +48,7 @@ foam.CLASS({
     color: #093649;
   }
   ^ .Rectangle-8 {
-    padding: 8px 10px;
+    padding: 0 10px;
     border: solid 0.5px #59a5d5 !important;
     margin: 0px 2px !important;
     -webkit-box-shadow: none;
@@ -172,29 +175,32 @@ foam.CLASS({
   ^ .status{
     color: white;
     display: inline-block;
-    padding-top: 3px;
+    padding-top: 2px;
     text-align: center;
   }
   .Submit-as{
     float: left;
-    margin-top:4px;
+    margin-top:2px;
     margin-right:10px;
   }
   .SubmitButton{
-    margin-top:2px;
+    margin-top:1.5px;
+    margin-right:10px;
     float: left;
   }
   .SubmitLabel {
     float:right;
   }
-  .Sb{
-    colour: #fffff;
-    padding-top: 2px;
-    margin-left:10px !important;
+  .New, .Pending, .Updated, .Solved, .Open {
+    padding-top: 1px;
   }
   `,
 
   properties: [
+    {
+      name: 'dao',
+      factory: function() { return this.ticketDAO; }
+    },
     {
       class: 'String',
       name: 'requestor'
@@ -202,11 +208,6 @@ foam.CLASS({
     {
       class: 'String',
       name: 'subject'
-    },
-    {
-      class: 'String',
-      name: 'status',
-      value: 'New'
     },
     {
       class: 'String',
@@ -218,12 +219,19 @@ foam.CLASS({
       name: 'status',
       value: 'New'
     },
+    {
+      class: 'Int',
+      name: 'ticketCount',
+      value: '...'
+    },
     'voidMenuBtn_',
     'voidPopUp_',
   ],
 
   methods: [
     function initE(){
+      this.dao.on.sub(this.onDAOUpdate);    
+      this.onDAOUpdate(); 
       this.SUPER();
       this.hideSummary = true;
       this
@@ -233,12 +241,12 @@ foam.CLASS({
         .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
             .start().add('Submit as').addClass('SubmitButton').end()
             .start().addClass('SubmitLabel')
-              .start().addClass('Sb ' + this.status$).add(this.status$).end()
+              .start().addClass(this.status$).add(this.status$).end()
             .end()
         .end()
 
-        .start().add('New Ticket').addClass('New-Ticket').end()
-
+        .start().addClass('New-ticket').add('New Ticket ',this.ticketCount$).end()
+      
         .start().addClass('bg2')
           .start().addClass('label')
             .add('Requestor')
@@ -352,8 +360,16 @@ foam.CLASS({
     function voidPopUp(){
       var self = this;
       self.voidPopUp_.close();
-     // console.log(this.status)
-      
+    },
+    {
+      name: 'onDAOUpdate',
+      isFramed: true,
+      code: function() {
+        var self = this;
+        this.dao.select(this.COUNT()).then(function(count) {
+          self.ticketCount = count.value;
+        });
+      }
     }
   ]
 });
