@@ -10,7 +10,7 @@ import foam.core.X;
 import foam.mlang.predicate.And;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.Sink;
 
 public class OrderedDAO

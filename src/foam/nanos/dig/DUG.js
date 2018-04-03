@@ -52,7 +52,7 @@ foam.CLASS({
     },
     {
       class: 'Enum',
-      of: 'foam.nanos.dig.Format',
+      of: 'foam.nanos.http.Format',
       name: 'format',
       // format hidden until implemented
       hidden: true
@@ -86,7 +86,7 @@ foam.CLASS({
         try {
           DAO dao = (DAO) x.get(getDaoKey());
           // TODO: choose outputter based on format
-          dao.listen(new HTTPSink(getUrl(), foam.nanos.dig.Format.JSON), null);
+          dao.listen(new HTTPSink(getUrl(), foam.nanos.http.Format.JSON), null);
         } catch (Throwable t) {
           ((Logger) x.get("logger")).error("DUG", "error executing DUG", t);
         }

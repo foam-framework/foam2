@@ -9,7 +9,7 @@ package foam.nanos.auth;
 import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.ProxyDAO;
 import foam.dao.Sink;
 import foam.mlang.order.Comparator;
@@ -28,7 +28,7 @@ public class PasswordHashingDAO
 
   @Override
   public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( sink == null ) sink = new ListSink();
+    if ( sink == null ) sink = new ArraySink();
     PasswordRemovalSink passwordRemovalSink = new PasswordRemovalSink(x, sink);
     super.select_(x, passwordRemovalSink, skip, limit, order, predicate);
     return sink;
