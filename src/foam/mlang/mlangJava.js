@@ -177,10 +177,6 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'f',
-      javaCode: 'return true;'
-    },
-    {
       name: 'createStatement',
       javaReturns: 'String',
       javaCode: 'return " 1 = 1 ";'
