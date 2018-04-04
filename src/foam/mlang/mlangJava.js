@@ -118,22 +118,6 @@ foam.CLASS({
 
   methods: [
     {
-      // TODO: This is a duplicate of the method in Predicate,
-      // but it's necessary because when we refine Predicate, it doesn't
-      // update classes that copied their axioms in from Predicate as a trait.
-      // If we were more careful about the ordering of classes this wouldn't be
-      // necessary.
-      name: 'f',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        }
-      ],
-      javaCode: 'return false;',
-      javaReturns: 'boolean'
-    },
-    {
       // TODO: Same TODO as .f method above
       name: 'toIndex',
       javaSupport: false
@@ -192,10 +176,6 @@ foam.CLASS({
   refines: 'foam.mlang.predicate.True',
 
   methods: [
-    {
-      name: 'f',
-      javaCode: 'return true;'
-    },
     {
       name: 'createStatement',
       javaReturns: 'String',

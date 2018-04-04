@@ -151,7 +151,10 @@ foam.INTERFACE({
       name: 'f',
       swiftReturns: 'Bool',
       args: [
-        'obj'
+        {
+          name: 'obj',
+          swiftType: 'Any?'
+        }
       ]
     },
     {
@@ -232,6 +235,12 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'f',
+      code: function () { return false; },
+      javaCode: 'return false;',
+      swiftCode: 'return false'
+    },
+    {
       name: 'toIndex',
       code: function() { },
       swiftCode: 'return',
@@ -290,6 +299,7 @@ foam.CLASS({
     {
       name: 'f',
       code: function() { return true; },
+      javaCode: 'return true;',
       swiftCode: 'return true',
     },
   ]
