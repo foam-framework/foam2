@@ -172,9 +172,6 @@ public static void writePart(Part p) throws Exception {
           while ((i = (int) ((InputStream) x).available()) > 0) {
             int result = (int) (((InputStream) x).read(bArray));
             if (result == -1)
-      
-         
-
             break;
       }
           FileOutputStream f2 = new FileOutputStream("/tmp/image.jpg");
