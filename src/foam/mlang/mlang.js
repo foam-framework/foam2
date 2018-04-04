@@ -300,9 +300,9 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      code: function() { return false; },
-      javaCode: 'return false;',
-      swiftCode: 'return false',
+      code: function() { return true; },
+      javaCode: 'return true;',
+      swiftCode: 'return true',
     },
   ]
 });
