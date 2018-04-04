@@ -29,3 +29,4 @@ p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"c
 // p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})
 // p({"class":"foam.nanos.menu.Menu","id":"relationshipDemo","label":"Relationship Demo","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.relationship.Controller"}}})
 p({"class":"foam.nanos.menu.Menu","id":"emailSupport","label":"Email Support","handler":{"class":"foam.nanos.menu.ViewMenu", "view": {"class":"foam.support.view.SupportEmailView"}},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"createTicket","label":"Create Ticket","handler":{"class":"foam.nanos.menu.ViewMenu", "view": {"class":"foam.support.view.CreateTicketView"}},"order":1000,"parent":"admin"})

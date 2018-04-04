@@ -158,6 +158,8 @@ var classes = [
   'foam.nanos.notification.email.EmailTemplate',
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
+  'foam.nanos.notification.email.POP3Email',
+  'foam.nanos.notification.email.ClientPOP3EmailService',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.script.Script',
@@ -232,6 +234,7 @@ var skeletons = [
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
+  'foam.nanos.notification.email.POP3Email',
   'foam.nanos.notification.push.PushService',
 ];
 

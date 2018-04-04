@@ -102,9 +102,8 @@ foam.CLASS({
       font-stretch: normal;
       line-height: 1.67;
       letter-spacing: 0.2px;
-      text-align: left;
+      text-align: center;
       color: #ffffff;
-      padding-left: 10px;
     }
   `
 });
