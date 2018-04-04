@@ -168,13 +168,13 @@ public static void writePart(Part p) throws Exception {
           // Construct the required byte array
           System.out.println("x.length = " + x.available());
           byte[] bArray = new byte[x.available()];
-
-         while ((i = (int) ((InputStream) x).available()) > 0) {
-           int result = (int) (((InputStream) x).read(bArray));
+          int i = 0;
+          while ((i = (int) ((InputStream) x).available()) > 0) {
+            int result = (int) (((InputStream) x).read(bArray));
             if (result == -1)
-          //i = 0;
-         //byte[] bArray = new byte[x.available()];
-         // byte[] bArray = new byte[5000];
+      
+         
+
             break;
       }
           FileOutputStream f2 = new FileOutputStream("/tmp/image.jpg");
