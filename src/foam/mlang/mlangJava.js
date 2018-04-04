@@ -62,16 +62,6 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'f',
-      args: [
-        {
-          name: 'obj',
-          javaType: 'Object'
-        }
-      ],
-      javaReturns: 'boolean'
-    },
-    {
       name: 'partialEval',
       javaReturns: 'foam.mlang.predicate.Predicate'
     },
