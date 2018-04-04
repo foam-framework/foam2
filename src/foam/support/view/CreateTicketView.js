@@ -190,13 +190,6 @@ foam.CLASS({
       name: 'message',
       view: 'foam.u2.tag.TextArea'
     },
-    {
-      class: 'String',
-      name: 'status',
-      value: 'New'
-    },
-    'voidMenuBtn_',
-    'voidPopUp_',
   ],
 
   methods: [

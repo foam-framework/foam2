@@ -55,6 +55,7 @@ foam.CLASS({
 
   methods: [
     function initE(){
+
       this.addClass(this.myClass())
       .start().hide(this.hideSummary$)
         .tag({ class: 'foam.support.view.TicketSummaryView' })
