@@ -7,17 +7,6 @@
 foam.CLASS({
   refines: 'foam.mlang.predicate.AbstractPredicate',
   methods: [
-    {
-      name: 'f',
-      args: [
-        {
-          name: 'obj',
-          swiftType: 'Any?'
-        }
-      ],
-      swiftCode: 'return false',
-      swiftReturns: 'Bool'
-
-    }
+    function f() { },
   ],
 });
