@@ -1162,7 +1162,7 @@ foam.CLASS({
       swiftCode: `
 let v1 = (arg1 as! Expr).f(obj)
 let v2 = (arg2 as! Expr).f(obj)
-return ! FOAM_utils.equals(v1, v2)
+return !FOAM_utils.equals(v1, v2)
       `
     }
   ]
