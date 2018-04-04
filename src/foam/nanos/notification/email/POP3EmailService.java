@@ -81,7 +81,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          emailFolder.open(Folder.READ_ONLY);
 
          BufferedReader reader = new BufferedReader(new InputStreamReader(
-          System.in));
+          System.in));
 
          // retrieve the messages from the folder in an array and print it
          Message[] messages = emailFolder.getMessages();
@@ -130,10 +130,10 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 //    * based on which, it processes and
 //    * fetches the content of the message
 //    */
- public static void writePart(Part p) throws Exception {
-          if (p instanceof Message)
-             //Call methos writeEnvelope
-             writeEnvelope((Message) p);
+public static void writePart(Part p) throws Exception {
+  if (p instanceof Message)
+     //Call methos writeEnvelope
+     writeEnvelope((Message) p);
 
       System.out.println("----------------------------");
       System.out.println("CONTENT-TYPE: " + p.getContentType());
@@ -245,4 +245,5 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
    }
 
 }
+
 
