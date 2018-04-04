@@ -150,7 +150,6 @@ foam.INTERFACE({
     {
       name: 'f',
       swiftReturns: 'Bool',
-      javaReturns: 'boolean',
       args: [
         {
           name: 'obj',
