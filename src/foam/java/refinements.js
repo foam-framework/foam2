@@ -291,7 +291,7 @@ foam.LIB({
         name: 'hashCode',
         type: 'int',
         visibility: 'public',
-        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return p.name + '_'; }).join(',')});`
+        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return '(Object) ' + p.name + '_'; }).join(',')});`
       });
 
       if ( cls.name ) {
