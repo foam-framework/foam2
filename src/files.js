@@ -513,5 +513,5 @@ FOAM_FILES([
   { name: "foam/support/view/CreateTicketView" },
   { name: "foam/support/view/TicketSummaryView" },
   { name: "foam/support/view/EmailTableView" },
-  { name: "foam/support/view/SummaryCard" }
+
 ]);
