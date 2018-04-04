@@ -153,7 +153,6 @@ foam.INTERFACE({
       args: [
         {
           name: 'obj',
-          javaType: 'Object',
           swiftType: 'Any?'
         }
       ]
