@@ -623,7 +623,7 @@ foam.CLASS({
       "targetProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.targetProperty.name)}(),
       "targetDAOKey": "${this.targetDAOKey}",
       "junctionDAOKey": "${this.junctionDAOKey}",
-      "junction": ${this.sourceProperty.sourceCls_.name}.ownClassInfo()
+      "junction": ${this.sourceProperty.sourceCls_.name}.classInfo()
     ]);
 `;
       }
