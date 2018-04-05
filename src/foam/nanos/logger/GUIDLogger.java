@@ -21,6 +21,8 @@ public class GUIDLogger
     log.setId(Long.toString(d.getTime()) + "-" + Integer.toString(r.nextInt(100000), 5));
     log.setTime(new Date());
     log.setFrom("BackEnd");
+    log.setBelong(System.getProperty("user.name"));
+    log.setType(type);
     log.setDescription("see detail for more detail");
     log.setDetail(combine(args));
     return log;
