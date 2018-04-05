@@ -75,16 +75,16 @@ foam.CLASS({
           "arg2": relationship?.sourceId
         ])
 
-        let sink = __context__.create(Map.self, args: [
+        let map = __context__.create(Map.self, args: [
           "arg1": relationship?.targetProperty,
           "delegate": __context__.create(ArraySink.self)
         ])
 
-        let junction: Map = try relationship!.junctionDAO!.`where`(pred).select(sink!) as! Map
+        let junction: Map = try relationship!.junctionDAO!.`where`(pred).select(map!) as! Map
         return try delegate.`where`(__context__.create(In.self, args: [
           "arg1": primaryKey,
           "arg2": (junction.delegate as? ArraySink)?.array
-        ])).select_(x, sink!, skip, limit, order, predicate) */
+        ])).select_(x, sink, skip, limit, order, predicate) */
       }
     }
   ]
