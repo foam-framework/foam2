@@ -28,3 +28,14 @@ return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
     },
   ],
 });
+
+foam.CLASS({
+  refines: 'foam.mlang.ArrayConstant',
+
+  methods: [
+    {
+      name: 'f',
+      swiftCode: 'return value'
+    }
+  ]
+});
