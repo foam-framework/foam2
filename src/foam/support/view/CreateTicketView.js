@@ -214,7 +214,6 @@ foam.CLASS({
       name: 'message',
       view: 'foam.u2.tag.TextArea'
     },
-<<<<<<< HEAD
     {
       class: 'String',
       name: 'status',
@@ -226,9 +225,7 @@ foam.CLASS({
       value: '...'
     },
     'voidMenuBtn_',
-    'voidPopUp_',
-=======
->>>>>>> d1fb2a4eac5fbdd41317a64f7995d07765fdec2b
+    'voidPopUp_'
   ],
 
   methods: [
@@ -317,40 +314,40 @@ foam.CLASS({
           self.status = 'Pending'
           self.voidPopUp()
         })
-             .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Pending').addClass('Pending status').end()
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Pending').addClass('Pending status').end()
         .end()
 
         .start('div').on('click', function(){
           self.status = 'New'
           self.voidPopUp()
         })
-             .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('New').addClass('New status').end()
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('New').addClass('New status').end()
         .end()
 
         .start('div').on('click', function(){
           self.status = 'Solved'
           self.voidPopUp()
         })
-             .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Solved').addClass('Solved status').end()
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Solved').addClass('Solved status').end()
         .end()
 
         .start('div').on('click', function(){
           self.status = 'Updated'
           self.voidPopUp()
         })
-             .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Updated').addClass('Updated status').end()
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Updated').addClass('Updated status').end()
         .end()
 
         .start('div').on('click', function(){
           self.status = 'Open'
           self.voidPopUp()
         })
-             .start().add('Submit as').addClass('Submit-as').end()
-             .start().add('Open').addClass('Open status').end()
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Open').addClass('Open status').end()
         .end()
                  
         self.voidMenuBtn_.add(self.voidPopUp_)
