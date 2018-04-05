@@ -14,7 +14,8 @@ foam.CLASS({
   imports:[
     'ticketDAO',
     'user',
-    'hideSummary'
+    'hideSummary',
+    'stack'
   ],
 
   exports: [
@@ -286,6 +287,8 @@ foam.CLASS({
         });
 
         this.ticketDAO.put(ticket);
+
+        this.stack.push({ class: 'foam.support.view.TicketView' });
       }
     },
     {

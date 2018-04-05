@@ -8,14 +8,14 @@ foam.CLASS({
     package: 'foam.support.model',
     name: 'Ticket',
 
-    documentation: 'First Ticket Modal',
+    documentation: 'Ticket Model',
 
     javaImports: [
       'java.util.Date'
     ],
 
     tableColumns: [
-      'id','supportEmail', 'subject', 'createdAt', 'status'
+      'id', 'requestorEmail', 'subject', 'createdAt', 'status'
     ],
 
     properties: [
