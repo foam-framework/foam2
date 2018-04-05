@@ -117,8 +117,8 @@ foam.CLASS({
                 .start().addClass('firstdiv')
                    .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
                    .nbsp().nbsp().nbsp().nbsp().nbsp()
-                   .start(this.PUBLIC_REPLY).addClass('Public-Reply').enableClass('border', this.publicUnderline$).end()
-                   .start(this.INTERNAL_NOTE).addClass('Internal-Note').enableClass('border', this.noteUnderline$).end()
+                   .start(this.PUBLIC_REPLY).addClass('Public-Reply').enableClass('border', this.variant$).end()
+                   .start(this.INTERNAL_NOTE).addClass('Internal-Note').enableClass('border', this.variant$.map(function(a){ return !a; })).end()
             .end()
               .endContext()
                  .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
@@ -132,8 +132,6 @@ foam.CLASS({
        code:function(X)
        {
         this.variant = false;
-        this.publicUnderline = true;
-        this.noteUnderline = false;
         this.message = "";
        }             
     },
@@ -143,8 +141,6 @@ foam.CLASS({
       code:function(X)
       {
         this.variant = true;
-        this.publicUnderline = false;
-        this.noteUnderline = true;
         this.message = "";
       }              
    }
