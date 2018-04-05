@@ -245,11 +245,11 @@ foam.CLASS({
             .end()
         .end()
 
-        .start().addClass('New-ticket').add('New Ticket ',this.ticketCount$).end()
+        .start().addClass('New-ticket').add('New Ticket #',this.ticketCount$).end()
       
         .start().addClass('bg2')
           .start().addClass('label')
-            .add('Requestor')
+            .add('Requestor Email')
           .end()
           .start()
             .tag(this.REQUESTOR)
@@ -280,7 +280,7 @@ foam.CLASS({
         
         var ticket = this.Ticket.create({
           publicMessage: this.message,
-          requestorId: this.requestor,
+          requestorEmail: this.requestor,
           subject: this.subject,
           status: this.status
         });

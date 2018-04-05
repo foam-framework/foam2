@@ -26,13 +26,8 @@ foam.CLASS({
         label:'Ticket ID'
       }, 
       {
-        class: 'Long',
-        name: 'requestorId'
-      },
-      {
         class: 'String',
-        name: 'supportEmail',
-        label:'Requestor'
+        name: 'requestorEmail'
       },
       {
         class: 'String',
