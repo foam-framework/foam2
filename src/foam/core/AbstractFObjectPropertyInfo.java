@@ -90,4 +90,31 @@ public abstract class AbstractFObjectPropertyInfo
       prop.updateSignature(val, sig);
     }
   }
+
+  @Override
+  public boolean hardDiff(FObject o1, FObject o2, FObject diff) {
+    boolean check = super.hardDiff(o1, o2, diff);
+    //check is false only when both the.get(o1) and this.get(o2) are null;
+    if ( ! check ) return false;
+    
+    /**
+     * if there are point to the same instance, can not guarantee if there are changed
+     * scenario: 
+     *  FObject obj = (FOBject) X.get("DAO").find(id);
+     *  obj.getFObject().setXXX(foo);
+     *  X.get("DAO").put(obj);
+     * In this case: the before value inside the model is loss, so can not find difference
+     */
+    if ( (this.get(o1) == this.get(o2)) ) {
+      //shadow copy, since we only use to print to journal
+      this.set(diff, this.get(o2));
+      return true;
+    }
+
+    //compare the diff
+    Object d = ((FObject) this.get(o1)).hardDiff((FObject)this.get(o2));
+    this.set(diff, d);
+    if ( d == null ) return false;
+    return true;
+  }
 }

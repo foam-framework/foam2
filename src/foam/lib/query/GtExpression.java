@@ -4,8 +4,10 @@ import foam.lib.parse.*;
 
 public class GtExpression
   extends ProxyParser {
-  public GtExpression() {
-    setDelegate(new Literal(">"));
+  public GtExpression(Parser valueParser) {
+    setDelegate(new Seq1(1,
+                         new Literal(">"),
+                         valueParser));
   }
 
   @Override
@@ -13,6 +15,10 @@ public class GtExpression
     ps = super.parse(ps, x);
     if ( ps == null ) return ps;
 
-    return ps.setValue(new foam.mlang.predicate.Gt());
+    foam.mlang.predicate.Gt expr = new foam.mlang.predicate.Gt();
+    expr.setArg1((foam.mlang.Expr)x.get("arg1"));
+    expr.setArg2((foam.mlang.Expr)ps.value());
+
+    return ps.setValue(expr);
   }
 }

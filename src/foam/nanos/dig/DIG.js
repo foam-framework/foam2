@@ -22,6 +22,7 @@ foam.CLASS({
   searchColumns: [],
 
   properties: [
+    'id',
     {
       class: 'String',
       name: 'daoKey',
@@ -38,6 +39,8 @@ foam.CLASS({
         });
       }
     },
+    'cmd',
+    'format',
     {
       class: 'String',
       name: 'dao',
@@ -61,6 +64,7 @@ foam.CLASS({
       displayWidth: 100,
       name: 'subject'
     },
+    'data',
     {
       class: 'URL',
       // TODO: appears not to work if named 'url', find out why.
@@ -68,6 +72,7 @@ foam.CLASS({
       label: 'URL',
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
+      setter: function() {}, // Prevent from ever getting set
       expression: function(key, data, email, subject, daoKey, cmd, format) {
         var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd + "&format=" + format.name.toLowerCase();
 
