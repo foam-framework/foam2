@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DIG',
+  extends: 'foam.nanos.http.DefaultHttpParameters',
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
@@ -21,11 +22,7 @@ foam.CLASS({
   searchColumns: [],
 
   properties: [
-    {
-        class: 'String',
-        name: 'id',
-        displayWidth: 40
-    },
+    'id',
     {
       class: 'String',
       name: 'daoKey',
@@ -42,17 +39,16 @@ foam.CLASS({
         });
       }
     },
+    'cmd',
+    'format',
     {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Command',
-      name: 'cmd',
-      value: foam.nanos.dig.Command.SELECT
-    },
-    {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Format',
-      name: 'format',
-      value: foam.nanos.dig.Format.JSON
+      class: 'String',
+      name: 'dao',
+      hidden: true,
+      transient: true,
+      postSet: function(old, nu) {
+        this.daoKey = nu;
+      }
     },
     {
         class: 'String',
@@ -68,18 +64,7 @@ foam.CLASS({
       displayWidth: 100,
       name: 'subject'
     },
-    {
-      class: 'String',
-      name: 'data',
-      view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120 }
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'owner',
-      hidden: true
-      // TODO: set tableCellRenderer
-    },
+    'data',
     {
       class: 'URL',
       // TODO: appears not to work if named 'url', find out why.
@@ -87,6 +72,7 @@ foam.CLASS({
       label: 'URL',
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
+      setter: function() {}, // Prevent from ever getting set
       expression: function(key, data, email, subject, daoKey, cmd, format) {
         var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd + "&format=" + format.name.toLowerCase();
 

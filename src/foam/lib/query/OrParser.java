@@ -4,8 +4,8 @@ import foam.lib.parse.*;
 
 public class OrParser
   extends foam.lib.parse.ProxyParser {
-  public OrParser() {
-    setDelegate(new Repeat(new AndParser(),
+  public OrParser(Parser andParser) {
+    setDelegate(new Repeat(andParser,
                            new Seq0(new foam.lib.json.Whitespace(),
                                     new Literal("OR"))));
   }

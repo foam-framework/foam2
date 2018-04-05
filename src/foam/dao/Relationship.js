@@ -288,15 +288,18 @@ foam.INTERFACE({
     // TODO: These should really be properties.
     {
       name: 'getDAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'DAO'
     },
     {
       name: 'getJunctionDAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'DAO'
     },
     {
       name: 'getTargetDAO',
-      javaReturns: 'foam.dao.DAO'
+      javaReturns: 'foam.dao.DAO',
+      swiftReturns: 'DAO'
     },
   ]
 });
@@ -387,7 +390,7 @@ foam.CLASS({
     },
     {
       name: 'remove',
-      javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
+      javaCode: 'getJunctionDAO().remove(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
       code: function remove(target) {
         return this.junctionDAO.remove(this.createJunction(target.id));
       }

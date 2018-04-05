@@ -6,7 +6,7 @@ public class Test {
   public static void main(String[] args) {
     QueryParser parser = new QueryParser(TestModel.getOwnClassInfo());
 
-    String query = "name:adam age>20 OR age<5 name:john";
+    String query = "name:adam birthdate=2017/01/01..2017/12/25 OR name:adam birthdate<2017/01/12 OR name:adam birthdate>2017/03/21";
 
     StringPStream sps = new StringPStream();
     sps.setString(query);
@@ -14,6 +14,7 @@ public class Test {
     PStream ps = sps;
 
     ParserContext x = new ParserContextImpl();
+    x.set("X", foam.core.EmptyX.instance());
 
     ps = parser.parse(ps, x);
 

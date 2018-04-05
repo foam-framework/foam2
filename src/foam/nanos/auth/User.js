@@ -49,6 +49,10 @@ foam.CLASS({
         if ( firstName.length > 70 ) {
           return 'First name cannot exceed 70 characters.';
         }
+
+        if ( /\d/.test(firstName) ) {
+          return 'First name cannot contain numbers.';
+        }
       }
     },
     {
@@ -57,6 +61,10 @@ foam.CLASS({
       validateObj: function (middleName) {
         if ( middleName.length > 70 ) {
           return 'Middle name cannot exceed 70 characters.';
+        }
+
+        if ( /\d/.test(middleName) ) {
+          return 'Middle name cannot contain numbers.';
         }
       }
     },
@@ -67,6 +75,10 @@ foam.CLASS({
       validateObj: function (lastName) {
         if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
+        }
+
+        if ( /\d/.test(lastName) ) {
+          return 'Last name cannot contain numbers.';
         }
       }
     },
