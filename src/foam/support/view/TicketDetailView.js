@@ -75,8 +75,9 @@ foam.CLASS({
     letter-spacing: 0.3px;
     text-align: left;
     color: #093649; 
+    margin-top: 30px;
   }
-  ^ .main {
+  ^ .sub-div-format {
     width: 488px;
     height: 16px;
     opacity: 0.7;
@@ -89,36 +90,43 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
+    margin-bottom: 20px;
   }
   `,
 
   methods: [
     function initE(){
-    var self = this;
-    this.hideSummary = true;
-    var email = this.data.supportEmail;
+      var self = this;
+      this.hideSummary = true;
+      var email = this.data.supportEmail;
+    
+      //find user associated to ticket
+      this.userDAO.find(this.data.requestorId).then(function(a){
+        self.name= a.firstName;
+      })
+      //format date for ui
+      var formattedDate = this.formatDate(this.data.createdAt);
 
-    this.userDAO.find(this.data.requestorId).then(function(a){
-      self.name= a.firstName;
-    })
+      this.addClass(this.myClass())
+        .start(this.BACK_ACTION).end()
+        .start().addClass('primarydiv')
+          .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
+          .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
+        .end()
+        .br()
+        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
+        .end()
+        .tag({ class: 'foam.support.view.ReplyView' });
+    },
 
-    var locale = "en-us";
-    var month = this.data.createdAt.toLocaleString(locale, {month: "short"});
-    var date=this.data.createdAt.getDate();
-    var hours=this.data.createdAt.getHours(); 
-    var mins= this.data.createdAt.getMinutes()
-    this.addClass(this.myClass())
-    .start(this.BACK_ACTION).end()
-    .br().br().br()
-    .start().addClass('primarydiv')
-    .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-    .start().addClass()
-    .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
-    .end()
-    .end()
-    .br()
-    .start().addClass('main').add("#",this.data.id,"  ","    |     ",month," ",date," ",hours,":",mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
-    .end()
+    function formatDate(date){
+      var formattedDate = {
+        month: date.toLocaleString("en-us", {month: "short"}),
+        date: date.getDate(),
+        hours: date.getHours(),
+        mins: date.getMinutes()
+      }
+      return formattedDate;
     }
   ],
   actions: [

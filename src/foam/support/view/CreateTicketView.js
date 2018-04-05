@@ -214,6 +214,7 @@ foam.CLASS({
       name: 'message',
       view: 'foam.u2.tag.TextArea'
     },
+<<<<<<< HEAD
     {
       class: 'String',
       name: 'status',
@@ -226,6 +227,8 @@ foam.CLASS({
     },
     'voidMenuBtn_',
     'voidPopUp_',
+=======
+>>>>>>> d1fb2a4eac5fbdd41317a64f7995d07765fdec2b
   ],
 
   methods: [
