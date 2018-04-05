@@ -14,15 +14,7 @@ foam.CLASS({
         class: 'String',
         name: 'message',
         view: 'foam.u2.tag.TextArea',
-      },
-      {
-        name: 'publicUnderline',
-        value: true
-      },
-      {
-        name: 'noteUnderline',
-        value: false
-      },
+      }
    ],
 
     exports: [
