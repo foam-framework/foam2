@@ -192,7 +192,7 @@ foam.CLASS({
   .SubmitLabel {
     float:right;
   }
-  .New, .Pending, .Updated, .Solved, .Open {
+  ^ .New, .Pending, .Updated, .Solved, .Open {
     padding-top: 4px;
     font-size: 10px;
   }
