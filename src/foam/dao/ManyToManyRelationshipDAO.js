@@ -83,8 +83,10 @@ foam.CLASS({
         let junction: Map = try relationship!.junctionDAO!.`where`(pred).select(map!) as! Map
         return try delegate.`where`(__context__.create(In.self, args: [
           "arg1": primaryKey,
-          "arg2": (junction.delegate as? ArraySink)?.array
-        ])).select_(x, sink, skip, limit, order, predicate) */
+          "arg2": __context__.create(ArrayConstant.self, args: [
+            "value": (junction.delegate as? ArraySink)?.array
+          ])
+        ])).select_(x, sink, skip, limit, order, predicate)  */
       }
     }
   ]
