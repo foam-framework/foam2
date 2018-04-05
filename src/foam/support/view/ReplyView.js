@@ -1,7 +1,7 @@
 
 foam.CLASS({
     package: 'foam.support.view',
-    name: 'InternalNote',
+    name: 'ReplyView',
     extends: 'foam.u2.View',
 
     documentation: 'Internal note for ticket detail view',

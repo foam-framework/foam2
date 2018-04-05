@@ -116,7 +116,7 @@ foam.CLASS({
         .br()
         .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
         .end()
-        .tag({ class: 'foam.support.view.InternalNote' });
+        .tag({ class: 'foam.support.view.ReplyView' });
     },
 
     function formatDate(date){
