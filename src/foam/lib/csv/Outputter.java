@@ -93,7 +93,7 @@ public class Outputter
 
   /**
    * Gets a filtered list of properties. Removes network and storage transient variables
-   * if necessary, removes unsupported types and removes null values / empty strings
+   * if necessary, removes unsupported types
    * @param obj the object to get the property list from
    * @return the filtered list of properties
    */
@@ -117,11 +117,6 @@ public class Outputter
            prop instanceof AbstractFObjectPropertyInfo ) {
         continue;
       }
-
-      // filter out null values & empty strings
-      Object value = prop.f(obj);
-      if ( value == null ) continue;
-      if ( value instanceof String && ((String) value).isEmpty() ) continue;
 
       props_.add(prop);
     }

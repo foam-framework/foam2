@@ -1158,7 +1158,12 @@ foam.CLASS({
       name: 'f',
       code: function(o) {
         return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
-      }
+      },
+      swiftCode: `
+let v1 = (arg1 as! Expr).f(obj)
+let v2 = (arg2 as! Expr).f(obj)
+return !FOAM_utils.equals(v1, v2)
+      `
     }
   ]
 });

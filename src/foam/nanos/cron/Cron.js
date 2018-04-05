@@ -59,6 +59,11 @@ foam.CLASS({
       name: 'scheduledTime',
       documentation: `Scheduled time to run Cron script.`,
       javaFactory: 'return getNextScheduledTime();'
+    },
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true
     }
   ],
 
