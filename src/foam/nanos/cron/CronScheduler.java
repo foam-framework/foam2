@@ -57,10 +57,11 @@ public class CronScheduler
       while ( true ) {
         Date now = new Date();
 
-        cronDAO_.where(MLang.LTE(Cron.SCHEDULED_TIME, now)).select(new AbstractSink() {
+        cronDAO_.where(MLang.AND(MLang.LTE(Cron.SCHEDULED_TIME, now), MLang.EQ(Cron.ENABLED, true))).select(new AbstractSink() {
           @Override
           public void put(Object obj, Detachable sub) {
             Cron cron = (Cron) obj;
+
             PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
             try {
               cron.runScript(CronScheduler.this.getX());
