@@ -6,13 +6,16 @@ foam.CLASS({
   requires: [
     'foam.support.model.Ticket', 
     'foam.u2.PopupView',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.nanos.notification.email.POP3Email',
+    'foam.nanos.notification.email.POP3EmailService'
   ],
 
   imports:[
     'ticketDAO',
     'user',
-    'hideSummary'
+    'hideSummary',
+    'pop3'
   ],
 
   exports: [
@@ -243,6 +246,9 @@ foam.CLASS({
         });
 
         this.ticketDAO.put(ticket);
+        if(this.requestor!="" && this.subject!="",this.message!="") {
+        sendMail(this.requestor,this.subject,this.message);
+        }
       }
     },
     {
