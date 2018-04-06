@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Modified by admin admin (1) at 2018-03-15T19:39:53Z
 p({"class":"foam.support.model.Ticket","id":1,"requestorId":1,"supportEmail":"admnin","subject":"some subject","publicMessage":"this is a message","status":"New"})
 // Modified by admin admin (1) at 2018-03-15T19:40:08Z
@@ -45,3 +46,5 @@ p({"class":"foam.support.model.Ticket","id":22,"createdAt":"2018-03-29T17:14:52.
 p({"class":"foam.support.model.Ticket","id":23,"createdAt":"2018-03-29T18:08:14.496Z","status":"New"})
 // Modified by admin admin (1) at 2018-03-29T18:44:21Z
 p({"class":"foam.support.model.Ticket","id":24,"createdAt":"2018-03-29T18:44:21.857Z","status":"New"})
+=======
+>>>>>>> 0dd9ba8e4e22d090c151c0de19b993fbd178c5b6

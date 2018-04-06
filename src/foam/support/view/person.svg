@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="40" height="40" viewBox="0 0 40 40">
+    <defs>
+        <circle id="a" cx="20" cy="20" r="20"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <g>
+            <use fill="#FFF" xlink:href="#a"/>
+            <circle cx="20" cy="20" r="19.5" stroke="#A4B3B8"/>
+        </g>
+        <path fill="#CCC" fill-rule="nonzero" d="M30 28.067c0 .9-.733 1.666-1.667 1.666H11.667A1.65 1.65 0 0 1 10 28.067c0-3.5 1.833-6.667 4.7-8.467a6.75 6.75 0 0 0 5.3 2.567 6.7 6.7 0 0 0 5.3-2.567c2.867 1.8 4.7 4.967 4.7 8.467zM14.6 15.4c0-2.967 2.4-5.4 5.4-5.4 3 0 5.4 2.4 5.4 5.4 0 3-2.433 5.4-5.4 5.4-2.967 0-5.4-2.4-5.4-5.4z"/>
+    </g>
+</svg>

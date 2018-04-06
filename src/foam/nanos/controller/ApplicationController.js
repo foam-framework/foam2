@@ -86,6 +86,9 @@ foam.CLASS({
       content: "";
       display: block;
     }
+    .foam-u2-UnstyledActionView:focus{
+      outline: none;
+    }
   `,
 
   properties: [
