@@ -91,7 +91,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
                break;
             }
          }
-
          emailFolder.close(false);
          store.close();
 
@@ -115,10 +114,10 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       fetch(host, mailStoreType, username, password);
    }
 
-public static void writePart(Part p) throws Exception {
-  if (p instanceof Message)
+      public static void writePart(Part p) throws Exception {
+      if (p instanceof Message)
   
-     writeEnvelope((Message) p);
+      writeEnvelope((Message) p);
 
       System.out.println("----------------------------");
       System.out.println("CONTENT-TYPE: " + p.getContentType());
@@ -128,7 +127,6 @@ public static void writePart(Part p) throws Exception {
          System.out.println("---------------------------");
          System.out.println((String) p.getContent());
       } 
-
       else if (p.isMimeType("multipart/*")) {
          System.out.println("This is a Multipart");
          System.out.println("---------------------------");
@@ -137,13 +135,11 @@ public static void writePart(Part p) throws Exception {
          for (int i = 0; i < count; i++)
             writePart(mp.getBodyPart(i));
       } 
-    
       else if (p.isMimeType("message/rfc822")) {
          System.out.println("This is a Nested Message");
          System.out.println("---------------------------");
          writePart((Part) p.getContent());
       } 
-  
        else if (p.isMimeType("image/jpeg")) {
        System.out.println("--------> image/jpeg");
           Object o = p.getContent();
@@ -197,7 +193,6 @@ public static void writePart(Part p) throws Exception {
          }
       }
    }
-
    public static void writeEnvelope(Message m) throws Exception {
       System.out.println("This is the message envelope");
       System.out.println("---------------------------");
@@ -207,12 +202,10 @@ public static void writePart(Part p) throws Exception {
          for (int j = 0; j < a.length; j++)
          System.out.println("FROM: " + a[j].toString());
       }
-
       if ((a = m.getRecipients(Message.RecipientType.TO)) != null) {
          for (int j = 0; j < a.length; j++)
          System.out.println("TO: " + a[j].toString());
       }
-
       if (m.getSubject() != null)
          System.out.println("SUBJECT: " + m.getSubject());
    }
