@@ -23,6 +23,18 @@ foam.CLASS({
   properties: [
     ['anonymous', true],
     'propName',
+    'propShortName',
+    'propAliases',
+    {
+      name: 'getAliasesBody',
+      expression: function() {
+      var b = 'new String[] {';
+        for (var i = 0; i < this.propAliases.length; i++) {
+          b+= '"'+ this.propAliases[i]+'"' + (i < this.propAliases.length-1 ? ', ' : '');
+        }
+        return b+'};';
+      }
+    },
     {
       class: 'Boolean',
       name: 'networkTransient'
@@ -64,6 +76,7 @@ foam.CLASS({
     'jsonParser',
     'csvParser',
     'cloneProperty',
+    'queryParser',
     'diffProperty',
     {
       name: 'methods',
@@ -74,6 +87,18 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.propName + '";'
+          },
+          {
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body:  this.propShortName ? 'return "' +this.propShortName+'";' : 'return null;'
+          },
+          {
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
           },
           {
             name: 'get',
@@ -129,6 +154,12 @@ foam.CLASS({
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
             body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
+          },
+          {
+            name: 'queryParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' +  (this.queryParser ? this.queryParser : null) + ';'
           },
           {
             name: 'csvParser',
