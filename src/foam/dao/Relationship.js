@@ -336,12 +336,14 @@ foam.CLASS({
     {
       class: 'Object',
       javaType: 'foam.core.PropertyInfo',
+      swiftType: 'PropertyInfo',
       name: 'targetProperty',
       hidden: true
     },
     {
       class: 'Object',
       javaType: 'foam.core.PropertyInfo',
+      swiftType: 'PropertyInfo',
       name: 'sourceProperty',
       hidden: true
     },
@@ -431,8 +433,8 @@ getSourceProperty().set(junction, getSourceId());
 return junction;`,
 
       swiftCode: `let junction: FObject = self.junction.create(x: __context__) as! FObject
-(targetProperty as? PropertyInfo)?.set(junction, value: targetId)
-(sourceProperty as? PropertyInfo)?.set(junction, value: sourceId)
+targetProperty.set(junction, value: targetId)
+sourceProperty.set(junction, value: sourceId)
 return junction`
     },
     {
