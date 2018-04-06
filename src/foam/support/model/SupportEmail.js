@@ -29,7 +29,6 @@ foam.CLASS({
     {
       class: 'Password',
       name: 'password'
-    },
-
+    }
   ]
 });
