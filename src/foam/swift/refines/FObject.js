@@ -210,6 +210,17 @@ foam.LIB({
         }));
       }
 
+      // make implement identifiable if has id property
+      if ( this.hasOwnAxiom('id') ) {
+        cls.implements = cls.implements.concat('Identifiable');
+        cls.methods.push(foam.swift.Method.create({
+          name: 'getPrimaryKey',
+          visibility: 'public',
+          returnType: 'Any?',
+          body: 'return id'
+        }));
+      }
+
       return cls;
     },
   ],

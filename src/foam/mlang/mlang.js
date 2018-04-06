@@ -912,42 +912,63 @@ foam.CLASS({
   ],
 
   methods: [
-    function f(o) {
-      var lhs = this.arg1.f(o);
-      var rhs = this.arg2.f(o);
+    {
+      name: 'f',
+      code: function f(o) {
+        var lhs = this.arg1.f(o);
+        var rhs = this.arg2.f(o);
 
-      if ( ! rhs ) return false;
+        if ( ! rhs ) return false;
 
-      for ( var i = 0 ; i < rhs.length ; i++ ) {
-        var v = rhs[i];
+        for ( var i = 0 ; i < rhs.length ; i++ ) {
+          var v = rhs[i];
 
-        if ( foam.String.isInstance(v) && this.upperCase_ ) v = v.toUpperCase();
-        if ( foam.util.equals(lhs, v) ) return true;
-      }
-      return false;
+          if ( foam.String.isInstance(v) && this.upperCase_ ) v = v.toUpperCase();
+          if ( foam.util.equals(lhs, v) ) return true;
+        }
+        return false;
 
-      // TODO: This is not a sufficient enough check for valueSet_.
-      // We can have constants that contain other FObjects, in
-      // particular with multi part id support.So this code path is
-      // disabled for now.
+        // TODO: This is not a sufficient enough check for valueSet_.
+        // We can have constants that contain other FObjects, in
+        // particular with multi part id support.So this code path is
+        // disabled for now.
 
 
-      // If arg2 is a constant array, we use valueSet for it.
-      if ( this.Constant.isInstance(this.arg2) ) {
-        if ( ! this.valueSet_ ) {
-          var set = {};
-          for ( var i = 0 ; i < rhs.length ; i++ ) {
-            var s = rhs[i];
-            if ( this.upperCase_ ) s = s.toUpperCase();
-            set[s] = true;
+        // If arg2 is a constant array, we use valueSet for it.
+        if ( this.Constant.isInstance(this.arg2) ) {
+          if ( ! this.valueSet_ ) {
+            var set = {};
+            for ( var i = 0 ; i < rhs.length ; i++ ) {
+              var s = rhs[i];
+              if ( this.upperCase_ ) s = s.toUpperCase();
+              set[s] = true;
+            }
+            this.valueSet_ = set;
           }
-          this.valueSet_ = set;
+
+          return !! this.valueSet_[lhs];
         }
 
-        return !! this.valueSet_[lhs];
-      }
+        return rhs ? rhs.indexOf(lhs) !== -1 : false;
+      },
+      swiftCode:
+`let lhs = (arg1 as! Expr).f(obj)
+let rhs = (arg2 as! Expr).f(obj)
+if ( rhs == nil ) {
+  return false
+}
 
-      return rhs ? rhs.indexOf(lhs) !== -1 : false;
+if let values = rhs as? [Any] {
+  for value in values {
+    if ( FOAM_utils.equals(lhs, value) ) {
+      return true
+    }
+  }
+} else if let rhsStr = rhs as? String, let lhsStr = lhs as? String {
+  return rhsStr.contains(lhsStr)
+}
+
+return false`
     },
     function partialEval() {
       if ( ! this.Constant.isInstance(this.arg2) ) return this;

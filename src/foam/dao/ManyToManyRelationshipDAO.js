@@ -67,7 +67,27 @@ foam.CLASS({
   select(foam.mlang.MLang.MAP(getRelationship().getTargetProperty(), new foam.dao.ArraySink()));
 
   return getDelegate().where(foam.mlang.MLang.IN(getPrimaryKey(), ((foam.dao.ArraySink)(junction.getDelegate())).getArray().toArray())).select_(
-    x, sink, skip, limit, order, predicate);`
+    x, sink, skip, limit, order, predicate);`,
+
+      swiftCode: function () {
+        /* let pred = __context__.create(Eq.self, args: [
+          "arg1": relationship?.sourceProperty,
+          "arg2": relationship?.sourceId
+        ])
+
+        let map = __context__.create(Map.self, args: [
+          "arg1": relationship?.targetProperty,
+          "delegate": __context__.create(ArraySink.self)
+        ])
+
+        let junction: Map = try relationship!.junctionDAO!.`where`(pred).select(map!) as! Map
+        return try delegate.`where`(__context__.create(In.self, args: [
+          "arg1": primaryKey,
+          "arg2": __context__.create(ArrayConstant.self, args: [
+            "value": (junction.delegate as? ArraySink)?.array
+          ])
+        ])).select_(x, sink, skip, limit, order, predicate)  */
+      }
     }
   ]
 });
