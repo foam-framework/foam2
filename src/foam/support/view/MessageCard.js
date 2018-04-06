@@ -45,8 +45,8 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #a4b3b8;
-    padding-left: 0px;
-    padding-right: 890px;
+    padding-top: 28px;
+    padding-right: 50px;
   }
   ^ .text {
     width: 231px;
@@ -67,20 +67,13 @@ foam.CLASS({
     height: 40px;
     object-fit: contain;
     padding: 20px 0px 0px 20px;
+    display: inline-block;
+    float: left;
   }
- ^ #v27 {
-  display: inline-block;
-  float: left;
- 
- }
- ^ #v29 {
-  display: inline-block;
-  float: left;
- }
- ^ #v31 {
-  padding-top: 28px;
-  padding-right: 50px;
- }
+  ^ .tb {
+    display: inline-block;
+    float: left; 
+  }
   `,
   
   messages: [
@@ -105,7 +98,7 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div').addClass('bg')
-            .start('table')
+            .start('table').addClass('tb')
               .start('tr')
                 .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
                 .start('td').add(this.nameLabel).addClass('company-name').end() 
