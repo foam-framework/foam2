@@ -78,12 +78,4 @@ public class StringPStream
   public PStream apply(Parser ps, ParserContext x) {
     return ps.parse(this, x);
   }
-
-  public int decrement() {
-    return this.pos = this.pos == 0 ? 0 : this.pos-1;
-  }
-
-  public char beforeHead() {
-    return pos == 0 ?  head() :str.get().charAt(pos-1);
-  }
 }

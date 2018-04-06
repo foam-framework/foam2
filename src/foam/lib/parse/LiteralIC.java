@@ -19,7 +19,7 @@ public class LiteralIC implements Parser {
   }
 
   public LiteralIC(String s, Object v) {
-    string = s;
+    string = s.toUpperCase();
     value = v;
   }
 
@@ -27,7 +27,7 @@ public class LiteralIC implements Parser {
     if ( string ==null) return null;
     for ( int i = 0 ; i < string.length() ; i++ ) {
       if ( ! ps.valid() ||
-          Character.toUpperCase(ps.head()) != string.toUpperCase().charAt(i) ) {
+          Character.toUpperCase(ps.head()) != string.charAt(i) ) {
         return null;
       }
 

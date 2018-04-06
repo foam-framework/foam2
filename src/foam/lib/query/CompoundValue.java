@@ -23,6 +23,6 @@ public class CompoundValue extends foam.lib.parse.ProxyParser {
     ps = super.parse ( ps, x );
     if ( ps == null || ps.value () == null ) return null;
 
-    return ps.setValue ( ps.value () );
+    return ps;
   }
 }

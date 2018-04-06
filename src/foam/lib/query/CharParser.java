@@ -12,9 +12,9 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Range;
 
-public class charParser extends foam.lib.parse.ProxyParser {
+public class CharParser extends foam.lib.parse.ProxyParser {
 
-  public charParser() {
+  public CharParser() {
     setDelegate(
         new Alt(new Range('A', 'z'), new Range('0', '9'), new Literal("-"), new Literal("^"),
             new Literal("_"), new Literal("@"), new Literal("%"), new Literal("."))
@@ -26,7 +26,7 @@ public class charParser extends foam.lib.parse.ProxyParser {
     ps = super.parse ( ps, x );
     if ( ps == null || ps.value () == null ) return null;
 
-    return ps.setValue ( ps.value () );
+    return ps;
 
   }
 }
