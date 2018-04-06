@@ -1,6 +1,11 @@
 package foam.lib.query;
 
-import foam.lib.parse.*;
+import foam.lib.parse.Alt;
+import foam.lib.parse.Literal;
+import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContext;
+import foam.lib.parse.Seq1;
+
 
 public class PropertyExpressionParser
   extends foam.lib.parse.ProxyParser {
@@ -13,16 +18,17 @@ public class PropertyExpressionParser
     setDelegate(new Seq1(2,
                          new foam.lib.json.Whitespace(),
                          new Literal(prop.getName()),
-                         // TODO: There should probably be a better way to detect Date
-                         // properties, but this works for now.
-                         prop.getValueClass().equals(java.util.Date.class) ?
-                         new Alt(new DuringExpression(),
-                                 new LtExpression(new DateParser()),
-                                 new GtExpression(new DateParser())) :
-                         // TODO: Let the property produce it's own ValueParser
-                         new Alt(new LtExpression(new ValueParser()),
-                                 new EqExpression(new ValueParser()),
-                                 new GtExpression(new ValueParser()))));
+                         new Alt(
+//                                 new ParenParser(),
+                                 new EqualsParser(prop.queryParser()),
+                                 new ContainParser(prop.queryParser()),
+                                 new BeforeLteParser(prop.queryParser()),
+                                 new BeforeLtParser(prop.queryParser()),
+                                 new AfterGteParser(prop.queryParser()),
+                                 new AfterGtParser(prop.queryParser())
+//                                 ,
+//                                 new IdParser()
+                             )));
   }
 
   @Override

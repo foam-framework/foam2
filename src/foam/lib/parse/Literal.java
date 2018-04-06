@@ -31,6 +31,7 @@ public class Literal implements Parser {
   }
 
   public PStream parse(PStream ps, ParserContext x) {
+    if ( string == null ) return null;
     for ( int i = 0 ; i < string.length() ; i++ ) {
       if ( ! ps.valid() ||
            ps.head() != string.charAt(i) ) {
