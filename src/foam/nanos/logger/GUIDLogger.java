@@ -23,7 +23,7 @@ public class GUIDLogger
     log.setFrom("BackEnd");
     log.setBelong(System.getProperty("user.name"));
     log.setType(type);
-    log.setDescription("see detail for more detail");
+    log.setDescription(args[0].toString());
     log.setDetail(combine(args));
     return log;
   }

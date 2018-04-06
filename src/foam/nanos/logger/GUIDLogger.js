@@ -101,7 +101,7 @@ foam.CLASS({
       return this.Log.create({
         time: new Date(),
         from: 'Web',
-        belong: '' + this.user.id,
+        belong: (! this.user) ? '' : '' + this.user.firstName + ' ' + this.user.lastName,
         type: type,
         description: description,
         detail: detail
