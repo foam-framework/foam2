@@ -16,9 +16,7 @@ public class AndParser
     setDelegate(new Repeat(exprParser,
                            new Seq0(new foam.lib.json.Whitespace(),
                                     new Alt(new LiteralIC("AND "),
-                                            new Literal(" "),
-                                            new Not(new LiteralIC("OR")))
-                                    )));
+                                            new Not(new LiteralIC("OR"))))));
   }
 
   public PStream parse(PStream ps, ParserContext x) {

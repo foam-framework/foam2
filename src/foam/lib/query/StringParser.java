@@ -21,33 +21,25 @@ public class StringParser implements Parser {
   public PStream parse(PStream ps, ParserContext x) {
 
     if ( !ps.valid() )  return null;
-    char delim = ps.beforeHead();
 
-    delim = ( delim == '=' || delim == ':' || delim == '(' ) ? ' ' : delim;
-
-    if ( Character.isLetter(delim) ) {
-      delim = ' ';
-    }
-
+    char delim = ' ';
     char lastc = delim;
 
     // TODO: use thread-local SB instead to avoid generating garbage
     StringBuilder sb = new StringBuilder();
+    PStream lastPs=null;
 
     while ( ps.valid() ) {
       char c = ps.head();
-      if ( c == ')' ) {
-        ps.decrement();
+
+      if ( c == '=' || c == '<' || c == '>' || c == '-' || c == ':' || c == ',' || c == ' ' || c == ')' ) {
+        ps=lastPs;
         break;
       }
-
+      
       if ( c == delim && lastc != ESCAPE ) break;
-
-      if ( c == '=' || c == '<' || c == '>' || c == '-' || c == ':' || c == ',' || c == ' ' ) {
-        ps.decrement();
-        break;
-      }
-
+      
+      lastPs=ps;
       PStream tail = ps.tail();
 
       if ( c == ESCAPE ) {

@@ -25,11 +25,6 @@ public class InvalidPStream
   }
 
   @Override
-  public char beforeHead() {
-    return 0;
-  }
-
-  @Override
   public boolean valid() {
     return false;
   }
@@ -57,10 +52,5 @@ public class InvalidPStream
   @Override
   public PStream apply(Parser ps, ParserContext x) {
     return null;
-  }
-
-  @Override
-  public int decrement() {
-    return 0;
   }
 }
