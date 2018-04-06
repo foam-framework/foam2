@@ -18,17 +18,12 @@ public class PropertyExpressionParser
     setDelegate(new Seq1(2,
                          new foam.lib.json.Whitespace(),
                          new Literal(prop.getName()),
-                         new Alt(
-//                                 new ParenParser(),
-                                 new EqualsParser(prop.queryParser()),
+                         new Alt(new EqualsParser(prop.queryParser()),
                                  new ContainParser(prop.queryParser()),
                                  new BeforeLteParser(prop.queryParser()),
                                  new BeforeLtParser(prop.queryParser()),
                                  new AfterGteParser(prop.queryParser()),
-                                 new AfterGtParser(prop.queryParser())
-//                                 ,
-//                                 new IdParser()
-                             )));
+                                 new AfterGtParser(prop.queryParser()))));//new IdParser()
   }
 
   @Override
