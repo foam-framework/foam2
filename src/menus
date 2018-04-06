@@ -28,10 +28,7 @@ p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"c
 // p({"class":"foam.nanos.menu.Menu","id":"demos","label":"Demos","order":1000,"parent":"","handler":{"class":"foam.nanos.menu.SubMenu"}})
 // p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})
 // p({"class":"foam.nanos.menu.Menu","id":"relationshipDemo","label":"Relationship Demo","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.relationship.Controller"}}})
-<<<<<<< HEAD
 p({"class":"foam.nanos.menu.Menu","id":"emailSupport","label":"Email Support","handler":{"class":"foam.nanos.menu.ViewMenu", "view": {"class":"foam.support.view.SupportEmailView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"createTicket","label":"Create Ticket","handler":{"class":"foam.nanos.menu.ViewMenu", "view": {"class":"foam.support.view.CreateTicketView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"ticketDetail","label":"Ticket Detail","handler":{"class":"foam.nanos.menu.ViewMenu", "view": {"class":"foam.support.view.TicketDetailView"}},"order":1000,"parent":"admin"})
 
-=======
->>>>>>> 0dd9ba8e4e22d090c151c0de19b993fbd178c5b6
