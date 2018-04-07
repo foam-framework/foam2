@@ -67,7 +67,7 @@
               value$: this.skip$,
               extent$: this.limit$,
               height: 40*18+41, // TODO use window height.
-              width: 15,
+              width: 18,
               size$: this.daoCount$,
             })).
           end().
