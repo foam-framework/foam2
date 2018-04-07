@@ -311,7 +311,7 @@ public abstract class AbstractJDAO
       FObject   ret       = (FObject) classInfo.getObjClass().newInstance();
 
       return ret;
-    } catch ( Throwable t ) {
+    } catch (Throwable t) {
       throw new RuntimeException(t);
     }
   }
