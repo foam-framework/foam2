@@ -25,18 +25,18 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.pool.FixedThreadPool',
     'foam.util.SafetyUtil',
-    'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.JtwigModel',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.environment.EnvironmentConfiguration',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
-    'org.jtwig.resource.loader.TypedResourceLoader',
+    'java.nio.charset.StandardCharsets',
+    'java.util.Date',
+    'java.util.Properties',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
-    'java.nio.charset.StandardCharsets',
-    'java.util.Date',
-    'java.util.Properties'
+    'org.apache.commons.lang3.StringUtils',
+    'org.jtwig.environment.EnvironmentConfiguration',
+    'org.jtwig.environment.EnvironmentConfigurationBuilder',
+    'org.jtwig.JtwigModel',
+    'org.jtwig.JtwigTemplate',
+    'org.jtwig.resource.loader.TypedResourceLoader'
   ],
 
   axioms: [
