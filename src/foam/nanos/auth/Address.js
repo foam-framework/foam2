@@ -101,7 +101,13 @@ foam.CLASS({
         if ( ! postalCodeRegex.test(postalCode) ) {
           return 'Invalid postal code.';
         }
-      }
+      },
+      preSet: function(oldValue, newValue){
+        return newValue.toUpperCase();
+      },
+      javaSetter:
+        `postalCode_ = val.toUpperCase();
+        postalCodeIsSet_ = true;`
     },
     {
       class: 'Reference',
