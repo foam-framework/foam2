@@ -234,6 +234,11 @@ public abstract class AbstractJDAO
     Object  id  = getPrimaryKey().get(obj);
     FObject ret = getDelegate().remove_(x, obj);
 
+    if ( ret == null ) {
+      // TODO: log
+      return ret;
+    }
+
     try {
       writeComment((User) x.get("user"));
       // TODO: Would be more efficient to output the ID portion of the object.  But
