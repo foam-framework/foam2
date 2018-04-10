@@ -140,8 +140,9 @@ foam.CLASS({
   ^ .status{
     color: white;
     display: inline-block;
-    padding-top: 4px;
     text-align: center;
+    padding-top: 4px;
+    font-size: 10px;
   }
   ^ .Missing-Cash-Out-for {
     width: 268px;
@@ -186,6 +187,11 @@ foam.CLASS({
     text-align: left;
     color: #093649;
     margin-bottom: 20px;
+  }
+  .SubmitLabel span{
+    font-size: 10px;
+    position: relative;
+    top: 4px;
   }
   `,
 
