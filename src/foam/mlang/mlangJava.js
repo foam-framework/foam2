@@ -689,7 +689,7 @@ foam.CLASS({
     {
       name: 'f',
       // TODO(adamvy): Is there a better option than all the Comparable casts?
-      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))==0;'
+      javaCode: 'return foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))==0;'
     },
     {
       name: 'createStatement',
@@ -706,7 +706,7 @@ foam.CLASS({
   methods: [
     {
       name: 'f',
-      javaCode: 'return  foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))!=0;'
+      javaCode: 'return foam.util.SafetyUtil.compare(getArg1().f(obj),getArg2().f(obj))!=0;'
     },
     {
       name: 'createStatement',

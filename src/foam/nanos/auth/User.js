@@ -19,6 +19,10 @@ foam.CLASS({
     'foam.nanos.auth.Phone'
   ],
 
+  javaImports: [
+    'foam.util.SafetyUtil'
+  ],
+
   documentation: '',
 
   tableColumns: [
@@ -247,29 +251,6 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'businessIdentificationNumber',
-      width: 35,
-      documentation: 'Business Identification Number (BIN)',
-      validateObj: function (businessIdentificationNumber) {
-        var re = /^[a-zA-Z0-9 ]{1,35}$/;
-        if (  businessIdentificationNumber.length > 0 && ! re.test(businessIdentificationNumber) ) {
-          return 'Invalid registration number.'
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'issuingAuthority',
-      width: 35,
-      validateObj: function (issuingAuthority) {
-        var re = /^[a-zA-Z0-9 ]{1,35}$/;
-        if ( issuingAuthority.length > 0 && ! re.test(issuingAuthority) ) {
-          return 'Invalid issuing authority.';
-        }
-      }
-    },
-    {
-      class: 'String',
       name: 'bankIdentificationCode',
       width: 20,
       documentation: 'Bank Identification Code (BIC)'
@@ -300,8 +281,17 @@ foam.CLASS({
   ],
 
   methods: [
-    function label() {
-      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+    {
+      name: 'label',
+      javaReturns: 'String',
+      code: function label() {
+        return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+      },
+      javaCode: `
+        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
+        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
+        return getFirstName() + " " + getLastName();
+      `
     }
   ]
 });
