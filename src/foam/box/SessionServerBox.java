@@ -47,10 +47,11 @@ public class SessionServerBox
           session.setContext(getX().put(Session.class, session));
         }
 
-        X x = session.getContext().put(
+        User user = (User) session.getContext().get("user");
+        X    x    = session.getContext().put(
             "logger",
             new PrefixLogger(
-                new Object[] { "[Service]", spec.getName() },
+                new Object[] { user == null ? "" : user.getId() + " - " + user.label(), "[Service]", spec.getName() },
                 (Logger) session.getContext().get("logger")));
 
         session.setLastUsed(new Date());
@@ -64,7 +65,6 @@ public class SessionServerBox
         }
 
         if ( authenticate_ && ! auth.check(session.getContext(), "service." + spec.getName()) ) {
-          User   user     = (User) x.get("user");
           DAO    groupDAO = (DAO) x.get("groupDAO");
           Group  group    = (Group) groupDAO.find(user.getGroup());
           Logger logger   = (Logger) x.get("logger");

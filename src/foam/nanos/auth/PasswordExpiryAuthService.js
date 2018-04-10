@@ -56,6 +56,7 @@ return getDelegate().loginByEmail(x, email, password);`
       name: 'isPasswordExpired',
       documentation: 'Checks if password is expired. True if expired, false if not expired',
       javaReturns: 'boolean',
+      javaThrows: ['javax.naming.AuthenticationException'],
       args: [
         {
           name: 'user',
@@ -63,11 +64,11 @@ return getDelegate().loginByEmail(x, email, password);`
         }
       ],
       javaCode:
-`if ( user == null ) return true;
-if ( user.getPasswordExpiry() == null ) return false;
-
+`if ( user == null ) {
+  throw new AuthenticationException("User not found");
+}
 // if we are after the expiry date then prevent login
-return user.getPasswordExpiry().getTime() < System.currentTimeMillis();`
+return user.getPasswordExpiry() != null && user.getPasswordExpiry().getTime() < System.currentTimeMillis();`
     }
   ]
 });

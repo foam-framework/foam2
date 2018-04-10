@@ -105,6 +105,7 @@ FOAM_FILES([
   { name: 'foam/nanos/dig/DIG' },
   { name: 'foam/nanos/dig/DUG' },
   { name: 'foam/nanos/dig/LinkView' },
+  { name: 'foam/nanos/demo/relationship/CourseType' },
   { name: 'foam/nanos/demo/relationship/Course' },
   { name: 'foam/nanos/demo/relationship/Professor' },
   { name: 'foam/nanos/demo/relationship/Student' },
