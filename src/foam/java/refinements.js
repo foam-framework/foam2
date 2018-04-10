@@ -715,7 +715,12 @@ foam.CLASS({
   refines: 'foam.core.Enum',
 
   properties: [
-    ['javaType',       'java.lang.Enum'],
+    {
+      name: 'javaType',
+      expression: function(of) {
+        return of.id
+      }
+    },
     ['javaInfoType',   'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
     ['javaCSVParser',  'foam.lib.json.IntParser']
@@ -786,10 +791,10 @@ foam.CLASS({
       });
 
       var cast = info.getMethod('cast');
-      cast.body = 'if ( o instanceof Integer ) {'
-      + 'return forOrdinal((int) o); '
-      + '}'
-      + ' return (java.lang.Enum) o;';
+      cast.body = `if ( o instanceof Integer ) {
+  return forOrdinal((int) o);
+}
+return (${this.of.id})o;`;
 
       return info;
     }
