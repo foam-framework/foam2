@@ -148,7 +148,7 @@ public class HttpParametersWebAgent
           break;
         }
         if ( "application/jsonj".equals(f) ) {
-          format = Format.JSON;
+          format = Format.JSONJ;
           resp.setContentType("application/json");
           break;
         }
@@ -168,8 +168,11 @@ public class HttpParametersWebAgent
           resp.setContentType("application/xml");
           break;
         case "JSON":
-        case "JSONJ":
           format = Format.JSON;
+          resp.setContentType("application/json");
+          break;
+        case "JSONJ":
+          format = Format.JSONJ;
           resp.setContentType("application/json");
           break;
         case "CSV":
