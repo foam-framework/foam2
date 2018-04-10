@@ -168,13 +168,23 @@ foam.CLASS({
   ^ .status{
     color: white;
     display: inline-block;
-    padding-top: 3px;
     text-align: center;
+    padding-top: 4px;
+    font-size: 10px;
   }
   .Submit-as{
     float: left;
     margin-top:4px;
     margin-right:10px;
+    float: left;
+  }
+  .SubmitLabel {
+    float:right;
+  }
+  .SubmitLabel span{
+    font-size: 10px;
+    position: relative;
+    top: 4px;
   }
   `,
 
