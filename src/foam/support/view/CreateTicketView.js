@@ -245,9 +245,7 @@ foam.CLASS({
         });
 
         this.ticketDAO.put(ticket);
-        if(this.requestor!="" && this.subject!="",this.message!="") {
-          sendMail(this.requestor,this.subject,this.message);
-        }
+       
         
       }
     },
