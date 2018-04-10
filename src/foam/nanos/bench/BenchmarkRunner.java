@@ -9,17 +9,18 @@ package foam.nanos.bench;
 import foam.core.ContextAgent;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
-
+import java.io.PrintWriter;
 import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkRunner
   extends ContextAwareSupport
   implements ContextAgent
 {
-  protected String name_;
-  protected int threadCount_;
-  protected int invocationCount_;
+  protected String    name_;
+  protected int       threadCount_;
+  protected int       invocationCount_;
   protected Benchmark test_;
+  protected String    result_ = "";
 
   // Builder pattern to avoid large constructor in the case
   // we want to add more variables to this test runner later.
@@ -30,10 +31,11 @@ public class BenchmarkRunner
   public static class Builder<T extends Builder<T>>
     extends ContextAwareSupport
   {
-    private String name_ = "foam.nanos.bench.BenchmarkRunner";
-    private int threadCount_ = 0;
-    private int invocationCount_ = 0;
-    private Benchmark test_;
+    protected String    name_ = "foam.nanos.bench.BenchmarkRunner";
+    protected int       threadCount_ = 0;
+    protected int       invocationCount_ = 0;
+    protected Benchmark test_;
+
 
     public Builder(X x) {
       setX(x);
@@ -96,6 +98,10 @@ public class BenchmarkRunner
     return invocationCount_;
   }
 
+  public String getResult() {
+    return result_;
+  }
+
   @Override
   public void execute(final X x) {
     try {
@@ -137,11 +143,15 @@ public class BenchmarkRunner
       // calculate length taken
       // get number of threads completed and duration
       // print out transactions per second
-      long endTime = System.currentTimeMillis();
+      long  endTime  = System.currentTimeMillis();
       float complete = (float) (threadCount_ * invocationCount_);
       float duration = ((float) (endTime - startTime) / 1000.0f);
-      System.out.println("Operations per second: " + (complete / duration));
-      System.out.println("Operations per second per thread: " + (complete / duration / (float) threadCount_));
+
+      result_ =
+        "Operations per second: " + (complete / duration) + "\n" +
+        "Operations per second per thread: " + (complete / duration / (float) threadCount_) + "\n";
+
+      System.out.print(result_);
     } catch (Throwable t) {
       t.printStackTrace();
     }
