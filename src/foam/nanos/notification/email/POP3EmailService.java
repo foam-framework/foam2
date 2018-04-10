@@ -43,6 +43,8 @@ public class POP3EmailService
          });
 
        try {
+        Transport transport = session.getTransport("smtp");
+        transport.connect("smtp.gmail.com", 25, username, password);
 	   // Create a default MimeMessage object.
 	   Message message = new MimeMessage(session);
 	
@@ -60,7 +62,7 @@ public class POP3EmailService
 	   message.setText(body);
 
 	   // Send message
-	   Transport.send(message);
+	   transport.sendMessage(message,message.getAllRecipients());
 
 	   System.out.println("Sent message successfully....");
 
