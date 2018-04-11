@@ -33,6 +33,6 @@ public class AfterGtParser extends foam.lib.parse.ProxyParser {
       .setArg2(( ps.value() instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) ps
           .value() : new foam.mlang.Constant(ps.value()));
 
-    return ps.setValue (predicate);
+    return ps.setValue(predicate);
   }
 }

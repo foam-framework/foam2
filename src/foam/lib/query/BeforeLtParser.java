@@ -24,7 +24,7 @@ public class BeforeLtParser extends foam.lib.parse.ProxyParser {
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
+    ps = super.parse( ps, x );
     if ( ps == null ) return ps;
 
     foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Lt();
