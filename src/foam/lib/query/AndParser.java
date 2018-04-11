@@ -29,7 +29,7 @@ public class AndParser
 
     foam.mlang.predicate.Predicate[] args = new foam.mlang.predicate.Predicate[values.length];
 
-    for ( int i = 0; i < values.length; i++ ) {
+    for ( int i = 0 ; i < values.length ; i++ ) {
       args[i] = (foam.mlang.predicate.Predicate) values[i];
     }
 
