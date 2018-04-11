@@ -13,24 +13,19 @@ foam.CLASS({
   documentation: 'View displaying history',
 
   css: `
-    ^{
-      width: 905px;
+    ^ {
       height: 370px;
       background: white;
       position: relative;
       vertical-align: top;
-      margin-right: 6px;
-      border-radius: 3px;
+      border-radius: 2px;
       overflow: auto;
       font-size: 12px;
-      padding-left: 40px;
-      padding-top: 20px;
-      padding-bottom: 20px;
-      margin-bottom: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
       z-index: 0;
     }
-    ^h2 {
-      width: 128px;
+    ^ h2 {
       height: 20px;
       opacity: 0.6;
       font-family: Roboto;
@@ -43,10 +38,10 @@ foam.CLASS({
       text-align: left;
       color: #093649;
     }
-    ^timelineRecord {
+    ^ .timelineRecord {
       position: relative;
     }
-    ^timeline {
+    ^ .timeline {
       width: 2px;
       height: 100%;
       background: rgba(164, 179, 184, 0.3);
@@ -78,8 +73,8 @@ foam.CLASS({
             // Reverses records array for chronological output
             view.forEach(records.array.reverse(), function(record) {
               view.start('div')
-                .addClass(view.myClass('timelineRecord'))
-                .start('div').addClass(view.myClass('timeline')).end()
+                .addClass('timelineRecord')
+                .start('div').addClass('timeline').end()
                 .call(function() {
                   view.historyItemView.outputRecord(this, record)
                 })

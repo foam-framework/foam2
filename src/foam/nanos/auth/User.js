@@ -19,6 +19,10 @@ foam.CLASS({
     'foam.nanos.auth.Phone'
   ],
 
+  javaImports: [
+    'foam.util.SafetyUtil'
+  ],
+
   documentation: '',
 
   tableColumns: [
@@ -45,15 +49,28 @@ foam.CLASS({
       class: 'String',
       name: 'firstName',
       tableWidth: 160,
-      validateObj: function(firstName) {
+      validateObj: function (firstName) {
         if ( firstName.length > 70 ) {
           return 'First name cannot exceed 70 characters.';
+        }
+
+        if ( /\d/.test(firstName) ) {
+          return 'First name cannot contain numbers.';
         }
       }
     },
     {
       class: 'String',
-      name: 'middleName'
+      name: 'middleName',
+      validateObj: function (middleName) {
+        if ( middleName.length > 70 ) {
+          return 'Middle name cannot exceed 70 characters.';
+        }
+
+        if ( /\d/.test(middleName) ) {
+          return 'Middle name cannot contain numbers.';
+        }
+      }
     },
     {
       class: 'String',
@@ -63,6 +80,18 @@ foam.CLASS({
         if ( lastName.length > 70 ) {
           return 'Last name cannot exceed 70 characters.';
         }
+
+        if ( /\d/.test(lastName) ) {
+          return 'Last name cannot contain numbers.';
+        }
+      }
+    },
+    {
+      class: 'String',
+      name: 'legalName',
+      transient: true,
+      expression: function ( firstName, middleName, lastName ) {
+        return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
       }
     },
     {
@@ -85,6 +114,7 @@ foam.CLASS({
     {
       class: 'EMail',
       name: 'email',
+      label: 'Email Address',
       displayWidth: 80,
       width: 100,
       preSet: function (_, val) {
@@ -112,6 +142,14 @@ foam.CLASS({
       name: 'phone',
       factory: function () { return this.Phone.create(); },
       view: { class: 'foam.nanos.auth.PhoneDetailView' }
+    },
+    {
+      class: 'String',
+      name: 'phoneNumber',
+      transient: true,
+      expression: function (phone) {
+        return phone.number;
+      }
     },
     {
       class: 'FObjectProperty',
@@ -171,7 +209,7 @@ foam.CLASS({
       validateObj: function (password) {
         var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
 
-        if ( ! re.test(password) ) {
+        if ( password.length > 0 && ! re.test(password) ) {
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       }
@@ -186,6 +224,10 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'passwordLastModified'
+    },
+    {
+      class: 'DateTime',
+      name: 'passwordExpiry'
     },
     // TODO: startDate, endDate,
     // TODO: do we want to replace 'note' with a simple ticket system?
@@ -204,29 +246,6 @@ foam.CLASS({
       validateObj: function (businessName) {
         if ( businessName.length > 35 ) {
           return 'Business name cannot be greater than 35 characters.';
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'businessIdentificationNumber',
-      width: 35,
-      documentation: 'Business Identification Number (BIN)',
-      validateObj: function (businessIdentificationNumber) {
-        var re = /^[a-zA-Z0-9 ]{1,35}$/;
-        if (  businessIdentificationNumber.length > 0 && ! re.test(businessIdentificationNumber) ) {
-          return 'Invalid registration number.'
-        }
-      }
-    },
-    {
-      class: 'String',
-      name: 'issuingAuthority',
-      width: 35,
-      validateObj: function (issuingAuthority) {
-        var re = /^[a-zA-Z0-9 ]{1,35}$/;
-        if ( issuingAuthority.length > 0 && ! re.test(issuingAuthority) ) {
-          return 'Invalid issuing authority.';
         }
       }
     },
@@ -262,8 +281,17 @@ foam.CLASS({
   ],
 
   methods: [
-    function label() {
-      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+    {
+      name: 'label',
+      javaReturns: 'String',
+      code: function label() {
+        return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+      },
+      javaCode: `
+        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
+        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
+        return getFirstName() + " " + getLastName();
+      `
     }
   ]
 });
