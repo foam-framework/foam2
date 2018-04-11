@@ -22,15 +22,15 @@ public class ContainParser extends foam.lib.parse.ProxyParser {
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
+    ps = super.parse(ps, x);
     if ( ps == null ) return ps;
 
-    foam.mlang.predicate.Binary expr = new foam.mlang.predicate.Contains ();
-    expr.setArg1 ( ( foam.mlang.Expr ) x.get ( "arg1" ) );
+    foam.mlang.predicate.Binary expr = new foam.mlang.predicate.Contains();
+    expr.setArg1((foam.mlang.Expr) x.get("arg1"));
 
-    expr.setArg2 ( ( ps.value () instanceof foam.mlang.Expr ) ? ( foam.mlang.Expr ) ps
-        .value () : new foam.mlang.Constant ( ps.value () ) );
+    expr.setArg2(
+        ( ps.value() instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) ps.value() : new foam.mlang.Constant(ps.value()));
 
-    return ps.setValue ( expr );
+    return ps.setValue(expr);
   }
 }

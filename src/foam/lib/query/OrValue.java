@@ -28,7 +28,7 @@ public class OrValue extends foam.lib.parse.ProxyParser {
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
-    if ( ps == null || ps.value() == null ) return null;
+    if ( ps == null ) return null;
 
     Object[] values = (Object[]) ps.value();
     Object[] args = new Object[( (Object[]) values[1] ).length];

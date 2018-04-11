@@ -66,10 +66,10 @@ public class EqualsParser extends foam.lib.parse.ProxyParser {
     }
 
     foam.mlang.predicate.Binary expr = new foam.mlang.predicate.Eq();
-    expr.setArg1 (( foam.mlang.Expr ) x.get("arg1"));
-    expr.setArg2 (( ps.value() instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) ps
-        .value() : new foam.mlang.Constant(ps.value()));
+    expr.setArg1((foam.mlang.Expr) x.get("arg1"));
+    expr.setArg2(
+        ( ps.value() instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) ps.value() : new foam.mlang.Constant(ps.value()));
 
-    return ps.setValue ( expr );
+    return ps.setValue(expr);
   }
 }

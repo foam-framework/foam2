@@ -43,8 +43,7 @@ public class YYYYMMDDRangeDateParser extends ProxyParser  {
 
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
-
-    if ( ps == null || ps.value() == null ) return null;
+    if ( ps == null ) return null;
 
     Object[] result;
     result = (Object[]) ps.value();

@@ -25,12 +25,12 @@ public class HasParser extends foam.lib.parse.ProxyParser {
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
+    ps = super.parse(ps, x);
     if ( ps == null ) return ps;
 
-    Has predicate = new foam.mlang.predicate.Has ();
-    predicate.setArg1 ( info_ );
+    Has predicate = new foam.mlang.predicate.Has();
+    predicate.setArg1(info_);
 
-    return ps.setValue ( predicate );
+    return ps.setValue(predicate);
   }
 }

@@ -17,12 +17,4 @@ public class CompoundValue extends foam.lib.parse.ProxyParser {
                         new OrValue(),
                         new AndValue()));
   }
-
-  @Override
-  public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
-    if ( ps == null || ps.value () == null ) return null;
-
-    return ps;
-  }
 }

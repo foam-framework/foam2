@@ -36,9 +36,7 @@ public class RelativeDateParser extends ProxyParser {
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
-
-    if (ps == null || ps.value() == null)
-      return null;
+    if (ps == null ) return null;
 
     // example today or today-7 {today,"-",7}
     Object[] result = null;

@@ -20,21 +20,21 @@ public class AndParser
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
+    ps = super.parse(ps, x);
     if ( ps == null ) return ps;
 
-    foam.mlang.predicate.And and = new foam.mlang.predicate.And ();
+    foam.mlang.predicate.And and = new foam.mlang.predicate.And();
 
-    Object[] values = ( Object[] ) ps.value ();
+    Object[] values = (Object[]) ps.value();
 
     foam.mlang.predicate.Predicate[] args = new foam.mlang.predicate.Predicate[values.length];
 
     for ( int i = 0; i < values.length; i++ ) {
-      args[i] = ( foam.mlang.predicate.Predicate ) values[i];
+      args[i] = (foam.mlang.predicate.Predicate) values[i];
     }
 
-    and.setArgs ( args );
+    and.setArgs(args);
 
-    return ps.setValue ( and );
+    return ps.setValue(and);
   }
 }

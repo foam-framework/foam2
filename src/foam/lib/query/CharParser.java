@@ -23,10 +23,9 @@ public class CharParser extends foam.lib.parse.ProxyParser {
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
-    if ( ps == null || ps.value () == null ) return null;
+    ps = super.parse( ps, x );
+    if ( ps == null ) return null;
 
     return ps;
-
   }
 }

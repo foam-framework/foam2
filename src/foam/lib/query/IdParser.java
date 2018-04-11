@@ -24,7 +24,7 @@ public class IdParser extends foam.lib.parse.ProxyParser {
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
-    if ( ps == null || ps.value() == null ) return null;
+    if ( ps == null ) return null;
 
     Binary predicate = new foam.mlang.predicate.Eq();
     Object[] values = (Object[]) ps.value();
