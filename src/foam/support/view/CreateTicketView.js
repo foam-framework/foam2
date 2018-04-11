@@ -176,8 +176,9 @@ foam.CLASS({
   ^ .status{
     color: white;
     display: inline-block;
-    padding-top: 4px;
     text-align: center;
+    padding-top: 4px;
+    font-size: 10px;
   }
   .Submit-as{
     float: left;
@@ -192,9 +193,10 @@ foam.CLASS({
   .SubmitLabel {
     float:right;
   }
-  ^ .New .Pending .Updated .Solved .Open {
-    padding-top: 4px;
+  .SubmitLabel span{
     font-size: 10px;
+    position: relative;
+    top: 4px;
   }
   `,
 
