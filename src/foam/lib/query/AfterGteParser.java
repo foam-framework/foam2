@@ -26,18 +26,16 @@ public class AfterGteParser extends foam.lib.parse.ProxyParser {
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
+    ps = super.parse( ps, x );
     if ( ps == null ) return ps;
 
-    foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Gte ();
-    predicate.setArg1 ( ( foam.mlang.Expr ) x.get ( "arg1" ) );
+    foam.mlang.predicate.Binary predicate = new foam.mlang.predicate.Gte();
+    predicate.setArg1(( foam.mlang.Expr ) x.get( "arg1" ));
 
-    if ( ps.value () instanceof Object[] )
-      predicate.setArg2 ( ( foam.mlang.Expr ) ( ( Object[] ) ps.value () )[0] );
-    else predicate
-        .setArg2 ( ( ps.value () instanceof foam.mlang.Expr ) ? ( foam.mlang.Expr ) ps
-            .value () : new foam.mlang.Constant ( ps.value () ) );
+    predicate
+      .setArg2(( ps.value() instanceof foam.mlang.Expr ) ? (foam.mlang.Expr) ps
+          .value() : new foam.mlang.Constant(ps.value()));
 
-    return ps.setValue ( predicate );
+    return ps.setValue(predicate);
   }
 }
