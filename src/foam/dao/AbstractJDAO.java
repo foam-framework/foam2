@@ -16,10 +16,13 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
 import foam.nanos.logger.*;
+import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.TimeZone;
 
@@ -58,24 +61,43 @@ public abstract class AbstractJDAO
     }
 
     logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
-    try {
-      //get repo entries in filename.0 journal first
-      File inFile = getX().get(foam.nanos.fs.Storage.class).get(filename + ".0");
-      //load repo entries into DAO
-      if ( inFile.exists() ) loadJournal(inFile);
 
+    try {
+      String file = filename + ".0";
+      logger_.log("Loading file: " + file);
+      //get repo entries in filename.0 journal first
+      File inFile = getX().get(foam.nanos.fs.Storage.class).get(file);
+      //load repo entries into DAO
+      if ( inFile.exists() ) {
+        int validEntries = loadJournal(inFile);
+        logger_.log("Success reading " + validEntries + " entries from file: " + file);
+      } else {
+        logger_.warning("Can not find file: " + file);
+      }
+      //get runtime journal
+      file = filename;
+      logger_.log("Loading file: " + file);
       //get output journal
-      outFile_ = getX().get(foam.nanos.fs.Storage.class).get(filename);
+      outFile_ = getX().get(foam.nanos.fs.Storage.class).get(file);
       //if output journal does not existing, create one
       if ( ! outFile_.exists() ) {
+        logger_.warning("Can not find file: " + file);
         //if output journal does not exist, create one
-        outFile_.createNewFile();
+        File dir = outFile_.getAbsoluteFile().getParentFile();
+        if ( !dir.exists() ) {
+          logger_.log("Create dir: " + dir.getAbsolutePath());
+          dir.mkdirs();
+        }
+        logger_.log("Create file: " + file);
+        outFile_.getAbsoluteFile().createNewFile();
       } else {
         //if output journal file exists, load entries into DAO
-        loadJournal(outFile_);
+        int validEntries = loadJournal(outFile_);
+        logger_.log("Success reading " + validEntries + " entries from file: " + file);
       }
       //link output journal file to BufferedWriter
       out_ = new BufferedWriter(new FileWriter(outFile_, true));
+      out_.newLine();
     } catch ( IOException e ) {
       logger_.error(e);
       throw new RuntimeException(e);
@@ -84,9 +106,23 @@ public abstract class AbstractJDAO
 
   protected abstract Outputter getOutputter();
 
-  protected void loadJournal(File file)
-      throws IOException
+  protected int loadJournal(File file)
+    throws IOException
   {
+    PM pm = new PM(this.getClass(), "loadJournal:" + file);
+    try {
+      return loadJournal_(file);
+    } finally {
+      pm.log(getX());
+    }
+  }
+
+
+  protected int loadJournal_(File file)
+    throws IOException
+  {
+    // recoding success reading entries
+    int successReading = 0;
     JSONParser parser = getX().create(JSONParser.class);
     BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -108,18 +144,27 @@ public abstract class AbstractJDAO
 
         switch ( operation ) {
           case 'p':
+            PropertyInfo id = (PropertyInfo) getOf().getAxiomByName("id");
+            if ( getDelegate().find(id.get(object)) != null ) {
+              //If data exists, merge difference
+              //get old date
+              FObject old = getDelegate().find(id.get(object));
+              //merge difference
+              object = mergeChange(old, object);
+            }
             getDelegate().put(object);
             break;
           case 'r':
             getDelegate().remove(object);
             break;
         }
+        successReading++;
       } catch (Throwable t) {
         logger_.error("error replaying journal line:", line, t);
       }
     }
-
     br.close();
+    return successReading;
   }
 
   /**
@@ -163,18 +208,37 @@ public abstract class AbstractJDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
-    FObject ret = getDelegate().put_(x, obj);
+    PropertyInfo id     = (PropertyInfo) getOf().getAxiomByName("id");
+    FObject      o      = getDelegate().find_(x, id.get(obj));
+    FObject      ret    = null;
+    String       record = null;
+
+    if ( o == null ) {
+      //data does not exist
+      ret = getDelegate().put_(x, obj);
+      //stringify to json string
+      record = getOutputter().stringify(ret);
+    } else {
+      //compare with old data if old data exists
+      //get difference FObject
+      ret = difference(o, obj);
+      //if no difference, then return
+      if ( ret == null ) return obj;
+      //stringify difference FObject into json string
+      record = getOutputter().stringify(ret);
+      //put new data into memory
+      ret = getDelegate().put_(x, obj);
+    }
 
     try {
       // TODO(drish): supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + getOutputter().stringify(ret) + ")");
+      out_.write("p(" + record + ")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
       logger_.error("put", e);
     }
-
     return ret;
   }
 
@@ -183,12 +247,20 @@ public abstract class AbstractJDAO
     Object  id  = getPrimaryKey().get(obj);
     FObject ret = getDelegate().remove_(x, obj);
 
+    if ( ret == null ) {
+      // TODO: log
+      return ret;
+    }
+
     try {
       writeComment((User) x.get("user"));
       // TODO: Would be more efficient to output the ID portion of the object.  But
       // if ID is an alias or multi part id we should only output the
       // true properties that ID/MultiPartID maps too.
-      out_.write("r(" + getOutputter().stringify(ret) + ")");
+      FObject r = generateFObject(ret);
+      PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
+      idInfo.set(r, idInfo.get(ret));
+      out_.write("r(" + getOutputter().stringify(r) + ")");
       out_.newLine();
       out_.flush();
     } catch (IOException e) {
@@ -204,5 +276,61 @@ public abstract class AbstractJDAO
 
     getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
     getDelegate().removeAll_(x, skip, limit, order, predicate);
+  }
+
+  protected FObject difference(FObject o, FObject n) {
+    FObject diff = o.hardDiff(n);
+    //no difference, then return null
+    if ( diff == null ) return null;
+    //get the PropertyInfo for the id
+    PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
+    //set id property to new instance
+    idInfo.set(diff, idInfo.get(o));
+    return diff;
+  }
+
+  protected FObject mergeChange(FObject o, FObject c) {
+    //if no change to merge, return FObject;
+    if ( c == null ) return o;
+    //merge change
+    return maybeMerge(o, c);
+  }
+
+  protected FObject maybeMerge(FObject o, FObject c) {
+    if ( o == null ) return o = c;
+
+    //get PropertyInfos
+    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator e = list.iterator();
+
+    while ( e.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) e.next();
+      if ( prop instanceof AbstractFObjectPropertyInfo ) {
+        //do nested merge
+        //check if change
+        if ( ! prop.isSet(c) ) continue;
+        maybeMerge((FObject) prop.get(o), (FObject) prop.get(c));
+      } else {
+        //check if change
+        if ( ! prop.isSet(c) ) continue;
+        //set new value
+        prop.set(o, prop.get(c));
+      }
+    }
+
+    return o;
+  }
+
+  //return a new Fobject
+  protected FObject generateFObject(FObject o) {
+    try {
+      ClassInfo classInfo = o.getClassInfo();
+      //create a new Instance
+      FObject   ret       = (FObject) classInfo.getObjClass().newInstance();
+
+      return ret;
+    } catch (Throwable t) {
+      throw new RuntimeException(t);
+    }
   }
 }

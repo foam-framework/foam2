@@ -22,19 +22,18 @@ foam.CLASS({
 
   requires: [
     'foam.mlang.sink.Count',
-    'foam.u2.TableView',
-    'foam.u2.ViewSpec',
-    'foam.u2.tag.Card',
-    'foam.u2.tag.Input',
-    'foam.u2.view.ChoiceView',
-    //'foam.u2.search.DateFieldSearchView',
     'foam.u2.search.BooleanRefinement',
     'foam.u2.search.EnumRefinement',
     'foam.u2.search.GroupAutocompleteSearchView',
     'foam.u2.search.GroupBySearchView',
     'foam.u2.search.PropertyRefinement',
     'foam.u2.search.SearchManager',
-    'foam.u2.search.TextSearchView'
+    'foam.u2.search.TextSearchView',
+    'foam.u2.TableView',
+    'foam.u2.tag.Card',
+    'foam.u2.tag.Input',
+    'foam.u2.view.ChoiceView',
+    'foam.u2.ViewSpec'
   ],
 
   exports: [

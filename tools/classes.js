@@ -9,6 +9,7 @@ var classes = [
   'foam.core.Serializable',
   'foam.core.Exception',
   'foam.core.ContextAgent',
+  'foam.core.Identifiable',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -122,6 +123,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
   'foam.nanos.auth.token.TokenService',
@@ -136,6 +138,8 @@ var classes = [
   'foam.nanos.auth.twofactor.AbstractTOTPAuthService',
   'foam.nanos.auth.twofactor.ClientOTPAuthService',
   'foam.nanos.auth.twofactor.GoogleTOTPAuthService',
+  'foam.nanos.http.HttpParameters',
+  'foam.nanos.http.DefaultHttpParameters',
   'foam.nanos.session.Session',
   'foam.nanos.pool.AbstractFixedThreadPool',
   'foam.nanos.pm.PMInfo',
@@ -195,6 +199,7 @@ var classes = [
   'foam.nanos.demo.relationship.Student',
   'foam.nanos.demo.relationship.Professor',
   'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
 
@@ -205,9 +210,14 @@ var classes = [
   'foam.crypto.sign.Signable',
   'foam.crypto.sign.SignedFObject',
 
-  'foam.nanos.dig.Format',
+  'foam.nanos.http.Command',
+  'foam.nanos.http.Format',
+  'foam.nanos.http.DefaultHttpParameters',
+  'foam.nanos.http.HttpParameters',
+  'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
-  'foam.nanos.dig.DigPostParameters',
+
+  'foam.lib.query.TestModel'
 ];
 
 var abstractClasses = [

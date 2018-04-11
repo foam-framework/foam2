@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DIG',
+  extends: 'foam.nanos.http.DefaultHttpParameters',
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
@@ -21,11 +22,7 @@ foam.CLASS({
   searchColumns: [],
 
   properties: [
-    {
-        class: 'String',
-        name: 'id',
-        displayWidth: 40
-    },
+    'id',
     {
       class: 'String',
       name: 'daoKey',
@@ -42,15 +39,16 @@ foam.CLASS({
         });
       }
     },
+    'cmd',
+    'format',
     {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Command',
-      name: 'cmd'
-    },
-    {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Format',
-      name: 'format'
+      class: 'String',
+      name: 'dao',
+      hidden: true,
+      transient: true,
+      postSet: function(old, nu) {
+        this.daoKey = nu;
+      }
     },
     {
         class: 'String',
@@ -58,26 +56,35 @@ foam.CLASS({
     },
     {
       class: 'EMail',
+      displayWidth: 100,
       name: 'email'
     },
     {
-      class: 'String',
-      name: 'data'
+      class: 'EMail',
+      displayWidth: 100,
+      name: 'subject'
     },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'owner',
-      hidden: true
-      // TODO: set tableCellRenderer
-    },
+    'data',
     {
       class: 'URL',
-      name: 'url',
+      // TODO: appears not to work if named 'url', find out why.
+      name: 'digURL',
       label: 'URL',
-      displayWidth: 100
+      displayWidth: 120,
+      view: 'foam.nanos.dig.LinkView',
+      setter: function() {}, // Prevent from ever getting set
+      expression: function(key, data, email, subject, daoKey, cmd, format) {
+        var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd + "&format=" + format.name.toLowerCase();
+
+        if ( key )     url += "?id=" + key;
+        if ( data )    url += "?data=" + data;
+        if ( email )   url += "?email=" + email;
+        if ( subject ) url += "?subject=" + subject;
+
+        return url;
+      }
     }
-  ]
+  ],
 
   methods: [
   ]

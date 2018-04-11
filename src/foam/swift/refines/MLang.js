@@ -28,3 +28,48 @@ return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
     },
   ],
 });
+
+foam.CLASS({
+  refines: 'foam.mlang.ArrayConstant',
+
+  methods: [
+    {
+      name: 'f',
+      swiftCode: 'return value'
+    }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.mlang.sink.Map',
+
+  methods: [
+    {
+      name: 'f',
+      args: [
+        {
+          name: 'obj',
+          swiftType: 'Any?'
+        }
+      ],
+      swiftReturns: 'Any?',
+      swiftCode: `return (arg1 as? Expr)?.f(obj)`
+    },
+    {
+      name: 'put',
+      args: [
+        {
+          name: 'obj',
+          swiftType: 'Any'
+        },
+        {
+          name: 'sub',
+          swiftType: 'Detachable'
+        }
+      ],
+      swiftReturns: 'Void',
+      swiftCode: `delegate.put(f(obj), sub)`
+
+    }
+  ]
+});
