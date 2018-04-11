@@ -19,6 +19,10 @@ foam.CLASS({
     'foam.nanos.auth.Phone'
   ],
 
+  javaImports: [
+    'foam.util.SafetyUtil'
+  ],
+
   documentation: '',
 
   tableColumns: [
@@ -277,8 +281,17 @@ foam.CLASS({
   ],
 
   methods: [
-    function label() {
-      return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+    {
+      name: 'label',
+      javaReturns: 'String',
+      code: function label() {
+        return this.organization || ( this.lastName ? this.firstName + ' ' + this.lastName : this.firstName );
+      },
+      javaCode: `
+        if ( ! SafetyUtil.isEmpty(getOrganization()) ) return getOrganization();
+        if ( SafetyUtil.isEmpty(getLastName()) ) return getFirstName();
+        return getFirstName() + " " + getLastName();
+      `
     }
   ]
 });
