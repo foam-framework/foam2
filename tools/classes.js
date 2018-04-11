@@ -203,6 +203,7 @@ var classes = [
   'foam.nanos.demo.relationship.Student',
   'foam.nanos.demo.relationship.Professor',
   'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
 

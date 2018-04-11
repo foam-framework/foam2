@@ -21,11 +21,11 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
+    'foam.dao.FnSink',
     'foam.mlang.Constant',
     'foam.mlang.predicate.True',
     'foam.mlang.sink.Count',
     'foam.mlang.sink.GroupBy',
-    'foam.dao.FnSink',
     'foam.u2.view.ChoiceView'
   ],
 

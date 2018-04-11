@@ -16,14 +16,15 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
 import foam.nanos.logger.*;
+import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.TimeZone;
-import java.util.List;
-import java.util.Iterator;
 
 public abstract class AbstractJDAO
   extends ProxyDAO
@@ -106,9 +107,21 @@ public abstract class AbstractJDAO
   protected abstract Outputter getOutputter();
 
   protected int loadJournal(File file)
-      throws IOException
+    throws IOException
   {
-    //recoding success reading entries
+    PM pm = new PM(this.getClass(), "loadJournal:" + file);
+    try {
+      return loadJournal_(file);
+    } finally {
+      pm.log(getX());
+    }
+  }
+
+
+  protected int loadJournal_(File file)
+    throws IOException
+  {
+    // recoding success reading entries
     int successReading = 0;
     JSONParser parser = getX().create(JSONParser.class);
     BufferedReader br = new BufferedReader(new FileReader(file));
@@ -195,10 +208,11 @@ public abstract class AbstractJDAO
    */
   @Override
   public FObject put_(X x, FObject obj) {
-    PropertyInfo id = (PropertyInfo) getOf().getAxiomByName("id");
-    FObject o = getDelegate().find_(x, id.get(obj));
-    FObject ret = null;
-    String record = null;
+    PropertyInfo id     = (PropertyInfo) getOf().getAxiomByName("id");
+    FObject      o      = getDelegate().find_(x, id.get(obj));
+    FObject      ret    = null;
+    String       record = null;
+
     if ( o == null ) {
       //data does not exist
       ret = getDelegate().put_(x, obj);
@@ -215,6 +229,7 @@ public abstract class AbstractJDAO
       //put new data into memory
       ret = getDelegate().put_(x, obj);
     }
+
     try {
       // TODO(drish): supress class name from output
       writeComment((User) x.get("user"));
@@ -231,6 +246,11 @@ public abstract class AbstractJDAO
   public FObject remove_(X x, FObject obj) {
     Object  id  = getPrimaryKey().get(obj);
     FObject ret = getDelegate().remove_(x, obj);
+
+    if ( ret == null ) {
+      // TODO: log
+      return ret;
+    }
 
     try {
       writeComment((User) x.get("user"));
@@ -278,9 +298,11 @@ public abstract class AbstractJDAO
 
   protected FObject maybeMerge(FObject o, FObject c) {
     if ( o == null ) return o = c;
+
     //get PropertyInfos
     List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator e = list.iterator();
+
     while ( e.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) e.next();
       if ( prop instanceof AbstractFObjectPropertyInfo ) {
@@ -295,6 +317,7 @@ public abstract class AbstractJDAO
         prop.set(o, prop.get(c));
       }
     }
+
     return o;
   }
 
@@ -303,9 +326,10 @@ public abstract class AbstractJDAO
     try {
       ClassInfo classInfo = o.getClassInfo();
       //create a new Instance
-      FObject ret = (FObject) classInfo.getObjClass().newInstance();
+      FObject   ret       = (FObject) classInfo.getObjClass().newInstance();
+
       return ret;
-    } catch ( Throwable t ) {
+    } catch (Throwable t) {
       throw new RuntimeException(t);
     }
   }
