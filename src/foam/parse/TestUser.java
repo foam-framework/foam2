@@ -74,6 +74,7 @@ public class TestUser {
         {"birthday=2020/09/10"," ( ( ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ) ) "},
         {"birthday=2020-09-10"," ( ( ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ) ) "},
         {"birthday<2020-09-10"," ( ( birthday <  ?  ) ) "},
+        {"birthday<=2020-09-10"," ( ( birthday <=  ?  ) ) "},
         {"birthday>2020-09-10"," ( ( birthday >  ?  ) ) "},
         {"birthday=2011"," ( ( ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ) ) "},//
         {"birthday=2020"," ( ( ( birthday >=  ?  )  AND  ( birthday <=  ?  ) ) ) "},
@@ -103,7 +104,7 @@ public class TestUser {
         {"is:emailVerified"," ( ( emailverified =  ?  ) ) "},
 //        {"id=me"," ( ( id =  ?  ) ) "},
 
-//        {"firstName=Simon,Wassim"," ( ( ( firstname =  ?  )  OR  ( firstname =  ?  ) ) ) "},
+        {"firstName=Simon,Wassim"," ( ( ( firstname =  ?  )  OR  ( firstname =  ?  ) ) ) "},
 //        {"id=(6|7)"," ( ( ( id =  ?  )  OR  ( id =  ?  ) ) ) "},
 //        {"id=(6|7)"," ( ( ( id =  ?  )  OR  ( id =  ?  ) ) ) "},//TODO add alises
 

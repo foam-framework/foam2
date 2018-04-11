@@ -9,14 +9,15 @@ package foam.lib.query;
 import foam.lib.parse.Alt;
 import foam.lib.parse.Literal;
 import foam.lib.parse.PStream;
+import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Repeat;
 
 public class ValueList extends foam.lib.parse.ProxyParser {
 
-  public ValueList() {
+  public ValueList(Parser valueParser) {
     setDelegate(new Alt(new CompoundValue(),
-                        new Repeat(new ValueParser(),
+                        new Repeat(valueParser,
                                    new Literal(","),
                                    1)));
   }
@@ -26,6 +27,10 @@ public class ValueList extends foam.lib.parse.ProxyParser {
     ps = super.parse(ps, x);
     if ( ps == null || ps.value() == null ) return null;
 
-    return ps.setValue(( (Object[]) ps.value() ));
+    if ( ((Object[]) ps.value()).length == 1 ) {
+      return ps.setValue(((Object[]) ps.value())[0]);
+    }
+
+    return ps.setValue(((Object[]) ps.value()));
   }
 }

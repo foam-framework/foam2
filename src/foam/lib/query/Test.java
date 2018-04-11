@@ -11,7 +11,7 @@ public class Test {
     QueryParser parser = new QueryParser(TestModel.getOwnClassInfo());
 
     //String query = "name:adam birthdate=2017/01/01..2017/12/25 OR name:adam birthdate<2017/01/12 OR name:adam birthdate>2017/03/21";
-    String query = "age:30 birthdate=2017/01/01..2017/12/25 OR name:adam birthdate<2017/01/12 OR name:adam birthdate>2017/03/21";
+    String query = "n=adam";
 
     StringPStream sps = new StringPStream();
     sps.setString(query);

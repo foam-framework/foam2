@@ -3,6 +3,7 @@ package foam.parse;
 import java.util.ArrayList;
 import java.util.List;
 
+import foam.lib.query.IdParser;
 import foam.lib.parse.Alt;
 import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
@@ -25,7 +26,6 @@ public class QueryParser extends foam.lib.parse.ProxyParser {
 
     List<Parser> expressions = new ArrayList<Parser>();
 
-    int i = 0;
     for ( Object prop : properties ) {
       foam.core.PropertyInfo info = (foam.core.PropertyInfo) prop;
 
@@ -36,6 +36,8 @@ public class QueryParser extends foam.lib.parse.ProxyParser {
 
       if ( info.getSQLType().equalsIgnoreCase("BOOLEAN") ) expressions.add(new IsParser(info));
     }
+
+    expressions.add(new IdParser());
 
     Parser[] parsers = new Parser[expressions.size()];
     expressions.toArray(parsers);
