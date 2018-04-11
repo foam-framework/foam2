@@ -25,7 +25,7 @@ public class ValueList extends foam.lib.parse.ProxyParser {
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
-    if ( ps == null || ps.value() == null ) return null;
+    if ( ps == null ) return null;
 
     if ( ((Object[]) ps.value()).length == 1 ) {
       return ps.setValue(((Object[]) ps.value())[0]);

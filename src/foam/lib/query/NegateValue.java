@@ -20,13 +20,13 @@ public class NegateValue extends foam.lib.parse.ProxyParser {
         new Seq(
             new Literal("("),
             new Alt(new Literal("-"), new LiteralIC("not ")),
-            new ValueParser(),//("value"),
+            new ValueParser(),
             new Literal(")")
         ));
   }
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    return null;
+    return null; //TODO parse N negative values 
   }
 }

@@ -46,9 +46,9 @@ public class DuringExpressionParser
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
+    ps = super.parse( ps, x );
+    if ( ps == null ) return null;
 
-    if ( ps == null || ps.value() == null ) return null;
     if ( ps.value() instanceof java.lang.Long ) return ps
         .setValue( new java.util.Date(( java.lang.Long ) ps.value()));
     Object[] result;
@@ -62,7 +62,7 @@ public class DuringExpressionParser
 
       return ps.setValue( d );
     } else if ( ps.value() != null ) {
-      return ps.setValue( result );
+      return ps.setValue(result);
     } else {
       return null;
     }

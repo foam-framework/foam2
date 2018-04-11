@@ -27,7 +27,7 @@ public class AndValue extends foam.lib.parse.ProxyParser {
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    return null;
+    return null;//TODO parse N values
   }
 
 }

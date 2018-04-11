@@ -55,8 +55,7 @@ public class StringPStream
   }
 
   public PStream tail() {
-    //if ( tail_ == null )
-    tail_ = new StringPStream(str, pos + 1);
+    if ( tail_ == null ) tail_ = new StringPStream(str, pos + 1);
     return tail_;
   }
 

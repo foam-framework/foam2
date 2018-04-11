@@ -6,8 +6,6 @@
 
 package foam.lib.query;
 
-import java.security.AccessControlException;
-
 import foam.lib.parse.LiteralIC;
 import foam.lib.parse.Not;
 import foam.lib.parse.PStream;
@@ -20,24 +18,21 @@ public class MeParser extends foam.lib.parse.ProxyParser {
   public MeParser() {
     setDelegate(
         new Seq(new LiteralIC("me"),
-                new Not(new charParser())));
+                new Not(new CharParser())));
   }
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse ( ps, x );
-    if ( ps == null || ps.value () == null ) return null;
+    if ( ps == null ) return null;
 
-    if ( ( ( Object[] ) ps.value () )[0].equals ( "me" ) ) {
-      User user = ( User ) x.get ( "user" );
-      try {
-        if ( user == null )
-          throw new AccessControlException ( "User is not logged in" );
-      } catch ( Exception e ) {
-        System.out.println ( "User is not logged in" );
-        return ps.setValue ( null );
-      }
-      return ps.setValue ( user.getId () );
+    if ( ( (Object[]) ps.value() )[0].equals("me") ) {
+      User user = (User) x.get("user");
+        if ( user == null ) {
+          System.err.println("User is not logged in");
+          return null;
+        }
+      return ps.setValue(user.getId());
     }
     return null;
   }

@@ -13,27 +13,26 @@ import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.Seq;
+import foam.lib.parse.Seq1;
 import foam.mlang.predicate.Not;
 
 public class NegateParser extends foam.lib.parse.ProxyParser  {
 
   public NegateParser(Parser exprParser) {
-    setDelegate(new Alt(new Seq(new Literal("-"),
+    setDelegate(new Alt(new Seq1(1,new Literal("-"),
                                 exprParser),
-                        new Seq(new LiteralIC("NOT "),
+                        new Seq1(1,new LiteralIC("NOT "),
                                 exprParser)));
   }
 
   @Override
   public PStream parse(PStream ps, ParserContext x) {
-    ps = super.parse ( ps, x );
-    if ( ps == null || ps.value () == null ) return null;
+    ps = super.parse(ps, x);
+    if ( ps == null ) return null;
 
-    Object[] values = ( Object[] ) ps.value ();
-    Not predicate = new foam.mlang.predicate.Not ();
-    foam.mlang.predicate.Binary arg1 = ( foam.mlang.predicate.Eq ) values[1];
-    predicate.setArg1 ( arg1 );
+    Not predicate = new foam.mlang.predicate.Not();
+    predicate.setArg1((foam.mlang.predicate.Binary) ps.value());
 
-    return ps.setValue ( predicate );
+    return ps.setValue(predicate);
   }
 }
