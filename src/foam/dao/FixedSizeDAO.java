@@ -1,5 +1,6 @@
 package foam.dao;
 
+import java.util.Iterator;
 import foam.core.*;
 import foam.util.ConcurrentList;
 import foam.util.List;
@@ -11,9 +12,12 @@ public class FixedSizeDAO
 {
   private List<FObject> list;
   public FixedSizeDAO(X x, ClassInfo classInfo, int maxSize) {
+    this(x, classInfo, maxSize, false);
+  }
+  public FixedSizeDAO(X x, ClassInfo classInfo, int maxSize, boolean isAutoRemoveOldest) {
     setX(x);
     setOf(classInfo);
-    list = new ConcurrentList<FObject>(maxSize, true);
+    list = new ConcurrentList<FObject>(maxSize, isAutoRemoveOldest);
   }
 
   public FObject put_(X x, FObject obj) {
@@ -27,26 +31,20 @@ public class FixedSizeDAO
   }
 
   public FObject remove_(X x, FObject obj) {
-    FObject ret = null;
-    FObject[] fo = new FObject[list.size()];
-    fo = list.toArray(fo);
-    int i = 0;
-    for ( ; i < fo.length ; i ++ ) {
-      if ( getPrimaryKey().get(fo[i]).equals(getPrimaryKey().get(obj)) ) break;
-    }
-    ret = list.remove(fo[i], i);
-    return ret;
+    //TODO
+    FObject ret = find_(x, obj);
+    if ( ret == null ) return null;
+    return list.remove(ret, 0);
   }
 
   public FObject find_(X x, Object o) {
     FObject ret = null;
-    FObject[] fo = new FObject[list.size()];
-    fo = list.toArray(fo);
-    for ( int i = 0 ; i < fo.length ; i ++ ) {
-      Object id = getPrimaryKey().get(fo[i]);
+    Iterator<FObject> i = list.iterator();
+    while( i.hasNext() ) {
+      FObject f = i.next();
+      Object id = getPrimaryKey().get(f);
       if ( getOf().isInstance(o) ? id.equals(getPrimaryKey().get(o)) : id.equals(o) ) {
-        ret = fo[i];
-        break;
+        ret = f;
       }
     }
     return AbstractFObject.maybeClone(ret);
@@ -56,11 +54,11 @@ public class FixedSizeDAO
     sink = prepareSink(sink);
     Sink         decorated = decorateSink_(sink, skip, limit, order, predicate);
     Subscription sub       = new Subscription();
-    FObject[] fo = new FObject[list.size()];
-    fo = list.toArray(fo);
-    for ( int i = 0 ; i < fo.length ; i++ ) {
+    Iterator<FObject> i = list.iterator();
+    while( i.hasNext() ) {
+      FObject f = i.next();
       if ( sub.getDetached() ) break;
-      decorated.put(fo[i], sub);
+      decorated.put(f, sub);
     }
     decorated.eof();
     return sink;
