@@ -31,6 +31,8 @@ public class PropertyExpressionParser
     setDelegate(new Seq1(2,
                          new foam.lib.json.Whitespace(),
                          new Alt(names),
+                         // TODO: There should probably be a better way to detect Date
+                         // properties, but this works for now.
                          prop.getValueClass().equals(java.util.Date.class) ?
                          new Alt(new EqualsParser(new DuringExpressionParser()),
                                  new BeforeLteParser(new LiteralDateParser()),
