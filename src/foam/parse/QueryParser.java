@@ -38,6 +38,7 @@ public class QueryParser extends foam.lib.parse.ProxyParser {
     }
 
     expressions.add(new IdParser());
+    expressions.add(new MeParser());
 
     Parser[] parsers = new Parser[expressions.size()];
     expressions.toArray(parsers);
