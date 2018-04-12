@@ -33,16 +33,45 @@ public class ThreadsWebAgent
     out.println("<H1>Threads</H1>\n");
     out.println("<pre>");
 
+    int parkedThreads    = 0;
+    int sleepingThreads  = 0;
+    out.println("<table style=\"width: 100%\">");
+    out.println("<tr>");
+    out.println("<th stye=\"text-align: left\">Thread Name</th>");
+    out.println("<th>Last Method Call</th>");
+    out.println("</tr>");
     for ( Thread thread : threadArray ){
-      out.println("<a href=\"threads?id="+ thread.getId() + "\">" + thread.toString() + "</a>");
-      StackTraceElement[] elements = thread.getStackTrace();
-
+      StackTraceElement[] elements  = thread.getStackTrace();
+      String methodName             = null;
       if ( elements.length > 0 ) {
-        out.println(elements[0].toString());
+        methodName = elements[0].getMethodName();
+        switch ( methodName ) {
+          case "park":
+            parkedThreads += 1;
+            continue;
+          case "sleep":
+            sleepingThreads += 1;
+            break;
+          default:
+            break;
+        }
       } else {
-        out.println("This thread has not started, has started but not yet been scheduled to run, or has terminated.");
+        methodName = "Unscheduled";
       }
+
+      out.println("<tr>");
+      out.println("<td>");
+      out.println("<a href=\"threads?id="+ thread.getId() + "\">" + thread.toString() + "</a>");
+      out.println("</td>");
+      out.println("<td style=\"text-align: center;\">");
+      out.println(methodName);
+      out.println("</td>");
+      out.println("<tr>");
     }
+    out.println("</table>");
+
+    out.println("<br><br><H2>Summary</H2>\n");
+    out.format("Total Threads : %d ; Parked Threads (not listed) : %d ; Sleeping Threads : %d ; Other Threads : %d", threadArray.length, parkedThreads, sleepingThreads, (threadArray.length - parkedThreads - sleepingThreads));
 
     String param = req.getParameter("id");
     if ( ! SafetyUtil.isEmpty(param) ) {
