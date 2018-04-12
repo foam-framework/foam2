@@ -1,6 +1,9 @@
 package foam.lib.query;
 
-import foam.lib.parse.*;
+import foam.lib.parse.Alt;
+import foam.lib.parse.PStream;
+import foam.lib.parse.Parser;
+import foam.lib.parse.ParserContext;
 
 public class QueryParser
   extends foam.lib.parse.ProxyParser {
