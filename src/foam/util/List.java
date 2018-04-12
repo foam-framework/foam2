@@ -1,5 +1,8 @@
 package foam.util;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 public class List<O> {
   private final int maxSize_;
   private Node<O> head_;
@@ -151,7 +154,7 @@ public class List<O> {
     return ret;
   }
   public O valueAtIndex(int i) {
-    if ( i >= curSize_ || i < 0 ) throw new RuntimeException("List: index out of bound");
+    if ( i >= curSize_ || i < 0 ) throw new IndexOutOfBoundsException("List: index out of bound");
     Node<O> e = head_;
     //find node at i
     for ( int n = 0 ; n < i ; n++ ) {
@@ -161,7 +164,7 @@ public class List<O> {
     return e.getValue();
   }
   public O removeAtIndex(int i) {
-    if ( i >= curSize_ || i < 0 ) throw new RuntimeException("List: index out of bound");
+    if ( i >= curSize_ || i < 0 ) throw new IndexOutOfBoundsException("List: index out of bound");
     Node<O> e = head_;
     //find node at i;
     for ( int n = 0 ; n < i ; n++ ) {
@@ -170,7 +173,7 @@ public class List<O> {
     return removeNode(e);
   }
   public O remove(O o, int startIndex) {
-    if ( startIndex >= curSize_ || startIndex < 0 ) throw new RuntimeException("List: index out of bound");
+    if ( startIndex >= curSize_ || startIndex < 0 ) throw new IndexOutOfBoundsException("List: index out of bound");
     Node<O> e = head_;
     for ( int i = 0 ; i < startIndex ; i++ ) {
       e = e.getPost();
@@ -197,7 +200,7 @@ public class List<O> {
     return node.getValue();
   }
   public void addBefore(O o, int index) {
-    if ( ! isAllowAdd() ) throw  new RuntimeException("List: List is already full");
+    if ( ! isAllowAdd() ) throw  new IndexOutOfBoundsException("List: List is already full");
     if ( index >= curSize_ || index < 0 ) throw new RuntimeException("List: index out of bound");
     Node<O> node = new Node<O>(o);
     Node<O> e = head_;
@@ -217,7 +220,7 @@ public class List<O> {
     curSize_++;
   }
   public void addAfter(O o, int index) {
-    if ( ! isAllowAdd() ) throw  new RuntimeException("List: List is already full");
+    if ( ! isAllowAdd() ) throw  new IndexOutOfBoundsException("List: List is already full");
     if ( index >= curSize_ || index < 0 ) throw new RuntimeException("List: index out of bound");
     Node<O> node = new Node<O>(o);
     Node<O> e = head_;
@@ -258,6 +261,28 @@ public class List<O> {
       array[c] = null;
     }
     return array;
+  }
+  public Iterator<O> iterator() {
+    return new ListIter<O>(toArray(), 0);
+  }
+
+  static final class ListIter<O> implements Iterator<O> {
+    private final Object[] array_;
+    private int cursor_;
+    ListIter(Object[] array, int cursor) {
+      array_ = array;
+      cursor_ = cursor;
+    }
+    @Override
+    public boolean hasNext() {
+      return cursor_ < array_.length;
+    }
+    @Override
+    public O next() {
+      if ( ! hasNext() )
+        throw new NoSuchElementException();
+      return (O) array_[cursor_++];
+    }
   }
   public String toString() {
     String ret = "[";

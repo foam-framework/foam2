@@ -1,6 +1,7 @@
 package foam.util;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Iterator;
 
 public class ConcurrentList<O> extends List<O> {
   private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
@@ -132,5 +133,9 @@ public class ConcurrentList<O> extends List<O> {
     } finally {
       readLock.unlock();
     }
+  }
+  @Override 
+  public Iterator<O> iterator() {
+    return new ListIter<O>(toArray(), 0);
   }
 }
