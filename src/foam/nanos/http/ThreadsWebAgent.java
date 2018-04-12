@@ -35,6 +35,14 @@ public class ThreadsWebAgent
 
     for ( Thread thread : threadArray ){
       out.println("<a href=\"threads?id="+ thread.getId() + "\">" + thread.toString() + "</a>");
+      StackTraceElement[] elements = thread.getStackTrace();
+
+      if ( elements.length > 0 ) {
+        out.println(elements[0].toString());
+      } else {
+        out.println("This thread has not started, has started but has not" +
+          " yet been scheduled to run by the system, or has terminated.");
+      }
     }
 
     String param = req.getParameter("id");
