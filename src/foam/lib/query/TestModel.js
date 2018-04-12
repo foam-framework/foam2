@@ -4,7 +4,9 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'name'
+      name: 'name',
+      shortName:'n',
+      aliases:['fname','fn','first']
     },
     {
       class: 'Int',
@@ -13,6 +15,7 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'birthdate'
-    }
+    },
+    { class: 'Enum', of: 'foam.lib.query.FooEnum', name: 'foo' }
   ]
 });

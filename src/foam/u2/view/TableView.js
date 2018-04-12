@@ -330,6 +330,12 @@ foam.CLASS({
       documentation: 'Set this to true to let the user select columns.'
     },
     {
+      class: 'Boolean',
+      name: 'disableUserSelection',
+      value: false,
+      documentation: 'Ignores selection by user.'
+    },
+    {
       name: 'ascIcon',
       documentation: 'HTML entity representing unicode Up-Pointing Triangle',
       factory: function() {
@@ -443,11 +449,17 @@ foam.CLASS({
               select(this.orderedDAO$proxy, function(obj) {
                 return this.E('tr').
                   on('mouseover', function() { view.hoverSelection = obj; }).
-                  callIf(view.dblclick, function() { this.on('dblclick', function() { view.dblclick && view.dblclick(obj); }); }).
-                  on('click', function() {
-                    view.selection = obj;
-                    if ( view.importSelection$ ) view.importSelection = obj;
-                    if ( view.editRecord$ ) view.editRecord(obj);
+                  callIf(view.dblclick && ! view.disableUserSelection, function() {
+                    this.on('dblclick', function() {
+                      view.dblclick && view.dblclick(obj);
+                    });
+                  }).
+                  callIf( ! view.disableUserSelection, function() {
+                    this.on('click', function() {
+                      view.selection = obj;
+                      if ( view.importSelection$ ) view.importSelection = obj;
+                      if ( view.editRecord$ ) view.editRecord(obj);
+                    })
                   }).
                   addClass(view.slot(function(selection) {
                     return selection && foam.util.equals(obj.id, selection.id) ?
