@@ -45,6 +45,7 @@ public class FixedSizeDAO
       Object id = getPrimaryKey().get(f);
       if ( getOf().isInstance(o) ? id.equals(getPrimaryKey().get(o)) : id.equals(o) ) {
         ret = f;
+        break;
       }
     }
     return AbstractFObject.maybeClone(ret);
