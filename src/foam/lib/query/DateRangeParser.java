@@ -1,6 +1,8 @@
 package foam.lib.query;
 
-import foam.lib.parse.*;
+import foam.lib.parse.Literal;
+import foam.lib.parse.ProxyParser;
+import foam.lib.parse.Seq2;
 
 public class DateRangeParser
   extends ProxyParser {

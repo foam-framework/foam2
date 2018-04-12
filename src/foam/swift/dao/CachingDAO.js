@@ -48,7 +48,7 @@ foam.CLASS({
       forwards: [ 'find_', 'select_' ],
       swiftExpressionArgs: ['src', 'cache'],
       swiftExpression: `
-let pDao = self.PromisedDAO_create()
+let pDao = self.PromisedDAO_create(["of": self.of])
 DispatchQueue.global(qos: .background).async {
   try? cache.removeAll()
   let sink = self.DAOSink_create(["dao": cache])

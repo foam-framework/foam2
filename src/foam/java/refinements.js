@@ -36,6 +36,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaQueryParser',
+      expression: function(javaJSONParser) { return javaJSONParser; }
+    },
+    {
+      class: 'String',
       name: 'javaCSVParser'
     },
     {
@@ -49,6 +54,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaGetter'
+    },
+    {
+      class: 'String',
+      name: 'shortName'
+    },
+    {
+      class:'StringArray',
+      name: 'aliases'
     },
     {
       class: 'String',
@@ -85,12 +98,15 @@ foam.CLASS({
       return foam.java.PropertyInfo.create({
         sourceCls:        cls,
         propName:         this.name,
+        propShortName:    this.shortName,
+        propAliases:      this.aliases,
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,
         cloneProperty:    this.javaCloneProperty,
         diffProperty:     this.javaDiffProperty,
         jsonParser:       this.javaJSONParser,
+        queryParser:      this.javaQueryParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
@@ -278,7 +294,6 @@ foam.LIB({
 
       if ( this.hasOwnAxiom('id') ) {
         cls.implements = cls.implements.concat('foam.core.Identifiable');
-        var getid = cls.getMethod('getId');
         cls.method({
           visibility: 'public',
           type: 'Object',
@@ -291,7 +306,7 @@ foam.LIB({
         name: 'hashCode',
         type: 'int',
         visibility: 'public',
-        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return p.name + '_'; }).join(',')});`
+        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return '(Object) ' + p.name + '_'; }).join(',')});`
       });
 
       if ( cls.name ) {
@@ -716,7 +731,12 @@ foam.CLASS({
   refines: 'foam.core.Enum',
 
   properties: [
-    ['javaType',       'java.lang.Enum'],
+    {
+      name: 'javaType',
+      expression: function(of) {
+        return of.id
+      }
+    },
     ['javaInfoType',   'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
     ['javaCSVParser',  'foam.lib.json.IntParser']
@@ -787,10 +807,10 @@ foam.CLASS({
       });
 
       var cast = info.getMethod('cast');
-      cast.body = 'if ( o instanceof Integer ) {'
-      + 'return forOrdinal((int) o); '
-      + '}'
-      + ' return (java.lang.Enum) o;';
+      cast.body = `if ( o instanceof Integer ) {
+  return forOrdinal((int) o);
+}
+return (${this.of.id})o;`;
 
       return info;
     }
@@ -833,6 +853,7 @@ foam.CLASS({
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+    ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
     ['javaCSVParser', 'foam.lib.json.DateParser'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
@@ -860,6 +881,7 @@ foam.CLASS({
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+       ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
        ['javaCSVParser', 'foam.lib.json.DateParser'],
        ['sqlType', 'DATE']
    ],
@@ -910,6 +932,7 @@ foam.CLASS({
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringParser()'],
+    ['javaQueryParser', 'new foam.lib.query.StringParser()'],
     ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
     {
       name: 'sqlType',

@@ -74,7 +74,7 @@ foam.CLASS({
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
       expression: function(key, data, email, subject, daoKey, cmd, format) {
-        var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd + "&format=" + format.name.toLowerCase();
+        var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd.name.toLowerCase() + "&format=" + format.name.toLowerCase();
 
         if ( key )     url += "?id=" + key;
         if ( data )    url += "?data=" + data;

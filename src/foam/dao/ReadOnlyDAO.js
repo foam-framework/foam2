@@ -24,6 +24,7 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `throw new UnsupportedOperationException("Cannot put into ReadOnlyDAO");`,
+      swiftCode: `throw FoamError("Cannot put into ReadOnlyDAO")`,
       code: function put_(x, obj) {
       return Promise.reject('Cannot put into ReadOnlyDAO');
       }
@@ -31,6 +32,7 @@ foam.CLASS({
     {
       name: 'remove_',
       javaCode: `throw new UnsupportedOperationException("Cannot remove from ReadOnlyDAO");`,
+      swiftCode: `throw FoamError("Cannot remove from ReadOnlyDAO")`,
       code: function remove_(x, obj) {
         return Promise.reject('Cannot remove from ReadOnlyDAO');
       }
@@ -38,6 +40,7 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `throw new UnsupportedOperationException("Cannot removeAll from ReadOnlyDAO");`,
+      swiftCode: `throw FoamError("Cannot removeAll from ReadOnlyDAO")`,
       code: function removeAll() {
         return Promise.reject('Cannot removeAll from ReadOnlyDAO');
       }

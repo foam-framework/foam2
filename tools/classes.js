@@ -9,6 +9,7 @@ var classes = [
   'foam.core.Serializable',
   'foam.core.Exception',
   'foam.core.ContextAgent',
+  'foam.core.Identifiable',
   'foam.mlang.predicate.Predicate',
   'foam.mlang.predicate.True',
   'foam.mlang.predicate.False',
@@ -198,6 +199,7 @@ var classes = [
   'foam.nanos.demo.relationship.Student',
   'foam.nanos.demo.relationship.Professor',
   'foam.nanos.demo.relationship.Course',
+  'foam.nanos.demo.relationship.CourseType',
   'foam.nanos.demo.relationship.StudentCourseJunction',
   'foam.nanos.fs.File',
 
@@ -214,10 +216,9 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
-
   'foam.lib.query.TestModel',
-  //logger
-  'foam.nanos.logger.Log'
+  'foam.nanos.logger.Log',
+  'foam.lib.query.FooEnum'
 ];
 
 var abstractClasses = [

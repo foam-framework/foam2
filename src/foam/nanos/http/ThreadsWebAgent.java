@@ -35,6 +35,13 @@ public class ThreadsWebAgent
 
     for ( Thread thread : threadArray ){
       out.println("<a href=\"threads?id="+ thread.getId() + "\">" + thread.toString() + "</a>");
+      StackTraceElement[] elements = thread.getStackTrace();
+
+      if ( elements.length > 0 ) {
+        out.println(elements[0].toString());
+      } else {
+        out.println("This thread has not started, has started but not yet been scheduled to run, or has terminated.");
+      }
     }
 
     String param = req.getParameter("id");
@@ -48,8 +55,12 @@ public class ThreadsWebAgent
           out.println("<b>Thread: " + thread.getName() + "</b>\n");
           StackTraceElement[] elements = thread.getStackTrace();
 
-          for ( StackTraceElement element : elements ) {
-            out.println(element.toString());
+          if ( elements.length > 0 ) {
+            for ( StackTraceElement element : elements ) {
+              out.println(element.toString());
+            }
+          } else {
+            out.println("This thread has not started, has started but not yet been scheduled to run, or has terminated.");
           }
           break;
         }
