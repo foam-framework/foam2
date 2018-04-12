@@ -31,11 +31,10 @@ public class BenchmarkRunner
   public static class Builder<T extends Builder<T>>
     extends ContextAwareSupport
   {
-    protected String    name_ = "foam.nanos.bench.BenchmarkRunner";
-    protected int       threadCount_ = 0;
+    protected String    name_            = "foam.nanos.bench.BenchmarkRunner";
+    protected int       threadCount_     = Runtime.getRuntime().availableProcessors();
     protected int       invocationCount_ = 0;
     protected Benchmark test_;
-
 
     public Builder(X x) {
       setX(x);
@@ -68,10 +67,10 @@ public class BenchmarkRunner
 
   protected BenchmarkRunner(X x, Builder<?> builder) {
     setX(x);
-    name_ = builder.name_;
-    threadCount_ = builder.threadCount_;
+    name_            = builder.name_;
+    threadCount_     = builder.threadCount_;
     invocationCount_ = builder.invocationCount_;
-    test_ = builder.test_;
+    test_            = builder.test_;
   }
 
   /**
@@ -148,6 +147,7 @@ public class BenchmarkRunner
       float duration = ((float) (endTime - startTime) / 1000.0f);
 
       result_ =
+        "Threads: " + threadCount_ + "\n" +
         "Operations per second: " + (complete / duration) + "\n" +
         "Operations per second per thread: " + (complete / duration / (float) threadCount_) + "\n";
 
