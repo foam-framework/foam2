@@ -47,6 +47,7 @@ public class ConcurrentLRU<K, V>
 
   @Override
   public Set<Map.Entry<K,V>> entrySet() {
+    //TODO: can not prevent value change
     readLock.lock();
     try {
       return super.entrySet();
