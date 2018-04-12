@@ -28,8 +28,7 @@ public class LRUDAO
   }
 
   public FObject remove_(X x, FObject obj) {
-    //TODO
-    return obj;
+    return lru_.remove(getPrimaryKey().get(obj));
   }
 
   public FObject find_(X x, Object o) {
