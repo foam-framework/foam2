@@ -248,7 +248,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 
          BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Message[] messages = folder.getMessages();
-            Message message1 = folder.getMessage(3);
+            Message message1 = folder.getMessage(0);
             System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
             System.out.println(message1.getSubject());
 
