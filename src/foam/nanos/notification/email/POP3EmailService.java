@@ -218,6 +218,32 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          System.out.println("SUBJECT: " + m.getSubject());
    }
 
+   private Email getMessageId(int id){
+      Email message  = new Email();
+      int length=getSize();
+      int i=0;
+      message=al.get(i);
+      i++;
+  try{
+      while(message.getId()!=id && i<length)
+          message=al.get(i);
+          i++;
+      if(message.getId()!=id)
+          message=null;
+          String emailId = folder.getId(message).toString(emailid);
+                        if (emailId.equals(emailId)){
+                              System.out.println("Your ids are matching...");
+                        }
+                        else{
+                              System.out.println("check your id properly");
+                        }
+                  }
+                        catch(Exception ex){
+                        System.out.println("Following exception" + ex);
+                        }
+      return message;
+   }
+
    public void reply() 
    {
       Date date = null;
@@ -245,10 +271,12 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          }
          folder.open(Folder.READ_ONLY);
       
+         
 
          BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Message[] messages = folder.getMessages();
-            Message message1 = folder.getMessage(0);
+            //Message message1 = folder.getMessage(emailId);
+            Message message1 = folder.getMessageId(1);
             System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
             System.out.println(message1.getSubject());
 
