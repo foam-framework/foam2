@@ -16,66 +16,42 @@ foam.CLASS({
     'foam.nanos.logger.Log'
   ],
 
+  properties: [
+    {
+      name: 'self',
+      factory: function(){
+        return this;
+      }
+    }
+  ],
+
   methods: [
+    function outputLogger(type, array) {
+      if (array.length > 1) {
+        var ret = ''
+        for (var i = 0 ; i < array.length ; i++ ) {
+          ret = ret + this.normalizeDetail(array[i]);
+        }
+        this.addToDAO(type, 'Please see details', ret);
+      } else if ( array.length == 1 ) {
+        var des = this.normalizeDescription(array[0]) || 'Please see details';
+        this.addToDAO(type, des, this.normalizeDetail(array[0]));
+      }
+    },
     function log() {
-      if (arguments.length > 1) {
-        var ret = ''
-        for (var i = 0 ; i < arguments.length ; i++ ) {
-          ret = ret + this.normalizeDetail(arguments[i]);
-        }
-        this.addToDAO('log', 'Please see details', ret);
-      } else if ( arguments.length == 1 ) {
-        var des = this.normalizeDescription(arguments[0]) || 'Please see details';
-        this.addToDAO('log', des, this.normalizeDetail(arguments[0]));
-      }
+      this.outputLogger('log', Array.from(arguments))
     },
-    function warning(e) {
-      if (arguments.length > 1) {
-        var ret = ''
-        for (var i = 0 ; i < arguments.length ; i++ ) {
-          ret = ret + this.normalizeDetail(arguments[i]);
-        }
-        this.addToDAO('warning', 'Please see details', ret);
-      } else if ( arguments.length == 1 ) {
-        var des = this.normalizeDescription(arguments[0]) || 'Please see details';
-        this.addToDAO('warning', des, this.normalizeDetail(arguments[0]));
-      }
+    function warning() {
+      this.outputLogger('warning', Array.from(arguments))
     },
-    function info(e) {
-      if (arguments.length > 1) {
-        var ret = ''
-        for (var i = 0 ; i < arguments.length ; i++ ) {
-          ret = ret + this.normalizeDetail(arguments[i]);
-        }
-        this.addToDAO('info', 'Please see details', ret);
-      } else if ( arguments.length == 1 ) {
-        var des = this.normalizeDescription(arguments[0]) || 'Please see details';
-        this.addToDAO('info', des, this.normalizeDetail(arguments[0]));
-      }
+    function info() {
+      this.outputLogger('info', Array.from(arguments))
     },
-    function error(e) {
-      if (arguments.length > 1) {
-        var ret = ''
-        for (var i = 0 ; i < arguments.length ; i++ ) {
-          ret = ret + this.normalizeDetail(arguments[i]);
-        }
-        this.addToDAO('error', 'Please see details', ret);
-      } else if ( arguments.length == 1 ) {
-        var des = this.normalizeDescription(arguments[0]) || 'Please see details';
-        this.addToDAO('error', des, this.normalizeDetail(arguments[0]));
-      }
+    function error() {
+      this.outputLogger('error', Array.from(arguments))
     },
-    function debug(e) {
-      if (arguments.length > 1) {
-        var ret = ''
-        for (var i = 0 ; i < arguments.length ; i++ ) {
-          ret = ret + this.normalizeDetail(arguments[i]);
-        }
-        this.addToDAO('debug', 'Please see details', ret);
-      } else if ( arguments.length == 1 ) {
-        var des = this.normalizeDescription(arguments[0]) || 'Please see details';
-        this.addToDAO('debug', des, this.normalizeDetail(arguments[0]));
-      }
+    function debug() {
+      this.outputLogger('debug', Array.from(arguments))
     },
     function normalizeDetail(e) {
       if ( foam.core.Exception.isInstance(e) ) {
