@@ -216,8 +216,8 @@ var classes = [
   'foam.nanos.http.HttpParameters',
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
-
   'foam.lib.query.TestModel',
+  'foam.nanos.logger.Log',
   'foam.lib.query.FooEnum'
 ];
 
