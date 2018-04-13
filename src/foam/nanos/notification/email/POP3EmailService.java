@@ -33,6 +33,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.Part;
+import javax.mail.UIDFolder;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -52,13 +53,14 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import com.sun.mail.pop3.POP3Folder;
 
 import java.lang.Object;
 
 public class POP3EmailService extends ContextAwareSupport implements POP3Email, NanoService
 {
     public static void fetch(String pop3Host, String storeType, String user, String password) {
-          try {
+      try {
          Properties properties = new Properties();
          properties.put("mail.store.protocol", "pop3");
          properties.put("mail.pop3.host", pop3Host);
@@ -82,13 +84,16 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 
          Message[] messages = emailFolder.getMessages();
                   
-         
+         POP3Folder pop3Folder = (POP3Folder) emailFolder;
          System.out.println("messages.length---" + messages.length);
-
+            
          for (int i = 0; i < messages.length; i++) {
             Message message = messages[i];
             System.out.println("---------------------------------");
             writePart(message);
+            String emailId = pop3Folder.getUID(message);
+            System.out.println("-------- EMAIL UID ----------");
+            System.out.println(emailId);
             String line = reader.readLine();
             if ("YES".equals(line)) {
                message.writeTo(System.out);
@@ -122,7 +127,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
    public static void writePart(Part p) throws Exception {
   if (p instanceof Message)
      writeEnvelope((Message) p);
-
       System.out.println("----------------------------");
       System.out.println("CONTENT-TYPE: " + p.getContentType());
 
@@ -217,7 +221,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
    public void reply() 
    {
       Date date = null;
-      long emailId = Long.valueOf(234234);
+      String emailId = "GmailId162c04e9c76e0b6c";
       Properties properties = new Properties();
       properties.put("mail.store.protocol", "pop3s");
       properties.put("mail.pop3s.host", "pop.gmail.com");
@@ -234,7 +238,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          Store store = session.getStore("pop3s");
          store.connect("pop.gmail.com", "pat.dev.test1@gmail.com","Choose123");
 
-         Folder folder = store.getFolder("inbox");
+            Folder folder = store.getFolder("inbox");
          if (!folder.exists()) {
             System.out.println("inbox not found");
                System.exit(0);
@@ -244,12 +248,12 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 
          BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Message[] messages = folder.getMessages();
+            Message message1 = folder.getMessage(3);
+            System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
+            System.out.println(message1.getSubject());
 
-      //   Long emailid = folder.getUID(messages[0]);
-      //   Long emailID = folder.getMessagesByUID(emailid);
          if (messages.length != 0 ) {
 
-            
             for (int i = 0, n = messages.length; i < n; i++) {
                Message message = messages[i];
                date = message.getSentDate();
@@ -278,7 +282,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
                if (sent != null) {
                   System.out.println("Sent: " + sent);
                }else{
-                     System.out.println("Please verify your emailID" + emailId);
+                  System.out.println("Please verify your emailID" + emailId);
                }
                
               System.out.print("Do you want to reply to this email with ID [y/n] : ");
