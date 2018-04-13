@@ -36,7 +36,6 @@ public class FixedSizeDAO
   }
 
   public FObject remove_(X x, FObject obj) {
-    //TODO
     FObject ret = find_(x, obj);
     if ( ret == null ) return null;
     return list.remove(ret, 0);
