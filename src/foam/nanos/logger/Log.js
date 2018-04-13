@@ -27,7 +27,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'belong',
+      name: 'user',
       label: 'User ID'
     },
     {
