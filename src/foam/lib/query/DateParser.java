@@ -1,8 +1,11 @@
 package foam.lib.query;
 
-import foam.lib.parse.*;
-
 import foam.lib.json.IntParser;
+import foam.lib.parse.Literal;
+import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContext;
+import foam.lib.parse.ProxyParser;
+import foam.lib.parse.Seq;
 
 public class DateParser
   extends ProxyParser {
