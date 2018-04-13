@@ -21,6 +21,10 @@ public class ThreadsWebAgent
 {
   public ThreadsWebAgent() {}
 
+  private String removeJavaBaseClass(String str){
+    return str.substring(str.indexOf("/") + 1);
+  }
+
   public void execute(X x) {
     PrintWriter        out         = x.get(PrintWriter.class);
     HttpServletRequest req         = x.get(HttpServletRequest.class);
@@ -37,22 +41,26 @@ public class ThreadsWebAgent
     int sleepingThreads  = 0;
     out.println("<table style=\"width: 100%\">");
     out.println("<tr>");
-    out.println("<th stye=\"text-align: left\">Thread Name</th>");
+    out.println("<th style=\"text-align: left\">Thread Name</th>");
     out.println("<th>Last Method Call</th>");
     out.println("</tr>");
     for ( Thread thread : threadArray ){
       StackTraceElement[] elements  = thread.getStackTrace();
       String methodName             = null;
+
       if ( elements.length > 0 ) {
         methodName = elements[0].getMethodName();
+
         switch ( methodName ) {
           case "park":
             parkedThreads += 1;
             continue;
           case "sleep":
             sleepingThreads += 1;
+            methodName = removeJavaBaseClass(elements[0].toString());
             break;
           default:
+            methodName = removeJavaBaseClass(elements[0].toString());
             break;
         }
       } else {
@@ -63,7 +71,7 @@ public class ThreadsWebAgent
       out.println("<td>");
       out.println("<a href=\"threads?id="+ thread.getId() + "\">" + thread.toString() + "</a>");
       out.println("</td>");
-      out.println("<td style=\"text-align: center;\">");
+      out.println("<td>");
       out.println(methodName);
       out.println("</td>");
       out.println("<tr>");
