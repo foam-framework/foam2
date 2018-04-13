@@ -43,6 +43,15 @@ foam.CLASS({
   ^ .foam-u2-view-TableView td{
     width: 8px;
   }
+  ^ .foam-u2-view-TableView-th-editColumns{
+    width: 10px;
+  }
+  ^ .foam-u2-view-TableView-th-id{
+    width: 125px;
+  }
+  ^ .foam-u2-view-TableView-th-requestorEmail{
+    width: 200px;
+  }
   `,
 
   properties: [
@@ -55,6 +64,7 @@ foam.CLASS({
 
   methods: [
     function initE(){
+
       this.addClass(this.myClass())
       .start().hide(this.hideSummary$)
         .tag({ class: 'foam.support.view.TicketSummaryView' })

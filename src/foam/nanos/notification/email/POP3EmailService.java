@@ -1,9 +1,10 @@
 package foam.nanos.notification.email;
 
+import foam.core.X;
 import foam.core.ContextAwareSupport;
 import foam.nanos.NanoService;
 import foam.nanos.notification.email.POP3Email;
-import foam.core.X;
+
 import java.util.Properties;
 import java.util.Objects;
 import java.util.Date;
@@ -20,9 +21,6 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -35,6 +33,10 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.Part;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -76,8 +78,11 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          BufferedReader reader = new BufferedReader(new InputStreamReader(
           System.in));
 
+<<<<<<< HEAD
           
 
+=======
+>>>>>>> cb46672b4185942eeaf09b8a80374c943d961292
          Message[] messages = emailFolder.getMessages();
                   
          
@@ -117,9 +122,16 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       fetch(host, mailStoreType, username, password);
    }
 
+<<<<<<< HEAD
    public static void writePart(Part p) throws Exception {
   if (p instanceof Message)
      writeEnvelope((Message) p);
+=======
+      public static void writePart(Part p) throws Exception {
+      if (p instanceof Message)
+  
+      writeEnvelope((Message) p);
+>>>>>>> cb46672b4185942eeaf09b8a80374c943d961292
 
       System.out.println("----------------------------");
       System.out.println("CONTENT-TYPE: " + p.getContentType());
@@ -145,6 +157,10 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
        else if (p.isMimeType("image/jpeg")) {
        System.out.println("--------> image/jpeg");
           Object o = p.getContent();
+<<<<<<< HEAD
+=======
+
+>>>>>>> cb46672b4185942eeaf09b8a80374c943d961292
           InputStream x = (InputStream) o;
           System.out.println("x.length = " + x.available());
           byte[] bArray = new byte[x.available()];
@@ -210,6 +226,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       if (m.getSubject() != null)
          System.out.println("SUBJECT: " + m.getSubject());
    }
+<<<<<<< HEAD
 
    public void reply() 
    {
@@ -315,6 +332,8 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          e.printStackTrace();
       }
    }
+=======
+>>>>>>> cb46672b4185942eeaf09b8a80374c943d961292
 }
 
 

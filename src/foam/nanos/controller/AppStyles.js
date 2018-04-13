@@ -105,5 +105,11 @@ foam.CLASS({
       text-align: center;
       color: #ffffff;
     }
+    textarea:focus{
+      outline: none;
+    }
+    input:focus{
+      outline: none;
+    }
   `
 });
