@@ -12,15 +12,6 @@ foam.CLASS({
     'user'
   ],
 
-  propertes: [
-    {
-      name: 'self',
-      factory: function() {
-        return this;
-      }
-    }
-  ],
-
   requires: [
     'foam.nanos.logger.Log'
   ],
