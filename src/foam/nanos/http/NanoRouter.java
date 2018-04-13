@@ -15,8 +15,11 @@ import foam.dao.DAOSkeleton;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
+import foam.nanos.logger.PrefixLogger;
 import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
+import foam.util.SafetyUtil;
+import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Map;
@@ -36,6 +39,22 @@ public class NanoRouter
   extends HttpServlet
   implements NanoService, ContextAware
 {
+  public static final int BUFFER_SIZE = 4096;
+
+  protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+      @Override
+      protected StringBuilder initialValue() {
+        return new StringBuilder();
+      }
+
+      @Override
+      public StringBuilder get() {
+        StringBuilder b = super.get();
+        b.setLength(0);
+        return b;
+      }
+    };
+
   protected X x_;
 
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
@@ -73,7 +92,8 @@ public class NanoRouter
               }
             })
             .put(NSpec.class, spec);
-        serv.execute(y);
+        X z = y.put(HttpParameters.class, parseParameters(y, req, resp));
+        serv.execute(z);
       }
     } catch (Throwable t) {
       System.err.println("Error serving " + serviceKey + " " + path);
@@ -122,13 +142,6 @@ public class NanoRouter
       }
     }
 
-/*
-    if ( service instanceof WebAgent ) {
-      service = new WebAgentServlet((WebAgent) service);
-      informService(service, spec);
-    }
-    */
-
     if ( service instanceof WebAgent ) return (WebAgent) service;
 
     Logger logger = (Logger) getX().get("logger");
@@ -139,6 +152,157 @@ public class NanoRouter
   protected void informService(Object service, NSpec spec) {
     if ( service instanceof ContextAware ) ((ContextAware) service).setX(getX());
     if ( service instanceof NSpecAware   ) ((NSpecAware) service).setNSpec(spec);
+  }
+
+  protected HttpParameters parseParameters(X x, HttpServletRequest req, HttpServletResponse resp)
+    throws IOException {
+
+    Logger              logger      = (Logger) getX().get("logger");
+    String              methodName  = req.getMethod();
+    String              accept      = req.getHeader("Accept");
+    String              contentType = req.getHeader("Content-Type");
+    BufferedReader      reader      = req.getReader();
+    Command             command     = Command.select;
+    HttpParameters      parameters  = null;
+
+    logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
+
+    try {
+      //
+      // NOTE: X must contain HttpServletRequest and HttpServletResponse
+      //
+      parameters = (HttpParameters) x.create(DefaultHttpParameters.class);
+      //parameters.setX(x);
+    } catch (ClassCastException exception) {
+      throw new RuntimeException(exception);
+    }
+
+    // Capture 'data' on all requests
+    if ( ! SafetyUtil.isEmpty(req.getParameter("data")) ) {
+      logger.debug("data", req.getParameter("data"));
+      parameters.set("data", req.getParameter("data"));
+    } else {
+      //
+      // When content-type is other than application/x-www-form-urlencoded, the
+      // HttpServletRequest.reader stream must be processes manually to extract
+      // parameters from the body.
+      //
+      // Future considerations for partial parameters in the POST URI
+      // see examples: https://technologyconversations.com/2014/08/12/rest-api-with-json/
+      //
+      try {
+        int read = 0;
+        int count = 0;
+        int length = req.getContentLength();
+
+        StringBuilder builder = sb.get();
+        char[] cbuffer = new char[BUFFER_SIZE];
+        while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
+          builder.append(cbuffer, 0, read);
+          count += read;
+        }
+        logger.debug("reader data:", builder.toString());
+        if ( ! SafetyUtil.isEmpty(builder.toString()) ) {
+          parameters.set("data", builder.toString());
+        }
+      } catch (IOException e) {
+        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to parse body/data.");
+        throw e;
+      }
+    }
+
+    if ( ! "application/x-www-form-urlencoded".equals(contentType) ) {
+      switch ( methodName.toUpperCase() ) {
+      case "POST":
+        command = Command.put;
+        break;
+      case "PUT":
+        command = Command.put;
+        break;
+      case "DELETE":
+        command = Command.remove;
+        break;
+        // defauts to SELECT
+      }
+    } else {
+      String cmd = req.getParameter("cmd");
+      logger.debug("command", cmd);
+      if ( ! SafetyUtil.isEmpty(cmd) ) {
+        switch ( cmd.toLowerCase() ) {
+        case "put":
+          command = Command.put;
+          break;
+        case "remove":
+          command = Command.remove;
+          break;
+        case "help":
+          command = Command.help;
+          break;
+          // defaults to SELECT
+        }
+      } else {
+        logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+      }
+    }
+    parameters.set("cmd", command);
+
+    Format format = Format.JSON;
+    resp.setContentType("text/html");
+    if ( ! SafetyUtil.isEmpty(accept) && ! "application/x-www-form-urlencoded".equals(contentType) ) {
+      logger.debug("accept", accept);
+      String[] formats = accept.split(";");
+      for ( int i = 0; i < formats.length; i++ ) {
+        String f = formats[i].trim();
+        if ( "application/json".equals(f) ) {
+          format = Format.JSON;
+          resp.setContentType(f);
+          break;
+        }
+        if ( "application/jsonj".equals(f) ) {
+          format = Format.JSONJ;
+          resp.setContentType("application/json");
+          break;
+        }
+        if ( "application/xml".equals(f) ) {
+          format = Format.XML;
+          resp.setContentType(f);
+          break;
+        }
+      }
+    } else {
+      String f = req.getParameter("format");
+      logger.debug("format", format);
+      if ( ! SafetyUtil.isEmpty(f) ) {
+        switch ( f.toUpperCase() ) {
+        case "XML":
+          format = Format.XML;
+          resp.setContentType("application/xml");
+          break;
+        case "JSON":
+          format = Format.JSON;
+          resp.setContentType("application/json");
+          break;
+        case "JSONJ":
+          format = Format.JSONJ;
+          resp.setContentType("application/json");
+          break;
+        case "CSV":
+          format = Format.CSV;
+          resp.setContentType("text/plain");
+          break;
+        case "HTML":
+          format = Format.HTML;
+          resp.setContentType("text/html");
+          break;
+        }
+      } else {
+        logger.warning("accept/format could not be determined, defaulting to JSON.");
+      }
+    }
+    parameters.set("format", format);
+
+    logger.debug("parameters", parameters);
+    return parameters;
   }
 
   @Override
