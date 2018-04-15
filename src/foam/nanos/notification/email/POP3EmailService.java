@@ -33,6 +33,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.Part;
+import javax.mail.UIDFolder;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -52,13 +53,14 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import com.sun.mail.pop3.POP3Folder;
 
 import java.lang.Object;
 
 public class POP3EmailService extends ContextAwareSupport implements POP3Email, NanoService
 {
     public static void fetch(String pop3Host, String storeType, String user, String password) {
-          try {
+      try {
          Properties properties = new Properties();
          properties.put("mail.store.protocol", "pop3");
          properties.put("mail.pop3.host", pop3Host);
@@ -74,16 +76,24 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
          Folder emailFolder = store.getFolder("INBOX");
          emailFolder.open(Folder.READ_ONLY);
 
+         
          BufferedReader reader = new BufferedReader(new InputStreamReader(
           System.in));
 
-         Message[] messages = emailFolder.getMessages();
-         System.out.println("messages.length---" + messages.length);
+          
 
+         Message[] messages = emailFolder.getMessages();
+                  
+         POP3Folder pop3Folder = (POP3Folder) emailFolder;
+         System.out.println("messages.length---" + messages.length);
+            
          for (int i = 0; i < messages.length; i++) {
             Message message = messages[i];
             System.out.println("---------------------------------");
             writePart(message);
+            String emailId = pop3Folder.getUID(message);
+            System.out.println("-------- EMAIL UID ----------");
+            System.out.println(emailId);
             String line = reader.readLine();
             if ("YES".equals(line)) {
                message.writeTo(System.out);
@@ -114,11 +124,9 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       fetch(host, mailStoreType, username, password);
    }
 
-      public static void writePart(Part p) throws Exception {
-      if (p instanceof Message)
-  
-      writeEnvelope((Message) p);
-
+   public static void writePart(Part p) throws Exception {
+  if (p instanceof Message)
+     writeEnvelope((Message) p);
       System.out.println("----------------------------");
       System.out.println("CONTENT-TYPE: " + p.getContentType());
 
@@ -208,6 +216,139 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       }
       if (m.getSubject() != null)
          System.out.println("SUBJECT: " + m.getSubject());
+   }
+
+   private Email getMessageId(int id){
+      Email message  = new Email();
+      int length=getSize();
+      int i=0;
+      message=al.get(i);
+      i++;
+  try{
+      while(message.getId()!=id && i<length)
+          message=al.get(i);
+          i++;
+      if(message.getId()!=id)
+          message=null;
+          String emailId = folder.getId(message).toString(emailid);
+                        if (emailId.equals(emailId)){
+                              System.out.println("Your ids are matching...");
+                        }
+                        else{
+                              System.out.println("check your id properly");
+                        }
+                  }
+                        catch(Exception ex){
+                        System.out.println("Following exception" + ex);
+                        }
+      return message;
+   }
+
+   public void reply() 
+   {
+      Date date = null;
+      String emailId = "GmailId162c04e9c76e0b6c";
+      Properties properties = new Properties();
+      properties.put("mail.store.protocol", "pop3s");
+      properties.put("mail.pop3s.host", "pop.gmail.com");
+      properties.put("mail.pop3s.port", "995");
+      properties.put("mail.pop3.starttls.enable", "true");
+      properties.put("mail.smtp.auth", "true");
+      properties.put("mail.smtp.starttls.enable", "true");
+      properties.put("mail.smtp.host", "relay.jangosmtp.net");
+      properties.put("mail.smtp.port", "25");
+      Session session = Session.getDefaultInstance(properties);
+
+      try 
+      {
+         Store store = session.getStore("pop3s");
+         store.connect("pop.gmail.com", "pat.dev.test1@gmail.com","Choose123");
+
+            Folder folder = store.getFolder("inbox");
+         if (!folder.exists()) {
+            System.out.println("inbox not found");
+               System.exit(0);
+         }
+         folder.open(Folder.READ_ONLY);
+      
+         
+
+         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Message[] messages = folder.getMessages();
+            //Message message1 = folder.getMessage(emailId);
+            Message message1 = folder.getMessageId(1);
+            System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
+            System.out.println(message1.getSubject());
+
+         if (messages.length != 0 ) {
+
+            for (int i = 0, n = messages.length; i < n; i++) {
+               Message message = messages[i];
+               date = message.getSentDate();
+               String from = InternetAddress.toString(message.getFrom());
+          
+            
+               if (from != null) {
+                  System.out.println("From: " + from);
+               }
+               String replyTo = InternetAddress.toString(message
+	            .getReplyTo());
+               if (replyTo != null) {
+                  System.out.println("Reply-to: " + replyTo);
+               }
+               String to = InternetAddress.toString(message
+	            .getRecipients(Message.RecipientType.TO));
+               if (to != null) {
+                  System.out.println("To: " + to);
+               }
+
+               String subject = message.getSubject();
+               if (subject != null) {
+                  System.out.println("Subject: " + subject);
+               }
+               Date sent = message.getSentDate();
+               if (sent != null) {
+                  System.out.println("Sent: " + sent);
+               }else{
+                  System.out.println("Please verify your emailID" + emailId);
+               }
+               
+              System.out.print("Do you want to reply to this email with ID [y/n] : ");
+               String ans = reader.readLine();
+               if ("Y".equals(ans) || "y".equals(ans)) {
+
+                  Message replyMessage = new MimeMessage(session);
+                  replyMessage = (MimeMessage) message.reply(false);
+                 // emailId = emailFromUser;
+                  //replyMessage.setFrom(new InternetAddress(this.emailId));
+                  replyMessage.setFrom(new InternetAddress(to));
+                  replyMessage.setText("Thanks");
+                  replyMessage.setReplyTo(message.getReplyTo());
+
+                  Transport t = session.getTransport("smtp");
+                  try {
+	             t.connect("abc", "****");
+	             t.sendMessage(replyMessage,
+                        replyMessage.getAllRecipients());
+                  } finally {
+                     t.close();
+                  }
+                  System.out.println("message replied successfully ....");
+
+                  folder.close(false);
+                  store.close();
+
+               } else if ("n".equals(ans)) {
+                  break;
+               }
+            }
+            
+         } else {
+            System.out.println("There is no msg....");
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
    }
 }
 
