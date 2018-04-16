@@ -234,7 +234,10 @@ describe('selector registry', function() {
         expect(foo.messages[0].equals(message)).toBe(true);
         done.fail();
       }
-      if ( result ) done();
+      if ( result ) {
+        expect().nothing();
+        done();
+      }
     }
     intervalId = setInterval(checkMessages, interval);
   });
