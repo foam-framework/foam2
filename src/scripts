@@ -1,0 +1,34 @@
+p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
+p({"class":"foam.nanos.script.Script","id":"279885d4-28ad-4af8-b1d9-69e6105970e1","description":"test","lastRun":"2017-09-29T16:23:47.978Z","server":true,"scheduled":false,"code":"return \"hello World\"","output":"","notes":""})
+p({"class":"foam.nanos.script.Script","id":"createPermissions","description":"Create missing Permissions","server":false,"scheduled":false,"code":"x.groupDAO.select(function(g) {\nfor ( var i = 0 ; i < g.permissions.length ; i++ ) {\nx.permissionDAO.put(g.permissions[i]);\n}\n});\n\nx.nSpecDAO.select(function(s) {\nperm = 'service.execute.' + s.id;\np = foam.nanos.auth.Permission.create({id: perm});\nx.permissionDAO.put(p);\n});","output":"","notes":""})
+p({"class":"foam.nanos.script.Script","id":"showJDAODirectory","description":"Discover where JDAO files are being saved.","lastRun":"2018-01-10T17:09:54.779Z","server":true,"scheduled":false,"code":"import foam.dao.*;\n\nsetAccessibility(true);\n\nDAO dao = x.get(\"userDAO\");\n\nwhile ( ! ( dao instanceof JDAO ) ) dao = dao.getDelegate();\n\nprint(dao.file_);","output":"/Users/kgr/NANOPAY/users\n","notes":""})
+p({"class":"foam.nanos.script.Script","id":"benchmarkHashing","description":"Concurrent Hashing Benchmark","code":"import foam.nanos.bench.*;\nimport net.nanopay.bench.*;\n\nx = x.put(\"pmLogger\", null);\nb = new HashingBenchmark();\nbuilder = new BenchmarkRunner.Builder(x).setThreadCount(2).setInvocationCount(10000).setBenchmark(b);\nrunner = builder.build();\nrunner.execute(x);"})
+// Modified by admin admin (1) at 2018-03-27T14:27:56Z
+p({"class":"foam.nanos.cron.Cron","scheduledTime":"2018-03-27T14:28:00.0Z","id":"a7dd1a29-d748-440a-aff0-79ec1c2da8df","lastRun":"2018-03-27T14:27:56.108Z","lastDuration":911,"scheduled":false,"code":"c = new foam.nanos.notification.email.POP3EmailCron();\n\nc.setX(x);\n\nc.start();\n","output":""})// Modified by admin admin (1) at 2018-04-15T21:57:27Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","code":"pop3 = x.get(\"pop3\");\npop3.reply()"})
+// Modified by admin admin (1) at 2018-04-15T21:57:33Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T21:57:33.237Z","lastDuration":1562,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T21:57:43Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T21:57:43.320Z","lastDuration":481,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:02:05Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T22:02:05.157Z","lastDuration":1335,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:02:26Z
+p({"class":"foam.nanos.script.Script","id":"fetch Email","code":"pop3 = x.get(\"pop3\");\npop3.reply()"})
+// Modified by admin admin (1) at 2018-04-15T22:03:57Z
+p({"class":"foam.nanos.script.Script","id":"fetch Email","code":"pop3 = x.get(\"pop3\");\npop3.start()"})
+// Modified by admin admin (1) at 2018-04-15T22:04:21Z
+p({"class":"foam.nanos.script.Script","id":"fetch Email","lastRun":"2018-04-15T22:04:21.492Z","lastDuration":17319,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.start()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:04:22Z
+p({"class":"foam.nanos.script.Script","id":"fetch Email","lastRun":"2018-04-15T22:04:22.96Z","lastDuration":598,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.start()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:04:22Z
+p({"class":"foam.nanos.script.Script","id":"fetch Email","lastRun":"2018-04-15T22:04:22.578Z","lastDuration":477,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.start()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:05:13Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T22:05:13.259Z","lastDuration":1355,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:14:37Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T22:14:37.73Z","lastDuration":1393,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:15:10Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T22:15:10.71Z","lastDuration":1371,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:15:31Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T22:15:31.618Z","lastDuration":574,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})
+// Modified by admin admin (1) at 2018-04-15T22:40:41Z
+p({"class":"foam.nanos.script.Script","id":"create pop3","lastRun":"2018-04-15T22:40:41.196Z","lastDuration":621,"scheduled":false,"code":"pop3 = x.get(\"pop3\");\npop3.reply()","output":""})

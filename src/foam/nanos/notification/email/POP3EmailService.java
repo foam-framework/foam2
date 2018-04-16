@@ -216,34 +216,25 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       System.out.println("SUBJECT: " + m.getSubject());
   }
 
-  private Email getMessageId(int id){
-    Email message  = new Email();
-    int length=getSize();
-    int i=0;
-    message=al.get(i);
-    i++;
-    try{
-      while(message.getId()!=id && i<length)
-        message=al.get(i);
-        i++;
-      if(message.getId()!=id)
-        message=null;
-        String emailId = folder.getId(message).toString(emailid);
-        if (emailId.equals(emailId)){
-          System.out.println("Your ids are matching...");
+  private Message getMessageById(String id, Message[] messages, POP3Folder folder){
+    String uidString = null;
+    for (int j = 0; j < messages.length; j++){
+      try {
+        uidString = folder.getUID(messages[j]);
+        System.out.println(uidString);
+        if ( id == uidString ){
+          return messages[j];
         }
-        else{
-          System.out.println("check your id properly");
-        }
-    } catch(Exception ex){
-      System.out.println("Following exception" + ex);
+      } catch(Exception e){
+        System.out.println(e);
+      }
     }
-    return message;
-   }
+    return null;
+  }
 
   public void reply(){
     Date date = null;
-    String emailId = "GmailId162c04e9c76e0b6c";
+    String emailId = "GmailId162cb55999fced53";
     Properties properties = new Properties();
     properties.put("mail.store.protocol", "pop3s");
     properties.put("mail.pop3s.host", "pop.gmail.com");
@@ -268,8 +259,12 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
       Message[] messages = folder.getMessages();
-      //Message message1 = folder.getMessage(emailId);
-      Message message1 = folder.getMessageId(1);
+      POP3Folder pop3Folder = (POP3Folder) folder;
+      Message message1 = getMessageById(emailId, messages, pop3Folder);
+      if (message1 == null){
+        System.out.println("............. !No Email Found! .........");
+        return;
+      }
       System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
       System.out.println(message1.getSubject());
 
