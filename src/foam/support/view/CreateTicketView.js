@@ -67,7 +67,6 @@ foam.CLASS({
     background: #59a5d5; 
   }
   ^ .label{
-    width: 484px;
     height: 16px;
     font-family: Roboto;
     font-size: 14px;
@@ -88,8 +87,8 @@ foam.CLASS({
   .foam-u2-tag-TextArea {
     margin-top:8px;
   }
-  .property-requestor{
-    width: 300px;
+  .property-requestorEmail,.property-requestorName{
+    width: 450px;
     height: 40px;
   }
   .property-message{
@@ -198,6 +197,10 @@ foam.CLASS({
     position: relative;
     top: 4px;
   }
+  .rname {
+    margin-right:20px;
+    float:left;
+  }
   `,
 
   properties: [
@@ -207,7 +210,11 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'requestor'
+      name: 'requestorEmail'
+    },
+    {
+      class: 'String',
+      name: 'requestorName'
     },
     {
       class: 'String',
@@ -252,12 +259,25 @@ foam.CLASS({
         .start().addClass('New-ticket').add('New Ticket #',this.ticketCount$).end()
       
         .start().addClass('bg2')
-          .start().addClass('label')
-            .add('Requestor Email')
+        .start()
+          .start().addClass('rname')
+            .start().addClass('label')
+              .add('Requestor Name')
+            .end()
+            .start()
+              .tag(this.REQUESTOR_NAME)
+            .end()
           .end()
-          .start()
-            .tag(this.REQUESTOR)
+
+          .start().addClass('remail')
+            .start().addClass('label')
+              .add('Requestor Email')
+            .end()
+            .start()
+              .tag(this.REQUESTOR_EMAIL)
+            .end()
           .end()
+        .end()
 
           .start().addClass('label')
             .add('Subject')
@@ -284,7 +304,8 @@ foam.CLASS({
         
         var ticket = this.Ticket.create({
           publicMessage: this.message,
-          requestorEmail: this.requestor,
+          requestorEmail: this.requestorEmail,
+          requestorName: this.requestorName,
           subject: this.subject,
           status: this.status
         });

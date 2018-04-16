@@ -15,7 +15,7 @@ foam.CLASS({
     ],
 
     tableColumns: [
-      'id', 'requestorEmail', 'subject', 'createdAt', 'status'
+      'id', 'requestorName', 'requestorEmail', 'subject', 'createdAt', 'status'
     ],
 
     properties: [
@@ -28,6 +28,10 @@ foam.CLASS({
       {
         class: 'String',
         name: 'requestorEmail'
+      },
+      {
+        class: 'String',
+        name: 'requestorName'
       },
       {
         class: 'String',
