@@ -5,7 +5,12 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.auth.User',
-    'foam.u2.PopupView'
+    'foam.u2.PopupView',
+    'foam.support.model.TicketMessage',
+    'foam.nanos.notification.email.POP3Email',
+    'foam.nanos.notification.email.POP3EmailService',
+    'foam.support.view.ReplyView',
+    
   ],
 
   implements: [
@@ -15,17 +20,26 @@ foam.CLASS({
   imports: [
     'stack',
     'userDAO',
-    'hideSummary'
+    'hideSummary',
+     'messages',
+     'pop3',
+    'ticketDAO',
+     
   ],
   
   exports: [
-    'as data'
+    'as data',
+    'viewData'
   ],
 
   properties: [
     'name',
     'voidMenuBtn_',
-    'voidPopUp_'
+    'voidPopUp_',
+    {
+      name: 'viewData',
+      value: {}
+    }
   ],
 
   css: `
@@ -200,7 +214,7 @@ foam.CLASS({
       var self = this;
       this.hideSummary = true;
       var email = this.data.supportEmail;
-    
+      
       //find user associated to ticket
       this.userDAO.find(this.data.requestorId).then(function(a){
         self.name= a.firstName;
@@ -244,18 +258,17 @@ foam.CLASS({
       name: 'submitTicket',
       label: '',
       code: function(){
-        /*
-        var ticket = this.Ticket.create({
-          publicMessage: this.message,
-          requestorEmail: this.requestor,
-          subject: this.subject,
-          status: this.status
-        });
-
-        this.ticketDAO.put(ticket);*/
-
+        if(this.viewData['variant']==false && this.messages=="" && this.data.requestorEmail!=""){
+        x = this.pop3;
+        var messageId=x.sendEmail(this.data.requestorEmail,this.data.subject,this.viewData['message']);
+        this.ticketDAO.find(this.data.id).then(function(a){
+        if(data.emailId=="") {
+          this.data.emailId=messageId;
+        }
+      })
         this.stack.push({ class: 'foam.support.view.TicketView' });
       }
+    }
     },
     {
       name: 'backAction',

@@ -16,7 +16,7 @@ foam.INTERFACE({
     },
     {
       name: 'sendEmail',
-      javaReturns: 'void',
+      javaReturns: 'String',
       returns: 'Promise',  
       args: [
         {

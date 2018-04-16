@@ -255,7 +255,7 @@ foam.CLASS({
         });
 
         this.ticketDAO.put(ticket);
-       
+      
         
       }
     },

@@ -8,15 +8,23 @@ foam.CLASS({
     
     properties:[
       {
-        name: 'variant'
+        name: 'variant',
+        postSet: function(oldValue, newValue){
+          this.viewData.variant = newValue;
+        }
       },
       {
         class: 'String',
         name: 'message',
         view: 'foam.u2.tag.TextArea',
+        postSet: function(oldValue, newValue){
+          this.viewData.message = newValue;
+        }
       }
    ],
-
+    imports: [
+      'viewData'
+    ],
     exports: [
       'as data'
     ],
@@ -102,6 +110,8 @@ foam.CLASS({
       function initE(){
         this.SUPER();
         var self = this;
+        this.variant = true;
+
         this
           .addClass(this.myClass())
             .start().addClass('bg')
