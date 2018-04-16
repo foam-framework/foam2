@@ -83,7 +83,7 @@ foam.CLASS({
       background-color: #ffffff;
       border: solid 1px rgba(164, 179, 184, 0.5);
       margin-left:75px;
-      margin-top:22px;    
+      margin-top:40px;
     }
     ^ .background-color{
       background: #093649;
