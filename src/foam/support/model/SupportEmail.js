@@ -25,6 +25,10 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'userId'
+    },
+    {
+      class: 'Password',
+      name: 'password'
     }
   ]
 });

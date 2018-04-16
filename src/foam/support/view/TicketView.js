@@ -52,6 +52,9 @@ foam.CLASS({
   ^ .foam-u2-view-TableView-th-requestorEmail{
     width: 200px;
   }
+  ^ .foam-u2-view-TableView-th-requestorName{
+    width: 200px;
+  }
   `,
 
   properties: [

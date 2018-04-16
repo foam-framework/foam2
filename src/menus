@@ -31,3 +31,4 @@ p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"c
 p({"class":"foam.nanos.menu.Menu","id":"detail","label":"Detail","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketDetailView"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"message","label":"Message","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.MessageCard"}},"order":1000,"parent":"admin"})
 p({"class":"foam.nanos.menu.Menu","id":"reply","label":"Reply","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.ReplyView"}},"order":1000,"parent":"admin"})
+
