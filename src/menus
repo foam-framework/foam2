@@ -28,3 +28,6 @@ p({"class":"foam.nanos.menu.Menu","id":"support","label":"Support","handler":{"c
 // p({"class":"foam.nanos.menu.Menu","id":"demos","label":"Demos","order":1000,"parent":"","handler":{"class":"foam.nanos.menu.SubMenu"}})
 // p({"class":"foam.nanos.menu.Menu","id":"demo","label":"Demo1","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.Demo"}}})
 // p({"class":"foam.nanos.menu.Menu","id":"relationshipDemo","label":"Relationship Demo","order":1000,"parent":"demos","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.demo.relationship.Controller"}}})
+p({"class":"foam.nanos.menu.Menu","id":"detail","label":"Detail","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.TicketDetailView"}},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"message","label":"Message","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.MessageCard"}},"order":1000,"parent":"admin"})
+p({"class":"foam.nanos.menu.Menu","id":"reply","label":"Reply","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.support.view.ReplyView"}},"order":1000,"parent":"admin"})

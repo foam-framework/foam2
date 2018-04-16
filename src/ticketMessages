@@ -1,0 +1,4 @@
+// Modified by admin admin (1) at 2018-04-16T16:48:25Z
+p({"class":"foam.support.model.TicketMessage","id":1,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T16:48:23.963Z","message":"hello"})
+// Modified by admin admin (1) at 2018-04-16T16:48:46Z
+p({"class":"foam.support.model.TicketMessage","id":2,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T16:48:43.51Z","message":"hello","ticketId":1})

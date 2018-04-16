@@ -5,6 +5,10 @@ foam.CLASS({
     extends: 'foam.u2.View',
 
     documentation: 'Internal note for ticket detail view',
+
+    requires: [
+      'foam.support.view.MessageCard'
+    ],
     
     properties:[
       {
@@ -23,8 +27,8 @@ foam.CLASS({
 
     css: `
     ^ .bg {
-        width: 1000px;
-        height: 280px;
+        width: 1150px;
+        height: 210px;
         border-radius: 2px;
         background-color: #ffffff;
     }
@@ -96,6 +100,14 @@ foam.CLASS({
     ^ .foam-u2-UnstyledActionView:focus{
       outline: none;
     }
+    hr { 
+      background-color: #e6e6e6; 
+      height: 1px; 
+      border: 0; 
+    }
+    ^ .line {
+      padding-top:
+    }
       `,
   
     methods: [
@@ -114,7 +126,10 @@ foam.CLASS({
             .end()
               .endContext()
                  .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
-            .end()
+                 .start('hr').end()
+                 .end()
+            .end();
+            
       },
     ],
     actions: [

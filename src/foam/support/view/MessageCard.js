@@ -11,11 +11,10 @@ foam.CLASS({
 
   css: `
   ^ .bg {
-    width: 1240px;
-    height: 200px;
+    width: 1150px;
+    height: 280px;
     border-radius: 2px;
     background-color: #ffffff;
-    margin: 10px;
   }
   ^ .company-name {
     width: 60px;
@@ -34,7 +33,7 @@ foam.CLASS({
     padding-right: 0px;
   }
   ^ .date {
-    width: 200px;
+    width: 500px;
     height: 8px;
     font-family: Roboto;
     font-size: 10px;
@@ -49,7 +48,7 @@ foam.CLASS({
     padding-right: 50px;
   }
   ^ .text {
-    width: 231px;
+    width: 1150px;
     height: 96px;
     font-family: Roboto;
     font-size: 12px;
@@ -60,7 +59,7 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    padding: 60px 928px 324px 80px;
+    padding: 60px 928px 324px 60px;
   }
   ^ .person {
     width: 40px;
@@ -69,27 +68,36 @@ foam.CLASS({
     padding: 20px 0px 0px 20px;
     display: inline-block;
     float: left;
+    
   }
   ^ .tb {
     display: inline-block;
     float: left; 
   }
   `,
-  
-  messages: [
-    { name: 'nameLabel',  message: 'nanopay' },
-    { name: 'textLabel',  message: 'Hello World  !!! Please feel free to surf...\n This is the simple text..' },
-  ],
 
   properties: [
-    {
-      class: 'Date',
-      name: 'currentDate',
-      factory: function(){
-        return new Date();
-      },   
-    },
-   
+   {
+     class: 'String',
+     name: 'message',     
+   },
+   {
+    class: 'String',
+    name: 'requestName',
+    value: 'Nanopay'
+   },
+   {
+     class: 'String',
+     name: 'msg',
+     value: 'Hello !!! World.....'
+   },
+   {
+    class: 'Date',
+    name: 'currentDate',
+    factory: function(){
+      return new Date();
+    },   
+  },
   ],
 
   methods: [
@@ -101,12 +109,12 @@ foam.CLASS({
             .start('table').addClass('tb')
               .start('tr')
                 .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
-                .start('td').add(this.nameLabel).addClass('company-name').end() 
-                .start('td').add(this.currentDate$).addClass('date').end() 
+                .start('td').add(this.message.requestName).addClass('company-name').end() 
+                .start('td').add(this.message.currentDate).addClass('date').end() 
                 .end()
               .end()
             .end()
-            .start().add(this.textLabel).addClass('text').end()                  
+            .start().add(this.message.msg).addClass('text').end()                  
         .end()              
     },
   ]
