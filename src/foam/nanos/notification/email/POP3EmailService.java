@@ -1,5 +1,6 @@
 package foam.nanos.notification.email;
 
+import foam.core.X;
 import foam.core.ContextAwareSupport;
 import foam.nanos.NanoService;
 import foam.nanos.notification.email.POP3Email;
@@ -16,9 +17,59 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.Folder;
  
 
-public class POP3EmailService
-    extends ContextAwareSupport
-    implements POP3Email, NanoService
+import java.util.Properties;
+import java.util.Objects;
+import java.util.Date;
+import java.lang.*;
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
+ 
+import javax.mail.Address;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
+import javax.mail.Store;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.Part;
+import javax.mail.UIDFolder;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import com.sun.mail.pop3.POP3Folder;
+
+import java.lang.Object;
+
+public class POP3EmailService extends ContextAwareSupport implements POP3Email, NanoService
 {
  public POP3EmailService()
   {
@@ -27,8 +78,13 @@ public class POP3EmailService
 
   //Implement POP3 Fetch.
    public void start() {
-      String username = "pat.dev.test1@gmail.com";// change accordingly
-      String password = "Choose123";// change accordingly
+
+      String host = "pop.gmail.com";
+      String mailStoreType = "pop3";
+      String username = "pat.dev.test1@gmail.com";
+      String password = "Choose123";
+
+      fetch(host, mailStoreType, username, password);
    }
   
    public String sendEmail(String requestor,String subject,String body){  
