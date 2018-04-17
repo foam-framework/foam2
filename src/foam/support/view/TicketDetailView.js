@@ -344,12 +344,10 @@ foam.CLASS({
           if(this.viewData['variant']==false && this.messages=="" && this.data.requestorEmail!=""){
             x = this.pop3;
             var messageId=x.sendEmail(this.data.requestorEmail,this.data.subject,this.viewData['message']);
-            this.ticketDAO.find(this.data.id).then(function(a){
-            if(data.emailId=="") {
-              this.data.emailId=messageId;
-              this.ticketDAO.put(this.data);
-              }
-            })
+            if(this.data.emailId==""){
+              this.data.emailId=messageId
+              this.ticketDAO.put(this.data)
+            }
           }
        }
     }
