@@ -3,14 +3,11 @@ foam.CLASS({
   name: 'TicketDetailView',
   extends: 'foam.u2.View',
 
-  // javaImports: [
-  //   'java.util.Date'
-  // ],
+  documentation: 'Ticket Detail View',
 
   requires: [
     'foam.nanos.auth.User',
     'foam.u2.PopupView',
-    'foam.support.model.SupportEmail',
     'foam.support.model.TicketMessage',
     'foam.support.model.Ticket',
     'foam.support.view.ReplyView',
@@ -25,9 +22,7 @@ foam.CLASS({
     'stack',
     'userDAO',
     'hideSummary',
-    'supportEmailDAO',
     'ticketMessageDAO'
-    
   ],
   
   exports: [
@@ -38,18 +33,12 @@ foam.CLASS({
     'name',
     'voidMenuBtn_',
     'voidPopUp_',
-    {
-      name: 'data',
-      factory: function() { return this.supportEmailDAO; }
-    },
+    'ticketMessages'
   ],
 
   css: `
-  * {
-    box-sizing: border-box;
-  }
   ^ {
-    width: 1170px;
+    width: 1000px;
     margin-top: 25px;
     background-color: #edf0f5;
     display: inline-block;
@@ -187,8 +176,7 @@ foam.CLASS({
     letter-spacing: 0.3px;
     text-align: left;
     color: #093649; 
-    margin-top: 80px;
-    padding-left: 20px;
+    margin-top: 80px;    
   }
   ^ .sub-div-format {
     width: 488px;
@@ -203,17 +191,13 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    margin-bottom: 20px;
-    padding-left: 20px;
+    margin-bottom: 20px;    
   }
   .SubmitLabel span{
     font-size: 10px;
     position: relative;
     top: 4px;
-  }
-  ^ .carddiv {
-    padding-left: 20px;
-  }
+  } 
   `,
 
   methods: [
@@ -221,20 +205,14 @@ foam.CLASS({
       var self = this;
       this.hideSummary = true;
       var formattedDate = {};
-      var email = this.data.supportEmail;
-      //this.data.message.put(ticketmessage);
-      var messages = this.data.messages;
-      //find user associated to ticket
-        // this.userDAO.find(this.data.requestorId).then(function(a){
-        //   self.name = a.firstName;
-        // })
+      
       //format date for ui
       if( this.data.createdAt ){
         formattedDate = this.formatDate(this.data.createdAt);
       }
       
       this.addClass(this.myClass())
-        .start().addClass('carddiv')
+        .start()
           .start(this.BACK_ACTION).end()
           .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).end()
           .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
@@ -249,16 +227,15 @@ foam.CLASS({
          .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
         .end()
         .br()
-        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
+        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
         .end()
-        .start().addClass('carddiv')
+        .start()
         .tag({ class: 'foam.support.view.ReplyView' })
-       // .tag({ class: 'foam.support.view.MessageCard' })
         .end()
         .end()
-        .forEach(messages, function(a){
-          self.tag({ class: 'foam.support.view.MessageCard', message: a.requestName })
-        });
+        .select(this.data.messages, function(a){
+          self.tag({ class: 'foam.support.view.MessageCard', message: a })
+        })
     },
 
     function formatDate(date){
@@ -276,16 +253,6 @@ foam.CLASS({
       name: 'submitTicket',
       label: '',
       code: function(){
-        /*
-        var ticket = this.Ticket.create({
-          publicMessage: this.message,
-          requestorEmail: this.requestor,
-          subject: this.subject,
-          status: this.status
-        });
-
-        this.ticketDAO.put(ticket);*/
-
         this.stack.push({ class: 'foam.support.view.TicketView' });
       }
     },

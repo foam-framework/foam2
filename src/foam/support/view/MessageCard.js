@@ -5,20 +5,35 @@ foam.CLASS({
 
   documentation: 'Card for message views',
 
+  requires: [
+    'foam.support.model.TicketMessage',
+    'foam.support.model.Ticket',
+  ],
+
+  imports: [
+    'ticketMessageDAO',
+    'ticketDAO',
+    'userDAO'
+  ],  
+
   javaImports: [
     'java.util.Date'
   ],
 
   css: `
+  * {
+    box-sizing: border-box;
+  }
   ^ .bg {
-    width: 1150px;
+    width: 1000px;
     height: 280px;
     border-radius: 2px;
     background-color: #ffffff;
+    padding-top: 10px;
   }
   ^ .company-name {
-    width: 60px;
-    height: 16px;
+    margin-right: 10px;
+    float: left;
     font-family: Roboto;
     font-size: 12px;
     font-weight: bold;
@@ -29,12 +44,10 @@ foam.CLASS({
     text-align: left;
     color: #093649;
     padding-left: 20px;
-    padding-top: 25px;
+    padding-top: 10px;
     padding-right: 0px;
   }
-  ^ .date {
-    width: 500px;
-    height: 8px;
+  ^ .date {   
     font-family: Roboto;
     font-size: 10px;
     font-weight: normal;
@@ -44,12 +57,10 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #a4b3b8;
-    padding-top: 28px;
-    padding-right: 50px;
+    padding-top: 14px;
+    
   }
   ^ .text {
-    width: 1150px;
-    height: 96px;
     font-family: Roboto;
     font-size: 12px;
     font-weight: normal;
@@ -59,63 +70,54 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    padding: 60px 928px 324px 60px;
+    margin-left:10px;
+    padding: 30px 0 0 60px;
   }
   ^ .person {
-    width: 40px;
+    width: 40;
     height: 40px;
     object-fit: contain;
-    padding: 20px 0px 0px 20px;
     display: inline-block;
     float: left;
-    
+    margin-left: 10px;
+    padding-left: 10px;    
   }
   ^ .tb {
     display: inline-block;
     float: left; 
+    width: 0px; 
+  }
+  hr { 
+    background-color: #e6e6e6; 
+    height: 1px; 
+    border: 0;       
   }
   `,
 
   properties: [
    {
-     class: 'String',
      name: 'message',     
    },
-   {
-    class: 'String',
-    name: 'requestName',
-    value: 'Nanopay'
-   },
-   {
-     class: 'String',
-     name: 'msg',
-     value: 'Hello !!! World.....'
-   },
-   {
-    class: 'Date',
-    name: 'currentDate',
-    factory: function(){
-      return new Date();
-    },   
-  },
+   'requestName'
   ],
 
   methods: [
     function initE(){
       var self = this;
+      //find requestorName associated to ticketMessages
+      this.userDAO.find(this.message.senderId).then(function(a){
+        self.requestName = a.firstName + " " + a.lastName;
+      });
+
       this
-        .addClass(this.myClass())
+        .addClass(this.myClass()) 
         .start('div').addClass('bg')
-            .start('table').addClass('tb')
-              .start('tr')
-                .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
-                .start('td').add(this.message.requestName).addClass('company-name').end() 
-                .start('td').add(this.message.currentDate).addClass('date').end() 
-                .end()
-              .end()
-            .end()
-            .start().add(this.message.msg).addClass('text').end()                  
-        .end()              
+        .start('hr').end() 
+            .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
+            .start().start().add(this.requestName$).addClass('company-name').end() 
+            .start().add(this.message.dateCreated).addClass('date').end().end()
+            .start().add(this.message.message).addClass('text').end()   
+        .end()                      
     },
   ]
 });

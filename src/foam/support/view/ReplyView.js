@@ -27,8 +27,8 @@ foam.CLASS({
 
     css: `
     ^ .bg {
-        width: 1150px;
-        height: 210px;
+        width: 1000px;
+        height: 230px;
         border-radius: 2px;
         background-color: #ffffff;
     }
@@ -100,13 +100,8 @@ foam.CLASS({
     ^ .foam-u2-UnstyledActionView:focus{
       outline: none;
     }
-    hr { 
-      background-color: #e6e6e6; 
-      height: 1px; 
-      border: 0; 
-    }
     ^ .line {
-      padding-top:
+      padding-top: 10px;
     }
       `,
   
@@ -126,7 +121,6 @@ foam.CLASS({
             .end()
               .endContext()
                  .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
-                 .start('hr').end()
                  .end()
             .end();
             
