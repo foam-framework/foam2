@@ -2,28 +2,28 @@ foam.CLASS({
   package: 'foam.support.view',
   name: 'CreateTicketView',
   extends: 'foam.u2.View',
-
+  implements: [
+    'foam.mlang.Expressions'
+  ],
   requires: [
     'foam.support.model.Ticket', 
     'foam.u2.PopupView',
-    'foam.u2.dialog.Popup',
-    'foam.nanos.notification.email.POP3Email',
-    'foam.nanos.notification.email.POP3EmailService'
   ],
-
   imports:[
     'ticketDAO',
     'user',
-    'hideSummary'
+    'hideSummary',
+    'stack'
   ],
-
   exports: [
     'as data'
   ],
-
   css: `
   * {
     box-sizing: border-box;
+  }
+  .foam-support-view-CreateTicketView {
+    margin-top:20px;
   }
   .div{
     margin-top: 40px;
@@ -45,6 +45,7 @@ foam.CLASS({
     color: #093649;
   }
   ^ .Rectangle-8 {
+    padding: 0 10px;
     border: solid 0.5px #59a5d5 !important;
     margin: 0px 2px !important;
     -webkit-box-shadow: none;
@@ -57,7 +58,6 @@ foam.CLASS({
     text-align: center;
     color: #ffffff;
     float: right;
-    width: 140px;
     height: 40px;
     border-radius: 2px;
     background: #59a5d5; 
@@ -80,16 +80,11 @@ foam.CLASS({
     background-color: #ffffff;
     border: solid 1px rgba(164, 179, 184, 0.5);
   }
-<<<<<<< HEAD
-  .property-requestor{
-    width: 300px;
-=======
   .foam-u2-tag-TextArea {
     margin-top:8px;
   }
   .property-requestorEmail,.property-requestorName{
     width: 450px;
->>>>>>> 91a2ed70177d59a58e4d391fad4fef42eff47a9c
     height: 40px;
   }
   .property-message{
@@ -117,6 +112,7 @@ foam.CLASS({
     color: #093649;
   } 
   .bg2 {
+    margin-top:20px;
     border-radius: 2px;
     background-color: #ffffff;
     padding: 20px;
@@ -155,11 +151,11 @@ foam.CLASS({
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.19);
   }
   .popUpDropDown > div {     
+    padding: 8px 0 0 11px;
     box-sizing:border-box;
     width: 170px;
     height: 35px;  
     z-index: 10000
-    padding: 9px 0 0 11px;
     font-family: Roboto;
     font-size: 12px;
     font-weight: normal;
@@ -182,7 +178,11 @@ foam.CLASS({
   }
   .Submit-as{
     float: left;
-    margin-top:4px;
+    margin-top:2px;
+    margin-right:10px;
+  }
+  .SubmitButton{
+    margin-top:1.5px;
     margin-right:10px;
     float: left;
   }
@@ -199,8 +199,11 @@ foam.CLASS({
     float:left;
   }
   `,
-
   properties: [
+    {
+      name: 'dao',
+      factory: function() { return this.ticketDAO; }
+    },
     {
       class: 'String',
       name: 'requestorEmail'
@@ -218,10 +221,23 @@ foam.CLASS({
       name: 'message',
       view: 'foam.u2.tag.TextArea'
     },
+    {
+      class: 'String',
+      name: 'status',
+      value: 'New'
+    },
+    {
+      class: 'Int',
+      name: 'ticketCount',
+      value: '...'
+    },
+    'voidMenuBtn_',
+    'voidPopUp_'
   ],
-
   methods: [
     function initE(){
+      this.dao.on.sub(this.onDAOUpdate);    
+      this.onDAOUpdate(); 
       this.SUPER();
       this.hideSummary = true;
       this
@@ -236,7 +252,8 @@ foam.CLASS({
               .start().addClass(this.status$).add(this.status$).end()
             .end()
         .end()
-
+        .start().addClass('New-ticket').add('New Ticket #',this.ticketCount$).end()
+      
         .start().addClass('bg2')
         .start()
           .start().addClass('rname')
@@ -247,7 +264,6 @@ foam.CLASS({
               .tag(this.REQUESTOR_NAME)
             .end()
           .end()
-
           .start().addClass('remail')
             .start().addClass('label')
               .add('Requestor Email')
@@ -257,14 +273,12 @@ foam.CLASS({
             .end()
           .end()
         .end()
-
           .start().addClass('label')
             .add('Subject')
           .end()
           .start()
             .tag(this.SUBJECT)
           .end()
-
           .start().addClass('label')
             .add('Message')
           .end()
@@ -274,28 +288,21 @@ foam.CLASS({
         .end()
     }
   ],
-
   actions: [
     {
       name: 'submitTicket',
-      label: 'Submit Ticket ' + this.status,
+      label: '',
       code: function(){
         
         var ticket = this.Ticket.create({
           publicMessage: this.message,
-<<<<<<< HEAD
-          requestorId: this.requestor,
-=======
           requestorEmail: this.requestorEmail,
           requestorName: this.requestorName,
->>>>>>> 91a2ed70177d59a58e4d391fad4fef42eff47a9c
           subject: this.subject,
           status: this.status
         });
-
         this.ticketDAO.put(ticket);
-      
-        
+        this.stack.push({ class: 'foam.support.view.TicketView' });
       }
     },
     {
@@ -320,20 +327,60 @@ foam.CLASS({
           width: 170,
         })
         self.voidPopUp_.addClass('popUpDropDown')
-        .start('div').add('Submit as')
-          .on('click', this.voidPopUp)//on click will change according to conditions
+        .start('div').on('click', function(){
+          self.status = 'Pending'
+          self.voidPopUp()
+        })
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Pending').addClass('Pending status').end()
         .end()
+        .start('div').on('click', function(){
+          self.status = 'New'
+          self.voidPopUp()
+        })
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('New').addClass('New status').end()
+        .end()
+        .start('div').on('click', function(){
+          self.status = 'Solved'
+          self.voidPopUp()
+        })
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Solved').addClass('Solved status').end()
+        .end()
+        .start('div').on('click', function(){
+          self.status = 'Updated'
+          self.voidPopUp()
+        })
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Updated').addClass('Updated status').end()
+        .end()
+        .start('div').on('click', function(){
+          self.status = 'Open'
+          self.voidPopUp()
+        })
+          .start().add('Submit as').addClass('Submit-as').end()
+          .start().add('Open').addClass('Open status').end()
+        .end()
+                 
         self.voidMenuBtn_.add(self.voidPopUp_)
       }
     }
   ],
-
-
   listeners: [
     function voidPopUp(){
       var self = this;
       self.voidPopUp_.close();
-      self.status = status;
+    },
+    {
+      name: 'onDAOUpdate',
+      isFramed: true,
+      code: function() {
+        var self = this;
+        this.dao.select(this.COUNT()).then(function(count) {
+          self.ticketCount = count.value;
+        });
+      }
     }
   ]
 });
