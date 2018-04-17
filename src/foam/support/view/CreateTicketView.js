@@ -5,23 +5,19 @@ foam.CLASS({
   implements: [
     'foam.mlang.Expressions'
   ],
-
   requires: [
     'foam.support.model.Ticket', 
     'foam.u2.PopupView',
   ],
-
   imports:[
     'ticketDAO',
     'user',
     'hideSummary',
     'stack'
   ],
-
   exports: [
     'as data'
   ],
-
   css: `
   * {
     box-sizing: border-box;
@@ -203,7 +199,6 @@ foam.CLASS({
     float:left;
   }
   `,
-
   properties: [
     {
       name: 'dao',
@@ -239,7 +234,6 @@ foam.CLASS({
     'voidMenuBtn_',
     'voidPopUp_'
   ],
-
   methods: [
     function initE(){
       this.dao.on.sub(this.onDAOUpdate);    
@@ -258,7 +252,6 @@ foam.CLASS({
               .start().addClass(this.status$).add(this.status$).end()
             .end()
         .end()
-
         .start().addClass('New-ticket').add('New Ticket #',this.ticketCount$).end()
       
         .start().addClass('bg2')
@@ -271,7 +264,6 @@ foam.CLASS({
               .tag(this.REQUESTOR_NAME)
             .end()
           .end()
-
           .start().addClass('remail')
             .start().addClass('label')
               .add('Requestor Email')
@@ -281,14 +273,12 @@ foam.CLASS({
             .end()
           .end()
         .end()
-
           .start().addClass('label')
             .add('Subject')
           .end()
           .start()
             .tag(this.SUBJECT)
           .end()
-
           .start().addClass('label')
             .add('Message')
           .end()
@@ -298,7 +288,6 @@ foam.CLASS({
         .end()
     }
   ],
-
   actions: [
     {
       name: 'submitTicket',
@@ -312,9 +301,7 @@ foam.CLASS({
           subject: this.subject,
           status: this.status
         });
-
         this.ticketDAO.put(ticket);
-
         this.stack.push({ class: 'foam.support.view.TicketView' });
       }
     },
@@ -347,7 +334,6 @@ foam.CLASS({
           .start().add('Submit as').addClass('Submit-as').end()
           .start().add('Pending').addClass('Pending status').end()
         .end()
-
         .start('div').on('click', function(){
           self.status = 'New'
           self.voidPopUp()
@@ -355,7 +341,6 @@ foam.CLASS({
           .start().add('Submit as').addClass('Submit-as').end()
           .start().add('New').addClass('New status').end()
         .end()
-
         .start('div').on('click', function(){
           self.status = 'Solved'
           self.voidPopUp()
@@ -363,7 +348,6 @@ foam.CLASS({
           .start().add('Submit as').addClass('Submit-as').end()
           .start().add('Solved').addClass('Solved status').end()
         .end()
-
         .start('div').on('click', function(){
           self.status = 'Updated'
           self.voidPopUp()
@@ -371,7 +355,6 @@ foam.CLASS({
           .start().add('Submit as').addClass('Submit-as').end()
           .start().add('Updated').addClass('Updated status').end()
         .end()
-
         .start('div').on('click', function(){
           self.status = 'Open'
           self.voidPopUp()
@@ -384,8 +367,6 @@ foam.CLASS({
       }
     }
   ],
-
-
   listeners: [
     function voidPopUp(){
       var self = this;

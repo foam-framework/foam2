@@ -4,6 +4,18 @@ import foam.core.X;
 import foam.core.ContextAwareSupport;
 import foam.nanos.NanoService;
 import foam.nanos.notification.email.POP3Email;
+import foam.core.X;
+import java.util.Properties;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.Folder;
+ 
 
 import java.util.Properties;
 import java.util.Objects;
@@ -59,6 +71,11 @@ import java.lang.Object;
 
 public class POP3EmailService extends ContextAwareSupport implements POP3Email, NanoService
 {
+ public POP3EmailService()
+  {
+    super();
+  }
+
   public static void fetch(String pop3Host, String storeType, String user, String password) {
     try {
       Properties properties = new Properties();
@@ -68,17 +85,13 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       properties.put("mail.pop3.starttls.enable", "true");
       Session emailSession = Session.getDefaultInstance(properties);
       emailSession.setDebug(true);
-
       Store store = emailSession.getStore("pop3s");
-
       store.connect(pop3Host, user, password);
-
       Folder emailFolder = store.getFolder("INBOX");
       emailFolder.open(Folder.READ_ONLY);
     
       BufferedReader reader = new BufferedReader(new InputStreamReader(
       System.in));
-
       Message[] messages = emailFolder.getMessages();
               
       POP3Folder pop3Folder = (POP3Folder) emailFolder;
@@ -100,7 +113,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       }
       emailFolder.close(false);
       store.close();
-
     } catch (NoSuchProviderException e) {
         e.printStackTrace();
     } catch (MessagingException e) {
@@ -111,22 +123,13 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
         e.printStackTrace();
     }
   }
-   public void start() {
 
-      String host = "pop.gmail.com";
-      String mailStoreType = "pop3";
-      String username = "pat.dev.test1@gmail.com";
-      String password = "Choose123";
-
-      fetch(host, mailStoreType, username, password);
-   }
 
   public static void writePart(Part p) throws Exception {
     if (p instanceof Message)
       writeEnvelope((Message) p);
       System.out.println("----------------------------");
       System.out.println("CONTENT-TYPE: " + p.getContentType());
-
     if (p.isMimeType("text/plain")) {
       System.out.println("This is plain text");
       System.out.println("---------------------------");
@@ -148,7 +151,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     else if (p.isMimeType("image/jpeg")) {
       System.out.println("--------> image/jpeg");
       Object o = p.getContent();
-
       InputStream x = (InputStream) o;
       System.out.println("x.length = " + x.available());
       byte[] bArray = new byte[x.available()];
@@ -203,7 +205,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     System.out.println("This is the message envelope");
     System.out.println("---------------------------");
     Address[] a;
-
     if ((a = m.getFrom()) != null) {
       for (int j = 0; j < a.length; j++)
       System.out.println("FROM: " + a[j].toString());
@@ -215,7 +216,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     if (m.getSubject() != null)
       System.out.println("SUBJECT: " + m.getSubject());
   }
-
   private Message getMessageById(String id, Message[] messages, POP3Folder folder){
     String uidString = null;
     for (int j = 0; j < messages.length; j++){
@@ -231,7 +231,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     }
     return null;
   }
-
   public void reply(){
     Date date = null;
     String emailId = "GmailId162cb55999fced53";
@@ -245,18 +244,15 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     properties.put("mail.smtp.host", "relay.jangosmtp.net");
     properties.put("mail.smtp.port", "25");
     Session session = Session.getDefaultInstance(properties);
-
     try {
       Store store = session.getStore("pop3s");
       store.connect("pop.gmail.com", "pat.dev.test1@gmail.com","Choose123");
-
       Folder folder = store.getFolder("inbox");
       if (!folder.exists()) {
         System.out.println("inbox not found");
         System.exit(0);
       }
       folder.open(Folder.READ_ONLY);
-
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
       Message[] messages = folder.getMessages();
       POP3Folder pop3Folder = (POP3Folder) folder;
@@ -267,7 +263,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       }
       System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
       System.out.println(message1.getSubject());
-
       if (messages.length != 0 ) {
         for (int i = 0, n = messages.length; i < n; i++) {
           Message message = messages[i];
@@ -288,7 +283,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
           if (to != null) {
             System.out.println("To: " + to);
           }
-
           String subject = message.getSubject();
           if (subject != null) {
             System.out.println("Subject: " + subject);
@@ -310,17 +304,15 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
             replyMessage.setFrom(new InternetAddress(to));
             replyMessage.setText("Thanks");
             replyMessage.setReplyTo(message.getReplyTo());
-
             Transport t = session.getTransport("smtp");
             try {
-	            t.connect("abc", "****");
-	            t.sendMessage(replyMessage,
+                t.connect("abc", "****");
+                t.sendMessage(replyMessage,
               replyMessage.getAllRecipients());
             } finally {
               t.close();
             }
               System.out.println("message replied successfully ....");
-
               folder.close(false);
               store.close();
             } else if ("n".equals(ans)) {
@@ -334,6 +326,62 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       e.printStackTrace();
     }
   }
+
+  //Implement POP3 Fetch.
+   public void start() {
+
+      String host = "pop.gmail.com";
+      String mailStoreType = "pop3";
+      String username = "pat.dev.test1@gmail.com";
+      String password = "Choose123";
+
+      fetch(host, mailStoreType, username, password);
+   }
+  
+   public String sendEmail(String requestor,String subject,String body){  
+      String host = "pop.gmail.com";// change accordingly
+      String mailStoreType = "pop3";
+      String username = "pat.dev.test1@gmail.com";// change accordingly
+      String password = "Choose123";// change accordingly
+      Properties props = new Properties();
+      props.put("mail.smtp.auth", "true");
+      props.put("mail.smtp.starttls.enable", "true");
+      props.put("mail.smtp.host", host);
+      props.put("mail.smtp.port", "25");
+      Session session = Session.getInstance(props,
+         new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+               return new PasswordAuthentication(username, password);
+	   }
+         });
+
+       try {
+        Transport transport = session.getTransport("smtp");
+        transport.connect("smtp.gmail.com", 25, username, password);
+	   // Create a default MimeMessage object.
+	   Message message = new MimeMessage(session);
+	
+	   // Set From: header field of the header.
+	   message.setFrom(new InternetAddress("pat.dev.test1@gmail.com"));
+	
+	   // Set To: header field of the header.
+	   message.setRecipients(Message.RecipientType.TO,
+               InternetAddress.parse(requestor));
+	
+	   // Set Subject: header field
+	   message.setSubject(subject);
+	
+	   // Now set the actual message
+	   message.setText(body);
+
+
+	   // Send message
+	   transport.sendMessage(message,message.getAllRecipients());
+     System.out.println("Sent message successfully....");
+     String messageID = ((MimeMessage) message).getMessageID();
+     return messageID;
+      } catch (MessagingException e) {
+         throw new RuntimeException(e);
+      }
+   }
 }
-
-
