@@ -26,10 +26,11 @@ foam.CLASS({
   }
   ^ .bg {
     width: 1000px;
-    height: 250px;
+    height: auto;
     border-radius: 2px;
     background-color: #ffffff;
     padding-top: 10px;
+    padding-bottom: 30px;
   }
   ^ .company-name {
     margin-right: 10px;
