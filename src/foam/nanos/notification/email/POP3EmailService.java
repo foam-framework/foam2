@@ -234,7 +234,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 
   public void reply(){
     Date date = null;
-    String emailId = "GmailId162cb608ff7adc32";
+    String emailId = "GmailId162d454e2973ac01";
     Properties properties = new Properties();
     properties.put("mail.store.protocol", "pop3s");
     properties.put("mail.pop3s.host", "pop.gmail.com");
@@ -258,7 +258,9 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       folder.open(Folder.READ_ONLY);
 
       BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+      System.out.println("Message fetched is here:");
       Message[] messages = folder.getMessages();
+
       POP3Folder pop3Folder = (POP3Folder) folder;
       Message message1 = getMessageById(emailId, messages, pop3Folder);
       if (message1 == null){
@@ -299,10 +301,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
           }else{
             System.out.println("Please verify your emailID" + emailId);
           }
-               
-          System.out.print("Do you want to reply to this email with ID [y/n] : ");
-          String ans = reader.readLine();
-          if ("Y".equals(ans) || "y".equals(ans)) {
+
             Message replyMessage = new MimeMessage(session);
             replyMessage = (MimeMessage) message.reply(false);
             // emailId = emailFromUser;
@@ -323,13 +322,8 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
 
               folder.close(false);
               store.close();
-            } else if ("n".equals(ans)) {
-              break;
             }
           }            
-        } else {
-          System.out.println("There is no msg....");
-        }
     } catch (Exception e) {
       e.printStackTrace();
     }
