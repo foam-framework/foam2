@@ -38,11 +38,11 @@ foam.CLASS({
   properties: [
     'name',
     {
-     name:'boolView',
+     name:'boolDropDown',
      value: true
     },
     {
-      name:'boolView1',
+      name:'boolViewFollowUp',
       value: false
      },
     'lbl',
@@ -257,12 +257,12 @@ foam.CLASS({
       var email = this.data.supportEmail;
       this.data.status$.sub(this.test);
       if(this.data.status == "Solved"){
-      this.boolView1=false;
-      this.boolView=true;
+      this.boolViewFollowUp=false;
+      this.boolDropDown=true;
     }
     else {
-      this.boolView1=true;
-      this.boolView=false;
+      this.boolViewFollowUp=true;
+      this.boolDropDown=false;
     }
      //find user associated to ticket
       this.userDAO.find(this.data.requestorEmail).then(function(a){
@@ -278,14 +278,14 @@ foam.CLASS({
       this.addClass(this.myClass())
         .start()
           .start(this.BACK_ACTION).end()
-          .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.boolView$).end()
-              .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.boolView$)
+          .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.boolDropDown$).end()
+              .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.boolDropDown$)
                   .start().add('Submit as').addClass('SubmitButton').end()
                      .start().addClass('SubmitLabel')
                        .start().addClass(this.data.status$).add(this.data.status$).end()
                      .end()
               .end()
-                  .start().addClass('abcde').enableClass('hide', this.boolView1$)
+                  .start().addClass('abcde').enableClass('hide', this.boolViewFollowUp$)
                       .start(this.SUBMIT_TICKET).addClass('Rectangle-9').on('click', this.test)
                         .start().add('Follow Up').addClass('SubmitButton').end()
                       .end()
@@ -298,7 +298,7 @@ foam.CLASS({
         .br()
         .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
         .end()
-        .start().enableClass('abc',this.boolView$)
+        .start().enableClass('abc',this.boolDropDown$)
            .tag({ class: 'foam.support.view.ReplyView' })
         .end()   
     },
@@ -319,11 +319,11 @@ foam.CLASS({
       label: '',
       code: function(){
         var self = this;
-        if(this.boolView1==true && this.boolView==false){  
+        if(this.boolViewFollowUp==true && this.boolDropDown==false){  
           if(this.data.status=="Solved") {
             this.data.status='Solved'
-            this.boolView=true;
-            this.boolView1=false;
+            this.boolDropDown=true;
+            this.boolViewFollowUp=false;
             this.ticketDAO.put(this.data).then(function(a){
                if (!a) {
                 console.log('no ticket Created');
@@ -429,11 +429,11 @@ foam.CLASS({
     },
     function test(){
      var self = this;
-     if(this.data.status=="Solved" && this.boolView1==false && this.boolView==true)
+     if(this.data.status=="Solved" && this.boolViewFollowUp==false && this.boolDropDown==true)
           {
             this.data.status='Pending'
-            this.boolView=true;
-            this.boolView1=false;
+            this.boolDropDown=true;
+            this.boolViewFollowUp=false;
             this.ticketDAO.put(this.data).then(function(a){
               if (!a){
                 console.log('no ticket Created');
