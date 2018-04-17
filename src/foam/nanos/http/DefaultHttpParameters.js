@@ -31,6 +31,12 @@ foam.CLASS({
       value: foam.nanos.http.Command.SELECT
     },
     {
+      name: 'q',
+      label: 'Query',
+      class: 'String',
+      view: { class: 'foam.u2.tag.TextArea', rows: 2, cols: 120 }
+    },
+    {
       class: 'String',
       name: 'data',
       view: { class: 'foam.u2.tag.TextArea', rows: 16, cols: 120 }
@@ -111,7 +117,7 @@ foam.CLASS({
   } else {
     value = this.getValues_().get(name);
   }
-  if ( value != null ) {
+  if ( value != null && ! foam.util.SafetyUtil.isEmpty(value.toString()) ) {
     return value;
   }
   javax.servlet.http.HttpServletRequest req = this.getX().get(javax.servlet.http.HttpServletRequest.class);
@@ -193,6 +199,6 @@ foam.CLASS({
     this.getValues_().put(name, value);
   }
 `
-    },
+    }
   ]
 });
