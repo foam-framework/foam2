@@ -123,7 +123,7 @@ foam.CLASS({
                 .start().add(this.message.dateCreated).addClass('date').end()
               .end()
                 .start().add(this.message.message).addClass('text').end()   
-            .end()     
+          .end()     
         .end()               
     },
   ]
