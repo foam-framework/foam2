@@ -75,9 +75,13 @@ foam.CLASS({
            this.start()
               .start().add(state).addClass('generic-status '+ state).end()
            .end()
+        }
+      },
+      {
+        class: 'Long',
+        name: 'emailId'
       }
-    }
-  ]
+    ]
 });
 
 foam.RELATIONSHIP({
