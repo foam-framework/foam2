@@ -3,6 +3,8 @@ foam.CLASS({
   name: 'TicketDetailView',
   extends: 'foam.u2.View',
 
+  documentation: 'Ticket Detail View',
+
   requires: [
     'foam.nanos.auth.User',
     'foam.u2.PopupView',
@@ -25,6 +27,7 @@ foam.CLASS({
      'pop3',
     'ticketDAO',
      
+    'ticketMessageDAO'
   ],
   
   exports: [
@@ -53,7 +56,7 @@ foam.CLASS({
 
   css: `
   ^ {
-    width: 992px;
+    width: 1000px;
     margin-top: 25px;
     background-color: #edf0f5;
     display: inline-block;
@@ -113,6 +116,7 @@ foam.CLASS({
     background: #59a5d5; 
   }
   .foam-u2-UnstyledActionView-voidDropDown{
+    padding: 0px;
     float: right;
     width: 30px;
     height: 40px;
@@ -184,7 +188,7 @@ foam.CLASS({
     font-size: 10px;
   }
   ^ .Missing-Cash-Out-for {
-    width: 268px;
+    width: auto;
     height: 20px;
     font-family: Roboto;
     font-size: 20px;
@@ -197,6 +201,7 @@ foam.CLASS({
     color: #093649;
     float:left;
     display: inline-block;
+    padding-right: 20px;
   }
   ^ .primarydiv{
     width: 1000px;
@@ -210,7 +215,7 @@ foam.CLASS({
     letter-spacing: 0.3px;
     text-align: left;
     color: #093649; 
-    margin-top: 80px;
+    margin-top: 80px;    
   }
   ^ .sub-div-format {
     width: 488px;
@@ -225,7 +230,7 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    margin-bottom: 20px;
+    margin-bottom: 20px;    
   }
   .SubmitLabel span{
     font-size: 10px;
@@ -287,11 +292,11 @@ foam.CLASS({
                   .end()
         .end()
         .start().addClass('primarydiv')
-          .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-          .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
+         .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
+         .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
         .end()
         .br()
-        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
+        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
         .end()
         .start().enableClass('abc',this.boolView$)
            .tag({ class: 'foam.support.view.ReplyView' })
@@ -301,7 +306,7 @@ foam.CLASS({
     function formatDate(date){
       var formattedDate = {
         month: date.toLocaleString("en-us", {month: "short"}),
-        date: date.getDate(),
+         date: date.getDate(),
         hours: date.getHours(),
         mins: date.getMinutes()
       }

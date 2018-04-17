@@ -1,14 +1,2 @@
-// Modified by admin admin (1) at 2018-04-10T15:53:30Z
-p({"class":"foam.support.model.Ticket","id":1,"subject":"hi","publicMessage":"hi","createdAt":"2018-04-10T15:53:30.387Z","status":"New"})
-// Modified by admin admin (1) at 2018-04-10T15:53:30Z
-p({"class":"foam.support.model.Ticket","id":2,"subject":"hi","publicMessage":"hi","createdAt":"2018-04-10T15:53:30.722Z","status":"New"})
-// Modified by admin admin (1) at 2018-04-10T15:53:30Z
-p({"class":"foam.support.model.Ticket","id":3,"subject":"hi","publicMessage":"hi","createdAt":"2018-04-10T15:53:30.880Z","status":"New"})
-// Modified by admin admin (1) at 2018-04-10T15:53:38Z
-p({"class":"foam.support.model.Ticket","id":4,"createdAt":"2018-04-10T15:53:38.749Z","status":"New"})
-// Modified by admin admin (1) at 2018-04-10T15:54:47Z
-p({"class":"foam.support.model.Ticket","id":5,"subject":"hi","publicMessage":"hi","createdAt":"2018-04-10T15:54:47.727Z","status":"New"})
-// Modified by admin admin (1) at 2018-04-10T19:12:00Z
-p({"class":"foam.support.model.Ticket","id":6,"subject":"hi","publicMessage":"dsdsdsdsd","createdAt":"2018-04-10T19:12:00.598Z","status":"New"})
-// Modified by admin admin (1) at 2018-04-12T15:06:12Z
-p({"class":"foam.support.model.Ticket","id":7,"subject":"hi","publicMessage":"hi","createdAt":"2018-04-12T15:06:12.68Z","status":"New"})
+// Modified by admin admin (1) at 2018-04-10T18:44:58Z
+p({"class":"foam.support.model.Ticket","id":1,"requestorEmail":"pat@gmail.com","subject":"subject","publicMessage":"hello","createdAt":"2018-04-10T18:44:58.565Z","status":"Solved"})

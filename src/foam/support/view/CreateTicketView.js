@@ -63,7 +63,6 @@ foam.CLASS({
     background: #59a5d5; 
   }
   ^ .label{
-    width: 484px;
     height: 16px;
     font-family: Roboto;
     font-size: 14px;
@@ -81,8 +80,16 @@ foam.CLASS({
     background-color: #ffffff;
     border: solid 1px rgba(164, 179, 184, 0.5);
   }
+<<<<<<< HEAD
   .property-requestor{
     width: 300px;
+=======
+  .foam-u2-tag-TextArea {
+    margin-top:8px;
+  }
+  .property-requestorEmail,.property-requestorName{
+    width: 450px;
+>>>>>>> 91a2ed70177d59a58e4d391fad4fef42eff47a9c
     height: 40px;
   }
   .property-message{
@@ -115,6 +122,7 @@ foam.CLASS({
     padding: 20px;
   }
   .foam-u2-UnstyledActionView-voidDropDown{
+    padding: 0px;
     float: right;
     width: 30px;
     height: 40px;
@@ -186,12 +194,20 @@ foam.CLASS({
     position: relative;
     top: 4px;
   }
+  .rname {
+    margin-right:20px;
+    float:left;
+  }
   `,
 
   properties: [
     {
       class: 'String',
-      name: 'requestor'
+      name: 'requestorEmail'
+    },
+    {
+      class: 'String',
+      name: 'requestorName'
     },
     {
       class: 'String',
@@ -211,18 +227,36 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
-        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).end()
-        .start(this.SUBMIT_TICKET).addClass('Rectangle-8').end()
-
-        .start().add(this.title).addClass('New-Ticket').end()
+        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$)
+          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).end()
+        .end()
+        .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
+            .start().add('Submit as').addClass('SubmitButton').end()
+            .start().addClass('SubmitLabel')
+              .start().addClass(this.status$).add(this.status$).end()
+            .end()
+        .end()
 
         .start().addClass('bg2')
-          .start().addClass('label')
-            .add('Requestor')
+        .start()
+          .start().addClass('rname')
+            .start().addClass('label')
+              .add('Requestor Name')
+            .end()
+            .start()
+              .tag(this.REQUESTOR_NAME)
+            .end()
           .end()
-          .start()
-            .tag(this.REQUESTOR)
+
+          .start().addClass('remail')
+            .start().addClass('label')
+              .add('Requestor Email')
+            .end()
+            .start()
+              .tag(this.REQUESTOR_EMAIL)
+            .end()
           .end()
+        .end()
 
           .start().addClass('label')
             .add('Subject')
@@ -249,7 +283,12 @@ foam.CLASS({
         
         var ticket = this.Ticket.create({
           publicMessage: this.message,
+<<<<<<< HEAD
           requestorId: this.requestor,
+=======
+          requestorEmail: this.requestorEmail,
+          requestorName: this.requestorName,
+>>>>>>> 91a2ed70177d59a58e4d391fad4fef42eff47a9c
           subject: this.subject,
           status: this.status
         });

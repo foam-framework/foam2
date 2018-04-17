@@ -36,6 +36,10 @@ foam.CLASS({
       },
       {
         class: 'String',
+        name: 'requestorName'
+      },
+      {
+        class: 'String',
         name: 'subject',
         label:'Subject',
       },

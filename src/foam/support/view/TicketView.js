@@ -17,6 +17,7 @@ foam.CLASS({
   ^ {
     width: 992px;
     margin: auto;
+    padding-bottom: 40px;
   }
   ^ .foam-u2-UnstyledActionView-create {
     float: right;
@@ -50,6 +51,9 @@ foam.CLASS({
     width: 125px;
   }
   ^ .foam-u2-view-TableView-th-requestorEmail{
+    width: 200px;
+  }
+  ^ .foam-u2-view-TableView-th-requestorName{
     width: 200px;
   }
   `,
