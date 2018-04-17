@@ -5,6 +5,10 @@ foam.CLASS({
     extends: 'foam.u2.View',
 
     documentation: 'Internal note for ticket detail view',
+
+    requires: [
+      'foam.support.view.MessageCard'
+    ],
     
     properties:[
       {
@@ -24,7 +28,7 @@ foam.CLASS({
     css: `
     ^ .bg {
         width: 1000px;
-        height: 280px;
+        height: 250px;
         border-radius: 2px;
         background-color: #ffffff;
     }
@@ -114,7 +118,8 @@ foam.CLASS({
             .end()
               .endContext()
                  .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
-            .end()
+                 .end()
+            .end();     
       },
     ],
     actions: [
