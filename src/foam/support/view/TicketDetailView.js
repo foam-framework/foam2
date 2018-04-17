@@ -298,7 +298,7 @@ foam.CLASS({
         .br()
         .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
         .end()
-        .start().enableClass('abc',this.boolDropDown$)
+        .start().enableClass('hide',this.boolDropDown$)
            .tag({ class: 'foam.support.view.ReplyView' })
         .end()   
     },
