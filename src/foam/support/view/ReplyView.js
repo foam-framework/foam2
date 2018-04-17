@@ -5,18 +5,30 @@ foam.CLASS({
     extends: 'foam.u2.View',
 
     documentation: 'Internal note for ticket detail view',
+
+    requires: [
+      'foam.support.view.MessageCard'
+    ],
     
     properties:[
       {
-        name: 'variant'
+        name: 'variant',
+        postSet: function(oldValue, newValue){
+          this.viewData.variant = newValue;
+        }
       },
       {
         class: 'String',
         name: 'message',
         view: 'foam.u2.tag.TextArea',
+        postSet: function(oldValue, newValue){
+          this.viewData.message = newValue;
+        }
       }
    ],
-
+    imports: [
+      'viewData'
+    ],
     exports: [
       'as data'
     ],
@@ -24,7 +36,7 @@ foam.CLASS({
     css: `
     ^ .bg {
         width: 1000px;
-        height: 280px;
+        height: 250px;
         border-radius: 2px;
         background-color: #ffffff;
     }
@@ -102,6 +114,8 @@ foam.CLASS({
       function initE(){
         this.SUPER();
         var self = this;
+        this.variant = true;
+
         this
           .addClass(this.myClass())
             .start().addClass('bg')
@@ -114,7 +128,8 @@ foam.CLASS({
             .end()
               .endContext()
                  .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
-            .end()
+                 .end()
+            .end();     
       },
     ],
     actions: [

@@ -3,9 +3,16 @@ foam.CLASS({
   name: 'TicketDetailView',
   extends: 'foam.u2.View',
 
+  documentation: 'Ticket Detail View',
+
   requires: [
     'foam.nanos.auth.User',
-    'foam.u2.PopupView'
+    'foam.u2.PopupView',
+    'foam.support.model.TicketMessage',
+    'foam.nanos.notification.email.POP3Email',
+    'foam.nanos.notification.email.POP3EmailService',
+    'foam.support.view.ReplyView',
+    
   ],
 
   implements: [
@@ -15,25 +22,41 @@ foam.CLASS({
   imports: [
     'stack',
     'userDAO',
-    'hideSummary'
+    'hideSummary',
+     'messages',
+     'pop3',
+    'ticketDAO',
+     
+    'ticketMessageDAO'
   ],
   
   exports: [
-    'as data'
+    'as data',
+    'viewData'
   ],
 
   properties: [
     'name',
+    {
+     name:'boolDropDown',
+     value: true
+    },
+    {
+      name:'boolViewFollowUp',
+      value: false
+     },
+    'lbl',
     'voidMenuBtn_',
-    'voidPopUp_'
+    'voidPopUp_',
+    {
+      name: 'viewData',
+      value: {}
+    }
   ],
 
   css: `
-  * {
-    box-sizing: border-box;
-  }
   ^ {
-    width: 992px;
+    width: 1000px;
     margin-top: 25px;
     background-color: #edf0f5;
     display: inline-block;
@@ -55,6 +78,25 @@ foam.CLASS({
     text-align: center;
     color: #093649;
   }
+  .Rectangle-9 {
+    width: 135px;
+    padding-left: 35px;
+    border: solid 0.5px #59a5d5 !important;
+    margin: 0px 2px !important;
+    -webkit-box-shadow: none;
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    letter-spacing: 0.2px;
+    text-align: center;
+    color: #ffffff;
+    float: right;
+    height: 40px;
+    border-radius: 2px;
+    background: #59a5d5;    
+  }
   ^ .Rectangle-8 {
     padding: 0 10px;
     border: solid 0.5px #59a5d5 !important;
@@ -74,6 +116,7 @@ foam.CLASS({
     background: #59a5d5; 
   }
   .foam-u2-UnstyledActionView-voidDropDown{
+    padding: 0px;
     float: right;
     width: 30px;
     height: 40px;
@@ -145,7 +188,7 @@ foam.CLASS({
     font-size: 10px;
   }
   ^ .Missing-Cash-Out-for {
-    width: 268px;
+    width: auto;
     height: 20px;
     font-family: Roboto;
     font-size: 20px;
@@ -158,6 +201,7 @@ foam.CLASS({
     color: #093649;
     float:left;
     display: inline-block;
+    padding-right: 20px;
   }
   ^ .primarydiv{
     width: 1000px;
@@ -171,7 +215,7 @@ foam.CLASS({
     letter-spacing: 0.3px;
     text-align: left;
     color: #093649; 
-    margin-top: 80px;
+    margin-top: 80px;    
   }
   ^ .sub-div-format {
     width: 488px;
@@ -186,12 +230,23 @@ foam.CLASS({
     letter-spacing: 0.2px;
     text-align: left;
     color: #093649;
-    margin-bottom: 20px;
+    margin-bottom: 20px;    
   }
   .SubmitLabel span{
     font-size: 10px;
     position: relative;
     top: 4px;
+  }
+  ^ .hide {
+    visibility:hidden !important;
+  }
+  .def{
+    position: relative;
+    left: 20px;
+  }
+  .abcde{
+    position: absolute;
+    right: 130PX;
   }
   `,
 
@@ -200,39 +255,58 @@ foam.CLASS({
       var self = this;
       this.hideSummary = true;
       var email = this.data.supportEmail;
-    
-      //find user associated to ticket
-      this.userDAO.find(this.data.requestorId).then(function(a){
+      this.data.status$.sub(this.test);
+      if(this.data.status == "Solved"){
+      this.boolViewFollowUp=false;
+      this.boolDropDown=true;
+    }
+    else {
+      this.boolViewFollowUp=true;
+      this.boolDropDown=false;
+    }
+     //find user associated to ticket
+      this.userDAO.find(this.data.requestorEmail).then(function(a){
+      if(a==null){
+         self.name="No user mapped"
+       }
+       else{
         self.name= a.firstName;
+       }
       })
       //format date for ui
       var formattedDate = this.formatDate(this.data.createdAt);
-      
       this.addClass(this.myClass())
         .start()
           .start(this.BACK_ACTION).end()
-          .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).end()
-          .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
-              .start().add('Submit as').addClass('SubmitButton').end()
-              .start().addClass('SubmitLabel')
-                .start().addClass(this.data.status$).add(this.data.status$).end()
+          .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.boolDropDown$).end()
+              .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.boolDropDown$)
+                  .start().add('Submit as').addClass('SubmitButton').end()
+                     .start().addClass('SubmitLabel')
+                       .start().addClass(this.data.status$).add(this.data.status$).end()
+                     .end()
               .end()
-          .end()
+                  .start().addClass('abcde').enableClass('hide', this.boolViewFollowUp$)
+                      .start(this.SUBMIT_TICKET).addClass('Rectangle-9').on('click', this.test)
+                        .start().add('Follow Up').addClass('SubmitButton').end()
+                      .end()
+                  .end()
         .end()
         .start().addClass('primarydiv')
-          .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-          .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
+         .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
+         .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
         .end()
         .br()
-        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.name$,"<",this.data.supportEmail,">","  ","  |  Via support@mintchip.ca") 
+        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
         .end()
-        .tag({ class: 'foam.support.view.ReplyView' });
+        .start().enableClass('abc',this.boolDropDown$)
+           .tag({ class: 'foam.support.view.ReplyView' })
+        .end()   
     },
 
     function formatDate(date){
       var formattedDate = {
         month: date.toLocaleString("en-us", {month: "short"}),
-        date: date.getDate(),
+         date: date.getDate(),
         hours: date.getHours(),
         mins: date.getMinutes()
       }
@@ -244,18 +318,39 @@ foam.CLASS({
       name: 'submitTicket',
       label: '',
       code: function(){
-        /*
-        var ticket = this.Ticket.create({
-          publicMessage: this.message,
-          requestorEmail: this.requestor,
-          subject: this.subject,
-          status: this.status
-        });
-
-        this.ticketDAO.put(ticket);*/
-
-        this.stack.push({ class: 'foam.support.view.TicketView' });
-      }
+        var self = this;
+        if(this.boolViewFollowUp==true && this.boolDropDown==false){  
+          if(this.data.status=="Solved") {
+            this.data.status='Solved'
+            this.boolDropDown=true;
+            this.boolViewFollowUp=false;
+            this.ticketDAO.put(this.data).then(function(a){
+               if (!a) {
+                console.log('no ticket Created');
+               }
+              self.stack.push({ class: 'foam.support.view.TicketView' });
+            })
+        }  
+          else {
+            this.ticketDAO.put(this.data).then(function(a){
+              if (!a){
+                console.log('no ticket Created');
+              }
+              self.stack.push({ class: 'foam.support.view.TicketView' });
+            })
+          }        
+        }
+        else{
+          if(this.viewData['variant']==false && this.messages=="" && this.data.requestorEmail!=""){
+            x = this.pop3;
+            var messageId=x.sendEmail(this.data.requestorEmail,this.data.subject,this.viewData['message']);
+            if(this.data.emailId==""){
+              this.data.emailId=messageId
+              this.ticketDAO.put(this.data)
+            }
+          }
+       }
+    }
     },
     {
       name: 'backAction',
@@ -268,11 +363,11 @@ foam.CLASS({
       name: 'voidDropDown',
       label: '',
       code: function(X) {
-        var self = this;
-        if(this.voidPopUp_) {
-          this.voidPopUp_ = null;
-          return;
-        }
+          var self = this;
+          if(this.voidPopUp_) {
+            this.voidPopUp_ = null;
+            return;
+          }
         
         self.voidPopUp_ = self.PopupView.create({
           x: -140,
@@ -330,5 +425,29 @@ foam.CLASS({
       var self = this;
       self.voidPopUp_.close();
     },
+    function test(){
+     var self = this;
+     if(this.data.status=="Solved" && this.boolViewFollowUp==false && this.boolDropDown==true)
+          {
+            this.data.status='Pending'
+            this.boolDropDown=true;
+            this.boolViewFollowUp=false;
+            this.ticketDAO.put(this.data).then(function(a){
+              if (!a){
+                console.log('no ticket Created');
+              }
+              self.stack.push({ class: 'foam.support.view.TicketView' });
+            })
+          } 
+          else
+          {
+            this.ticketDAO.put(this.data).then(function(a){
+              if (!a){
+                console.log('no ticket Created');
+              }
+              self.stack.push({ class: 'foam.support.view.TicketView' });
+            })
+          }
+    }
   ]
 });

@@ -13,6 +13,25 @@ foam.INTERFACE({
       name: 'start',
       javaReturns: 'void',
       returns: 'Promise'
+    },
+    {
+      name: 'sendEmail',
+      javaReturns: 'String',
+      returns: 'Promise',  
+      args: [
+        {
+          class:'String',
+          name:'requestor'
+        },
+        {
+          class:'String',
+          name:'subject'
+        },
+        {
+          class:'String',
+          name:'body'
+        }
+      ]
     }
   ]
 });

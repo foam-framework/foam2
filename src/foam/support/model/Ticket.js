@@ -17,8 +17,13 @@ foam.CLASS({
     tableColumns: [
       'id', 'requestorEmail', 'subject', 'createdAt', 'status'
     ],
-
+    exports: [
+      'subject'
+    ],
     properties: [
+      {
+        name:'emailId'
+      },
       {
         class: 'Long',
         name: 'id',

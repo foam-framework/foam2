@@ -17,6 +17,7 @@ foam.CLASS({
   ^ {
     width: 992px;
     margin: auto;
+    padding-bottom: 40px;
   }
   ^ .foam-u2-UnstyledActionView-create {
     float: right;

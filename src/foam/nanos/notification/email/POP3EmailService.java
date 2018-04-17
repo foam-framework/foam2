@@ -81,10 +81,8 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       Store store = emailSession.getStore("imaps");
 
       store.connect(pop3Host, user, password);
-
       Folder emailFolder = store.getFolder("INBOX");
       emailFolder.open(Folder.READ_ONLY);
-
       Message[] messages = emailFolder.getMessages();
               
       IMAPFolder imapfolder = (IMAPFolder) emailFolder;
@@ -122,15 +120,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     }
   }
 
-  public void start() {
-
-    String host = "pop.gmail.com";
-    String mailStoreType = "pop3";
-    String username = "pat.dev.test1@gmail.com";
-    String password = "Choose123";
-
-    fetch(host, mailStoreType, username, password);
-  }
+  
 
   private Message getMessageById(String id, Message[] messages, IMAPFolder folder){
     String uidString = null;
@@ -147,7 +137,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     }
     return null;
   }
-
   public void reply(){
     Date date = null;
     String emailId = "GmailId162d463489abf2d7";
@@ -162,13 +151,11 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     properties.put("mail.smtp.host", "relay.jangosmtp.net");
     properties.put("mail.smtp.port", "25");
     Session session = Session.getDefaultInstance(properties);
-
     try {
       Store store = session.getStore("imaps");
 
       // Store store = session.getStore("pop3s");
       store.connect("pop.gmail.com", "pat.dev.test1@gmail.com","Choose123");
-
       Folder folder = store.getFolder("inbox");
       if (!folder.exists()) {
         System.out.println("inbox not found");
@@ -194,7 +181,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       }
       System.out.println("............. !MESSAGE WITH EMAIL ID FETCHED! .........");
       System.out.println(message1.getSubject());
-
       if (messages.length != 0 ) {
         for (int i = 0, n = messages.length; i < n; i++) {
           Message message = messages[i];
@@ -215,7 +201,6 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
           if (to != null) {
             System.out.println("To: " + to);
           }
-
           String subject = message.getSubject();
           if (subject != null) {
             System.out.println("Subject: " + subject);
@@ -234,17 +219,15 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
             replyMessage.setFrom(new InternetAddress(to));
             replyMessage.setText("Thanks");
             replyMessage.setReplyTo(message.getReplyTo());
-
             Transport t = session.getTransport("smtp");
             try {
-	            t.connect("abc", "****");
-	            t.sendMessage(replyMessage,
+                t.connect("abc", "****");
+                t.sendMessage(replyMessage,
               replyMessage.getAllRecipients());
             } finally {
               t.close();
             }
               System.out.println("message replied successfully ....");
-
               folder.close(false);
               store.close();
             }
@@ -253,6 +236,62 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
       e.printStackTrace();
     }
   }
+
+  //Implement POP3 Fetch.
+   public void start() {
+
+      String host = "pop.gmail.com";
+      String mailStoreType = "pop3";
+      String username = "pat.dev.test1@gmail.com";
+      String password = "Choose123";
+
+      fetch(host, mailStoreType, username, password);
+   }
+  
+   public String sendEmail(String requestor,String subject,String body){  
+      String host = "pop.gmail.com";// change accordingly
+      String mailStoreType = "pop3";
+      String username = "pat.dev.test1@gmail.com";// change accordingly
+      String password = "Choose123";// change accordingly
+      Properties props = new Properties();
+      props.put("mail.smtp.auth", "true");
+      props.put("mail.smtp.starttls.enable", "true");
+      props.put("mail.smtp.host", host);
+      props.put("mail.smtp.port", "25");
+      Session session = Session.getInstance(props,
+         new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+               return new PasswordAuthentication(username, password);
+	   }
+         });
+
+       try {
+        Transport transport = session.getTransport("smtp");
+        transport.connect("smtp.gmail.com", 25, username, password);
+	   // Create a default MimeMessage object.
+	   Message message = new MimeMessage(session);
+	
+	   // Set From: header field of the header.
+	   message.setFrom(new InternetAddress("pat.dev.test1@gmail.com"));
+	
+	   // Set To: header field of the header.
+	   message.setRecipients(Message.RecipientType.TO,
+               InternetAddress.parse(requestor));
+	
+	   // Set Subject: header field
+	   message.setSubject(subject);
+	
+	   // Now set the actual message
+	   message.setText(body);
+
+
+	   // Send message
+	   transport.sendMessage(message,message.getAllRecipients());
+     System.out.println("Sent message successfully....");
+     String messageID = ((MimeMessage) message).getMessageID();
+     return messageID;
+      } catch (MessagingException e) {
+         throw new RuntimeException(e);
+      }
+   }
 }
-
-
