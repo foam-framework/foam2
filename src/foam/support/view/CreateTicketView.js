@@ -201,6 +201,9 @@ foam.CLASS({
     margin-right:20px;
     float:left;
   }
+  ^ .drop_down {
+    padding-right: 20px;
+  }
   `,
 
   properties: [
@@ -248,7 +251,9 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start(this.DELETE_DRAFT).addClass('Rectangle-7').end()
-        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).end()
+        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$)
+          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).addClass('drop_down').end()
+        .end()
         .start(this.SUBMIT_TICKET).addClass('Rectangle-8')
             .start().add('Submit as').addClass('SubmitButton').end()
             .start().addClass('SubmitLabel')
