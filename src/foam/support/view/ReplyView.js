@@ -28,7 +28,7 @@ foam.CLASS({
     css: `
     ^ .bg {
         width: 1000px;
-        height: 230px;
+        height: 250px;
         border-radius: 2px;
         background-color: #ffffff;
     }
@@ -99,9 +99,6 @@ foam.CLASS({
     }
     ^ .foam-u2-UnstyledActionView:focus{
       outline: none;
-    }
-    ^ .line {
-      padding-top: 10px;
     }
       `,
   

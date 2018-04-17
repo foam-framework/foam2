@@ -150,7 +150,7 @@ foam.CLASS({
     font-size: 10px;
   }
   ^ .Missing-Cash-Out-for {
-    width: 268px;
+    width: auto;
     height: 20px;
     font-family: Roboto;
     font-size: 20px;
@@ -163,6 +163,7 @@ foam.CLASS({
     color: #093649;
     float:left;
     display: inline-block;
+    padding-right: 20px;
   }
   ^ .primarydiv{
     width: 1000px;

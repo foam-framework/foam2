@@ -26,7 +26,7 @@ foam.CLASS({
   }
   ^ .bg {
     width: 1000px;
-    height: 280px;
+    height: 250px;
     border-radius: 2px;
     background-color: #ffffff;
     padding-top: 10px;
@@ -58,7 +58,6 @@ foam.CLASS({
     text-align: left;
     color: #a4b3b8;
     padding-top: 14px;
-    
   }
   ^ .text {
     font-family: Roboto;
@@ -92,6 +91,9 @@ foam.CLASS({
     height: 1px; 
     border: 0;       
   }
+  ^ .spaceline {
+    padding-top: 15px;
+  }
   `,
 
   properties: [
@@ -112,12 +114,16 @@ foam.CLASS({
       this
         .addClass(this.myClass()) 
         .start('div').addClass('bg')
-        .start('hr').end() 
-            .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
-            .start().start().add(this.requestName$).addClass('company-name').end() 
-            .start().add(this.message.dateCreated).addClass('date').end().end()
-            .start().add(this.message.message).addClass('text').end()   
-        .end()                      
+          .start('hr').end() 
+            .start().addClass('spaceline')
+              .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/person.svg'}).addClass('person')
+              .start()
+                .start().add(this.requestName$).addClass('company-name').end() 
+                .start().add(this.message.dateCreated).addClass('date').end()
+              .end()
+                .start().add(this.message.message).addClass('text').end()   
+            .end()     
+        .end()               
     },
   ]
 });

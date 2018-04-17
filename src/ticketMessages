@@ -6,5 +6,3 @@ p({"class":"foam.support.model.TicketMessage","id":2,"senderId":1,"receiverId":2
 p({"class":"foam.support.model.TicketMessage","id":3,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T18:24:25.6Z","message":"hello","ticketId":1})
 // Modified by admin admin (1) at 2018-04-16T18:25:30Z
 p({"class":"foam.support.model.TicketMessage","id":4,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T18:25:23.113Z","message":"hello","ticketId":1})
-// Modified by admin admin (1) at 2018-04-16T18:25:55Z
-p({"class":"foam.support.model.TicketMessage","id":5,"senderId":2,"receiverId":2,"dateCreated":"2018-04-16T18:25:53.583Z","message":"hello world","ticketId":2})
