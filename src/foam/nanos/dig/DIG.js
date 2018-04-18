@@ -75,13 +75,49 @@ foam.CLASS({
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
       expression: function(key, data, email, subject, daoKey, cmd, format, q) {
-        var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd.name.toLowerCase() + "&format=" + format.name.toLowerCase();
+        var query = false;
+        var url = "/service/dig";
 
-        if ( key )     url += "&id=" + key;
-        if ( data )    url += "&data=" + data;
-        if ( email )   url += "&email=" + email;
-        if ( subject ) url += "&subject=" + subject;
-        if ( q )       url += "&q=" + q;
+        if ( daoKey ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "dao=" + daoKey;
+        }
+        if ( cmd ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "cmd=" + cmd.name.toLowerCase();
+        }
+        if ( format ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "cmd=" + format.name.toLowerCase();
+        }
+        if ( key ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "id=" + key;
+        }
+        if ( data ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "data=" + data;
+        }
+        if ( email ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "email=" + email;
+        }
+        if ( subject ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "subject=" + subject;
+        }
+        if ( q ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "&q=" + q;
+        }
 
         return url;
       }
