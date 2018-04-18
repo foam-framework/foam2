@@ -63,8 +63,8 @@ public class DigWebAgent
     CharBuffer          buffer_     = CharBuffer.allocate(65535);
     String              data        = p.getParameter("data");
     String              daoName     = p.getParameter("dao");
-    Command             command     = (Command) p.get("cmd");
-    Format              format      = (Format) p.get("format");
+    Command             command     = (Command) p.get(Command.class);
+    Format              format      = (Format) p.get(Format.class);
     String              id          = p.getParameter("id");
     String              q           = p.getParameter("q");
     DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
