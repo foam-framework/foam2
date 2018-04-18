@@ -104,21 +104,9 @@ public class DigWebAgent
       ClassInfo cInfo    = dao.getOf();
       Class     objClass = cInfo.getObjClass();
 
-      Nary pred = new WebAgentQueryParser(cInfo).parse(x, q);
-      if ( pred != null ) {
-        logger.debug("predicate/nary", pred.getClass(), pred.toString());
-        dao = dao.where(pred);
-      }
-      // if ( pred instanceof Nary ) {
-      //   Nary nary = (Nary) pred;
-      //   logger.debug("nary", nary.getClass(), nary.toString());
-      //   dao = dao.where(nary);
-      // } else {
-      //   logger.debug("predicate", pred.getClass(), pred.toString());
-      //   Predicate partial = pred.getPatialEval();
-      //   logger.debug("partial", partial.getClass(), partial.toString());
-      //   dao = dao.where(partial);
-      // }
+      Predicate pred = new WebAgentQueryParser(cInfo).parse(x, q);
+      logger.debug("predicate", pred.getClass(), pred.toString());
+      dao = dao.where(pred);
 
       if ( Command.put == command ) {
         if ( Format.JSON == format ) {
