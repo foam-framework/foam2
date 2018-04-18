@@ -50,6 +50,7 @@ foam.CLASS({
         this.daoKey = nu;
       }
     },
+    'q',
     {
         class: 'String',
         name: 'key'
@@ -73,13 +74,14 @@ foam.CLASS({
       displayWidth: 120,
       view: 'foam.nanos.dig.LinkView',
       setter: function() {}, // Prevent from ever getting set
-      expression: function(key, data, email, subject, daoKey, cmd, format) {
+      expression: function(key, data, email, subject, daoKey, cmd, format, q) {
         var url = "/service/dig?dao=" + daoKey + "&cmd=" + cmd.name.toLowerCase() + "&format=" + format.name.toLowerCase();
 
-        if ( key )     url += "?id=" + key;
-        if ( data )    url += "?data=" + data;
-        if ( email )   url += "?email=" + email;
-        if ( subject ) url += "?subject=" + subject;
+        if ( key )     url += "&id=" + key;
+        if ( data )    url += "&data=" + data;
+        if ( email )   url += "&email=" + email;
+        if ( subject ) url += "&subject=" + subject;
+        if ( q )       url += "&q=" + q;
 
         return url;
       }
