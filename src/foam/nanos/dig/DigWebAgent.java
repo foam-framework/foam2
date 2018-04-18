@@ -25,6 +25,7 @@ import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
 import foam.lib.parse.ParserContextImpl;
 import foam.lib.parse.StringPStream;
+import foam.mlang.predicate.Nary;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.boot.NSpec;
 import foam.nanos.http.Command;
@@ -103,9 +104,21 @@ public class DigWebAgent
       ClassInfo cInfo    = dao.getOf();
       Class     objClass = cInfo.getObjClass();
 
-      Predicate pred = new WebAgentQueryParser(cInfo).parse(x, q);
-      logger.debug("predicate", pred.getClass());
-      dao = dao.where(pred);
+      Nary pred = new WebAgentQueryParser(cInfo).parse(x, q);
+      if ( pred != null ) {
+        logger.debug("predicate/nary", pred.getClass(), pred.toString());
+        dao = dao.where(pred);
+      }
+      // if ( pred instanceof Nary ) {
+      //   Nary nary = (Nary) pred;
+      //   logger.debug("nary", nary.getClass(), nary.toString());
+      //   dao = dao.where(nary);
+      // } else {
+      //   logger.debug("predicate", pred.getClass(), pred.toString());
+      //   Predicate partial = pred.getPatialEval();
+      //   logger.debug("partial", partial.getClass(), partial.toString());
+      //   dao = dao.where(partial);
+      // }
 
       if ( Command.put == command ) {
         if ( Format.JSON == format ) {

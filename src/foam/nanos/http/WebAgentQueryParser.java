@@ -18,6 +18,7 @@ import foam.lib.parse.ParserContextImpl;
 import foam.lib.parse.StringPStream;
 import foam.parse.QueryParser;
 import foam.mlang.predicate.Predicate;
+import foam.mlang.predicate.Nary;
 import foam.mlang.MLang;
 import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
@@ -34,7 +35,7 @@ public class WebAgentQueryParser {
     parser_ = new QueryParser(classInfo);
   }
 
-  public Predicate parse(X x, String q)
+  public Nary parse(X x, String q)
     throws IllegalArgumentException {
 
     if ( ! SafetyUtil.isEmpty(q) ) {
@@ -51,11 +52,11 @@ public class WebAgentQueryParser {
         throw new IllegalArgumentException("failed to parse [" + q + "]: "+message);
       }
       parser_.setX(EmptyX.instance());
-      Predicate pred = (Predicate) ps.value();
-      return pred;
-    } else {
-      return MLang.TRUE;
+      Nary nary = (Nary) ps.value();
+      logger.debug(this.getClass().getSimpleName(), "nary", nary.getClass(), nary.toString());
+      return nary;
     }
+    return null; //MLang.TRUE;
   }
 
   /**
