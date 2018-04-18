@@ -154,6 +154,7 @@ public class HttpParametersWebAgent
       }
     }
     parameters.set("cmd", command);
+    parameters.set(Command.class, command);
 
     Format format = Format.JSON;
     resp.setContentType("text/html");
@@ -209,6 +210,7 @@ public class HttpParametersWebAgent
       }
     }
     parameters.set("format", format);
+    parameters.set(Format.class, format);
 
     logger.debug("parameters", parameters);
     x = x.put(HttpParameters.class, parameters);

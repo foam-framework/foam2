@@ -87,7 +87,7 @@ foam.CLASS({
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ],
       code: function(name) {
@@ -115,7 +115,7 @@ foam.CLASS({
     return value;
   }
   javax.servlet.http.HttpServletRequest req = this.getX().get(javax.servlet.http.HttpServletRequest.class);
-  return req.getParameter(name);
+  return req.getParameter(name.toString());
   `
     },
     {
@@ -170,7 +170,7 @@ foam.CLASS({
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          javaType: 'Object'
         },
         {
           name: 'value',
