@@ -35,7 +35,7 @@ public class WebAgentQueryParser {
     parser_ = new QueryParser(classInfo);
   }
 
-  public Nary parse(X x, String q)
+  public Predicate parse(X x, String q)
     throws IllegalArgumentException {
 
     if ( ! SafetyUtil.isEmpty(q) ) {
@@ -52,11 +52,11 @@ public class WebAgentQueryParser {
         throw new IllegalArgumentException("failed to parse [" + q + "]: "+message);
       }
       parser_.setX(EmptyX.instance());
-      Nary nary = (Nary) ps.value();
-      logger.debug(this.getClass().getSimpleName(), "nary", nary.getClass(), nary.toString());
-      return nary;
+      Predicate pred = (Predicate) ps.value();
+      logger.debug(this.getClass().getSimpleName(), "pred", pred.getClass(), pred.toString());
+      return pred;
     }
-    return null; //MLang.TRUE;
+    return MLang.TRUE;
   }
 
   /**
