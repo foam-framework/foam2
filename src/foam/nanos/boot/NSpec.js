@@ -88,6 +88,20 @@ foam.CLASS({
       }
     },
     {
+      class: 'Boolean',
+      name: 'pm',
+      value: true,
+      tableCellFormatter: function(value, obj, property) {
+        this
+          .start()
+            .call(function() {
+              if ( value ) { this.style({color: 'green'}); }
+            })
+            .add(value ? ' Y' : '-')
+          .end();
+      }
+    },
+    {
       class: 'String',
       name: 'serviceClass',
       displayWidth: 80

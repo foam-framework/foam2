@@ -37,6 +37,7 @@ import foam.nanos.logger.Logger;
 import foam.nanos.logger.PrefixLogger;
 import foam.nanos.notification.email.EmailMessage;
 import foam.nanos.notification.email.EmailService;
+import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.nio.CharBuffer;
@@ -62,8 +63,8 @@ public class DigWebAgent
     CharBuffer          buffer_     = CharBuffer.allocate(65535);
     String              data        = p.getParameter("data");
     String              daoName     = p.getParameter("dao");
-    Enum                command     = (Enum) p.get("cmd");
-    Enum                format      = (Enum) p.get("format");
+    Command             command     = (Command) p.get("cmd");
+    Format              format      = (Format) p.get("format");
     String              id          = p.getParameter("id");
     String              q           = p.getParameter("q");
     DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
@@ -74,23 +75,24 @@ public class DigWebAgent
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
     //
+    PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
-    if ( SafetyUtil.isEmpty(daoName) ) {
-      resp.setContentType("text/html");
-      outputPage(x);
-      // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
-      //   String url = "/#dig";
-      //   try {
-      //     resp.sendRedirect(url);
-      //   } catch ( java.io.IOException e ) {
-      //     logger.error("Failed to redirect to", url, e);
-      //   }
-      return;
-    }
-
     try {
+      if ( SafetyUtil.isEmpty(daoName) ) {
+        resp.setContentType("text/html");
+        outputPage(x);
+        // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
+        //   String url = "/#dig";
+        //   try {
+        //     resp.sendRedirect(url);
+        //   } catch ( java.io.IOException e ) {
+        //     logger.error("Failed to redirect to", url, e);
+        //   }
+        return;
+      }
+
       DAO dao = (DAO) x.get(daoName);
 
       if ( dao == null ) {
@@ -358,6 +360,8 @@ public class DigWebAgent
       } catch ( java.io.IOException e ) {
         logger.error("Failed to send HttpServletResponse CODE", e);
       }
+    } finally {
+      pm.log(x);
     }
   }
 
