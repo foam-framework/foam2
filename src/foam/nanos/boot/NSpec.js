@@ -76,7 +76,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'parameters',
-      value: true,
+      value: false,
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
