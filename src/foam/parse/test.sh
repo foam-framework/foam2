@@ -42,19 +42,22 @@ function test () {
     send_verbose
     send_quiet
     #printf "EXPECTATION=$EXPECTATION"
-    if [ "$STATUS_CODE" != "200" ] && [ $EXPECTATION -eq $PASS ]; then
-        printf "\n(1) FAIL ($STATUS_CODE) q=$QUERY"
-        #send_verbose
+    if [ "$STATUS_CODE" != "200" ]; then
+         if [ $EXPECTATION -eq $PASS ]; then
+             printf "\n(1) FAIL ($STATUS_CODE) q=$QUERY"
+         else
+             printf "\n(2) PASS ($STATUS_CODE) q=$QUERY"
+         fi
     elif grep -q "No data" out.html; then
          if [ $EXPECTATION -eq $PASS ]; then
-             printf "\n(2) FAIL ($STATUS_CODE) NO_DATA q=$QUERY"
+             printf "\n(3) FAIL ($STATUS_CODE) NO_DATA q=$QUERY"
          else
-             printf "\n(3) PASS ($STATUS_CODE) NO_DATA q=$QUERY"
+             printf "\n(4) PASS ($STATUS_CODE) NO_DATA q=$QUERY"
          fi
     elif [ $EXPECTATION -eq $PASS ]; then
-        printf "\n(4) PASS ($STATUS_CODE) q=$QUERY"
+        printf "\n(5) PASS ($STATUS_CODE) q=$QUERY"
     else
-        printf "\n(5) FAIL ($STATUS_CODE) q=$QUERY"
+        printf "\n(6) FAIL ($STATUS_CODE) q=$QUERY"
     fi
     printf "\n"
 
@@ -76,4 +79,7 @@ test $PASS "name=Ontario%20AND%20countryId=CA"
 test $FAIL "name=Ontari%20AND%20countryId=CA"
 
 # id
-test $PASS "id=1"
+test $FAIL "id=1"
+
+# id - actually this fails - we expect only one record, but get all.
+test $PASS "id=ON"
