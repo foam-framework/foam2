@@ -295,7 +295,7 @@ foam.CLASS({
         .end()
         .br()
         .start().addClass('sub-div-format')
-          .add("#", this.data.id, "   |    ", formattedDate.month, " ", formattedDate.date, " ", formattedDate.hours, ":", formattedDate.mins, "  |  ", this.data.requestorName, "<", this.requestorEmail, ">", "  |  Via support@mintchip.ca") 
+          .add("#", this.data.id, "   |    ", formattedDate.month, " ", formattedDate.date, " ", formattedDate.hours, ":", formattedDate.mins, "  |  ", this.data.requestorName, " <", this.data.requestorEmail, ">", "  |  Via support@mintchip.ca") 
         .end()
         .start().enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
           .tag({ class: 'foam.support.view.ReplyView' })
