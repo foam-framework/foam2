@@ -23,10 +23,9 @@ foam.CLASS({
     'stack',
     'userDAO',
     'hideSummary',
-     'messages',
-     'pop3',
-    'ticketDAO',
-     
+    'messages',
+    'pop3',
+    'ticketDAO', 
     'ticketMessageDAO'
   ],
   
@@ -254,53 +253,37 @@ foam.CLASS({
     function initE(){
       var self = this;
       this.hideSummary = true;
-      var email = this.data.supportEmail;
-      this.data.status$.sub(this.test);
-      if(this.data.status == "Solved"){
-      this.boolViewFollowUp=false;
-      this.boolDropDown=true;
-    }
-    else {
-      this.boolViewFollowUp=true;
-      this.boolDropDown=false;
-    }
-     //find user associated to ticket
-      this.userDAO.find(this.data.requestorEmail).then(function(a){
-      if(a==null){
-         self.name="No user mapped"
-       }
-       else{
-        self.name= a.firstName;
-       }
-      })
       //format date for ui
       var formattedDate = this.formatDate(this.data.createdAt);
+
       this.addClass(this.myClass())
         .start()
           .start(this.BACK_ACTION).end()
-          .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.boolDropDown$).end()
-              .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.boolDropDown$)
-                  .start().add('Submit as').addClass('SubmitButton').end()
-                     .start().addClass('SubmitLabel')
-                       .start().addClass(this.data.status$).add(this.data.status$).end()
-                     .end()
+          .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.data.status$.map(function(a){ return a == 'Solved' ? true : false; })).end()
+            .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.data.status$.map(function(a){ return a == 'Solved' ? true : false; }))
+              .start().add('Submit as').addClass('SubmitButton').end()
+                .start().addClass('SubmitLabel')
+                  .start().addClass(this.data.status$).add(this.data.status$).end()
+                .end()
               .end()
-                  .start().addClass('abcde').enableClass('hide', this.boolViewFollowUp$)
-                      .start(this.SUBMIT_TICKET).addClass('Rectangle-9').on('click', this.test)
-                        .start().add('Follow Up').addClass('SubmitButton').end()
-                      .end()
-                  .end()
+              .start().addClass('abcde').enableClass('hide', this.data.status$.map(function(a){ return a != 'Solved' ? true : false; }))
+                .start(this.SUBMIT_TICKET).addClass('Rectangle-9').on('click', this.test)
+                  .start().add('Follow Up').addClass('SubmitButton').end()
+                .end()
+              .end()
+            .end()
+          .start().addClass('primarydiv')
+            .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
+            .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
+          .end()
+          .br()
+          .start().addClass('sub-div-format')
+            .add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
+          .end()
+          .start().enableClass('hide', this.data.status$.map(function(a){ return a == 'Solved' ? true : false; }))
+            .tag({ class: 'foam.support.view.ReplyView' })
+          .end()
         .end()
-        .start().addClass('primarydiv')
-         .start().addClass('Missing-Cash-Out-for').add(this.data.subject+"...").end()
-         .start().add(this.data.status).addClass('generic-status '+ this.data.status).end()
-        .end()
-        .br()
-        .start().addClass('sub-div-format').add("#",this.data.id,"  ","    |     ",formattedDate.month," ",formattedDate.date," ",formattedDate.hours,":",formattedDate.mins,"  ","  |  ",this.requestorName,"<",this.requestorEmail,">","  ","  |  Via support@mintchip.ca") 
-        .end()
-        .start().enableClass('hide',this.boolDropDown$)
-           .tag({ class: 'foam.support.view.ReplyView' })
-        .end()   
     },
 
     function formatDate(date){
