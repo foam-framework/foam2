@@ -25,11 +25,8 @@ foam.CLASS({
     box-sizing: border-box;
   }
   ^ .bg {
-    width: 1000px;
-    height: auto;
     border-radius: 2px;
     background-color: #ffffff;
-    padding-top: 10px;
     padding-bottom: 30px;
   }
   ^ .company-name {
@@ -90,8 +87,7 @@ foam.CLASS({
     width: 0px; 
   }
   hr { 
-    background-color: #e6e6e6; 
-    height: 1px; 
+    margin: 1px;
     border: 0;       
   }
   ^ .spaceline {

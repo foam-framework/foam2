@@ -2,3 +2,5 @@
 p({"class":"foam.support.model.Ticket","id":1,"requestorEmail":"zahnno@gmail.com","requestorName":"patrick","subject":"here's a subject","createdAt":"2018-04-19T04:30:15.552Z","status":"New","userId":1})
 // Modified by admin admin (1) at 2018-04-19T04:31:35Z
 p({"class":"foam.support.model.Ticket","id":2,"requestorEmail":"Zanowski","requestorName":"Patrick","subject":"here","createdAt":"2018-04-19T04:31:35.226Z","status":"New","userId":1})
+// Modified by admin admin (1) at 2018-04-19T04:38:54Z
+p({"class":"foam.support.model.Ticket","id":2,"requestorEmail":"Zanowski","requestorName":"Patrick","subject":"here","createdAt":"2018-04-19T04:31:35.226Z","status":"Solved","userId":1})

@@ -315,6 +315,7 @@ foam.CLASS({
         });
 
         this.ticketDAO.put(ticket).then(function(ticket){
+          if (self.message == "") return;
           var message = self.TicketMessage.create({
             senderId: self.user.id,
             dateCreated: new Date(),

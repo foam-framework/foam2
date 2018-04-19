@@ -335,8 +335,11 @@ foam.CLASS({
         });
 
         this.ticketDAO.put(this.data).then(function(a){
-          if (!a) return
-
+          if (!a) return;
+          if (self.viewData.message == "") {
+            self.stack.push({ class: 'foam.support.view.TicketView' });
+            return;
+          }
           self.data.messages.put(message).then(function(a){
             if (!a) return;
             self.stack.push({ class: 'foam.support.view.TicketView' });
