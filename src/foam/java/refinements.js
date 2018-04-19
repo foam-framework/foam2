@@ -1234,7 +1234,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()']
+    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()']
   ]
 });
 
@@ -1267,6 +1268,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });
