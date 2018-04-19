@@ -13,22 +13,22 @@ import foam.nanos.http.WebAgent;
 public class PMWebAgent
   extends ProxyWebAgent
 {
-  protected Class cls_;
-  protected String name_ = "execute";
+  protected final Class  cls_;
+  protected final String name_;
 
   public PMWebAgent(WebAgent delegate) {
-    setDelegate(delegate);
-    cls_ = delegate.getClass();
+    this(delegate.getClass(), "execute", delegate);
   }
 
   public PMWebAgent(Class cls, String name, WebAgent delegate) {
     setDelegate(delegate);
-    cls_ = cls;
+    cls_  = cls;
     name_ = name;
   }
 
   public void execute(X x) {
     PM pm = new PM(cls_, name_);
+
     try {
       getDelegate().execute(x);
     } finally {
