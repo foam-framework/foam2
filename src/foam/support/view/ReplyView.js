@@ -10,6 +10,10 @@ foam.CLASS({
     'foam.support.view.MessageCard'
   ],
 
+  exports: [
+    'message'
+  ],
+
   properties:[
     {
       name: 'variant',
@@ -116,39 +120,36 @@ foam.CLASS({
       this.variant = false;
 
       this
-        .addClass(this.myClass())
-          .start().addClass('bg')
-            .startContext({ data: this })
-              .start().addClass('firstdiv')
-                  .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
-                  .nbsp().nbsp().nbsp().nbsp().nbsp()
-                  .start(this.PUBLIC_REPLY).addClass('Public-Reply').enableClass('border', this.variant$.map(function(a){ return !a; })).end()
-                  .start(this.INTERNAL_NOTE).addClass('Internal-Note').enableClass('border', this.variant$).end()
+      .addClass(this.myClass())
+      .start().addClass('bg')
+        .startContext({ data: this })
+          .start().addClass('firstdiv')
+            .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/view/person.svg'}).addClass('person').end()
+            .nbsp().nbsp().nbsp().nbsp().nbsp()
+            .start(this.PUBLIC_REPLY).addClass('Public-Reply').enableClass('border', this.variant$.map(function(a){ return !a; })).end()
+            .start(this.INTERNAL_NOTE).addClass('Internal-Note').enableClass('border', this.variant$).end()
           .end()
-            .endContext()
-                .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
-                .end()
-          .end();     
+        .endContext()
+        .start(this.MESSAGE).addClass('Rectangle').enableClass('background-color', this.variant$).end()
+      .end();
     },
   ],
-actions: [
-  {
-      name:'publicReply',
-      label:'Public Reply',
-      code:function(X)
-      {
-      this.variant = false;
-      this.message = "";
-      }             
-  },
-  {
-    name:'internalNote',
-    label:'Internal Note',  
-    code:function(X)
+  actions: [
     {
-      this.variant = true;
-      this.message = "";
-    }              
-  }
-]
+      name: 'publicReply',
+      label: 'Public Reply',
+      code: function(X) {
+        this.variant = false;
+        this.message = "";
+      }             
+    },
+    {
+      name: 'internalNote',
+      label: 'Internal Note',  
+      code: function(X) {
+        this.variant = true;
+        this.message = "";
+      }              
+    }
+  ]
 });
