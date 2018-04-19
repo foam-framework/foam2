@@ -10,7 +10,7 @@ PASS=0
 FAIL=1
 STATUS_CODE=
 QUERY=
-#                      --silent \
+
 function send_quiet {
     STATUS_CODE=$(/usr/bin/curl --write-out %{http_code} \
                                 --silent \
@@ -83,3 +83,9 @@ test $FAIL "id=1"
 
 # id - actually this fails - we expect only one record, but get all.
 test $PASS "id=ON"
+
+# OR
+test $PASS "name=Ontario%20OR%20name=Alberta"
+
+# OR - should only be one record
+test $PASS "name=Ontari%20OR%20name=Alberta"

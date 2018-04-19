@@ -16,6 +16,7 @@ import foam.core.X;
 import foam.core.XMLSupport;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
+import foam.dao.AuthenticatedDAO;
 import foam.dao.DAO;
 import foam.lib.csv.*;
 import foam.lib.json.*;
@@ -408,13 +409,15 @@ public class DigWebAgent
 
   protected void outputPage(X x) {
     final PrintWriter   out         = x.get(PrintWriter.class);
-    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    DAO                 dao         = (DAO) x.get("nSpecDAO");
+
+    dao = new AuthenticatedDAO("dig", true, dao);
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");
 
     // gets all ongoing nanopay services
-    nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
+    dao.orderBy(NSpec.NAME).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           NSpec s = (NSpec) o;
