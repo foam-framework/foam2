@@ -78,8 +78,11 @@ test $PASS "name=Ontario%20AND%20countryId=CA"
 # AND should fail with mispelling of Ontario
 test $FAIL "name=Ontari%20AND%20countryId=CA"
 
-# id
+# id 1 does not exist
 test $FAIL "id=1"
 
-# id - actually this fails - we expect only one record, but get all.
+# id
 test $PASS "id=ON"
+
+# id AND name
+test $PASS "id=ON%20AND%20name=Ontario"
