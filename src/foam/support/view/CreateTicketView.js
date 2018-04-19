@@ -2,22 +2,29 @@ foam.CLASS({
   package: 'foam.support.view',
   name: 'CreateTicketView',
   extends: 'foam.u2.View',
+
   implements: [
     'foam.mlang.Expressions'
   ],
+
   requires: [
-    'foam.support.model.Ticket', 
+    'foam.support.model.Ticket',
+    'foam.support.model.TicketMessage',
     'foam.u2.PopupView',
+    'foam.u2.dialog.NotificationMessage'
   ],
+
   imports:[
     'ticketDAO',
     'user',
     'hideSummary',
     'stack'
   ],
+
   exports: [
     'as data'
   ],
+
   css: `
   * {
     box-sizing: border-box;
@@ -188,6 +195,7 @@ foam.CLASS({
   }
   .SubmitLabel {
     float:right;
+    min-width: 60px;
   }
   .SubmitLabel span{
     font-size: 10px;
@@ -199,6 +207,7 @@ foam.CLASS({
     float:left;
   }
   `,
+
   properties: [
     {
       name: 'dao',
@@ -234,6 +243,7 @@ foam.CLASS({
     'voidMenuBtn_',
     'voidPopUp_'
   ],
+
   methods: [
     function initE(){
       this.dao.on.sub(this.onDAOUpdate);    
@@ -288,20 +298,33 @@ foam.CLASS({
         .end()
     }
   ],
+
   actions: [
     {
       name: 'submitTicket',
       label: '',
       code: function(){
-        
+        var self = this;
+
         var ticket = this.Ticket.create({
-          publicMessage: this.message,
           requestorEmail: this.requestorEmail,
           requestorName: this.requestorName,
+          userId: this.user.id,
           subject: this.subject,
           status: this.status
         });
-        this.ticketDAO.put(ticket);
+
+        this.ticketDAO.put(ticket).then(function(ticket){
+          var message = self.TicketMessage.create({
+            senderId: self.user.id,
+            dateCreated: new Date(),
+            message: self.message,
+            type: 'Internal'
+          });
+          ticket.messages.put(message).then(function(a){
+            self.add(this.NotificationMessage.create({ message: 'Ticket Created!' }));
+          });
+        });
         this.stack.push({ class: 'foam.support.view.TicketView' });
       }
     },

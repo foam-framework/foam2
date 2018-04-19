@@ -59,6 +59,8 @@ foam.CLASS({
     text-align: left;
     color: #a4b3b8;
     padding-top: 14px;
+    width: 225px;
+    display: inline-block;
   }
   ^ .text {
     font-family: Roboto;
@@ -95,6 +97,16 @@ foam.CLASS({
   ^ .spaceline {
     padding-top: 15px;
   }
+  ^ .internal-status{
+    display: inline-block;
+    width: 100px;
+    height: 20px;
+    padding-left: 8px;
+    padding-top: 2px;
+    border-radius: 100px;
+    background-color: #1cc2b7;
+    color: white;
+  }
   `,
 
   properties: [
@@ -121,6 +133,11 @@ foam.CLASS({
               .start()
                 .start().add(this.requestName$).addClass('company-name').end() 
                 .start().add(this.message.dateCreated).addClass('date').end()
+                .callIf(this.message.type == 'Internal', function(){
+                  this.start().addClass('internal-status')
+                    .add('Internal Note')
+                  .end()
+                })
               .end()
                 .start().add(this.message.message).addClass('text').end()   
           .end()     

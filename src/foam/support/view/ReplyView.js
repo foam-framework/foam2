@@ -10,10 +10,6 @@ foam.CLASS({
     'foam.support.view.MessageCard'
   ],
 
-  exports: [
-    'message'
-  ],
-
   properties:[
     {
       name: 'variant',
@@ -30,9 +26,11 @@ foam.CLASS({
       }
     }
   ],
+
   imports: [
     'viewData'
   ],
+  
   exports: [
     'as data'
   ],
@@ -118,6 +116,11 @@ foam.CLASS({
       this.SUPER();
       var self = this;
       this.variant = false;
+
+      this.message$.sub(function(){
+        self.viewData.message = self.message;
+        self.viewData.variant = self.variant;
+      });
 
       this
       .addClass(this.myClass())

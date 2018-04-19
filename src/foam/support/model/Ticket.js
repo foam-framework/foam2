@@ -44,10 +44,6 @@ foam.CLASS({
       label:'Subject',
     },
     {
-      class: 'String',
-      name: 'publicMessage'
-    },
-    {
       class: 'Date',
       name: 'createdAt',
       visibility: foam.u2.Visibility.RO,

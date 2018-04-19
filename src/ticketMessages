@@ -1,20 +1,2 @@
-// Modified by admin admin (1) at 2018-04-16T16:48:25Z
-p({"class":"foam.support.model.TicketMessage","id":1,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T16:48:23.963Z","message":"hello"})
-// Modified by admin admin (1) at 2018-04-16T16:48:46Z
-p({"class":"foam.support.model.TicketMessage","id":2,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T16:48:43.51Z","message":"hello","ticketId":1})
-// Modified by admin admin (1) at 2018-04-16T18:24:39Z
-p({"class":"foam.support.model.TicketMessage","id":3,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T18:24:25.6Z","message":"hello","ticketId":1})
-// Modified by admin admin (1) at 2018-04-16T18:25:30Z
-p({"class":"foam.support.model.TicketMessage","id":4,"senderId":1,"receiverId":2,"dateCreated":"2018-04-16T18:25:23.113Z","message":"hello","ticketId":1})
-// Modified by admin admin (1) at 2018-04-19T03:21:29Z
-p({"class":"foam.support.model.TicketMessage","id":5,"dateCreated":"2018-04-19T03:21:29.112Z"})
-// Modified by admin admin (1) at 2018-04-19T03:31:22Z
-p({"class":"foam.support.model.TicketMessage","id":6,"dateCreated":"2018-04-19T03:31:22.139Z"})
-// Modified by admin admin (1) at 2018-04-19T03:31:24Z
-p({"class":"foam.support.model.TicketMessage","id":7,"dateCreated":"2018-04-19T03:31:24.326Z"})
-// Modified by admin admin (1) at 2018-04-19T03:38:45Z
-p({"class":"foam.support.model.TicketMessage","id":8,"dateCreated":"2018-04-19T03:38:45.162Z"})
-// Modified by admin admin (1) at 2018-04-19T03:51:13Z
-p({"class":"foam.support.model.TicketMessage","id":9,"dateCreated":"2018-04-19T03:51:13.864Z"})
-// Modified by admin admin (1) at 2018-04-19T03:51:18Z
-p({"class":"foam.support.model.TicketMessage","id":10,"dateCreated":"2018-04-19T03:51:18.644Z"})
+// Modified by admin admin (1) at 2018-04-19T04:31:35Z
+p({"class":"foam.support.model.TicketMessage","id":1,"senderId":1,"dateCreated":"2018-04-19T04:31:35.240Z","message":"lskdfhalksf","type":"Internal","ticketId":2})

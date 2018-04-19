@@ -26,8 +26,7 @@ foam.CLASS({
     'messages',
     'pop3',
     'ticketDAO', 
-    'ticketMessageDAO',
-    'message'
+    'ticketMessageDAO'
   ],
   
   exports: [
@@ -152,7 +151,7 @@ foam.CLASS({
   .popUpDropDown > div {     
     padding: 8px 0 0 11px;
     box-sizing:border-box;
-    width: 170px;
+    width: 185px;
     height: 35px;  
     z-index: 10000
     font-family: Roboto;
@@ -174,7 +173,8 @@ foam.CLASS({
     float: left;
   }
   .SubmitLabel {
-    float:right;
+    float: right;
+    min-width: 60px;
   }
   .Submit-as{
     float: left;
@@ -274,7 +274,9 @@ foam.CLASS({
       this.addClass(this.myClass())
       .start()
         .start(this.BACK_ACTION).end()
-        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; })).end()
+        .start(this.VOID_DROP_DOWN, null, this.voidMenuBtn_$).enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
+          .start({class:'foam.u2.tag.Image',data:'../../..//foam/support/images/drop_down.png'}).end()
+        .end()
           .start(this.SUBMIT_TICKET).addClass('Rectangle-8').enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
             .start().add('Submit as').addClass('SubmitButton').end()
             .start().addClass('SubmitLabel')
@@ -298,6 +300,9 @@ foam.CLASS({
         .start().enableClass('hide', this.status$.map(function(a){ return a == 'Solved' ? true : false; }))
           .tag({ class: 'foam.support.view.ReplyView' })
         .end()
+        .select(this.data.messages, function(a){
+          self.tag({ class: 'foam.support.view.MessageCard', message: a })
+        })
       .end()
     },
 
@@ -319,18 +324,20 @@ foam.CLASS({
       code: function(){
         var self = this;
         var receiverId = this.data.receiverId ? this.data.receiverId : null;
+        var messageType = this.viewData.variant ? 'Internal' : 'Public';
 
         var message = this.TicketMessage.create({
           senderId: this.data.userId,
           receiverId: receiverId,
           dateCreated: new Date(),
-          message: this.message
+          message: this.viewData.message,
+          type: messageType
         });
 
         this.ticketDAO.put(this.data).then(function(a){
           if (!a) return
 
-          self.ticketMessageDAO.put(message).then(function(a){
+          self.data.messages.put(message).then(function(a){
             if (!a) return;
             self.stack.push({ class: 'foam.support.view.TicketView' });
           });
