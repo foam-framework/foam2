@@ -135,7 +135,7 @@ foam.CLASS({
                   .end()
                 })
               .end()
-                .start().add(this.message.message).addClass('text').end()   
+              .start().add(this.message.message).addClass('text').end()   
           .end()     
         .end()               
     },

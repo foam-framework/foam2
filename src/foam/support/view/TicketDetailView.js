@@ -342,17 +342,18 @@ foam.CLASS({
           }
           self.data.messages.put(message).then(function(a){
             if (!a) return;
+            if( !self.data.emailId ){
+              // var messageId = self.pop3.sendEmail(self.data.requestorEmail, self.data.subject, self.viewData.message)
+              self.data.emailId = 2;
+              self.ticketDAO.put(self.data);
+              self.stack.push({ class: 'foam.support.view.TicketView' });
+            }
             self.stack.push({ class: 'foam.support.view.TicketView' });
           });
         });
 
-        // if(this.viewData['variant']==false && this.messages=="" && this.data.requestorEmail!=""){
-        //   x = this.pop3;
-        //   var messageId=x.sendEmail(this.data.requestorEmail,this.data.subject,this.viewData['message']);
-        //   if(this.data.emailId==""){
-        //     this.data.emailId=messageId
-        //     this.ticketDAO.put(this.data)
-        //   }
+        // if(this.viewData.variant == false && this.messages == "" && !this.data.requestorEmail){
+
         // }
       }
     },

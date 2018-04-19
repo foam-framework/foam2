@@ -15,6 +15,7 @@ foam.CLASS({
   ],
 
   imports:[
+    'ctrl',
     'ticketDAO',
     'user',
     'hideSummary',
@@ -323,7 +324,7 @@ foam.CLASS({
             type: 'Internal'
           });
           ticket.messages.put(message).then(function(a){
-            self.add(this.NotificationMessage.create({ message: 'Ticket Created!' }));
+            ctrl.add(self.NotificationMessage.create({ message: 'Ticket Created!' }));
           });
         });
         this.stack.push({ class: 'foam.support.view.TicketView' });
