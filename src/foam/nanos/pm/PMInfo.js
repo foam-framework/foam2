@@ -27,7 +27,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'numOccurrences',
+      name: 'count',
       label: 'Count'
     },
     {
@@ -39,8 +39,8 @@ foam.CLASS({
       class: 'Long',
       name: 'average',
       label: 'Avg',
-      getter: function() { return (this.totalTime / this.numOccurrences).toFixed(2); },
-      javaGetter: `return (long) Math.round( ( getTotalTime() / getNumOccurrences() ) * 100 ) / 100;`,
+      getter: function() { return (this.totalTime / this.count).toFixed(2); },
+      javaGetter: `return (long) Math.round( ( getTotalTime() / getCount() ) * 100 ) / 100;`,
       transient: true
     },
     {

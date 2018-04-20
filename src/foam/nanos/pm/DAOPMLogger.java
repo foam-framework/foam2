@@ -32,7 +32,7 @@ public class DAOPMLogger
       pmi.setMinTime(pm.getTime());
       pmi.setMaxTime(pm.getTime());
       pmi.setTotalTime(pm.getTime());
-      pmi.setNumOccurrences(1);
+      pmi.setCount(1);
 
       pmd.put(pmi);
     } else {
@@ -42,7 +42,7 @@ public class DAOPMLogger
       if ( pm.getTime() > dpmi.getMaxTime() )
         dpmi.setMaxTime(pm.getTime());
 
-      dpmi.setNumOccurrences(dpmi.getNumOccurrences() + 1);
+      dpmi.setCount(dpmi.getCount() + 1);
       dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
       pmd.put(dpmi);
     }
