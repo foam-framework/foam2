@@ -222,7 +222,8 @@ var classes = [
   'foam.nanos.dig.DUG',
 
   'foam.lib.query.TestModel',
-  'foam.lib.query.FooEnum'
+  'foam.lib.query.FooEnum',
+  'foam.demos.net.nap.web.model.Messageboard'
 ];
 
 var abstractClasses = [

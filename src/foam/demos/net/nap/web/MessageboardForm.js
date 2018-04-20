@@ -6,8 +6,24 @@
 
 foam.CLASS({
   package: 'foam.demos.net.nap.web',
-  name: 'Messageboard',
+  name: 'MessageboardForm',
   extends: 'foam.u2.Controller',
+
+  requires: [
+    'foam.demos.net.nap.web.model.Messageboard'
+  ],
+
+  imports: [
+    'messageboard',
+    'messageboardDAO',
+    'stack'
+  ],
+
+  documentation: '',
+
+  tableColumns: [
+    'title', 'createDate', 'creator'
+  ],
 
   properties: [
     // {
@@ -21,6 +37,10 @@ foam.CLASS({
     //   }
     // },
     {
+      class: 'Long',
+      name: 'id'
+    },
+    {
       class: 'String',
       name: 'title'
     },
@@ -32,10 +52,11 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'createdDate',
+      visibility: foam.u2.Visibility.RO,
       factory: function(){
         return new Date();
-      },
-      javaFactory: 'return new java.util.Date();'
+      }
+      //javaFactory: 'return new java.util.Date();'
     },
     {
       class: 'String',
@@ -66,8 +87,11 @@ foam.CLASS({
             .start('td').add('Content').end()
             .start('td').add(this.CONTENT).end()
           .end()
-          .start(this.SAVE_MESSAGE).end()
-          .start(this.UPLOAD_BUTTON, { showLabel:true })
+          .start('tr')
+            .start('td').add(this.BACK_ACTION).end()
+            .start('td').add(this.SAVE_ACTION).end()
+          .end()
+          //.start().add(this.UPLOAD_BUTTON, { showLabel:true }).end()
 
 
         .end();
@@ -77,7 +101,7 @@ foam.CLASS({
 
   actions: [
     {
-      name: 'saveMessage',
+      name: 'saveAction',
       label: 'Save',
       code: function(X) {
         var self = this;
@@ -88,14 +112,17 @@ foam.CLASS({
         //   return;
         // }
 
-        var message = this.Messageboard.create({
-          title: this.title,
-          content: this.content
+        var message = self.Messageboard.create({
+          title: self.title,
+          content: self.content,
+          creator : self.creator,
+          createdDate : self.createdDate
         });
 
-        X.dao.put(message);
-
-        //X.stack.push({class: 'net.nanopay.invoice.ui.SalesView'});
+        this.messageboardDAO.put(message).then(function(message) {
+          self.message = message;
+          X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardForm' });
+        });
       }
     },
     {
@@ -104,6 +131,13 @@ foam.CLASS({
 
       code: function(X) {
         X.ctrl.add(foam.u2.dialog.Popup.create(undefined, X).tag({class: 'net.nanopay.ui.modal.UploadModal', exportData$: this.data$}));
+      }
+    },
+    {
+      name: 'backAction',
+      label: 'Back',
+      code: function(X){
+        X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
       }
     }
   ]
