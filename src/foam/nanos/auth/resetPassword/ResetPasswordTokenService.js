@@ -19,8 +19,8 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
