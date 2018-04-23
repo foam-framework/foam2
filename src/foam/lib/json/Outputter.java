@@ -41,15 +41,15 @@ public class Outputter
   protected boolean       outputClassNames_ = true;
 
   // Hash properties
-  protected String        hashAlgo_ = "SHA-256";
-  protected boolean       outputHash_ = false;
-  protected boolean       rollHashes_ = false;
+  protected String        hashAlgo_     = "SHA-256";
+  protected boolean       outputHash_   = false;
+  protected boolean       rollHashes_   = false;
   protected byte[]        previousHash_ = null;
-  protected final Object  hashLock_ = new Object();
+  protected final Object  hashLock_     = new Object();
 
   // signing properties
-  protected String        signAlgo_ = null;
-  protected PrivateKey    signingKey_ = null;
+  protected String        signAlgo_        = null;
+  protected PrivateKey    signingKey_      = null;
   protected boolean       outputSignature_ = false;
 
   public Outputter() {
