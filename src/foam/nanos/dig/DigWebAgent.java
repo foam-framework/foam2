@@ -16,6 +16,7 @@ import foam.core.X;
 import foam.core.XMLSupport;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
+import foam.dao.AuthenticatedDAO;
 import foam.dao.DAO;
 import foam.lib.csv.*;
 import foam.lib.json.*;
@@ -78,11 +79,20 @@ public class DigWebAgent
     PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
+    Object authService = x.get("auth");
+
+    logger.debug("AuthService", authService);
+
+    nSpecDAO = new AuthenticatedDAO("nSpec", true, nSpecDAO);
+    ((foam.core.ContextAware)nSpecDAO).setX(x);
+    nSpecDAO = nSpecDAO.inX(x);
+    //x.put("nSpecDAO", nSpecDAO);
+    X y = x.put("nSpecDAO", nSpecDAO);
 
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         resp.setContentType("text/html");
-        outputPage(x);
+        outputPage(y);
         // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
         //   String url = "/#dig";
         //   try {
@@ -412,9 +422,8 @@ public class DigWebAgent
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");
-
     // gets all ongoing nanopay services
-    nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
+    nSpecDAO.inX(x).orderBy(NSpec.NAME).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           NSpec s = (NSpec) o;
