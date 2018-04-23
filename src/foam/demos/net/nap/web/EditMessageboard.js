@@ -1,26 +1,29 @@
-foam.CLASS({
-  package: 'net.nanopay.settings.business',
-  name: 'EditBusinessView',
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+ foam.CLASS({
+  package: 'foam.demos.net.nap.web',
+  name: 'EditMessageboard',
   extends: 'foam.u2.View',
 
-  documentation: 'Edit business view.',
+  documentation: 'Edit Messageboard Form',
+
+  implements: [
+  'foam.mlang.Expressions'
+  ],
 
   requires: [
-    'foam.nanos.auth.Address',
-    'foam.nanos.auth.User',
-    'foam.u2.dialog.NotificationMessage',
-    'net.nanopay.retail.model.Business'
+    'foam.demos.net.nap.web.model.Messageboard',
+    'foam.nanos.fs.File',
   ],
 
   imports: [
-    'addressDAO',
-    'businessSectorDAO',
-    'businessTypeDAO',
-    'countryDAO',
-    'regionDAO',
     'stack',
-    'user',
-    'userDAO'
+    'messageboard',
+    'messageboardDAO'
   ],
 
   exports: [
@@ -33,6 +36,48 @@ foam.CLASS({
       margin: auto;
       background-color: #edf0f5;
     }
+    ^ .net-nanopay-ui-ActionView-backAction {
+      border-radius: 2px;
+      background-color: rgba(164, 179, 184, 0.1);
+      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
+      margin-right: 10px;
+    }
+    ^ .actions {
+      width: 1240px;
+      height: 40px;
+      margin: 0 auto;
+    }
+    ^ .left-actions {
+      display: inline-block;
+      float: left;
+    }
+    ^ .net-nanopay-ui-ActionView-saveAction {
+      float: right;
+      border-radius: 2px;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
+      margin-top: 10px;
+    }
+    ^ .net-nanopay-ui-ActionView-saveAction:hover {
+      background: %SECONDARYCOLOR%;
+      opacity: 0.9;
+    }
+    ^ .net-nanopay-ui-ActionView-backAction {
+      border-radius: 2px;
+      background-color: rgba(164, 179, 184, 0.1);
+      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
+      margin-top: 10px;
+    }
+    ^ .net-nanopay-ui-ActionView-backAction:hover {
+      background: lightgray;
+    }
+
+
+
+
+
+
+
     ^ .settingsBar {
       width: 100%;
       height: 40px;
@@ -208,131 +253,82 @@ foam.CLASS({
     }
   `,
 
-  properties:[
-    {
-      name: 'dragActive',
-      value: false
-    }
-  ],
-
   methods: [
     function initE() {
       this.SUPER();
-      this.data = this.user;
+      var self = this;
+      //this.data = this.messageboard;
 
       this
         .addClass(this.myClass())
-        .on('dragover', this.onDragOver)
-        .on('drop', this.onDropOut)
-        .start()
-          .start('div').addClass('editBusinessContainer')
-            .start('h2').add('Edit Business profile').end()
-            .start(this.CLOSE_BUTTON).end()
-            .start().addClass(this.myClass('registration-container'))
-              .start('h3').add('Business information').end()
-              .start().addClass('business-image-container')
-              .tag({
-                class: 'foam.nanos.auth.ProfilePictureView',
-                data$: this.user.businessProfilePicture$,
-                placeholderImage: 'images/business-placeholder.png',
-                uploadHidden: false,
-                dragActive$: this.dragActive$
-              })
-              .end()
-              .start().addClass('input-container')
-                .start('label').add('Business Name *').end()
-                .start(this.User.BUSINESS_NAME).end()
-              .end()
-              .start().addClass('input-container').addClass('input-companytype-width')
-                .start('label').add('Business Type').end()
-                .start(this.User.BUSINESS_TYPE_ID).end()
-              .end()
-              .start().addClass('input-container').addClass('input-businesssector-width')
-                .start('label').add('Business Sector').end()
-                .start(this.User.BUSINESS_SECTOR_ID).end()
-              .end()
-              .start().addClass('input-container')
-                .start('label').add('Website').end()
-                .start(this.User.WEBSITE).end()
-              .end()
-              .start().addClass('input-container')
-                .start('label').add('Business Identification No. *').end()
-                .start(this.User.BUSINESS_REGISTRATION_NUMBER).end()
-              .end()
-              .start().addClass('input-container')
-                .start('label').add('Issuing Authority *').end()
-                .start(this.User.BUSINESS_REGISTRATION_AUTHORITY).end()
-              .end()
-              .start('h3').add('Business Address *').end()
-              .tag(this.User.BUSINESS_ADDRESS, {showVerified: false,showType: false})
-              .start(this.SAVE_BUSINESS).addClass('foam-u2-ActionView-saveBusiness').end()
-            .end()
+        .start().addClass('actions')
+          .start().addClass('left-actions')
+            .start(this.BACK_ACTION).end()
+            .start(this.SAVE_ACTION).end()
           .end()
-        .end()
+            .start('table').addClass('tableView')
+              .start('tr')
+                .start('td').add('Id').end()
+                .start('td').add(this.data.ID).end()
+              .end()
+              .start('tr')
+                .start('td').add('Title').end()
+                .start('td').add(this.data.TITLE).end()
+              .end()
+              .start('tr')
+                .start('td').add('Date').end()
+                .start('td').add(this.data.CREATED_DATE).end()
+              .end()
+              .start('tr')
+                .start('td').add('Creator').end()
+                .start('td').add(this.data.CREATOR).end()
+              .end()
+              .start('tr')
+                .start('td').add('Content').end()
+                .start('td').add(this.data.CONTENT).end()
+              .end()
+              //.start().add(this.UPLOAD_BUTTON, { showLabel:true }).end()
+            .end()
+            .end();
     }
-  ],
-
-  messages: [
-    { name: 'noInformation', message: 'Please fill out all necessary fields before proceeding.' },
-    { name: 'invalidPostal', message: 'Invalid postal code entry.' },
-    { name: 'structAddress', message: 'Enter street number and name for structured address.' },
-    { name: 'nonStructAddress', message: 'Enter an address' },
   ],
 
   actions: [
     {
-      name: 'closeButton',
-      icon: 'images/cancel-x.png',
-      code: function (X) {
-        X.stack.back();
+      name: 'saveAction',
+      label: 'Save',
+      code: function(X) {
+        var self = this;
+
+        // if (!this.data.amount || this.data.amount < 0){
+        //   this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Amount.', type: 'error' }));
+        //   return;
+        // }
+
+        // var message = self.Messageboard.create({
+        //   id : this.data.id,
+        //   title: this.data.title,
+        //   content: this.data.content,
+        //   creator : this.data.creator,
+        //   createdDate : this.data.createdDate
+        // });
+
+        X.messageboardDAO.put(this).then(function() {
+          //this.message = message;
+          X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+        });
       }
     },
     {
-      name: 'saveBusiness',
-      label: 'Save',
-      code: function(X) {
-        var view = X.view;
-        var address = this.address;
-        address.postalCode = address.postalCode.toUpperCase().replace(/\s/g, '');
-        if ( address.structured ) {
-          if ( ! address.streetNumber || ! address.streetNumber ) {
-            view.add(foam.u2.dialog.NotificationMessage.create({ message: view.structAddress, type: 'error' }));
-            return;
-          }
-        } else {
-          if ( ! address.address1 ) {
-            view.add(foam.u2.dialog.NotificationMessage.create({ message: view.nonStructAddress, type: 'error' }));
-            return;
-          }
-        }
-
-        if ( ! /^(?!.*[DFIOQU])[A-VXY][0-9][A-Z][0-9][A-Z][0-9]$/.test(address.postalCode) ) {
-          view.add(foam.u2.dialog.NotificationMessage.create({ message: view.invalidPostal, type: 'error' }));
-          return;
-        }
-
-        if ( ! this.businessName || ! this.businessIdentificationNumber || ! this.issuingAuthority || ! address.city ) {
-          view.add(foam.u2.dialog.NotificationMessage.create({ message: view.noInformation, type: 'error' }));
-          return;
-        }
-
-        this.organization = this.businessName;
-        X.userDAO.put(this).then(function(a) {
-          X.stack.push({ class:'net.nanopay.settings.business.BusinessProfileView' })
-        })
+      name: 'backAction',
+      label: 'Back',
+      code: function(X){
+        X.stack.back();
+        //alert("1 : " + this.stack);
+        //this.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+        //this.stack.back();
       }
     }
-  ],
-
-  listeners:[
-    function onDropOut(e) {
-      e.preventDefault();
-      this.dragActive = false;
-    },
-    
-    function onDragOver(e) {
-      this.dragActive = true;
-      e.preventDefault();
-    }
   ]
+
 });

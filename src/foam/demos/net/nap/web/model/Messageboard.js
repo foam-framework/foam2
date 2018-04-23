@@ -9,9 +9,9 @@ foam.CLASS({
   name: 'Messageboard',
 
   tableColumns: [
-    'title', 'createDate', 'creator'
+    'id', 'title', 'createDate', 'creator'
   ],
-  
+
   properties: [
     {
       class: 'Long',
