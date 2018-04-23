@@ -117,5 +117,6 @@ FOAM_FILES([
   { name: 'foam/nanos/demo/relationship/Controller' },
   { name: 'foam/demos/net/nap/web/model/Messageboard' },
   { name: 'foam/demos/net/nap/web/MessageboardForm', flags: ['web'] },
-  { name: 'foam/demos/net/nap/web/MessageboardList', flags: ['web'] }
+  { name: 'foam/demos/net/nap/web/MessageboardList', flags: ['web'] },
+  { name: 'foam/demos/net/nap/web/EditMessageboard', flags: ['web'] }
 ]);

@@ -10,7 +10,8 @@ foam.CLASS({
   extends: 'foam.u2.Controller',
 
   requires: [
-    'foam.demos.net.nap.web.model.Messageboard'
+    'foam.demos.net.nap.web.model.Messageboard',
+    'foam.nanos.fs.File',
   ],
 
   imports: [
@@ -19,23 +20,13 @@ foam.CLASS({
     'stack'
   ],
 
-  documentation: '',
+  documentation: 'New Messageboard Form',
 
   tableColumns: [
-    'title', 'createDate', 'creator'
+    'id', 'title', 'createDate', 'creator'
   ],
 
   properties: [
-    // {
-    //   class: 'String',
-    //   name: 'query',
-    //   view: {
-    //     class: 'foam.u2.TextField',
-    //     type: 'Permission Search',
-    //     placeholder: 'Permission',
-    //     onKey: true
-    //   }
-    // },
     {
       class: 'Long',
       name: 'id'
@@ -61,8 +52,63 @@ foam.CLASS({
     {
       class: 'String',
       name: 'creator'
+    },
+    {
+      class: 'foam.nanos.fs.FileArray',
+      name: 'data'
     }
   ],
+
+  css: `
+    ^{
+      width: 100%;
+      margin: auto;
+      background-color: #edf0f5;
+    }
+    ^ .net-nanopay-ui-ActionView-backAction {
+      border-radius: 2px;
+      background-color: rgba(164, 179, 184, 0.1);
+      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
+      margin-right: 10px;
+    }
+    ^ .actions {
+      width: 1240px;
+      height: 40px;
+      margin: 0 auto;
+    }
+    ^ .left-actions {
+      display: inline-block;
+      float: left;
+    }
+    ^ .net-nanopay-ui-ActionView-saveAction {
+      float: right;
+      border-radius: 2px;
+      background-color: %SECONDARYCOLOR%;
+      color: white;
+      margin-top: 10px;
+    }
+    ^ .net-nanopay-ui-ActionView-saveAction:hover {
+      background: %SECONDARYCOLOR%;
+      opacity: 0.9;
+    }
+    ^ .net-nanopay-ui-ActionView-backAction {
+      border-radius: 2px;
+      background-color: rgba(164, 179, 184, 0.1);
+      box-shadow: 0 0 1px 0 rgba(9, 54, 73, 0.8);
+      margin-top: 10px;
+    }
+    ^ .net-nanopay-ui-ActionView-backAction:hover {
+      background: lightgray;
+    }
+    ^ .attachment-input {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+  `,
 
   methods: [
     function initE() {
@@ -70,7 +116,16 @@ foam.CLASS({
       var self = this;
 
       this.addClass(this.myClass())
+        .start().addClass('actions')
+          .start().addClass('left-actions')
+            .start(this.BACK_ACTION).end()
+            .start(this.SAVE_ACTION).end()
+          .end()
         .start('table')
+          .start('tr')
+            .start('td').add('Id').end()
+            .start('td').add(this.ID).end()
+          .end()
           .start('tr')
             .start('td').add('Title').end()
             .start('td').add(this.TITLE).end()
@@ -88,11 +143,27 @@ foam.CLASS({
             .start('td').add(this.CONTENT).end()
           .end()
           .start('tr')
-            .start('td').add(this.BACK_ACTION).end()
-            .start('td').add(this.SAVE_ACTION).end()
+            .start('td').add('Attachments').end()
+            // .start('td').add(this.slot(function (data) {
+            //   var e = this.E();
+            //   for ( var i = 0 ; i < data.length ; i++ ) {
+            //     e.tag({
+            //       class: 'net.nanopay.invoice.ui.InvoiceFileView',
+            //       data: data[i],
+            //       fileNumber: i + 1,
+            //     });
+            //   }
+            //   return e;
+            // }, this.data$))
+            // .start(this.UPLOAD_BUTTON, { showLabel:true }).end() //.addClass('attachment-btn white-blue-button btn').end()
+            .start('td').addClass('attachment-btn white-blue-button btn')
+              .add('Choose File')
+              .on('click', this.onAddAttachmentClicked)
+            .end()
+
           .end()
           //.start().add(this.UPLOAD_BUTTON, { showLabel:true }).end()
-
+        .end()
 
         .end();
 
@@ -113,16 +184,23 @@ foam.CLASS({
         // }
 
         var message = self.Messageboard.create({
+          id : self.id,
           title: self.title,
           content: self.content,
           creator : self.creator,
           createdDate : self.createdDate
         });
 
-        this.messageboardDAO.put(message).then(function(message) {
-          self.message = message;
-          X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardForm' });
-        });
+        X.messageboardDAO.put(message).then(function() {
+          X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+        })
+      }
+    },
+    {
+      name: 'backAction',
+      label: 'Back',
+      code: function(X){
+        X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
       }
     },
     {
@@ -132,43 +210,13 @@ foam.CLASS({
       code: function(X) {
         X.ctrl.add(foam.u2.dialog.Popup.create(undefined, X).tag({class: 'net.nanopay.ui.modal.UploadModal', exportData$: this.data$}));
       }
-    },
-    {
-      name: 'backAction',
-      label: 'Back',
-      code: function(X){
-        X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
-      }
+    }
+  ],
+
+  listeners: [
+    function onAddAttachmentClicked (e) {
+      this.document.querySelector('.attachment-input').click();
     }
   ]
-  //,
-
-  // methods: [
-  //   {
-  //     name: 'generateNanoInvoice',
-  //       javaReturns: 'net.nanopay.invoice.model.Invoice',
-  //       javaCode: `
-  //         DAO invoiceDAO = (DAO) getX().get("invoiceDAO");
-  //
-  //         Invoice inv = new Invoice();
-  //         inv.setX(getX());
-  //
-  //         inv.setInvoiceNumber(getInvoiceNum());
-  //         inv.setPurchaseOrder("" + getId());
-  //         inv.setIssueDate(getDate());
-  //         inv.setDueDate(getDueDate());
-  //         inv.setPaymentDate(getDatePaid());
-  //         inv.setDraft(false);
-  //         inv.setNote(getNotes());
-  //         inv.setAmount(getTotal());
-  //         inv.setCurrencyCode(getCurrencyCode());
-  //         inv.setStatus(getStatus());
-  //         inv.setPayeeId(2);
-  //         inv.setPayerId(getUserId());
-  //         invoiceDAO.put(inv);
-  //         return inv;
-  //         `
-  //     }
-  // ]
 
 });
