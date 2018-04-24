@@ -17,7 +17,6 @@ import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
-
 import static foam.mlang.MLang.EQ;
 
 public class Boot {

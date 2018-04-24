@@ -28,7 +28,7 @@ foam.CLASS({
       name: 'cmd',
       class: 'Enum',
       of: 'foam.nanos.http.Command',
-      value: foam.nanos.http.Command.SELECT
+      value: 'SELECT',
     },
     {
       class: 'String',
@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'format',
       class: 'Enum',
       of: 'foam.nanos.http.Format',
-      value: foam.nanos.http.Format.JSON
+      value: 'JSON',
     },
     {
       name: 'values_',
