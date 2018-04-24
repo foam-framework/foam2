@@ -11,10 +11,21 @@ foam.CLASS({
       installInClass: function(cls) {
         cls.toSwiftClass =  function() {
           var cls = foam.swift.Enum.create({
+            id: this.model_.id,
             name: this.model_.swiftName,
             extends: 'Int',
             implements: ['FOAM_enum'],
           });
+
+          // push id field
+          cls.fields.push(
+            foam.swift.Field.create({
+              type: 'String',
+              name: 'id',
+              getter: `return "${this.model_.id}";`,
+              visibility: 'public'
+            })
+          );
 
           var templates = foam.swift.EnumTemplates.create();
           var axioms = this.getAxiomsByClass(foam.core.Property);
