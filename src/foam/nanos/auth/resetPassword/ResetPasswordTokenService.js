@@ -102,9 +102,6 @@ return false;`
 }
 
 String newPassword = user.getPassword();
-if ( newPassword.contains(" ")) {
-  throw new RuntimeException("Password cannot contains spaces");
-}
 
 int length = newPassword.length();
 if ( length < 7 || length > 32 ) {
