@@ -180,9 +180,10 @@ public class Outputter
       writer_.append(afterKey_());
       writer_.append(":");
       outputString(value.getClass().getName());
-      writer_.append(beforeKey_());
       writer_.append(",");
+      writer_.append(beforeKey_());
       writer_.append("ordinal");
+      writer_.append(afterKey_());
       writer_.append(":");
       outputNumber(value.ordinal());
     writer_.append("}");
