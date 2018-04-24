@@ -16,6 +16,16 @@ foam.CLASS({
             implements: ['FOAM_enum'],
           });
 
+          // push id field
+          cls.fields.push(
+            foam.swift.Field.create({
+              type: 'String',
+              name: 'classId',
+              getter: `return "${this.model_.id}";`,
+              visibility: 'public'
+            })
+          );
+
           var templates = foam.swift.EnumTemplates.create();
           var axioms = this.getAxiomsByClass(foam.core.Property);
           for (var i = 0; i < axioms.length; i++) {
