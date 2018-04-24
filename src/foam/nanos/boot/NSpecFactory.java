@@ -8,8 +8,8 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.nanos.*;
-import foam.nanos.pm.PM;
 import foam.nanos.logger.Logger;
+import foam.nanos.pm.PM;
 
 public class NSpecFactory
   implements XFactory
@@ -26,6 +26,11 @@ public class NSpecFactory
   public Object create(X x) {
     // Avoid infinite recursions when creating services
     if ( isCreating_ ) {
+      if ( ! "logger".equals(spec_.getName()) ) {
+        Logger logger = (Logger) x.get("logger");
+        if ( logger != null ) logger.warning("Recursive Service Factory", spec_.getName());
+      }
+
       return null;
     }
 
