@@ -252,7 +252,7 @@ out.append("}");
 out.append("{");
 outputString(&out, "class");
 out.append(":");
-outputString(&out, data.id)
+outputString(&out, data.classId)
 out.append(",");
 outputString(&out, "ordinal");
 out.append(":");

@@ -20,7 +20,7 @@ foam.CLASS({
           cls.fields.push(
             foam.swift.Field.create({
               type: 'String',
-              name: 'id',
+              name: 'classId',
               getter: `return "${this.model_.id}";`,
               visibility: 'public'
             })
