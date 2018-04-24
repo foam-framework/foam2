@@ -249,7 +249,16 @@ out.append("}");
         },
       ],
       swiftCode: function() {/*
+out.append("{");
+outputString(&out, "class");
+out.append(":");
+outputString(&out, data.id)
+out.append(",");
+outputString(&out, "ordinal");
+out.append(":");
 outputNumber(&out, data.ordinal as NSNumber)
+out.append("}");
+
       */},
     },
     {
