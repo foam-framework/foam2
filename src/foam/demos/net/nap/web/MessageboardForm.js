@@ -21,11 +21,13 @@ foam.CLASS({
     'messageboardDAO',
     'stack',
     'blobService',
-    'onInvoiceFileRemoved'
+    'onInvoiceFileRemoved',
+    'user',
   ],
 
   exports: [
     'as data',
+    'onInvoiceFileRemoved'
   ],
 
   documentation: 'New Messageboard Form',
@@ -72,6 +74,8 @@ foam.CLASS({
       name: 'dragActive',
       value: false
     },
+    'fileNumber',
+    [ 'removeHidden', false ],
     [ 'uploadHidden', false ]
   ],
 
@@ -127,6 +131,31 @@ foam.CLASS({
     ^ .attachment-btn {
       margin: 10px 0;
     }
+    ^ .attachment-filename {
+      max-width: 342px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      float: left;
+    }
+    ^ .attachment-filename a {
+      height: 16px;
+      font-size: 12px;
+      line-height: 1.66;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #59a5d5;
+      padding-left: 12px;
+    }
+    ^ .net-nanopay-invoice-ui-InvoiceFileView {
+      min-width: 175px;
+      max-width: 275px;
+      height: 40px;
+      background-color: #ffffff;  //#EEF0F5;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 5px;
+    }
 
   `,
 
@@ -157,7 +186,7 @@ foam.CLASS({
             .end()
             .start('tr')
               .start('td').add('Creator').end()
-              .start('td').add(this.CREATOR).end()
+              .start('td').add(this.user.id).end()
             .end()
             .start('tr')
               .start('td').add('Content').end()
@@ -171,14 +200,15 @@ foam.CLASS({
                  .add(this.slot(function (data) {
                    var e = this.E();
                    for ( var i = 0 ; i < data.length ; i++ ) {
-                     // e.tag({
-                     //   class: 'net.nanopay.invoice.ui.InvoiceFileView',
-                     //   data: data[i],
-                     //   fileNumber: i + 1,
-                     // });
+                     e.tag({
+                       class: 'net.nanopay.invoice.ui.InvoiceFileView',
+                       data: data[i],
+                       fileNumber: i + 1,
+                     });
                    }
                    return e;
-                 }, this.data$))
+                  }, this.data$))
+
 
 
 
@@ -191,13 +221,21 @@ foam.CLASS({
                   })
                   .on('change', this.onChange)
                 .end()
+
                 .start().addClass('attachment-btn white-blue-button btn')
                   .add('Choose File')
                   .on('click', this.onAddAttachmentClicked)
                 .end()
+
             .end()
           .end()
         .end();
+    },
+    function onInvoiceFileRemoved (fileNumber) {
+      alert(fileNumber);
+      this.document.querySelector('.attachment-input').value = null;
+      this.data.splice(fileNumber - 1, 1);
+      this.data = Array.from(this.data);
     }
   ],
 
@@ -218,10 +256,10 @@ foam.CLASS({
           id : self.id,
           title: self.title,
           content: self.content,
-          creator : self.creator,
-          createdDate : self.createdDate
+          creator : this.user.id,
+          createdDate : self.createdDate,
+          data : self.data
         });
-
         X.messageboardDAO.put(message).then(function() {
           X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
         })
