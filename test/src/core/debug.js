@@ -20,6 +20,7 @@ describe('coverage for debugging helpers', function() {
     var p = foam.core.Property.create({ name: 'prop' });
     p.describe();
     p.cls_.describe();
+    expect().nothing();
   });
 });
 

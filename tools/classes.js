@@ -123,6 +123,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
@@ -130,6 +131,9 @@ var classes = [
   'foam.nanos.auth.token.ClientTokenService',
   'foam.nanos.auth.token.AbstractTokenService',
   'foam.nanos.auth.email.EmailTokenService',
+  'foam.nanos.auth.email.EmailDocService',
+  'foam.nanos.auth.email.EmailDocInterface',
+  'foam.nanos.auth.email.ClientEmailDocService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.ServiceProvider',
@@ -217,7 +221,8 @@ var classes = [
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
 
-  'foam.lib.query.TestModel'
+  'foam.lib.query.TestModel',
+  'foam.lib.query.FooEnum'
 ];
 
 var abstractClasses = [
@@ -230,10 +235,12 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
+
 ];
 
 var proxies = [
