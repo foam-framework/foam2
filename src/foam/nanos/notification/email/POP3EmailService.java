@@ -95,7 +95,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
         // iterate through tickets from the ticketDAO, compare emailId on ticket, if its not there create new ticket
         // by setting the ticket emailId to the emailId from the imapfolder.getUID() method.
         // and putting to  TicketDAO
-/*
+
         try{ 
           ArraySink sink = (ArraySink) ticketDAO.where(
           AND(
@@ -108,7 +108,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
         }
         catch ( Throwable e ) {
          
-        }*/
+        }
 
 
         System.out.println(emailId);
@@ -161,10 +161,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
         System.out.println("inbox not found");
         System.exit(0);
       }
-      folder.open(folder.READ_WRITE);
-
-      // BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-    
+      folder.open(folder.READ_WRITE);    
 
       Message[] messages = folder.getMessages();
       for (int i = 0, n = messages.length; i < n; i++){
