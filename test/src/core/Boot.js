@@ -50,7 +50,8 @@ describe('AbstractClass.getAxioms', function() {
 
   it('coverage', function() {
     foam.core.Property.getAxioms();
-    foam.core.Property.getAxioms(); // previous results cached
+    // Previous results cached.
+    expect(foam.core.Property.getAxioms()).toBeDefined();
   });
 
 });
@@ -63,7 +64,7 @@ describe('AbstractClass.toString', function() {
   });
 
   it('coverage', function() {
-    foam.core.Property.toString();
+    expect(foam.core.Property.toString()).toBeDefined();
   });
 
 });
@@ -863,6 +864,7 @@ describe('Listeners', function() {
   it('listeners are installed as method-alikes', function() {
     t.onAlarm();
     t.onClear();
+    expect().nothing();
   });
 });
 

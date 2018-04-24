@@ -30,7 +30,7 @@ foam.INTERFACE({
         {
           name: 'name',
           documentation: 'Return single value for named parameter, or null if not found.',
-          javaType: 'String'
+          javaType: 'Object'
         },
         {
           name: 'value',
@@ -44,7 +44,7 @@ foam.INTERFACE({
         {
           name: 'name',
           documentation: 'Return single value for named parameter, or null if not found.',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ],
       javaReturns: 'Object'

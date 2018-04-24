@@ -36,6 +36,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaQueryParser',
+      expression: function(javaJSONParser) { return javaJSONParser; }
+    },
+    {
+      class: 'String',
       name: 'javaCSVParser'
     },
     {
@@ -49,6 +54,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaGetter'
+    },
+    {
+      class: 'String',
+      name: 'shortName'
+    },
+    {
+      class:'StringArray',
+      name: 'aliases'
     },
     {
       class: 'String',
@@ -85,12 +98,15 @@ foam.CLASS({
       return foam.java.PropertyInfo.create({
         sourceCls:        cls,
         propName:         this.name,
+        propShortName:    this.shortName,
+        propAliases:      this.aliases,
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,
         cloneProperty:    this.javaCloneProperty,
         diffProperty:     this.javaDiffProperty,
         jsonParser:       this.javaJSONParser,
+        queryParser:      this.javaQueryParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
@@ -837,6 +853,7 @@ foam.CLASS({
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+    ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
     ['javaCSVParser', 'foam.lib.json.DateParser'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
@@ -864,6 +881,7 @@ foam.CLASS({
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+       ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
        ['javaCSVParser', 'foam.lib.json.DateParser'],
        ['sqlType', 'DATE']
    ],
@@ -914,6 +932,7 @@ foam.CLASS({
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringParser()'],
+    ['javaQueryParser', 'new foam.lib.query.StringParser()'],
     ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
     {
       name: 'sqlType',
@@ -1215,7 +1234,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()']
+    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()']
   ]
 });
 
@@ -1248,6 +1268,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });

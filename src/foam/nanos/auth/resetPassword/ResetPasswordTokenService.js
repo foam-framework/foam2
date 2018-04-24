@@ -19,8 +19,8 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
@@ -158,6 +158,12 @@ userResult.setPasswordLastModified(Calendar.getInstance().getTime());
 userResult.setPreviousPassword(userResult.getPassword());
 userResult.setPassword(Password.hash(newPassword));
 userDAO.put(userResult);
+EmailService email = (EmailService) getEmail();
+EmailMessage message = new EmailMessage();
+message.setTo(new String[] { userResult.getEmail() });
+HashMap<String, Object> args = new HashMap<>();
+args.put("name", userResult.getFirstName());
+email.sendEmailFromTemplate(userResult, message, "password-changed", args);
 return true;`
     }
   ]
