@@ -11,7 +11,6 @@ foam.CLASS({
       installInClass: function(cls) {
         cls.toSwiftClass =  function() {
           var cls = foam.swift.Enum.create({
-            id: this.model_.id,
             name: this.model_.swiftName,
             extends: 'Int',
             implements: ['FOAM_enum'],
