@@ -8,12 +8,14 @@ package foam.nanos.boot;
 
 import foam.core.*;
 import foam.nanos.*;
+import foam.nanos.pm.PM;
 
 public class NSpecFactory
   implements XFactory
 {
-  NSpec  spec_;
-  ProxyX x_;
+  NSpec   spec_;
+  ProxyX  x_;
+  boolean isCreating_ = false;
 
   public NSpecFactory(ProxyX x, NSpec spec) {
     x_    = x;
@@ -21,7 +23,15 @@ public class NSpecFactory
   }
 
   public Object create(X x) {
+    // Avoid infinite recursions when creating services
+    if ( isCreating_ ) {
+      return null;
+    }
+
+    isCreating_ = true;
+
     Object ns = null;
+    PM     pm = new PM(this.getClass(), spec_ == null ? "-" : spec_.getName());
 
     try {
       ns = spec_.createService(x_.getX());
@@ -31,6 +41,9 @@ public class NSpecFactory
     } catch (Throwable t) {
       // TODO: LOG
       t.printStackTrace();
+    } finally {
+      pm.log(x_.getX());
+      isCreating_ = false;
     }
 
     return ns;
