@@ -37,6 +37,11 @@ foam.CLASS({
       class: 'String',
       name: 'content',
       view: { class: 'foam.u2.tag.TextArea', rows: 40, cols: 120}
+    },
+    {
+      class: 'foam.nanos.fs.FileArray',
+      name: 'data',
+      view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView' }
     }
   ]
 });
