@@ -9,6 +9,7 @@ package foam.nanos.boot;
 import foam.core.*;
 import foam.nanos.*;
 import foam.nanos.pm.PM;
+import foam.nanos.logger.Logger;
 
 public class NSpecFactory
   implements XFactory
@@ -30,17 +31,19 @@ public class NSpecFactory
 
     isCreating_ = true;
 
-    Object ns = null;
-    PM     pm = new PM(this.getClass(), spec_ == null ? "-" : spec_.getName());
+    Object ns     = null;
+    PM     pm     = new PM(this.getClass(), spec_ == null ? "-" : spec_.getName());
+    Logger logger = (Logger) x.get("logger");
 
     try {
+      if ( logger != null ) logger.info("Creating Service", spec_.getName());
       ns = spec_.createService(x_.getX());
+      if ( logger != null ) logger.info("Created Service", spec_.getName());
 
       if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_.getX());
       if ( ns instanceof NanoService  ) ((NanoService)  ns).start();
     } catch (Throwable t) {
-      // TODO: LOG
-      t.printStackTrace();
+      if ( logger != null ) logger.error("Error Creating Service", spec_.getName(), t);
     } finally {
       pm.log(x_.getX());
       isCreating_ = false;
