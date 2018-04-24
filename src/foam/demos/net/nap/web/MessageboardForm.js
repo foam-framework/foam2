@@ -10,14 +10,22 @@ foam.CLASS({
   extends: 'foam.u2.Controller',
 
   requires: [
+    'foam.blob.BlobBlob',
     'foam.demos.net.nap.web.model.Messageboard',
     'foam.nanos.fs.File',
+    'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
     'messageboard',
     'messageboardDAO',
-    'stack'
+    'stack',
+    'blobService',
+    'onInvoiceFileRemoved'
+  ],
+
+  exports: [
+    'as data',
   ],
 
   documentation: 'New Messageboard Form',
@@ -55,8 +63,16 @@ foam.CLASS({
     },
     {
       class: 'foam.nanos.fs.FileArray',
-      name: 'data'
-    }
+      name: 'data',
+      value: this.exportData
+    },
+    'exportData',
+    {
+      class: 'Boolean',
+      name: 'dragActive',
+      value: false
+    },
+    [ 'uploadHidden', false ]
   ],
 
   css: `
@@ -108,6 +124,10 @@ foam.CLASS({
       position: absolute;
       z-index: -1;
     }
+    ^ .attachment-btn {
+      margin: 10px 0;
+    }
+
   `,
 
   methods: [
@@ -121,52 +141,63 @@ foam.CLASS({
             .start(this.BACK_ACTION).end()
             .start(this.SAVE_ACTION).end()
           .end()
-        .start('table')
-          .start('tr')
-            .start('td').add('Id').end()
-            .start('td').add(this.ID).end()
-          .end()
-          .start('tr')
-            .start('td').add('Title').end()
-            .start('td').add(this.TITLE).end()
-          .end()
-          .start('tr')
-            .start('td').add('Date').end()
-            .start('td').add(this.CREATED_DATE).end()
-          .end()
-          .start('tr')
-            .start('td').add('Creator').end()
-            .start('td').add(this.CREATOR).end()
-          .end()
-          .start('tr')
-            .start('td').add('Content').end()
-            .start('td').add(this.CONTENT).end()
-          .end()
-          .start('tr')
-            .start('td').add('Attachments').end()
-            // .start('td').add(this.slot(function (data) {
-            //   var e = this.E();
-            //   for ( var i = 0 ; i < data.length ; i++ ) {
-            //     e.tag({
-            //       class: 'net.nanopay.invoice.ui.InvoiceFileView',
-            //       data: data[i],
-            //       fileNumber: i + 1,
-            //     });
-            //   }
-            //   return e;
-            // }, this.data$))
-            // .start(this.UPLOAD_BUTTON, { showLabel:true }).end() //.addClass('attachment-btn white-blue-button btn').end()
-            .start('td').addClass('attachment-btn white-blue-button btn')
-              .add('Choose File')
-              .on('click', this.onAddAttachmentClicked)
+
+          .start('table')
+            .start('tr')
+              .start('td').add('Id').end()
+              .start('td').add(this.ID).end()
             .end()
+            .start('tr')
+              .start('td').add('Title').end()
+              .start('td').add(this.TITLE).end()
+            .end()
+            .start('tr')
+              .start('td').add('Date').end()
+              .start('td').add(this.CREATED_DATE).end()
+            .end()
+            .start('tr')
+              .start('td').add('Creator').end()
+              .start('td').add(this.CREATOR).end()
+            .end()
+            .start('tr')
+              .start('td').add('Content').end()
+              .start('td').add(this.CONTENT).end()
+            .end()
+            .start('tr')
+              .start('td').add('Attachments').end()
+              .start('td')
 
+              .start('div').addClass('box-for-drag-drop')
+                 .add(this.slot(function (data) {
+                   var e = this.E();
+                   for ( var i = 0 ; i < data.length ; i++ ) {
+                     // e.tag({
+                     //   class: 'net.nanopay.invoice.ui.InvoiceFileView',
+                     //   data: data[i],
+                     //   fileNumber: i + 1,
+                     // });
+                   }
+                   return e;
+                 }, this.data$))
+
+
+
+
+
+                .start('input').addClass('attachment-input')
+                  .attrs({
+                    type: 'file',
+                    accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png,application/msword,application/pdf'
+                  })
+                  .on('change', this.onChange)
+                .end()
+                .start().addClass('attachment-btn white-blue-button btn')
+                  .add('Choose File')
+                  .on('click', this.onAddAttachmentClicked)
+                .end()
+            .end()
           .end()
-          //.start().add(this.UPLOAD_BUTTON, { showLabel:true }).end()
-        .end()
-
         .end();
-
     }
   ],
 
@@ -202,20 +233,67 @@ foam.CLASS({
       code: function(X){
         X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
       }
-    },
-    {
-      name: 'uploadButton',
-      label: 'Choose File',
-
-      code: function(X) {
-        X.ctrl.add(foam.u2.dialog.Popup.create(undefined, X).tag({class: 'net.nanopay.ui.modal.UploadModal', exportData$: this.data$}));
-      }
     }
   ],
 
   listeners: [
-    function onAddAttachmentClicked (e) {
+    function onAddAttachmentClicked () {
       this.document.querySelector('.attachment-input').click();
+    },
+
+    // function onChange (e) {
+    //   this.dragActive = false;
+    //   var file = e.target.files[0];
+    //   this.addFile(file);
+    // },
+
+    function onChange (e) {
+      var files = e.target.files;
+      this.addFiles(files)
+    },
+
+    // function addFile (file) {
+    //   if ( file.size > ( 2 * 1024 * 1024 ) ) {
+    //     this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
+    //     return;
+    //   }
+    //   this.data = this.File.create({
+    //     filename: file.name,
+    //     filesize: file.size,
+    //     mimeType: file.type,
+    //     data: this.BlobBlob.create({
+    //       blob: file
+    //     })
+    //   });
+    // }
+
+    function addFiles(files){
+      var errors = false;
+      for ( var i = 0 ; i < files.length ; i++ ) {
+        // skip files that exceed limit
+        if ( files[i].size > ( 10 * 1024 * 1024 ) ) {
+          if ( ! errors ) errors = true;
+          this.add(this.NotificationMessage.create({ message: this.FileSizeError, type: 'error' }));
+          continue;
+        }
+        var isIncluded = false
+        for ( var j = 0 ; j < this.data.length ; j++ ) {
+          if( this.data[j].filename.localeCompare(files[i].name) === 0 ) {
+            isIncluded = true;
+            break
+          }
+        }
+        if ( isIncluded ) continue ;
+        this.data.push(this.File.create({
+          filename: files[i].name,
+          filesize: files[i].size,
+          mimeType: files[i].type,
+          data: this.BlobBlob.create({
+            blob: files[i]
+          })
+        }))
+      }
+      this.data = Array.from(this.data);
     }
   ]
 
