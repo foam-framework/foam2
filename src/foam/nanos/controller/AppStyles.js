@@ -70,7 +70,7 @@ foam.CLASS({
       background-color: #eedb5f;
     }
     .Updated {
-      width: 67px;
+      width: 60px;
       height: 20px;
       border-radius: 100px;
       background-color: #093649;

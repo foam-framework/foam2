@@ -25,11 +25,8 @@ foam.CLASS({
     box-sizing: border-box;
   }
   ^ .bg {
-    width: 1000px;
-    height: auto;
     border-radius: 2px;
     background-color: #ffffff;
-    padding-top: 10px;
     padding-bottom: 30px;
   }
   ^ .company-name {
@@ -59,6 +56,8 @@ foam.CLASS({
     text-align: left;
     color: #a4b3b8;
     padding-top: 14px;
+    width: 225px;
+    display: inline-block;
   }
   ^ .text {
     font-family: Roboto;
@@ -88,12 +87,21 @@ foam.CLASS({
     width: 0px; 
   }
   hr { 
-    background-color: #e6e6e6; 
-    height: 1px; 
+    margin: 1px;
     border: 0;       
   }
   ^ .spaceline {
     padding-top: 15px;
+  }
+  ^ .internal-status{
+    display: inline-block;
+    width: 100px;
+    height: 20px;
+    padding-left: 8px;
+    padding-top: 2px;
+    border-radius: 100px;
+    background-color: #1cc2b7;
+    color: white;
   }
   `,
 
@@ -121,8 +129,13 @@ foam.CLASS({
               .start()
                 .start().add(this.requestName$).addClass('company-name').end() 
                 .start().add(this.message.dateCreated).addClass('date').end()
+                .callIf(this.message.type == 'Internal', function(){
+                  this.start().addClass('internal-status')
+                    .add('Internal Note')
+                  .end()
+                })
               .end()
-                .start().add(this.message.message).addClass('text').end()   
+              .start().add(this.message.message).addClass('text').end()   
           .end()     
         .end()               
     },

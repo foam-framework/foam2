@@ -26,6 +26,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'message'
+    },
+    {
+      class: 'String',
+      name: 'type'
     }
   ]
 });
