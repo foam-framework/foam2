@@ -689,13 +689,7 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        var sessionId = localStorage['defaultSession'];
-        var url = window.location.origin + '/' + this.serviceName
-        // attach session id if available
-        if ( sessionId ) {
-          url += '?sessionId=' + sessionId;
-        }
-        return url;
+        return window.location.origin + '/' + this.serviceName;
       }
     }
   ],
@@ -707,8 +701,15 @@ foam.CLASS({
         return Promise.resolve(blob);
       }
 
+      var url = this.address;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.address);
+      req.fromUrl(url);
       req.method = 'PUT';
       req.payload = blob;
 
@@ -726,12 +727,25 @@ foam.CLASS({
         return null;
       }
 
-      return this.address + '/' + blob.id;
+      var url = this.address + '/' + blob.id;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+      return url;
     },
 
     function find_(x, id) {
+      var url = this.address + '/' + id;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.address + '/' + id);
+      req.fromUrl(url);
       req.method = 'GET';
       req.responseType = 'blob';
 
