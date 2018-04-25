@@ -35,10 +35,10 @@ foam.CLASS({
     
   methods: [
     {
-    name: 'args',
+    name: 'info',
     args: [
       {
-      name: 'message',
+      name: 'args',
       javaType: 'Object...'  
       }
     ],
