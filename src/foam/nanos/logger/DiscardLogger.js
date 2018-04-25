@@ -5,32 +5,53 @@
  */
 
 foam.CLASS({
-    package: 'foam.nanos.logger',
-    name: 'DiscardLogger',
-    implements: [ 'foam.nanos.logger.Logger' ],
-    extends: [ 'ProxyLogger' ],
+  package: 'foam.nanos.logger',
+  name: 'DiscardLogger',
+  implements: [ 'foam.nanos.logger.Logger' ],
+  extends: [ 'ProxyLogger' ],
 
-    properties: [
-        {
-          name: 'discardInfo',
-          class: 'Boolean',
-          value: 'false'
-        },
-        {
-          name: 'discardWarning',
-          class: 'Boolean',
-          value: 'false'
-        },
-        {
-          name: 'discardError',
-          class: 'Boolean', 
-          value: 'false'
-        },        
-        {
-          name: 'discardDebug',
-          class: 'Boolean',
-          value: 'false'
+  properties: [
+    {
+      name: 'discardInfo',
+      class: 'Boolean',
+      value: 'false'
+    },
+    {
+      name: 'discardWarning',
+      class: 'Boolean',
+      value: 'false'
+    },
+    {
+      name: 'discardError',
+      class: 'Boolean',
+      value: 'false'
+    },
+    {
+      name: 'discardDebug',
+      class: 'Boolean',
+      value: 'false'
+    }
+  ],
+    
+  methods: [
+    {
+    name: 'info',
+    args: [
+      {
+      name: 'message',
+      javaType: 'String'  
+      }
+    ],
+    javaCode: `
+      public class DiscardLogger
+        extends ProxyLogger
+
+      info(message) {
+        if ( ! get.discardInfo() ) {
+          getDelegate().info(message);
         }
-      ]
-  });
-  
+      }
+    `
+    }
+  ]
+});
