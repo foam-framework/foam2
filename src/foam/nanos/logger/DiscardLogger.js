@@ -14,22 +14,22 @@ foam.CLASS({
     {
       name: 'discardInfo',
       class: 'Boolean',
-      value: 'false'
+      value: false
     },
     {
       name: 'discardWarning',
       class: 'Boolean',
-      value: 'false'
+      value: false
     },
     {
       name: 'discardError',
       class: 'Boolean',
-      value: 'false'
+      value: false
     },
     {
       name: 'discardDebug',
       class: 'Boolean',
-      value: 'false'
+      value: false
     }
   ],
     
