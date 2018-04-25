@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+// TODO: Create AbstractJDBCDAO baseclass
 public class PostgresDAO
   extends AbstractDAO
 {
