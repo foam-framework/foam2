@@ -43,14 +43,9 @@ foam.CLASS({
       }
     ],
     javaCode: `
-      public class DiscardLogger
-        extends ProxyLogger
-
-      info(message) {
         if ( ! get.discardInfo() ) {
           getDelegate().info(message);
         }
-      }
     `
     }
   ]
