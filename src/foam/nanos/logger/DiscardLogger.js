@@ -42,7 +42,7 @@ foam.CLASS({
     ],
     javaCode: `
         if ( ! get.discardInfo() ) {
-          getDelegate().info(message);
+          getDelegate().info(args);
         }
     `
     }
