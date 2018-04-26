@@ -4,54 +4,53 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
-// TODO: rename properties to use camelCase
 foam.CLASS({
   package: 'foam.nanos.pm',
   name: 'PMInfo',
 
   documentation: 'Performance Measurement database entry.',
 
-  ids: [ 'clsname', 'pmname' ],
+  ids: [ 'clsName', 'pmName' ],
 
   searchColumns: [ ],
 
   properties: [
     {
       class: 'String',
-      name: 'clsname',
+      name: 'clsName',
       label: 'Class'
     },
     {
       class: 'String',
-      name: 'pmname',
+      name: 'pmName',
       label: 'Name'
     },
     {
       class: 'Int',
-      name: 'numoccurrences',
+      name: 'count',
       label: 'Count'
     },
     {
       class: 'Long',
-      name: 'mintime',
+      name: 'minTime',
       label: 'Min'
     },
     {
       class: 'Long',
       name: 'average',
       label: 'Avg',
-      getter: function() { return (this.totaltime / this.numoccurrences).toFixed(2); },
-      javaGetter: `return (long) Math.round( ( getTotaltime() / getNumoccurrences() ) * 100 ) / 100;`,
+      getter: function() { return (this.totalTime / this.count).toFixed(2); },
+      javaGetter: `return (long) Math.round( ( getTotalTime() / getCount() ) * 100 ) / 100;`,
       transient: true
     },
     {
       class: 'Long',
-      name: 'maxtime',
+      name: 'maxTime',
       label: 'Max'
     },
     {
       class: 'Long',
-      name: 'totaltime',
+      name: 'totalTime',
       label: 'Total',
       tableCellFormatter: {
         class: {

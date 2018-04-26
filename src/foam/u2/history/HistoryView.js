@@ -57,6 +57,7 @@ foam.CLASS({
   properties: [
     'data',
     'historyItemView',
+    'records',
     { class: 'String', name: 'title', value: 'History' }
   ],
 
@@ -70,11 +71,14 @@ foam.CLASS({
         .call(function outputRecords() {
           // Gets records from DAO
           view.data.select().then(function(records) {
+            view.records = records;
             // Reverses records array for chronological output
-            view.forEach(records.array.reverse(), function(record) {
+            view.forEach(records.array.reverse(), function(record, index) {
               view.start('div')
                 .addClass('timelineRecord')
-                .start('div').addClass('timeline').end()
+                .callIf(index != view.records.array.length - 1, function(){
+                  this.start('div').addClass('timeline').end()
+                })
                 .call(function() {
                   view.historyItemView.outputRecord(this, record)
                 })
