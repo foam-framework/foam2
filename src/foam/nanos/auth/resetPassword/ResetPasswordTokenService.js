@@ -28,6 +28,7 @@ foam.CLASS({
     'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
+    'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
