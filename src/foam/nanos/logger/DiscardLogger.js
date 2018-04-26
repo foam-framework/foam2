@@ -59,7 +59,7 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
   if ( ! getDiscardWarn() ) {
-    getDelegate().warn(args);
+    getDelegate().warning(args);
   }
 `
     },
