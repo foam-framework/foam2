@@ -16,7 +16,7 @@ foam.CLASS({
       value: false
     },
     {
-      name: 'discardWarn',
+      name: 'discardWarning',
       class: 'Boolean',
       value: false
     },
@@ -49,7 +49,7 @@ foam.CLASS({
 `
     },
     {
-      name: 'warn',
+      name: 'warning',
       args: [
         {
           name: 'args',
@@ -58,7 +58,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-  if ( ! getDiscardWarn() ) {
+  if ( ! getDiscardWarning() ) {
     getDelegate().warning(args);
   }
 `
