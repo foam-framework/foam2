@@ -1,26 +1,27 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
 foam.CLASS({
+  package: 'foam.nanos.logger',
   name: 'DiscardLogger',
-  extends: [ 'foam.nanos.logger.ProxyLogger' ],
+  extends: 'foam.nanos.logger.ProxyLogger',
 
   properties: [
     {
-      name: 'discardInfo',
-      class: 'Boolean',
-      value: false
-    },
-    {
-      name: 'discardWarning',
-      class: 'Boolean',
-      value: false
-    },
-    {
       name: 'discardError',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'discardWarn',
+      class: 'Boolean',
+      value: false
+    },
+    {
+      name: 'discardInfo',
       class: 'Boolean',
       value: false
     },
@@ -30,21 +31,24 @@ foam.CLASS({
       value: false
     }
   ],
-    
+
   methods: [
     {
-    name: 'info',
-    args: [
-      {
-      name: 'args',
-      javaType: 'Object...'  
-      }
-    ],
-    javaCode: `
-        if ( ! get.discardInfo() ) {
-          getDelegate().info(args);
+      name: 'info',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
         }
-    `
+      ],
+      javaReturns: 'void',
+      javaCode: `
+  if ( ! getDiscardInfo() ) {
+    getDelegate().info(args);
+  }
+`
     }
   ]
+
 });
+

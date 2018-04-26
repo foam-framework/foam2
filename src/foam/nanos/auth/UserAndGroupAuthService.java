@@ -232,10 +232,6 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
-    if ( newPassword.contains(" ") ) {
-      throw new RuntimeException("Password cannot contain spaces");
-    }
-
     int length = newPassword.length();
     if ( length < 7 || length > 32 ) {
       throw new RuntimeException("Password must be 7-32 characters long");

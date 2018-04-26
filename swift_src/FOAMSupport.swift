@@ -511,6 +511,7 @@ public class ModelParserFactory {
 }
 
 public protocol FOAM_enum: JSONOutputter {
+  var classId: String { get }
   var ordinal: Int { get }
   var name: String { get }
   var label: String { get }

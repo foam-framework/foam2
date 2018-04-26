@@ -150,7 +150,9 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.logger.DiscardLogger',
   'foam.nanos.logger.Logger',
+  'foam.nanos.logger.ProxyLogger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.ListMenu',
@@ -254,7 +256,6 @@ var proxies = [
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
-  'foam.nanos.logger.Logger',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];
