@@ -51,16 +51,19 @@ foam.CLASS({
     {
       name: 'generateToken',
       javaCode:
-`
-try{
-AppConfig appConfig = (AppConfig) getAppConfig();
+`AppConfig appConfig = (AppConfig) getAppConfig();
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 String url = appConfig.getUrl()
     .replaceAll("/$", "");
 
+// check if email invalid
+if ( user == null || ! Email.isValid(user.getEmail()) ) {
+  throw new RuntimeException("Invalid Email");
+}
+
 Sink sink = new ArraySink();
-sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))/**/
+sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))
    .limit(1).select(sink);
 
 List list = ((ArraySink) sink).getArray();
@@ -88,11 +91,7 @@ args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName())
 args.put("link", url +"?token=" + token.getData() + "#reset");
 
 email.sendEmailFromTemplate(user, message, "reset-password", args);
-return true;
-}catch(Exception e){
-  e.printStackTrace();
-}
-return false;`
+return true;`
     },
     {
       name: 'processToken',
