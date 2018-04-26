@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'DiscardLogger',
   extends: 'foam.nanos.logger.ProxyLogger',
-
+ 
   properties: [
     {
       name: 'discardError',
@@ -34,6 +34,36 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'error',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+  if ( ! getDiscardError() ) {
+    getDelegate().error(args);
+  }
+`
+    },
+    {
+      name: 'warn',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+  if ( ! getDiscardWarn() ) {
+    getDelegate().warn(args);
+  }
+`
+    },
+    {
       name: 'info',
       args: [
         {
@@ -45,6 +75,21 @@ foam.CLASS({
       javaCode: `
   if ( ! getDiscardInfo() ) {
     getDelegate().info(args);
+  }
+`
+    },
+    {
+      name: 'debug',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+  if ( ! getDiscardDebug() ) {
+    getDelegate().debug(args);
   }
 `
     }
