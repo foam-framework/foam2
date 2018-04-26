@@ -128,9 +128,6 @@ foam.CLASS({
 
         var user = this.User.create({ email: this.email });
         this.resetPasswordToken.generateToken(user).then(function (result) {
-          if ( ! result ) {
-            throw new Error('Error generating reset token');
-          }
           self.add(self.NotificationMessage.create({ message: 'Password reset instructions sent to ' + self.email }));
         })
         .catch(function (err) {
