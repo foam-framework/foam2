@@ -18,33 +18,54 @@ foam.CLASS({
         name: 'lastUniqueObject',
       },
       {
-        class: 'Int',
+        class: 'int',
         name: 'repeatCount',
       }
     ],
   
     methods: [
       {
-        name: 'checkRepeats',
+        name: 'infoCheckRepeats',
         args: [
           {
-            name: 'newObject',
-            javaType: 'Object'
+            name: 'args',
+            javaType: 'Object...'
           }
         ],
         javaReturns: 'void',
         javaCode: `
-          if ( len(new_object) != len(luo) OR hashcode(new_object)!= hc(luo) ) {
-            // checking if object is new should be its own function maybe?
-            print "repeated #{repeat_count} times"
-            repeat_count = 0
-            last_unique_object = new_object
-            pass new_object to getDelegate()
+          if ( ! repeatedLog(lastUniqueObject,args) ) {
+            if (repeatCount > 1){
+              getDelegate.info("the last message was repeated" + repeatCount + "times")
             }
-          else( its a repeat ) {
-            repeat_count += 1
+          repeatCount = 1
+          lastUniqueObject = args
+          getDelegate().info(args)
+          else {
+            repeatCount++
             }
           `
+      },
+      {....
+      },
+      {
+        name: 'repeatedLog',
+        args:[
+          {
+            class: 'Object...',
+            name: 'Object1'
+          },
+          {
+            class: 'Object...',
+            name: 'Object2'
+          }
+        ],
+        javaReturns: 'boolean',
+        javaCode: `
+        return (Object1.length == Object2.length) || 
+           (Object1.hashCode() == Object2.hashCode())
+        `
+
       }
     ]
   
