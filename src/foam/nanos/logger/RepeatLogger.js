@@ -15,11 +15,11 @@ foam.CLASS({
     properties: [
       {
         class: 'Object',
-        name: 'last_unique_object',
+        name: 'lastUniqueObject',
       },
       {
         class: 'Int',
-        name: 'repeat_count',
+        name: 'repeatCount',
       }
     ],
   
