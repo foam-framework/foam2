@@ -496,7 +496,7 @@ return this.select_(this.getX(), sink, 0, this.MAX_SAFE_INTEGER, null, null);
       javaCode: `
 // Temporary until DAO supports find_(Predicate) directly
 if ( id instanceof foam.mlang.predicate.Predicate ) {
-  java.util.List l = ((ListSink) this.where((foam.mlang.predicate.Predicate) id).limit(1).select(new ListSink())).getData();
+  java.util.List l = ((ArraySink) this.where((foam.mlang.predicate.Predicate) id).limit(1).select(new ArraySink())).getArray();
   return l.size() == 1 ? (foam.core.FObject) l.get(0) : null;
 }
 
@@ -668,7 +668,7 @@ protected void onReset() {
 }
 
 protected Sink prepareSink(Sink s) {
-  return s == null ? new ListSink() : s;
+  return s == null ? new ArraySink() : s;
 }
 
 public Sink select() {

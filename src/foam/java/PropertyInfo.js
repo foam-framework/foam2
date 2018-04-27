@@ -23,6 +23,18 @@ foam.CLASS({
   properties: [
     ['anonymous', true],
     'propName',
+    'propShortName',
+    'propAliases',
+    {
+      name: 'getAliasesBody',
+      expression: function() {
+      var b = 'new String[] {';
+        for (var i = 0; i < this.propAliases.length; i++) {
+          b+= '"'+ this.propAliases[i]+'"' + (i < this.propAliases.length-1 ? ', ' : '');
+        }
+        return b+'};';
+      }
+    },
     {
       class: 'Boolean',
       name: 'networkTransient'
@@ -64,6 +76,8 @@ foam.CLASS({
     'jsonParser',
     'csvParser',
     'cloneProperty',
+    'queryParser',
+    'diffProperty',
     {
       name: 'methods',
       factory: function() {
@@ -73,6 +87,18 @@ foam.CLASS({
             visibility: 'public',
             type: 'String',
             body: 'return "' + this.propName + '";'
+          },
+          {
+            name: 'getShortName',
+            visibility: 'public',
+            type: 'String',
+            body:  this.propShortName ? 'return "' +this.propShortName+'";' : 'return null;'
+          },
+          {
+            name: 'getAliases',
+            visibility: 'public',
+            type: 'String[]',
+            body: 'return ' + this.getAliasesBody
           },
           {
             name: 'get',
@@ -128,6 +154,12 @@ foam.CLASS({
             type: 'foam.lib.parse.Parser',
             visibility: 'public',
             body: 'return ' +  (this.jsonParser ? this.jsonParser : null) + ';'
+          },
+          {
+            name: 'queryParser',
+            type: 'foam.lib.parse.Parser',
+            visibility: 'public',
+            body: 'return ' +  (this.queryParser ? this.queryParser : null) + ';'
           },
           {
             name: 'csvParser',
@@ -212,6 +244,20 @@ foam.CLASS({
             body: this.cloneProperty
           });
         }
+
+        if ( this.diffProperty != null ) {
+          m.push({
+            name: 'diff',
+            visibility: 'public',
+            type: 'void',
+            args: [ { type: 'foam.core.FObject',      name: 'o1'   },
+                    { type: 'foam.core.FObject',      name: 'o2'   },
+                    { type: 'java.util.Map',          name: 'diff' },
+                    { type: 'foam.core.PropertyInfo', name: 'prop' }],
+            body: this.diffProperty
+          });
+        }
+
         return m;
       }
     }

@@ -23,7 +23,7 @@ import java.util.Map;
 // TODO: make this a functional tree rather than a linked list. (for performance)
 
 abstract class AbstractX
-  implements X
+  implements X, Appendable
 {
   public <T> T get(Class<T> key) {
     return (T)get(this, key);
@@ -57,6 +57,10 @@ abstract class AbstractX
 
   public <T> T create(Class<T> type, Map<String, Object> args) {
     return ((FacetManager)get("facetManager")).create(type, args, this);
+  }
+
+  public void append(StringBuilder sb) {
+    sb.append("[context]");
   }
 }
 

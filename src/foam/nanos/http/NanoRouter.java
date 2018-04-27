@@ -17,6 +17,7 @@ import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
 import foam.nanos.NanoService;
 import foam.nanos.pm.PM;
+import foam.nanos.pm.PMWebAgent;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Map;
@@ -26,9 +27,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 
+/**
+ * Top-Level Router Servlet.
+ * Routes servlet requests based on NSpecDAO configuration.
+ * Services can be exported as either Box Skeletons or as WebAgents/Servlets.
+ * WebAgents require the service.run.<nspecname> permission.
+ */
 public class NanoRouter
-    extends HttpServlet
-    implements NanoService, ContextAware
+  extends HttpServlet
+  implements NanoService, ContextAware
 {
   protected X x_;
 
@@ -38,14 +45,14 @@ public class NanoRouter
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
-    String      path       = req.getRequestURI();
-    String[]    urlParams  = path.split("/");
-    String      serviceKey = urlParams[2];
-    Object      service    = getX().get(serviceKey);
-    DAO         nSpecDAO   = (DAO) getX().get("nSpecDAO");
-    NSpec       spec       = (NSpec) nSpecDAO.find(serviceKey);
-    WebAgent    serv       = getWebAgent(spec, service);
-    PM          pm         = new PM(this.getClass(), serviceKey);
+    String   path       = req.getRequestURI();
+    String[] urlParams  = path.split("/");
+    String   serviceKey = urlParams[2];
+    Object   service    = getX().get(serviceKey);
+    DAO      nSpecDAO   = (DAO) getX().get("nSpecDAO");
+    NSpec    spec       = (NSpec) nSpecDAO.find(serviceKey);
+    WebAgent serv       = getWebAgent(spec, service);
+    PM       pm         = new PM(this.getClass(), serviceKey);
 
     resp.setContentType("text/html");
 
@@ -111,8 +118,22 @@ public class NanoRouter
         ((Logger) getX().get("logger")).error("Unable to create NSPec servlet: " + spec.getName());
       }
     } else {
-      if ( service instanceof WebAgent && spec.getAuthenticate() ) {
-        service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
+      if ( service instanceof WebAgent ) {
+        WebAgent pmService = (WebAgent) service;
+
+        if ( spec.getParameters() ) {
+          service = new HttpParametersWebAgent((WebAgent) service);
+        }
+        if ( spec.getPm() ) {
+          service = new PMWebAgent(pmService.getClass(), spec.getName(), (WebAgent) service);
+        }
+
+        //
+        // NOTE: Authentication must be last as HttpParametersWebAgent will consume the authentication parameters.
+        //
+        if (spec.getAuthenticate() ) {
+          service = new AuthWebAgent("service.run." + spec.getName(), (WebAgent) service);
+        }
       }
     }
 

@@ -25,17 +25,18 @@ foam.CLASS({
     'foam.core.X',
     'foam.nanos.pool.FixedThreadPool',
     'foam.util.SafetyUtil',
-    'org.apache.commons.lang3.StringUtils',
-    'org.jtwig.JtwigModel',
-    'org.jtwig.JtwigTemplate',
-    'org.jtwig.environment.EnvironmentConfiguration',
-    'org.jtwig.environment.EnvironmentConfigurationBuilder',
-    'org.jtwig.resource.loader.TypedResourceLoader',
+    'java.nio.charset.StandardCharsets',
+    'java.util.Date',
+    'java.util.Properties',
     'javax.mail.*',
     'javax.mail.internet.InternetAddress',
     'javax.mail.internet.MimeMessage',
-    'java.util.Date',
-    'java.util.Properties'
+    'org.apache.commons.lang3.StringUtils',
+    'org.jtwig.environment.EnvironmentConfiguration',
+    'org.jtwig.environment.EnvironmentConfigurationBuilder',
+    'org.jtwig.JtwigModel',
+    'org.jtwig.JtwigTemplate',
+    'org.jtwig.resource.loader.TypedResourceLoader'
   ],
 
   axioms: [
@@ -67,6 +68,12 @@ protected EnvironmentConfiguration config_ = null;`
   ],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'enabled',
+      value: true,
+      javaFactory: 'return true;'
+    },
     {
       class: 'String',
       name: 'host',
@@ -129,10 +136,11 @@ protected EnvironmentConfiguration config_ = null;`
   config_ = EnvironmentConfigurationBuilder
     .configuration()
     .resources()
-    .resourceLoaders()
-    .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
-    .and().and()
-    .build();
+      .resourceLoaders()
+        .add(new TypedResourceLoader("dao", new DAOResourceLoader(getX(), group)))
+      .and()
+    .and()
+  .build();
 }
 return config_;`
     },
@@ -223,8 +231,10 @@ return config_;`
           javaType: 'final foam.nanos.notification.email.EmailMessage'
         }
       ],
-      javaCode:
-`((FixedThreadPool) getThreadPool()).submit(getX(), new ContextAgent() {
+      javaCode: `
+if ( ! this.getEnabled() ) return;
+
+((FixedThreadPool) getThreadPool()).submit(getX(), new ContextAgent() {
   @Override
   public void execute(X x) {
     try {
@@ -246,11 +256,21 @@ return config_;`
     },
     {
       name: 'sendEmailFromTemplate',
-      javaCode:
-`String group = user != null ? (String) user.getGroup() : null;
+      javaCode: `
+if ( ! this.getEnabled() ) return;
+
+String group = user != null ? (String) user.getGroup() : null;
 EmailTemplate emailTemplate = DAOResourceLoader.findTemplate(getX(), name, group);
 if ( emailMessage == null )
   return;
+
+for ( String key : templateArgs.keySet() ) {
+  Object value = templateArgs.get(key);
+  if ( value instanceof String ) {
+    String s = (String) value;
+    templateArgs.put(key, new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+  }
+}
 
 EnvironmentConfiguration config = getConfig(group);
 JtwigTemplate template = JtwigTemplate.inlineTemplate(emailTemplate.getBody(), config);
