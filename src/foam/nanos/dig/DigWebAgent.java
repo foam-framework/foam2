@@ -79,7 +79,6 @@ public class DigWebAgent
     PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
-<<<<<<< HEAD
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         resp.setContentType("text/html");
@@ -87,21 +86,6 @@ public class DigWebAgent
         nSpecDAO = new foam.dao.AuthenticatedDAO("nSpec", true, nSpecDAO);
         ((foam.dao.ProxyDAO)nSpecDAO).setX(x);
         X y = x.put("nSpecDAO", nSpecDAO);
-=======
-    Object authService = x.get("auth");
-
-    logger.debug("AuthService", authService);
-
-    nSpecDAO = new AuthenticatedDAO("nSpec", true, nSpecDAO);
-    ((foam.core.ContextAware)nSpecDAO).setX(x);
-    nSpecDAO = nSpecDAO.inX(x);
-    //x.put("nSpecDAO", nSpecDAO);
-    X y = x.put("nSpecDAO", nSpecDAO);
-
-    try {
-      if ( SafetyUtil.isEmpty(daoName) ) {
-        resp.setContentType("text/html");
->>>>>>> 2e38f6463412441caad5a646182f595491b70a6e
         outputPage(y);
         // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
         //   String url = "/#dig";
