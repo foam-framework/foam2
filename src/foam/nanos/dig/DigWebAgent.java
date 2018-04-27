@@ -78,11 +78,14 @@ public class DigWebAgent
     PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
-
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         resp.setContentType("text/html");
-        outputPage(x);
+        //todo put this back in x for page output as well.
+        nSpecDAO = new foam.dao.AuthenticatedDAO("nSpec", true, nSpecDAO);
+        ((foam.dao.ProxyDAO)nSpecDAO).setX(x);
+        X y = x.put("nSpecDAO", nSpecDAO);
+        outputPage(y);
         // FIXME: Presently the dig UI doesn't have any way to submit/send a request.
         //   String url = "/#dig";
         //   try {
@@ -409,12 +412,16 @@ public class DigWebAgent
   protected void outputPage(X x) {
     final PrintWriter   out         = x.get(PrintWriter.class);
     DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    Logger              logger      = (Logger) x.get("logger");
+    foam.nanos.auth.AuthService authService = (foam.nanos.auth.AuthService) x.get("auth");
+    logger.info(this.getClass().getSimpleName(), "outputPage", "authService", authService);
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");
 
     // gets all ongoing nanopay services
-    nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
+    //nSpecDAO.inX(x).orderBy(NSpec.NAME).select(new AbstractSink() {
+    nSpecDAO.inX(x).orderBy(NSpec.NAME).select_(x, new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           NSpec s = (NSpec) o;
@@ -422,7 +429,7 @@ public class DigWebAgent
             out.println("<option value=" + s.getName() + ">" + s.getName() + "</option>");
           }
         }
-      });
+      }, 0, 0, null, null);
 
     out.println("</select></span>");
     out.println("<br><br><span id=formatSpan>Format:<select name=format id=format onchange=changeUrl() style=margin-left:25><option value=csv>CSV</option><option value=xml>XML</option><option value=json selected>JSON</option><option value=html>HTML</option><option value=jsonj>JSON/J</option></select></span>");
