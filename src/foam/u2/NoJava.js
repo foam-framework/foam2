@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
   properties: [ 'javaCode', 'javaReturns', 'javaThrows' ]
@@ -57,7 +56,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Model',
-  properties: [ 'javaImports', 'generateJava', 'arequire', 'import' ]
+  properties: [ 'javaImports', 'generateJava', 'arequire', 'import', 'description' ]
 });
 foam.CLASS({
   refines: 'foam.core.Property',
@@ -65,7 +64,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.String',
-  properties: [ 'javaGetter', 'javaSetter' ]
+  properties: [ 'javaGetter', 'javaSetter', 'description' ]
 });
 foam.CLASS({
   refines: 'foam.u2.ViewSpec',

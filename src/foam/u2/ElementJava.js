@@ -7,7 +7,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
-  properties: [ 'tableCellFormatter', 'tableCellView', 'tableWidth', 'attribute' ]
+  properties: [ 'tableCellFormatter', 'tableCellView', 'tableWidth', 'attribute', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Currency',
@@ -23,15 +23,23 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Double',
-  properties: [ 'tableCellFormatter' ]
+  properties: [ 'tableCellFormatter', 'visibility' ]
+});
+foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Float',
   properties: [ 'view' ]
 });
 foam.CLASS({
+  refines: 'foam.core.FObjectArray',
+  properties: [ 'view', 'visibility' ]
+});
+foam.CLASS({
   refines: 'foam.core.FObjectProperty',
-  properties: [ 'view' ]
+  properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.Int',
@@ -55,7 +63,7 @@ foam.CLASS({
 });
 foam.CLASS({
   refines: 'foam.core.Reference',
-  properties: [ 'view' ]
+  properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
   refines: 'foam.core.String',
