@@ -26,7 +26,7 @@ public class AuthenticatedSink
   public void put(Object obj, Detachable sub) {
     AuthService authService = (AuthService) getX().get("auth");
     String      permission  = prefix_ + ((FObject)obj).getProperty("id");
-
+    System.err.println("X: "+getX()+", authService: "+authService+", permission: "+permission);
     if ( authService.check(getX(), permission) ) super.put(obj, sub);
   }
 
