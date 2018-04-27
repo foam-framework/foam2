@@ -21,21 +21,17 @@ foam.CLASS({
 
   documentation: 'Titled raised View border used by the DocBrowser.',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-             border-radius: 3px;
-             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
-             display: inline-block;
-             width:100%;
-        }
-        ^title { padding: 6px; align-content: center; background: #c8e2f9; }
-        ^info { float: right; font-size: smaller; }
-        ^content { padding: 6px; min-width: 220px; height: 100%; background: white; }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+         border-radius: 3px;
+         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.38);
+         display: inline-block;
+         width:100%;
+    }
+    ^title { padding: 6px; align-content: center; background: #c8e2f9; }
+    ^info { float: right; font-size: smaller; }
+    ^content { padding: 6px; min-width: 220px; height: 100%; background: white; }
+  `,
 
   properties: [
     'title',

@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.lib.json.Outputter;
 import java.security.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,7 +16,7 @@ import java.util.Map;
 /** Abstract base class for all generated FOAM Objects. **/
 public abstract class AbstractFObject
   extends    ContextAwareSupport
-  implements FObject, Comparable
+  implements FObject, Comparable, Appendable
 {
 
   public static FObject maybeClone(FObject fo) {
@@ -63,6 +64,29 @@ public abstract class AbstractFObject
     }
 
     return result;
+  }
+
+  public FObject hardDiff(FObject obj) {
+    FObject ret = null;
+    boolean isDiff = false;
+    try {
+      ret = (FObject) this.getClassInfo().getObjClass().newInstance();
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      PropertyInfo prop = null;
+      while ( i.hasNext() ) {
+        prop = (PropertyInfo) i.next();
+        if ( prop.getNetworkTransient() || prop.getStorageTransient() ) continue;
+        if ( prop.hardDiff(this, obj, ret) ) {
+          isDiff = true;
+        }
+      }
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
+    } finally {
+      if ( isDiff ) return ret;
+      return null;
+    }
   }
 
   @Override
@@ -196,5 +220,42 @@ public abstract class AbstractFObject
       t.printStackTrace();
       return false;
     }
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    append(sb);
+    return sb.toString();
+  }
+
+  public void append(StringBuilder sb)  {
+    List     props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i     = props.iterator();
+
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+
+      sb.append(prop.getName());
+      sb.append(": ");
+
+      try {
+        Object value = prop.get(this);
+
+        if ( value instanceof Appendable ) {
+          ((Appendable) value).append(sb);
+        } else {
+          sb.append(value);
+        }
+      } catch (Throwable t) {
+        sb.append("-");
+      }
+
+      if ( i.hasNext() ) sb.append(", ");
+    }
+  }
+
+  public String toJSON() {
+    Outputter out = new Outputter();
+    return out.stringify(this);
   }
 }

@@ -9,7 +9,7 @@ package foam.nanos.auth;
 import foam.core.ContextAwareSupport;
 import foam.core.X;
 import foam.dao.DAO;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.Sink;
 import foam.mlang.MLang;
 import foam.nanos.NanoService;
@@ -34,6 +34,10 @@ public class UserAndGroupAuthService
 
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
+
+  public UserAndGroupAuthService(X x) {
+    setX(x);
+  }
 
   @Override
   public void start() {
@@ -145,10 +149,10 @@ public class UserAndGroupAuthService
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
-    Sink sink = new ListSink();
+    Sink sink = new ArraySink();
     sink = userDAO_.where(MLang.EQ(User.EMAIL, email.toLowerCase())).limit(1).select(sink);
 
-    List data = ((ListSink) sink).getData();
+    List data = ((ArraySink) sink).getArray();
     if ( data == null || data.size() != 1 ) {
       throw new AuthenticationException("User not found");
     }
@@ -226,10 +230,6 @@ public class UserAndGroupAuthService
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
-    }
-
-    if ( newPassword.contains(" ") ) {
-      throw new RuntimeException("Password cannot contain spaces");
     }
 
     int length = newPassword.length();

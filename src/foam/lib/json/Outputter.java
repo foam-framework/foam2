@@ -11,14 +11,13 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.encoders.Base64;
-
 import java.io.*;
 import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.util.encoders.Base64;
 
 public class Outputter
   extends AbstractSink
@@ -34,22 +33,23 @@ public class Outputter
     }
   };
 
-  protected StringWriter  stringWriter_ = null;
   protected PrintWriter   writer_;
   protected OutputterMode mode_;
+  protected StringWriter  stringWriter_        = null;
   protected boolean       outputDefaultValues_ = false;
+  protected boolean       outputClassNames_    = true;
 
   // Hash properties
-  protected String        hashAlgo_ = "SHA-256";
-  protected boolean       outputHash_ = false;
-  protected boolean       rollHashes_ = false;
-  protected byte[]        previousHash_ = null;
-  protected final Object  hashLock_ = new Object();
+  protected String        hashAlgo_            = "SHA-256";
+  protected boolean       outputHash_          = false;
+  protected boolean       rollHashes_          = false;
+  protected byte[]        previousHash_        = null;
+  protected final Object  hashLock_            = new Object();
 
   // signing properties
-  protected String        signAlgo_ = null;
-  protected PrivateKey    signingKey_ = null;
-  protected boolean       outputSignature_ = false;
+  protected String        signAlgo_            = null;
+  protected PrivateKey    signingKey_          = null;
+  protected boolean       outputSignature_     = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -69,7 +69,7 @@ public class Outputter
       writer = new PrintWriter(stringWriter_);
     }
 
-    this.mode_ = mode;
+    this.mode_   = mode;
     this.writer_ = writer;
   }
 
@@ -172,7 +172,21 @@ public class Outputter
   }
 
   public void outputEnum(Enum<?> value) {
-    outputNumber(value.ordinal());
+//    outputNumber(value.ordinal());
+
+    writer_.append("{");
+      writer_.append(beforeKey_());
+      writer_.append("class");
+      writer_.append(afterKey_());
+      writer_.append(":");
+      outputString(value.getClass().getName());
+      writer_.append(",");
+      writer_.append(beforeKey_());
+      writer_.append("ordinal");
+      writer_.append(afterKey_());
+      writer_.append(":");
+      outputNumber(value.ordinal());
+    writer_.append("}");
   }
 
   public void output(Object value) {
@@ -213,29 +227,34 @@ public class Outputter
     outputString(sdf.get().format(date));
   }
 
+  protected Boolean maybeOutputProperty(FObject fo, PropertyInfo prop, boolean includeComma) {
+    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+    if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
+
+    Object value = prop.get(fo);
+    if ( value == null ) return false;
+    if ( includeComma ) writer_.append(",");
+    outputProperty(fo, prop);
+    return true;
+  }
+
   protected void outputFObject(FObject o) {
     ClassInfo info = o.getClassInfo();
     writer_.append("{");
-    writer_.append(beforeKey_());
-    writer_.append("class");
-    writer_.append(afterKey_());
-    writer_.append(":");
-
-    outputString(info.getId());
+    if ( outputClassNames_ ) {
+      writer_.append(beforeKey_());
+      writer_.append("class");
+      writer_.append(afterKey_());
+      writer_.append(":");
+      outputString(info.getId());
+    }
     List axioms = info.getAxiomsByClass(PropertyInfo.class);
     Iterator i = axioms.iterator();
-
+    boolean outputComma = outputClassNames_;
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
-      if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) continue;
-      if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) continue;
-      if ( ! outputDefaultValues_ && ! prop.isSet(o) ) continue;
-
-      Object value = prop.get(o);
-      if ( value == null ) continue;
-
-      writer_.append(",");
-      outputProperty(o, prop);
+      outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
 
     if ( outputHash_ ) {
@@ -329,6 +348,10 @@ public class Outputter
 
   public void setOutputDefaultValues(boolean outputDefaultValues) {
     outputDefaultValues_ = outputDefaultValues;
+  }
+
+  public void setOutputClassNames(boolean outputClassNames) {
+    outputClassNames_ = outputClassNames;
   }
 
   public void setHashAlgorithm(String algorithm) {

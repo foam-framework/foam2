@@ -232,44 +232,40 @@ foam.CLASS({
     'selection? as importSelection'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          border-spacing: 14px 8px;
-        }
+  css: `
+    ^ {
+      border-spacing: 14px 8px;
+    }
 
-        ^ th {
-          text-align: left;
-          white-space: nowrap;
-        }
+    ^ th {
+      text-align: left;
+      white-space: nowrap;
+    }
 
-        ^row:hover {
-          background: #eee;
-          cursor: pointer;
-        }
+    ^row:hover {
+      background: #eee;
+      cursor: pointer;
+    }
 
-        ^selected {
-          background: #eee;
-        }
+    ^selected {
+      background: #eee;
+    }
 
-        ^vertDots {
-          font-size: 20px;
-          font-weight: bold;
-          padding-right: 12px;
-        }
+    ^vertDots {
+      font-size: 20px;
+      font-weight: bold;
+      padding-right: 12px;
+    }
 
-        ^noselect {
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          -khtml-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          user-select: none;
-        }
-    */}
-    })
-  ],
+    ^noselect {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  `,
 
   properties: [
     {
@@ -332,6 +328,12 @@ foam.CLASS({
       name: 'editColumnsEnabled',
       value: true,
       documentation: 'Set this to true to let the user select columns.'
+    },
+    {
+      class: 'Boolean',
+      name: 'disableUserSelection',
+      value: false,
+      documentation: 'Ignores selection by user.'
     },
     {
       name: 'ascIcon',
@@ -447,11 +449,17 @@ foam.CLASS({
               select(this.orderedDAO$proxy, function(obj) {
                 return this.E('tr').
                   on('mouseover', function() { view.hoverSelection = obj; }).
-                  callIf(view.dblclick, function() { this.on('dblclick', function() { view.dblclick && view.dblclick(obj); }); }).
-                  on('click', function() {
-                    view.selection = obj;
-                    if ( view.importSelection$ ) view.importSelection = obj;
-                    if ( view.editRecord$ ) view.editRecord(obj);
+                  callIf(view.dblclick && ! view.disableUserSelection, function() {
+                    this.on('dblclick', function() {
+                      view.dblclick && view.dblclick(obj);
+                    });
+                  }).
+                  callIf( ! view.disableUserSelection, function() {
+                    this.on('click', function() {
+                      view.selection = obj;
+                      if ( view.importSelection$ ) view.importSelection = obj;
+                      if ( view.editRecord$ ) view.editRecord(obj);
+                    })
                   }).
                   addClass(view.slot(function(selection) {
                     return selection && foam.util.equals(obj.id, selection.id) ?

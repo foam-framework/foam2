@@ -22,28 +22,28 @@ public class DAOPMLogger
     if ( pm.getName().toLowerCase().indexOf("pm") != -1 )                return;
 
     PMInfo pmi = new PMInfo();
-    pmi.setClsname(pm.getClassType().getName());
-    pmi.setPmname(pm.getName());
+    pmi.setClsName(pm.getClassType().getName());
+    pmi.setPmName(pm.getName());
 
     DAO pmd = (DAO) getX().get(DAO_NAME);
 
     PMInfo dpmi = (PMInfo) pmd.find(pmi);
     if ( dpmi == null ) {
-      pmi.setMintime(pm.getTime());
-      pmi.setMaxtime(pm.getTime());
-      pmi.setTotaltime(pm.getTime());
-      pmi.setNumoccurrences(1);
+      pmi.setMinTime(pm.getTime());
+      pmi.setMaxTime(pm.getTime());
+      pmi.setTotalTime(pm.getTime());
+      pmi.setCount(1);
 
       pmd.put(pmi);
     } else {
-      if ( pm.getTime() < dpmi.getMintime() )
-        dpmi.setMintime(pm.getTime());
+      if ( pm.getTime() < dpmi.getMinTime() )
+        dpmi.setMinTime(pm.getTime());
 
-      if ( pm.getTime() > dpmi.getMaxtime() )
-        dpmi.setMaxtime(pm.getTime());
+      if ( pm.getTime() > dpmi.getMaxTime() )
+        dpmi.setMaxTime(pm.getTime());
 
-      dpmi.setNumoccurrences(dpmi.getNumoccurrences() + 1);
-      dpmi.setTotaltime(dpmi.getTotaltime() + pm.getTime());
+      dpmi.setCount(dpmi.getCount() + 1);
+      dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
       pmd.put(dpmi);
     }
   }
