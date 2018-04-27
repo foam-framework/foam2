@@ -146,5 +146,3 @@ foam.CLASS({
     function load() { },
   ],
 });
-
-

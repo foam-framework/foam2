@@ -58,5 +58,3 @@ foam.CLASS({
   refines: 'foam.core.String',
   properties: [ 'swiftFactory', 'swiftName']
 });
-
-
