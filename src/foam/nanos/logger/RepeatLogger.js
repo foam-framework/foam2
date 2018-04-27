@@ -25,10 +25,10 @@ foam.CLASS({
   
     methods: [
       {
-        name: 'check_repeats',
+        name: 'checkRepeats',
         args: [
           {
-            name: 'new_object',
+            name: 'newObject',
             javaType: 'Object'
           }
         ],
