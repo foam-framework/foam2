@@ -25,7 +25,7 @@ foam.CLASS({
   
     methods: [
       {
-        name: 'infoCheckRepeats',
+        name: 'info',
         args: [
           {
             name: 'args',
