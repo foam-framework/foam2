@@ -123,9 +123,7 @@ foam.CLASS({
       line-height: 2.86;
       cursor: pointer;
     }
-
   `,
-
 
   properties: [
     {
@@ -159,7 +157,7 @@ foam.CLASS({
             self.stack.push({ class: 'foam.nanos.auth.SignInView' });
           })
         .end()
-      .end()
+      .end();
     }
   ],
 
