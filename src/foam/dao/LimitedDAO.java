@@ -20,6 +20,15 @@ public class LimitedDAO
   public LimitedDAO(long limit, DAO delegate) {
     limit_ = limit;
     setDelegate(delegate);
+    if ( delegate instanceof ProxyDAO ) {
+      setX(((ProxyDAO)delegate).getX());
+    }
+  }
+
+  public LimitedDAO(X x, long limit, DAO delegate) {
+    limit_ = limit;
+    setDelegate(delegate);
+    setX(x);
   }
 
   public LimitedDAO setLimit(long limit) {
