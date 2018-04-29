@@ -18,6 +18,15 @@ public class FilteredDAO
   public FilteredDAO(Predicate predicate, DAO delegate) {
     predicate_ = predicate;
     setDelegate(delegate);
+    if ( delegate instanceof ProxyDAO ) {
+      setX(((ProxyDAO)delegate).getX());
+    }
+  }
+
+  public FilteredDAO(X x, Predicate predicate, DAO delegate) {
+    predicate_ = predicate;
+    setX(x);
+    setDelegate(delegate);
   }
 
   public FilteredDAO() {}

@@ -8,11 +8,19 @@ public class UnreliableDAO
   public UnreliableDAO(DAO delegate) {
     super();
     setDelegate(delegate);
+    if ( delegate instanceof ProxyDAO ) {
+      setX(((ProxyDAO)delegate).getX());
+    }
   }
 
   public UnreliableDAO(double errorRate, DAO delegate) {
     this(delegate);
     errorRate_ = errorRate;
+  }
+
+  public UnreliableDAO(foam.core.X x, double errorRate, DAO delegate) {
+    this(errorRate, delegate);
+    setX(x);
   }
 
   @Override
