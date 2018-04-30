@@ -26,6 +26,25 @@ foam.INTERFACE({
       ]
     },
     {
+      name: 'generateTokenWithParameters',
+      returns: 'Promise',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'user',
+          javaType: 'foam.nanos.auth.User',
+          swiftType: 'User'
+        },
+        {
+          name: 'parameters',
+          javaType: 'java.util.Map<String, Object>',
+          swiftType: '[String:Any]'
+        }
+      ]
+    },
+    {
       name: 'processToken',
       returns: 'Promise',
       javaReturns: 'boolean',

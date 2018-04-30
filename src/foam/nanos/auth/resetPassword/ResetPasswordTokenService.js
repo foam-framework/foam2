@@ -50,7 +50,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateToken',
+      name: 'generateTokenWithParameters',
       javaCode:
 `AppConfig appConfig = (AppConfig) getAppConfig();
 DAO userDAO = (DAO) getLocalUserDAO();
