@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'Messageboard',
 
   tableColumns: [
-    'id', 'title', 'createDate', 'creator'
+    'id', 'title', 'createdDate', 'creator'
   ],
 
   properties: [
@@ -23,7 +23,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'creator'
+      name: 'creator',
+      visibility: foam.u2.Visibility.RO
     },
     {
       class: 'DateTime',
@@ -40,7 +41,7 @@ foam.CLASS({
     },
     {
       class: 'foam.nanos.fs.FileArray',
-      name: 'data',
+      name: 'messageboardFile',
       view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView' }
     }
   ]
