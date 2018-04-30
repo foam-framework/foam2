@@ -230,7 +230,7 @@ foam.CLASS({
           password: this.newPassword
         });
 
-        this.resetPasswordToken.processToken(user, this.token).then(function (result) {
+        this.resetPasswordToken.processToken(null, user, this.token).then(function (result) {
           self.stack.push({ class: 'foam.nanos.auth.resetPassword.SuccessView' });
         }).catch(function (err) {
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));

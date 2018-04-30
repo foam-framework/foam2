@@ -31,7 +31,7 @@ return calendar.getTime();`
 
     {
       name: 'generateToken',
-      javaCode: `return this.generateTokenWithParameters(user, null);`
+      javaCode: `return this.generateTokenWithParameters(x, user, null);`
     }
   ]
 });

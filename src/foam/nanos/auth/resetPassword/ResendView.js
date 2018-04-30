@@ -127,7 +127,7 @@ foam.CLASS({
         var self = this;
 
         var user = this.User.create({ email: this.email });
-        this.resetPasswordToken.generateToken(user).then(function (result) {
+        this.resetPasswordToken.generateToken(null, user).then(function (result) {
           self.add(self.NotificationMessage.create({ message: 'Password reset instructions sent to ' + self.email }));
         })
         .catch(function (err) {
