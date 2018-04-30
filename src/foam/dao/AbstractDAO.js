@@ -106,7 +106,7 @@ return getOf() == null ? null : (foam.core.PropertyInfo) getOf().getAxiomByName(
         ]);
       */},
       javaCode: `
-return new FilteredDAO(predicate, this);
+return new FilteredDAO(this.getX(), predicate, this);
       `,
     },
 
@@ -123,7 +123,7 @@ return new FilteredDAO(predicate, this);
         });
       },
       javaCode: `
-return new OrderedDAO(comparator, this);
+return new OrderedDAO(this.getX(), comparator, this);
       `,
     },
 
@@ -146,7 +146,7 @@ return SkipDAO_create([
 ])
       */},
       javaCode: `
-return new SkipDAO(count, this);
+return new SkipDAO(this.getX(), count, this);
       `,
     },
 
@@ -169,7 +169,7 @@ return LimitedDAO_create([
 ])
       */},
       javaCode: `
-return new LimitedDAO(count, this);
+return new LimitedDAO(this.getX(), count, this);
       `,
     },
 

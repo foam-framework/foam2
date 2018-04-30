@@ -27,6 +27,11 @@ foam.CLASS({
 `Calendar calendar = Calendar.getInstance();
 calendar.add(java.util.Calendar.DAY_OF_MONTH, 1);
 return calendar.getTime();`
+    },
+
+    {
+      name: 'generateToken',
+      javaCode: `return this.generateTokenWithParameters(x, user, null);`
     }
   ]
 });

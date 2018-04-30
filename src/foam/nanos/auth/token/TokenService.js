@@ -19,9 +19,38 @@ foam.INTERFACE({
       swiftThrows: true,
       args: [
         {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context?'
+        },
+        {
           name: 'user',
           javaType: 'foam.nanos.auth.User',
           swiftType: 'User'
+        }
+      ]
+    },
+    {
+      name: 'generateTokenWithParameters',
+      returns: 'Promise',
+      javaReturns: 'boolean',
+      swiftReturns: 'Bool',
+      swiftThrows: true,
+      args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context?'
+        },
+        {
+          name: 'user',
+          javaType: 'foam.nanos.auth.User',
+          swiftType: 'User'
+        },
+        {
+          name: 'parameters',
+          javaType: 'java.util.Map<String, Object>',
+          swiftType: '[String:Any]'
         }
       ]
     },
@@ -32,6 +61,11 @@ foam.INTERFACE({
       swiftReturns: 'Bool',
       swiftThrows: true,
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X',
+          swiftType: 'Context?'
+        },
         {
           name: 'user',
           javaType: 'foam.nanos.auth.User',
