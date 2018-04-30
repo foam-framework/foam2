@@ -22,7 +22,7 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateToken',
+      name: 'generateTokenWithParameters',
       javaCode:
 `try {
 DAO tokenDAO = (DAO) getX().get("tokenDAO");
