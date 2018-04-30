@@ -15,6 +15,9 @@ import foam.dao.DAO;
 import foam.dao.JDAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
+import foam.nanos.logger.Logger;
+import foam.nanos.logger.ProxyLogger;
+import foam.nanos.logger.StdoutLogger;
 import foam.nanos.script.Script;
 import foam.nanos.session.Session;
 import static foam.mlang.MLang.EQ;
@@ -28,6 +31,9 @@ public class Boot {
   }
 
   public Boot(String datadir) {
+    Logger logger = new ProxyLogger(new StdoutLogger());
+    root_.put("logger", logger);
+
     if ( datadir == null || datadir == "" ) {
       datadir = System.getProperty("JOURNAL_HOME");
     }
@@ -44,7 +50,7 @@ public class Boot {
       @Override
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
-        System.out.println("Registering: " + sp.getName());
+        logger.info("Registering:", sp.getName());
         root_.putFactory(sp.getName(), new SingletonFactory(new NSpecFactory((ProxyX) root_, sp)));
       }
     });
@@ -63,7 +69,7 @@ public class Boot {
       public void put(Object obj, Detachable sub) {
         NSpec sp = (NSpec) obj;
 
-        System.out.println("Starting: " + sp.getName());
+        logger.info("Starting:", sp.getName());
         root_.get(sp.getName());
       }
     });
