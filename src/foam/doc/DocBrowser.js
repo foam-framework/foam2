@@ -1375,9 +1375,20 @@ foam.CLASS({
     },
 
     function addRelatedto( x, y, w, h ) {
-      var d = 400;
+      var d = this.conventionalUML ? 400 : 300;
       var d1 = 200;
       var cls = this.data;
+      //just to avoid the overlap
+      var path = cls.id;
+      var req = Object.values(foam.USED).
+      filter( function ( cls ) {
+        return cls.model_.requires && cls.model_.requires.map(
+          function ( r ) {
+            return r.path;
+          }).includes(path);
+      });
+      d1+=(req.length * (h || 30)) +20;
+     
       var targetM =  [];
       var recursiveM ;
       if ( cls.getAxioms( foam.dao.Relationship ) !== undefined ) {
@@ -1391,6 +1402,7 @@ foam.CLASS({
             }
           }
         }
+
         var relatedtoline;
         if ( recursiveM !== undefined ) {
             a = recursiveM;
@@ -1399,7 +1411,7 @@ foam.CLASS({
               yCoordinates: [ y, y, y - 20, y - 20, y ],
               color: 'black'
           } );
-          x = x + 10;
+          
           var arrowRelatedto = this.arrowEnd( x, y, Math.PI );
           var cardinalityToNameLabel;
           if ( a.cardinality !== 'undefined' ) {
@@ -1470,10 +1482,21 @@ foam.CLASS({
 
     function addRelatedFrom( x, y, w, h ) {
       var marge = 45;
-      var d = -400;
+      var d = this.conventionalUML ? -400 : -300;
       var d1 = 210;
       var cls = this.data;
       var axeX = x + d;
+      //just to avoid the overlap????
+      var path = cls.id;
+      var req = Object.values(foam.USED).
+      filter( function ( cls ) {
+        return cls.model_.requires && cls.model_.requires.map(
+          function ( r ) {
+            return r.path;
+          }).includes(path);
+      });
+      d1+=(req.length * (h || 30)) +20;
+        
       var axeY = y + d1;
 
       var targetM =  [];
@@ -1490,7 +1513,8 @@ foam.CLASS({
               targetM.push(a);
             }
           }
-        }
+        }  
+
         if ( recursiveM !== undefined ) {
             a=recursiveM;
           relatedtoline = foam.graphics.Polygon.create( {
@@ -1498,7 +1522,7 @@ foam.CLASS({
               yCoordinates: [ y, y, y - 20, y - 20, y ],
               color: 'black'
           } );
-          x = x + 10;
+          
           var arrowRelatedto = this.arrowEnd( x, y, Math.PI );
           var cardinalityToNameLabel;
           if ( a.cardinality !== 'undefined' ) {
