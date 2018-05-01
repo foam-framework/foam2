@@ -63,6 +63,9 @@ public class Boot {
     // Export the ServiceDAO
     ((ProxyDAO) root_.get("nSpecDAO")).setDelegate(
         new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", false, serviceDAO_)));
+    // 'read' authenticated version - for dig and docs
+    ((ProxyDAO) root_.get("AuthenticatedNSpecDAO")).setDelegate(
+        new foam.dao.PMDAO(new foam.dao.AuthenticatedDAO("service", true, (DAO) root_.get("nSpecDAO"))));
 
     serviceDAO_.where(EQ(NSpec.LAZY, false)).select(new AbstractSink() {
       @Override

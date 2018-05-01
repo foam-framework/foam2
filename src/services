@@ -1,4 +1,5 @@
 p({"class":"foam.nanos.boot.NSpec", "name":"nSpecDAO",                         "lazy":true,  "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
+p({"class":"foam.nanos.boot.NSpec", "name":"AuthenticatedNSpecDAO",                         "lazy":true,  "serve":true,  "serviceClass":"foam.dao.ProxyDAO", "client":"{\"of\":\"foam.nanos.boot.NSpec\",\"cache\":true}"})
 p({"class":"foam.nanos.boot.NSpec", "name":"http",                             "lazy":false, "serve":false, "serviceClass":"foam.nanos.http.NanoHttpServer"})
 p({"class":"foam.nanos.boot.NSpec", "name":"httprouter",                       "lazy":true,  "serve":false, "serviceClass":"foam.nanos.http.NanoRouter"})
 p({"class":"foam.nanos.boot.NSpec", "name":"websockets",                       "lazy":false, "serve":false, "serviceClass":"foam.nanos.ws.NanoWebSocketServer"})
