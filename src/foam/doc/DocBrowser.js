@@ -466,6 +466,8 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'conventionalUML',
+      // this property will allow to switch from the conventional UML diagram (diagram contain
+      // a set of properties ) to UML ++ diagram ( and vice versa ).
       value: true
     },
     {
@@ -1391,7 +1393,7 @@ foam.CLASS({
         }
         var relatedtoline;
         if ( recursiveM !== undefined ) {
-            a=recursiveM;
+            a = recursiveM;
           relatedtoline = foam.graphics.Polygon.create( {
               xCoordinates: [ x, x - 20, x - 20, x + 10, x + 10 ],
               yCoordinates: [ y, y, y - 20, y - 20, y ],
@@ -1416,7 +1418,7 @@ foam.CLASS({
         }
         if ( targetM !== undefined ) {
           for ( var key in targetM ) {//cls.getAxiomsByClass( foam.dao.Relationship )
-            a=targetM[key];
+            a = targetM[key];
             var relatedtoName = this.Box.create( {
               x: x + d,
               y: y + d1 + 5 * ( key + 1 ),
