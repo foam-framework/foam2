@@ -11,24 +11,24 @@ foam.CLASS({
  
   properties: [
     {
-      name: 'discardError',
+      name: 'logError',
       class: 'Boolean',
-      value: false
+      value: true
     },
     {
-      name: 'discardWarning',
+      name: 'logWarning',
       class: 'Boolean',
-      value: false
+      value: true
     },
     {
-      name: 'discardInfo',
+      name: 'logInfo',
       class: 'Boolean',
-      value: false
+      value: true
     },
     {
-      name: 'discardDebug',
+      name: 'logDebug',
       class: 'Boolean',
-      value: false
+      value: true
     }
   ],
 
@@ -43,7 +43,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-  if ( ! getDiscardError() ) {
+  if ( getLogError() ) {
     getDelegate().error(args);
   }
 `
@@ -58,7 +58,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-  if ( ! getDiscardWarning() ) {
+  if ( getLogWarning() ) {
     getDelegate().warning(args);
   }
 `
@@ -73,7 +73,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-  if ( ! getDiscardInfo() ) {
+  if ( getLogInfo() ) {
     getDelegate().info(args);
   }
 `
@@ -88,7 +88,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-  if ( ! getDiscardDebug() ) {
+  if ( getLogDebug() ) {
     getDelegate().debug(args);
   }
 `
