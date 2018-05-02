@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 foam.CLASS({
   package: 'foam.doc',
   name: 'DocBorder',
@@ -125,27 +126,23 @@ foam.CLASS({
   extends: 'foam.u2.View',
 
   requires: [
-    'foam.doc.DocBorder',
-    'foam.doc.ClassLink'
+    'foam.doc.ClassLink',
+    'foam.doc.DocBorder'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ a {
-          display: inline-block;
-          padding: 2px;
-          width: 200px;
-        }
-        ^package {
-          font-weight: 700;
-        }
-        ^indent {
-          margin-left: 30px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ a {
+      display: inline-block;
+      padding: 2px;
+      width: 200px;
+    }
+    ^package {
+      font-weight: 700;
+    }
+    ^indent {
+      margin-left: 30px;
+    }
+  `,
 
   properties: [
     'title',
@@ -170,7 +167,8 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-      var pkg = '';
+      var pkg  = '';
+
       this.
         addClass(this.myClass()).
         start(this.DocBorder, {title: this.title, info$: this.info$}).
@@ -366,9 +364,9 @@ foam.CLASS({
   documentation: 'FOAM documentation browser.',
 
   requires: [
-    'foam.doc.DocBorder',
-    'foam.doc.ClassList',
     'foam.doc.ClassDocView',
+    'foam.doc.ClassList',
+    'foam.doc.DocBorder',
     'foam.doc.UMLDiagram'
   ],
 
@@ -376,29 +374,25 @@ foam.CLASS({
 
   exports: [
     'as data',
-    'path as browserPath',
     'axiom as selectedAxiom',
-    'showInherited',
     'conventionalUML',
+    'path as browserPath',
+    'showInherited',
     'showOnlyProperties'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          font-family: roboto, arial;
-          color: #555;
-        }
-        ^ th {
-          color: #555;
-        }
-        ^ td {
-          padding-right: 12px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      font-family: roboto, arial;
+      color: #555;
+    }
+    ^ th {
+      color: #555;
+    }
+    ^ td {
+      padding-right: 12px;
+    }
+  `,
 
   constants: {
     MODEL_COMPARATOR: foam.compare.compound([foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare
@@ -559,8 +553,8 @@ foam.CLASS({
   name: 'DocBrowserWindow',
 
   requires: [
-    'foam.doc.DocBrowser',
-    'foam.core.Window'
+    'foam.core.Window',
+    'foam.doc.DocBrowser'
   ],
 
   imports: [ 'window' ],
@@ -608,14 +602,15 @@ foam.CLASS({
     'browserPath' ,
     'conventionalUML'
   ],
+
   requires: [
-    'foam.graphics.Transform',
-    'foam.graphics.Label',
-    'foam.graphics.Box',
-    'foam.u2.PopupView',
+    'foam.doc.ClassLink',
     'foam.doc.DocBorder',
     'foam.doc.Link',
-    'foam.doc.ClassLink'
+    'foam.graphics.Box',
+    'foam.graphics.Label',
+    'foam.graphics.Transform',
+    'foam.u2.PopupView'
   ],
 
   exports: [ 'as data' ],
@@ -625,7 +620,7 @@ foam.CLASS({
     UNSELECTED_COLOR: '#FFFFCC'
   },
 
-  css:`
+  css: `
     ^ {
       width: 1200px;
       margin: 20px;
@@ -643,6 +638,7 @@ foam.CLASS({
       width: 400px;
     }
  `,
+
   properties: [
     'feedback_',
     {
@@ -697,9 +693,10 @@ foam.CLASS({
   methods: [
     function initE() {
       var data = this.data;
-      this.className = this.data.name;
+      this.className  = this.data.name;
       this.elementMap = new Map();
       this.properties = this.getAllProperties( data );
+
       if ( this.properties.length > 10 ) this.canvas.height = this.properties.length * 60 + 800;
       this.widthCenterModel = this.conventionalUML ? 370 : 200;
 
@@ -1035,6 +1032,7 @@ foam.CLASS({
         }
       }
     },
+
     function getAllProperties( data ) {
       var prop=[];
       for ( var key in data.axiomMap_ ) {
@@ -1375,20 +1373,20 @@ foam.CLASS({
     },
 
     function addRelatedto( x, y, w, h ) {
-      var d = this.conventionalUML ? 400 : 300;
-      var d1 = 200;
-      var cls = this.data;
+      var d    = this.conventionalUML ? 400 : 300;
+      var d1   = 200;
+      var cls  = this.data;
       //just to avoid the overlap
       var path = cls.id;
-      var req = Object.values(foam.USED).
+      var req  = Object.values(foam.USED).
       filter( function ( cls ) {
         return cls.model_.requires && cls.model_.requires.map(
           function ( r ) {
             return r.path;
           }).includes(path);
       });
-      d1+=(req.length * (h || 30)) +20;
-     
+      d1 += (req.length * (h || 30)) + 20;
+
       var targetM =  [];
       var recursiveM ;
       if ( cls.getAxioms( foam.dao.Relationship ) !== undefined ) {
@@ -1411,7 +1409,7 @@ foam.CLASS({
               yCoordinates: [ y, y, y - 20, y - 20, y ],
               color: 'black'
           } );
-          
+
           var arrowRelatedto = this.arrowEnd( x, y, Math.PI );
           var cardinalityToNameLabel;
           if ( a.cardinality !== 'undefined' ) {
@@ -1480,23 +1478,24 @@ foam.CLASS({
       }
     },
 
-    function addRelatedFrom( x, y, w, h ) {
+    function addRelatedFrom(x, y, w, h) {
       var marge = 45;
-      var d = this.conventionalUML ? -400 : -300;
-      var d1 = 210;
-      var cls = this.data;
-      var axeX = x + d;
+      var d     = this.conventionalUML ? -400 : -300;
+      var d1    = 210;
+      var cls   = this.data;
+      var axeX  = x + d;
       //just to avoid the overlap????
-      var path = cls.id;
-      var req = Object.values(foam.USED).
+      var path  = cls.id;
+      var req   = Object.values(foam.USED).
       filter( function ( cls ) {
         return cls.model_.requires && cls.model_.requires.map(
           function ( r ) {
             return r.path;
           }).includes(path);
       });
-      d1+=(req.length * (h || 30)) +20;
-        
+
+      d1 += (req.length * (h || 30)) +20;
+
       var axeY = y + d1;
 
       var targetM =  [];
@@ -1513,16 +1512,16 @@ foam.CLASS({
               targetM.push(a);
             }
           }
-        }  
+        }
 
         if ( recursiveM !== undefined ) {
-            a=recursiveM;
-          relatedtoline = foam.graphics.Polygon.create( {
-              xCoordinates: [ x, x - 20, x - 20, x + 10, x + 10 ],
-              yCoordinates: [ y, y, y - 20, y - 20, y ],
-              color: 'black'
-          } );
-          
+          a = recursiveM;
+          relatedtoline = foam.graphics.Polygon.create({
+            xCoordinates: [ x, x - 20, x - 20, x + 10, x + 10 ],
+            yCoordinates: [ y, y, y - 20, y - 20, y ],
+            color: 'black'
+          });
+
           var arrowRelatedto = this.arrowEnd( x, y, Math.PI );
           var cardinalityToNameLabel;
           if ( a.cardinality !== 'undefined' ) {
@@ -1542,7 +1541,7 @@ foam.CLASS({
 
         if ( targetM !== undefined ) {
           for ( var key in targetM ) {
-            a=targetM[key];
+            a = targetM[key];
             axeY = axeY + marge;
             var RelatedFromName = foam.graphics.Box.create( {
                 x: axeX,
@@ -1596,7 +1595,7 @@ foam.CLASS({
     //************** not supported yet **************************
 
     function addExports(x, y, w, h) {
-      var d = 100;
+      var d   = 100;
       var cls = this.data;
       if ( cls.model_.exports !== undefined ) {
         for ( var key in cls.model_.exports ) {
@@ -1638,7 +1637,7 @@ foam.CLASS({
     },
 
     function addImports(x, y, w, h) {
-      var d = 100;
+      var d   = 100;
       var cls = this.data;
       if ( cls.model_.imports !== undefined ) {
         for ( var key in cls.model_.imports ) {
@@ -1680,9 +1679,9 @@ foam.CLASS({
 
   listeners: [
     function onClick( evt ) {
-      var x = evt.offsetX,
-        y = evt.offsetY;
-      var c = this.canvas.findFirstChildAt(x, y);
+      var x  = evt.offsetX;
+      var y  = evt.offsetY;
+      var c  = this.canvas.findFirstChildAt(x, y);
       var xc = c.instance_.x;
       var yc = c.instance_.y;
 
