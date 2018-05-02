@@ -4,71 +4,72 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+ 
 foam.CLASS({
-    package: 'foam.nanos.logger',
-    name: 'RepeatLogger',
-    extends: 'foam.nanos.logger.ProxyLogger',
+  package: 'foam.nanos.logger',
+  name: 'DiscardLogger',
+  extends: 'foam.nanos.logger.ProxyLogger',
+  properties: [
+    {
+      class: 'Object',
+      name: 'lastUniqueObject',
+      value: null
+    },
+    {
+      class: 'Int',
+      name: 'repeatCount',
+      value: 0
+    }
+  ],
 
-    documentation: `takes a stream of log objects, passes unique objects to 
-                    proxylogger, otherwise counts and prints number of repeats`,
-   
-    properties: [
-      {
-        class: 'Object',
-        name: 'lastUniqueObject',
-      },
-      {
-        class: 'int',
-        name: 'repeatCount',
-      }
-    ],
-  
-    methods: [
-      {
-        name: 'info',
-        args: [
-          {
-            name: 'args',
-            javaType: 'Object...'
-          }
-        ],
-        javaReturns: 'void',
-        javaCode: `
-          if ( ! repeatedLog(lastUniqueObject,args) ) {
-            if (repeatCount > 1){
-              getDelegate.info("the last message was repeated" + repeatCount + "times")
+  methods: [
+    {
+      name: 'info',
+      args:[
+        {
+          name: 'args',
+          javaType: 'Object...',
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+        if ( getLastUniqueObject() == null){
+          setLastUniqueObject(args);
+          setRepeatCount(1);  
+          getDelegate().info(args);
+          System.err.println(getRepeatCount());
+        }
+        else {
+          Object[] o = (Object[]) getLastUniqueObject();
+          if ( ! (args.length == o.length ) ){
+            if (getRepeatCount() > 1){
+              getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
             }
-          repeatCount = 1
-          lastUniqueObject = args
-          getDelegate().info(args)
-          else {
-            repeatCount++
-            }
-          `
-      },
-      {....
-      },
-      {
-        name: 'repeatedLog',
-        args:[
-          {
-            class: 'Object...',
-            name: 'Object1'
-          },
-          {
-            class: 'Object...',
-            name: 'Object2'
+            setLastUniqueObject(args);
+            setRepeatCount(1);        
+            getDelegate().info(args);
+            System.err.println(getLastUniqueObject());
           }
-        ],
-        javaReturns: 'boolean',
-        javaCode: `
-        return (Object1.length == Object2.length) || 
-           (Object1.hashCode() == Object2.hashCode())
-        `
+          else{
+            for ( int i = 0; i < args.length; i ++) {
+              if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
+                if (getRepeatCount() > 1){
+                  getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
+                }
+              setLastUniqueObject(args);
+              setRepeatCount(1);
+              getDelegate().info(args);
+              return;        
+              } 
+            }
+            setRepeatCount(getRepeatCount()+1);
+          }
+        }
+      `
+    }
 
-      }
-    ]
-  
-  });
-  
-  
+  ]
+});
+ 
+// abstract out logic for when a new error/ old error is encountered
+// implement hashcode to check instead of equals
