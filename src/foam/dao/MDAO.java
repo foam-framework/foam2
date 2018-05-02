@@ -53,11 +53,17 @@ public class MDAO
     index_ = new AltIndex(new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id")));
   }
 
-  public void addIndex(PropertyInfo prop) {
-    index_.addIndex(new TreeIndex(prop));
+  public void addUniqueIndex(PropertyInfo prop) {
+    index_.addIndex(new TreeIndex(prop, new TreeIndex((PropertyInfo) this.of_.getAxiomByName("id"))));
   }
 
-  public void addIndex(Index index) { index_.addIndex(index);}
+  public void addIndex(Index index) {
+    index_.addIndex(index);
+  }
+
+  public void addIndex(PropertyInfo... props) {
+    for ( PropertyInfo prop : props ) addUniqueIndex(prop);
+  }
 
   public FObject put_(X x, FObject obj) {
     FObject oldValue = find(obj);
@@ -103,7 +109,7 @@ public class MDAO
     //Whe did or logic by seperate request from MDAO. We return different plan for each parameter of OR logic.
     if ( simplePredicate instanceof Or ) {
       Sink dependSink = new ArraySink();
-      // When we have groupBy, order, skip, limit such requirement, we can't do it saparately so I replace a array sink to temporarily holde the whole data
+      // When we have groupBy, order, skip, limit such requirement, we can't do it separately so I replace a array sink to temporarily holde the whole data
       //Then after the plan wa slelect we change it to the origin sink
       int length = ( (Or) simplePredicate ).getArgs().length;
       List<Plan> planList = new ArrayList<>();
