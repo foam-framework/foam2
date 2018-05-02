@@ -152,7 +152,8 @@ foam.CLASS({
         this.addContent();
         this.action && this.action.maybeCall(this.__subContext__, this.data);
       }
-
+      
+      e.preventDefault();
       e.stopPropagation();
     },
     {
