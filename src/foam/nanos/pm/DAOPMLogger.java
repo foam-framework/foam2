@@ -16,6 +16,13 @@ public class DAOPMLogger
   public final static String SERVICE_NAME = "pmLogger";
   public final static String DAO_NAME     = "pmInfoDAO";
 
+  protected final Object[] locks_ = new Object[128];
+
+  protected Object getLock(PMInfo pmi) {
+    int hash = pmi.getClsName().hashCode() * 31 + pmi.getPmName().hashCode();
+    return locks_[(int)(hash%locks_.length)];
+  }
+
   @Override
   public void log(PM pm) {
     if ( pm.getClassType().getName().toLowerCase().indexOf("pm") != -1 ) return;
@@ -27,24 +34,26 @@ public class DAOPMLogger
 
     DAO pmd = (DAO) getX().get(DAO_NAME);
 
-    PMInfo dpmi = (PMInfo) pmd.find(pmi);
-    if ( dpmi == null ) {
-      pmi.setMinTime(pm.getTime());
-      pmi.setMaxTime(pm.getTime());
-      pmi.setTotalTime(pm.getTime());
-      pmi.setCount(1);
+    synchronized ( getLock(pmi) ) {
+      PMInfo dpmi = (PMInfo) pmd.find(pmi);
+      if ( dpmi == null ) {
+        pmi.setMinTime(pm.getTime());
+        pmi.setMaxTime(pm.getTime());
+        pmi.setTotalTime(pm.getTime());
+        pmi.setCount(1);
 
-      pmd.put(pmi);
-    } else {
-      if ( pm.getTime() < dpmi.getMinTime() )
-        dpmi.setMinTime(pm.getTime());
+        pmd.put(pmi);
+      } else {
+        if ( pm.getTime() < dpmi.getMinTime() )
+          dpmi.setMinTime(pm.getTime());
 
-      if ( pm.getTime() > dpmi.getMaxTime() )
-        dpmi.setMaxTime(pm.getTime());
+        if ( pm.getTime() > dpmi.getMaxTime() )
+          dpmi.setMaxTime(pm.getTime());
 
-      dpmi.setCount(dpmi.getCount() + 1);
-      dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
-      pmd.put(dpmi);
+        dpmi.setCount(dpmi.getCount() + 1);
+        dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
+        pmd.put(dpmi);
+      }
     }
   }
 }
