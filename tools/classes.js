@@ -44,6 +44,7 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.box.Box',
   'foam.box.Skeleton',
+  'foam.box.AbstractSkeleton',
   'foam.box.ProxyBox',
   'foam.box.SubBox',
   'foam.box.Message',
