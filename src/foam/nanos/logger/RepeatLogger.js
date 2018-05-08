@@ -88,10 +88,37 @@ foam.CLASS({
                     setLastLogLevel(LogLevel.ERROR);
                   }
                 break;
-                  
                 }
               }
     `  
+    },
+    {
+      name: 'logLastLogRepeats',
+   
+      javaReturns: 'void',
+      javaCode: 
+      `
+      switch ( getLastLogLevel() ) {
+        case DEBUG: {
+          getDelegate().debug("The last log was repeated " + getRepeatCount() + " times" );
+          break;
+        }
+        case INFO:  {
+          getDelegate().info("The last log was repeated "+ getRepeatCount()  + " times" );
+          break;
+        }
+        case WARNING:  {
+          getDelegate().warning("The last log was repeated "+ getRepeatCount()  + " times" );
+          break;      
+        }        
+        case ERROR:  {
+          getDelegate().error("The last log was repeated " + getRepeatCount() + " times" );
+          break;
+        }
+      }     
+      `
+
+
     },
 
     {
@@ -110,31 +137,10 @@ foam.CLASS({
       javaCode: `
         if (! getLastLogLevel().toString().equalsIgnoreCase(logLevelName)){
               if (getRepeatCount() > 1){
-
-                switch ( getLastLogLevel() ) {
-                  case DEBUG: {
-                    getDelegate().debug("previous count repeated " + getRepeatCount() +" times");
-                    break;
-                  }
-                  case INFO:  {
-                    getDelegate().info("previous count repeated " + getRepeatCount() +" times");
-                    break;
-                  }
-                  case WARNING:  {
-                    getDelegate().warning("previous count repeated " + getRepeatCount() +" times");
-                    break;      
-                  }        
-                  case ERROR:  {
-                    getDelegate().error("previous count repeated " + getRepeatCount() +" times");
-                    break;
-                  }
-                }     
-                 
+                logLastLogRepeats();   
               }
-              
               newLogHandler(logLevelName,true,args);
               return;
-              // ;
             };
             
 
@@ -142,12 +148,11 @@ foam.CLASS({
           newLogHandler(logLevelName,false,args);
           }
             else {
-
                 Object[] o = (Object[]) getLastUniqueObject();
                 if ( ! (args.length == o.length ) ){
                   // Different Message
                   if (getRepeatCount() > 1){
-                    getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
+                    logLastLogRepeats();   
                   }
                   newLogHandler(logLevelName,false,args);
                 }
@@ -156,7 +161,7 @@ foam.CLASS({
                   for ( int i = 0; i < args.length; i ++) {
                     if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
                       if (getRepeatCount() > 1){
-                        getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
+                        logLastLogRepeats();   
                       }
                       newLogHandler(logLevelName,false,args);
                     return;        
@@ -165,11 +170,7 @@ foam.CLASS({
                   setRepeatCount(getRepeatCount()+1);
                 }
               }
-
-
-     
             `
-    
     },
     {
       name: 'debug',
@@ -215,7 +216,6 @@ foam.CLASS({
       String logLevelName = new String("warning");
       repeatLogConstructor(logLevelName,args);
       `
-    
     },
     {
       name: 'error',
@@ -231,8 +231,6 @@ foam.CLASS({
       repeatLogConstructor(logLevelName,args);
       `
     }
-
-
   ]
 });
  
