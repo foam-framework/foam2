@@ -72,6 +72,9 @@ public class MDAO
       state_ = index_.remove(state_, oldValue);
     }
 
+    obj = obj.fclone();
+    obj.freeze();
+
     state_ = index_.put(state_, obj);
 
     return obj;

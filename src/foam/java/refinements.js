@@ -117,6 +117,15 @@ foam.CLASS({
       })
     },
 
+    function generateSetter_() {
+      return this.javaSetter ? this.javaSetter :
+        `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+assert${foam.String.capitalize(this.name)}(val);
+${this.name}_ = val;
+${this.name}IsSet_ = true;
+`;
+    },
+
     function buildJavaClass(cls) {
       if ( ! this.generateJava ) return;
 
@@ -132,7 +141,6 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
-      var assertName = 'assert' + capitalized;
 
       cls.
         field({
@@ -167,8 +175,7 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: assertName + '(val);\n' +
-            ( this.javaSetter || ( privateName + ' = val;\n' + isSet + ' = true;' ) )
+          body: this.generateSetter_()
         });
 
       if ( this.javaFactory ) {
@@ -181,7 +188,7 @@ foam.CLASS({
       }
 
       cls.method({
-        name: assertName,
+        name: 'assert' + foam.String.capitalize(this.name),
         visibility: 'public',
         args: [
           {
@@ -262,6 +269,7 @@ foam.LIB({
       cls.abstract = this.model_.abstract;
 
       cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+
       cls.method({
         name: 'getClassInfo',
         type: 'foam.core.ClassInfo',
@@ -832,6 +840,13 @@ foam.CLASS({
           cls.extends = this.extends;
           cls.values = this.VALUES;
 
+          cls.field({
+            name: '__frozen__',
+            visibility: 'protected',
+            type: 'boolean',
+            initializer: 'false'
+          });
+          
           var axioms = this.getAxioms();
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
