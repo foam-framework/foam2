@@ -33,6 +33,160 @@ foam.CLASS({
 
   methods: [
     {
+        name: 'newLogHandler',
+        args: [ 
+          {
+          name: 'logLevelName',
+          javaType: 'String'
+          },
+          {
+            name: 'setLastLogLevel',
+            javaType: 'Boolean'
+          },
+          {
+            name: 'args',
+            javaType: 'Object...',
+          },
+
+        ],
+        javaReturns: 'void',
+        javaCode: `
+        switch ( logLevelName ) {
+          case "debug": {
+              setRepeatCount(1);
+              setLastUniqueObject(args);
+              getDelegate().debug(args);  
+              if (setLastLogLevel){
+                setLastLogLevel(LogLevel.DEBUG);
+              break;
+          }
+              }
+              case "info":  {
+                setRepeatCount(1);
+                setLastUniqueObject(args);
+                getDelegate().info(args);  
+                if (setLastLogLevel){
+                  setLastLogLevel(LogLevel.INFO);
+                }
+                break;
+              }
+              case "warning":  {
+                setRepeatCount(1);
+                setLastUniqueObject(args);
+                getDelegate().warning(args);  
+                if (setLastLogLevel){
+                  setLastLogLevel(LogLevel.WARNING);
+                }
+                break;
+                
+                }     
+                case "error":  {
+                  setRepeatCount(1);
+                  setLastUniqueObject(args);
+                  getDelegate().error(args);  
+                  if (setLastLogLevel){
+                    setLastLogLevel(LogLevel.ERROR);
+                  }
+                break;
+                  
+                }
+              }
+    `  
+    },
+
+    {
+      name: 'repeatLogConstructor',
+      args: [ 
+        {
+        name: 'logLevelName',
+        javaType: 'String'
+        },
+        {
+          name: 'args',
+          javaType: 'Object...',
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+        if (! getLastLogLevel().toString().equalsIgnoreCase(logLevelName)){
+              if (getRepeatCount() > 1){
+
+                switch ( getLastLogLevel() ) {
+                  case DEBUG: {
+                    getDelegate().debug("previous count repeated " + getRepeatCount() +" times");
+                    break;
+                  }
+                  case INFO:  {
+                    getDelegate().info("previous count repeated " + getRepeatCount() +" times");
+                    break;
+                  }
+                  case WARNING:  {
+                    getDelegate().warning("previous count repeated " + getRepeatCount() +" times");
+                    break;      
+                  }        
+                  case ERROR:  {
+                    getDelegate().error("previous count repeated " + getRepeatCount() +" times");
+                    break;
+                  }
+                }     
+                 
+              }
+              
+              newLogHandler(logLevelName,true,args);
+              return;
+              // ;
+            };
+            
+
+        if ( getLastUniqueObject() == null){
+          newLogHandler(logLevelName,false,args);
+          }
+            else {
+
+                Object[] o = (Object[]) getLastUniqueObject();
+                if ( ! (args.length == o.length ) ){
+                  // Different Message
+                  if (getRepeatCount() > 1){
+                    getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
+                  }
+                  newLogHandler(logLevelName,false,args);
+                }
+             
+               else{
+                  for ( int i = 0; i < args.length; i ++) {
+                    if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
+                      if (getRepeatCount() > 1){
+                        getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
+                      }
+                      newLogHandler(logLevelName,false,args);
+                    return;        
+                    } 
+                  }
+                  setRepeatCount(getRepeatCount()+1);
+                }
+              }
+
+
+     
+            `
+    
+    },
+    {
+      name: 'debug',
+      args:[
+        {
+          name: 'args',
+          javaType: 'Object...',
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+      String logLevelName = new String("debug");
+      repeatLogConstructor(logLevelName,args);
+      `
+    
+    },
+    {
       name: 'info',
       args:[
         {
@@ -42,72 +196,26 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-      if ( getLastLogLevel() != LogLevel.INFO){
-          if (getRepeatCount() > 1){
-            switch ( getLastLogLevel() ) {
-              case DEBUG: {
-                getDelegate().debug("previous count repeated " + getRepeatCount() +" times");
-                break;
-              }
-              case INFO:  {
-                getDelegate().info("previous count repeated " + getRepeatCount() +" times");
-                break;
-              }
-              case WARNING:  {
-                getDelegate().warning("previous count repeated " + getRepeatCount() +" times");
-                break;      
-              }        
-              case ERROR:  {
-                getDelegate().error("previous count repeated " + getRepeatCount() +" times");
-                break;
-              }
-            }      
-          setRepeatCount(1);
-          setLastUniqueObject(args);
-          setLastLogLevel(LogLevel.INFO);
-          getDelegate().info(args);          
-          return;
-        };
+      String logLevelName = new String("info");
+      repeatLogConstructor(logLevelName,args);
+      `
+    
+    },
+
+    {
+      name: 'warning',
+      args:[
+        {
+          name: 'args',
+          javaType: 'Object...',
         }
-
-
-        if ( getLastUniqueObject() == null){
-          setLastUniqueObject(args);
-          setRepeatCount(1);  
-          getDelegate().info(args);
-
-        }
-
-
-        else {
-          Object[] o = (Object[]) getLastUniqueObject();
-          if ( ! (args.length == o.length ) ){
-            // Different Message
-            if (getRepeatCount() > 1){
-              getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
-            }
-            setLastUniqueObject(args);
-            setRepeatCount(1);        
-            getDelegate().info(args);
-            // System.err.println(getLastUniqueObject());
-          }
-          else{
-            for ( int i = 0; i < args.length; i ++) {
-              if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
-                if (getRepeatCount() > 1){
-                  getDelegate().info("previous count repeated " + getRepeatCount() +" times");             
-                }
-              setLastUniqueObject(args);
-              setRepeatCount(1);
-              getDelegate().info(args);
-              return;        
-              } 
-            }
-            setRepeatCount(getRepeatCount()+1);
-          }
-        }
-      
-       `
+      ],
+      javaReturns: 'void',
+      javaCode: `
+      String logLevelName = new String("warning");
+      repeatLogConstructor(logLevelName,args);
+      `
+    
     },
     {
       name: 'error',
@@ -119,72 +227,9 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-      if ( getLastLogLevel() != LogLevel.ERROR){
-          if (getRepeatCount() > 1){
-            switch ( getLastLogLevel() ) {
-              case DEBUG: {
-                getDelegate().debug("previous count repeated " + getRepeatCount() +" times");
-                break;
-              }
-              case INFO:  {
-                getDelegate().info("previous count repeated " + getRepeatCount() +" times");
-                break;
-              }
-              case WARNING:  {
-                getDelegate().warning("previous count repeated " + getRepeatCount() +" times");
-                break;     
-              }         
-              case ERROR:  {
-                getDelegate().error("previous count repeated " + getRepeatCount() +" times");
-                break;
-              }
-            }      
-          setRepeatCount(1);
-          setLastUniqueObject(args);
-          setLastLogLevel(LogLevel.ERROR);
-          getDelegate().error(args);
-          return;          
-          };
-        }
-
-
-        if ( getLastUniqueObject() == null){
-          setLastUniqueObject(args);
-          setRepeatCount(1);  
-          getDelegate().error(args);
-
-        }
-
-
-        else {
-          Object[] o = (Object[]) getLastUniqueObject();
-          if ( ! (args.length == o.length ) ){
-            // Different Message
-            if (getRepeatCount() > 1){
-              getDelegate().error("previous count repeated " + getRepeatCount() +" times");             
-            }
-            setLastUniqueObject(args);
-            setRepeatCount(1);        
-            getDelegate().error(args);
-            // System.err.println(getLastUniqueObject());
-          }
-          else{
-            for ( int i = 0; i < args.length; i ++) {
-              if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
-                if (getRepeatCount() > 1){
-                  getDelegate().error("previous count repeated " + getRepeatCount() +" times");             
-                }
-              setLastUniqueObject(args);
-              setRepeatCount(1);
-              getDelegate().error(args);
-              return;        
-              } 
-            }
-            setRepeatCount(getRepeatCount()+1);
-          }
-        }
-      
-       `
+      String logLevelName = new String("error");
+      repeatLogConstructor(logLevelName,args);
+      `
     }
 
 
