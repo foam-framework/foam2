@@ -125,6 +125,8 @@ public class MDAO
       plan = index_.planSelect(state_, sink, skip, limit, order, simplePredicate);
     }
 
+    // TODO: if plan cost is >= size, log a warning
+    
     plan.select(state_, sink, skip, limit, order, simplePredicate);
 
     return sink;
