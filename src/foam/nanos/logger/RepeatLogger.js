@@ -4,13 +4,13 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
- 
+
 foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'DiscardLogger',
   extends: 'foam.nanos.logger.ProxyLogger',
   requires: [
-    'foam.nanos.logger.LogLevel',
+    'foam.nanos.logger.LogLevel'
   ],
   properties: [
     {
@@ -31,7 +31,6 @@ foam.CLASS({
       javaFactory: `return foam.nanos.logger.LogLevel.INFO;`
     }
   ],
-
   methods: [
     {
         name: 'newLogHandler',
@@ -46,9 +45,8 @@ foam.CLASS({
           },
           {
             name: 'args',
-            javaType: 'Object...',
+            javaType: 'Object...'
           },
-
         ],
         javaReturns: 'void',
         javaCode: `
@@ -124,7 +122,6 @@ foam.CLASS({
         {
         name: 'logLevelName',
         javaType: 'Enum'
-        // what is java enum type?
         },
         {
           name: 'args',
@@ -142,35 +139,33 @@ foam.CLASS({
               return;
             };
             
-
         if ( getLastUniqueObject() == null){
           newLogHandler(logLevelName,false,args);
           }
-            else {
-                Object[] o = (Object[]) getLastUniqueObject();
-                if ( ! (args.length == o.length ) ){
-                  // Different Message
-                  if (getRepeatCount() > 1){
-                    logLastLogRepeats();   
-                  }
-                  newLogHandler(logLevelName,false,args);
-                }
+        else {
+          Object[] o = (Object[]) getLastUniqueObject();
+          if ( ! (args.length == o.length ) ){
+            // Different Message
+            if (getRepeatCount() > 1){
+              logLastLogRepeats();   
+            }
+            newLogHandler(logLevelName,false,args);
+          }
              
-               else{
-                  for ( int i = 0; i < args.length; i ++) {
-                    if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
-                      if (getRepeatCount() > 1){
-                        logLastLogRepeats();   
-                      }
-                      newLogHandler(logLevelName,false,args);
-                    return;        
-                    } 
-                  }
-                  setRepeatCount(getRepeatCount()+1);
+          else{
+            for ( int i = 0; i < args.length; i ++) {
+              if  ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) )  ) {
+                if (getRepeatCount() > 1){
+                  logLastLogRepeats();   
                 }
-              }
-        ;
-            `
+                newLogHandler(logLevelName,false,args);
+                return;        
+              } 
+            }
+            setRepeatCount(getRepeatCount()+1);
+          }
+        }
+      `
     },
     {
       name: 'debug',
@@ -199,9 +194,7 @@ foam.CLASS({
       Enum logLevelName = LogLevel.INFO;
       repeatLogConstructor(logLevelName,args);
       `
-    
     },
-
     {
       name: 'warning',
       args:[
@@ -233,5 +226,4 @@ foam.CLASS({
   ]
 });
  
-// abstract out logic for when a new error/ old error is encountered
 // implement hashcode to check instead of equals
