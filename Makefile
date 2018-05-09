@@ -28,6 +28,35 @@ foam2_MAVEN_DEPS = \
 	org.bouncycastle:bcpkix-jdk15on:1.57 \
 	org.bouncycastle:bcprov-jdk15on:1.57 \
 	org.java-websocket:Java-WebSocket:1.3.7 \
+	org.eclipse.jetty:jetty-alpn-conscrypt-server:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-alpn-java-server:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-alpn-openjdk8-server:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-alpn-server:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-annotations:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-client:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-continuation:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-deploy:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-hazelcast:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-http:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-infinispan:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-io:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-jaas:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-jaspi:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-jmx:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-jndi:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-nosql:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-plus:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-proxy:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-quickstart:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-rewrite:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-security:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-server:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-servlet:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-servlets:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-unixsocket:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-util:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-webapp:9.4.8.v20171121 \
+	org.eclipse.jetty:jetty-xml:9.4.8.v20171121 \
 	com.google.guava:guava:23.6-jre \
 	com.google.appengine:appengine-api-1.0-sdk:1.9.24
 
