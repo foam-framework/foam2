@@ -64,32 +64,28 @@ foam.CLASS({
     }
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-      ^ {
-        margin: 8px;
-        padding: 8px;
-      }
+  css: `
+    ^ {
+      margin: 8px;
+      padding: 8px;
+    }
 
-      ^label {
-        color: #444;
-        flex-grow: 1;
-        margin-left: 12px;
-        overflow: hidden;
-        white-space: nowrap;
-        display: inline;
-      }
+    ^label {
+      color: #444;
+      flex-grow: 1;
+      margin-left: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline;
+    }
 
-      ^noselect {
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-      }
-    */}
-    })
-  ]
+    ^noselect {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  `
 });

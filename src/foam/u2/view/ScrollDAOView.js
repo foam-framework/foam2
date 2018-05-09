@@ -23,25 +23,21 @@ foam.CLASS({
 
   documentation: 'A DOM-based native scrolling view over for a DAO.',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-          overflow-y: scroll;
-          -webkit-overflow-scrolling: touch;
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          box-sizing: border-box;
-          contain: layout;
-          will-change: transform;
-        }
-    */}
-    })
-  ],
+  css: `
+    ^ {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      box-sizing: border-box;
+      contain: layout;
+      will-change: transform;
+    }
+  `,
 
   requires: [
     'foam.dao.QuickSink',
