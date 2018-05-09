@@ -118,12 +118,19 @@ foam.CLASS({
     },
 
     function generateSetter_() {
-      return this.javaSetter ? this.javaSetter :
-        `if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-assert${foam.String.capitalize(this.name)}(val);
-${this.name}_ = val;
-${this.name}IsSet_ = true;
-`;
+      return this.javaSetter ? this.javaSetter : `
+        // The next line will eventually be promoted to production
+        // if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+
+        // But until then, this line helps to detect code which needs to be fixed before then.
+        if ( this.__frozen__ ) {
+          System.err.println("!!!!!!!!!!!!!!!!!!!!!!! INVALID MUTATION OF FROZEN OBJECT, fclone() REQUIRED !!!!!!!!!!!!!!!!!!!!!!!");
+          Thread.dumpStack();
+        }
+        assert${foam.String.capitalize(this.name)}(val);
+        ${this.name}_ = val;
+        ${this.name}IsSet_ = true;
+      `;
     },
 
     function buildJavaClass(cls) {
@@ -846,7 +853,7 @@ foam.CLASS({
             type: 'boolean',
             initializer: 'false'
           });
-          
+
           var axioms = this.getAxioms();
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
