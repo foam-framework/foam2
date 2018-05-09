@@ -5,6 +5,7 @@
  */
 package foam.dao.index;
 
+import foam.core.ContextAwareSupport;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractDAO;
@@ -14,8 +15,10 @@ import foam.mlang.predicate.Predicate;
 import static foam.dao.AbstractDAO.decorateSink;
 import foam.mlang.predicate.True;
 import foam.mlang.sink.GroupBy;
+import foam.nanos.NanoService;
+import foam.nanos.logger.Logger;
 
-public class TreeNode {
+public class TreeNode extends ContextAwareSupport implements NanoService{
 
   protected Object key;
   protected Object value;
@@ -23,6 +26,7 @@ public class TreeNode {
   protected long level;
   protected TreeNode left;
   protected TreeNode right;
+  protected Logger logger_;
 
   protected final static TreeNode NULL_NODE = new TreeNode(null, null,
                                                           0, 0, null, null);
@@ -54,6 +58,12 @@ public class TreeNode {
       return s.cloneNode();
     }
     return s;
+  }
+
+  private Logger getLogger() {
+    if ( logger_ == null ) logger_ = (Logger) getX().get("logger");
+
+    return logger_;
   }
 
   public static TreeNode getNullNode() {
@@ -504,14 +514,20 @@ public class TreeNode {
           // decorateSink if it have some predicate or order can't be deal with index.
           sink = decorateSink(null, sink, skip, limit, null, predicate);
           reverseSortSkipLimitTreeNode(currentNode, sink, 0, AbstractDAO.MAX_SAFE_INTEGER, size, tail);
+          if ( predicate != null && getLogger() != null )
+            getLogger().info("WARNING,NO INDEX OF MDAO,[MDAO]," + predicate.createStatement());
         } else {
           sink = decorateSink(null, sink, skip, limit, null, predicate);
           select_(currentNode, sink, skip, limit, size, tail);
+          if ( predicate != null && getLogger() != null )
+            getLogger().info("WARNING,NO INDEX OF MDAO,[MDAO]," + predicate.createStatement());
         }
       } else {
         sink = decorateSink(null, sink, skip, limit, order, predicate);
         select_(currentNode, sink, skip, limit, size, tail);
         sink.eof();
+        if ( predicate != null && getLogger() != null )
+          getLogger().info("WARNING,NO INDEX OF MDAO,[MDAO]," + predicate.createStatement());
       }
     } else if ( ! reverseSort ) {
       skipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
@@ -519,5 +535,8 @@ public class TreeNode {
       reverseSortSkipLimitTreeNode(currentNode, sink, skip, limit, size, tail);
     }
   }
+  @Override
+  public void start() {
 
+  }
 }
