@@ -27,7 +27,8 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.logger.LogLevel',
       name: 'lastLogLevel',
-      factory: function() { return foam.nanos.logger.LogLevel.INFO; }
+      factory: function() { return foam.nanos.logger.LogLevel.INFO; },
+      javaFactory: `return foam.nanos.logger.LogLevel.INFO;`
     }
   ],
 
@@ -37,7 +38,7 @@ foam.CLASS({
         args: [ 
           {
           name: 'logLevelName',
-          javaType: 'String'
+          javaType: 'Enum'
           },
           {
             name: 'setLastLogLevel',
@@ -51,8 +52,8 @@ foam.CLASS({
         ],
         javaReturns: 'void',
         javaCode: `
-        switch ( logLevelName ) {
-          case "debug": {
+        switch ( LogLevel.values()[logLevelName.ordinal()] ) {
+          case DEBUG: {
               setRepeatCount(1);
               setLastUniqueObject(args);
               getDelegate().debug(args);  
@@ -61,7 +62,7 @@ foam.CLASS({
               break;
           }
               }
-              case "info":  {
+              case INFO:  {
                 setRepeatCount(1);
                 setLastUniqueObject(args);
                 getDelegate().info(args);  
@@ -70,7 +71,7 @@ foam.CLASS({
                 }
                 break;
               }
-              case "warning":  {
+              case WARNING:  {
                 setRepeatCount(1);
                 setLastUniqueObject(args);
                 getDelegate().warning(args);  
@@ -80,7 +81,7 @@ foam.CLASS({
                 break;
                 
                 }     
-                case "error":  {
+                case ERROR:  {
                   setRepeatCount(1);
                   setLastUniqueObject(args);
                   getDelegate().error(args);  
@@ -94,7 +95,6 @@ foam.CLASS({
     },
     {
       name: 'logLastLogRepeats',
-   
       javaReturns: 'void',
       javaCode: 
       `
@@ -117,25 +117,24 @@ foam.CLASS({
         }
       }     
       `
-
-
     },
-
     {
       name: 'repeatLogConstructor',
       args: [ 
         {
         name: 'logLevelName',
-        javaType: 'String'
+        javaType: 'Enum'
+        // what is java enum type?
         },
         {
           name: 'args',
           javaType: 'Object...',
         }
       ],
+      synchronized: true,
       javaReturns: 'void',
       javaCode: `
-        if (! getLastLogLevel().toString().equalsIgnoreCase(logLevelName)){
+        if ( getLastLogLevel().ordinal() != logLevelName.ordinal() ){
               if (getRepeatCount() > 1){
                 logLastLogRepeats();   
               }
@@ -170,6 +169,7 @@ foam.CLASS({
                   setRepeatCount(getRepeatCount()+1);
                 }
               }
+        ;
             `
     },
     {
@@ -182,10 +182,9 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-      String logLevelName = new String("debug");
+      Enum logLevelName = LogLevel.DEBUG;
       repeatLogConstructor(logLevelName,args);
-      `
-    
+      `   
     },
     {
       name: 'info',
@@ -197,7 +196,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-      String logLevelName = new String("info");
+      Enum logLevelName = LogLevel.INFO;
       repeatLogConstructor(logLevelName,args);
       `
     
@@ -213,7 +212,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-      String logLevelName = new String("warning");
+      Enum logLevelName = LogLevel.WARNING;
       repeatLogConstructor(logLevelName,args);
       `
     },
@@ -227,7 +226,7 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
-      String logLevelName = new String("error");
+      Enum logLevelName = LogLevel.ERROR;
       repeatLogConstructor(logLevelName,args);
       `
     }
