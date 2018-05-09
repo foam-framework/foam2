@@ -55,7 +55,6 @@ public class FileWebAgent
 
   @Override
   public void execute(X x) {
-    PrintWriter pw = x.get(PrintWriter.class);
     HttpServletRequest req = x.get(HttpServletRequest.class);
     HttpServletResponse resp = x.get(HttpServletResponse.class);
 
@@ -73,6 +72,7 @@ public class FileWebAgent
 
       // handle reading of directories
       if ( src.isDirectory() && src.canRead() ) {
+        PrintWriter pw = x.get(PrintWriter.class);
         resp.setContentType(EXTS.get("html"));
         pw.write(
             "<!DOCTYPE html>\n" +
@@ -116,6 +116,7 @@ public class FileWebAgent
       t.printStackTrace();
       resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
       resp.setContentType(EXTS.get("json"));
+      PrintWriter pw = x.get(PrintWriter.class);
       pw.write("{\"error\": \"File not found\"," + "\"filename\": \"" + StringEscapeUtils.escapeJson(path) + "\"}");
     } finally {
       IOUtils.closeQuietly(is);
