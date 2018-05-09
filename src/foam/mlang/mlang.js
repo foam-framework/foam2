@@ -2012,7 +2012,7 @@ foam.CLASS({
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function THEN_BY(a, b) { return this._binary_("ThenBy", a, b); }
+    function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); }
   ]
 });
 
