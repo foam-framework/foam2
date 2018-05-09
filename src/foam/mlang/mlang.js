@@ -1887,6 +1887,10 @@ foam.CLASS({
       return this.arg2.f(this.arg1.f(o));
     },
 
+    function compare(o1, o2) {
+      return this.comparePropertyValues(this.f(o1), this.f(o2));
+    },
+
     function comparePropertyValues(o1, o2) {
       /**
          Compare property values using arg2's property value comparator.
