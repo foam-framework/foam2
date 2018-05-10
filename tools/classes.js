@@ -150,7 +150,7 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
-  'foam.nanos.logger.DiscardLogger',
+  'foam.nanos.logger.LogLevelFilterLogger',
   'foam.nanos.logger.Logger',
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.menu.Menu',
