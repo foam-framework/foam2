@@ -69,15 +69,16 @@ public class MDAO
   }
 
   public FObject put_(X x, FObject obj) {
+    // Clone and freeze outside of lock to minimize time spent under lock
+    obj = obj.fclone();
+    obj.freeze();
+
     synchronized ( lock_.writeLock() ) {
       FObject oldValue = find(obj);
 
       if ( oldValue != null ) {
         state_ = index_.remove(state_, oldValue);
       }
-
-      obj = obj.fclone();
-      obj.freeze();
 
       state_ = index_.put(state_, obj);
 
@@ -110,8 +111,8 @@ public class MDAO
 
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
-            ? (FObject)index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
-            : (FObject)index_.planFind(state, o).find(state,o)
+            ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
+            : (FObject) index_.planFind(state, o).find(state,o)
     );
   }
 
