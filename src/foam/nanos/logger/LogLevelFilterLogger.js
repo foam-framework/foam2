@@ -6,9 +6,9 @@
 
 foam.CLASS({
   package: 'foam.nanos.logger',
-  name: 'DiscardLogger',
+  name: 'LogLevelFilterLogger',
   extends: 'foam.nanos.logger.ProxyLogger',
- 
+
   properties: [
     {
       name: 'logError',
