@@ -87,14 +87,15 @@ foam.CLASS({
     }
     ^ .box-for-drag-drop {
       border: dashed 4px #edf0f5;
-      width: 90%;
+      background:white;
       height: 110px;
       padding: 10px 10px;
       position: relative;
     }
+   
     ^ .boxless-for-drag-drop {
       border: solid 4px white;
-      width: 90%;
+      background:white;
       height: 110px;
       padding: 10px 10px;
       position: relative;
@@ -108,14 +109,15 @@ foam.CLASS({
     },
     {
       class: 'foam.nanos.fs.FileProperty',
-      name: 'data'
+      name: 'ProfilePictureImage'
     },
     {
       class: 'Boolean',
       name: 'dragActive',
       value: false
     },
-    [ 'uploadHidden', false ]
+    [ 'uploadHidden', false ],
+    [ 'boxHidden', false ]
   ],
 
   messages: [
@@ -133,31 +135,31 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start('div').addClass(this.dragActive$.map(function (drag) {
+        .start('div').addClass((this.boxHidden)?'boxless-for-drag-drop' :this.dragActive$.map(function (drag) {
           return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
         }))
-          .add(this.slot(function (data) {
+          .add(this.slot(function (ProfilePictureImage) {
             return this.E('img').addClass('shopperImage')
             .attrs({
-              src: this.data$.map(function (data) {
-                if ( data && data.data ) {
-                  var blob = data.data;
+              src: this.ProfilePictureImage$.map(function (ProfilePictureImage) {
+                if ( ProfilePictureImage && ProfilePictureImage.data) {
+                  var blob = ProfilePictureImage.data;
                   var sessionId = localStorage['defaultSession'];
                   if ( self.BlobBlob.isInstance(blob) ) 
                     return URL.createObjectURL(blob.blob);
                   else {
-                    var url = '/service/httpFileService/' + data.id;
+                    var url = '/service/httpFileService/' + ProfilePictureImage.id;
                     // attach session id if available
                     if ( sessionId ) 
                       url += '?sessionId=' + sessionId;
                     return url;
                   }
                 } else {
-                   return self.placeholderImage;
+                    return self.placeholderImage;
                 }
               })
             });
-          }, this.data$))
+          }, this.ProfilePictureImage$))
           .on('dragstart', this.onDragStart)
           .on('dragenter', this.onDragEnter)
           .on('dragover', this.onDragOver)
@@ -175,8 +177,8 @@ foam.CLASS({
               .on('click', this.onAddAttachmentClicked)
             .end()
           .end()
-          .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.data$.map(function (data) {
-              return data;
+          .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.ProfilePictureImage$.map(function (ProfilePictureImage) {
+              return ProfilePictureImage;
             }))
             .start().addClass('attachment-btn grey-button btn')
               .add(this.RemoveImageLabel)
@@ -198,7 +200,7 @@ foam.CLASS({
 
     function onRemoveClicked (e) {
       this.dragActive = false;
-      this.data = null;
+      this.ProfilePictureImage= null;
     },
 
     function onDragOver(e) {
@@ -232,8 +234,8 @@ foam.CLASS({
 
     function isImageType(file) {
       if ( file.type === "image/jpg"  || 
-           file.type === "image/jpeg" || 
-           file.type === "image/png" ) 
+            file.type === "image/jpeg" || 
+            file.type === "image/png" ) 
         return true;
       return false;
     },
@@ -249,7 +251,7 @@ foam.CLASS({
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
         return;
       }
-      this.data = this.File.create({
+      this.ProfilePictureImage= this.File.create({
         owner: this.user.id,
         filename: file.name,
         filesize: file.size,
