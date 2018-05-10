@@ -92,7 +92,7 @@ foam.CLASS({
       padding: 10px 10px;
       position: relative;
     }
-   
+
     ^ .boxless-for-drag-drop {
       border: solid 4px white;
       background:white;
@@ -125,7 +125,7 @@ foam.CLASS({
     { name: 'RemoveImageLabel', message: 'Remove File' },
     { name: 'UploadDesc', message: 'Or drag and drop an image here' },
     { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
-    { name: 'FileError', message: 'File required' },    
+    { name: 'FileError', message: 'File required' },
     { name: 'FileTypeError', message: 'Wrong file format' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }
   ],
@@ -136,27 +136,26 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div').addClass((this.boxHidden)?'boxless-for-drag-drop' :this.dragActive$.map(function (drag) {
-          return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
+          return drag ? 'box-for-drag-drop' : 'boxless-for-drag-drop';
         }))
           .add(this.slot(function (ProfilePictureImage) {
             return this.E('img').addClass('shopperImage')
             .attrs({
               src: this.ProfilePictureImage$.map(function (ProfilePictureImage) {
-                if ( ProfilePictureImage && ProfilePictureImage.data) {
+                if ( ProfilePictureImage && ProfilePictureImage.data ) {
                   var blob = ProfilePictureImage.data;
                   var sessionId = localStorage['defaultSession'];
-                  if ( self.BlobBlob.isInstance(blob) ) 
+                  if ( self.BlobBlob.isInstance(blob) )
                     return URL.createObjectURL(blob.blob);
-                  else {
-                    var url = '/service/httpFileService/' + ProfilePictureImage.id;
-                    // attach session id if available
-                    if ( sessionId ) 
-                      url += '?sessionId=' + sessionId;
-                    return url;
-                  }
-                } else {
-                    return self.placeholderImage;
+
+                  var url = '/service/httpFileService/' + ProfilePictureImage.id;
+                  // attach session id if available
+                  if ( sessionId )
+                    url += '?sessionId=' + sessionId;
+                  return url;
                 }
+
+                return self.placeholderImage;
               })
             });
           }, this.ProfilePictureImage$))
@@ -189,7 +188,7 @@ foam.CLASS({
             .start().add(this.UploadDesc).addClass('uploadDescription').end()
             .start().add(this.UploadRestrict).addClass('uploadRestriction').end()
           .end()
-        .end()
+        .end();
     }
   ],
 
@@ -205,39 +204,35 @@ foam.CLASS({
 
     function onDragOver(e) {
       this.dragActive = true;
-      e.preventDefault();    
+      e.preventDefault();
     },
 
     function onDrop(e) {
-      e.preventDefault();  
+      e.preventDefault();
       this.dragActive = false;
-      if ( this.uploadHidden ) 
-        return;
-      else {
-        var inputFile;
-        if ( e.dataTransfer.items ) {
-          inputFile = e.dataTransfer.items[0]
-          if ( inputFile.kind === 'file' ) {     
-            var file = inputFile.getAsFile();
-            if ( this.isImageType(file) ) this.addFile(file);
-            else 
-              this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
-          }
-        } else if( e.dataTransfer.files ) {
-          var file = e.dataTransfer.files[0];
-          if ( this.isImageType(file) ) this.addFile(file);
-          else 
-            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' })); 
+      if ( this.uploadHidden ) return;
+
+      var inputFile;
+      if ( e.dataTransfer.items ) {
+        inputFile = e.dataTransfer.items[0]
+        if ( inputFile.kind === 'file' ) {
+          var file = inputFile.getAsFile();
+          if ( this.isImageType(file) )
+            this.addFile(file);
+          else
+            this.add(this.NotificationMessage.create({message: this.FileTypeError, type: 'error'}));
         }
+      } else if ( e.dataTransfer.files ) {
+        var file = e.dataTransfer.files[0];
+        if ( this.isImageType(file) )
+          this.addFile(file);
+        else
+          this.add(this.NotificationMessage.create({message: this.FileTypeError, type: 'error'}));
       }
     },
 
     function isImageType(file) {
-      if ( file.type === "image/jpg"  || 
-            file.type === "image/jpeg" || 
-            file.type === "image/png" ) 
-        return true;
-      return false;
+      return file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png";
     },
 
     function onChange (e) {
@@ -245,7 +240,7 @@ foam.CLASS({
       var file = e.target.files[0];
       this.addFile(file);
     },
-    
+
     function addFile (file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
