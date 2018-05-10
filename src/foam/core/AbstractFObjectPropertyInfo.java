@@ -105,7 +105,7 @@ public abstract class AbstractFObjectPropertyInfo
      *  X.get("DAO").put(obj);
      * In this case: the before value inside the model is loss, so can not find difference
      */
-    if ( (this.get(o1) == this.get(o2)) ) {
+    if ( ( this.get(o1) == null && this.get(o2) != null ) || ( this.get(o1) == this.get(o2) ) ) {
       //shadow copy, since we only use to print to journal
       this.set(diff, this.get(o2));
       return true;
