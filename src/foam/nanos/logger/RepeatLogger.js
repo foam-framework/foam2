@@ -7,7 +7,7 @@
 
 foam.CLASS({
   package: 'foam.nanos.logger',
-  name: 'DiscardLogger',
+  name: 'RepeatLogger',
   extends: 'foam.nanos.logger.ProxyLogger',
   requires: [
     'foam.nanos.logger.LogLevel'
@@ -28,8 +28,7 @@ foam.CLASS({
       class: 'Enum',
       of: 'foam.nanos.logger.LogLevel',
       name: 'lastLogLevel',
-      factory: function() { return foam.nanos.logger.LogLevel.INFO; },
-      // javaFactory: `return foam.nanos.logger.LogLevel.INFO;`
+      factory: function() { return foam.nanos.logger.LogLevel.INFO; }
     }
   ],
 
@@ -226,4 +225,5 @@ foam.CLASS({
   ]
 });
  
-// implement hashcode to check instead of equals
+// is there somewhere a check of hashcode equality is preferable?
+// remeber Joel mentioning it, but can't remember the exact context.
