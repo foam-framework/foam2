@@ -103,11 +103,11 @@ foam.CLASS({
       break;
     }
     case INFO: {
-      getDelegate().info("The last log was repeated "+ getRepeatCount()  + " times" );
+      getDelegate().info("The last log was repeated " + getRepeatCount()  + " times" );
       break;
     }
     case WARNING: {
-      getDelegate().warning("The last log was repeated "+ getRepeatCount()  + " times" );
+      getDelegate().warning("The last log was repeated " + getRepeatCount()  + " times" );
       break;      
     }        
     case ERROR: {
@@ -118,7 +118,7 @@ foam.CLASS({
 `
     },
     {
-      name: 'repeatLogConstructor',
+      name: 'repeatLogFilter',
       args: [ 
         {
           name: 'logLevelName',
@@ -145,7 +145,6 @@ foam.CLASS({
   } else {
     Object[] o = (Object[]) getLastUniqueObject();
     if ( ! (args.length == o.length ) ) {
-      // Different Message
       if ( getRepeatCount() > 1 ) {
         logLastLogRepeats();   
       }
@@ -153,7 +152,6 @@ foam.CLASS({
     } else {
       for ( int i = 0 ; i < args.length ; i++ ) {
         if ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) ) ) {
-          // simplify above logic
           if ( getRepeatCount() > 1 ) {
             logLastLogRepeats();   
           }
@@ -177,7 +175,7 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
   Enum logLevelName = LogLevel.DEBUG;
-  repeatLogConstructor(logLevelName, args);
+  repeatLogFilter(logLevelName, args);
   `   
     },
     {
@@ -191,7 +189,7 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
   Enum logLevelName = LogLevel.INFO;
-  repeatLogConstructor(logLevelName,args);
+  repeatLogFilter(logLevelName, args);
 `
     },
     {
@@ -205,7 +203,7 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
   Enum logLevelName = LogLevel.WARNING;
-  repeatLogConstructor(logLevelName,args);
+  repeatLogFilter(logLevelName, args);
 `
     },
     {
@@ -219,11 +217,8 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
   Enum logLevelName = LogLevel.ERROR;
-  repeatLogConstructor(logLevelName,args);
+  repeatLogFilter(logLevelName, args);
 `
     }
   ]
 });
- 
-// is there somewhere a check of hashcode equality is preferable?
-// remeber Joel mentioning it, but can't remember the exact context.
