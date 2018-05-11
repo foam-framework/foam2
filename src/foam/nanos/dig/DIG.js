@@ -91,7 +91,7 @@ foam.CLASS({
         if ( format ) {
           url += query ? "&" : "?";
           query = true;
-          url += "cmd=" + format.name.toLowerCase();
+          url += "format=" + format.name.toLowerCase();
         }
         if ( key ) {
           url += query ? "&" : "?";
