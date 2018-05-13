@@ -22,8 +22,8 @@ import java.util.ArrayList;
 public class Repeat implements Parser{
   private Parser p;
   private Parser delim;
-  private int min;
-  private int max;
+  private int    min;
+  private int    max;
 
   public Repeat(Parser parser) {
     this(parser, null);
