@@ -17,6 +17,9 @@
 
 package foam.lib.parse;
 
+// TODO: this doesn't make any sense, just use Seq instead.
+// Seq1 is faster than Seq because it doesn't build an array, but this one
+// does so there's no reason for it to exist.
 public class Seq2
   implements Parser
 {
