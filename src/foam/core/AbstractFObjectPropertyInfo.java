@@ -7,6 +7,7 @@
 package foam.core;
 
 import foam.nanos.logger.Logger;
+import foam.util.SafetyUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -105,7 +106,7 @@ public abstract class AbstractFObjectPropertyInfo
      *  X.get("DAO").put(obj);
      * In this case: the before value inside the model is loss, so can not find difference
      */
-    if ( (this.get(o1) == this.get(o2)) ) {
+    if ( SafetyUtil.compare(o1, o2) == 0 ) {
       //shadow copy, since we only use to print to journal
       this.set(diff, this.get(o2));
       return true;
