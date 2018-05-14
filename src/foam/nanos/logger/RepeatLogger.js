@@ -97,21 +97,23 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: 
       `
+  String logCountMessage = ("The last log was repeated " + getRepeatCount() + " times" ); 
+  
   switch ( getLastLogLevel() ) {
     case DEBUG: {
-      getDelegate().debug("The last log was repeated " + getRepeatCount() + " times" );
+      getDelegate().debug( logCountMessage );
       break;
     }
     case INFO: {
-      getDelegate().info("The last log was repeated " + getRepeatCount()  + " times" );
+      getDelegate().info( logCountMessage );
       break;
     }
     case WARNING: {
-      getDelegate().warning("The last log was repeated " + getRepeatCount()  + " times" );
+      getDelegate().warning( logCountMessage );
       break;      
     }        
     case ERROR: {
-      getDelegate().error("The last log was repeated " + getRepeatCount() + " times" );
+      getDelegate().error( logCountMessage );
       break;
     }
   }     
