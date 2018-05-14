@@ -54,34 +54,30 @@ foam.CLASS({
   setRepeatCount(1);
   setLastUniqueObject(args);
   switch ( LogLevel.values()[logLevelName.ordinal()] ) {
-    case DEBUG: {
+    case DEBUG: 
       getDelegate().debug(args);  
-      if (updateLastLogLevel){
+      if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.DEBUG);
       }
       break;
-    }
-    case INFO: {
+    case INFO:
       getDelegate().info(args);  
-      if (updateLastLogLevel){
+      if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.INFO);
       }
       break;
-    }
-    case WARNING: {
+    case WARNING:
       getDelegate().warning(args);  
-      if (updateLastLogLevel){
+      if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.WARNING);
       }
-      break;
-    }     
-    case ERROR: {
+      break;    
+    case ERROR:
       getDelegate().error(args);  
-      if (updateLastLogLevel){
+      if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.ERROR);
       }
       break;
-    }
   }
 `  
     },
@@ -90,25 +86,21 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: 
       `
-  String logCountMessage = ("The last log was repeated " + getRepeatCount() + " times" ); 
+  String logCountMessage = "The last log was repeated " + getRepeatCount() + " times" ; 
   
   switch ( getLastLogLevel() ) {
-    case DEBUG: {
+    case DEBUG:
       getDelegate().debug( logCountMessage );
       break;
-    }
-    case INFO: {
+    case INFO:
       getDelegate().info( logCountMessage );
       break;
-    }
-    case WARNING: {
+    case WARNING: 
       getDelegate().warning( logCountMessage );
-      break;      
-    }        
-    case ERROR: {
+      break;             
+    case ERROR: 
       getDelegate().error( logCountMessage );
       break;
-    }
   }     
 `
     },
