@@ -41,7 +41,7 @@ foam.CLASS({
           javaType: 'Enum'
         },
         {
-          name: 'setLastLogLevel',
+          name: 'updateLastLogLevel',
           javaType: 'Boolean'
         },
         {
@@ -56,7 +56,7 @@ foam.CLASS({
       setRepeatCount(1);
       setLastUniqueObject(args);
       getDelegate().debug(args);  
-      if (setLastLogLevel){
+      if (updateLastLogLevel){
         setLastLogLevel(LogLevel.DEBUG);
       }
       break;
@@ -65,7 +65,7 @@ foam.CLASS({
       setRepeatCount(1);
       setLastUniqueObject(args);
       getDelegate().info(args);  
-      if (setLastLogLevel){
+      if (updateLastLogLevel){
         setLastLogLevel(LogLevel.INFO);
       }
       break;
@@ -74,7 +74,7 @@ foam.CLASS({
       setRepeatCount(1);
       setLastUniqueObject(args);
       getDelegate().warning(args);  
-      if (setLastLogLevel){
+      if (updateLastLogLevel){
         setLastLogLevel(LogLevel.WARNING);
       }
       break;
@@ -84,7 +84,7 @@ foam.CLASS({
       setRepeatCount(1);
       setLastUniqueObject(args);
       getDelegate().error(args);  
-      if (setLastLogLevel){
+      if (updateLastLogLevel){
         setLastLogLevel(LogLevel.ERROR);
       }
       break;
