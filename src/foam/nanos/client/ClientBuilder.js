@@ -54,9 +54,9 @@ foam.CLASS({
 
         requires: [
           'foam.box.HTTPBox',
-          'foam.dao.RequestResponseClientDAO',
           'foam.dao.ClientDAO',
-          'foam.dao.EasyDAO'
+          'foam.dao.EasyDAO',
+          'foam.dao.RequestResponseClientDAO'
         ],
 
         exports: [
