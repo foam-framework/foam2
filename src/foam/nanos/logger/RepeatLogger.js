@@ -51,10 +51,10 @@ foam.CLASS({
       ],
       javaReturns: 'void',
       javaCode: `
+  setRepeatCount(1);
+  setLastUniqueObject(args);
   switch ( LogLevel.values()[logLevelName.ordinal()] ) {
     case DEBUG: {
-      setRepeatCount(1);
-      setLastUniqueObject(args);
       getDelegate().debug(args);  
       if (updateLastLogLevel){
         setLastLogLevel(LogLevel.DEBUG);
@@ -62,8 +62,6 @@ foam.CLASS({
       break;
     }
     case INFO: {
-      setRepeatCount(1);
-      setLastUniqueObject(args);
       getDelegate().info(args);  
       if (updateLastLogLevel){
         setLastLogLevel(LogLevel.INFO);
@@ -71,18 +69,13 @@ foam.CLASS({
       break;
     }
     case WARNING: {
-      setRepeatCount(1);
-      setLastUniqueObject(args);
       getDelegate().warning(args);  
       if (updateLastLogLevel){
         setLastLogLevel(LogLevel.WARNING);
       }
       break;
-      
     }     
     case ERROR: {
-      setRepeatCount(1);
-      setLastUniqueObject(args);
       getDelegate().error(args);  
       if (updateLastLogLevel){
         setLastLogLevel(LogLevel.ERROR);
