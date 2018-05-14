@@ -8,20 +8,19 @@ package foam.core;
 
 import foam.dao.pg.IndexedPreparedStatement;
 import foam.nanos.logger.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.Map;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public abstract class AbstractPropertyInfo
-    implements PropertyInfo
+  implements PropertyInfo
 {
   protected ClassInfo parent;
 
@@ -68,9 +67,9 @@ public abstract class AbstractPropertyInfo
 
   @Override
   public boolean hardDiff(FObject o1, FObject o2, FObject diff){
-    //compare the property value of o1 and o2
-    //If value is Object reference, only compare reference. (AbstractObjectPropertyInfo will override hardDiff method)
-    //use to compare String and primitive type
+    // compare the property value of o1 and o2
+    // If value is Object reference, only compare reference. (AbstractObjectPropertyInfo will override hardDiff method)
+    // use to compare String and primitive type
     int same = this.comparePropertyToValue(this.get(o1), this.get(o2));
     //return the value of o2 if o1 and o2 are different
     if ( same != 0 ) {
