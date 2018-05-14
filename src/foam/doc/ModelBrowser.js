@@ -9,7 +9,7 @@ foam.CLASS({
     'foam.doc.DocBorder',
     'foam.doc.SimpleClassView',
     'foam.doc.UMLDiagram',
-    'foam.nanos.boot.NSpec',
+    'foam.nanos.boot.NSpec'
   ],
 
   imports: [
@@ -17,8 +17,8 @@ foam.CLASS({
   ],
 
   exports: [
-    'showOnlyProperties',
-    'showInherited'
+    'showInherited',
+    'showOnlyProperties'
   ],
 
   properties: [
@@ -43,7 +43,7 @@ foam.CLASS({
       width: 700px;
       margin: 20px;
     }
-    ^ .foam-doc-UMLDiagram{ 
+    ^ .foam-doc-UMLDiagram{
       width: 700px;
       margin: 0;
       margin-bottom: 20px;
@@ -107,9 +107,9 @@ foam.CLASS({
         window.print();
       }
     }
-  ],
-
+  ]
 });
+
 
 foam.CLASS({
   package: 'foam.doc',
@@ -137,8 +137,8 @@ foam.CLASS({
       var data = this.data;
 
       this.
-          start('b').add(data.id).end().br().
-          add('Extends: ');
+        start('b').add(data.id).end().br().
+        add('Extends: ');
 
       var cls = data;
       for ( var i = 0 ; cls ; i++ ) {
