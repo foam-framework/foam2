@@ -44,6 +44,7 @@ var classes = [
   'foam.mlang.ArrayConstant',
   'foam.box.Box',
   'foam.box.Skeleton',
+  'foam.box.AbstractSkeleton',
   'foam.box.ProxyBox',
   'foam.box.SubBox',
   'foam.box.Message',
@@ -123,6 +124,7 @@ var classes = [
   'foam.nanos.auth.Country',
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.ClientAuthService',
+  'foam.nanos.auth.HtmlDoc',
   'foam.nanos.auth.PasswordExpiryAuthService',
   'foam.nanos.auth.twofactor.authy.AuthyService',
   'foam.nanos.auth.token.Token',
@@ -130,6 +132,9 @@ var classes = [
   'foam.nanos.auth.token.ClientTokenService',
   'foam.nanos.auth.token.AbstractTokenService',
   'foam.nanos.auth.email.EmailTokenService',
+  'foam.nanos.auth.email.EmailDocService',
+  'foam.nanos.auth.email.EmailDocInterface',
+  'foam.nanos.auth.email.ClientEmailDocService',
   'foam.nanos.auth.resetPassword.ResetPasswordTokenService',
   'foam.nanos.auth.PreventDuplicateEmailDAO',
   'foam.nanos.auth.ServiceProvider',
@@ -146,7 +151,10 @@ var classes = [
   'foam.nanos.script.Language',
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
+  'foam.nanos.logger.LogLevelFilterLogger',
+  'foam.nanos.logger.RepeatLogger',  
   'foam.nanos.logger.Logger',
+  'foam.nanos.logger.ProxyLogger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.ListMenu',
@@ -217,7 +225,8 @@ var classes = [
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
 
-  'foam.lib.query.TestModel'
+  'foam.lib.query.TestModel',
+  'foam.lib.query.FooEnum'
 ];
 
 var abstractClasses = [
@@ -230,10 +239,12 @@ var skeletons = [
   'foam.dao.DAO',
   'foam.mop.MOP',
   'foam.nanos.auth.AuthService',
+  'foam.nanos.auth.email.EmailDocInterface',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.auth.token.TokenService',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService',
+
 ];
 
 var proxies = [
@@ -247,7 +258,6 @@ var proxies = [
   'foam.nanos.auth.AuthService',
   'foam.nanos.auth.twofactor.OTPAuthService',
   'foam.nanos.http.WebAgent',
-  'foam.nanos.logger.Logger',
   'foam.nanos.notification.email.EmailService',
   'foam.nanos.notification.push.PushService'
 ];

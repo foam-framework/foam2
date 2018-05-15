@@ -16,35 +16,48 @@ public class DAOPMLogger
   public final static String SERVICE_NAME = "pmLogger";
   public final static String DAO_NAME     = "pmInfoDAO";
 
+  protected final Object[] locks_ = new Object[128];
+
+  public DAOPMLogger() {
+    for ( int i = 0 ; i < locks_.length ; i++ ) locks_[i] = new Object();
+  }
+
+  protected Object getLock(PMInfo pmi) {
+    int hash = pmi.getClsName().hashCode() * 31 + pmi.getPmName().hashCode();
+    return locks_[(int) (Math.abs(hash) % locks_.length)];
+  }
+
   @Override
   public void log(PM pm) {
     if ( pm.getClassType().getName().toLowerCase().indexOf("pm") != -1 ) return;
     if ( pm.getName().toLowerCase().indexOf("pm") != -1 )                return;
 
     PMInfo pmi = new PMInfo();
-    pmi.setClsname(pm.getClassType().getName());
-    pmi.setPmname(pm.getName());
+    pmi.setClsName(pm.getClassType().getName());
+    pmi.setPmName(pm.getName());
 
     DAO pmd = (DAO) getX().get(DAO_NAME);
 
-    PMInfo dpmi = (PMInfo) pmd.find(pmi);
-    if ( dpmi == null ) {
-      pmi.setMintime(pm.getTime());
-      pmi.setMaxtime(pm.getTime());
-      pmi.setTotaltime(pm.getTime());
-      pmi.setNumoccurrences(1);
+    synchronized ( getLock(pmi) ) {
+      PMInfo dpmi = (PMInfo) pmd.find(pmi);
+      if ( dpmi == null ) {
+        pmi.setMinTime(pm.getTime());
+        pmi.setMaxTime(pm.getTime());
+        pmi.setTotalTime(pm.getTime());
+        pmi.setCount(1);
 
-      pmd.put(pmi);
-    } else {
-      if ( pm.getTime() < dpmi.getMintime() )
-        dpmi.setMintime(pm.getTime());
+        pmd.put(pmi);
+      } else {
+        if ( pm.getTime() < dpmi.getMinTime() )
+          dpmi.setMinTime(pm.getTime());
 
-      if ( pm.getTime() > dpmi.getMaxtime() )
-        dpmi.setMaxtime(pm.getTime());
+        if ( pm.getTime() > dpmi.getMaxTime() )
+          dpmi.setMaxTime(pm.getTime());
 
-      dpmi.setNumoccurrences(dpmi.getNumoccurrences() + 1);
-      dpmi.setTotaltime(dpmi.getTotaltime() + pm.getTime());
-      pmd.put(dpmi);
+        dpmi.setCount(dpmi.getCount() + 1);
+        dpmi.setTotalTime(dpmi.getTotalTime() + pm.getTime());
+        pmd.put(dpmi);
+      }
     }
   }
 }

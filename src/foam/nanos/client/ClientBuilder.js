@@ -28,6 +28,7 @@ foam.CLASS({
         // requests to nSpecDAO.
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
+          cache: true,
           delegate: this.RetryBox.create({
             maxAttempts: -1,
             delegate: this.HTTPBox.create({

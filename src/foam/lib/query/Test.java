@@ -1,12 +1,17 @@
 package foam.lib.query;
 
-import foam.lib.parse.*;
+import foam.lib.parse.PStream;
+import foam.lib.parse.ParserContext;
+import foam.lib.parse.ParserContextImpl;
+import foam.lib.parse.StringPStream;
+import foam.parse.QueryParser;
 
 public class Test {
   public static void main(String[] args) {
     QueryParser parser = new QueryParser(TestModel.getOwnClassInfo());
 
-    String query = "name:adam birthdate=2017/01/01..2017/12/25 OR name:adam birthdate<2017/01/12 OR name:adam birthdate>2017/03/21";
+    //String query = "name:adam birthdate=2017/01/01..2017/12/25 OR name:adam birthdate<2017/01/12 OR name:adam birthdate>2017/03/21";
+    String query = "n=adam";
 
     StringPStream sps = new StringPStream();
     sps.setString(query);

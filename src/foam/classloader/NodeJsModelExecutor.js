@@ -21,7 +21,6 @@ foam.CLASS({
 
   requires: [
     'foam.apploader.ClassLoader',
-    'foam.apploader.ModelLookupDAO',
     'foam.apploader.NodeModelFileDAO',
     'foam.classloader.OrDAO',
   ],

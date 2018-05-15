@@ -28,21 +28,7 @@ foam.CLASS({
       name: 'cmd',
       class: 'Enum',
       of: 'foam.nanos.http.Command',
-      value: foam.nanos.http.Command.SELECT,
-      adapt: function(old, nu) {
-        if ( nu instanceof String ) {
-          switch( nu.toUpperCase() ) {
-          case 'POST':
-            return foam.nanos.http.Command.PUT;
-          case 'PUT':
-            return foam.nanos.http.Command.PUT;
-          case 'DELETE':
-            return foam.nanos.http.Command.REMOVE;
-          default:
-            return foam.nanos.http.Command.SELECT;
-          }
-        }
-      }
+      value: 'SELECT',
     },
     {
       class: 'String',
@@ -53,23 +39,7 @@ foam.CLASS({
       name: 'format',
       class: 'Enum',
       of: 'foam.nanos.http.Format',
-      value: foam.nanos.http.Format.JSON,
-      adapt: function(old, nu) {
-        if ( nu instanceof String ) {
-          switch( nu.toUpperCase() ) {
-          case 'CSV':
-            return foam.nanos.http.Format.CSV;
-          case 'HTML':
-            return foam.nanos.http.Format.HTML;
-          case 'XML':
-            return foam.nanos.http.Format.XML;
-          case 'APPLICATION/XML':
-            return foam.nanos.http.Format.XML;
-          default:
-            return foam.nanos.http.Format.JSON;
-          }
-        }
-      }
+      value: 'JSON',
     },
     {
       name: 'values_',
@@ -117,7 +87,7 @@ foam.CLASS({
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          javaType: 'Object'
         }
       ],
       code: function(name) {
@@ -145,7 +115,7 @@ foam.CLASS({
     return value;
   }
   javax.servlet.http.HttpServletRequest req = this.getX().get(javax.servlet.http.HttpServletRequest.class);
-  return req.getParameter(name);
+  return req.getParameter(name.toString());
   `
     },
     {
@@ -200,7 +170,7 @@ foam.CLASS({
       args: [
         {
           name: 'name',
-          javaType: 'String'
+          javaType: 'Object'
         },
         {
           name: 'value',

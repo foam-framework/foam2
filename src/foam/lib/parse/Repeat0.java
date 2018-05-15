@@ -22,8 +22,8 @@ import java.util.ArrayList;
 public class Repeat0 implements Parser {
   private Parser p;
   private Parser delim;
-  private int min;
-  private int max;
+  private int    min;
+  private int    max;
 
   public Repeat0(Parser parser) {
     this(parser, null);
@@ -38,10 +38,10 @@ public class Repeat0 implements Parser {
   }
 
   public Repeat0(Parser parser, Parser delimiter, int minimum, int maximum) {
-    p = parser;
+    p     = parser;
     delim = delimiter;
-    min = minimum;
-    max = maximum;
+    min   = minimum;
+    max   = maximum;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
