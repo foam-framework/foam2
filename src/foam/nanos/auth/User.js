@@ -321,6 +321,20 @@ foam.RELATIONSHIP({
 });
 
 foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.support.model.SupportEmail',
+  forwardName: 'supportEmails',
+  inverseName: 'user'
+});
+
+foam.RELATIONSHIP({
+  sourceModel: 'foam.nanos.auth.User',
+  targetModel: 'foam.support.model.Ticket',
+  forwardName: 'tickets',
+  inverseName: 'user'
+});
+
+foam.RELATIONSHIP({
   cardinality: '1:*',
   sourceModel: 'foam.nanos.auth.ServiceProvider',
   targetModel: 'foam.nanos.auth.User',

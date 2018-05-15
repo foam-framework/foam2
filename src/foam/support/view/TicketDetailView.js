@@ -25,8 +25,7 @@ foam.CLASS({
     'hideSummary',
     'messages',
     'pop3',
-    'ticketDAO', 
-    'ticketMessageDAO'
+    'user'
   ],
   
   exports: [
@@ -334,7 +333,7 @@ foam.CLASS({
           type: messageType
         });
 
-        this.ticketDAO.put(this.data).then(function(a){
+        this.user.tickets.put(this.data).then(function(a){
           if (!a) return;
           if (self.viewData.message == "") {
             self.stack.push({ class: 'foam.support.view.TicketView' });
@@ -345,7 +344,7 @@ foam.CLASS({
             if( !self.data.emailId ){
               // var messageId = self.pop3.sendEmail(self.data.requestorEmail, self.data.subject, self.viewData.message)
               self.data.emailId = 2;
-              self.ticketDAO.put(self.data);
+              self.user.tickets.put(self.data);
               self.stack.push({ class: 'foam.support.view.TicketView' });
             }
             self.stack.push({ class: 'foam.support.view.TicketView' });
@@ -433,7 +432,7 @@ foam.CLASS({
     function followUpSubmit(){
       var self = this;
       this.data.status = 'Pending';
-      this.ticketDAO.put(this.data).then(function(a){
+      self.user.tickets.put(this.data).then(function(a){
         if (!a){
           console.log('no ticket Created');
         }

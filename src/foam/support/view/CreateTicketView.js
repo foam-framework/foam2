@@ -212,7 +212,7 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      factory: function() { return this.ticketDAO; }
+      factory: function() { return this.user.tickets; }
     },
     {
       class: 'String',
@@ -315,7 +315,8 @@ foam.CLASS({
           status: this.status
         });
 
-        this.ticketDAO.put(ticket).then(function(ticket){
+        console.log("this.user: "+ this.user);
+        this.dao.put(ticket).then(function(ticket){
           if (self.message == "") return;
           var message = self.TicketMessage.create({
             senderId: self.user.id,

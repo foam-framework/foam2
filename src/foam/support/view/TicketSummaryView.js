@@ -12,7 +12,7 @@ foam.CLASS({
     'foam.support.view.TicketView',
   ],
   imports: [
-    'user', 'ticketDAO'
+    'user'
   ],
   exports: [ 'as data' ],
  
@@ -66,7 +66,7 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      factory: function() { return this.ticketDAO; }
+      factory: function() { return this.user.tickets; }
     },
     {
       class: 'Int',

@@ -9,7 +9,7 @@ foam.CLASS({
     'foam.support.view.CreateTicketView'
   ],
 
-  imports: [ 'ticketDAO' ,'createLabel'],
+  imports: [ 'user' ,'createLabel'],
 
   exports: [ 'hideSummary' ],
 
@@ -75,7 +75,7 @@ foam.CLASS({
       .end()
       .tag({
         class: 'foam.u2.ListCreateController',
-        dao: this.ticketDAO,
+        dao: this.user.tickets,
         detailView: this.TicketDetailView,
         summaryView: this.TicketTableView.create(),
         createDetailView: this.CreateTicketView,
@@ -95,7 +95,7 @@ foam.CLASS({
         'foam.support.model.Ticket',
       ],
       
-      imports: [ 'ticketDAO'],
+      imports: [ 'user'],
 
       properties: [
         'selection'
@@ -107,7 +107,7 @@ foam.CLASS({
             .start({
               selection$: this.selection$,
               class: 'foam.u2.view.ScrollTableView',
-              data: this.ticketDAO,
+              data: this.user.tickets,
             }).addClass(this.myClass('table')).end();
         }
       ]
