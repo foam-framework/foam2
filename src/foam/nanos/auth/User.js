@@ -164,7 +164,7 @@ foam.CLASS({
       tableWidth: 91,
       view: {
         class: 'foam.u2.view.ChoiceView',
-        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank' ]
+        choices: [ 'Personal', 'Business', 'Merchant', 'Broker', 'Bank', 'Processor' ]
       }
     },
     {

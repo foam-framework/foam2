@@ -51,7 +51,7 @@ foam.CLASS({
       this.addClass(this.myClass());
       var self = this;
       var menu = this.menu;
-      var X    = this.X;
+      var X    = this.__subContext__;
 
       menu.children.orderBy(this.Menu.ORDER, this.Menu.LABEL).select({
         put: function(menu) {

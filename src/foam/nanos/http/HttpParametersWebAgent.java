@@ -20,6 +20,22 @@ import javax.servlet.http.HttpServletResponse;
 public class HttpParametersWebAgent
   extends ProxyWebAgent
 {
+  public static final int BUFFER_SIZE = 4096;
+
+  protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
+      @Override
+      protected StringBuilder initialValue() {
+        return new StringBuilder();
+      }
+
+      @Override
+      public StringBuilder get() {
+        StringBuilder b = super.get();
+        b.setLength(0);
+        return b;
+      }
+    };
+
   protected Class parametersClass = DefaultHttpParameters.class;
 
   public HttpParametersWebAgent() {}
@@ -59,8 +75,7 @@ public class HttpParametersWebAgent
     Command             command     = Command.select;
 
     try {
-      parameters = (HttpParameters) getX().create(this.parametersClass);
-      parameters.setX(x);
+      parameters = (HttpParameters) x.create(this.parametersClass);
     } catch (ClassCastException exception) {
       throw new RuntimeException(exception);
     }
@@ -79,22 +94,27 @@ public class HttpParametersWebAgent
       // see examples: https://technologyconversations.com/2014/08/12/rest-api-with-json/
       //
       try {
-        StringBuffer buffer = new StringBuffer();
+
+        int read = 0;
+        int count = 0;
+        int length = req.getContentLength();
+
         BufferedReader reader = req.getReader();
-        String line;
-        while ( ( line = reader.readLine() ) != null ) {
-          buffer.append(line.trim());
+        StringBuilder builder = sb.get();
+        char[] cbuffer = new char[BUFFER_SIZE];
+        while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
+          builder.append(cbuffer, 0, read);
+          count += read;
         }
-        logger.debug("reader data:", buffer.toString());
-        if ( !SafetyUtil.isEmpty(buffer.toString()) ) {
-          parameters.set("data", buffer.toString());
+        logger.debug("reader data:", builder.toString());
+        if ( ! SafetyUtil.isEmpty(builder.toString()) ) {
+          parameters.set("data", builder.toString());
         }
       } catch (IOException e) {
-        logger.error(e);
         try {
-          resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to parse.");
-        } catch ( java.io.IOException ioe ) {
-          logger.error("Failed to send HttppServletResponse", ioe);
+          resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Failed to parse body/data.");
+        } catch (IOException ioe) {
+          // nop
         }
         return;
       }
@@ -134,6 +154,7 @@ public class HttpParametersWebAgent
       }
     }
     parameters.set("cmd", command);
+    parameters.set(Command.class, command);
 
     Format format = Format.JSON;
     resp.setContentType("text/html");
@@ -189,6 +210,7 @@ public class HttpParametersWebAgent
       }
     }
     parameters.set("format", format);
+    parameters.set(Format.class, format);
 
     logger.debug("parameters", parameters);
     x = x.put(HttpParameters.class, parameters);

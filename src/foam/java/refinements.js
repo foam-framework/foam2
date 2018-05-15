@@ -36,6 +36,11 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'javaQueryParser',
+      expression: function(javaJSONParser) { return javaJSONParser; }
+    },
+    {
+      class: 'String',
       name: 'javaCSVParser'
     },
     {
@@ -49,6 +54,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaGetter'
+    },
+    {
+      class: 'String',
+      name: 'shortName'
+    },
+    {
+      class:'StringArray',
+      name: 'aliases'
     },
     {
       class: 'String',
@@ -85,12 +98,15 @@ foam.CLASS({
       return foam.java.PropertyInfo.create({
         sourceCls:        cls,
         propName:         this.name,
+        propShortName:    this.shortName,
+        propAliases:      this.aliases,
         propType:         this.javaType,
         propValue:        this.javaValue,
         propRequired:     this.required,
         cloneProperty:    this.javaCloneProperty,
         diffProperty:     this.javaDiffProperty,
         jsonParser:       this.javaJSONParser,
+        queryParser:      this.javaQueryParser,
         csvParser:        this.javaCSVParser,
         extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
@@ -99,6 +115,22 @@ foam.CLASS({
         xmlTextNode:      this.xmlTextNode,
         sqlType:          this.sqlType
       })
+    },
+
+    function generateSetter_() {
+      return this.javaSetter ? this.javaSetter : `
+        // The next line will eventually be promoted to production
+        // if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+
+        // But until then, this line helps to detect code which needs to be fixed before then.
+        if ( this.__frozen__ ) {
+          System.err.println("!!!!!!!!!!!!!!!!!!!!!!! INVALID MUTATION OF FROZEN OBJECT, fclone() REQUIRED !!!!!!!!!!!!!!!!!!!!!!!");
+          Thread.dumpStack();
+        }
+        assert${foam.String.capitalize(this.name)}(val);
+        ${this.name}_ = val;
+        ${this.name}IsSet_ = true;
+      `;
     },
 
     function buildJavaClass(cls) {
@@ -116,7 +148,6 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
-      var assertName = 'assert' + capitalized;
 
       cls.
         field({
@@ -151,8 +182,7 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: assertName + '(val);\n' +
-            ( this.javaSetter || ( privateName + ' = val;\n' + isSet + ' = true;' ) )
+          body: this.generateSetter_()
         });
 
       if ( this.javaFactory ) {
@@ -165,7 +195,7 @@ foam.CLASS({
       }
 
       cls.method({
-        name: assertName,
+        name: 'assert' + foam.String.capitalize(this.name),
         visibility: 'public',
         args: [
           {
@@ -246,6 +276,7 @@ foam.LIB({
       cls.abstract = this.model_.abstract;
 
       cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+
       cls.method({
         name: 'getClassInfo',
         type: 'foam.core.ClassInfo',
@@ -816,6 +847,13 @@ foam.CLASS({
           cls.extends = this.extends;
           cls.values = this.VALUES;
 
+          cls.field({
+            name: '__frozen__',
+            visibility: 'protected',
+            type: 'boolean',
+            initializer: 'false'
+          });
+
           var axioms = this.getAxioms();
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
@@ -837,6 +875,7 @@ foam.CLASS({
     ['javaType', 'java.util.Date'],
     ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+    ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
     ['javaCSVParser', 'foam.lib.json.DateParser'],
     ['sqlType', 'TIMESTAMP WITHOUT TIME ZONE']
   ],
@@ -864,6 +903,7 @@ foam.CLASS({
        ['javaType', 'java.util.Date'],
        ['javaInfoType', 'foam.core.AbstractDatePropertyInfo'],
        ['javaJSONParser', 'new foam.lib.json.DateParser()'],
+       ['javaQueryParser', 'new foam.lib.query.DuringExpressionParser()'],
        ['javaCSVParser', 'foam.lib.json.DateParser'],
        ['sqlType', 'DATE']
    ],
@@ -914,6 +954,7 @@ foam.CLASS({
     ['javaType', 'String'],
     ['javaInfoType', 'foam.core.AbstractStringPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringParser()'],
+    ['javaQueryParser', 'new foam.lib.query.StringParser()'],
     ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
     {
       name: 'sqlType',
@@ -1215,7 +1256,8 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()']
+    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()']
   ]
 });
 
@@ -1248,6 +1290,7 @@ foam.CLASS({
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
+    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
   ]
 });

@@ -6,14 +6,14 @@ foam.CLASS({
   documentation: 'Implementation of Token Service used for verifying email addresses',
 
   javaImports: [
-    'foam.dao.DAO',
     'foam.dao.ArraySink',
+    'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
+    'foam.nanos.auth.token.Token',
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
-    'foam.nanos.auth.token.Token',
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',
@@ -22,11 +22,11 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateToken',
+      name: 'generateTokenWithParameters',
       javaCode:
 `try {
 DAO tokenDAO = (DAO) getX().get("tokenDAO");
-DAO userDAO = (DAO) getX().get("localUserDAO");
+DAO userDAO  = (DAO) getX().get("localUserDAO");
 AppConfig appConfig = (AppConfig) getX().get("appConfig");
 String url = appConfig.getUrl()
     .replaceAll("/$", "");

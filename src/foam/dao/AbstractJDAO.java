@@ -16,6 +16,7 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.nanos.auth.User;
 import foam.nanos.logger.*;
+import foam.nanos.pm.PM;
 import foam.util.SafetyUtil;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -106,9 +107,21 @@ public abstract class AbstractJDAO
   protected abstract Outputter getOutputter();
 
   protected int loadJournal(File file)
-      throws IOException
+    throws IOException
   {
-    //recoding success reading entries
+    PM pm = new PM(this.getClass(), "loadJournal:" + file);
+    try {
+      return loadJournal_(file);
+    } finally {
+      pm.log(getX());
+    }
+  }
+
+
+  protected int loadJournal_(File file)
+    throws IOException
+  {
+    // recoding success reading entries
     int successReading = 0;
     JSONParser parser = getX().create(JSONParser.class);
     BufferedReader br = new BufferedReader(new FileReader(file));
