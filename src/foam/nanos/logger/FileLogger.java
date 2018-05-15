@@ -92,4 +92,9 @@ public class FileLogger
   public void debug(Object...  args) {
     logger.fine(combine(args));
   }
+
+  public String toString() {
+    return this.getClass().getSimpleName();
+  }
 }
+
