@@ -66,6 +66,10 @@ foam.CLASS({
     'wrapCSS as installCSS'
   ],
 
+  constants: {
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor' ]
+  },
+
   css: `
     body {
       font-family: 'Roboto', sans-serif;
@@ -199,13 +203,11 @@ foam.CLASS({
           });
         }
 
-        this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g,    this.primaryColor).
-          replace(/%SECONDARYCOLOR%/g,  this.secondaryColor).
-          replace(/%TABLECOLOR%/g,      this.tableColor).
-          replace(/%TABLEHOVERCOLOR%/g, this.tableHoverColor).
-          replace(/%ACCENTCOLOR%/g,     this.accentColor),
-          id);
+        for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
+          var m = this.MACROS[i];
+          text = text.replace(new RegExp("%" + m.toUpperCase() + "%"), this[m]);
+        }
+        this.installCSS(text, id);
       }
     },
 
