@@ -13,18 +13,17 @@ import foam.dao.DAO;
 import foam.dao.MapDAO;
 import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
-
 import java.security.PrivateKey;
 
 public class SigningJDAO
-    extends AbstractJDAO
+  extends AbstractJDAO
 {
-  protected Outputter outputter_ = null;
-  protected String algorithm_ = null;
-  protected PrivateKey key_ = null;
+  protected Outputter  outputter_ = null;
+  protected String     algorithm_ = null;
+  protected PrivateKey key_       = null;
 
   public SigningJDAO(X x, ClassInfo classInfo, String filename, PrivateKey key) {
-    this(x, new MapDAO(classInfo), filename, "SHA256with"+key.getAlgorithm(), key);
+    this(x, new MapDAO(classInfo), filename, "SHA256with" + key.getAlgorithm(), key);
   }
 
   public SigningJDAO(X x, ClassInfo classInfo, String filename, String algorithm, PrivateKey key) {
@@ -32,13 +31,13 @@ public class SigningJDAO
   }
 
   public SigningJDAO(X x, DAO delegate, String filename, PrivateKey key) {
-    this(x, delegate, filename, "SHA256with"+key.getAlgorithm(), key);
+    this(x, delegate, filename, "SHA256with" + key.getAlgorithm(), key);
   }
 
   public SigningJDAO(X x, DAO delegate, String filename, String algorithm, PrivateKey key) {
     super(x, delegate, filename);
     algorithm_ = algorithm;
-    key_ = key;
+    key_       = key;
   }
 
   @Override
@@ -49,6 +48,7 @@ public class SigningJDAO
       outputter_.setSigningAlgorithm(algorithm_);
       outputter_.setSigningKey(key_);
     }
+
     return outputter_;
   }
 }
