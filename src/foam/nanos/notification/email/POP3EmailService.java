@@ -2,25 +2,18 @@ package foam.nanos.notification.email;
 
 import foam.core.X;
 import foam.core.ContextAwareSupport;
+import foam.dao.DAO;
 import foam.nanos.NanoService;
+import foam.dao.ArraySink;
 import foam.nanos.notification.email.POP3Email;
-import foam.core.X;
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.Folder;
- 
+import foam.support.model.Ticket;
+import static foam.mlang.MLang.*;
 
 import java.util.Properties;
 import java.util.Objects;
 import java.util.Date;
 import java.lang.*;
+import java.util.List;
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,161 +59,74 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import com.sun.mail.pop3.POP3Folder;
+import com.sun.mail.imap.IMAPFolder;
 
 import java.lang.Object;
 
 public class POP3EmailService extends ContextAwareSupport implements POP3Email, NanoService
 {
- public POP3EmailService()
-  {
-    super();
-  }
+  public void fetch(String pop3Host, String storeType, String user, String password) {
+    DAO ticketDAO = (DAO) getX().get("ticketDAO");
 
-  public static void fetch(String pop3Host, String storeType, String user, String password) {
     try {
       Properties properties = new Properties();
-      properties.put("mail.store.protocol", "pop3");
+      properties.setProperty("mail.store.protocol", "imaps");
+      // properties.put("mail.store.protocol", "pop3");
       properties.put("mail.pop3.host", pop3Host);
       properties.put("mail.pop3.port", "995");
       properties.put("mail.pop3.starttls.enable", "true");
       Session emailSession = Session.getDefaultInstance(properties);
       emailSession.setDebug(true);
-      Store store = emailSession.getStore("pop3s");
+
+      Store store = emailSession.getStore("imaps");
+
       store.connect(pop3Host, user, password);
       Folder emailFolder = store.getFolder("INBOX");
       emailFolder.open(Folder.READ_ONLY);
-    
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-      System.in));
       Message[] messages = emailFolder.getMessages();
               
-      POP3Folder pop3Folder = (POP3Folder) emailFolder;
+      IMAPFolder imapfolder = (IMAPFolder) emailFolder;
       System.out.println("messages.length---" + messages.length);
         
       for (int i = 0; i < messages.length; i++) {
         Message message = messages[i];
-        System.out.println("---------------------------------");
-        writePart(message);
-        String emailId = pop3Folder.getUID(message);
-        System.out.println("-------- EMAIL UID ----------");
-        System.out.println(emailId);
-        String line = reader.readLine();
-        if ("YES".equals(line)) {
-          message.writeTo(System.out);
-        } else if ("QUIT".equals(line)) {
-          break;
+        long emailId = imapfolder.getUID(message);
+        System.out.println("--------emailId--------");
+        // iterate through tickets from the ticketDAO, compare emailId on ticket, if its not there create new ticket
+        // by setting the ticket emailId to the emailId from the imapfolder.getUID() method.
+        // and putting to  TicketDAO
+
+        try{ 
+          ArraySink sink = (ArraySink) ticketDAO.where(
+          AND(
+            EQ(Ticket.EMAIL_ID)
+          )
+        ).select(new ArraySink());
+          List ticketList = sink.getArray();
+          System.out.println(ticketList); 
+
         }
+        catch ( Throwable e ) {
+         
+        }
+
+
+        System.out.println(emailId);
       }
       emailFolder.close(false);
       store.close();
-    } catch (NoSuchProviderException e) {
-        e.printStackTrace();
-    } catch (MessagingException e) {
-        e.printStackTrace();
-    } catch (IOException e) {
-        e.printStackTrace();
     } catch (Exception e) {
         e.printStackTrace();
     }
   }
 
-
-  public static void writePart(Part p) throws Exception {
-    if (p instanceof Message)
-      writeEnvelope((Message) p);
-      System.out.println("----------------------------");
-      System.out.println("CONTENT-TYPE: " + p.getContentType());
-    if (p.isMimeType("text/plain")) {
-      System.out.println("This is plain text");
-      System.out.println("---------------------------");
-      System.out.println((String) p.getContent());
-    } 
-    else if (p.isMimeType("multipart/*")) {
-      System.out.println("This is a Multipart");
-      System.out.println("---------------------------");
-      Multipart mp = (Multipart) p.getContent();
-      int count = mp.getCount();
-      for (int i = 0; i < count; i++)
-        writePart(mp.getBodyPart(i));
-    } 
-    else if (p.isMimeType("message/rfc822")) {
-      System.out.println("This is a Nested Message");
-      System.out.println("---------------------------");
-      writePart((Part) p.getContent());
-    } 
-    else if (p.isMimeType("image/jpeg")) {
-      System.out.println("--------> image/jpeg");
-      Object o = p.getContent();
-      InputStream x = (InputStream) o;
-      System.out.println("x.length = " + x.available());
-      byte[] bArray = new byte[x.available()];
-      int i = 0;
-      while ((i = (int) ((InputStream) x).available()) > 0) {
-        int result = (int) (((InputStream) x).read(bArray));
-        if (result == -1)
-        break;
-      }
-      FileOutputStream f2 = new FileOutputStream("/tmp/image.jpg");
-      f2.write(bArray);
-    } 
-    else if (p.getContentType().contains("image/")) {
-      System.out.println("content type" + p.getContentType());
-      File f = new File("image" + new Date().getTime() + ".jpg");
-      DataOutputStream output = new DataOutputStream(
-        new BufferedOutputStream(new FileOutputStream(f)));
-        com.sun.mail.util.BASE64DecoderStream test = 
-              (com.sun.mail.util.BASE64DecoderStream) p
-              .getContent();
-      byte[] buffer = new byte[1024];
-      int bytesRead;
-      while ((bytesRead = test.read(buffer)) != -1) {
-        output.write(buffer, 0, bytesRead);
-      }
-    } 
-    else {
-      Object o = p.getContent();
-      if (o instanceof String) {
-        System.out.println("This is a string");
-        System.out.println("---------------------------");
-        System.out.println((String) o);
-      } 
-      else if (o instanceof InputStream) {
-        System.out.println("This is just an input stream");
-        System.out.println("---------------------------");
-        InputStream is = (InputStream) o;
-        is = (InputStream) o;
-        int c;
-        while ((c = is.read()) != -1)
-            System.out.write(c);
-      } 
-      else {
-        System.out.println("This is an unknown type");
-        System.out.println("---------------------------");
-        System.out.println(o.toString());
-      }
-    }
-  }
   
-  public static void writeEnvelope(Message m) throws Exception {
-    System.out.println("This is the message envelope");
-    System.out.println("---------------------------");
-    Address[] a;
-    if ((a = m.getFrom()) != null) {
-      for (int j = 0; j < a.length; j++)
-      System.out.println("FROM: " + a[j].toString());
-    }
-    if ((a = m.getRecipients(Message.RecipientType.TO)) != null) {
-      for (int j = 0; j < a.length; j++)
-      System.out.println("TO: " + a[j].toString());
-    }
-    if (m.getSubject() != null)
-      System.out.println("SUBJECT: " + m.getSubject());
-  }
-  private Message getMessageById(String id, Message[] messages, POP3Folder folder){
+
+  private Message getMessageById(String id, Message[] messages, IMAPFolder folder){
     String uidString = null;
     for (int j = 0; j < messages.length; j++){
       try {
-        uidString = folder.getUID(messages[j]);
+        uidString = "folder.getUID(messages[j]);";
         System.out.println(uidString);
         if ( id == uidString ){
           return messages[j];
@@ -233,9 +139,10 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
   }
   public void reply(){
     Date date = null;
-    String emailId = "GmailId162cb55999fced53";
+    String emailId = "GmailId162d463489abf2d7";
     Properties properties = new Properties();
-    properties.put("mail.store.protocol", "pop3s");
+    // properties.put("mail.store.protocol", "pop3s");
+    properties.setProperty("mail.store.protocol", "imaps");
     properties.put("mail.pop3s.host", "pop.gmail.com");
     properties.put("mail.pop3s.port", "995");
     properties.put("mail.pop3.starttls.enable", "true");
@@ -245,18 +152,26 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
     properties.put("mail.smtp.port", "25");
     Session session = Session.getDefaultInstance(properties);
     try {
-      Store store = session.getStore("pop3s");
+      Store store = session.getStore("imaps");
+
+      // Store store = session.getStore("pop3s");
       store.connect("pop.gmail.com", "pat.dev.test1@gmail.com","Choose123");
       Folder folder = store.getFolder("inbox");
       if (!folder.exists()) {
         System.out.println("inbox not found");
         System.exit(0);
       }
-      folder.open(Folder.READ_ONLY);
-      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+      folder.open(folder.READ_WRITE);    
+
       Message[] messages = folder.getMessages();
-      POP3Folder pop3Folder = (POP3Folder) folder;
-      Message message1 = getMessageById(emailId, messages, pop3Folder);
+      for (int i = 0, n = messages.length; i < n; i++){
+        System.out.println("------------!!!!!!Here's a message!!!!!!!!!---------");
+        System.out.println(messages[i].getSubject());
+      }
+      IMAPFolder imapfolder = (IMAPFolder) folder;
+
+      System.out.println("Message fetched is here:");
+      Message message1 = getMessageById(emailId, messages, imapfolder);
       if (message1 == null){
         System.out.println("............. !No Email Found! .........");
         return;
@@ -293,10 +208,7 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
           }else{
             System.out.println("Please verify your emailID" + emailId);
           }
-               
-          System.out.print("Do you want to reply to this email with ID [y/n] : ");
-          String ans = reader.readLine();
-          if ("Y".equals(ans) || "y".equals(ans)) {
+
             Message replyMessage = new MimeMessage(session);
             replyMessage = (MimeMessage) message.reply(false);
             // emailId = emailFromUser;
@@ -315,13 +227,8 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
               System.out.println("message replied successfully ....");
               folder.close(false);
               store.close();
-            } else if ("n".equals(ans)) {
-              break;
             }
           }            
-        } else {
-          System.out.println("There is no msg....");
-        }
     } catch (Exception e) {
       e.printStackTrace();
     }
