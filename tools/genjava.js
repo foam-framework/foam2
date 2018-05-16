@@ -266,6 +266,4 @@ addDepsToClasses().then(function() {
   abstractClasses.forEach(generateAbstractClass);
   skeletons.forEach(generateSkeleton);
   proxies.forEach(generateProxy);
-
-  var srcFolder = path_.join(__dirname, '../src/');
 });
