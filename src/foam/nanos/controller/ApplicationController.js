@@ -44,6 +44,7 @@ foam.CLASS({
   ],
 
   imports: [
+    'getElementById',
     'installCSS',
     'sessionSuccess',
     'window'
@@ -160,12 +161,18 @@ foam.CLASS({
     },
 
     function setDefaultMenu() {
-      // Don't select default if menu already set
-      if ( this.window.location.hash || ! this.user.group ) return;
-
       this.groupDAO.find(this.user.group).then(function (group) {
         this.group.copyFrom(group);
-        this.window.location.hash = group.defaultMenu;
+
+        for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
+          var m = this.MACROS[i];
+          if ( group[m] ) this[m] = group[m];
+        }
+
+        // Don't select default if menu already set
+        if ( group && ! this.window.location.hash ) {
+          this.window.location.hash = group.defaultMenu;
+        }
       }.bind(this));
     },
 
@@ -191,6 +198,24 @@ foam.CLASS({
       });
     },
 
+    function expandShortFormMacro(css, m) {
+      /* A short-form macros is of the form %PRIMARY_COLOR%. */
+      var M = m.toUpperCase();
+
+      return css.replace(
+        new RegExp("%" + M + "%", 'g'),
+        '/*%' + M + '%*/ ' + this[m]);
+    },
+
+    function expandLongFormMacro(css, m) {
+      // A long-form macros is of the form "/*%PRIMARY_COLOR%*/ blue".
+      var M = m.toUpperCase();
+
+      return css.replace(
+        new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
+        '/*%' + M + '%*/ ' + this[m]);
+    },
+
     // CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
       if ( text ) {
@@ -203,11 +228,24 @@ foam.CLASS({
           });
         }
 
+        let eid = foam.u2.Element.NEXT_ID();
+
         for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
-          var m = this.MACROS[i];
-          text = text.replace(new RegExp("%" + m.toUpperCase() + "%"), this[m]);
+          let m     = this.MACROS[i];
+          var text2 = this.expandShortFormMacro(this.expandLongFormMacro(text, m), m);
+
+            // If the macro was found, then listen for changes to the property
+            // and update the CSS if it changes.
+            if ( text != text2 ) {
+              text = text2;
+              this.slot(m).sub(function() {
+                var el = this.getElementById(eid);
+                el.innerText = this.expandLongFormMacro(el.innerText, m);
+              }.bind(this));
+            }
         }
-        this.installCSS(text, id);
+
+        this.installCSS(text, id, eid);
       }
     },
 
