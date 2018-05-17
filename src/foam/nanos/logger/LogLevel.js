@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,14 @@
  * limitations under the License.
  */
 
-package foam.lib.parse;
-
-public class Optional
-  implements Parser
-{
-  protected Parser p_;
-
-  public Optional(Parser parser) {
-    p_ = parser;
-  }
-
-  public PStream parse(PStream ps, ParserContext x) {
-    PStream ret = ps.apply(p_, x);
-    if ( ret != null ) return ret;
-    return ps.setValue(null);
-  }
-}
+foam.ENUM({
+    package: 'foam.nanos.logger',
+    name: 'LogLevel',
+    values: [
+      { name: 'DEBUG',       label: 'Debug' },
+      { name: 'INFO',        label: 'Info' },
+      { name: 'WARNING',     label: 'Warning' },
+      { name: 'ERROR',       label: 'Error' }
+    ]
+  });
+  

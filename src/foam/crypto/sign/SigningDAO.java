@@ -10,16 +10,15 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import java.security.PrivateKey;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.security.PrivateKey;
-
 public class SigningDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   protected PrivateKey key_;
-  protected String algorithm_;
-  protected DAO signatureDAO_;
+  protected String     algorithm_;
+  protected DAO        signatureDAO_;
 
   private static String getDefaultAlgorithm(PrivateKey key) {
     switch ( key.getAlgorithm() ) {
@@ -40,8 +39,8 @@ public class SigningDAO
   public SigningDAO(X x, DAO delegate, String algorithm, PrivateKey key) {
     setX(x);
     setDelegate(delegate);
-    key = key;
-    algorithm_ = algorithm;
+    key           = key;
+    algorithm_    = algorithm;
     signatureDAO_ = (DAO) x.get("signatureDAO");
   }
 

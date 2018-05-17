@@ -16,7 +16,7 @@ import java.security.*;
 public class SigningInputStream
     extends InputStream
 {
-  protected Signature sig_;
+  protected Signature   sig_;
   protected InputStream in_;
 
   /**
@@ -49,7 +49,7 @@ public class SigningInputStream
 
   public SigningInputStream(Signature signature, InputStream in) {
     sig_ = signature;
-    in_ = in;
+    in_  = in;
   }
 
   @Override
