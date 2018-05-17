@@ -49,7 +49,12 @@ foam.CLASS({
       name: 'defaultMenu',
       of: 'foam.nanos.menu.Menu'
     },
-    { class: 'URL', name: 'logo' },
+    { class: 'URL',    name: 'logo' },
+    { class: 'String', name: 'primaryColor' },
+    { class: 'String', name: 'secondaryColor' },
+    { class: 'String', name: 'tableColor' },
+    { class: 'String', name: 'tableHoverColor' },
+    { class: 'String', name: 'accentColor' },
 /*    {
       class: 'FObjectProperty',
       of: 'foam.nanos.app.AppConfig',

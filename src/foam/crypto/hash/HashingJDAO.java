@@ -15,9 +15,9 @@ import foam.lib.json.Outputter;
 import foam.lib.json.OutputterMode;
 
 public class HashingJDAO
-    extends AbstractJDAO
+  extends AbstractJDAO
 {
-  protected String algorithm_ = null;
+  protected String    algorithm_ = null;
   protected Outputter outputter_ = null;
 
   public HashingJDAO(X x, ClassInfo classInfo, String filename) {
@@ -44,6 +44,7 @@ public class HashingJDAO
       outputter_.setHashAlgorithm(algorithm_);
       outputter_.setOutputHash(true);
     }
+
     return outputter_;
   }
 }

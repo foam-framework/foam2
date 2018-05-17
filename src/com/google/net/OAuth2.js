@@ -29,11 +29,11 @@ foam.CLASS({
   },
 
   properties: [
+    'auth2',
+    'authToken',
     'clientId',
     'cookiePolicy',
-    'scopes',
-    'auth2',
-    'authToken'
+    'scopes'
   ],
 
   methods: [
