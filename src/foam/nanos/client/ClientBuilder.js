@@ -9,16 +9,15 @@ foam.CLASS({
   name: 'ClientBuilder',
 
   implements: [
-    'foam.box.Context',
     'foam.mlang.Expressions'
   ],
 
   requires: [
     'foam.box.HTTPBox',
     'foam.box.RetryBox',
-    'foam.dao.ClientDAO',
+    'foam.dao.EasyDAO',
     'foam.dao.RequestResponseClientDAO',
-    'foam.nanos.boot.NSpec'
+    'foam.nanos.boot.NSpec',
   ],
 
   properties: [
@@ -29,6 +28,7 @@ foam.CLASS({
         // requests to nSpecDAO.
         return this.RequestResponseClientDAO.create({
           of: this.NSpec,
+          cache: true,
           delegate: this.RetryBox.create({
             maxAttempts: -1,
             delegate: this.HTTPBox.create({
@@ -38,98 +38,70 @@ foam.CLASS({
           })
         });
       }
-    }
-  ],
+    },
+    {
+      name: 'promise',
+      factory: function() {
+        var self = this;
+        return new Promise(function(resolve) {
+          // TODO: Instead of generating a model, generate and return a context.
+          // We're not currently doing this because building a model with
+          // properties that have factories allow those properties to get
+          // instantiated lazily but there's no reason we can't give contexts
+          // the ability to do this too.
+          var client = {
+            package: 'foam.nanos.client',
+            name: 'Client',
+            exports: [],
+            properties: [],
+          };
 
-  methods: [
-    function then(resolve) {
-      var self = this;
+          var references = [];
 
-      var client = {
-        package: 'foam.nanos.client',
-        name: 'Client',
+          // Force hard reload when app version updates
+          self.nSpecDAO.find("appConfig").then(function(spec) {
+            var appConfig = spec.service;
+            var version   = appConfig.version;
 
-        implements: [ 'foam.box.Context' ],
-
-        requires: [
-          'foam.box.HTTPBox',
-          'foam.dao.RequestResponseClientDAO',
-          'foam.dao.ClientDAO',
-          'foam.dao.EasyDAO'
-        ],
-
-        exports: [
-        ],
-
-        properties: [
-        ],
-
-        methods: [
-          function createDAO(config) {
-            config.daoType = 'MDAO'; // 'IDB';
-            config.cache   = true;
-
-            return this.EasyDAO.create(config);
-          }
-        ]
-      };
-
-      var references = [];
-
-      // Force hard reload when app version updates
-      self.nSpecDAO.find("appConfig").then(function(spec) {
-        var appConfig = spec.service;
-        var version   = appConfig.version;
-
-        if ( "CLIENT_VERSION" in localStorage ) {
-          var oldVersion = localStorage.CLIENT_VERSION;
-          if ( version != oldVersion ) {
-            localStorage.CLIENT_VERSION = version;
-            location.reload(true);
-          }
-        } else {
-          localStorage.CLIENT_VERSION = version;
-        }
-      });
-
-      self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
-        put: function(spec) {
-          if ( spec.client ) {
-            client.exports.push(spec.name);
-
-            var json = JSON.parse(spec.client);
-
-            references = references.concat(foam.json.references(self.__context__, json));
-
-            client.properties.push({
-              name: spec.name,
-              factory: function() {
-                if ( ! json.serviceName ) json.serviceName = 'service/' + spec.name;
-                if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
-                if ( ! json.daoType     ) json.daoType     = 'CLIENT';
-                return foam.json.parse(json, null, this);
-                //return foam.json.parseString(spec.client, this.__context__);
+            if ( "CLIENT_VERSION" in localStorage ) {
+              var oldVersion = localStorage.CLIENT_VERSION;
+              if ( version != oldVersion ) {
+                localStorage.CLIENT_VERSION = version;
+                location.reload(true);
               }
-            });
-          }
-        },
-        eof: function() {
-          Promise.all(references).then(function() {
-            resolve(foam.core.Model.create(client));
+            } else {
+              localStorage.CLIENT_VERSION = version;
+            }
           });
-//          resolve(foam.core.Model.create(client));
-//          foam.CLASS(client);
-//          resolve(foam.nanos.client.Client);
-        }
-      });
-    }
-  ]
-});
 
-/*
-{
-  class: 'foam.dao.EasyDAO',
-  of: 'foam.nanos.pm.PMInfo',
-  type: 'CLIENT'
-}
-*/
+          self.nSpecDAO.where(self.EQ(self.NSpec.SERVE, true)).select({
+            put: function(spec) {
+              if ( spec.client ) {
+                client.exports.push(spec.name);
+
+                var json = JSON.parse(spec.client);
+
+                references = references.concat(foam.json.references(self.__context__, json));
+
+                client.properties.push({
+                  name: spec.name,
+                  factory: function() {
+                    if ( ! json.serviceName ) json.serviceName = 'service/' + spec.name;
+                    if ( ! json.class       ) json.class       = 'foam.dao.EasyDAO'
+                    if ( ! json.daoType     ) json.daoType     = 'CLIENT';
+                    return foam.json.parse(json, null, this);
+                  }
+                });
+              }
+            },
+            eof: function() {
+              Promise.all(references).then(function() {
+                resolve(foam.core.Model.create(client).buildClass());
+              });
+            }
+          });
+        })
+      },
+    },
+  ],
+});

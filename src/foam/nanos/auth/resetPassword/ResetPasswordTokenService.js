@@ -12,28 +12,29 @@ foam.CLASS({
   documentation: 'Implementation of Token Service used for reset password',
 
   imports: [
-    'appConfig',    
+    'appConfig',
     'email',
-    'localUserDAO',    
+    'localUserDAO',
     'tokenDAO'
   ],
 
   javaImports: [
+    'foam.dao.ArraySink',
     'foam.dao.DAO',
-    'foam.dao.ListSink',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
-    'foam.nanos.auth.token.Token',    
-    'foam.nanos.auth.User',    
+    'foam.nanos.auth.token.Token',
+    'foam.nanos.auth.User',
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
+    'foam.util.Email',
     'foam.util.Password',
     'foam.util.SafetyUtil',
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',
-    'java.util.UUID',
+    'java.util.UUID'
   ],
 
   axioms: [
@@ -49,21 +50,24 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateToken',
+      name: 'generateTokenWithParameters',
       javaCode:
-`
-try{
-AppConfig appConfig = (AppConfig) getAppConfig();
+`AppConfig appConfig = (AppConfig) getAppConfig();
 DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 String url = appConfig.getUrl()
     .replaceAll("/$", "");
 
-Sink sink = new ListSink();
-sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))/**/
+// check if email invalid
+if ( user == null || ! Email.isValid(user.getEmail()) ) {
+  throw new RuntimeException("Invalid Email");
+}
+
+Sink sink = new ArraySink();
+sink = userDAO.where(MLang.EQ(User.EMAIL, user.getEmail()))
    .limit(1).select(sink);
 
-List list = ((ListSink) sink).getData();
+List list = ((ArraySink) sink).getArray();
 if ( list == null || list.size() == 0 ) {
   throw new RuntimeException("User not found");
 }
@@ -88,11 +92,7 @@ args.put("name", String.format("%s %s", user.getFirstName(), user.getLastName())
 args.put("link", url +"?token=" + token.getData() + "#reset");
 
 email.sendEmailFromTemplate(user, message, "reset-password", args);
-return true;
-}catch(Exception e){
-  e.printStackTrace();
-}
-return false;`
+return true;`
     },
     {
       name: 'processToken',
@@ -102,9 +102,6 @@ return false;`
 }
 
 String newPassword = user.getPassword();
-if ( newPassword.contains(" ")) {
-  throw new RuntimeException("Password cannot contains spaces");
-}
 
 int length = newPassword.length();
 if ( length < 7 || length > 32 ) {
@@ -127,14 +124,14 @@ DAO userDAO = (DAO) getLocalUserDAO();
 DAO tokenDAO = (DAO) getTokenDAO();
 Calendar calendar = Calendar.getInstance();
 
-Sink sink = new ListSink();
+Sink sink = new ArraySink();
 sink = tokenDAO.where(MLang.AND(
   MLang.EQ(Token.PROCESSED, false),
   MLang.GT(Token.EXPIRY, calendar.getTime()),
   MLang.EQ(Token.DATA, token)
 )).limit(1).select(sink);
 
-List data = ((ListSink) sink).getData();
+List data = ((ArraySink) sink).getArray();
 if ( data == null || data.size() == 0 ) {
   throw new RuntimeException("Token not found");
 }
@@ -158,6 +155,12 @@ userResult.setPasswordLastModified(Calendar.getInstance().getTime());
 userResult.setPreviousPassword(userResult.getPassword());
 userResult.setPassword(Password.hash(newPassword));
 userDAO.put(userResult);
+EmailService email = (EmailService) getEmail();
+EmailMessage message = new EmailMessage();
+message.setTo(new String[] { userResult.getEmail() });
+HashMap<String, Object> args = new HashMap<>();
+args.put("name", userResult.getFirstName());
+email.sendEmailFromTemplate(userResult, message, "password-changed", args);
 return true;`
     }
   ]

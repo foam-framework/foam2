@@ -1,7 +1,7 @@
 package foam.nanos.auth;
 
 import foam.core.X;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.util.Password;
 
 import javax.naming.AuthenticationException;
@@ -72,7 +72,7 @@ public class UserAndGroupAuthServiceTest
   public void addTestUsers() {
     System.out.println("Registering " + numUsers + " Users");
     long startTime  = System.nanoTime();
-    ListSink sink   = (ListSink) groupDAO_.select(new ListSink());
+    ArraySink sink   = (ArraySink) groupDAO_.select(new ArraySink());
 
     /**
      * For each user, randomly select a group from the groups created
@@ -86,8 +86,8 @@ public class UserAndGroupAuthServiceTest
       user.setLastName("R" + i);
       user.setPassword(Password.hash("marc" + i));
 
-      int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
-      Group group = (Group) sink.getData().get(randomGroup);
+      int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getArray().size());
+      Group group = (Group) sink.getArray().get(randomGroup);
 
       user.setGroup(group);
       userDAO_.put(user);
@@ -122,15 +122,15 @@ public class UserAndGroupAuthServiceTest
   public void testCheck() {
     System.out.println("Permissions Check for " + numUsers + " users");
     long startTime = System.nanoTime();
-    ListSink sink  = (ListSink) groupDAO_.select(new ListSink());
+    ArraySink sink  = (ArraySink) groupDAO_.select(new ArraySink());
 
     /**
      * For each user, we check if they have access to a random permission
      * We store these permissions in an array to test caching
      * */
     for ( int i = 0 ; i < xArray.size() ; i++ ) {
-      int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getData().size());
-      Group group     = (Group) sink.getData().get(randomGroup);
+      int randomGroup = ThreadLocalRandom.current().nextInt(0, sink.getArray().size());
+      Group group     = (Group) sink.getArray().get(randomGroup);
 
       int randomPermission  = ThreadLocalRandom.current().nextInt(0, group.getPermissions().length);
       Permission permission = group.getPermissions()[randomPermission];

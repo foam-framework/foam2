@@ -10,7 +10,7 @@ import foam.core.X;
 import foam.mlang.predicate.And;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.order.Comparator;
-import foam.dao.ListSink;
+import foam.dao.ArraySink;
 import foam.dao.Sink;
 
 public class OrderedDAO
@@ -21,6 +21,14 @@ public class OrderedDAO
   public OrderedDAO(Comparator order, DAO delegate) {
     order_ = order;
     setDelegate(delegate);
+    if ( delegate instanceof ProxyDAO ) {
+      setX(((ProxyDAO)delegate).getX());
+    }
+  }
+
+  public OrderedDAO(X x, Comparator order, DAO delegate) {
+    this(order, delegate);
+    setX(x);
   }
 
   public OrderedDAO setOrder(foam.mlang.order.Comparator order) {

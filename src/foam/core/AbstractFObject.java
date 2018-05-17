@@ -6,6 +6,7 @@
 
 package foam.core;
 
+import foam.lib.json.Outputter;
 import java.security.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,7 +18,6 @@ public abstract class AbstractFObject
   extends    ContextAwareSupport
   implements FObject, Comparable, Appendable
 {
-
   public static FObject maybeClone(FObject fo) {
     return ( fo == null ? null : fo.fclone() );
   }
@@ -63,6 +63,29 @@ public abstract class AbstractFObject
     }
 
     return result;
+  }
+
+  public FObject hardDiff(FObject obj) {
+    FObject ret = null;
+    boolean isDiff = false;
+    try {
+      ret = (FObject) this.getClassInfo().getObjClass().newInstance();
+      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+      Iterator i = props.iterator();
+      PropertyInfo prop = null;
+      while ( i.hasNext() ) {
+        prop = (PropertyInfo) i.next();
+        if ( prop.getNetworkTransient() || prop.getStorageTransient() ) continue;
+        if ( prop.hardDiff(this, obj, ret) ) {
+          isDiff = true;
+        }
+      }
+    } catch ( Throwable t ) {
+      throw new RuntimeException(t);
+    } finally {
+      if ( isDiff ) return ret;
+      return null;
+    }
   }
 
   @Override
@@ -212,7 +235,7 @@ public abstract class AbstractFObject
       PropertyInfo prop = (PropertyInfo) i.next();
 
       sb.append(prop.getName());
-      sb.append(" ");
+      sb.append(": ");
 
       try {
         Object value = prop.get(this);
@@ -226,7 +249,18 @@ public abstract class AbstractFObject
         sb.append("-");
       }
 
-      if ( i.hasNext() ) sb.append(" ");
+      if ( i.hasNext() ) sb.append(", ");
     }
+  }
+
+  public String toJSON() {
+    Outputter out = new Outputter();
+    return out.stringify(this);
+  }
+
+  protected boolean __frozen__ = false;
+
+  public void freeze() {
+    __frozen__ = true;
   }
 }

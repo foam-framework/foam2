@@ -65,7 +65,7 @@ foam.CLASS({
       isFramed: true,
       code: function() {
         var self = this;
-        this.data.select(this.MAX(this.PMInfo.TOTALTIME)).then(function(max) {
+        this.data.select(this.MAX(this.PMInfo.TOTAL_TIME)).then(function(max) {
           self.maxTotalTime = max.value;
         });
       }

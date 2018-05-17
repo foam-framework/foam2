@@ -7,6 +7,7 @@
 foam.CLASS({
   package: 'foam.nanos.dig',
   name: 'DIG',
+  extends: 'foam.nanos.http.DefaultHttpParameters',
 
   documentation: 'Data Integration Gateway - Perform DAO operations against a web service',
 
@@ -21,11 +22,7 @@ foam.CLASS({
   searchColumns: [],
 
   properties: [
-    {
-        class: 'String',
-        name: 'id',
-        displayWidth: 40
-    },
+    'id',
     {
       class: 'String',
       name: 'daoKey',
@@ -42,40 +39,88 @@ foam.CLASS({
         });
       }
     },
+    'cmd',
+    'format',
     {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Command',
-      name: 'cmd'
+      class: 'String',
+      name: 'dao',
+      hidden: true,
+      transient: true,
+      postSet: function(old, nu) {
+        this.daoKey = nu;
+      }
     },
-    {
-      class: 'Enum',
-      of: 'foam.nanos.dig.Format',
-      name: 'format'
-    },
+    'q',
     {
         class: 'String',
         name: 'key'
     },
     {
       class: 'EMail',
+      displayWidth: 100,
       name: 'email'
     },
     {
-      class: 'String',
-      name: 'data'
+      class: 'EMail',
+      displayWidth: 100,
+      name: 'subject'
     },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'owner',
-      hidden: true
-      // TODO: set tableCellRenderer
-    },
+    'data',
     {
       class: 'URL',
-      name: 'url',
+      // TODO: appears not to work if named 'url', find out why.
+      name: 'digURL',
       label: 'URL',
-      displayWidth: 100
+      displayWidth: 120,
+      view: 'foam.nanos.dig.LinkView',
+      setter: function() {}, // Prevent from ever getting set
+      expression: function(key, data, email, subject, daoKey, cmd, format, q) {
+        var query = false;
+        var url = "/service/dig";
+
+        if ( daoKey ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "dao=" + daoKey;
+        }
+        if ( cmd ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "cmd=" + cmd.name.toLowerCase();
+        }
+        if ( format ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "format=" + format.name.toLowerCase();
+        }
+        if ( key ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "id=" + key;
+        }
+        if ( data ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "data=" + data;
+        }
+        if ( email ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "email=" + email;
+        }
+        if ( subject ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "subject=" + subject;
+        }
+        if ( q ) {
+          url += query ? "&" : "?";
+          query = true;
+          url += "&q=" + q;
+        }
+
+        return url;
+      }
     }
   ],
 

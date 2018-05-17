@@ -19,6 +19,9 @@ public interface FObject
   FObject deepClone();
   FObject shallowClone();
   Map diff(FObject obj);
+  void freeze();
+  //Return is FObject that contain different fields between two FObjects.
+  FObject hardDiff(FObject obj);
   Object setProperty(String prop, Object value);
   Object getProperty(String prop);
   boolean isPropertySet(String prop);
