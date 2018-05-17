@@ -97,14 +97,9 @@ public class POP3EmailService extends ContextAwareSupport implements POP3Email, 
         // and putting to  TicketDAO
 
         try{ 
-          ArraySink sink = (ArraySink) ticketDAO.where(
-          AND(
-            EQ(Ticket.EMAIL_ID)
-          )
-        ).select(new ArraySink());
+          ArraySink sink = (ArraySink) ticketDAO.where(EQ(Ticket.EMAIL_ID, emailId)).select(new ArraySink());
           List ticketList = sink.getArray();
           System.out.println(ticketList); 
-
         }
         catch ( Throwable e ) {
          

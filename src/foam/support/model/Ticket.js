@@ -22,9 +22,6 @@ foam.CLASS({
   ],
   properties: [
     {
-      name:'emailId'
-    },
-    {
       class: 'Long',
       name: 'id',
       visibility: foam.u2.Visibility.RO,
@@ -84,7 +81,7 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'userId'
+      name:'emailId'
     }
   ]
 });
