@@ -1,5 +1,5 @@
 foam.CLASS({
-  package: 'foam.nanos.notification.menu',
+  package: 'foam.nanos.notification',
   name: 'Notification',
 
   documentation: 'Notification model',

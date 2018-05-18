@@ -12,7 +12,7 @@ foam.CLASS({
 
   imports: [ 'notificationDAO', 'scriptDAO', 'user', 'invoiceDAO' ],
 
-  requires: [ 'foam.nanos.notification.menu.Notification' ],
+  requires: [ 'foam.nanos.notification.Notification' ],
 
   javaImports: [
     'bsh.EvalError',

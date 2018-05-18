@@ -1,4 +1,4 @@
-package foam.nanos.notification.menu;
+package foam.nanos.notification;
 import foam.core.Detachable;
 import foam.dao.AbstractSink;
 import foam.nanos.notification.email.EmailMessage;
