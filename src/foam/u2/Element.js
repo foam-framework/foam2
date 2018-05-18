@@ -1950,6 +1950,7 @@ foam.SCRIPT({
   requires: [
     'foam.u2.U2Context',
   ],
+  flags: ['web'],
   code: function() {
     foam.__context__ = foam.u2.U2Context.create().__subContext__;
   }
