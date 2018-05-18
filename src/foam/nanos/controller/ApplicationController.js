@@ -19,7 +19,6 @@
   Accessible through browser at location path static/foam2/src/foam/nanos/controller/index.html
   Available on browser console as ctrl. (exports axiom)
 */
-
 foam.CLASS({
   package: 'foam.nanos.controller',
   name: 'ApplicationController',
@@ -28,22 +27,24 @@ foam.CLASS({
   documentation: 'FOAM Application Controller.',
 
   implements: [
-    'foam.nanos.client.Client',
+    'foam.box.Context',
     'foam.nanos.controller.AppStyles'
   ],
 
   requires: [
+    'foam.nanos.client.ClientBuilder',
     'foam.nanos.auth.Group',
-    'foam.nanos.auth.User',
     'foam.nanos.auth.ResendVerificationEmail',
-    'foam.nanos.u2.navigation.TopNavigation',
     'foam.nanos.auth.SignInView',
-    'foam.u2.stack.Stack',
+    'foam.nanos.auth.User',
     'foam.nanos.auth.resetPassword.ResetView',
+    'foam.nanos.u2.navigation.TopNavigation',
+    'foam.u2.stack.Stack',
     'foam.u2.stack.StackView'
   ],
 
   imports: [
+    'getElementById',
     'installCSS',
     'sessionSuccess',
     'window'
@@ -65,6 +66,10 @@ foam.CLASS({
     'webApp',
     'wrapCSS as installCSS'
   ],
+
+  constants: {
+    MACROS: [ 'primaryColor', 'secondaryColor', 'tableColor', 'tableHoverColor', 'accentColor' ]
+  },
 
   css: `
     body {
@@ -89,26 +94,35 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'clientPromise',
+      factory: function() {
+        var self = this;
+        return self.ClientBuilder.create().promise.then(function(cls) {
+          return cls.create(null, self);
+        });
+      },
+    },
+    {
       name: 'stack',
-      factory: function() { return this.Stack.create(); }
+      factory: function() { return this.Stack.create(null, this.__subSubContext__); }
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.User',
       name: 'user',
-      factory: function() { return this.User.create(); }
+      factory: function() { return this.User.create(null, this.__subSubContext__); }
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group',
-      factory: function() { return this.Group.create(); }
+      factory: function() { return this.Group.create(null, this.__subSubContext__); }
     },
     {
       class: 'Boolean',
       name: 'signUpEnabled',
-      adapt: function(v) {
-        return v === 'false' ? false : true;
+      adapt: function(_, v) {
+        return foam.String.isInstance(v) ? v !== 'false' : v;
       }
     },
     {
@@ -129,39 +143,54 @@ foam.CLASS({
   methods: [
     function init() {
       this.SUPER();
+
       var self = this;
+      self.clientPromise.then(function(client) {
+        self.__subSubContext__ = client.__subContext__;
+        self.getCurrentUser();
 
-      this.getCurrentUser();
+        window.onpopstate = function(event) {
+          if ( location.hash != null ) {
+            var hid = location.hash.substr(1);
 
-      window.onpopstate = function(event) {
-        if ( location.hash != null ) {
-          var hid = location.hash.substr(1);
+            hid && self.__subSubContext__.menuDAO.find(hid).then(function(menu) {
+              menu && menu.launch(this, null);
+            });
+          }
+        };
 
-          hid && self.menuDAO.find(hid).then(function(menu) {
-            menu && menu.launch(this, null);
-          });
-        }
-      };
-
-      window.onpopstate();
+        window.onpopstate();
+      });
     },
 
     function initE() {
-      this
-        .addClass(this.myClass())
-        .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
-        .start('div').addClass('stack-wrapper')
-          .tag({class: 'foam.u2.stack.StackView', data: this.stack, showActions: false})
-        .end();
+      var self = this;
+      self.clientPromise.then(function() {
+        self
+          .addClass(self.myClass())
+          .tag({class: 'foam.nanos.u2.navigation.TopNavigation'})
+          .start('div').addClass('stack-wrapper')
+            .tag({class: 'foam.u2.stack.StackView', data: self.stack, showActions: false})
+          .end();
+      });
     },
 
     function setDefaultMenu() {
       // Don't select default if menu already set
       if ( this.window.location.hash || ! this.user.group ) return;
 
-      this.groupDAO.find(this.user.group).then(function (group) {
+      this.__subSubContext__.groupDAO.find(this.user.group).then(function (group) {
         this.group.copyFrom(group);
-        this.window.location.hash = group.defaultMenu;
+
+        for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
+          var m = this.MACROS[i];
+          if ( group[m] ) this[m] = group[m];
+        }
+
+        // Don't select default if menu already set
+        if ( group && ! this.window.location.hash ) {
+          this.window.location.hash = group.defaultMenu;
+        }
       }.bind(this));
     },
 
@@ -169,7 +198,7 @@ foam.CLASS({
       var self = this;
 
       // get current user, else show login
-      this.auth.getCurrentUser(null).then(function (result) {
+      this.__subSubContext__.auth.getCurrentUser(null).then(function (result) {
         self.loginSuccess = !! result;
         if ( result ) {
           self.user.copyFrom(result);
@@ -187,6 +216,24 @@ foam.CLASS({
       });
     },
 
+    function expandShortFormMacro(css, m) {
+      /* A short-form macros is of the form %PRIMARY_COLOR%. */
+      var M = m.toUpperCase();
+
+      return css.replace(
+        new RegExp("%" + M + "%", 'g'),
+        '/*%' + M + '%*/ ' + this[m]);
+    },
+
+    function expandLongFormMacro(css, m) {
+      // A long-form macros is of the form "/*%PRIMARY_COLOR%*/ blue".
+      var M = m.toUpperCase();
+
+      return css.replace(
+        new RegExp('/\\*%' + M + '%\\*/[^;]*', 'g'),
+        '/*%' + M + '%*/ ' + this[m]);
+    },
+
     // CSS preprocessor, works on classes instantiated in subContext
     function wrapCSS(text, id) {
       if ( text ) {
@@ -199,13 +246,24 @@ foam.CLASS({
           });
         }
 
-        this.installCSS(text.
-          replace(/%PRIMARYCOLOR%/g,    this.primaryColor).
-          replace(/%SECONDARYCOLOR%/g,  this.secondaryColor).
-          replace(/%TABLECOLOR%/g,      this.tableColor).
-          replace(/%TABLEHOVERCOLOR%/g, this.tableHoverColor).
-          replace(/%ACCENTCOLOR%/g,     this.accentColor),
-          id);
+        let eid = foam.u2.Element.NEXT_ID();
+
+        for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
+          let m     = this.MACROS[i];
+          var text2 = this.expandShortFormMacro(this.expandLongFormMacro(text, m), m);
+
+            // If the macro was found, then listen for changes to the property
+            // and update the CSS if it changes.
+            if ( text != text2 ) {
+              text = text2;
+              this.slot(m).sub(function() {
+                var el = this.getElementById(eid);
+                el.innerText = this.expandLongFormMacro(el.innerText, m);
+              }.bind(this));
+            }
+        }
+
+        this.installCSS(text, id, eid);
       }
     },
 

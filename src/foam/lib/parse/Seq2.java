@@ -17,15 +17,17 @@
 
 package foam.lib.parse;
 
-public class Seq2 implements Parser {
+public class Seq2
+  implements Parser
+{
   private Parser[] parsers;
-  private int index1;
-  private int index2;
+  private int      index1;
+  private int      index2;
 
   public Seq2(int i, int j, Parser... args) {
     parsers = args;
-    index1 = i;
-    index2 = j;
+    index1  = i;
+    index2  = j;
   }
 
   public PStream parse(PStream ps, ParserContext x) {

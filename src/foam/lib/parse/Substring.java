@@ -9,7 +9,7 @@ package foam.lib.parse;
 public class Substring
   extends ProxyParser
 {
-  
+
   public Substring(Parser delegate) {
     super(delegate);
   }
@@ -19,9 +19,7 @@ public class Substring
 
     ps = super.parse(ps, x);
 
-    if ( ps != null ) {
-      return ps.setValue(start.substring(ps));
-    }
+    if ( ps != null ) return ps.setValue(start.substring(ps));
 
     return ps;
   }

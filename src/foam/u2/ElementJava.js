@@ -97,6 +97,10 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.u2',
+  name: 'Tab'
+});
+foam.CLASS({
+  package: 'foam.u2',
   name: 'Tabs',
   methods: [ 
     function add() { },
@@ -145,4 +149,16 @@ foam.CLASS({
     function initE() { } ,
     function load() { },
   ],
+});
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Transform'
+});
+foam.CLASS({
+  package: 'foam.graphics',
+  name: 'Canvas'
+});
+foam.CLASS({
+  refines: 'foam.core.Method',
+  properties: [ 'javaCode' ]
 });
