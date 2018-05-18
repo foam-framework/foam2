@@ -10,7 +10,9 @@ foam.CLASS({
 
   implements: [ 'foam.nanos.auth.EnabledAware' ],
 
-  imports: [ 'scriptDAO' ],
+  imports: [ 'notificationDAO', 'scriptDAO', 'user', 'invoiceDAO' ],
+
+  requires: [ 'foam.nanos.notification.menu.Notification' ],
 
   javaImports: [
     'bsh.EvalError',
@@ -159,14 +161,20 @@ foam.CLASS({
         this.output = '';
 
 //        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+        var notification = null;
         if ( this.server ) {
           this.scheduled = true;
           this.scriptDAO.put(this).then(function(script) {
             self.copyFrom(script);
+            notification = self.Notification.create({
+              userId: self.user.id,
+              notificationType: "Script run",
+              body: 'Script output: ' + self.output + '. \nLast time run: ' + self.lastRun + '. \nLast duration: ' + self.duration
+            })
+            self.notificationDAO.put(notification);
           });
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
-
           with ( { log: log, print: log, x: self.__context__ } ) {
             var ret = eval(this.code);
             console.log('ret: ', ret);
@@ -174,6 +182,12 @@ foam.CLASS({
           }
 
           this.scriptDAO.put(this);
+          notification = self.Notification.create({
+            userId: self.user.id,
+            notificationType: "Script run",
+            body: 'Script output: ' + self.output + '. \nLast time run: ' + self.lastRun + '. \nLast duration: ' + self.duration
+          })
+          self.notificationDAO.put(notification);
         }
       }
     }

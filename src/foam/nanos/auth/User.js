@@ -261,6 +261,14 @@ foam.CLASS({
       value: false
     },
     {
+      class: 'StringArray',
+      name: 'disabledNotifs'
+    },
+    {
+      class: 'StringArray',
+      name: 'disabledNotifsEmail'
+    },
+    {
       class: 'URL',
       name: 'website',
       displayWidth: 80,
