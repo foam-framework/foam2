@@ -6,6 +6,7 @@ foam.CLASS({
   documentation: 'Implementation of Token Service used for verifying email addresses',
 
   javaImports: [
+    'foam.core.FObject',
     'foam.dao.ArraySink',
     'foam.dao.DAO',
     'foam.dao.Sink',
@@ -73,9 +74,10 @@ if ( list == null || list.size() == 0 ) {
 }
 
 // set token processed to true
-Token result = (Token) list.get(0);
-result.setProcessed(true);
-tokenDAO.put(result);
+FObject result = (FObject) list.get(0);
+Token clone = (Token) result.fclone();
+clone.setProcessed(true);
+tokenDAO.put(clone);
 
 // set user email verified to true
 user.setEmailVerified(true);
