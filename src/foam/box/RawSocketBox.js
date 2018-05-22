@@ -23,7 +23,8 @@ foam.CLASS({
   requires: [ 'foam.box.ReplyBox' ],
   imports: [
     'me',
-    'registry',
+    'outputter',
+    'registry'
   ],
 
   properties: [
@@ -31,24 +32,6 @@ foam.CLASS({
       class: 'Object',
       name: 'socket',
       javaType: 'org.java_websocket.WebSocket'
-    }
-  ],
-
-  classes: [
-    {
-      name: 'JSONOutputter',
-      extends: 'foam.json.Outputter',
-
-      requires: [ 'foam.box.ReturnBox' ],
-      imports: [ 'me' ],
-      methods: [
-        function output(o) {
-          if ( o === this.me ) {
-            return this.SUPER(this.ReturnBox.create());
-          }
-          return this.SUPER(o);
-        }
-      ]
     }
   ],
 
@@ -66,12 +49,13 @@ foam.CLASS({
           // property on Message and have custom serialization in it to
           // do the registration.
 
-          msg.attributes.replyBox =
-            this.__context__.registry.register(null, null, msg.attributes.replyBox);
+          msg.attributes.replyBox = this.__context__.registry.
+              register(null, null, msg.attributes.replyBox);
         }
 
+        var payload = this.outputter.stringify(msg);
         try {
-          this.socket.write(msg);
+          this.socket.write(payload);
           if ( replyBox ) {
             msg.attributes.replyBox = replyBox;
           }

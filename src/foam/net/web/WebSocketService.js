@@ -16,22 +16,14 @@ foam.CLASS({
     'foam.box.RawWebSocketBox'
   ],
 
-  imports: [ 'creationContext' ],
+  imports: [
+    'creationContext',
+    'parser'
+  ],
 
   properties: [
     {
       name: 'delegate'
-    },
-    {
-      class: 'FObjectProperty',
-      of: 'foam.json.Parser',
-      name: 'parser',
-      factory: function() {
-        return this.Parser.create({
-          strict: true,
-          creationContext: this.creationContext
-        });
-      }
     }
   ],
 

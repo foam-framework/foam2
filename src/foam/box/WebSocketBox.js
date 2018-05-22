@@ -20,9 +20,9 @@ foam.CLASS({
   name: 'WebSocketBox',
 
   requires: [
-    'foam.net.web.WebSocket',
     'foam.box.Message',
-    'foam.box.RawWebSocketBox'
+    'foam.box.RawWebSocketBox',
+    'foam.net.web.WebSocket'
   ],
 
   imports: [
