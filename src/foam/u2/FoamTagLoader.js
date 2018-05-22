@@ -28,28 +28,32 @@ foam.CLASS({
     function loadTag(el) {
       var clsName = el.getAttribute('class');
 
-      this.classloader.load(clsName).then(function(cls) {
-        var obj = cls.create(null, foam.__context__);
+      return new Promise(function(resolve, reject) {
+        this.classloader.load(clsName).then(function(cls) {
+          var obj = cls.create(null, foam.__context__);
 
-        if ( obj.then ) {
-          var p = new Promise(function(resolve) {
-            obj.then(function() { resolve(); });
-          });
-          return p;
-        }
+          /*
+          if ( obj.then ) {
+            var p = new Promise(function(resolve) {
+              obj.then(function() { resolve(); });
+            });
+            return p;
+          }
+          */
 
-        if ( obj.promiseE ) {
-          obj.promiseE().then(function(view) { this.installView(el, view); });
-        } else if ( obj.toE ) {
-          this.installView(el, obj.toE({}, foam.__context__));
-        } else if ( ! foam.u2.Element.isInstance(view) )  {
-          installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
-        }
-        return new Promise.resolve();
-      }.bind(this), function(e) {
-        console.error(e);
-        console.error('Failed to load class: ', clsName);
-      });
+          if ( obj.promiseE ) {
+            obj.promiseE().then(function(view) { this.installView(el, view); });
+          } else if ( obj.toE ) {
+            this.installView(el, obj.toE({}, foam.__context__));
+          } else if ( ! foam.u2.Element.isInstance(view) )  {
+            installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
+          }
+          resolve();
+        }.bind(this), function(e) {
+          console.error(e);
+          console.error('Failed to load class: ', clsName);
+        });
+      }.bind(this));
     },
 
     function installView(el, view) {
@@ -80,7 +84,7 @@ foam.CLASS({
       var els = Array.from(this.document.getElementsByTagName('foam'));
       this.window.removeEventListener('load', this.onLoad);
 
-      aForEach(els, this.loadTag.bind(this));
+      this.aForEach(els, this.loadTag.bind(this));
 //      els.forEach(this.loadTag.bind(this));
     }
   ]
