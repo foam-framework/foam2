@@ -8,7 +8,7 @@ foam.CLASS({
     'java.util.Date'
   ],
 
-	tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
+  tableColumns: ['id', 'body', 'notificationType', 'broadcasted', 'userId', 'groupId' ],
 
   properties: [
     {
