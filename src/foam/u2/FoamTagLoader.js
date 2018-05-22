@@ -28,33 +28,54 @@ foam.CLASS({
     function loadTag(el) {
       var clsName = el.getAttribute('class');
 
-      this.classloader.load(clsName).then(function(cls) {
-        var id  = el.id;
+      return new Promise(function(resolve, reject) {
+        this.classloader.load(clsName).then(function(cls) {
+          var obj = cls.create(null, foam.__context__);
 
-        var view = cls.create(null, foam.__context__);
+          /*
+          if ( obj.then ) {
+            var p = new Promise(function(resolve) {
+              obj.then(function() { resolve(); });
+            });
+            return p;
+          }
+          */
 
-        if ( view.toE ) {
-          view = view.toE({}, foam.__context__);
-        } else if ( ! foam.u2.Element.isInstance(view) )  {
-          view = foam.u2.DetailView.create({data: view, showActions: true});
-        }
+          if ( obj.promiseE ) {
+            obj.promiseE().then(function(view) { this.installView(el, view); });
+          } else if ( obj.toE ) {
+            this.installView(el, obj.toE({}, foam.__context__));
+          } else if ( ! foam.u2.Element.isInstance(view) )  {
+            installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
+          }
+          resolve();
+        }.bind(this), function(e) {
+          console.error(e);
+          console.error('Failed to load class: ', clsName);
+        });
+      }.bind(this));
+    },
 
-        for ( var j = 0 ; j < el.attributes.length ; j++ ) {
-          var attr = el.attributes[j];
-          var p    = this.findPropertyIC(view.cls_, attr.name);
-          if ( p ) p.set(view, attr.value);
-        }
+    function installView(el, view) {
+      var id  = el.id;
 
-        el.outerHTML = view.outerHTML;
-        view.load();
+      for ( var j = 0 ; j < el.attributes.length ; j++ ) {
+        var attr = el.attributes[j];
+        var p    = this.findPropertyIC(view.cls_, attr.name);
+        if ( p ) p.set(view, attr.value);
+      }
 
-        // Store view in global variable if named. Useful for testing.
-        if ( id ) global[id] = view;
+      el.outerHTML = view.outerHTML;
+      view.load();
 
-      }.bind(this), function(e) {
-        console.error(e);
-        console.error('Failed to load class: ', clsName);
-      });
+      // Store view in global variable if named. Useful for testing.
+      if ( id ) global[id] = view;
+    },
+
+    function aForEach(a, f, opt_i) {
+      var i = opt_i || 0;
+      if ( ! a || ! a.length || i >= a.length ) return;
+      f(a[i]).then(this.aForEach.bind(this, a, f, i+1));
     }
   ],
 
@@ -63,8 +84,8 @@ foam.CLASS({
       var els = Array.from(this.document.getElementsByTagName('foam'));
       this.window.removeEventListener('load', this.onLoad);
 
-      // Install last to first to avoid messing up the 'els' list.
-      els.forEach(this.loadTag.bind(this));
+      this.aForEach(els, this.loadTag.bind(this));
+//      els.forEach(this.loadTag.bind(this));
     }
   ]
 });
