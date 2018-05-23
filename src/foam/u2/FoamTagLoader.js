@@ -31,12 +31,14 @@ foam.CLASS({
       this.classloader.load(clsName).then(function(cls) {
         var obj = cls.create(null, foam.__context__);
 
+        /*
         if ( obj.then ) {
           var p = new Promise(function(resolve) {
             obj.then(function() { resolve(); });
           });
           return p;
         }
+        */
 
         if ( obj.promiseE ) {
           obj.promiseE().then(function(view) { this.installView(el, view); });
@@ -45,7 +47,6 @@ foam.CLASS({
         } else if ( ! foam.u2.Element.isInstance(view) )  {
           installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
         }
-        return new Promise.resolve();
       }.bind(this), function(e) {
         console.error(e);
         console.error('Failed to load class: ', clsName);
@@ -53,7 +54,7 @@ foam.CLASS({
     },
 
     function installView(el, view) {
-      var id  = el.id;
+      var id = el.id;
 
       for ( var j = 0 ; j < el.attributes.length ; j++ ) {
         var attr = el.attributes[j];
@@ -66,12 +67,6 @@ foam.CLASS({
 
       // Store view in global variable if named. Useful for testing.
       if ( id ) global[id] = view;
-    },
-
-    function aForEach(a, f, opt_i) {
-      var i = opt_i || 0;
-      if ( ! a || ! a.length || i >= a.length ) return;
-      f(a[i]).then(this.aForEach.bind(this, a, f, i+1));
     }
   ],
 
@@ -80,8 +75,7 @@ foam.CLASS({
       var els = Array.from(this.document.getElementsByTagName('foam'));
       this.window.removeEventListener('load', this.onLoad);
 
-      aForEach(els, this.loadTag.bind(this));
-//      els.forEach(this.loadTag.bind(this));
+      els.forEach(this.loadTag.bind(this));
     }
   ]
 });
