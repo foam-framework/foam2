@@ -25,15 +25,7 @@
      'messageboard'
   ],
 
-  exports: [
-    'dblclick'
-  ],
-
   css: `
-    ^ {
-      width: 1240px;
-      margin: 0 auto;
-    }
     ^ .inline-float-right {
       float: right;
       display: inline-block;
@@ -42,29 +34,62 @@
       margin-bottom: 10px;
     }
     ^ .net-nanopay-ui-ActionView-create{
-      margin-right: 10px;
+      margin-bottom: 10px;
+      float: right;
     }
-    ^ table {
-      width: 1240px;
-    }
-    ^ .foam-u2-view-TableView-row {
-      height: 40px;
-    }
-    ^ .table-attachment {
-      width: 20px;
-      height: 20px;
-      float: left;
-      padding: 10px 0 0 10px;
-    }
-    ^ h3{
-      width: 150px;
-      display: inline-block;
-      font-size: 14px;
-      line-height: 1;
-      font-weight: 500;
-      text-align: center;
-      color: #093649;
-    }
+   ^ table {
+     border-collapse: collapse;
+     margin: auto;
+     width: 962px;
+     max-height:200px;
+     overflow-y:auto;
+   }
+   ^ .foam-u2-view-TableView {
+    border-spacing: 14px 8px;
+    overflow: scroll;
+   }
+   ^ table > tbody:nth-child(even) {
+     background: #f6f9f9;
+   }
+   ^ td {
+    font-family: Roboto;
+    font-size: 12px;
+    line-height: 1.33;
+    letter-spacing: 0.2px;
+    padding-left: 15px;
+    font-size: 12px;
+    color: #093649;
+   }
+  ^ tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+    height: 20px;
+  }
+  ^ .table-attachment {
+    width: 20px;
+    height: 20px;
+    float: left;
+    padding: 10px 0 0 10px;
+  }
+  ^ thead {
+    width: 962px;
+    background-color: rgba(110, 174, 195, 0.2);
+    padding-bottom: 10px;
+    margin: 0;
+  }
+  ^ table > thead > tr {
+    height: 40px;
+  }
+  ^ table > tbody > tr {
+    height: 35px;
+  }
+  ^ .net-nanopay-ui-ActionView {
+    background: #59aadd;
+    color: white;
+    margin-right: 4px;
+  }
+
 
   `,
 
@@ -78,6 +103,16 @@
           'id', 'title', 'creator', 'createdDate'
         ]
       }
+    },
+    {
+      class: 'String',
+      name: 'query',
+      view: {
+        class: 'foam.u2.TextField',
+        type: 'Messageboard Search',
+        placeholder: 'Title',
+        onKey: true
+      }
     }
   ],
 
@@ -86,22 +121,90 @@
       this.SUPER();
       var self = this;
 
+ this.start('table')
+  .start('tr')
+    .start('td')
+        //.start().addClass('button-div')
+          .start(this.QUERY).end()
+          .start(this.CREATE).end()
+          //.start().add('Create').on('click', this.onCreate).end()
+        //.end()
+    .end()
+    .end()
+  .end()
+
+
+  .start('tr')
+    .start('td')
+
       this
         .addClass(this.myClass())
-        .start()
-          .start()
-            .start().addClass('button-div')
-              .start(this.CREATE).end()
-              //.start().add('Create').on('click', this.onCreate).end()
+        // .start()
+        //   // .start('div')
+        //   //   .start().addClass('button-div')
+        //   //     .start(this.QUERY).end()
+        //   //     .start(this.CREATE).addClass('net-nanopay-ui-ActionView').end()
+        //   //     //.start().add('Create').on('click', this.onCreate).end()
+        //   //   .end()
+        //   // .end()
+        //   .start()
+
+            .start('table').addClass('foam-u2-view-TableView')
+              .start('thead')
+                .start('tr')
+                  .start('td').add('').end()
+                  .start('td').add('Id').end()
+                  .start('td').add('Title').end()
+                  .start('td').add('Creator').end()
+                  .start('td').add('Date').end()
+                  .start('td').add('').end()
+              .end()
             .end()
+            .start('tbody')
+              .select(this.messageboardDAO.orderBy(this.Messageboard.ID), function(m) {
+                var cb = foam.u2.md.CheckBox.create({data: m.starmark});
+                cb.data$.sub(function() { self.starMessageboard(m, cb.data); });
+
+                this.start('tr').on('dblclick', function() { self.stack.push({
+                      class: 'foam.demos.net.nap.web.EditMessageboard',
+                      data: m
+                    }, this); } )
+                  .start('td').tag(cb).end()
+                  .start('td').add(m.id).end()
+                  .show(self.query$.map(function(query) { query = query.trim(); return query == "" || m.title.indexOf(query) != -1; }))
+                  .start('td').add(m.title).end()
+                  .start('td').add(m.creator).end()
+                  .start('td').add(m.createdDate.toISOString().substring(0,10)).end()
+                  .start('td')
+                    .callIf(m.messageboardFile[0], function(){
+                      this.start().addClass('table-attachment')
+                        .tag({ class: 'foam.u2.tag.Image', data: 'images/ic-attachment.svg' })
+                      .end()
+                    })
+                  .end()
+
+                .end()
+              }).end()
+
+
+          //   .end()
+          // .end()
+
           .end()
-          .start()
-            .add(this.DATA)
           .end()
+        .end()
+
+
          .end();
     },
-    function dblclick(messageboard) {
-      this.onEdit(messageboard);
+
+    function starMessageboard(messageboard, data) {
+      var dao = this.messageboardDAO;
+      dao.find(messageboard).then(function(messageboard) {
+
+        messageboard.starmark = data;
+        dao.put(messageboard);
+      });
     }
   ],
 
@@ -118,39 +221,5 @@
   ],
 
   listeners: [
-    function onEdit(messageboard) {
-      this.stack.push({
-        class: 'foam.demos.net.nap.web.EditMessageboard',
-        data: messageboard
-      }, this);
-    },
-
-    {
-      name: 'onAttachmentButtonClick',
-      code: function (e) {
-        var p = this.PopupView.create({
-          minWidth: 175,
-          width: 275,
-          padding: 0.1,
-          x: 0.1,
-          y: 20
-        });
-
-        p.addClass('dropdown-content')
-        .call(function () {
-          var files = this.data.messageboardFile;
-          for ( var i = 0 ; i < files.length ; i++ ) {
-            p.tag({
-              class: 'net.nanopay.invoice.ui.InvoiceFileView',
-              data: files[i],
-              fileNumber: i + 1,
-              removeHidden: true
-            })
-          }
-        }.bind(this));
-
-        this.popupMenu_.add(p);
-      }
-    }
  ]
 });

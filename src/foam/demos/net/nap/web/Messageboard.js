@@ -27,16 +27,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'starmark',
-      //view: { class: 'foam.u2.CheckBox' }
-      tableCellFormatter: function(value, obj, property) {
-        this
-          .start()
-            .call(function() {
-              if ( value ) { this.tag({ class: 'foam.u2.tag.Image', data: 'images/star.svg' }).style({'width': '25'}); }
-            })
-            //.add(value ? ' Y' : '-')
-          .end();
-      }
+      view: { class: 'foam.u2.CheckBox' }
     },
     {
       class: 'String',
@@ -66,18 +57,10 @@ foam.CLASS({
       name: 'content',
       view: { class: 'foam.u2.tag.TextArea', rows: 30, cols: 120}
     },
-    // {
-    //   class: 'foam.nanos.fs.FileArray',
-    //   name: 'messageboardFile',
-    //   view: { class: 'foam.demos.net.nap.web.MessageboardFileView' }
-    // }
-
     {
       class: 'foam.nanos.fs.FileArray',
       name: 'messageboardFile',
-      label: 'Attachments',
-      documentation: 'Additional documents for messageboard',
-      view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView' }
+      view: { class: 'foam.demos.net.nap.web.MessageboardForm' }
     }
   ]
 });
