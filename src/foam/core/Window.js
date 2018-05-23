@@ -198,10 +198,12 @@ foam.CLASS({
     function cancelAnimationFrame(id) {
       this.window.cancelAnimationFrame(id);
     },
-    function installCSS(text, id) {
+    function installCSS(text, id, opt_eid) {
+      var eid = foam.u2.Element.NEXT_ID();
       /* Create a new <style> tag containing the given CSS code. */
-      this.document && this.document.head.insertAdjacentHTML('beforeend',
-          '<style owner="' + id + '">' + text + '</style>');
+      this.document && this.document.head.insertAdjacentHTML(
+        'beforeend',
+        '<style id="' + opt_eid + '" owner="' + id + '">' + text + '</style>');
     }
   ]
 });

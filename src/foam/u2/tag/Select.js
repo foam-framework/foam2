@@ -58,9 +58,9 @@ foam.CLASS({
         }
 
         for ( var i = 0 ; i < choices.length ; i++ ) {
-          var c = choices[i];
-          var value = c[1];
-          let e = self.E('option').attrs({
+          var c     = choices[i];
+          let value = c[1];
+          let e     = self.E('option').attrs({
             value: i,
             selected: self.data === i ? true : undefined
           }).add(value);

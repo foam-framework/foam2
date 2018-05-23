@@ -13,7 +13,7 @@ import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
 
 public class EmailVerificationDAO
-    extends ProxyDAO
+  extends ProxyDAO
 {
   EmailTokenService emailToken;
 

@@ -17,7 +17,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 public class ThreadsWebAgent
-    implements WebAgent
+  implements WebAgent
 {
   public ThreadsWebAgent() {}
 

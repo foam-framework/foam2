@@ -87,14 +87,15 @@ foam.CLASS({
     }
     ^ .box-for-drag-drop {
       border: dashed 4px #edf0f5;
-      width: 90%;
+      background:white;
       height: 110px;
       padding: 10px 10px;
       position: relative;
     }
+
     ^ .boxless-for-drag-drop {
       border: solid 4px white;
-      width: 90%;
+      background:white;
       height: 110px;
       padding: 10px 10px;
       position: relative;
@@ -108,14 +109,15 @@ foam.CLASS({
     },
     {
       class: 'foam.nanos.fs.FileProperty',
-      name: 'data'
+      name: 'ProfilePictureImage'
     },
     {
       class: 'Boolean',
       name: 'dragActive',
       value: false
     },
-    [ 'uploadHidden', false ]
+    [ 'uploadHidden', false ],
+    [ 'boxHidden', false ]
   ],
 
   messages: [
@@ -123,7 +125,7 @@ foam.CLASS({
     { name: 'RemoveImageLabel', message: 'Remove File' },
     { name: 'UploadDesc', message: 'Or drag and drop an image here' },
     { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
-    { name: 'FileError', message: 'File required' },    
+    { name: 'FileError', message: 'File required' },
     { name: 'FileTypeError', message: 'Wrong file format' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }
   ],
@@ -133,31 +135,30 @@ foam.CLASS({
       var self = this;
       this
         .addClass(this.myClass())
-        .start('div').addClass(this.dragActive$.map(function (drag) {
-          return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
+        .start('div').addClass((this.boxHidden)?'boxless-for-drag-drop' :this.dragActive$.map(function (drag) {
+          return drag ? 'box-for-drag-drop' : 'boxless-for-drag-drop';
         }))
-          .add(this.slot(function (data) {
+          .add(this.slot(function (ProfilePictureImage) {
             return this.E('img').addClass('shopperImage')
             .attrs({
-              src: this.data$.map(function (data) {
-                if ( data && data.data ) {
-                  var blob = data.data;
+              src: this.ProfilePictureImage$.map(function (ProfilePictureImage) {
+                if ( ProfilePictureImage && ProfilePictureImage.data ) {
+                  var blob = ProfilePictureImage.data;
                   var sessionId = localStorage['defaultSession'];
-                  if ( self.BlobBlob.isInstance(blob) ) 
+                  if ( self.BlobBlob.isInstance(blob) )
                     return URL.createObjectURL(blob.blob);
-                  else {
-                    var url = '/service/httpFileService/' + data.id;
-                    // attach session id if available
-                    if ( sessionId ) 
-                      url += '?sessionId=' + sessionId;
-                    return url;
-                  }
-                } else {
-                   return self.placeholderImage;
+
+                  var url = '/service/httpFileService/' + ProfilePictureImage.id;
+                  // attach session id if available
+                  if ( sessionId )
+                    url += '?sessionId=' + sessionId;
+                  return url;
                 }
+
+                return self.placeholderImage;
               })
             });
-          }, this.data$))
+          }, this.ProfilePictureImage$))
           .on('dragstart', this.onDragStart)
           .on('dragenter', this.onDragEnter)
           .on('dragover', this.onDragOver)
@@ -175,8 +176,8 @@ foam.CLASS({
               .on('click', this.onAddAttachmentClicked)
             .end()
           .end()
-          .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.data$.map(function (data) {
-              return data;
+          .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.ProfilePictureImage$.map(function (ProfilePictureImage) {
+              return ProfilePictureImage;
             }))
             .start().addClass('attachment-btn grey-button btn')
               .add(this.RemoveImageLabel)
@@ -187,7 +188,7 @@ foam.CLASS({
             .start().add(this.UploadDesc).addClass('uploadDescription').end()
             .start().add(this.UploadRestrict).addClass('uploadRestriction').end()
           .end()
-        .end()
+        .end();
     }
   ],
 
@@ -198,44 +199,40 @@ foam.CLASS({
 
     function onRemoveClicked (e) {
       this.dragActive = false;
-      this.data = null;
+      this.ProfilePictureImage= null;
     },
 
     function onDragOver(e) {
       this.dragActive = true;
-      e.preventDefault();    
+      e.preventDefault();
     },
 
     function onDrop(e) {
-      e.preventDefault();  
+      e.preventDefault();
       this.dragActive = false;
-      if ( this.uploadHidden ) 
-        return;
-      else {
-        var inputFile;
-        if ( e.dataTransfer.items ) {
-          inputFile = e.dataTransfer.items[0]
-          if ( inputFile.kind === 'file' ) {     
-            var file = inputFile.getAsFile();
-            if ( this.isImageType(file) ) this.addFile(file);
-            else 
-              this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
-          }
-        } else if( e.dataTransfer.files ) {
-          var file = e.dataTransfer.files[0];
-          if ( this.isImageType(file) ) this.addFile(file);
-          else 
-            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' })); 
+      if ( this.uploadHidden ) return;
+
+      var inputFile;
+      if ( e.dataTransfer.items ) {
+        inputFile = e.dataTransfer.items[0]
+        if ( inputFile.kind === 'file' ) {
+          var file = inputFile.getAsFile();
+          if ( this.isImageType(file) )
+            this.addFile(file);
+          else
+            this.add(this.NotificationMessage.create({message: this.FileTypeError, type: 'error'}));
         }
+      } else if ( e.dataTransfer.files ) {
+        var file = e.dataTransfer.files[0];
+        if ( this.isImageType(file) )
+          this.addFile(file);
+        else
+          this.add(this.NotificationMessage.create({message: this.FileTypeError, type: 'error'}));
       }
     },
 
     function isImageType(file) {
-      if ( file.type === "image/jpg"  || 
-           file.type === "image/jpeg" || 
-           file.type === "image/png" ) 
-        return true;
-      return false;
+      return file.type === "image/jpg" || file.type === "image/jpeg" || file.type === "image/png";
     },
 
     function onChange (e) {
@@ -243,13 +240,13 @@ foam.CLASS({
       var file = e.target.files[0];
       this.addFile(file);
     },
-    
+
     function addFile (file) {
       if ( file.size > ( 2 * 1024 * 1024 ) ) {
         this.add(this.NotificationMessage.create({ message: this.ErrorMessage, type: 'error' }));
         return;
       }
-      this.data = this.File.create({
+      this.ProfilePictureImage= this.File.create({
         owner: this.user.id,
         filename: file.name,
         filesize: file.size,

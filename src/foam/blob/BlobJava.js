@@ -188,7 +188,7 @@ foam.CLASS({
 
   javaImports: [
     'org.apache.commons.io.IOUtils',
-    'org.apache.geronimo.mail.util.Hex',
+    'org.apache.commons.codec.binary.Hex',
     'java.io.File',
     'java.io.FileOutputStream'
   ],
@@ -226,7 +226,7 @@ try {
   blob.read(os, 0, size);
   os.close();
 
-  String digest = new String(Hex.encode(os.digest()));
+  String digest = new String(Hex.encodeHexString(os.digest()));
   File dest = new File(sha256_ + File.separator + digest);
   tmp.renameTo(dest);
 
