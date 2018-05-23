@@ -12,26 +12,27 @@
   documentation: 'Edit Messageboard Form',
 
   implements: [
-  'foam.mlang.Expressions'
+    'foam.mlang.Expressions'
   ],
 
   requires: [
-    'foam.demos.net.nap.web.model.Messageboard',
-    'foam.nanos.fs.File',
     'foam.blob.BlobBlob',
+    'foam.nanos.fs.File',
+    'foam.demos.net.nap.web.model.Messageboard',
     'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
-    'user',
-    'stack',
+    'blobService',
     'messageboard',
     'messageboardDAO',
-    'blobService'
+    'stack',
+    'user'
   ],
 
   exports: [
-    'as view'
+    'as view',
+    'onFileRemoved'
   ],
 
   css: `
@@ -83,6 +84,8 @@
     }
     ^ .attachment-btn {
       margin-left: 5px;
+      margin-bottom: 10px;
+      margin-top: 10px;
     }
     ^ .attachment-input {
       width: 0.1px;
@@ -100,11 +103,14 @@
       overflow: scroll;
     }
     ^ .boxless-for-drag-drop {
-      border: solid 4px white;
-      width: 90%;
+      border: dashed 4px #a4b3b8;
+      width: 97%;
       height: 110px;
       padding: 10px 10px;
       position: relative;
+      margin-bottom: 10px;
+      margin-left: 5px;
+      overflow: scroll;
     }
     ^ .tableView {
       ackground: #fafafa;
@@ -162,6 +168,37 @@
       white-space: nowrap;
       float: left;
     }
+    ^ .attachment-filename a {
+      height: 16px;
+      font-size: 12px;
+      line-height: 1.66;
+      letter-spacing: 0.2px;
+      text-align: left;
+      color: #59a5d5;
+      padding-left: 12px;
+    }
+    ^ .attachment-view {
+      min-width: 700px;
+      max-width: 275px;
+      height: 40px;
+      background-color: #ffffff;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 5px;
+    }
+    ^ .attachment-footer {
+      float: right;
+    }
+    ^ .attachment-filesize {
+      width: 16.7px;
+      height: 8px;
+      font-size: 6px;
+      line-height: 1.33;
+      letter-spacing: 0.1px;
+      text-align: left;
+      color: #a4b3b8;
+      padding-top: 6px;
+    }
 
   `,
 
@@ -177,7 +214,8 @@
       name: 'dragActive',
       value: false
     },
-    [ 'uploadHidden', false ]
+    [ 'uploadHidden', false ],
+    [ 'removeHidden', false ]
   ],
 
   messages: [
@@ -212,6 +250,10 @@
                 .start('td').addClass('foam-u2-PropertyView').add(this.data.ID).end()
               .end()
               .start('tr')
+                .start('td').addClass('foam-u2-PropertyView-label').add('Starmark').end()
+                .start('td').addClass('foam-u2-PropertyView').tag(this.data.STARMARK).end()
+              .end()
+              .start('tr')
                 .start('td').addClass('foam-u2-PropertyView-label').add('Title').end()
                 .start('td').addClass('foam-u2-PropertyView').add(this.data.TITLE).end()
               .end()
@@ -235,29 +277,31 @@
                   .add('Choose File')
                   .on('click', this.onAddAttachmentClicked)
                 .end()
-                //.start('div').addClass('box-for-drag-drop')
-                .start('div').addClass(this.dragActive$.map(function (drag) {
-                  return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
-                }))
+                .start('div').addClass('boxless-for-drag-drop')
+                // .start('div').addClass(this.dragActive$.map(function (drag) {
+                //   return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
+                // }))
                   .add(this.slot(function (data) {
                     var e = this.E();
                     for ( var i = 0 ; i < data.length ; i++ ) {
                       var fileData = messageboardObj.messageboardFile;
-                      //e.tag({
-                        e.start().addClass('attachment-number')
-                          .add(this.formatFileNumber(i+1))
-                        .end()
+                        e.start('div').addClass('attachment-view').setID(i+1)
+                        // .start().addClass('attachment-number')
+                        //   .add(this.formatFileNumber(i+1))
+                        // .end()
                         .start().addClass('attachment-filename')
                           .start('a')
                             .attrs({
                               href: this.messageboardFile$.map(function (fileData) {
-                                if ( data ) {
-                                    var blob = data.data;
+                                if ( fileData[i] ) {
+                                    var blob = fileData[i].data;
                                     var sessionId = localStorage['defaultSession'];
+
                                     if ( self.BlobBlob.isInstance(blob) ) {
                                       return URL.createObjectURL(blob.blob);
                                     } else {
-                                      var url = '/service/httpFileService/' + data.id;
+                                      var url = '/service/httpFileService/' + fileData[i].id;
+
                                       // attach session id if available
                                       if ( sessionId ) {
                                         url += '?sessionId=' + sessionId;
@@ -276,13 +320,28 @@
                              var len = filename.length;
                              return ( len > 35 ) ? (filename.substr(0, 20) +
                                '...' + filename.substr(len - 10, len)) : filename;
-                           }, this.messageboardFile[i].filename$))   //this.messageboardFile[i].filename$ messageboardObj
+                           }, this.messageboardFile[i].filename$))
                         .end()
                      .end()
-                    //});
+                     .start().addClass('attachment-footer').setID(i+1)
+                       //.start().add(this.REMOVE).hide(this.removeHidden).end()
+                       .start({ class: 'foam.u2.tag.Image', data: 'images/ic-delete.svg'}).hide(this.removeHidden).end()
+                       //.on('click', this.onFileRemoved)
+                       .on('click', function(e) {
+                         console
+                         self.messageboardFile.splice(this.id - 1, 1);
+                         this.remove();
+                         self.messageboardFile = Array.from(self.messageboardFile);
+                       })
+
+                       // .start().addClass('attachment-filesize')
+                       //   .add(this.formatFileSize())
+                       // .end()
+                     .end()
+                     .end()
                     }
                     return e;
-                  }, this.messageboardFile$))
+                  }, this.data.messageboardFile$))
                   .on('dragstart', this.onDragStart)
                   .on('dragenter', this.onDragEnter)
                   .on('dragover', this.onDragOver)
@@ -291,7 +350,7 @@
                     .start('input').addClass('attachment-input')
                       .attrs({
                         type: 'file',
-                        accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png,application/msword,application/pdf'
+                        accept: 'image/jpg,image/gif,image/jpeg,image/bmp,image/png,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.openxmlformats-officedocument.presentationml.slideshow,application/vnd.oasis.opendocument.text,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                       })
                       .on('change', this.onChange)
                     .end()
@@ -303,13 +362,13 @@
             .end();
     },
 
-    function formatFileNumber(i) {
-      return ('000' + i).slice(-3);
-    },
+    // function formatFileNumber(i) {
+    //   return ('000' + i).slice(-3);
+    // }
 
-    function formatFileSize() {
-      return Math.ceil(this.data.filesize / 1024) + 'K';
-    }
+    // function formatFileSize() {
+    //   return Math.ceil(this.messageboardFile.filesize / 1024) + 'K';
+    // }
   ],
 
   actions: [
@@ -358,11 +417,28 @@
         });
       }
     }
+    // {
+    //   name: 'remove',
+    //   icon: 'images/ic-delete.svg',
+    //   code: function (X) {
+    //     alert(X.data.fileNumber);
+    //     this.onFileRemoved(X.data.fileNumber);
+    //   }
+    // }
   ],
 
   listeners: [
     function onAddAttachmentClicked (e) {
       this.document.querySelector('.attachment-input').click();
+    },
+
+    function onFileRemoved (data) {
+      console.log(data.querySelector('.attachment-number'));
+      //data.remove();
+      //alert("fileNumber : " + self.document.querySelector('.attachment-view'));
+      //this.document.querySelector('.attachment-view').value = null;
+      //this.messageboardFile.splice(2 - 1, 1);
+      //this.messageboardFile = Array.from(this.messageboardFile);
     },
 
     function onRemoveClicked (e) {
@@ -379,6 +455,80 @@
     function onDragOver(e) {
       this.dragActive = true;
       e.preventDefault();
+    },
+
+    // function onDrop(e) {
+    //   e.preventDefault();
+    //   this.dragActive = false;
+    //   if ( this.uploadHidden )
+    //     return;
+    //   else {
+    //     var inputFile;
+    //     if ( e.dataTransfer.items ) {
+    //       inputFile = e.dataTransfer.items[0]
+    //       if ( inputFile.kind === 'file' ) {
+    //         var file = inputFile.getAsFile();
+    //         if ( this.isFileType(file) ) this.addFiles(file);
+    //         else
+    //           this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+    //       }
+    //     } else if( e.dataTransfer.files ) {
+    //       var file = e.dataTransfer.files[0];
+    //       if ( this.isFileType(file) ) this.addFiles(file);
+    //       else
+    //         this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+    //     }
+    //   }
+    // },
+
+    function onDrop(e) {
+      e.preventDefault();
+      var files = [];
+      var inputFile;
+      if ( e.dataTransfer.items ) {
+        inputFile = e.dataTransfer.items
+        if ( inputFile ) {
+          for ( var i = 0; i < inputFile.length; i++ ) {
+            // If dropped items aren't files, reject them
+            if ( inputFile[i].kind === 'file' ) {
+              var file = inputFile[i].getAsFile();
+              if( this.isFileType(file) ) files.push(file);
+              else
+                this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+            }
+          }
+        }
+      } else if( e.dataTransfer.files ) {
+        inputFile = e.dataTransfer.files
+        for (var i = 0; i < inputFile.length; i++) {
+          var file = inputFile[i];
+          if( this.isFileType(file) ) files.push(file);
+          else{
+            this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
+          }
+        }
+      }
+      this.addFiles(files)
+    },
+
+    function isFileType(file) {
+      if ( file.type === "image/jpg"  ||
+           file.type === "image/jpeg" ||
+           file.type === "image/gif"  ||
+           file.type === "image/bmp"  ||
+           file.type === "image/png"  ||
+           file.type === "application/msword" ||
+           file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+           file.type === "application/vnd.ms-powerpoint" ||
+           file.type === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+           file.type === "application/vnd.openxmlformats-officedocument.presentationml.slideshow" ||
+           file.type === "application/vnd.oasis.opendocument.text" ||
+           file.type === "application/vnd.ms-excel" ||
+           file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+           file.type === "application/pdf"
+        )
+        return true;
+      return false;
     },
 
     function addFiles(files){
@@ -399,6 +549,7 @@
         }
         if ( isIncluded ) continue ;
         this.messageboardFile.push(this.File.create({
+          owner: this.user.id,
           filename: files[i].name,
           filesize: files[i].size,
           mimeType: files[i].type,
@@ -407,31 +558,37 @@
           })
         }))
       }
-      this.messageboardFile = Array.from(this.messageboardFile);
-      this.exportData = this.data;
+      this.data.messageboardFile = Array.from(this.messageboardFile);
+      this.exportData = this.messageboardFile;
     },
 
     function onSave(X) {
-        var self = this;
+      var self = this;
 
-        // if (!this.data.amount || this.data.amount < 0){
-        //   this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Amount.', type: 'error' }));
-        //   return;
-        // }
-
-        var message = self.Messageboard.create({
-          id : this.data.id,
-          title: this.data.title,
-          content: this.data.content,
-          creator : this.data.creator,
-          createdDate : this.data.createdDate,
-          messageboardFile : this.messageboardFile
-        });
-
-        this.messageboardDAO.put(message).then(function() {
-          self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
-        });
+      if ( this.data.title == null || this.data.title == '' ) {
+        this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Title.', type: 'error' }));
+        return;
       }
+
+      if ( this.data.content == null || this.data.content == '' ) {
+        this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Content.', type: 'error' }));
+        return;
+      }
+
+      var message = self.Messageboard.create({
+        id : this.data.id,
+        starmark : this.data.starmark,
+        title: this.data.title,
+        content: this.data.content,
+        creator : this.data.creator,
+        createdDate : this.data.createdDate,
+        messageboardFile : Array.from(this.messageboardFile)
+      });
+
+      this.messageboardDAO.put(message).then(function() {
+        self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+      });
+    }
   ]
 
 });
