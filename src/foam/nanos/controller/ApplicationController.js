@@ -250,10 +250,10 @@ foam.CLASS({
           });
         }
 
-        var eid = foam.u2.Element.NEXT_ID();
+        let eid = foam.u2.Element.NEXT_ID();
 
         for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
-          var m     = this.MACROS[i];
+          let m     = this.MACROS[i];
           var text2 = this.expandShortFormMacro(this.expandLongFormMacro(text, m), m);
 
             // If the macro was found, then listen for changes to the property
