@@ -17,14 +17,17 @@
 
 package foam.lib.parse;
 
-public class Not implements Parser {
-  private Parser p;
+public class Not
+  implements Parser
+{
+
+  protected Parser p_;
+
   public Not(Parser parser) {
-    p = parser;
+    p_ = parser;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    PStream ret = ps.apply(p, x);
-    return ret != null ? null : ps;
+    return ps.apply(p_, x) != null ? null : ps;
   }
 }

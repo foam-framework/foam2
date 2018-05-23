@@ -68,7 +68,7 @@ public class DigWebAgent
     Format              format      = (Format) p.get(Format.class);
     String              id          = p.getParameter("id");
     String              q           = p.getParameter("q");
-    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
     String[]            email       = p.getParameterValues("email");
     boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject     = p.getParameter("subject");
@@ -408,10 +408,8 @@ public class DigWebAgent
 
   protected void outputPage(X x) {
     final PrintWriter   out         = x.get(PrintWriter.class);
-    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
     Logger              logger      = (Logger) x.get("logger");
-
-    nSpecDAO = new foam.dao.AuthenticatedDAO("nSpec", true, nSpecDAO);
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");

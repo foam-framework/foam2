@@ -117,6 +117,22 @@ foam.CLASS({
       })
     },
 
+    function generateSetter_() {
+      return this.javaSetter ? this.javaSetter : `
+        // The next line will eventually be promoted to production
+        // if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
+
+        // But until then, this line helps to detect code which needs to be fixed before then.
+        if ( this.__frozen__ ) {
+          System.err.println("!!!!!!!!!!!!!!!!!!!!!!! INVALID MUTATION OF FROZEN OBJECT, fclone() REQUIRED !!!!!!!!!!!!!!!!!!!!!!!");
+          Thread.dumpStack();
+        }
+        assert${foam.String.capitalize(this.name)}(val);
+        ${this.name}_ = val;
+        ${this.name}IsSet_ = true;
+      `;
+    },
+
     function buildJavaClass(cls) {
       if ( ! this.generateJava ) return;
 
@@ -132,7 +148,6 @@ foam.CLASS({
       var constantize = foam.String.constantize(this.name);
       var isSet       = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
-      var assertName = 'assert' + capitalized;
 
       cls.
         field({
@@ -167,8 +182,7 @@ foam.CLASS({
             }
           ],
           type: 'void',
-          body: assertName + '(val);\n' +
-            ( this.javaSetter || ( privateName + ' = val;\n' + isSet + ' = true;' ) )
+          body: this.generateSetter_()
         });
 
       if ( this.javaFactory ) {
@@ -181,7 +195,7 @@ foam.CLASS({
       }
 
       cls.method({
-        name: assertName,
+        name: 'assert' + foam.String.capitalize(this.name),
         visibility: 'public',
         args: [
           {
@@ -262,6 +276,7 @@ foam.LIB({
       cls.abstract = this.model_.abstract;
 
       cls.fields.push(foam.java.ClassInfo.create({ id: this.id }));
+
       cls.method({
         name: 'getClassInfo',
         type: 'foam.core.ClassInfo',
@@ -831,6 +846,13 @@ foam.CLASS({
           cls.package = this.package;
           cls.extends = this.extends;
           cls.values = this.VALUES;
+
+          cls.field({
+            name: '__frozen__',
+            visibility: 'protected',
+            type: 'boolean',
+            initializer: 'false'
+          });
 
           var axioms = this.getAxioms();
 
