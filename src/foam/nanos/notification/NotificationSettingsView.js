@@ -176,7 +176,7 @@ foam.CLASS({
                         name: 'notifsTab',
                         value: key,
                         checked: false
-                      }).end().start().addClass('checkBox-Text').add(key).end()
+                      }).end().start().addClass('checkBox-Text').add(key).end();
                   } else {
                     self2.br().start('input')
                       .attrs({
@@ -184,7 +184,7 @@ foam.CLASS({
                         name: 'notifsTab',
                         value: key,
                         checked: true
-                      }).end().start().addClass('checkBox-Text').add(key).end()
+                      }).end().start().addClass('checkBox-Text').add(key).end();
                   }
                 }
               }
