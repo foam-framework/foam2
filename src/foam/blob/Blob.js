@@ -478,12 +478,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'root',
-      generateJava: false
+      generateJava: false,
+      documentation: 'Root directory of where files are stored'
     },
     {
       class: 'String',
       name: 'tmp',
       transient: true,
+      documentation: 'Temp directory of where files are stored before hashing'
       expression: function(root) {
         return root + '/tmp';
       }
@@ -492,6 +494,7 @@ foam.CLASS({
       class: 'String',
       name: 'sha256',
       transient: true,
+      documentation: 'Directory of where files are stored after hashing',
       expression: function(root) {
         return root + '/sha256';
       }
