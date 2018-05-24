@@ -35,6 +35,10 @@ foam.CLASS({
     'foam.dao.ManyToManyRelationshipProperty'
   ],
 
+  imports: [
+    'classloader?',
+  ],
+
   properties: [
     {
       name: 'id',
@@ -142,7 +146,22 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
+    function initRelationship() {
+      // Do the initialization syncronously if the models are already loaded.
+      if ( this.lookup(this.sourceModel, true) &&
+           this.lookup(this.targetModel, true) ) {
+        return Promise.resolve(this.initRelationship_());
+      }
+
+      var wait = this.classloader ?
+          this.classloader.load.bind(this.classloader) :
+          foam.package.waitForClass;
+      return Promise.all([
+        wait(this.sourceModel),
+        wait(this.targetModel),
+      ]).then(this.initRelationship_.bind(this));
+    },
+    function initRelationship_() {
       var sourceProp;
       var targetProp;
       var cardinality   = this.cardinality;
@@ -246,6 +265,7 @@ foam.CLASS({
         };
       }
       */
+      return this;
     }
   ]
 });
@@ -256,10 +276,8 @@ foam.LIB({
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
       var r = foam.dao.Relationship.create(m, opt_ctx);
-
       r.validate && r.validate();
-      foam.package.registerClass(r);
-
+      r.initRelationship();
       return r;
     }
   ]
