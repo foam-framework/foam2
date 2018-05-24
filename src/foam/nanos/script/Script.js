@@ -197,12 +197,13 @@ foam.CLASS({
           with ( { log: log, print: log, x: self.__context__ } ) {
             this.status = this.ScriptStatus.RUNNING;
             var ret = eval(this.code);
-            console.log('ret: ', ret);
-            this.status = this.ScriptStatus.UNSCHEDULED;
-            // TODO: if Promise returned, then wait
+            var self = this;
+            Promise.resolve(ret).then(function()
+            {
+              self.status = self.ScriptStatus.UNSCHEDULED;
+              self.scriptDAO.put(self);
+            });
           }
-          
-          this.scriptDAO.put(this);
         }
       }
     }
