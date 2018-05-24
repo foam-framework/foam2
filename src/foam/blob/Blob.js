@@ -477,7 +477,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'root'
+      name: 'root',
+      generateJava: false
     },
     {
       class: 'String',
