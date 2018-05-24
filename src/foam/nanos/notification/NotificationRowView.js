@@ -18,10 +18,10 @@
     imports: [
       'invoiceDAO',
       'notificationDAO',
+      'setTimeout',
       'stack',
       'user',
-      'userDAO',
-      'setTimeout'
+      'userDAO'
     ],
 
     exports: [
@@ -166,10 +166,10 @@
           this.start('div').addClass('divBody')
         }
         this
-        .on('mouseover', this.read)
-        .addClass(this.myClass())
-        this.start(this.OPTIONS_DROP_DOWN, { icon: 'images/ic-options.png', showLabel:true }, this.optionsBtn_$).end()
-        this.add(this.NotificationView.create({of: this.data.cls_, data: this.data}))
+          .on('mouseover', this.read)
+          .addClass(this.myClass());
+          this.start(this.OPTIONS_DROP_DOWN, { icon: 'images/ic-options.png', showLabel:true }, this.optionsBtn_$).end();
+          this.add(this.NotificationView.create({of: this.data.cls_, data: this.data}));
       }
     ],
 
@@ -184,7 +184,7 @@
             width: 165,
             x: -137,
             y: 40
-          })
+          });
 
           self.optionPopup_.addClass('popUpDropDown')
             .start('div').add('Remove')
@@ -200,7 +200,7 @@
               .add('Mark as Unread')
               .on('click', this.markUnread)
             .end()
-          self.optionsBtn_.add(self.optionPopup_)
+          self.optionsBtn_.add(self.optionPopup_);
         }
       },
     ],
@@ -213,13 +213,13 @@
       
       function notShow() {
         this.user = this.user.clone();
-        this.user.disabledNotifs.push(this.data.notificationType);
+        this.user.disabledTopics.push(this.data.notificationType);
         this.userDAO.put(this.user);
         this.stack.push({ class: 'foam.nanos.notification.NotificationListView'});
       },
 
       function read(){
-        if ( !this.data.read ) {
+        if ( ! this.data.read ) {
             this.data.read = true;
             this.notificationDAO.put(this.data);
         }

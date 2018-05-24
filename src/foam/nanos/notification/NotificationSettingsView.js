@@ -127,7 +127,7 @@ foam.CLASS({
 
   properties: [
     {
-      name: 'notifs',
+      name: 'notifications',
       factory: function(notificationDAO) {
         return this.notificationDAO;
       }
@@ -161,7 +161,7 @@ foam.CLASS({
     function addNotifCheckBoxes(self) {
       var self2 = this;
       return this.call(function() {
-        self.notifs.where(self.OR(
+        self.notifications.where(self.OR(
           self.EQ(self.Notification.USER_ID, self.user.id),
           self.EQ(self.Notification.GROUP_ID, self.user.group),
           self.EQ(self.Notification.BROADCASTED, true)
@@ -169,7 +169,7 @@ foam.CLASS({
             for ( var key in g.groups ) {
               if ( key != "General" ) {
                 if ( key != '' ) {
-                  if ( self.user.disabledNotifs.includes(key) ) {
+                  if ( self.user.disabledTopics.includes(key) ) {
                     self2.br().start('input')
                       .attrs({
                         type: 'checkbox',
@@ -190,13 +190,13 @@ foam.CLASS({
               }
             }
         });
-        });
+      });
     },
 
     function addEmailCheckBoxes(self) {
       var self2 = this;
       return this.call(function() {
-        self.notifs.where(self.OR(
+        self.notifications.where(self.OR(
           self.EQ(self.Notification.USER_ID, self.user.id),
           self.EQ(self.Notification.GROUP_ID, self.user.group),
           self.EQ(self.Notification.BROADCASTED, true)
@@ -204,7 +204,7 @@ foam.CLASS({
             for ( var key in g.groups ) {
               if ( key != "General" ) {
                 if ( key != '' ) {
-                  if ( self.user.disabledNotifsEmail.includes(key) ) {
+                  if ( self.user.disabledTopicsEmail.includes(key) ) {
                     self2.br().start('input')
                       .attrs({
                         type: 'checkbox',
@@ -225,7 +225,7 @@ foam.CLASS({
               }
             }
         });
-        });
+      });
     }
   ],
 
@@ -236,16 +236,16 @@ foam.CLASS({
       code: function() {
         var notifs = document.getElementsByName("notifsTab");
         this.user = this.user.clone();
-        for (i = 0; i < notifs.length; i++) {
+        for ( i = 0; i < notifs.length; i++ ) {
           var type = notifs[i].value;
-            if (notifs[i].checked) {
-              while ( this.user.disabledNotifs.includes(type) ) {
-                  var index = this.user.disabledNotifs.indexOf(type);
-                  this.user.disabledNotifs.splice(index, 1);
+            if ( notifs[i].checked ) {
+              while ( this.user.disabledTopics.includes(type) ) {
+                  var index = this.user.disabledTopics.indexOf(type);
+                  this.user.disabledTopics.splice(index, 1);
               }
             } else {
-              if ( ! this.user.disabledNotifs.includes(type) ) {
-                this.user.disabledNotifs.push(type);
+              if ( ! this.user.disabledTopics.includes(type) ) {
+                this.user.disabledTopics.push(type);
               }
             }
           }
@@ -260,23 +260,22 @@ foam.CLASS({
       code: function() {
         var notifs = document.getElementsByName("notifsEmail");
         this.user = this.user.clone();
-        for (i = 0; i < notifs.length; i++) {
+        for ( i = 0; i < notifs.length; i++ ) {
           var type = notifs[i].value;
-            if (notifs[i].checked) {
-              while ( this.user.disabledNotifsEmail.includes(type) ) {
-                  var index = this.user.disabledNotifsEmail.indexOf(type);
-                  this.user.disabledNotifsEmail.splice(index, 1);
-              }
-            } else {
-              if ( ! this.user.disabledNotifsEmail.includes(type) ) {
-                this.user.disabledNotifsEmail.push(type);
-              }
+          if ( notifs[i].checked ) {
+            while ( this.user.disabledTopicsEmail.includes(type) ) {
+                var index = this.user.disabledTopicsEmail.indexOf(type);
+                this.user.disabledTopicsEmail.splice(index, 1);
+            }
+          } else {
+            if ( ! this.user.disabledTopicsEmail.includes(type) ) {
+              this.user.disabledTopicsEmail.push(type);
             }
           }
-          this.userDAO.put(this.user);
-          this.stack.push({ class: 'foam.nanos.notification.NotificationListView'});
         }
-
+        this.userDAO.put(this.user);
+        this.stack.push({ class: 'foam.nanos.notification.NotificationListView'});
+      }
     }
   ]
 })

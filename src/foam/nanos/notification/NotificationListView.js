@@ -27,19 +27,19 @@ foam.CLASS({
 
   css: `
   
-    .foam-u2-DAOList > div {
+     ^ .foam-u2-DAOList > div {
       background: white;
       margin-top:1px;
       min-height: 66px;
     }
-    .foam-u2-DAOList > div:nth-child(odd) {
+     ^ .foam-u2-DAOList > div:nth-child(odd) {
       background: #f6f9f9;
     }
-    .notifs {
+     ^ .notifs {
       width:500px;
       margin:0 auto;
     }
-    .setting {
+     ^ .setting {
       padding-right:0px;
       background: none;
       float: right;
@@ -57,11 +57,11 @@ foam.CLASS({
       text-align: left;
       color: #59a5d5;
     }
-    .setting:hover {
+     ^ .setting:hover {
       text-decoration: underline;
       cursor: pointer;
     }
-    h3 {
+     ^ h3 {
       margin-bottom:20px;
       width: 105px;
       height: 20px;
@@ -76,14 +76,14 @@ foam.CLASS({
       text-align: left;
       color: #093649;
     }
-    .unread .foam-u2-DAOList > div {
+     ^ .unread .foam-u2-DAOList > div {
       background-color: rgba(89, 165, 213, 0.3)
     }
   `,
 
   properties: [
     {
-      name: 'notifs',
+      name: 'notifications',
       expression: function(notificationDAO) {
         return this.notificationDAO.where(
           this.AND(
@@ -93,7 +93,7 @@ foam.CLASS({
               this.EQ(this.Notification.GROUP_ID, this.user.group),
               this.EQ(this.Notification.BROADCASTED, true)
             ), 
-            this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledNotifs))
+            this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledTopics))
           )
         ).orderBy(this.DESC(this.Notification.ISSUED_DATE))
       },
@@ -113,7 +113,7 @@ foam.CLASS({
               this.EQ(this.Notification.GROUP_ID, this.user.group),
               this.EQ(this.Notification.BROADCASTED, true)
             ), 
-            this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledNotifs))
+            this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledTopics))
           )
         ).orderBy(this.DESC(this.Notification.ISSUED_DATE))
       },
@@ -127,10 +127,12 @@ foam.CLASS({
   methods: [
     function initE() {
       var self = this;
-      this.add(this.notifsE())
+      this
+        .addClass(this.myClass())
+        .add(this.notificationsE())
     },
 
-    function notifsE() {
+    function notificationsE() {
       return this.E()
         .addClass('notifs')
         .start(this.SETTINGS)
@@ -140,18 +142,16 @@ foam.CLASS({
           .add('Notifications')
         .end()
         .start('div').addClass('unread').add(this.UNREAD).end()
-        .add(this.NOTIFS)
+        .add(this.NOTIFICATIONS)
     }
   ],
 
   actions: [
     {
       name: 'settings',
-      label: 'Settings',
       code: function() {
         this.stack.push({ class: 'foam.nanos.notification.NotificationSettingsView' });
       }
     }
   ]
-
 });
