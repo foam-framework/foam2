@@ -32,3 +32,5 @@ p({"class":"foam.nanos.menu.Menu","id":"dig","label":"DIG","handler":{"class":"f
 p({"class":"foam.nanos.menu.Menu","id":"dug","label":"DUG","handler":{"class":"foam.nanos.menu.DAOMenu","daoKey":"dugDAO"},"order":1000,"parent":"integration"})
 p({"class":"foam.nanos.menu.Menu","id":"docs","label":"Documentation Browser","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.DocBrowser"}},"order":2000,"parent":"integration"})
 p({"class":"foam.nanos.menu.Menu","id":"model-doc","label":"Reference Guide","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.doc.ModelBrowser"}},"order":2000,"parent":"integration"})
+p({"class":"foam.nanos.menu.Menu","id":"notifications","handler":{"class":"foam.nanos.menu.ViewMenu","view":{"class":"foam.nanos.notification.NotificationListView"}},"order":1000,"parent":"hidden"})
+
