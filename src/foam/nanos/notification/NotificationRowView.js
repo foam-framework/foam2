@@ -18,7 +18,6 @@
     imports: [
       'invoiceDAO',
       'notificationDAO',
-      'setTimeout',
       'stack',
       'user',
       'userDAO'

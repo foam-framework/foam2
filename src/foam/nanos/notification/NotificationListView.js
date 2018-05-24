@@ -16,8 +16,8 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.notification.Notification',
-    'foam.u2.stack.Stack',
-    'foam.nanos.notification.NotificationRowView'
+    'foam.nanos.notification.NotificationRowView',
+    'foam.u2.stack.Stack'
   ],
 
   exports: [
