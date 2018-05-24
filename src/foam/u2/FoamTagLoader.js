@@ -29,32 +29,44 @@ foam.CLASS({
       var clsName = el.getAttribute('class');
 
       this.classloader.load(clsName).then(function(cls) {
-        var id  = el.id;
+        var obj = cls.create(null, foam.__context__);
 
-        var view = cls.create(null, foam.__context__);
+        /*
+        if ( obj.then ) {
+          var p = new Promise(function(resolve) {
+            obj.then(function() { resolve(); });
+          });
+          return p;
+        }
+        */
 
-        if ( view.toE ) {
-          view = view.toE({}, foam.__context__);
+        if ( obj.promiseE ) {
+          obj.promiseE().then(function(view) { this.installView(el, view); });
+        } else if ( obj.toE ) {
+          this.installView(el, obj.toE({}, foam.__context__));
         } else if ( ! foam.u2.Element.isInstance(view) )  {
-          view = foam.u2.DetailView.create({data: view, showActions: true});
+          installView(el, foam.u2.DetailView.create({data: view, showActions: true}));
         }
-
-        for ( var j = 0 ; j < el.attributes.length ; j++ ) {
-          var attr = el.attributes[j];
-          var p    = this.findPropertyIC(view.cls_, attr.name);
-          if ( p ) p.set(view, attr.value);
-        }
-
-        el.outerHTML = view.outerHTML;
-        view.load();
-
-        // Store view in global variable if named. Useful for testing.
-        if ( id ) global[id] = view;
-
       }.bind(this), function(e) {
         console.error(e);
         console.error('Failed to load class: ', clsName);
       });
+    },
+
+    function installView(el, view) {
+      var id = el.id;
+
+      for ( var j = 0 ; j < el.attributes.length ; j++ ) {
+        var attr = el.attributes[j];
+        var p    = this.findPropertyIC(view.cls_, attr.name);
+        if ( p ) p.set(view, attr.value);
+      }
+
+      el.outerHTML = view.outerHTML;
+      view.load();
+
+      // Store view in global variable if named. Useful for testing.
+      if ( id ) global[id] = view;
     }
   ],
 
@@ -63,7 +75,6 @@ foam.CLASS({
       var els = Array.from(this.document.getElementsByTagName('foam'));
       this.window.removeEventListener('load', this.onLoad);
 
-      // Install last to first to avoid messing up the 'els' list.
       els.forEach(this.loadTag.bind(this));
     }
   ]

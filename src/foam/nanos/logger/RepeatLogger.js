@@ -9,6 +9,7 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'RepeatLogger',
   extends: 'foam.nanos.logger.ProxyLogger',
+
   requires: [
     'foam.nanos.logger.LogLevel'
   ],
@@ -21,8 +22,7 @@ foam.CLASS({
     },
     {
       class: 'Int',
-      name: 'repeatCount',
-      value: 0
+      name: 'repeatCount'
     },
     {
       class: 'Enum',
@@ -35,7 +35,7 @@ foam.CLASS({
   methods: [
     {
       name: 'newLogHandler',
-      args: [ 
+      args: [
         {
           name: 'logLevelName',
           javaType: 'Enum'
@@ -54,40 +54,40 @@ foam.CLASS({
   setRepeatCount(1);
   setLastUniqueObject(args);
   switch ( LogLevel.values()[logLevelName.ordinal()] ) {
-    case DEBUG: 
-      getDelegate().debug(args);  
+    case DEBUG:
+      getDelegate().debug(args);
       if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.DEBUG);
       }
       break;
     case INFO:
-      getDelegate().info(args);  
+      getDelegate().info(args);
       if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.INFO);
       }
       break;
     case WARNING:
-      getDelegate().warning(args);  
+      getDelegate().warning(args);
       if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.WARNING);
       }
-      break;    
+      break;
     case ERROR:
-      getDelegate().error(args);  
+      getDelegate().error(args);
       if ( updateLastLogLevel ){
         setLastLogLevel(LogLevel.ERROR);
       }
       break;
   }
-`  
+`
     },
     {
       name: 'logLastLogRepeats',
       javaReturns: 'void',
-      javaCode: 
+      javaCode:
       `
-  String logCountMessage = "The last log was repeated " + getRepeatCount() + " times" ; 
-  
+  String logCountMessage = "The last log was repeated " + getRepeatCount() + " times" ;
+
   switch ( getLastLogLevel() ) {
     case DEBUG:
       getDelegate().debug( logCountMessage );
@@ -95,18 +95,18 @@ foam.CLASS({
     case INFO:
       getDelegate().info( logCountMessage );
       break;
-    case WARNING: 
+    case WARNING:
       getDelegate().warning( logCountMessage );
-      break;             
-    case ERROR: 
+      break;
+    case ERROR:
       getDelegate().error( logCountMessage );
       break;
-  }     
+  }
 `
     },
     {
       name: 'repeatLogFilter',
-      args: [ 
+      args: [
         {
           name: 'logLevelName',
           javaType: 'Enum'
@@ -121,30 +121,30 @@ foam.CLASS({
       javaCode: `
   if ( getLastLogLevel().ordinal() != logLevelName.ordinal() ) {
     if ( getRepeatCount() > 1 ) {
-      logLastLogRepeats();   
+      logLastLogRepeats();
     }
     newLogHandler(logLevelName, true, args);
     return;
   };
-  
+
   if ( getLastUniqueObject() == null ) {
     newLogHandler(logLevelName,false,args);
   } else {
     Object[] o = (Object[]) getLastUniqueObject();
     if ( ! (args.length == o.length ) ) {
       if ( getRepeatCount() > 1 ) {
-        logLastLogRepeats();   
+        logLastLogRepeats();
       }
       newLogHandler(logLevelName,false,args);
     } else {
       for ( int i = 0 ; i < args.length ; i++ ) {
         if ( ! ( args[i].equals(o[i]) && !(args[i] instanceof Exception) ) ) {
           if ( getRepeatCount() > 1 ) {
-            logLastLogRepeats();   
+            logLastLogRepeats();
           }
           newLogHandler(logLevelName, false, args);
-          return;        
-        } 
+          return;
+        }
       }
       setRepeatCount( getRepeatCount() + 1 );
     }
@@ -163,7 +163,7 @@ foam.CLASS({
       javaCode: `
   Enum logLevelName = LogLevel.DEBUG;
   repeatLogFilter(logLevelName, args);
-  `   
+  `
     },
     {
       name: 'info',
