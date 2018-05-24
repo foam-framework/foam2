@@ -485,7 +485,7 @@ foam.CLASS({
       class: 'String',
       name: 'tmp',
       transient: true,
-      documentation: 'Temp directory of where files are stored before hashing'
+      documentation: 'Temp directory of where files are stored before hashing',
       expression: function(root) {
         return root + '/tmp';
       }
