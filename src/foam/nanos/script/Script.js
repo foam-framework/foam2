@@ -10,6 +10,10 @@ foam.CLASS({
 
   implements: [ 'foam.nanos.auth.EnabledAware' ],
 
+  requires: [
+    'foam.nanos.script.ScriptStatus'
+  ],
+
   imports: [ 'scriptDAO' ],
 
   javaImports: [
@@ -29,7 +33,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'status', 'run',
   ],
 
   searchColumns: [],
@@ -74,9 +78,14 @@ foam.CLASS({
       value: true
     },
     {
-      class: 'Boolean',
-      name: 'scheduled',
-      hidden: true
+      class: 'foam.core.Enum',
+      of: 'foam.nanos.script.ScriptStatus', 
+      name: 'status',
+      visibility: foam.u2.Visibility.RO,
+      factory: function()
+      {
+        return this.ScriptStatus.UNSCHEDULED;
+      }
     },
     {
       class: 'String',
@@ -148,6 +157,24 @@ foam.CLASS({
         ps.flush();
         setOutput(baos.toString());
     `
+    },
+    {
+      name: 'poll', 
+      code: function()
+      {
+        var self = this;
+        var interval = setInterval(function()
+        {
+            self.scriptDAO.find(self.id).then(function(script)
+            {
+              if(script.status !== this.ScriptStatus.RUNNING)
+              {
+                this.copyFrom(script);
+                clearInterval(interval);
+              }
+            }.bind(self)).catch(function(){ clearInterval(interval); });
+        }, 2000);
+      }
     }
   ],
 
@@ -157,22 +184,24 @@ foam.CLASS({
       code: function() {
         var self = this;
         this.output = '';
-
-//        if ( this.language === foam.nanos.script.Language.BEANSHELL ) {
+        this.status = this.ScriptStatus.SCHEDULED;
         if ( this.server ) {
-          this.scheduled = true;
           this.scriptDAO.put(this).then(function(script) {
-            self.copyFrom(script);
+              self.copyFrom(script);
+              if(script.status === self.ScriptStatus.RUNNING)
+                self.poll();  
           });
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
-
+          
           with ( { log: log, print: log, x: self.__context__ } ) {
+            this.status = this.ScriptStatus.RUNNING;
             var ret = eval(this.code);
             console.log('ret: ', ret);
+            this.status = this.ScriptStatus.UNSCHEDULED;
             // TODO: if Promise returned, then wait
           }
-
+          
           this.scriptDAO.put(this);
         }
       }
