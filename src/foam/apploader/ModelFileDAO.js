@@ -56,20 +56,25 @@ foam.CLASS({
           };
 
           context.foam.RELATIONSHIP = function(r) {
-            var references = foam.json.references(x, r);
-
-            Promise.all(references.concat([
-              foam.package.waitForClass(r.sourceModel),
-              foam.package.waitForClass(r.targetModel)
-            ])).then(function() {
-              var obj = foam.dao.Relationship.create(r, x);
-
+            relationship = Promise.all(foam.json.references(x, r)).then(function() {
+               var obj = foam.dao.Relationship.create(r, x);
               obj.validate && obj.validate();
-              foam.package.registerClass(obj);
-            });
+              return obj;
+            })
           };
 
           with ( context ) { eval(text); }
+
+          if ( ! json && relationship ) return relationship;
+
+          if ( relationship ) {
+            // If json is set then a relationship was encountered in the same
+            // file as another model. In this case, the relationship wasn't
+            // explicitly asked for but is likely expected to be initialized. If
+            // this behavior isn't desired then the relationship should be moved
+            // into its own file.
+            relationship.then(function(r) { r.initRelationship() });
+          }
 
           if ( ! json ) {
             throw new Error('No model found for ' + id);
