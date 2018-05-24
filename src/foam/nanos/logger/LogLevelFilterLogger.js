@@ -53,7 +53,7 @@ foam.CLASS({
         }
       ],
       javaReturns: 'void',
-      javaCode: "if ( getLogWarning() ) getDelegate().error(args);"
+      javaCode: "if ( getLogWarning() ) getDelegate().warning(args);"
     },
     {
       name: 'info',
@@ -64,7 +64,7 @@ foam.CLASS({
         }
       ],
       javaReturns: 'void',
-      javaCode: "if ( getLogInfo() ) getDelegate().error(args);"
+      javaCode: "if ( getLogInfo() ) getDelegate().info(args);"
     },
     {
       name: 'debug',
@@ -75,7 +75,7 @@ foam.CLASS({
         }
       ],
       javaReturns: 'void',
-      javaCode: "if ( getLogDebug() ) getDelegate().error(args);"
+      javaCode: "if ( getLogDebug() ) getDelegate().debug(args);"
     }
   ]
 });
