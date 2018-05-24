@@ -7,6 +7,7 @@
 package foam.core;
 
 import foam.nanos.logger.Logger;
+import foam.util.SafetyUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

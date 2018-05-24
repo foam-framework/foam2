@@ -98,25 +98,29 @@ foam.CLASS({
       factory: function() {
         var self = this;
         return self.ClientBuilder.create().promise.then(function(cls) {
-          return cls.create(null, self);
+          self.client = cls.create(null, self);
+          return self.client;
         });
       },
     },
     {
+      name: 'client',
+    },
+    {
       name: 'stack',
-      factory: function() { return this.Stack.create(null, this.__subSubContext__); }
+      factory: function() { return this.Stack.create(); }
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.User',
       name: 'user',
-      factory: function() { return this.User.create(null, this.__subSubContext__); }
+      factory: function() { return this.User.create(); }
     },
     {
       class: 'foam.core.FObjectProperty',
       of: 'foam.nanos.auth.Group',
       name: 'group',
-      factory: function() { return this.Group.create(null, this.__subSubContext__); }
+      factory: function() { return this.Group.create(); }
     },
     {
       class: 'Boolean',
@@ -146,14 +150,14 @@ foam.CLASS({
 
       var self = this;
       self.clientPromise.then(function(client) {
-        self.__subSubContext__ = client.__subContext__;
+        self.setPrivate_('__subContext__', client.__subContext__);
         self.getCurrentUser();
 
         window.onpopstate = function(event) {
           if ( location.hash != null ) {
             var hid = location.hash.substr(1);
 
-            hid && self.__subSubContext__.menuDAO.find(hid).then(function(menu) {
+            hid && self.client.menuDAO.find(hid).then(function(menu) {
               menu && menu.launch(this, null);
             });
           }
@@ -179,7 +183,7 @@ foam.CLASS({
       // Don't select default if menu already set
       if ( this.window.location.hash || ! this.user.group ) return;
 
-      this.__subSubContext__.groupDAO.find(this.user.group).then(function (group) {
+      this.client.groupDAO.find(this.user.group).then(function (group) {
         this.group.copyFrom(group);
 
         for ( var i = 0 ; i < this.MACROS.length ; i++ ) {
@@ -198,7 +202,7 @@ foam.CLASS({
       var self = this;
 
       // get current user, else show login
-      this.__subSubContext__.auth.getCurrentUser(null).then(function (result) {
+      this.client.auth.getCurrentUser(null).then(function (result) {
         self.loginSuccess = !! result;
         if ( result ) {
           self.user.copyFrom(result);
