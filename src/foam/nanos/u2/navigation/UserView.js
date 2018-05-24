@@ -204,8 +204,7 @@ foam.CLASS({
               return this.E().start('div').addClass('dot')
                 .add(this.countUnread$)
               .end()
-          })).end();
-        this.end()
+          })).end()
 
         .start().addClass('profile-container')
           .on('click', function() {
