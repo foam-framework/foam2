@@ -196,8 +196,8 @@ foam.CLASS({
 
   constants: [
     {
-      value: 4096,
       name: 'BUFFER_SIZE',
+      value: 4096,
       type: 'int'
     }
   ],
