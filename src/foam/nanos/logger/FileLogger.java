@@ -24,7 +24,15 @@ public class FileLogger
     logger.setLevel(Level.ALL);
 
     try {
-      Handler handler = new FileHandler("nano.log");
+      String logPath = System.getProperty("LOG_HOME");
+      Handler handler = null;
+
+      if ( logPath == null ) {
+        handler = new FileHandler("nano.log");
+      } else {
+        handler = new FileHandler(logPath + "/nano.log");
+      }
+      
       handler.setFormatter(new CustomFormatter());
       logger.addHandler(handler);
     } catch (IOException e) {
@@ -97,4 +105,3 @@ public class FileLogger
     return this.getClass().getSimpleName();
   }
 }
-
