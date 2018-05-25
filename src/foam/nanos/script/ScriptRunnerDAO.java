@@ -15,20 +15,21 @@ import foam.nanos.pool.FixedThreadPool;
 public class ScriptRunnerDAO
   extends ProxyDAO
   {
-  final private int DEFAULT_WAIT_TIME = 2000;
+  final public static int DEFAULT_WAIT_TIME = 2000;
 
-  public ScriptRunnerDAO(DAO delegate) 
+  public ScriptRunnerDAO(DAO delegate)
   {
     super();
     setDelegate(delegate);
   }
 
-  public FObject put_(final X x, FObject obj) 
+  public FObject put_(final X x, FObject obj)
   {
     Script script = (Script) obj;
-  
-    if (script.getStatus() == ScriptStatus.SCHEDULED)
-        this.runScript(x, script);
+
+    if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
+      this.runScript(x, script);
+    }
 
     return getDelegate().put_(x, obj);
   }
@@ -38,44 +39,39 @@ public class ScriptRunnerDAO
     long estimatedTime = this.estimateWaitTime(script);
     final CountDownLatch latch = new CountDownLatch(1);
 
-    try
-    {
+    try {
       ((FixedThreadPool) x.get("threadPool")).submit(x, new ContextAgent(){
 
         @Override
         public void execute(X y) {
-          try
-          {
+          try {
             script.setStatus(ScriptStatus.RUNNING);
             getDelegate().put_(x, script);
             script.runScript(x);
             script.setStatus(ScriptStatus.UNSCHEDULED);
-          } catch(Throwable t)
-          {
+          } catch(Throwable t) {
             script.setStatus(ScriptStatus.ERROR);
             t.printStackTrace();
           }
           // save the state
           getDelegate().put_(x, script);
-          
+
           latch.countDown();
         }
       });
-      
+
       latch.await(estimatedTime, TimeUnit.MILLISECONDS);
-  
-    } catch(InterruptedException e)
-    {
+
+    } catch(InterruptedException e) {
       e.printStackTrace();
     }
   }
 
   private long estimateWaitTime(Script script)
   {
-      if (script.getLastRun() == null || this.DEFAULT_WAIT_TIME > script.getLastDuration() * 2)
-        return this.DEFAULT_WAIT_TIME;
+      if ( script.getLastRun() == null || DEFAULT_WAIT_TIME > script.getLastDuration() * 2 )
+        return DEFAULT_WAIT_TIME;
       //  1 ms so it returns right away
       return 1;
   }
 }
- 

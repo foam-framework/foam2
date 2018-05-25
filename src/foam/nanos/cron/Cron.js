@@ -19,7 +19,7 @@ foam.CLASS({
   documentation: 'FOAM class that models a Cron script',
 
   tableColumns: [
-    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'status', 'run',
+    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
   ],
 
   searchColumns: [],
