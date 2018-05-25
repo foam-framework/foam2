@@ -65,21 +65,21 @@ public abstract class AbstractJDAO
     try {
       String file = filename + ".0";
       logger_.log("Loading file: " + file);
-      //get repo entries in filename.0 journal first
+      // get repo entries in filename.0 journal first
       File inFile = getX().get(foam.nanos.fs.Storage.class).get(file);
-      //load repo entries into DAO
+      // load repo entries into DAO
       if ( inFile.exists() ) {
         int validEntries = loadJournal(inFile);
         logger_.log("Success reading " + validEntries + " entries from file: " + file);
       } else {
         logger_.warning("Can not find file: " + file);
       }
-      //get runtime journal
+      // get runtime journal
       file = filename;
       logger_.log("Loading file: " + file);
-      //get output journal
+      // get output journal
       outFile_ = getX().get(foam.nanos.fs.Storage.class).get(file);
-      //if output journal does not existing, create one
+      // if output journal does not existing, create one
       if ( ! outFile_.exists() ) {
         logger_.warning("Can not find file: " + file);
         //if output journal does not exist, create one
@@ -91,12 +91,12 @@ public abstract class AbstractJDAO
         logger_.log("Create file: " + file);
         outFile_.getAbsoluteFile().createNewFile();
       } else {
-        //if output journal file exists, load entries into DAO
+        // if output journal file exists, load entries into DAO
         int validEntries = loadJournal(outFile_);
         logger_.log("Success reading " + validEntries + " entries from file: " + file);
       }
-      //link output journal file to BufferedWriter
-      out_ = new BufferedWriter(new FileWriter(outFile_, true));
+      // link output journal file to BufferedWriter
+      out_ = new BufferedWriter(new FileWriter(outFile_, true), 16*1024);
       out_.newLine();
     } catch ( IOException e ) {
       logger_.error(e);
