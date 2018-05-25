@@ -109,10 +109,8 @@ foam.CLASS({
           })
           .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
           .end()
-          .callIf( this.user.firstName, function(){
-            this.start({class: 'foam.nanos.u2.navigation.UserView'})
+          .start({class: 'foam.nanos.u2.navigation.UserView'})
             .end()
-          })
         .end()
     }
   ]
