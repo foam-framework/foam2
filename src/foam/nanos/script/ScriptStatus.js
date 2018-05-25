@@ -1,21 +1,21 @@
 foam.ENUM({
-	package: 'foam.nanos.script', 
+	package: 'foam.nanos.script',
 	name: 'ScriptStatus',
 	values: [
 		{
-			name:'SCHEDULED', 
+			name:'SCHEDULED',
 				label: 'Scheduled'
-		}, 
+		},
 		{
-			name:'UNSCHEDULED', 
+			name:'UNSCHEDULED',
 			label: 'Unscheduled'
 		},
 		{
 			name:'RUNNING',
 			label: 'Running'
-		}, 
+		},
 		{
-			name: 'ERROR', 
+			name: 'ERROR',
 			label: 'Error'
 		}
 	]
