@@ -28,11 +28,7 @@ foam.CLASS({
     'foam.nanos.u2.navigation.UserView'
   ],
 
-  imports: [
-    'menuDAO',
-    'user',
-    'logo'
-  ],
+  imports: [ 'menuDAO', 'user', 'loginSuccess' ],
 
   axioms: [
     foam.u2.CSS.create({
@@ -99,19 +95,17 @@ foam.CLASS({
 
   methods: [
     function initE(){
-      var self = this;
       this
-        .addClass(this.myClass())
-        .start().addClass('topNavContainer')
-          .callIf( this.logo, function(){
-            this.start({class: 'foam.nanos.u2.navigation.BusinessLogoView'})
-            .end()
-          })
-          .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
-          .end()
-          .start({class: 'foam.nanos.u2.navigation.UserView'})
-            .end()
+      .addClass(this.myClass())
+      .start().addClass('topNavContainer')
+        .show( this.loginSuccess$)
+        .start({class: 'foam.nanos.u2.navigation.BusinessLogoView' })
         .end()
-    }
+        .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
+        .end()
+        .start({class: 'foam.nanos.u2.navigation.UserView'})
+        .end()
+      .end();
+      }
   ]
 });
