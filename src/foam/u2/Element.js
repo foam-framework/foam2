@@ -1945,8 +1945,16 @@ foam.CLASS({
   ]
 });
 
-foam.__context__ = foam.u2.U2Context.create().__subContext__;
-
+foam.SCRIPT({
+  id: 'foam.u2.U2ContextScript',
+  requires: [
+    'foam.u2.U2Context',
+  ],
+  flags: ['web'],
+  code: function() {
+    foam.__context__ = foam.u2.U2Context.create().__subContext__;
+  }
+});
 
 foam.CLASS({
   refines: 'foam.core.FObject',
