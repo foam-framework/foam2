@@ -11,10 +11,11 @@ foam.CLASS({
   implements: [ 'foam.nanos.auth.EnabledAware' ],
 
   requires: [
-    'foam.nanos.script.ScriptStatus'
+    'foam.nanos.script.ScriptStatus',
+    'foam.nanos.notification.Notification'
   ],
 
-  imports: [ 'scriptDAO' ],
+  imports: [ 'notificationDAO', 'user', 'scriptDAO' ],
 
   javaImports: [
     'bsh.EvalError',
@@ -167,12 +168,22 @@ foam.CLASS({
         {
             self.scriptDAO.find(self.id).then(function(script)
             {
-              if(script.status !== this.ScriptStatus.RUNNING)
+              if(script.status !== self.ScriptStatus.RUNNING)
               {
-                this.copyFrom(script);
+                self.copyFrom(script);
                 clearInterval(interval);
+
+                // create notification 
+                var notification = self.Notification.create({
+                  userId: self.user.id, 
+                  notificationType: "Script Execution", 
+                  body: `Status: ${script.status}
+                        Script Output: ${script.output}
+                        LastDuration: ${script.lastDuration}`
+                });
+                self.notificationDAO.put(notification);
               }
-            }.bind(self)).catch(function(){ clearInterval(interval); });
+            }).catch(function(){ clearInterval(interval); });
         }, 2000);
       }
     }
