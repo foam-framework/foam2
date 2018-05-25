@@ -80,4 +80,13 @@ foam.CLASS({
   ]
 });
 
-foam.u2.FoamTagLoader.create();
+foam.SCRIPT({
+  id: 'foam.u2.FoamTagLoaderScript',
+  requires: [
+    'foam.u2.FoamTagLoader',
+  ],
+  flags: ['web'],
+  code: function() {
+    foam.u2.FoamTagLoader.create();
+  },
+});
