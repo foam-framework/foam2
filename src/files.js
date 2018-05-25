@@ -37,6 +37,7 @@ FOAM_FILES([
   { name: "foam/core/Boolean" },
   { name: "foam/core/AxiomArray" },
   { name: "foam/core/EndBoot" },
+  { name: "foam/core/Script" },
   { name: "foam/core/FObjectArray" },
   { name: "foam/core/Constant" },
   { name: "foam/core/Validation" },
