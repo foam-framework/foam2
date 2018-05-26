@@ -265,6 +265,7 @@ foam.CLASS({
         };
       }
       */
+      foam.package.registerClass(this);
       return this;
     }
   ]
