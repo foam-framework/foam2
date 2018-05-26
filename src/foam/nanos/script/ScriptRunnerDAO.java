@@ -14,17 +14,15 @@ import foam.nanos.pool.FixedThreadPool;
 
 public class ScriptRunnerDAO
   extends ProxyDAO
-  {
+{
   final public static int DEFAULT_WAIT_TIME = 2000;
 
-  public ScriptRunnerDAO(DAO delegate)
-  {
+  public ScriptRunnerDAO(DAO delegate) {
     super();
     setDelegate(delegate);
   }
 
-  public FObject put_(final X x, FObject obj)
-  {
+  public FObject put_(final X x, FObject obj) {
     Script script = (Script) obj;
 
     if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
@@ -34,14 +32,12 @@ public class ScriptRunnerDAO
     return getDelegate().put_(x, obj);
   }
 
-  private void runScript(final X x, Script script)
-  {
+  protected void runScript(final X x, Script script) {
     long estimatedTime = this.estimateWaitTime(script);
     final CountDownLatch latch = new CountDownLatch(1);
 
     try {
-      ((FixedThreadPool) x.get("threadPool")).submit(x, new ContextAgent(){
-
+      ((FixedThreadPool) x.get("threadPool")).submit(x, new ContextAgent() {
         @Override
         public void execute(X y) {
           try {
@@ -67,11 +63,10 @@ public class ScriptRunnerDAO
     }
   }
 
-  private long estimateWaitTime(Script script)
-  {
-      if ( script.getLastRun() == null || DEFAULT_WAIT_TIME > script.getLastDuration() * 2 )
-        return DEFAULT_WAIT_TIME;
-      //  1 ms so it returns right away
-      return 1;
+  protected long estimateWaitTime(Script script) {
+      return script.getLastRun() == null || DEFAULT_WAIT_TIME > script.getLastDuration() * 2 ?
+        DEFAULT_WAIT_TIME :
+        1 ; //  1 ms so it returns right away
+
   }
 }
