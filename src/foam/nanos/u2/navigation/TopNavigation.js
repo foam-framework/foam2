@@ -102,6 +102,6 @@ foam.CLASS({
         .start({class: 'foam.nanos.u2.navigation.UserView'})
         .end()
       .end();
-      }
+    }
   ]
 });
