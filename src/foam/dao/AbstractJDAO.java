@@ -207,7 +207,7 @@ public abstract class AbstractJDAO
    * @returns FObject
    */
   @Override
-  public FObject put_(X x, FObject obj) {
+  public synchronized FObject put_(X x, FObject obj) {
     PropertyInfo id     = (PropertyInfo) getOf().getAxiomByName("id");
     FObject      o      = getDelegate().find_(x, id.get(obj));
     FObject      ret    = null;
@@ -234,6 +234,8 @@ public abstract class AbstractJDAO
       // TODO: supress class name from output
       writeComment((User) x.get("user"));
       out_.write("p(");
+      // TODO: output string directly here rather than converting to 'record'
+      // String above.
       out_.write(record);
       out_.write(")");
       out_.newLine();
