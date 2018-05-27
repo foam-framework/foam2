@@ -233,7 +233,9 @@ public abstract class AbstractJDAO
     try {
       // TODO: supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + record + ")");
+      out_.write("p(");
+      out_.write(record);
+      out_.write(")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
