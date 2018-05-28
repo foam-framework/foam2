@@ -59,7 +59,7 @@ public class SessionServerBox
 
         sessionDAO.put(session);
 
-        if ( authenticate_ && session.getUserId() == 0 ) {
+        if ( authenticate_ && ( session.getUserId() == 0 || session.isExpired() ) ) {
           msg.replyWithException(new AccessControlException("Not logged in"));
           return;
         }
