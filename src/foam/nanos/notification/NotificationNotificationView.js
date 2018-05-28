@@ -5,7 +5,7 @@ foam.CLASS({
   methods: [
     function initE() {
       this
-        .start('div').addClass('body').add(this.data.body).end();
+      this.SUPER();
     }
   ]
 })

@@ -45,22 +45,7 @@
         //color: white;
         //background: #607D8B;
       }*/
-      ^ .body {
-        padding-bottom:10px;
-        padding-top:20px;
-        padding-left:20px;
-        width: 414px;
-        height: 14px;
-        font-family: Roboto;
-        font-size: 12px;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: 1.17;
-        letter-spacing: 0.2px;
-        text-align: left;
-        color: #093649;
-      }
+      
       ^ i {
         margin-top: 5px;
       }
@@ -100,9 +85,6 @@
         letter-spacing: 0.2px;
         color: #093649;
         line-height: 30px;
-      }
-      ^ .divBody {
-        background: black !important;
       }
       ^ .popUpDropDown > div:hover {
         background-color: #59a5d5;
@@ -159,11 +141,6 @@
 
     methods: [
       function initE() { 
-        if ( ! this.data.read ) {
-          this.start('div').addClass('divBodyUnread')
-        } else {
-          this.start('div').addClass('divBody')
-        }
         this
           .on('mouseover', this.read)
           .addClass(this.myClass());
