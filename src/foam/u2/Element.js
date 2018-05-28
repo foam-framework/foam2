@@ -569,6 +569,10 @@ foam.CLASS({
 
   constants: [
     {
+      name: 'CSS_CLASSNAME_PATTERN',
+      factory: function() { return /^[a-z_-][a-z\d_-]*$/i; }
+    },
+    {
       documentation: `
         Psedo-attributes don't work consistently with setAttribute() so need to
         be set on the real DOM element directly.
@@ -577,12 +581,12 @@ foam.CLASS({
       value: {
         value: true,
         checked: true
-      },
+      }
     },
 
     {
       name: 'DEFAULT_VALIDATOR',
-      factory: function() { return foam.u2.DefaultValidator.create() },
+      factory: function() { return foam.u2.DefaultValidator.create(); }
     },
 
     {
@@ -593,7 +597,7 @@ foam.CLASS({
         to try and mutate the Element while in the OUTPUT state.
       `,
       name: 'OUTPUT',
-      factory: function() { return foam.u2.OutputElementState.create() },
+      factory: function() { return foam.u2.OutputElementState.create(); }
     },
 
     {
@@ -602,7 +606,7 @@ foam.CLASS({
         A Loaded Element should be visible in the DOM.
       `,
       name: 'LOADED',
-      factory: function() { return foam.u2.LoadedElementState.create() },
+      factory: function() { return foam.u2.LoadedElementState.create(); }
     },
 
     {
@@ -611,7 +615,7 @@ foam.CLASS({
         An unloaded Element can be readded to the DOM.
       `,
       name: 'UNLOADED',
-      factory: function() { return foam.u2.UnloadedElementState.create() },
+      factory: function() { return foam.u2.UnloadedElementState.create(); }
     },
 
     {
@@ -619,9 +623,7 @@ foam.CLASS({
         Initial state of an Element before it has been added to the DOM.
       `,
       name: 'INITIAL',
-      factory: function() {
-        return foam.u2.InitialElementState.create();
-      },
+      factory: function() { return foam.u2.InitialElementState.create(); }
     },
 
     // ???: Add DESTROYED State?
@@ -669,25 +671,25 @@ foam.CLASS({
         LINK: true,
         META: true,
         PARAM: true
-      },
+      }
     },
 
     {
       name: '__ID__',
-      value: [ 0 ],
+      value: [ 0 ]
     },
 
     {
       name: 'NEXT_ID',
       value: function() {
         return 'v' + this.__ID__[ 0 ]++;
-      },
+      }
     },
 
     {
       documentation: `Keys which respond to keydown but not keypress`,
       name: 'KEYPRESS_CODES',
-      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true }
     },
 
     {
@@ -1716,6 +1718,10 @@ foam.CLASS({
       if ( oldClass === newClass ) return;
       this.removeClass(oldClass);
       if ( newClass ) {
+        if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
+          console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
+          throw "Invalid CSS classname";
+        }
         this.classes[newClass] = true;
         this.onSetClass(newClass, true);
       }
