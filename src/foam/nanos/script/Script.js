@@ -11,11 +11,10 @@ foam.CLASS({
   implements: [ 'foam.nanos.auth.EnabledAware' ],
 
   requires: [
-    'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.Notification'
+    'foam.nanos.script.ScriptStatus', 'foam.nanos.notification.notifications.NotificationScript'
   ],
 
-  imports: [ 'notificationDAO', 'user', 'scriptDAO' ],
+  imports: [ 'scriptDAO', 'notificationDAO', 'user' ],
 
   javaImports: [
     'bsh.EvalError',
@@ -34,7 +33,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id', 'enabled', 'server', /*'language',*/ 'description', 'lastDuration', 'status', 'run',
   ],
 
   searchColumns: [],
@@ -80,10 +79,11 @@ foam.CLASS({
     },
     {
       class: 'foam.core.Enum',
-      of: 'foam.nanos.script.ScriptStatus',
+      of: 'foam.nanos.script.ScriptStatus', 
       name: 'status',
       visibility: foam.u2.Visibility.RO,
-      factory: function() {
+      factory: function()
+      {
         return this.ScriptStatus.UNSCHEDULED;
       }
     },
@@ -114,14 +114,12 @@ foam.CLASS({
       javaReturns: 'Interpreter',
       javaCode: `
         Interpreter shell = new Interpreter();
-
         try {
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
           shell.eval("sudo(String user) { foam.util.Auth.sudo(x, user); }");
         } catch (EvalError e) {}
-
         return shell;
       `
     },
@@ -138,7 +136,6 @@ foam.CLASS({
         PrintStream           ps    = new PrintStream(baos);
         Interpreter           shell = createInterpreter(x);
         PM                    pm    = new PM(this.getClass(), getId());
-
         // TODO: import common packages like foam.core.*, foam.dao.*, etc.
         try {
           setOutput("");
@@ -151,7 +148,6 @@ foam.CLASS({
         } finally {
           pm.log(x);
         }
-
         setLastRun(new Date());
         setLastDuration(pm.getTime());
         ps.flush();
@@ -159,28 +155,20 @@ foam.CLASS({
     `
     },
     {
-      name: 'poll',
-      code: function() {
+      name: 'poll', 
+      code: function()
+      {
         var self = this;
-        var interval = setInterval(function() {
-            self.scriptDAO.find(self.id).then(function(script) {
-              if ( script.status !== self.ScriptStatus.RUNNING ) {
-                self.copyFrom(script);
+        var interval = setInterval(function()
+        {
+            self.scriptDAO.find(self.id).then(function(script)
+            {
+              if(script.status !== this.ScriptStatus.RUNNING)
+              {
+                this.copyFrom(script);
                 clearInterval(interval);
-
-                // create notification
-                var notification = self.Notification.create({
-                  userId: self.user.id,
-                  notificationType: "Script Execution",
-                  body: `Status: ${script.status}
-                        Script Output: ${script.output}
-                        LastDuration: ${script.lastDuration}`
-                });
-                self.notificationDAO.put(notification);
               }
-            }).catch(function() {
-               clearInterval(interval);
-              });
+            }.bind(self)).catch(function(){ clearInterval(interval); });
         }, 2000);
       }
     }
@@ -193,25 +181,39 @@ foam.CLASS({
         var self = this;
         this.output = '';
         this.status = this.ScriptStatus.SCHEDULED;
+        var notification = null;
         if ( this.server ) {
           this.scriptDAO.put(this).then(function(script) {
               self.copyFrom(script);
-              if ( script.status === self.ScriptStatus.RUNNING ) {
-                self.poll();
-              }
+              notification = self.NotificationScript.create({
+                userId: self.user.id,
+                script: script,
+                notificationType: "Script run",
+                body: 'Script output: ' + script.output + '. \nLast time run: ' + self.lastRun + '. \nLast duration: ' + self.duration
+              })
+              self.notificationDAO.put(notification);
+              if(script.status === self.ScriptStatus.RUNNING)
+                self.poll();  
           });
         } else {
           var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
-
+          
           with ( { log: log, print: log, x: self.__context__ } ) {
             this.status = this.ScriptStatus.RUNNING;
             var ret = eval(this.code);
-            var self = this;
-            Promise.resolve(ret).then(function() {
-              self.status = self.ScriptStatus.UNSCHEDULED;
-              self.scriptDAO.put(self);
-            });
+            console.log('ret: ', ret);
+            this.status = this.ScriptStatus.UNSCHEDULED;
+            // TODO: if Promise returned, then wait
           }
+          
+          this.scriptDAO.put(this);
+          notification = self.NotificationScript.create({
+            userId: self.user.id,
+            script: this,
+            notificationType: "Script run",
+            body: 'Script output: ' + self.output + '. \nLast time run: ' + self.lastRun + '. \nLast duration: ' + self.duration
+          })
+          self.notificationDAO.put(notification);
         }
       }
     }
