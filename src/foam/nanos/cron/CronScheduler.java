@@ -60,12 +60,12 @@ public class CronScheduler
         cronDAO_.where(MLang.AND(MLang.LTE(Cron.SCHEDULED_TIME, now), MLang.EQ(Cron.ENABLED, true))).select(new AbstractSink() {
           @Override
           public void put(Object obj, Detachable sub) {
-            Cron cron = (Cron) obj;
+            Cron cron = (Cron) ((FObject) obj).fclone();
 
             PM pm = new PM(CronScheduler.this.getClass(), "cronScheduler");
             try {
               cron.runScript(CronScheduler.this.getX());
-              cronDAO_.put((FObject)obj);
+              cronDAO_.put((FObject) cron);
             } catch (Throwable t) {
               logger.error(this.getClass(), "Error running Cron Job", cron.getId(), t.getMessage());
             } finally {
