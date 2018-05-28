@@ -58,5 +58,13 @@ foam.CLASS({
       hidden: true,
       transient: true
     }
+  ],
+
+  methods: [
+    {
+      name: 'isExpired',
+      javaReturns: 'boolean',
+      javaCode: `return System.currentTimeMillis() > getExpiry().getTime();`
+    }
   ]
 });
