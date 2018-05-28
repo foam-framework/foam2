@@ -9,15 +9,22 @@ foam.CLASS({
   name: 'Messageboard',
 
   tableColumns: [
-    'id', 'title', 'createdDate', 'creator', 'starmark'
+    'starmark', 'title', 'createdDate', 'creator'
   ],
 
   imports: [
+    'blobService',
     'messageboardDAO',
     'user'
   ],
 
   javaImports: [ 'java.util.Date' ],
+
+  requires: [
+    'foam.blob.BlobBlob',
+    'foam.nanos.fs.File',
+    'foam.u2.dialog.NotificationMessage'
+  ],
 
   properties: [
     {
@@ -34,7 +41,6 @@ foam.CLASS({
             .call(function() {
               if ( value ) { this.tag({ class: 'foam.u2.tag.Image', data: 'images/star.svg' }).style({'width': '25'}); }
             })
-            //.add(value ? ' Y' : '-')
           .end();
       }
     },
@@ -48,33 +54,33 @@ foam.CLASS({
       class: 'String',
       name: 'creator',
       visibility: foam.u2.Visibility.RO,
-      //value: this.user.firstName
+      factory: function() { return this.user.firstName; }
     },
     {
-      class: 'Date',
+      class: 'Long',
+      name: 'creatorId',
+      visibility: foam.u2.Visibility.RO,
+      factory: function() { return this.user.id; },
+      hidden: true
+    },
+    {
+      class: 'DateTime',
       name: 'createdDate',
       visibility: foam.u2.Visibility.RO,
       factory: function() { return new Date(); },
-      javaFactory: 'return new Date();'
-      // ,
-      // tableCellFormatter: function(date) {
-      //   this.add(date ? date.toISOString().substring(0,10) : '');
-      // }
+      javaFactory: 'return new Date();',
+      tableCellFormatter: function(date) {
+        this.add(date ? date.toISOString().substring(0,10) : '');
+      }
     },
     {
       class: 'String',
       name: 'content',
       view: { class: 'foam.u2.tag.TextArea', rows: 30, cols: 120}
     },
-    // {
-    //   class: 'foam.nanos.fs.FileArray',
-    //   name: 'messageboardFile',
-    //   view: { class: 'foam.demos.net.nap.web.MessageboardFileView' }
-    // }
-
     {
       class: 'foam.nanos.fs.FileArray',
-      name: 'messageboardFile',
+      name: 'data',
       label: 'Attachments',
       documentation: 'Additional documents for messageboard',
       view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView' }
