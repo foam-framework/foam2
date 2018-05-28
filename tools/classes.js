@@ -156,6 +156,7 @@ var classes = [
   'foam.nanos.logger.Logger',
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.logger.AbstractLogger',
+  'foam.nanos.logger.FileLogger',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.ListMenu',
