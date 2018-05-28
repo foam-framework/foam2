@@ -60,6 +60,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
 
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
     return (User) Password.sanitize(user);
   }
 
@@ -72,8 +76,13 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid User Id");
     }
 
-    if ( userDAO_.find(userId) == null ) {
+    User user = userDAO_.find(userId);
+    if ( user == null ) {
       throw new AuthenticationException("User not found");
+    }
+
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
     }
 
     String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
@@ -114,6 +123,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
     challengeMap.remove(userId);
 
     Session session = x.get(Session.class);
@@ -135,6 +148,10 @@ public class UserAndGroupAuthService
     User user = (User) userDAO_.find(userId);
     if ( user == null ) {
       throw new AuthenticationException("User not found.");
+    }
+
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
@@ -160,6 +177,10 @@ public class UserAndGroupAuthService
     User user = (User) data.get(0);
     if ( user == null ) {
       throw new AuthenticationException("User not found");
+    }
+
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
@@ -188,7 +209,7 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(session.getUserId());
-    if ( user == null ) {
+    if ( user == null || ! user.getEnabled() ) {
       return false;
     }
 
@@ -230,6 +251,10 @@ public class UserAndGroupAuthService
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null ) {
       throw new AuthenticationException("User not found");
+    }
+
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
     }
 
     int length = newPassword.length();
