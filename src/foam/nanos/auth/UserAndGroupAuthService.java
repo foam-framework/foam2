@@ -76,7 +76,7 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("Invalid User Id");
     }
 
-    User user = userDAO_.find(userId);
+    User user = (User) userDAO_.find(userId);
     if ( user == null ) {
       throw new AuthenticationException("User not found");
     }
