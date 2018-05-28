@@ -207,38 +207,43 @@ public abstract class AbstractJDAO
    * @returns FObject
    */
   @Override
-  public FObject put_(X x, FObject obj) {
+  public synchronized FObject put_(X x, FObject obj) {
     PropertyInfo id     = (PropertyInfo) getOf().getAxiomByName("id");
     FObject      o      = getDelegate().find_(x, id.get(obj));
     FObject      ret    = null;
     String       record = null;
 
     if ( o == null ) {
-      //data does not exist
+      // data does not exist
       ret = getDelegate().put_(x, obj);
-      //stringify to json string
+      // stringify to json string
       record = getOutputter().stringify(ret);
     } else {
-      //compare with old data if old data exists
-      //get difference FObject
+      // compare with old data if old data exists
+      // get difference FObject
       ret = difference(o, obj);
-      //if no difference, then return
+      // if no difference, then return
       if ( ret == null ) return obj;
-      //stringify difference FObject into json string
+      // stringify difference FObject into json string
       record = getOutputter().stringify(ret);
-      //put new data into memory
+      // put new data into memory
       ret = getDelegate().put_(x, obj);
     }
 
     try {
-      // TODO(drish): supress class name from output
+      // TODO: supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + record + ")");
+      out_.write("p(");
+      // TODO: output string directly here rather than converting to 'record'
+      // String above.
+      out_.write(record);
+      out_.write(")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
       logger_.error("put", e);
     }
+
     return ret;
   }
 

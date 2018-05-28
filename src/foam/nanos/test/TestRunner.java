@@ -12,6 +12,9 @@ import foam.core.*;
 import foam.dao.*;
 import foam.mlang.MLang.*;
 import foam.nanos.NanoService;
+import foam.nanos.script.ScriptStatus;
+import foam.nanos.test.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -33,7 +36,7 @@ public class TestRunner
     final DAO tests = (DAO) getX().get("TestDAO");
     try {
       final JDAO jTests = new JDAO(getX(), tests,"TestFile.jrl");
-      tests.where(foam.mlang.MLang.EQ(Test.SCHEDULED, Boolean.TRUE)).select(new AbstractSink() {
+      tests.where(foam.mlang.MLang.EQ(Test.STATUS, ScriptStatus.SCHEDULED)).select(new AbstractSink() {
         @Override
         public void put(Object obj, Detachable sub) {
           ((Test) obj).runScript(getX());
@@ -63,7 +66,7 @@ public class TestRunner
       Test test2 = new Test();
       test2.setId("Test 2");
       test2.setCode("test(1==2 ,\"FALSE\");");
-      test2.setScheduled(true);
+      test2.setStatus(ScriptStatus.SCHEDULED);
       jTests.put(test2);
       Test test3 = new Test();
       test3.setId("Test 3");
