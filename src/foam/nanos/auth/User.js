@@ -207,6 +207,7 @@ foam.CLASS({
       label: 'Password',
       displayWidth: 30,
       width: 100,
+      storageTransient: true,
       validateObj: function (password) {
         var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
 
