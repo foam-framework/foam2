@@ -19,6 +19,16 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'privacy',
+      value: 'Privacy Policy'
+    },
+    {
+      class: 'String',
+      name: 'privacyUrl',
+      value: 'https://nanopay.net/privacy-policy'
+    },
+    {
+      class: 'String',
       name: 'copyright',
       value: 'Copyright © 2018 Nanopay. All rights reserved.'
     },
@@ -46,11 +56,6 @@ foam.CLASS({
       clsas: 'String',
       name: 'privacyLabel',
       value: 'Privacy Policy'
-    },
-    {
-      clsas: 'String',
-      name: 'privacyUrl',
-      value: 'https://nanopay.net/privacy-policy'
     },
     {
       class: 'Enum',

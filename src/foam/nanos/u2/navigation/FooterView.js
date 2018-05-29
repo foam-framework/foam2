@@ -32,6 +32,9 @@ foam.CLASS({
     ^ div {
       font-size:14px;
     }
+    ^ .mode {
+      display: inline-block;
+    }
     ^ .copyright-label {
       margin-right: 50px;
       float: right;
@@ -91,11 +94,11 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div').addClass('col').addClass('mini-links')
-          .start(this.GO_TO,{ label: this.aboutLabel }).end()
+          .start(this.GO_TO,{ label$: this.appConfig.urlLabel$ }).end()
           .add('|')
           .start(this.GO_TO_TERM, { label$: this.appConfig.termsAndCondLabel$ }).end()
           .add('|')
-          .start(this.GO_TO_PRIVACY, { label$: this.appConfig.privacyLabel$ }).end()
+          .start(this.GO_TO_PRIVACY, { label$: this.appConfig.privacy$ }).end()
           .add('|')
           .start().addClass('mode').add(this.appConfig.mode$.map(function(m) { return m.label; }), ' version: ', this.appConfig.version$).end()
         .end()
@@ -115,20 +118,21 @@ foam.CLASS({
   actions: [
      {
       name: 'goTo',
+      label:'',
       code: function(X) {
         this.window.location.assign(X.appConfig.url);
       }
     },
     {
       name: 'goToTerm',
-      label: 'ss',
+      label: '',
       code: function(X) {
         X.openTermsModal()
       }
     },
     {
       name: 'goToPrivacy',
-      label: 'Privacy Policy',
+      label: '',
       code: function(X) {
         this.window.location.assign(X.appConfig.privacyUrl);
       }
