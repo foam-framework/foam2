@@ -48,14 +48,9 @@ foam.CLASS({
       value: 'Terms and Conditions'
     },
     {
-      clsas: 'String',
+      class: 'String',
       name: 'termsAndCondLink',
       value: 'net.nanopay.ui.modal.TandCModal'
-    },
-    {
-      clsas: 'String',
-      name: 'privacyLabel',
-      value: 'Privacy Policy'
     },
     {
       class: 'Enum',
