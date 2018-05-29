@@ -26,14 +26,14 @@ foam.CLASS({
         return promise.then(function(text) {
           if ( ! text ) return null;
           var json;
-          var relationship = false;
+          var jsonId;
 
           var context = {
             foam: Object.create(foam)
           };
 
           context.foam.CLASS = function(m) {
-            var jsonId = m.package ?
+            jsonId = m.package ?
                 m.package + '.' + m.name :
                 m.name;
 
@@ -56,28 +56,37 @@ foam.CLASS({
           };
 
           context.foam.RELATIONSHIP = function(r) {
-            var references = foam.json.references(x, r);
+            var s = r.sourceModel;
+            var si = s.lastIndexOf('.');
+            var t = r.targetModel;
+            var ti = t.lastIndexOf('.');
 
-            Promise.all(references.concat([
-              foam.package.waitForClass(r.sourceModel),
-              foam.package.waitForClass(r.targetModel)
-            ])).then(function() {
-              var obj = foam.dao.Relationship.create(r, x);
-
-              obj.validate && obj.validate();
-              foam.package.registerClass(obj);
-            });
+            r.class = r.class || 'foam.dao.Relationship';
+            r.package = r.package || s.substring(0, si)
+            r.name = r.name || s.substring(si+1) + t.substring(ti+1) + 'Relationship';
+            context.foam.CLASS(r);
+            if ( jsonId !== id ) {
+              // If a relationship was encountered but not asked for, initialize
+              // the relationship because it is likely to be expected.
+              // If this behavior isn't desired then the relationship should be
+              // moved into its own file.
+              self.find(jsonId).then(function(m) {
+                m.initRelationship();
+              });
+            }
           };
 
-          with ( context ) { eval(text); }
+          if ( foam.String.isInstance(text) ) {
+            with ( context ) { eval(text); }
+          } else {
+            context.foam.CLASS(text);
+          }
 
           if ( ! json ) {
             throw new Error('No model found for ' + id);
           }
 
-          var references = foam.json.references(x, json);
-
-          return Promise.all(references).then(function() {
+          return Promise.all(foam.json.references(x, json)).then(function() {
             return foam.lookup(json.class || 'Model').create(json, x);
           });
         }, function() {
