@@ -39,7 +39,7 @@ foam.CLASS({
 
             if ( jsonId !== id ) {
               self.cache[jsonId] = m;
-              return
+              return;
             }
 
             json = m;
