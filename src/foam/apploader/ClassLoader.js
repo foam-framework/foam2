@@ -23,7 +23,8 @@ foam.CLASS({
 have multiple classloaders running alongside eachother`
 ],*/
   requires: [
-    'foam.classloader.OrDAO'
+    'foam.classloader.OrDAO',
+    'foam.dao.Relationship',
   ],
   properties: [
     {
@@ -134,7 +135,10 @@ have multiple classloaders running alongside eachother`
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
           return this.pending[id] = this.modelDAO.find(id).then(function(m) {
-            if ( ! m ) return Promise.reject(new Error('Class Not Found: ' + id));
+            if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
+            if ( self.Relationship.isInstance(m) ) {
+              return m.initRelationship();
+            }
 
             return this.buildClass_(m, path);
           }.bind(this), function() {
