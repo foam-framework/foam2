@@ -15,11 +15,10 @@ foam.CLASS({
   ],
 
   imports: [
+    'auth',
     'emailToken',
-    'editProfilePopUp',
-    'user',
     'stack',
-    'auth'
+    'user'
   ],
 
   css:`
@@ -68,7 +67,6 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
-      if (this.editProfilePopUp) this.editProfilePopUp.remove();
 
       this
         .addClass(this.myClass())
