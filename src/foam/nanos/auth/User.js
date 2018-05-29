@@ -220,14 +220,13 @@ foam.CLASS({
       class: 'Password',
       name: 'password',
       hidden: true,
-      networkTransient: true,
+      networkTransient: true
     },
     {
       class: 'Password',
       name: 'previousPassword',
       hidden: true,
-      displayWidth: 30,
-      width: 100
+      networkTransient: true
     },
     {
       class: 'DateTime',
