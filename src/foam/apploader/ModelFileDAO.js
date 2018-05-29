@@ -38,10 +38,11 @@ foam.CLASS({
 
             if ( jsonId !== id ) {
               self.cache[jsonId] = m;
-              return jsonId;
+            } else {
+              json = m;
             }
 
-            json = m;
+            return jsonId;
           };
 
           context.foam.INTERFACE = function(json) {
@@ -63,13 +64,13 @@ foam.CLASS({
             r.class = r.class || 'foam.dao.Relationship';
             r.package = r.package || s.substring(0, si)
             r.name = r.name || s.substring(si+1) + t.substring(ti+1) + 'Relationship';
-            var id = context.foam.CLASS(r);
-            if ( id ) {
+            var rId = context.foam.CLASS(r);
+            if ( rId !== id ) {
               // If a relationship was encountered but not asked for, initialize
               // the relationship because it is likely to be expected.
               // If this behavior isn't desired then the relationship should be
               // moved into its own file.
-              self.find(id).then(function(m) {
+              self.find(rId).then(function(m) {
                 m.initRelationship();
               });
             }
@@ -85,9 +86,7 @@ foam.CLASS({
             throw new Error('No model found for ' + id);
           }
 
-          var references = foam.json.references(x, json);
-
-          return Promise.all(references).then(function() {
+          return Promise.all(foam.json.references(x, json)).then(function() {
             return foam.lookup(json.class || 'Model').create(json, x);
           });
         }, function() {
