@@ -19,12 +19,38 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'copyright'
+      name: 'copyright',
+      value: 'Copyright © 2018 Nanopay. All rights reserved.'
     },
     {
       class: 'String',
       name: 'url',
       value: 'http://localhost:8080/'
+    },
+    {
+      class: 'String',
+      name: 'urlLabel',
+      value: 'Powered by Nanopay'
+    },
+    {
+      class:'String',
+      name: 'termsAndCondLabel',
+      value: 'Terms and Conditions'
+    },
+    {
+      clsas: 'String',
+      name: 'termsAndCondLink',
+      value: 'net.nanopay.ui.modal.TandCModal'
+    },
+    {
+      clsas: 'String',
+      name: 'privacyLabel',
+      value: 'Privacy Policy'
+    },
+    {
+      clsas: 'String',
+      name: 'privacyUrl',
+      value: 'https://nanopay.net/privacy-policy'
     },
     {
       class: 'Enum',
