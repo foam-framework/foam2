@@ -718,6 +718,9 @@ foam.LIB({
 
               o[key] = json.name;
               continue;
+            } else if ( ( key === 'class' ) && o[key] == 'foam.dao.Relationship' ) {
+              r.push(x.classloader.maybeLoad(o['sourceModel']));
+              r.push(x.classloader.maybeLoad(o['targetModel']));
             } else if ( ( key === 'of' || key === 'class' || key == 'view' || key == 'refines' ) &&
                         foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));

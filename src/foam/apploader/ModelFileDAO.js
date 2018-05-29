@@ -26,7 +26,6 @@ foam.CLASS({
         return promise.then(function(text) {
           if ( ! text ) return null;
           var json;
-          var relationship = false;
 
           var context = {
             foam: Object.create(foam)
@@ -39,7 +38,7 @@ foam.CLASS({
 
             if ( jsonId !== id ) {
               self.cache[jsonId] = m;
-              return;
+              return jsonId;
             }
 
             json = m;
@@ -56,24 +55,30 @@ foam.CLASS({
           };
 
           context.foam.RELATIONSHIP = function(r) {
-            relationship = Promise.all(foam.json.references(x, r)).then(function() {
-               var obj = foam.dao.Relationship.create(r, x);
-              obj.validate && obj.validate();
-              return obj;
-            })
+            var s = r.sourceModel;
+            var si = s.lastIndexOf('.');
+            var t = r.targetModel;
+            var ti = t.lastIndexOf('.');
+
+            r.class = r.class || 'foam.dao.Relationship';
+            r.package = r.package || s.substring(0, si)
+            r.name = r.name || s.substring(si+1) + t.substring(ti+1) + 'Relationship';
+            var id = context.foam.CLASS(r);
+            if ( id ) {
+              // If a relationship was encountered but not asked for, initialize
+              // the relationship because it is likely to be expected.
+              // If this behavior isn't desired then the relationship should be
+              // moved into its own file.
+              self.find(id).then(function(m) {
+                m.initRelationship();
+              });
+            }
           };
 
-          with ( context ) { eval(text); }
-
-          if ( ! json && relationship ) return relationship;
-
-          if ( relationship ) {
-            // If json is set then a relationship was encountered in the same
-            // file as another model. In this case, the relationship wasn't
-            // explicitly asked for but is likely expected to be initialized. If
-            // this behavior isn't desired then the relationship should be moved
-            // into its own file.
-            relationship.then(function(r) { r.initRelationship() });
+          if ( foam.String.isInstance(text) ) {
+            with ( context ) { eval(text); }
+          } else {
+            context.foam.CLASS(text);
           }
 
           if ( ! json ) {
