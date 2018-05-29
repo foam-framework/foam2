@@ -147,21 +147,6 @@ foam.CLASS({
 
   methods: [
     function initRelationship() {
-      // Do the initialization syncronously if the models are already loaded.
-      if ( this.lookup(this.sourceModel, true) &&
-           this.lookup(this.targetModel, true) ) {
-        return Promise.resolve(this.initRelationship_());
-      }
-
-      var wait = this.classloader ?
-          this.classloader.load.bind(this.classloader) :
-          foam.package.waitForClass;
-      return Promise.all([
-        wait(this.sourceModel),
-        wait(this.targetModel),
-      ]).then(this.initRelationship_.bind(this));
-    },
-    function initRelationship_() {
       var sourceProp;
       var targetProp;
       var cardinality   = this.cardinality;
@@ -276,10 +261,12 @@ foam.LIB({
   name: 'foam',
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
-      var r = foam.dao.Relationship.create(m, opt_ctx);
-      r.validate && r.validate();
-      r.initRelationship();
-      return r;
+      m.class = 'foam.dao.Relationship';
+      Promise.all(foam.json.references(opt_ctx || foam.__context__, m)).then(function() {
+        var r = foam.dao.Relationship.create(m, opt_ctx);
+        r.validate && r.validate();
+        r.initRelationship();
+      });
     }
   ]
 });
