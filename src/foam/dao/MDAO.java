@@ -71,8 +71,8 @@ public class MDAO
     for ( PropertyInfo prop : props ) addUniqueIndex(prop);
   }
 
-  protected Logger getLogger() {
-    if ( logger_ == null ) logger_ = (Logger) getX().get("logger");
+  protected Logger getLogger(X x) {
+    if ( logger_ == null ) logger_ = (Logger) x.get("logger");
 
     return logger_;
   }
@@ -156,7 +156,7 @@ public class MDAO
 
     // TODO: if plan cost is >= size, log a warning
     if ( plan.cost() >= index_.size(state_) ) {
-      getLogger().error(predicate.createStatement(), " UnIndex search by " + "MDAO");
+      getLogger(x).error(predicate.createStatement(), " UnIndex search by " + "MDAO");
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
