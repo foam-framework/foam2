@@ -16,7 +16,10 @@ foam.CLASS({
 
   imports: [
     'emailToken',
-    'user'
+    'editProfilePopUp',
+    'user',
+    'stack',
+    'auth'
   ],
 
   css:`
@@ -41,7 +44,10 @@ foam.CLASS({
       margin-top: 35px;
       outline: none;
     }
-
+    ^ .net-nanopay-ui-ActionView-goBack {
+      background: none;
+      color: #59a5d5;
+    }
   `,
 
   properties: [
@@ -62,6 +68,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       var self = this;
+      if (this.editProfilePopUp) this.editProfilePopUp.remove();
 
       this
         .addClass(this.myClass())
@@ -74,6 +81,7 @@ foam.CLASS({
             .start().add(this.Instructions3).end()
             .start(this.RESEND_EMAIL).end()
           .end()
+          .start(this.GO_BACK).end()
         .end();
     }
   ],
@@ -94,7 +102,16 @@ foam.CLASS({
           self.add(self.NotificationMessage.create({ message: err.message, type: 'error' }));
         });
       }
+    },
+    {
+      name: 'goBack',
+      label: 'Go to sign in page.',
+      code: function(X) {
+        this.auth.logout().then(function() {
+          this.window.location.hash = '';
+          this.window.location.reload();
+        });
+      }
     }
   ]
-
 });
