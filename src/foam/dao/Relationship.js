@@ -35,10 +35,6 @@ foam.CLASS({
     'foam.dao.ManyToManyRelationshipProperty'
   ],
 
-  imports: [
-    'classloader?',
-  ],
-
   properties: [
     {
       name: 'id',
