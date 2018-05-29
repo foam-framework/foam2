@@ -11,10 +11,10 @@ foam.CLASS({
   implements: [ 'foam.nanos.NanoService' ],
 
   javaImports: [
-    'java.text.SimpleDateFormat',
     'java.io.IOException',
-    'java.util.logging.Formatter',
+    'java.text.SimpleDateFormat',
     'java.util.logging.FileHandler',
+    'java.util.logging.Formatter',
     'java.util.logging.Handler',
     'java.util.logging.Level',
     'java.util.logging.Logger',
