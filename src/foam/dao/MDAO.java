@@ -15,6 +15,8 @@ import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
+import foam.nanos.logger.Logger;
+
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -48,6 +50,7 @@ public class MDAO
 {
   protected AltIndex      index_;
   protected Object        state_;
+  protected Logger        logger_;
   protected ReadWriteLock lock_ = new ReentrantReadWriteLock();
 
   public MDAO(ClassInfo of) {
@@ -66,6 +69,12 @@ public class MDAO
 
   public void addIndex(PropertyInfo... props) {
     for ( PropertyInfo prop : props ) addUniqueIndex(prop);
+  }
+
+  protected Logger getLogger() {
+    if ( logger_ == null ) logger_ = (Logger) getX().get("logger");
+
+    return logger_;
   }
 
   public FObject put_(X x, FObject obj) {
@@ -146,6 +155,9 @@ public class MDAO
     }
 
     // TODO: if plan cost is >= size, log a warning
+    if ( plan.cost() >= index_.size(state_) ) {
+      getLogger().error(predicate.createStatement(), " UnIndex search by " + "MDAO");
+    }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
 
