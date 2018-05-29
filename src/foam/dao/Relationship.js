@@ -261,12 +261,10 @@ foam.LIB({
   name: 'foam',
   methods: [
     function RELATIONSHIP(m, opt_ctx) {
-      m.class = 'foam.dao.Relationship';
-      Promise.all(foam.json.references(opt_ctx || foam.__context__, m)).then(function() {
-        var r = foam.dao.Relationship.create(m, opt_ctx);
-        r.validate && r.validate();
-        r.initRelationship();
-      });
+      var r = foam.dao.Relationship.create(m, opt_ctx);
+      r.validate && r.validate();
+      r.initRelationship();
+      return r;
     }
   ]
 });
