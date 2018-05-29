@@ -12,9 +12,9 @@ foam.CLASS({
   abstract: true,
 
   javaImports: [
-    'java.io.Writer',
-    'java.io.StringWriter',
     'java.io.PrintWriter',
+    'java.io.StringWriter',
+    'java.io.Writer',
     'java.text.SimpleDateFormat'
   ],
 
