@@ -203,7 +203,8 @@ foam.CLASS({
     },
     {
       class: 'Password',
-      name: 'password',
+      name: 'desiredPassword',
+      label: 'Password',
       displayWidth: 30,
       width: 100,
       validateObj: function (password) {
@@ -213,6 +214,12 @@ foam.CLASS({
           return 'Password must contain one lowercase letter, one uppercase letter, one digit, and be between 7 and 32 characters in length.';
         }
       }
+    },
+    {
+      class: 'Password',
+      name: 'password',
+      hidden: true,
+      networkTransient: true,
     },
     {
       class: 'Password',

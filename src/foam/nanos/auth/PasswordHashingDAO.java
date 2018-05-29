@@ -27,19 +27,6 @@ public class PasswordHashingDAO
   }
 
   @Override
-  public Sink select_(X x, Sink sink, long skip, long limit, Comparator order, Predicate predicate) {
-    if ( sink == null ) sink = new ArraySink();
-    PasswordRemovalSink passwordRemovalSink = new PasswordRemovalSink(x, sink);
-    super.select_(x, passwordRemovalSink, skip, limit, order, predicate);
-    return sink;
-  }
-
-  @Override
-  public FObject find_(X x, Object id) {
-    return Password.sanitize(super.find_(x, id));
-  }
-
-  @Override
   public FObject put_(X x, FObject obj) {
     Object  id     = obj.getProperty("id");
     FObject stored = getDelegate().find(id);
@@ -55,8 +42,6 @@ public class PasswordHashingDAO
       obj.setProperty("passwordLastModified", stored.getProperty("passwordLastModified"));
     }
 
-    // clone result and return copy with no password parameters
-    FObject result = super.put_(x, obj);
-    return Password.sanitize(result);
+    return super.put_(x, obj);
   }
 }
