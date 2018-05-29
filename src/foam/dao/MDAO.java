@@ -50,7 +50,6 @@ public class MDAO
 {
   protected AltIndex      index_;
   protected Object        state_;
-  protected Logger        logger_;
   protected ReadWriteLock lock_ = new ReentrantReadWriteLock();
 
   public MDAO(ClassInfo of) {
@@ -69,12 +68,6 @@ public class MDAO
 
   public void addIndex(PropertyInfo... props) {
     for ( PropertyInfo prop : props ) addUniqueIndex(prop);
-  }
-
-  protected Logger getLogger(X x) {
-    if ( logger_ == null ) logger_ = (Logger) x.get("logger");
-
-    return logger_;
   }
 
   public FObject put_(X x, FObject obj) {
@@ -156,7 +149,7 @@ public class MDAO
 
     // TODO: if plan cost is >= size, log a warning
     if ( plan.cost() >= index_.size(state_) ) {
-      getLogger(x).error(predicate.createStatement(), " UnIndex search by " + "MDAO");
+      ( (Logger) x.get("logger") ).error(predicate.createStatement(), " UnIndex search by MDAO ");
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
