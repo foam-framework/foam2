@@ -93,7 +93,6 @@ foam.CLASS({
           .start().addClass('mode').add(this.appConfig.mode$.map(function(m) { return m.label; }), ' version: ', this.appConfig.version$).end()
         .end()
         .start('div').addClass('col').addClass('copyright-label')
-         // .start('p').add('Copyright © 2018 ' + this.webApp + '. All rights reserved.').end()
           .start('p').add(this.appConfig.copyright$).end()
         .end()
 
