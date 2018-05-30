@@ -37,7 +37,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'urlLabel',
-      value: 'FOAM powered'
+      value: 'FOAM Powered'
     },
     {
       class:'String',
