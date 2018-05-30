@@ -30,7 +30,8 @@ foam.CLASS({
     'java.io.PrintStream',
     'java.util.Date',
     'java.util.List',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
+    'foam.nanos.script.ScriptStatus'
   ],
 
   tableColumns: [
@@ -85,7 +86,8 @@ foam.CLASS({
       visibility: foam.u2.Visibility.RO,
       factory: function() {
         return this.ScriptStatus.UNSCHEDULED;
-      }
+      },
+      javaValue: 'ScriptStatus.UNSCHEDULED'
     },
     {
       class: 'String',
