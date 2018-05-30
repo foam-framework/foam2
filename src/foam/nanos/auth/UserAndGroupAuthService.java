@@ -232,6 +232,7 @@ public class UserAndGroupAuthService
     }
 
     // store new password in DAO and put in context
+    user = (User) user.fclone();
     user.setPasswordLastModified(Calendar.getInstance().getTime());
     user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
