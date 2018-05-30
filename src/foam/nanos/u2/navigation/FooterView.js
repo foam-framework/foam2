@@ -77,16 +77,6 @@ foam.CLASS({
     }
   `,
 
-  properties: [
-    {
-      class: 'String',
-      name: 'aboutLabel',
-      factory: function () {
-        return 'Powered by nanopay';
-      }
-    }
-  ],
-
   methods: [
     function initE(){
       this.SUPER();
