@@ -8,7 +8,10 @@ foam.CLASS({
   package: 'foam.u2.history',
   name: 'HistoryView',
   extends: 'foam.u2.View',
-  requires: [ 'foam.u2.history.HistoryItemView' ],
+  requires: [
+    'foam.u2.history.HistoryItemView',
+    'foam.dao.history.HistoryRecord',
+  ],
 
   documentation: 'View displaying history',
 
@@ -52,12 +55,14 @@ foam.CLASS({
       margin-bottom: 20px;
       content: '';
     }
+    ^ > div:last-of-type .timeline {
+      display: none;
+    }
   `,
 
   properties: [
     'data',
     'historyItemView',
-    'records',
     { class: 'String', name: 'title', value: 'History' }
   ],
 
@@ -68,24 +73,15 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('h2').add(this.title).end()
-        .call(function outputRecords() {
-          // Gets records from DAO
-          view.data.select().then(function(records) {
-            view.records = records;
-            // Reverses records array for chronological output
-            view.forEach(records.array.reverse(), function(record, index) {
-              view.start('div')
-                .addClass('timelineRecord')
-                .callIf(index != view.records.array.length - 1, function(){
-                  this.start('div').addClass('timeline').end()
-                })
-                .call(function() {
-                  view.historyItemView.outputRecord(this, record)
-                })
-              .end();
+        .select(view.data.orderBy(this.DESC(this.HistoryRecord.TIMESTAMP)), function(record) {
+          return this.E().start('div')
+            .addClass('timelineRecord')
+            .start('div').addClass('timeline').end()
+            .call(function() {
+              view.historyItemView.outputRecord(this, record)
             })
-          })
-        });
+          .end();
+        }, false);
     }
   ]
 });
