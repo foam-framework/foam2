@@ -9,9 +9,11 @@ foam.CLASS({
   name: 'HistoryView',
   extends: 'foam.u2.View',
   requires: [
-    'foam.u2.history.HistoryItemView',
     'foam.dao.history.HistoryRecord',
+    'foam.u2.history.HistoryItemView',
   ],
+
+  implements: [ 'foam.mlang.Expressions' ],
 
   documentation: 'View displaying history',
 
@@ -81,7 +83,7 @@ foam.CLASS({
               view.historyItemView.outputRecord(this, record)
             })
           .end();
-        }, false);
+        });
     }
   ]
 });
