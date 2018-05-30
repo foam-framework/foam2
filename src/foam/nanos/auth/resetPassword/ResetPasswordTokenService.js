@@ -101,7 +101,7 @@ return true;`
   throw new RuntimeException("Cannot leave new password field empty");
 }
 
-String newPassword = user.getPassword();
+String newPassword = user.getDesiredPassword();
 
 int length = newPassword.length();
 if ( length < 7 || length > 32 ) {
