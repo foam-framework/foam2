@@ -31,7 +31,6 @@ foam.CLASS({
     'java.util.Date',
     'java.util.List',
     'static foam.mlang.MLang.*',
-    'foam.nanos.script.ScriptStatus'
   ],
 
   tableColumns: [
