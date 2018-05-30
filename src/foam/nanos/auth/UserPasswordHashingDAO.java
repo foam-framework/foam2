@@ -35,8 +35,29 @@ public class UserPasswordHashingDAO
       if ( stored != null && ! SafetyUtil.isEmpty(stored.getPassword()) ) {
         user.setPreviousPassword(stored.getPassword());
       }
+      return super.put_(x, obj);
     }
 
+    // if user not found, continue
+    if ( stored == null ) {
+      return super.put_(x, obj);
+    }
+
+    // set password if not empty
+    if ( ! SafetyUtil.isEmpty(stored.getPassword()) ) {
+      user.setPassword(stored.getPassword());
+    }
+
+    // set previous password if not empty
+    if ( ! SafetyUtil.isEmpty(stored.getPreviousPassword()) ) {
+      user.setPreviousPassword(stored.getPreviousPassword());
+    }
+
+    // set password last modified if not null
+    if ( stored.getPasswordLastModified() != null ) {
+      user.setPasswordLastModified(stored.getPasswordLastModified());
+    }
+    
     return super.put_(x, obj);
   }
 }

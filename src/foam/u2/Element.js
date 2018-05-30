@@ -1546,6 +1546,17 @@ foam.CLASS({
       return slot;
     },
 
+    /**
+     * Given a DAO and a function that maps from a record in that DAO to an
+     * Element, call the function with each record as an argument and add the
+     * returned elements to the view.
+     * Will update the view whenever the contents of the DAO change.
+     * @param {DAO<T>} dao The DAO to use as a data source
+     * @param {T -> Element} f A function to be called on each record in the DAO. Should
+     * return an Element that represents the view of the record passed to it.
+     * @param {Boolean} update True if you'd like changes to each record to be put to
+     * the DAO
+     */
     function select(dao, f, update) {
       var es   = {};
       var self = this;
