@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -12,7 +12,6 @@ import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.util.Password;
 import foam.util.SafetyUtil;
-
 import java.util.Calendar;
 
 public class UserPasswordHashingDAO
@@ -25,7 +24,7 @@ public class UserPasswordHashingDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    User user = (User) obj;
+    User user   = (User) obj;
     User stored = (User) getDelegate().find(user.getId());
 
     // hash desired password if provided
