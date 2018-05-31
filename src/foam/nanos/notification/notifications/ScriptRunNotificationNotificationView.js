@@ -1,11 +1,11 @@
 foam.CLASS({
   package: 'foam.nanos.notification.notifications',
-  name: 'NotificationScriptNotificationView',
+  name: 'ScriptRunNotificationNotificationView',
   extends: 'foam.nanos.notification.NotificationView',
 
   imports: [
-    'stack',
-    'scriptDAO'
+    'scriptDAO',
+    'stack'
   ],
 
   exports: [
@@ -17,7 +17,7 @@ foam.CLASS({
     function initE() {
       this.SUPER();
       this
-      .addClass(this.myClass())
+        .addClass(this.myClass())
         .start(this.LINK).end();
     }
   ],
@@ -26,7 +26,6 @@ foam.CLASS({
       name: 'link',
       label: 'Go to script',
       code: function() {
-        var self = this;
         self.stack.push({ class: 'foam.comics.DAOUpdateControllerView', key: this.data.script.id }, this );
       }
     }

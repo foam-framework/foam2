@@ -151,7 +151,7 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationSettingsView'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
-  { name: 'foam/nanos/notification/notifications/NotificationScriptNotificationView'},
+  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
   { name: 'foam/u2/ModalHeader', flags: ['web'] },
   { name: "foam/u2/AttrSlot" },
   { name: "foam/u2/ViewSpec" },
