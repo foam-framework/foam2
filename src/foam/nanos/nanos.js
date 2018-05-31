@@ -73,6 +73,7 @@ FOAM_FILES([
   { name: "foam/nanos/menu/TreeAltView" },
   { name: "foam/nanos/auth/PermissionTableView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/TopNavigation", flags: ['web'] },
+  { name: "foam/nanos/u2/navigation/FooterView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/BusinessLogoView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/UserView", flags: ['web'] },
   { name: "foam/nanos/u2/navigation/SubMenuBar", flags: ['web'] },

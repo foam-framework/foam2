@@ -795,7 +795,7 @@ foam.CLASS({
 
         var blob = prop.f(obj);
 
-        if ( ! blob ) return obj;
+        if ( ! blob ) return a();
 
         return self.blobService.put(blob).then(function(b) {
           prop.set(obj, b);
