@@ -12,10 +12,14 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.notifications.NotificationScript'
+    'foam.nanos.notification.notifications.ScriptRunNotification'
   ],
 
-  imports: [ 'notificationDAO', 'user', 'scriptDAO' ],
+  imports: [ 
+    'notificationDAO',
+    'scriptDAO',
+    'user'
+  ],
 
   javaImports: [
     'bsh.EvalError',
@@ -169,7 +173,7 @@ foam.CLASS({
                 clearInterval(interval);
 
                 // create notification
-                var notification = self.NotificationScript.create({
+                var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
                   script: script,
                   notificationType: "Script Execution",

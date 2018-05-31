@@ -172,7 +172,7 @@ var classes = [
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notification',
-  'foam.nanos.notification.notifications.NotificationScript',
+  'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.script.Script',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
