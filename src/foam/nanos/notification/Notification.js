@@ -35,6 +35,13 @@ foam.CLASS({
       visibility: foam.u2.Visibility.RO
     },
     {
+      class: 'Date',
+      name: 'expiryDate',
+      factory: function() {
+        return new Date(Date.now() + (90 * 24 * 60 * 60 * 1000));
+      }
+    },
+    {
       class: 'String',
       name: 'body',
       documentation: 'Notification body'
@@ -54,7 +61,7 @@ foam.CLASS({
       of: 'foam.nanos.auth.Group',
       name: 'groupId',
       view: { class: 'foam.u2.view.ReferenceView', placeholder: 'select group' }
-    }, 
+    },
     {
       class: 'Map',
       name: 'emailArgs',
@@ -65,6 +72,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'emailName',
+      label: 'Email template name',
       value: 'notification',
       documentation: 'Email template name'
     },
