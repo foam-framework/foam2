@@ -38,7 +38,7 @@ public class AuthWebAgent
 
     if ( cookies != null )
       for ( Cookie cookie : cookies )
-        if ( cookie.getName().toString().equals(SESSION_ID) )
+        if ( SESSION_ID.equals(cookie.getName()) )
           return cookie;
 
     return null;
@@ -92,13 +92,14 @@ public class AuthWebAgent
     // get session id from either query parameters or cookie
     String sessionId = ( ! SafetyUtil.isEmpty(req.getParameter("sessionId")) ) ?
         req.getParameter("sessionId") : ( cookie != null ) ?
-        cookie.getValue().toString() : null;
+        cookie.getValue() : null;
 
     if ( ! SafetyUtil.isEmpty(sessionId) ) {
       session = (Session) sessionDAO.find(sessionId);
       if ( session == null ) {
         session = new Session();
         session.setId(sessionId);
+        createCookie(x, session);
       } else if ( ! attemptLogin && session.getContext().get("user") != null ) {
         return session;
       }
