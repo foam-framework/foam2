@@ -38,7 +38,7 @@ public class AuthWebAgent
 
     if ( cookies != null )
       for ( Cookie cookie : cookies )
-        if ( cookie.getName().equals(SESSION_ID) )
+        if ( SESSION_ID.equals(cookie.getName()) )
           return cookie;
 
     return null;
