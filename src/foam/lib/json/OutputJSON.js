@@ -20,4 +20,4 @@ foam.INTERFACE({
       ]
     }  
   ]
-})
+});
