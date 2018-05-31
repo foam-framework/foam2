@@ -203,9 +203,11 @@ foam.CLASS({
     },
     {
       class: 'Password',
-      name: 'password',
+      name: 'desiredPassword',
+      label: 'Password',
       displayWidth: 30,
       width: 100,
+      storageTransient: true,
       validateObj: function (password) {
         var re = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{7,32}$/;
 
@@ -216,10 +218,15 @@ foam.CLASS({
     },
     {
       class: 'Password',
+      name: 'password',
+      hidden: true,
+      networkTransient: true
+    },
+    {
+      class: 'Password',
       name: 'previousPassword',
       hidden: true,
-      displayWidth: 30,
-      width: 100
+      networkTransient: true
     },
     {
       class: 'DateTime',
