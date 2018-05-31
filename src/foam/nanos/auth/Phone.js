@@ -24,6 +24,9 @@ foam.CLASS({
         if ( ! numberRegex.test(number) ) {
           return 'Invalid phone number.';
         }
+      },
+      preSet: function(o, n){
+        return n.replace(/[- )(]/g,'');
       }
     }
   ]
