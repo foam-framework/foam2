@@ -29,4 +29,4 @@ foam.CLASS({
       if ( ! this.of ) this.of = p.of;
     }
   ]
-})
+});
