@@ -30,7 +30,6 @@ public class UserAndGroupAuthService
   protected DAO userDAO_;
   protected DAO groupDAO_;
   protected DAO sessionDAO_;
-  protected Map challengeMap; // TODO: let's store in Session Context instead
 
   // pattern used to check if password has only alphanumeric characters
   java.util.regex.Pattern alphanumeric = java.util.regex.Pattern.compile("[^a-zA-Z0-9]");
@@ -44,7 +43,6 @@ public class UserAndGroupAuthService
     userDAO_     = (DAO) getX().get("localUserDAO");
     groupDAO_    = (DAO) getX().get("groupDAO");
     sessionDAO_  = (DAO) getX().get("sessionDAO");
-    challengeMap = new LRULinkedHashMap<Long, Challenge>(20000);
   }
 
   public User getCurrentUser(X x) throws AuthenticationException {
@@ -60,7 +58,11 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
 
-    return (User) Password.sanitize(user);
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
+    return user;
   }
 
   /**
@@ -68,20 +70,7 @@ public class UserAndGroupAuthService
    * This is saved in a LinkedHashMap with ttl of 5
    */
   public String generateChallenge(long userId) throws AuthenticationException {
-    if ( userId < 1 ) {
-      throw new AuthenticationException("Invalid User Id");
-    }
-
-    if ( userDAO_.find(userId) == null ) {
-      throw new AuthenticationException("User not found");
-    }
-
-    String   generatedChallenge = UUID.randomUUID() + String.valueOf(userId);
-    Calendar calendar           = Calendar.getInstance();
-    calendar.add(Calendar.SECOND, 5);
-
-    challengeMap.put(userId, new Challenge(generatedChallenge, calendar.getTime()));
-    return generatedChallenge;
+    throw new UnsupportedOperationException("Unsupported operation: generateChallenge");
   }
 
   /**
@@ -91,36 +80,7 @@ public class UserAndGroupAuthService
    * How often should we purge this map for challenges that have expired?
    */
   public User challengedLogin(X x, long userId, String challenge) throws AuthenticationException {
-    if ( userId < 1 || "".equals(challenge) ) {
-      throw new AuthenticationException("Invalid Parameters");
-    }
-
-    Challenge c = (Challenge) challengeMap.get(userId);
-    if ( c == null ) {
-      throw new AuthenticationException("Invalid userId");
-    }
-
-    if ( ! c.getChallenge().equals(challenge) ) {
-      throw new AuthenticationException("Invalid Challenge");
-    }
-
-    if ( new Date().after(c.getTtl()) ) {
-      challengeMap.remove(userId);
-      throw new AuthenticationException("Challenge expired");
-    }
-
-    User user = (User) userDAO_.find(userId);
-    if ( user == null ) {
-      throw new AuthenticationException("User not found");
-    }
-
-    challengeMap.remove(userId);
-
-    Session session = x.get(Session.class);
-    session.setUserId(user.getId());
-    session.setContext(session.getContext().put("user", user));
-    sessionDAO_.put(session);
-    return (User) Password.sanitize(user);
+    throw new UnsupportedOperationException("Unsupported operation: challengedLogin");
   }
 
   /**
@@ -137,6 +97,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found.");
     }
 
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
     if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Invalid Password");
     }
@@ -145,7 +109,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
-    return (User) Password.sanitize(user);
+    return user;
   }
 
   public User loginByEmail(X x, String email, String password) throws AuthenticationException {
@@ -162,6 +126,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
     if ( ! Password.verify(password, user.getPassword()) ) {
       throw new AuthenticationException("Incorrect password");
     }
@@ -170,7 +138,7 @@ public class UserAndGroupAuthService
     session.setUserId(user.getId());
     session.setContext(session.getContext().put("user", user));
     sessionDAO_.put(session);
-    return (User) Password.sanitize(user);
+    return user;
   }
 
   /**
@@ -188,7 +156,7 @@ public class UserAndGroupAuthService
     }
 
     User user = (User) userDAO_.find(session.getUserId());
-    if ( user == null ) {
+    if ( user == null || ! user.getEnabled() ) {
       return false;
     }
 
@@ -232,6 +200,10 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    if ( ! user.getEnabled() ) {
+      throw new AuthenticationException("User disabled");
+    }
+
     int length = newPassword.length();
     if ( length < 7 || length > 32 ) {
       throw new RuntimeException("Password must be 7-32 characters long");
@@ -260,12 +232,13 @@ public class UserAndGroupAuthService
     }
 
     // store new password in DAO and put in context
+    user = (User) user.fclone();
     user.setPasswordLastModified(Calendar.getInstance().getTime());
     user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
     user = (User) userDAO_.put(user);
     session.setContext(session.getContext().put("user", user));
-    return (User) Password.sanitize(user);
+    return user;
   }
 
   /**

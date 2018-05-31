@@ -10,18 +10,17 @@ import foam.core.*;
 import foam.dao.AbstractSink;
 import foam.lib.json.OutputterMode;
 import foam.util.SafetyUtil;
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
+import org.apache.commons.io.IOUtils;
 
 public class Outputter
-  extends AbstractSink
+  extends    AbstractSink
   implements foam.lib.Outputter
 {
 
@@ -69,11 +68,11 @@ public class Outputter
   public Outputter(PrintWriter writer, OutputterMode mode, boolean outputHeaders) {
     if ( writer == null ) {
       stringWriter_ = new StringWriter();
-      writer = new PrintWriter(stringWriter_);
+      writer        = new PrintWriter(stringWriter_);
     }
 
-    this.mode_ = mode;
-    this.writer_ = writer;
+    this.mode_          = mode;
+    this.writer_        = writer;
     this.outputHeaders_ = outputHeaders;
   }
 
@@ -138,6 +137,13 @@ public class Outputter
   }
 
   public String escape(String s) {
+    // TODO: make comma escaping configurable
+    //
+    // options:
+    //   escape commas:   , -> \,
+    //   remove commas:   , ->
+    //   quote strings:   Acme, Inc. -> "Acme, Inc."
+
     return s.replace("\n","\\n").replace("\"", "\\\"");
   }
 
@@ -218,6 +224,6 @@ public class Outputter
   @Override
   public void flush() throws IOException {
     if ( stringWriter_ != null ) stringWriter_.flush();
-    if ( writer_ != null ) writer_.flush();
+    if ( writer_       != null ) writer_.flush();
   }
 }
