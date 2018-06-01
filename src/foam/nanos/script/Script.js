@@ -83,9 +83,7 @@ foam.CLASS({
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
       visibility: foam.u2.Visibility.RO,
-      factory: function() {
-        return this.ScriptStatus.UNSCHEDULED;
-      },
+      value: foam.nanos.script.ScriptStatus.UNSCHEDULED,
       javaValue: 'ScriptStatus.UNSCHEDULED'
     },
     {
