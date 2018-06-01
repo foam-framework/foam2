@@ -17,6 +17,7 @@ foam.CLASS({
       imports: [ 'timer' ],
       properties: [
         { class: 'Int', name: 'age' },
+        [ 'alpha', 0.8 ],
         [ 'radius', 1 ],
         [ 'color', 'green' ],
         [ 'border', 'green' ]
@@ -33,8 +34,8 @@ foam.CLASS({
             this.add(this.cls_.create({x: 0, y: -2, scaleX: 0.8, scaleY: 0.8, rotation: -Math.PI/20}, this.__context__));
           }
           if ( this.age === 293 ) {
-            this.add(this.cls_.create({x: -2, y: 0, scaleX: 0.5, scaleY: 0.5, rotation:  Math.PI/2}, this.__context__));
-            this.add(this.cls_.create({x: +2, y: 0, scaleX: 0.5, scaleY: 0.5, rotation: -Math.PI/2}, this.__context__));
+            this.add(this.cls_.create({x: -2, y: 0, scaleX: 0.6, scaleY: 0.6, rotation:  Math.PI/2}, this.__context__));
+            this.add(this.cls_.create({x: +2, y: 0, scaleX: 0.6, scaleY: 0.6, rotation: -Math.PI/2}, this.__context__));
           }
         }
       ]
@@ -42,8 +43,8 @@ foam.CLASS({
   ],
 
   properties: [
-    [ 'width', 550 ],
-    [ 'height', 300 ],
+    [ 'width', 800 ],
+    [ 'height', 600 ],
     [ 'color', 'black' ],
     [ 'autorepaint' , true ],
     { class: 'Int', name: 'time' },
@@ -52,7 +53,7 @@ foam.CLASS({
 
   methods: [
     function initCView() {
-      this.add(this.root = this.Leaf.create({x: this.width/2, y: this.height-100}));
+      this.add(this.root = this.Leaf.create({x: this.width/2, y: this.height-200}));
       this.tick();
     }
   ],
