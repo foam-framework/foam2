@@ -173,7 +173,6 @@ foam.CLASS({
                 clearInterval(interval);
 
                 // create notification
-                debugger;
                 var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
                   scriptId: script.id,
