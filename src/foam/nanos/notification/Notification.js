@@ -38,6 +38,7 @@ foam.CLASS({
       class: 'Date',
       name: 'expiryDate',
       factory: function() {
+        // 90 days since creation date
         return new Date(Date.now() + (90 * 24 * 60 * 60 * 1000));
       }
     },
