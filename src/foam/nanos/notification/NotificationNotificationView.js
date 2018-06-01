@@ -4,7 +4,6 @@ foam.CLASS({
   extends: 'foam.nanos.notification.NotificationView',
   methods: [
     function initE() {
-      this
       this.SUPER();
     }
   ]
