@@ -26,7 +26,7 @@ foam.CLASS({
       name: 'link',
       label: 'Go to script',
       code: function() {
-        self.stack.push({ class: 'foam.comics.DAOUpdateControllerView', key: this.data.script.id }, this );
+        this.stack.push({ class: 'foam.comics.DAOUpdateControllerView', key: this.data.scriptId }, this );
       }
     }
   ]

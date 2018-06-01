@@ -173,9 +173,10 @@ foam.CLASS({
                 clearInterval(interval);
 
                 // create notification
+                debugger;
                 var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
-                  script: script,
+                  scriptId: script.id,
                   notificationType: "Script Execution",
                   body: `Status: ${script.status}
                         Script Output: ${script.output}

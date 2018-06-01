@@ -5,8 +5,8 @@ foam.CLASS({
 
   properties: [
     {
-      class: "FObjectProperty",
-      name: "script"
+      class: "String",
+      name: "scriptId"
     }
   ]
 })
