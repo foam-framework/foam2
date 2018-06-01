@@ -97,7 +97,6 @@
         height: 40px;
         border-radius: 2px;
         border: solid 1px #59a5d5;
-        margin-bottom:20px;
         margin-left:20px;
         margin-top:10px;
       }
@@ -130,6 +129,25 @@
         letter-spacing: 0.2px;
         text-align: center;
         color: #59a5d5;
+      }
+      ^ div {
+        padding-bottom:20px;
+      }
+      ^ .msg {
+        font-size: 12px;
+        word-wrap: break-word;
+        padding-bottom: 0;
+        padding-top: 20;
+        line-height: 1.4;
+        padding-left: 20px;
+        width: 414px;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        margin-right: 10;
+        overflow: hidden;
+        color: #093649;
       }
     `,
 
