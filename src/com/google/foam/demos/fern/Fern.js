@@ -18,9 +18,9 @@ foam.CLASS({
       properties: [
         { class: 'Int', name: 'age' },
         [ 'alpha', 0.8 ],
-        [ 'radius', 1 ],
+        [ 'radius', 2 ],
         [ 'color', 'green' ],
-        [ 'border', 'green' ]
+        [ 'border', null ]
       ],
       methods: [
         function initCView() {
