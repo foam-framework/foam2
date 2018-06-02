@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-(function() {
+foam.SCRIPT({
+  id: 'foam.net.LibScript',
+  // TODO: flags/requires?
+  code: function() {
   var pkg = 'foam.net.' + (foam.isServer ? 'node' : 'web');
   var clss = [
     'BaseHTTPRequest',
@@ -33,4 +36,5 @@
   for ( var i = 0; i < clss.length; i++ ) {
     foam.register(foam.lookup(pkg + '.' + clss[i]), 'foam.net.' + clss[i]);
   }
-})();
+  }
+})

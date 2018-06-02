@@ -24,7 +24,7 @@ foam.CLASS( {
   ],
 
   methods: [
-    function initCView( x, y, dataSource, graphColors, columnWidth, columnGap, w, h, columnMaxLength, lengthX, lengthY, axisUnit, ) {
+    function initCView( x, y, dataSource, graphColors, columnWidth, columnGap, w, h, columnMaxLength, lengthX, lengthY, axisUnit ) {
       var legendBox, legendLabel;
       var simpleMargin = this.columnGap;
       this.columnGap = this.columnGap * this.dataSource.LegendEntries.length;
