@@ -25,6 +25,15 @@ foam.CLASS({
   properties: [ 'id' ]
 });
 
+foam.SCRIPT({
+  id: 'foam.dao.sync.VersionedSyncRecordScript',
+  requires: [
+    'foam.version.VersionedClassFactorySingleton',
+    'foam.dao.sync.SyncRecord',
+  ],
+  code: function() {
 // Define foam.dao.sync.VersionedSyncRecord.
 foam.lookup('foam.version.VersionedClassFactorySingleton').create().get(
     foam.lookup('foam.dao.sync.SyncRecord'));
+  }
+});
