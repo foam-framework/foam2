@@ -10,6 +10,7 @@ import foam.core.ClassInfo;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
+import foam.core.*;
 import foam.dao.AbstractSink;
 import java.io.*;
 import java.security.PrivateKey;
@@ -81,6 +82,17 @@ public class Outputter
 
     stringWriter_.getBuffer().setLength(0);
     outputFObject(obj);
+    return this.toString();
+  }
+
+  public String stringifyDiff(FObject o, FObject n) {
+    if ( stringWriter_ == null ) {
+      stringWriter_ = new StringWriter();
+      writer_ = new PrintWriter(stringWriter_);
+    }
+
+    stringWriter_.getBuffer().setLength(0);
+    outputFObjectDelta(o, n, true);
     return this.toString();
   }
 
@@ -232,9 +244,88 @@ public class Outputter
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
+    Object value = prop.get(fo);	
+    if ( value == null ) return false;
+
     if ( includeComma ) writer_.append(",");
     outputProperty(fo, prop);
     return true;
+  }
+
+  protected void outputFObjectDelta(FObject o, FObject n, boolean outerObject) {
+    ClassInfo info = o.getClassInfo();
+    boolean outputComma = true;
+    if ( ! o.equals(n) ) {
+      writer_.append("{");
+      if ( outputClassNames_ ) {
+        //output Class name
+        writer_.append(beforeKey_());
+        writer_.append("class");
+        writer_.append(afterKey_());
+        writer_.append(":");
+        outputString(info.getId());
+      }
+      List axioms = info.getAxiomsByClass(PropertyInfo.class);
+      Iterator i = axioms.iterator();
+      if ( outerObject ) {
+        if ( outputClassNames_ ) 
+          writer_.append(",");
+        PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
+        outputProperty(n, id);
+      } else {
+        if ( ! outputClassNames_ ) 
+          outputComma = false;
+      }
+
+      while( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        outputComma = maybeOutputPropertyDiff(o, n, prop, outputComma) || outputComma;
+      }
+
+      if ( outerObject ) {
+        if ( outputHash_ ) {
+          writer_.append(",");
+          outputHash(n);
+        }
+    
+        if ( outputSignature_ ) {
+          writer_.append(",");
+          outputSignature(n);
+        }
+      }
+  
+      writer_.append("}");
+    }
+  }
+
+  protected boolean maybeOutputPropertyDiff(FObject o, FObject n, PropertyInfo prop, boolean includeComma) {
+    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+
+    boolean isDiff = false;
+
+    if ( prop.compare(o, n) != 0 ) {
+      if ( includeComma ) writer_.append(",");
+      isDiff = true;
+      if ( prop instanceof AbstractFObjectPropertyInfo ) {
+        if ( prop.get(o) == null ) {
+          outputProperty(n, prop);
+        } else {
+          writer_.append(beforeKey_());
+          writer_.append(prop.getName());
+          writer_.append(afterKey_());
+          writer_.append(":");
+          if ( prop.get(n) == null ) {
+            writer_.append("null");
+          } else {
+            outputFObjectDelta((FObject) prop.get(o), (FObject) prop.get(n), false);
+          }
+        }
+      } else {
+        outputProperty(n, prop);
+      }
+    }
+    return isDiff;
   }
 
   protected void outputFObject(FObject o) {

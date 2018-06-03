@@ -219,13 +219,7 @@ public abstract class AbstractJDAO
       // stringify to json string
       record = getOutputter().stringify(ret);
     } else {
-      // compare with old data if old data exists
-      // get difference FObject
-      ret = difference(o, obj);
-      // if no difference, then return
-      if ( ret == null ) return obj;
-      // stringify difference FObject into json string
-      record = getOutputter().stringify(ret);
+      record = getOutputter().stringifyDiff(o, obj);
       // put new data into memory
       ret = getDelegate().put_(x, obj);
     }
