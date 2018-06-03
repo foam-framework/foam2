@@ -22,7 +22,7 @@ foam.CLASS({
   properties: [
     {
       name: 'of',
-      value: foam.u2.control.Stack
+      value: 'foam.u2.control.Stack'
     },
     {
       class: 'Int',
