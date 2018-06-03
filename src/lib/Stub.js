@@ -109,6 +109,7 @@ foam.CLASS({
       name: 'methods_',
       expression: function(of, name, methods, replyPolicyName) {
         var cls = this.lookup(of);
+        var lookup = this.lookup.bind(this);
 
         return (
           methods ?
@@ -120,7 +121,25 @@ foam.CLASS({
             if ( returns && returns !== 'Promise' ) {
               var id = returns.split('.');
               id[id.length - 1] = 'Promised' + id[id.length - 1];
+              var returnsImpl = returns;
               returns = id.join('.');
+
+              var returnCls = lookup(returns, true);
+              if (!returnCls) {
+                var returnParts = returns.split('.');
+                foam.CLASS({
+                  package: returnParts.slice(0, -1).join('.'),
+                  name: returnParts[returnParts.length - 1],
+
+                  properties: [
+                    {
+                      class: 'Promised',
+                      of: returnsImpl,
+                      name: 'delegate',
+                    },
+                  ],
+                });
+              }
             }
 
             return foam.core.StubMethod.create({
