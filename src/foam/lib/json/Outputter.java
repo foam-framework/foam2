@@ -279,7 +279,7 @@ public class Outputter
 
       while( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
-        outputComma = maybeOutputPropertyDiff(o, n, prop, outputComma) || outputComma;
+        outputComma = maybeOutputPropertyDelta(o, n, prop, outputComma) || outputComma;
       }
 
       if ( outerObject ) {
@@ -298,7 +298,7 @@ public class Outputter
     }
   }
 
-  protected boolean maybeOutputPropertyDiff(FObject o, FObject n, PropertyInfo prop, boolean includeComma) {
+  protected boolean maybeOutputPropertyDelta(FObject o, FObject n, PropertyInfo prop, boolean includeComma) {
     if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
