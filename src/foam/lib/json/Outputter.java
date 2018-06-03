@@ -10,7 +10,7 @@ import foam.core.ClassInfo;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
-import foam.core.*;
+import foam.core.AbstractFObjectPropertyInfo;
 import foam.dao.AbstractSink;
 import java.io.*;
 import java.security.PrivateKey;
