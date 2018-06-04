@@ -75,25 +75,23 @@ public class Outputter
   }
 
   public String stringify(FObject obj) {
-    if ( stringWriter_ == null ) {
-      stringWriter_ = new StringWriter();
-      writer_ = new PrintWriter(stringWriter_);
-    }
-
-    stringWriter_.getBuffer().setLength(0);
+    initWriter();
     outputFObject(obj);
     return this.toString();
   }
 
   public String stringifyDiff(FObject o, FObject n) {
+    initWriter();
+    outputFObjectDelta(o, n, true);
+    return this.toString();
+  }
+
+  protected void initWriter() {
     if ( stringWriter_ == null ) {
       stringWriter_ = new StringWriter();
       writer_ = new PrintWriter(stringWriter_);
     }
-
     stringWriter_.getBuffer().setLength(0);
-    outputFObjectDelta(o, n, true);
-    return this.toString();
   }
 
   protected void outputUndefined() {
