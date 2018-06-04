@@ -225,12 +225,14 @@ public abstract class AbstractJDAO
     try {
       // TODO: supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(");
-      // TODO: output string directly here rather than converting to 'record'
-      // String above.
-      out_.write(record);
-      out_.write(")");
-      out_.newLine();
+      if ( "".equals(record.trim())) {
+        out_.write("p(");
+        // TODO: output string directly here rather than converting to 'record'
+        // String above.
+        out_.write(record);
+        out_.write(")");
+        out_.newLine();
+      }
       out_.flush();
     } catch (Throwable e) {
       logger_.error("put", e);
@@ -292,13 +294,7 @@ public abstract class AbstractJDAO
 
   protected void mergeProperty(FObject oldFObject, FObject diffFObject, PropertyInfo prop) {
     if ( ! prop.isSet(diffFObject) ) return;
-    if ( prop instanceof AbstractFObjectPropertyInfo ) {
-      if ( prop.get(oldFObject) == null ) prop.set(oldFObject, prop.get(diffFObject));
-      if ( prop.get(diffFObject) == null ) prop.set(oldFObject, null);
-      prop.set(oldFObject, mergeFObject((FObject) prop.get(oldFObject), (FObject) prop.get(diffFObject)));
-    } else {
       prop.set(oldFObject, prop.get(diffFObject));
-    }
   }
 
   //return a new Fobject
