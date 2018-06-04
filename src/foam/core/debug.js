@@ -30,7 +30,12 @@
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  properties: [ 'source' ],
+  properties: [
+    {
+      name: 'source',
+      transient: true,
+    },
+  ],
 
   methods: [
     function validate() {
@@ -69,7 +74,12 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  properties: [ 'source' ],
+  properties: [
+    {
+      name: 'source',
+      transient: true,
+    },
+  ],
 
   methods: [
     function validate(model) {
