@@ -285,11 +285,11 @@ public abstract class AbstractJDAO
 
   protected FObject difference(FObject o, FObject n) {
     FObject diff = o.hardDiff(n);
-    //no difference, then return null
+    // no difference, then return null
     if ( diff == null ) return null;
-    //get the PropertyInfo for the id
+    // get the PropertyInfo for the id
     PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
-    //set id property to new instance
+    // set id property to new instance
     idInfo.set(diff, idInfo.get(o));
     return diff;
   }

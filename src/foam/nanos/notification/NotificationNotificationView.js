@@ -8,4 +8,4 @@ foam.CLASS({
         .start('div').addClass('body').add(this.data.body).end();
     }
   ]
-})
+});
