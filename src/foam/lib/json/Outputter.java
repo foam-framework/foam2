@@ -80,9 +80,9 @@ public class Outputter
     return this.toString();
   }
 
-  public String stringifyDiff(FObject o, FObject n) {
+  public String stringifyDiff(FObject oldFObject, FObject newFObject) {
     initWriter();
-    outputFObjectDelta(o, n, true);
+    outputFObjectDelta(oldFObject, newFObject);
     return this.toString();
   }
 
@@ -250,80 +250,65 @@ public class Outputter
     return true;
   }
 
-  protected void outputFObjectDelta(FObject o, FObject n, boolean outerObject) {
-    ClassInfo info = o.getClassInfo();
+  protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
+    ClassInfo info = oldFObject.getClassInfo();
     boolean outputComma = true;
-    if ( ! o.equals(n) ) {
-      writer_.append("{");
-      if ( outputClassNames_ ) {
-        //output Class name
-        writer_.append(beforeKey_());
-        writer_.append("class");
-        writer_.append(afterKey_());
-        writer_.append(":");
-        outputString(info.getId());
-      }
+    boolean isDiff = false;
+    boolean isPropertyDiff = false;
+    if ( ! oldFObject.equals(newFObject) ) {
       List axioms = info.getAxiomsByClass(PropertyInfo.class);
       Iterator i = axioms.iterator();
-      if ( outerObject ) {
-        if ( outputClassNames_ ) 
-          writer_.append(",");
-        PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
-        outputProperty(n, id);
-      } else {
-        if ( ! outputClassNames_ ) 
-          outputComma = false;
-      }
 
       while( i.hasNext() ) {
         PropertyInfo prop = (PropertyInfo) i.next();
-        outputComma = maybeOutputPropertyDelta(o, n, prop, outputComma) || outputComma;
+        isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
+        if ( isPropertyDiff) {
+          if ( ! isDiff ) {
+            writer_.append("{");
+            if ( outputClassNames_ ) {
+              //output Class name
+              writer_.append(beforeKey_());
+              writer_.append("class");
+              writer_.append(afterKey_());
+              writer_.append(":");
+              outputString(info.getId());
+            }
+            if ( outputClassNames_ ) 
+              writer_.append(",");
+            PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
+            outputProperty(newFObject, id);
+            isDiff = true;
+          }
+
+          writer_.append(",");
+          outputProperty(newFObject, prop);
+        }
       }
 
-      if ( outerObject ) {
+      if ( isDiff ) {
         if ( outputHash_ ) {
           writer_.append(",");
-          outputHash(n);
+          outputHash(newFObject);
         }
     
         if ( outputSignature_ ) {
           writer_.append(",");
-          outputSignature(n);
+          outputSignature(newFObject);
         }
+        writer_.append("}");
       }
-  
-      writer_.append("}");
+
     }
   }
 
-  protected boolean maybeOutputPropertyDelta(FObject o, FObject n, PropertyInfo prop, boolean includeComma) {
+  protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
     if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
 
-    boolean isDiff = false;
-
-    if ( prop.compare(o, n) != 0 ) {
-      if ( includeComma ) writer_.append(",");
-      isDiff = true;
-      if ( prop instanceof AbstractFObjectPropertyInfo ) {
-        if ( prop.get(o) == null ) {
-          outputProperty(n, prop);
-        } else {
-          writer_.append(beforeKey_());
-          writer_.append(prop.getName());
-          writer_.append(afterKey_());
-          writer_.append(":");
-          if ( prop.get(n) == null ) {
-            writer_.append("null");
-          } else {
-            outputFObjectDelta((FObject) prop.get(o), (FObject) prop.get(n), false);
-          }
-        }
-      } else {
-        outputProperty(n, prop);
-      }
+    if ( prop.compare(oldFObject, newFObject) != 0 ) {
+      return true;
     }
-    return isDiff;
+    return false;
   }
 
   protected void outputFObject(FObject o) {
