@@ -40,7 +40,11 @@ foam.CLASS({
       class: 'Proxy',
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
-      factory: function() { return this.HTMLValidator.create() }
+      factory: function() {
+        // Note that HTMLValidator is a singleton so only once instance of
+        // HTMLValidator should ever be created here.
+        return this.HTMLValidator.create()
+      }
     }
   ]
 });
