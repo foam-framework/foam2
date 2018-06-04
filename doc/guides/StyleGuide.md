@@ -1,8 +1,6 @@
 # FOAM2 Coding Style Guidelines
 
-Except where noted below, FOAM conforms to the Google Javascript Style Guide available at:
-
-https://google.github.io/styleguide/javascriptguide.xml
+Except where noted below, FOAM conforms to the [Google Javascript Style Guide](https://google.github.io/styleguide/jsguide.html).
 
 ## Exceptions
 * One space is required inside the parentheses of `if`, `for`, `while`, and `switch` headers:
