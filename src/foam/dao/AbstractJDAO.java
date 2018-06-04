@@ -275,28 +275,29 @@ public abstract class AbstractJDAO
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 
-  protected FObject mergeFObject(FObject o, FObject c) {
-    if ( c == null ) return o;
+  //add diff property to old property
+  protected FObject mergeFObject(FObject oldFObject, FObject diffFObject) {
+    if ( diffFObject == null ) return oldFObject;
 
     //get PropertyInfos
-    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator e = list.iterator();
 
     while( e.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) e.next();
-      mergeProperty(o, c, prop);
+      mergeProperty(oldFObject, diffFObject, prop);
     }
-    return o;
+    return oldFObject;
   }
 
-  protected void mergeProperty(FObject o, FObject c, PropertyInfo prop) {
-    if ( ! prop.isSet(c) ) return;
+  protected void mergeProperty(FObject oldFObject, FObject diffFObject, PropertyInfo prop) {
+    if ( ! prop.isSet(diffFObject) ) return;
     if ( prop instanceof AbstractFObjectPropertyInfo ) {
-      if ( prop.get(o) == null ) prop.set(o, prop.get(c));
-      if ( prop.get(c) == null ) prop.set(o, null);
-      prop.set(o, mergeFObject((FObject) prop.get(o), (FObject) prop.get(c)));
+      if ( prop.get(oldFObject) == null ) prop.set(oldFObject, prop.get(diffFObject));
+      if ( prop.get(diffFObject) == null ) prop.set(oldFObject, null);
+      prop.set(oldFObject, mergeFObject((FObject) prop.get(oldFObject), (FObject) prop.get(diffFObject)));
     } else {
-      prop.set(o, prop.get(c));
+      prop.set(oldFObject, prop.get(diffFObject));
     }
   }
 
