@@ -21,6 +21,7 @@ foam.CLASS({
   extends: 'foam.u2.View',
   properties: [
     {
+      class: 'Class',
       name: 'of',
       value: 'foam.u2.control.Stack'
     },
