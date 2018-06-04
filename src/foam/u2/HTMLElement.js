@@ -41,7 +41,7 @@ foam.CLASS({
       of: 'foam.u2.DefaultValidator',
       name: 'validator',
       factory: function() {
-        // Note that HTMLValidator is a singleton so only once instance of
+        // Note that HTMLValidator is a singleton so only one instance of
         // HTMLValidator should ever be created here.
         return this.HTMLValidator.create()
       }
