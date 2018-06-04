@@ -6,66 +6,98 @@
 
 
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'BooleanElementJavaRefine',
   refines: 'foam.core.Boolean',
   properties: [ 'tableCellFormatter', 'tableCellView', 'tableWidth', 'attribute', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'CurrencyElementJavaRefine',
   refines: 'foam.core.Currency',
   properties: [ 'tableCellFormatter' , 'precision' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'DateElementJavaRefine',
   refines: 'foam.core.Date',
   properties: [ 'tableCellFormatter' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'DateTimeElementJavaRefine',
   refines: 'foam.core.DateTime',
   properties: [ 'tableCellFormatter', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'DoubleElementJavaRefine',
   refines: 'foam.core.Double',
   properties: [ 'tableCellFormatter', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'EnumElementJavaRefine',
   refines: 'foam.core.Enum',
   properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FloatElementJavaRefine',
   refines: 'foam.core.Float',
   properties: [ 'view' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FObjectArrayElementJavaRefine',
   refines: 'foam.core.FObjectArray',
   properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FObjectPropertyElementJavaRefine',
   refines: 'foam.core.FObjectProperty',
   properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'IntElementJavaRefine',
   refines: 'foam.core.Int',
   properties: [ 'attribute' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'LongElementJavaRefine',
   refines: 'foam.core.Long',
   properties: [ 'tableCellFormatter', 'visibility', 'tableWidth' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'MethodElementJavaRefine',
   refines: 'foam.core.Method',
   properties: [ 'javaCode' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ModelElementJavaRefine',
   refines: 'foam.core.Model',
   properties: [ 'tableProperties', 'tableColumns', 'generateJava', 'searchColumns', 'tableCellFormatter', 'css', 'import', 'description' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'PropertyElementJavaRefine',
   refines: 'foam.core.Property',
   properties: [ 'tableCellFormatter', 'searchView', 'attribute', 'view' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ReferenceElementJavaRefine',
   refines: 'foam.core.Reference',
   properties: [ 'view', 'visibility' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'StringElementJavaRefine',
   refines: 'foam.core.String',
   properties: [ 'tableCellFormatter', 'tableCellView', 'displayWidth', 'view', 'visibility', 'tableWidth', 'description' ]
 });
@@ -157,8 +189,4 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.graphics',
   name: 'Canvas'
-});
-foam.CLASS({
-  refines: 'foam.core.Method',
-  properties: [ 'javaCode' ]
 });

@@ -15,58 +15,86 @@
  * limitations under the License.
  */
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'AbstractMethodNoJavaRefine',
   refines: 'foam.core.AbstractMethod',
   properties: [ 'javaCode', 'javaReturns', 'javaThrows' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ArgumentNoJavaRefine',
   refines: 'foam.core.Argument',
   properties: [ 'javaType' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'CurrencyNoJavaRefine',
   refines: 'foam.core.Currency',
   properties: [ 'javaGetter' , 'precision' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'EMailNoJavaRefine',
   refines: 'foam.core.EMail',
   properties: [ 'javaSetter' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ImplementsNoJavaRefine',
   refines: 'foam.core.Implements',
   properties: [ 'java' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ImportNoJavaRefine',
   refines: 'foam.core.Import',
   properties: [ 'javaType' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'InnerClassNoJavaRefine',
   refines: 'foam.core.InnerClass',
   properties: [ 'generateJava' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ListenerNoJavaRefine',
   refines: 'foam.core.Listener',
   properties: [ 'javaCode' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'LongNoJavaRefine',
   refines: 'foam.core.Long',
   properties: [ 'javaGetter' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'MethodNoJavaRefine',
   refines: 'foam.core.Method',
   properties: [ 'javaCode' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ModelNoJavaRefine',
   refines: 'foam.core.Model',
   properties: [ 'javaImports', 'generateJava', 'arequire', 'import', 'description' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'PropertyNoJavaRefine',
   refines: 'foam.core.Property',
   properties: [ 'javaType', 'generateJava', 'javaFactory','javaInfoType' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'StringNoJavaRefine',
   refines: 'foam.core.String',
   properties: [ 'javaGetter', 'javaSetter', 'description' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ViewSpecNoJavaRefine',
   refines: 'foam.u2.ViewSpec',
   properties: [ 'javaInfoType', 'javaJSONParser' ]
 });
