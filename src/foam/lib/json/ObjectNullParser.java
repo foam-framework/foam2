@@ -8,13 +8,13 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
+//parse null string, when object is null
 public abstract class ObjectNullParser
   extends ProxyParser
 {
   public ObjectNullParser(Parser objectParser) {
     super(
       new Alt(
-        //new Seq0(new Whitespace(),new NullParser()),
         new NullParser(),
         objectParser
       )
