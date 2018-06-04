@@ -9,18 +9,22 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class StringArrayParser
-  extends ProxyParser
+  extends ObjectNullParser
 {
   public StringArrayParser() {
-    super(new Seq1(3,
-      new Whitespace(),
-      new Literal("["),
-      new Whitespace(),
-      new Repeat(
-        new StringParser(),
-        new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
-      new Whitespace(),
-      new Literal("]")));
+    super(
+      new Alt(
+        new NullParser(),
+        new Seq1(3,
+          new Whitespace(),
+          new Literal("["),
+          new Whitespace(),
+          new Repeat(
+            new StringParser(),
+            new Seq0(new Whitespace(), new Literal(","), new Whitespace())),
+          new Whitespace(),
+          new Literal("]"))
+      ));
   }
 
   public PStream parse(PStream ps, ParserContext x) {
@@ -28,6 +32,8 @@ public class StringArrayParser
     if ( ps == null ) {
       return null;
     }
+    if ( ps.value() == null ) return ps;
+    
     Object[] objs = (Object[]) ps.value();
     String[] str = new String[objs.length];
     for ( int i = 0 ; i < objs.length ; i++ ) {

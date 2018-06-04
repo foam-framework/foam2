@@ -145,12 +145,10 @@ public abstract class AbstractJDAO
         switch ( operation ) {
           case 'p':
             PropertyInfo id = (PropertyInfo) getOf().getAxiomByName("id");
-            if ( getDelegate().find(id.get(object)) != null ) {
-              //If data exists, merge difference
-              //get old date
-              FObject old = getDelegate().find(id.get(object));
+            FObject old = getDelegate().find(id.get(object));
+            if ( old != null ) {
               //merge difference
-              object = mergeChange(old, object);
+              object = mergeFObject(old.fclone(), object);
             }
             getDelegate().put(object);
             break;
@@ -288,6 +286,31 @@ public abstract class AbstractJDAO
     return diff;
   }
 
+  protected FObject mergeFObject(FObject o, FObject c) {
+    if ( c == null ) return o;
+
+    //get PropertyInfos
+    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator e = list.iterator();
+
+    while( e.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) e.next();
+      mergeProperty(o, c, prop);
+    }
+    return o;
+  }
+
+  protected void mergeProperty(FObject o, FObject c, PropertyInfo prop) {
+    if ( ! prop.isSet(c) ) return;
+    if ( prop instanceof AbstractFObjectPropertyInfo ) {
+      if ( prop.get(o) == null ) prop.set(o, prop.get(c));
+      if ( prop.get(c) == null ) prop.set(o, null);
+      prop.set(o, mergeFObject((FObject) prop.get(o), (FObject) prop.get(c)));
+    } else {
+      prop.set(o, prop.get(c));
+    }
+  }
+
   protected FObject mergeChange(FObject o, FObject c) {
     //if no change to merge, return FObject;
     if ( c == null ) return o;
@@ -308,6 +331,9 @@ public abstract class AbstractJDAO
         //do nested merge
         //check if change
         if ( ! prop.isSet(c) ) continue;
+        if ( prop.get(c) == null ) {
+
+        }
         maybeMerge((FObject) prop.get(o), (FObject) prop.get(c));
       } else {
         //check if change

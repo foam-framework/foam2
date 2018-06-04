@@ -10,7 +10,7 @@ import foam.lib.parse.*;
 import foam.core.*;
 
 public class FObjectParser
-    extends ProxyParser
+    extends ObjectNullParser
 {
 
   public FObjectParser(final Class defaultClass) {
