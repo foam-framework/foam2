@@ -56,12 +56,12 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     {
       class: 'Long',
       name: 'lastDuration',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     /*
     {
@@ -82,8 +82,8 @@ foam.CLASS({
       class: 'foam.core.Enum',
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
-      visibility: foam.u2.Visibility.RO,
-      value: foam.nanos.script.ScriptStatus.UNSCHEDULED,
+      visibility: 'RO',
+      value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED'
     },
     {
@@ -94,7 +94,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'output',
-      visibility: foam.u2.Visibility.RO,
+      visibility: 'RO',
       view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80, css: {"font-family": "monospace"}  }
     },
     {
