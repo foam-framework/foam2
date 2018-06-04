@@ -9,7 +9,7 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class StringArrayParser
-  extends ObjectNullParser
+  extends ProxyParser
 {
   public StringArrayParser() {
     super(
@@ -33,7 +33,7 @@ public class StringArrayParser
       return null;
     }
     if ( ps.value() == null ) return ps;
-    
+
     Object[] objs = (Object[]) ps.value();
     String[] str = new String[objs.length];
     for ( int i = 0 ; i < objs.length ; i++ ) {
