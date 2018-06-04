@@ -5,6 +5,9 @@
  */
 
 foam.CLASS({
+  package: 'foam.swift',
+  name: 'SwiftArgumentRefines',
+
   refines: 'foam.core.Argument',
   requires: [
     'foam.swift.Argument',
