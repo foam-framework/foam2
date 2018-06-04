@@ -275,17 +275,6 @@ public abstract class AbstractJDAO
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 
-  protected FObject difference(FObject o, FObject n) {
-    FObject diff = o.hardDiff(n);
-    // no difference, then return null
-    if ( diff == null ) return null;
-    // get the PropertyInfo for the id
-    PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
-    // set id property to new instance
-    idInfo.set(diff, idInfo.get(o));
-    return diff;
-  }
-
   protected FObject mergeFObject(FObject o, FObject c) {
     if ( c == null ) return o;
 
@@ -309,41 +298,6 @@ public abstract class AbstractJDAO
     } else {
       prop.set(o, prop.get(c));
     }
-  }
-
-  protected FObject mergeChange(FObject o, FObject c) {
-    //if no change to merge, return FObject;
-    if ( c == null ) return o;
-    //merge change
-    return maybeMerge(o, c);
-  }
-
-  protected FObject maybeMerge(FObject o, FObject c) {
-    if ( o == null ) return o = c;
-
-    //get PropertyInfos
-    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-    Iterator e = list.iterator();
-
-    while ( e.hasNext() ) {
-      PropertyInfo prop = (PropertyInfo) e.next();
-      if ( prop instanceof AbstractFObjectPropertyInfo ) {
-        //do nested merge
-        //check if change
-        if ( ! prop.isSet(c) ) continue;
-        if ( prop.get(c) == null ) {
-
-        }
-        maybeMerge((FObject) prop.get(o), (FObject) prop.get(c));
-      } else {
-        //check if change
-        if ( ! prop.isSet(c) ) continue;
-        //set new value
-        prop.set(o, prop.get(c));
-      }
-    }
-
-    return o;
   }
 
   //return a new Fobject
