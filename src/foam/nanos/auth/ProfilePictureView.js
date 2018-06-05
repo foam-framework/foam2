@@ -171,7 +171,7 @@ foam.CLASS({
               })
               .on('change', this.onChange)
             .end()
-            .start().addClass('attachment-btn white-blue-button btn')
+            .start().addClass('attachment-btn').addClass('white-blue-button').addClass('btn')
               .add(this.UploadImageLabel)
               .on('click', this.onAddAttachmentClicked)
             .end()
@@ -179,7 +179,7 @@ foam.CLASS({
           .start().addClass('removeButtonContainer').show( !(this.uploadHidden) && this.ProfilePictureImage$.map(function (ProfilePictureImage) {
               return ProfilePictureImage;
             }))
-            .start().addClass('attachment-btn grey-button btn')
+            .start().addClass('attachment-btn').addClass('grey-button').addClass('btn')
               .add(this.RemoveImageLabel)
               .on('click', this.onRemoveClicked)
             .end()

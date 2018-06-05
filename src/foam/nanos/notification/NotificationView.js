@@ -10,4 +10,4 @@ foam.CLASS({
         .addClass(this.myClass());
     }
   ]
-})
+});

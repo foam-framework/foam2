@@ -33,7 +33,7 @@ foam.CLASS({
 
         var files = prop.f(obj);
 
-        if ( ! files ) return obj;
+        if ( ! files ) return a();
 
         var promiseList = [];
         for ( var j = 0 ; j < files.length ; j++ ) {
