@@ -75,7 +75,6 @@ public abstract class AbstractFObject
       PropertyInfo prop = null;
       while ( i.hasNext() ) {
         prop = (PropertyInfo) i.next();
-        if ( prop.getNetworkTransient() || prop.getStorageTransient() ) continue;
         if ( prop.hardDiff(this, obj, ret) ) {
           isDiff = true;
         }

@@ -19,7 +19,7 @@ import java.util.List;
 import static foam.mlang.MLang.AND;
 import static foam.mlang.MLang.EQ;
 
-// If notification's emailEnabled is true, the decorator creates an email based on provided or default emailTemplate, sets the reciever based on notification userId/groupId/broadcasted 
+// If notification's emailEnabled is true, the decorator creates an email based on provided or default emailTemplate, sets the reciever based on notification userId/groupId/broadcasted
 public class SendEmailNotificationDAO extends ProxyDAO {
 
   public SendEmailNotificationDAO(DAO delegate) {
@@ -32,7 +32,7 @@ public class SendEmailNotificationDAO extends ProxyDAO {
   }
   @Override
   public FObject put_(X x, FObject obj) {
-    DAO userDAO = (DAO) x.get("userDAO");
+    DAO userDAO = (DAO) x.get("localUserDAO");
     AppConfig config     = (AppConfig) x.get("appConfig");
     EmailService email      = (EmailService) x.get("email");
     ArrayList<String> users = new ArrayList<>();
