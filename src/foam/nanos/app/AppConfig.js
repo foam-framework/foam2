@@ -32,7 +32,8 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'url'
+      name: 'url',
+      value: 'http://localhost:8080/'
     },
     {
       class: 'String',

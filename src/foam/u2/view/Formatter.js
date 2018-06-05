@@ -5,14 +5,12 @@
  */
 
 foam.INTERFACE({
-  package: 'foam.core',
-  name: 'Identifiable',
-
+  package: 'foam.u2.view',
+  name: 'Formatter',
   methods: [
     {
-      name: 'getPrimaryKey',
-      javaReturns: 'Object',
-      swiftReturns: 'Any?'
+      name: 'format',
+      args: ['e', 'value', 'obj', 'axiom']
     }
   ]
 });
