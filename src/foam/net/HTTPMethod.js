@@ -32,7 +32,6 @@ foam.CLASS({
 
   requires: [
     'foam.net.HTTPArgument',
-    'foam.core.Imports'
   ],
 
   constants: {
