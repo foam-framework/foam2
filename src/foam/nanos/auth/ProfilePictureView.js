@@ -200,6 +200,7 @@ foam.CLASS({
     function onRemoveClicked (e) {
       this.dragActive = false;
       this.ProfilePictureImage= null;
+      this.document.querySelector('.attachment-input').value = null;
     },
 
     function onDragOver(e) {
