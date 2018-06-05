@@ -152,13 +152,17 @@ foam.CLASS({
       border-radius: 50%;
       display: table-caption;
       background: red;
-      width:15px;
-      height:15px;
+      width: 15px;
+      height: 15px;
       position: relative;
-      top: -30px;
-      left:5px;
+      top: -28px;
+      left: 4px;
       text-align: center;
-      font-size: 8px;
+      font-size: 9px
+    }
+    ^ .dot>span {
+      display: flow-root;
+      margin-top: 2px;
     }
     .net-nanopay-ui-topNavigation-UserTopNavView .dot > span {
         padding-top: 3px;
@@ -184,7 +188,7 @@ foam.CLASS({
       }
     }
   ],
-  
+
 
   methods: [
     function initE() {
