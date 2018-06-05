@@ -232,7 +232,7 @@ public class Outputter
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
-    Object value = prop.get(fo);	
+    Object value = prop.get(fo);
     if ( value == null ) return false;
 
     if ( includeComma ) writer_.append(",");
