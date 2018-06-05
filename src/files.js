@@ -508,6 +508,7 @@ FOAM_FILES([
   { name: "foam/mop/MOP" },
   { name: "foam/mop/MOPJava", flags: ['java'] },
   { name: "foam/dao/pg/ConnectionPool" },
+  { name: "foam/lib/Outputter" },
   { name: "foam/lib/json/OutputterMode" },
   { name: "foam/lib/parse/Parser" },
   { name: "foam/lib/parse/PStream" },
