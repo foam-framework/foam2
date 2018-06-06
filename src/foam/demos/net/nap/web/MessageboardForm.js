@@ -17,14 +17,17 @@ foam.CLASS({
     'foam.blob.BlobBlob',
     'foam.nanos.fs.File',
     'foam.demos.net.nap.web.model.Messageboard',
+    'foam.nanos.notification.Notification',
     'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
     'blobService',
-    'onInvoiceFileRemoved',
     'messageboard',
     'messageboardDAO',
+    'notification',
+    'notificationDAO',
+    'onInvoiceFileRemoved',
     'stack',
     'user'
   ],
@@ -42,8 +45,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'starmark_',
-      view: { class: 'foam.u2.CheckBox' }
+      name: 'mark_',
+      //view: { class: 'foam.u2.CheckBox' }
     },
     {
       class: 'String',
@@ -68,7 +71,7 @@ foam.CLASS({
     },
     {
       class: 'foam.nanos.fs.FileArray',
-      name: 'messageboardFile_',
+      name: 'data_',
       value: this.exportData
     },
     'exportData',
@@ -245,7 +248,6 @@ foam.CLASS({
       color: #a4b3b8;
       padding-top: 6px;
     }
-
   `,
 
   methods: [
@@ -272,7 +274,7 @@ foam.CLASS({
             .end()
             .start('tr')
               .start('td').addClass('foam-u2-PropertyView-label').add('Starmark').end()
-              .start('td').addClass('foam-u2-PropertyView').tag(this.STARMARK_).end()
+              .start('td').addClass('foam-u2-PropertyView').tag(this.MARK_).end()
             .end()
             .start('tr')
               .start('td').addClass('foam-u2-PropertyView-label').add('Title').end()
@@ -294,7 +296,7 @@ foam.CLASS({
               .start('td').addClass('foam-u2-PropertyView-label').add('Attachments').end()
               .start('td')
 
-              .start().addClass('attachment-btn white-blue-button btn')
+              .start().addClass('attachment-btn').addClass('white-blue-button').addClass('btn')
                 .add('Choose File')
                 .on('click', this.onAddAttachmentClicked)
               .end()
@@ -313,7 +315,7 @@ foam.CLASS({
                       .start().addClass('attachment-filename')
                         .start('a')
                           .attrs({
-                            href: this.messageboardFile_$.map(function (data) {
+                            href: this.data_.map(function (data) {
                               if ( data[i] ) {
                                   var blob = data[i].data;
                                   var sessionId = localStorage['defaultSession'];
@@ -341,7 +343,7 @@ foam.CLASS({
                            var len = filename.length;
                            return ( len > 35 ) ? (filename.substr(0, 20) +
                              '...' + filename.substr(len - 10, len)) : filename;
-                         }, this.messageboardFile_[i].filename$))   //this.messageboardFile[i].filename$ messageboardObj
+                         }, this.data_[i].filename$))   //this.messageboardFile[i].filename$ messageboardObj
                       .end()
                    .end()
                    .start().addClass('attachment-footer').setID(i+1)
@@ -349,9 +351,9 @@ foam.CLASS({
                      .start({ class: 'foam.u2.tag.Image', data: 'images/ic-delete.svg'}).hide(this.removeHidden).end()
                      .on('click', function(e) {
                        console.log(this);
-                       self.messageboardFile_.splice(this.id - 1, 1);
+                       self.data_.splice(this.id - 1, 1);
                        this.remove();
-                       self.messageboardFile_ = Array.from(self.messageboardFile_);
+                       self.data_ = Array.from(self.data_);
                      })
 
                      // .start().addClass('attachment-filesize')
@@ -361,7 +363,7 @@ foam.CLASS({
                    .end()
                   }
                   return e;
-                }, this.messageboardFile_$))
+                }, this.data_$))
                 .on('dragstart', this.onDragStart)
                 .on('dragenter', this.onDragEnter)
                 .on('dragover', this.onDragOver)
@@ -514,14 +516,14 @@ foam.CLASS({
           continue;
         }
         var isIncluded = false
-        for ( var j = 0 ; j < this.messageboardFile.length ; j++ ) {
-          if( this.messageboardFile[j].filename.localeCompare(files[i].name) === 0 ) {
+        for ( var j = 0 ; j < this.data_.length ; j++ ) {
+          if( this.data_[j].filename.localeCompare(files[i].name) === 0 ) {
             isIncluded = true;
             break
           }
         }
         if ( isIncluded ) continue ;
-        this.messageboardFile_.push(this.File.create({
+        this.data_.push(this.File.create({
           filename: files[i].name,
           filesize: files[i].size,
           mimeType: files[i].type,
@@ -530,7 +532,7 @@ foam.CLASS({
           })
         }))
       }
-      this.messageboardFile_ = Array.from(this.messageboardFile_);
+      this.data_ = Array.from(this.data_);
       this.exportData = this.data;
     },
 
@@ -549,18 +551,27 @@ foam.CLASS({
 
       var message = self.Messageboard.create({
         id : self.id_,
-        starmark : self.starmark_,
+        mark : self.mark_,
         title: self.title_,
         content: self.description_,
         creator : this.user.firstName_,
         createdDate : self.createdDate_,
-        messageboardFile : Array.from(self.messageboardFile_)
+        data : Array.from(self.data_)
       });
+
+      var notification = self.Notification.create({
+        notificationType : "New Post On Messageboard",
+        userId: this.user.id,
+        body: self.title_,
+        groupId: this.user.group
+
+      });
+
+      self.notificationDAO.put(notification);
 
       self.messageboardDAO.put(message).then(function() {
         self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
       });
-
 
     }
   ]
