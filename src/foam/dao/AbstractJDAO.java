@@ -224,7 +224,7 @@ public abstract class AbstractJDAO
 
     try {
       // TODO: supress class name from output
-      if ( ! "".equals(record.trim())) {
+      if ( ! "".equals(record)) {
         writeComment((User) x.get("user"));
         out_.write("p(");
         // TODO: output string directly here rather than converting to 'record'
