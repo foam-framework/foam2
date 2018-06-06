@@ -20,6 +20,91 @@ foam.INTERFACE({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'ProxyJournal',
+
+  documentation: 'Proxy journal class',
+
+  implements: [
+    'foam.dao.Journal'
+  ],
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Journal',
+      name: 'delegate',
+      forwards: [ 'replay', 'put', 'remove', 'eof', 'reset' ]
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'CompositeJournal',
+
+  documentation: 'Composite journal implementation',
+
+  implements: [
+    'foam.dao.Journal'
+  ],
+
+  properties: [
+    {
+      class: 'FObjectArray',
+      of: 'foam.dao.Journal',
+      name: 'delegates'
+    }
+  ],
+
+  methods: [
+    {
+      name: 'replay',
+      javaCode: `
+        for ( Journal delegate : getDelegates() ) {
+          delegate.replay(dao);
+        }
+      `
+    },
+    {
+      name: 'put',
+      javaCode: `
+        for ( Journal delegate : getDelegates() ) {
+          delegate.put(obj, sub);
+        }
+      `
+    },
+    {
+      name: 'remove',
+      javaCode: `
+        for ( Journal delegate : getDelegates() ) {
+          delegate.remove(obj, sub);
+        }
+      `
+    },
+    {
+      name: 'eof',
+      javaCode: `
+        for ( Journal delegate : getDelegates() ) {
+          delegate.eof();
+        }
+      `
+    },
+    {
+      name: 'reset',
+      javaCode: `
+        for ( Journal delegate : getDelegates() ) {
+          delegate.reset(sub);
+        }
+      `
+    }
+  ]
+});
+
+
 foam.CLASS({
   package: 'foam.dao',
   name: 'FileJournal',
@@ -87,7 +172,7 @@ foam.CLASS({
       class: 'Object',
       name: 'reader',
       javaType: 'java.io.BufferedReader',
-      javaFactory: `
+      javaGetter: `
         try {
           return new BufferedReader(new FileReader(getFile()));
         } catch ( Throwable t ) {
@@ -99,11 +184,14 @@ foam.CLASS({
       class: 'Object',
       name: 'writer',
       javaType: 'java.io.BufferedWriter',
-      javaFactory: `
+      javaGetter: `
         try {
-          return new BufferedWriter(new FileWriter(getFile()));
+          BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
+          writer.newLine();
+          return writer;
         } catch ( Throwable t ) {
-          throw new RuntimeException("Failed to write to journal");
+          ((Logger) getLogger()).error("Failed to write to journal", t);
+          throw new RuntimeException(t);
         }
       `
     }
@@ -133,7 +221,8 @@ foam.CLASS({
           writer.newLine();
           writer.flush();
         } catch ( Throwable t ) {
-          throw new RuntimeException("Failed to write to journal");
+          ((Logger) getLogger()).error("Failed to write to journal", t);
+          throw new RuntimeException(t);
         }
       `
     },
@@ -185,22 +274,3 @@ foam.CLASS({
   ]
 });
 
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'ProxyJournal',
-
-  documentation: 'Proxy journal class',
-
-  implements: [
-    'foam.dao.Journal'
-  ],
-
-  properties: [
-    {
-      class: 'Proxy',
-      of: 'foam.dao.Journal',
-      name: 'delegate',
-      forwards: [ 'replay', 'put', 'remove', 'eof', 'reset' ]
-    }
-  ]
-});
