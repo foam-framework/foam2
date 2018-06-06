@@ -83,7 +83,7 @@ foam.CLASS({
       name: 'data',
       label: 'Attachments',
       documentation: 'Additional documents for messageboard',
-      view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView' }
+      view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView', data:this.data$}
     }
   ]
 });

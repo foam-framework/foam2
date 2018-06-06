@@ -118,7 +118,4 @@ FOAM_FILES([
   { name: 'foam/demos/net/nap/web/MessageboardForm', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/MessageboardList', flags: ['web'] },
   { name: 'foam/demos/net/nap/web/EditMessageboard', flags: ['web'] },
-  { name: 'foam/demos/net/nap/web/MessageboardFileView', flags: ['web'] },
-  { name: 'foam/demos/net/nap/web/MessageboardFileUploadView', flags: ['web'] },
-  { name: 'foam/demos/net/nap/web/MessageboardFileView_', flags: ['web'] }
 ]);
