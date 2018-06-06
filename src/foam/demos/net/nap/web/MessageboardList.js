@@ -11,27 +11,34 @@
 
   documentation: 'Messageboard List',
 
-  // implements: [
-  //   'foam.mlang.Expressions'
-  // ],
+  implements: [
+    'foam.mlang.Expressions'
+  ],
 
   requires: [
     'foam.demos.net.nap.web.model.Messageboard'
   ],
 
   imports: [
-     'stack',
+     'messageboard',
      'messageboardDAO',
-     'messageboard'
+     'stack'
+  ],
+
+  exports: [
+    'dblclick',
+    'filter',
+    'filteredMessageboardDAO'
   ],
 
   css: `
-    ^ .inline-float-right {
-      float: right;
-      display: inline-block;
+    ^ {
+      width: 962px;
+      margin: 0 auto;
     }
     ^ .button-div{
       margin-bottom: 10px;
+      margin-left: 15px;
     }
     ^ .net-nanopay-ui-ActionView-create{
       margin-bottom: 10px;
@@ -89,6 +96,25 @@
     color: white;
     margin-right: 4px;
   }
+  ^ .filter-search {
+    width: 450px;
+    height: 40px;
+    border-radius: 2px;
+    background-color: #ffffff;
+    display: inline-block;
+    margin-bottom: 30px;
+    vertical-align: top;
+    border: 0;
+    box-shadow:none;
+    padding: 10px 10px 10px 31px;
+    font-size: 14px;
+  }
+  ^ .searchIcon {
+    position: absolute;
+    margin-left: 5px;
+    margin-top: 8px;
+  }
+
 
 
   `,
@@ -97,21 +123,33 @@
     {
       name: 'data',
       factory: function() { return this.messageboardDAO; },
-      view: {
-        class: 'foam.u2.view.ScrollTableView',
-        columns: [
-          'id', 'title', 'creator', 'createdDate'
-        ]
-      }
+      // view: {
+      //   class: 'foam.u2.view.ScrollTableView',
+      //   columns: [
+      //     'mark', 'id', 'title', 'creator', 'createdDate'
+      //   ]
+      // }
     },
     {
       class: 'String',
-      name: 'query',
+      name: 'filter',
       view: {
         class: 'foam.u2.TextField',
         type: 'Messageboard Search',
         placeholder: 'Title',
         onKey: true
+      }
+    },
+    {
+      name: 'filteredMessageboardDAO',
+      expression: function(data, filter) {
+        return this.messageboardDAO.where(this.CONTAINS_IC(this.Messageboard.TITLE, filter));//.orderBy(this.DESC(this.Messageboard.CREATED_DATE));
+      },
+      view: {
+        class: 'foam.u2.view.ScrollTableView',
+        columns: [
+          'mark', 'id', 'title', 'creator', 'createdDate'
+        ]
       }
     }
   ],
@@ -121,91 +159,24 @@
       this.SUPER();
       var self = this;
 
- this.start('table')
-  .start('tr')
-    .start('td')
-        //.start().addClass('button-div')
-          .start(this.QUERY).end()
-          .start(this.CREATE).end()
-          //.start().add('Create').on('click', this.onCreate).end()
-        //.end()
-    .end()
-    .end()
-  .end()
-
-
-  .start('tr')
-    .start('td')
-
       this
         .addClass(this.myClass())
-        // .start()
-        //   // .start('div')
-        //   //   .start().addClass('button-div')
-        //   //     .start(this.QUERY).end()
-        //   //     .start(this.CREATE).addClass('net-nanopay-ui-ActionView').end()
-        //   //     //.start().add('Create').on('click', this.onCreate).end()
-        //   //   .end()
-        //   // .end()
-        //   .start()
-
-            .start('table').addClass('foam-u2-view-TableView')
-              .start('thead')
-                .start('tr')
-                  .start('td').add('').end()
-                  .start('td').add('Id').end()
-                  .start('td').add('Title').end()
-                  .start('td').add('Creator').end()
-                  .start('td').add('Date').end()
-                  .start('td').add('').end()
-              .end()
+        .start()
+          .start().addClass('container')
+            .start().addClass('button-div')
+              //.start(this.QUERY).end()
+              .start({class: 'foam.u2.tag.Image', data: 'images/ic-search.svg'}).addClass('searchIcon').end()
+              .start(this.FILTER).addClass('filter-search').end()
+              .start(this.CREATE).end()
             .end()
-            .start('tbody')
-              .select(this.messageboardDAO.orderBy(this.Messageboard.ID), function(m) {
-                var cb = foam.u2.md.CheckBox.create({data: m.starmark});
-                cb.data$.sub(function() { self.starMessageboard(m, cb.data); });
-
-                this.start('tr').on('dblclick', function() { self.stack.push({
-                      class: 'foam.demos.net.nap.web.EditMessageboard',
-                      data: m
-                    }, this); } )
-                  .start('td').tag(cb).end()
-                  .start('td').add(m.id).end()
-                  .show(self.query$.map(function(query) { query = query.trim(); return query == "" || m.title.indexOf(query) != -1; }))
-                  .start('td').add(m.title).end()
-                  .start('td').add(m.creator).end()
-                  .start('td').add(m.createdDate.toISOString().substring(0,10)).end()
-                  .start('td')
-                    .callIf(m.messageboardFile[0], function(){
-                      this.start().addClass('table-attachment')
-                        .tag({ class: 'foam.u2.tag.Image', data: 'images/ic-attachment.svg' })
-                      .end()
-                    })
-                  .end()
-
-                .end()
-              }).end()
-
-
-          //   .end()
-          // .end()
-
           .end()
-          .end()
-        .end()
-
-
-         .end();
+          .add(this.FILTERED_MESSAGEBOARD_DAO)
+          .tag({ class: 'net.nanopay.ui.Placeholder', dao: this.data, message: this.placeholderText, image: 'images/person.svg'})
+      .end();
     },
-
-    function starMessageboard(messageboard, data) {
-      var dao = this.messageboardDAO;
-      dao.find(messageboard).then(function(messageboard) {
-
-        messageboard.starmark = data;
-        dao.put(messageboard);
-      });
-    }
+  function dblclick(messageboard) {
+    this.stack.push({ class: 'foam.demos.net.nap.web.EditMessageboard', data: messageboard });
+  }
   ],
 
   actions: [
