@@ -145,12 +145,10 @@ public abstract class AbstractJDAO
         switch ( operation ) {
           case 'p':
             PropertyInfo id = (PropertyInfo) getOf().getAxiomByName("id");
-            if ( getDelegate().find(id.get(object)) != null ) {
-              //If data exists, merge difference
-              //get old date
-              FObject old = getDelegate().find(id.get(object));
+            FObject old = getDelegate().find(id.get(object));
+            if ( old != null ) {
               //merge difference
-              object = mergeChange(old, object);
+              object = mergeFObject(old.fclone(), object);
             }
             getDelegate().put(object);
             break;
@@ -219,27 +217,23 @@ public abstract class AbstractJDAO
       // stringify to json string
       record = getOutputter().stringify(ret);
     } else {
-      // compare with old data if old data exists
-      // get difference FObject
-      ret = difference(o, obj);
-      // if no difference, then return
-      if ( ret == null ) return obj;
-      // stringify difference FObject into json string
-      record = getOutputter().stringify(ret);
+      record = getOutputter().stringifyDelta(o, obj);
       // put new data into memory
       ret = getDelegate().put_(x, obj);
     }
 
     try {
       // TODO: supress class name from output
-      writeComment((User) x.get("user"));
-      out_.write("p(");
-      // TODO: output string directly here rather than converting to 'record'
-      // String above.
-      out_.write(record);
-      out_.write(")");
-      out_.newLine();
-      out_.flush();
+      if ( ! "".equals(record)) {
+        writeComment((User) x.get("user"));
+        out_.write("p(");
+        // TODO: output string directly here rather than converting to 'record'
+        // String above.
+        out_.write(record);
+        out_.write(")");
+        out_.newLine();
+        out_.flush();
+      }
     } catch (Throwable e) {
       logger_.error("put", e);
     }
@@ -283,47 +277,23 @@ public abstract class AbstractJDAO
     getDelegate().removeAll_(x, skip, limit, order, predicate);
   }
 
-  protected FObject difference(FObject o, FObject n) {
-    FObject diff = o.hardDiff(n);
-    // no difference, then return null
-    if ( diff == null ) return null;
-    // get the PropertyInfo for the id
-    PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
-    // set id property to new instance
-    idInfo.set(diff, idInfo.get(o));
-    return diff;
-  }
-
-  protected FObject mergeChange(FObject o, FObject c) {
-    //if no change to merge, return FObject;
-    if ( c == null ) return o;
-    //merge change
-    return maybeMerge(o, c);
-  }
-
-  protected FObject maybeMerge(FObject o, FObject c) {
-    if ( o == null ) return o = c;
+  //add diff property to old property
+  protected FObject mergeFObject(FObject oldFObject, FObject diffFObject) {
 
     //get PropertyInfos
-    List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator e = list.iterator();
 
-    while ( e.hasNext() ) {
+    while( e.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) e.next();
-      if ( prop instanceof AbstractFObjectPropertyInfo ) {
-        //do nested merge
-        //check if change
-        if ( ! prop.isSet(c) ) continue;
-        maybeMerge((FObject) prop.get(o), (FObject) prop.get(c));
-      } else {
-        //check if change
-        if ( ! prop.isSet(c) ) continue;
-        //set new value
-        prop.set(o, prop.get(c));
-      }
+      mergeProperty(oldFObject, diffFObject, prop);
     }
+    return oldFObject;
+  }
 
-    return o;
+  protected void mergeProperty(FObject oldFObject, FObject diffFObject, PropertyInfo prop) {
+    if ( prop.isSet(diffFObject) )
+      prop.set(oldFObject, prop.get(diffFObject));
   }
 
   //return a new Fobject
