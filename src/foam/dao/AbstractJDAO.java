@@ -217,7 +217,7 @@ public abstract class AbstractJDAO
       // stringify to json string
       record = getOutputter().stringify(ret);
     } else {
-      record = getOutputter().stringifyDiff(o, obj);
+      record = getOutputter().stringifyDelta(o, obj);
       // put new data into memory
       ret = getDelegate().put_(x, obj);
     }

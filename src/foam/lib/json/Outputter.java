@@ -80,7 +80,7 @@ public class Outputter
     return this.toString();
   }
 
-  public String stringifyDiff(FObject oldFObject, FObject newFObject) {
+  public String stringifyDelta(FObject oldFObject, FObject newFObject) {
     initWriter();
     outputFObjectDelta(oldFObject, newFObject);
     return this.toString();
