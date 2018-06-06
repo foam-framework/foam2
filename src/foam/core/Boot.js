@@ -213,23 +213,10 @@ foam.LIB({
           // Register the class in the global package path.
           foam.package.registerClass(cls);
         } else {
-          if ( ! m.name ) {
-            // No ID for the refinement so give it one. These names should be
-            // consistent regardless of how this is being run (e.g. node, web,
-            // debug, etc) so the first axiom name is used.
-            var n = new RegExp('(.*)\\.(.*)?$').exec(m.refines)
-            var p = n ? n[1] : 'foam.core';
-            n = (n ? n[2] : m.refines) + 'Refines';
-            if ( model.axioms_.length ) {
-              n = n + model.axioms_[0].name;
-            }
-            model.name = n;
-            model.package = p
-          }
           // Register refinement id in global context.
           // If duplicate names are being registered and the system complains,
           // find the offending refinement and give it a package and name.
-          foam.register(cls, ( model.package || 'foam.core' ) + '.' + model.name);
+          foam.register(cls, model.id);
         }
 
         return cls;
