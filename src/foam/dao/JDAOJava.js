@@ -188,9 +188,21 @@ foam.CLASS({
 });
 
 foam.CLASS({
-  refines: 'foam.dao.JDAO',
+  package: 'foam.dao',
+  name: 'ProxyJournal',
 
-  methods: [
+  documentation: 'Proxy journal class',
 
+  implements: [
+    'foam.dao.Journal'
+  ],
+
+  properties: [
+    {
+      class: 'Proxy',
+      of: 'foam.dao.Journal',
+      name: 'delegate',
+      forwards: [ 'replay', 'put', 'remove', 'eof', 'reset' ]
+    }
   ]
 });
