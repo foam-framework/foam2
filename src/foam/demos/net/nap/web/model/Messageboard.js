@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'Messageboard',
 
   tableColumns: [
-    'starmark', 'title', 'createdDate', 'creator'
+    'mark', 'title', 'createdDate', 'creator', 'attachment'
   ],
 
   imports: [
@@ -33,7 +33,7 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'starmark',
+      name: 'mark',
       //view: { class: 'foam.u2.CheckBox' }
       tableCellFormatter: function(value, obj, property) {
         this
@@ -63,6 +63,12 @@ foam.CLASS({
       factory: function() { return this.user.id; },
       hidden: true
     },
+    // {
+    //   class: 'Reference',
+    //   of: 'foam.nanos.auth.Group',
+    //   name: 'groupId',
+    //   view: { class: 'foam.u2.view.ReferenceView', placeholder: 'select group' }
+    // },
     {
       class: 'DateTime',
       name: 'createdDate',
