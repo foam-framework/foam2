@@ -205,7 +205,7 @@
   properties: [
     {
       class: 'foam.nanos.fs.FileArray',
-      name: 'messageboardFile',
+      name: 'data_',
       value: this.exportData
     },
     'exportData',
@@ -233,7 +233,7 @@
       var userId = this.user.id;
       var userName = this.user.firstName;
       var messageboardObj = this.data;
-      this.messageboardFile = Array.from(messageboardObj.messageboardFile);
+      this.data_ = Array.from(messageboardObj.data);
 
       this
         .addClass(this.myClass())
@@ -251,7 +251,7 @@
               .end()
               .start('tr')
                 .start('td').addClass('foam-u2-PropertyView-label').add('Starmark').end()
-                .start('td').addClass('foam-u2-PropertyView').tag(this.data.STARMARK).end()
+                .start('td').addClass('foam-u2-PropertyView').tag(this.data.MARK).end()
               .end()
               .start('tr')
                 .start('td').addClass('foam-u2-PropertyView-label').add('Title').end()
@@ -273,7 +273,7 @@
                 .start('td').addClass('foam-u2-PropertyView-label').add('Attachments').end()
                 .start('td')
 
-                .start().addClass('attachment-btn white-blue-button btn')
+                .start().addClass('attachment-btn').addClass('white-blue-button').addClass('btn')
                   .add('Choose File')
                   .on('click', this.onAddAttachmentClicked)
                 .end()
@@ -281,10 +281,10 @@
                 // .start('div').addClass(this.dragActive$.map(function (drag) {
                 //   return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
                 // }))
-                  .add(this.slot(function (data) {
+                  .add(this.slot(function (data_) {
                     var e = this.E();
-                    for ( var i = 0 ; i < data.length ; i++ ) {
-                      var fileData = messageboardObj.messageboardFile;
+                    for ( var i = 0 ; i < data_.length ; i++ ) {
+                      var fileData = data_.data;
                         e.start('div').addClass('attachment-view').setID(i+1)
                         // .start().addClass('attachment-number')
                         //   .add(this.formatFileNumber(i+1))
@@ -292,7 +292,7 @@
                         .start().addClass('attachment-filename')
                           .start('a')
                             .attrs({
-                              href: this.messageboardFile$.map(function (fileData) {
+                              href: this.data_$.map(function (fileData) {
                                 if ( fileData[i] ) {
                                     var blob = fileData[i].data;
                                     var sessionId = localStorage['defaultSession'];
@@ -320,7 +320,7 @@
                              var len = filename.length;
                              return ( len > 35 ) ? (filename.substr(0, 20) +
                                '...' + filename.substr(len - 10, len)) : filename;
-                           }, this.messageboardFile[i].filename$))
+                           }, this.data_[i].filename$))
                         .end()
                      .end()
                      .start().addClass('attachment-footer').setID(i+1)
@@ -329,9 +329,9 @@
                        //.on('click', this.onFileRemoved)
                        .on('click', function(e) {
                          console
-                         self.messageboardFile.splice(this.id - 1, 1);
+                         self.data_.splice(this.id - 1, 1);
                          this.remove();
-                         self.messageboardFile = Array.from(self.messageboardFile);
+                         self.data_ = Array.from(self.data_);
                        })
 
                        // .start().addClass('attachment-filesize')
@@ -341,7 +341,7 @@
                      .end()
                     }
                     return e;
-                  }, this.data.messageboardFile$))
+                  }, this.data.data$))
                   .on('dragstart', this.onDragStart)
                   .on('dragenter', this.onDragEnter)
                   .on('dragover', this.onDragOver)
@@ -541,14 +541,14 @@
           continue;
         }
         var isIncluded = false
-        for ( var j = 0 ; j < this.data.length ; j++ ) {
-          if( this.data[j].filename.localeCompare(files[i].name) === 0 ) {
+        for ( var j = 0 ; j < this.data_.length ; j++ ) {
+          if( this.data_[j].filename.localeCompare(files[i].name) === 0 ) {
             isIncluded = true;
             break
           }
         }
         if ( isIncluded ) continue ;
-        this.messageboardFile.push(this.File.create({
+        this.data_.push(this.File.create({
           owner: this.user.id,
           filename: files[i].name,
           filesize: files[i].size,
@@ -558,8 +558,8 @@
           })
         }))
       }
-      this.data.messageboardFile = Array.from(this.messageboardFile);
-      this.exportData = this.messageboardFile;
+      this.data.data = Array.from(this.data_);
+      this.exportData = this.data_;
     },
 
     function onSave(X) {
@@ -577,12 +577,12 @@
 
       var message = self.Messageboard.create({
         id : this.data.id,
-        starmark : this.data.starmark,
+        mark : this.data.mark,
         title: this.data.title,
         content: this.data.content,
         creator : this.data.creator,
         createdDate : this.data.createdDate,
-        messageboardFile : Array.from(this.messageboardFile)
+        data : Array.from(this.data_)
       });
 
       this.messageboardDAO.put(message).then(function() {
