@@ -10,7 +10,7 @@ foam.INTERFACE({
   methods: [
     {
       name: 'replay',
-      javaReturns: 'void',
+      javaReturns: 'foam.dao.DAO',
       args: [
         {
           name: 'dao',
@@ -180,7 +180,17 @@ foam.CLASS({
         } catch ( Throwable t) {
           ((Logger) getLogger()).error("failed to read from journal", t);
         }
+
+        return dao;
       `
     }
+  ]
+});
+
+foam.CLASS({
+  refines: 'foam.dao.JDAO',
+
+  methods: [
+
   ]
 });
