@@ -77,6 +77,7 @@ var classes = [
   'foam.dao.DAO',
   'foam.dao.Journal',
   'foam.dao.ProxyJournal',
+  'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
