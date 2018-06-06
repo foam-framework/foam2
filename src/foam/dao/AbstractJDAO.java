@@ -232,8 +232,8 @@ public abstract class AbstractJDAO
         out_.write(record);
         out_.write(")");
         out_.newLine();
+        out_.flush();
       }
-      out_.flush();
     } catch (Throwable e) {
       logger_.error("put", e);
     }
@@ -292,7 +292,7 @@ public abstract class AbstractJDAO
   }
 
   protected void mergeProperty(FObject oldFObject, FObject diffFObject, PropertyInfo prop) {
-    if ( ! prop.isSet(diffFObject) ) return;
+    if ( prop.isSet(diffFObject) )
       prop.set(oldFObject, prop.get(diffFObject));
   }
 
