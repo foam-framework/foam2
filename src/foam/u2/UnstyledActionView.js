@@ -81,7 +81,13 @@ foam.CLASS({
       name: 'buttonState',
       factory: function() { return this.action && this.action.confirmationRequired ? this.ButtonState.CONFIRM : this.ButtonState.NO_CONFIRM; }
     },
-    'data',
+    {
+      name: 'data',
+      postSet: function() {
+        // Reset state
+        this.buttonState = undefined;
+      }
+    },
     'action',
     [ 'nodeName', 'button' ],
     {
@@ -148,11 +154,13 @@ foam.CLASS({
         this.debounce();
       }
       else if ( this.buttonState == this.ButtonState.ARMED ) {
+        this.buttonState = this.ButtonState.CONFIRM;
         this.removeAllChildren();
         this.addContent();
         this.action && this.action.maybeCall(this.__subContext__, this.data);
       }
-
+      
+      e.preventDefault();
       e.stopPropagation();
     },
     {
@@ -160,6 +168,8 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 200,
       code: function() {
+        if ( this.buttonState != this.ButtonState.DEBOUNCE ) return;
+
         this.buttonState = this.ButtonState.ARMED;
         this.deactivateConfirm();
       }
@@ -169,6 +179,7 @@ foam.CLASS({
       isMerged: true,
       mergeDelay: 6000,
       code: function() {
+        if ( this.buttonState != this.ButtonState.ARMED ) return;
         this.removeAllChildren();
         this.addContent();
         this.buttonState = this.ButtonState.CONFIRM;

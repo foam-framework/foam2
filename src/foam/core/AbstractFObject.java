@@ -18,7 +18,6 @@ public abstract class AbstractFObject
   extends    ContextAwareSupport
   implements FObject, Comparable, Appendable
 {
-
   public static FObject maybeClone(FObject fo) {
     return ( fo == null ? null : fo.fclone() );
   }
@@ -76,7 +75,6 @@ public abstract class AbstractFObject
       PropertyInfo prop = null;
       while ( i.hasNext() ) {
         prop = (PropertyInfo) i.next();
-        if ( prop.getNetworkTransient() || prop.getStorageTransient() ) continue;
         if ( prop.hardDiff(this, obj, ret) ) {
           isDiff = true;
         }
@@ -257,5 +255,11 @@ public abstract class AbstractFObject
   public String toJSON() {
     Outputter out = new Outputter();
     return out.stringify(this);
+  }
+
+  protected boolean __frozen__ = false;
+
+  public void freeze() {
+    __frozen__ = true;
   }
 }

@@ -6,14 +6,15 @@ foam.CLASS({
   documentation: 'Implementation of Token Service used for verifying email addresses',
 
   javaImports: [
-    'foam.dao.DAO',
+    'foam.core.FObject',
     'foam.dao.ArraySink',
+    'foam.dao.DAO',
     'foam.dao.Sink',
     'foam.mlang.MLang',
     'foam.nanos.app.AppConfig',
+    'foam.nanos.auth.token.Token',
     'foam.nanos.notification.email.EmailMessage',
     'foam.nanos.notification.email.EmailService',
-    'foam.nanos.auth.token.Token',
     'java.util.Calendar',
     'java.util.HashMap',
     'java.util.List',
@@ -22,11 +23,11 @@ foam.CLASS({
 
   methods: [
     {
-      name: 'generateToken',
+      name: 'generateTokenWithParameters',
       javaCode:
 `try {
 DAO tokenDAO = (DAO) getX().get("tokenDAO");
-DAO userDAO = (DAO) getX().get("localUserDAO");
+DAO userDAO  = (DAO) getX().get("localUserDAO");
 AppConfig appConfig = (AppConfig) getX().get("appConfig");
 String url = appConfig.getUrl()
     .replaceAll("/$", "");
@@ -73,9 +74,10 @@ if ( list == null || list.size() == 0 ) {
 }
 
 // set token processed to true
-Token result = (Token) list.get(0);
-result.setProcessed(true);
-tokenDAO.put(result);
+FObject result = (FObject) list.get(0);
+Token clone = (Token) result.fclone();
+clone.setProcessed(true);
+tokenDAO.put(clone);
 
 // set user email verified to true
 user.setEmailVerified(true);

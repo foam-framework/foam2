@@ -28,67 +28,59 @@ foam.CLASS({
     'foam.nanos.u2.navigation.UserView'
   ],
 
-  imports: [
-    'menuDAO',
-    'user',
-    'logo'
-  ],
+  imports: [ 'menuDAO', 'user', 'loginSuccess' ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ {
-          background: #093649;
-          width: 100%;
-          min-width: 992px;
-          height: 60px;
-          color: white;
-          padding-top: 5px;
-        }
-        ^ .topNavContainer {
-          width: 100%;
-          margin: auto;
-        }
-        ^ .menuBar > div > ul {
-          margin-top: 0;
-          padding-left: 0;
-          font-weight: 100;
-          color: #ffffff;
-        }
-        ^ .foam-nanos-menu-MenuBar li {
-          display: inline-block;
-          cursor: pointer;
-        }
-        ^ .menuItem{
-          display: inline-block;
-          padding: 20px 0 5px 0px;
-          cursor: pointer;
-          border-bottom: 1px solid transparent;
-          -webkit-transition: all .15s ease-in-out;
-          -moz-transition: all .15s ease-in-out;
-          -ms-transition: all .15s ease-in-out;
-          -o-transition: all .15s ease-in-out;
-          transition: all .15s ease-in-out;
-        }
-        ^ .menuItem:hover, ^ .menuItem.hovered {
-          border-bottom: 1px solid white;
-          padding-bottom: 5px;
-          text-shadow: 0 0 0px white, 0 0 0px white;
-        }
-        ^ .selected {
-          border-bottom: 1px solid #1cc2b7 !important;
-          padding-bottom: 5px;
-          text-shadow: 0 0 0px white, 0 0 0px white;
-        }
-        ^ .menuBar{
-          width: 50%;
-          overflow: auto;
-          white-space: nowrap;
-          margin-left: 60px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      background: %PRIMARYCOLOR%;
+      width: 100%;
+      min-width: 992px;
+      height: 60px;
+      color: white;
+      padding-top: 5px;
+    }
+    ^ .topNavContainer {
+      width: 100%;
+      margin: auto;
+    }
+    ^ .menuBar > div > ul {
+      margin-top: 0;
+      padding-left: 0;
+      font-weight: 100;
+      color: #ffffff;
+    }
+    ^ .foam-nanos-menu-MenuBar li {
+      display: inline-block;
+      cursor: pointer;
+    }
+    ^ .menuItem{
+      display: inline-block;
+      padding: 20px 0 5px 0px;
+      cursor: pointer;
+      border-bottom: 1px solid transparent;
+      -webkit-transition: all .15s ease-in-out;
+      -moz-transition: all .15s ease-in-out;
+      -ms-transition: all .15s ease-in-out;
+      -o-transition: all .15s ease-in-out;
+      transition: all .15s ease-in-out;
+    }
+    ^ .menuItem:hover, ^ .menuItem.hovered {
+      cursor: pointer;
+      padding-bottom: 5px;
+      border-bottom: 1px solid white;
+    }
+    ^ .selected {
+      border-bottom: 4px solid %ACCENTCOLOR% !important;
+      padding-bottom: 5px;
+      text-shadow: 0 0 0px white, 0 0 0px white;
+    }
+    ^ .menuBar{
+      width: 60%;
+      overflow: auto;
+      white-space: nowrap;
+      margin-left: 60px;
+    }
+  `,
 
   properties: [
     {
@@ -99,21 +91,17 @@ foam.CLASS({
 
   methods: [
     function initE(){
-      var self = this;
       this
-        .addClass(this.myClass())
-        .start().addClass('topNavContainer')
-          .callIf( this.logo, function(){
-            this.start({class: 'foam.nanos.u2.navigation.BusinessLogoView'})
-            .end()
-          })
-          .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
-          .end()
-          .callIf( this.user.firstName, function(){
-            this.start({class: 'foam.nanos.u2.navigation.UserView'})
-            .end()
-          })
+      .addClass(this.myClass())
+      .start().addClass('topNavContainer')
+        .show( this.loginSuccess$)
+        .start({class: 'foam.nanos.u2.navigation.BusinessLogoView' })
         .end()
+        .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
+        .end()
+        .start({class: 'foam.nanos.u2.navigation.UserView'})
+        .end()
+      .end();
     }
   ]
 });

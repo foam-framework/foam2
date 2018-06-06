@@ -718,7 +718,13 @@ foam.LIB({
 
               o[key] = json.name;
               continue;
-            } else if ( ( key === 'of' || key === 'class' || key == 'view' || key == 'refines' ) &&
+            } else if ( (
+                key === 'of' ||
+                key === 'class' ||
+                key == 'view' ||
+                key == 'sourceModel' ||
+                key == 'targetModel' ||
+                key == 'refines' ) &&
                         foam.String.isInstance(o[key]) ) {
               r.push(x.classloader.maybeLoad(o[key]));
               continue;

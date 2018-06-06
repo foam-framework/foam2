@@ -16,6 +16,7 @@ import foam.core.X;
 import foam.core.XMLSupport;
 import foam.dao.AbstractSink;
 import foam.dao.ArraySink;
+import foam.dao.AuthenticatedDAO;
 import foam.dao.DAO;
 import foam.lib.csv.*;
 import foam.lib.json.*;
@@ -67,7 +68,7 @@ public class DigWebAgent
     Format              format      = (Format) p.get(Format.class);
     String              id          = p.getParameter("id");
     String              q           = p.getParameter("q");
-    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
     String[]            email       = p.getParameterValues("email");
     boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
     String              subject     = p.getParameter("subject");
@@ -78,7 +79,6 @@ public class DigWebAgent
     PM pm = new PM(getClass(), command.getName()+'/'+format.getName());
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
-
     try {
       if ( SafetyUtil.isEmpty(daoName) ) {
         resp.setContentType("text/html");
@@ -408,13 +408,13 @@ public class DigWebAgent
 
   protected void outputPage(X x) {
     final PrintWriter   out         = x.get(PrintWriter.class);
-    DAO                 nSpecDAO    = (DAO) x.get("nSpecDAO");
+    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
+    Logger              logger      = (Logger) x.get("logger");
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");
-
     // gets all ongoing nanopay services
-    nSpecDAO.orderBy(NSpec.NAME).select(new AbstractSink() {
+    nSpecDAO.inX(x).orderBy(NSpec.NAME).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
           NSpec s = (NSpec) o;
@@ -423,7 +423,6 @@ public class DigWebAgent
           }
         }
       });
-
     out.println("</select></span>");
     out.println("<br><br><span id=formatSpan>Format:<select name=format id=format onchange=changeUrl() style=margin-left:25><option value=csv>CSV</option><option value=xml>XML</option><option value=json selected>JSON</option><option value=html>HTML</option><option value=jsonj>JSON/J</option></select></span>");
     out.println("<br><br><span>Command:<select name=cmd id=cmd width=150 style=margin-left:5  onchange=changeCmd(this.value)><option value=put selected>PUT</option><option value=select>SELECT</option><option value=remove>REMOVE</option><option value=help>HELP</option></select></span>");

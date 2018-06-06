@@ -171,6 +171,25 @@ out.append(data.stringValue)
       */},
     },
     {
+      name: 'outputDate',
+      args: [
+        {
+          swiftAnnotations: ['inout'],
+          swiftType: 'String',
+          name: 'out'
+        },
+        {
+          swiftType: 'Date',
+          name: 'data'
+        }
+      ],
+      swiftCode: function() {/*
+let formatter = DateFormatter()
+formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+out.append("\"\(formatter.string(from: data))\"")
+      */}
+    },
+    {
       name: 'output',
       args: [
         {
@@ -198,6 +217,8 @@ if let data = data as? JSONOutputter {
   outputArray(&out, data)
 } else if let data = data as? [String:Any?] {
   outputMap(&out, data)
+} else if let data = data as? Date {
+  outputDate(&out, data)
 } else if data == nil {
   outputNil(&out)
 } else {
@@ -249,16 +270,7 @@ out.append("}");
         },
       ],
       swiftCode: function() {/*
-out.append("{");
-outputString(&out, "class");
-out.append(":");
-outputString(&out, data.classId)
-out.append(",");
-outputString(&out, "ordinal");
-out.append(":");
 outputNumber(&out, data.ordinal as NSNumber)
-out.append("}");
-
       */},
     },
     {
