@@ -10,7 +10,6 @@ foam.INTERFACE({
   methods: [
     {
       name: 'replay',
-      javaReturns: 'foam.dao.DAO',
       args: [
         {
           name: 'dao',
@@ -38,6 +37,7 @@ foam.CLASS({
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
     'foam.nanos.fs.Storage',
+    'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
 
     'java.io.BufferedReader',
@@ -180,8 +180,6 @@ foam.CLASS({
         } catch ( Throwable t) {
           ((Logger) getLogger()).error("failed to read from journal", t);
         }
-
-        return dao;
       `
     }
   ]
