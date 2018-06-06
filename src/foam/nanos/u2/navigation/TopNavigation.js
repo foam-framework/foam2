@@ -75,7 +75,7 @@ foam.CLASS({
       text-shadow: 0 0 0px white, 0 0 0px white;
     }
     ^ .menuBar{
-      width: 60%;
+      width: auto;
       overflow: auto;
       white-space: nowrap;
       margin-left: 60px;
