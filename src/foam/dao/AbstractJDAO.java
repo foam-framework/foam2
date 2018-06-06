@@ -279,7 +279,6 @@ public abstract class AbstractJDAO
 
   //add diff property to old property
   protected FObject mergeFObject(FObject oldFObject, FObject diffFObject) {
-    if ( diffFObject == null ) return oldFObject;
 
     //get PropertyInfos
     List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
