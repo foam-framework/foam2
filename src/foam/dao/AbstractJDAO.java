@@ -65,21 +65,21 @@ public abstract class AbstractJDAO
     try {
       String file = filename + ".0";
       logger_.log("Loading file: " + file);
-      //get repo entries in filename.0 journal first
+      // get repo entries in filename.0 journal first
       File inFile = getX().get(foam.nanos.fs.Storage.class).get(file);
-      //load repo entries into DAO
+      // load repo entries into DAO
       if ( inFile.exists() ) {
         int validEntries = loadJournal(inFile);
         logger_.log("Success reading " + validEntries + " entries from file: " + file);
       } else {
         logger_.warning("Can not find file: " + file);
       }
-      //get runtime journal
+      // get runtime journal
       file = filename;
       logger_.log("Loading file: " + file);
-      //get output journal
+      // get output journal
       outFile_ = getX().get(foam.nanos.fs.Storage.class).get(file);
-      //if output journal does not existing, create one
+      // if output journal does not existing, create one
       if ( ! outFile_.exists() ) {
         logger_.warning("Can not find file: " + file);
         //if output journal does not exist, create one
@@ -91,12 +91,12 @@ public abstract class AbstractJDAO
         logger_.log("Create file: " + file);
         outFile_.getAbsoluteFile().createNewFile();
       } else {
-        //if output journal file exists, load entries into DAO
+        // if output journal file exists, load entries into DAO
         int validEntries = loadJournal(outFile_);
         logger_.log("Success reading " + validEntries + " entries from file: " + file);
       }
-      //link output journal file to BufferedWriter
-      out_ = new BufferedWriter(new FileWriter(outFile_, true));
+      // link output journal file to BufferedWriter
+      out_ = new BufferedWriter(new FileWriter(outFile_, true), 16*1024);
       out_.newLine();
     } catch ( IOException e ) {
       logger_.error(e);
@@ -207,38 +207,43 @@ public abstract class AbstractJDAO
    * @returns FObject
    */
   @Override
-  public FObject put_(X x, FObject obj) {
+  public synchronized FObject put_(X x, FObject obj) {
     PropertyInfo id     = (PropertyInfo) getOf().getAxiomByName("id");
     FObject      o      = getDelegate().find_(x, id.get(obj));
     FObject      ret    = null;
     String       record = null;
 
     if ( o == null ) {
-      //data does not exist
+      // data does not exist
       ret = getDelegate().put_(x, obj);
-      //stringify to json string
+      // stringify to json string
       record = getOutputter().stringify(ret);
     } else {
-      //compare with old data if old data exists
-      //get difference FObject
+      // compare with old data if old data exists
+      // get difference FObject
       ret = difference(o, obj);
-      //if no difference, then return
+      // if no difference, then return
       if ( ret == null ) return obj;
-      //stringify difference FObject into json string
+      // stringify difference FObject into json string
       record = getOutputter().stringify(ret);
-      //put new data into memory
+      // put new data into memory
       ret = getDelegate().put_(x, obj);
     }
 
     try {
-      // TODO(drish): supress class name from output
+      // TODO: supress class name from output
       writeComment((User) x.get("user"));
-      out_.write("p(" + record + ")");
+      out_.write("p(");
+      // TODO: output string directly here rather than converting to 'record'
+      // String above.
+      out_.write(record);
+      out_.write(")");
       out_.newLine();
       out_.flush();
     } catch (Throwable e) {
       logger_.error("put", e);
     }
+
     return ret;
   }
 
@@ -280,11 +285,11 @@ public abstract class AbstractJDAO
 
   protected FObject difference(FObject o, FObject n) {
     FObject diff = o.hardDiff(n);
-    //no difference, then return null
+    // no difference, then return null
     if ( diff == null ) return null;
-    //get the PropertyInfo for the id
+    // get the PropertyInfo for the id
     PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
-    //set id property to new instance
+    // set id property to new instance
     idInfo.set(diff, idInfo.get(o));
     return diff;
   }

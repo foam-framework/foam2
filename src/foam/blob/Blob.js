@@ -477,12 +477,15 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'root'
+      name: 'root',
+      generateJava: false,
+      documentation: 'Root directory of where files are stored'
     },
     {
       class: 'String',
       name: 'tmp',
       transient: true,
+      documentation: 'Temp directory of where files are stored before hashing',
       expression: function(root) {
         return root + '/tmp';
       }
@@ -491,6 +494,7 @@ foam.CLASS({
       class: 'String',
       name: 'sha256',
       transient: true,
+      documentation: 'Directory of where files are stored after hashing',
       expression: function(root) {
         return root + '/sha256';
       }
@@ -689,13 +693,7 @@ foam.CLASS({
       class: 'String',
       name: 'address',
       factory: function() {
-        var sessionId = localStorage['defaultSession'];
-        var url = window.location.origin + '/' + this.serviceName
-        // attach session id if available
-        if ( sessionId ) {
-          url += '?sessionId=' + sessionId;
-        }
-        return url;
+        return window.location.origin + '/' + this.serviceName;
       }
     }
   ],
@@ -707,8 +705,15 @@ foam.CLASS({
         return Promise.resolve(blob);
       }
 
+      var url = this.address;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.address);
+      req.fromUrl(url);
       req.method = 'PUT';
       req.payload = blob;
 
@@ -726,12 +731,25 @@ foam.CLASS({
         return null;
       }
 
-      return this.address + '/' + blob.id;
+      var url = this.address + '/' + blob.id;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+      return url;
     },
 
     function find_(x, id) {
+      var url = this.address + '/' + id;
+      var sessionId = localStorage['defaultSession'];
+      // attach session id if available
+      if ( sessionId ) {
+        url += '?sessionId=' + sessionId;
+      }
+
       var req = this.HTTPRequest.create();
-      req.fromUrl(this.address + '/' + id);
+      req.fromUrl(url);
       req.method = 'GET';
       req.responseType = 'blob';
 
@@ -777,7 +795,7 @@ foam.CLASS({
 
         var blob = prop.f(obj);
 
-        if ( ! blob ) return obj;
+        if ( ! blob ) return a();
 
         return self.blobService.put(blob).then(function(b) {
           prop.set(obj, b);

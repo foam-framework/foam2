@@ -234,6 +234,7 @@ public class Outputter
 
     Object value = prop.get(fo);
     if ( value == null ) return false;
+
     if ( includeComma ) writer_.append(",");
     outputProperty(fo, prop);
     return true;

@@ -569,6 +569,10 @@ foam.CLASS({
 
   constants: [
     {
+      name: 'CSS_CLASSNAME_PATTERN',
+      factory: function() { return /^[a-z_-][a-z\d_-]*$/i; }
+    },
+    {
       documentation: `
         Psedo-attributes don't work consistently with setAttribute() so need to
         be set on the real DOM element directly.
@@ -577,12 +581,12 @@ foam.CLASS({
       value: {
         value: true,
         checked: true
-      },
+      }
     },
 
     {
       name: 'DEFAULT_VALIDATOR',
-      factory: function() { return foam.u2.DefaultValidator.create() },
+      factory: function() { return foam.u2.DefaultValidator.create(); }
     },
 
     {
@@ -593,7 +597,7 @@ foam.CLASS({
         to try and mutate the Element while in the OUTPUT state.
       `,
       name: 'OUTPUT',
-      factory: function() { return foam.u2.OutputElementState.create() },
+      factory: function() { return foam.u2.OutputElementState.create(); }
     },
 
     {
@@ -602,7 +606,7 @@ foam.CLASS({
         A Loaded Element should be visible in the DOM.
       `,
       name: 'LOADED',
-      factory: function() { return foam.u2.LoadedElementState.create() },
+      factory: function() { return foam.u2.LoadedElementState.create(); }
     },
 
     {
@@ -611,7 +615,7 @@ foam.CLASS({
         An unloaded Element can be readded to the DOM.
       `,
       name: 'UNLOADED',
-      factory: function() { return foam.u2.UnloadedElementState.create() },
+      factory: function() { return foam.u2.UnloadedElementState.create(); }
     },
 
     {
@@ -619,9 +623,7 @@ foam.CLASS({
         Initial state of an Element before it has been added to the DOM.
       `,
       name: 'INITIAL',
-      factory: function() {
-        return foam.u2.InitialElementState.create();
-      },
+      factory: function() { return foam.u2.InitialElementState.create(); }
     },
 
     // ???: Add DESTROYED State?
@@ -669,25 +671,25 @@ foam.CLASS({
         LINK: true,
         META: true,
         PARAM: true
-      },
+      }
     },
 
     {
       name: '__ID__',
-      value: [ 0 ],
+      value: [ 0 ]
     },
 
     {
       name: 'NEXT_ID',
       value: function() {
         return 'v' + this.__ID__[ 0 ]++;
-      },
+      }
     },
 
     {
       documentation: `Keys which respond to keydown but not keypress`,
       name: 'KEYPRESS_CODES',
-      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true },
+      value: { 8: true, 13: true, 27: true, 33: true, 34: true, 37: true, 38: true, 39: true, 40: true }
     },
 
     {
@@ -1544,6 +1546,17 @@ foam.CLASS({
       return slot;
     },
 
+    /**
+     * Given a DAO and a function that maps from a record in that DAO to an
+     * Element, call the function with each record as an argument and add the
+     * returned elements to the view.
+     * Will update the view whenever the contents of the DAO change.
+     * @param {DAO<T>} dao The DAO to use as a data source
+     * @param {T -> Element} f A function to be called on each record in the DAO. Should
+     * return an Element that represents the view of the record passed to it.
+     * @param {Boolean} update True if you'd like changes to each record to be put to
+     * the DAO
+     */
     function select(dao, f, update) {
       var es   = {};
       var self = this;
@@ -1716,6 +1729,10 @@ foam.CLASS({
       if ( oldClass === newClass ) return;
       this.removeClass(oldClass);
       if ( newClass ) {
+        if ( ! this.CSS_CLASSNAME_PATTERN.test(newClass) ) {
+          console.log('!!!!!!!!!!!!!!!!!!! Invalid CSS ClassName: ', newClass);
+          throw "Invalid CSS classname";
+        }
         this.classes[newClass] = true;
         this.onSetClass(newClass, true);
       }
@@ -1945,8 +1962,16 @@ foam.CLASS({
   ]
 });
 
-foam.__context__ = foam.u2.U2Context.create().__subContext__;
-
+foam.SCRIPT({
+  id: 'foam.u2.U2ContextScript',
+  requires: [
+    'foam.u2.U2Context',
+  ],
+  flags: ['web'],
+  code: function() {
+    foam.__context__ = foam.u2.U2Context.create().__subContext__;
+  }
+});
 
 foam.CLASS({
   refines: 'foam.core.FObject',

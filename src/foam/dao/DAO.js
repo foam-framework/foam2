@@ -32,7 +32,7 @@ foam.INTERFACE({
           name: 'obj',
           swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'put_',
@@ -48,7 +48,7 @@ foam.INTERFACE({
           name: 'obj',
           swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'remove',
@@ -60,7 +60,7 @@ foam.INTERFACE({
           name: 'obj',
           swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'remove_',
@@ -76,7 +76,7 @@ foam.INTERFACE({
           name: 'obj',
           swiftType: 'FObject'
         }
-      ],
+      ]
     },
     {
       name: 'find',
@@ -104,7 +104,7 @@ foam.INTERFACE({
           name: 'id',
           swiftType: 'Any?'
         }
-      ],
+      ]
     },
     {
       name: 'select',
@@ -115,8 +115,8 @@ foam.INTERFACE({
         {
           name: 'sink',
           swiftType: 'Sink',
-        },
-      ],
+        }
+      ]
     },
     {
       name: 'select_',
@@ -153,7 +153,7 @@ foam.INTERFACE({
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'removeAll',
@@ -190,7 +190,7 @@ foam.INTERFACE({
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'listen',
@@ -208,7 +208,7 @@ foam.INTERFACE({
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'listen_',
@@ -230,7 +230,7 @@ foam.INTERFACE({
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'pipe', // TODO: return a promise? don't put pipe and listen here?
@@ -260,8 +260,8 @@ foam.INTERFACE({
           name: 'predicate',
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
-        },
-      ],
+        }
+      ]
     },
     {
       name: 'where',
@@ -273,7 +273,7 @@ foam.INTERFACE({
           swiftType: 'FoamPredicate?',
           swiftDefaultValue: 'nil',
         }
-      ],
+      ]
     },
     {
       name: 'orderBy',
@@ -284,7 +284,7 @@ foam.INTERFACE({
           name: 'comparator',
           swiftType: 'Comparator'
         }
-      ],
+      ]
     },
     {
       name: 'skip',
@@ -295,7 +295,7 @@ foam.INTERFACE({
           name: 'count',
           swiftType: 'Int'
         }
-      ],
+      ]
     },
     {
       name: 'limit',
@@ -306,7 +306,7 @@ foam.INTERFACE({
           name: 'count',
           swiftType: 'Int'
         }
-      ],
+      ]
     },
     {
       name: 'inX',

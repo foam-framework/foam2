@@ -658,4 +658,4 @@ return newValue as! ${swiftType}
       },
     },
   ],
-})
+});
