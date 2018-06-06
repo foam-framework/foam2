@@ -113,25 +113,27 @@ foam.CLASS({
         return (
           methods ?
             methods.map(function(m) { return cls.getAxiomByName(m); }) :
-          cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
-          map(function(m) {
-            var returns = foam.String.isInstance(m.returns) ? m.returns :
-                m.returns && m.returns.typeName;
-            if ( returns && returns !== 'Promise' ) {
-              var id = returns.split('.');
-              id[id.length - 1] = 'Promised' + id[id.length - 1];
-              returns = id.join('.');
-            }
+            cls.getAxiomsByClass(foam.core.Method).filter(function (m) { return cls.hasOwnAxiom(m.name); }) ).
+              map(function(m) {
+                var returns = foam.String.isInstance(m.returns) ?
+                    m.returns :
+                    m.returns && m.returns.typeName ;
 
-            return foam.core.StubMethod.create({
-              name: m.name,
-              replyPolicyName: replyPolicyName,
-              boxPropName: name,
-              swiftReturns: m.swiftReturns,
-              args: m.args,
-              returns: returns
-            });
-          });
+                if ( returns && returns !== 'Promise' ) {
+                  var id = returns.split('.');
+                  id[id.length - 1] = 'Promised' + id[id.length - 1];
+                  returns = id.join('.');
+                }
+
+                return foam.core.StubMethod.create({
+                  name: m.name,
+                  replyPolicyName: replyPolicyName,
+                  boxPropName: name,
+                  swiftReturns: m.swiftReturns,
+                  args: m.args,
+                  returns: returns
+                });
+              });
       }
     },
     {

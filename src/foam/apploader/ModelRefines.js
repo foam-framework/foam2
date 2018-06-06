@@ -15,6 +15,13 @@ foam.CLASS({
                            []);
 
         if ( this.extends ) deps.push(this.extends);
+
+        if ( this.refines ) deps.push(this.refines);
+
+        return deps.map(function(d) {
+          if ( d.indexOf('.') == -1 ) return 'foam.core.' + d;
+          return d;
+        });
         return deps;
       }
     },

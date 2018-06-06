@@ -7,6 +7,13 @@ foam.CLASS({
   package: 'foam.nanos.boot',
   name: 'NSpec',
 
+  requires: [
+    {
+      path: 'foam.comics.BrowserView',
+      flags: ['web'],
+    },
+  ],
+
   javaImports: [
     'bsh.EvalError',
     'bsh.Interpreter',
