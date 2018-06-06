@@ -30,7 +30,12 @@
 foam.CLASS({
   refines: 'foam.core.Model',
 
-  properties: [ 'source' ],
+  properties: [
+    {
+      name: 'source',
+      transient: true,
+    },
+  ],
 
   methods: [
     function validate() {
@@ -69,7 +74,12 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Property',
 
-  properties: [ 'source' ],
+  properties: [
+    {
+      name: 'source',
+      transient: true,
+    },
+  ],
 
   methods: [
     function validate(model) {
@@ -130,7 +140,10 @@ foam.CLASS({
   ]
 });
 
-
+foam.SCRIPT({
+  id: 'foam.core.DebugScript',
+  flags: ['debug'],
+  code: function() {
 foam.assert(
     ! foam.core.FObject.describe,
     'foam.core.FObject.describe already set.');
@@ -253,6 +266,8 @@ if ( false && global.Proxy ) {
     };
   })();
 }
+  }
+});
 
 
 /* Add describe() support to objects. */
@@ -293,7 +308,10 @@ foam.CLASS({
   ]
 });
 
-
+foam.SCRIPT({
+  id: 'foam.core.DebugDescribeScript',
+  flags: ['debug'],
+  code: function() {
 /* Add describe support to contexts. */
 foam.__context__ = foam.__context__.createSubContext({
   describe: function() {
@@ -314,6 +332,8 @@ foam.__context__ = foam.__context__.createSubContext({
     }
     this.log('\n');
 }});
+  }
+});
 
 
 foam.CLASS({
@@ -343,7 +363,13 @@ foam.CLASS({
   ]
 });
 
+foam.SCRIPT({
+  id: 'foam.core.DebugContextScript',
+  flags: ['debug'],
+  code: function() {
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
+  }
+})
 
 
 
@@ -424,9 +450,14 @@ foam.LIB({
   ]
 });
 
-
+foam.SCRIPT({
+  id: 'foam.core.DebugArgumentScript',
+  flags: ['debug'],
+  code: function() {
 // Access Argument now to avoid circular reference because of lazy model building.
 foam.core.Argument;
+  }
+});
 
 /* Methods gain type checking. */
 foam.CLASS({
@@ -451,6 +482,10 @@ foam.CLASS({
 
   ]
 });
+
+foam.SCRIPT({
+  id: 'foam.core.DebugUpgradeLibScript',
+  code: function() {
 // Upgrade a LIBs
 var upgradeLib = function upgradeLib(lib) {
   for ( var key in lib ) {
@@ -490,6 +525,8 @@ foam.LIB = function typeCheckedLIB(model) {
 
 // Access Import now to avoid circular reference because of lazy model building.
 foam.core.Import;
+  }
+});
 
 foam.CLASS({
   refines: 'foam.core.FObject',
