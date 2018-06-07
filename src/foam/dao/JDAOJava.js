@@ -314,12 +314,12 @@ foam.CLASS({
               successReading++;
             } catch ( Throwable t ) {
               getLogger().error("error replaying journal line:", line, t);
-            } finally {
-              getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
             }
           }
         } catch ( Throwable t) {
           getLogger().error("failed to read from journal", t);
+        } finally {
+          getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
         }
       `
     },
