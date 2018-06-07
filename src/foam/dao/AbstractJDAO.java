@@ -106,7 +106,7 @@ public abstract class AbstractJDAO
     FObject r = generateFObject(ret);
     PropertyInfo idInfo = (PropertyInfo) getOf().getAxiomByName("id");
     idInfo.set(r, idInfo.get(ret));
-    journal_.put(r, null);
+    journal_.remove(r, null);
     return ret;
   }
 
