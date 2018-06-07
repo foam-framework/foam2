@@ -396,14 +396,3 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'DiffFileJournal',
-  extends: 'foam.dao.FileJournal',
-
-  documentation: 'Stores the diff version',
-
-
-});
