@@ -1,23 +1,30 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.core',
   name: 'Script',
+
   properties: [
     {
       class: 'String',
-      name: 'id',
+      name: 'id'
     },
     {
       class: 'Function',
-      name: 'code',
+      name: 'code'
     },
     {
-      name: 'flags',
+      name: 'flags'
     },
     {
       class: 'StringArray',
-      name: 'requires',
-    },
-  ],
+      name: 'requires'
+    }
+  ]
 });
 
 foam.LIB({
