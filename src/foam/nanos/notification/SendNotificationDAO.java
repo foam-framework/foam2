@@ -7,18 +7,11 @@ import foam.dao.AbstractSink;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.nanos.auth.User;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import static foam.mlang.MLang.EQ;
 
 public class SendNotificationDAO extends ProxyDAO {
-
-
-  public SendNotificationDAO(DAO delegate) {
-    setDelegate(delegate);
-  }
 
   public SendNotificationDAO(X x, DAO delegate) {
     setX(x);
@@ -39,7 +32,7 @@ public class SendNotificationDAO extends ProxyDAO {
           send(user, notif, x);
         }
       });
-    } else if ( notif.getGroupId() != null ){
+    } else if ( notif.getGroupId() != null ) {
 
       userDAO.where(EQ(User.GROUP, notif.getGroupId())).select(new AbstractSink() {
         @Override
@@ -51,21 +44,16 @@ public class SendNotificationDAO extends ProxyDAO {
     }
 
     if ( notif.getGroupId() == null && ! notif.getBroadcasted() ) {
-      return super.put_(x,notif);
+      return super.put_(x, notif);
     }
     return obj;
   }
 
   public void send(User user, Notification notif, X x) {
-    Notification notification = new Notification();
+    Notification notification = (Notification) notif.fclone();
     notification.setUserId(user.getId());
-    notification.setBody(notif.getBody());
-    notification.setEmailArgs(notif.getEmailArgs());
-    notification.setEmailIsEnabled(notif.getEmailIsEnabled());
-    notification.setEmailName(notif.getEmailName());
-    notification.setExpiryDate(notif.getExpiryDate());
-    notification.setIssuedDate(notif.getIssuedDate());
-    notification.setNotificationType(notif.getNotificationType());
+    notification.setBroadcasted(false);
+    notification.setGroupId(null);
     ((DAO) x.get("notificationDAO")).put(notification);
   }
 }
