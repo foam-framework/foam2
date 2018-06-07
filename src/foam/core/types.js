@@ -493,7 +493,7 @@ foam.CLASS({
       name: 'targetDAOKey',
       expression: function(of) {
         if ( ! of ) {
-          console.log('ERROR: invalid \'of\' for property with targetDAOKey', this.name);
+          console.error("invalid 'of' for property with targetDAOKey", this.name);
         }
         return foam.String.daoize(of.name);
       }
