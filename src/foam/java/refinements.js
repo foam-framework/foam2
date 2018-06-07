@@ -932,6 +932,45 @@ foam.CLASS({
     ['javaJSONParser', 'new foam.lib.json.MapParser()'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
     ['javaFactory', 'return new java.util.HashMap();']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = this.compareTemplate();
+      return info;
+    }
+  ],
+
+  templates: [
+    {
+        name: 'compareTemplate',
+        template: function() {
+/*<%= this.javaType %> values1 = get_(o1);
+<%= this.javaType %> values2 = get_(o2);
+if ( values1 == null && values2 == null ) return 0;
+if ( values2 == null ) return 1;
+if ( values1 == null ) return -1;
+
+if ( values1.size() > values2.size() ) return 1;
+if ( values1.size() < values2.size() ) return -1;
+
+int result;
+Object v1;
+Object v2;
+for ( Object key : values1.keySet() ) {
+  v1 = values2.get(key);
+  v2 = values2.get(key);
+  if ( v1 == null && v2 == null ) continue;
+  if ( v2 == null ) return 1;
+  if ( v1 == null ) return -1;
+  result = ((Comparable) v1).compareTo(v2);
+  if ( result != 0 ) return result;
+}
+return 0;*/
+      }
+    }
   ]
 });
 
