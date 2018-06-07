@@ -13,21 +13,9 @@ import foam.lib.json.Outputter;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
-
 public abstract class AbstractJDAO
   extends ProxyDAO
 {
-  protected static final ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
-    @Override
-    protected SimpleDateFormat initialValue() {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-      sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-      return sdf;
-    }
-  };
-
   protected Journal journal_;
 
   public AbstractJDAO(foam.core.X x, DAO delegate, String filename) {
@@ -94,7 +82,6 @@ public abstract class AbstractJDAO
     FObject ret = getDelegate().remove_(x, obj);
 
     if ( ret == null ) {
-      // TODO: log
       return ret;
     }
 
