@@ -119,19 +119,20 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.FObject',
+    'foam.core.ProxyX',
+    'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
+    'foam.lib.parse.*',
     'foam.nanos.fs.Storage',
     'foam.nanos.logger.Logger',
     'foam.util.SafetyUtil',
-
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
     'java.util.regex.Pattern',
-
     'static foam.lib.json.OutputterMode.STORAGE'
   ],
 
@@ -168,6 +169,7 @@ foam.CLASS({
         }
       `
     },
+    // reader uses a getter because we want a new reader on file replay
     {
       class: 'Object',
       name: 'reader',
@@ -176,15 +178,17 @@ foam.CLASS({
         try {
           return new BufferedReader(new FileReader(getFile()));
         } catch ( Throwable t ) {
-          throw new RuntimeException("Failed to read from journal");
+          ((Logger) getLogger()).error("Failed to read from journal", t);
+          throw new RuntimeException(t);
         }
       `
     },
+    // writer uses a factory because we want to use one writer for the lifetime of this journal object
     {
       class: 'Object',
       name: 'writer',
       javaType: 'java.io.BufferedWriter',
-      javaGetter: `
+      javaFactory: `
         try {
           BufferedWriter writer = new BufferedWriter(new FileWriter(getFile(), true), 16 * 1024);
           writer.newLine();
@@ -216,13 +220,13 @@ foam.CLASS({
         }
       ],
       javaCode: `
-        try ( BufferedWriter writer = getWriter() ) {
+        try {
+          BufferedWriter writer = getWriter();
           writer.write(data);
           writer.newLine();
           writer.flush();
         } catch ( Throwable t ) {
           ((Logger) getLogger()).error("Failed to write to journal", t);
-          throw new RuntimeException(t);
         }
       `
     },
@@ -234,6 +238,7 @@ foam.CLASS({
     },
     {
       name: 'replay',
+      documentation: 'Replays the journal file'
       javaCode: `
         JSONParser parser = getX().create(JSONParser.class);
 
@@ -249,7 +254,7 @@ foam.CLASS({
 
               FObject object = parser.parseString(line);
               if ( object == null ) {
-                ((Logger) getLogger()).error("parse error", "line:", line);
+                ((Logger) getLogger()).error("parse error", getParsingErrorMessage(line), "line:", line);
                 continue;
               }
 
@@ -269,6 +274,29 @@ foam.CLASS({
         } catch ( Throwable t) {
           ((Logger) getLogger()).error("failed to read from journal", t);
         }
+      `
+    },
+    {
+      name: 'getParsingErrorMessage',
+      documentation: 'Gets the result of a failed parsing of a journal line',
+      javaReturns: 'String',
+      args: [
+        {
+          class: 'String',
+          name: 'line'
+        }
+      ],
+      javaCode: `
+        Parser        parser = new ExprParser();
+        PStream       ps     = new StringPStream();
+        ParserContext x      = new ParserContextImpl();
+
+        ((StringPStream) ps).setString(line);
+        x.set("X", ( getX() == null ) ? new ProxyX() : getX());
+
+        ErrorReportingPStream eps = new ErrorReportingPStream(ps);
+        ps = eps.apply(parser, x);
+        return eps.getMessage();
       `
     }
   ]
