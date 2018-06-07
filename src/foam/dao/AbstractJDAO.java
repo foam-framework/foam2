@@ -6,7 +6,6 @@
 
 package foam.dao;
 
-import foam.core.ClassInfo;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.core.X;
@@ -92,7 +91,6 @@ public abstract class AbstractJDAO
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    Object  id  = getPrimaryKey().get(obj);
     FObject ret = getDelegate().remove_(x, obj);
 
     if ( ret == null ) {
