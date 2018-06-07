@@ -7,6 +7,7 @@ foam.CLASS({
   properties: [ 'of' ],
   methods: [
     function initE() {
+      this.SUPER();
       this
         .addClass(this.myClass())
         .start('div').on('click', this.onClick).addClass('msg').add(this.data.body).end();
