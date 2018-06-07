@@ -113,12 +113,10 @@ foam.CLASS({
     'foam.dao.Journal'
   ],
 
-  imports: [
-    'logger'
-  ],
-
   javaImports: [
+    'foam.core.AbstractFObjectPropertyInfo',
     'foam.core.FObject',
+    'foam.core.PropertyInfo',
     'foam.core.ProxyX',
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
@@ -126,12 +124,16 @@ foam.CLASS({
     'foam.lib.parse.*',
     'foam.nanos.fs.Storage',
     'foam.nanos.logger.Logger',
+    'foam.nanos.logger.PrefixLogger',
+    'foam.nanos.logger.StdoutLogger',
     'foam.util.SafetyUtil',
     'java.io.BufferedReader',
     'java.io.BufferedWriter',
     'java.io.File',
     'java.io.FileReader',
     'java.io.FileWriter',
+    'java.util.Iterator',
+    'java.util.List',
     'java.util.regex.Pattern',
     'static foam.lib.json.OutputterMode.STORAGE'
   ],
@@ -149,9 +151,27 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'FObjectProperty',
+      of: 'foam.nanos.logger.Logger',
+      name: 'logger',
+      javaFactory: `
+        Logger logger = (Logger) getX().get("logger");
+        if ( logger == null ) {
+          logger = new StdoutLogger();
+        }
+        return new PrefixLogger(new Object[] { "[JDAO]", getFilename() }, logger);
+      `
+    },
+    {
       class: 'String',
       name: 'filename',
       required: true
+    },
+    {
+      class: 'Boolean',
+      name: 'createFile',
+      documentation: 'Flag to create file if not present',
+      value: false,
     },
     {
       class: 'Object',
@@ -159,13 +179,27 @@ foam.CLASS({
       javaType: 'java.io.File',
       javaFactory: `
         try {
+          getLogger().log("Loading file: " + getFilename());
           File file = getX().get(Storage.class).get(getFilename());
           if ( ! file.exists() ) {
-            file.createNewFile();
+            getLogger().warning("Can not find file: " + getFilename());
+
+            if ( getCreateFile() ) {
+              // if output journal does not exist, create one
+              File dir = file.getAbsoluteFile().getParentFile();
+              if ( ! dir.exists() ) {
+                getLogger().log("Create dir: " + dir.getAbsolutePath());
+                dir.mkdirs();
+              }
+
+              getLogger().log("Create file: " + getFilename());
+              file.getAbsoluteFile().createNewFile();
+            }
           }
           return file;
         } catch ( Throwable t ) {
-          throw new RuntimeException("Failed to create journal");
+          getLogger().error("Failed to read from journal", t);
+          throw new RuntimeException(t);
         }
       `
     },
@@ -178,7 +212,7 @@ foam.CLASS({
         try {
           return new BufferedReader(new FileReader(getFile()));
         } catch ( Throwable t ) {
-          ((Logger) getLogger()).error("Failed to read from journal", t);
+          getLogger().error("Failed to read from journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -194,7 +228,7 @@ foam.CLASS({
           writer.newLine();
           return writer;
         } catch ( Throwable t ) {
-          ((Logger) getLogger()).error("Failed to write to journal", t);
+          getLogger().error("Failed to write to journal", t);
           throw new RuntimeException(t);
         }
       `
@@ -226,7 +260,7 @@ foam.CLASS({
           writer.newLine();
           writer.flush();
         } catch ( Throwable t ) {
-          ((Logger) getLogger()).error("Failed to write to journal", t);
+          getLogger().error("Failed to write to journal", t);
         }
       `
     },
@@ -238,8 +272,10 @@ foam.CLASS({
     },
     {
       name: 'replay',
-      documentation: 'Replays the journal file'
+      documentation: 'Replays the journal file',
       javaCode: `
+        // count number of lines successfully read
+        int successReading = 0;
         JSONParser parser = getX().create(JSONParser.class);
 
         try ( BufferedReader reader = getReader() ) {
@@ -254,12 +290,19 @@ foam.CLASS({
 
               FObject object = parser.parseString(line);
               if ( object == null ) {
-                ((Logger) getLogger()).error("parse error", getParsingErrorMessage(line), "line:", line);
+                getLogger().error("parse error", getParsingErrorMessage(line), "line:", line);
                 continue;
               }
 
               switch ( operation ) {
                 case 'p':
+                  FObject old;
+                  PropertyInfo id = (PropertyInfo) dao.getOf().getAxiomByName("id");
+                  if ( ( old = dao.find(id.get(object)) ) != null ) {
+                    // if object already in dao, merge the difference
+                    object = mergeChange(old, object);
+                  }
+
                   dao.put(object);
                   break;
 
@@ -267,12 +310,16 @@ foam.CLASS({
                   dao.remove(object);
                   break;
               }
+
+              successReading++;
             } catch ( Throwable t ) {
-              ((Logger) getLogger()).error("error replaying journal line:", line, t);
+              getLogger().error("error replaying journal line:", line, t);
+            } finally {
+              getLogger().log("Successfully read " + successReading + " entries from file: " + getFilename());
             }
           }
         } catch ( Throwable t) {
-          ((Logger) getLogger()).error("failed to read from journal", t);
+          getLogger().error("failed to read from journal", t);
         }
       `
     },
@@ -297,6 +344,65 @@ foam.CLASS({
         ErrorReportingPStream eps = new ErrorReportingPStream(ps);
         ps = eps.apply(parser, x);
         return eps.getMessage();
+      `
+    },
+    {
+      name: 'mergeChange',
+      javaReturns: 'foam.core.FObject',
+      documentation: 'Merges two FObjects',
+      args: [
+        {
+          class: 'FObjectProperty',
+          name: 'o',
+        },
+        {
+          class: 'FObjectProperty',
+          name: 'c'
+        }
+      ],
+      javaCode: `
+        //if no change to merge, return FObject;
+        if ( c == null ) return o;
+        //merge change
+        return mergeChange_(o, c);
+      `
+    },
+    {
+      name: 'mergeChange_',
+      javaReturns: 'foam.core.FObject',
+      args: [
+        {
+          class: 'FObjectProperty',
+          name: 'o',
+        },
+        {
+          class: 'FObjectProperty',
+          name: 'c'
+        }
+      ],
+      javaCode: `
+        if ( o == null ) return c;
+
+        //get PropertyInfos
+        List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator e = list.iterator();
+
+        while ( e.hasNext() ) {
+          PropertyInfo prop = (PropertyInfo) e.next();
+          if ( prop instanceof AbstractFObjectPropertyInfo ) {
+            //do nested merge
+            //check if change
+            if ( ! prop.isSet(c) ) continue;
+            mergeChange_((FObject) prop.get(o), (FObject) prop.get(c));
+          } else {
+            //check if change
+            if ( ! prop.isSet(c) ) continue;
+            //set new value
+            prop.set(o, prop.get(c));
+          }
+        }
+
+        return o;
       `
     }
   ]
