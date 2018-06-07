@@ -296,11 +296,11 @@ foam.CLASS({
 
               switch ( operation ) {
                 case 'p':
-                  FObject old;
                   PropertyInfo id = (PropertyInfo) dao.getOf().getAxiomByName("id");
-                  if ( ( old = dao.find(id.get(object)) ) != null ) {
-                    // if object already in dao, merge the difference
-                    object = mergeChange(old, object);
+                  FObject old = dao.find(id.get(object));
+                  if ( old != null ) {
+                    // merge difference
+                    object = mergeFObject(old.fclone(), object);
                   }
 
                   dao.put(object);
@@ -347,64 +347,63 @@ foam.CLASS({
       `
     },
     {
-      name: 'mergeChange',
+      name: 'mergeFObject',
       javaReturns: 'foam.core.FObject',
-      documentation: 'Merges two FObjects',
+      documentation: 'Add diff property to old property',
       args: [
         {
           class: 'FObjectProperty',
-          name: 'o',
+          name: 'oldFObject',
         },
         {
           class: 'FObjectProperty',
-          name: 'c'
+          name: 'diffFObject'
         }
       ],
       javaCode: `
-        //if no change to merge, return FObject;
-        if ( c == null ) return o;
-        //merge change
-        return mergeChange_(o, c);
+        //get PropertyInfos
+        List list = oldFObject.getClassInfo().getAxiomsByClass(PropertyInfo.class);
+        Iterator e = list.iterator();
+
+        while( e.hasNext() ) {
+          PropertyInfo prop = (PropertyInfo) e.next();
+          mergeProperty(oldFObject, diffFObject, prop);
+        }
+        return oldFObject;
       `
     },
     {
-      name: 'mergeChange_',
-      javaReturns: 'foam.core.FObject',
+      name: 'mergeProperty',
       args: [
         {
           class: 'FObjectProperty',
-          name: 'o',
+          name: 'oldFObject',
         },
         {
           class: 'FObjectProperty',
-          name: 'c'
+          name: 'diffFObject'
+        },
+        {
+          name: 'prop',
+          javaType: 'foam.core.PropertyInfo'
         }
       ],
       javaCode: `
-        if ( o == null ) return c;
-
-        //get PropertyInfos
-        List list = o.getClassInfo().getAxiomsByClass(PropertyInfo.class);
-        Iterator e = list.iterator();
-
-        while ( e.hasNext() ) {
-          PropertyInfo prop = (PropertyInfo) e.next();
-          if ( prop instanceof AbstractFObjectPropertyInfo ) {
-            //do nested merge
-            //check if change
-            if ( ! prop.isSet(c) ) continue;
-            mergeChange_((FObject) prop.get(o), (FObject) prop.get(c));
-          } else {
-            //check if change
-            if ( ! prop.isSet(c) ) continue;
-            //set new value
-            prop.set(o, prop.get(c));
-          }
+        if ( prop.isSet(diffFObject) ) {
+          prop.set(oldFObject, prop.get(diffFObject));
         }
-
-        return o;
       `
     }
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'DiffFileJournal',
+  extends: 'foam.dao.FileJournal',
+
+  documentation: 'Stores the diff version',
+
+
+});
