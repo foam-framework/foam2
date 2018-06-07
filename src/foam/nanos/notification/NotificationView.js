@@ -22,4 +22,4 @@ foam.CLASS({
         this.childNodes[0].style({display:'block'})
     }
   ]
-})
+});

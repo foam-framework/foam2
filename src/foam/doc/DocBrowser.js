@@ -394,9 +394,14 @@ foam.CLASS({
     }
   `,
 
-  constants: {
-    MODEL_COMPARATOR: foam.compare.compound([foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare
-  },
+  constants: [
+    {
+      name: 'MODEL_COMPARATOR',
+      factory: function() {
+        return foam.compare.compound([foam.core.Model.PACKAGE, foam.core.Model.NAME]).compare;
+      },
+    },
+  ],
 
   properties: [
     {
