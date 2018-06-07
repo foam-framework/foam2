@@ -24,20 +24,19 @@ foam.CLASS({
 
   css: `
     ^ {
-      display: inline-block;
       vertical-align: top;
     }
-    ^ ul{
+    ^ ul {
       margin-top: 20px;
       font-size: 13px;
       list-style-type: none;
     }
-    ^ li{
+    ^ li {
       margin-left: 25px;
       display: inline-block;
       cursor: pointer;
     }
-    ^ .foam-nanos-menu-SubMenuView-inner{
+    ^ .foam-nanos-menu-SubMenuView-inner {
       z-index: 10001;
     }
   `,
