@@ -127,15 +127,12 @@ public abstract class AbstractJDAO
     return diff;
   }
 
-  //return a new Fobject
+  // return a new FObject
   protected FObject generateFObject(FObject o) {
     try {
-      ClassInfo classInfo = o.getClassInfo();
       //create a new Instance
-      FObject ret = (FObject) classInfo.getObjClass().newInstance();
-
-      return ret;
-    } catch (Throwable t) {
+      return (FObject) o.getClassInfo().getObjClass().newInstance();
+    } catch ( Throwable t ) {
       throw new RuntimeException(t);
     }
   }
