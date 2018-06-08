@@ -121,6 +121,7 @@ foam.CLASS({
     'foam.lib.json.ExprParser',
     'foam.lib.json.JSONParser',
     'foam.lib.json.Outputter',
+    'foam.lib.json.OutputterMode',
     'foam.lib.parse.*',
     'foam.nanos.fs.Storage',
     'foam.nanos.logger.Logger',
@@ -134,8 +135,7 @@ foam.CLASS({
     'java.io.FileWriter',
     'java.util.Iterator',
     'java.util.List',
-    'java.util.regex.Pattern',
-    'static foam.lib.json.OutputterMode.STORAGE'
+    'java.util.regex.Pattern'
   ],
 
   axioms: [
@@ -143,7 +143,10 @@ foam.CLASS({
       name: 'javaExtras',
       buildJavaClass: function (cls) {
         cls.extras.push(foam.java.Code.create({
-          data: `protected Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");`
+          data: `
+            protected Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
+            protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE);
+          `
         }))
       }
     }
@@ -243,11 +246,12 @@ foam.CLASS({
     {
       name: 'put',
       javaCode: `
-        PropertyInfo id = (PropertyInfo) getDao().getOf().getAxiomByName("id");
+        FObject fobj = (FObject) obj;
+        PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
         FObject old = getDao().find(id.get(obj));
         String record = ( old != null ) ?
-          new Outputter(STORAGE).stringifyDelta(old, (FObject) obj) :
-          new Outputter(STORAGE).stringify((FObject) obj);
+          outputter_.stringifyDelta(old.fclone(), fobj) :
+          outputter_.stringify(fobj);
         write_("p(" + record + ")");
       `
     },
@@ -262,7 +266,7 @@ foam.CLASS({
           FObject toWrite = (FObject) fobj.getClassInfo().getObjClass().newInstance();
           PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
           id.set(toWrite, id.get(obj));
-          write_("r(" + new Outputter(STORAGE).stringify(toWrite) + ")");
+          write_("r(" + outputter_.stringify(toWrite) + ")");
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }
