@@ -79,18 +79,16 @@ public class JDAO
 
   @Override
   public FObject put_(X x, FObject obj) {
-    FObject result = getDelegate().put_(x, obj);
     writeComment((User) x.get("user"));
-    journal_.put(result, null);
-    return result;
+    journal_.put(obj, null);
+    return getDelegate().put_(x, obj);
   }
 
   @Override
   public FObject remove_(X x, FObject obj) {
-    FObject result = getDelegate().remove_(x, obj);
     writeComment((User) x.get("user"));
-    journal_.remove(result, null);
-    return result;
+    journal_.remove(obj, null);
+    return getDelegate().remove_(x, obj);
   }
 
   @Override
