@@ -954,8 +954,17 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.util.Map'],
     ['javaJSONParser', 'new foam.lib.json.MapParser()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractMapPropertyInfo'],
     ['javaFactory', 'return new java.util.HashMap();']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = 'return super.compare(o1, o2);';
+      return info;
+    }
   ]
 });
 
