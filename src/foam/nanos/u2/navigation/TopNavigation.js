@@ -32,6 +32,7 @@ foam.CLASS({
 
   css: `
     ^ {
+      display: flex;
       background: %PRIMARYCOLOR%;
       width: 100%;
       min-width: 992px;
@@ -39,9 +40,11 @@ foam.CLASS({
       color: white;
       padding-top: 5px;
     }
-    ^ .topNavContainer {
-      width: 100%;
-      margin: auto;
+    ^ .menuBar {
+      flex-grow: 2;
+      overflow: auto;
+      white-space: nowrap;
+      margin-left: 60px;
     }
     ^ .menuBar > div > ul {
       margin-top: 0;
@@ -53,7 +56,7 @@ foam.CLASS({
       display: inline-block;
       cursor: pointer;
     }
-    ^ .menuItem{
+    ^ .menuItem {
       display: inline-block;
       padding: 20px 0 5px 0px;
       cursor: pointer;
@@ -74,33 +77,25 @@ foam.CLASS({
       padding-bottom: 5px;
       text-shadow: 0 0 0px white, 0 0 0px white;
     }
-    ^ .menuBar{
-      width: 60%;
-      overflow: auto;
-      white-space: nowrap;
-      margin-left: 60px;
-    }
   `,
 
   properties: [
     {
       name: 'dao',
-      factory: function() { return this.menuDAO; }
+      factory: () => this.menuDAO
     }
   ],
 
   methods: [
-    function initE(){
+    function initE() {
       this
       .addClass(this.myClass())
-      .start().addClass('topNavContainer')
-        .show( this.loginSuccess$)
-        .start({class: 'foam.nanos.u2.navigation.BusinessLogoView' })
-        .end()
-        .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
-        .end()
-        .start({class: 'foam.nanos.u2.navigation.UserView'})
-        .end()
+      .show(this.loginSuccess$)
+      .start({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
+      .end()
+      .start({ class: 'foam.nanos.menu.MenuBar' }).addClass('menuBar')
+      .end()
+      .start({ class: 'foam.nanos.u2.navigation.UserView' })
       .end();
     }
   ]
