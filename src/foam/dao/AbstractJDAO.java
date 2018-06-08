@@ -41,7 +41,7 @@ public abstract class AbstractJDAO
 
   protected final File           outFile_;
   protected final BufferedWriter out_;
-  protected       Logger         logger_ = new StdoutLogger();
+  protected       Logger         logger_ = NullLogger.instance();
 
   public AbstractJDAO(foam.core.X x, ClassInfo classInfo, String filename) {
     this(x, new MapDAO(classInfo), filename);
@@ -52,15 +52,12 @@ public abstract class AbstractJDAO
     setX(x);
     setOf(delegate.getOf());
     setDelegate(delegate);
-    Logger logger = logger_;
 
     if ( x != null ) {
-      logger = (Logger) x.get("logger");
+      Logger l2 = (Logger) x.get("logger");
 
-      if ( logger == null ) logger = logger_;
+      if ( l2 != null ) logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, l2);
     }
-
-    logger_ = new PrefixLogger(new Object[] { "[JDAO]", filename }, logger);
 
     try {
       String file = filename + ".0";
