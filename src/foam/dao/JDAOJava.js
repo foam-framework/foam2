@@ -151,6 +151,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao'
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.nanos.logger.Logger',
       name: 'logger',
@@ -238,11 +242,31 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
-      javaCode: `write_("p(" + new Outputter(STORAGE).stringify((FObject) obj) + ")");`
+      javaCode: `
+        PropertyInfo id = (PropertyInfo) getDao().getOf().getAxiomByName("id");
+        FObject old = getDao().find(id.get(obj));
+        String record = ( old != null ) ?
+          new Outputter(STORAGE).stringifyDelta(old, (FObject) obj) :
+          new Outputter(STORAGE).stringify((FObject) obj);
+        write_("p(" + record + ")");
+      `
     },
     {
       name: 'remove',
-      javaCode: `write_("r(" + new Outputter(STORAGE).stringify((FObject) obj) + ")");`
+      javaCode: `
+        try {
+          // TODO: Would be more efficient to output the ID portion of the object.  But
+          // if ID is an alias or multi part id we should only output the
+          // true properties that ID/MultiPartID maps too.
+          FObject fobj = (FObject) obj;
+          FObject toWrite = (FObject) fobj.getClassInfo().getObjClass().newInstance();
+          PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
+          id.set(toWrite, id.get(obj));
+          write_("r(" + new Outputter(STORAGE).stringify(toWrite) + ")");
+        } catch ( Throwable t ) {
+          throw new RuntimeException(t);
+        }
+      `
     },
     {
       name: 'write_',
