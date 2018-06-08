@@ -10,21 +10,18 @@ import foam.core.ClassInfo;
 import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
-import foam.core.AbstractFObjectPropertyInfo;
 import foam.dao.AbstractSink;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
-import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.encoders.Base64;
 
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter
 {
-
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -39,18 +36,6 @@ public class Outputter
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
-
-  // Hash properties
-  protected String        hashAlgo_            = "SHA-256";
-  protected boolean       outputHash_          = false;
-  protected boolean       rollHashes_          = false;
-  protected byte[]        previousHash_        = null;
-  protected final Object  hashLock_            = new Object();
-
-  // signing properties
-  protected String        signAlgo_            = null;
-  protected PrivateKey    signingKey_          = null;
-  protected boolean       outputSignature_     = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -274,7 +259,7 @@ public class Outputter
               writer_.append(":");
               outputString(info.getId());
             }
-            if ( outputClassNames_ ) 
+            if ( outputClassNames_ )
               writer_.append(",");
             PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
             outputProperty(newFObject, id);
@@ -287,18 +272,8 @@ public class Outputter
       }
 
       if ( isDiff ) {
-        if ( outputHash_ ) {
-          writer_.append(",");
-          outputHash(newFObject);
-        }
-    
-        if ( outputSignature_ ) {
-          writer_.append(",");
-          outputSignature(newFObject);
-        }
         writer_.append("}");
       }
-
     }
   }
 
@@ -330,51 +305,7 @@ public class Outputter
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
 
-    if ( outputHash_ ) {
-      writer_.append(",");
-      outputHash(o);
-    }
-
-    if ( outputSignature_ ) {
-      writer_.append(",");
-      outputSignature(o);
-    }
-
     writer_.append("}");
-  }
-
-  protected void outputHash(FObject o) {
-    String hash;
-    if ( rollHashes_ ) {
-      synchronized ( hashLock_ ) {
-        previousHash_ = o.hash(hashAlgo_, previousHash_);
-        hash = Base64.toBase64String(previousHash_);
-      }
-    } else {
-      hash = Base64.toBase64String(
-          o.hash(hashAlgo_, null));
-    }
-
-    writer_.append(beforeKey_())
-        .append("hash")
-        .append(afterKey_())
-        .append(":")
-        .append("\"")
-        .append(hash)
-        .append("\"");
-  }
-
-  protected void outputSignature(FObject o) {
-    String signature = Base64.toBase64String(
-        o.sign(signAlgo_, signingKey_));
-
-    writer_.append(beforeKey_())
-        .append("signature")
-        .append(afterKey_())
-        .append(":")
-        .append("\"")
-        .append(signature)
-        .append("\"");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -425,30 +356,6 @@ public class Outputter
 
   public void setOutputClassNames(boolean outputClassNames) {
     outputClassNames_ = outputClassNames;
-  }
-
-  public void setHashAlgorithm(String algorithm) {
-    hashAlgo_ = algorithm;
-  }
-
-  public void setOutputHash(boolean outputHash) {
-    outputHash_ = outputHash;
-  }
-
-  public void setRollHashes(boolean rollHashes) {
-    rollHashes_ = rollHashes;
-  }
-
-  public void setOutputSignature(boolean outputSignature) {
-    outputSignature_ = outputSignature;
-  }
-
-  public void setSigningAlgorithm(String algorithm) {
-    signAlgo_ = algorithm;
-  }
-
-  public void setSigningKey(PrivateKey signingKey) {
-    signingKey_ = signingKey;
   }
 
   @Override
