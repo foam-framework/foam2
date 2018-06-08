@@ -148,10 +148,9 @@ public class MDAO
     }
 
     // TODO: if plan cost is >= size, log a warning
-    if ( plan.cost() >= index_.size(state_) ) {
+    if ( predicate != null && plan.cost() >= index_.size(state_) ) {
       Logger logger = (Logger) x.get("logger");
-      if ( logger != null )
-        logger.error(predicate.createStatement(), " UnIndex search by MDAO ");
+      logger.error(predicate.createStatement(), " Unindexed search on MDAO");
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
