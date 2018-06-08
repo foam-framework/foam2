@@ -58,7 +58,7 @@ public class JDAO
 
     // create journal
     journal_ = new FileJournal.Builder(getX())
-      .setDao(getDelegate())
+      .setDao(delegate)
       .setFilename(filename)
       .setCreateFile(true)
       .build();
