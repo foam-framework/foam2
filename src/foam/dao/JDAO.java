@@ -117,7 +117,7 @@ public class JDAO
 
     builder.append(" (")
       .append(String.valueOf(user.getId()))
-      .append(") at")
+      .append(") at ")
       .append(sdf.get().format(Calendar.getInstance().getTime()));
 
     journal_.write_(builder.toString());
