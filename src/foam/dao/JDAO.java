@@ -103,21 +103,13 @@ public class JDAO
    * @param user user who modified entry
    */
   protected void writeComment(User user) {
-    StringBuilder builder = sb.get()
+    journal_.write_(sb.get()
       .append("// Modified by ")
-      .append(user.getFirstName());
-
-    // append last name if present
-    if (!SafetyUtil.isEmpty(user.getLastName())) {
-      builder.append(" ")
-        .append(user.getLastName());
-    }
-
-    builder.append(" (")
-      .append(String.valueOf(user.getId()))
+      .append(user.label())
+      .append(" (")
+      .append(user.getId())
       .append(") at ")
-      .append(sdf.get().format(Calendar.getInstance().getTime()));
-
-    journal_.write_(builder.toString());
+      .append(sdf.get().format(Calendar.getInstance().getTime()))
+      .toString());
   }
 }
