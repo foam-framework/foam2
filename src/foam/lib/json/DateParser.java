@@ -7,6 +7,7 @@
 package foam.lib.json;
 
 import foam.lib.parse.*;
+import foam.util.SafetyUtil;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -55,16 +56,16 @@ public class DateParser
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
 
-    if ( ps == null) {
+    if (ps == null) {
       return null;
     }
 
-    if ( ps.value() == null ) {
+    if (ps.value() == null) {
       return ps.setValue(null);
     }
 
     // Checks if Long Date (Timestamp from epoch)
-    if ( ps.value() instanceof Long ) {
+    if (ps.value() instanceof Long) {
       return ps.setValue(new Date((Long) ps.value()));
     }
 
@@ -84,14 +85,24 @@ public class DateParser
       (Integer) result[9],
       (Integer) result[11]);
 
+    boolean zeroPrefixed = true;
     StringBuilder milliseconds = sb.get();
     Object[] millis = (Object[]) result[13];
-    for ( Object milli : millis ) {
-      if ( '0' == (char) milli ) continue;
-      milliseconds.append((char) milli);
+
+    for ( int i = 0 ; i < millis.length ; i++ ) {
+      // do not prefix with zeros
+      if ( zeroPrefixed && '0' == (char) millis[i] ) {
+        continue;
+      }
+
+      // append millisecond
+      if ( zeroPrefixed ) zeroPrefixed = false;
+      milliseconds.append((char) millis[i]);
     }
 
-    c.add(Calendar.MILLISECOND, Integer.parseInt(milliseconds.toString(), 10));
+    // try to parse milliseconds, default to 0
+    c.add(Calendar.MILLISECOND, ! SafetyUtil.isEmpty(milliseconds.toString()) ?
+      Integer.parseInt(milliseconds.toString(), 10) : 0);
     return ps.setValue(c.getTime());
   }
 }
