@@ -9,7 +9,7 @@ foam.CLASS({
   name: 'Messageboard',
 
   tableColumns: [
-    'mark', 'title', 'createdDate', 'creator', 'attachment'
+    'mark', 'title', 'createdDate', 'creator', 'attachment', 'hits'
   ],
 
   imports: [
@@ -34,7 +34,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'mark',
-      //view: { class: 'foam.u2.CheckBox' }
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
@@ -63,12 +62,6 @@ foam.CLASS({
       factory: function() { return this.user.id; },
       hidden: true
     },
-    // {
-    //   class: 'Reference',
-    //   of: 'foam.nanos.auth.Group',
-    //   name: 'groupId',
-    //   view: { class: 'foam.u2.view.ReferenceView', placeholder: 'select group' }
-    // },
     {
       class: 'DateTime',
       name: 'createdDate',
@@ -83,6 +76,17 @@ foam.CLASS({
       class: 'String',
       name: 'content',
       view: { class: 'foam.u2.tag.TextArea', rows: 30, cols: 120}
+    },
+    {
+      class: 'Long',
+      name: 'hits',
+      label: 'Hits',
+      visibility: foam.u2.Visibility.RO
+    },
+    {
+      class: 'String',
+      name: 'viewer',
+      visibility: foam.u2.Visibility.RO
     },
     {
       class: 'foam.nanos.fs.FileArray',
