@@ -241,7 +241,6 @@
           .start().addClass('left-actions')
             .start(this.BACK_ACTION).end()
             .start(this.DELETE).addClass('net-nanopay-ui-ActionView-delete').end()
-            //.start(this.SAVE_ACTION).addClass('net-nanopay-ui-ActionView-saveAction').end()
             .start().add('SAVE').addClass('net-nanopay-ui-ActionView-saveAction').on('click', this.onSave).end()
           .end()
             .start('table').addClass('tableView')
@@ -266,6 +265,10 @@
                 .start('td').addClass('foam-u2-PropertyView').add(userName).end()
               .end()
               .start('tr')
+                .start('td').addClass('foam-u2-PropertyView-label').add('Hits').end()
+                .start('td').addClass('foam-u2-PropertyView').add(this.data.HITS).end()
+              .end()
+              .start('tr')
                 .start('td').addClass('foam-u2-PropertyView-label').add('Content').end()
                 .start('td').addClass('foam-u2-PropertyView').add(this.data.CONTENT).end()
               .end()
@@ -278,17 +281,11 @@
                   .on('click', this.onAddAttachmentClicked)
                 .end()
                 .start('div').addClass('boxless-for-drag-drop')
-                // .start('div').addClass(this.dragActive$.map(function (drag) {
-                //   return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
-                // }))
                   .add(this.slot(function (data_) {
                     var e = this.E();
                     for ( var i = 0 ; i < data_.length ; i++ ) {
                       var fileData = data_.data;
                         e.start('div').addClass('attachment-view').setID(i+1)
-                        // .start().addClass('attachment-number')
-                        //   .add(this.formatFileNumber(i+1))
-                        // .end()
                         .start().addClass('attachment-filename')
                           .start('a')
                             .attrs({
@@ -309,10 +306,6 @@
                                       return url;
                                     }
                                 }
-                                // else {
-                                //   alert('2');
-                                //   start().add(messageboardObj.messageboardFile[i].filename).end()
-                                // }
                              }),
                              target: '_blank'
                            })  //attrs
