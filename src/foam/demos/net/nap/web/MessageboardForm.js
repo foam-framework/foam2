@@ -46,7 +46,6 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'mark_',
-      //view: { class: 'foam.u2.CheckBox' }
     },
     {
       class: 'String',
@@ -256,14 +255,11 @@ foam.CLASS({
       var self = this;
       var userId = this.user.id;
       var userName = this.user.firstName;
-      // var messageboardObj = this.data;
-      // this.messageboardFile = Array.from(messageboardObj.messageboardFile);
 
       this.addClass(this.myClass())
         .start().addClass('actions')
           .start().addClass('left-actions')
             .start(this.BACK_ACTION).end()
-            //.start(this.SAVE_ACTION).end()
             .start().add('SAVE').addClass('net-nanopay-ui-ActionView-saveAction').on('click', this.save).end()
           .end()
 
@@ -301,17 +297,10 @@ foam.CLASS({
                 .on('click', this.onAddAttachmentClicked)
               .end()
               .start('div').addClass('boxless-for-drag-drop')
-              // .start('div').addClass(this.dragActive$.map(function (drag) {
-              //   return drag ? 'box-for-drag-drop':'boxless-for-drag-drop';
-              // }))
                 .add(this.slot(function (data) {
                   var e = this.E();
                   for ( var i = 0 ; i < data.length ; i++ ) {
-                    //var fileData = messageboardObj.messageboardFile;
                       e.start('div').addClass('attachment-view').setID(i+1)
-                      // .start().addClass('attachment-number')
-                      //   .add(this.formatFileNumber(i+1))
-                      // .end()
                       .start().addClass('attachment-filename')
                         .start('a')
                           .attrs({
@@ -332,10 +321,6 @@ foam.CLASS({
                                     return url;
                                   }
                               }
-                              // else {
-                              //   alert('2');
-                              //   start().add(messageboardObj.messageboardFile[i].filename).end()
-                              // }
                            }),
                            target: '_blank'
                          })  //attrs
@@ -343,11 +328,10 @@ foam.CLASS({
                            var len = filename.length;
                            return ( len > 35 ) ? (filename.substr(0, 20) +
                              '...' + filename.substr(len - 10, len)) : filename;
-                         }, this.data_[i].filename$))   //this.messageboardFile[i].filename$ messageboardObj
+                         }, this.data_[i].filename$))
                       .end()
                    .end()
                    .start().addClass('attachment-footer').setID(i+1)
-                     //.start().add(this.REMOVE).hide(this.removeHidden).end()
                      .start({ class: 'foam.u2.tag.Image', data: 'images/ic-delete.svg'}).hide(this.removeHidden).end()
                      .on('click', function(e) {
                        console.log(this);
@@ -355,10 +339,6 @@ foam.CLASS({
                        this.remove();
                        self.data_ = Array.from(self.data_);
                      })
-
-                     // .start().addClass('attachment-filesize')
-                     //   .add(this.formatFileSize())
-                     // .end()
                    .end()
                    .end()
                   }
@@ -379,52 +359,12 @@ foam.CLASS({
                 .end()
             .end()
             .end()
-
           .end()
           .end();
-  },
-    function formatFileNumber(i) {
-      return ('000' + i).slice(-3);
-    },
-
-    // function formatFileSize() {
-    //   return Math.ceil(this.data.filesize / 1024) + 'K';
-    // }
+  }
   ],
 
   actions: [
-    // {
-    //   name: 'saveAction',
-    //   label: 'Save',
-    //   code: function(X) {
-    //     var self = this;
-    //
-    //     if ( self.title == null || self.title == '' ) {
-    //       this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Title.', type: 'error' }));
-    //       return;
-    //     }
-    //
-    //     if ( self.content == null || self.content == '' ) {
-    //       this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Content.', type: 'error' }));
-    //       return;
-    //     }
-    //
-    //     var message = this.Messageboard.create({
-    //       id : self.id,
-    //       starmark : self.starmark,
-    //       title: self.title,
-    //       content: self.content,
-    //       creator : self.creator,
-    //       createdDate : self.createdDate,
-    //       messageboardFile : Array.from(self.messageboardFile)
-    //     });
-    //
-    //     self.messageboardDAO.put(message).then(function() {
-    //       self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' }, this);
-    //     })
-    //   }
-    // },
-
     {
       name: 'backAction',
       label: 'Back',
@@ -564,7 +504,6 @@ foam.CLASS({
         userId: this.user.id,
         body: self.title_,
         groupId: this.user.group
-
       });
 
       self.notificationDAO.put(notification);
@@ -572,7 +511,6 @@ foam.CLASS({
       self.messageboardDAO.put(message).then(function() {
         self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
       });
-
     }
   ]
 
