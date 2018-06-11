@@ -12,7 +12,9 @@ public class DateParser
   extends ProxyParser
 {
   public DateParser() {
-    super(new Alt(new LongParser(),
+    super(new Alt(
+                  new NullParser(),
+                  new LongParser(),
                   new Seq(
                     new Literal("\""),
                     new IntParser(),
@@ -36,6 +38,9 @@ public class DateParser
     ps = super.parse(ps, x);
 
     if ( ps == null ) return null;
+
+    if ( ps.value() == null ) 
+      return ps.setValue(null);
 
     // Checks if Long Date (Timestamp from epoch)
     if ( ps.value() instanceof java.lang.Long ) {

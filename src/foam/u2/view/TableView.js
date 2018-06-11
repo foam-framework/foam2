@@ -1,77 +1,8 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
  */
-
-foam.INTERFACE({
-  package: 'foam.u2.view',
-  name: 'Formatter',
-  methods: [
-    {
-      name: 'format',
-      args: ['e', 'value', 'obj', 'axiom']
-    }
-  ]
-});
-
-foam.CLASS({
-  package: 'foam.u2.view',
-  name: 'FnFormatter',
-  implements: [ 'foam.u2.view.Formatter' ],
-  properties: [
-    {
-      class: 'Function',
-      name: 'f'
-    }
-  ],
-  methods: [
-    function format(e, value, obj, axiom) {
-      this.f.call(e, value, obj, axiom);
-    }
-  ]
-});
-
-
-foam.CLASS({
-  package: 'foam.u2.view',
-  name: 'TableCellFormatter',
-  extends: 'FObjectProperty',
-  properties: [
-    {
-      name: 'of',
-      value: 'foam.u2.view.Formatter'
-    },
-    {
-      name: 'adapt',
-      value: function(o, f, prop) {
-        if ( foam.Function.isInstance(f) ) {
-          return foam.u2.view.FnFormatter.create({
-            f: f
-          });
-        }
-        return foam.core.FObjectProperty.ADAPT.value.call(this, o, f, prop);
-      }
-    },
-    {
-      name: 'value',
-      adapt: function(_, v) {
-        return this.adapt.call(this, _, v, this);
-      }
-    }
-  ]
-});
 
 foam.CLASS({
   package: 'foam.u2.view',

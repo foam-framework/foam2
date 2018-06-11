@@ -46,4 +46,13 @@ foam.CLASS({
   ]
 });
 
+foam.SCRIPT({
+  id: 'foam.u2.tag.ImageScript',
+  requires: [
+    'foam.u2.tag.Image',
+  ],
+  flags: ['web'],
+  code: function() {
 foam.__context__.registerElement(foam.u2.tag.Image);
+  }
+});
