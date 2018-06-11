@@ -10,7 +10,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaType',
-      factory: function() { return this.of; }
+      factory: function() {
+        return this.of;
+      }
     }
   ]
 });
@@ -37,7 +39,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaQueryParser',
-      expression: function(javaJSONParser) { return javaJSONParser; }
+      expression: function(javaJSONParser) {
+        return javaJSONParser;
+      }
     },
     {
       class: 'String',
@@ -60,7 +64,7 @@ foam.CLASS({
       name: 'shortName'
     },
     {
-      class:'StringArray',
+      class: 'StringArray',
       name: 'aliases'
     },
     {
@@ -96,25 +100,25 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls:        cls,
-        propName:         this.name,
-        propShortName:    this.shortName,
-        propAliases:      this.aliases,
-        propType:         this.javaType,
-        propValue:        this.javaValue,
-        propRequired:     this.required,
-        cloneProperty:    this.javaCloneProperty,
-        diffProperty:     this.javaDiffProperty,
-        jsonParser:       this.javaJSONParser,
-        queryParser:      this.javaQueryParser,
-        csvParser:        this.javaCSVParser,
-        extends:          this.javaInfoType,
+        sourceCls: cls,
+        propName: this.name,
+        propShortName: this.shortName,
+        propAliases: this.aliases,
+        propType: this.javaType,
+        propValue: this.javaValue,
+        propRequired: this.required,
+        cloneProperty: this.javaCloneProperty,
+        diffProperty: this.javaDiffProperty,
+        jsonParser: this.javaJSONParser,
+        queryParser: this.javaQueryParser,
+        csvParser: this.javaCSVParser,
+        extends: this.javaInfoType,
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
-        xmlAttribute:     this.xmlAttribute,
-        xmlTextNode:      this.xmlTextNode,
-        sqlType:          this.sqlType
-      })
+        xmlAttribute: this.xmlAttribute,
+        xmlTextNode: this.xmlTextNode,
+        sqlType: this.sqlType
+      });
     },
 
     function generateSetter_() {
@@ -146,7 +150,7 @@ foam.CLASS({
       var privateName = this.name + '_';
       var capitalized = foam.String.capitalize(this.name);
       var constantize = foam.String.constantize(this.name);
-      var isSet       = this.name + 'IsSet_';
+      var isSet = this.name + 'IsSet_';
       var factoryName = capitalized + 'Factory_';
 
       cls.
@@ -168,7 +172,7 @@ foam.CLASS({
           body: this.javaGetter || ('if ( ! ' + isSet + ' ) {\n' +
             ( this.javaFactory ?
                 '  set' + capitalized + '(' + factoryName + '());\n' :
-                ' return ' + this.javaValue  + ';\n' ) +
+                ' return ' + this.javaValue + ';\n' ) +
             '}\n' +
             'return ' + privateName + ';')
         }).
@@ -269,7 +273,7 @@ foam.LIB({
     function buildJavaClass(cls) {
       cls = cls || foam.java.Class.create();
 
-      cls.name    = this.model_.name;
+      cls.name = this.model_.name;
       cls.package = this.model_.package;
       cls.extends = this.model_.extends === 'FObject' ?
         'foam.core.AbstractFObject' : this.model_.extends;
@@ -294,16 +298,18 @@ foam.LIB({
 
       var axioms = this.getOwnAxioms();
 
-      for ( var i = 0 ; i < axioms.length ; i++ ) {
+      for ( var i = 0; i < axioms.length; i ++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls, this);
       }
 
       // TODO: instead of doing this here, we should walk all Axioms
       // and introuce a new buildJavaAncestorClass() method
       cls.allProperties = this.getAxiomsByClass(foam.core.Property)
-        .filter(function(p) { return !!p.javaType && p.javaInfoType && p.generateJava; })
+        .filter(function(p) {
+          return !! p.javaType && p.javaInfoType && p.generateJava;
+        })
         .map(function(p) {
-          return foam.java.Field.create({name: p.name, type: p.javaType});
+          return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
 
@@ -321,7 +327,9 @@ foam.LIB({
         name: 'hashCode',
         type: 'int',
         visibility: 'public',
-        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) { return '(Object) ' + p.name + '_'; }).join(',')});`
+        body: `return java.util.Objects.hash(${cls.allProperties.map(function(p) {
+          return '(Object) ' + p.name + '_';
+        }).join(',')});`
       });
 
       if ( cls.name ) {
@@ -340,7 +348,7 @@ foam.LIB({
           visibility: 'public',
           name: cls.name,
           type: '',
-          args: [ { type: 'foam.core.X', name: 'x' } ],
+          args: [{ type: 'foam.core.X', name: 'x' }],
           body: 'setX(x);'
         });
 
@@ -350,8 +358,12 @@ foam.LIB({
             visibility: 'public',
             name: cls.name,
             type: '',
-            args: props.map(function(f) { return {name: f.name, type: f.type}; }),
-            body: props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; }).join(';\n') + ';'
+            args: props.map(function(f) {
+              return { name: f.name, type: f.type };
+            }),
+            body: props.map(function(f) {
+              return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')';
+            }).join(';\n') + ';'
           });
 
           // Context oriented all-property constructor
@@ -359,14 +371,21 @@ foam.LIB({
             visibility: 'public',
             name: cls.name,
             type: '',
-            args: [{name: 'x', type: 'foam.core.X' }].concat(props.map(function(f) { return {name: f.name, type: f.type}; })),
-            body: ['setX(x)'].concat(props.map(function(f) { return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')'; })).join(';\n') + ';'
+            args: [{ name: 'x', type: 'foam.core.X' }]
+              .concat(props.map(function(f) {
+                return { name: f.name, type: f.type };
+              })),
+            body: ['setX(x)'].concat(props.map(function(f) {
+              return 'set' + foam.String.capitalize(f.name) + '(' + f.name + ')';
+            })).join(';\n') + ';'
           });
         }
 
         if ( ! cls.abstract ) {
           // Apply builder pattern if more than 3 properties and not abstract.
-          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(function(p) { return p.generateJava && p.javaInfoType; }) }).buildJavaClass(cls);
+          foam.java.Builder.create({ properties: this.getAxiomsByClass(foam.core.Property).filter(function(p) {
+            return p.generateJava && p.javaInfoType;
+          }) }).buildJavaClass(cls);
         }
       }
 
@@ -430,7 +449,9 @@ foam.CLASS({
         body: this.javaCode ? this.javaCode : ''
       });
     },
-    function isStatic() { return false; }
+    function isStatic() {
+      return false;
+    }
   ]
 });
 
@@ -459,13 +480,13 @@ foam.CLASS({
   methods: [
     function buildJavaClass(cls) {
       if ( ! this.type ) {
-        this.warn("Skipping constant ", this.name, " with unknown type.");
+        this.warn('Skipping constant ', this.name, ' with unknown type.');
         return;
       }
 
       cls.constant({
-        name:  this.name,
-        type:  this.type || undefined,
+        name: this.name,
+        type: this.type || undefined,
         value: this.value,
         documentation: this.documentation || undefined
       });
@@ -492,7 +513,7 @@ foam.CLASS({
         name: this.name,
         type: 'void',
         body: this.javaCode
-      })
+      });
     }
   ]
 });
@@ -518,7 +539,9 @@ foam.CLASS({
       getter: function() {
         // TODO: This could be an expression if the copyFrom in createChildMethod
         // didn't finalize its value
-        if ( this.name == 'find' ) console.log(this.name, "returns", this.javaReturns)
+        if ( this.name == 'find' ) {
+          console.log(this.name, 'returns', this.javaReturns);
+        }
         var code = '';
 
         if ( this.javaReturns && this.javaReturns !== 'void' ) {
@@ -528,7 +551,7 @@ foam.CLASS({
         code += 'get' + foam.String.capitalize(this.property) + '()';
         code += '.' + this.name + '(';
 
-        for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
+        for ( var i = 0; this.args && i < this.args.length; i ++ ) {
           code += this.args[i].name;
           if ( i != this.args.length - 1 ) code += ', ';
         }
@@ -581,16 +604,17 @@ foam.CLASS({
   axioms: [
     {
       installInClass: function(cls) {
-        cls.buildJavaClass =  function(cls) {
+        cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Interface.create();
 
           cls.name = this.model_.name;
           cls.package = this.model_.package;
-          cls.implements = (this.implements || []).concat(this.model_.javaExtends || []);
+          cls.implements = (this.implements || [])
+            .concat(this.model_.javaExtends || []);
 
           var axioms = this.getAxioms();
 
-          for ( var i = 0 ; i < axioms.length ; i++ ) {
+          for ( var i = 0; i < axioms.length; i ++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
 
@@ -749,12 +773,12 @@ foam.CLASS({
     {
       name: 'javaType',
       expression: function(of) {
-        return of.id
+        return of.id;
       }
     },
-    ['javaInfoType',   'foam.core.AbstractEnumPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.IntParser()'],
-    ['javaCSVParser',  'foam.lib.json.IntParser']
+    ['javaCSVParser', 'foam.lib.json.IntParser']
   ],
 
   methods: [
@@ -839,7 +863,7 @@ foam.CLASS({
   axioms: [
     {
       installInClass: function(cls) {
-        cls.buildJavaClass =  function(cls) {
+        cls.buildJavaClass = function(cls) {
           cls = cls || foam.java.Enum.create();
 
           cls.name = this.name;
@@ -856,7 +880,7 @@ foam.CLASS({
 
           var axioms = this.getAxioms();
 
-          for ( var i = 0 ; i < axioms.length ; i++ ) {
+          for ( var i = 0; i < axioms.length; i ++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
 
@@ -930,8 +954,17 @@ foam.CLASS({
   properties: [
     ['javaType', 'java.util.Map'],
     ['javaJSONParser', 'new foam.lib.json.MapParser()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
+    ['javaInfoType', 'foam.core.AbstractMapPropertyInfo'],
     ['javaFactory', 'return new java.util.HashMap();']
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      var compare = info.getMethod('compare');
+      compare.body = 'return super.compare(o1, o2);';
+      return info;
+    }
   ]
 });
 
@@ -940,9 +973,9 @@ foam.CLASS({
   refines: 'foam.core.List',
 
   properties: [
-    [ 'javaType',       'java.util.List' ],
-    [ 'javaFactory',    'return new java.util.ArrayList();' ],
-    [ 'javaJSONParser', 'new foam.lib.json.ListParser()' ]
+    ['javaType', 'java.util.List'],
+    ['javaFactory', 'return new java.util.ArrayList();'],
+    ['javaJSONParser', 'new foam.lib.json.ListParser()']
   ]
 });
 
@@ -958,7 +991,7 @@ foam.CLASS({
     ['javaCSVParser', 'foam.lib.csv.CSVStringParser'],
     {
       name: 'sqlType',
-      expression: function (width) {
+      expression: function(width) {
         return 'VARCHAR(' + width + ')';
       }
     }
@@ -993,7 +1026,8 @@ foam.CLASS({
     {
       name: 'javaJSONParser',
       expression: function(of) {
-        return 'new foam.lib.json.FObjectParser(' + (of ? of.id + '.class' : '') + ')';
+        return 'new foam.lib.json.FObjectParser('
+          + (of ? of.id + '.class' : '') + ')';
       }
     }
   ]
@@ -1004,9 +1038,19 @@ foam.CLASS({
   refines: 'foam.core.StringArray',
 
   properties: [
-    ['javaType',       'String[]'],
+    ['javaType', 'String[]'],
     ['javaInfoType', 'foam.core.AbstractArrayPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.StringArrayParser()'],
+    {
+      name: 'javaValue',
+      expression: function(value) {
+        if ( ! value ) {
+          return null;
+        } else {
+          return 'new String[] {\"' + value.join('\",\"') + '\"}';
+        }
+      }
+    },
     ['sqlType', 'TEXT']
   ],
 
@@ -1018,7 +1062,8 @@ foam.CLASS({
 
       var cast = info.getMethod('cast');
       cast.body = 'Object[] value = (Object[])o;\n'
-                + this.javaType + ' ret = new String[value == null ? 0 : value.length];\n'
+                + this.javaType
+                + ' ret = new String[value == null ? 0 : value.length];\n'
                 + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
 
@@ -1031,7 +1076,7 @@ foam.CLASS({
       });
 
       var isDefaultValue = info.getMethod('isDefaultValue');
-      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);'
+      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
 
       return info;
     }
@@ -1041,7 +1086,7 @@ foam.CLASS({
     {
         name: 'compareTemplate',
         template: function() {
-/*<%= this.javaType %> values1 = get_(o1);
+/* <%= this.javaType %> values1 = get_(o1);
 <%= this.javaType %> values2 = get_(o2);
 if ( values1 == null && values2 == null ) return 0;
 if ( values2 == null ) return 1;
@@ -1086,7 +1131,7 @@ foam.CLASS({
       });
 
       var isDefaultValue = info.getMethod('isDefaultValue');
-      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);'
+      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
 
       return info;
     }
@@ -1096,7 +1141,7 @@ foam.CLASS({
     {
       name: 'compareTemplate',
       template: function() {
-/*<%= this.javaType %> values1 = get_(o1);
+/* <%= this.javaType %> values1 = get_(o1);
 <%= this.javaType %> values2 = get_(o2);
 if ( values1 == null && values2 == null ) return 0;
 if ( values2 == null ) return 1;
@@ -1124,14 +1169,15 @@ foam.CLASS({
     {
       name: 'javaType',
       expression: function(of) {
-        return of + '[]'
+        return of + '[]';
       }
     },
     {
       name: 'javaJSONParser',
-      expression: function (of) {
+      expression: function(of) {
         var id = of ? of.id ? of.id : of : null;
-        return 'new foam.lib.json.FObjectArrayParser(' + ( id ? id + '.class' : '') + ')';
+        return 'new foam.lib.json.FObjectArrayParser('
+          + ( id ? id + '.class' : '') + ')';
       }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectArrayPropertyInfo']
@@ -1145,7 +1191,8 @@ foam.CLASS({
 
       var cast = info.getMethod('cast');
       cast.body = 'Object[] value = (Object[])o;\n'
-                + this.javaType + ' ret = new ' + this.of + '[value == null ? 0 : value.length];\n'
+                + this.javaType + ' ret = new '
+                + this.of + '[value == null ? 0 : value.length];\n'
                 + 'if ( value != null ) System.arraycopy(value, 0, ret, 0, value.length);\n'
                 + 'return ret;';
       // TODO: Change to ClassInfo return type once primitive support is added
@@ -1157,7 +1204,7 @@ foam.CLASS({
       });
 
       var isDefaultValue = info.getMethod('isDefaultValue');
-      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);'
+      isDefaultValue.body = 'return java.util.Arrays.equals(get_(o), null);';
 
       return info;
     }
@@ -1167,7 +1214,7 @@ foam.CLASS({
     {
       name: 'compareTemplate',
       template: function() {
-/*<%= this.javaType %> values1 = get_(o1);
+/* <%= this.javaType %> values1 = get_(o1);
 <%= this.javaType %> values2 = get_(o2);
 if ( values1 == null && values2 == null ) return 0;
 if ( values2 == null ) return 1;
@@ -1243,7 +1290,7 @@ foam.CLASS({
       var info = this.SUPER(cls);
 
       var m = info.getMethod('cast');
-      m.body = 'return ((Boolean) o).booleanValue();'
+      m.body = 'return ((Boolean) o).booleanValue();';
 
       return info;
     }
@@ -1277,7 +1324,9 @@ foam.CLASS({
   properties: [
     {
       name: 'javaType',
-      expression: function(of) { return of ? of : 'Object'; }
+      expression: function(of) {
+        return of ? of : 'Object';
+      }
     },
     ['javaInfoType', 'foam.core.AbstractFObjectPropertyInfo'],
     ['javaJSONParser', 'new foam.lib.json.FObjectParser()']
@@ -1354,13 +1403,13 @@ foam.CLASS({
 
   properties: [
     // No point parsing it, multi part id is always transient.
-    [ 'javaJSONParser', 'new foam.lib.parse.Fail()' ],
+    ['javaJSONParser', 'new foam.lib.parse.Fail()'],
     {
       name: 'javaGetter',
       factory: function() {
         var str = `return new ${this.of.id}.Builder(getX()).
 `;
-        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+        for ( var i = 0; i < this.propNames.length; i ++ ) {
           var name = foam.String.capitalize(this.propNames[i]);
 
           str += `  set${name}(get${name}()).
@@ -1375,7 +1424,7 @@ foam.CLASS({
       factory: function() {
         var str = '';
 
-        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
+        for ( var i = 0; i < this.propNames.length; i ++ ) {
           var name = foam.String.capitalize(this.propNames[i]);
 
           str += `set${name}(val.get${name}());
@@ -1399,8 +1448,8 @@ foam.CLASS({
       name: 'javaImports',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
-          foam.java.JavaImport.create({import: o}) :
-          foam.java.JavaImport.create(o) ;
+          foam.java.JavaImport.create({ import: o }) :
+          foam.java.JavaImport.create(o);
       }
     }
   ]
@@ -1453,8 +1502,10 @@ foam.CLASS({
               name: a.name, type: a.javaType
             };
           }),
-        body: `${this.name + 'Listener_'}.fire(new Object[] { ${ this.args.map(function(a) { return a.name; }).join(', ') } });`
-      })
+        body: `${this.name + 'Listener_'}.fire(new Object[] { ${ this.args.map(function(a) {
+          return a.name;
+        }).join(', ') } });`
+      });
 
       var listener = foam.java.Field.create({
         name: this.name + 'Listener_',
@@ -1474,8 +1525,10 @@ foam.CLASS({
               name: 'go',
               type: 'void',
               visibility: 'public',
-              args: [ foam.java.Argument.create({ type: 'Object[]', name: 'args' }) ],
-              body: `${this.name + '_real_'}(${ this.args && this.args.map(function(a, i) { return "(" + a.javaType + ")args[" + i + "]";}).join(', ') });`
+              args: [foam.java.Argument.create({ type: 'Object[]', name: 'args' })],
+              body: `${this.name + '_real_'}(${ this.args && this.args.map(function(a, i) {
+                return '(' + a.javaType + ')args[' + i + ']';
+              }).join(', ') });`
             })
           ]
         })
