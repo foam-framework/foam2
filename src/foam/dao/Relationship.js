@@ -558,6 +558,7 @@ foam.CLASS({
   properties: [
     ['of', 'foam.dao.ManyToManyRelationship'],
     ['transient', true],
+    ['javaInfoType', 'foam.core.AbstractFObjectRelationshipPropertyInfo'],
     ['tableCellFormatter', null],
     ['cloneProperty', function(value, map) {}],
     ['javaCloneProperty', '//noop'],
@@ -629,6 +630,14 @@ foam.CLASS({
     ]);
 `;
       }
+    }
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.getMethod('compare').body = `return 0;`
+      return info;
     }
   ]
 });

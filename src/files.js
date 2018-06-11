@@ -197,7 +197,10 @@ FOAM_FILES([
   { name: "foam/dao/GUIDDAO" },
   { name: "foam/dao/ReadOnlyDAO" },
   { name: "foam/dao/StoreAndForwardDAO" },
-  { name: "foam/dao/JDAO", flags: ['node'] },
+  { name: "foam/dao/Journal" },
+  { name: "foam/dao/JournalJava", flags: ['java'] },
+  { name: "foam/dao/JDAO", flags: ['web'] },
+  { name: "foam/dao/JDAOJava", flags: ['java'] },
   { name: "foam/dao/Relationship" },
   { name: "foam/dao/RelationshipDAO" },
   { name: "foam/dao/ManyToManyRelationshipDAO" },
@@ -512,5 +515,4 @@ FOAM_FILES([
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
-  { name: "foam/crypto/sign/SignedFObject" }
 ]);

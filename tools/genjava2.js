@@ -91,7 +91,6 @@ externalFile.blacklist.forEach(function(cls) {
   'foam.dao.DecoratedDAO',
   'foam.dao.DeDupDAO',
   'foam.dao.IDBDAO',
-  'foam.dao.JDAO',
   'foam.dao.LoggingDAO',
   'foam.dao.MDAO',
   'foam.dao.PromisedDAO',

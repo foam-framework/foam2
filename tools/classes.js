@@ -75,6 +75,11 @@ var classes = [
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
+  'foam.dao.JDAO',
+  'foam.dao.Journal',
+  'foam.dao.ProxyJournal',
+  'foam.dao.CompositeJournal',
+  'foam.dao.FileJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
@@ -221,7 +226,6 @@ var classes = [
 
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
-  'foam.crypto.sign.SignedFObject',
 
   'foam.nanos.http.Command',
   'foam.nanos.http.Format',
