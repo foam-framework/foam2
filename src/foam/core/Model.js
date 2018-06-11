@@ -36,7 +36,10 @@ foam.CLASS({
     'name',
     {
       name: 'flags',
-      factory: function() { return {}; }
+      documentation: `
+        When set, marks the model with the given flags. This can be used for
+        things like stripping out platform specific models when building.
+      `,
     },
     {
       name: 'label',
