@@ -317,19 +317,13 @@
                         .end()
                      .end()
                      .start().addClass('attachment-footer').setID(i+1)
-                       //.start().add(this.REMOVE).hide(this.removeHidden).end()
                        .start({ class: 'foam.u2.tag.Image', data: 'images/ic-delete.svg'}).hide(this.removeHidden).end()
-                       //.on('click', this.onFileRemoved)
                        .on('click', function(e) {
                          console
                          self.data_.splice(this.id - 1, 1);
                          this.remove();
                          self.data_ = Array.from(self.data_);
                        })
-
-                       // .start().addClass('attachment-filesize')
-                       //   .add(this.formatFileSize())
-                       // .end()
                      .end()
                      .end()
                     }
@@ -353,44 +347,10 @@
 
             .end()
             .end();
-    },
-
-    // function formatFileNumber(i) {
-    //   return ('000' + i).slice(-3);
-    // }
-
-    // function formatFileSize() {
-    //   return Math.ceil(this.messageboardFile.filesize / 1024) + 'K';
-    // }
+    }
   ],
 
   actions: [
-    // {
-    //   name: 'saveAction',
-    //   label: 'Save',
-    //   code: function(X) {
-    //     var self = this;
-    //
-    //     // if (!this.data.amount || this.data.amount < 0){
-    //     //   this.add(foam.u2.dialog.NotificationMessage.create({ message: 'Please Enter Amount.', type: 'error' }));
-    //     //   return;
-    //     // }
-    //
-    //     var message = foam.demos.net.nap.web.model.Messageboard.create({
-    //       id : this.data.id,
-    //       title: this.data.title,
-    //       content: this.data.content,
-    //       creator : this.data.creator,
-    //       createdDate : this.data.createdDate,
-    //       data : this.messageboardFile
-    //     });
-    //
-    //     X.messageboardDAO.put(message).then(function() {
-    //       X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
-    //     });
-    //   }
-    // },
-
     {
       name: 'backAction',
       label: 'Back',
@@ -410,14 +370,6 @@
         });
       }
     }
-    // {
-    //   name: 'remove',
-    //   icon: 'images/ic-delete.svg',
-    //   code: function (X) {
-    //     alert(X.data.fileNumber);
-    //     this.onFileRemoved(X.data.fileNumber);
-    //   }
-    // }
   ],
 
   listeners: [
@@ -427,11 +379,6 @@
 
     function onFileRemoved (data) {
       console.log(data.querySelector('.attachment-number'));
-      //data.remove();
-      //alert("fileNumber : " + self.document.querySelector('.attachment-view'));
-      //this.document.querySelector('.attachment-view').value = null;
-      //this.messageboardFile.splice(2 - 1, 1);
-      //this.messageboardFile = Array.from(this.messageboardFile);
     },
 
     function onRemoveClicked (e) {
@@ -449,30 +396,6 @@
       this.dragActive = true;
       e.preventDefault();
     },
-
-    // function onDrop(e) {
-    //   e.preventDefault();
-    //   this.dragActive = false;
-    //   if ( this.uploadHidden )
-    //     return;
-    //   else {
-    //     var inputFile;
-    //     if ( e.dataTransfer.items ) {
-    //       inputFile = e.dataTransfer.items[0]
-    //       if ( inputFile.kind === 'file' ) {
-    //         var file = inputFile.getAsFile();
-    //         if ( this.isFileType(file) ) this.addFiles(file);
-    //         else
-    //           this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
-    //       }
-    //     } else if( e.dataTransfer.files ) {
-    //       var file = e.dataTransfer.files[0];
-    //       if ( this.isFileType(file) ) this.addFiles(file);
-    //       else
-    //         this.add(this.NotificationMessage.create({ message: this.FileTypeError, type: 'error' }));
-    //     }
-    //   }
-    // },
 
     function onDrop(e) {
       e.preventDefault();
