@@ -230,7 +230,8 @@ var classes = [
 
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
-  'foam.demos.net.nap.web.model.Messageboard'
+  'foam.demos.net.nap.web.model.Messageboard',
+  'foam.demos.net.nap.web.model.MessageboardAudit'
 ];
 
 var abstractClasses = [
