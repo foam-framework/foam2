@@ -10,9 +10,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'javaType',
-      factory: function() {
-        return this.of;
-      }
+      factory: function() { return this.of; }
     }
   ]
 });
@@ -100,24 +98,24 @@ foam.CLASS({
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls: cls,
-        propName: this.name,
-        propShortName: this.shortName,
-        propAliases: this.aliases,
-        propType: this.javaType,
-        propValue: this.javaValue,
-        propRequired: this.required,
-        cloneProperty: this.javaCloneProperty,
-        diffProperty: this.javaDiffProperty,
-        jsonParser: this.javaJSONParser,
-        queryParser: this.javaQueryParser,
-        csvParser: this.javaCSVParser,
-        extends: this.javaInfoType,
+        sourceCls:        cls,
+        propName:         this.name,
+        propShortName:    this.shortName,
+        propAliases:      this.aliases,
+        propType:         this.javaType,
+        propValue:        this.javaValue,
+        propRequired:     this.required,
+        cloneProperty:    this.javaCloneProperty,
+        diffProperty:     this.javaDiffProperty,
+        jsonParser:       this.javaJSONParser,
+        queryParser:      this.javaQueryParser,
+        csvParser:        this.javaCSVParser,
+        extends:          this.javaInfoType,
         networkTransient: this.networkTransient,
         storageTransient: this.storageTransient,
-        xmlAttribute: this.xmlAttribute,
-        xmlTextNode: this.xmlTextNode,
-        sqlType: this.sqlType
+        xmlAttribute:     this.xmlAttribute,
+        xmlTextNode:      this.xmlTextNode,
+        sqlType:          this.sqlType
       });
     },
 
@@ -298,7 +296,7 @@ foam.LIB({
 
       var axioms = this.getOwnAxioms();
 
-      for ( var i = 0; i < axioms.length; i ++ ) {
+      for ( var i = 0 ; i < axioms.length ; i++ ) {
         axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls, this);
       }
 
@@ -551,7 +549,7 @@ foam.CLASS({
         code += 'get' + foam.String.capitalize(this.property) + '()';
         code += '.' + this.name + '(';
 
-        for ( var i = 0; this.args && i < this.args.length; i ++ ) {
+        for ( var i = 0 ; this.args && i < this.args.length ; i++ ) {
           code += this.args[i].name;
           if ( i != this.args.length - 1 ) code += ', ';
         }
@@ -614,7 +612,7 @@ foam.CLASS({
 
           var axioms = this.getAxioms();
 
-          for ( var i = 0; i < axioms.length; i ++ ) {
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
 
@@ -880,7 +878,7 @@ foam.CLASS({
 
           var axioms = this.getAxioms();
 
-          for ( var i = 0; i < axioms.length; i ++ ) {
+          for ( var i = 0 ; i < axioms.length ; i++ ) {
             axioms[i].buildJavaClass && axioms[i].buildJavaClass(cls);
           }
 
@@ -1409,7 +1407,7 @@ foam.CLASS({
       factory: function() {
         var str = `return new ${this.of.id}.Builder(getX()).
 `;
-        for ( var i = 0; i < this.propNames.length; i ++ ) {
+        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
           var name = foam.String.capitalize(this.propNames[i]);
 
           str += `  set${name}(get${name}()).
@@ -1424,7 +1422,7 @@ foam.CLASS({
       factory: function() {
         var str = '';
 
-        for ( var i = 0; i < this.propNames.length; i ++ ) {
+        for ( var i = 0 ; i < this.propNames.length ; i++ ) {
           var name = foam.String.capitalize(this.propNames[i]);
 
           str += `set${name}(val.get${name}());
@@ -1448,7 +1446,7 @@ foam.CLASS({
       name: 'javaImports',
       adaptArrayElement: function(o) {
         return typeof o === 'string' ?
-          foam.java.JavaImport.create({ import: o }) :
+          foam.java.JavaImport.create({import: o}) :
           foam.java.JavaImport.create(o);
       }
     }
