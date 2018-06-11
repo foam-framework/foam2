@@ -9,6 +9,7 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 public class DateParser
@@ -54,14 +55,17 @@ public class DateParser
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
 
-    if (ps == null) return null;
+    if ( ps == null) {
+      return null;
+    }
 
-    if (ps.value() == null)
+    if ( ps.value() == null ) {
       return ps.setValue(null);
+    }
 
     // Checks if Long Date (Timestamp from epoch)
-    if (ps.value() instanceof java.lang.Long) {
-      return ps.setValue(new java.util.Date((java.lang.Long) ps.value()));
+    if ( ps.value() instanceof Long ) {
+      return ps.setValue(new Date((Long) ps.value()));
     }
 
     Object[] result = (Object[]) ps.value();
@@ -83,7 +87,7 @@ public class DateParser
     StringBuilder milliseconds = sb.get();
     Object[] millis = (Object[]) result[13];
     for ( Object milli : millis ) {
-      if ('0' == (char) milli) continue;
+      if ( '0' == (char) milli ) continue;
       milliseconds.append((char) milli);
     }
 
