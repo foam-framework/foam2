@@ -12,10 +12,14 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.Notification'
+    'foam.nanos.notification.notifications.ScriptRunNotification'
   ],
 
-  imports: [ 'notificationDAO', 'user', 'scriptDAO' ],
+  imports: [ 
+    'notificationDAO',
+    'scriptDAO',
+    'user'
+  ],
 
   javaImports: [
     'bsh.EvalError',
@@ -30,7 +34,7 @@ foam.CLASS({
     'java.io.PrintStream',
     'java.util.Date',
     'java.util.List',
-    'static foam.mlang.MLang.*'
+    'static foam.mlang.MLang.*',
   ],
 
   tableColumns: [
@@ -56,12 +60,12 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     {
       class: 'Long',
       name: 'lastDuration',
-      visibility: foam.u2.Visibility.RO
+      visibility: 'RO'
     },
     /*
     {
@@ -82,10 +86,9 @@ foam.CLASS({
       class: 'foam.core.Enum',
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
-      visibility: foam.u2.Visibility.RO,
-      factory: function() {
-        return this.ScriptStatus.UNSCHEDULED;
-      }
+      visibility: 'RO',
+      value: 'UNSCHEDULED',
+      javaValue: 'ScriptStatus.UNSCHEDULED'
     },
     {
       class: 'String',
@@ -95,7 +98,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'output',
-      visibility: foam.u2.Visibility.RO,
+      visibility: 'RO',
       view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80, css: {"font-family": "monospace"}  }
     },
     {
@@ -169,8 +172,9 @@ foam.CLASS({
                 clearInterval(interval);
 
                 // create notification
-                var notification = self.Notification.create({
+                var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
+                  scriptId: script.id,
                   notificationType: "Script Execution",
                   body: `Status: ${script.status}
                         Script Output: ${script.output}

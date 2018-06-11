@@ -9,7 +9,7 @@ package foam.lib.json;
 import foam.lib.parse.*;
 
 public class MapParser
-  extends ProxyParser
+  extends ObjectNullParser
 {
   public MapParser() {
     super(new Seq1(3,

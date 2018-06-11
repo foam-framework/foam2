@@ -7,17 +7,16 @@
 package foam.dao.history;
 
 import foam.core.FObject;
-import foam.core.X;
 import foam.core.PropertyInfo;
+import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
 import foam.dao.SequenceNumberDAO;
 import foam.nanos.auth.User;
-
+import foam.nanos.logger.Logger;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-
 import static foam.mlang.MLang.EQ;
 
 public class HistoryDAO
@@ -73,16 +72,22 @@ public class HistoryDAO
     User user = (User) x.get("user");
     FObject current = this.find_(x, obj);
 
-    // add new history record
-    Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
-    HistoryRecord historyRecord = new HistoryRecord();
-    historyRecord.setObjectId(objectId);
-    historyRecord.setUser(formatUserName(user));
-    historyRecord.setTimestamp(new Date());
-    if ( current != null ) {
-      historyRecord.setUpdates(getUpdatedProperties(current, obj));
+    try {
+      // add new history record
+      Object objectId = ((PropertyInfo) obj.getClassInfo().getAxiomByName("id")).f(obj);
+      HistoryRecord historyRecord = new HistoryRecord();
+      historyRecord.setObjectId(objectId);
+      historyRecord.setUser(formatUserName(user));
+      historyRecord.setTimestamp(new Date());
+      if ( current != null ) {
+        historyRecord.setUpdates(getUpdatedProperties(current, obj));
+      }
+
+      historyDAO_.put_(x, historyRecord);
+    } catch (Throwable t) {
+      Logger l = (Logger) x.get("logger");
+      l.error("Unexpected error creating history record.", t);
     }
-    historyDAO_.put_(x, historyRecord);
 
     return super.put_(x, obj);
   }

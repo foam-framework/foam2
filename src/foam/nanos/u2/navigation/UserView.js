@@ -38,26 +38,34 @@ foam.CLASS({
     'window'
   ],
 
-  requires: [ 'foam.nanos.auth.Group', 'foam.nanos.menu.SubMenuView', 'foam.nanos.menu.Menu', 'foam.nanos.notification.Notification' ],
+  requires: [
+    'foam.nanos.auth.Group',
+    'foam.nanos.menu.Menu',
+    'foam.nanos.menu.SubMenuView',
+    'foam.nanos.notification.Notification'
+  ],
 
   css: `
     ^ {
-      display: inline-block;
-      float: right;
-      margin-right: 40px;
+      align-items: center;
+      display: flex;
+      margin: 0 40px;
+    }
+    ^ .icon-container {
+      position: relative;
+    }
+    ^ .icon-container.selected {
+      padding-bottom: 0; /* Override */
+    }
+    ^ .icon-container:hover {
+      border-bottom: 1px solid white;
     }
     ^ h1 {
-      margin: 0;
-      padding: 15px;
       font-size: 16px;
-      display: inline-block;
       font-weight: 100;
       color: white;
-      position: relative;
-      bottom: 5;
     }
     ^ h1:hover {
-      cursor: pointer;
       text-shadow: 0 0 5px white, 0 0 10px white;
     }
     ^carrot {
@@ -66,22 +74,47 @@ foam.CLASS({
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
       border-top: 5px solid white;
-      display: inline-block;
-      position: relative;
-      right: 10;
-      bottom: 7;
+    }
+    ^ > .profile-container {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      margin-left: 10px;
+    }
+    ^ > .profile-container:hover {
       cursor: pointer;
     }
-    ^ img{
+    ^ > .profile-container > * {
+      margin: 0 5px 5px;
+    }
+    ^ img {
+      height: 25px;
       width: 25px;
-      display: inline-block;
-      position: relative;
-      top: 2px;
-      right: 10px;
+      padding-bottom: 5px;
       cursor: pointer;
+      border-bottom: 1px solid transparent;
+      -webkit-transition: all .15s ease-in-out;
+      -moz-transition: all .15s ease-in-out;
+      -ms-transition: all .15s ease-in-out;
+      -o-transition: all .15s ease-in-out;
+      transition: all .15s ease-in-out;
     }
-    ^user-name:hover {
-      cursor: pointer;
+    ^ .dot {
+      border-radius: 50%;
+      display: table-caption;
+      background: red;
+      width: 15px;
+      height: 15px;
+      position: absolute;
+      top: -2px;
+      left: 13px;
+      text-align: center;
+      font-size: 8px;
+    }
+    ^ .dot > span {
+        padding-top: 3px;
+        display: inline-block;
     }
     ^ .foam-nanos-menu-SubMenuView-inner {
       position: absolute;
@@ -91,7 +124,7 @@ foam.CLASS({
       background: white;
       box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
       top: 65px;
-      right: 15px;
+      right: 0px;
     }
     ^ .foam-nanos-menu-SubMenuView-inner > div {
       height: 40px;
@@ -119,133 +152,116 @@ foam.CLASS({
       width: 0;
       border: 8px solid transparent;
       border-bottom-color: white;
-      -ms-transform: translate(130px, -16px);
-      transform: translate(130px, -16px);
-    }
-    ^ .profile-container{
-      display: inline-block;
-      cursor: pointer;
-      padding-top: 10px;
-      height: 40px;
-    }
-    ^ img:hover {
-      cursor: pointer;
-      padding-bottom: 0px;
-      border-bottom: 1px solid white;
-    }
-    ^ img: {
-      height:30px;
-    }
-    ^ div .img {
-      width:30px;
-      display: inline-block;
-      //padding-bottom:0px;
-      cursor: pointer;
-      //border-bottom: 1px solid transparent;
-      -webkit-transition: all .15s ease-in-out;
-      -moz-transition: all .15s ease-in-out;
-      -ms-transition: all .15s ease-in-out;
-      -o-transition: all .15s ease-in-out;
-      transition: all .15s ease-in-out;
-    }
-    ^ .dot {
-      border-radius: 50%;
-      display: table-caption;
-      background: red;
-      width:15px;
-      height:15px;
-      position: relative;
-      top: -30px;
-      left:5px;
-      text-align: center;
-      font-size: 8px;
-    }
-    .net-nanopay-ui-topNavigation-UserTopNavView .dot > span {
-        padding-top: 3px;
-        display: inline-block;
-    }
-    /* ^ span {
-      top: -15px;
-    } */
-      .img{
-      display: inline-block;
+      -ms-transform: translate(110px, -16px);
+      transform: translate(110px, -16px);
     }
   `,
 
   properties: [
     {
-      class: "Int",
+      class: 'Int',
       name: 'countUnread'
     },
     {
+      class: 'Boolean',
+      name: 'showCountUnread',
+      expression: (countUnread) => countUnread > 0,
+    },
+    {
       name: 'userCur',
-      factory: function(user){
-        return this.user;
-      }
+      factory: (user) => this.user
     }
   ],
-  
 
   methods: [
     function initE() {
       this.notificationDAO.on.sub(this.onDAOUpdate);
       this.user.id$.sub(this.onDAOUpdate);
       this.onDAOUpdate();
-      var self = this;
       this
         .addClass(this.myClass())
 
-        .start('div').addClass('img').on('click', function() {
-          this.stack.push({ class: "foam.nanos.notification.NotificationListView" });
-        }.bind(this))
-          .start('img').attrs({src: "images/bell.png"}).end()
-          .add(this.slot(function(countUnread){
-            if ( countUnread > 0 )
-              return this.E().start('div').addClass('dot')
-                .add(this.countUnread$)
-              .end()
-          })).end()
+        // The notifications container
+        .start('div')
+          .addClass('icon-container')
 
+          // Show blue underline if user is on notifications page.
+          .enableClass('selected', this.currentMenu$.map((menu) => {
+            return this.Menu.isInstance(menu) && menu.id === 'notifications';
+          }))
+
+          // Clicking on the bell icon will change to the notifications page.
+          .on('click', this.changeToNotificationsPage.bind(this))
+
+          .start('img')
+            .attrs({ src: 'images/bell.png' })
+          .end()
+
+          // The unread notification count bubble. Only shown if there is at
+          // least one unread notification.
+          .start('span')
+            .addClass('dot')
+            .add( this.countUnread$ )
+            .show( this.showCountUnread$ )
+          .end()
+        .end()
+
+        // The username and settings dropdown
         .start().addClass('profile-container')
-          .on('click', function() {
-            this.tag(this.SubMenuView.create({menu: this.Menu.create({id: 'settings'})}))
-          }.bind(this))
+          .on('click', () => {
+            this.tag(this.SubMenuView.create({
+              menu: this.Menu.create({ id: 'settings' })
+            }));
+          })
           .start('h1')
             .add( this.user.firstName$ ).addClass(this.myClass('user-name'))
           .end()
-        .end()
-        .start('div')
-          .addClass(this.myClass('carrot'))
-            .on('click', function() {
-              this.tag(this.SubMenuView.create({menu: this.Menu.create({id: 'settings'})}))
-            }.bind(this))
+          .start('div')
+            .addClass(this.myClass('carrot'))
+          .end()
         .end();
+    },
+
+    /** Change the application page to #notifications */
+    function changeToNotificationsPage() {
+      this.menuDAO
+          .where(this.EQ(this.Menu.ID, 'notifications'))
+          .select()
+          .then((queryResult) => {
+            if ( queryResult.length === 0 ) {
+              throw Error('No menu item in menuDAO with id "notifications"');
+            }
+            var notificationMenu = queryResult.array[0];
+            notificationMenu.launch();
+          })
+          .catch((err) => console.error(err));
     }
   ],
 
-  listeners:[
+  listeners: [
     {
       name: 'onDAOUpdate',
       isFramed: true,
-      code: function () {
-          var self = this;
-          var group = self.user.group;
-          var id = self.user.id;
-          if ( id != 0 ) {
-            this.notificationDAO.where(
-              this.AND(
-                this.EQ(this.Notification.READ, false),
-                this.OR(
-                  this.EQ(this.Notification.USER_ID, id),
-                  this.EQ(this.Notification.GROUP_ID, group),
-                  this.EQ(this.Notification.BROADCASTED, true)
-                ),
-                this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledTopics))
-              )
-            ).select(this.COUNT()).then(function(count) {
-                self.countUnread = count.value;
-            })
-          }
+      code: function() {
+        var group = this.user.group;
+        var id = this.user.id;
+        if ( id != 0 ) {
+          this.notificationDAO.where(
+            this.AND(
+              this.EQ(this.Notification.READ, false),
+              this.OR(
+                this.EQ(this.Notification.USER_ID, id),
+                this.EQ(this.Notification.GROUP_ID, group),
+                this.EQ(this.Notification.BROADCASTED, true)
+              ),
+              this.NOT(this.IN(
+                  this.Notification.NOTIFICATION_TYPE,
+                  this.user.disabledTopics))
+            )
+          ).select(this.COUNT()).then((count) => {
+              this.countUnread = count.value;
+          });
+        }
       }
     }
   ]
