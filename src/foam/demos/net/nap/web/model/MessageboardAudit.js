@@ -31,10 +31,6 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'messageboardId'
-    },
-    {
-      class: 'Long',
-      name: 'totalCount'
     }
   ]
 });
