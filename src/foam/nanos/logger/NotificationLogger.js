@@ -55,12 +55,13 @@ foam.CLASS({
 //        javaReturns: 'void',
         javaCode: `
 
-        X x = getX();
+            X x = getX();
             foam.nanos.notification.Notification s = new foam.nanos.notification.Notification();
             s.setUserId(9);
             s.setEmailIsEnabled(true);
-//            s.setEmailName("notification-logger-error");
-//            s.setBody("A notification email was triggered from the nanopay notification logger.");
+        //    s.setGroupId("NOC");
+            s.setEmailName("notification-logger-error");
+            s.setBody("A notification email was triggered from the nanopay notification logger.");
             ((DAO) x.get("notificationDAO")).put_(x,s) ;
         `
       },
@@ -74,6 +75,7 @@ foam.CLASS({
         ],
         javaReturns: 'void',
         javaCode: `
+        System.err.print(args);
         getDelegate().info(args);          
         if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
           System.err.print("generate notification event");
