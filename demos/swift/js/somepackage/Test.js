@@ -6,6 +6,7 @@
 
 foam.CLASS({
   name: 'Test',
+  package: 'somepackage',
   requires: [
     'somepackage.RequiredClass',
   ],
