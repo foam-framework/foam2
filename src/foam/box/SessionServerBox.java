@@ -57,7 +57,7 @@ public class SessionServerBox
         session.setLastUsed(new Date());
         session.setUses(session.getUses()+1);
 
-        sessionDAO.put(session);
+        if ( user != null ) sessionDAO.put(session);
 
         if ( authenticate_ && session.getUserId() == 0 ) {
           msg.replyWithException(new AccessControlException("Not logged in"));
