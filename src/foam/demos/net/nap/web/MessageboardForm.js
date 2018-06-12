@@ -17,6 +17,7 @@ foam.CLASS({
     'foam.blob.BlobBlob',
     'foam.nanos.fs.File',
     'foam.demos.net.nap.web.model.Messageboard',
+    'foam.demos.net.nap.web.model.MessageboardAudit',
     'foam.nanos.notification.Notification',
     'foam.u2.dialog.NotificationMessage'
   ],
@@ -24,7 +25,9 @@ foam.CLASS({
   imports: [
     'blobService',
     'messageboard',
+    'messageboardAudit',
     'messageboardDAO',
+    'messageboardAuditDAO',
     'notification',
     'notificationDAO',
     'onInvoiceFileRemoved',
@@ -499,6 +502,11 @@ foam.CLASS({
         data : Array.from(self.data_)
       });
 
+      var messageboardAudit = self.MessageboardAudit.create({
+        userId: this.user.id,
+        messageboardId: self.id_
+      });
+
       var notification = self.Notification.create({
         notificationType : "New Post On Messageboard",
         userId: this.user.id,
@@ -507,6 +515,7 @@ foam.CLASS({
       });
 
       self.notificationDAO.put(notification);
+      self.messageboardAuditDAO.put(messageboardAudit);
 
       self.messageboardDAO.put(message).then(function() {
         self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
