@@ -38,51 +38,70 @@ foam.CLASS({
     methods: [
       {
         name: 'generateNotificationEvent',
-        // args: [
-        //   {
-        //     name: 'currentThreshhold',
-        //     javaType: 'Enum'
-        //   },
-        //   {
-        //     name: 'updateLastLogLevel',
-        //     javaType: 'Boolean'
-        //   },
-        //   {
-        //     name: 'args',
-        //     javaType: 'Object...'
-        //   },
-        // ],
-//        javaReturns: 'void',
         javaCode: `
-
             X x = getX();
             foam.nanos.notification.Notification s = new foam.nanos.notification.Notification();
-            s.setUserId(9);
+            // s.setUserId(9);
+            s.setGroupId("NOC");
             s.setEmailIsEnabled(true);
-        //    s.setGroupId("NOC");
             s.setEmailName("notification-logger-error");
             s.setBody("A notification email was triggered from the nanopay notification logger.");
-            ((DAO) x.get("notificationDAO")).put_(x,s) ;
+            if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,s) ;
         `
       },
-      {
-        name: 'info',
-        args: [
-          {
-            name: 'args',
-            javaType: 'Object...'
-          }
-        ],
-        javaReturns: 'void',
-        javaCode: `
-        System.err.print(args);
-        getDelegate().info(args);          
-        if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
-          System.err.print("generate notification event");
-          generateNotificationEvent();
+    {
+      name: 'info',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
         }
-        `
-    },
+      ],
+      javaReturns: 'void',
+      javaCode: `
+      if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
+        generateNotificationEvent();
+        System.err.print("info notification email sent");
+      }
+      getDelegate().info(args);          
+
+      `
+  },
+  {
+    name: 'warning',
+    args: [
+      {
+        name: 'args',
+        javaType: 'Object...'
+      }
+    ],
+    javaReturns: 'void',
+    javaCode: `
+    if (LogLevel.WARNING.getOrdinal() >= getErrorLevelThreshhold() ) {
+      generateNotificationEvent();
+      System.err.print("warning notification email sent");      
+    }
+    getDelegate().warning(args);          
+    `
+},
+{
+  name: 'error',
+  args: [
+    {
+      name: 'args',
+      javaType: 'Object...'
+    }
+  ],
+  javaReturns: 'void',
+  javaCode: `
+  if (LogLevel.ERROR.getOrdinal() >= getErrorLevelThreshhold() ) {
+    generateNotificationEvent();
+    System.err.print("error notification email sent");    
+  }
+  getDelegate().error(args);          
+  
+  `
+},
 
 
 
