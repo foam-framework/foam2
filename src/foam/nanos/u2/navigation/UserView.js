@@ -66,7 +66,6 @@ foam.CLASS({
       color: white;
     }
     ^ h1:hover {
-      text-shadow: 0 0 5px white, 0 0 10px white;
     }
     ^carrot {
       width: 0;
