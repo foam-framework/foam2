@@ -32,13 +32,15 @@ foam.CLASS({
 
   css: `
     ^ {
-      display: flex;
       background: %PRIMARYCOLOR%;
       width: 100%;
       min-width: 992px;
       height: 60px;
       color: white;
       padding-top: 5px;
+    }
+    ^ .logged-in-container {
+      display: flex;
     }
     ^ .menuBar {
       flex-grow: 2;
@@ -77,6 +79,16 @@ foam.CLASS({
       padding-bottom: 5px;
       text-shadow: 0 0 0px white, 0 0 0px white;
     }
+    ^ .welcome-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1.25;
+      letter-spacing: 0.3px;
+      width: 100%;
+      height: calc(100% - 5px); /* Compensate for 5px padding-top of topnav */
+    }
   `,
 
   properties: [
@@ -89,14 +101,19 @@ foam.CLASS({
   methods: [
     function initE() {
       this
-      .addClass(this.myClass())
-      .show(this.loginSuccess$)
-      .start({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
-      .end()
-      .start({ class: 'foam.nanos.menu.MenuBar' }).addClass('menuBar')
-      .end()
-      .start({ class: 'foam.nanos.u2.navigation.UserView' })
-      .end();
+        .addClass(this.myClass())
+        .start()
+          .addClass('logged-in-container')
+          .show(this.loginSuccess$)
+          .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
+          .start({ class: 'foam.nanos.menu.MenuBar' })
+            .addClass('menuBar')
+          .end()
+          .tag({ class: 'foam.nanos.u2.navigation.UserView' })
+        .end()
+        .start()
+          .add('Welcome').addClass('welcome-label').hide(this.loginSuccess$)
+        .end();
     }
   ]
 });
