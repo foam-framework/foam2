@@ -155,7 +155,7 @@ foam.CLASS({
       class: 'Boolean',
       name: 'createFile',
       documentation: 'Flag to create file if not present',
-      value: false,
+      value: true,
     },
     {
       class: 'Object',
@@ -166,7 +166,7 @@ foam.CLASS({
           getLogger().log("Loading file: " + getFilename());
           File file = getX().get(Storage.class).get(getFilename());
           if ( ! file.exists() ) {
-            getLogger().warning("Can not find file: " + getFilename());
+            getLogger().warning("Journal not found:" + getFilename());
 
             if ( getCreateFile() ) {
               // if output journal does not exist, create one
