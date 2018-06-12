@@ -94,7 +94,7 @@ foam.CLASS({
         return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
       },
       javaGetter: `
-        return ( ! getMiddleName().equals("") )
+        return ! getMiddleName().equals("")
           ? getFirstName() + " " + getMiddleName() + " " + getLastName()
           : getFirstName() + " " + getLastName();
       `,
