@@ -5,9 +5,9 @@
  */
 
 var classes = [
-  'TestApp',
-  'TestDetailView',
-  'TestExtended',
+  'somepackage.TestApp',
+  'somepackage.TestDetailView',
+  'somepackage.TestExtended',
   'foam.box.Box',
   'foam.box.BoxRegistry',
   'foam.box.BoxService',
