@@ -45,22 +45,7 @@
         //color: white;
         //background: #607D8B;
       }*/
-      ^ .body {
-        padding-bottom:10px;
-        padding-top:20px;
-        padding-left:20px;
-        width: 414px;
-        height: 14px;
-        font-family: Roboto;
-        font-size: 12px;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: 1.17;
-        letter-spacing: 0.2px;
-        text-align: left;
-        color: #093649;
-      }
+      
       ^ i {
         margin-top: 5px;
       }
@@ -73,12 +58,13 @@
         box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
       }
       ^ .net-nanopay-ui-ActionView-optionsDropDown {
-        width: 26px;
-        height: 26px;
+        width: 26px !important;
+        height: 26px !important;
+        border: none !important;
         background-color: rgba(164, 179, 184, 0.0);
         float: right;
-        margin-right:20px;
-        margin-top:20px;
+        margin-right:20px !important;
+        margin-top:20px !important;
       }
       ^ .net-nanopay-ui-ActionView-optionsDropDown > img {
         height:23px;
@@ -94,32 +80,28 @@
       }
       ^ .popUpDropDown > div {
         width: 165px;
-        height: 30px;
+        height: 20px;
         font-size: 14px;
         font-weight: 300;
         letter-spacing: 0.2px;
         color: #093649;
         line-height: 30px;
       }
-      ^ .divBody {
-        background: black !important;
-      }
       ^ .popUpDropDown > div:hover {
         background-color: #59a5d5;
         color: white;
         cursor: pointer;
       }
-      ^ .net-nanopay-ui-ActionView-link {
+      ^ .net-nanopay-ui-ActionView {
         background-color: rgba(201, 76, 76, 0.0);
         width: 135px;
         height: 40px;
         border-radius: 2px;
         border: solid 1px #59a5d5;
-        margin-bottom:20px;
         margin-left:20px;
         margin-top:10px;
       }
-      ^ .net-nanopay-ui-ActionView-link > span {
+      ^ .net-nanopay-ui-ActionView > span {
         height: 40px;
         font-family: Roboto;
         font-size: 14px;
@@ -149,6 +131,25 @@
         text-align: center;
         color: #59a5d5;
       }
+      ^ div {
+        padding-bottom:20px;
+      }
+      ^ .msg {
+        font-size: 12px;
+        word-wrap: break-word;
+        padding-bottom: 0;
+        padding-top: 20;
+        line-height: 1.4;
+        padding-left: 20px;
+        width: 414px;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        margin-right: 10;
+        overflow: hidden;
+        color: #093649;
+      }
     `,
 
     properties: [
@@ -159,11 +160,6 @@
 
     methods: [
       function initE() { 
-        if ( ! this.data.read ) {
-          this.start('div').addClass('divBodyUnread')
-        } else {
-          this.start('div').addClass('divBody')
-        }
         this
           .on('mouseover', this.read)
           .addClass(this.myClass());
