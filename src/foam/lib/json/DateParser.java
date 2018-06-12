@@ -56,16 +56,16 @@ public class DateParser
   public PStream parse(PStream ps, ParserContext x) {
     ps = super.parse(ps, x);
 
-    if (ps == null) {
+    if ( ps == null ) {
       return null;
     }
 
-    if (ps.value() == null) {
+    if ( ps.value() == null ) {
       return ps.setValue(null);
     }
 
     // Checks if Long Date (Timestamp from epoch)
-    if (ps.value() instanceof Long) {
+    if ( ps.value() instanceof Long ) {
       return ps.setValue(new Date((Long) ps.value()));
     }
 
