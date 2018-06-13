@@ -510,19 +510,6 @@ public class ModelParserFactory {
   }
 }
 
-public protocol FOAM_enum: JSONOutputter {
-  var classId: String { get }
-  var ordinal: Int { get }
-  var name: String { get }
-  var label: String { get }
-}
-
-extension FOAM_enum {
-  public func toJSON(outputter: Outputter, out: inout String) {
-    outputter.outputEnum(&out, self)
-  }
-}
-
 public class FoamError: Error {
   var obj: Any?
   init(_ obj: Any?) { self.obj = obj }
