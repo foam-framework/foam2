@@ -391,7 +391,9 @@ class PInfo: PropertyInfo {
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
-  let visibility = Visibility.<%=this.visibility.name%>
+  lazy private(set) var visibility: Visibility = {
+    return Visibility.<%=this.visibility.name%>
+  }()
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
   public func set(_ obj: FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
@@ -641,7 +643,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        return (of ? of.model_.swiftName : 'FOAM_enum') + (required ? '' : '?');
+        return (of ? of.model_.swiftName : 'AbstractEnum') + (required ? '' : '?');
       },
     },
     {
