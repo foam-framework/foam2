@@ -54,10 +54,12 @@ return firstName + " " + lastName
     {
       class: 'String',
       name: 'prevFirstName',
+      visibility: 'RO',
     },
     {
       class: 'String',
       name: 'prevLastName',
+      visibility: 'RO',
     },
     {
       class: 'String',

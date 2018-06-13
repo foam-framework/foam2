@@ -19,6 +19,8 @@ var classes = [
   'foam.box.RPCMessage',
   'foam.box.ReplyBox',
   'foam.box.ReturnBox',
+  'foam.core.AbstractEnum',
+  'foam.core.Identifiable',
   'foam.dao.AnonymousSink',
   'foam.dao.ArraySink',
   'foam.dao.ClientDAO',
