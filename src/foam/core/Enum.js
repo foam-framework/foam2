@@ -268,6 +268,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'documentation',
+      transient: true,
       adapt: function(_, d) {
         return typeof d === 'function' ? foam.String.multiline(d).trim() : d;
       }
@@ -285,12 +286,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
+      transient: true,
       final: true
     },
     {
       class: 'String',
       name: 'label',
       final: true,
+      transient: true,
       factory: function() {
         return this.name;
       }
