@@ -13,7 +13,11 @@ foam.CLASS({
 
     javaImports: [
       'foam.dao.DAO',
-      'foam.core.X'
+      'foam.core.X',
+      'java.util.Date',
+      'java.text.DateFormat',
+      'java.text.SimpleDateFormat'
+
   ],
 
     requires: [
@@ -25,7 +29,7 @@ foam.CLASS({
       {
         class: 'Int',
         name: 'errorLevelThreshhold',
-        value: 2,
+        value: 10,
       },
       {
         class: 'Enum',
@@ -38,15 +42,31 @@ foam.CLASS({
     methods: [
       {
         name: 'generateNotificationEvent',
+        args: [
+          {
+            name: 'args',
+            javaType: 'Object...'
+          }
+        ],
         javaCode: `
-            X x = getX();
-            foam.nanos.notification.Notification s = new foam.nanos.notification.Notification();
-            // s.setUserId(9);
-            s.setGroupId("NOC");
-            s.setEmailIsEnabled(true);
-            s.setEmailName("notification-logger-error");
-            s.setBody("A notification email was triggered from the nanopay notification logger.");
-            if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,s) ;
+              try {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                X x = getX();
+                foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
+                notif.setUserId(9);
+                // s.setGroupId("NOC");
+                notif.setEmailIsEnabled(true);
+                notif.getEmailArgs().put("type", args);
+                notif.setEmailName("notification-logger-error");
+                notif.setBody("A notification email was triggered from the nanopay notification logger.");
+                if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,notif) ;         
+                System.err.print("generateNotificationEventCompleted");
+                System.err.print("\\n");
+              } catch(Throwable t) {
+                System.out.println("DJ NOTIFICATION ERROR MESSAGE: " + t);
+              }
+
         `
       },
     {
@@ -60,7 +80,7 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
       if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
-        generateNotificationEvent();
+        generateNotificationEvent(args);
         System.err.print("info notification email sent");
       }
       getDelegate().info(args);          
@@ -78,7 +98,7 @@ foam.CLASS({
     javaReturns: 'void',
     javaCode: `
     if (LogLevel.WARNING.getOrdinal() >= getErrorLevelThreshhold() ) {
-      generateNotificationEvent();
+      // generateNotificationEvent(args);
       System.err.print("warning notification email sent");      
     }
     getDelegate().warning(args);          
@@ -95,7 +115,7 @@ foam.CLASS({
   javaReturns: 'void',
   javaCode: `
   if (LogLevel.ERROR.getOrdinal() >= getErrorLevelThreshhold() ) {
-    generateNotificationEvent();
+    generateNotificationEvent(args);
     System.err.print("error notification email sent");    
   }
   getDelegate().error(args);          
