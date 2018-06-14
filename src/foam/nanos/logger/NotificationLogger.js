@@ -98,7 +98,7 @@ foam.CLASS({
     javaReturns: 'void',
     javaCode: `
     if (LogLevel.WARNING.getOrdinal() >= getErrorLevelThreshhold() ) {
-      // generateNotificationEvent(args);
+      generateNotificationEvent(args);
       System.err.print("warning notification email sent");      
     }
     getDelegate().warning(args);          
