@@ -16,7 +16,6 @@ import foam.mlang.predicate.Or;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.GroupBy;
 import foam.nanos.logger.Logger;
-
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
