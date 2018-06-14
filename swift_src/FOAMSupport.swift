@@ -433,9 +433,17 @@ public class AbstractFObject: NSObject, FObject, ContextAware {
   }
 
   public func copyFrom(_ o: FObject) {
-    ownClassInfo().axioms(byType: PropertyInfo.self).forEach { (p) in
-      if o.hasOwnProperty(p.name) {
-        p.set(self, value: p.get(o))
+    if ownClassInfo().id == o.ownClassInfo().id {
+      ownClassInfo().axioms(byType: PropertyInfo.self).forEach { (p) in
+        if o.hasOwnProperty(p.name) {
+          p.set(self, value: p.get(o))
+        }
+      }
+    } else {
+      ownClassInfo().axioms(byType: PropertyInfo.self).forEach { (p) in
+        if let p2 = o.ownClassInfo().axiom(byName: p.name) as? PropertyInfo {
+          p.set(self, value: p2.get(o))
+        }
       }
     }
   }
