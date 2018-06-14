@@ -20,9 +20,11 @@ foam.CLASS({
   name: 'ViewSpec',
   extends: 'foam.core.Property',
 
-  documentation: 'Set a ViewFactory to be a string containing a class name, ' +
-      'a Class object, or a factory function(args, context). ' +
-      'Useful for rowViews and similar.',
+  documentation: `
+    Set a ViewFactory to be a string containing a class name,
+    a Class object, or a factory function(args, context).
+    Useful for rowViews and similar.`
+  ,
 
   axioms: [
     {
