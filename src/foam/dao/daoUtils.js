@@ -177,7 +177,7 @@ if oldValue != nil {
         var old = this.innerSub;
         old && old.detach();
         this.innerSub = this.dao && this.dao.listen_(this.dao.__context__, this);
-        if ( old ) this.reset();
+        this.reset();
       }
     }
   ]
