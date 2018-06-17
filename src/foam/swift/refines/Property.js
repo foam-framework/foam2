@@ -145,6 +145,11 @@ foam.CLASS({
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
     {
+      class: 'String',
+      name: 'swiftToJSON',
+      value: 'outputter.output(&out, value)',
+    },
+    {
       class: 'Boolean',
       name: 'swiftSupport',
       value: true,
@@ -454,6 +459,9 @@ class PInfo: PropertyInfo {
 <% } else { %>
     return nil
 <% } %>
+  }
+  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
+    <%=p.swiftToJSON%>
   }
 }
 return PInfo(classInfo())

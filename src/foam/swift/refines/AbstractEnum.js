@@ -70,3 +70,13 @@ foam.CLASS({
     },
   ],
 });
+
+foam.CLASS({
+  refines: 'foam.core.Enum',
+  properties: [
+    {
+      name: 'swiftToJSON',
+      value: 'outputter.output(&out, (value as? AbstractEnum)?.ordinal ?? nil)',
+    },
+  ],
+});

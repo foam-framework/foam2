@@ -72,9 +72,10 @@ class SwiftTestsTests: XCTestCase {
     t.prevFirstName = "MY_PREV_NAME"
     t.boolProp = false
     t.intProp = 34
-    t.enumProp = Visibility.FINAL
+    t.enumProp = Visibility.FINAL // Outputs as just the ordinal
+    t.anyProp = Visibility.FINAL // Outputs as the full fobject
     XCTAssertEqual(Outputter().swiftStringify(t),
-    "{\"class\":\"somepackage.Test\",\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\",\"enumProp\":{\"class\":\"foam.u2.Visibility\",\"ordinal\":1}}")
+    "{\"class\":\"somepackage.Test\",\"anyProp\":{\"class\":\"foam.u2.Visibility\",\"ordinal\":1},\"intProp\":34,\"boolProp\":false,\"prevFirstName\":\"MY_PREV_NAME\",\"enumProp\":1}")
   }
 
   func testExpression() {
