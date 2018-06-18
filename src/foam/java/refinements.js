@@ -775,7 +775,15 @@ foam.CLASS({
       }
     },
     ['javaInfoType', 'foam.core.AbstractEnumPropertyInfo'],
-    ['javaJSONParser', 'new foam.lib.json.IntParser()'],
+    {
+      name: 'javaJSONParser',
+      expression: function(of) {
+        // TODO: Ditch the IntParser and only use FObjectParser.
+        return `new foam.lib.parse.Alt(
+          new foam.lib.json.FObjectParser(${of ? of.id + '.class' : ''}),
+          new foam.lib.json.IntParser())`;
+      }
+    },
     ['javaCSVParser', 'foam.lib.json.IntParser']
   ],
 
@@ -807,23 +815,6 @@ foam.CLASS({
           }
         ],
         body: `return ${this.of.id}.forOrdinal(ordinal);`
-      });
-
-      info.method({
-        name: 'toJSON',
-        visibility: 'public',
-        type: 'void',
-        args: [
-          {
-            name: 'outputter',
-            type: 'foam.lib.json.Outputter'
-          },
-          {
-            name: 'value',
-            type: 'Object'
-          }
-        ],
-        body: `outputter.output(getOrdinal(value));`
       });
 
       info.method({

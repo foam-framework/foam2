@@ -71,7 +71,10 @@ describe('Enum tests', function() {
 
     todo.status = TodoStatus.CLOSED;
     expect(todo.status).toBe(TodoStatus.CLOSED);
-    expect(foam.json.objectify(todo).status).toBe(TodoStatus.CLOSED.ordinal);
+    expect(foam.json.objectify(todo).status).toEqual({
+      ordinal: 100,
+      isOpen: false
+    });
 
     expect(function() {
       todo.status = 'invalid enum value';

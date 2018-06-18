@@ -268,6 +268,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'documentation',
+      transient: true,
       adapt: function(_, d) {
         return typeof d === 'function' ? foam.String.multiline(d).trim() : d;
       }
@@ -285,11 +286,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
+      transient: true,
       final: true
     },
     {
       class: 'String',
       name: 'label',
+      transient: true,
       final: true,
       factory: function() {
         return this.name;
@@ -298,9 +301,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function outputFObject(o) {
-      o.out(this.ordinal);
-    },
     function toString() { return this.name; }
   ]
 });
@@ -355,10 +355,6 @@ foam.CLASS({
         throw 'Attempt to set invalid Enum value. Enum: ' + of.id + ', value: ' + n;
       }
     ],
-    {
-      name: 'toJSON',
-      value: function(value) { return value.ordinal; }
-    }
   ]
 });
 
