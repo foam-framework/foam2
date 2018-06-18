@@ -57,12 +57,13 @@ foam.CLASS({
     {
       class: 'String',
       name: 'appLink',
-      value: 'https://www.apple.com/lae/ios/app-store/'
+      value: 'https://itunes.apple.com/ca/app/mintchip/id1051748158?mt=8'
     },
     {
       class: 'String',
       name: 'playLink',
-      value: 'https://play.google.com/store?hl=en'
+      value: 'https://play.google.com/store/apps/details?id=net.nanopay.mintchip_android'
+      
     }
   ]
 });
