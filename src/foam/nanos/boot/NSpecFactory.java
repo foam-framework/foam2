@@ -26,9 +26,9 @@ public class NSpecFactory
   public Object create(X x) {
     // Avoid infinite recursions when creating services
     if ( isCreating_ ) {
-      if ( ! "logger".equals(spec_.getName()) ) {
-        Logger logger = (Logger) x.get("logger");
-        if ( logger != null ) logger.warning("Recursive Service Factory", spec_.getName());
+      if ( ! "startupLogger".equals(spec_.getName()) ) {
+        Logger startupLogger = (Logger) x.get("startupLogger");
+        if ( startupLogger != null ) startupLogger.warning("Recursive Service Factory", spec_.getName());
       }
 
       return null;
@@ -38,17 +38,17 @@ public class NSpecFactory
 
     Object ns     = null;
     PM     pm     = new PM(this.getClass(), spec_ == null ? "-" : spec_.getName());
-    Logger logger = (Logger) x.get("logger");
+    Logger startupLogger = (Logger) x.get("startupLogger");
 
     try {
-      if ( logger != null ) logger.info("Creating Service", spec_.getName());
+      if ( startupLogger != null ) startupLogger.info("Creating Service", spec_.getName());
       ns = spec_.createService(x_.getX());
-      if ( logger != null ) logger.info("Created Service", spec_.getName());
+      if ( startupLogger != null ) startupLogger.info("Created Service", spec_.getName());
 
       if ( ns instanceof ContextAware ) ((ContextAware) ns).setX(x_.getX());
       if ( ns instanceof NanoService  ) ((NanoService)  ns).start();
     } catch (Throwable t) {
-      if ( logger != null ) logger.error("Error Creating Service", spec_.getName(), t);
+      if ( startupLogger != null ) startupLogger.error("Error Creating Service", spec_.getName(), t);
     } finally {
       pm.log(x_.getX());
       isCreating_ = false;
