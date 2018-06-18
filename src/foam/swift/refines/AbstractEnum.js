@@ -66,9 +66,9 @@ foam.CLASS({
           }
           return cls
         };
-      },
-    },
-  ],
+      }
+    }
+  ]
 });
 
 foam.CLASS({
@@ -76,7 +76,7 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftToJSON',
-      value: 'outputter.output(&out, (value as? AbstractEnum)?.ordinal ?? nil)',
-    },
-  ],
+      value: 'outputter.output(&out, (value as? AbstractEnum)?.ordinal ?? nil)'
+    }
+  ]
 });
