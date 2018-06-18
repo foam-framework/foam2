@@ -13,7 +13,15 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.core.X'
+    'foam.core.X',
+    'org.apache.http.client.methods.HttpPost',
+    'org.apache.http.util.EntityUtils',
+    'org.apache.http.entity.StringEntity',
+    'org.apache.http.client.HttpClient',
+    'org.apache.http.impl.client.DefaultHttpClient',
+    'org.apache.http.impl.client.CloseableHttpClient',
+    'org.apache.http.impl.client.HttpClients',
+    'org.apache.http.client.methods.CloseableHttpResponse'    
   ],
 
   requires: [
@@ -51,12 +59,26 @@ foam.CLASS({
       javaCode: `
   X x = x_.put("logger", NullLogger.instance() ) ; 
   
-  String message = "";
+  
+  String message = type + ": ";
   foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
   for ( int i = 0 ; i < args.length ; i++ ) {
     message = message + args[i] + " ";  
   }
-  
+
+  CloseableHttpClient client = HttpClients.createDefault();
+  HttpPost httppost = new HttpPost("https://hooks.slack.com/services/...");
+  httppost.addHeader("Content-type", "application/json");
+  StringEntity params = new StringEntity("{\\"text\\" : \\""+message+"\\"}","UTF-8");
+  params.setContentType("application/json");
+  httppost.setEntity(params);
+  try {
+    CloseableHttpResponse response = client.execute(httppost);
+  }
+  catch (Throwable t){
+    ;
+  }
+
   notif.setEmailIsEnabled(true);
   // notif.setGroupId("NOC");
   notif.setUserId(9);
@@ -79,7 +101,7 @@ foam.CLASS({
       javaReturns: 'void',
       javaCode: `
   if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
-    String logLevel = "An info";
+    String logLevel = LogLevel.INFO.name_;
     generateNotificationEvent(logLevel,args);
   }
   getDelegate().info(args);          
@@ -96,7 +118,7 @@ foam.CLASS({
     javaReturns: 'void',
     javaCode: `
   if (LogLevel.WARNING.getOrdinal() >= getErrorLevelThreshhold() ) {
-    String logLevel = "A warning";
+    String logLevel = LogLevel.WARNING.name_;
     generateNotificationEvent(logLevel,args);
   }
   getDelegate().warning(args);          
@@ -113,7 +135,7 @@ foam.CLASS({
   javaReturns: 'void',
   javaCode: `
   if (LogLevel.ERROR.getOrdinal() >= getErrorLevelThreshhold() ) {
-    String logLevel = "An error";  
+    String logLevel = LogLevel.ERROR.name_;  
     generateNotificationEvent(logLevel,args);
   }
   getDelegate().error(args);          
