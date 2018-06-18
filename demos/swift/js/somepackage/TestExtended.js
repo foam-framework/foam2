@@ -6,7 +6,8 @@
 
 foam.CLASS({
   name: 'TestExtended',
-  extends: 'Test',
+  package: 'somepackage',
+  extends: 'somepackage.Test',
   properties: [
     {
       class: 'String',

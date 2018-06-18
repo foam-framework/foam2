@@ -257,23 +257,6 @@ out.append("}");
       */},
     },
     {
-      name: 'outputEnum',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'FOAM_enum',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-outputNumber(&out, data.ordinal as NSNumber)
-      */},
-    },
-    {
       name: 'outputFObject',
       args: [
         {

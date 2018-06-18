@@ -21,8 +21,7 @@ foam.CLASS({
     {
       name: 'swiftAdapt',
       value: `
-if let newValue = newValue as? FObject { return newValue }
-if let newValue = newValue as? PropertyInfo { return newValue }
+if let newValue = newValue as? Expr { return newValue }
 return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
       `,
     },
