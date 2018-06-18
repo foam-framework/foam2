@@ -13,10 +13,8 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.DAO',
-    'foam.core.X',
-    'java.util.Date',
-    'java.text.DateFormat',
-],
+    'foam.core.X'
+  ],
 
   requires: [
     'foam.nanos.logger.LogLevel',
@@ -27,7 +25,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'errorLevelThreshhold',
-      value: 12,
+      value: 1,
     },
     {
       class: 'Enum',
@@ -42,32 +40,53 @@ foam.CLASS({
       name: 'generateNotificationEvent',
       args: [
         {
+          name: 'type',
+          javaType: 'String'
+        },
+        {
           name: 'args',
           javaType: 'Object...'
         }
       ],
       javaCode: `
-            try {
-              X x = x_.put("logger", NullLogger.instance() ) ; 
-              foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
-              notif.setUserId(9);
-              // s.setGroupId("NOC");
-              notif.setEmailIsEnabled(true);
-              notif.getEmailArgs().put("type", args);
-              notif.setEmailName("notification-logger-error");
-              notif.setBody("A notification email was triggered from the nanopay notification logger.");
-              if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,notif) ;         
-              // if (x_.get("notificationDAO") != null) ((DAO) x_.get("notificationDAO")).put_(x_,notif) ; 
-              System.err.print("generateNotificationEventCompleted");
-              System.err.print("\\n");
-            } catch(Throwable t) {
-              System.out.println("DJ NOTIFICATION ERROR MESSAGE: " + t);
-            }
-
-      `
+  X x = x_.put("logger", NullLogger.instance() ) ; 
+  
+  String message = "";
+  foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
+  for ( int i = 0 ; i < args.length ; i++ ) {
+    message = message + args[i] + " ";  
+  }
+  
+  notif.setEmailIsEnabled(true);
+  // notif.setGroupId("NOC");
+  notif.setUserId(9);
+  notif.getEmailArgs().put("type", type);
+  notif.getEmailArgs().put("message", message);
+  notif.setEmailName("notification-logger-error");
+  if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,notif) ;         
+  // System.err.print("generateNotificationEventCompleted");
+  // System.err.print("\\n");
+  `
     },
+    {
+      name: 'info',
+      args: [
+        {
+          name: 'args',
+          javaType: 'Object...'
+        }
+      ],
+      javaReturns: 'void',
+      javaCode: `
+  if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
+    String logLevel = "An info";
+    generateNotificationEvent(logLevel,args);
+  }
+  getDelegate().info(args);          
+  `
+  },
   {
-    name: 'info',
+    name: 'warning',
     args: [
       {
         name: 'args',
@@ -76,16 +95,15 @@ foam.CLASS({
     ],
     javaReturns: 'void',
     javaCode: `
-    if (LogLevel.INFO.getOrdinal() >= getErrorLevelThreshhold() ) {
-      generateNotificationEvent(args);
-      System.err.print("info notification email sent");
-    }
-    getDelegate().info(args);          
-
-    `
-},
-{
-  name: 'warning',
+  if (LogLevel.WARNING.getOrdinal() >= getErrorLevelThreshhold() ) {
+    String logLevel = "A warning";
+    generateNotificationEvent(logLevel,args);
+  }
+  getDelegate().warning(args);          
+  `
+  },
+  {
+  name: 'error',
   args: [
     {
       name: 'args',
@@ -94,35 +112,13 @@ foam.CLASS({
   ],
   javaReturns: 'void',
   javaCode: `
-  if (LogLevel.WARNING.getOrdinal() >= getErrorLevelThreshhold() ) {
-    Thread.dumpStack();
-    generateNotificationEvent(args);
-    System.err.print("warning notification email sent");      
+  if (LogLevel.ERROR.getOrdinal() >= getErrorLevelThreshhold() ) {
+    String logLevel = "An error";  
+    generateNotificationEvent(logLevel,args);
   }
-  getDelegate().warning(args);          
-  `
-},
-{
-name: 'error',
-args: [
-  {
-    name: 'args',
-    javaType: 'Object...'
-  }
-],
-javaReturns: 'void',
-javaCode: `
-if (LogLevel.ERROR.getOrdinal() >= getErrorLevelThreshhold() ) {
-  generateNotificationEvent(args);
-  System.err.print("error notification email sent");    
-}
-getDelegate().error(args);          
-
+  getDelegate().error(args);          
 `
-},
-
-
-
+  },
   ]
 });
 
