@@ -145,6 +145,11 @@ foam.CLASS({
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
     {
+      class: 'String',
+      name: 'swiftToJSON',
+      value: 'outputter.output(&out, value)',
+    },
+    {
       class: 'Boolean',
       name: 'swiftSupport',
       value: true,
@@ -391,7 +396,9 @@ class PInfo: PropertyInfo {
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
-  let visibility = Visibility.<%=this.visibility.name%>
+  lazy private(set) var visibility: Visibility = {
+    return Visibility.<%=this.visibility.name%>
+  }()
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
   public func set(_ obj: FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
@@ -452,6 +459,9 @@ class PInfo: PropertyInfo {
 <% } else { %>
     return nil
 <% } %>
+  }
+  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
+    <%=p.swiftToJSON%>
   }
 }
 return PInfo(classInfo())
@@ -641,7 +651,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        return (of ? of.model_.swiftName : 'FOAM_enum') + (required ? '' : '?');
+        return (of ? of.model_.swiftName : 'AbstractEnum') + (required ? '' : '?');
       },
     },
     {

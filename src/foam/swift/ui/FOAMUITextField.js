@@ -45,7 +45,7 @@ newValue.delegate = self
     {
       name: 'fromProperty',
       swiftCode: function() {/*
-view.isEnabled = prop.visibility == .RW
+view.isEnabled = prop.visibility == Visibility.RW
 if view.isEnabled {
   view.backgroundColor = UIColor(red: 0.97, green: 0.97, blue: 0.97, alpha: 1)
 }
