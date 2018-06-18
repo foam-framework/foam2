@@ -269,9 +269,6 @@ foam.CLASS({
       class: 'String',
       name: 'documentation',
       transient: true,
-      adapt: function(_, d) {
-        return typeof d === 'function' ? foam.String.multiline(d).trim() : d;
-      }
     },
     {
       class: 'Int',
