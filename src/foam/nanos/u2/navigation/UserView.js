@@ -35,14 +35,21 @@ foam.CLASS({
     'notificationDAO',
     'stack',
     'user',
-    'window'
+    'userDAO',
+    'window',
+    'localBalanceDAO'
+  ],
+
+  exports: [
+    'as data'
   ],
 
   requires: [
     'foam.nanos.auth.Group',
     'foam.nanos.menu.Menu',
     'foam.nanos.menu.SubMenuView',
-    'foam.nanos.notification.Notification'
+    'foam.nanos.notification.Notification',
+    'foam.u2.PopupView',
   ],
 
   css: `
@@ -152,6 +159,9 @@ foam.CLASS({
       -ms-transform: translate(110px, -16px);
       transform: translate(110px, -16px);
     }
+    ^ .currency-container {
+      all:none !important;
+    }
   `,
 
   properties: [
@@ -164,10 +174,7 @@ foam.CLASS({
       name: 'showCountUnread',
       expression: (countUnread) => countUnread > 0,
     },
-    {
-      name: 'userCur',
-      factory: (user) => this.user
-    }
+    'optionsBtn_'
   ],
 
   methods: [
@@ -178,8 +185,16 @@ foam.CLASS({
       this
         .addClass(this.myClass())
 
+        //currency menu
+        .start().addClass('currency-container')
+          .select(this.menuDAO.where(this.EQ(this.Menu.ID, 'currency')), function(menu) {
+            return menu.handler;
+          })
+        this.end()
+
+
         // The notifications container
-        .start('div')
+        this.start('div')
           .addClass('icon-container')
 
           // Show blue underline if user is on notifications page.
@@ -221,6 +236,7 @@ foam.CLASS({
 
     /** Change the application page to #notifications */
     function changeToNotificationsPage() {
+
       this.menuDAO
           .where(this.EQ(this.Menu.ID, 'notifications'))
           .select()
