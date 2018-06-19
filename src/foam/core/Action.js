@@ -175,9 +175,17 @@ foam.CLASS({
       of: 'Action',
       name: 'actions',
       adaptArrayElement: function(o, prop) {
-        return typeof o === 'function' ?
-            foam.core.Action.create({name: o.name, code: o}) :
-            this.lookup(prop.of).create(o) ;
+        if ( typeof o === 'function' ) {
+          return foam.core.Action.create({name: o.name, code: o});
+        }
+
+        if ( o.class ) {
+          var a = this.lookup(o.class);
+          if ( ! a ) throw 'Unknown class : ' + o.class;
+          return a.create(o, this);
+        }
+
+        return this.lookup(prop.of).create(o, this);
       }
     }
   ]
