@@ -152,6 +152,9 @@ foam.CLASS({
       -ms-transform: translate(110px, -16px);
       transform: translate(110px, -16px);
     }
+    ^ .currency-container {
+      all:none !important;
+    }
   `,
 
   properties: [
@@ -178,8 +181,16 @@ foam.CLASS({
       this
         .addClass(this.myClass())
 
+        //currency menu
+        .start().addClass('currency-container')
+          .select(this.menuDAO.where(this.EQ(this.Menu.ID, 'currency')), function(menu) {
+            return menu.handler;
+          })
+        this.end()
+
+
         // The notifications container
-        .start('div')
+        this.start('div')
           .addClass('icon-container')
 
           // Show blue underline if user is on notifications page.
