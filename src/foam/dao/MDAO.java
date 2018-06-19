@@ -110,6 +110,13 @@ public class MDAO
 
     if ( o == null ) return null;
 
+    // Temporary until DAO supports find_(Predicate) directly
+    if ( o instanceof foam.mlang.predicate.Predicate ) {
+      java.util.List l = ((ArraySink) this.where((foam.mlang.predicate.Predicate) o).limit(1).select(new ArraySink())
+      ).getArray();
+      return l.size() == 1 ? (foam.core.FObject) l.get(0) : null;
+    }
+
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
             ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
