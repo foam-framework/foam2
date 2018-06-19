@@ -170,8 +170,7 @@ foam.CLASS({
     {
       name: 'userCur',
       factory: (user) => this.user
-    },
-    'optionsBtn_'
+    }
   ],
 
   methods: [
