@@ -35,21 +35,14 @@ foam.CLASS({
     'notificationDAO',
     'stack',
     'user',
-    'userDAO',
-    'window',
-    'localBalanceDAO'
-  ],
-
-  exports: [
-    'as data'
+    'window'
   ],
 
   requires: [
     'foam.nanos.auth.Group',
     'foam.nanos.menu.Menu',
     'foam.nanos.menu.SubMenuView',
-    'foam.nanos.notification.Notification',
-    'foam.u2.PopupView',
+    'foam.nanos.notification.Notification'
   ],
 
   css: `
@@ -174,6 +167,10 @@ foam.CLASS({
       name: 'showCountUnread',
       expression: (countUnread) => countUnread > 0,
     },
+    {
+      name: 'userCur',
+      factory: (user) => this.user
+    },
     'optionsBtn_'
   ],
 
@@ -236,7 +233,6 @@ foam.CLASS({
 
     /** Change the application page to #notifications */
     function changeToNotificationsPage() {
-
       this.menuDAO
           .where(this.EQ(this.Menu.ID, 'notifications'))
           .select()
