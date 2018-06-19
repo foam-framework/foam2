@@ -236,6 +236,8 @@ public class UserAndGroupAuthService
     user.setPasswordLastModified(Calendar.getInstance().getTime());
     user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
+    // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
+    user.setPasswordExpiry(null);
     user = (User) userDAO_.put(user);
     session.setContext(session.getContext().put("user", user));
     return user;
