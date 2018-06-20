@@ -35,6 +35,9 @@ public class UserPasswordHashingDAO
       if ( stored != null && ! SafetyUtil.isEmpty(stored.getPassword()) ) {
         user.setPreviousPassword(stored.getPassword());
       }
+
+      // erase desired password after hashing
+      user.setDesiredPassword(null);
       return super.put_(x, obj);
     }
 
@@ -57,7 +60,7 @@ public class UserPasswordHashingDAO
     if ( stored.getPasswordLastModified() != null ) {
       user.setPasswordLastModified(stored.getPasswordLastModified());
     }
-    
+
     return super.put_(x, obj);
   }
 }
