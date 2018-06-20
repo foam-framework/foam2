@@ -173,7 +173,8 @@ foam.CLASS({
 
         Interpreter shell = new Interpreter();
         try {
-          shell.set("x", x);
+          foam.core.X y = x.put("logger", new foam.nanos.logger.StdoutLogger());
+          shell.set("x", y);
           Object service = shell.eval(getServiceScript());
           saveService(x, service);
           return service;
