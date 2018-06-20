@@ -58,36 +58,24 @@ foam.CLASS({
       ],
       javaCode: `
   X x = x_.put("logger", NullLogger.instance() ) ; 
-  
+
+  foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
   
   String message = type + ": ";
-  foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
   for ( int i = 0 ; i < args.length ; i++ ) {
     message = message + args[i] + " ";  
   }
 
-  CloseableHttpClient client = HttpClients.createDefault();
-  HttpPost httppost = new HttpPost("https://hooks.slack.com/services/...");
-  httppost.addHeader("Content-type", "application/json");
-  StringEntity params = new StringEntity("{\\"text\\" : \\""+message+"\\"}","UTF-8");
-  params.setContentType("application/json");
-  httppost.setEntity(params);
-  try {
-    CloseableHttpResponse response = client.execute(httppost);
-  }
-  catch (Throwable t){
-    ;
-  }
-
   notif.setEmailIsEnabled(true);
-  // notif.setGroupId("NOC");
-  notif.setUserId(9);
+  notif.setGroupId("NOC");
   notif.getEmailArgs().put("type", type);
   notif.getEmailArgs().put("message", message);
   notif.setEmailName("notification-logger-error");
   if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,notif) ;         
-  // System.err.print("generateNotificationEventCompleted");
-  // System.err.print("\\n");
+  notif.setSendSlackMessage(true);
+  notif.setSlackWebhook("https://hooks.slack.com/services/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");
+  notif.setSlackMessage(message);
+
   `
     },
     {
@@ -139,7 +127,7 @@ foam.CLASS({
     generateNotificationEvent(logLevel,args);
   }
   getDelegate().error(args);          
-`
+  `
   },
   ]
 });
