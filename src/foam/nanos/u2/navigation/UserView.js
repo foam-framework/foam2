@@ -211,7 +211,7 @@ foam.CLASS({
             .add( this.countUnread$ )
             .show( this.showCountUnread$ )
           .end()
-        .end();
+        .end()
 
         // The username and settings dropdown
         .start().addClass('profile-container')
