@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'NotificationListView',
@@ -11,8 +17,9 @@ foam.CLASS({
   imports: [
     'notificationDAO',
     'stack',
-    'user'
-    ],
+    'user',
+    'currentMenu',
+  ],
 
   requires: [
     'foam.nanos.notification.Notification',
@@ -26,7 +33,6 @@ foam.CLASS({
   ],
 
   css: `
-  
      ^ .foam-u2-DAOList > div {
       background: white;
       margin-top:1px;
@@ -92,10 +98,12 @@ foam.CLASS({
               this.EQ(this.Notification.USER_ID, this.user.id),
               this.EQ(this.Notification.GROUP_ID, this.user.group),
               this.EQ(this.Notification.BROADCASTED, true)
-            ), 
-            this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledTopics))
+            ),
+            this.NOT(this.IN(
+                this.Notification.NOTIFICATION_TYPE,
+                this.user.disabledTopics))
           )
-        ).orderBy(this.DESC(this.Notification.ISSUED_DATE))
+        ).orderBy(this.DESC(this.Notification.ISSUED_DATE));
       },
       view: {
         class: 'foam.u2.DAOList',
@@ -112,10 +120,12 @@ foam.CLASS({
               this.EQ(this.Notification.USER_ID, this.user.id),
               this.EQ(this.Notification.GROUP_ID, this.user.group),
               this.EQ(this.Notification.BROADCASTED, true)
-            ), 
-            this.NOT(this.IN(this.Notification.NOTIFICATION_TYPE, this.user.disabledTopics))
+            ),
+            this.NOT(this.IN(
+                this.Notification.NOTIFICATION_TYPE,
+                this.user.disabledTopics))
           )
-        ).orderBy(this.DESC(this.Notification.ISSUED_DATE))
+        ).orderBy(this.DESC(this.Notification.ISSUED_DATE));
       },
       view: {
         class: 'foam.u2.DAOList',
@@ -123,13 +133,10 @@ foam.CLASS({
       }
     }
   ],
-  
+
   methods: [
     function initE() {
-      var self = this;
-      this
-        .addClass(this.myClass())
-        .add(this.notificationsE())
+      this.addClass(this.myClass()).add(this.notificationsE());
     },
 
     function notificationsE() {
@@ -142,7 +149,7 @@ foam.CLASS({
           .add('Notifications')
         .end()
         .start('div').addClass('unread').add(this.UNREAD).end()
-        .add(this.NOTIFICATIONS)
+        .add(this.NOTIFICATIONS);
     }
   ],
 
@@ -150,7 +157,9 @@ foam.CLASS({
     {
       name: 'settings',
       code: function() {
-        this.stack.push({ class: 'foam.nanos.notification.NotificationSettingsView' });
+        this.stack.push({
+          class: 'foam.nanos.notification.NotificationSettingsView'
+        });
       }
     }
   ]

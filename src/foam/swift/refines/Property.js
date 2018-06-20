@@ -145,6 +145,11 @@ foam.CLASS({
       expression: function(swiftName) { return foam.String.constantize(swiftName); },
     },
     {
+      class: 'String',
+      name: 'swiftToJSON',
+      value: 'outputter.output(&out, value)',
+    },
+    {
       class: 'Boolean',
       name: 'swiftSupport',
       value: true,
@@ -341,7 +346,7 @@ self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
 return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftExpression ) { %>
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
-let valFunc = { [unowned self] () -> <%= this.swiftValueType %> in
+let valFunc = { [unowned self] () -> <%= this.swiftType %> in
   <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
   let <%=arg.join('$')%> = self.<%=arg[0]%><% if (arg.length > 1) {%>$<% arg.slice(1).forEach(function(a) { %>.dot("<%=a%>")<% }) %>.swiftGet()<% } %>
   <% } %>
@@ -391,7 +396,9 @@ class PInfo: PropertyInfo {
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
-  let visibility = Visibility.<%=this.visibility.name%>
+  lazy private(set) var visibility: Visibility = {
+    return Visibility.<%=this.visibility.name%>
+  }()
   lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
   public func set(_ obj: FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
@@ -452,6 +459,9 @@ class PInfo: PropertyInfo {
 <% } else { %>
     return nil
 <% } %>
+  }
+  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
+    <%=p.swiftToJSON%>
   }
 }
 return PInfo(classInfo())
@@ -641,7 +651,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        return (of ? of.model_.swiftName : 'FOAM_enum') + (required ? '' : '?');
+        return (of ? of.model_.swiftName : 'AbstractEnum') + (required ? '' : '?');
       },
     },
     {

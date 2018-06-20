@@ -362,8 +362,6 @@ foam.CLASS({
     {
       name: 'delegate',
       transient: true,
-      cloneProperty: function(){},
-      javaCloneProperty: '//nop',
       factory: function() {
         return this.blobService.find(this.id);
       },
@@ -393,7 +391,21 @@ foam.CLASS({
   properties: [
     [ 'of', 'foam.blob.Blob' ],
     [ 'tableCellView', function() {} ],
-    [ 'view', { class: 'foam.u2.view.BlobView' } ]
+    [ 'view', { class: 'foam.u2.view.BlobView' } ],
+    [ 'cloneProperty', function () {} ],
+    [ 'diffProperty', function () {} ],
+    [ 'javaCloneProperty', '// noop' ],
+    [ 'javaDiffProperty', '// noop' ]
+  ],
+
+  methods: [
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.getMethod('compare').body = `return 0;`
+      info.getMethod('comparePropertyToObject').body = `return 0;`
+      info.getMethod('comparePropertyToValue').body = `return 0;`
+      return info;
+    }
   ]
 });
 

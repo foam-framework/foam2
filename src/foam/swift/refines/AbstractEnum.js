@@ -6,95 +6,77 @@
 
 foam.CLASS({
   refines: 'foam.core.AbstractEnum',
+  flags: ['swift'],
   axioms: [
     {
       installInClass: function(cls) {
-        cls.toSwiftClass =  function() {
-          var cls = foam.swift.Enum.create({
-            name: this.model_.swiftName,
-            extends: 'Int',
-            implements: ['FOAM_enum'],
-          });
+        var toSwiftValue = function(v) {
+          var type = foam.typeOf(v);
 
-          // push id field
-          cls.fields.push(
-            foam.swift.Field.create({
-              type: 'String',
-              name: 'classId',
-              getter: `return "${this.model_.id}";`,
-              visibility: 'public'
-            })
-          );
-
-          var templates = foam.swift.EnumTemplates.create();
-          var axioms = this.getAxiomsByClass(foam.core.Property);
-          for (var i = 0; i < axioms.length; i++) {
-            var a = axioms[i];
-            cls.fields.push(
-              foam.swift.Field.create({
-                type: a.swiftType,
-                name: a.swiftName,
-                getter: templates.propertyGetter(a, this.VALUES),
-                visibility: 'public',
-              })
-            );
+          if ( type == foam.Number ) {
+            return `${v}`;
+          } else if ( type == foam.String ) {
+            return `"${v}"`;
+          } else {
+            console.log('Encountered unexpected type while outputting enum');
+            debugger;
           }
-
-          this.VALUES.forEach(function(v) {
-            cls.values.push(foam.swift.EnumValue.create({
+        }
+        var toSwiftClass = cls.toSwiftClass;
+        cls.toSwiftClass =  function() {
+          var self = this;
+          var cls = toSwiftClass.bind(self)()
+          self.VALUES.forEach(function(v) {
+            cls.field(foam.swift.Field.create({
               name: v.name,
-            }))
+              static: true,
+              visibility: 'public',
+              defaultValue: `Context.GLOBAL.create(
+                ${self.model_.swiftName}.self, args: [
+                  ${v.cls_.getAxiomsByClass(foam.core.Property)
+                      .filter(function(p) {
+                        return toSwiftValue(p.get(v));
+                      })
+                      .map(function(p) {
+                        return `"${p.name}": ${toSwiftValue(p.get(v))}`
+                      }).join(',')}
+                ])!`,
+            }));
           });
-
-          cls.method(foam.swift.Method.create({
-            name: 'fromOrdinal',
-            args: [
-              foam.swift.Argument.create({
-                type: 'Int',
-                localName: 'ordinal',
-              })
-            ],
-            static: true,
-            returnType: this.model_.swiftName + '!',
-            body: templates.fromOrdinal(this.VALUES),
-          }))
-
-
-          return cls;
+          if ( this.model_.id != 'foam.core.AbstractEnum' ) {
+            cls.method(foam.swift.Method.create({
+              static: true,
+              name: 'fromOrdinal',
+              args: [
+                foam.swift.Argument.create({
+                  localName: 'o',
+                  type: 'Int',
+                })
+              ],
+              body: `
+                switch o {
+                  ${self.VALUES.map(function(v) {
+                    return `case ${v.ordinal}: return ${v.name}`;
+                  }).join('\n')}
+                  default: fatalError()
+                }
+              `,
+              returnType: self.model_.swiftName,
+            }));
+          }
+          return cls
         };
       }
     }
-  ],
+  ]
 });
 
 foam.CLASS({
-  package: 'foam.swift',
-  name: 'EnumTemplates',
-  templates: [
+  refines: 'foam.core.Enum',
+  properties: [
     {
-      name: 'propertyGetter',
-      args: ['property', 'values'],
-      template: function() {/*
-<% var p = property.clone() %>
-switch self {
-<% values.forEach(function(v) { %>
-  <% p.value = v[p.name] %>
-  case .<%=v.name%>: return <%=p.swiftValue%>
-<% }) %>
-}
-      */},
-    },
-    {
-      name: 'fromOrdinal',
-      args: ['values'],
-      template: function() {/*
-switch ordinal {
-<% values.forEach(function(v) { %>
-  case <%=v.ordinal%>: return .<%=v.name%>
-<% }) %>
-  default: return nil
-}
-      */},
-    },
-  ],
+      name: 'swiftToJSON',
+      value: 'outputter.output(&out, (value as? AbstractEnum)?.ordinal ?? nil)'
+    }
+  ]
 });
