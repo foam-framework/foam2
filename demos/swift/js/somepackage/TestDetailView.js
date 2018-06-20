@@ -1,7 +1,8 @@
 foam.CLASS({
   class: 'foam.swift.ui.GenIBOutletDetailViewModel',
+  package: 'somepackage',
   name: 'TestDetailView',
   classes: [
-    'Test',
+    'somepackage.Test',
   ],
 });

@@ -1,10 +1,11 @@
 foam.CLASS({
   name: 'TestApp',
+  package: 'somepackage',
   swiftImports: [
     'UIKit',
   ],
   requires: [
-    'Test',
+    'somepackage.Test',
     'foam.swift.dao.ArrayDAO',
     'foam.swift.ui.DAOTableViewSource',
     'foam.swift.ui.DAOViewController',
@@ -24,7 +25,7 @@ return UINavigationController(rootViewController: daoController.vc)
     },
     {
       class: 'foam.dao.DAOProperty',
-      of: 'Test',
+      of: 'somepackage.Test',
       name: 'dao',
       swiftFactory: function() {/*
 return ArrayDAO_create([
