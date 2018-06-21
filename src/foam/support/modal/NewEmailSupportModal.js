@@ -5,6 +5,10 @@ foam.CLASS({
 
   documentation:'EMAIL SUPPORT MODAL',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
     'foam.u2.ModalHeader',
     'foam.support.model.SupportEmail',
@@ -137,34 +141,33 @@ foam.CLASS({
       {
         name: 'nextButton',
         label: 'Next',
-        code: function(X){
-        var expr = foam.mlang.Expressions.create();
+        code: function(X) {
 
-        if(!this.email) return;
-        var self = this;
-        // check to see if the user email is existed
-        this.supportEmailDAO.where(expr.EQ(this.SupportEmail.EMAIL, this.email)).select().then(
-          function(result){
-            if (result.a.length == 0) {
-              const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-              console.log(self.email);
-              if (!emailRegex.test(self.email)){
-                self.add(self.NotificationMessage.create({ message: 'The email you have entered is invalid, try again.', type: 'error' })); 
-                return;
+          if(!this.email) return;
+          var self = this;
+          const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (!emailRegex.test(this.email)) {
+            this.add(this.NotificationMessage.create({ message: 'The email you have entered is invalid, try again.', type: 'error' })); 
+            return;
+          }
+
+          // check to see if the user email is existed
+          this.supportEmailDAO.where(this.EQ(this.SupportEmail.EMAIL, this.email)).select(this.COUNT()).then(
+            function(result) {
+              if (result.value === 0) {
+                var email = self.SupportEmail.create({
+                  email: self.email,
+                  connectedTime: new Date()
+                });
+                // save support email details in journal
+                self.user.supportEmails.put(email);
+                self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal' }));
+                X.closeDialog();
+              } else {
+                self.add(self.NotificationMessage.create({ message: 'The email you have entered is existed.', type: 'error' }));
               }
-              var email = self.SupportEmail.create({
-                email: self.email,
-                userId: self.user.id,
-                connectedTime: new Date()
-              });
-              // save support email details in journal
-              self.user.supportEmails.put(email);
-              self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal'}));
-              X.closeDialog()
-            } else {
-              self.add(self.NotificationMessage.create({ message: 'The email you have entered is existed.', type: 'error' })); 
             }
-        });
+          );
         }
       },
       {
