@@ -186,10 +186,10 @@ foam.CLASS({
           .select(this.menuDAO.where(this.EQ(this.Menu.ID, 'currency')), function(menu) {
             return menu.handler;
           })
-        this.end().
+        this.end()
 
         // The notifications container
-        start('div')
+        this.start('div')
           .addClass('icon-container')
 
           // Show blue underline if user is on notifications page.
