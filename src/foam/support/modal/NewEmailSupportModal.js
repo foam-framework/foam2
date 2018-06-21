@@ -155,10 +155,10 @@ foam.CLASS({
               var email = self.SupportEmail.create({
                 email: self.email,
                 userId: self.user.id,
-                connectedTime: new Date(Date)
+                connectedTime: new Date()
               });
               // save support email details in journal
-              self.supportEmailDAO.put(email);
+              self.user.supportEmails.put(email);
               self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal'}));
               X.closeDialog()
             } else {

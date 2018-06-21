@@ -12,6 +12,10 @@ foam.CLASS({
       name: 'email'
     },
     {
+      class: 'Password',
+      name: 'password'
+    },
+    {
       class: 'String',
       name: 'status',
       factory: function(){
@@ -21,14 +25,6 @@ foam.CLASS({
     {
       class: 'Date',
       name: 'connectedTime'
-    },
-    {
-      class: 'Long',
-      name: 'userId'
-    },
-    {
-      class: 'Password',
-      name: 'password'
     }
   ]
 });

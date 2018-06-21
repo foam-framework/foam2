@@ -5,11 +5,12 @@ foam.CLASS({
 
   requires: [ 
     'foam.u2.ListCreateController',
-    'foam.u2.dialog.Popup'
+    'foam.u2.dialog.Popup',
+    'foam.u2.view.TableView'
   ],
 
   imports: [ 
-    'supportEmailDAO', 
+    'user',
     'createLabel',  
     'ctrl' 
   ],
@@ -119,7 +120,7 @@ foam.CLASS({
   methods: [
     function initE(){
       var self = this;
-      this.supportEmailDAO.limit(1).select().then(function(a){ 
+      this.user.supportEmails.limit(1).select().then(function(a){ 
         self.emptyDAO = a.array.length == 0;
       });
 
@@ -131,7 +132,7 @@ foam.CLASS({
           .start().addClass('align').end() 
           .start({
             class: 'foam.u2.ListCreateController',
-            dao: this.supportEmailDAO,
+            dao: this.user.supportEmails,
             summaryView: this.EmailSupportTableView.create(),
             showActions: false
           }).hide(this.emptyDAO$).end()
@@ -163,11 +164,20 @@ foam.CLASS({
       
       exports: [ 'as data' ],
       
-      imports: [ 'supportEmailDAO' ],
+      imports: [ 'user' ],
       
       properties: [
         'selection'
       ],
+
+      css:`
+        ^ .foam-u2-view-TableView-th-email{
+          width: 50%;
+        }
+        ^ .foam-u2-view-TableView-th-connectedTime{
+          width: 300%;
+        }
+      `,
       
   methods: [
       function initE() {
@@ -176,8 +186,8 @@ foam.CLASS({
             selection$: this.selection$,
             class: 'foam.u2.view.ScrollTableView',
             height: 20,
-            data: this.supportEmailDAO,
-            columns: ['id', 'email', 'status', 'connectedTime']
+            data: this.user.supportEmails,
+            columns: ['id', 'email', 'connectedTime', 'status']
           }).addClass(this.myClass('table')).end();
           }
         ] 
