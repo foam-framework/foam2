@@ -119,6 +119,36 @@ foam.CLASS({
   ]
 });
 
+foam.CLASS({
+  package: 'foam.doc',
+  name: 'EnumInfo',
+  ids: ['name'],
+
+  requires: [
+    'foam.doc.ClassLink'
+  ],
+
+  properties: [
+    {
+      name: 'name',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(value);
+      }
+    },
+    {
+      name: 'label',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(value);
+      }
+    },
+    {
+      name: 'documentation',
+      tableCellFormatter: function(value, obj, axiom) {
+        this.add(value);
+      }
+    },
+  ]
+});
 
 foam.CLASS({
   package: 'foam.doc',
@@ -207,6 +237,62 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  package: 'foam.doc',
+  name: 'ClassDocViewEnumValue',
+  extends: 'foam.u2.View',
+
+  requires: [
+    'foam.dao.ArrayDAO',
+    'foam.doc.EnumInfo',
+    'foam.doc.ClassLink',
+    'foam.u2.view.TableView'
+  ],
+
+  imports: [
+    'selectedAxiom'
+  ],
+
+  methods: [
+    function initE() {
+      this.SUPER();
+      var data = this.data;
+      this.
+          start('b').add(data.id).end().
+          br().
+          add('extends: ');
+
+      var cls = data;
+      for ( var i = 0 ; cls ; i++ ) {
+        cls = this.lookup(cls.model_.extends, true);
+        if ( i ) this.add(' : ');
+        this.start(this.ClassLink, {data: cls}).end();
+        if ( cls === foam.core.FObject ) break;
+      }
+      this.br();
+      this.start(foam.u2.HTMLElement).add(data.model_.documentation).end();
+
+      this.add( this.slot(function () {
+        var axs = [];
+        for ( var key in data.model_.values ) {
+          var a  = data.model_.values[key];
+          var ai = foam.doc.EnumInfo.create({
+            label: data[a.name].label,
+            documentation: data[a.name].documentation,
+            name: a.name
+          });
+          axs.push(ai);
+        }
+        return this.TableView.create({
+          of: this.EnumInfo,
+          data: this.ArrayDAO.create({array: axs}),
+          hoverSelection$: this.selectedAxiom$
+        });
+      }));
+    }
+  ]
+});
 
 foam.CLASS({
   package: 'foam.doc',
@@ -365,6 +451,7 @@ foam.CLASS({
 
   requires: [
     'foam.doc.ClassDocView',
+    'foam.doc.ClassDocViewEnumValue',
     'foam.doc.ClassList',
     'foam.doc.DocBorder',
     'foam.doc.UMLDiagram'
@@ -521,11 +608,17 @@ foam.CLASS({
                   return this.ClassDocView.create({data: selectedClass});
                 })).
               end().
-            end().
+              start(this.DocBorder, {title: 'Enum values'}).
+              add(this.slot(function(selectedClass) {
+                if ( ! selectedClass ) return '';
+                  return this.ClassDocViewEnumValue.create({data: selectedClass});
+                })).
+              end().
               start('td').
               style({
                 'vertical-align': 'top'
               }).
+              end().
               tag(this.ClassList, {
                 title: 'Class List',
                 showPackages: false,
@@ -534,6 +627,7 @@ foam.CLASS({
               }).
               end().
               start('td').
+              style({'vertical-align': 'top'}). 
               tag(this.ClassList, {title: 'Sub-Classes', data$: this.subClasses$}).
               br().
               tag(this.ClassList, {title: 'Required-By', data$: this.requiredByClasses$}).
