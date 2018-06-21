@@ -62,7 +62,8 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.doc',
   name: 'AxiomInfo',
-  ids: ['name'],
+
+  ids: [ 'name' ],
 
   requires: [
     'foam.doc.ClassLink'
@@ -119,10 +120,12 @@ foam.CLASS({
   ]
 });
 
+
 foam.CLASS({
   package: 'foam.doc',
   name: 'EnumInfo',
-  ids: ['name'],
+
+  ids: [ 'name' ],
 
   requires: [
     'foam.doc.ClassLink'
@@ -149,6 +152,7 @@ foam.CLASS({
     },
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.doc',
@@ -245,8 +249,8 @@ foam.CLASS({
 
   requires: [
     'foam.dao.ArrayDAO',
-    'foam.doc.EnumInfo',
     'foam.doc.ClassLink',
+    'foam.doc.EnumInfo',
     'foam.u2.view.TableView'
   ],
 
@@ -293,6 +297,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.doc',
@@ -627,7 +632,7 @@ foam.CLASS({
               }).
               end().
               start('td').
-              style({'vertical-align': 'top'}). 
+              style({'vertical-align': 'top'}).
               tag(this.ClassList, {title: 'Sub-Classes', data$: this.subClasses$}).
               br().
               tag(this.ClassList, {title: 'Required-By', data$: this.requiredByClasses$}).
@@ -715,7 +720,7 @@ foam.CLASS({
   exports: [ 'as data' ],
 
   constants: {
-    SELECTED_COLOR: 'white', //#ddd',
+    SELECTED_COLOR:   'white',
     UNSELECTED_COLOR: '#FFFFCC'
   },
 
@@ -817,22 +822,20 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('center')
-        .tag('br')
-        .start(this.canvas)
-        .on('click', this.onClick)
-        .end()
+          .tag('br')
+          .start(this.canvas)
+            .on('click', this.onClick)
+          .end()
         .end();
     },
 
-    function sign( ex, sx ) {
-      if ( ex - sx > 0 ) {
-        return 1;
-      } if ( ex - sx < 0 )
-          return -1;
-        return 0;
+    function sign(ex, sx) {
+      if ( ex - sx > 0 ) return 1;
+      if ( ex - sx < 0 ) return -1;
+      return 0;
     },
 
-    function triangle( ptX, ptY, ang ) {
+    function triangle(ptX, ptY, ang) {
       return foam.graphics.Polygon.create({
         xCoordinates: [ ptX + this.triangleSize * Math.sin(ang), ptX + this.triangleSize * Math.cos(ang), ptX - this.triangleSize * Math.cos(ang), ptX + this.triangleSize * Math.sin(ang) ],
         yCoordinates: [ ptY, ptY + this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang), ptY - this.triangleSize * Math.sin(ang) + this.triangleSize * Math.cos(ang), ptY ],
@@ -840,10 +843,10 @@ foam.CLASS({
       });
     },
 
-    function addLegend( x, y, w, h ) {
+    function addLegend(x, y, w, h) {
       var startX = 180;
       var startY = 20;
-      var d = 120;
+      var d      = 120;
 
       var marge = 4;
       var cls = this.data;
@@ -1023,10 +1026,10 @@ foam.CLASS({
       this.selected = this.canvas.addChildren( RelatedFromNameLabel, RelatedFromLinkLine, arrowRelatedFrom );
     },
 
-    function addModel( x, y, w, h ) {
+    function addModel(x, y, w, h) {
       var marge = 5;
       var step = 30;
-      var cls = this.data;
+      var cls  = this.data;
       var modelBox = this.Box.create({
         x: x,
         y: y,
@@ -1132,7 +1135,7 @@ foam.CLASS({
       }
     },
 
-    function getAllProperties( data ) {
+    function getAllProperties(data) {
       var prop=[];
       for ( var key in data.axiomMap_ ) {
         if ( Object.hasOwnProperty.call(data.axiomMap_, key) ) {
@@ -1145,17 +1148,17 @@ foam.CLASS({
       return prop;
     },
 
-    function setData( mapDataX, mapDataY, cls ) {
+    function setData(mapDataX, mapDataY, cls) {
       this.elementMap.set({
         x: mapDataX,
         y: mapDataY
       }, cls);
     },
 
-    function addExtends( x, y, w, h ) {
+    function addExtends(x, y, w, h) {
       var marge = 5;
-      var d = 90;
-      var cls = this.data;
+      var d     = 90;
+      var cls   = this.data;
 
       for ( var i = 0; cls; i++ ) {
         cls = this.lookup( cls.model_.extends, true );
@@ -1200,11 +1203,11 @@ foam.CLASS({
       }
     },
 
-    function addImplements( x, y, w, h ) {
+    function addImplements(x, y, w, h) {
       var marge = 5;
       var sideY = 150; //d
       var sideX = -250;
-      var cls = this.data;
+      var cls   = this.data;
 
       if ( cls.model_.implements !== undefined ) {
         for ( var key in cls.model_.implements ) {
@@ -1250,7 +1253,7 @@ foam.CLASS({
       }
     },
 
-    function addRequiredBy( x, y, w, h ) {
+    function addRequiredBy(x, y, w, h) {
       var triangleSize = 5;
       var marge = 5;
       var d = this.conventionalUML ? 400 : 300;
@@ -1471,10 +1474,10 @@ foam.CLASS({
       });
     },
 
-    function addRelatedto( x, y, w, h ) {
-      var d    = this.conventionalUML ? 400 : 300;
-      var d1   = 200;
-      var cls  = this.data;
+    function addRelatedto(x, y, w, h) {
+      var d   = this.conventionalUML ? 400 : 300;
+      var d1  = 200;
+      var cls = this.data;
       //just to avoid the overlap
       var path = cls.id;
       var req  = Object.values(foam.USED).
