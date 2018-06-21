@@ -26,7 +26,7 @@ foam.CLASS({
     ^ .foam-u2-UnstyledActionView-create {
       display: none;
     }
-    ^ .foam-u2-UnstyledActionView-newEmail{
+    ^ .foam-u2-UnstyledActionView-newEmail {
       width: 135px;
       height: 40px;
       border-radius: 2px;
@@ -46,7 +46,7 @@ foam.CLASS({
       margin: auto;
       margin-left: 
     }
-    ^ .btn-mid{
+    ^ .btn-mid {
       width: 100%;
       text-align: center;
       margin-top: 20px;
@@ -58,7 +58,7 @@ foam.CLASS({
       background-color: #ffffff;
       margin: auto;
     }
-    ^ .title{
+    ^ .title {
       width: 100%;
       height: 20px;
       opacity: 0.6;
@@ -75,22 +75,22 @@ foam.CLASS({
       padding-right: 10px;
       padding-top: 30px;
     }
-    ^ .title1{
+    ^ .title1 {
       padding: 2px;
       margin: 28px;
     }
-    ^ .align{
+    ^ .align {
       margin-left: 10px;
       margin-right: 10px;
       margin-bottom: 30px;
     }
-    ^ .input-container-half{
+    ^ .input-container-half {
       width: 960px;
       height: 35px;
       border-radius: 2px;
       background-color: #ffffff;
     }
-    ^ .No-support-email-con{
+    ^ .No-support-email-con {
       width: 183px;
       height: 16px;
       font-family: Roboto;
@@ -105,8 +105,11 @@ foam.CLASS({
       margin-left: 389px;
       margin-right: 388px
     }
-    ^ .foam-u2-view-TableView-th-connectedTime{
-      width: 140px;
+    ^ .foam-u2-view-TableView-th-connectedTime {
+      width: 50%;
+    }
+    ^ .foam-u2-view-TableView-th-email {
+      width: 30%;
     }
   `,
 
@@ -128,7 +131,9 @@ foam.CLASS({
       .addClass(this.myClass())
       .start().addClass('Rectangle-11-Copy')
         .start().addClass('title1')
-          .start().add('Support Email Management').addClass('title').end()
+          .start()
+            .add('Support Emails Management').addClass('title')
+          .end()
           .start().addClass('align').end() 
           .start({
             class: 'foam.u2.ListCreateController',
@@ -137,7 +142,9 @@ foam.CLASS({
             showActions: false
           }).hide(this.emptyDAO$).end()
           .start().addClass('input-container-half').show(this.emptyDAO$)
-            .start().add('No Email Support Connected').addClass('No-support-email-con').end()
+            .start()
+              .add('No support email connected').addClass('No-support-email-con')
+            .end()
           .end()
           .start().addClass('btn-mid')
             .start(this.NEW_EMAIL).end()
@@ -167,30 +174,32 @@ foam.CLASS({
       imports: [ 'user' ],
       
       properties: [
-        'selection'
-      ],
-
-      css:`
-        ^ .foam-u2-view-TableView-th-email{
-          width: 50%;
-        }
-        ^ .foam-u2-view-TableView-th-connectedTime{
-          width: 300%;
-        }
-      `,
-      
-  methods: [
-      function initE() {
-        this
-          .start({
-            selection$: this.selection$,
-            class: 'foam.u2.view.ScrollTableView',
-            height: 20,
-            data: this.user.supportEmails,
-            columns: ['id', 'email', 'connectedTime', 'status']
-          }).addClass(this.myClass('table')).end();
+        'selection',
+        {
+          name: 'data',
+          factory: function() {
+            return this.user.supportEmails;
           }
-        ] 
-      }
-    ]
-  });
+        }
+      ],
+      
+      methods: [
+        function initE() {
+          this
+            .start({
+              class: 'foam.u2.view.ScrollTableView',
+              selection$: this.selection$,
+              data: this.data,
+              columns: [
+                'email',
+                'connectedTime',
+                'status'
+              ]
+            })
+              .addClass(this.myClass('table'))
+            .end();
+        }
+      ] 
+    }
+  ]
+});

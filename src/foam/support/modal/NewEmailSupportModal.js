@@ -122,18 +122,19 @@ foam.CLASS({
           title: 'New Email'
         }))
         .start().addClass('div2')
-        .start().addClass('label1') 
-            .add(this.titlelabel)
-        .end()
-        .start(this.EMAIL).addClass('input-wide').end()
-        .start().addClass('div')
-        .start(this.CLOSE_MODAL).addClass('Rectangle-7')
-        .end()
-          .startContext({ data : this })
-        .start(this.NEXT_BUTTON).addClass('Rectangle-8')
-        .end()
-          .endContext()
-        .end()
+          .start().addClass('label1')
+              .add(this.titlelabel)
+          .end()
+          .start(this.EMAIL).addClass('input-wide').end()
+          .start().addClass('div')
+            .start(this.CLOSE_MODAL).addClass('Rectangle-7')
+            .end()
+            .startContext({ data : this })
+              .start(this.NEXT_BUTTON).addClass('Rectangle-8')
+              .end()
+            .endContext()
+          .end()
+        .end();
       }
     ], 
 
@@ -172,9 +173,9 @@ foam.CLASS({
       },
       {
         name: 'closeModal',
-        label: 'Close',
-        code: function(X){
-          X.closeDialog()
+        label: 'Cancel',
+        code: function(X) {
+          X.closeDialog();
         }
       }
     ]
