@@ -35,6 +35,9 @@ public class LongParser implements Parser {
       if ( Character.isDigit(c) ) {
         n *= 10;
         n += Character.digit(c, 10);
+      } else if ( '.' == c ) {
+        // only parse longs, not floating points
+        return null;
       } else {
         break;
       }
