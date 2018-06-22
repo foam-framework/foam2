@@ -52,6 +52,7 @@ public protocol PropertyInfo: Axiom, SlotGetterAxiom, SlotSetterAxiom, GetterAxi
   func viewFactory(x: Context) -> FObject?
   func hasOwnProperty(_ o: FObject) -> Bool
   func clearProperty(_ o: FObject)
+  func toJSON(outputter: Outputter, out: inout String, value: Any?)
 }
 extension PropertyInfo {
   public func f(_ obj: Any?) -> Any? {
@@ -70,9 +71,6 @@ public protocol JSONOutputter {
 }
 
 extension PropertyInfo {
-  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
-    outputter.output(&out, value)
-  }
   public func compare(_ o1: FObject, _ o2: FObject) -> Int {
     let v1 = get(o1) as AnyObject?
     let v2 = get(o2) as AnyObject?
@@ -515,19 +513,6 @@ public class ModelParserFactory {
         ]]),
       "delim": Literal(["string": ","]),
       ])
-  }
-}
-
-public protocol FOAM_enum: JSONOutputter {
-  var classId: String { get }
-  var ordinal: Int { get }
-  var name: String { get }
-  var label: String { get }
-}
-
-extension FOAM_enum {
-  public func toJSON(outputter: Outputter, out: inout String) {
-    outputter.outputEnum(&out, self)
   }
 }
 
