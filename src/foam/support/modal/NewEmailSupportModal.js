@@ -105,12 +105,19 @@ foam.CLASS({
       {
         class: 'Long',
         name: 'id'
+      },
+      {
+        class: 'String',
+        name: 'emailRegex',
+        value: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       }
     ],
 
     messages:[
       { name:'title', message:'New Email' },
       { name:'titlelabel', message:'Input the email address you want to connect to the help desk.' },
+      { name:'emailInvalid', message: 'The email you have entered is invalid, try again.'},
+      { name:'emailNotExist', message: 'The email you have entered is existed.'}
     ],
 
     methods:[
@@ -143,12 +150,10 @@ foam.CLASS({
         name: 'nextButton',
         label: 'Next',
         code: function(X) {
-
           if(!this.email) return;
           var self = this;
-          const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          if (!emailRegex.test(this.email)) {
-            this.add(this.NotificationMessage.create({ message: 'The email you have entered is invalid, try again.', type: 'error' })); 
+          if (!this.emailRegex.test(this.email)) {
+            this.add(this.NotificationMessage.create({ message: this.emailInvalid, type: 'error' })); 
             return;
           }
 
@@ -165,7 +170,7 @@ foam.CLASS({
                 self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal' }));
                 X.closeDialog();
               } else {
-                self.add(self.NotificationMessage.create({ message: 'The email you have entered is existed.', type: 'error' }));
+                self.add(self.NotificationMessage.create({ message: this.emailNotExist, type: 'error' }));
               }
             }
           );

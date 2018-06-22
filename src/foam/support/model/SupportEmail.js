@@ -23,7 +23,7 @@ foam.CLASS({
       }
     },
     {
-      class: 'Date',
+      class: 'DateTime',
       name: 'connectedTime'
     }
   ]
