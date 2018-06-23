@@ -42,7 +42,23 @@ foam.CLASS({
       factory: function() { return foam.nanos.logger.LogLevel.INFO; }
     }
   ],
-
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data:
+`protected ThreadLocal<Boolean> currentlyLogging = new ThreadLocal<Boolean>() {
+  @Override
+  protected Boolean initialValue() {
+    return false;
+  }
+};`
+        }))
+      }
+    }
+  ],
+  
   methods: [
     {
       name: 'generateNotificationEvent',
@@ -57,25 +73,33 @@ foam.CLASS({
         }
       ],
       javaCode: `
-  X x = x_.put("logger", NullLogger.instance() ) ; 
-
-  foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
-  
-  String message = type + ": ";
-  for ( int i = 0 ; i < args.length ; i++ ) {
-    message = message + args[i] + " ";  
+  if (currentlyLogging.get()) {
+    return;
   }
+  currentlyLogging.set(true);
+  
+  try {
+    foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
 
-  notif.setEmailIsEnabled(true);
-  notif.setGroupId("NOC");
-  notif.getEmailArgs().put("type", type);
-  notif.getEmailArgs().put("message", message);
-  notif.setEmailName("notification-logger-error");
-  if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x,notif) ;         
-  notif.setSendSlackMessage(true);
-  notif.setSlackWebhook("https://hooks.slack.com/services/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");
-  notif.setSlackMessage(message);
-
+    String message = type + ": ";
+    for ( int i = 0 ; i < args.length ; i++ ) {
+      message = message + args[i] + " ";  
+    }
+  
+    notif.setSendSlackMessage(true);
+    notif.setSlackWebhook("https://hooks.slack.com/services/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");
+    notif.setSlackMessage(message);
+    notif.setEmailIsEnabled(true);
+    notif.setGroupId("NOC");
+    notif.getEmailArgs().put("type", type);
+    notif.getEmailArgs().put("message", message);
+    notif.setEmailName("notification-logger-error");
+    if (x_.get("notificationDAO") != null) ((DAO) x_.get("notificationDAO")).put_(x_,notif) ;         
+  }
+  catch (Throwable t) {
+    t.printStackTrace();
+  }
+  currentlyLogging.set(false);
   `
     },
     {
