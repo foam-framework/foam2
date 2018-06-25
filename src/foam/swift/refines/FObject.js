@@ -144,7 +144,7 @@ foam.LIB({
         classInfo.fields.push(foam.swift.Field.create({
           defaultValue: '[:]',
           lazy: true,
-          type: `[${this.getAxiomByName(multiton.property).swiftType}:FObject]`,
+          type: `[${this.getAxiomByName(multiton.property).swiftType}:${foam.core.FObject.model_.swiftName}]`,
           name: 'multitonMap',
         }));
         classInfo.fields.push(foam.swift.Field.create({
@@ -156,7 +156,7 @@ foam.LIB({
       } else if (singleton) {
         classInfo.fields.push(foam.swift.Field.create({
           visibility: 'private',
-          type: 'FObject?',
+          type: foam.core.FObject.model_.swiftName + '?',
           name: 'instance',
         }));
       }
@@ -199,7 +199,7 @@ foam.LIB({
 
       // make implement identifiable if has id property
       if ( this.hasOwnAxiom('id') ) {
-        cls.implements = cls.implements.concat('Identifiable');
+        cls.implements = cls.implements.concat(foam.core.Identifiable.model_.swiftName);
         cls.methods.push(foam.swift.Method.create({
           name: 'getPrimaryKey',
           visibility: 'public',

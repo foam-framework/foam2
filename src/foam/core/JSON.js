@@ -694,7 +694,7 @@ foam.LIB({
     {
       name: 'references',
       code: function(x, o, r) {
-        r = r || [];
+        r = r || {};
 
         if ( foam.Array.isInstance(o) ) {
           for ( var i = 0 ; i < o.length ; i++ ) {
@@ -705,6 +705,10 @@ foam.LIB({
                     foam.core.FObject.isInstance(o) ) {
           return r;
         } else if ( foam.Object.isInstance(o) ) {
+          if ( foam.String.isInstance(o.name) ) {
+            var id = o.package ? o.package + '.' + o.name : o.name;
+            r[id] = Promise.resolve();
+          }
           for ( var key in o ) {
             // anonymous class support.
             if ( key === 'class' && foam.Object.isInstance(o[key]) ) {
@@ -712,9 +716,9 @@ foam.LIB({
               json.name = 'AnonymousClass' + foam.next$UID();
               console.log('Constructing anonymous class', json.name);
 
-              r.push(Promise.all(foam.json.references(x, json, [])).then(function() {
+              r[json.name] = Promise.all(foam.json.references(x, json)).then(function() {
                 return x.classloader.maybeLoad(foam.core.Model.create(json));
-              }));
+              });
 
               o[key] = json.name;
               continue;
@@ -725,15 +729,15 @@ foam.LIB({
                 key == 'sourceModel' ||
                 key == 'targetModel' ||
                 key == 'refines' ) &&
-                        foam.String.isInstance(o[key]) ) {
-              r.push(x.classloader.maybeLoad(o[key]));
+                        foam.String.isInstance(o[key]) && !r[o[key]] ) {
+              r[o[key]] = x.classloader.maybeLoad(o[key]);
               continue;
             }
 
             foam.json.references(x, o[key], r);
           }
 
-          return r;
+          return Object.values(r);
         }
       }
     },

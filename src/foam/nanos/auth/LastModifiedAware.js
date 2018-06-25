@@ -19,7 +19,6 @@ foam.INTERFACE({
       name: 'setLastModified',
       args: [
         {
-          class: 'Date',
           name: 'value',
           javaType: 'java.util.Date',
           swiftType: 'Date'

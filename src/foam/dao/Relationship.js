@@ -293,17 +293,17 @@ foam.INTERFACE({
     {
       name: 'getDAO',
       javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'DAO'
+      returns: 'foam.dao.DAO'
     },
     {
       name: 'getJunctionDAO',
       javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'DAO'
+      returns: 'foam.dao.DAO'
     },
     {
       name: 'getTargetDAO',
       javaReturns: 'foam.dao.DAO',
-      swiftReturns: 'DAO'
+      returns: 'foam.dao.DAO'
     },
   ]
 });
@@ -415,7 +415,7 @@ foam.CLASS({
     },
     {
       name: 'createJunction',
-      args: [ { name: 'targetId', of: 'Object' } ],
+      args: [ { name: 'targetId' } ],
       returns: 'foam.core.FObject',
       javaReturns: 'foam.core.FObject',
       code: function createJunction(targetId) {
@@ -620,13 +620,13 @@ foam.CLASS({
     {
       name: 'swiftFactory',
       factory: function () {
-        return `return __context__.create(ManyToManyRelationshipImpl.self, args: [
+        return `return __context__.create(foam_dao_ManyToManyRelationshipImpl.self, args: [
       "sourceId": id,
-      "sourceProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.sourceProperty.name)}(),
-      "targetProperty": ${this.sourceProperty.sourceCls_.name}.${foam.String.constantize(this.targetProperty.name)}(),
+      "sourceProperty": ${this.sourceProperty.sourceCls_.model_.swiftName}.${foam.String.constantize(this.sourceProperty.name)}(),
+      "targetProperty": ${this.sourceProperty.sourceCls_.model_.swiftName}.${foam.String.constantize(this.targetProperty.name)}(),
       "targetDAOKey": "${this.targetDAOKey}",
       "junctionDAOKey": "${this.junctionDAOKey}",
-      "junction": ${this.sourceProperty.sourceCls_.name}.classInfo()
+      "junction": ${this.sourceProperty.sourceCls_.model_.swiftName}.classInfo()
     ]);
 `;
       }

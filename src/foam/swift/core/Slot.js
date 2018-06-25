@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'linkFrom',
       args: [
         {
-          swiftType: 'Slot',
+          of: 'foam.swift.core.Slot',
           name: 's2',
         },
       ],
@@ -88,7 +88,7 @@ return Subscription {
       name: 'linkTo',
       args: [
         {
-          swiftType: 'Slot',
+          of: 'foam.swift.core.Slot',
           name: 'other',
         },
       ],
@@ -101,7 +101,7 @@ return other.linkFrom(self)
       name: 'follow',
       args: [
         {
-          swiftType: 'Slot',
+          of: 'foam.swift.core.Slot',
           name: 'other',
         },
       ],
@@ -120,7 +120,7 @@ return other.swiftSub { (_, _) in l() }
       name: 'mapFrom',
       args: [
         {
-          swiftType: 'Slot',
+          of: 'foam.swift.core.Slot',
           name: 'other',
         },
         {
@@ -142,7 +142,7 @@ return other.swiftSub { (_, _) in l() }
       name: 'mapTo',
       args: [
         {
-          swiftType: 'Slot',
+          of: 'foam.swift.core.Slot',
           name: 'other',
         },
         {
@@ -165,9 +165,9 @@ return other.mapFrom(self, f)
           name: 'f',
         },
       ],
-      swiftReturns: 'ExpressionSlot',
+      returns: 'foam.swift.core.ExpressionSlot',
       swiftCode: function() {/*
-return ExpressionSlot([
+return foam_swift_core_ExpressionSlot([
   "code": { (args: [Any?]) -> Any? in f(args[0]) },
   "args": [self]
 ])
@@ -181,9 +181,9 @@ return ExpressionSlot([
           name: 'name',
         },
       ],
-      swiftReturns: 'SubSlot',
+      returns: 'foam.swift.core.SubSlot',
       swiftCode: function() {/*
-let s = SubSlot([
+let s = foam_swift_core_SubSlot([
   "parentSlot": self,
   "name": name,
 ])
