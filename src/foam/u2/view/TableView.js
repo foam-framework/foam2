@@ -178,6 +178,10 @@ foam.CLASS({
       white-space: nowrap;
     }
 
+    ^ td {
+      white-space: nowrap;
+    }
+
     ^row:hover {
       background: #eee;
       cursor: pointer;
