@@ -22,7 +22,12 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .start('div').on('click', this.onClick).addClass('msg').add(this.data.body).end();
+        .start('div')
+          .on('click', this.onClick)
+          .addClass('msg')
+          .add(this.data.body)
+          .show(this.data.body !== '')
+        .end();
     }
   ],
 
