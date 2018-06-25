@@ -11,7 +11,7 @@ foam.CLASS({
 
   properties: [
     {
-      swiftType: '[Slot]',
+      swiftType: '[foam_swift_core_Slot]',
       name: 'args',
       swiftPostSet: 'subToArgs_(newValue)',
     },
@@ -52,7 +52,7 @@ return sub(topics: ["propertyChange", "value"], listener: listener)
       args: [
         {
           name: 'slots',
-          swiftType: '[Slot]',
+          swiftType: '[foam_swift_core_Slot]',
         },
       ],
       swiftCode: function() {/*

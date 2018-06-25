@@ -19,7 +19,6 @@ foam.INTERFACE({
       name: 'setEnabled',
       args: [
         {
-          class: 'Boolean',
           name: 'value',
           javaType: 'boolean',
           swiftType: 'Bool'

@@ -165,7 +165,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftJsonParser',
-      value: 'Context.GLOBAL.create(AnyParser.self)!',
+      factory: function() {
+        return `Context.GLOBAL.create(${foam.swift.parse.json.AnyParser.model_.swiftName}.self)!`;
+      },
     },
     {
       class: 'Boolean',
@@ -241,7 +243,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         cls.fields.push(this.Field.create({
           visibility: 'private',
           name: this.swiftSlotValueName,
-          type: 'PropertySlot',
+          type: foam.swift.core.PropertySlot.model_.swiftName,
           lazy: true,
           initializer: this.swiftSlotInitializer()
         }));
@@ -253,7 +255,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         cls.fields.push(this.Field.create({
           visibility: 'public',
           name: this.swiftSlotName,
-          type: 'Slot',
+          type: foam.swift.core.Slot.model_.swiftName,
           getter: 'return self.' + this.swiftSlotValueName,
           setter: this.swiftSlotSetter(),
         }));
@@ -327,7 +329,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
     {
       name: 'swiftSlotInitializer',
       template: function() {/*
-let s = PropertySlot([
+let s = <%=foam.swift.core.PropertySlot.model_.swiftName%>([
   "object": self,
   "propertyName": "<%=this.name%>",
 ])
@@ -404,11 +406,11 @@ class PInfo: PropertyInfo {
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
-  lazy private(set) var visibility: Visibility = {
-    return Visibility.<%=this.visibility.name%>
+  lazy private(set) var visibility: <%=foam.u2.Visibility.model_.swiftName%> = {
+    return <%=foam.u2.Visibility.model_.swiftName%>.<%=this.visibility.name%>
   }()
-  lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
-  public func set(_ obj: FObject, value: Any?) {
+  lazy private(set) public var jsonParser: <%=foam.swift.parse.parser.Parser.model_.swiftName%>? = <%=this.swiftJsonParser%>
+  public func set(_ obj: foam_core_FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
 <% var p = this %>
 <% if ( p.swiftExpression ) { %>
@@ -424,23 +426,23 @@ class PInfo: PropertyInfo {
       _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
   }
-  public func get(_ obj: FObject) -> Any? {
+  public func get(_ obj: foam_core_FObject) -> Any? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftVarName%>
   }
-  public func getSlot(_ obj: FObject) -> Slot {
+  public func getSlot(_ obj: foam_core_FObject) -> <%=foam.swift.core.Slot.model_.swiftName%> {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }
-  public func setSlot(_ obj: FObject, value: Slot) {
+  public func setSlot(_ obj: foam_core_FObject, value: <%=foam.swift.core.Slot.model_.swiftName%>) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     obj.<%=this.swiftSlotName%> = value
   }
-  public func hasOwnProperty(_ obj: FObject) -> Bool {
+  public func hasOwnProperty(_ obj: foam_core_FObject) -> Bool {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.`<%=p.swiftInitedName%>`
   }
-  public func clearProperty(_ obj: FObject) {
+  public func clearProperty(_ obj: foam_core_FObject) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     obj.<%= p.swiftInitedName %> = false
     obj.<%= p.swiftValueName %> = nil
@@ -461,14 +463,14 @@ class PInfo: PropertyInfo {
     <%=this.swiftCompareValues%>
   }
   init(_ ci: ClassInfo) { classInfo = ci }
-  func viewFactory(x: Context) -> FObject? {
+  func viewFactory(x: Context) -> foam_core_FObject? {
 <% if (this.swiftView && !this.hidden) { %>
-    return x.lookup("<%=this.swiftView%>")?.create(x: x) as? FObject
+    return x.lookup("<%=this.swiftView%>")?.create(x: x) as? foam_core_FObject
 <% } else { %>
     return nil
 <% } %>
   }
-  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
+  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: inout String, value: Any?) {
     <%=p.swiftToJSON%>
   }
 }
@@ -484,7 +486,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        of = of ? of.model_.swiftName : 'FObject';
+        of = of ? of.model_.swiftName : 'foam_core_FObject';
         return of + (required ? '' : '?');
       },
     },
@@ -587,7 +589,7 @@ foam.CLASS({
         cls.toSwiftClass =  function() {
           var cls = foam.swift.SwiftClass.create({
             visibility: 'public',
-            name: this.name,
+            name: this.model_.swiftName,
             implements: [this.model_.viewType],
             imports: ['UIKit'],
           });
@@ -614,7 +616,7 @@ foam.CLASS({
               visibility: 'public',
               name: dvName,
               weak: true,
-              type: 'DetailView?',
+              type: 'foam_swift_ui_DetailView?',
               didSet: didSets.join('\n') + `\n${dvName}?.view = self`,
             }));
           })
