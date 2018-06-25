@@ -46,7 +46,7 @@ foam.CLASS({
       of: 'foam.log.LogLevel',
       name: 'logLevel',
       factory: function() { return this.LogLevel.INFO; },
-      swiftFactory: 'return LogLevel.INFO',
+      swiftFactory: 'return foam_log_LogLevel.INFO',
     }
   ],
 

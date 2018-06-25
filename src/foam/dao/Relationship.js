@@ -367,8 +367,8 @@ foam.CLASS({
   build();`,
 
       swiftFactory:
-`return __context__.create(ReadOnlyDAO.self, args: [
-  "delegate": __context__.create(ManyToManyRelationshipDAO.self, args: [
+`return __context__.create(foam_dao_ReadOnlyDAO.self, args: [
+  "delegate": __context__.create(foam_dao_ManyToManyRelationshipDAO.self, args: [
     "relationship": self,
     "delegate": __context__[targetDAOKey]
   ])
@@ -382,7 +382,7 @@ foam.CLASS({
         return this.__context__[this.junctionDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getJunctionDAOKey());',
-      swiftFactory: 'return __context__[junctionDAOKey] as? (DAO & FObject)'
+      swiftFactory: 'return __context__[junctionDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -392,7 +392,7 @@ foam.CLASS({
         return this.__context__[this.targetDAOKey];
       },
       javaFactory: 'return (foam.dao.DAO)getX().get(getTargetDAOKey());',
-      swiftFactory: 'return __context__[targetDAOKey] as? (DAO & FObject)'
+      swiftFactory: 'return __context__[targetDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     }
   ],
   methods: [
@@ -400,7 +400,7 @@ foam.CLASS({
       name: 'add',
       args: [ { name: 'target', of: 'foam.core.FObject' } ],
       javaCode: 'getJunctionDAO().put(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
-      swiftCode: 'try junctionDAO!.put(createJunction((target as? Identifiable)?.getPrimaryKey()))',
+      swiftCode: 'try junctionDAO!.put(createJunction((target as? foam_core_Identifiable)?.getPrimaryKey()))',
       code: function add(target) {
         return this.junctionDAO.put(this.createJunction(target.id));
       }
@@ -408,7 +408,7 @@ foam.CLASS({
     {
       name: 'remove',
       javaCode: 'getJunctionDAO().remove(createJunction(((foam.core.Identifiable)target).getPrimaryKey()));',
-      swiftCode: 'try junctionDAO!.remove(createJunction((target as? Identifiable)?.getPrimaryKey()))',
+      swiftCode: 'try junctionDAO!.remove(createJunction((target as? foam_core_Identifiable)?.getPrimaryKey()))',
       code: function remove(target) {
         return this.junctionDAO.remove(this.createJunction(target.id));
       }
@@ -432,7 +432,7 @@ getTargetProperty().set(junction, targetId);
 getSourceProperty().set(junction, getSourceId());
 return junction;`,
 
-      swiftCode: `let junction: FObject = self.junction.create(x: __context__) as! FObject
+      swiftCode: `let junction: foam_core_FObject = self.junction.create(x: __context__) as! foam_core_FObject
 targetProperty.set(junction, value: targetId)
 sourceProperty.set(junction, value: sourceId)
 return junction`

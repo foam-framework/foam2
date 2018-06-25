@@ -88,7 +88,7 @@ foam.INTERFACE({
     {
       name: 'loginByEmail',
       javaReturns: 'foam.nanos.auth.User',
-      of: 'foam.nanos.auth.User',
+      returns: 'foam.nanos.auth.User',
       javaThrows: [ 'javax.naming.AuthenticationException' ],
       swiftThrows: true,
       args: [
