@@ -132,12 +132,7 @@ foam.CLASS({
       class: 'foam.u2.view.TableCellFormatter',
       name: 'tableCellFormatter',
       value: function(date) {
-        if ( date ) {
-          this.start()
-            .style({'white-space': 'nowrap'})
-            .add(date.toLocaleString())
-          .end();
-        }
+        if ( date ) this.add(date.toLocaleString());
       }
     }
   ]
