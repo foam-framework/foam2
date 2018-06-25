@@ -705,7 +705,7 @@ foam.LIB({
                     foam.core.FObject.isInstance(o) ) {
           return r;
         } else if ( foam.Object.isInstance(o) ) {
-          if ( foam.String.isInstance(o.name) ) {
+          if ( foam.String.isInstance(o && o.name) ) {
             var id = o.package ? o.package + '.' + o.name : o.name;
             r[id] = Promise.resolve();
           }
