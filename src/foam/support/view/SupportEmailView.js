@@ -3,16 +3,16 @@ foam.CLASS({
   name:'SupportEmailView',
   extends:'foam.u2.View',
 
-  requires: [ 
-    'foam.u2.ListCreateController',
+  requires: [
     'foam.u2.dialog.Popup',
+    'foam.u2.ListCreateController',
     'foam.u2.view.TableView'
   ],
 
-  imports: [ 
-    'user',
+  imports: [
     'createLabel',  
-    'ctrl' 
+    'ctrl',
+    'user'
   ],
 
   exports: [
@@ -120,6 +120,11 @@ foam.CLASS({
     }
   ],
 
+  messages:[
+    { name:'title', message: 'Support Emails Management' },
+    { name:'noSupportEmail', message: 'No support email connected' }
+  ],
+
   methods: [
     function initE(){
       var self = this;
@@ -132,7 +137,7 @@ foam.CLASS({
       .start().addClass('Rectangle-11-Copy')
         .start().addClass('title1')
           .start()
-            .add('Support Emails Management').addClass('title')
+            .add(this.title).addClass('title')
           .end()
           .start().addClass('align').end() 
           .start({
@@ -143,7 +148,7 @@ foam.CLASS({
           }).hide(this.emptyDAO$).end()
           .start().addClass('input-container-half').show(this.emptyDAO$)
             .start()
-              .add('No support email connected').addClass('No-support-email-con')
+              .add(this.noSupportEmail).addClass('No-support-email-con')
             .end()
           .end()
           .start().addClass('btn-mid')

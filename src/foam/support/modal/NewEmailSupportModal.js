@@ -10,18 +10,18 @@ foam.CLASS({
   ],
 
   requires: [
-    'foam.u2.ModalHeader',
     'foam.support.model.SupportEmail',
-    'foam.u2.dialog.Popup',
     'foam.support.modal.NewEmailSupportConfirmationModal',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.ModalHeader',
+    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'closeDialog',
+    'ctrl',
     'supportEmailDAO',
     'user',
-    'ctrl'
   ],
 
   exports:[
@@ -116,8 +116,8 @@ foam.CLASS({
     messages:[
       { name:'title', message:'New Email' },
       { name:'titlelabel', message:'Input the email address you want to connect to the help desk.' },
-      { name:'emailInvalid', message: 'The email you have entered is invalid, try again.'},
-      { name:'emailNotExist', message: 'The email you have entered is existed.'}
+      { name:'emailInvalid', message: 'The email you have entered is invalid. Try again.'},
+      { name:'emailExists', message: 'The email you have entered already exists.'}
     ],
 
     methods:[
@@ -170,7 +170,7 @@ foam.CLASS({
                 self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal' }));
                 X.closeDialog();
               } else {
-                self.add(self.NotificationMessage.create({ message: this.emailNotExist, type: 'error' }));
+                self.add(self.NotificationMessage.create({ message: this.emailExists, type: 'error' }));
               }
             }
           );
