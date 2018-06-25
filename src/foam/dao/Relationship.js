@@ -415,7 +415,7 @@ foam.CLASS({
     },
     {
       name: 'createJunction',
-      args: [ { name: 'targetId' } ],
+      args: [ { name: 'targetId', javaType: 'Object' } ],
       returns: 'foam.core.FObject',
       javaReturns: 'foam.core.FObject',
       code: function createJunction(targetId) {
