@@ -17,10 +17,13 @@
 
   requires: [
     'foam.demos.net.nap.web.model.Messageboard',
-    'foam.demos.net.nap.web.model.MessageboardAudit'
+    'foam.demos.net.nap.web.model.MessageboardAudit',
+    'foam.nanos.auth.Group'
   ],
 
   imports: [
+     'auth',
+     'groupDAO',
      'messageboard',
      'messageboardAudit',
      'messageboardDAO',
@@ -143,20 +146,34 @@
       view: {
         class: 'foam.u2.view.ScrollTableView',
         columns: [
-          'mark', 'id', 'title', 'creator', 'createdDate', 'hits'
+          'starmark', 'id', 'title', 'creator', 'createdDate', 'hits'
         ]
       }
     },
     {
       class: 'String',
       name: 'viewer'
-    }
+    },
+    {
+      class: 'Boolean',
+      name: 'rwPermission',
+      value: false
+    },
+    {
+      class: 'Boolean',
+      name: 'rPermission',
+      value: false
+    },
   ],
 
   methods: [
     function initE() {
       this.SUPER();
       var self = this;
+
+      this.groupDAO.find(this.user.group).then(function (group) { if ( group.implies('messageboard.write.*') || group.implies('messageboard.*') ) { self.rwPermission = true; }
+                                                                  if ( group.implies('messageboard.read.*') || group.implies('messageboard.*') ) { self.rPermission = true; }
+                                              } )
 
       this
         .addClass(this.myClass())
@@ -165,40 +182,43 @@
             .start().addClass('button-div')
               .start({class: 'foam.u2.tag.Image', data: 'images/ic-search.svg'}).addClass('searchIcon').end()
               .start(this.FILTER).addClass('filter-search').end()
-              .start(this.CREATE).end()
+              .start(this.CREATE).show(self.rwPermission$).end()
             .end()
           .end()
           .add(this.FILTERED_MESSAGEBOARD_DAO)
       .end();
     },
-  function dblclick(messageboard) {
-    var messageboardAudit = this.MessageboardAudit.create({
-      userId: this.user.id,
-      messageboardId: messageboard.id
-    });
+    function dblclick(messageboard) {
+      if ( !self.rwPermission || !self.rPermission ) {
+        return;
+      }
 
-    var message = this.Messageboard.create({
-      id : messageboard.id,
-      mark : messageboard.mark,
-      title: messageboard.title,
-      content: messageboard.content,
-      creator : messageboard.creator,
-      createdDate : messageboard.createdDate,
-      data : Array.from(messageboard.data),
-      hits: messageboard.hits + 1
-      //viewer: this.viewer
-    });
+      var messageboardAudit = this.MessageboardAudit.create({
+        userId: this.user.id,
+        messageboardId: messageboard.id
+      });
 
-    this.messageboardAuditDAO.put(messageboardAudit);
-    this.messageboardDAO.put(message);
-    this.stack.push({ class: 'foam.demos.net.nap.web.EditMessageboard', data: messageboard });
-  }
+      var message = this.Messageboard.create({
+        id : messageboard.id,
+        starmark : messageboard.starmark,
+        title: messageboard.title,
+        content: messageboard.content,
+        creator : messageboard.creator,
+        createdDate : messageboard.createdDate,
+        data : Array.from(messageboard.data),
+        hits: messageboard.hits + 1
+        //viewer: this.viewer
+      });
+
+      this.messageboardAuditDAO.put(messageboardAudit);
+      this.messageboardDAO.put(message);
+      this.stack.push({ class: 'foam.demos.net.nap.web.EditMessageboard', data: messageboard });
+    }
   ],
 
   actions: [
     {
       name: 'create',
-      label: 'Create',
       code: function(X) {
         var self = this;
 
