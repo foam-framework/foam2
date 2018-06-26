@@ -33,7 +33,6 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
-      max: 999,
       tableWidth: 45
     },
     {
@@ -92,7 +91,12 @@ foam.CLASS({
       transient: true,
       expression: function ( firstName, middleName, lastName ) {
         return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
-      }
+      },
+      javaGetter: `
+        return ! getMiddleName().equals("")
+          ? getFirstName() + " " + getMiddleName() + " " + getLastName()
+          : getFirstName() + " " + getLastName();
+      `,
     },
     {
       class: 'String',

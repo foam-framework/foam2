@@ -21,10 +21,10 @@ foam.CLASS({
         foam.swift.Field.create({
           lazy: true,
           visibility: 'public',
-          name: this.swiftName + '$proxy',
+          name: this.name + '$proxy',
           type: 'ProxyDAO',
           initializer: `
-let d = __context__.create(ProxyDAO.self, args: ["delegate": ${this.swiftName}])!
+let d = __context__.create(ProxyDAO.self, args: ["delegate": ${this.name}])!
 _ = ${this.swiftSlotName}.sub(listener: { sub, topics in
   if let dao = topics.last as? DAO {
     d.delegate = dao

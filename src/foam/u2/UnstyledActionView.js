@@ -127,7 +127,7 @@ foam.CLASS({
       /** Add text or icon to button. **/
       if ( this.icon ) {
         // this.nodeName = 'a';
-        this.start('img').attr('src', this.icon).end();
+        this.start('img').attr('src', this.icon$).end();
       } else if ( this.iconFontName ) {
         this.nodeName = 'i';
         this.cssClass(this.action.name);

@@ -6,6 +6,7 @@
 
 foam.CLASS({
   name: 'Test',
+  package: 'somepackage',
   requires: [
     'somepackage.RequiredClass',
   ],
@@ -32,6 +33,10 @@ foam.CLASS({
       expression: function(firstName) { return firstName },
     },
     {
+      class: 'String',
+      name: 'description',
+    },
+    {
       name: 'anyProp',
     },
     {
@@ -53,10 +58,12 @@ return firstName + " " + lastName
     {
       class: 'String',
       name: 'prevFirstName',
+      visibility: 'RO',
     },
     {
       class: 'String',
       name: 'prevLastName',
+      visibility: 'RO',
     },
     {
       class: 'String',
