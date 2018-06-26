@@ -494,7 +494,7 @@ foam.CLASS({
 
       var message = self.Messageboard.create({
         id : self.id_,
-        mark : self.mark_,
+        starmark : self.mark_,
         title: self.title_,
         content: self.description_,
         creator : this.user.firstName_,
