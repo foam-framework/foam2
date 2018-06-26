@@ -250,7 +250,7 @@
               .end()
               .start('tr')
                 .start('td').addClass('foam-u2-PropertyView-label').add('Starmark').end()
-                .start('td').addClass('foam-u2-PropertyView').tag(this.data.MARK).end()
+                .start('td').addClass('foam-u2-PropertyView').tag(this.data.STARMARK).end()
               .end()
               .start('tr')
                 .start('td').addClass('foam-u2-PropertyView-label').add('Title').end()
@@ -493,7 +493,7 @@
 
       var message = self.Messageboard.create({
         id : this.data.id,
-        mark : this.data.mark,
+        starmark : this.data.starmark,
         title: this.data.title,
         content: this.data.content,
         creator : this.data.creator,
