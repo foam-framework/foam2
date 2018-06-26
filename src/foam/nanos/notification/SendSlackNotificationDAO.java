@@ -3,6 +3,7 @@ import foam.core.FObject;
 import foam.core.X;
 import foam.dao.DAO;
 import foam.dao.ProxyDAO;
+import foam.nanos.logger.Logger;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -36,9 +37,9 @@ public class SendSlackNotificationDAO extends ProxyDAO {
         httppost.setEntity(params);
         try {
             CloseableHttpResponse response =  client.execute(httppost);
-            // TO REVIEWER - Is there a better way to handle non 200 responses from slack?
             if (response.getStatusLine().getStatusCode() != 200 ){
-              System.err.print("Could not post to Slack; error code -" + response.getStatusLine().getStatusCode() + "\n1");
+              Logger       logger    = (Logger) x.get("logger");
+              logger.info("Could not post to Slack; error code -" + response.getStatusLine().getStatusCode());
             };
         } catch (Throwable t) {
           System.err.print(t);
