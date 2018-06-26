@@ -6,10 +6,10 @@
 
  foam.CLASS({
   package: 'foam.demos.net.nap.web',
-  name: 'EditMessageboard',
+  name: 'EditRegulatoryNotice',
   extends: 'foam.u2.View',
 
-  documentation: 'Edit Messageboard Form',
+  documentation: 'Edit RegulatoryNotice Form',
 
   implements: [
     'foam.mlang.Expressions'
@@ -18,14 +18,14 @@
   requires: [
     'foam.blob.BlobBlob',
     'foam.nanos.fs.File',
-    'foam.demos.net.nap.web.model.Messageboard',
+    'foam.demos.net.nap.web.model.RegulatoryNotice',
     'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
     'blobService',
-    'messageboard',
-    'messageboardDAO',
+    'regulatoryNotice',
+    'fegulatoryNoticeDAO',
     'stack',
     'user'
   ],
@@ -232,8 +232,8 @@
       var self = this;
       var userId = this.user.id;
       var userName = this.user.firstName;
-      var messageboardObj = this.data;
-      this.data_ = Array.from(messageboardObj.data);
+      var regulatoryNoticeObj = this.data;
+      this.data_ = Array.from(regulatoryNoticeObj.data);
 
       this
         .addClass(this.myClass())
@@ -365,7 +365,7 @@
       code: function(X){
         var self = this;
 
-        X.messageboardDAO.remove(this).then(function() {
+        X.regulatoryNoticeDAO.remove(this).then(function() {
           X.stack.back();
         });
       }
@@ -491,7 +491,7 @@
         return;
       }
 
-      var message = self.Messageboard.create({
+      var message = self.RegulatoryNotice.create({
         id : this.data.id,
         starmark : this.data.starmark,
         title: this.data.title,
@@ -501,8 +501,8 @@
         data : Array.from(this.data_)
       });
 
-      this.messageboardDAO.put(message).then(function() {
-        self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+      this.regulatoryNoticeDAO.put(message).then(function() {
+        self.stack.push({ class: 'foam.demos.net.nap.web.RegulatoryNoticeList' });
       });
     }
   ]
