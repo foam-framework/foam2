@@ -38,11 +38,9 @@ foam.CLASS({
       class: 'Int',
       name: 'errorLevelThreshhold',
       value: 4,
-      /** This value needs to be changed for the logger to execute. 
-       *  Here, DEBUG -> 0, INFO -> 1, WARNING -> 2, ERROR -> 3.
-       *  The equality condition for execution is greater than or equal to.
-      */
-
+      documentation: `The value of errorLevelThreshhold control when this logger executes. 
+      Ordinal values for LogLevels are: DEBUG -> 0, INFO -> 1, WARNING -> 2, ERROR -> 3.
+      The equality condition for execution is greater than or equal to errorLevelThreshhold.`
     },
     {
       class: 'Enum',
