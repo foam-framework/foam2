@@ -25,7 +25,7 @@
   imports: [
     'blobService',
     'regulatoryNotice',
-    'fegulatoryNoticeDAO',
+    'regulatoryNoticeDAO',
     'stack',
     'user'
   ],

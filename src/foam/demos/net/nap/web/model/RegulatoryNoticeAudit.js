@@ -13,24 +13,29 @@ foam.CLASS({
     'user'
   ],
 
+  javaImports: [ 'java.util.Date' ],
+  
+  ids: [ 'regulatoryNoticeId' ],
+
   properties: [
     {
       class: 'Long',
-      name: 'id'
-    },
-    {
-      class: 'Reference',
-      of: 'foam.nanos.auth.User',
-      name: 'viewer',
-      view: { class: 'foam.u2.view.ReferenceView', placeholder: 'select user' }
+      name: 'regulatoryNoticeId',
+      documentation: 'Message Id the user read'
     },
     {
       class: 'Long',
       name: 'userId'
     },
     {
-      class: 'Long',
-      name: 'regulatoryNoticeId'
+      class: 'DateTime',
+      name: 'readDate',
+      visibility: foam.u2.Visibility.RO,
+      factory: function() { return new Date(); },
+      javaFactory: 'return new Date();',
+      tableCellFormatter: function(date) {
+        this.add(date ? date.toISOString().substring(0,10) : '');
+      }
     }
   ]
 });
