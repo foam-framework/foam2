@@ -222,6 +222,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
+      synchronized: true,
       javaCode: `
         FObject fobj = (FObject) obj;
         PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
@@ -234,6 +235,7 @@ foam.CLASS({
     },
     {
       name: 'remove',
+      synchronized: true,
       javaCode: `
         try {
           // TODO: Would be more efficient to output the ID portion of the object.  But
