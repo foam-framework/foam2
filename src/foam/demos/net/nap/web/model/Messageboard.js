@@ -33,12 +33,12 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'mark',
+      name: 'starmark',
       tableCellFormatter: function(value, obj, property) {
         this
           .start()
-            .call(function() {
-              if ( value ) { this.tag({ class: 'foam.u2.tag.Image', data: 'images/star.svg' }).style({'width': '25'}); }
+            .callIf(value, function() {
+              this.tag({ class: 'foam.u2.tag.Image', data: 'images/star.svg' }).style({'width': '25'});
             })
           .end();
       }
@@ -81,11 +81,6 @@ foam.CLASS({
       class: 'Long',
       name: 'hits',
       label: 'Hits',
-      visibility: foam.u2.Visibility.RO
-    },
-    {
-      class: 'String',
-      name: 'viewer',
       visibility: foam.u2.Visibility.RO
     },
     {
