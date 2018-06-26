@@ -5,6 +5,10 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
+/**
+  Notification Logger sends an email and Slack message throught the notification
+  centre if the error level of an encountered log is higher than the errorThreshholdMessage
+*/
 
 foam.CLASS({
   package: 'foam.nanos.logger',
@@ -33,7 +37,10 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'errorLevelThreshhold',
-      value: 1,
+      value: 4,
+      documentation: `The value of errorLevelThreshhold control when this logger executes. 
+      Ordinal values for LogLevels are: DEBUG -> 0, INFO -> 1, WARNING -> 2, ERROR -> 3.
+      The equality condition for execution is greater than or equal to errorLevelThreshhold.`
     },
     {
       class: 'Enum',
