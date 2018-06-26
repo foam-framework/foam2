@@ -10,10 +10,9 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'String',
-      name: 'lastModifiedBy'
+      class: 'Long',
+      name: 'lastModifiedBy',
+      documentation: 'Reference to User id who last modified the entry'
     }
   ]
 });
-
-// TODO: create a LastModifiedByAwareDAO
