@@ -298,6 +298,11 @@ foam.CLASS({
       class: 'Date',
       name: 'lastModified',
       documentation: 'Last modified date'
+    },
+    {
+      class: 'Long',
+      name: 'lastModifiedBy',
+      documentation: 'Reference to User id who last modified the entry'
     }
   ],
 

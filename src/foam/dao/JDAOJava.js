@@ -11,7 +11,9 @@ foam.CLASS({
 
   javaImports: [
     'foam.core.ClassInfo',
+    'foam.core.FObject',
     'foam.core.X',
+    'foam.nanos.auth.LastModifiedByAware',
     'java.text.SimpleDateFormat',
     'java.util.Calendar',
     'java.util.TimeZone'
@@ -95,7 +97,7 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
         FObject result = getDelegate().put_(x, obj);
-        if ( ! ( result instanceof LastModifiedByAware ) ) {
+        if ( ! ( result instanceof LastModifiedByAware ) || ((LastModifiedByAware) result).getLastModifiedBy() == 0 ) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
         journal_.put(result, null);
@@ -107,7 +109,7 @@ foam.CLASS({
       synchronized: true,
       javaCode: `
         FObject result = getDelegate().remove_(x, obj);
-        if ( ! ( result instanceof LastModifiedByAware ) ) {
+        if ( ! ( result instanceof LastModifiedByAware ) || ((LastModifiedByAware) result).getLastModifiedBy() == 0 ) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
         journal_.remove(result, null);
