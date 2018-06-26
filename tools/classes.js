@@ -157,6 +157,7 @@ var classes = [
   'foam.nanos.auth.Language',
   'foam.nanos.auth.Region',
   'foam.nanos.logger.LogLevelFilterLogger',
+  'foam.nanos.logger.NotificationLogger',
   'foam.nanos.logger.RepeatLogger',
   'foam.nanos.logger.Logger',
   'foam.nanos.logger.ProxyLogger',
