@@ -6,10 +6,10 @@
 
 foam.CLASS({
   package: 'foam.demos.net.nap.web.model',
-  name: 'MessageboardAudit',
+  name: 'RegulatoryNoticeAudit',
 
   imports: [
-    'messageboardAuditDAO',
+    'regulatoryNoticeAuditDAO',
     'user'
   ],
 
@@ -30,7 +30,7 @@ foam.CLASS({
     },
     {
       class: 'Long',
-      name: 'messageboardId'
+      name: 'regulatoryNoticeId'
     }
   ]
 });

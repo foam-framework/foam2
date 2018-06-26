@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.demos.net.nap.web',
-  name: 'MessageboardForm',
+  name: 'RegulatoryNoticeForm',
   extends: 'foam.u2.View',
 
   implements: [
@@ -16,18 +16,18 @@ foam.CLASS({
   requires: [
     'foam.blob.BlobBlob',
     'foam.nanos.fs.File',
-    'foam.demos.net.nap.web.model.Messageboard',
-    'foam.demos.net.nap.web.model.MessageboardAudit',
+    'foam.demos.net.nap.web.model.RegulatoryNotice',
+    'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
     'foam.nanos.notification.Notification',
     'foam.u2.dialog.NotificationMessage'
   ],
 
   imports: [
     'blobService',
-    'messageboard',
-    'messageboardAudit',
-    'messageboardDAO',
-    'messageboardAuditDAO',
+    'regulatoryNotice',
+    'regulatoryNoticeAudit',
+    'regulatoryNoticeDAO',
+    'regulatoryNoticeAuditDAO',
     'notification',
     'notificationDAO',
     'onInvoiceFileRemoved',
@@ -39,7 +39,7 @@ foam.CLASS({
     'as data',
   ],
 
-  documentation: 'New Messageboard Form',
+  documentation: 'New RegulatoryNotice Form',
 
   properties: [
     {
@@ -373,7 +373,7 @@ foam.CLASS({
       label: 'Back',
       code: function(X){
         var self = this;
-        X.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+        X.stack.push({ class: 'foam.demos.net.nap.web.RegulatoryNoticeList' });
       }
     }
   ],
@@ -492,7 +492,7 @@ foam.CLASS({
         return;
       }
 
-      var message = self.Messageboard.create({
+      var message = self.RegulatoryNotice.create({
         id : self.id_,
         starmark : self.mark_,
         title: self.title_,
@@ -502,23 +502,23 @@ foam.CLASS({
         data : Array.from(self.data_)
       });
 
-      var messageboardAudit = self.MessageboardAudit.create({
+      var regulatoryNoticeAudit = self.RegulatoryNoticeAudit.create({
         userId: this.user.id,
-        messageboardId: self.id_
+        regulatoryNoticeId: self.id_
       });
 
       var notification = self.Notification.create({
-        notificationType : "New Post On Messageboard",
+        notificationType : "New Post On RegulatoryNotice",
         userId: this.user.id,
         body: self.title_,
         groupId: this.user.group
       });
 
       self.notificationDAO.put(notification);
-      self.messageboardAuditDAO.put(messageboardAudit);
+      self.regulatoryNoticeAuditDAO.put(regulatoryNoticeAudit);
 
-      self.messageboardDAO.put(message).then(function() {
-        self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardList' });
+      self.regulatoryNoticeDAO.put(message).then(function() {
+        self.stack.push({ class: 'foam.demos.net.nap.web.RegulatoryNoticeList' });
       });
     }
   ]

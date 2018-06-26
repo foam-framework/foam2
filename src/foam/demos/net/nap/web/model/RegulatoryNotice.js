@@ -6,7 +6,7 @@
 
 foam.CLASS({
   package: 'foam.demos.net.nap.web.model',
-  name: 'Messageboard',
+  name: 'RegulatoryNotice',
 
   tableColumns: [
     'mark', 'title', 'createdDate', 'creator', 'attachment', 'hits'
@@ -14,7 +14,7 @@ foam.CLASS({
 
   imports: [
     'blobService',
-    'messageboardDAO',
+    'regulatoryNoticeDAO',
     'user'
   ],
 
@@ -87,7 +87,7 @@ foam.CLASS({
       class: 'foam.nanos.fs.FileArray',
       name: 'data',
       label: 'Attachments',
-      documentation: 'Additional documents for messageboard',
+      documentation: 'Additional documents for RegulatoryNotice',
       view: { class: 'net.nanopay.invoice.ui.InvoiceFileUploadView', data:this.data$}
     }
   ]

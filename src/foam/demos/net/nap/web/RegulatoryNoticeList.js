@@ -6,28 +6,28 @@
 
  foam.CLASS({
   package: 'foam.demos.net.nap.web',
-  name: 'MessageboardList',
+  name: 'RegulatoryNoticeList',
   extends: 'foam.u2.Controller',
 
-  documentation: 'Messageboard List',
+  documentation: 'RegulatoryNotice List',
 
   implements: [
     'foam.mlang.Expressions'
   ],
 
   requires: [
-    'foam.demos.net.nap.web.model.Messageboard',
-    'foam.demos.net.nap.web.model.MessageboardAudit',
+    'foam.demos.net.nap.web.model.RegulatoryNotice',
+    'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
     'foam.nanos.auth.Group'
   ],
 
   imports: [
      'auth',
      'groupDAO',
-     'messageboard',
-     'messageboardAudit',
-     'messageboardDAO',
-     'messageboardAuditDAO',
+     'regulatoryNotice',
+     'regulatoryNoticeAudit',
+     'regulatoryNoticeDAO',
+     'regulatoryNoticeAuditDAO',
      'stack',
      'user'
   ],
@@ -35,7 +35,7 @@
   exports: [
     'dblclick',
     'filter',
-    'filteredMessageboardDAO'
+    'filteredRegulatoryNoticeDAO'
   ],
 
   css: `
@@ -126,7 +126,7 @@
   properties: [
     {
       name: 'data',
-      factory: function() { return this.messageboardDAO; }
+      factory: function() { return this.regulatoryNoticeDAO; }
     },
     {
       class: 'String',
@@ -139,9 +139,9 @@
       }
     },
     {
-      name: 'filteredMessageboardDAO',
+      name: 'filteredRegulatoryNoticeDAO',
       expression: function(data, filter) {
-        return this.messageboardDAO.where(this.OR(this.CONTAINS_IC(this.Messageboard.TITLE, filter), this.CONTAINS_IC(this.Messageboard.CONTENT, filter))).orderBy(this.DESC(this.Messageboard.CREATED_DATE));
+        return this.regulatoryNoticeDAO.where(this.OR(this.CONTAINS_IC(this.RegulatoryNotice.TITLE, filter), this.CONTAINS_IC(this.RegulatoryNotice.CONTENT, filter))).orderBy(this.DESC(this.RegulatoryNotice.CREATED_DATE));
       },
       view: {
         class: 'foam.u2.view.ScrollTableView',
@@ -171,8 +171,8 @@
       this.SUPER();
       var self = this;
 
-      this.groupDAO.find(this.user.group).then(function (group) { if ( group.implies('messageboard.write.*') || group.implies('messageboard.*') ) { self.rwPermission = true; }
-                                                                  if ( group.implies('messageboard.read.*') || group.implies('messageboard.*') ) { self.rPermission = true; }
+      this.groupDAO.find(this.user.group).then(function (group) { if ( group.implies('*') || group.implies('regulatoryNotice.write.*') ) { self.rwPermission = true; }
+                                                                  if ( group.implies('*') || group.implies('regulatoryNotice.read.*') ) { self.rPermission = true; }
                                               } )
 
       this
@@ -185,34 +185,33 @@
               .start(this.CREATE).show(self.rwPermission$).end()
             .end()
           .end()
-          .add(this.FILTERED_MESSAGEBOARD_DAO)
+          .add(this.FILTERED_REGULATORY_NOTICE_DAO)
       .end();
     },
-    function dblclick(messageboard) {
-      if ( !self.rwPermission || !self.rPermission ) {
+    function dblclick(regulatoryNotice) {
+      if ( !( self.rwPermission || !self.rPermission ) ) {
         return;
       }
 
-      var messageboardAudit = this.MessageboardAudit.create({
+      var regulatoryNoticeAudit = this.RegulatoryNoticeAudit.create({
         userId: this.user.id,
-        messageboardId: messageboard.id
+        regulatoryNoticeId: regulatoryNotice.id
       });
 
-      var message = this.Messageboard.create({
-        id : messageboard.id,
-        starmark : messageboard.starmark,
-        title: messageboard.title,
-        content: messageboard.content,
-        creator : messageboard.creator,
-        createdDate : messageboard.createdDate,
-        data : Array.from(messageboard.data),
-        hits: messageboard.hits + 1
-        //viewer: this.viewer
+      var message = this.RegulatoryNotice.create({
+        id : regulatoryNotice.id,
+        starmark : regulatoryNotice.starmark,
+        title: regulatoryNotice.title,
+        content: regulatoryNotice.content,
+        creator : regulatoryNotice.creator,
+        createdDate : regulatoryNotice.createdDate,
+        data : Array.from(regulatoryNotice.data),
+        hits: regulatoryNotice.hits + 1
       });
 
-      this.messageboardAuditDAO.put(messageboardAudit);
-      this.messageboardDAO.put(message);
-      this.stack.push({ class: 'foam.demos.net.nap.web.EditMessageboard', data: messageboard });
+      this.regulatoryNoticeAuditDAO.put(regulatoryNoticeAudit);
+      this.regulatoryNoticeDAO.put(message);
+      this.stack.push({ class: 'foam.demos.net.nap.web.EditRegulatoryNotice', data: regulatoryNotice });
     }
   ],
 
@@ -222,7 +221,7 @@
       code: function(X) {
         var self = this;
 
-        self.stack.push({ class: 'foam.demos.net.nap.web.MessageboardForm' });
+        self.stack.push({ class: 'foam.demos.net.nap.web.RegulatoryNoticeForm' });
       }
     }
   ]
