@@ -87,6 +87,7 @@ foam.CLASS({
     }
   
     notif.setSendSlackMessage(true);
+    // TODO move this hardcoded link to a notification profile
     notif.setSlackWebhook("https://hooks.slack.com/services/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");
     notif.setSlackMessage(message);
     notif.setEmailIsEnabled(true);
