@@ -360,7 +360,6 @@ foam.CLASS({
       name: 'id'
     },
     {
-      class: 'Blob',
       name: 'delegate',
       transient: true,
       factory: function() {
