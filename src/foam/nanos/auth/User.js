@@ -187,12 +187,6 @@ foam.CLASS({
       view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
-      name: 'accounts',
-      hidden: true
-    },
-    {
       class: 'Reference',
       name: 'language',
       of: 'foam.nanos.auth.Language',
