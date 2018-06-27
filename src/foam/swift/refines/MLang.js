@@ -21,8 +21,8 @@ foam.CLASS({
     {
       name: 'swiftAdapt',
       value: `
-if let newValue = newValue as? Expr { return newValue }
-return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
+if let newValue = newValue as? foam_mlang_Expr { return newValue }
+return Context.GLOBAL.create(foam_mlang_Constant.self, args: ["value": newValue])!
       `,
     },
   ],
@@ -52,7 +52,7 @@ foam.CLASS({
         }
       ],
       swiftReturns: 'Any?',
-      swiftCode: `return (arg1 as? Expr)?.f(obj)`
+      swiftCode: `return (arg1 as? foam_mlang_Expr)?.f(obj)`
     },
     {
       name: 'put',

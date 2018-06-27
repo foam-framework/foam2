@@ -26,7 +26,7 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: '(FObject & DAO)',
+      swiftType: '(foam_core_FObject & foam_dao_DAO)',
       name: 'dao',
     },
     {
@@ -39,14 +39,15 @@ return String(
       */}
     },
     {
-      swiftType: 'FObject',
+      class: 'FObjectProperty',
+      required: true,
       name: 'data',
       swiftExpressionArgs: ['dao$of'],
       swiftExpression: function() {/*
 guard let of = dao$of as? ClassInfo else {
   fatalError("no dao of over here!")
 }
-return of.create(x: self.__context__) as! FObject
+return of.create(x: self.__context__) as! foam_core_FObject
       */},
     },
     {
@@ -72,7 +73,7 @@ let onVcChange = { [weak self] () -> Void in
       title: "Save",
       style: .plain,
       target: self,
-      action: #selector(DAOCreateViewController.onSaveButtonPressed))
+      action: #selector(foam_swift_ui_DAOCreateViewController.onSaveButtonPressed))
 }
 self.onDetach(self.vc$.swiftSub({ (_, _) in
   onVcChange()

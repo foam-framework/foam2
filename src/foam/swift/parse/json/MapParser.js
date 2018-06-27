@@ -36,7 +36,7 @@ return
           Whitespace_create(),
           Literal_create(["string": ":"]),
           Whitespace_create(),
-          __context__.create(AnyParser.self)!,
+          __context__.create(foam_swift_parse_json_AnyParser.self)!,
         ]]),
       "delim":
         Seq0_create(["parsers": [

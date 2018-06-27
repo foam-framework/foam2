@@ -36,11 +36,11 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftType',
-      value: 'Future<FObject>',
+      value: 'Future<foam_core_FObject>',
     },
     {
       name: 'swiftFactory',
-      value: 'return Future<FObject>()',
+      value: 'return Future<foam_core_FObject>()',
     },
   ]
 });

@@ -26,7 +26,7 @@ foam.INTERFACE({
         {
           name: 'user',
           javaType: 'foam.nanos.auth.User',
-          swiftType: 'User'
+          of: 'foam.nanos.auth.User',
         }
       ]
     },
@@ -45,7 +45,7 @@ foam.INTERFACE({
         {
           name: 'user',
           javaType: 'foam.nanos.auth.User',
-          swiftType: 'User'
+          of: 'foam.nanos.auth.User',
         },
         {
           name: 'parameters',
@@ -69,7 +69,7 @@ foam.INTERFACE({
         {
           name: 'user',
           javaType: 'foam.nanos.auth.User',
-          swiftType: 'User'
+          of: 'foam.nanos.auth.User',
         },
         {
           name: 'token',

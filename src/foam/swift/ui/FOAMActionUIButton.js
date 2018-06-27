@@ -21,7 +21,8 @@ newValue.setTitle(self.action?.label, for: .normal)
       */},
     },
     {
-      swiftType: 'FObject?',
+      class: 'FObjectProperty',
+      required: false,
       name: 'fobj',
     },
     {

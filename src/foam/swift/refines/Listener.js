@@ -81,7 +81,7 @@ foam.CLASS({
           lazy: true,
           name: this.swiftSlotName,
           initializer: this.slotInit(),
-          type: 'Slot',
+          type: foam.swift.core.Slot.model_.swiftName,
         }));
       }
       cls.method(this.Method.create({

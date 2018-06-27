@@ -79,7 +79,7 @@ return resultSink
     {
       name: 'removeAll_',
       swiftCode: `
-let predicate: FoamPredicate = predicate ?? True_create()
+let predicate: foam_mlang_predicate_Predicate = predicate ?? True_create()
 var skip: Int = skip ?? 0;
 var limit: Int = limit ?? Int.max
 

@@ -42,10 +42,10 @@ foam.CLASS({
         foam.swift.Field.create({
           name: `${this.prop}EventProxy_`,
           visibility: 'private',
-          type: 'EventProxy',
+          type: foam.core.EventProxy.model_.swiftName,
           lazy: true,
           initializer: `
-return __context__.create(EventProxy.self, args: [
+return __context__.create(foam_core_EventProxy.self, args: [
   "dest": self,
   "src": ${this.prop},
 ])!

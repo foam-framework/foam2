@@ -10,7 +10,10 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(required) {
-        return '(DAO & FObject)' + (required ? '' : '?');
+        var d = foam.dao.DAO.model_.swiftName;
+        var f = foam.core.FObject.model_.swiftName;
+        var o = required ? '' : '?';
+        return `(${d} & ${f})${o}`;
       },
     },
   ],
@@ -22,11 +25,11 @@ foam.CLASS({
           lazy: true,
           visibility: 'public',
           name: this.name + '$proxy',
-          type: 'ProxyDAO',
+          type: foam.dao.ProxyDAO.model_.swiftName,
           initializer: `
-let d = __context__.create(ProxyDAO.self, args: ["delegate": ${this.name}])!
+let d = __context__.create(foam_dao_ProxyDAO.self, args: ["delegate": ${this.name}])!
 _ = ${this.swiftSlotName}.sub(listener: { sub, topics in
-  if let dao = topics.last as? DAO {
+  if let dao = topics.last as? foam_dao_DAO {
     d.delegate = dao
   } else {
     d.clearProperty("delegate")
