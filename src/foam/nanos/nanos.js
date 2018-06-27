@@ -123,5 +123,10 @@ FOAM_FILES([
   { name: 'foam/nanos/notification/NotificationSettingsView'},
   { name: 'foam/nanos/notification/NotificationView'},
   { name: 'foam/nanos/notification/NotificationNotificationView'},
-  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'}
+  { name: 'foam/nanos/notification/notifications/ScriptRunNotificationNotificationView'},
+  { name: 'foam/demos/net/nap/web/model/RegulatoryNotice' },
+  { name: 'foam/demos/net/nap/web/model/RegulatoryNoticeAudit' },
+  { name: 'foam/demos/net/nap/web/RegulatoryNoticeForm', flags: ['web'] },
+  { name: 'foam/demos/net/nap/web/RegulatoryNoticeList', flags: ['web'] },
+  { name: 'foam/demos/net/nap/web/EditRegulatoryNotice', flags: ['web'] }
 ]);
