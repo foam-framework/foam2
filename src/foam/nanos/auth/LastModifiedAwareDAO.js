@@ -5,7 +5,7 @@
  */
 
 foam.CLASS({
-  package: 'foam.dao',
+  package: 'foam.nanos.auth',
   name: 'LastModifiedAwareDAO',
   extends: 'foam.dao.ProxyDAO',
 
@@ -24,9 +24,12 @@ foam.CLASS({
         value.lastModified = new Date();
         return SUPER(value);
       },
-      javaCode:
-`((LastModifiedAware) obj).setLastModified(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
-return super.put_(x, obj);`
+      javaCode: `
+        if ( obj instanceof LastModifiedAware ) {
+          ((LastModifiedAware) obj).setLastModified(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
+        }
+        return super.put_(x, obj);
+      `
     }
   ]
 });
