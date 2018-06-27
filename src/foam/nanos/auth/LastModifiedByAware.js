@@ -10,9 +10,31 @@ foam.INTERFACE({
 
   properties: [
     {
-      class: 'Long',
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
       name: 'lastModifiedBy',
-      documentation: 'Reference to User id who last modified the entry'
+      documentation: 'User who last modified entry'
+    }
+  ]
+});
+
+/**
+ * This refinement is necessary because of the way the class loader works.
+ * There wasn't a way in which User could implement LastModifiedByAware
+ */
+foam.CLASS({
+  refines: 'foam.nanos.auth.User',
+
+  implements: [
+    'foam.nanos.auth.LastModifiedByAware'
+  ],
+
+  properties: [
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      documentation: 'User who last modified entry'
     }
   ]
 });
