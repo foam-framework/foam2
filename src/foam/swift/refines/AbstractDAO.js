@@ -18,8 +18,8 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
-      this.SUPER(cls, superAxiom, parentCls);
+    function writeToSwiftClass(cls, parentCls) {
+      this.SUPER(cls, parentCls);
       cls.fields.push(
         foam.swift.Field.create({
           lazy: true,

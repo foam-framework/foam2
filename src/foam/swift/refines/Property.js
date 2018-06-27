@@ -7,10 +7,11 @@
 foam.CLASS({
   refines: 'foam.core.Property',
   requires: [
-    'foam.swift.Field',
-    'foam.swift.SwiftClass',
-    'foam.swift.Method',
     'foam.swift.Argument',
+    'foam.swift.Field',
+    'foam.swift.Method',
+    'foam.swift.ProtocolField',
+    'foam.swift.SwiftClass',
   ],
   properties: [
     {
@@ -188,15 +189,21 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
       if ( ! this.swiftSupport ) return;
 
       if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
-        // TODO: Should we add vars to the protocol?
+        cls.field(this.ProtocolField.create({
+          name: this.swiftVarName,
+          type: this.swiftType,
+          // TODO: Make these configurable?
+          get: true,
+          set: true,
+        }));
         return;
       }
 
-      var isOverride = !!superAxiom;
+      var isOverride = !!parentCls.getSuperClass().getAxiomByName(this.name);
       cls.fields.push(this.Field.create({
         visibility: 'public',
         override: isOverride,
