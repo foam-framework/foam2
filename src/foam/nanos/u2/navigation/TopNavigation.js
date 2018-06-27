@@ -89,6 +89,12 @@ foam.CLASS({
       width: 100%;
       height: calc(100% - 5px); /* Compensate for 5px padding-top of topnav */
     }
+    ^ .menuBar{
+      width: auto;
+      overflow: auto;
+      white-space: nowrap;
+      margin-left: 60px;
+    }
   `,
 
   properties: [
