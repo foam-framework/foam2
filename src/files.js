@@ -427,6 +427,7 @@ FOAM_FILES([
   { name: "foam/u2/stack/StackView", flags: ['web'] },
   { name: "foam/apploader/ModelRefines" },
   { name: "foam/apploader/ClassLoader" },
+  { name: "foam/apploader/SubClassLoader" },
   { name: "foam/classloader/OrDAO", flags: ['debug'] },
   { name: "foam/apploader/JSON2ModelFileDAO" },
   { name: "foam/apploader/WebModelFileFetcher" },
