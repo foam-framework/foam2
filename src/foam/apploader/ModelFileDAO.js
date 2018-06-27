@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.apploader',
   name: 'ModelFileDAO',
@@ -86,7 +92,7 @@ foam.CLASS({
             throw new Error('No model found for ' + id);
           }
 
-          return Promise.all(foam.json.references(x, json)).then(function() {
+          return Promise.all(foam.json.references(x, json, [], [jsonId])).then(function() {
             return foam.lookup(json.class || 'Model').create(json, x);
           });
         }, function() {
