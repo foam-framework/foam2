@@ -135,7 +135,7 @@ have multiple classloaders running alongside eachother`
 
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
-          var x2 = self.SubClassLoader.create({delegate: self, path: [id]}).__subContext__;
+          var x2 = self.SubClassLoader.create({delegate: self, path: path.concat(id)});
           return this.pending[id] = this.modelDAO.inX(x2).find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
             if ( self.Relationship.isInstance(m) ) {
