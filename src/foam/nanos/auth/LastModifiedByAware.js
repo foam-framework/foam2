@@ -20,7 +20,8 @@ foam.INTERFACE({
 
 /**
  * This refinement is necessary because of the way the class loader works.
- * There wasn't a way in which User could implement LastModifiedByAware
+ * There wasn't a way in which User could implement LastModifiedByAware and the
+ * LastModifiedAware interface to have a reference property without doing this refinement 
  */
 foam.CLASS({
   refines: 'foam.nanos.auth.User',
