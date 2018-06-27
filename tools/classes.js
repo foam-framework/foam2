@@ -120,6 +120,7 @@ var classes = [
   'foam.nanos.auth.Group',
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
+  'foam.nanos.auth.LastModifiedByAwareDAO',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.DayOfWeek',
   'foam.nanos.auth.Hours',
