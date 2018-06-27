@@ -135,7 +135,8 @@ have multiple classloaders running alongside eachother`
 
           if ( foam.lookup(id, true) ) return Promise.resolve(foam.lookup(id));
 
-          var x2 = self.SubClassLoader.create({delegate: self, path: path.concat(id)});
+          path = path.concat(id);
+          var x2 = self.SubClassLoader.create({delegate: self, path: path});
           return this.pending[id] = this.modelDAO.inX(x2).find(id).then(function(m) {
             if ( ! m ) return Promise.reject(new Error('Model Not Found: ' + id));
             if ( self.Relationship.isInstance(m) ) {
@@ -172,8 +173,6 @@ have multiple classloaders running alongside eachother`
               { name: 'path', of: 'StringArray' } ],
       code: function(model, path) {
         var self = this;
-
-        path = path.concat(model.id);
 
         var deps = this.modelDeps_(model, path);
 
