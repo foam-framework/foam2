@@ -79,7 +79,7 @@ have multiple classloaders running alongside eachother`
       name: 'maybeLoad_',
       returns: 'Promise',
       args: [ { name: 'id', of: 'String' },
-              { name: 'path', of: 'Array' } ],
+              { name: 'path', of: 'StringArray' } ],
       code: function(id, path) {
         return this.load_(id, path).catch(function() { return null; });
       }
@@ -167,7 +167,7 @@ have multiple classloaders running alongside eachother`
     {
       name: 'buildClass_',
       args: [ { name: 'model', of: 'foam.core.Model' },
-              { name: 'path', of: 'Array' } ],
+              { name: 'path', of: 'StringArray' } ],
       code: function(model, path) {
         var self = this;
 
