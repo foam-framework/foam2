@@ -141,9 +141,6 @@ foam.INTERFACE({
   package: 'foam.mlang.predicate',
   name: 'Predicate',
 
-  // Predicate is already a thing in Swift so avoid using that name.
-  swiftName: 'FoamPredicate',
-
   documentation: 'Predicate interface: f(obj) -> boolean.',
 
   methods: [
@@ -952,8 +949,8 @@ foam.CLASS({
         return rhs ? rhs.indexOf(lhs) !== -1 : false;
       },
       swiftCode:
-`let lhs = (arg1 as! Expr).f(obj)
-let rhs = (arg2 as! Expr).f(obj)
+`let lhs = (arg1 as! foam_mlang_Expr).f(obj)
+let rhs = (arg2 as! foam_mlang_Expr).f(obj)
 if ( rhs == nil ) {
   return false
 }
@@ -1127,8 +1124,8 @@ foam.CLASS({
         return ( v1 === undefined && v2 === null ) || foam.util.equals(v1, v2);
       },
       swiftCode: `
-let v1 = (arg1 as! Expr).f(obj)
-let v2 = (arg2 as! Expr).f(obj)
+let v1 = (arg1 as! foam_mlang_Expr).f(obj)
+let v2 = (arg2 as! foam_mlang_Expr).f(obj)
 return FOAM_utils.equals(v1, v2)
       `,
     },
@@ -1181,8 +1178,8 @@ foam.CLASS({
         return ! foam.util.equals(this.arg1.f(o), this.arg2.f(o));
       },
       swiftCode: `
-let v1 = (arg1 as! Expr).f(obj)
-let v2 = (arg2 as! Expr).f(obj)
+let v1 = (arg1 as! foam_mlang_Expr).f(obj)
+let v2 = (arg2 as! foam_mlang_Expr).f(obj)
 return !FOAM_utils.equals(v1, v2)
       `
     }
@@ -1296,7 +1293,6 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.mlang.predicate',
   name: 'Not',
-  swiftName: 'NotPred',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 

@@ -17,6 +17,11 @@ foam.CLASS({
 
   properties: [
     {
+      name: 'of',
+      swiftExpressionArgs: ['src$of'],
+      swiftExpression: 'return src$of as! ClassInfo',
+    },
+    {
       /** The source DAO on which to add caching. Writes go straight
         to the src, and cache is updated to match.
       */
