@@ -10,6 +10,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
+    'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.LastModifiedAware'
   ],
 
@@ -286,6 +287,11 @@ foam.CLASS({
           return 'Invalid website';
         }
       }
+    },
+    {
+      class: 'Date',
+      name: 'created',
+      documentation: 'Creation date'
     },
     {
       class: 'Date',
