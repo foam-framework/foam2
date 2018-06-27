@@ -79,7 +79,7 @@ have multiple classloaders running alongside eachother`
       name: 'maybeLoad_',
       returns: 'Promise',
       args: [ { name: 'id', of: 'String' },
-              { name: 'path', of: 'Array' } ],
+              { name: 'path', of: 'StringArray' } ],
       code: function(id, path) {
         return this.load_(id, path).catch(function() { return null; });
       }
@@ -109,7 +109,7 @@ have multiple classloaders running alongside eachother`
           // dependency to something that this class depends upon then
           // we can just resolve right away.
           for ( var i = 0 ; i < path.length ; i++ ) {
-            if ( path[i].id === id ) return Promise.resolve();
+            if ( path[i] === id ) return Promise.resolve();
           }
 
           if ( this.pending[id] ) return this.pending[id];
@@ -167,11 +167,11 @@ have multiple classloaders running alongside eachother`
     {
       name: 'buildClass_',
       args: [ { name: 'model', of: 'foam.core.Model' },
-              { name: 'path', of: 'Array' } ],
+              { name: 'path', of: 'StringArray' } ],
       code: function(model, path) {
         var self = this;
 
-        path = path.concat(model);
+        path = path.concat(model.id);
 
         var deps = this.modelDeps_(model, path);
 
