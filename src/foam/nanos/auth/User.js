@@ -10,8 +10,7 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedAware'
   ],
 
   requires: [
@@ -186,12 +185,6 @@ foam.CLASS({
       name: 'address',
       factory: function () { return this.Address.create(); },
       view: { class: 'foam.nanos.auth.AddressDetailView' }
-    },
-    {
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
-      name: 'accounts',
-      hidden: true
     },
     {
       class: 'Reference',

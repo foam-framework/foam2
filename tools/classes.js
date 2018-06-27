@@ -120,6 +120,7 @@ var classes = [
   'foam.nanos.auth.Group',
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
+  'foam.nanos.auth.LastModifiedByAwareDAO',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.DayOfWeek',
   'foam.nanos.auth.Hours',
@@ -236,7 +237,9 @@ var classes = [
   'foam.nanos.dig.DUG',
 
   'foam.lib.query.TestModel',
-  'foam.lib.query.FooEnum'
+  'foam.lib.query.FooEnum',
+  'foam.demos.net.nap.web.model.RegulatoryNotice',
+  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit'
 ];
 
 var abstractClasses = [
