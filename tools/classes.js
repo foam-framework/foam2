@@ -118,6 +118,8 @@ var classes = [
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.Group',
+  'foam.nanos.auth.CreatedByAware',
+  'foam.nanos.auth.CreatedByAwareDAO',
   'foam.nanos.auth.LastModifiedAware',
   'foam.nanos.auth.LastModifiedByAware',
   'foam.nanos.auth.LastModifiedByAwareDAO',
