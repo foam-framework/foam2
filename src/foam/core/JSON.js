@@ -712,7 +712,7 @@ foam.LIB({
               json.name = 'AnonymousClass' + foam.next$UID();
               console.log('Constructing anonymous class', json.name);
 
-              r.push(Promise.all(foam.json.references(x, json)).then(function() {
+              r.push(Promise.all(foam.json.references(x, json, [])).then(function() {
                 return x.classloader.maybeLoad(foam.core.Model.create(json));
               }));
 
