@@ -225,7 +225,6 @@ FOAM_FILES([
   { name: "foam/dao/BatchMutationIDBDAO", flags: ['web'] },
   { name: "foam/dao/RestDAO" },
   { name: "foam/dao/EnabledAwareDAO" },
-  { name: "foam/dao/LastModifiedAwareDAO" },
   { name: "foam/dao/ValidationDAODecorator" },
   { name: "foam/dao/SQL", flags: ['sql'] },
   { name: "foam/dao/NoDisjunctionDAO" },
