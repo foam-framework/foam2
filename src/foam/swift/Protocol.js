@@ -28,6 +28,12 @@ foam.CLASS({
     },
     {
       class: 'FObjectArray',
+      of: 'foam.swift.ProtocolField',
+      name: 'fields',
+      factory: function() { return []; }
+    },
+    {
+      class: 'FObjectArray',
       of: 'foam.swift.ProtocolMethod',
       name: 'methods',
       factory: function() { return []; }
@@ -37,6 +43,10 @@ foam.CLASS({
   methods: [
     function method(m) {
       this.methods.push(m);
+      return this;
+    },
+    function field(f) {
+      this.fields.push(f);
       return this;
     },
 
@@ -63,6 +73,11 @@ foam.CLASS({
       for ( var i = 0 ; i < this.methods.length ; i++ ) {
         o.indent();
         o.out(this.methods[i]);
+        o.out('\n');
+      }
+      for ( var i = 0 ; i < this.fields.length ; i++ ) {
+        o.indent();
+        o.out(this.fields[i]);
         o.out('\n');
       }
 

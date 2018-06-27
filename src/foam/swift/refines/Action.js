@@ -47,7 +47,7 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, _, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
       if ( !this.swiftCode ) return;
       cls.fields.push(this.Field.create({
         lazy: true,
