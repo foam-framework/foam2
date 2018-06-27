@@ -16,28 +16,6 @@ foam.CLASS({
     },
     'fetcher',
   ],
-  classes: [
-    {
-      name: 'ClassLoader',
-      exports: ['as classloader'],
-      properties: [
-        {
-          class: 'Proxy',
-          of: 'foam.apploader.ClassLoader',
-          name: 'delegate',
-        },
-        {
-          name: 'path',
-          value: [],
-        },
-      ],
-      methods: [
-        function maybeLoad(id) {
-          return this.delegate.maybeLoad_(id, this.path);
-        },
-      ],
-    },
-  ],
   methods: [
     {
       name: 'find_',
@@ -114,8 +92,7 @@ foam.CLASS({
             throw new Error('No model found for ' + id);
           }
 
-          var classloader = self.ClassLoader.create({delegate: x.classloader, path: [jsonId]});
-          return Promise.all(foam.json.references(classloader.__subContext__, json)).then(function() {
+          return Promise.all(foam.json.references(x, json)).then(function() {
             return foam.lookup(json.class || 'Model').create(json, x);
           });
         }, function() {
