@@ -39,13 +39,13 @@ foam.LIB({
         code: this.model_.swiftCode,
       });
       this.getOwnAxioms().filter(axiomFilter).forEach(function(axiom) {
-        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name), this);
+        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this);
       }.bind(this));
 
       var multiton = this.getAxiomsByClass(foam.pattern.Multiton);
       multiton = multiton.length ? multiton[0] : null;
       if ( multiton && ! this.hasOwnAxiom(multiton.property) ) {
-        this.getAxiomByName(multiton.property).writeToSwiftClass(cls, this.getSuperAxiomByName(multiton.property), this);
+        this.getAxiomByName(multiton.property).writeToSwiftClass(cls, this);
       }
       var singleton = this.getAxiomsByClass(foam.pattern.Singleton)
       singleton = singleton.length ? singleton[0] : null;

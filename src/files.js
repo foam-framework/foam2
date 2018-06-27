@@ -103,6 +103,7 @@ FOAM_FILES([
   { name: "foam/swift/refines/Proxy", flags: ['swift'] },
   { name: "foam/swift/refines/InterfaceMethod", flags: ['swift'] },
   { name: "foam/swift/ProtocolMethod", flags: ['swift'] },
+  { name: "foam/swift/ProtocolField", flags: ['swift'] },
   { name: "foam/swift/refines/Model", flags: ['swift'] },
   { name: "foam/swift/refines/Requires", flags: ['swift'] },
   { name: "foam/swift/refines/IntProperty", flags: ['swift'] },
