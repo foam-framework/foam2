@@ -109,7 +109,7 @@ have multiple classloaders running alongside eachother`
           // dependency to something that this class depends upon then
           // we can just resolve right away.
           for ( var i = 0 ; i < path.length ; i++ ) {
-            if ( path[i].id === id ) return Promise.resolve();
+            if ( path[i] === id ) return Promise.resolve();
           }
 
           if ( this.pending[id] ) return this.pending[id];
@@ -171,7 +171,7 @@ have multiple classloaders running alongside eachother`
       code: function(model, path) {
         var self = this;
 
-        path = path.concat(model);
+        path = path.concat(model.id);
 
         var deps = this.modelDeps_(model, path);
 

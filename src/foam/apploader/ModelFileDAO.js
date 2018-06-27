@@ -92,7 +92,7 @@ foam.CLASS({
             throw new Error('No model found for ' + id);
           }
 
-          return Promise.all(foam.json.references(x, json)).then(function() {
+          return Promise.all(foam.json.references(x, json, [], [jsonId])).then(function() {
             return foam.lookup(json.class || 'Model').create(json, x);
           });
         }, function() {
