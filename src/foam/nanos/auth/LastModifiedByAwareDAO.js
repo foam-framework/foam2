@@ -33,7 +33,7 @@ foam.CLASS({
     {
       name: 'removeAll_',
       javaCode: `
-        getDelegate().select_(x, new RemoveSink(x, this), skip, limit, order, predicate);
+        getDelegate().select_(x, new foam.dao.RemoveSink(x, this), skip, limit, order, predicate);
       `
     }
   ]
