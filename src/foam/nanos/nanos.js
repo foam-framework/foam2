@@ -45,6 +45,8 @@ FOAM_FILES([
   { name: "foam/nanos/auth/token/AbstractTokenService" },
   { name: "foam/nanos/auth/ChangePasswordView"},
   { name: "foam/nanos/auth/User" },
+  { name: "foam/nanos/auth/CreatedAware" },
+  { name: "foam/nanos/auth/CreatedAwareDAO" },
   { name: "foam/nanos/auth/LastModifiedByAware" },
   { name: "foam/nanos/auth/LastModifiedByAwareDAO" },
   { name: "foam/nanos/auth/AddressDetailView", flags: ['web'] },
