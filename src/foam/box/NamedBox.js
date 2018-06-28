@@ -74,6 +74,7 @@ return ownClassInfo().create(args: [
     },
     {
       name: 'getBaseName',
+      returns: 'String',
       swiftReturns: 'String',
       code: function getBaseName() {
         return this.name.substring(this.name.lastIndexOf('/') + 1);
