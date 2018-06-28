@@ -42,6 +42,14 @@ public class NanoRouter
   protected Map<String, WebAgent> handlerMap_ = new ConcurrentHashMap<>();
 
   @Override
+  public void init(javax.servlet.ServletConfig config) throws javax.servlet.ServletException {
+    Object x = config.getServletContext().getAttribute("X");
+    if ( x != null && x instanceof foam.core.X ) x_ = (foam.core.X)x;
+    
+    super.init(config);
+  }
+
+  @Override
   protected void service(final HttpServletRequest req, final HttpServletResponse resp)
       throws ServletException, IOException
   {
