@@ -293,17 +293,17 @@ foam.INTERFACE({
     {
       name: 'getDAO',
       javaReturns: 'foam.dao.DAO',
-      returns: 'foam.dao.DAO'
+      swiftReturns: 'foam_dao_DAO'
     },
     {
       name: 'getJunctionDAO',
       javaReturns: 'foam.dao.DAO',
-      returns: 'foam.dao.DAO'
+      swiftReturns: 'foam_dao_DAO'
     },
     {
       name: 'getTargetDAO',
       javaReturns: 'foam.dao.DAO',
-      returns: 'foam.dao.DAO'
+      swiftReturns: 'foam_dao_DAO'
     },
   ]
 });

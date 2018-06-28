@@ -370,7 +370,7 @@ for (key, child) in children {
           swiftType: 'String',
         },
       ],
-      returns: 'foam.core.EventProxy',
+      swiftReturns: 'foam_core_EventProxy',
       code: function getChild(key) {
         if ( ! this.children[key] ) {
           this.children[key] = this.cls_.create({
