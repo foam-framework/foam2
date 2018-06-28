@@ -80,6 +80,7 @@ var classes = [
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
+  'foam.dao.WriteOnlyFileJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
