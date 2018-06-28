@@ -282,7 +282,7 @@ listeners_.add(new DAOListener(sink, listeners_));
 
     {
       name: 'decorateListener_',
-      returns: 'foam.dao.Sink',
+      swiftReturns: 'foam_dao_Sink',
       javaReturns: 'Sink',
       args: [
         {
@@ -330,7 +330,7 @@ return sink;
     */
     {
       name: 'decorateSink_',
-      returns: 'foam.dao.Sink',
+      swiftReturns: 'foam_dao_Sink',
       javaReturns: 'foam.dao.Sink',
       args: [
         {
