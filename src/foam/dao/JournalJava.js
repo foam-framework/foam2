@@ -227,7 +227,7 @@ foam.CLASS({
         FObject fobj = (FObject) obj;
         PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
         FObject old = getDao().find(id.get(obj));
-        String record = ( old != null ) ?
+        String record = ( old != null && ! SafetyUtil.equals(old, fobj) ) ?
           outputter_.stringifyDelta(old.fclone(), fobj) :
           outputter_.stringify(fobj);
         write_("p(" + record + ")");
