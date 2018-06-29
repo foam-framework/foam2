@@ -452,17 +452,19 @@ foam.CLASS({
   ]
 });
 
-
+// ???: What does this do?
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
   implements: [ 'foam.dao.Sink' ],
+
   axioms: [
     {
       class: 'foam.box.Remote',
       clientClass: 'foam.dao.ClientSink'
     }
   ],
+
   properties: [
     {
       class: 'Function',
@@ -478,17 +480,21 @@ foam.CLASS({
       name: 'batch'
     }
   ],
+
   methods: [
     function put(obj, s) {
       this.reset();
     },
+
     function remove(obj, s) {
       this.reset();
     },
+
     function reset() {
       this.paint();
     }
   ],
+
   listeners: [
     {
       name: 'paint',
@@ -510,6 +516,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -1962,6 +1969,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   id: 'foam.u2.U2ContextScript',
   requires: [
@@ -1972,6 +1980,7 @@ foam.SCRIPT({
     foam.__context__ = foam.u2.U2Context.create().__subContext__;
   }
 });
+
 
 foam.CLASS({
   refines: 'foam.core.FObject',

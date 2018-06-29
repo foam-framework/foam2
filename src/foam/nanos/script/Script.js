@@ -15,7 +15,7 @@ foam.CLASS({
     'foam.nanos.notification.notifications.ScriptRunNotification'
   ],
 
-  imports: [ 
+  imports: [
     'notificationDAO',
     'scriptDAO',
     'user'
@@ -38,7 +38,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id', 'server', 'description', 'lastDuration', 'status', 'run'
   ],
 
   searchColumns: [],
@@ -50,7 +50,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      tableCellFormatter: function(value) {
+        this.start().style({color: value ? 'green' : 'gray'}).add(value ? 'Y' : 'N').end();
+      },
+      value: true
     },
     {
       class: 'String',

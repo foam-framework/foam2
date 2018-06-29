@@ -13,7 +13,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftName',
-      expression: function(name) { return name; },
+      expression: function(id) {
+        return id.replace(/\./g, '_')
+      },
     },
     {
       class: 'Boolean',

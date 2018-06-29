@@ -7,16 +7,25 @@
 foam.CLASS({
   refines: 'foam.core.Property',
   requires: [
-    'foam.swift.Field',
-    'foam.swift.SwiftClass',
-    'foam.swift.Method',
     'foam.swift.Argument',
+    'foam.swift.Field',
+    'foam.swift.Method',
+    'foam.swift.ProtocolField',
+    'foam.swift.SwiftClass',
   ],
   properties: [
     {
       class: 'String',
-      name: 'swiftName',
-      expression: function(name) { return name; },
+      name: 'swiftVarName',
+      expression: function(name) {
+        var reserved = [
+          'description',
+        ];
+        if ( reserved.indexOf(name) != -1 ) {
+          return 'swift_' + name;
+        }
+        return name;
+      },
     },
     {
       class: 'String',
@@ -25,27 +34,27 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftSlotLinkSubName',
-      expression: function(swiftName) { return swiftName + '_Value_Sub_'; },
+      expression: function(name) { return name + '_Value_Sub_'; },
     },
     {
       class: 'String',
       name: 'swiftSlotValueName',
-      expression: function(swiftName) { return swiftName + '_Value_'; },
+      expression: function(name) { return name + '_Value_'; },
     },
     {
       class: 'String',
       name: 'swiftSlotName',
-      expression: function(swiftName) { return swiftName + '$'; },
+      expression: function(name) { return name + '$'; },
     },
     {
       class: 'String',
       name: 'swiftInitedName',
-      expression: function(swiftName) { return '_' + swiftName + '_inited_'; },
+      expression: function(name) { return '_' + name + '_inited_'; },
     },
     {
       class: 'String',
       name: 'swiftValueName',
-      expression: function(swiftName) { return '_' + swiftName + '_'; },
+      expression: function(name) { return '_' + name + '_'; },
     },
     {
       class: 'String',
@@ -70,7 +79,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftFactoryName',
-      expression: function(swiftName) { return '_' + swiftName + '_factory_'; },
+      expression: function(name) { return '_' + name + '_factory_'; },
     },
     {
       class: 'String',
@@ -90,7 +99,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftPreSetFuncName',
-      expression: function(swiftName) { return '_' + swiftName + '_preSet_'; },
+      expression: function(name) { return '_' + name + '_preSet_'; },
     },
     {
       class: 'String',
@@ -99,7 +108,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftPostSetFuncName',
-      expression: function(swiftName) { return '_' + swiftName + '_postSet_'; },
+      expression: function(name) { return '_' + name + '_postSet_'; },
     },
     {
       class: 'String',
@@ -119,7 +128,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftExpressionSubscriptionName',
-      expression: function(swiftName) { return '_' + swiftName + '_expression_'; },
+      expression: function(name) { return '_' + name + '_expression_'; },
     },
     {
       class: 'String',
@@ -132,17 +141,17 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftAdaptFuncName',
-      expression: function(swiftName) { return '_' + swiftName + '_adapt_'; },
+      expression: function(name) { return '_' + name + '_adapt_'; },
     },
     {
       class: 'String',
       name: 'swiftPrivateAxiomName',
-      expression: function(swiftName) { return '_' + foam.String.constantize(swiftName) + '_'; },
+      expression: function(name) { return '_' + foam.String.constantize(name) + '_'; },
     },
     {
       class: 'String',
       name: 'swiftAxiomName',
-      expression: function(swiftName) { return foam.String.constantize(swiftName); },
+      expression: function(name) { return foam.String.constantize(name); },
     },
     {
       class: 'String',
@@ -157,7 +166,9 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftJsonParser',
-      value: 'Context.GLOBAL.create(AnyParser.self)!',
+      factory: function() {
+        return `Context.GLOBAL.create(${foam.swift.parse.json.AnyParser.model_.swiftName}.self)!`;
+      },
     },
     {
       class: 'Boolean',
@@ -178,19 +189,25 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
       if ( ! this.swiftSupport ) return;
 
       if ( foam.core.AbstractInterface.isSubClass(parentCls) ) {
-        // TODO: Should we add vars to the protocol?
+        cls.field(this.ProtocolField.create({
+          name: this.swiftVarName,
+          type: this.swiftType,
+          // TODO: Make these configurable?
+          get: true,
+          set: true,
+        }));
         return;
       }
 
-      var isOverride = !!superAxiom;
+      var isOverride = !!parentCls.getSuperClass().getAxiomByName(this.name);
       cls.fields.push(this.Field.create({
         visibility: 'public',
         override: isOverride,
-        name: this.swiftName,
+        name: this.swiftVarName,
         type: this.swiftType,
         getter: this.swiftGetter || this.swiftGetterTemplate(),
         setter: this.swiftSetter(),
@@ -233,7 +250,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         cls.fields.push(this.Field.create({
           visibility: 'private',
           name: this.swiftSlotValueName,
-          type: 'PropertySlot',
+          type: foam.swift.core.PropertySlot.model_.swiftName,
           lazy: true,
           initializer: this.swiftSlotInitializer()
         }));
@@ -245,7 +262,7 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         cls.fields.push(this.Field.create({
           visibility: 'public',
           name: this.swiftSlotName,
-          type: 'Slot',
+          type: foam.swift.core.Slot.model_.swiftName,
           getter: 'return self.' + this.swiftSlotValueName,
           setter: this.swiftSlotSetter(),
         }));
@@ -319,9 +336,9 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
     {
       name: 'swiftSlotInitializer',
       template: function() {/*
-let s = PropertySlot([
+let s = <%=foam.swift.core.PropertySlot.model_.swiftName%>([
   "object": self,
-  "propertyName": "<%=this.swiftName%>",
+  "propertyName": "<%=this.name%>",
 ])
 self.onDetach(Subscription(detach: {
   s.detach()
@@ -332,7 +349,7 @@ return s
     {
       name: 'swiftSetter',
       template: function() {/*
-self.set(key: "<%=this.swiftName%>", value: value)
+self.set(key: "<%=this.name%>", value: value)
       */},
     },
     {
@@ -342,7 +359,7 @@ if <%=this.swiftInitedName%> {
   return <%=this.swiftValueName%><% if ( this.swiftType != this.swiftValueType ) { %>!<% } %>
 }
 <% if ( this.swiftFactory ) { %>
-self.set(key: "<%=this.swiftName%>", value: <%=this.swiftFactoryName%>())
+self.set(key: "<%=this.name%>", value: <%=this.swiftFactoryName%>())
 return <%=this.swiftValueName%><% if ( this.swiftRequiresCast ) { %>!<% } %>
 <% } else if ( this.swiftExpression ) { %>
 if <%= this.swiftExpressionSubscriptionName %> != nil { return <%= this.swiftValueName %> }
@@ -358,7 +375,7 @@ let detach: Listener = { [unowned self] _,_ in
     s.detach()
   }
   self.<%=this.swiftExpressionSubscriptionName%> = nil
-  self.clearProperty("<%=this.swiftName%>")
+  self.clearProperty("<%=this.name%>")
 }
 <%=this.swiftExpressionSubscriptionName%> = [
   <% for (var i = 0, arg; arg = this.swiftExpressionArgs[i]; i++) { arg = arg.split('$') %>
@@ -375,7 +392,7 @@ return <%=this.swiftValue%>
 <% } else if ( this.swiftType.match(/[!?]$/) ) { %>
 return nil
 <% } else { %>
-fatalError("No default value for <%=this.swiftName%>")
+fatalError("No default value for <%=this.name%>")
 <% } %>
       */},
     },
@@ -392,15 +409,15 @@ self.onDetach(self.<%=this.swiftSlotLinkSubName%>!)
       args: ['parentCls'],
       template: function() {/*
 class PInfo: PropertyInfo {
-  let name = "<%=this.swiftName%>"
+  let name = "<%=this.name%>"
   let classInfo: ClassInfo
   let transient = <%=!!this.transient%>
   let label = "<%=this.label%>" // TODO localize
-  lazy private(set) var visibility: Visibility = {
-    return Visibility.<%=this.visibility.name%>
+  lazy private(set) var visibility: <%=foam.u2.Visibility.model_.swiftName%> = {
+    return <%=foam.u2.Visibility.model_.swiftName%>.<%=this.visibility.name%>
   }()
-  lazy private(set) public var jsonParser: Parser? = <%=this.swiftJsonParser%>
-  public func set(_ obj: FObject, value: Any?) {
+  lazy private(set) public var jsonParser: <%=foam.swift.parse.parser.Parser.model_.swiftName%>? = <%=this.swiftJsonParser%>
+  public func set(_ obj: foam_core_FObject, value: Any?) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
 <% var p = this %>
 <% if ( p.swiftExpression ) { %>
@@ -408,31 +425,31 @@ class PInfo: PropertyInfo {
       for s in obj.<%=p.swiftExpressionSubscriptionName%>! { s.detach() }
     }
 <% } %>
-    let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.swiftName%>` : nil
+    let oldValue: Any? = obj.<%=p.swiftInitedName%> ? obj.`<%=p.name%>` : nil
     obj.<%=p.swiftValueName%> = obj.<%=p.swiftPreSetFuncName%>(oldValue, obj.<%=p.swiftAdaptFuncName%>(oldValue, value))
     obj.<%=p.swiftInitedName%> = true
     obj.<%=p.swiftPostSetFuncName%>(oldValue, obj.<%=p.swiftValueName%>)
-    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) && !FOAM_utils.equals(oldValue, obj.<%=p.swiftValueName%>) {
-      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    if obj.hasListeners(["propertyChange", "<%=p.name%>"]) && !FOAM_utils.equals(oldValue, obj.<%=p.swiftValueName%>) {
+      _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
   }
-  public func get(_ obj: FObject) -> Any? {
+  public func get(_ obj: foam_core_FObject) -> Any? {
     let obj = obj as! <%=parentCls.model_.swiftName%>
-    return obj.<%=this.swiftName%>
+    return obj.<%=this.swiftVarName%>
   }
-  public func getSlot(_ obj: FObject) -> Slot {
+  public func getSlot(_ obj: foam_core_FObject) -> <%=foam.swift.core.Slot.model_.swiftName%> {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }
-  public func setSlot(_ obj: FObject, value: Slot) {
+  public func setSlot(_ obj: foam_core_FObject, value: <%=foam.swift.core.Slot.model_.swiftName%>) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     obj.<%=this.swiftSlotName%> = value
   }
-  public func hasOwnProperty(_ obj: FObject) -> Bool {
+  public func hasOwnProperty(_ obj: foam_core_FObject) -> Bool {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.`<%=p.swiftInitedName%>`
   }
-  public func clearProperty(_ obj: FObject) {
+  public func clearProperty(_ obj: foam_core_FObject) {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     obj.<%= p.swiftInitedName %> = false
     obj.<%= p.swiftValueName %> = nil
@@ -445,22 +462,22 @@ class PInfo: PropertyInfo {
 <% } %>
 
     // Only pub if there are listeners.
-    if obj.hasListeners(["propertyChange", "<%=p.swiftName%>"]) {
-      _ = obj.pub(["propertyChange", "<%=p.swiftName%>", obj.<%=p.swiftSlotName%>])
+    if obj.hasListeners(["propertyChange", "<%=p.name%>"]) {
+      _ = obj.pub(["propertyChange", "<%=p.name%>", obj.<%=p.swiftSlotName%>])
     }
   }
   public func compareValues(_ v1: Any?, _ v2: Any?) -> Int {
     <%=this.swiftCompareValues%>
   }
   init(_ ci: ClassInfo) { classInfo = ci }
-  func viewFactory(x: Context) -> FObject? {
+  func viewFactory(x: Context) -> foam_core_FObject? {
 <% if (this.swiftView && !this.hidden) { %>
-    return x.lookup("<%=this.swiftView%>")?.create(x: x) as? FObject
+    return x.lookup("<%=this.swiftView%>")?.create(x: x) as? foam_core_FObject
 <% } else { %>
     return nil
 <% } %>
   }
-  public func toJSON(outputter: Outputter, out: inout String, value: Any?) {
+  public func toJSON(outputter: <%=foam.swift.parse.json.output.Outputter.model_.swiftName%>, out: inout String, value: Any?) {
     <%=p.swiftToJSON%>
   }
 }
@@ -476,7 +493,7 @@ foam.CLASS({
     {
       name: 'swiftType',
       expression: function(of, required) {
-        of = of ? of.model_.swiftName : 'FObject';
+        of = of ? of.model_.swiftName : 'foam_core_FObject';
         return of + (required ? '' : '?');
       },
     },
@@ -579,7 +596,7 @@ foam.CLASS({
         cls.toSwiftClass =  function() {
           var cls = foam.swift.SwiftClass.create({
             visibility: 'public',
-            name: this.name,
+            name: this.model_.swiftName,
             implements: [this.model_.viewType],
             imports: ['UIKit'],
           });
@@ -606,7 +623,7 @@ foam.CLASS({
               visibility: 'public',
               name: dvName,
               weak: true,
-              type: 'DetailView?',
+              type: 'foam_swift_ui_DetailView?',
               didSet: didSets.join('\n') + `\n${dvName}?.view = self`,
             }));
           })

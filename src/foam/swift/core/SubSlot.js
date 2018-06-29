@@ -42,7 +42,7 @@ parentChange()
     {
       name: 'swiftGet',
       swiftCode: function() {/*
-if let o = parentSlot.swiftGet() as? FObject { return o.get(key: name) }
+if let o = parentSlot.swiftGet() as? foam_core_FObject { return o.get(key: name) }
 return nil
       */},
     },
@@ -50,7 +50,7 @@ return nil
     {
       name: 'swiftSet',
       swiftCode: function() {/*
-if let o = parentSlot.swiftGet() as? FObject { o.set(key: name, value: value) }
+if let o = parentSlot.swiftGet() as? foam_core_FObject { o.set(key: name, value: value) }
       */},
     },
 
@@ -69,7 +69,7 @@ return sub(topics: ["propertyChange", "value"], listener: listener)
       swiftCode: function() {/*
 prevSub?.detach()
 prevSub = nil
-if let o = parentSlot.swiftGet() as? FObject {
+if let o = parentSlot.swiftGet() as? foam_core_FObject {
   prevSub = o.getSlot(key: name)?.swiftSub(valueChange_listener)
   onDetach(prevSub!)
 }
@@ -80,7 +80,7 @@ valueChange()
     {
       name: 'valueChange',
       swiftCode: function() {/*
-if let parentValue = parentSlot.swiftGet() as? FObject {
+if let parentValue = parentSlot.swiftGet() as? foam_core_FObject {
   value = parentValue.get(key: name)
 } else {
   value = nil
