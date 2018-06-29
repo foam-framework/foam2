@@ -15,7 +15,6 @@ foam.CLASS({
     'foam.core.X',
     'foam.dao.DAO',
     'foam.dao.NullDAO',
-    'foam.nanos.auth.User',
     'foam.nanos.logger.LogLevel'
   ],
 
@@ -24,16 +23,40 @@ foam.CLASS({
       name: 'dao',
       class: 'foam.dao.DAOProperty',
       javaFactory: `
+initializing.set(true);
 String daoName = "logMessageDAO";
-DAO dao = (DAO) getX().get(daoName);
+System.out.println("DAOLogger initializing "+daoName);
+DAO dao = (DAO) getX().put("logger", new foam.nanos.logger.StdoutLogger()).get(daoName);
 if ( dao == null ) {
-  System.err.println("DAO not found: "+daoName);
-  return new NullDAO();
+  System.err.println("DAOLogger DAO not found: "+daoName);
+  dao = new NullDAO();
 }
+initializing.set(false);
 return dao;
 `
+    },
+    {
+      name: 'logger',
+      class: 'Object',
+      javaFactory: `return new foam.nanos.logger.StdoutLogger();`
     }
- ],
+  ],
+  axioms: [
+    {
+      name: 'javaExtras',
+      buildJavaClass: function(cls) {
+        cls.extras.push(foam.java.Code.create({
+          data:
+          `protected ThreadLocal<Boolean> initializing = new ThreadLocal<Boolean>() {
+  @Override
+  protected Boolean initialValue() {
+    return false;
+  }
+};`
+        }));
+      }
+    }
+  ],
 
   methods: [
     {
@@ -50,18 +73,12 @@ return dao;
       ],
       javaReturns: 'void',
       javaCode: `
-X x = getX();
-LogMessage lm = new LogMessage();
-lm.setDate(sdf.get().format(System.currentTimeMillis()));
-lm.setSeverity(severity);
-User user = (User) x.get("user");
-if ( user != null ) {
-  lm.setUser(String.valueOf(user.getId()));
-} else {
-  lm.setUser("1");
+if ( initializing.get() ) {
+  System.out.println("DAOLogger initializing");
+  return;
 }
-lm.setMessage(message);
-getDao().put(lm);
+LogMessage lm = new LogMessage.Builder(getX()).setSeverity(severity).setMessage(message).build();
+getDao().put_(getX().put("logger", (Logger) getLogger()), lm);
 `
     },
     {

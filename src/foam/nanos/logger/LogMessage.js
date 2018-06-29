@@ -8,10 +8,15 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'LogMessage',
 
+  implements: [
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.CreatedByAware'
+  ],
+
   properties: [
     {
-      name: 'date',
-      class: 'String'
+      class: 'Date',
+      name: 'created',
     },
     {
       name: 'severity',
@@ -20,11 +25,13 @@ foam.CLASS({
     },
     {
       name: 'id',
-      class: 'Long',
+      class: 'Long'
     },
     {
-      name: 'user',
-      class: 'String'
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'createdBy',
+      documentation: 'User who created the entry'
     },
     {
       name: 'message',
