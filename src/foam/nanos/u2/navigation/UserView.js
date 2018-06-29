@@ -47,11 +47,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      align-items: center;
       display: flex;
-      margin: 0 40px;
+      margin: 10 40px;
     }
     ^ .icon-container {
+      margin-top: 4;
       position: relative;
     }
     ^ .icon-container.selected {
@@ -186,10 +186,10 @@ foam.CLASS({
           .select(this.menuDAO.where(this.EQ(this.Menu.ID, 'currency')), function(menu) {
             return menu.handler;
           })
-        this.end().
+        this.end()
 
         // The notifications container
-        start('div')
+        this.start('div')
           .addClass('icon-container')
 
           // Show blue underline if user is on notifications page.
@@ -211,7 +211,7 @@ foam.CLASS({
             .add( this.countUnread$ )
             .show( this.showCountUnread$ )
           .end()
-        .end();
+        .end()
 
         // The username and settings dropdown
         .start().addClass('profile-container')

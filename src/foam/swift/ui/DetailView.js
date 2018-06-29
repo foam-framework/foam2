@@ -30,12 +30,12 @@ return data?.ownClassInfo().label ?? self.ownClassInfo().label
     },
     {
       name: 'propertyViews',
-      swiftType: '[String:FObject]',
+      swiftType: '[String:foam_core_FObject]',
       swiftFactory: 'return [:]',
     },
     {
       name: 'actionViews',
-      swiftType: '[String:FOAMActionUIButton]',
+      swiftType: '[String:foam_swift_ui_FOAMActionUIButton]',
       swiftFactory: 'return [:]',
     },
     {
@@ -50,7 +50,7 @@ return data?.ownClassInfo().label ?? self.ownClassInfo().label
       swiftExpression: 'return data?.ownClassInfo() ?? nil',
     },
     {
-      swiftType: 'FObject?',
+      swiftType: 'foam_core_FObject?',
       name: 'data',
     },
     {
@@ -83,7 +83,7 @@ subViewSubscriptions = [:]
       swiftCode: function() {/*
 var properties: [PropertyInfo] = []
 var actions: [ActionInfo] = []
-if let fobj = data as AnyObject as? FObject {
+if let fobj = data as AnyObject as? foam_core_FObject {
   properties += fobj.ownClassInfo().axioms(byType: PropertyInfo.self)
   actions += fobj.ownClassInfo().axioms(byType: ActionInfo.self)
 }
@@ -184,10 +184,10 @@ if let bottom: UIView = actionViews.first ?? labelViews.last {
           swiftType: 'PropertyInfo',
         }
       ],
-      swiftReturns: 'FObject?',
+      swiftReturns: 'foam_core_FObject?',
       swiftCode: function() {/*
 if let c = config[a.name] as? [String:Any?],
-    let vf = c["viewFactory"] as? (Context) -> FObject? {
+    let vf = c["viewFactory"] as? (Context) -> foam_core_FObject? {
   return vf(__context__)
 }
 return a.viewFactory(x: __context__)
@@ -195,7 +195,7 @@ return a.viewFactory(x: __context__)
     },
   ],
   swiftCode: function() {/*
-public subscript(key: String) -> FObject? {
+public subscript(key: String) -> foam_core_FObject? {
   guard let of = self.of else { return nil }
   if let v = self.propertyViews[key] ?? self.actionViews[key] {
     return v
@@ -203,7 +203,7 @@ public subscript(key: String) -> FObject? {
   if let a = of.axiom(byName: key) {
     if let a = a as? PropertyInfo, let viewFobj = getView(a) {
       let prop = a.name
-      if let viewFobj = viewFobj as? PropertyView {
+      if let viewFobj = viewFobj as? foam_swift_ui_PropertyView {
         viewFobj.fromProperty(a)
       }
       propertyViews[prop] = viewFobj

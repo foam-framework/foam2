@@ -34,7 +34,7 @@ try? <%=this.boxPropName%>.send(msg)
 replyBox.detach()
 msg.detach()
 
-let o = try replyBox.future.get()
+let o = try replyBox.promise.get()
 if let o = o as? Error {
   throw o
 }
@@ -87,7 +87,7 @@ foam.CLASS({
   properties: [
     {
       name: 'swiftType',
-      value: 'Box',
+      factory: function() { return foam.box.Box.model_.swiftName },
     }
   ]
 });

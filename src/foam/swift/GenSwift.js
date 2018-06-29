@@ -73,7 +73,6 @@ foam.CLASS({
       value: [
         'FObject',
         'foam.core.AbstractInterface',
-        'foam.box.RPCReturnBox',
         'foam.swift.ui.AbstractGenIBOutletDetailView',
       ],
     },

@@ -69,12 +69,13 @@ if let index = self.name.range(of: "/", options: .backwards)?.lowerBound {
 }
 return ownClassInfo().create(args: [
   "name": name
-], x: __subContext__) as! Box
+], x: __subContext__) as! foam_box_Box
       */},
     },
     {
       name: 'getBaseName',
       returns: 'String',
+      swiftReturns: 'String',
       code: function getBaseName() {
         return this.name.substring(this.name.lastIndexOf('/') + 1);
       },
