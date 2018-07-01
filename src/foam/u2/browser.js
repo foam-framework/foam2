@@ -174,20 +174,16 @@ foam.CLASS({
     }
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function() {/*
-        ^ {
-          align-items: center;
-          border-bottom: 1px solid #eee;
-          box-sizing: border-box;
-          display: flex;
-          min-height: 48px;
-          padding: 16px;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ {
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      box-sizing: border-box;
+      display: flex;
+      min-height: 48px;
+      padding: 16px;
+    }
+  `,
 
   methods: [
     function initE() {
@@ -304,6 +300,7 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'BasicStackView',
   extends: 'foam.u2.View',
+
   imports: [
     'stack'
   ],
