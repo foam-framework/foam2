@@ -4,14 +4,25 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
   requires: [
     'foam.dao.SequenceNumberDAO',
+    'foam.dao.journal.FileAppendDAO',
     'foam.dao.journal.UserCommentJournalEntryDAODecorator',
     'foam.dao.journal.JournalEntryDAO',
     'foam.dao.journal.PutRemoveJournalDAODecorator',
   ],
   properties: [
     {
+      class: 'String',
+      name: 'journalFile',
+    },
+    {
       class: 'foam.dao.DAOProperty',
       name: 'journalEntryDAO',
+      javaFactory: `
+return new foam.dao.journal.FileAppendDAO.Builder(getX())
+  .setOf(foam.dao.journal.JournalEntry.getOwnClassInfo())
+  .setFileName(getJournalFile())
+  .build();
+      `,
     },
     {
       class: 'foam.dao.DAOProperty',
@@ -27,7 +38,7 @@ j = new foam.dao.SequenceNumberDAO.Builder(getX())
   .build();
 
 foam.dao.DAO d =  new foam.dao.journal.JournalEntryDAO.Builder(getX())
-  .setDelegate(getDestinationDAO())
+  .setDestinationDAO(getDestinationDAO())
   .setJournalEntryDAO(j)
   .build();
 d = new foam.dao.journal.UserCommentJournalEntryDAODecorator.Builder(getX())
