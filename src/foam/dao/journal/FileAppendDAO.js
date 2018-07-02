@@ -1,4 +1,3 @@
-src/services
 foam.CLASS({
   package: 'foam.dao.journal',
   name: 'FileAppendDAO',
