@@ -24,8 +24,8 @@ foam.INTERFACE({
       name: 'send',
       args: [
         {
+          of: 'foam.box.Message',
           name: 'msg',
-          swiftType: 'Message'
         }
       ],
       swiftThrows: true,

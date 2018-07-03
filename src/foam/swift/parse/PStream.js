@@ -18,7 +18,7 @@ foam.INTERFACE({
     },
     {
       name: 'tail',
-      swiftReturns: 'PStream',
+      returns: 'foam.swift.parse.PStream',
     },
     {
       name: 'substring',
@@ -26,7 +26,7 @@ foam.INTERFACE({
       args: [
         {
           name: 'end',
-          swiftType: 'PStream',
+          of: 'foam.swift.parse.PStream',
         },
       ],
     },
@@ -36,11 +36,10 @@ foam.INTERFACE({
     },
     {
       name: 'setValue',
-      swiftReturns: 'PStream',
+      returns: 'foam.swift.parse.PStream',
       args: [
         {
           name: 'value',
-          swiftType: 'Any?',
         },
       ],
     },

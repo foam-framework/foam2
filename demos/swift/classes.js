@@ -29,7 +29,6 @@ var classes = [
   'foam.mlang.Constant',
   'foam.mlang.predicate.Eq',
   'foam.mlang.sink.Count',
-  'foam.swift.box.RPCReturnBox',
   'foam.swift.dao.ArrayDAO',
   'foam.swift.dao.CachingDAO',
   'foam.swift.parse.StringPStream',

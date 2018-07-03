@@ -36,10 +36,10 @@ foam.CLASS({
 if newValue == nil { return }
 
 
-let findIndex = { (o: FObject) -> Int? in
+let findIndex = { (o: foam_core_FObject) -> Int? in
   let id = o.get(key: "id")
   return self.daoContents.index(where: { (o) -> Bool in
-    let o = o as! FObject
+    let o = o as! foam_core_FObject
     return FOAM_utils.equals(id, o.get(key: "id"))
   })
 }
@@ -48,7 +48,7 @@ daoSub = try? newValue!.listen(FnSink_create([
   "fn": { [weak self] str, obj, sub in
     if self == nil { return }
     if str == "add" {
-      if let index = findIndex(obj as! FObject) {
+      if let index = findIndex(obj as! foam_core_FObject) {
         self?.daoContents[index] = obj
         self?.tableView?.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
       } else {
@@ -56,7 +56,7 @@ daoSub = try? newValue!.listen(FnSink_create([
         self?.tableView?.insertRows(at: [IndexPath(row: self!.daoContents.count - 1, section: 0)], with: .automatic)
       }
     } else if str == "remove" {
-      if let index = findIndex(obj as! FObject) {
+      if let index = findIndex(obj as! foam_core_FObject) {
         self?.daoContents.remove(at: index)
         self?.tableView?.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
       }
@@ -96,7 +96,7 @@ onDAOUpdate()
       name: 'rowViewFactory',
     },
     {
-      swiftType: '((UITableViewCell, FObject) -> Void)',
+      swiftType: '((UITableViewCell, foam_core_FObject) -> Void)',
       swiftRequiresEscaping: true,
       name: 'rowViewPrepare',
     },
@@ -110,7 +110,7 @@ onDAOUpdate()
       name: 'onDAOUpdate',
       isMerged: true,
       swiftCode: function() {/*
-let sink = try? dao!.select(ArraySink_create()) as? ArraySink
+let sink = try? dao!.select(ArraySink_create()) as? foam_dao_ArraySink
 daoContents = sink??.array ?? []
 tableView?.reloadData()
       */},
@@ -125,7 +125,7 @@ public func tableView(_ tableView: UITableView, numberOfRowsInSection section: I
 
 public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
   let cell = tableView.dequeueReusableCell(withIdentifier: reusableCellIdentifier) ?? rowViewFactory()
-  rowViewPrepare(cell, daoContents[indexPath.row] as! FObject)
+  rowViewPrepare(cell, daoContents[indexPath.row] as! foam_core_FObject)
   return cell
 }
 

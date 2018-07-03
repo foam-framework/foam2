@@ -80,6 +80,7 @@ var classes = [
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
   'foam.dao.FileJournal',
+  'foam.dao.WriteOnlyFileJournal',
   'foam.dao.BaseClientDAO',
   'foam.dao.ClientDAO',
   'foam.dao.ClientSink',
@@ -103,7 +104,6 @@ var classes = [
   'foam.dao.SQLStatement',
   'foam.dao.EasyDAO',
   'foam.dao.EnabledAwareDAO',
-  'foam.dao.LastModifiedAwareDAO',
   'foam.mlang.order.Comparator',
   'foam.mlang.order.Desc',
   'foam.mlang.sink.Count',
@@ -118,8 +118,14 @@ var classes = [
   'foam.nanos.bench.Benchmark',
   'foam.nanos.auth.EnabledAware',
   'foam.nanos.auth.Group',
+  'foam.nanos.auth.CreatedAware',
+  'foam.nanos.auth.CreatedAwareDAO',
+  'foam.nanos.auth.CreatedByAware',
+  'foam.nanos.auth.CreatedByAwareDAO',
   'foam.nanos.auth.LastModifiedAware',
+  'foam.nanos.auth.LastModifiedAwareDAO',
   'foam.nanos.auth.LastModifiedByAware',
+  'foam.nanos.auth.LastModifiedByAwareDAO',
   'foam.nanos.auth.Permission',
   'foam.nanos.auth.DayOfWeek',
   'foam.nanos.auth.Hours',
@@ -236,7 +242,9 @@ var classes = [
   'foam.nanos.dig.DUG',
 
   'foam.lib.query.TestModel',
-  'foam.lib.query.FooEnum'
+  'foam.lib.query.FooEnum',
+  'foam.demos.net.nap.web.model.RegulatoryNotice',
+  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit'
 ];
 
 var abstractClasses = [

@@ -40,7 +40,7 @@ foam.CLASS({
       },
       swiftFactory: 'return NullDAO_create()',
       swiftPostSet: `
-if let oldValue = oldValue as? AbstractDAO {
+if let oldValue = oldValue as? foam_dao_AbstractDAO {
   _ = oldValue.on["reset"].pub()
 }
       `,
@@ -130,10 +130,10 @@ foam.CLASS({
     },
     {
       name: 'dao',
-      swiftType: 'DAO?',
+      swiftType: 'foam_dao_DAO?',
       swiftPostSet: `
 self.innerSub?.detach()
-try? self.innerSub = newValue?.listen(self, args as? FoamPredicate)
+try? self.innerSub = newValue?.listen(self, args as? foam_mlang_predicate_Predicate)
 if oldValue != nil {
   self.reset(Subscription(detach: {}))
 }
