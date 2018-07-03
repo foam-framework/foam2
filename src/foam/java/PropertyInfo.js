@@ -71,11 +71,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'doHashing'
+      name: 'includeInDigest'
     },
     {
       class: 'Boolean',
-      name: 'doSigning'
+      name: 'includeInSignature'
     },
     'sourceCls',
     'propType',
@@ -241,16 +241,16 @@ foam.CLASS({
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
           },
           {
-            name: 'doHashing',
+            name: 'includeInDigest',
             visibility: 'public',
             type: 'boolean',
-            body: `return ${this.doHashing};`
+            body: `return ${this.includeInDigest};`
           },
           {
-            name: 'doSigning',
+            name: 'includeInSignature',
             visibility: 'public',
             type: 'boolean',
-            body: `return ${this.doSigning};`
+            body: `return ${this.includeInSignature};`
           }
         ];
 

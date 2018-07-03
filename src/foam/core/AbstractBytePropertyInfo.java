@@ -30,13 +30,13 @@ public abstract class AbstractBytePropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
-    if ( ! doHashing() ) return;
+    if ( ! includeInDigest() ) return;
     md.update((byte) get(obj));
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
-    if ( ! doSigning() ) return;
+    if ( ! includeInSignature() ) return;
     sig.update((byte) get(obj));
   }
 }

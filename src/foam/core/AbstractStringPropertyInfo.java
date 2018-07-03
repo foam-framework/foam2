@@ -38,7 +38,7 @@ public abstract class AbstractStringPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
-    if ( ! doHashing() ) return;
+    if ( ! includeInDigest() ) return;
     String val = (String) get(obj);
     if ( SafetyUtil.isEmpty(val) ) return;
     md.update(val.getBytes(StandardCharsets.UTF_8));
@@ -46,7 +46,7 @@ public abstract class AbstractStringPropertyInfo
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
-    if ( ! doSigning() ) return;
+    if ( ! includeInSignature() ) return;
     String val = (String) get(obj);
     if ( SafetyUtil.isEmpty(val) ) return;
     sig.update(val.getBytes(StandardCharsets.UTF_8));

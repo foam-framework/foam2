@@ -45,14 +45,14 @@ public abstract class AbstractLongPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
-    if ( ! doHashing() ) return;
+    if ( ! includeInDigest() ) return;
     long val = (long) get(obj);
     md.update((ByteBuffer) bb.get().putLong(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
-    if ( ! doSigning() ) return;
+    if ( ! includeInSignature() ) return;
     long val = (long) get(obj);
     sig.update((ByteBuffer) bb.get().putLong(val).flip());
   }
