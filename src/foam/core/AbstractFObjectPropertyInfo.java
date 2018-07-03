@@ -62,6 +62,7 @@ public abstract class AbstractFObjectPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! doHashing() ) return;
     FObject val = (FObject) get(obj);
     if ( val == null ) return;
 
@@ -78,6 +79,7 @@ public abstract class AbstractFObjectPropertyInfo
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! doSigning() ) return;
     FObject val = (FObject) get(obj);
     if ( val == null ) return;
 

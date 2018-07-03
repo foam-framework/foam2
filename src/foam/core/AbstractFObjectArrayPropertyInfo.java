@@ -80,6 +80,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! doHashing() ) return;
     FObject[] val = (FObject[]) this.get(obj);
     if ( val == null || val.length == 0 ) return;
 
@@ -98,6 +99,7 @@ public abstract class AbstractFObjectArrayPropertyInfo
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! doSigning() ) return;
     FObject[] val = (FObject[]) this.get(obj);
     if ( val == null || val.length == 0 ) return;
 
