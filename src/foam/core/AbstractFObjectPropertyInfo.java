@@ -70,6 +70,7 @@ public abstract class AbstractFObjectPropertyInfo
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
+      if ( ! prop.doHashing() ) continue;
       if ( ! prop.isSet(val) ) continue;
       if ( prop.isDefaultValue(val) ) continue;
       md.update(prop.getNameAsByteArray());
@@ -87,6 +88,7 @@ public abstract class AbstractFObjectPropertyInfo
     Iterator i = props.iterator();
     while ( i.hasNext() ) {
       PropertyInfo prop = (PropertyInfo) i.next();
+      if ( ! prop.doSigning() ) continue;
       if ( ! prop.isSet(val) ) continue;
       if ( prop.isDefaultValue(val) ) continue;
       sig.update(prop.getNameAsByteArray());
