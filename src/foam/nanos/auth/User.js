@@ -9,8 +9,8 @@ foam.CLASS({
   name: 'User',
 
   implements: [
-    'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.EnabledAware',
     'foam.nanos.auth.LastModifiedAware'
   ],
 
