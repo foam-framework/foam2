@@ -45,14 +45,14 @@ public abstract class AbstractIntPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
-    if ( ! doHashing() ) return;
+    if ( ! includeInDigest() ) return;
     int val = (int) get(obj);
     md.update((ByteBuffer) bb.get().putInt(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
-    if ( ! doSigning() ) return;
+    if ( ! includeInSignature() ) return;
     int val = (int) get(obj);
     sig.update((ByteBuffer) bb.get().putInt(val).flip());
   }

@@ -12,7 +12,7 @@ foam.INTERFACE({
 
   methods: [
     {
-      name: 'doSigning',
+      name: 'includeInSignature',
       javaReturns: 'boolean',
       documentation: 'Flag to determine if we should include this property as part of the signature'
     },
