@@ -261,10 +261,10 @@ return on.sub(listener: { (sub: Subscription, args: [Any?]) -> Void in
   guard let topic = args[1] as? String else { return }
   switch topic {
     case "put":
-      mySink.put(args.last as! FObject, sub)
+      mySink.put(args.last as! foam_core_FObject, sub)
       break
     case "remove":
-      mySink.remove(args.last as! FObject, sub)
+      mySink.remove(args.last as! foam_core_FObject, sub)
       break
     case "reset":
       mySink.reset(sub)
@@ -282,17 +282,18 @@ listeners_.add(new DAOListener(sink, listeners_));
 
     {
       name: 'decorateListener_',
-      swiftReturns: 'Sink',
+      swiftReturns: 'foam_dao_Sink',
       javaReturns: 'Sink',
       args: [
         {
+          of: 'foam.dao.Sink',
           name: 'sink',
-          swiftType: 'Sink',
           javaType: 'Sink',
         },
         {
+          of: 'foam.mlang.predicate.Predicate',
+          optional: true,
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
           javaType: 'foam.mlang.predicate.Predicate',
         },
       ],
@@ -329,12 +330,12 @@ return sink;
     */
     {
       name: 'decorateSink_',
-      swiftReturns: 'Sink',
+      swiftReturns: 'foam_dao_Sink',
       javaReturns: 'foam.dao.Sink',
       args: [
         {
+          of: 'foam.dao.Sink',
           name: 'sink',
-          swiftType: 'Sink',
           javaType: 'foam.dao.Sink',
         },
         {
@@ -348,13 +349,15 @@ return sink;
           javaType: 'long',
         },
         {
+          of: 'foam.mlang.order.Comparator',
           name: 'order',
-          swiftType: 'Comparator?',
+          optional: true,
           javaType: 'foam.mlang.order.Comparator',
         },
         {
+          of: 'foam.mlang.predicate.Predicate',
           name: 'predicate',
-          swiftType: 'FoamPredicate?',
+          optional: true,
           javaType: 'foam.mlang.predicate.Predicate',
         },
       ],
@@ -712,7 +715,7 @@ foam.CLASS({
   properties: [
     {
       // TODO: FObjectProperty of Predicate. Doing this currently breaks java.
-      swiftType: 'FoamPredicate',
+      swiftType: 'foam_mlang_predicate_Predicate',
       name: 'predicate',
       required: true
     },

@@ -115,8 +115,9 @@ foam.CLASS({
 
       methods: [
         function initE() {
-          this.memento$.sub(this.onMementoChange);
-          this.onMementoChange();
+          // comment out memento since it causes the issue (#1266) for go-back button in detail views
+          // this.memento$.sub(this.onMementoChange);
+          // this.onMementoChange();
 
           this
             .start(this.CREATE, this.createLabel && {label: this.createLabel}).style({float: 'right'}).end()

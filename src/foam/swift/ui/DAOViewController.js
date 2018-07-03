@@ -73,7 +73,7 @@ let tvc = UITableViewController()
 tvc.navigationItem.rightBarButtonItem = UIBarButtonItem(
     barButtonSystemItem: .add,
     target: self,
-    action: #selector(DAOViewController.onCreate))
+    action: #selector(foam_swift_ui_DAOViewController.onCreate))
 
 if let of = dao?.get(key: "of") as? ClassInfo {
   tvc.title = of.label

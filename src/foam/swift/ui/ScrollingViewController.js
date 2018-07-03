@@ -12,7 +12,8 @@ foam.CLASS({
   ],
   properties: [
     {
-      swiftType: 'FObject?',
+      class: 'FObjectProperty',
+      required: false,
       name: 'view',
     },
     {

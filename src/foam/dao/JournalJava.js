@@ -222,6 +222,7 @@ foam.CLASS({
   methods: [
     {
       name: 'put',
+      synchronized: true,
       javaCode: `
         FObject fobj = (FObject) obj;
         PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
@@ -234,6 +235,7 @@ foam.CLASS({
     },
     {
       name: 'remove',
+      synchronized: true,
       javaCode: `
         try {
           // TODO: Would be more efficient to output the ID portion of the object.  But
@@ -398,6 +400,22 @@ foam.CLASS({
           prop.set(oldFObject, prop.get(diffFObject));
         }
       `
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.dao',
+  name: 'WriteOnlyFileJournal',
+  extends: 'foam.dao.FileJournal',
+
+  documentation: 'Write Only implementation of file journal',
+
+  methods: [
+    {
+      name: 'replay',
+      javaCode: ``
     }
   ]
 });

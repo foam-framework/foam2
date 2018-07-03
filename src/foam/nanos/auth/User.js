@@ -10,8 +10,8 @@ foam.CLASS({
 
   implements: [
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.CreatedAware',
+    'foam.nanos.auth.LastModifiedAware'
   ],
 
   requires: [
@@ -188,12 +188,6 @@ foam.CLASS({
       view: { class: 'foam.nanos.auth.AddressDetailView' }
     },
     {
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
-      name: 'accounts',
-      hidden: true
-    },
-    {
       class: 'Reference',
       name: 'language',
       of: 'foam.nanos.auth.Language',
@@ -293,6 +287,11 @@ foam.CLASS({
           return 'Invalid website';
         }
       }
+    },
+    {
+      class: 'Date',
+      name: 'created',
+      documentation: 'Creation date'
     },
     {
       class: 'Date',
