@@ -92,6 +92,16 @@ foam.CLASS({
           foam.typeOf(value) === foam.Undefined ? 'null' :
           value;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'doHashing',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'doSigning',
+      value: true
     }
   ],
 
@@ -115,7 +125,9 @@ foam.CLASS({
         storageTransient: this.storageTransient,
         xmlAttribute:     this.xmlAttribute,
         xmlTextNode:      this.xmlTextNode,
-        sqlType:          this.sqlType
+        sqlType:          this.sqlType,
+        doHashing:        this.doHashing,
+        doSigning:        this.doSigning
       });
     },
 

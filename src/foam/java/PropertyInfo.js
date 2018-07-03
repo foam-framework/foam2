@@ -69,6 +69,14 @@ foam.CLASS({
         return 'set' + foam.String.capitalize(propName);
       }
     },
+    {
+      class: 'Boolean',
+      name: 'doHashing'
+    },
+    {
+      class: 'Boolean',
+      name: 'doSigning'
+    },
     'sourceCls',
     'propType',
     'propValue',
@@ -231,6 +239,18 @@ foam.CLASS({
             args: [ { name: 'o', type: 'Object' } ],
             /* TODO: revise when/if expression support is added to Java */
             body: `return foam.util.SafetyUtil.compare(get_(o), ${this.propValue}) == 0;`
+          },
+          {
+            name: 'doHashing',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.doHashing};`
+          },
+          {
+            name: 'doSigning',
+            visibility: 'public',
+            type: 'boolean',
+            body: `return ${this.doSigning};`
           }
         ];
 
