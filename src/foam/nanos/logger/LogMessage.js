@@ -8,9 +8,13 @@ foam.CLASS({
   package: 'foam.nanos.logger',
   name: 'LogMessage',
 
+  documentation: `Modelled log output.
+Implement LastModifiedByAware to suppress 'modified by' comment in journal output.`,
+
   implements: [
     'foam.nanos.auth.CreatedAware',
-    'foam.nanos.auth.CreatedByAware'
+    'foam.nanos.auth.CreatedByAware',
+    'foam.nanos.auth.LastModifiedByAware'
   ],
 
   properties: [
@@ -32,6 +36,15 @@ foam.CLASS({
       of: 'foam.nanos.auth.User',
       name: 'createdBy',
       documentation: 'User who created the entry'
+    },
+    {
+      class: 'Reference',
+      of: 'foam.nanos.auth.User',
+      name: 'lastModifiedBy',
+      value: '1',
+      transient: true,
+      hidden: true,
+      documentation: 'Added to suppress journal comments regarding "modified by". Also, a non-null value is required.'
     },
     {
       name: 'message',
