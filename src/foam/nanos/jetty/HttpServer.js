@@ -11,6 +11,15 @@ foam.CLASS({
       value: 8080
     },
     {
+      class: 'StringArray',
+      name: 'welcomeFiles',
+      factory: function() {
+        return [
+          '/src/foam/nanos/controller/index.html'
+        ];
+      }
+    },
+    {
       class: 'FObjectArray',
       of: 'foam.nanos.servlet.ServletMapping',
       name: 'servletMappings'
@@ -32,6 +41,9 @@ foam.CLASS({
 
         org.eclipse.jetty.servlet.ServletContextHandler handler =
           new org.eclipse.jetty.servlet.ServletContextHandler();
+
+        handler.setResourceBase(System.getProperty("user.dir"));
+        handler.setWelcomeFiles(getWelcomeFiles());
 
         handler.setAttribute("X", getX());
 
