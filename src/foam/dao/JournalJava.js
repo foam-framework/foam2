@@ -403,19 +403,3 @@ foam.CLASS({
     }
   ]
 });
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'WriteOnlyFileJournal',
-  extends: 'foam.dao.FileJournal',
-
-  documentation: 'Write Only implementation of file journal',
-
-  methods: [
-    {
-      name: 'replay',
-      javaCode: ``
-    }
-  ]
-});
