@@ -245,6 +245,10 @@ var classes = [
   'foam.nanos.dig.DIG',
   'foam.nanos.dig.DUG',
 
+  'foam.nanos.jetty.HttpServer',
+  'foam.nanos.servlet.ServletMapping',
+  'foam.nanos.servlet.ErrorPageMapping',
+
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
