@@ -32,7 +32,7 @@ foam.CLASS({
       this.SUPER();
       this
         .addClass(this.myClass())
-        .start('div')
+        .start()
           .addClass('msg')
           .enableClass('fully-visible', this.fullyVisible$)
           .on('click', this.toggleFullVisibility)
