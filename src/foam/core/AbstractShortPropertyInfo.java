@@ -49,12 +49,14 @@ public abstract class AbstractShortPropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! includeInDigest() ) return;
     short val = (short) get(obj);
     md.update((ByteBuffer) bb.get().putShort(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! includeInSignature() ) return;
     short val = (short) get(obj);
     sig.update((ByteBuffer) bb.get().putShort(val).flip());
   }

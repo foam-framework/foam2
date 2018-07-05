@@ -92,30 +92,42 @@ foam.CLASS({
           foam.typeOf(value) === foam.Undefined ? 'null' :
           value;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInDigest',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInSignature',
+      value: true
     }
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls:        cls,
-        propName:         this.name,
-        propShortName:    this.shortName,
-        propAliases:      this.aliases,
-        propType:         this.javaType,
-        propValue:        this.javaValue,
-        propRequired:     this.required,
-        cloneProperty:    this.javaCloneProperty,
-        diffProperty:     this.javaDiffProperty,
-        jsonParser:       this.javaJSONParser,
-        queryParser:      this.javaQueryParser,
-        csvParser:        this.javaCSVParser,
-        extends:          this.javaInfoType,
-        networkTransient: this.networkTransient,
-        storageTransient: this.storageTransient,
-        xmlAttribute:     this.xmlAttribute,
-        xmlTextNode:      this.xmlTextNode,
-        sqlType:          this.sqlType
+        sourceCls:          cls,
+        propName:           this.name,
+        propShortName:      this.shortName,
+        propAliases:        this.aliases,
+        propType:           this.javaType,
+        propValue:          this.javaValue,
+        propRequired:       this.required,
+        cloneProperty:      this.javaCloneProperty,
+        diffProperty:       this.javaDiffProperty,
+        jsonParser:         this.javaJSONParser,
+        queryParser:        this.javaQueryParser,
+        csvParser:          this.javaCSVParser,
+        extends:            this.javaInfoType,
+        networkTransient:   this.networkTransient,
+        storageTransient:   this.storageTransient,
+        xmlAttribute:       this.xmlAttribute,
+        xmlTextNode:        this.xmlTextNode,
+        sqlType:            this.sqlType,
+        includeInDigest:    this.includeInDigest,
+        includeInSignature: this.includeInSignature
       });
     },
 
