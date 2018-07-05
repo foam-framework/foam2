@@ -14,7 +14,17 @@ foam.CLASS({
   ],
 
   properties: [
-    'of'
+    'of',
+    {
+      class: 'Boolean',
+      name: 'fullyVisible',
+      documentation: `If a notification's body content is too long, it will be
+          truncated and an ellipsis will be added to the cutoff point. Clicking
+          on a notification toggles between truncated form and being fully
+          visible. This property tracks whether the notification is being
+          truncated or displayed in full.`,
+      value: false
+    }
   ],
 
   methods: [
@@ -23,21 +33,18 @@ foam.CLASS({
       this
         .addClass(this.myClass())
         .start('div')
-          .on('click', this.onClick)
           .addClass('msg')
-          .add(this.data.body)
+          .enableClass('fully-visible', this.fullyVisible$)
+          .on('click', this.toggleFullVisibility)
           .show(this.data.body !== '')
+          .add(this.data.body)
         .end();
     }
   ],
 
   listeners: [
-    function onClick() {
-      if ( this.childNodes[0].css.display == 'block' ) {
-        this.childNodes[0].style({ display: '-webkit-box' });
-      } else {
-        this.childNodes[0].style({ display: 'block' });
-      }
+    function toggleFullVisibility() {
+      this.fullyVisible = ! this.fullyVisible;
     }
   ]
 });
