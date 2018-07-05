@@ -90,11 +90,10 @@ foam.CLASS({
         return dao.where(this.STARTS_WITH_IC(this.Person.SURNAME, prefix));
       },
       view: {
-        class: 'foam.u2.TableView',
+        class: 'foam.u2.view.TableView',
         of: com.google.foam.demos.sevenguis.Person,
         title: '',
-        scrollEnabed: true,
-        editColumns: false
+        editColumnsEnabled: false
       }
     },
     {
@@ -117,7 +116,7 @@ foam.CLASS({
           start(this.PREFIX, {onKey: true, type: 'search'}).end().
           start('div').addClass('content').
             start('span').addClass('summaryPane').
-              start(this.FILTERED_DAO, {hardSelection$: this.selection$}).end().
+              start(this.FILTERED_DAO, {selection$: this.selection$}).end().
             end().
             start('span').addClass('detailPane').
               add(this.PERSON).
