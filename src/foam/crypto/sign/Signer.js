@@ -12,6 +12,11 @@ foam.INTERFACE({
 
   methods: [
     {
+      name: 'includeInSignature',
+      javaReturns: 'boolean',
+      documentation: 'Flag to determine if we should include this property as part of the signature'
+    },
+    {
       name: 'updateSignature',
       javaThrows: [
         'java.security.SignatureException'
