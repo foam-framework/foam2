@@ -31,7 +31,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftType',
-      value: 'Any?',
+      expression: function(of, optional) {
+        of = foam.String.isInstance(of) ? foam.lookup(of, true) : of;
+        return of ? of.model_.swiftName + (optional ? '?' : '') : 'Any?';
+      },
     },
   ],
   methods: [

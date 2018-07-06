@@ -11,7 +11,7 @@ import foam.core.ContextAware;
 import foam.core.X;
 import foam.core.XFactory;
 import foam.dao.DAO;
-import foam.dao.DAOSkeleton;
+import foam.dao.SessionDAOSkeleton;
 import foam.nanos.boot.NSpec;
 import foam.nanos.boot.NSpecAware;
 import foam.nanos.logger.Logger;
@@ -101,7 +101,7 @@ public class NanoRouter
       try {
         Class cls = spec.getBoxClass() != null && spec.getBoxClass().length() > 0 ?
             Class.forName(spec.getBoxClass()) :
-            DAOSkeleton.class ;
+            SessionDAOSkeleton.class ;
         Skeleton skeleton = (Skeleton) cls.newInstance();
 
         // TODO: create using Context, which should do this automatically

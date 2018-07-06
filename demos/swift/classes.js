@@ -5,9 +5,9 @@
  */
 
 var classes = [
-  'TestApp',
-  'TestDetailView',
-  'TestExtended',
+  'somepackage.TestApp',
+  'somepackage.TestDetailView',
+  'somepackage.TestExtended',
   'foam.box.Box',
   'foam.box.BoxRegistry',
   'foam.box.BoxService',
@@ -19,6 +19,8 @@ var classes = [
   'foam.box.RPCMessage',
   'foam.box.ReplyBox',
   'foam.box.ReturnBox',
+  'foam.core.AbstractEnum',
+  'foam.core.Identifiable',
   'foam.dao.AnonymousSink',
   'foam.dao.ArraySink',
   'foam.dao.ClientDAO',
@@ -27,7 +29,6 @@ var classes = [
   'foam.mlang.Constant',
   'foam.mlang.predicate.Eq',
   'foam.mlang.sink.Count',
-  'foam.swift.box.RPCReturnBox',
   'foam.swift.dao.ArrayDAO',
   'foam.swift.dao.CachingDAO',
   'foam.swift.parse.StringPStream',

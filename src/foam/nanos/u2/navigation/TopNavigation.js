@@ -39,9 +39,14 @@ foam.CLASS({
       color: white;
       padding-top: 5px;
     }
-    ^ .topNavContainer {
-      width: 100%;
-      margin: auto;
+    ^ .logged-in-container {
+      display: flex;
+    }
+    ^ .menuBar {
+      flex-grow: 2;
+      overflow: auto;
+      white-space: nowrap;
+      margin-left: 60px;
     }
     ^ .menuBar > div > ul {
       margin-top: 0;
@@ -53,7 +58,7 @@ foam.CLASS({
       display: inline-block;
       cursor: pointer;
     }
-    ^ .menuItem{
+    ^ .menuItem {
       display: inline-block;
       padding: 20px 0 5px 0px;
       cursor: pointer;
@@ -74,8 +79,18 @@ foam.CLASS({
       padding-bottom: 5px;
       text-shadow: 0 0 0px white, 0 0 0px white;
     }
+    ^ .welcome-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      line-height: 1.25;
+      letter-spacing: 0.3px;
+      width: 100%;
+      height: calc(100% - 5px); /* Compensate for 5px padding-top of topnav */
+    }
     ^ .menuBar{
-      width: 60%;
+      width: auto;
       overflow: auto;
       white-space: nowrap;
       margin-left: 60px;
@@ -85,23 +100,26 @@ foam.CLASS({
   properties: [
     {
       name: 'dao',
-      factory: function() { return this.menuDAO; }
+      factory: () => this.menuDAO
     }
   ],
 
   methods: [
-    function initE(){
+    function initE() {
       this
-      .addClass(this.myClass())
-      .start().addClass('topNavContainer')
-        .show( this.loginSuccess$)
-        .start({class: 'foam.nanos.u2.navigation.BusinessLogoView' })
+        .addClass(this.myClass())
+        .start()
+          .addClass('logged-in-container')
+          .show(this.loginSuccess$)
+          .tag({ class: 'foam.nanos.u2.navigation.BusinessLogoView' })
+          .start({ class: 'foam.nanos.menu.MenuBar' })
+            .addClass('menuBar')
+          .end()
+          .tag({ class: 'foam.nanos.u2.navigation.UserView' })
         .end()
-        .start({class: 'foam.nanos.menu.MenuBar'}).addClass('menuBar')
-        .end()
-        .start({class: 'foam.nanos.u2.navigation.UserView'})
-        .end()
-      .end();
+        .start()
+          .add('Welcome').addClass('welcome-label').hide(this.loginSuccess$)
+        .end();
     }
   ]
 });

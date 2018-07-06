@@ -47,13 +47,13 @@ foam.CLASS({
     },
   ],
   methods: [
-    function writeToSwiftClass(cls, _, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
       if ( !this.swiftCode ) return;
       cls.fields.push(this.Field.create({
         lazy: true,
         name: this.swiftSlotName,
         initializer: this.slotInit(),
-        type: 'Slot',
+        type: 'foam_swift_core_Slot',
       }));
       cls.methods.push(this.Method.create({
         name: this.swiftName,
@@ -86,7 +86,7 @@ class ActionInfo_: ActionInfo {
   let args: [MethodArg] = []
   let label = "<%=this.label%>" // TODO localize
   let name = "<%=this.swiftName%>"
-  public func getSlot(_ obj: FObject) -> Slot {
+  public func getSlot(_ obj: foam_core_FObject) -> foam_swift_core_Slot {
     let obj = obj as! <%=parentCls.model_.swiftName%>
     return obj.<%=this.swiftSlotName%>
   }
@@ -98,7 +98,7 @@ return ActionInfo_()
       name: 'slotInit',
       args: [],
       template: function() {/*
-return ConstantSlot([
+return foam_swift_core_ConstantSlot([
   "value": { [weak self] (args: [Any?]) throws -> Any? in
     if self == nil { fatalError() }
     return self!.`<%=this.swiftName%>`()

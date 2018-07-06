@@ -11,6 +11,7 @@ var classpaths = [
 
 var command = [
   'node',
+//  '--inspect-brk',
   root + '/tools/genswift.js',
   dir + '/classes.js',
   dir + '/gen',
