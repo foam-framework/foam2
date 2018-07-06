@@ -15,46 +15,68 @@
  * limitations under the License.
  */
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ArgumentNoSwiftRefine',
   refines: 'foam.core.Argument',
   properties: [ 'swiftType', 'swiftDefaultValue' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ConstantNoSwiftRefine',
   refines: 'foam.core.Constant',
   properties: [ 'type', 'swiftValue', 'swiftType' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ContextMethodNoSwiftRefine',
   refines: 'foam.core.ContextMethod',
   properties: [ 'swiftThrows' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'FObjectPropertyNoSwiftRefine',
   refines: 'foam.core.FObjectProperty',
   properties: [ 'swiftFactory', 'swiftPostSet' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'InterfaceModelNoSwiftRefine',
   refines: 'foam.core.InterfaceModel',
   properties: [ 'swiftName', 'swiftImplements' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'InterfaceMethodNoSwiftRefine',
   refines: 'foam.core.internal.InterfaceMethod',
   properties: [ 'swiftReturns', 'swiftThrows', 'swiftSupport' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ListenerNoSwiftRefine',
   refines: 'foam.core.Listener',
   properties: [ 'swiftCode' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'MethodNoSwiftRefine',
   refines: 'foam.core.Method',
   properties: [ 'swiftReturns', 'swiftCode', 'swiftSynchronized' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'ModelNoSwiftRefine',
   refines: 'foam.core.Model',
   properties: [ 'swiftName', 'generateSwift', 'swiftImplements' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'PropertyNoSwiftRefine',
   refines: 'foam.core.Property',
   properties: [ 'swiftType', 'swiftExpression', 'swiftExpressionArgs', 'swiftPostSet', 'swiftFactory', 'swiftRequiresEscaping', 'swiftGetter', 'swiftSupport' ]
 });
 foam.CLASS({
+  package: 'foam.u2',
+  name: 'StringNoSwiftRefine',
   refines: 'foam.core.String',
   properties: [ 'swiftFactory', 'swiftName']
 });
