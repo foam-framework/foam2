@@ -113,3 +113,42 @@ if( ! Object.is ) {
     return x !== x && y !== y;
   };
 }
+
+if ( typeof localStorage != "undefined" ) {
+  try {
+    localStorage.getItem('asdf')
+  } catch(e) {
+    console.warn("Local storage error", e);
+    console.warn("Substituting in memory local storage.");
+
+    Object.defineProperty(this, 'localStorage', {
+      value: (function() {
+        var prototype = {
+          getItem: function(key) {
+            return this[key];
+          },
+          key: function(n) {
+            return Object.keys(this)[n];
+          },
+          setItem: function(key, value) {
+            this[key] = value;
+          },
+          removeItem: function(key) {
+            delete this[key];
+          },
+          clear: function() {
+            var self = this;
+            Object.keys(this).map(function(k) { self.removeItem(k); });
+          },
+          get length() {
+            return Object.keys(this).length;
+          }
+        };
+
+        return Object.create(prototype);
+      })(),
+      configurable: true,
+      enumerable: true
+    });
+  };
+}
