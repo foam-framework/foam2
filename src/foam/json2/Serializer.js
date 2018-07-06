@@ -160,28 +160,9 @@ foam.CLASS({
 
       if ( this.transient ) return;
 
-      if ( ! foam.util.flagFilter(x.flags)(this) ) return;
-
       out.key(this.name);
 
       outputter.output(x, this.f(obj), out);
-    }
-  ]
-});
-
-foam.CLASS({
-  refines: 'foam.core.AxiomArray',
-  methods: [
-    function outputPropertyJSON2(x, obj, outputter, out) {
-      if ( obj.hasDefaultValue(this.name) ) return;
-
-      if ( this.transient ) return;
-
-      var o = this.f(obj).filter(foam.util.flagFilter(x.flags));
-
-      out.key(this.name);
-
-      outputter.output(x, o, out);
     }
   ]
 });
