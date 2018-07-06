@@ -47,11 +47,11 @@ foam.CLASS({
 
   css: `
     ^ {
-      align-items: center;
       display: flex;
-      margin: 0 40px;
+      margin: 10 40px;
     }
     ^ .icon-container {
+      margin-top: 4;
       position: relative;
     }
     ^ .icon-container.selected {
