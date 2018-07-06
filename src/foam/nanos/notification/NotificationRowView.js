@@ -150,6 +150,9 @@
         overflow: hidden;
         color: #093649;
       }
+      ^ .msg.fully-visible {
+        display: block;
+      }
     `,
 
     properties: [
