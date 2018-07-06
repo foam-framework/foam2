@@ -11,19 +11,17 @@ import foam.core.Detachable;
 import foam.core.FObject;
 import foam.core.PropertyInfo;
 import foam.dao.AbstractSink;
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
-import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.util.encoders.Base64;
 
 public class Outputter
   extends AbstractSink
   implements foam.lib.Outputter
 {
-
   protected ThreadLocal<SimpleDateFormat> sdf = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -38,18 +36,6 @@ public class Outputter
   protected StringWriter  stringWriter_        = null;
   protected boolean       outputDefaultValues_ = false;
   protected boolean       outputClassNames_    = true;
-
-  // Hash properties
-  protected String        hashAlgo_            = "SHA-256";
-  protected boolean       outputHash_          = false;
-  protected boolean       rollHashes_          = false;
-  protected byte[]        previousHash_        = null;
-  protected final Object  hashLock_            = new Object();
-
-  // signing properties
-  protected String        signAlgo_            = null;
-  protected PrivateKey    signingKey_          = null;
-  protected boolean       outputSignature_     = false;
 
   public Outputter() {
     this(OutputterMode.FULL);
@@ -74,14 +60,23 @@ public class Outputter
   }
 
   public String stringify(FObject obj) {
+    initWriter();
+    outputFObject(obj);
+    return this.toString();
+  }
+
+  public String stringifyDelta(FObject oldFObject, FObject newFObject) {
+    initWriter();
+    outputFObjectDelta(oldFObject, newFObject);
+    return this.toString();
+  }
+
+  protected void initWriter() {
     if ( stringWriter_ == null ) {
       stringWriter_ = new StringWriter();
       writer_ = new PrintWriter(stringWriter_);
     }
-
     stringWriter_.getBuffer().setLength(0);
-    outputFObject(obj);
-    return this.toString();
   }
 
   protected void outputUndefined() {
@@ -232,12 +227,64 @@ public class Outputter
     if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
     if ( ! outputDefaultValues_ && ! prop.isSet(fo) ) return false;
 
-    Object value = prop.get(fo);	
+    Object value = prop.get(fo);
+
     if ( value == null ) return false;
 
     if ( includeComma ) writer_.append(",");
     outputProperty(fo, prop);
     return true;
+  }
+
+  protected void outputFObjectDelta(FObject oldFObject, FObject newFObject) {
+    ClassInfo info = oldFObject.getClassInfo();
+    boolean outputComma = true;
+    boolean isDiff = false;
+    boolean isPropertyDiff = false;
+    if ( ! oldFObject.equals(newFObject) ) {
+      List axioms = info.getAxiomsByClass(PropertyInfo.class);
+      Iterator i = axioms.iterator();
+
+      while( i.hasNext() ) {
+        PropertyInfo prop = (PropertyInfo) i.next();
+        isPropertyDiff = maybeOutputPropertyDelta(oldFObject, newFObject, prop);
+        if ( isPropertyDiff) {
+          if ( ! isDiff ) {
+            writer_.append("{");
+            if ( outputClassNames_ ) {
+              //output Class name
+              writer_.append(beforeKey_());
+              writer_.append("class");
+              writer_.append(afterKey_());
+              writer_.append(":");
+              outputString(info.getId());
+            }
+            if ( outputClassNames_ )
+              writer_.append(",");
+            PropertyInfo id = (PropertyInfo) info.getAxiomByName("id");
+            outputProperty(newFObject, id);
+            isDiff = true;
+          }
+
+          writer_.append(",");
+          outputProperty(newFObject, prop);
+        }
+      }
+
+      if ( isDiff ) {
+        writer_.append("}");
+      }
+    }
+  }
+
+  protected boolean maybeOutputPropertyDelta(FObject oldFObject, FObject newFObject, PropertyInfo prop) {
+    if ( mode_ == OutputterMode.NETWORK && prop.getNetworkTransient() ) return false;
+    if ( mode_ == OutputterMode.STORAGE && prop.getStorageTransient() ) return false;
+
+    if ( prop.compare(oldFObject, newFObject) != 0 ) {
+      return true;
+    }
+    return false;
   }
 
   protected void outputFObject(FObject o) {
@@ -258,51 +305,7 @@ public class Outputter
       outputComma = maybeOutputProperty(o, prop, outputComma) || outputComma;
     }
 
-    if ( outputHash_ ) {
-      writer_.append(",");
-      outputHash(o);
-    }
-
-    if ( outputSignature_ ) {
-      writer_.append(",");
-      outputSignature(o);
-    }
-
     writer_.append("}");
-  }
-
-  protected void outputHash(FObject o) {
-    String hash;
-    if ( rollHashes_ ) {
-      synchronized ( hashLock_ ) {
-        previousHash_ = o.hash(hashAlgo_, previousHash_);
-        hash = Base64.toBase64String(previousHash_);
-      }
-    } else {
-      hash = Base64.toBase64String(
-          o.hash(hashAlgo_, null));
-    }
-
-    writer_.append(beforeKey_())
-        .append("hash")
-        .append(afterKey_())
-        .append(":")
-        .append("\"")
-        .append(hash)
-        .append("\"");
-  }
-
-  protected void outputSignature(FObject o) {
-    String signature = Base64.toBase64String(
-        o.sign(signAlgo_, signingKey_));
-
-    writer_.append(beforeKey_())
-        .append("signature")
-        .append(afterKey_())
-        .append(":")
-        .append("\"")
-        .append(signature)
-        .append("\"");
   }
 
   protected void outputPropertyInfo(PropertyInfo prop) {
@@ -353,30 +356,6 @@ public class Outputter
 
   public void setOutputClassNames(boolean outputClassNames) {
     outputClassNames_ = outputClassNames;
-  }
-
-  public void setHashAlgorithm(String algorithm) {
-    hashAlgo_ = algorithm;
-  }
-
-  public void setOutputHash(boolean outputHash) {
-    outputHash_ = outputHash;
-  }
-
-  public void setRollHashes(boolean rollHashes) {
-    rollHashes_ = rollHashes;
-  }
-
-  public void setOutputSignature(boolean outputSignature) {
-    outputSignature_ = outputSignature;
-  }
-
-  public void setSigningAlgorithm(String algorithm) {
-    signAlgo_ = algorithm;
-  }
-
-  public void setSigningKey(PrivateKey signingKey) {
-    signingKey_ = signingKey;
   }
 
   @Override
