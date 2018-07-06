@@ -16,12 +16,6 @@
  */
 foam.CLASS({
   package: 'foam.u2',
-  name: 'AbstractMethodNoJavaRefine',
-  refines: 'foam.core.AbstractMethod',
-  properties: [ 'javaCode', 'javaReturns', 'javaThrows' ]
-});
-foam.CLASS({
-  package: 'foam.u2',
   name: 'ArgumentNoJavaRefine',
   refines: 'foam.core.Argument',
   properties: [ 'javaType' ]
@@ -58,12 +52,6 @@ foam.CLASS({
 });
 foam.CLASS({
   package: 'foam.u2',
-  name: 'ListenerNoJavaRefine',
-  refines: 'foam.core.Listener',
-  properties: [ 'javaCode' ]
-});
-foam.CLASS({
-  package: 'foam.u2',
   name: 'LongNoJavaRefine',
   refines: 'foam.core.Long',
   properties: [ 'javaGetter' ]
@@ -72,7 +60,12 @@ foam.CLASS({
   package: 'foam.u2',
   name: 'MethodNoJavaRefine',
   refines: 'foam.core.Method',
-  properties: [ 'javaCode' ]
+  properties: [
+    {
+      name: 'javaCode',
+      flags: ['java'],
+    }
+  ]
 });
 foam.CLASS({
   package: 'foam.u2',
