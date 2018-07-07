@@ -73,6 +73,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Enum',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftToJSON',

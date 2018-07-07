@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.PromisedMethod',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
@@ -33,6 +34,7 @@ _ = try! method(args)
 
 foam.CLASS({
   refines: 'foam.core.Promised',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',

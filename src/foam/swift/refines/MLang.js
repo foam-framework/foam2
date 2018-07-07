@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.mlang.AbstractExpr',
+  flags: ['swift'],
   methods: [
     function f() {}
   ]
@@ -13,6 +14,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.ExprProperty',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -30,6 +32,7 @@ return Context.GLOBAL.create(foam_mlang_Constant.self, args: ["value": newValue]
 
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
+  flags: ['swift'],
 
   methods: [
     {
@@ -41,6 +44,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Map',
+  flags: ['swift'],
 
   methods: [
     {

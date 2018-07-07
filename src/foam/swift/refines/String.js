@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.String',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',

@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Import',
+  flags: ['swift'],
   requires: [
     'foam.swift.Field',
   ],

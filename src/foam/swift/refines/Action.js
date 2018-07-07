@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Action',
+  flags: ['swift'],
   requires: [
     'foam.swift.Field',
     'foam.swift.Method',
