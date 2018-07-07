@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Argument',
+  flags: ['swift'],
   requires: [
     'foam.swift.Argument',
   ],

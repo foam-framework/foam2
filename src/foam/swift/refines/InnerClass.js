@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.InnerClass',
+  flags: ['swift'],
   requires: [
     'foam.swift.Method',
     'foam.swift.Argument',

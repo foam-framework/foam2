@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.dao.DAOProperty',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
