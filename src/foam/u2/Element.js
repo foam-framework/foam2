@@ -240,6 +240,7 @@ foam.CLASS({
 
   methods: [
     function output(out) {
+      console.error('Outputting unloaded element can cause event/binding bugs.', this.cls_.id);
       this.state = this.OUTPUT;
       this.output_(out);
       return out;
@@ -265,7 +266,9 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.initE();
-      return this.SUPER(out);
+      this.state = this.OUTPUT;
+      this.output_(out);
+      return out;
     },
     function toString() { return 'INITIAL'; }
   ]
