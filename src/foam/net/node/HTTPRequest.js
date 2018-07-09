@@ -24,6 +24,8 @@ foam.CLASS({
     'foam.net.node.HTTPResponse'
   ],
 
+  flags: ['node'],
+
   properties: [
     {
       class: 'Boolean',
