@@ -495,6 +495,11 @@ foam.CLASS({
   ],
 
   methods: [
+    function init() {
+      // Repaint on every change to the DAO.
+      this.dao.sub('on', 'reset', this.paint);
+    },
+
     function put(obj, s) {
       this.reset();
     },
