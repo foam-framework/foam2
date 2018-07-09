@@ -20,7 +20,7 @@ public class QueryParser
 {
   private foam.core.ClassInfo info_;
 
-  public QueryParser( foam.core.ClassInfo classInfo ) {
+  public QueryParser(foam.core.ClassInfo classInfo) {
     info_ = classInfo;
 
     java.util.List properties = classInfo.getAxiomsByClass(foam.core.PropertyInfo.class);
