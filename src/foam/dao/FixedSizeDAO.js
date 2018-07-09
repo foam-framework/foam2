@@ -16,50 +16,50 @@
  */
 
 foam.CLASS({
-    package: 'foam.dao',
-    name: 'FixedSizeDAO',
-    extends: 'foam.dao.ProxyDAO',
+  package: 'foam.dao',
+  name: 'FixedSizeDAO',
+  extends: 'foam.dao.ProxyDAO',
   
-    documentation: function() {/*
-      DAO Decorator that stores a fixed number of objects.
-    */},
+  documentation: function() {/*
+    DAO Decorator that stores a fixed number of objects.
+  */},
   
-    javaImports:[
-      'org.apache.commons.collections.buffer.CircularFifoBuffer',
-      'foam.dao.Sink',
-    ],
-
-    properties: [
-      {
-        class: 'Object',
-        name: 'FixedSizeArray',
-        javaType: 'org.apache.commons.collections.buffer.CircularFifoBuffer',
-        javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(10000); `
-      }
-    ],
+  javaImports:[
+    'org.apache.commons.collections.buffer.CircularFifoBuffer',
+    'foam.dao.Sink',
+  ],
   
-    methods: [
-      {
-        name: 'put_',
-        args:[
-          {
-            name: 'x',
-            of: 'foam.core.X'
-          },
-          {
-            name: 'obj',    
-            of: 'foam.core.FObject',
-          }
-        ],
-        javaCode: `
+  properties: [
+    {
+      class: 'Object',
+      name: 'FixedSizeArray',
+      javaType: 'org.apache.commons.collections.buffer.CircularFifoBuffer',
+      javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(10000); `
+    }
+  ],
+  
+  methods: [
+    {
+      name: 'put_',
+      args: [
+        {
+          name: 'x',
+          of: 'foam.core.X'
+        },
+        {
+          name: 'obj',    
+          of: 'foam.core.FObject',
+        }
+      ],
+      javaCode: `
 getFixedSizeArray().add(obj);
 return getDelegate().put_(x, obj);
-        `,
-      },
-      {
-        name: 'select_',
-        javaReturns: 'foam.dao.Sink',
-        javaCode: `
+  `
+    },
+    {
+      name: 'select_',
+      javaReturns: 'foam.dao.Sink',
+      javaCode: `
 if ( sink.equals(null) ) {
   sink = new foam.dao.ArraySink();
 }
@@ -69,9 +69,7 @@ for (int i = 0; i < tester.length; i++){
 }
 return sink;
         `
-      }
-    ],
-  
-
-  });
+    }
+  ]
+});
   
