@@ -205,18 +205,24 @@ foam.CLASS({
         for ( var i = 0 ; i < v.length ; i++ ) {
           var def = v[i];
 
+          if ( foam.Object.isInstance(def) && def.class ) {
+            def = this.lookup(def.class).create(def);
+          }
+
           if ( foam.String.isInstance(def) ) {
             def = { label: def, name: foam.String.constantize(def) };
           }
+
+          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
+            def = foam.core.internal.EnumValueAxiom.create({definition: def});
+          }
+
+          v[i] = def;
 
           if ( def.ordinal || def.ordinal === 0 ) {
             next = def.ordinal + 1;
           } else {
             def.ordinal = next++;
-          }
-
-          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
-            v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
           }
 
           if ( used[def.ordinal] ) {
