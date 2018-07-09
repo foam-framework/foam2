@@ -455,13 +455,18 @@ foam.CLASS({
   ]
 });
 
-// ???: What does this do?
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
   implements: [
     'foam.dao.Sink'
   ],
+
+  documentation: `
+    Given a DAO and a function that maps from an object in that DAO to an
+    Element, apply the function to each object in the DAO and add the returned
+    elements to the view. Will render again every time the DAO changes.
+  `,
 
   axioms: [
     {
@@ -473,16 +478,19 @@ foam.CLASS({
   properties: [
     {
       class: 'Function',
-      name: 'addRow'
+      name: 'addRow',
+      documentation: `Takes a object from the the DAO and returns an Element.`
     },
     {
       class: 'Function',
-      name: 'cleanup'
+      name: 'cleanup',
+      documentation: `Should clean up the elements produced by addRow.`
     },
     'dao',
     {
       class: 'Int',
-      name: 'batch'
+      name: 'batch',
+      documentation: `Used to check whether a paint should be performed or not.`
     }
   ],
 
