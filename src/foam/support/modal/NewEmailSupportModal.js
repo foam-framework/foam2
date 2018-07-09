@@ -5,19 +5,23 @@ foam.CLASS({
 
   documentation:'EMAIL SUPPORT MODAL',
 
+  implements: [
+    'foam.mlang.Expressions'
+  ],
+
   requires: [
-    'foam.u2.ModalHeader',
     'foam.support.model.SupportEmail',
-    'foam.u2.dialog.Popup',
     'foam.support.modal.NewEmailSupportConfirmationModal',
-    'foam.u2.dialog.NotificationMessage'
+    'foam.u2.ModalHeader',
+    'foam.u2.dialog.NotificationMessage',
+    'foam.u2.dialog.Popup'
   ],
 
   imports: [
     'closeDialog',
+    'ctrl',
     'supportEmailDAO',
     'user',
-    'ctrl'
   ],
 
   exports:[
@@ -101,12 +105,19 @@ foam.CLASS({
       {
         class: 'Long',
         name: 'id'
+      },
+      {
+        class: 'String',
+        name: 'emailRegex',
+        value: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
       }
     ],
 
     messages:[
       { name:'title', message:'New Email' },
       { name:'titlelabel', message:'Input the email address you want to connect to the help desk.' },
+      { name:'emailInvalid', message: 'The email you have entered is invalid. Try again.'},
+      { name:'emailExists', message: 'The email you have entered already exists.'}
     ],
 
     methods:[
@@ -118,18 +129,19 @@ foam.CLASS({
           title: 'New Email'
         }))
         .start().addClass('div2')
-        .start().addClass('label1') 
-            .add(this.titlelabel)
-        .end()
-        .start(this.EMAIL).addClass('input-wide').end()
-        .start().addClass('div')
-        .start(this.CLOSE_MODAL).addClass('Rectangle-7')
-        .end()
-          .startContext({ data : this })
-        .start(this.NEXT_BUTTON).addClass('Rectangle-8')
-        .end()
-          .endContext()
-        .end()
+          .start().addClass('label1')
+              .add(this.titlelabel)
+          .end()
+          .start(this.EMAIL).addClass('input-wide').end()
+          .start().addClass('div')
+            .start(this.CLOSE_MODAL).addClass('Rectangle-7')
+            .end()
+            .startContext({ data : this })
+              .start(this.NEXT_BUTTON).addClass('Rectangle-8')
+              .end()
+            .endContext()
+          .end()
+        .end();
       }
     ], 
 
@@ -137,27 +149,38 @@ foam.CLASS({
       {
         name: 'nextButton',
         label: 'Next',
-        code: function(X){
+        code: function(X) {
           if(!this.email) return;
-          var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          if (!emailRegex.test(this.email)){
-            this.add(this.NotificationMessage.create({ message: 'The email you have entered is invalid, try again.', type: 'error' })); 
+          var self = this;
+          if (!this.emailRegex.test(this.email)) {
+            this.add(this.NotificationMessage.create({ message: this.emailInvalid, type: 'error' })); 
             return;
           }
-          var email = this.SupportEmail.create({
-            email: this.email,
-            userId: this.user.id
-          })
-          this.supportEmailDAO.put(email);
-          this.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal'}));
-          X.closeDialog()
+
+          // check to see if the user email is existed
+          this.supportEmailDAO.where(this.EQ(this.SupportEmail.EMAIL, this.email)).select(this.COUNT()).then(
+            function(result) {
+              if (result.value === 0) {
+                var email = self.SupportEmail.create({
+                  email: self.email,
+                  connectedTime: new Date()
+                });
+                // save support email details in journal
+                self.user.supportEmails.put(email);
+                self.ctrl.add(foam.u2.dialog.Popup.create().tag({ class: 'foam.support.modal.NewEmailSupportConfirmationModal' }));
+                X.closeDialog();
+              } else {
+                self.add(self.NotificationMessage.create({ message: this.emailExists, type: 'error' }));
+              }
+            }
+          );
         }
       },
       {
         name: 'closeModal',
-        label: 'Close',
-        code: function(X){
-          X.closeDialog()
+        label: 'Cancel',
+        code: function(X) {
+          X.closeDialog();
         }
       }
     ]
