@@ -465,7 +465,8 @@ foam.CLASS({
   documentation: `
     Given a DAO and a function that maps from an object in that DAO to an
     Element, apply the function to each object in the DAO and add the returned
-    elements to the view. Will render again every time the DAO changes.
+    elements to the view. Will render again every time the DAO is put to or
+    removed from.
   `,
 
   axioms: [
@@ -495,11 +496,6 @@ foam.CLASS({
   ],
 
   methods: [
-    function init() {
-      // Repaint on every change to the DAO.
-      this.dao.sub('on', 'reset', this.paint);
-    },
-
     function put(obj, s) {
       this.reset();
     },
@@ -1625,6 +1621,8 @@ foam.CLASS({
 
       this.onDetach(dao.listen(listener));
       listener.delegate.paint();
+
+      dao.sub('on', 'reset', listener.delegate.paint);
 
       return this;
     },
