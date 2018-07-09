@@ -522,7 +522,7 @@ foam.CLASS({
 
           var objs = a.array;
           self.cleanup();
-          for ( var i = 0; i < objs.length; i++ ) {
+          for ( var i = 0 ; i < objs.length ; i++ ) {
             self.addRow(objs[i]);
           }
         });
