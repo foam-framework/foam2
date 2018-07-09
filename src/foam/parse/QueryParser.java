@@ -1,12 +1,9 @@
 package foam.parse;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import foam.lib.parse.Alt;
-import foam.lib.parse.PStream;
 import foam.lib.parse.Parser;
 import foam.lib.parse.ParserContext;
+import foam.lib.parse.PStream;
 import foam.lib.query.AndParser;
 import foam.lib.query.HasParser;
 import foam.lib.query.IsParser;
@@ -15,8 +12,12 @@ import foam.lib.query.NegateParser;
 import foam.lib.query.OrParser;
 import foam.lib.query.ParenParser;
 import foam.lib.query.PropertyExpressionParser;
+import java.util.ArrayList;
+import java.util.List;
 
-public class QueryParser extends foam.lib.parse.ProxyParser {
+public class QueryParser
+  extends foam.lib.parse.ProxyParser
+{
   private foam.core.ClassInfo info_;
 
   public QueryParser( foam.core.ClassInfo classInfo ) {
@@ -43,8 +44,8 @@ public class QueryParser extends foam.lib.parse.ProxyParser {
     expressions.toArray(parsers);
 
     setDelegate(new Alt(new ParenParser (new OrParser(new AndParser(new Alt(parsers)))),
-                        new ParenParser (new OrParser(new ParenParser(new AndParser(new Alt(parsers))))),
-                        new OrParser(new AndParser(new Alt(parsers)))));
+      new ParenParser (new OrParser(new ParenParser(new AndParser(new Alt(parsers))))),
+      new OrParser(new AndParser(new Alt(parsers)))));
   }
 
   @Override
