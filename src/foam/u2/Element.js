@@ -459,7 +459,9 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
-  implements: [ 'foam.dao.Sink' ],
+  implements: [
+    'foam.dao.Sink'
+  ],
 
   axioms: [
     {
@@ -511,7 +513,7 @@ foam.CLASS({
 
           var objs = a.array;
           self.cleanup();
-          for ( var i = 0 ; i < objs.length ; i++ ) {
+          for ( var i = 0; i < objs.length; i++ ) {
             self.addRow(objs[i]);
           }
         });
