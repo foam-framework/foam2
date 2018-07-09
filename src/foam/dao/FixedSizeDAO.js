@@ -17,29 +17,24 @@
 
 foam.CLASS({
     package: 'foam.dao',
-    name: 'FixesSizeDAO',
+    name: 'FixedSizeDAO',
     extends: 'foam.dao.ProxyDAO',
   
     documentation: function() {/*
       DAO Decorator that stores a fixed number of objects.
     */},
   
+    javaImports:[
+      'org.apache.commons.collections.buffer.CircularFifoBuffer',
+      'foam.dao.Sink',
+    ],
+
     properties: [
       {
-          class: 'Int',
-          name: 'Size',
-          value: '1000',
-          documentation: 'The number of elements the DAO will store'
-      },
-      {
-        class: 'Array',
+        class: 'Object',
         name: 'FixedSizeArray',
-        value: '[1000]FObject'
-      },
-      {
-        class: 'AtomicInteger',
-        name: 'putIndex',
-        value: '0'
+        javaType: 'org.apache.commons.collections.buffer.CircularFifoBuffer',
+        javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(10000); `
       }
     ],
   
@@ -48,30 +43,32 @@ foam.CLASS({
         name: 'put_',
         args:[
           {
-            class: 'FObject',
-            name: 'obj'    
+            name: 'x',
+            of: 'foam.core.X'
+          },
+          {
+            name: 'obj',    
+            of: 'foam.core.FObject',
           }
         ],
-        // code: function put_(x, obj) {
-        //   if ( ! obj.hasOwnProperty(this.property) ) {
-        //     obj[this.property] = foam.uuid.randomGUID();
-        //   }
-  
-        //   return this.delegate.put_(x, obj);
-        // },
         javaCode: `
-        
-        FixedSizeArray[putIndex.getAndIncrement] = obj;
-        
-        return getDelegate().put_(x, obj);
+getFixedSizeArray().add(obj);
+return getDelegate().put_(x, obj);
         `,
       },
       {
-          name: 'display_',
-          javaCode:
-          `
-
-          `
+        name: 'select_',
+        javaReturns: 'foam.dao.Sink',
+        javaCode: `
+if ( sink.equals(null) ) {
+  sink = new foam.dao.ArraySink();
+}
+Object[] tester = getFixedSizeArray().toArray();
+for (int i = 0; i < tester.length; i++){
+  sink.put(tester[i],null);
+}
+return sink;
+        `
       }
     ],
   
