@@ -22,7 +22,7 @@ foam.CLASS({
     {
       class: 'Int',
       name: 'fixedArraySize',
-      value: 2
+      value: 10000
     },
     {
       class: 'Object',
