@@ -230,6 +230,7 @@ FOAM_FILES([
   { name: "foam/dao/SQL", flags: ['sql'] },
   { name: "foam/dao/NoDisjunctionDAO" },
   { name: "foam/dao/NoNeqDAO" },
+  { name: "foam/dao/FixedSizeDAO" },
   { name: "foam/parse/QueryParser" },
   { name: "foam/physics/Physical" },
   { name: "foam/physics/Collider" },
