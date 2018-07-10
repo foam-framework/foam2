@@ -10,12 +10,14 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: function () {/*
-    DAO Decorator that stores a fixed number of objects.
+    DAO that stores a fixed number of objects.
   */},
 
   javaImports: [
     'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'foam.dao.Sink',
+    'org.apache.commons.collections.Buffer',
+    'org.apache.commons.collections.BufferUtils'
   ],
 
   properties: [
@@ -27,8 +29,8 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'FixedSizeArray',
-      javaType: 'org.apache.commons.collections.buffer.CircularFifoBuffer',
-      javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(getFixedArraySize()); `
+      javaType: 'org.apache.commons.collections.Buffer',
+      javaFactory: `return BufferUtils.synchronizedBuffer(new org.apache.commons.collections.buffer.CircularFifoBuffer(getFixedArraySize())); `
     }
   ],
 
@@ -46,9 +48,9 @@ foam.CLASS({
         }
       ],
       javaCode: `
-      foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
-      getFixedSizeArray().add(delegatedObject);
-      return delegatedObject;
+foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
+getFixedSizeArray().add(delegatedObject);
+return delegatedObject;
   `
     },
     {
@@ -59,7 +61,7 @@ if ( sink == null ) {
   sink = new foam.dao.ArraySink();
 }
 Object[] tester = getFixedSizeArray().toArray();
-for (int i = 0; i < tester.length; i++){
+for ( int i = 0; i < tester.length; i++ ) {
   sink.put(tester[i],null);
 }
 return sink;
