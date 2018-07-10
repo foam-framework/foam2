@@ -31,10 +31,15 @@ foam.CLASS({
   
   properties: [
     {
+      class: 'Int',
+      name: 'fixedArraySize',
+      value: 2
+    },
+    {
       class: 'Object',
       name: 'FixedSizeArray',
       javaType: 'org.apache.commons.collections.buffer.CircularFifoBuffer',
-      javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(10000); `
+      javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(getFixedArraySize()); `
     }
   ],
   
@@ -60,7 +65,7 @@ return getDelegate().put_(x, obj);
       name: 'select_',
       javaReturns: 'foam.dao.Sink',
       javaCode: `
-if ( sink.equals(null) ) {
+if ( sink == null ) {
   sink = new foam.dao.ArraySink();
 }
 Object[] tester = getFixedSizeArray().toArray();
