@@ -252,7 +252,10 @@ var classes = [
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
-  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit'
+  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
+
+  'foam.dao.journal.JournalEntryCommand',
+  'foam.dao.journal.EasyJournalEntryDAO',
 ];
 
 var abstractClasses = [

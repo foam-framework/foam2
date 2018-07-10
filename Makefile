@@ -12,6 +12,8 @@ foam2_MAVEN_DEPS = \
 	javax.servlet:javax.servlet-api:3.1.0 \
 	javax.websocket:javax.websocket-api:1.1 \
 	jstl:jstl:1.2 \
+	org.apache.httpcomponents:httpcore:4.4.9 \
+	org.apache.httpcomponents:httpclient:4.5.5 \
 	org.apache.commons:commons-text:1.1 \
 	org.apache.commons:commons-dbcp2:2.0.1 \
 	org.apache.commons:commons-lang3:3.6 \
