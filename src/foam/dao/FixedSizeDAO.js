@@ -19,16 +19,16 @@ foam.CLASS({
   package: 'foam.dao',
   name: 'FixedSizeDAO',
   extends: 'foam.dao.ProxyDAO',
-  
-  documentation: function() {/*
+
+  documentation: function () {/*
     DAO Decorator that stores a fixed number of objects.
   */},
-  
-  javaImports:[
+
+  javaImports: [
     'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'foam.dao.Sink',
   ],
-  
+
   properties: [
     {
       class: 'Int',
@@ -42,7 +42,7 @@ foam.CLASS({
       javaFactory: `return new org.apache.commons.collections.buffer.CircularFifoBuffer(getFixedArraySize()); `
     }
   ],
-  
+
   methods: [
     {
       name: 'put_',
@@ -52,13 +52,14 @@ foam.CLASS({
           of: 'foam.core.X'
         },
         {
-          name: 'obj',    
+          name: 'obj',
           of: 'foam.core.FObject',
         }
       ],
       javaCode: `
-getFixedSizeArray().add(obj);
-return getDelegate().put_(x, obj);
+      foam.core.FObject delegatedObject = getDelegate().put_(x, obj);
+      getFixedSizeArray().add(delegatedObject);
+      return delegatedObject;
   `
     },
     {
@@ -77,4 +78,3 @@ return sink;
     }
   ]
 });
-  
