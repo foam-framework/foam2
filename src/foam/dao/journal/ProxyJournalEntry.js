@@ -32,7 +32,7 @@ foam.CLASS({
       class: 'FObjectProperty',
       name: 'data',
       javaGetter: `return getDelegate().getData();`,
-      javaSetter: `getDelegate().setCmd(val);`
+      javaSetter: `getDelegate().setData(val);`
     }
   ],
 
