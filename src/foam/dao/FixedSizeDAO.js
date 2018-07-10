@@ -60,9 +60,9 @@ return delegatedObject;
 if ( sink == null ) {
   sink = new foam.dao.ArraySink();
 }
-Object[] tester = getFixedSizeArray().toArray();
-for ( int i = 0; i < tester.length; i++ ) {
-  sink.put(tester[i],null);
+Object[] arrayObject = getFixedSizeArray().toArray();
+for ( int i = 0; i < arrayObject.length; i++ ) {
+  sink.put( arrayObject[i], null );
 }
 return sink;
         `
