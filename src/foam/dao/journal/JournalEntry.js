@@ -7,12 +7,23 @@
 foam.CLASS({
   package: 'foam.dao.journal',
   name: 'JournalEntry',
+
   properties: [
     {
       class: 'Long',
       name: 'id',
     },
+    {
+      class: 'Enum',
+      of: 'foam.dao.journal.JournalEntryCommand',
+      name: 'cmd'
+    },
+    {
+      class: 'FObjectProperty',
+      name: 'data'
+    }
   ],
+
   methods: [
     {
       name: 'replay',
@@ -22,7 +33,16 @@ foam.CLASS({
           of: 'foam.dao.DAO',
         },
       ],
-      javaCode: '// NOOP',
+      javaCode: `
+        switch ( getCmd() ) {
+          case PUT:
+            dao.put(getData());
+            break;
+          case REMOVE:
+            dao.remove(getData());
+            break;
+        }
+      `,
     },
   ],
 });

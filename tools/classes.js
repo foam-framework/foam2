@@ -254,6 +254,7 @@ var classes = [
   'foam.demos.net.nap.web.model.RegulatoryNotice',
   'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
+  'foam.dao.journal.JournalEntryCommand',
   'foam.dao.journal.EasyJournalEntryDAO',
 ];
 
