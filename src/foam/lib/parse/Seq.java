@@ -17,20 +17,27 @@
 
 package foam.lib.parse;
 
+import java.util.List;
+
 public class Seq
   implements Parser
 {
-  protected Parser[] parsers;
+  protected Parser[] parsers_;
+
+  public Seq(List<Parser> parsers) {
+    parsers_ = new Parser[parsers.size()];
+    parsers.toArray(parsers_);
+  }
 
   public Seq(Parser... args) {
-    parsers = args;
+    parsers_ = args;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
-    Object[] values = new Object[parsers.length];
+    Object[] values = new Object[parsers_.length];
 
-    for ( int i = 0 ; i < parsers.length ; i++ ) {
-      ps = ps.apply(parsers[i], x);
+    for ( int i = 0 ; i < parsers_.length ; i++ ) {
+      ps = ps.apply(parsers_[i], x);
       if ( ps == null ) return null;
       values[i] = ps.value();
     }

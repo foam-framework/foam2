@@ -14,7 +14,6 @@ import foam.mlang.MLang.*;
 import foam.nanos.NanoService;
 import foam.nanos.script.ScriptStatus;
 import foam.nanos.test.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
