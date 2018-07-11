@@ -18,7 +18,7 @@ import java.util.List;
 public class QueryParser
   extends foam.lib.parse.ProxyParser
 {
-  private foam.core.ClassInfo info_;
+  protected foam.core.ClassInfo info_;
 
   public QueryParser(foam.core.ClassInfo classInfo) {
     info_ = classInfo;
