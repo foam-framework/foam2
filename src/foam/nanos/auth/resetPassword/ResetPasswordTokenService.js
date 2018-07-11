@@ -138,6 +138,7 @@ if ( data == null || data.size() == 0 ) {
 
 // set token processed to true
 Token tokenResult = (Token) data.get(0);
+tokenResult = (Token) tokenResult.fclone();
 tokenResult.setProcessed(true);
 tokenDAO.put(tokenResult);
 
@@ -151,6 +152,7 @@ if ( ! Password.isValid(newPassword) ) {
 }
 
 // update user's password
+userResult = (User) userResult.fclone();
 userResult.setPasswordLastModified(Calendar.getInstance().getTime());
 userResult.setPreviousPassword(userResult.getPassword());
 userResult.setPassword(Password.hash(newPassword));
