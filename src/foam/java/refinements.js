@@ -315,6 +315,17 @@ foam.LIB({
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
+      cls.method({
+        visibility: 'protected',
+        type: 'void',
+        name: 'beforeFreeze',
+        body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+          filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
+          filter(function(p) { return p.javaFactory; }).
+          map(function(p) {
+            return `get${foam.String.capitalize(p.name)}();`
+          }).join('\n')
+      });
 
       if ( this.hasOwnAxiom('id') ) {
         cls.implements = cls.implements.concat('foam.core.Identifiable');
