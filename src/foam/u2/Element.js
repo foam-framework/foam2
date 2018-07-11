@@ -484,6 +484,10 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'foam.dao.DAOProperty',
+      name: 'dao',
+    },
+    {
       class: 'Function',
       name: 'addRow',
       documentation: `Called on each object in the DAO.`
@@ -493,7 +497,6 @@ foam.CLASS({
       name: 'cleanup',
       documentation: `Called before addRow is applied to objects in the DAO.`
     },
-    'dao',
     {
       class: 'Int',
       name: 'batch',
@@ -522,6 +525,11 @@ foam.CLASS({
       code: function() {
         var batch = ++this.batch;
         var self = this;
+
+        if ( ! foam.dao.DAO.isInstance(this.dao) ) {
+          throw new Exception(`You must set the 'dao' property of RenderSink.`);
+        }
+
         this.dao.select().then(function(a) {
           // Check if this is a stale render
           if ( self.batch !== batch ) return;
