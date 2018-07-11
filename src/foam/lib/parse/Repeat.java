@@ -19,14 +19,20 @@ package foam.lib.parse;
 
 import java.util.ArrayList;
 
-public class Repeat implements Parser{
+public class Repeat
+  implements Parser
+{
   private Parser p;
   private Parser delim;
   private int    min;
   private int    max;
 
   public Repeat(Parser parser) {
-    this(parser, null);
+    this(parser, null, -1, -1);
+  }
+
+  public Repeat(Parser parser, String str) {
+    this(parser, new Literal(str));
   }
 
   public Repeat(Parser parser, Parser delimiter) {
@@ -37,11 +43,15 @@ public class Repeat implements Parser{
     this(parser, delimiter, minimum, -1);
   }
 
+  public Repeat(Parser parser, String delimiter, int minimum) {
+    this(parser, new Literal(delimiter), minimum);
+  }
+
   public Repeat(Parser parser, Parser delimiter, int minimum, int maximum) {
-    p = parser;
+    p     = parser;
     delim = delimiter;
-    min = minimum;
-    max = maximum;
+    min   = minimum;
+    max   = maximum;
   }
 
   public PStream parse(PStream ps, ParserContext x) {
