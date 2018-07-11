@@ -17,8 +17,18 @@
 
 package foam.lib.parse;
 
-public class Alt implements Parser {
-  private Parser[] parsers_;
+import java.util.List;
+
+
+public class Alt
+  implements Parser
+{
+  protected Parser[] parsers_;
+
+  public Alt(List<Parser> parsers) {
+    parsers_ = new Parser[parsers.size()];
+    parsers.toArray(parsers_);
+  }
 
   public Alt(Parser... args) {
     parsers_ = args;
