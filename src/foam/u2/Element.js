@@ -463,10 +463,16 @@ foam.CLASS({
   ],
 
   documentation: `
-    Given a DAO and a function that maps from an object in that DAO to an
-    Element, apply the function to each object in the DAO and add the returned
-    elements to the view. Will render again every time the DAO is put to or
-    removed from.
+    Any call to put, remove, or reset on this sink will:
+
+      1. call the 'cleanup' method, then
+      2. call the 'addRow' method on each object in the DAO.
+
+    You must provide three things:
+
+      1. the DAO,
+      2. an implementation of the 'addRow' method, and
+      3. an implementation of the 'cleanup' method.
   `,
 
   axioms: [
@@ -480,12 +486,12 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'addRow',
-      documentation: `Takes a object from the the DAO and returns an Element.`
+      documentation: `Called on each object in the DAO.`
     },
     {
       class: 'Function',
       name: 'cleanup',
-      documentation: `Should clean up the elements produced by addRow.`
+      documentation: `Called before addRow is applied to objects in the DAO.`
     },
     'dao',
     {
