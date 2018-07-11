@@ -13,6 +13,7 @@ foam.CLASS({
 
   javaImports: [
     'foam.dao.Sink',
+    'foam.dao.Subscription',
     'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'org.apache.commons.collections.Buffer',
     'org.apache.commons.collections.BufferUtils'
@@ -55,15 +56,16 @@ return delegatedObject;
       name: 'select_',
       javaReturns: 'foam.dao.Sink',
       javaCode: `
-if ( sink == null ) {
-  sink = new foam.dao.ArraySink();
-}
+sink = prepareSink(sink);
+Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
+Subscription sub = new Subscription();    
 Object[] arrayObject = getFixedSizeArray().toArray();
 for ( int i = 0; i < arrayObject.length; i++ ) {
-  sink.put( arrayObject[i], null );
+  decorated.put( arrayObject[i], null );
 }
+decorated.eof();
 return sink;
-        `
+`
     }
   ]
 });
