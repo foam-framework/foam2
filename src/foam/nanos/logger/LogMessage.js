@@ -19,7 +19,7 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
 
   properties: [
     {
-      class: 'Date',
+      class: 'DateTime',
       name: 'created',
     },
     {
