@@ -9,13 +9,11 @@ foam.CLASS({
   name: 'FixedSizeDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: function () {/*
-    DAO that stores a fixed number of objects.
-  */},
+  documentation: 'DAO that stores a fixed number of objects',
 
   javaImports: [
-    'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'foam.dao.Sink',
+    'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'org.apache.commons.collections.Buffer',
     'org.apache.commons.collections.BufferUtils'
   ],
