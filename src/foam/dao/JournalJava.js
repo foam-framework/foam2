@@ -93,7 +93,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.AbstractFObjectPropertyInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
