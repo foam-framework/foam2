@@ -86,8 +86,8 @@ foam.CLASS({
       // passing the model definition as model:, rather than
       // as all of the arguments to create().
       adaptArrayElement: function(o) {
-        return foam.core.InnerEnum.isInstance(o) ?
-          o :
+        return foam.core.InnerEnum.isInstance(o) ? o :
+          o.class ? this.lookup(o.class).create(o) :
           foam.core.InnerEnum.create({model: o}) ;
       }
     }
