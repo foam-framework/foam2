@@ -28,9 +28,7 @@ return ""
     },
     {
       name: 'swiftValue',
-      expression: function(value) {
-        return '"' + value.replace(/"/g, '\\"') + '"'
-      },
+      expression: function(value) { return foam.swift.stringify(value) },
     },
   ],
 });

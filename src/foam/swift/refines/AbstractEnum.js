@@ -10,18 +10,6 @@ foam.CLASS({
   axioms: [
     {
       installInClass: function(cls) {
-        var toSwiftValue = function(v) {
-          var type = foam.typeOf(v);
-
-          if ( type == foam.Number ) {
-            return `${v}`;
-          } else if ( type == foam.String ) {
-            return `"${v}"`;
-          } else {
-            console.log('Encountered unexpected type while outputting enum');
-            debugger;
-          }
-        }
         var toSwiftClass = cls.toSwiftClass;
         cls.toSwiftClass =  function() {
           var self = this;
@@ -35,10 +23,10 @@ foam.CLASS({
                 ${self.model_.swiftName}.self, args: [
                   ${v.cls_.getAxiomsByClass(foam.core.Property)
                       .filter(function(p) {
-                        return toSwiftValue(p.get(v));
+                        return foam.swift.stringify(p.get(v));
                       })
                       .map(function(p) {
-                        return `"${p.name}": ${toSwiftValue(p.get(v))}`
+                        return `"${p.name}": ${foam.swift.stringify(p.get(v))}`
                       }).join(',')}
                 ])!`,
             }));

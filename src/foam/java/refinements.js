@@ -94,43 +94,48 @@ foam.CLASS({
           foam.typeOf(value) === foam.Undefined ? 'null' :
           value;
       }
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInDigest',
+      value: true
+    },
+    {
+      class: 'Boolean',
+      name: 'includeInSignature',
+      value: true
     }
   ],
 
   methods: [
     function createJavaPropertyInfo_(cls) {
       return foam.java.PropertyInfo.create({
-        sourceCls:        cls,
-        propName:         this.name,
-        propShortName:    this.shortName,
-        propAliases:      this.aliases,
-        propType:         this.javaType,
-        propValue:        this.javaValue,
-        propRequired:     this.required,
-        cloneProperty:    this.javaCloneProperty,
-        diffProperty:     this.javaDiffProperty,
-        jsonParser:       this.javaJSONParser,
-        queryParser:      this.javaQueryParser,
-        csvParser:        this.javaCSVParser,
-        extends:          this.javaInfoType,
-        networkTransient: this.networkTransient,
-        storageTransient: this.storageTransient,
-        xmlAttribute:     this.xmlAttribute,
-        xmlTextNode:      this.xmlTextNode,
-        sqlType:          this.sqlType
+        sourceCls:          cls,
+        propName:           this.name,
+        propShortName:      this.shortName,
+        propAliases:        this.aliases,
+        propType:           this.javaType,
+        propValue:          this.javaValue,
+        propRequired:       this.required,
+        cloneProperty:      this.javaCloneProperty,
+        diffProperty:       this.javaDiffProperty,
+        jsonParser:         this.javaJSONParser,
+        queryParser:        this.javaQueryParser,
+        csvParser:          this.javaCSVParser,
+        extends:            this.javaInfoType,
+        networkTransient:   this.networkTransient,
+        storageTransient:   this.storageTransient,
+        xmlAttribute:       this.xmlAttribute,
+        xmlTextNode:        this.xmlTextNode,
+        sqlType:            this.sqlType,
+        includeInDigest:    this.includeInDigest,
+        includeInSignature: this.includeInSignature
       });
     },
 
     function generateSetter_() {
       return this.javaSetter ? this.javaSetter : `
-        // The next line will eventually be promoted to production
-        // if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-
-        // But until then, this line helps to detect code which needs to be fixed before then.
-        if ( this.__frozen__ ) {
-          System.err.println("!!!!!!!!!!!!!!!!!!!!!!! INVALID MUTATION OF FROZEN OBJECT, fclone() REQUIRED !!!!!!!!!!!!!!!!!!!!!!!");
-          Thread.dumpStack();
-        }
+        if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
         assert${foam.String.capitalize(this.name)}(val);
         ${this.name}_ = val;
         ${this.name}IsSet_ = true;
@@ -314,6 +319,17 @@ foam.LIB({
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
+      cls.method({
+        visibility: 'protected',
+        type: 'void',
+        name: 'beforeFreeze',
+        body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+          filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
+          filter(function(p) { return p.javaFactory; }).
+          map(function(p) {
+            return `get${foam.String.capitalize(p.name)}();`
+          }).join('\n')
+      });
 
       if ( this.hasOwnAxiom('id') ) {
         cls.implements = cls.implements.concat('foam.core.Identifiable');
@@ -404,7 +420,8 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'javaCode'
+      name: 'javaCode',
+      flags: ['java'],
     },
     {
       class: 'String',
