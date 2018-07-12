@@ -12,6 +12,10 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
+      code: function(value) {
+        value.lastModifiedBy = x.get('user').id;
+        return this.SUPER(value);
+      },
       javaCode: `
         if ( obj instanceof LastModifiedByAware ) {
           User user = (User) x.get("user");
