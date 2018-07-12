@@ -7,6 +7,9 @@
 package foam.nanos.http;
 
 import foam.core.*;
+import foam.nanos.http.HttpParameters;
+import foam.nanos.logger.Logger;
+
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import javax.servlet.http.Cookie;
@@ -18,10 +21,12 @@ public class TraceWebAgent
   public TraceWebAgent() {}
 
   public void execute(X x) {
+    Logger              logger = (Logger) x.get("logger");
+
     try {
       PrintWriter        out = x.get(PrintWriter.class);
       HttpServletRequest req = x.get(HttpServletRequest.class);
-
+      HttpParameters     params = x.get(HttpParameters.class);
 
       out.println("<HTML>\n" +
           "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
@@ -40,11 +45,40 @@ public class TraceWebAgent
       Enumeration headerNames = req.getHeaderNames();
       while ( headerNames.hasMoreElements() ) {
         String headerName = (String) headerNames.nextElement();
-        System.err.println("Header: " + headerName);
         out.println("<TR><TD>" + headerName);
         out.println("    <TD>" + req.getHeader(headerName));
       }
       out.println("</TABLE>");
+
+      out.println("<BR>\n" +
+                  "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
+                  "<TR BGCOLOR=\"#FFAD00\">\n" +
+                  "<TH>Parameter Name<TH>Parameter Value");
+      Enumeration paramNames = req.getParameterNames();
+      while ( paramNames.hasMoreElements() ) {
+        String paramName = (String) paramNames.nextElement();
+        out.println("<TR><TD>" + paramName);
+        String[] paramValues = req.getParameterValues(paramName);
+        if ( paramValues.length > 1 ) {
+          out.println("    <TD>" + String.join(", ", paramValues));
+        } else {
+          out.println("    <TD>" + paramValues[0]);
+        }
+      }
+      out.println("</TABLE>");
+
+      out.println("<BR>\n" +
+                  "<TABLE BORDER=1 ALIGN=\"CENTER\">\n" +
+                  "<TR BGCOLOR=\"#FFAD00\">\n" +
+                  "<TH>Nanopay Parameter Name<TH>Parameter Value");
+
+      // Nanopay parameters
+      if ( params != null ) {
+        out.println("<TR><TD>Parameters");
+        out.println("    <TD>" + params);
+      }
+      out.println("</TABLE>");
+
       out.println("</BODY></HTML>");
 
       try {
@@ -56,7 +90,7 @@ public class TraceWebAgent
          out.println("cookies are not supported");
       }
     } catch (Throwable t) {
-      t.printStackTrace();
+      logger.error(t);
     }
   }
 }
