@@ -9,13 +9,11 @@ foam.CLASS({
   name: 'FixedSizeDAO',
   extends: 'foam.dao.ProxyDAO',
 
-  documentation: function () {/*
-    DAO that stores a fixed number of objects.
-  */},
+  documentation: 'DAO that stores a fixed number of objects',
 
   javaImports: [
-    'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'foam.dao.Sink',
+    'org.apache.commons.collections.buffer.CircularFifoBuffer',
     'org.apache.commons.collections.Buffer',
     'org.apache.commons.collections.BufferUtils'
   ],
@@ -57,15 +55,15 @@ return delegatedObject;
       name: 'select_',
       javaReturns: 'foam.dao.Sink',
       javaCode: `
-if ( sink == null ) {
-  sink = new foam.dao.ArraySink();
+sink = prepareSink(sink);
+Sink decorated = decorateSink_(sink, skip, limit, order, predicate);
+Object[] arrayObject = getFixedSizeArray().toArray();
+for ( int i = 0; i < arrayObject.length; i++ ) {
+  decorated.put( arrayObject[i], null );
 }
-Object[] tester = getFixedSizeArray().toArray();
-for ( int i = 0; i < tester.length; i++ ) {
-  sink.put(tester[i],null);
-}
+decorated.eof();
 return sink;
-        `
+`
     }
   ]
 });
