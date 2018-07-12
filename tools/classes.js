@@ -173,6 +173,7 @@ var classes = [
   'foam.nanos.logger.NotificationLogger',
   'foam.nanos.logger.RepeatLogger',
   'foam.nanos.logger.ProxyLogger',
+  'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
   'foam.nanos.menu.DAOMenu',
   'foam.nanos.menu.ListMenu',
