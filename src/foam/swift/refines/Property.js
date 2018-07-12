@@ -538,9 +538,7 @@ foam.CLASS({
     },
     {
       name: 'swiftValue',
-      expression: function(value) {
-        return '' + value;
-      },
+      expression: function(value) { return foam.swift.stringify(value) },
     },
   ],
 });
