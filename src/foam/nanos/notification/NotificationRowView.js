@@ -177,7 +177,7 @@
             .end()
             .callIf(this.data.notificationType !== 'General', function() {
               this.start('div')
-                .add('Not show like this')
+                .add('Hide similar notifications')
                 .on('click', self.hideNotificationType)
               .end();
             })
