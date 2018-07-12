@@ -98,7 +98,7 @@ public class TraceWebAgent
       StringWriter stringWriter = new StringWriter();
       Outputter outputter = new Outputter(new PrintWriter(stringWriter), OutputterMode.FULL);
       outputter.output(kv);
-      logger.info("TraceWebAgent", stringWriter.toString());
+      logger.info("TraceWebAgent", stringWriter);
 
       try {
         Cookie[] cookies = req.getCookies();
