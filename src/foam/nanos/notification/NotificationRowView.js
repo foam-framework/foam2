@@ -28,24 +28,6 @@
     ],
 
     css: `
-      /*^ {
-        padding-right: 8px;
-        margin: 8px;
-        display: flex;
-        //background: gray;
-        width: 220px;
-        border-radius: 5px;
-      }
-      *//*^:hover {
-        background: #DDD;
-      }*//*
-      ^ .id {
-        padding: 8px;
-        border-radius: 4px 0 0 4px;
-        //color: white;
-        //background: #607D8B;
-      }*/
-      
       ^ i {
         margin-top: 5px;
       }
@@ -162,21 +144,27 @@
     ],
 
     methods: [
-      function initE() { 
+      function initE() {
         this
           .on('mouseover', this.read)
           .addClass(this.myClass());
-          this.start(this.OPTIONS_DROP_DOWN, { icon: 'images/ic-options.png', showLabel:true }, this.optionsBtn_$).end();
-          this.add(this.NotificationView.create({of: this.data.cls_, data: this.data}));
+
+        this.tag(this.OPTIONS_DROP_DOWN, {
+          icon: 'images/ic-options.png',
+          showLabel: true
+        }, this.optionsBtn_$);
+        this.add(this.NotificationView.create({
+          of: this.data.cls_,
+          data: this.data
+        }));
       }
     ],
 
     actions: [
-    
       {
         name: 'optionsDropDown',
         label: '',
-        code: function (X) {
+        code: function(X) {
           var self = this;
           self.optionPopup_ = this.PopupView.create({
             width: 165,
@@ -188,47 +176,50 @@
             .start('div').add('Remove')
               .on('click', this.removeNotification)
             .end()
-            .callIf(this.data.notificationType != 'General', function(){
+            .callIf(this.data.notificationType !== 'General', function() {
               this.start('div')
                 .add('Not show like this')
-                .on('click', self.notShow)
-              .end()
+                .on('click', self.hideNotificationType)
+              .end();
             })
             .start('div')
               .add('Mark as Unread')
               .on('click', this.markUnread)
-            .end()
+            .end();
           self.optionsBtn_.add(self.optionPopup_);
         }
       },
     ],
 
     listeners: [
-
       function removeNotification() {
         this.notificationDAO.remove(this.data);
       },
-      
-      function notShow() {
+
+      function hideNotificationType() {
         this.user = this.user.clone();
         this.user.disabledTopics.push(this.data.notificationType);
         this.userDAO.put(this.user);
-        this.stack.push({ class: 'foam.nanos.notification.NotificationListView'});
+        this.stack.push({
+          class: 'foam.nanos.notification.NotificationListView'
+        });
       },
 
-      function read(){
+      function read() {
         if ( ! this.data.read ) {
             this.data.read = true;
             this.notificationDAO.put(this.data);
         }
       },
 
-      function markUnread(){
+      function markUnread() {
         if ( this.data.read ) {
           this.data.read = false;
-          this.notificationDAO.put(this.data); 
+          this.notificationDAO.put(this.data);
         }
-        this.stack.push({ class: 'foam.nanos.notification.NotificationListView'});
+        this.stack.push({
+          class: 'foam.nanos.notification.NotificationListView'
+        });
       }
     ]
   });
