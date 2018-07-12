@@ -62,12 +62,11 @@
       }
       ^ .popUpDropDown > div {
         width: 165px;
-        height: 20px;
         font-size: 14px;
         font-weight: 300;
         letter-spacing: 0.2px;
         color: #093649;
-        line-height: 30px;
+        padding: 10px 0;
       }
       ^ .popUpDropDown > div:hover {
         background-color: #59a5d5;
