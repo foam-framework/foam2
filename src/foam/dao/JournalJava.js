@@ -138,7 +138,7 @@ foam.CLASS({
       class: 'Object',
       name: 'parser',
       javaType: 'foam.lib.json.JSONParser',
-      javaGetter: 'return getX().create(JSONParser.class);'
+      javaFactory: `return getX().create(JSONParser.class);`
     },
     {
       class: 'foam.dao.DAOProperty',
