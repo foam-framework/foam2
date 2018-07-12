@@ -22,7 +22,7 @@ foam.CLASS({
       name: 'put_',
       code: function(value) {
         value.lastModified = new Date();
-        return SUPER(value);
+        return this.SUPER(value);
       },
       javaCode: `
         if ( obj instanceof LastModifiedAware ) {
