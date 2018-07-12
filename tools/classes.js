@@ -76,6 +76,7 @@ var classes = [
   'foam.box.SessionClientBox',
   'foam.dao.DAO',
   'foam.dao.JDAO',
+  'foam.dao.FilteredDAO',
   'foam.dao.Journal',
   'foam.dao.ProxyJournal',
   'foam.dao.CompositeJournal',
