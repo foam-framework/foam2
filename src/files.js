@@ -173,6 +173,7 @@ FOAM_FILES([
   { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAODecorator" },
   { name: "foam/dao/AbstractDAO" },
+  { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/refinements", flags: ['java'] },
   { name: "foam/dao/SQLStatement" },
