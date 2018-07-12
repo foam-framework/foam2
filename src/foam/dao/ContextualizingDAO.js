@@ -58,7 +58,7 @@ foam.CLASS({
       args: [ { name: 'x', of: 'foam.core.X' },
               { name: 'obj', of: 'foam.core.FObject' } ],
       code: function(obj) {
-        return obj && obj.fclone(this);
+        return obj && obj.clone(this);
       },
       javaCode: `if ( obj != null ) {
   obj = obj.fclone();
