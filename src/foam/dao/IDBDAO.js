@@ -166,7 +166,7 @@ foam.CLASS({
 
     function find_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id !== undefined ? obj.id : obj);
+      var key  = this.serializeId(obj.id !== undefined ? obj.id : obj);
 
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
@@ -174,7 +174,7 @@ foam.CLASS({
           request.transaction.addEventListener(
             'complete',
             function() {
-              if (!request.result) {
+              if ( ! request.result ) {
                 resolve(null);
                 return;
               }
@@ -190,7 +190,7 @@ foam.CLASS({
 
     function remove_(x, obj) {
       var self = this;
-      var key = this.serializeId(obj.id !== undefined ? obj.id : obj);
+      var key  = this.serializeId(obj.id !== undefined ? obj.id : obj);
       return new Promise(function(resolve, reject) {
         self.withStore("readwrite", function(store) {
           var getRequest = store.get(key);
@@ -237,44 +237,43 @@ foam.CLASS({
             };
           });
         });
-      } else {
-        // send items to the sink and remove one by one
-        return new Promise(function(resolve, reject) {
-          self.withStore('readwrite', function(store) {
-            var request = store.openCursor();
-            request.onsuccess = function(e) {
-              var cursor = e.target.result;
-              if (cursor) {
-                var value = self.deserialize(cursor.value);
-                if (query.f(value)) {
-                  var deleteReq = cursor.delete();
-                  deleteReq.addEventListener(
-                    'success',
-                    function() {
-                      self.pub('on','remove', value);
-                    });
-                  deleteReq.onerror = function(e) {
-                  };
-                }
-                cursor.continue();
-              }
-            };
-            request.transaction.addEventListener('complete', function() {
-              resolve();
-            });
-            request.onerror = function(e) {
-              reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
-            };
-          });
-        });
       }
+      // send items to the sink and remove one by one
+      return new Promise(function(resolve, reject) {
+        self.withStore('readwrite', function(store) {
+          var request = store.openCursor();
+          request.onsuccess = function(e) {
+            var cursor = e.target.result;
+            if (cursor) {
+              var value = self.deserialize(cursor.value);
+              if (query.f(value)) {
+                var deleteReq = cursor.delete();
+                deleteReq.addEventListener(
+                  'success',
+                  function() {
+                    self.pub('on','remove', value);
+                  });
+                deleteReq.onerror = function(e) {
+                };
+              }
+              cursor.continue();
+            }
+          };
+          request.transaction.addEventListener('complete', function() {
+            resolve();
+          });
+          request.onerror = function(e) {
+            reject(self.IDBInternalException.create({ id: 'remove_all', error: e }));
+          };
+        });
+      });
     },
 
     function select_(x, sink, skip, limit, order, predicate) {
       var resultSink = sink || this.ArraySink.create();
       sink = this.decorateSink_(resultSink, skip, limit, order, predicate);
 
-      var sub = foam.core.FObject.create();
+      var sub      = foam.core.FObject.create();
       var detached = false;
       sub.onDetach(function() { detached = true; });
 
@@ -307,6 +306,7 @@ foam.CLASS({
             sink.put(value, sub);
             cursor.continue();
           };
+
           request.onerror = function(e) {
             reject(self.IDBInternalException.create({ id: 'select', error: e }));
           };

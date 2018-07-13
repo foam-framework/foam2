@@ -29,7 +29,7 @@ foam.CLASS({
           name: 'out',
         },
         {
-          swiftType: 'FObject',
+          of: 'FObject',
           name: 'o',
         },
         {
@@ -265,7 +265,7 @@ out.append("}");
           name: 'out',
         },
         {
-          swiftType: 'FObject',
+          of: 'FObject',
           name: 'data',
         },
       ],
@@ -295,7 +295,7 @@ out.append("}");
       name: 'swiftStringify',
       args: [
         {
-          swiftType: 'FObject',
+          of: 'FObject',
           name: 'data',
         },
       ],

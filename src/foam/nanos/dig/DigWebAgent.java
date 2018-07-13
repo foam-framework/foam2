@@ -57,21 +57,21 @@ public class DigWebAgent
   public DigWebAgent() {}
 
   public void execute(X x) {
-    Logger              logger      = (Logger) x.get("logger");
-    HttpServletResponse resp        = x.get(HttpServletResponse.class);
-    HttpParameters      p           = x.get(HttpParameters.class);
-    final PrintWriter   out         = x.get(PrintWriter.class);
-    CharBuffer          buffer_     = CharBuffer.allocate(65535);
-    String              data        = p.getParameter("data");
-    String              daoName     = p.getParameter("dao");
-    Command             command     = (Command) p.get(Command.class);
-    Format              format      = (Format) p.get(Format.class);
-    String              id          = p.getParameter("id");
-    String              q           = p.getParameter("q");
-    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
-    String[]            email       = p.getParameterValues("email");
-    boolean             emailSet    = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
-    String              subject     = p.getParameter("subject");
+    Logger              logger   = (Logger) x.get("logger");
+    HttpServletResponse resp     = x.get(HttpServletResponse.class);
+    HttpParameters      p        = x.get(HttpParameters.class);
+    final PrintWriter   out      = x.get(PrintWriter.class);
+    CharBuffer          buffer_  = CharBuffer.allocate(65535);
+    String              data     = p.getParameter("data");
+    String              daoName  = p.getParameter("dao");
+    Command             command  = (Command) p.get(Command.class);
+    Format              format   = (Format) p.get(Format.class);
+    String              id       = p.getParameter("id");
+    String              q        = p.getParameter("q");
+    DAO                 nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
+    String[]            email    = p.getParameterValues("email");
+    boolean             emailSet = email != null && email.length > 0 && ! SafetyUtil.isEmpty(email[0]);
+    String              subject  = p.getParameter("subject");
 
     //
     // FIXME/TODO: ensuring XML and CSV flows return proper response objects and codes has not been completed since the switch to HttpParameters.
@@ -117,7 +117,7 @@ public class DigWebAgent
           foam.lib.json.Outputter outputterJson = new foam.lib.json.Outputter(OutputterMode.NETWORK);
           outputterJson.setOutputDefaultValues(true);
           outputterJson.setOutputClassNames(false);
-          //let FObjectArray parse first
+          // let FObjectArray parse first
           if ( SafetyUtil.isEmpty(data) ) {
               resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "PUT|POST expecting data, non received.");
               return;
@@ -366,9 +366,9 @@ public class DigWebAgent
   }
 
   protected void output(X x, String data) {
-    HttpParameters      p       = x.get(HttpParameters.class);
-    String []           email   = p.getParameterValues("email");
-    String              subject = p.getParameter("subject");
+    HttpParameters p       = x.get(HttpParameters.class);
+    String[]       email   = p.getParameterValues("email");
+    String         subject = p.getParameter("subject");
 
     if ( email.length == 0 ) {
       PrintWriter out = x.get(PrintWriter.class);
@@ -407,9 +407,9 @@ public class DigWebAgent
   }
 
   protected void outputPage(X x) {
-    final PrintWriter   out         = x.get(PrintWriter.class);
-    DAO                 nSpecDAO    = (DAO) x.get("AuthenticatedNSpecDAO");
-    Logger              logger      = (Logger) x.get("logger");
+    final PrintWriter out      = x.get(PrintWriter.class);
+    DAO               nSpecDAO = (DAO) x.get("AuthenticatedNSpecDAO");
+    Logger            logger   = (Logger) x.get("logger");
 
     out.println("<form method=post><span>DAO:</span>");
     out.println("<span><select name=dao id=dao style=margin-left:35 onchange=changeUrl()>");

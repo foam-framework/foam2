@@ -24,25 +24,21 @@ foam.CLASS({
     'filterController'
   ],
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^header {
-          align-items: center;
-          display: flex;
-        }
-        ^label {
-          flex-grow: 1;
-        }
-        ^container {
-          margin: 12px;
-        }
-        ^body input {
-          width: 100%;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^header {
+      align-items: center;
+      display: flex;
+    }
+    ^label {
+      flex-grow: 1;
+    }
+    ^container {
+      margin: 12px;
+    }
+    ^body input {
+      width: 100%;
+    }
+  `,
 
   properties: [
     'prop',
@@ -92,15 +88,15 @@ foam.CLASS({
 
       this.addClass(this.myClass()).addClass(this.myClass('container'));
       this.start('div')
-          .addClass(this.myClass('header'))
-          .start()
-              .addClass(this.myClass('label'))
-              .add(this.label)
-          .end()
-          .startContext({ data: this })
-            .add(this.showRemove ? this.REMOVE_FILTER : undefined)
-          .endContext()
-        .end();
+        .addClass(this.myClass('header'))
+        .start()
+            .addClass(this.myClass('label'))
+            .add(this.label)
+        .end()
+        .startContext({ data: this })
+          .add(this.showRemove ? this.REMOVE_FILTER : undefined)
+        .endContext()
+      .end();
 
       this.bodyE = this.start('div').addClass(this.myClass('body'));
       for ( var i = 0; i < this.addQueue_.length; i++ ) {

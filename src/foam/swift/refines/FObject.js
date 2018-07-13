@@ -6,6 +6,7 @@
 
 foam.LIB({
   name: 'foam.core.FObject',
+  flags: ['swift'],
   methods: [
     function toSwiftClass() {
       var axiomFilter = foam.util.flagFilter(['swift']);
@@ -39,13 +40,13 @@ foam.LIB({
         code: this.model_.swiftCode,
       });
       this.getOwnAxioms().filter(axiomFilter).forEach(function(axiom) {
-        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this.getSuperAxiomByName(axiom.name), this);
+        if ( axiom.writeToSwiftClass ) axiom.writeToSwiftClass(cls, this);
       }.bind(this));
 
       var multiton = this.getAxiomsByClass(foam.pattern.Multiton);
       multiton = multiton.length ? multiton[0] : null;
       if ( multiton && ! this.hasOwnAxiom(multiton.property) ) {
-        this.getAxiomByName(multiton.property).writeToSwiftClass(cls, this.getSuperAxiomByName(multiton.property), this);
+        this.getAxiomByName(multiton.property).writeToSwiftClass(cls, this);
       }
       var singleton = this.getAxiomsByClass(foam.pattern.Singleton)
       singleton = singleton.length ? singleton[0] : null;
@@ -144,7 +145,7 @@ foam.LIB({
         classInfo.fields.push(foam.swift.Field.create({
           defaultValue: '[:]',
           lazy: true,
-          type: `[${this.getAxiomByName(multiton.property).swiftType}:FObject]`,
+          type: `[${this.getAxiomByName(multiton.property).swiftType}:${foam.core.FObject.model_.swiftName}]`,
           name: 'multitonMap',
         }));
         classInfo.fields.push(foam.swift.Field.create({
@@ -156,7 +157,7 @@ foam.LIB({
       } else if (singleton) {
         classInfo.fields.push(foam.swift.Field.create({
           visibility: 'private',
-          type: 'FObject?',
+          type: foam.core.FObject.model_.swiftName + '?',
           name: 'instance',
         }));
       }
@@ -199,7 +200,7 @@ foam.LIB({
 
       // make implement identifiable if has id property
       if ( this.hasOwnAxiom('id') ) {
-        cls.implements = cls.implements.concat('Identifiable');
+        cls.implements = cls.implements.concat(foam.core.Identifiable.model_.swiftName);
         cls.methods.push(foam.swift.Method.create({
           name: 'getPrimaryKey',
           visibility: 'public',
@@ -216,6 +217,7 @@ foam.LIB({
 foam.CLASS({
   package: 'foam.swift',
   name: 'FObjectTemplates',
+  flags: ['swift'],
   templates: [
     {
       name: 'exportsBody',

@@ -129,6 +129,7 @@ foam.CLASS({
                   name: m.name,
                   replyPolicyName: replyPolicyName,
                   boxPropName: name,
+                  // javaReturns: m.javaReturns, TODO Should we do this?
                   swiftReturns: m.swiftReturns,
                   args: m.args,
                   returns: returns

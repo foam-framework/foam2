@@ -44,12 +44,13 @@ foam.INTERFACE({
         },
         {
           name: 'service',
-          swiftType: 'BoxService?',
+          of: 'foam.box.BoxService',
+          optional: true,
           javaType: 'foam.box.BoxService'
         },
         {
           name: 'box',
-          swiftType: 'Box',
+          of: 'foam.box.Box',
           javaType: 'foam.box.Box'
         }
       ],

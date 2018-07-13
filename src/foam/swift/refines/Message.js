@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.i18n.MessageAxiom',
+  flags: ['swift'],
   requires: [
     'foam.swift.Field',
     'foam.i18n.TranslationFormatStringParser',

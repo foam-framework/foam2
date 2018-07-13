@@ -29,7 +29,7 @@ return UINavigationController(rootViewController: daoController.vc)
       name: 'dao',
       swiftFactory: function() {/*
 return ArrayDAO_create([
-  "of": Test.classInfo(),
+  "of": somepackage_Test.classInfo(),
 ])
       */},
     },
@@ -45,39 +45,38 @@ let dvc = DAOViewController_create([
 ])
 
 let uiLabelViewConfig = [
-  "viewFactory": { (x: Context) -> FObject? in
-    return x.create(FOAMUILabel.self)
+  "viewFactory": { (x: Context) -> foam_core_FObject? in
+    return x.create(foam_swift_ui_FOAMUILabel.self)
   }
 ]
 
 dvc.dataSource.rowViewFactory = { () -> UITableViewCell in
   let nib = UINib(nibName: "TestRowView", bundle: Bundle.main)
-  let customView = nib.instantiate(withOwner: dvc.vc, options: nil)[0] as! TestDetailView
-  customView.dv_Test = x.create(DetailView.self, args: [
-    "of": Test.classInfo(),
+  let customView = nib.instantiate(withOwner: dvc.vc, options: nil)[0] as! somepackage_TestDetailView
+  customView.dv_somepackage_Test = x.create(foam_swift_ui_DetailView.self, args: [ "of": somepackage_Test.classInfo(),
     "config": [
       "firstName": uiLabelViewConfig,
       "lastName": uiLabelViewConfig,
       "exprProp": uiLabelViewConfig,
     ]
   ])!
-  let cell = DAOTableViewSource.SimpleRowView(
+  let cell = foam_swift_ui_DAOTableViewSource.SimpleRowView(
       view: customView, style: .default, reuseIdentifier: dvc.dataSource.reusableCellIdentifier)
   return cell
 }
 dvc.dataSource.rowViewPrepare = { (cell, fobj) -> Void in
-  let cell = cell as! DAOTableViewSource.SimpleRowView
-  let view = cell.view as! TestDetailView
-  view.dv_Test?.data = fobj
+  let cell = cell as! foam_swift_ui_DAOTableViewSource.SimpleRowView
+  let view = cell.view as! somepackage_TestDetailView
+  view.dv_somepackage_Test?.data = fobj
 }
 
-dvc.tableViewDelegate?.updateVcFactory = { (o: FObject) -> UIViewController in
+dvc.tableViewDelegate?.updateVcFactory = { (o: foam_core_FObject) -> UIViewController in
   let dv = self.DetailView_create([
     "data": o,
     "config": [
       "exprProp": [
-        "viewFactory": { (x: Context) -> FObject? in
-          return x.create(FOAMUILabel.self)
+        "viewFactory": { (x: Context) -> foam_core_FObject? in
+          return x.create(foam_swift_ui_FOAMUILabel.self)
         }
       ]
     ]
@@ -88,8 +87,8 @@ dvc.tableViewDelegate?.updateVcFactory = { (o: FObject) -> UIViewController in
   ])
 
   let nib = UINib(nibName: "CustomView", bundle: Bundle.main)
-  let customView = nib.instantiate(withOwner: svc.vc, options: nil)[0] as! TestDetailView
-  customView.dv_Test = dv
+  let customView = nib.instantiate(withOwner: svc.vc, options: nil)[0] as! somepackage_TestDetailView
+  customView.dv_somepackage_Test = dv
 
   return svc.vc
 }
