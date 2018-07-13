@@ -34,7 +34,6 @@
       ^ .popUpDropDown {
         padding: 0 !important;
         z-index: 1000;
-        width: 165px;
         background: white;
         opacity: 1;
         box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.19);
@@ -61,12 +60,12 @@
         background-color: rgba(164, 179, 184, 0.3);
       }
       ^ .popUpDropDown > div {
-        width: 165px;
         font-size: 14px;
         font-weight: 300;
         letter-spacing: 0.2px;
         color: #093649;
-        padding: 10px 0;
+        padding: 10px 16px;
+        text-align: left;
       }
       ^ .popUpDropDown > div:hover {
         background-color: #59a5d5;
@@ -166,18 +165,20 @@
         code: function(X) {
           var self = this;
           self.optionPopup_ = this.PopupView.create({
-            width: 165,
+            width: 205,
             x: -137,
             y: 40
           });
 
           self.optionPopup_.addClass('popUpDropDown')
-            .start('div').add('Remove')
+            .start('div')
+              .style({ color: '#D81E05' })
+              .add('Remove')
               .on('click', this.removeNotification)
             .end()
             .callIf(this.data.notificationType !== 'General', function() {
               this.start('div')
-                .add('Hide similar notifications')
+                .add('Hide notifications like this')
                 .on('click', self.hideNotificationType)
               .end();
             })
