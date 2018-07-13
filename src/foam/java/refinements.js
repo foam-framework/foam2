@@ -1402,11 +1402,11 @@ foam.CLASS({
     function buildJavaClass(cls) {
       this.SUPER(cls);
       cls.method({
-        name: `get${foam.String.capitalize(this.name)}Object`,
+        name: `get${foam.String.capitalize(this.name)}$find`,
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
-        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find(get${foam.String.capitalize(this.name)}());`
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, get${foam.String.capitalize(this.name)}());`
       });
     }
   ]
