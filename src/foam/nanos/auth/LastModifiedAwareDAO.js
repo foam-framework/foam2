@@ -20,9 +20,9 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code: function(value) {
-        value.lastModified = new Date();
-        return this.SUPER(value);
+      code: function(x, obj) {
+        obj.lastModified = new Date();
+        return this.SUPER(x, obj);
       },
       javaCode: `
         if ( obj instanceof LastModifiedAware ) {
