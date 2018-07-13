@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Argument',
+  flags: ['java'],
   properties: [
     {
       class: 'String',
@@ -18,6 +19,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: ['java'],
   properties: [
     {
       class: 'Boolean',
@@ -133,14 +135,7 @@ foam.CLASS({
 
     function generateSetter_() {
       return this.javaSetter ? this.javaSetter : `
-        // The next line will eventually be promoted to production
-        // if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
-
-        // But until then, this line helps to detect code which needs to be fixed before then.
-        if ( this.__frozen__ ) {
-          System.err.println("!!!!!!!!!!!!!!!!!!!!!!! INVALID MUTATION OF FROZEN OBJECT, fclone() REQUIRED !!!!!!!!!!!!!!!!!!!!!!!");
-          Thread.dumpStack();
-        }
+        if ( this.__frozen__ ) throw new UnsupportedOperationException("Object is frozen.");
         assert${foam.String.capitalize(this.name)}(val);
         ${this.name}_ = val;
         ${this.name}IsSet_ = true;
@@ -238,6 +233,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Implements',
+  flags: ['java'],
   properties: [
     {
       name: 'java',
@@ -255,6 +251,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.InnerClass',
+  flags: ['java'],
   properties: [
     {
       class: 'Boolean',
@@ -322,6 +319,17 @@ foam.LIB({
           return foam.java.Field.create({ name: p.name, type: p.javaType });
         });
 
+      cls.method({
+        visibility: 'protected',
+        type: 'void',
+        name: 'beforeFreeze',
+        body: 'super.beforeFreeze();\n' + this.getAxiomsByClass(foam.core.Property).
+          filter(function(p) { return !! p.javaType && p.javaInfoType && p.generateJava; }).
+          filter(function(p) { return p.javaFactory; }).
+          map(function(p) {
+            return `get${foam.String.capitalize(p.name)}();`
+          }).join('\n')
+      });
 
       if ( this.hasOwnAxiom('id') ) {
         cls.implements = cls.implements.concat('foam.core.Identifiable');
@@ -407,11 +415,13 @@ foam.LIB({
 
 foam.CLASS({
   refines: 'foam.core.AbstractMethod',
+  flags: ['java'],
 
   properties: [
     {
       class: 'String',
-      name: 'javaCode'
+      name: 'javaCode',
+      flags: ['java'],
     },
     {
       class: 'String',
@@ -467,6 +477,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Constant',
+  flags: ['java'],
 
   properties: [
     {
@@ -506,6 +517,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Action',
+  flags: ['java'],
 
   properties: [
     {
@@ -530,6 +542,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Method',
+  flags: ['java'],
   properties: [
     {
       class: 'Boolean',
@@ -542,6 +555,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ProxiedMethod',
+  flags: ['java'],
 
   properties: [
     {
@@ -576,6 +590,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Import',
+  flags: ['java'],
 
   properties: [
     {
@@ -600,6 +615,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObject',
+  flags: ['java'],
   methods: [
     {
       name: 'toString',
@@ -611,6 +627,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.AbstractInterface',
+  flags: ['java'],
   axioms: [
     {
       installInClass: function(cls) {
@@ -638,6 +655,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Int',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'int'],
@@ -666,6 +684,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Byte',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'byte'],
@@ -694,6 +713,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Short',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'short'],
@@ -722,6 +742,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Long',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'long'],
@@ -750,6 +771,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Float',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'double'],
@@ -778,6 +800,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Enum',
+  flags: ['java'],
 
   properties: [
     {
@@ -869,6 +892,7 @@ return (${this.of.id})o;`;
 
 foam.CLASS({
   refines: 'foam.core.AbstractEnum',
+  flags: ['java'],
 
   axioms: [
     {
@@ -904,6 +928,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'java.util.Date'],
@@ -932,6 +957,7 @@ foam.CLASS({
 
 foam.CLASS({
    refines: 'foam.core.Date',
+  flags: ['java'],
 
    properties: [
        ['javaType', 'java.util.Date'],
@@ -960,6 +986,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Map',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'java.util.Map'],
@@ -981,6 +1008,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.List',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'java.util.List'],
@@ -992,6 +1020,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.String',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'String'],
@@ -1025,6 +1054,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
+  flags: ['java'],
   properties: [
     {
       name: 'javaType',
@@ -1046,6 +1076,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.StringArray',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'String[]'],
@@ -1119,6 +1150,7 @@ return 0;*/
 
 foam.CLASS({
   refines: 'foam.core.Array',
+  flags: ['java'],
 
   properties: [
     ['javaType', 'Object[]'],
@@ -1174,6 +1206,7 @@ return 0;*/
 
 foam.CLASS({
   refines: 'foam.core.FObjectArray',
+  flags: ['java'],
 
   properties: [
     {
@@ -1288,6 +1321,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
+  flags: ['java'],
   properties: [
     ['javaType', 'boolean'],
     ['javaInfoType', 'foam.core.AbstractBooleanPropertyInfo'],
@@ -1310,6 +1344,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Object',
+  flags: ['java'],
   properties: [
     ['javaType', 'Object'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
@@ -1321,6 +1356,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Class',
+  flags: ['java'],
   properties: [
     ['javaType', 'foam.core.ClassInfo'],
     ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo'],
@@ -1331,6 +1367,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Proxy',
+  flags: ['java'],
   properties: [
     {
       name: 'javaType',
@@ -1346,6 +1383,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Reference',
+  flags: ['java'],
   properties: [
     ['javaType', 'Object'],
     ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
@@ -1357,6 +1395,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.pattern.Multiton',
+  flags: ['java'],
 
   properties: [
     {
@@ -1392,6 +1431,7 @@ new foam.core.MultitonInfo("${this.javaName}", ${cls.name}.${foam.String.constan
 
 foam.CLASS({
   refines: 'foam.core.IDAlias',
+  flags: ['java'],
   properties: [
     {
       name: 'javaGetter',
@@ -1410,6 +1450,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.MultiPartID',
+  flags: ['java'],
 
   properties: [
     // No point parsing it, multi part id is always transient.
@@ -1450,6 +1491,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: ['java'],
 
   properties: [
     {
@@ -1468,6 +1510,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Listener',
+  flags: ['java'],
   properties: [
     {
       class: 'String',
@@ -1551,6 +1594,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Requires',
+  flags: ['java'],
   properties: [
     {
       name: 'javaPath',
@@ -1569,6 +1613,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Function',
+  flags: ['java'],
   properties: [
     ['javaType', 'java.util.function.Function']
   ]

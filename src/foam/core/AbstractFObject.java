@@ -262,7 +262,14 @@ public abstract class AbstractFObject
 
   protected boolean __frozen__ = false;
 
+  protected void beforeFreeze() {}
+
   public void freeze() {
+    beforeFreeze();
     __frozen__ = true;
+  }
+
+  public boolean isFrozen() {
+    return __frozen__;
   }
 }

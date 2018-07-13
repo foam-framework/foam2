@@ -83,6 +83,7 @@ FOAM_FILES([
   { name: "foam/java/Validation" },
 
   { name: "foam/i18n/TranslationFormatStringParser", flags: ['swift'] },
+  { name: "foam/swift/SwiftLib", flags: ['swift'] },
   { name: "foam/swift/Protocol", flags: ['swift'] },
   { name: "foam/swift/Argument", flags: ['swift'] },
   { name: "foam/swift/ProtocolArgument", flags: ['swift'] },
@@ -172,6 +173,7 @@ FOAM_FILES([
   { name: "foam/dao/ArraySink" },
   { name: "foam/dao/DAODecorator" },
   { name: "foam/dao/AbstractDAO" },
+  { name: "foam/dao/FilteredDAO" },
   { name: "foam/dao/DAOProperty" },
   { name: "foam/dao/refinements", flags: ['java'] },
   { name: "foam/dao/SQLStatement" },
