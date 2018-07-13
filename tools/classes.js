@@ -193,6 +193,7 @@ var classes = [
   'foam.nanos.notification.Notification',
   'foam.nanos.notification.notifications.ScriptRunNotification',
   'foam.nanos.script.Script',
+  'foam.nanos.script.TestRunnerScript',
   'foam.nanos.test.Test',
   'foam.nanos.cron.Cron',
   'foam.dao.history.PropertyUpdate',
