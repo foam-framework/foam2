@@ -15,15 +15,19 @@ foam.CLASS({
     {
       name: 'put_',
       code: function(x, obj) {
-        if ( ! obj.id ) {
-          obj.createdBy = x.user.id;
+        if ( ! foam.nanos.auth.CreatedByAware.isInstance(obj) ) {
+          return this.delegate.put_(x, obj);
         }
-        return this.SUPER(x, obj);
+        return this.delegate.find_(x, obj).then(function(result) {
+          if ( result == null ) {
+            obj.createdBy = x.user.id;
+          }
+          return this.delegate.put_(x, obj);
+        }.bind(this));
       },
       javaCode: `
-        Object id = obj.getProperty("id");
         // only set created by if object does not exist in DAO yet
-        if ( obj instanceof CreatedByAware && getDelegate().find_(x, id) == null ) {
+        if ( obj instanceof CreatedByAware && getDelegate().find_(x, obj) == null ) {
           User user = (User) x.get("user");
           ((CreatedByAware) obj).setCreatedBy(user.getId());
         }
