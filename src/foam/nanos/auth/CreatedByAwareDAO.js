@@ -14,10 +14,16 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
+      code: function(value) {
+        if ( foam.util.SafetyUtil.isEmpty(obj.id) ) {
+          value.createdBy = x.get('user').id;
+        }
+        return this.SUPER(value);
+      },
       javaCode: `
         Object id = obj.getProperty("id");
         // only set created by if object does not exist in DAO yet
-        if ( obj instanceof CreatedByAware && getDelegate().find(id) == null ) {
+        if ( obj instanceof CreatedByAware && getDelegate().find_(x, id) == null ) {
           User user = (User) x.get("user");
           ((CreatedByAware) obj).setCreatedBy(user.getId());
         }

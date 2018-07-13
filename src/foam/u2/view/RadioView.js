@@ -20,15 +20,11 @@ foam.CLASS({
   name: 'RadioView',
   extends: 'foam.u2.view.ChoiceView',
 
-  axioms: [
-    foam.u2.CSS.create({
-      code: function CSS() {/*
-        ^ label {
-          position: relative;
-        }
-      */}
-    })
-  ],
+  css: `
+    ^ label {
+      position: relative;
+    }
+  `,
 
   methods: [
     function initE() {
@@ -68,13 +64,11 @@ foam.CLASS({
             }).
           end().
           start('label').
-            attrs({
-              for: id
-            }).
+            attrs({for: id}).
             start('span').
               add(c[1]).
-            end()
-          .end();
+            end().
+          end();
       }.bind(this)));
     }
   ]
