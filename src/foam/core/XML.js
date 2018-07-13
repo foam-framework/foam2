@@ -39,6 +39,8 @@ foam.CLASS({
 
 /** Add toXML() method to FObject. **/
 foam.CLASS({
+  package: 'foam.core',
+  name: 'FObjectXMLStringify',
   refines: 'foam.core.FObject',
 
   methods: [

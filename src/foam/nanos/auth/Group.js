@@ -26,7 +26,8 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      value: true
     },
     {
       class: 'String',

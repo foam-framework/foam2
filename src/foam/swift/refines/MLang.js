@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.mlang.AbstractExpr',
+  flags: ['swift'],
   methods: [
     function f() {}
   ]
@@ -13,6 +14,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.ExprProperty',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -21,8 +23,8 @@ foam.CLASS({
     {
       name: 'swiftAdapt',
       value: `
-if let newValue = newValue as? Expr { return newValue }
-return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
+if let newValue = newValue as? foam_mlang_Expr { return newValue }
+return Context.GLOBAL.create(foam_mlang_Constant.self, args: ["value": newValue])!
       `,
     },
   ],
@@ -30,6 +32,7 @@ return Context.GLOBAL.create(Constant.self, args: ["value": newValue])!
 
 foam.CLASS({
   refines: 'foam.mlang.ArrayConstant',
+  flags: ['swift'],
 
   methods: [
     {
@@ -41,6 +44,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.mlang.sink.Map',
+  flags: ['swift'],
 
   methods: [
     {
@@ -52,7 +56,7 @@ foam.CLASS({
         }
       ],
       swiftReturns: 'Any?',
-      swiftCode: `return (arg1 as? Expr)?.f(obj)`
+      swiftCode: `return (arg1 as? foam_mlang_Expr)?.f(obj)`
     },
     {
       name: 'put',

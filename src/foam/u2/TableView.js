@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+/** Use foam.u2.view.TableView instead. **/
+
 foam.CLASS({
   package: 'foam.u2',
   name: 'TableCellPropertyRefinement',

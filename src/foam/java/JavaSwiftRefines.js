@@ -22,8 +22,10 @@ foam.CLASS({
 
       // Special merging behaviour for args.
       var i = 0;
-      for ( ; i < this.args.length ; i++ ) result.args[i] = this.args[i].clone().copyFrom(child.args[i]);
-      for ( ; i < child.args.length ; i++ ) result.args[i] = child.args[i];
+      var resultArgs = [];
+      for ( ; i < this.args.length ; i++ ) resultArgs.push(this.args[i].clone().copyFrom(child.args[i]));
+      for ( ; i < child.args.length ; i++ ) resultArgs.push(child.args[i]);
+      result.args = resultArgs; // To trigger the adaptArrayElement
 
       return result;
     },

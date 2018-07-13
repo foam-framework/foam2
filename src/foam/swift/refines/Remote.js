@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.box.Remote',
+  flags: ['swift'],
   requires: [
     'foam.swift.Method',
     'foam.swift.Argument',
@@ -18,7 +19,7 @@ foam.CLASS({
     }
   ],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls) {
       cls.method(this.Method.create({
         visibility: 'public',
         override: true,
@@ -27,7 +28,7 @@ foam.CLASS({
           this.Argument.create({
             localName: 'outputter',
             externalName: 'outputter',
-            type: 'Outputter',
+            type: foam.swift.parse.json.output.Outputter.model_.swiftName,
           }),
           this.Argument.create({
             localName: 'out',
@@ -46,9 +47,9 @@ foam.CLASS({
 <% var cls = this.lookup(this.clientClass) %>
 
 let X = __subContext__
-let registry = X["registry"] as! BoxRegistry
+let registry = X["registry"] as! foam_box_BoxRegistry
 
-var box: Box = X.create(SkeletonBox.self, args: ["data": self])!
+var box: foam_box_Box = X.create(foam_box_SkeletonBox.self, args: ["data": self])!
 box = registry.register(nil, nil, box)
 
 let obj = __context__.create(<%=cls.model_.swiftName%>.self)!

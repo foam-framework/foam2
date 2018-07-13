@@ -39,7 +39,7 @@ foam.CLASS({
       name: 'call',
       args: [
         {
-          swiftType: 'Message?',
+          of: 'foam.box.Message',
           name: 'message',
         },
       ],
@@ -90,8 +90,8 @@ foam.CLASS({
       },
       swiftCode: function() {/*
 do {
-  guard let object = message?.object as? RPCMessage,
-        let data = self.data as? FObject,
+  guard let object = message.object as? foam_box_RPCMessage,
+        let data = self.data as? foam_core_FObject,
         let method = data.ownClassInfo().axiom(byName: object.name) as? MethodInfo
   else {
     throw InvalidMessageException_create()
@@ -101,13 +101,13 @@ do {
 
   var p = try method.call(data, args: object.args)
 
-  guard let replyBox = message?.attributes["replyBox"] as? Box else { return }
+  guard let replyBox = message.attributes["replyBox"] as? foam_box_Box else { return }
   if let pFut = p as? Future<Any> { p = try pFut.get() }
   try replyBox.send(Message_create([
     "object": RPCReturnMessage_create(["data": p])
   ]))
 } catch let e {
-  if let errorBox = message?.attributes["errorBox"] as? Box {
+  if let errorBox = message.attributes["errorBox"] as? foam_box_Box {
     try? errorBox.send(Message_create([
       "object": RPCErrorMessage_create([
         "data": e.localizedDescription
@@ -131,7 +131,7 @@ do {
         });
       },
       swiftCode: function() {/*
-if let _ = msg.object as? RPCMessage {
+if let _ = msg.object as? foam_box_RPCMessage {
   call(msg)
   return
 }

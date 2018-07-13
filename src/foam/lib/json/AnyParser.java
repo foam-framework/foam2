@@ -20,7 +20,10 @@ public class AnyParser
           new NullParser(),
           new StringParser(),
           new BooleanParser(),
-          new LongParser(),
+          // parse long but fail if decimal is found
+          new Seq1(0,
+            new LongParser(),
+            new Not(new Literal("."))),
           new DoubleParser(),
           new StringArrayParser(),
           new StringDoubleArrayParser(),
