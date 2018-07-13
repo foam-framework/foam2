@@ -110,13 +110,6 @@ public class MDAO
 
     if ( o == null ) return null;
 
-    // Temporary until DAO supports find_(Predicate) directly
-    if ( o instanceof foam.mlang.predicate.Predicate ) {
-      java.util.List l = ((ArraySink) this.where((foam.mlang.predicate.Predicate) o).limit(1).inX(x).select(new ArraySink())
-      ).getArray();
-      return l.size() == 1 ? (foam.core.FObject) l.get(0) : null;
-    }
-
     return AbstractFObject.maybeClone(
         getOf().isInstance(o)
             ? (FObject) index_.planFind(state, getPrimaryKey().get(o)).find(state, getPrimaryKey().get(o))
@@ -155,8 +148,8 @@ public class MDAO
 
     // TODO: if plan cost is >= size, log a warning
     if ( state != null && predicate != null && plan.cost() > 1000 && plan.cost() >= index_.size(state_) ) {
-      Logger logger = (Logger) x.get("logger");
-      logger.error(predicate.createStatement(), " Unindexed search on MDAO");
+      //Logger logger = (Logger) x.get("logger");
+      //logger.error(predicate.createStatement(), " Unindexed search on MDAO");
     }
 
     plan.select(state, sink, skip, limit, order, simplePredicate);
