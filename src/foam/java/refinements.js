@@ -1383,12 +1383,32 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Reference',
-  flags: ['java'],
+  flags: [ 'java' ],
+
   properties: [
-    ['javaType', 'Object'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
-    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+    {
+      name: 'javaType',
+      factory: function() {
+        // targetDAOKey, of
+        return 'Object';
+      }
+    },
+    [ 'javaJSONParser',  'foam.lib.json.AnyParser.instance()' ],
+    [ 'javaQueryParser', 'foam.lib.query.AnyParser.instance()' ],
+    [ 'javaInfoType',    'foam.core.AbstractObjectPropertyInfo' ]
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      cls.method({
+        name: `get${foam.String.capitalize(this.name)}Object`,
+        visibility: 'public',
+        type: this.of.id,
+        args: [ { name: 'x', type: 'foam.core.X' } ],
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find(get${foam.String.capitalize(this.name)}());`
+      });
+    }
   ]
 });
 
