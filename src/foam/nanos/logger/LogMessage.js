@@ -17,9 +17,9 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
-  // searchColumns: [
-  //   'message'
-  //  ],
+  searchColumns: [
+    'severity'
+   ],
 
   properties: [
     {
