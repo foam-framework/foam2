@@ -19,11 +19,11 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code: function(value) {
-        if ( foam.util.SafetyUtil.isEmpty(obj.id) ) {
-          value.created = new Date();
+      code: function(x, obj) {
+        if ( ! obj.id ) {
+          obj.created = new Date();
         }
-        return this.SUPER(value);
+        return this.SUPER(x, obj);
       },
       javaCode: `
         Object id = obj.getProperty("id");
