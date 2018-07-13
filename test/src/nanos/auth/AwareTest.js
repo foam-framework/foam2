@@ -96,7 +96,9 @@ describe('Created/LastModified Aware tests', function() {
       return dao.put_(ctx, of.create().copyFrom(a)).then(function(c) {
         expect(c).not.toBeNull();
         expect(c.id).toEqual(a.id);
+        expect(c.createdBy).not.toBeNull();
         expect(c.createdBy).toEqual(a.createdBy);
+        expect(c.created).not.toBeNull();
         expect(c.created.getTime()).toEqual(a.created.getTime());
         expect(c.lastModifiedBy).toEqual(a.lastModifiedBy);
         expect(c.lastModified.getTime()).not.toEqual(a.lastModified.getTime());
