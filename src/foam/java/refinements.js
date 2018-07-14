@@ -1402,7 +1402,7 @@ foam.CLASS({
     function buildJavaClass(cls) {
       this.SUPER(cls);
       cls.method({
-        name: `get${foam.String.capitalize(this.name)}$find`,
+        name: `find${foam.String.capitalize(this.name)}`,
         visibility: 'public',
         type: this.of.id,
         args: [ { name: 'x', type: 'foam.core.X' } ],
