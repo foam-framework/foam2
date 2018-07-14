@@ -395,6 +395,7 @@ foam.CLASS({
       swiftFactory: 'return __context__[targetDAOKey] as? (foam_dao_DAO & foam_core_FObject)'
     }
   ],
+
   methods: [
     {
       name: 'add',
@@ -587,9 +588,9 @@ foam.CLASS({
       factory: function() {
         var sourceProperty = this.sourceProperty;
         var targetProperty = this.targetProperty;
-        var targetDAOKey = this.targetDAOKey;
+        var targetDAOKey   = this.targetDAOKey;
         var junctionDAOKey = this.junctionDAOKey;
-        var junction = this.junction;
+        var junction       = this.junction;
 
         return function(id) {
           return foam.dao.ManyToManyRelationshipImpl.create({
