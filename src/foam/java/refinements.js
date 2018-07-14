@@ -1389,7 +1389,13 @@ foam.CLASS({
     {
       name: 'javaType',
       factory: function() {
-        // targetDAOKey, of
+        // TODO: instead of creating reference properties as Object type, match
+        // the primary key of the target class/model
+        /*
+        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
+        console.log('******************************************************', this.of.id, idProp.javaType);
+        */
+
         return 'Object';
       }
     },
