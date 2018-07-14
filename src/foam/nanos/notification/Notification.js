@@ -29,6 +29,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'profile'
+    },
+    {
+      class: 'String',
       name: 'notificationType',
       label: 'Notification type',
       value: 'General'
