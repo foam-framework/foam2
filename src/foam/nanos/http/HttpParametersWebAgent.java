@@ -75,8 +75,6 @@ public class HttpParametersWebAgent
     Class          parametersClass = null;
     Command        command         = Command.select;
     String         cmd             = req.getParameter("cmd");
-//    String         data            = req.getParameter("data");
-//    String         format          = req.getParameter("format");
 
     logger.debug("methodName", methodName);
 
