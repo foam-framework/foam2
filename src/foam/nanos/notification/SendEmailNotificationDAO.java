@@ -47,12 +47,17 @@ public class SendEmailNotificationDAO extends ProxyDAO {
     message.setTo(new String[]{user.getEmail()});
 
     try {
-      email.sendEmailFromTemplate(user, message, notif.getEmailName(), notif.getEmailArgs());
+      if ( foam.util.SafetyUtil.isEmpty(notif.getEmailName()) ) {
+        message.setSubject(notif.getTemplate());
+        message.setBody(notif.getBody());
+        email.sendEmail(message);
+      } else {
+        email.sendEmailFromTemplate(user, message, notif.getEmailName(), notif.getEmailArgs());
+      }
     } catch(Throwable t) {
-      System.out.println("Error sending notification email. Error: " + t);
+      System.err.println("Error sending notification email message: "+message+". Error: " + t);
     }
 
     return super.put_(x,notif);
-
   }
 }
