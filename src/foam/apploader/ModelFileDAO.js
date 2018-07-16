@@ -82,6 +82,12 @@ foam.CLASS({
             }
           };
 
+          context.foam.SCRIPT = function(m) {
+            m.class = 'foam.core.Script';
+            json = m;
+          };
+
+
           if ( foam.String.isInstance(text) ) {
             with ( context ) { eval(text); }
           } else {
