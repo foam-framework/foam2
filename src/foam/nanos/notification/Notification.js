@@ -29,7 +29,7 @@ foam.CLASS({
     },
     {
       class: 'String',
-      name: 'profile'
+      name: 'template'
     },
     {
       class: 'String',

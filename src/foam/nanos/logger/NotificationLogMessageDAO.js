@@ -15,6 +15,10 @@ foam.CLASS({
     'foam.nanos.auth.EnabledAware'
   ],
 
+  imports: [
+    'notificationDAO'
+  ],
+
   javaImports: [
     'foam.dao.DAO',
     'foam.core.X',
@@ -29,19 +33,21 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
-      value: true
+      value: false
     },
     {
       class: 'Enum',
       of: 'foam.nanos.logger.LogLevel',
       name: 'threshold',
-      value: 'INFO',
       factory: function() {
         return foam.nanos.logger.LogLevel.ERROR;
       },
-      documentation: `The value of errorLevelThreshhold control when this logger executes.
+      javaFactory: `
+        return foam.nanos.logger.LogLevel.ERROR;
+`,
+      documentation: `The value of Threshhold control when this logger executes.
       Ordinal values for LogLevels are: DEBUG -> 0, INFO -> 1, WARNING -> 2, ERROR -> 3.
-      The equality condition for execution is greater than or equal to errorLevelThreshhold.`
+      The equality condition for execution is greater than or equal to Threshhold.`
     },
   ],
   axioms: [
@@ -64,10 +70,18 @@ foam.CLASS({
   methods: [
     {
       name: 'generateNotificationEvent',
-      code: function(message) {
-
+      code: function(x, log) {
+        var notif = foam.nanos.notification.Notification.create({
+          template: this.cls_,
+          body: log.severity.name + ': ' + log.message
+        });
+        this.notificationDAO.put_(x, notif);
       },
       args: [
+        {
+          name: 'x',
+          javaType: 'foam.core.X'
+        },
         {
           name: 'log',
           javaType: 'foam.nanos.logger.LogMessage'
@@ -81,12 +95,12 @@ foam.CLASS({
 
   try {
     foam.nanos.notification.Notification notif = new foam.nanos.notification.Notification();
-    notif.setProfile(this.getClass().getSimpleName());
+    notif.setTemplate(this.getClass().getSimpleName());
 
     String message = log.getSeverity().getName() + ": " + log.getMessage();
     notif.setBody(message);
 
-    if (x_.get("notificationDAO") != null) ((DAO) x_.get("notificationDAO")).put_(x_,notif) ;
+    if (x.get("notificationDAO") != null) ((DAO) x.get("notificationDAO")).put_(x, notif) ;
   }
   catch (Throwable t) {
     t.printStackTrace();
@@ -97,15 +111,17 @@ foam.CLASS({
     {
       name: 'put_',
       code: function(x, obj) {
-        if ( obj.severity.ordinal <= this.threshold.ordinal ) {
-          generateNotificationEvent(obj);
+        if ( this.enabled &&
+             obj.severity.ordinal <= this.threshold.ordinal ) {
+          generateNotificationEvent(x, obj);
         }
         return this.SUPER(x, obj);
       },
       javaCode: `
         LogMessage log = (LogMessage) obj;
-        if ( log.getSeverity().getOrdinal() <= getThreshold().getOrdinal() ) {
-          generateNotificationEvent(log);
+        if ( getEnabled() &&
+             log.getSeverity().getOrdinal() <= getThreshold().getOrdinal() ) {
+          generateNotificationEvent(x, log);
         }
         return super.put_(x, obj);
       `
