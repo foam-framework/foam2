@@ -133,6 +133,9 @@
       ^ .msg.fully-visible {
         display: block;
       }
+      ^ .popUpDropdown > .destructive-action {
+        color: #D81E05;
+      }
     `,
 
     properties: [
@@ -172,7 +175,7 @@
 
           self.optionPopup_.addClass('popUpDropDown')
             .start('div')
-              .style({ color: '#D81E05' })
+              .addClass('destructive-action')
               .add('Remove')
               .on('click', this.removeNotification)
             .end()
