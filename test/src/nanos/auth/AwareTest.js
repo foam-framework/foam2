@@ -21,41 +21,41 @@ describe('Created/LastModified Aware tests', function() {
       package: 'foam.nanos.auth',
       name: 'AwareTest',
 
-        implements: [
-          'foam.nanos.auth.CreatedAware',
-          'foam.nanos.auth.CreatedByAware',
-          'foam.nanos.auth.LastModifiedAware',
-          'foam.nanos.auth.LastModifiedByAware'
-        ],
+      implements: [
+        'foam.nanos.auth.CreatedAware',
+        'foam.nanos.auth.CreatedByAware',
+        'foam.nanos.auth.LastModifiedAware',
+        'foam.nanos.auth.LastModifiedByAware'
+      ],
 
-        properties: [
-          {
-            class: 'Long',
-            name: 'id',
-          },
-          {
-            class: 'String',
-            name: 'name',
-          },
-          {
-            class: 'DateTime',
-            name: 'created'
-          },
-          {
-            class: 'Reference',
-            of: 'foam.nanos.auth.User',
-            name: 'createdBy'
-          },
-          {
-            class: 'DateTime',
-            name: 'lastModified'
-          },
-          {
-            class: 'Reference',
-            of: 'foam.nanos.auth.User',
-            name: 'lastModifiedBy'
-          }
-        ]
+      properties: [
+        {
+          class: 'Long',
+          name: 'id',
+        },
+        {
+          class: 'String',
+          name: 'name',
+        },
+        {
+          class: 'DateTime',
+          name: 'created'
+        },
+        {
+          class: 'Reference',
+          of: 'foam.nanos.auth.User',
+          name: 'createdBy'
+        },
+        {
+          class: 'DateTime',
+          name: 'lastModified'
+        },
+        {
+          class: 'Reference',
+          of: 'foam.nanos.auth.User',
+          name: 'lastModifiedBy'
+        }
+      ]
     });
 
     expect( typeof foam.nanos.auth.User ).not.toBeUndefined();
