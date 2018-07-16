@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  flags: ['swift'],
   requires: [
     'foam.swift.SwiftClass',
   ],

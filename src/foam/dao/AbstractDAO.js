@@ -105,9 +105,7 @@ return getOf() == null ? null : (foam.core.PropertyInfo) getOf().getAxiomByName(
           "predicate": predicate,
         ]);
       */},
-      javaCode: `
-return new FilteredDAO(this.getX(), predicate, this);
-      `,
+      javaCode: 'return new FilteredDAO.Builder(getX()).setPredicate(predicate).setDelegate(this).build();'
     },
 
     {
@@ -701,95 +699,6 @@ foam.CLASS({
   name: 'ExternalException',
   implements: ['foam.core.Exception']
 })
-
-
-foam.CLASS({
-  package: 'foam.dao',
-  name: 'FilteredDAO',
-  extends: 'foam.dao.AbstractDAO',
-
-  requires: [
-    'foam.mlang.predicate.And'
-  ],
-
-  properties: [
-    {
-      // TODO: FObjectProperty of Predicate. Doing this currently breaks java.
-      swiftType: 'foam_mlang_predicate_Predicate',
-      name: 'predicate',
-      required: true
-    },
-    {
-      name: 'of',
-      factory: function() {
-        return this.delegate.of;
-      },
-      swiftExpressionArgs: ['delegate$of'],
-      swiftExpression: 'return delegate$of as! ClassInfo',
-    },
-    {
-      class: 'Proxy',
-      of: 'foam.dao.DAO',
-      name: 'delegate',
-      topics: [ 'on' ], // TODO: Remove this when all users of it are updated.
-      forwards: [ 'put_', 'remove_', 'find_', 'select_', 'removeAll_', 'cmd_' ]
-    }
-  ],
-
-  methods: [
-    function find_(x, key) {
-      var predicate = this.predicate;
-      return this.delegate.find_(x, key).then(function(o) {
-        return predicate.f(o) ? o : null;
-      });
-    },
-
-    {
-      name: 'select_',
-      code: function(x, sink, skip, limit, order, predicate) {
-        return this.delegate.select_(
-          x, sink, skip, limit, order,
-          predicate ?
-            this.And.create({ args: [this.predicate, predicate] }) :
-            this.predicate);
-      },
-      swiftCode: function() {/*
-return try delegate.select_(
-  x, sink, skip, limit, order,
-  predicate != nil ?
-    And_create(["args": [self.predicate, predicate!] ]) :
-    self.predicate)
-      */},
-    },
-
-    function removeAll_(x, skip, limit, order, predicate) {
-      return this.delegate.removeAll_(
-        x, skip, limit, order,
-        predicate ?
-          this.And.create({ args: [this.predicate, predicate] }) :
-          this.predicate);
-    },
-
-    {
-      name: 'listen_',
-      code: function listen_(x, sink, predicate) {
-        return this.delegate.listen_(
-          x, sink,
-          predicate ?
-            this.And.create({ args: [this.predicate, predicate] }) :
-            this.predicate);
-      },
-      swiftCode: `
-return try delegate.listen_(
-  x, sink,
-  predicate != nil ?
-    And_create(["args": [self.predicate, predicate]]) :
-    predicate)
-      `,
-    },
-  ]
-});
-
 
 foam.CLASS({
   package: 'foam.dao',

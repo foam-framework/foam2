@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.internal.InterfaceMethod',
+  flags: ['swift'],
   requires: [
     'foam.swift.ProtocolMethod',
   ],
