@@ -68,7 +68,8 @@ public class TraceWebAgent
         out.println("<TR><TD>" + paramName);
         String[] paramValues = req.getParameterValues(paramName);
         String paramValue = "";
-        if ( "password".equals(paramName) ) {
+        if ( "password".equals(paramName) ||
+             "sessionid".equals(paramName.toLowerCase()) ) {
           paramValue = "********";
         } else if ( paramValues.length > 0 ) {
           if ( paramValues.length > 1 ) {
