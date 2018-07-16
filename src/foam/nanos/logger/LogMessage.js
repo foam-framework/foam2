@@ -17,6 +17,10 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     'foam.nanos.auth.LastModifiedByAware'
   ],
 
+  searchColumns: [
+    'severity'
+   ],
+
   properties: [
     {
       class: 'DateTime',
@@ -50,7 +54,9 @@ Implement LastModifiedByAware to suppress 'modified by' comment in journal outpu
     },
     {
       name: 'message',
-      class: 'String'
+      class: 'String',
+      label: 'Log Message',
+      visibility: foam.u2.Visibility.RO      
     },
     // TODO: implement via an additional method on Logger logger.flag(x, y).log(message)
     // {

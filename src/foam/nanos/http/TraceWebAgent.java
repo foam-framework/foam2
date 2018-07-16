@@ -9,9 +9,14 @@ package foam.nanos.http;
 import foam.core.*;
 import foam.nanos.http.HttpParameters;
 import foam.nanos.logger.Logger;
+import foam.lib.json.Outputter;
+import foam.lib.json.OutputterMode;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Enumeration;
+import java.util.Map;
+import java.util.HashMap;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,6 +32,7 @@ public class TraceWebAgent
       PrintWriter        out = x.get(PrintWriter.class);
       HttpServletRequest req = x.get(HttpServletRequest.class);
       HttpParameters     params = x.get(HttpParameters.class);
+      Map                kv  = new HashMap();
 
       out.println("<HTML>\n" +
           "<HEAD><TITLE>trace</TITLE></HEAD>\n" +
@@ -46,7 +52,9 @@ public class TraceWebAgent
       while ( headerNames.hasMoreElements() ) {
         String headerName = (String) headerNames.nextElement();
         out.println("<TR><TD>" + headerName);
-        out.println("    <TD>" + req.getHeader(headerName));
+        String headerValue = req.getHeader(headerName);
+        out.println("    <TD>" + headerValue);
+        kv.put(headerName, headerValue);
       }
       out.println("</TABLE>");
 
@@ -59,11 +67,19 @@ public class TraceWebAgent
         String paramName = (String) paramNames.nextElement();
         out.println("<TR><TD>" + paramName);
         String[] paramValues = req.getParameterValues(paramName);
-        if ( paramValues.length > 1 ) {
-          out.println("    <TD>" + String.join(", ", paramValues));
-        } else {
-          out.println("    <TD>" + paramValues[0]);
+        String paramValue = "";
+        if ( "password".equals(paramName) ||
+             "sessionid".equals(paramName.toLowerCase()) ) {
+          paramValue = "********";
+        } else if ( paramValues.length > 0 ) {
+          if ( paramValues.length > 1 ) {
+            paramValue = String.join(" | ", paramValues);
+          } else {
+            paramValue = paramValues[0];
+          }
         }
+        out.println("    <TD>" + paramValue);
+        kv.put(paramName, paramValue);
       }
       out.println("</TABLE>");
 
@@ -74,12 +90,18 @@ public class TraceWebAgent
 
       // Nanopay parameters
       if ( params != null ) {
-        out.println("<TR><TD>Parameters");
+        out.println("<TR><TD>WebAgent Parameters");
         out.println("    <TD>" + params);
+        kv.put("_WebAgentParameters_", params.toString());
       }
       out.println("</TABLE>");
 
       out.println("</BODY></HTML>");
+
+      StringWriter stringWriter = new StringWriter();
+      Outputter outputter = new Outputter(new PrintWriter(stringWriter), OutputterMode.FULL);
+      outputter.output(kv);
+      logger.info("TraceWebAgent", stringWriter);
 
       try {
         Cookie[] cookies = req.getCookies();

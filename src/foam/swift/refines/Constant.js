@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Constant',
+  flags: ['swift'],
   requires: [
     'foam.swift.Field',
   ],
