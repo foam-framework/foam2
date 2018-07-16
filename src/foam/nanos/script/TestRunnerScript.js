@@ -41,13 +41,11 @@ foam.CLASS({
   properties: [
     {
       name: 'failedTests',
-      class: 'Int',
-      value: 0
+      class: 'Int'
     },
     {
       name: 'passedTests',
-      class: 'Int',
-      value: 0
+      class: 'Int'
     }
   ],
 
@@ -71,10 +69,10 @@ foam.CLASS({
         ArraySink tests = (ArraySink) testDAO.select(new ArraySink());
         List testArray = tests.getArray();
 
-        for(int i = 0; i < testArray.size(); i ++) {
+        for ( int i = 0; i < testArray.size(); i ++ ) {
           Test test = (Test) testArray.get(i);
           test = (Test) test.fclone();
-          if( test.getServer() ) {
+          if ( test.getServer() ) {
             runServerSideTest(x, test);
           } else {
             // TODO: Run client side tests in a headless browser.
@@ -106,8 +104,8 @@ foam.CLASS({
       javaCode: `
         printBold(test.getId());
         try {
-            test.runScript(x);
-            printOutput(test);
+          test.runScript(x);
+          printOutput(test);
         }
         catch ( Exception e ) {
           e.printStackTrace();
@@ -152,7 +150,5 @@ foam.CLASS({
         }
       `
     }
-
   ]
-
 });
