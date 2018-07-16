@@ -84,6 +84,7 @@ return String.valueOf(obj);`
       javaCode:
       `StringBuilder str = sb.get();
 for ( Object n : args ) {
+  str.append(',');
   str.append(formatArg(n));
 }
 return str.toString();`
