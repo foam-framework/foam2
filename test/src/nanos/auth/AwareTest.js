@@ -93,16 +93,21 @@ describe('Created/LastModified Aware tests', function() {
       expect(a.lastModified).not.toBeNull();
       expect(a.id).not.toBeNull();
 
-      return dao.put_(ctx, of.create().copyFrom(a)).then(function(c) {
-        expect(c).not.toBeNull();
-        expect(c.id).toEqual(a.id);
-        expect(c.createdBy).not.toBeNull();
-        expect(c.createdBy).toEqual(a.createdBy);
-        expect(c.created).not.toBeNull();
-        expect(c.created.getTime()).toEqual(a.created.getTime());
-        expect(c.lastModifiedBy).toEqual(a.lastModifiedBy);
-        expect(c.lastModified.getTime()).not.toEqual(a.lastModified.getTime());
-        done();
+      // delay to test last modified
+      setTimeout(function() {
+        return dao.put_(ctx, of.create().copyFrom(a)).then(function(c) {
+          expect(c).not.toBeNull();
+          expect(c.id).toEqual(a.id);
+          expect(c.createdBy).not.toBeNull();
+          expect(c.createdBy).toEqual(a.createdBy);
+          expect(c.created).not.toBeNull();
+          var delta = c.created.getTime() - a.created.getTime();
+          // expect(c.created.getTime()).toEqual(a.created.getTime());
+          expect(delta).toEqual(0);
+          expect(c.lastModifiedBy).toEqual(a.lastModifiedBy);
+          expect(c.lastModified.getTime()).not.toEqual(a.lastModified.getTime());
+          done();
+        }, 1000);
       });
     });
   });
