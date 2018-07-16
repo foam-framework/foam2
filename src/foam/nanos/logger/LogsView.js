@@ -220,7 +220,6 @@ foam.CLASS({
             .start().addClass('button-div')
               .start({class: 'foam.u2.tag.Image', data: 'images/ic-search.svg'}).addClass('searchIcon').end()
               .start(this.FILTER).addClass('filter-search').end()
-              .start(this.EXPORT_BUTTON, { icon: 'images/ic-export.png', showLabel:true }).end()
             .end()
           .end()
           .add(this.FILTERED_LOG_MESSAGE_DAO)
