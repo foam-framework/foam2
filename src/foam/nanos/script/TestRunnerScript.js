@@ -105,6 +105,8 @@ foam.CLASS({
         printBold(test.getId());
         try {
           test.runScript(x);
+          setPassedTests(getPassedTests() + (int) test.getPassed());
+          setFailedTests(getFailedTests() + (int) test.getFailed());
           printOutput(test);
         }
         catch ( Exception e ) {
@@ -136,16 +138,9 @@ foam.CLASS({
         for( String output: outputs ) {
           if ( output.startsWith("SUCCESS") ) {
             System.out.println("\\t" + GREEN_COLOR + " " + CHECK_MARK + " " + output + " " + RESET_COLOR);
-             setPassedTests(getPassedTests() + 1);
           }
           else if ( output.startsWith("FAILURE") ) {
             System.out.println("\\t" + RED_COLOR + " "+ CROSS_MARK + " " + output + " " + RESET_COLOR);
-             setFailedTests(getFailedTests() + 1);
-          }
-          else {
-            if ( ! SafetyUtil.isEmpty(output) ) {
-              System.out.println(output);
-            }
           }
         }
       `
