@@ -191,10 +191,10 @@ foam.CLASS({
     {
       name: 'filteredLogMessageDAO',
       expression: function(data, filter ) {
-        if (filter){
+        if ( filter ) {
           return data.where(this.CONTAINS(this.LogMessage.MESSAGE, filter)).orderBy(this.DESC(this.LogMessage.CREATED));
         }
-        else{
+        else {
           return data.orderBy(this.DESC(this.LogMessage.CREATED));
         }
       },
@@ -211,8 +211,6 @@ foam.CLASS({
   methods: [
     function initE() {
       this.SUPER();
-      var self = this;
-
       this
         .addClass(this.myClass())
         .start()
