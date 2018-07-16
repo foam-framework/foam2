@@ -93,7 +93,6 @@ foam.CLASS({
   ],
 
   javaImports: [
-    'foam.core.AbstractFObjectPropertyInfo',
     'foam.core.FObject',
     'foam.core.PropertyInfo',
     'foam.core.ProxyX',
@@ -123,13 +122,24 @@ foam.CLASS({
       buildJavaClass: function (cls) {
         cls.extras.push(`
           protected Pattern COMMENT = Pattern.compile("(/\\\\*([^*]|[\\\\r\\\\n]|(\\\\*+([^*/]|[\\\\r\\\\n])))*\\\\*+/)|(//.*)");
-          protected Outputter outputter_ = new Outputter(OutputterMode.STORAGE);
         `);
       }
     }
   ],
 
   properties: [
+    {
+      class: 'Object',
+      name: 'outputter',
+      javaType: 'foam.lib.json.Outputter',
+      javaFactory: `return new Outputter(OutputterMode.STORAGE);`
+    },
+    {
+      class: 'Object',
+      name: 'parser',
+      javaType: 'foam.lib.json.JSONParser',
+      javaFactory: `return getX().create(JSONParser.class);`
+    },
     {
       class: 'foam.dao.DAOProperty',
       name: 'dao'
@@ -228,8 +238,8 @@ foam.CLASS({
         PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
         FObject old = getDao().find(id.get(obj));
         String record = ( old != null ) ?
-          outputter_.stringifyDelta(old.fclone(), fobj) :
-          outputter_.stringify(fobj);
+          getOutputter().stringifyDelta(old.fclone(), fobj) :
+          getOutputter().stringify(fobj);
         write_("p(" + record + ")");
       `
     },
@@ -245,7 +255,7 @@ foam.CLASS({
           FObject toWrite = (FObject) fobj.getClassInfo().getObjClass().newInstance();
           PropertyInfo id = (PropertyInfo) fobj.getClassInfo().getAxiomByName("id");
           id.set(toWrite, id.get(obj));
-          write_("r(" + outputter_.stringify(toWrite) + ")");
+          write_("r(" + getOutputter().stringify(toWrite) + ")");
         } catch ( Throwable t ) {
           throw new RuntimeException(t);
         }
@@ -283,7 +293,7 @@ foam.CLASS({
       javaCode: `
         // count number of lines successfully read
         int successReading = 0;
-        JSONParser parser = getX().create(JSONParser.class);
+        JSONParser parser = getParser();
 
         try ( BufferedReader reader = getReader() ) {
           for ( String line ; ( line = reader.readLine() ) != null ; ) {

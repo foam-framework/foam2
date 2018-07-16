@@ -85,6 +85,7 @@ FOAM_FILES([
   { name: "foam/nanos/script/Language" },
   { name: "foam/nanos/script/ScriptStatus" },
   { name: "foam/nanos/script/Script" },
+  { name: "foam/nanos/script/TestRunnerScript" },
   { name: "foam/nanos/test/Test" },
   { name: "foam/nanos/test/TestBorder" },
   { name: "foam/nanos/cron/Cron" },
