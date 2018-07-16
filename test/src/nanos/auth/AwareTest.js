@@ -21,41 +21,41 @@ describe('Created/LastModified Aware tests', function() {
       package: 'foam.nanos.auth',
       name: 'AwareTest',
 
-        implements: [
-          'foam.nanos.auth.CreatedAware',
-          'foam.nanos.auth.CreatedByAware',
-          'foam.nanos.auth.LastModifiedAware',
-          'foam.nanos.auth.LastModifiedByAware'
-        ],
+      implements: [
+        'foam.nanos.auth.CreatedAware',
+        'foam.nanos.auth.CreatedByAware',
+        'foam.nanos.auth.LastModifiedAware',
+        'foam.nanos.auth.LastModifiedByAware'
+      ],
 
-        properties: [
-          {
-            class: 'Long',
-            name: 'id',
-          },
-          {
-            class: 'String',
-            name: 'name',
-          },
-          {
-            class: 'DateTime',
-            name: 'created'
-          },
-          {
-            class: 'Reference',
-            of: 'foam.nanos.auth.User',
-            name: 'createdBy'
-          },
-          {
-            class: 'DateTime',
-            name: 'lastModified'
-          },
-          {
-            class: 'Reference',
-            of: 'foam.nanos.auth.User',
-            name: 'lastModifiedBy'
-          }
-        ]
+      properties: [
+        {
+          class: 'Long',
+          name: 'id',
+        },
+        {
+          class: 'String',
+          name: 'name',
+        },
+        {
+          class: 'DateTime',
+          name: 'created'
+        },
+        {
+          class: 'Reference',
+          of: 'foam.nanos.auth.User',
+          name: 'createdBy'
+        },
+        {
+          class: 'DateTime',
+          name: 'lastModified'
+        },
+        {
+          class: 'Reference',
+          of: 'foam.nanos.auth.User',
+          name: 'lastModifiedBy'
+        }
+      ]
     });
 
     expect( typeof foam.nanos.auth.User ).not.toBeUndefined();
@@ -93,16 +93,21 @@ describe('Created/LastModified Aware tests', function() {
       expect(a.lastModified).not.toBeNull();
       expect(a.id).not.toBeNull();
 
-      return dao.put_(ctx, of.create().copyFrom(a)).then(function(c) {
-        expect(c).not.toBeNull();
-        expect(c.id).toEqual(a.id);
-        expect(c.createdBy).not.toBeNull();
-        expect(c.createdBy).toEqual(a.createdBy);
-        expect(c.created).not.toBeNull();
-        expect(c.created.getTime()).toEqual(a.created.getTime());
-        expect(c.lastModifiedBy).toEqual(a.lastModifiedBy);
-        expect(c.lastModified.getTime()).not.toEqual(a.lastModified.getTime());
-        done();
+      // delay to test last modified
+      setTimeout(function() {
+        return dao.put_(ctx, of.create().copyFrom(a)).then(function(c) {
+          expect(c).not.toBeNull();
+          expect(c.id).toEqual(a.id);
+          expect(c.createdBy).not.toBeNull();
+          expect(c.createdBy).toEqual(a.createdBy);
+          expect(c.created).not.toBeNull();
+          var delta = c.created.getTime() - a.created.getTime();
+          // expect(c.created.getTime()).toEqual(a.created.getTime());
+          expect(delta).toEqual(0);
+          expect(c.lastModifiedBy).toEqual(a.lastModifiedBy);
+          expect(c.lastModified.getTime()).not.toEqual(a.lastModified.getTime());
+          done();
+        }, 1000);
       });
     });
   });
