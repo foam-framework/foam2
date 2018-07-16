@@ -56,7 +56,6 @@ externalFile.blacklist.forEach(function(cls) {
 
   // These have hand written java impls so we don't want to clobber them.
   // TODO: Change gen.sh to prefer hand written java files over generated.
-  'foam.dao.FilteredDAO',
   'foam.dao.LimitedDAO',
   'foam.dao.OrderedDAO',
   'foam.dao.SkipDAO',

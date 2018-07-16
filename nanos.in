@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 DEBUG=n
 SUSPEND=n
 DEBUG_PORT=8000
 
-function usage {
+usage() {
     echo "Usage: nanos [OPTIONS] [NANOS_OPTIONS]"
     echo ""
     echo "Options:"
@@ -40,4 +40,4 @@ fi
 
 shift $(($OPTIND - 1))
 
-java $DEBUG_ARGS -cp @CLASSPATH@$EXTRA_CP foam.nanos.boot.Boot "$@"
+exec java $DEBUG_ARGS -cp @CLASSPATH@$EXTRA_CP foam.nanos.boot.Boot "$@"
