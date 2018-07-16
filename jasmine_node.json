@@ -5,6 +5,7 @@
     "src/**/*.js"
   ],
   "helpers": [
+    "../src/foam/nanos/nanos.js",
     "helpers/**/*.js"
   ]
 }
