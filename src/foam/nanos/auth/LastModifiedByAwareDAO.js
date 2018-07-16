@@ -12,9 +12,11 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code: function(value) {
-        value.lastModifiedBy = x.get('user').id;
-        return this.SUPER(value);
+      code: function(x, obj) {
+        if ( foam.nanos.auth.LastModifiedByAware.isInstance(obj) ) {
+          obj.lastModifiedBy = x.user.id;
+        }
+        return this.SUPER(x, obj);
       },
       javaCode: `
         if ( obj instanceof LastModifiedByAware ) {
