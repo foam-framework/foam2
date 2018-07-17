@@ -1414,6 +1414,34 @@ foam.CLASS({
         args: [ { name: 'x', type: 'foam.core.X' } ],
         body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, get${foam.String.capitalize(this.name)}());`
       });
+    },
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'toJSON',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.json.Outputter'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `
+          if ( value == null ) {
+            outputter.output(value);
+          } else if ( value instanceof ${this.of.id} && value instanceof foam.core.Identifiable ) {
+            outputter.output(((foam.core.Identifiable)value).getPrimaryKey());
+          } else {
+            outputter.output(value);
+          }
+        `
+      });
+      return info;
     }
   ]
 });

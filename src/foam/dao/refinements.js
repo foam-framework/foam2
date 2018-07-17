@@ -16,6 +16,22 @@ foam.CLASS({
       var info = this.SUPER(cls);
       var compare = info.getMethod('compare');
       compare.body = 'return 0;';
+      info.method({
+        name: 'toJSON',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.json.Outputter'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `return;`
+      });
       return info;
     }
   ]
