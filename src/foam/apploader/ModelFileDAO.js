@@ -61,6 +61,11 @@ foam.CLASS({
             context.foam.CLASS(json);
           };
 
+          context.foam.SCRIPT = function(json) {
+            json.class = json.class || 'foam.core.Script';
+            context.foam.CLASS(json);
+          };
+
           context.foam.RELATIONSHIP = function(r) {
             var s = r.sourceModel;
             var si = s.lastIndexOf('.');
@@ -81,12 +86,6 @@ foam.CLASS({
               });
             }
           };
-
-          context.foam.SCRIPT = function(m) {
-            m.class = 'foam.core.Script';
-            json = m;
-          };
-
 
           if ( foam.String.isInstance(text) ) {
             with ( context ) { eval(text); }
