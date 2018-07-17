@@ -23,15 +23,18 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'type'
+      name: 'type',
+      documentation: 'Address type.'
     },
     {
       class: 'Boolean',
-      name: 'verified'
+      name: 'verified',
+      documentation: 'Identifies if address has been verified.'
     },
     {
       class: 'Boolean',
-      name: 'deleted'
+      name: 'deleted',
+      documentation: 'Marks address as deleted.'
     },
     {
       class: 'Boolean',
@@ -71,6 +74,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'suite',
+      documentation: 'Suite pertaining to address.',
       width: 16,
       validateObj: function (suite) {
         var suiteRegex = /^[a-zA-Z0-9 ]{1,70}$/;
@@ -83,6 +87,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'city',
+      documentation: 'City pertaining to address.',
       required: true,
       validateObj: function (city) {
         var cityRegex = /^[a-zA-Z ]{1,35}$/;
@@ -95,6 +100,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'postalCode',
+      documentation: 'Postal code pertaining to address.',
       required: true,
       validateObj: function (postalCode) {
         var postalCodeRegex = /^[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d$/i;
@@ -113,13 +119,15 @@ foam.CLASS({
       class: 'Reference',
       targetDAOKey: 'countryDAO',
       name: 'countryId',
-      of: 'foam.nanos.auth.Country'
+      of: 'foam.nanos.auth.Country',
+      documentation: 'Country address.'
     },
     {
       class: 'Reference',
       targetDAOKey: 'regionDAO',
       name: 'regionId',
       of: 'foam.nanos.auth.Region',
+      documentation: 'Region address.',
       view: function (_, X) {
         var choices = X.data.slot(function (countryId) {
           return X.regionDAO.where(X.data.EQ(X.data.Region.COUNTRY_ID, countryId || ""));
@@ -134,15 +142,18 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'encrypted'
+      name: 'encrypted',
+      documentation: 'Determines if address should be or is encrypted.'
     },
     {
       class: 'Double',
-      name: 'latitude'
+      name: 'latitude',
+      documentation: 'Latitude of address location.'
     },
     {
       class: 'Double',
-      name: 'longitude'
+      name: 'longitude',
+      documentation: 'Longitude of address location.'
     },
     {
       class: 'String',
