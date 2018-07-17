@@ -516,4 +516,5 @@ FOAM_FILES([
   { name: "foam/crypto/hash/Hashable" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
+  { name: "foam/dao/CountryDAOTest" },
 ]);
