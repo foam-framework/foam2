@@ -1335,10 +1335,63 @@ foam.CLASS({
 foam.CLASS({
   refines: 'foam.core.Reference',
   properties: [
-    ['javaType', 'Object'],
-    ['javaJSONParser', 'foam.lib.json.AnyParser.instance()'],
-    ['javaQueryParser', 'foam.lib.query.AnyParser.instance()'],
-    ['javaInfoType', 'foam.core.AbstractObjectPropertyInfo']
+    {
+      name: 'javaType',
+      factory: function() {
+        // TODO: instead of creating reference properties as Object type, match
+        // the primary key of the target class/model
+        /*
+        var idProp = this.of.ID.cls_ == foam.core.IDAlias ? this.of.ID.targetProperty : this.of.ID;
+        console.log('******************************************************', this.of.id, idProp.javaType);
+        */
+
+        return 'Object';
+      }
+    },
+    [ 'javaJSONParser',  'foam.lib.json.AnyParser.instance()' ],
+    [ 'javaQueryParser', 'foam.lib.query.AnyParser.instance()' ],
+    [ 'javaInfoType',    'foam.core.AbstractObjectPropertyInfo' ]
+  ],
+
+  methods: [
+    function buildJavaClass(cls) {
+      this.SUPER(cls);
+      cls.method({
+        name: `find${foam.String.capitalize(this.name)}`,
+        visibility: 'public',
+        type: this.of.id,
+        args: [ { name: 'x', type: 'foam.core.X' } ],
+        body: `return (${this.of.id})((foam.dao.DAO) x.get("${this.targetDAOKey}")).find_(x, get${foam.String.capitalize(this.name)}());`
+      });
+    },
+    function createJavaPropertyInfo_(cls) {
+      var info = this.SUPER(cls);
+      info.method({
+        name: 'toJSON',
+        visibility: 'public',
+        type: 'void',
+        args: [
+          {
+            name: 'outputter',
+            type: 'foam.lib.json.Outputter'
+          },
+          {
+            name: 'value',
+            type: 'Object'
+          }
+        ],
+        body: `
+          if ( value == null ) {
+            outputter.output(value);
+          } else if ( value instanceof ${this.of.id} && value instanceof foam.core.Identifiable ) {
+            outputter.output(((foam.core.Identifiable)value).getPrimaryKey());
+          } else {
+            outputter.output(value);
+          }
+        `
+      });
+      return info;
+    }
   ]
 });
 
