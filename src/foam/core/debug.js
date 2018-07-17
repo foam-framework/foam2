@@ -141,7 +141,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.core.DebugScript',
+  package: 'foam.core',
+  name: 'DebugScript',
   flags: ['debug'],
   code: function() {
 foam.assert(
@@ -309,7 +310,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.core.DebugDescribeScript',
+  package: 'foam.core',
+  name: 'DebugDescribeScript',
   flags: ['debug'],
   code: function() {
 /* Add describe support to contexts. */
@@ -364,7 +366,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.core.DebugContextScript',
+  package: 'foam.core',
+  name: 'DebugContextScript',
   flags: ['debug'],
   code: function() {
 foam.__context__ = foam.debug.Window.create(null, foam.__context__).__subContext__;
@@ -451,7 +454,8 @@ foam.LIB({
 });
 
 foam.SCRIPT({
-  id: 'foam.core.DebugArgumentScript',
+  package: 'foam.core',
+  name: 'DebugArgumentScript',
   flags: ['debug'],
   code: function() {
 // Access Argument now to avoid circular reference because of lazy model building.
@@ -484,7 +488,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.core.DebugUpgradeLibScript',
+  package: 'foam.core',
+  name: 'DebugUpgradeLibScript',
   code: function() {
 // Upgrade a LIBs
 var upgradeLib = function upgradeLib(lib) {
