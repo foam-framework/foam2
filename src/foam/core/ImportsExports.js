@@ -91,6 +91,7 @@ foam.CLASS({
       name: 'name'
     },
     'key',
+    'of',
     {
       class: 'Boolean',
       name: 'required',

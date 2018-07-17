@@ -144,7 +144,13 @@ public class Outputter
     //   remove commas:   , ->
     //   quote strings:   Acme, Inc. -> "Acme, Inc."
 
-    return s.replace("\n","\\n").replace("\"", "\\\"");
+    s = s.replace("\n","\\n").replace("\"", "\\\"");
+
+    // quote strings:   Acme, Inc. -> "Acme, Inc."
+    if ( s.contains(",") )
+      return "\"" + s + "\"";
+    else
+      return s;
   }
 
   protected void outputString(String s) {

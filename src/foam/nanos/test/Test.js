@@ -3,6 +3,7 @@
  * Copyright 2017 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
+
 foam.CLASS({
   package: 'foam.nanos.test',
   name: 'Test',
@@ -24,6 +25,13 @@ foam.CLASS({
   ],
 
   searchColumns: [ ],
+
+  documentation: `
+    A scriptable Unit Test.
+    Tests can be run on either the server in BeanShell or on the client in Javascript.
+    Call test(boolean exp, String message) for each test, where 'exp' evaluates to
+    true if the test passed and false if it failed.
+  `,
 
   properties: [
     {

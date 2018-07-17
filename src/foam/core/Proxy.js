@@ -260,14 +260,14 @@ if (oldValue as? Bool ?? false) != newValue {
     },
     {
       name: 'parent',
-      swiftType: 'EventProxy?',
+      swiftType: 'foam_core_EventProxy?',
     },
     {
       name: 'children',
       factory: function() {
         return {};
       },
-      swiftType: '[String:EventProxy]',
+      swiftType: '[String:foam_core_EventProxy]',
       swiftFactory: 'return [:]',
     },
     {
@@ -341,7 +341,7 @@ if let src = src as? Topic {
       args: [
         {
           name: 'c',
-          swiftType: 'EventProxy',
+          of: 'foam.core.EventProxy',
         },
       ],
       code: function removeChild(c) {
@@ -370,7 +370,7 @@ for (key, child) in children {
           swiftType: 'String',
         },
       ],
-      swiftReturns: 'EventProxy',
+      swiftReturns: 'foam_core_EventProxy',
       code: function getChild(key) {
         if ( ! this.children[key] ) {
           this.children[key] = this.cls_.create({
@@ -384,7 +384,7 @@ for (key, child) in children {
       },
       swiftCode: `
 if children[key] == nil {
-  children[key] = __context__.create(EventProxy.self, args: [
+  children[key] = __context__.create(foam_core_EventProxy.self, args: [
     "parent": self,
     "dest": dest,
     "src": src,

@@ -58,8 +58,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found: " + session.getUserId());
     }
 
+    // check if user enabled
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
     }
 
     return user;
@@ -97,8 +104,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found.");
     }
 
+    // check if user enabled
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
@@ -126,8 +140,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    // check if user enabled
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
     }
 
     if ( ! Password.verify(password, user.getPassword()) ) {
@@ -155,6 +176,7 @@ public class UserAndGroupAuthService
       return false;
     }
 
+    // check if user exists and is enabled
     User user = (User) userDAO_.find(session.getUserId());
     if ( user == null || ! user.getEnabled() ) {
       return false;
@@ -166,9 +188,22 @@ public class UserAndGroupAuthService
       while ( ! SafetyUtil.isEmpty(groupId) ) {
         Group group = (Group) groupDAO_.find(groupId);
 
-        if ( group == null ) break;
+        // if group is null break
+        if ( group == null ) {
+          break;
+        }
 
-        if ( group.implies(permission) ) return true;
+        // check if group is enabled
+        if ( ! group.getEnabled() ) {
+          return false;
+        }
+
+        // check permission
+        if ( group.implies(permission) ) {
+          return true;
+        }
+
+        // check parent group
         groupId = group.getParent();
       }
     } catch (Throwable t) {
@@ -200,8 +235,15 @@ public class UserAndGroupAuthService
       throw new AuthenticationException("User not found");
     }
 
+    // check if user enabled
     if ( ! user.getEnabled() ) {
       throw new AuthenticationException("User disabled");
+    }
+
+    // check if user group enabled
+    Group group = (Group) groupDAO_.inX(x).find(user.getGroup());
+    if ( group != null && ! group.getEnabled() ) {
+      throw new AuthenticationException("User group disabled");
     }
 
     int length = newPassword.length();
@@ -236,6 +278,8 @@ public class UserAndGroupAuthService
     user.setPasswordLastModified(Calendar.getInstance().getTime());
     user.setPreviousPassword(user.getPassword());
     user.setPassword(Password.hash(newPassword));
+    // TODO: modify line to allow actual setting of password expiry in cases where users are required to periodically update their passwords
+    user.setPasswordExpiry(null);
     user = (User) userDAO_.put(user);
     session.setContext(session.getContext().put("user", user));
     return user;

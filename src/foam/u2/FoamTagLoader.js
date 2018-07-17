@@ -11,7 +11,7 @@ foam.CLASS({
 
   documentation: 'Converts <foam> tags in document into Views.',
 
-  imports: [ 'document', 'window', 'classloader' ],
+  imports: [ 'classloader', 'document', 'window' ],
 
   methods: [
     function init() {
@@ -80,13 +80,10 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   id: 'foam.u2.FoamTagLoaderScript',
-  requires: [
-    'foam.u2.FoamTagLoader',
-  ],
-  flags: ['web'],
-  code: function() {
-    foam.u2.FoamTagLoader.create();
-  },
+  requires: [ 'foam.u2.FoamTagLoader' ],
+  flags: [ 'web' ],
+  code: function() { foam.u2.FoamTagLoader.create(); }
 });

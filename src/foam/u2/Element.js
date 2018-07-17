@@ -240,6 +240,7 @@ foam.CLASS({
 
   methods: [
     function output(out) {
+      console.error('Outputting unloaded element can cause event/binding bugs.', this.cls_.id);
       this.state = this.OUTPUT;
       this.output_(out);
       return out;
@@ -265,7 +266,9 @@ foam.CLASS({
   methods: [
     function output(out) {
       this.initE();
-      return this.SUPER(out);
+      this.state = this.OUTPUT;
+      this.output_(out);
+      return out;
     },
     function toString() { return 'INITIAL'; }
   ]
@@ -452,17 +455,19 @@ foam.CLASS({
   ]
 });
 
-
+// ???: What does this do?
 foam.CLASS({
   package: 'foam.u2',
   name: 'RenderSink',
   implements: [ 'foam.dao.Sink' ],
+
   axioms: [
     {
       class: 'foam.box.Remote',
       clientClass: 'foam.dao.ClientSink'
     }
   ],
+
   properties: [
     {
       class: 'Function',
@@ -478,17 +483,21 @@ foam.CLASS({
       name: 'batch'
     }
   ],
+
   methods: [
     function put(obj, s) {
       this.reset();
     },
+
     function remove(obj, s) {
       this.reset();
     },
+
     function reset() {
       this.paint();
     }
   ],
+
   listeners: [
     {
       name: 'paint',
@@ -510,6 +519,7 @@ foam.CLASS({
     }
   ]
 });
+
 
 foam.CLASS({
   package: 'foam.u2',
@@ -550,7 +560,6 @@ foam.CLASS({
 
   requires: [
     'foam.u2.AttrSlot',
-    'foam.u2.DefaultValidator',
     'foam.u2.Entity',
     'foam.u2.ViewSpec'
   ],
@@ -586,6 +595,7 @@ foam.CLASS({
 
     {
       name: 'DEFAULT_VALIDATOR',
+      of: 'foam.u2.DefaultValidator',
       factory: function() { return foam.u2.DefaultValidator.create(); }
     },
 
@@ -597,6 +607,7 @@ foam.CLASS({
         to try and mutate the Element while in the OUTPUT state.
       `,
       name: 'OUTPUT',
+      of: 'foam.u2.OutputElementState',
       factory: function() { return foam.u2.OutputElementState.create(); }
     },
 
@@ -606,6 +617,7 @@ foam.CLASS({
         A Loaded Element should be visible in the DOM.
       `,
       name: 'LOADED',
+      of: 'foam.u2.LoadedElementState',
       factory: function() { return foam.u2.LoadedElementState.create(); }
     },
 
@@ -615,6 +627,7 @@ foam.CLASS({
         An unloaded Element can be readded to the DOM.
       `,
       name: 'UNLOADED',
+      of: 'foam.u2.UnloadedElementState',
       factory: function() { return foam.u2.UnloadedElementState.create(); }
     },
 
@@ -623,6 +636,7 @@ foam.CLASS({
         Initial state of an Element before it has been added to the DOM.
       `,
       name: 'INITIAL',
+      of: 'foam.u2.InitialElementState',
       factory: function() { return foam.u2.InitialElementState.create(); }
     },
 
@@ -1962,6 +1976,7 @@ foam.CLASS({
   ]
 });
 
+
 foam.SCRIPT({
   id: 'foam.u2.U2ContextScript',
   requires: [
@@ -1972,6 +1987,7 @@ foam.SCRIPT({
     foam.__context__ = foam.u2.U2Context.create().__subContext__;
   }
 });
+
 
 foam.CLASS({
   refines: 'foam.core.FObject',

@@ -34,6 +34,7 @@ foam.CLASS({
 
   properties: [
     'name',
+    'of',
     {
       name: 'value',
       expression: function(factory) {

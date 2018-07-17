@@ -67,9 +67,9 @@ foam.CLASS({
       outline: none;
     }
     ^ .uploadDescContainer{
-      position: absolute;
-      left: 132px;
-      bottom: 9px;
+      position: relative;
+      left: 26%;
+      bottom: 24%;
     }
     ^ .uploadDescription {
       margin-top: 9px;
@@ -88,17 +88,15 @@ foam.CLASS({
     ^ .box-for-drag-drop {
       border: dashed 4px #edf0f5;
       background:white;
-      height: 110px;
+      height: 100px;
       padding: 10px 10px;
-      position: relative;
     }
 
     ^ .boxless-for-drag-drop {
       border: solid 4px white;
       background:white;
-      height: 110px;
+      height: 100px;
       padding: 10px 10px;
-      position: relative;
     }
   `,
 
@@ -124,7 +122,7 @@ foam.CLASS({
     { name: 'UploadImageLabel', message: 'Choose File' },
     { name: 'RemoveImageLabel', message: 'Remove File' },
     { name: 'UploadDesc', message: 'Or drag and drop an image here' },
-    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommanded' },
+    { name: 'UploadRestrict', message: '* jpg, jpeg, or png only, 2MB maximum, 100*100 72dpi recommended' },
     { name: 'FileError', message: 'File required' },
     { name: 'FileTypeError', message: 'Wrong file format' },
     { name: 'ErrorMessage', message: 'Please upload an image less than 2MB' }

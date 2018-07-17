@@ -1,6 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +22,7 @@ foam.CLASS({
   extends: 'foam.dao.ProxyDAO',
 
   documentation: function() {/*
-    ContextualizingDAO recreates objects returned by find(), giving them
+    ContextualizingDAO recreates objects returned by find()/put(), giving them
     access to the exports that this ContextualizingDAO has access to.
     <p>
     If using a foam.dao.EasyDAO, set contextualize:true to automatically
@@ -35,13 +36,35 @@ foam.CLASS({
       code: function(x, id) {
         var self = this;
         return self.delegate.find_(x, id).then(function(obj) {
-          if ( obj ) return obj.clone(self);
-          return null;
+          return self.maybeContextualize_(x, obj);
         });
       },
-      javaCode: `foam.core.FObject ret = super.find_(x, id);
-if ( ret != null ) ret.setX(x);
-return ret;`
+      javaCode: 'return maybeContextualize_(x, super.find_(x, id));'
+    },
+    {
+      name: 'put_',
+      code: function(x, o) {
+        var self = this;
+        return self.delegate.put_(x, o).then(function(o) {
+          return self.maybeContextualize_(x, o);
+        });
+      },
+      javaCode: 'return maybeContextualize_(x, super.put_(x, obj));'
+    },
+    {
+      name: 'maybeContextualize_',
+      returns: 'foam.core.FObject',
+      javaReturns: 'foam.core.FObject',
+      args: [ { name: 'x', of: 'foam.core.X' },
+              { name: 'obj', of: 'foam.core.FObject' } ],
+      code: function(x, obj) {
+        return obj && obj.clone(this);
+      },
+      javaCode: `if ( obj != null ) {
+  obj = obj.fclone();
+  obj.setX(x);
+}
+return obj;`
     }
   ]
 });

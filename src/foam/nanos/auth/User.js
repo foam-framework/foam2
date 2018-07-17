@@ -9,9 +9,9 @@ foam.CLASS({
   name: 'User',
 
   implements: [
+    'foam.nanos.auth.CreatedAware',
     'foam.nanos.auth.EnabledAware',
-    'foam.nanos.auth.LastModifiedAware',
-    'foam.nanos.auth.LastModifiedByAware'
+    'foam.nanos.auth.LastModifiedAware'
   ],
 
   requires: [
@@ -33,7 +33,6 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'id',
-      max: 999,
       tableWidth: 45
     },
     {
@@ -92,7 +91,12 @@ foam.CLASS({
       transient: true,
       expression: function ( firstName, middleName, lastName ) {
         return middleName != '' ? firstName + ' ' + middleName + ' ' + lastName : firstName + ' ' + lastName;
-      }
+      },
+      javaGetter: `
+        return ! getMiddleName().equals("")
+          ? getFirstName() + " " + getMiddleName() + " " + getLastName()
+          : getFirstName() + " " + getLastName();
+      `,
     },
     {
       class: 'String',
@@ -182,12 +186,6 @@ foam.CLASS({
       name: 'address',
       factory: function () { return this.Address.create(); },
       view: { class: 'foam.nanos.auth.AddressDetailView' }
-    },
-    {
-      class: 'FObjectArray',
-      of: 'foam.core.FObject',
-      name: 'accounts',
-      hidden: true
     },
     {
       class: 'Reference',
@@ -289,6 +287,11 @@ foam.CLASS({
           return 'Invalid website';
         }
       }
+    },
+    {
+      class: 'Date',
+      name: 'created',
+      documentation: 'Creation date'
     },
     {
       class: 'Date',

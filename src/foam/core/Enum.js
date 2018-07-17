@@ -190,6 +190,10 @@ foam.CLASS({
   name: 'EnumModel',
   extends: 'Model',
 
+  requires: [
+    'foam.core.internal.EnumValueAxiom',
+  ],
+
   documentation: 'Model for defining Enum(erations).',
 
   properties: [
@@ -209,14 +213,16 @@ foam.CLASS({
             def = { label: def, name: foam.String.constantize(def) };
           }
 
+          def = this.EnumValueAxiom.isInstance(def) ? def :
+            def.class ? this.lookup(def.class).create(def) :
+            this.EnumValueAxiom.create({definition: def});
+
+          v[i] = def;
+
           if ( def.ordinal || def.ordinal === 0 ) {
             next = def.ordinal + 1;
           } else {
             def.ordinal = next++;
-          }
-
-          if ( ! foam.core.internal.EnumValueAxiom.isInstance(def) ) {
-            v[i] = def = foam.core.internal.EnumValueAxiom.create({definition: def});
           }
 
           if ( used[def.ordinal] ) {
@@ -268,9 +274,7 @@ foam.CLASS({
     {
       class: 'String',
       name: 'documentation',
-      adapt: function(_, d) {
-        return typeof d === 'function' ? foam.String.multiline(d).trim() : d;
-      }
+      transient: true,
     },
     {
       class: 'Int',
@@ -285,12 +289,14 @@ foam.CLASS({
     {
       class: 'String',
       name: 'name',
+      transient: true,
       final: true
     },
     {
       class: 'String',
       name: 'label',
       final: true,
+      transient: true,
       factory: function() {
         return this.name;
       }
