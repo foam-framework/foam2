@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Property',
+  flags: ['swift'],
   requires: [
     'foam.swift.Argument',
     'foam.swift.Field',
@@ -489,6 +490,7 @@ return PInfo(classInfo())
 
 foam.CLASS({
   refines: 'foam.core.FObjectProperty',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -502,6 +504,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Class',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -512,6 +515,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.List',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -526,6 +530,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Boolean',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -533,15 +538,14 @@ foam.CLASS({
     },
     {
       name: 'swiftValue',
-      expression: function(value) {
-        return '' + value;
-      },
+      expression: function(value) { return foam.swift.stringify(value) },
     },
   ],
 });
 
 foam.CLASS({
   refines: 'foam.core.Map',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -556,6 +560,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.StringArray',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -636,6 +641,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.DateTime',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -664,6 +670,7 @@ return Date()
 
 foam.CLASS({
   refines: 'foam.core.Enum',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',

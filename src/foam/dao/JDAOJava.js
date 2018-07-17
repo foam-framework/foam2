@@ -96,24 +96,22 @@ foam.CLASS({
       name: 'put_',
       synchronized: true,
       javaCode: `
-        FObject result = getDelegate().put_(x, obj);
-        if ( ! ( result instanceof LastModifiedByAware ) || ((LastModifiedByAware) result).getLastModifiedBy() == null ) {
+        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
-        journal_.put(result, null);
-        return result;
+        journal_.put(obj, null);
+        return super.put_(x, obj);
       `
     },
     {
       name: 'remove_',
       synchronized: true,
       javaCode: `
-        FObject result = getDelegate().remove_(x, obj);
-        if ( ! ( result instanceof LastModifiedByAware ) || ((LastModifiedByAware) result).getLastModifiedBy() == null ) {
+        if ( ! ( obj instanceof LastModifiedByAware ) || ((LastModifiedByAware) obj).getLastModifiedBy() == null ) {
           writeComment((foam.nanos.auth.User) x.get("user"));
         }
-        journal_.remove(result, null);
-        return result;
+        journal_.remove(obj, null);
+        return super.remove_(x, obj);
       `
     },
     {

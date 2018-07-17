@@ -23,18 +23,18 @@ public class HttpParametersWebAgent
   public static final int BUFFER_SIZE = 4096;
 
   protected static ThreadLocal<StringBuilder> sb = new ThreadLocal<StringBuilder>() {
-      @Override
-      protected StringBuilder initialValue() {
-        return new StringBuilder();
-      }
+    @Override
+    protected StringBuilder initialValue() {
+      return new StringBuilder();
+    }
 
-      @Override
-      public StringBuilder get() {
-        StringBuilder b = super.get();
-        b.setLength(0);
-        return b;
-      }
-    };
+    @Override
+    public StringBuilder get() {
+      StringBuilder b = super.get();
+      b.setLength(0);
+      return b;
+    }
+  };
 
   protected Class parametersClass = DefaultHttpParameters.class;
 
@@ -42,6 +42,7 @@ public class HttpParametersWebAgent
   public HttpParametersWebAgent(WebAgent delegate) {
     setDelegate(delegate);
   }
+
   public HttpParametersWebAgent(String parametersClassName, WebAgent delegate) {
     setParametersClass(parametersClassName);
     setDelegate(delegate);
@@ -56,9 +57,9 @@ public class HttpParametersWebAgent
   }
 
   public void execute(X x) {
-    Logger              logger     = (Logger) x.get("logger");
-    HttpServletRequest  req        = x.get(HttpServletRequest.class);
-    HttpServletResponse resp       = x.get(HttpServletResponse.class);
+    Logger              logger = (Logger) x.get("logger");
+    HttpServletRequest  req    = x.get(HttpServletRequest.class);
+    HttpServletResponse resp   = x.get(HttpServletResponse.class);
 
     logger = new PrefixLogger(new Object[] { this.getClass().getSimpleName() }, logger);
 
@@ -67,12 +68,12 @@ public class HttpParametersWebAgent
       return;
     }
 
-    String              methodName  = req.getMethod();
-    String              accept      = req.getHeader("Accept");
-    String              contentType = req.getHeader("Content-Type");
-    HttpParameters      parameters  = null;
-    Class               parametersClass = null;
-    Command             command     = Command.select;
+    String         methodName      = req.getMethod();
+    String         accept          = req.getHeader("Accept");
+    String         contentType     = req.getHeader("Content-Type");
+    HttpParameters parameters      = null;
+    Class          parametersClass = null;
+    Command        command         = Command.select;
 
     try {
       parameters = (HttpParameters) x.create(this.parametersClass);
@@ -81,7 +82,7 @@ public class HttpParametersWebAgent
     }
 
     // Capture 'data' on all requests
-    if ( !SafetyUtil.isEmpty(req.getParameter("data")) ) {
+    if ( ! SafetyUtil.isEmpty(req.getParameter("data")) ) {
       logger.debug("data", req.getParameter("data"));
       parameters.set("data", req.getParameter("data"));
     } else {
@@ -95,12 +96,12 @@ public class HttpParametersWebAgent
       //
       try {
 
-        int read = 0;
-        int count = 0;
+        int read   = 0;
+        int count  = 0;
         int length = req.getContentLength();
 
-        BufferedReader reader = req.getReader();
-        StringBuilder builder = sb.get();
+        BufferedReader reader  = req.getReader();
+        StringBuilder  builder = sb.get();
         char[] cbuffer = new char[BUFFER_SIZE];
         while ( ( read = reader.read(cbuffer, 0, BUFFER_SIZE)) != -1 && count < length ) {
           builder.append(cbuffer, 0, read);
