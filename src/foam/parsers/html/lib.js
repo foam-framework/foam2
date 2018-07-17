@@ -16,7 +16,8 @@
  */
 
 foam.SCRIPT({
-  id: 'foam.parser.html.LibScript',
+  package: 'foam.parser.html',
+  name: 'LibScript',
   code: function() {
   // By decree of:
   // http://xahlee.info/js/html5_non-closing_tag.html
