@@ -128,7 +128,7 @@ public class HttpParametersWebAgent
     }
 
     if ( ! "application/x-www-form-urlencoded".equals(contentType) ) {
-      switch ( cmd.toUpperCase() ) {
+      switch ( methodName.toUpperCase() ) {
       case "POST":
         command = Command.put;
         break;
@@ -138,11 +138,30 @@ public class HttpParametersWebAgent
       case "DELETE":
         command = Command.remove;
         break;
-      case "HELP":
-        command = Command.help;
-        resp.setContentType("text/html");
-        break;
-        // defauts to SELECT
+//      case "HELP":
+//        command = Command.help;
+//        resp.setContentType("text/html");
+//        break;
+      case "GET":
+        if ( ! SafetyUtil.isEmpty(cmd) ) {
+          switch ( cmd.toLowerCase() ) {
+            case "put":
+              command = Command.put;
+              break;
+            case "remove":
+              command = Command.remove;
+              break;
+            case "help":
+              command = Command.help;
+              resp.setContentType("text/html");
+              break;
+            // defaults to SELECT
+          }
+        } else {
+          logger.warning("cmd/method could not be determined, defaulting to SELECT.");
+        }
+       break;
+       // defauts to SELECT
       }
     } else {
       cmd = req.getParameter("cmd");
@@ -170,7 +189,7 @@ public class HttpParametersWebAgent
 
     Format format = Format.JSON;
     resp.setContentType("text/html");
-    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) && command !=  ) {
+    if ( req.getParameter("format") != null && ! "".equals(req.getParameter("format").trim()) && command != Command.help ) {
       String f = req.getParameter("format");
       switch ( f.toUpperCase() ) {
         case "XML":
@@ -201,7 +220,7 @@ public class HttpParametersWebAgent
       logger.debug("accept", accept);
       String[] formats = accept.split(";");
       int i;
-      for ( i=0 ; i < formats.length; i++ ) {
+      for ( i = 0 ; i < formats.length; i++ ) {
         String f = formats[i].trim();
 
         if ( f.contains("application/json") ) {
