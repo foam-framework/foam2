@@ -27,7 +27,7 @@ return Seq1_create(["index": 3, "parsers": [
   Literal_create(["string": "["]),
   Whitespace_create(),
   Repeat_create([
-    "delegate": __context__.create(AnyParser.self)!,
+    "delegate": __context__.create(foam_swift_parse_json_AnyParser.self)!,
     "delim": Seq0_create(["parsers": [
       Whitespace_create(),
       Literal_create(["string": ","]),

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
+
 foam.CLASS({
   package: 'foam.apploader',
   name: 'ModelFileDAO',
@@ -52,6 +58,11 @@ foam.CLASS({
 
           context.foam.ENUM = function(json) {
             json.class = json.class || 'foam.core.EnumModel';
+            context.foam.CLASS(json);
+          };
+
+          context.foam.SCRIPT = function(json) {
+            json.class = json.class || 'foam.core.Script';
             context.foam.CLASS(json);
           };
 

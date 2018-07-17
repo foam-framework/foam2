@@ -28,6 +28,18 @@ foam.CLASS({
       hidden: true,
       transient: true,
       getter: function() {
+        if ( this.refines && ! this.name ) {
+          // No ID for the refinement so give it one. These names should be
+          // consistent regardless of how this is being run (e.g. node, web,
+          // debug, etc) so the first axiom name is used.
+          var n = new RegExp('(.*)\\.(.*)?$').exec(this.refines)
+          var p = n ? n[1] : 'foam.core';
+          n = (n ? n[2] : this.refines) + 'Refines';
+          if ( this.axioms_.length ) {
+            n = n + this.axioms_[0].name;
+          }
+          return p + '.' + n;
+        }
         return this.package ? this.package + '.' + this.name : this.name;
       }
     },
@@ -36,7 +48,10 @@ foam.CLASS({
     'name',
     {
       name: 'flags',
-      factory: function() { return {}; }
+      documentation: `
+        When set, marks the model with the given flags. This can be used for
+        things like stripping out platform specific models when building.
+      `,
     },
     {
       name: 'label',

@@ -49,7 +49,7 @@ foam.CLASS({
       factory: function() {
         return this.Eq.create({ arg1: this.targetProperty, arg2: this.sourceId });
       },
-      javaFactory: 'throw new RuntimeException("TODO");'
+      javaFactory: 'return foam.mlang.MLang.EQ(getTargetProperty(), getSourceId());'
     },
     {
       name: 'delegate',

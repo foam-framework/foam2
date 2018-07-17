@@ -12,10 +12,14 @@ foam.CLASS({
 
   requires: [
     'foam.nanos.script.ScriptStatus',
-    'foam.nanos.notification.Notification'
+    'foam.nanos.notification.notifications.ScriptRunNotification'
   ],
 
-  imports: [ 'notificationDAO', 'user', 'scriptDAO' ],
+  imports: [
+    'notificationDAO',
+    'scriptDAO',
+    'user'
+  ],
 
   javaImports: [
     'bsh.EvalError',
@@ -34,7 +38,7 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'server', 'description', 'lastDuration', 'status', 'run'
+    'id', 'server', 'description', 'lastDuration', 'status', 'run'
   ],
 
   searchColumns: [],
@@ -46,7 +50,11 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'enabled'
+      name: 'enabled',
+      tableCellFormatter: function(value) {
+        this.start().style({color: value ? 'green' : 'gray'}).add(value ? 'Y' : 'N').end();
+      },
+      value: true
     },
     {
       class: 'String',
@@ -168,8 +176,9 @@ foam.CLASS({
                 clearInterval(interval);
 
                 // create notification
-                var notification = self.Notification.create({
+                var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
+                  scriptId: script.id,
                   notificationType: "Script Execution",
                   body: `Status: ${script.status}
                         Script Output: ${script.output}

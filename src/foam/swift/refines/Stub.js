@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.StubMethod',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
@@ -34,7 +35,7 @@ try? <%=this.boxPropName%>.send(msg)
 replyBox.detach()
 msg.detach()
 
-let o = try replyBox.future.get()
+let o = try replyBox.promise.get()
 if let o = o as? Error {
   throw o
 }
@@ -57,6 +58,7 @@ throw FoamError(o ?? "Failed to cast response to <%=this.swiftName%> as <%=this.
 
 foam.CLASS({
   refines: 'foam.core.StubNotification',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
@@ -84,10 +86,11 @@ try? delegate.send(msg)
 
 foam.CLASS({
   refines: 'foam.core.Stub',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
-      value: 'Box',
+      factory: function() { return foam.box.Box.model_.swiftName },
     }
   ]
 });

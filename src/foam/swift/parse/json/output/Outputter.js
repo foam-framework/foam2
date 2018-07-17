@@ -29,7 +29,7 @@ foam.CLASS({
           name: 'out',
         },
         {
-          swiftType: 'FObject',
+          of: 'FObject',
           name: 'o',
         },
         {
@@ -257,23 +257,6 @@ out.append("}");
       */},
     },
     {
-      name: 'outputEnum',
-      args: [
-        {
-          swiftAnnotations: ['inout'],
-          swiftType: 'String',
-          name: 'out',
-        },
-        {
-          swiftType: 'FOAM_enum',
-          name: 'data',
-        },
-      ],
-      swiftCode: function() {/*
-outputNumber(&out, data.ordinal as NSNumber)
-      */},
-    },
-    {
       name: 'outputFObject',
       args: [
         {
@@ -282,7 +265,7 @@ outputNumber(&out, data.ordinal as NSNumber)
           name: 'out',
         },
         {
-          swiftType: 'FObject',
+          of: 'FObject',
           name: 'data',
         },
       ],
@@ -312,7 +295,7 @@ out.append("}");
       name: 'swiftStringify',
       args: [
         {
-          swiftType: 'FObject',
+          of: 'FObject',
           name: 'data',
         },
       ],

@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.Import',
+  flags: ['swift'],
   requires: [
     'foam.swift.Field',
   ],
@@ -18,7 +19,10 @@ foam.CLASS({
     {
       class: 'String',
       name: 'swiftType',
-      value: 'Any?',
+      expression: function(of) {
+        of = foam.String.isInstance(of) ? foam.lookup(of, true) : of;
+        return  of ? of.model_.swiftName : 'Any?';
+      }
     },
     {
       class: 'String',
@@ -49,7 +53,7 @@ foam.CLASS({
       }));
       cls.fields.push(this.Field.create({
         name: this.name + '$',
-        type: 'Slot?',
+        type: foam.swift.core.Slot.model_.swiftName + '?',
         getter: this.slotGetter(),
         visibility: 'public',
       }));
@@ -68,7 +72,7 @@ foam.CLASS({
       name: 'slotGetter',
       args: [],
       template: function() {/*
-return __context__["<%=this.key%>$"] as? Slot ?? nil
+return __context__["<%=this.key%>$"] as? <%=foam.swift.core.Slot.model_.swiftName%> ?? nil
       */},
     },
     {

@@ -55,7 +55,7 @@ foam.INTERFACE({
           name: 'buffer',
         },
         {
-          class: 'Long',
+          of: 'Long',
           swiftType: 'Int',
           name: 'offset'
         }
@@ -81,7 +81,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -95,7 +95,7 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -105,7 +105,7 @@ foam.INTERFACE({
       returns: 'Promise',
       args: [
         {
-          class: 'String',
+          of: 'String',
           name: 'id'
         }
       ]
@@ -119,7 +119,7 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          class: 'String',
+          of: 'String',
           name: 'id'
         }
       ]
@@ -129,7 +129,7 @@ foam.INTERFACE({
       returns: 'String',
       args: [
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -143,7 +143,7 @@ foam.INTERFACE({
           of: 'foam.core.X'
         },
         {
-          class: 'Blob',
+          of: 'Blob',
           name: 'blob'
         }
       ]
@@ -362,12 +362,13 @@ foam.CLASS({
     {
       name: 'delegate',
       transient: true,
-      cloneProperty: function(){},
-      javaCloneProperty: '//nop',
+      javaInfoType: 'foam.blob.AbstractIdentifiedBlobPropertyInfo',
       factory: function() {
         return this.blobService.find(this.id);
       },
-      javaFactory: 'return ((BlobService) getBlobStore()).find(getId());'
+      javaFactory: `
+        return ((BlobService) getBlobStore()).find(getId());
+      `
     }
   ],
 

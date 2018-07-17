@@ -45,12 +45,14 @@ public abstract class AbstractDoublePropertyInfo
 
   @Override
   public void updateDigest(FObject obj, MessageDigest md) {
+    if ( ! includeInDigest() ) return;
     double val = (double) get(obj);
     md.update((ByteBuffer) bb.get().putDouble(val).flip());
   }
 
   @Override
   public void updateSignature(FObject obj, Signature sig) throws SignatureException {
+    if ( ! includeInSignature() ) return;
     double val = (double) get(obj);
     sig.update((ByteBuffer) bb.get().putDouble(val).flip());
   }

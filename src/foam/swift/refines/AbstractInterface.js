@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.AbstractInterface',
+  flags: ['swift'],
   axioms: [
     {
       installInClass: function(cls) {
@@ -18,7 +19,7 @@ foam.CLASS({
           var axioms = this.getAxioms();
 
           for ( var i = 0 ; i < axioms.length ; i++ ) {
-            axioms[i].writeToSwiftClass && axioms[i].writeToSwiftClass(cls, null, this);
+            axioms[i].writeToSwiftClass && axioms[i].writeToSwiftClass(cls, this);
           }
 
           return cls;
@@ -30,8 +31,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Implements',
+  flags: ['swift'],
   methods: [
-    function writeToSwiftClass(cls, superAxiom, parentCls) {
+    function writeToSwiftClass(cls, parentCls) {
       // Fill in any missing methods with a method that just calls fatalError().
       // We need to do this in swift because abstract classes aren't a thing so
       // we need to implement all methods.
@@ -51,8 +53,7 @@ foam.CLASS({
         if (m.getSwiftOverride(parentCls)) return;
         var method = foam.core.Method.create(m);
         method.swiftCode = 'fatalError()';
-        method.writeToSwiftClass(
-            cls, parentCls.getSuperAxiomByName(m.name), parentCls);
+        method.writeToSwiftClass(cls, parentCls);
       });
     }
   ],

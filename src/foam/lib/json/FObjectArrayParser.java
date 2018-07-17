@@ -8,7 +8,7 @@ package foam.lib.json;
 
 import foam.lib.parse.*;
 
-public class FObjectArrayParser extends ProxyParser {
+public class FObjectArrayParser extends ObjectNullParser {
   public FObjectArrayParser() {
     this(null);
   }
