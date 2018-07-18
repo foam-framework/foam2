@@ -27,6 +27,9 @@ public class SendSlackNotificationDAO extends ProxyDAO {
       Boolean sendSlackMessage = notif.getSendSlackMessage();
       String slackWebhook = notif.getSlackWebhook();
       String slackMessage = notif.getSlackMessage();
+      if ( foam.util.SafetyUtil.isEmpty(slackMessage) ) {
+        slackMessage = notif.getBody();
+      }
 
       if ( sendSlackMessage ) {
         CloseableHttpClient client = HttpClients.createDefault();
@@ -39,7 +42,7 @@ public class SendSlackNotificationDAO extends ProxyDAO {
             CloseableHttpResponse response =  client.execute(httppost);
             if (response.getStatusLine().getStatusCode() != 200 ){
               Logger       logger    = (Logger) x.get("logger");
-              logger.info("Could not post to Slack; error code -" + response.getStatusLine().getStatusCode());
+              logger.warning("Could not post to Slack; error code -" + response.getStatusLine().getStatusCode());
             };
         } catch (Throwable t) {
           System.err.print(t);

@@ -1337,6 +1337,33 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
+  name: 'IsInstanceOf',
+  extends: 'foam.mlang.predicate.AbstractPredicate',
+  implements: [ 'foam.core.Serializable' ],
+
+  documentation: 'Predicate which checks if objects are instances of the specified class.',
+
+  properties: [
+    {
+      class: 'Class',
+      name: 'targetClass',
+      javaType: 'foam.core.ClassInfo'
+    }
+  ],
+
+  methods: [
+    function f(obj) { return this.targetClass.isInstance(obj); },
+
+    function toString() {
+      return foam.String.constantize(this.cls_.name) +
+          '(' + this.targetClass.id + ')';
+    }
+  ]
+});
+
+
+foam.CLASS({
+  package: 'foam.mlang.predicate',
   name: 'Keyword',
   extends: 'foam.mlang.predicate.Unary',
   implements: [ 'foam.core.Serializable' ],
@@ -2008,7 +2035,9 @@ foam.CLASS({
     function SUM(arg1) { return this.Sum.create({ arg1: arg1 }); },
 
     function DESC(a) { return this._unary_("Desc", a); },
-    function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); }
+    function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
+
+    function INSTANCE_OF(cls) { return this.IsInstanceOf({targetClass: cls}); }
   ]
 });
 
