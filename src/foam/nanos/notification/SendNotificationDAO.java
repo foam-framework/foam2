@@ -23,7 +23,6 @@ public class SendNotificationDAO extends ProxyDAO {
     DAO userDAO = (DAO) x.get("localUserDAO");
     Notification notif = (Notification) obj;
 
-
     if ( notif.getBroadcasted() ) {
       userDAO.select(new AbstractSink() {
         @Override
@@ -33,7 +32,6 @@ public class SendNotificationDAO extends ProxyDAO {
         }
       });
     } else if ( notif.getGroupId() != null ) {
-
       userDAO.where(EQ(User.GROUP, notif.getGroupId())).select(new AbstractSink() {
         @Override
         public void put(Object o, Detachable d) {
@@ -54,7 +52,7 @@ public class SendNotificationDAO extends ProxyDAO {
     notification.setUserId(user.getId());
     notification.setBroadcasted(false);
     notification.setGroupId(null);
-    ((DAO) x.get("notificationDAO")).put(notification);
+    ((DAO) x.get("notificationDAO")).put_(x, notification);
   }
 }
 

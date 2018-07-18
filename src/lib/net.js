@@ -16,7 +16,8 @@
  */
 
 foam.SCRIPT({
-  id: 'foam.net.LibScript',
+  package: 'foam.net',
+  name: 'LibScript',
   // TODO: flags/requires?
   code: function() {
   var pkg = 'foam.net.' + (foam.isServer ? 'node' : 'web');
