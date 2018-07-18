@@ -30,12 +30,12 @@ public class FObjectParser
           public PStream parse(PStream ps, ParserContext x) {
             try {
               PStream ps1 = ps.apply(delegate, x);
-              Class c = ps1 != null ? Class.forName(ps1.value().toString()) : defaultClass;
+              Class   c   = ps1 != null ?
+                Class.forName(ps1.value().toString()) :
+                defaultClass ;
 
               // return null if class not specified in JSON and no default class available
-              if ( c == null ) {
-                return null;
-              }
+              if ( c == null ) return null;
 
               if ( ps1 != null ) ps = ps1;
 
