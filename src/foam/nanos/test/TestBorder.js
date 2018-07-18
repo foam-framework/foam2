@@ -45,7 +45,6 @@
           t.run();
           self.passed += t.passed;
           self.failed += t.failed;
-          console.log(t.stringify());
         },
         eof: function() {
           var duration = (Date.now() - startTime) / 1000;
@@ -54,8 +53,6 @@
       });
     }
    ],
-
-
 
    actions: [
      function runAll() {
