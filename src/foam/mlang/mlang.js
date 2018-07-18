@@ -1337,7 +1337,7 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.mlang.predicate',
-  name: 'InstanceOf',
+  name: 'IsInstanceOf',
   extends: 'foam.mlang.predicate.AbstractPredicate',
   implements: [ 'foam.core.Serializable' ],
 
@@ -1346,7 +1346,8 @@ foam.CLASS({
   properties: [
     {
       class: 'Class',
-      name: 'targetClass'
+      name: 'targetClass',
+      javaType: 'foam.core.ClassInfo'
     }
   ],
 
@@ -2036,7 +2037,7 @@ foam.CLASS({
     function DESC(a) { return this._unary_("Desc", a); },
     function THEN_BY(a, b) { return this.ThenBy.create({head: a, tail: b}); },
 
-    function INSTANCE_OF(cls) { return this.InstanceOf({targetClass: cls}); }
+    function INSTANCE_OF(cls) { return this.IsInstanceOf({targetClass: cls}); }
   ]
 });
 

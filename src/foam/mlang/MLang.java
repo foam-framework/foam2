@@ -96,7 +96,7 @@ public class MLang
   }
 
   public static Predicate INSTANCE_OF(ClassInfo info) {
-    return new InstanceOf(info);
+    return new IsInstanceOf(info);
   }
 
   public static Predicate INSTANCE_OF(Class cls) {

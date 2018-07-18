@@ -53,9 +53,10 @@ foam.CLASS({
       name: 'enabled',
       documentation: 'Enables script.',
       tableCellFormatter: function(value) {
-        this.start().style({
-          color: value ? 'green' : 'gray'
-        }).add(value ? 'Y' : 'N').end();
+        this.start()
+          .style({ color: value ? 'green' : 'gray' })
+          .add(value ? 'Y' : 'N')
+        .end();
       },
       value: true
     },
@@ -105,13 +106,21 @@ foam.CLASS({
     {
       class: 'String',
       name: 'code',
-      view: { class: 'foam.u2.tag.TextArea', rows: 20, cols: 80, css: {"font-family": "monospace"} }
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 20, cols: 80,
+        css: { 'font-family': 'monospace' }
+      }
     },
     {
       class: 'String',
       name: 'output',
       visibility: 'RO',
-      view: { class: 'foam.u2.tag.TextArea', rows: 12, cols: 80, css: {"font-family": "monospace"}  }
+      view: {
+        class: 'foam.u2.tag.TextArea',
+        rows: 12, cols: 80,
+        css: { 'font-family': 'monospace' }
+      }
     },
     {
       class: 'String',
@@ -134,7 +143,7 @@ foam.CLASS({
           shell.set("currentScript", this);
           shell.set("x", x);
           shell.eval("runScript(String name) { script = x.get(\\"scriptDAO\\").find(name); if ( script != null ) eval(script.code); }");
-          shell.eval("sudo(String user) { foam.util.Auth.sudo(x, user); }");
+          shell.eval("foam.core.X sudo(String user) { foam.util.Auth.sudo(x, (String) user); }");
         } catch (EvalError e) {}
 
         return shell;
@@ -187,7 +196,7 @@ foam.CLASS({
                 var notification = self.ScriptRunNotification.create({
                   userId: self.user.id,
                   scriptId: script.id,
-                  notificationType: "Script Execution",
+                  notificationType: 'Script Execution',
                   body: `Status: ${script.status}
                         Script Output: ${script.output}
                         LastDuration: ${script.lastDuration}`
@@ -217,7 +226,10 @@ foam.CLASS({
               }
           });
         } else {
-          var log = function() { this.output = this.output + Array.prototype.join.call(arguments, '') + '\n'; }.bind(this);
+          var log = function() {
+            this.output = this.output +
+              Array.prototype.join.call(arguments, '') + '\n';
+          }.bind(this);
 
           with ( { log: log, print: log, x: self.__context__ } ) {
             this.status = this.ScriptStatus.RUNNING;

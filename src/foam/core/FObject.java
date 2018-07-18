@@ -15,6 +15,7 @@ public interface FObject
     extends ContextAware, Comparable, Hashable, Signable
 {
   ClassInfo getClassInfo();
+  FObject copyFrom(FObject obj);
   FObject fclone();
   FObject deepClone();
   FObject shallowClone();
