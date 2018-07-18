@@ -6,7 +6,14 @@
 
 package foam.core;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public abstract class AbstractFObjectRelationshipPropertyInfo
   extends AbstractFObjectPropertyInfo
 {
+  @Override
+  public void toXML (FObject obj, Document doc, Element objElement) {
+    return;
+  }
 }

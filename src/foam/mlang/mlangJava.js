@@ -857,12 +857,12 @@ foam.CLASS({
 
 
 foam.CLASS({
-  refines: 'foam.mlang.predicate.InstanceOf',
+  refines: 'foam.mlang.predicate.IsInstanceOf',
 
-  methods: [
+   methods: [
     {
       name: 'f',
-      javaCode: 'return getClassInfo().isInstance(obj);'
+      javaCode: 'return getTargetClass().isInstance(obj);'
     }
   ]
 });
