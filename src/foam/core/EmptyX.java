@@ -163,10 +163,10 @@ class FactoryXI
   final XFactory  factory_;
 
   FactoryXI(X leftChild, X rightChild, Object key, XFactory factory) {
-    leftChild_   = leftChild;
-    rightChild_  = rightChild;
-    key_          = key;
-    factory_      = factory;
+    leftChild_  = leftChild;
+    rightChild_ = rightChild;
+    key_        = key;
+    factory_    = factory;
   }
 
   @Override
@@ -183,6 +183,7 @@ class FactoryXI
     }
     return getRightChild().get(x, key);
   }
+
   @Override
   public String toString() {
     return getLeftChild().toString() + ( "{Key: " + key_ + ", XFactory: "  + factory_ + "}\n" ) + getRightChild().toString();
