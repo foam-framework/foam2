@@ -28,7 +28,7 @@ public abstract class AbstractFObject
 
   public FObject shallowClone() {
     try {
-      FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
+      FObject ret = (FObject) getClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for ( PropertyInfo pi : props ) {
         pi.set(ret, pi.get(this));
@@ -41,7 +41,7 @@ public abstract class AbstractFObject
 
   public FObject fclone() {
     try {
-      FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
+      FObject ret = (FObject) getClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for( PropertyInfo pi : props ) {
         pi.cloneProperty(this, ret);
@@ -69,7 +69,7 @@ public abstract class AbstractFObject
     FObject ret = null;
     boolean isDiff = false;
     try {
-      ret = (FObject) this.getClassInfo().getObjClass().newInstance();
+      ret = (FObject) getClass().newInstance();
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
       PropertyInfo prop = null;
