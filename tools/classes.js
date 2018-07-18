@@ -34,7 +34,7 @@ var classes = [
   'foam.mlang.predicate.Lte',
   'foam.mlang.predicate.Has',
   'foam.mlang.predicate.Keyword',
-  'foam.mlang.predicate.InstanceOf',
+  'foam.mlang.predicate.IsInstanceOf',
   'foam.mlang.sink.Count',
   'foam.mlang.sink.GroupBy',
   'foam.mlang.F',
