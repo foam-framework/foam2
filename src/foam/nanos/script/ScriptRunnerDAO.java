@@ -26,13 +26,18 @@ public class ScriptRunnerDAO
     Script script = (Script) obj;
 
     if ( script.getStatus() == ScriptStatus.SCHEDULED ) {
-      this.runScript(x, script);
+      obj = this.runScript(x, script);
     }
 
     return getDelegate().put_(x, obj);
   }
 
-  protected void runScript(final X x, Script script) {
+  protected Script runScript(final X x, Script newScript) {
+    Script oldScript = (Script) find(newScript.getId());
+    Script script    = ( oldScript == null ) ?
+      newScript :
+      (Script) oldScript.fclone().copyFrom(newScript);
+
     long estimatedTime = this.estimateWaitTime(script);
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -61,6 +66,8 @@ public class ScriptRunnerDAO
     } catch(InterruptedException e) {
       e.printStackTrace();
     }
+
+    return script;
   }
 
   protected long estimateWaitTime(Script script) {
