@@ -17,7 +17,7 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'lastLogMessage',
+      name: 'previousLogMessage',
     },
     {
       class: 'Int',
@@ -26,7 +26,7 @@ foam.CLASS({
     {
       class: 'Enum',
       of: 'foam.nanos.logger.LogLevel',
-      name: 'lastLogLevel',
+      name: 'previousLogSeverity',
       factory: function() { return foam.nanos.logger.LogLevel.INFO; }
     }
   ],
@@ -36,31 +36,31 @@ foam.CLASS({
       name: 'put_',
       javaCode: `      
       LogMessage log = (LogMessage) obj;
-      if ( log.getSeverity().equals(getLastLogLevel()) ) {        
-        if ( log.getMessage().equals( getLastLogMessage()) ) {
+      if ( log.getSeverity().equals(getPreviousLogSeverity()) ) {        
+        if ( log.getMessage().equals(getPreviousLogMessage()) ) {
           setRepeatCount( getRepeatCount() + 1 );       
           return null;
         } else {
           if ( getRepeatCount() > 1 ) {    
             LogMessage repeatLog = new foam.nanos.logger.LogMessage();
-            repeatLog.setSeverity( getLastLogLevel() );
-            repeatLog.setMessage("The last log was repeated " + getRepeatCount() + " times");
-            super.put_(x,repeatLog);
+            repeatLog.setSeverity( getPreviousLogSeverity() );
+            repeatLog.setMessage("The previous log was repeated " + getRepeatCount() + " times");
+            super.put_(x, repeatLog);
           }          
-          setLastLogMessage( log.getMessage() );
-          setRepeatCount( 1 );
-          return super.put_(x,log);
+          setPreviousLogMessage( log.getMessage() );
+          setRepeatCount(1);
+          return super.put_(x, log);
         }
       } else {
         if ( getRepeatCount() > 1 ) {
           LogMessage repeatLog = new foam.nanos.logger.LogMessage() ;
-          repeatLog.setSeverity( getLastLogLevel() );
-          repeatLog.setMessage("The last log was repeated " + getRepeatCount() + " times");
+          repeatLog.setSeverity( getPreviousLogSeverity() );
+          repeatLog.setMessage("The previous log was repeated " + getRepeatCount() + " times");
           super.put_(x,repeatLog);
         }          
-        setLastLogLevel( log.getSeverity() );
-        setLastLogMessage( log.getMessage() );
-        setRepeatCount( 1 );
+        setPreviousLogSeverity( log.getSeverity() );
+        setPreviousLogMessage( log.getMessage() );
+        setRepeatCount(1);
         return super.put_(x,log);
       }
       `
