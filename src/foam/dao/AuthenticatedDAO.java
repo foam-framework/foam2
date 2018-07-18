@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2017 The FOAM Authors. All Rights Reserved.
+ * Copyright 2018 The FOAM Authors. All Rights Reserved.
  * http://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -8,10 +8,13 @@ package foam.dao;
 
 import foam.core.FObject;
 import foam.core.X;
+import foam.core.InvalidX;
 import foam.mlang.order.Comparator;
 import foam.mlang.predicate.Predicate;
 import foam.mlang.sink.Count;
 import foam.nanos.auth.AuthService;
+
+import java.security.AccessControlException;
 import java.security.Permission;
 
 /** Authenticate access to a DAO. **/
@@ -28,6 +31,7 @@ public class AuthenticatedDAO
   public AuthenticatedDAO(String name, boolean authenticateRead, DAO delegate) {
     this.name_             = name;
     this.authenticateRead_ = authenticateRead;
+    setX(InvalidX.instance());
     setDelegate(delegate);
   }
 
@@ -57,7 +61,7 @@ public class AuthenticatedDAO
     }
 
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
+      throw new AccessControlException("Insufficient permissions");
     }
 
     return super.put_(x, obj);
@@ -69,7 +73,7 @@ public class AuthenticatedDAO
     AuthService authService = (AuthService) x.get("auth");
 
     if ( ! authService.check(x, permission) ) {
-      throw new RuntimeException("Insufficient permissions");
+      throw new AccessControlException("Insufficient permissions");
     }
 
     return super.remove_(x, obj);
@@ -82,7 +86,7 @@ public class AuthenticatedDAO
       AuthService authService = (AuthService) x.get("auth");
 
       if ( ! authService.check(x, permission) ) {
-        throw new RuntimeException("Insufficient permissions");
+        throw new AccessControlException("Insufficient permissions");
       }
     }
 
