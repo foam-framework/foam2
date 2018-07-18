@@ -23,7 +23,8 @@ foam.CLASS({
 });
 
 foam.SCRIPT({
-  id: 'foam.apploader.ClassLoaderContextScript',
+  package: 'foam.apploader',
+  name: 'ClassLoaderContextScript',
   requires: [
     'foam.apploader.ClassLoaderContext',
   ],
