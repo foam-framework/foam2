@@ -42,41 +42,9 @@ foam.CLASS({
       vertical-align: top;
       margin-bottom: 30px;
     }
-    ^ .accountDiv {
-      width: 400px;
-      background-color: #ffffff;
-      padding: 12px 10.4px 12px 10.4px;
-      margin-bottom: 10px;
-    }
-    ^ .account {
-      font-family: Roboto;
-      font-size: 12px;
-      line-height: 1.33;
-      letter-spacing: 0.2px;
-      text-align: left;
-      color: #59a5d5;
-      text-decoration: underline;
-      display: inline-block;
-    }
-    ^ .accountBalance {
-      font-family: Roboto;
-      font-size: 12px;
-      line-height: 1.33;
-      letter-spacing: 0.2px;
-      float: right;
-      color: #093649;
-      display: inline-block;
-    }
     ^ .tableBarDiv {
       margin-top: 25px;
       margin-bottom: 10px;
-    }
-    ^ .interacLogo {
-      width: 90px;
-      height: 40px;
-      display: inline-block;
-      float: right;
-      margin-right: 12px;
     }
     ^ .titleMargin {
       margin: 0;
@@ -85,26 +53,6 @@ foam.CLASS({
       position: absolute;
       margin-left: 5px;
       margin-top: 8px;
-    }
-    ^ .net-nanopay-ui-ActionView-sendTransfer {
-      width: 135px;
-      height: 40px;
-      border-radius: 2px;
-      background: #59a5d5;
-      border: 0;
-      box-shadow: none;
-      display: inline-block;
-      line-height: 40px;
-      color: white;
-      font-size: 14px;
-      margin: 0;
-      padding: 0;
-      outline: none;
-      float: right;
-      cursor: pointer;
-    }
-    ^ .net-nanopay-ui-ActionView-sendTransfer:hover {
-      background: #3783b3;
     }
     ^ table {
       border-collapse: collapse;
@@ -151,22 +99,8 @@ foam.CLASS({
     ^ .foam-u2-view-TableView-row {
       height: 40px;
     }
-    ^ .net-nanopay-ui-ActionView-create {
-      visibility: hidden;
-    }
     ^ .foam-u2-md-OverlayDropdown {
       width: 175px;
-    }
-    ^ .net-nanopay-ui-ActionView-exportButton {
-      margin-right: 0;
-    }
-    ^ .net-nanopay-ui-ActionView-filterButton {
-      position: absolute;
-      width: 75px;
-      height: 35px;
-      opacity: 0.01;
-      cursor: pointer;
-      z-index: 100;
     }
   `,
 

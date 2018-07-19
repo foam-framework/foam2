@@ -162,11 +162,11 @@ foam.CLASS({
           if ( showInherited || Object.hasOwnProperty.call(data.axiomMap_, key) ) {
             var a  = data.axiomMap_[key];
 	            if ( ( ! showOnlyProperties ) || foam.core.Property.isInstance(a) ) {
-
                 var ai = foam.doc.PropertyInfo.create({
                   axiom: a,
                   type: a.cls_,
                   required: a.required,
+                  of: a.of,
                   documentation: a.documentation,
                   name: a.name
                 });
@@ -176,7 +176,7 @@ foam.CLASS({
         }
         return this.TableView.create({
           of: this.PropertyInfo,
-          data: this.ArrayDAO.create({array: axs})
+          data: this.ArrayDAO.create({ array: axs })
         });
       }));
     }
@@ -186,11 +186,12 @@ foam.CLASS({
 foam.CLASS({
   package: 'foam.doc',
   name: 'PropertyInfo',
-  documentation: "Table view model to display model in printable model browser's",
+  documentation: 'Table view model to display' +
+    ' model in printable model browser\'s',
   ids: ['name'],
 
   tableColumns: [
-    'name', 'required', 'type', 'documentation'
+    'name', 'required', 'of', 'type', 'documentation'
   ],
 
   properties: [
@@ -208,6 +209,14 @@ foam.CLASS({
       name: 'required',
       tableCellFormatter: function(value, obj, axiom) {
         this.add(value);
+      }
+    },
+    {
+      name: 'of',
+      label: 'Property Of',
+      tableCellFormatter: function(value, obj, axiom) {
+        var of_ = value ? value.id : '';
+        this.add(of_);
       }
     },
     {

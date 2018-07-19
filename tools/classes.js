@@ -173,7 +173,7 @@ var classes = [
   'foam.nanos.logger.FileLogger',
   'foam.nanos.logger.Logger',
   'foam.nanos.logger.NotificationLogMessageDAO',
-  'foam.nanos.logger.RepeatLogger',
+  'foam.nanos.logger.RepeatLogMessageDAO',
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
