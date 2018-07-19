@@ -52,6 +52,12 @@ public abstract class AbstractFObject
     }
   }
 
+  public FObject copyFrom(FObject obj) {
+    List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo p : props ) p.set(this, p.get(obj));
+    return this;
+  }
+
   public Map diff(FObject obj) {
     List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
     Iterator i = props.iterator();
