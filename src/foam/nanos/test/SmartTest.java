@@ -1,6 +1,7 @@
 package foam.nanos.test;
 
 import foam.core.X;
+import foam.core.EmptyX;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,29 +15,55 @@ public class SmartTest extends Test {
   public static final String CLEANUP_METHOD_SUFFIX = "Cleanup";
   public static final String SETUP_METHOD_SUFFIX = "Setup";
 
+  private Method globalSetupMethod;
+  private Method globalCleanupMethod;
   private Method preTestMethod;
   private Method postTestMethod;
   private final Map<String, TestChain> testChains = new HashMap<>();
 
+  protected X x_ = EmptyX.instance();
+
+  public X getX() {
+    return x_;
+  }
+
+  public void setX(X x) {
+    x_ = x;
+  }
+
   @Override
   public void runTest(X x) {
+    setX(x);
     prepareTestChains();
     runTestChains();
   }
 
   private void runTestChains() {
-    if ( invokeMethod(preTestMethod) ) {
+    if ( invokeMethod(globalSetupMethod) ) {
       for ( String test: testChains.keySet() ) {
         TestChain testChain = testChains.get(test);
-        if ( invokeMethod(testChain.setup) )  {
-          invokeMethod(testChain.test);
-          invokeMethod(testChain.cleanup);
-        }
+        runTestChain(testChain);
       }
+      invokeMethod(globalCleanupMethod);
     }
-    invokeMethod(postTestMethod);
   }
 
+  private void runTestChain(TestChain testChain) {
+
+    // don't run when the test Chain if doesn't have a test method
+    if ( testChain.test == null ) {
+      return;
+    }
+    if ( invokeMethod(preTestMethod) ) {
+      if ( invokeMethod(testChain.setup) )  {
+        invokeMethod(testChain.test);
+        invokeMethod(testChain.cleanup);
+      }
+      invokeMethod(postTestMethod);
+    }
+  }
+
+  // returns false when the invocation was not succesfull, else returns true
   private boolean invokeMethod(Method method) {
     if ( method != null ) {
       try {
@@ -67,6 +94,12 @@ public class SmartTest extends Test {
           break;
         case "postTest":
           postTestMethod = method;
+          break;
+        case "setup":
+          globalSetupMethod = method;
+          break;
+        case "cleanup":
+          globalCleanupMethod = method;
           break;
         default:
           insertMethodInTestChain(method);
