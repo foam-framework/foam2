@@ -28,7 +28,7 @@ public abstract class AbstractFObject
 
   public FObject shallowClone() {
     try {
-      FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
+      FObject ret = (FObject) getClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for ( PropertyInfo pi : props ) {
         pi.set(ret, pi.get(this));
@@ -41,7 +41,7 @@ public abstract class AbstractFObject
 
   public FObject fclone() {
     try {
-      FObject ret = (FObject) getClassInfo().getObjClass().newInstance();
+      FObject ret = (FObject) getClass().newInstance();
       List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       for( PropertyInfo pi : props ) {
         pi.cloneProperty(this, ret);
@@ -50,6 +50,12 @@ public abstract class AbstractFObject
     } catch (IllegalAccessException | InstantiationException e) {
       return null;
     }
+  }
+
+  public FObject copyFrom(FObject obj) {
+    List<PropertyInfo> props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    for ( PropertyInfo p : props ) p.set(this, p.get(obj));
+    return this;
   }
 
   public Map diff(FObject obj) {
@@ -69,7 +75,7 @@ public abstract class AbstractFObject
     FObject ret = null;
     boolean isDiff = false;
     try {
-      ret = (FObject) this.getClassInfo().getObjClass().newInstance();
+      ret = (FObject) getClass().newInstance();
       List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
       Iterator i = props.iterator();
       PropertyInfo prop = null;
@@ -267,5 +273,9 @@ public abstract class AbstractFObject
   public void freeze() {
     beforeFreeze();
     __frozen__ = true;
+  }
+
+  public boolean isFrozen() {
+    return __frozen__;
   }
 }

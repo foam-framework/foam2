@@ -123,7 +123,7 @@ foam.CLASS({
           url += "q=" + q;
         }
 
-        return url;
+        return encodeURI(url);
       }
     }
   ],

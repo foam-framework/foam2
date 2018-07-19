@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.box.RPCReturnBox',
+  flags: ['swift'],
   implements: [ 'foam.box.Box' ],
 
   properties: [

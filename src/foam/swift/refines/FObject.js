@@ -6,6 +6,7 @@
 
 foam.LIB({
   name: 'foam.core.FObject',
+  flags: ['swift'],
   methods: [
     function toSwiftClass() {
       var axiomFilter = foam.util.flagFilter(['swift']);
@@ -216,6 +217,7 @@ foam.LIB({
 foam.CLASS({
   package: 'foam.swift',
   name: 'FObjectTemplates',
+  flags: ['swift'],
   templates: [
     {
       name: 'exportsBody',

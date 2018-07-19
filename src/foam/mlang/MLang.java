@@ -6,9 +6,11 @@
 
 package foam.mlang;
 
+import foam.core.ClassInfo;
 import foam.dao.Sink;
 import foam.mlang.predicate.*;
 import foam.mlang.sink.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Static helper functions for creating MLangs.
@@ -17,7 +19,7 @@ import foam.mlang.sink.*;
  */
 public class MLang
 {
-  public static final Predicate TRUE = new True();
+  public static final Predicate TRUE  = new True();
   public static final Predicate FALSE = new False();
 
   public static Expr prepare(Object o) {
@@ -91,5 +93,17 @@ public class MLang
 
   public static Sink MAP(Object o1, foam.dao.Sink delegate) {
     return new Map(MLang.prepare(o1), delegate);
+  }
+
+  public static Predicate INSTANCE_OF(ClassInfo info) {
+    return new IsInstanceOf(info);
+  }
+
+  public static Predicate INSTANCE_OF(Class cls) {
+    try {
+      return INSTANCE_OF((ClassInfo) cls.getMethod("getOwnClassInfo").invoke(null));
+    } catch(NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
+      throw new RuntimeException("Attempt to call INSTANCE_OF on non Modelled class." + cls);
+    }
   }
 }

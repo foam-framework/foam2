@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.ProxiedMethod',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftCode',
@@ -23,6 +24,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Proxy',
+  flags: ['swift'],
   properties: [
     {
       name: 'swiftType',
@@ -35,6 +37,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.ProxySub',
+  flags: ['swift'],
   methods: [
     function writeToSwiftClass(cls) {
       return
