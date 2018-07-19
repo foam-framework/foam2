@@ -32,13 +32,21 @@ public class ScriptRunnerDAO
     return getDelegate().put_(x, obj);
   }
 
-  protected Script runScript(final X x, Script newScript) {
-    Script oldScript = (Script) find(newScript.getId());
-    Script script    = ( oldScript == null ) ?
-      newScript :
-      (Script) oldScript.fclone().copyFrom(newScript);
+  /**
+   * Unmodelled subclasses will revert to their base-class when sent
+   * to the client and back (to be shown in GUI). This method converts
+   * the script object back to its original class.
+   **/
+  Script fixScriptClass(Script script) {
+    Script oldScript = (Script) find(script.getId());
+    return oldScript == null ?
+      script :
+      (Script) oldScript.fclone().copyFrom(script);
+  }
 
-    long estimatedTime = this.estimateWaitTime(script);
+  Script runScript(final X x, Script newScript) {
+    Script script = fixScriptClass(newScript);
+    long   estimatedTime = this.estimateWaitTime(script);
     final CountDownLatch latch = new CountDownLatch(1);
 
     try {
@@ -62,7 +70,6 @@ public class ScriptRunnerDAO
       });
 
       latch.await(estimatedTime, TimeUnit.MILLISECONDS);
-
     } catch(InterruptedException e) {
       e.printStackTrace();
     }
@@ -70,10 +77,10 @@ public class ScriptRunnerDAO
     return script;
   }
 
-  protected long estimateWaitTime(Script script) {
-      return script.getLastRun() == null || DEFAULT_WAIT_TIME > script.getLastDuration() * 2 ?
-        DEFAULT_WAIT_TIME :
-        1 ; //  1 ms so it returns right away
+  long estimateWaitTime(Script script) {
+    return script.getLastRun() == null || DEFAULT_WAIT_TIME > script.getLastDuration() * 2 ?
+      DEFAULT_WAIT_TIME :
+      1 ; //  1 ms so it returns right away
 
   }
 }
