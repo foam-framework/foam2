@@ -125,6 +125,19 @@ foam.CLASS({
 
   methods: [
     {
+      name: 'sudo',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X',
+        },
+        {
+          name: 'emailAddress', javaType: 'String'
+        }
+      ],
+      javaReturns: 'foam.core.X',
+      javaCode: 'return foam.util.Auth.sudo(x, emailAddress);'
+    },
+    {
       name: 'createInterpreter',
       args: [
         { name: 'x', javaType: 'foam.core.X' }
