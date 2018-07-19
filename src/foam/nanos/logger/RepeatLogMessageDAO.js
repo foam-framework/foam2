@@ -7,8 +7,10 @@
 
 foam.CLASS({
   package: 'foam.nanos.logger',
-  name: 'RepeatLogger',
+  name: 'RepeatLogMessageDAO',
   extends: 'foam.dao.ProxyDAO',
+
+  documentation: `catches and consolidates repeated identical log messages`,
 
   requires: [
     'foam.nanos.logger.LogLevel'
