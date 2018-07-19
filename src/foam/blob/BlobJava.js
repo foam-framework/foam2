@@ -6,6 +6,7 @@
 
 foam.INTERFACE({
   refines: 'foam.blob.Blob',
+  flags: ['java'],
 
   methods: [
     {
@@ -40,6 +41,7 @@ foam.INTERFACE({
 
 foam.INTERFACE({
   refines: 'foam.blob.BlobService',
+  flags: ['java'],
 
   methods: [
     {
@@ -119,6 +121,7 @@ foam.INTERFACE({
 
 foam.CLASS({
   refines: 'foam.blob.AbstractBlob',
+  flags: ['java'],
 
   methods: [
     {
@@ -149,6 +152,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.blob.AbstractBlobService',
+  flags: ['java'],
 
   methods: [
     {
@@ -168,6 +172,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.blob.SubBlob',
+  flags: ['java'],
 
   methods: [
     {
@@ -185,6 +190,7 @@ return getParent().read(out, offset, length);`
 
 foam.CLASS({
   refines: 'foam.blob.BlobStore',
+  flags: ['java'],
 
   javaImports: [
     'org.apache.commons.io.IOUtils',

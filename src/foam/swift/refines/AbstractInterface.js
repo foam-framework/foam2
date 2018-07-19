@@ -6,6 +6,7 @@
 
 foam.CLASS({
   refines: 'foam.core.AbstractInterface',
+  flags: ['swift'],
   axioms: [
     {
       installInClass: function(cls) {
@@ -30,6 +31,7 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Implements',
+  flags: ['swift'],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
       // Fill in any missing methods with a method that just calls fatalError().
