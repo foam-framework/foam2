@@ -111,6 +111,7 @@ public class DigWebAgent
       dao = dao.where(pred);
 
       if ( Command.put == command ) {
+        String returnMessage = "success";
         if ( Format.JSON == format ) {
           JSONParser jsonParser = new JSONParser();
           jsonParser.setX(x);
@@ -158,10 +159,12 @@ public class DigWebAgent
                   resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                   return;
                 }
+
                 obj = (FObject) o;
                 obj = dao.put(obj);
                 results[i] = obj;
               }
+
               outputterJson.output(results);
               out.println(outputterJson);
               resp.setStatus(HttpServletResponse.SC_OK);
@@ -196,6 +199,8 @@ public class DigWebAgent
             obj = (FObject)i.next();
             obj = dao.put(obj);
           }
+
+          //returnMessage = "<objects>" + success + "</objects>";
         } else if ( Format.CSV == format ) {
           CSVSupport csvSupport = new CSVSupport();
           csvSupport.setX(x);
@@ -223,11 +228,11 @@ public class DigWebAgent
           resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Unsupported Accept");
           return;
         }
-        out.println("Success");
+        out.println(returnMessage);
       } else if ( Command.select == command ) {
         ArraySink sink = (ArraySink) dao.select(new ArraySink());
         if ( sink.getArray().size() == 0 ) {
-          out.println("No data");
+          out.println("[]");
           resp.setStatus(HttpServletResponse.SC_OK);
           return;
         }

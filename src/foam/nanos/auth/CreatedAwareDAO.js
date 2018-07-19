@@ -19,16 +19,20 @@ foam.CLASS({
   methods: [
     {
       name: 'put_',
-      code: function(value) {
-        if ( foam.util.SafetyUtil.isEmpty(obj.id) ) {
-          value.created = new Date();
+      code: function(x, obj) {
+        if ( ! foam.nanos.auth.CreatedAware.isInstance(obj) ) {
+          return this.delegate.put_(x, obj);
         }
-        return this.SUPER(value);
+        return this.delegate.find_(x, obj).then(function(result) {
+          if ( result == null ) {
+            obj.created = new Date();
+          }
+          return this.delegate.put_(x, obj);
+        }.bind(this));
       },
       javaCode: `
-        Object id = obj.getProperty("id");
         // only set created if object does not exist in DAO yet
-        if ( obj instanceof CreatedAware && getDelegate().find_(x, id) == null ) {
+        if ( obj instanceof CreatedAware && getDelegate().find_(x, obj) == null ) {
           ((CreatedAware) obj).setCreated(Calendar.getInstance(TimeZone.getTimeZone("UTC")).getTime());
         }
         return super.put_(x, obj);

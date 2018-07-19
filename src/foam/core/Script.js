@@ -11,7 +11,18 @@ foam.CLASS({
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      expression: function(package, name) {
+        return package ? package + '.' + name : name;
+      },
+    },
+    {
+      class: 'String',
+      name: 'package'
+    },
+    {
+      class: 'String',
+      name: 'name'
     },
     {
       class: 'Function',
