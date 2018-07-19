@@ -21,7 +21,9 @@ foam.CLASS({
   ],
 
   tableColumns: [
-    'id', 'enabled', 'description', 'server', 'passed', 'failed', 'lastRun', 'lastDuration', 'status', 'run'
+    'id', 'enabled', 'description', 'server',
+    'passed', 'failed', 'lastRun', 'lastDuration',
+    'status', 'run'
   ],
 
   searchColumns: [ ],
@@ -39,7 +41,7 @@ foam.CLASS({
       name: 'passed',
       visibility: foam.u2.Visibility.RO,
       tableCellFormatter: function(value) {
-        if ( value ) this.start().style({color: '#0f0'}).add(value).end();
+        if ( value ) this.start().style({ color: '#0f0' }).add(value).end();
       }
     },
     {
@@ -47,7 +49,7 @@ foam.CLASS({
       name: 'failed',
       visibility: foam.u2.Visibility.RO,
       tableCellFormatter: function(value) {
-        if ( value ) this.start().style({color: '#f00'}).add(value).end();
+        if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       }
     }
   ],
@@ -56,6 +58,11 @@ foam.CLASS({
     {
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
+      args: [
+        {
+          name: 'x', javaType: 'foam.core.X'
+        }
+      ],
       javaReturns: 'void',
       javaCode: '/* NOOP */'
     },
@@ -114,7 +121,7 @@ foam.CLASS({
           // creates the testing method
           shell.eval("test(boolean exp, String message) { if ( exp ) { currentScript.setPassed(currentScript.getPassed()+1); } else { currentScript.setFailed(currentScript.getFailed()+1); } print((exp ? \\"SUCCESS: \\" : \\"FAILURE: \\")+message);}");
           shell.eval(getCode());
-          runTest();
+          runTest(x);
         } catch (Throwable e) {
           setFailed(getFailed()+1);
           ps.println();
