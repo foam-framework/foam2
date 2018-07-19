@@ -26,7 +26,7 @@ foam.CLASS({
     'status', 'run'
   ],
 
-  searchColumns: [ ],
+  searchColumns: [ 'id' ],
 
   documentation: `
     A scriptable Unit Test.
@@ -51,7 +51,35 @@ foam.CLASS({
       tableCellFormatter: function(value) {
         if ( value ) this.start().style({ color: '#f00' }).add(value).end();
       }
-    }
+    },
+    {
+      class: 'String',
+      name: 'id',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '25ch',
+            'min-width': '25ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+          .end();
+      }
+    },
+    {
+      class: 'String',
+      name: 'description',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '25ch',
+            'min-width': '25ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+          .end();
+      }
+    },
   ],
 
   methods: [

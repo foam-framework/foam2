@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
+  implements: ['foam.nanos.auth.EnabledAware'],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
@@ -41,12 +41,22 @@ foam.CLASS({
     'id', 'server', 'description', 'lastDuration', 'status', 'run'
   ],
 
-  searchColumns: [],
+  searchColumns: [ 'id' ],
 
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '35ch',
+            'min-width': '35ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+          .end();
+      }
     },
     {
       class: 'Boolean',
@@ -62,7 +72,16 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
-      displayWidth: 80
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '55ch',
+            'min-width': '55ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     {
       class: 'DateTime',
@@ -72,7 +91,17 @@ foam.CLASS({
     {
       class: 'Long',
       name: 'lastDuration',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '5ch',
+            'min-width': '5ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+          .end();
+      }
     },
     /*
     {
