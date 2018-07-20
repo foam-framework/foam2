@@ -117,6 +117,12 @@ foam.CLASS({
       documentation: `The top-level script of the forked process.`
     },
     {
+      class: 'Array',
+      of: 'String',
+      name: 'childScriptParams',
+      documentation: `Parameters passed to the top-level Node JS script.`
+    },
+    {
       class: 'FObjectProperty',
       of: 'foam.box.Box',
       documentation: `Box used for child's SocketBox reply.`,
@@ -150,7 +156,8 @@ foam.CLASS({
 
       this.child_ = require('child_process').spawn(
           this.nodePath,
-          this.nodeParams.concat([ this.childScriptPath ]),
+          this.nodeParams.concat([ this.childScriptPath ])
+              .concat(this.childScriptParams),
           { detached: this.detached });
 
       this.child_.on('exit', this.onChildExit);
