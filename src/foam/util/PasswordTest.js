@@ -18,6 +18,20 @@ foam.CLASS({
         Password_HashWithInvalidInput_IllegalArgumentException("", "Password hashing with empty string input throws an IllegalArgumentException");
         Password_HashWithValidInput_Succeeds("Testing123");
 
+        // verify tests - null/empty input
+        Password_Verify(null, null, false, "Password verification returns false with password and hash both null");
+        Password_Verify("", null, false, "Password verification returns false with password empty and hash null");
+        Password_Verify(null, "", false, "Password verification returns false with password null and hash empty");
+        Password_Verify("", "", false, "Password verification returns false with password and hash both empty");
+
+        // verify tests - correct password invalid hashed password
+        Password_Verify("F0amframew0rk", null, false, "Password verification returns false with correct password and null hashed password");
+        Password_Verify("F0amframew0rk", "", false, "Password verification returns false with correct password and empty hashed password");
+        Password_Verify("F0amframew0rk", "i23kfjnewkj", false, "Password verification returns false with correct password and garbage data for hashed password");
+        Password_Verify("F0amframew0rk", "ZgZ8/RVYJjc=:67iHRqR2TmD7JQNNDMRIek/vcNmJlwBOXBaENDJsa+8fOsyW6A6k6/jZLvalXI9suIngb0J/ruyrHAkCCUkQ6w==", false, "Password verification returns false with correct password, incorrect salt but correct hashed password");
+        Password_Verify("F0amframew0rk", "ZgZ8/RVYJjg=:ZoRxd0SUr9TJposPLwrucP3aZNy1R2Fj2wgBk1uY5ShhNasUJMJV8ayj21NtSOJY5XSz8QzxRxQiWPVykbqXfQ==", false, "Password verification returns false with correct password, correct salt, but incorrect hashed password");
+        Password_Verify("F0amframew0rk", "ZgZ8/RVYJjg=:67iHRqR2TmD7JQNNDMRIek/vcNmJlwBOXBaENDJsa+8fOsyW6A6k6/jZLvalXI9suIngb0J/ruyrHAkCCUkQ6w==", true, "Password verification returns true with correct password, correct salt, and correct hashed password");
+
         // isValid tests
         Password_IsValid(null, false, "isValid method returns false given null");
         Password_IsValid("", false, "isValid method returns false given empty string");
@@ -53,6 +67,18 @@ foam.CLASS({
         } catch ( Throwable t ) {
           test(false, "Password hashing with valid input should not throw an exception");
         }
+      `
+    },
+    {
+      name: 'Password_Verify',
+      args: [
+        { class: 'String',  name: 'password' },
+        { class: 'String',  name: 'hash'     },
+        { class: 'Boolean', name: 'expected' },
+        { class: 'String',  name: 'message'  }
+      ],
+      javaCode: `
+        test(Password.verify(password, hash) == expected, message);
       `
     },
     {

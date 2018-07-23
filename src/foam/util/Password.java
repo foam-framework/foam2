@@ -95,7 +95,11 @@ public class Password {
    * @return true if matches, false otherwise
    */
   public static boolean verify(String password, String hash) {
-    return hash(password, decode(getSalt(hash))).equals(hash);
+    try {
+      return hash(password, decode(getSalt(hash))).equals(hash);
+    } catch ( Throwable t ) {
+      return false;
+    }
   }
 
   /**
