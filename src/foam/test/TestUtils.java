@@ -47,20 +47,10 @@ public class TestUtils {
     user.setId(1);
     user.setFirstName("John");
     user.setLastName("Smith");
-    user.setBusinessName("Widgets International");
     user.setEmail("john@example.com");
     File profilePicFile = new File();
     profilePicFile.setFilename("Profile picture");
     user.setProfilePicture(profilePicFile);
-    Address businessAddress = new Address();
-    businessAddress.setCity("Toronto");
-    user.setBusinessAddress(businessAddress);
-    Phone businessPhone = new Phone();
-    businessPhone.setNumber("123-456-7890");
-    user.setBusinessPhone(businessPhone);
-    File businessProfilePicFile = new File();
-    businessProfilePicFile.setFilename("Business profile picture");
-    user.setBusinessProfilePicture(businessProfilePicFile);
     user.setEnabled(true);
     return user;
   }
