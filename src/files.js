@@ -514,6 +514,7 @@ FOAM_FILES([
   { name: "foam/lib/parse/PStream" },
   { name: "foam/crypto/hash/Hasher" },
   { name: "foam/crypto/hash/Hashable" },
+  { name: "foam/crypto/hash/HashableTest" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
   { name: "foam/test/TestObj" },
