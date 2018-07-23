@@ -269,14 +269,14 @@ describe('foam.Function', function() {
     );
     expect(str3).toBe('');
 
-    // invalid function string
+    // invalid function string simply returns an empty string
     expect(function() {
       foam.Function.argsStr(
       "  fun ction invalid(a, c\r \p\n  { " +
       "         return [ a, b, c ]; " +
       "      } "
       );
-    }).toThrow();
+    }).toBe('');
 
     // arrow-function: single-arg
     var str4 = foam.Function.argsStr(
