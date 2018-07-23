@@ -756,7 +756,7 @@ foam.LIB({
     function is(a, b) { return a === b; },
     function isInstance(o) {
       return typeof o === 'object' && ! Array.isArray(o) &&
-          ! foam.core.FObject.isInstance(o);
+          ! foam.core.FObject.isInstance(o) && ! foam.Null.isInstance(o);
     },
     function clone(o) { return o; },
     function equals(a, b) { return a === b; },
