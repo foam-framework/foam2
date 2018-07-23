@@ -30,6 +30,10 @@ foam.CLASS({
     },
     {
       class: 'String',
+      name: 'template'
+    },
+    {
+      class: 'String',
       name: 'notificationType',
       label: 'Notification type',
       documentation: 'Type of notification.',
