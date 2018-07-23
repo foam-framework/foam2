@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import foam.box.DigErrorMessage;
 
 public class DigWebAgent
   implements WebAgent
@@ -93,11 +94,19 @@ public class DigWebAgent
         return;
       }
 
-      DAO dao = (DAO) x.get(daoName);
+      DAO dao = null; //(DAO) x.get(daoName);
 
       if ( dao == null ) {
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown DAO: "+daoName);
-        throw new RuntimeException("DAO not found");
+        //resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown DAO: "+daoName);
+
+        System.out.println("HttpServletResponse.SC_NOT_FOUND : " + HttpServletResponse.SC_NOT_FOUND);
+
+        DigErrorMessage digErrMsg = new DigErrorMessage();
+        digErrMsg.setCode("HttpServletResponse.SC_NOT_FOUND");
+        digErrMsg.setMessage("Unknown DAO");
+
+        System.out.println("digErrMsg : " + digErrMsg.toString());
+        //throw new RuntimeException("DAO not found");
       }
 
       dao = dao.inX(x);
@@ -327,7 +336,7 @@ public class DigWebAgent
           if ( Format.XML == format ) {
             resp.setContentType("text/html");
           }
-          out.println("unsuported DAO");
+          out.println("Unsupported DAO");
           resp.setStatus(HttpServletResponse.SC_OK);
           return;
         }
