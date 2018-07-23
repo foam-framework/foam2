@@ -245,6 +245,7 @@ var classes = [
 
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
+  'foam.crypto.sign.SignableTest',
 
   'foam.nanos.http.Command',
   'foam.nanos.http.Format',
