@@ -6,18 +6,18 @@
 
 package foam.util;
 
-import foam.core.FObject;
-import java.security.SecureRandom;
-import java.util.regex.Pattern;
+import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.util.encoders.Base64;
+
+import java.security.SecureRandom;
+import java.util.regex.Pattern;
 
 public class Password {
 
   // Min 8 characters, at least one uppercase, one lowercase, one number
-  public static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
+  private static Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$");
 
   private static ThreadLocal<SecureRandom> secureRandom = new ThreadLocal<SecureRandom>() {
     @Override
@@ -81,6 +81,7 @@ public class Password {
    * @return hashed password containing the salt. Format salt:hash
    */
   private static String hash(String password, byte[] salt, int keySize, int iterations) {
+    if ( SafetyUtil.isEmpty(password) ) throw new IllegalArgumentException("Password cannot be empty");
     PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator();
     generator.init(PBEParametersGenerator.PKCS5PasswordToBytes(password.toCharArray()), salt, iterations);
     byte[] key = ((KeyParameter) generator.generateDerivedParameters(keySize)).getKey();
@@ -103,6 +104,6 @@ public class Password {
    * @return true if valid, false otherwise
    */
   public static boolean isValid(String password) {
-    return PASSWORD_PATTERN.matcher(password).matches();
+    return ! SafetyUtil.isEmpty(password) && PASSWORD_PATTERN.matcher(password).matches();
   }
 }
