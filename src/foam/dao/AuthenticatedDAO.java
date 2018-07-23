@@ -31,7 +31,12 @@ public class AuthenticatedDAO
   public AuthenticatedDAO(String name, boolean authenticateRead, DAO delegate) {
     this.name_             = name;
     this.authenticateRead_ = authenticateRead;
-    setX(InvalidX.instance());
+    AccessControlException exception = new AccessControlException("When " +
+        "using a DAO decorated by AuthenticatedDAO, you may only call the " +
+        "context-oriented methods: put_(), find_(), select_(), remove_(), " +
+        "removeAll_(), pipe_(), and listen_(). Alternatively, you can also " +
+        "use .inX() to set the context on the DAO.");
+    setX(new InvalidX(exception));
     setDelegate(delegate);
   }
 
