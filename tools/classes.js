@@ -262,6 +262,7 @@ var classes = [
   'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
   'foam.util.PasswordTest',
+  'foam.test.TestObj',
 ];
 
 var abstractClasses = [
