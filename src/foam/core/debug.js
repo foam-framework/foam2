@@ -399,7 +399,12 @@ foam.LIB({
       if ( fn.isTypeChecker__ ) return fn;
 
       // parse out the arguments and their types
-      var args = foam.Function.args(fn);
+      try {
+        var args = foam.Function.args(fn);
+      } catch (_) {
+        // Could not parse args so don't bother decorating.
+        return fn;
+      }
 
       // check if no checkable arguments
       var checkable = false;
