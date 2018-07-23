@@ -863,6 +863,10 @@ foam.LIB({
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
+      // The native toString on the function that's returned will never work on
+      // its own because the args and vars declared above it won't exist so
+      // toString is overwritten to output a call to foam.mmethod with the
+      // original args.
       var toString = f.toString.bind(f);
       f.toString = function() {
         return foam.json.stringify ?
