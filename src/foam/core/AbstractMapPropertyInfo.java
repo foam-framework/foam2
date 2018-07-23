@@ -28,12 +28,17 @@ public abstract class AbstractMapPropertyInfo
     Object v1;
     Object v2;
     for ( Object key : m1.keySet() ) {
-      v1 = m2.get(key);
+      v1 = m1.get(key);
       v2 = m2.get(key);
       if ( v1 == null && v2 == null ) continue;
       if ( v2 == null ) return 1;
       if ( v1 == null ) return -1;
-      result = ((Comparable) v1).compareTo(v2);
+      if ( v1 instanceof Comparable) 
+        result = ((Comparable) v1).compareTo(v2);
+      else
+        //compare if refer to the same object
+        //will help when value is a static value
+        result = v1.equals(v2) ? 0 : -1;
       if ( result != 0 ) return result;
     }
     return 0;
