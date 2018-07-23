@@ -142,16 +142,15 @@ public abstract class AbstractFObject
     return property != null && property.isDefaultValue(this);
   }
 
-  public byte[] hash() {
+  public byte[] hash() throws NoSuchAlgorithmException {
     return this.hash(null);
   }
 
-  public byte[] hash(byte[] hash) {
+  public byte[] hash(byte[] hash) throws NoSuchAlgorithmException {
     return this.hash("SHA-256", hash);
   }
 
-  public byte[] hash(String algorithm, byte[] hash) {
-    try {
+  public byte[] hash(String algorithm, byte[] hash) throws NoSuchAlgorithmException {
       MessageDigest md = MessageDigest.getInstance(algorithm);
 
       // update with previous hash
@@ -171,10 +170,6 @@ public abstract class AbstractFObject
       }
 
       return md.digest();
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return null;
-    }
   }
 
   public byte[] sign(PrivateKey key) {
@@ -198,7 +193,6 @@ public abstract class AbstractFObject
       }
       return signer.sign();
     } catch (Throwable t) {
-      t.printStackTrace();
       return null;
     }
   }
@@ -224,7 +218,6 @@ public abstract class AbstractFObject
       }
       return verifier.verify(signature);
     } catch (Throwable t) {
-      t.printStackTrace();
       return false;
     }
   }
