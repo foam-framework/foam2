@@ -38,6 +38,7 @@ if ( newUser ) {
   if ( ! Email.isValid(user.getEmail()) ) {
     throw new RuntimeException("Invalid Email");
   }
+}
 
   Count count = new Count();
   count = (Count) ((DAO) getX().get("localUserDAO"))
@@ -46,7 +47,6 @@ if ( newUser ) {
   if ( count.getValue() == 1 ) {
     throw new RuntimeException("User with same email address already exists: " + user.getEmail());
   }
-}
 
 return super.put_(x, obj);
       `,
