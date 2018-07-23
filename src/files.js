@@ -300,6 +300,7 @@ FOAM_FILES([
   { name: "foam/box/SubscribeMessage" },
   { name: "foam/box/RPCReturnBox" },
   { name: "foam/box/RPCMessage" },
+  { name: "foam/box/DigErrorMessage" },
   { name: "foam/dao/BaseClientDAO" },
   { name: "foam/dao/MergeBox" },
   { name: "foam/dao/ClientDAO" },

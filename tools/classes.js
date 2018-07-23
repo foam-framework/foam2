@@ -75,6 +75,7 @@ var classes = [
   'foam.box.CheckAuthenticationBox',
   'foam.box.SessionReplyBox',
   'foam.box.SessionClientBox',
+  'foam.box.DigErrorMessage',
   'foam.dao.DAO',
   'foam.dao.JDAO',
   'foam.dao.FilteredDAO',
