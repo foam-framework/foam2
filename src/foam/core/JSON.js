@@ -82,6 +82,19 @@ foam.CLASS({
   ]
 });
 
+
+foam.CLASS({
+  name: '__Class__',
+  package: 'foam.core',
+  axioms: [
+    {
+      name: 'create',
+      installInClass: function(clsName) { return X.lookup(clsName, true); }
+    }
+  ]
+});
+
+
 /** Add toJSON() method to FObject. **/
 foam.CLASS({
   refines: 'foam.core.FObject',
