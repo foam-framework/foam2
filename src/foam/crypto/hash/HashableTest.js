@@ -37,7 +37,7 @@ foam.CLASS({
             "3bff0582ca5bb5a02744af846616d4d077e016eb5d247577277c2b1f7dd23458091ee8109cabc3df945515f1c510ecf9");
         Hashable_HashWithValidAlgorithm(input, "SHA-512",
             "f66eb6c7a08da83c3ab86f79e2a01958b4d07f6fe82251dfef8b0100e570781ae50a21146cc1a1d58116959d1620dfa1d0f6b5fcf4b8fc230c810f548d145db4");
-
+            
         // chained hash with correct digest
         Hashable_HashWithValidAlgorithmWithChaining(input, "MD5",
             "182c7575cbf3066c4cb3a6dcc85c730d",
