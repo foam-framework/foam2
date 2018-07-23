@@ -319,12 +319,12 @@ foam.CLASS({
       }
     },
     {
-      class: 'Date',
+      class: 'DateTime',
       name: 'created',
       documentation: 'Creation date.'
     },
     {
-      class: 'Date',
+      class: 'DateTime',
       name: 'lastModified',
       documentation: 'Last modified date.'
     }
