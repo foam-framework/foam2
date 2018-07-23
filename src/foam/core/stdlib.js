@@ -276,8 +276,8 @@ foam.LIB({
           match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
-        console.warn("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
-        return '';
+        /* istanbul ignore next */
+        throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
       }
 
       return isArrowFunction ? (match[2] || match[1] || '') : (match[3] || '');
