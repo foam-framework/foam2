@@ -17,17 +17,17 @@
 
 foam.SCRIPT({
   package: 'foam.net',
-  name: 'WebLibScript',
-  flags: ['web'],
+  name: 'NodeLibScript',
+  flags: ['node'],
   requires: [
-    'foam.net.web.HTTPRequest',
-    'foam.net.web.HTTPRequestScript', // For BaseHTTPRequest
-    'foam.net.web.HTTPResponse',
-    'foam.net.web.WebSocket',
-    'foam.net.web.WebSocketService',
+    'foam.net.node.BaseHTTPRequest',
+    'foam.net.node.HTTPRequest',
+    'foam.net.node.HTTPResponse',
+    'foam.net.node.WebSocket',
+    'foam.net.node.WebSocketService'
   ],
   code: function() {
-  var pkg = 'foam.net.web';
+  var pkg = 'foam.net.node';
   var clss = [
     'BaseHTTPRequest',
     'HTTPRequest',
