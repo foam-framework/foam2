@@ -837,8 +837,7 @@ describe('foam.Object', function() {
     expect(foam.Object.isInstance({})).toBe(true);
     expect(foam.Object.isInstance([])).toBe(false);
     expect(foam.Object.isInstance(66)).toBe(false);
-    // NOTE: null counts as an object
-    expect(foam.Object.isInstance(null)).toBe(true);
+    expect(foam.Object.isInstance(null)).toBe(false);
   });
   it('clone', function() {
     var a = { d: "hello" };
