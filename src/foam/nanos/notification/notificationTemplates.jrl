@@ -1,0 +1,1 @@
+p({"class":"foam.nanos.notification.Notification","id":1,"template":"NotificationLogMessageDAO","issuedDate":"2018-07-15T02:34:11.290Z","emailArgs":{},"emailIsEnabled":true, "emailName":"", "sendSlackMessage":true,"slackWebhook":"https://hooks.slack.com/services/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"})
