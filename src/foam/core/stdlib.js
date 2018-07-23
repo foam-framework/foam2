@@ -276,8 +276,8 @@ foam.LIB({
           match = str.match(/^(async )?function(\s+[_$\w]+|\s*)\((.*?)\)/);
 
       if ( ! match ) {
-        /* istanbul ignore next */
-        throw new TypeError("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
+        console.warn("foam.Function.argsStr could not parse input function:\n" + ( f ? f.toString() : 'undefined' ) );
+        return '';
       }
 
       return isArrowFunction ? (match[2] || match[1] || '') : (match[3] || '');
@@ -837,7 +837,7 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       var first = true;
-      return function(arg1) {
+      var f = function(arg1) {
         if ( first ) {
           for ( var key in map ) {
             var type = key === 'FObject' ?
@@ -863,6 +863,13 @@ foam.LIB({
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
+      var toString = f.toString.bind(f);
+      f.toString = function() {
+        return foam.json.stringify ?
+          `foam.mmethod(${foam.json.stringify(map)}, ${foam.json.stringify(opt_defaultMethod)})` :
+          toString();
+      };
+      return f;
     }
   ]
 });
