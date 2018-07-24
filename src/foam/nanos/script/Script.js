@@ -48,6 +48,11 @@ foam.CLASS({
       type: 'int',
       name: 'MAX_OUTPUT_CHARS',
       value: 20000,
+    },
+    {
+      type: 'int',
+      name: 'MAX_NOTIFICATION_OUTPUT_CHARS',
+      value: 200,
     }
   ],
 
@@ -257,7 +262,9 @@ foam.CLASS({
                   scriptId: script.id,
                   notificationType: 'Script Execution',
                   body: `Status: ${script.status}
-                        Script Output: ${script.output}
+                        Script Output: ${script.length > self.MAX_NOTIFICATION_OUTPUT_CHARS ?
+                          script.output.substring(0, self.MAX_NOTIFICATION_OUTPUT_CHARS) + '...' :
+                          script.output }
                         LastDuration: ${script.lastDuration}`
                 });
                 self.notificationDAO.put(notification);
