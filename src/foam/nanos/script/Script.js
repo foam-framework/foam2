@@ -146,9 +146,9 @@ foam.CLASS({
     {
       name: 'runScript',
       code: function() {
-        var log = () => {
+        var log = function() {
           this.output += Array.from(arguments).join('') + '\n';
-        };
+        }.bind(this);
         with ( { log: log, print: log, x: self.__context__ } )
           return Promise.resolve(eval(this.code));
       },
