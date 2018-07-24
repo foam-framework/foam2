@@ -123,7 +123,8 @@ foam.CLASS({
           this.output = '';
           this.runTest(x);
         } catch (err) {
-          this.failed = 1;
+          this.failed += 1;
+          this.output += err;
         }
 
         var endTime = Date.now();
