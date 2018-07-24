@@ -66,7 +66,11 @@ foam.CLASS({
       name: 'args',
       factory: function() {
         if ( this.code )
-          try { return foam.Function.args(this.code) } catch(_) {}
+          try {
+            return foam.Function.args(this.code)
+          } catch(e) {
+            console.warn('Unable to parse args:', e);
+          }
         return [];
       }
     }

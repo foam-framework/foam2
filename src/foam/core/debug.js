@@ -401,8 +401,9 @@ foam.LIB({
       // parse out the arguments and their types
       try {
         var args = foam.Function.args(fn);
-      } catch (_) {
+      } catch (e) {
         // Could not parse args so don't bother decorating.
+        console.warn('Unable to parse args:', e);
         return fn;
       }
 
