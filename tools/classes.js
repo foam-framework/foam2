@@ -173,7 +173,7 @@ var classes = [
   'foam.nanos.logger.FileLogger',
   'foam.nanos.logger.Logger',
   'foam.nanos.logger.NotificationLogMessageDAO',
-  'foam.nanos.logger.RepeatLogger',
+  'foam.nanos.logger.RepeatLogMessageDAO',
   'foam.nanos.logger.ProxyLogger',
   'foam.nanos.logger.LogsView',
   'foam.nanos.menu.Menu',
@@ -241,9 +241,11 @@ var classes = [
 
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.Hashable',
+  'foam.crypto.hash.HashableTest',
 
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
+  'foam.crypto.sign.SignableTest',
 
   'foam.nanos.http.Command',
   'foam.nanos.http.Format',
@@ -259,7 +261,10 @@ var classes = [
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
-  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit'
+  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
+
+  'foam.util.PasswordTest',
+  'foam.test.TestObj',
 ];
 
 var abstractClasses = [
