@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.script',
   name: 'Script',
 
-  implements: [ 'foam.nanos.auth.EnabledAware' ],
+  implements: ['foam.nanos.auth.EnabledAware'],
 
   requires: [
     'foam.nanos.script.ScriptStatus',
@@ -41,12 +41,30 @@ foam.CLASS({
     'id', 'server', 'description', 'lastDuration', 'status', 'run'
   ],
 
-  searchColumns: [],
+  searchColumns: ['id', 'description'],
+
+  constants: [
+    {
+      type: 'int',
+      name: 'MAX_OUTPUT_CHARS',
+      value: 20000,
+    }
+  ],
 
   properties: [
     {
       class: 'String',
-      name: 'id'
+      name: 'id',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '25ch',
+            'min-width': '25ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     {
       class: 'Boolean',
@@ -65,6 +83,16 @@ foam.CLASS({
       name: 'description',
       documentation: 'Description of the script.',
       displayWidth: 80
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '25ch',
+            'min-width': '25ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     {
       class: 'DateTime',
@@ -76,7 +104,17 @@ foam.CLASS({
       class: 'Long',
       name: 'lastDuration',
       documentation: 'Date and time the script took to complete.',
-      visibility: 'RO'
+      visibility: 'RO',
+      tableCellFormatter: function(value) {
+        this.start()
+          .style({
+            'overflow': 'hidden',
+            'max-width': '5ch',
+            'min-width': '5ch',
+            'text-overflow': 'ellipsis'
+          }).add(value)
+        .end();
+      }
     },
     /*
     {
@@ -120,7 +158,22 @@ foam.CLASS({
         class: 'foam.u2.tag.TextArea',
         rows: 12, cols: 80,
         css: { 'font-family': 'monospace' }
+      },
+      preSet: function(_, newVal) {
+        // for client side scripts
+        if ( newVal.length > this.MAX_OUTPUT_CHARS ) {
+          newVal = newVal.substring(0, this.MAX_OUTPUT_CHARS) + '...';
+        }
+        return newVal;
+      },
+      javaSetter: `
+      // for server side scripts
+      if (val.length() > MAX_OUTPUT_CHARS) {
+        val = val.substring(0, MAX_OUTPUT_CHARS) + "...";
       }
+      output_ = val;
+      outputIsSet_ = true;
+      `
     },
     {
       class: 'String',
