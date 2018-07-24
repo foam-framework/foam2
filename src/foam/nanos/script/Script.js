@@ -69,6 +69,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'enabled',
+      documentation: 'Enables script.',
       tableCellFormatter: function(value) {
         this.start()
           .style({ color: value ? 'green' : 'gray' })
@@ -80,6 +81,8 @@ foam.CLASS({
     {
       class: 'String',
       name: 'description',
+      documentation: 'Description of the script.',
+      displayWidth: 80
       tableCellFormatter: function(value) {
         this.start()
           .style({
@@ -94,11 +97,13 @@ foam.CLASS({
     {
       class: 'DateTime',
       name: 'lastRun',
+      documentation: 'Date and time the script ran last.',
       visibility: 'RO'
     },
     {
       class: 'Long',
       name: 'lastDuration',
+      documentation: 'Date and time the script took to complete.',
       visibility: 'RO',
       tableCellFormatter: function(value) {
         this.start()
@@ -124,12 +129,14 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'server',
+      documentation: 'Runs on server side if enabled.',
       value: true
     },
     {
       class: 'foam.core.Enum',
       of: 'foam.nanos.script.ScriptStatus',
       name: 'status',
+      documentation: 'Status of script.',
       visibility: 'RO',
       value: 'UNSCHEDULED',
       javaValue: 'ScriptStatus.UNSCHEDULED'
