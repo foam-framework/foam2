@@ -71,14 +71,6 @@ foam.CLASS({
     },
     {
       name: 'test',
-      code: function(condition, message) {
-        if ( condition ) {
-          this.passed += 1;
-        } else {
-          this.failed += 1;
-        }
-        this.print(( condition ? 'SUCCESS: ' : 'FAILURE: ') + message);
-      },
       args: [
         {
           name: 'exp', javaType: 'boolean'
@@ -114,24 +106,41 @@ foam.CLASS({
     },
     {
       name: 'runScript',
-      code: function(x) {
+      code: function() {
+        var ret;
         var startTime = Date.now();
 
         try {
           this.passed = 0;
           this.failed = 0;
           this.output = '';
-          this.runTest(x);
+          var log = () => {
+            this.output += Array.from(arguments).join('') + '\n';
+          };
+          var test = (condition, message) => {
+            if ( condition ) {
+              this.passed += 1;
+            } else {
+              this.failed += 1;
+            }
+            this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
+                message + '\n';
+          };
+          with ( { log: log, print: log, x: self.__context__, test: test } )
+            ret = Promise.resolve(eval(this.code));
         } catch (err) {
           this.failed += 1;
           this.output += err;
         }
 
-        var endTime = Date.now();
-        var duration = endTime - startTime; // Unit: milliseconds
+        ret.then(() => {
+          var endTime = Date.now();
+          var duration = endTime - startTime; // Unit: milliseconds
+          this.lastRun = new Date();
+          this.lastDuration = duration;
+        });
 
-        this.lastRun = new Date();
-        this.lastDuration = duration;
+        return ret;
       },
       args: [
         {
