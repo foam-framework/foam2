@@ -145,6 +145,13 @@ foam.CLASS({
     },
     {
       name: 'runScript',
+      code: function() {
+        var log = () => {
+          this.output += Array.from(arguments).join('') + '\n';
+        };
+        with ( { log: log, print: log, x: self.__context__ } )
+          return Promise.resolve(eval(this.code));
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'
@@ -220,20 +227,11 @@ foam.CLASS({
               }
           });
         } else {
-          var log = function() {
-            this.output = this.output +
-              Array.prototype.join.call(arguments, '') + '\n';
-          }.bind(this);
-
-          with ( { log: log, print: log, x: self.__context__ } ) {
-            this.status = this.ScriptStatus.RUNNING;
-            this.runScript(x);
-            var self = this;
-            Promise.resolve(ret).then(function() {
-              self.status = self.ScriptStatus.UNSCHEDULED;
-              self.scriptDAO.put(self);
-            });
-          }
+          this.status = this.ScriptStatus.RUNNING;
+          this.runScript().then(() => {
+            this.status = this.ScriptStatus.UNSCHEDULED;
+            this.scriptDAO.put(this);
+          });
         }
       }
     }
