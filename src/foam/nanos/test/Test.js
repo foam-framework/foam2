@@ -26,7 +26,7 @@ foam.CLASS({
     'status', 'run'
   ],
 
-  searchColumns: [ ],
+  searchColumns: ['id', 'description'],
 
   documentation: `
     A scriptable Unit Test.
@@ -58,6 +58,9 @@ foam.CLASS({
     {
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
+      code: function(x) {
+        return eval(this.code);
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'
@@ -100,6 +103,43 @@ foam.CLASS({
     },
     {
       name: 'runScript',
+      code: function() {
+        var ret;
+        var startTime = Date.now();
+
+        try {
+          this.passed = 0;
+          this.failed = 0;
+          this.output = '';
+          var log = function() {
+            this.output += Array.from(arguments).join('') + '\n';
+          }.bind(this);
+          var test = (condition, message) => {
+            if ( condition ) {
+              this.passed += 1;
+            } else {
+              this.failed += 1;
+            }
+            this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
+                message + '\n';
+          };
+          with ( { log: log, print: log, x: self.__context__, test: test } )
+            ret = Promise.resolve(eval(this.code));
+        } catch (err) {
+          this.failed += 1;
+          this.output += err;
+        }
+
+        ret.then(() => {
+          var endTime = Date.now();
+          var duration = endTime - startTime; // Unit: milliseconds
+          this.lastRun = new Date();
+          this.lastDuration = duration;
+          this.scriptDAO.put(this);
+        });
+
+        return ret;
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'

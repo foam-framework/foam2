@@ -191,6 +191,8 @@ var classes = [
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.NullEmailService',
+  'foam.nanos.notification.email.DAOEmailService',
+  'foam.nanos.notification.email.SMTPEmailMessageDAO',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notification',
@@ -241,9 +243,11 @@ var classes = [
 
   'foam.crypto.hash.Hasher',
   'foam.crypto.hash.Hashable',
+  'foam.crypto.hash.HashableTest',
 
   'foam.crypto.sign.Signer',
   'foam.crypto.sign.Signable',
+  'foam.crypto.sign.SignableTest',
 
   'foam.nanos.http.Command',
   'foam.nanos.http.Format',
@@ -259,7 +263,11 @@ var classes = [
   'foam.lib.query.TestModel',
   'foam.lib.query.FooEnum',
   'foam.demos.net.nap.web.model.RegulatoryNotice',
-  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit'
+  'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
+
+  'foam.util.EmailTest',
+  'foam.util.PasswordTest',
+  'foam.test.TestObj',
 ];
 
 var abstractClasses = [

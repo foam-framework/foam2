@@ -142,16 +142,15 @@ public abstract class AbstractFObject
     return property != null && property.isDefaultValue(this);
   }
 
-  public byte[] hash() {
+  public byte[] hash() throws NoSuchAlgorithmException {
     return this.hash(null);
   }
 
-  public byte[] hash(byte[] hash) {
+  public byte[] hash(byte[] hash) throws NoSuchAlgorithmException {
     return this.hash("SHA-256", hash);
   }
 
-  public byte[] hash(String algorithm, byte[] hash) {
-    try {
+  public byte[] hash(String algorithm, byte[] hash) throws NoSuchAlgorithmException {
       MessageDigest md = MessageDigest.getInstance(algorithm);
 
       // update with previous hash
@@ -171,62 +170,48 @@ public abstract class AbstractFObject
       }
 
       return md.digest();
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return null;
-    }
   }
 
-  public byte[] sign(PrivateKey key) {
+  public byte[] sign(PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     return this.sign("SHA256withRSA", key);
   }
 
-  public byte[] sign(String algorithm, PrivateKey key) {
-    try {
-      Signature signer = Signature.getInstance(algorithm);
-      signer.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
+  public byte[] sign(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    Signature signer = Signature.getInstance(algorithm);
+    signer.initSign(key, SecureRandom.getInstance("SHA1PRNG"));
 
-      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-      Iterator i = props.iterator();
-      while ( i.hasNext() ) {
-        PropertyInfo prop = (PropertyInfo) i.next();
-        if ( ! prop.includeInSignature() ) continue;
-        if ( ! prop.isSet(this) ) continue;
-        if ( prop.isDefaultValue(this) ) continue;
-        signer.update(prop.getNameAsByteArray());
-        prop.updateSignature(this, signer);
-      }
-      return signer.sign();
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return null;
+    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( ! prop.includeInSignature() ) continue;
+      if ( ! prop.isSet(this) ) continue;
+      if ( prop.isDefaultValue(this) ) continue;
+      signer.update(prop.getNameAsByteArray());
+      prop.updateSignature(this, signer);
     }
+    return signer.sign();
   }
 
-  public boolean verify(byte[] signature, PublicKey key) {
+  public boolean verify(byte[] signature, PublicKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     return this.verify(signature, "SHA256withRSA", key);
   }
 
-  public boolean verify(byte[] signature, String algorithm, PublicKey key) {
-    try {
-      Signature verifier = Signature.getInstance(algorithm);
-      verifier.initVerify(key);
+  public boolean verify(byte[] signature, String algorithm, PublicKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    Signature verifier = Signature.getInstance(algorithm);
+    verifier.initVerify(key);
 
-      List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
-      Iterator i = props.iterator();
-      while ( i.hasNext() ) {
-        PropertyInfo prop = (PropertyInfo) i.next();
-        if ( ! prop.includeInSignature() ) continue;
-        if ( ! prop.isSet(this) ) continue;
-        if ( prop.isDefaultValue(this) ) continue;
-        verifier.update(prop.getNameAsByteArray());
-        prop.updateSignature(this, verifier);
-      }
-      return verifier.verify(signature);
-    } catch (Throwable t) {
-      t.printStackTrace();
-      return false;
+    List props = getClassInfo().getAxiomsByClass(PropertyInfo.class);
+    Iterator i = props.iterator();
+    while ( i.hasNext() ) {
+      PropertyInfo prop = (PropertyInfo) i.next();
+      if ( ! prop.includeInSignature() ) continue;
+      if ( ! prop.isSet(this) ) continue;
+      if ( prop.isDefaultValue(this) ) continue;
+      verifier.update(prop.getNameAsByteArray());
+      prop.updateSignature(this, verifier);
     }
+    return verifier.verify(signature);
   }
 
   public String toString() {
