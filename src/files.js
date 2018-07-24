@@ -518,5 +518,6 @@ FOAM_FILES([
   { name: "foam/crypto/hash/HashableTest" },
   { name: "foam/crypto/sign/Signer" },
   { name: "foam/crypto/sign/Signable" },
+  { name: "foam/crypto/sign/SignableTest" },
   { name: "foam/test/TestObj" },
 ]);
