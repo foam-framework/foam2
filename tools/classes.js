@@ -263,6 +263,7 @@ var classes = [
   'foam.demos.net.nap.web.model.RegulatoryNotice',
   'foam.demos.net.nap.web.model.RegulatoryNoticeAudit',
 
+  'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.test.TestObj',
 ];
