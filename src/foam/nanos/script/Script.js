@@ -82,7 +82,6 @@ foam.CLASS({
       class: 'String',
       name: 'description',
       documentation: 'Description of the script.',
-      displayWidth: 80
       tableCellFormatter: function(value) {
         this.start()
           .style({
