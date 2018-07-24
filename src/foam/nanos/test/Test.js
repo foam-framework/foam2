@@ -91,9 +91,6 @@ foam.CLASS({
     },
     {
       name: 'print',
-      code: function(message) {
-        this.output += message + '\n';
-      },
       args: [
         {
           name: 'message', javaType: 'String'
