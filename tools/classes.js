@@ -191,6 +191,8 @@ var classes = [
   'foam.nanos.notification.email.SMTPEmailService',
   'foam.nanos.notification.email.ClientEmailService',
   'foam.nanos.notification.email.NullEmailService',
+  'foam.nanos.notification.email.DAOEmailService',
+  'foam.nanos.notification.email.SMTPEmailMessageDAO',
   'foam.nanos.notification.push.PushService',
   'foam.nanos.notification.push.FirebasePushService',
   'foam.nanos.notification.Notification',
