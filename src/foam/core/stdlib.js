@@ -867,11 +867,20 @@ foam.LIB({
       // its own because the args and vars declared above it won't exist so
       // toString is overwritten to output a call to foam.mmethod with the
       // original args.
-      var toString = f.toString.bind(f);
       f.toString = function() {
-        return foam.json.stringify ?
-          `foam.mmethod(${foam.json.stringify(map)}, ${foam.json.stringify(opt_defaultMethod)})` :
-          toString();
+        var mapString = '{';
+        var first = true;
+        for ( var key in map ) {
+          if ( ! first ) mapString += ',';
+          mapString += `"${key}":${map[key].toString()}`;
+          first = false;
+        }
+        mapString += '}';
+
+        var defaultMethodStr = opt_defaultMethod ?
+          opt_defaultMethod.toString() : 'null';
+
+        return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
       };
       return f;
     }
