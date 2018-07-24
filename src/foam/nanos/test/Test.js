@@ -135,6 +135,7 @@ foam.CLASS({
           var duration = endTime - startTime; // Unit: milliseconds
           this.lastRun = new Date();
           this.lastDuration = duration;
+          this.scriptDAO.put(this);
         });
 
         return ret;
