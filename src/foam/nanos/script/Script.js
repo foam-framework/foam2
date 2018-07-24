@@ -227,7 +227,7 @@ foam.CLASS({
 
           with ( { log: log, print: log, x: self.__context__ } ) {
             this.status = this.ScriptStatus.RUNNING;
-            var ret = eval(this.code);
+            this.runScript(x);
             var self = this;
             Promise.resolve(ret).then(function() {
               self.status = self.ScriptStatus.UNSCHEDULED;
