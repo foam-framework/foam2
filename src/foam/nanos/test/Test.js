@@ -26,7 +26,7 @@ foam.CLASS({
     'status', 'run'
   ],
 
-  searchColumns: [ ],
+  searchColumns: ['id', 'description'],
 
   documentation: `
     A scriptable Unit Test.
