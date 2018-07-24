@@ -58,6 +58,9 @@ foam.CLASS({
     {
       /** Template method used to add additional code in subclasses. */
       name: 'runTest',
+      code: function(x) {
+        return eval(this.code);
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'
@@ -68,6 +71,14 @@ foam.CLASS({
     },
     {
       name: 'test',
+      code: function(condition, message) {
+        if ( condition ) {
+          this.passed += 1;
+        } else {
+          this.failed += 1;
+        }
+        this.print(( condition ? 'SUCCESS: ' : 'FAILURE: ') + message);
+      },
       args: [
         {
           name: 'exp', javaType: 'boolean'
@@ -88,6 +99,9 @@ foam.CLASS({
     },
     {
       name: 'print',
+      code: function(message) {
+        this.output += message + '\n';
+      },
       args: [
         {
           name: 'message', javaType: 'String'
@@ -100,6 +114,24 @@ foam.CLASS({
     },
     {
       name: 'runScript',
+      code: function(x) {
+        var startTime = Date.now();
+
+        try {
+          this.passed = 0;
+          this.failed = 0;
+          this.output = '';
+          this.runTest(x);
+        } catch (err) {
+          this.failed = 1;
+        }
+
+        var endTime = Date.now();
+        var duration = endTime - startTime; // Unit: milliseconds
+
+        this.lastRun = new Date();
+        this.lastDuration = duration;
+      },
       args: [
         {
           name: 'x', javaType: 'foam.core.X'
