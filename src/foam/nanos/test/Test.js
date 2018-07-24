@@ -111,9 +111,9 @@ foam.CLASS({
           this.passed = 0;
           this.failed = 0;
           this.output = '';
-          var log = () => {
+          var log = function() {
             this.output += Array.from(arguments).join('') + '\n';
-          };
+          }.bind(this);
           var test = (condition, message) => {
             if ( condition ) {
               this.passed += 1;
