@@ -123,7 +123,7 @@ foam.CLASS({
             this.output += ( condition ? 'SUCCESS: ' : 'FAILURE: ' ) +
                 message + '\n';
           };
-          with ( { log: log, print: log, x: self.__context__, test: test } )
+          with ( { log: log, print: log, x: this.__context__, test: test } )
             ret = Promise.resolve(eval(this.code));
         } catch (err) {
           this.failed += 1;
