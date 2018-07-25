@@ -837,7 +837,7 @@ foam.LIB({
       var uid = '__mmethod__' + foam.next$UID() + '__';
 
       var first = true;
-      return function(arg1) {
+      var f = function(arg1) {
         if ( first ) {
           for ( var key in map ) {
             var type = key === 'FObject' ?
@@ -863,6 +863,26 @@ foam.LIB({
         }
         return ( type[uid] || opt_defaultMethod ).apply(this, arguments);
       };
+      // The native toString on the function that's returned will never work on
+      // its own because the args and vars declared above it won't exist so
+      // toString is overwritten to output a call to foam.mmethod with the
+      // original args.
+      f.toString = function() {
+        var mapString = '{';
+        var first = true;
+        for ( var key in map ) {
+          if ( ! first ) mapString += ',';
+          mapString += `"${key}":${map[key].toString()}`;
+          first = false;
+        }
+        mapString += '}';
+
+        var defaultMethodStr = opt_defaultMethod ?
+          opt_defaultMethod.toString() : 'null';
+
+        return `foam.mmethod(${mapString}, ${defaultMethodStr})`;
+      };
+      return f;
     }
   ]
 });
