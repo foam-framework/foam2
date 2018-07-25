@@ -139,6 +139,18 @@ foam.LIB({
             ],
             body: 'return nameAxiomMap_[name]',
           }),
+          foam.swift.Method.create({
+            name: 'instanceOf',
+            returnType: 'Bool',
+            args: [
+              foam.swift.Argument.create({
+                externalName: '_',
+                localName: 'o',
+                type: 'Any?',
+              }),
+            ],
+            body: `return o is ${this.model_.swiftName}`,
+          }),
         ],
       });
       if (multiton) {

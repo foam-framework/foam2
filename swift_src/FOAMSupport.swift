@@ -173,6 +173,7 @@ public protocol ClassInfo {
   var axioms: [Axiom] { get }
   func axiom(byName name: String) -> Axiom?
   func create(args: [String:Any?], x: Context) -> Any
+  func instanceOf(_ o: Any?) -> Bool
 }
 
 extension ClassInfo {
