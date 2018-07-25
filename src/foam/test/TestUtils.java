@@ -92,6 +92,11 @@ public class TestUtils {
       returnedMessage = t.getMessage();
       if ( ! wasCorrectExceptionType ) t.printStackTrace();
     }
+    if ( ! returnedMessage.equals(expectedExceptionMessage) ) {
+      System.out.println("Error message was not correct.");
+      System.out.println("EXPECTED: \"" + expectedExceptionMessage + "\"");
+      System.out.println("ACTUAL  : \"" + returnedMessage + "\"");
+    }
     return wasCorrectExceptionType && threw && returnedMessage.equals(expectedExceptionMessage);
   }
 }
