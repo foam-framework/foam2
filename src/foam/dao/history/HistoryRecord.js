@@ -18,7 +18,8 @@ foam.CLASS({
     },
     {
       class: 'Object',
-      name: 'objectId'
+      name: 'objectId',
+      documentation: 'Id of object related to history record.'
     },
     {
       class: 'String',
@@ -26,12 +27,14 @@ foam.CLASS({
     },
     {
       class: 'DateTime',
-      name: 'timestamp'
+      name: 'timestamp',
+      documentation: 'Date and time history record was created.'
     },
     {
       class: 'FObjectArray',
       of: 'foam.dao.history.PropertyUpdate',
-      name: 'updates'
+      name: 'updates',
+      documentation: 'Properties updated, contains new and old values.'
     }
   ]
 });

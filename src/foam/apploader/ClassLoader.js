@@ -27,6 +27,14 @@ have multiple classloaders running alongside eachother`
     'foam.core.Script',
     'foam.dao.Relationship',
     'foam.apploader.SubClassLoader',
+    {
+      path: 'foam.apploader.WebModelFileDAO',
+      flags: ['web'],
+    },
+    {
+      path: 'foam.apploader.NodeModelFileDAO',
+      flags: ['node'],
+    },
   ],
   properties: [
     {
@@ -46,9 +54,7 @@ have multiple classloaders running alongside eachother`
     {
       name: 'addClassPath',
       code: function(path, json2) {
-        var cls = foam.lookup(foam.isServer ?
-            'foam.apploader.NodeModelFileDAO' :
-            'foam.apploader.WebModelFileDAO');
+        var cls = this[foam.isServer ? 'NodeModelFileDAO' : 'WebModelFileDAO'];
         var modelDAO = cls.create({root: path, json2: json2}, this);
 
         if ( this.modelDAO ) {
