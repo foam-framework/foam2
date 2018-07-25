@@ -149,6 +149,9 @@ foam.CLASS({
 
 foam.CLASS({
   refines: 'foam.core.Model',
+  requires: [
+    'foam.core.MultiPartID',
+  ],
   properties: [
     {
       name: 'ids',

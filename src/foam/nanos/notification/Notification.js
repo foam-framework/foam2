@@ -8,7 +8,7 @@ foam.CLASS({
   package: 'foam.nanos.notification',
   name: 'Notification',
 
-  documentation: 'Notification model',
+  documentation: 'Notification model responsible for system and integrated messaging notifications.',
 
   javaImports: [
     'java.util.Date'
@@ -20,6 +20,7 @@ foam.CLASS({
     {
       class: 'Boolean',
       name: 'read',
+      documentation: 'Determines if notification has been read.',
       visibility: foam.u2.Visibility.RO
     },
     {
@@ -35,6 +36,7 @@ foam.CLASS({
       class: 'String',
       name: 'notificationType',
       label: 'Notification type',
+      documentation: 'Type of notification.',
       value: 'General'
     },
     {
@@ -42,11 +44,13 @@ foam.CLASS({
       name: 'issuedDate',
       factory: function() { return new Date(); },
       label: 'Notification Date',
+      documentation: 'Date notification was created.',
       visibility: foam.u2.Visibility.RO
     },
     {
       class: 'Date',
       name: 'expiryDate',
+      documentation: 'Expiration date of notification.',
       factory: function() {
         // 90 days since creation date
         return new Date(Date.now() + (90 * 24 * 60 * 60 * 1000));
@@ -59,25 +63,28 @@ foam.CLASS({
     },
     {
       class: 'Boolean',
-      name: 'broadcasted'
+      name: 'broadcasted',
+      documentation: 'Determines if notification is sent to all users in a group or system.'
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.User',
       name: 'userId',
+      documentation: 'User notification will be sent to.',
       view: { class: 'foam.u2.view.ReferenceView', placeholder: 'select user' }
     },
     {
       class: 'Reference',
       of: 'foam.nanos.auth.Group',
       name: 'groupId',
+      documentation: 'Group notification will be sent to.',
       view: { class: 'foam.u2.view.ReferenceView', placeholder: 'select group' }
     },
     {
       class: 'Map',
       name: 'emailArgs',
       visibility: foam.u2.Visibility.HIDDEN,
-      documentation: 'Arguments for email template',
+      documentation: 'Arguments for email template.',
       javaFactory: 'return new java.util.HashMap<String, Object>();'
     },
     {
@@ -85,23 +92,27 @@ foam.CLASS({
       name: 'emailName',
       label: 'Email template name',
       value: 'notification',
-      documentation: 'Email template name'
+      documentation: 'Email template name.'
     },
     {
       class: 'Boolean',
-      name: 'emailIsEnabled'
+      name: 'emailIsEnabled',
+      documentation: 'Determines an email is sent to user.'
     },
     {
       class: 'Boolean',
-      name: 'sendSlackMessage'
+      name: 'sendSlackMessage',
+      documentation: 'Sends notification as a Slack message.'
     },
     {
       class: 'String',
-      name: 'slackWebhook'
+      name: 'slackWebhook',
+      documentation: 'Webhook associated to Slack.'
     },
     {
       class: 'String',
-      name: 'slackMessage'
+      name: 'slackMessage',
+      documentation: 'Message to be sent to Slack if sendSlackMessage is enabled.'
     }
   ]
 });
