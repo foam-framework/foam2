@@ -360,7 +360,7 @@ foam.CLASS({
       name: 'id'
     },
     {
-      class: 'IdentifiedBlob',
+      class: 'NOPBlob',
       name: 'delegate',
       transient: true,
       factory: function() {
@@ -401,8 +401,9 @@ foam.CLASS({
 
 foam.CLASS({
   package: 'foam.core',
-  name: 'IdentifiedBlob',
+  name: 'NOPBlob',
   extends: 'foam.core.Blob',
+  documentation: 'Blob property with clone, diff, and compare disabled',
 
   properties: [
     [ 'cloneProperty', function () {} ],
