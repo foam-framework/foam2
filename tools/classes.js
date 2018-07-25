@@ -268,6 +268,7 @@ var classes = [
   'foam.util.EmailTest',
   'foam.util.PasswordTest',
   'foam.test.TestObj',
+  'foam.core.FObjectTest',
 ];
 
 var abstractClasses = [
