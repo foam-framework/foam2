@@ -82,7 +82,7 @@ public class TestUtils {
       Class exceptionType
   ) {
     boolean wasCorrectExceptionType = false;
-    boolean threw = true;
+    boolean threw = false;
     String returnedMessage = "";
     try {
       fn.run();
