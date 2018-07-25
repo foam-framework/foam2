@@ -156,7 +156,9 @@ userResult = (User) userResult.fclone();
 userResult.setPasswordLastModified(Calendar.getInstance().getTime());
 userResult.setPreviousPassword(userResult.getPassword());
 userResult.setPassword(Password.hash(newPassword));
+userResult.setPasswordExpiry(null);
 userDAO.put(userResult);
+
 EmailService email = (EmailService) getEmail();
 EmailMessage message = new EmailMessage();
 message.setTo(new String[] { userResult.getEmail() });
