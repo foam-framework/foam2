@@ -25,6 +25,9 @@ foam.CLASS({
     'propName',
     'propShortName',
     'propAliases',
+    'compare',
+    'comparePropertyToObject',
+    'comparePropertyToValue',
     {
       name: 'getAliasesBody',
       expression: function() {
@@ -141,21 +144,21 @@ foam.CLASS({
             type: 'int',
             visibility: 'public',
             args: [ { name: 'o1', type: 'Object' }, { name: 'o2', type: 'Object' } ],
-            body: 'return foam.util.SafetyUtil.compare(get_(o1), get_(o2));'
+            body: this.compare,
           },
           {
             name: 'comparePropertyToObject',
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'o', type: 'Object' } ],
-            body: 'return foam.util.SafetyUtil.compare(cast(key), get_(o));'
+            body: this.comparePropertyToObject, 
           },
           {
             name: 'comparePropertyToValue',
             type: 'int',
             visibility: 'public',
             args: [ { name: 'key', type: 'Object' }, { name: 'value', type: 'Object' } ],
-            body: 'return foam.util.SafetyUtil.compare(cast(key), cast(value));'
+            body: this.comparePropertyToValue, 
           },
           {
             name: 'jsonParser',
