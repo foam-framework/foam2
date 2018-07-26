@@ -24,6 +24,9 @@ foam.CLASS({
     ^ table > tbody:nth-child(odd) {
       background: #f6f9f9;
     }
+    ^ .foam-u2-md-CheckBox:hover {
+      background: #FFCCCC;
+    }
   `,
 
   properties: [
@@ -92,9 +95,20 @@ foam.CLASS({
                           .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
                               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
                               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
+                              //cb.data$.sub(function() { self.updateInheritedPermissions(p, g, self); });
                               this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
                                     .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                      if ( g.implies(p.id) ) { cb.style({'border-color': '#40C75B'}) };
+                                      self.groupDAO.find(g.parent).then(function(a){
+                                        if ( a != undefined && a.implies(p.id) ) {
+                                          cb.setAttribute('title', g.parent + ': ' + p.id); //'Permission inherited from ' + g.parent
+                                          cb.style({'border-color': '#40C75B'})
+                                        }
+                                      });
+
+                                      if ( g.implies(p.id) ) {
+                                        cb.setAttribute('title', g.id + ': ' + p.id);  //'Permissions granted from ' + g.id
+                                        cb.style({'border-color': '#40C75B'});
+                                      }
                                     }).end()
                           })
                       .end()
@@ -116,17 +130,35 @@ foam.CLASS({
 
     function updateGroup(permission, group, data) {
       var dao = this.groupDAO;
+      var e = foam.mlang.Expressions.create();
+
       dao.find(group).then(function(group) {
         // Remove permission if found
         var permissions = group.permissions.filter(function(p) {
           return p.id != permission.id;
         });
 
+        //parents' permissions
+        dao.find(group.parent).then(function(groupParent) {
+        if ( groupParent != undefined ) {
+            permissions += groupParent.permissions.filter(function(gp) {
+              return gp.id == permission.id;
+            })
+        }
+        });
+
         // Add if requested
         if ( data ) permissions.push(permission);
 
-        group.permissions = permissions;
+        group.permissions = Array.from(permissions);
+        //group.parent.permissions = Array.from(permissions);
         dao.put(group);
+        //dao.put(group.parent);
+
+        dao.where(e.EQ(this.Group.PARENT, group.id)).select().then(function (a) {
+          a.permissions = Array.from(permissions);
+          dao.put(a);
+        });
       });
     }
   ]
