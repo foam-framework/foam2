@@ -33,6 +33,7 @@ FOAM_FILES([
   { name: "foam/core/FObject" },
   { name: "foam/core/Model" },
   { name: "foam/core/Property" },
+  { name: "foam/core/Simple" },
   { name: "foam/core/Method" },
   { name: "foam/core/Boolean" },
   { name: "foam/core/AxiomArray" },
