@@ -205,7 +205,9 @@ return v1.hash ?? 0 > v2.hash ?? 0 ? 1 : -1
         return;
       }
 
-      var isOverride = !!parentCls.getSuperAxiomByName(this.name);
+      // We don't use getSuperAxiomByName here because that will pull in axioms
+      // from implements and those aren't overrides in swift.
+      var isOverride = !!parentCls.getSuperClass().getAxiomByName(this.name);
       cls.fields.push(this.Field.create({
         visibility: 'public',
         override: isOverride,
