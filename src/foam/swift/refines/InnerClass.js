@@ -12,7 +12,8 @@ foam.CLASS({
     'foam.swift.Argument',
   ],
   methods: [
-    function writeToSwiftClass(cls) {
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
       if ( !this.model.generateSwift ) return;
       var innerClass = this.model.buildClass();
       var innerSwiftClass = innerClass.toSwiftClass();
