@@ -84,7 +84,7 @@ foam.CLASS({
                     .start('tr').style({'background': '#D4E3EB'})
                       .tag('td').style({'text-align': 'left', 'width': '480', 'height': '35'})
                       .select(this.groupDAO.orderBy(this.Group.ID), function(g) {
-                        this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
+                        this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data;} ))
                           .addClass(g.id).start().style({'text-align': 'center', 'width': '100'}).add(g.id).end().end();
                       }).end()
                     .end()
@@ -95,17 +95,17 @@ foam.CLASS({
                           .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
                               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
                               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-                              this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
+                              this.start('td').show(groups[g.id].data$.map(function() { return groups[g.id].data; }))
                                     .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
-                                      self.groupDAO.find(g.parent).then(function(a){
+                                      self.groupDAO.find(g.parent).then(function(a) {
                                         if ( a != undefined && a.implies(p.id) ) {
-                                          cb.setAttribute('title', g.parent + ': ' + p.id); //'Permission inherited from ' + g.parent
+                                          cb.setAttribute('title', g.parent + ': ' + p.id);
                                           cb.style({'border-color': '#40C75B'})
                                         }
                                       });
 
                                       if ( g.implies(p.id) ) {
-                                        cb.setAttribute('title', g.id + ': ' + p.id);  //'Permissions granted from ' + g.id
+                                        cb.setAttribute('title', g.id + ': ' + p.id);
                                         cb.style({'border-color': '#40C75B'});
                                       }
                                     }).end()
@@ -150,6 +150,7 @@ foam.CLASS({
         if ( data ) permissions.push(permission);
 
         group.permissions = Array.from(permissions);
+        //group.parent.permissions = Array.from(permissions);
         dao.put(group);
 
         dao.where(e.EQ(this.Group.PARENT, group.id)).select().then(function (a) {
