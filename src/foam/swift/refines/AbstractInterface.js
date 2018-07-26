@@ -11,10 +11,9 @@ foam.CLASS({
     {
       installInClass: function(cls) {
         cls.toSwiftClass =  function() {
-          if ( this.model_.swiftName == 'foam_mlang_Expr' ) debugger;
           var cls = foam.lookup('foam.swift.Protocol').create({
             name: this.model_.swiftName,
-            implements: this.model_.swiftImplementsCode_
+            implements: this.model_.swiftAllImplements
           });
 
           var axioms = this.getAxioms();
