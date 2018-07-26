@@ -18,8 +18,9 @@ foam.CLASS({
     }
   ],
   methods: [
-    function writeToSwiftClass(cls) {
-      if ( !this.swiftSupport ) return;
+    function writeToSwiftClass(cls, parentCls) {
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      if ( ! this.swiftSupport ) return;
       cls.method(this.ProtocolMethod.create({
         name: this.swiftName,
         returnType: this.swiftReturns,

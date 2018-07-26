@@ -575,11 +575,11 @@ foam.CLASS({
       this.
         addClass(this.myClass()).
         tag(this.PATH, {displayWidth: 80}).
-          start('span').
-            style({'margin-left': '12px', 'font-size':'small'}).
-            add('  Show Inherited Axioms: ').
-          end().
-          tag(this.SHOW_INHERITED, {data$: this.showInherited$}).
+        start('span').
+          style({'margin-left': '12px', 'font-size':'small'}).
+          add('  Show Inherited Axioms: ').
+        end().
+        tag(this.SHOW_INHERITED, {data$: this.showInherited$}).
         br().br().
         start('table').
           start('tr').
@@ -591,59 +591,56 @@ foam.CLASS({
                   return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length;
                 })
               }).
-              add( 'Conventional UML : ' ).tag( this.CONVENTIONAL_UML, { data$: this.conventionalUML$ } ).
-              add(this.slot(function(selectedClass, conventionalUML) {
-                if (!selectedClass) return '';
-                return this.UMLDiagram.create({
-                  data: selectedClass
-                });
-              })).
+                add( 'Conventional UML : ' ).tag( this.CONVENTIONAL_UML, { data$: this.conventionalUML$ } ).
+                add(this.slot(function(selectedClass, conventionalUML) {
+                  if (!selectedClass) return '';
+                  return this.UMLDiagram.create({
+                    data: selectedClass
+                  });
+                })).
               end().
-              end().
-              start('td').
-                style({'vertical-align': 'top'}).
+            end().
+            start('td').
+              style({'vertical-align': 'top'}).
               tag(this.ClassList, {title: 'Class List', showPackages: false, showSummary: true, data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
-          start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
-          add( 'Show just properties : ' ).tag( this.SHOW_ONLY_PROPERTIES, { data$: this.showOnlyProperties$ } ).
-              add(this.slot(function(selectedClass) {
-                if ( ! selectedClass ) return '';
+              start(this.DocBorder, {title: 'Class Definition', info$: this.slot(function(selectedClass) { return selectedClass.getOwnAxioms().length + ' / ' + selectedClass.getAxioms().length; })}).
+                add( 'Show just properties : ' ).
+                tag( this.SHOW_ONLY_PROPERTIES, { data$: this.showOnlyProperties$ } ).
+                add(this.slot(function(selectedClass) {
+                  if ( ! selectedClass ) return '';
                   return this.ClassDocView.create({data: selectedClass});
                 })).
               end().
-              start(this.DocBorder, {title: 'Enum values'}).
-              add(this.slot(function(selectedClass) {
-                if ( ! selectedClass ) return '';
-                  return this.ClassDocViewEnumValue.create({data: selectedClass});
-                })).
-              end().
-              start('td').
-              style({
-                'vertical-align': 'top'
-              }).
-              end().
-              tag(this.ClassList, {
-                title: 'Class List',
-                showPackages: false,
-                showSummary: true,
-                data: Object.values(foam.USED).sort(this.MODEL_COMPARATOR)
-              }).
-              end().
-              start('td').
-              style({'vertical-align': 'top'}).
-              tag(this.ClassList, {title: 'Sub-Classes', data$: this.subClasses$}).
-              br().
-              tag(this.ClassList, {title: 'Required-By', data$: this.requiredByClasses$}).
-              br().
-              tag(this.ClassList, {title: 'Relationships', data$: this.relationshipClasses$}).
             end().
             start('td').
               style({'vertical-align': 'top'}).
               start(this.DocBorder, {title: 'Axiom Definition'}).
                 add(this.slot(function (axiom) { return axiom && foam.u2.DetailView.create({data: axiom.axiom}); })).
               end().
+            end().
+            start('td').
+              style({'vertical-align': 'top'}).
+              start(this.DocBorder, {title: 'Enum values'}).
+                add(this.slot(function(selectedClass) {
+                  if ( ! selectedClass ) return '';
+                  return this.ClassDocViewEnumValue.create({data: selectedClass});
+                  })).
+              end().
+            end().
+            start('td').
+              style({'vertical-align': 'top'}).
+              tag(this.ClassList, {title: 'Sub-Classes', data$: this.subClasses$}).
+            end().
+            start('td').
+              style({'vertical-align': 'top'}).
+              tag(this.ClassList, {title: 'Required-By', data$: this.requiredByClasses$}).
+            end().
+            start('td').
+              style({'vertical-align': 'top'}).
+              tag(this.ClassList, {title: 'Relationships', data$: this.relationshipClasses$}).
             end().
           end().
         end();

@@ -49,7 +49,8 @@ foam.CLASS({
   ],
   methods: [
     function writeToSwiftClass(cls, parentCls) {
-      if ( !this.swiftCode ) return;
+      if ( ! parentCls.hasOwnAxiom(this.name) ) return;
+      if ( ! this.swiftCode ) return;
       cls.fields.push(this.Field.create({
         lazy: true,
         name: this.swiftSlotName,

@@ -27,28 +27,31 @@ foam.CLASS({
     {
       name: 'put_',
       javaCode: `
-User user = (User) obj;
-boolean newUser = ( getDelegate().find(user.getId()) == null );
+  User user = (User) obj;
+  boolean newUser = ( getDelegate().find(user.getId()) == null );
 
-if ( newUser ) {
-  if ( SafetyUtil.isEmpty(user.getEmail()) ) {
-    throw new RuntimeException("Email required");
-  }
+  if ( newUser ) {
+    if ( SafetyUtil.isEmpty(user.getEmail()) ) {
+      throw new RuntimeException("Email required");
+    }
 
-  if ( ! Email.isValid(user.getEmail()) ) {
-    throw new RuntimeException("Invalid Email");
+    if ( ! Email.isValid(user.getEmail()) ) {
+      throw new RuntimeException("Invalid Email");
+    }
   }
 
   Count count = new Count();
   count = (Count) ((DAO) getX().get("localUserDAO"))
-      .where(MLang.EQ(User.EMAIL, user.getEmail()))
-      .limit(1).select(count);
+      .where(MLang.AND(
+        MLang.EQ(User.EMAIL, user.getEmail()),
+        MLang.NEQ(User.ID,  user.getId())
+      )).limit(1).select(count);
+
   if ( count.getValue() == 1 ) {
     throw new RuntimeException("User with same email address already exists: " + user.getEmail());
   }
-}
 
-return super.put_(x, obj);
+  return super.put_(x, obj);
       `,
    }
   ],
