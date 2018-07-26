@@ -29,9 +29,6 @@ foam.LIB({
         code: this.model_.swiftCode,
       });
 
-      var singleton = this.getAxiomsByClass(foam.pattern.Singleton)
-      singleton = singleton.length ? singleton[0] : null;
-
       var classInfo = foam.swift.SwiftClass.create({
         visibility: 'private',
         name: 'ClassInfo_',
@@ -106,7 +103,7 @@ foam.LIB({
                 type: 'Context',
               }),
             ],
-            body: templates.classInfoCreate(this.model_.swiftName, singleton, this),
+            body: `return ${this.model_.swiftName}(args, x)`,
           }),
           foam.swift.Method.create({
             name: 'axiom',
@@ -134,13 +131,6 @@ foam.LIB({
           }),
         ],
       });
-      if (singleton) {
-        classInfo.fields.push(foam.swift.Field.create({
-          visibility: 'private',
-          type: foam.core.FObject.model_.swiftName + '?',
-          name: 'instance',
-        }));
-      }
       cls.classes.push(classInfo);
       cls.fields.push(foam.swift.Field.create({
         static: true,
@@ -213,20 +203,6 @@ args["<%=p.exportName%>"] = <%if (p.key) {%><%=p.exportName%>$<%}else{%>__contex
 <% } %>
 return args
       */},
-    },
-    {
-      name: 'classInfoCreate',
-      args: ['swiftName', 'singleton', 'cls'],
-      template: function() {/*
-<% if ( singleton ){ %>
-if instance == nil {
-  instance = <%=swiftName%>(args, x)
-}
-return instance!
-<% } else { %>
-return <%=swiftName%>(args, x)
-<% } %>
-      */}
     },
     {
       name: 'axiomsInitializer',
