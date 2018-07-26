@@ -95,7 +95,6 @@ foam.CLASS({
                           .select(self.groupDAO.orderBy(self.Group.ID), function(g) {
                               var cb = foam.u2.md.CheckBox.create({data: self.checkPermissionForGroup(p.id, g)});
                               cb.data$.sub(function() { self.updateGroup(p, g, cb.data); });
-                              //cb.data$.sub(function() { self.updateInheritedPermissions(p, g, self); });
                               this.start('td').show(groups[g.id].data$.map(function() {return groups[g.id].data;}))
                                     .style({'text-align': 'center', 'width': '100'}).tag(cb).call(function() {
                                       self.groupDAO.find(g.parent).then(function(a){
@@ -151,9 +150,7 @@ foam.CLASS({
         if ( data ) permissions.push(permission);
 
         group.permissions = Array.from(permissions);
-        //group.parent.permissions = Array.from(permissions);
         dao.put(group);
-        //dao.put(group.parent);
 
         dao.where(e.EQ(this.Group.PARENT, group.id)).select().then(function (a) {
           a.permissions = Array.from(permissions);
